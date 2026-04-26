@@ -33,6 +33,14 @@ import {
 } from "./sidecar/protocol";
 import { COLLAB_DIR } from "./paths";
 import { resolveTerminalTarget } from "./terminal-target";
+import {
+  applyFilter,
+  extractBatonPayloads,
+  resetFrameBuffer,
+  type StringFilterMode,
+} from "./string-filter";
+
+export type { StringFilterMode };
 
 interface PtySession {
   pty: pty.IPty;
@@ -61,6 +69,479 @@ const pendingPtyDataTimers = new Map<
   ReturnType<typeof setTimeout>
 >();
 const WINDOWS_POWERSHELL_PTY_BATCH_MS = 16;
+
+// String link registry (terminal-to-terminal piping)
+
+export type StringLinkMode = "generic" | "baton";
+export type StringDeliveryState =
+  | "idle"
+  | "delivered"
+  | "duplicate-suppressed"
+  | "error";
+
+interface ActiveStringLink {
+  id: string;
+  sourceSessionId: string;
+  targetSessionId: string;
+  filter: StringFilterMode;
+  mode: StringLinkMode;
+  active: boolean;
+  triggerPattern?: string;
+  triggered: boolean;
+  deliveryState: StringDeliveryState;
+  lastPayload: string | null;
+  lastForwardedAt: number | null;
+  duplicateSuppressions: number;
+  lastError: string | null;
+}
+
+type StringActivityEntry = { ts: number; bytes: number };
+
+export type StringLinkRuntimeSnapshot = {
+  id: string;
+  sourceSessionId: string;
+  targetSessionId: string;
+  filter: StringFilterMode;
+  mode: StringLinkMode;
+  active: boolean;
+  triggerPattern?: string;
+  triggered: boolean;
+  deliveryState: StringDeliveryState;
+  lastPayload: string | null;
+  lastForwardedAt: number | null;
+  duplicateSuppressions: number;
+  lastError: string | null;
+};
+
+export type StringActivitySummary = {
+  events: number;
+  totalBytes: number;
+  mode: StringLinkMode;
+  deliveryState: StringDeliveryState;
+  lastPayload: string | null;
+  lastForwardedAt: number | null;
+  duplicateSuppressions: number;
+  lastError: string | null;
+};
+
+export type StringDataFlowPayload = {
+  stringId: string;
+  bytes: number;
+  mode: StringLinkMode;
+  deliveryState: StringDeliveryState;
+  lastPayload: string | null;
+  lastForwardedAt: number | null;
+  duplicateSuppressions: number;
+  lastError: string | null;
+};
+
+const activeStringLinks: ActiveStringLink[] = [];
+
+/** Ring buffer per string for activity tracking. */
+const stringActivity = new Map<string, StringActivityEntry[]>();
+const ACTIVITY_RING_SIZE = 50;
+
+const GENERIC_STRING_FORWARD_DEDUPE_MS = 100;
+const DEFAULT_BATON_DUPLICATE_TTL_MS = 4000;
+let batonDuplicateTtlMs = DEFAULT_BATON_DUPLICATE_TTL_MS;
+
+const lastForwardedByLinkId = new Map<
+  string,
+  { payload: string; at: number }
+>();
+
+type StringTargetWriter = (sessionId: string, data: string) => boolean;
+
+let stringTargetWriter: StringTargetWriter = writeToSession;
+
+function enforceStringFilter(
+  mode: StringLinkMode,
+  filter: StringFilterMode,
+): StringFilterMode {
+  return mode === "baton" ? "framed" : filter;
+}
+
+function normalizeForStringDedupe(s: string): string {
+  return s.replace(/[\r\n]+$/g, "").trim();
+}
+
+function buildStringSnapshot(
+  link: ActiveStringLink,
+): StringLinkRuntimeSnapshot {
+  return {
+    id: link.id,
+    sourceSessionId: link.sourceSessionId,
+    targetSessionId: link.targetSessionId,
+    filter: link.filter,
+    mode: link.mode,
+    active: link.active,
+    triggerPattern: link.triggerPattern,
+    triggered: link.triggered,
+    deliveryState: link.deliveryState,
+    lastPayload: link.lastPayload,
+    lastForwardedAt: link.lastForwardedAt,
+    duplicateSuppressions: link.duplicateSuppressions,
+    lastError: link.lastError,
+  };
+}
+
+function buildStringDataFlowPayload(
+  link: ActiveStringLink,
+  bytes: number,
+): StringDataFlowPayload {
+  return {
+    stringId: link.id,
+    bytes,
+    mode: link.mode,
+    deliveryState: link.deliveryState,
+    lastPayload: link.lastPayload,
+    lastForwardedAt: link.lastForwardedAt,
+    duplicateSuppressions: link.duplicateSuppressions,
+    lastError: link.lastError,
+  };
+}
+
+function emitStringDataFlow(link: ActiveStringLink, bytes: number): void {
+  sendToMainWindow("string:data-flow", buildStringDataFlowPayload(link, bytes));
+}
+
+function dedupeWindowMsForLink(link: ActiveStringLink): number {
+  return link.mode === "baton"
+    ? batonDuplicateTtlMs
+    : GENERIC_STRING_FORWARD_DEDUPE_MS;
+}
+
+function shouldSkipDuplicateStringForward(
+  link: ActiveStringLink,
+  filtered: string,
+): boolean {
+  const windowMs = dedupeWindowMsForLink(link);
+  if (windowMs <= 0) return false;
+
+  const now = Date.now();
+  const key = normalizeForStringDedupe(filtered);
+  const prev = lastForwardedByLinkId.get(link.id);
+  if (
+    prev
+    && normalizeForStringDedupe(prev.payload) === key
+    && now - prev.at < windowMs
+  ) {
+    return true;
+  }
+  lastForwardedByLinkId.set(link.id, { payload: filtered, at: now });
+  return false;
+}
+
+function resetStringLinkRuntime(link: ActiveStringLink): void {
+  resetFrameBuffer(link.id);
+  lastForwardedByLinkId.delete(link.id);
+  link.deliveryState = "idle";
+  link.lastPayload = null;
+  link.lastForwardedAt = null;
+  link.duplicateSuppressions = 0;
+  link.lastError = null;
+}
+
+export type StringLinkUpsertPayload = {
+  id: string;
+  sourceSessionId: string;
+  targetSessionId: string;
+  filter: StringFilterMode;
+  mode?: StringLinkMode;
+  active: boolean;
+  triggerPattern?: string;
+  /** When set, restores gate state from shell (e.g. after reload). Omit to derive from triggerPattern. */
+  triggered?: boolean;
+};
+
+/**
+ * Insert or replace a string link in the main-process registry (used by PTY
+ * output forwarding). Shell is the source of truth and calls this after
+ * canvas mutations and on restore.
+ */
+export function upsertStringLink(link: StringLinkUpsertPayload): void {
+  const mode = link.mode === "baton" ? "baton" : "generic";
+  const filter = enforceStringFilter(mode, link.filter);
+  const hasNonEmptyTrigger =
+    link.triggerPattern !== undefined && link.triggerPattern !== "";
+  const triggered =
+    link.triggered !== undefined
+      ? Boolean(link.triggered)
+      : !hasNonEmptyTrigger;
+  const entry: ActiveStringLink = {
+    id: link.id,
+    sourceSessionId: link.sourceSessionId,
+    targetSessionId: link.targetSessionId,
+    filter,
+    mode,
+    active: link.active,
+    triggered,
+    deliveryState: "idle",
+    lastPayload: null,
+    lastForwardedAt: null,
+    duplicateSuppressions: 0,
+    lastError: null,
+    ...(hasNonEmptyTrigger ? { triggerPattern: link.triggerPattern } : {}),
+  };
+  const idx = activeStringLinks.findIndex((l) => l.id === link.id);
+  if (idx !== -1) {
+    activeStringLinks[idx] = entry;
+    resetStringLinkRuntime(activeStringLinks[idx]!);
+  } else {
+    activeStringLinks.push(entry);
+    stringActivity.set(link.id, []);
+  }
+}
+
+export function registerStringLink(link: {
+  id: string;
+  sourceSessionId: string;
+  targetSessionId: string;
+  filter: StringFilterMode;
+  mode?: StringLinkMode;
+  active: boolean;
+  triggerPattern?: string;
+}): void {
+  upsertStringLink(link);
+}
+
+export function setStringLinkActive(linkId: string, active: boolean): boolean {
+  const link = activeStringLinks.find((l) => l.id === linkId);
+  if (!link) return false;
+  link.active = active;
+  return true;
+}
+
+export function setStringLinkFilter(
+  linkId: string,
+  filter: StringFilterMode,
+): boolean {
+  const link = activeStringLinks.find((l) => l.id === linkId);
+  if (!link) return false;
+  const nextFilter = enforceStringFilter(link.mode, filter);
+  if (link.filter !== nextFilter) {
+    resetFrameBuffer(linkId);
+    lastForwardedByLinkId.delete(linkId);
+  }
+  link.filter = nextFilter;
+  link.lastError = null;
+  return true;
+}
+
+export function setStringLinkMode(
+  linkId: string,
+  mode: StringLinkMode,
+): boolean {
+  const link = activeStringLinks.find((l) => l.id === linkId);
+  if (!link) return false;
+  link.mode = mode;
+  link.filter = enforceStringFilter(mode, link.filter);
+  resetStringLinkRuntime(link);
+  return true;
+}
+
+export function unregisterStringLink(linkId: string): void {
+  const idx = activeStringLinks.findIndex((l) => l.id === linkId);
+  if (idx !== -1) activeStringLinks.splice(idx, 1);
+  stringActivity.delete(linkId);
+  resetFrameBuffer(linkId);
+  lastForwardedByLinkId.delete(linkId);
+}
+
+export function toggleStringLink(linkId: string): boolean {
+  const link = activeStringLinks.find((l) => l.id === linkId);
+  if (!link) return false;
+  link.active = !link.active;
+  return link.active;
+}
+
+export function listStringLinks(): StringLinkRuntimeSnapshot[] {
+  return activeStringLinks.map((link) => buildStringSnapshot(link));
+}
+
+export function getStringActivity(
+  linkId: string,
+  sinceSec = 30,
+): StringActivitySummary {
+  const ring = stringActivity.get(linkId);
+  const link = activeStringLinks.find((entry) => entry.id === linkId);
+  const cutoff = Date.now() - sinceSec * 1000;
+  let events = 0;
+  let totalBytes = 0;
+  if (ring) {
+    for (const entry of ring) {
+      if (entry.ts >= cutoff) {
+        events++;
+        totalBytes += entry.bytes;
+      }
+    }
+  }
+
+  return {
+    events,
+    totalBytes,
+    mode: link?.mode ?? "generic",
+    deliveryState: link?.deliveryState ?? "idle",
+    lastPayload: link?.lastPayload ?? null,
+    lastForwardedAt: link?.lastForwardedAt ?? null,
+    duplicateSuppressions: link?.duplicateSuppressions ?? 0,
+    lastError: link?.lastError ?? null,
+  };
+}
+
+function recordStringActivity(linkId: string, bytes: number): void {
+  let ring = stringActivity.get(linkId);
+  if (!ring) {
+    ring = [];
+    stringActivity.set(linkId, ring);
+  }
+  ring.push({ ts: Date.now(), bytes });
+  if (ring.length > ACTIVITY_RING_SIZE) ring.shift();
+}
+
+function getActiveStringsForSession(sessionId: string): ActiveStringLink[] {
+  return activeStringLinks.filter(
+    (l) => l.sourceSessionId === sessionId && l.active,
+  );
+}
+
+/** Remove all string links referencing a session (called on session exit). */
+function cleanupStringsForSession(sessionId: string): void {
+  for (let i = activeStringLinks.length - 1; i >= 0; i--) {
+    const l = activeStringLinks[i]!;
+    if (l.sourceSessionId === sessionId || l.targetSessionId === sessionId) {
+      resetFrameBuffer(l.id);
+      stringActivity.delete(l.id);
+      lastForwardedByLinkId.delete(l.id);
+      activeStringLinks.splice(i, 1);
+    }
+  }
+}
+
+function noteStringDeliveryError(
+  link: ActiveStringLink,
+  message: string,
+): void {
+  link.deliveryState = "error";
+  link.lastError = message;
+  emitStringDataFlow(link, 0);
+}
+
+function noteStringDuplicateSuppressed(
+  link: ActiveStringLink,
+  payload: string,
+): void {
+  link.deliveryState = "duplicate-suppressed";
+  link.lastPayload = normalizeForStringDedupe(payload);
+  link.duplicateSuppressions += 1;
+  link.lastError = null;
+  emitStringDataFlow(link, 0);
+}
+
+function noteStringDelivered(
+  link: ActiveStringLink,
+  payload: string,
+  bytes: number,
+): void {
+  link.deliveryState = "delivered";
+  link.lastPayload = normalizeForStringDedupe(payload);
+  link.lastForwardedAt = Date.now();
+  link.lastError = null;
+  recordStringActivity(link.id, bytes);
+  emitStringDataFlow(link, bytes);
+}
+
+function forwardFilteredStringPayload(
+  link: ActiveStringLink,
+  filtered: string,
+): void {
+  if (shouldSkipDuplicateStringForward(link, filtered)) {
+    noteStringDuplicateSuppressed(link, filtered);
+    return;
+  }
+
+  if (!stringTargetWriter(link.targetSessionId, filtered)) {
+    noteStringDeliveryError(
+      link,
+      `Target session unavailable: ${link.targetSessionId}`,
+    );
+    return;
+  }
+
+  noteStringDelivered(link, filtered, Buffer.byteLength(filtered));
+}
+
+function pipeToStringTargets(sessionId: string, data: Buffer): void {
+  const links = getActiveStringsForSession(sessionId);
+  if (links.length === 0) return;
+
+  const text = data.toString("utf-8");
+
+  for (const link of links) {
+    if (link.mode === "baton") {
+      const payloads = extractBatonPayloads(data, link.id);
+
+      if (link.triggerPattern && !link.triggered) {
+        try {
+          const re = new RegExp(link.triggerPattern);
+          const matched = payloads.some((payload) => re.test(payload));
+          if (matched) {
+            link.triggered = true;
+          } else {
+            continue;
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      for (const payload of payloads) {
+        forwardFilteredStringPayload(link, `${payload}\r`);
+      }
+      continue;
+    }
+
+    if (link.triggerPattern && !link.triggered) {
+      try {
+        const re = new RegExp(link.triggerPattern);
+        if (re.test(text)) {
+          link.triggered = true;
+        } else {
+          continue;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    const filtered = applyFilter(link.filter, data, link.id);
+    if (filtered) {
+      forwardFilteredStringPayload(link, filtered);
+    }
+  }
+}
+
+export function __setStringTargetWriterForTests(
+  writer: StringTargetWriter | null,
+): void {
+  stringTargetWriter = writer ?? writeToSession;
+}
+
+export function __forwardStringDataForTests(
+  sessionId: string,
+  data: Buffer | string,
+): void {
+  const chunk = typeof data === "string"
+    ? Buffer.from(data, "utf-8")
+    : data;
+  pipeToStringTargets(sessionId, chunk);
+}
+
+export function __setBatonDuplicateTtlMsForTests(
+  ttlMs: number | null,
+): void {
+  batonDuplicateTtlMs = ttlMs ?? DEFAULT_BATON_DUPLICATE_TTL_MS;
+}
 
 function getSidecarClient(): SidecarClient {
   if (!sidecarClient) throw new Error("Sidecar client not initialized");
@@ -145,6 +626,8 @@ function forwardPtyData(
   senderWebContentsId: number | undefined,
   data: Buffer,
 ): void {
+  pipeToStringTargets(sessionId, data);
+
   if (!shouldBatchWindowsPowerShellOutput(sessionId)) {
     sendToSender(senderWebContentsId, "pty:data", {
       sessionId,
@@ -246,6 +729,7 @@ async function doEnsureSidecar(): Promise<void> {
           exitCode: number;
         };
         clearPendingPtyData(sessionId);
+        cleanupStringsForSession(sessionId);
         dataSockets.get(sessionId)?.destroy();
         dataSockets.delete(sessionId);
         sidecarPowerShellSessionIds.delete(sessionId);
@@ -352,12 +836,11 @@ function attachClient(
 
   disposables.push(
     ptyProcess.onData((data: string) => {
-      sendToSender(
+      forwardPtyData(
+        sessionId,
         senderWebContentsId,
-        "pty:data",
-        { sessionId, data },
+        Buffer.from(data, "utf-8"),
       );
-      scheduleForegroundCheck(sessionId);
     }),
   );
 
@@ -369,6 +852,7 @@ function attachClient(
       }
       if (!tmuxHasSession(name)) {
         deleteSessionMeta(sessionId);
+        cleanupStringsForSession(sessionId);
         sendToSender(
           senderWebContentsId,
           "pty:exit",
@@ -775,15 +1259,16 @@ export async function reconnectSession(
 export function writeToSession(
   sessionId: string,
   data: string,
-): void {
+): boolean {
   const dataSock = dataSockets.get(sessionId);
   if (dataSock && !dataSock.destroyed) {
     dataSock.write(data);
-    return;
+    return true;
   }
   const session = sessions.get(sessionId);
-  if (!session) return;
+  if (!session) return false;
   session.pty.write(data);
+  return true;
 }
 
 export function sendRawKeys(
@@ -836,6 +1321,7 @@ export async function killSession(
   sessionId: string,
 ): Promise<void> {
   clearForegroundCache(sessionId);
+  cleanupStringsForSession(sessionId);
   const backend = sessionBackend(sessionId);
   if (backend === "sidecar") {
     dataSockets.get(sessionId)?.destroy();
@@ -1088,8 +1574,14 @@ function shouldSkipForegroundCheck(sessionId: string): boolean {
 }
 
 function sendToMainWindow(channel: string, payload: unknown): void {
-  const { BrowserWindow } = require("electron");
-  const wins = BrowserWindow.getAllWindows();
+  let electronModule: { BrowserWindow?: { getAllWindows?: () => Array<{ isDestroyed: () => boolean; webContents: { send: (channel: string, payload: unknown) => void } }> } } | null = null;
+  try {
+    electronModule = require("electron");
+  } catch {
+    return;
+  }
+  const wins = electronModule?.BrowserWindow?.getAllWindows?.();
+  if (!wins) return;
   for (const win of wins) {
     if (!win.isDestroyed()) {
       win.webContents.send(channel, payload);

@@ -1,6 +1,6 @@
 # Collaborator Canvas
 
-Control Collaborator's spatial canvas from the terminal using the `collab-canvas` CLI.
+Control Collaborator's spatial canvas from the terminal using the `collaborator` CLI. `collab-canvas` remains a compatibility alias for tile/canvas commands.
 The canvas is a pannable, zoomable surface where tiles display terminals, files, images, and graphs.
 
 ## Coordinate System

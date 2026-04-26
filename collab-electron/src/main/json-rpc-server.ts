@@ -12,6 +12,7 @@ import {
   makeEndpointPath,
   prepareEndpoint,
 } from "./ipc-endpoint";
+import { isRpcError } from "./rpc-error";
 
 const SOCKET_PATH = makeEndpointPath("ipc");
 // Write the breadcrumb to the base directory (~/.collaborator/)
@@ -42,7 +43,7 @@ interface JsonRpcResponse {
   jsonrpc: "2.0";
   id: number | string | null;
   result?: unknown;
-  error?: { code: number; message: string; data?: unknown };
+  error?: { code: number | string; message: string; data?: unknown };
 }
 
 const methods = new Map<string, MethodEntry>();
@@ -73,10 +74,11 @@ function isJsonRpcRequest(obj: unknown): obj is JsonRpcRequest {
 
 function makeErrorResponse(
   id: number | string | null,
-  code: number,
+  code: number | string,
   message: string,
+  data?: unknown,
 ): JsonRpcResponse {
-  return { jsonrpc: "2.0", id, error: { code, message } };
+  return { jsonrpc: "2.0", id, error: { code, message, data } };
 }
 
 async function handleMessage(
@@ -107,6 +109,14 @@ async function handleMessage(
     const result = await handler(parsed.params);
     return { jsonrpc: "2.0", id: parsed.id, result };
   } catch (err) {
+    if (isRpcError(err)) {
+      return makeErrorResponse(
+        parsed.id,
+        err.rpcCode,
+        err.message,
+        err.details,
+      );
+    }
     const message =
       err instanceof Error ? err.message : String(err);
     return makeErrorResponse(parsed.id, -32000, message);

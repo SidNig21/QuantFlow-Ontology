@@ -196,7 +196,7 @@ contextBridge.exposeInMainWorld("shellApi", {
   canvasRpcResponse: (response: {
     requestId: string;
     result?: unknown;
-    error?: { code: number; message: string };
+    error?: { code: number | string; message: string; data?: unknown };
   }) => ipcRenderer.send("canvas:rpc-response", response),
 
   showConfirmDialog: (opts: {
@@ -229,6 +229,84 @@ contextBridge.exposeInMainWorld("shellApi", {
 
   ptyKillSession: (sessionId: string): Promise<void> =>
     ipcRenderer.invoke("pty:kill", { sessionId }),
+
+  ptyStringLinkUpsert: (payload: {
+    id: string;
+    sourceSessionId: string;
+    targetSessionId: string;
+    filter: "none" | "ansi-strip" | "framed";
+    mode?: "generic" | "baton";
+    active: boolean;
+    triggerPattern?: string;
+    triggered?: boolean;
+  }): Promise<void> =>
+    ipcRenderer.invoke("pty:string-link-upsert", payload),
+
+  ptyStringLinkList: (): Promise<Array<{
+    id: string;
+    sourceSessionId: string;
+    targetSessionId: string;
+    filter: "none" | "ansi-strip" | "framed";
+    mode: "generic" | "baton";
+    active: boolean;
+    triggerPattern?: string;
+    triggered: boolean;
+    deliveryState: "idle" | "delivered" | "duplicate-suppressed" | "error";
+    lastPayload: string | null;
+    lastForwardedAt: number | null;
+    duplicateSuppressions: number;
+    lastError: string | null;
+  }>> =>
+    ipcRenderer.invoke("pty:string-link-list"),
+
+  ptyStringLinkRemove: (stringId: string): Promise<void> =>
+    ipcRenderer.invoke("pty:string-link-remove", stringId),
+
+  ptyStringLinkSetActive: (payload: {
+    stringId: string;
+    active: boolean;
+  }): Promise<void> =>
+    ipcRenderer.invoke("pty:string-link-set-active", payload),
+
+  ptyStringLinkSetFilter: (payload: {
+    stringId: string;
+    filter: "none" | "ansi-strip" | "framed";
+  }): Promise<void> =>
+    ipcRenderer.invoke("pty:string-link-set-filter", payload),
+
+  ptyStringLinkSetMode: (payload: {
+    stringId: string;
+    mode: "generic" | "baton";
+  }): Promise<void> =>
+    ipcRenderer.invoke("pty:string-link-set-mode", payload),
+
+  canvasConnectionUpsert: (payload: {
+    id: string;
+    sourceId: string;
+    targetId: string;
+    transport: "agent-channel" | "pty-baton" | "pty-generic";
+    endpointKind: "agent" | "note" | "browser";
+    active: boolean;
+    lastError?: string | null;
+    lastErrorAt?: number | null;
+    sourcePtySessionId?: string | null;
+    targetPtySessionId?: string | null;
+    emitEvent?: boolean;
+  }): Promise<void> =>
+    ipcRenderer.invoke("canvas:connection-upsert", payload),
+
+  canvasConnectionRemove: (connectionId: string): Promise<void> =>
+    ipcRenderer.invoke("canvas:connection-remove", connectionId),
+
+  canvasConnectionRuntimeList: (): Promise<Array<{
+    connectionId: string;
+    pendingCount: number;
+    lastThreadPreview: string | null;
+    lastThreadId: string | null;
+    lastError: string | null;
+    lastErrorAt: number | null;
+  }>> =>
+    ipcRenderer.invoke("canvas:connection-runtime-list"),
 
   ptyWrite: (sessionId: string, data: string): void => {
     ipcRenderer.send("pty:write", { sessionId, data });
@@ -264,4 +342,34 @@ contextBridge.exposeInMainWorld("shellApi", {
   },
 
   ptyDiscover: () => ipcRenderer.invoke("pty:discover"),
+
+  onStringDataFlow: (
+    cb: (payload: {
+      stringId: string;
+      bytes: number;
+      mode: "generic" | "baton";
+      deliveryState: "idle" | "delivered" | "duplicate-suppressed" | "error";
+      lastPayload: string | null;
+      lastForwardedAt: number | null;
+      duplicateSuppressions: number;
+      lastError: string | null;
+    }) => void,
+  ) => {
+    const handler = (
+      _event: unknown,
+      payload: {
+        stringId: string;
+        bytes: number;
+        mode: "generic" | "baton";
+        deliveryState: "idle" | "delivered" | "duplicate-suppressed" | "error";
+        lastPayload: string | null;
+        lastForwardedAt: number | null;
+        duplicateSuppressions: number;
+        lastError: string | null;
+      },
+    ) => cb(payload);
+    ipcRenderer.on("string:data-flow", handler);
+    return () =>
+      ipcRenderer.removeListener("string:data-flow", handler);
+  },
 });

@@ -68,6 +68,40 @@ body {
   flex: 1;
 }
 
+.tile-close-btn {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 80ms ease,
+    background 80ms ease,
+    color 80ms ease;
+}
+
+.tile-entry:hover .tile-close-btn,
+.tile-entry.focused .tile-close-btn,
+.tile-close-btn:focus-visible {
+  opacity: 1;
+}
+
+.tile-close-btn:hover,
+.tile-close-btn:focus-visible {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: var(--foreground);
+  outline: none;
+}
+
 .tile-rename-input {
   font-family: inherit;
   font-size: 12px;

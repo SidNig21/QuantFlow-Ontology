@@ -21,6 +21,331 @@
 /** @type {Tile[]} */
 export const tiles = [];
 
+let canvasRevision = 1;
+
+/**
+ * @typedef {'agent-channel' | 'pty-baton' | 'pty-generic'} ConnectionTransport
+ * @typedef {'agent' | 'note' | 'browser'} ConnectionEndpointKind
+ *
+ * @typedef {Object} Connection
+ * @property {string} id
+ * @property {string} sourceId
+ * @property {string} targetId
+ * @property {ConnectionTransport} transport
+ * @property {ConnectionEndpointKind} endpointKind
+ * @property {boolean} active
+ * @property {string | null} [lastError]
+ * @property {number | null} [lastErrorAt]
+ * @property {string} [clientRequestId]
+ * @property {string} [triggerPattern]
+ * @property {boolean} [triggered]
+ */
+
+/** @type {Connection[]} */
+export const connections = [];
+
+let connectionIdCounter = 0;
+
+export function getCanvasRevision() {
+	return canvasRevision;
+}
+
+export function setCanvasRevision(revision) {
+	canvasRevision = Number.isFinite(revision) && revision > 0
+		? Math.trunc(revision)
+		: 1;
+	return canvasRevision;
+}
+
+export function bumpCanvasRevision() {
+	canvasRevision += 1;
+	return canvasRevision;
+}
+
+export function generateConnectionId() {
+	connectionIdCounter++;
+	return `connection-${Date.now()}-${connectionIdCounter}`;
+}
+
+function normalizeConnectionTransport(transport, endpointKind) {
+	if (transport === "pty-baton" || transport === "pty-generic") {
+		return transport;
+	}
+	return endpointKind === "agent" ? "agent-channel" : "agent-channel";
+}
+
+function normalizeEndpointKind(link) {
+	if (
+		link.endpointKind === "agent"
+		|| link.endpointKind === "note"
+		|| link.endpointKind === "browser"
+	) {
+		return link.endpointKind;
+	}
+	return "agent";
+}
+
+/** @param {Connection} link */
+export function addConnection(link) {
+	const endpointKind = normalizeEndpointKind(link);
+	const normalized = {
+		...link,
+		endpointKind,
+		transport: normalizeConnectionTransport(link.transport, endpointKind),
+		active: link.active ?? true,
+		lastError: link.lastError ?? null,
+		lastErrorAt: link.lastErrorAt ?? null,
+		clientRequestId: link.clientRequestId,
+	};
+	connections.push(normalized);
+	return normalized;
+}
+
+/** @param {string} id */
+export function removeConnection(id) {
+	const idx = connections.findIndex((c) => c.id === id);
+	if (idx !== -1) connections.splice(idx, 1);
+}
+
+/** @param {string} id */
+export function getConnection(id) {
+	return connections.find((c) => c.id === id) || null;
+}
+
+/** @param {string} id */
+export function toggleConnection(id) {
+	const link = getConnection(id);
+	if (link) link.active = !link.active;
+	return link;
+}
+
+/**
+ * @param {string} id
+ * @param {ConnectionTransport} transport
+ */
+export function setConnectionTransport(id, transport) {
+	const link = getConnection(id);
+	if (!link) return null;
+	link.transport = normalizeConnectionTransport(transport, link.endpointKind);
+	return link;
+}
+
+/**
+ * @param {string} id
+ * @param {string | null} error
+ */
+export function setConnectionLastError(id, error) {
+	const link = getConnection(id);
+	if (!link) return null;
+	link.lastError = error || null;
+	link.lastErrorAt = error ? Date.now() : null;
+	return link;
+}
+
+export function findConnectionByClientRequestId(clientRequestId) {
+	if (!clientRequestId) return null;
+	return connections.find((c) => c.clientRequestId === clientRequestId) || null;
+}
+
+/** @param {string} tileId */
+export function getConnectionsForTile(tileId) {
+	return connections.filter(
+		(c) => c.sourceId === tileId || c.targetId === tileId,
+	);
+}
+
+/** @param {string} tileId */
+export function getConnectionsForSource(tileId) {
+	return connections.filter((c) => c.sourceId === tileId);
+}
+
+/** @param {string} tileId */
+export function getConnectionsForTarget(tileId) {
+	return connections.filter((c) => c.targetId === tileId);
+}
+
+export function getActiveConnections() {
+	return connections.filter((c) => c.active);
+}
+
+export function wouldCreateConnectionCycle(sourceId, targetId) {
+	const visited = new Set();
+	const queue = [targetId];
+	while (queue.length > 0) {
+		const current = queue.shift();
+		if (current === sourceId) return true;
+		if (visited.has(current)) continue;
+		visited.add(current);
+		for (const s of connections) {
+			if (s.sourceId === current) queue.push(s.targetId);
+		}
+	}
+	return false;
+}
+
+/**
+ * Remove all connections referencing a tile.
+ * @param {string} tileId
+ * @returns {string[]} ids of removed connections
+ */
+export function removeConnectionsForTile(tileId) {
+	/** @type {string[]} */
+	const removedIds = [];
+	for (let i = connections.length - 1; i >= 0; i--) {
+		if (connections[i].sourceId === tileId || connections[i].targetId === tileId) {
+			removedIds.push(connections[i].id);
+			connections.splice(i, 1);
+		}
+	}
+	for (let i = strings.length - 1; i >= 0; i--) {
+		if (strings[i].sourceId === tileId || strings[i].targetId === tileId) {
+			strings.splice(i, 1);
+		}
+	}
+	return removedIds;
+}
+
+// ── String links (terminal-to-terminal pipes) ──
+
+/**
+ * @typedef {'none' | 'ansi-strip' | 'framed'} StringFilterMode
+ * @typedef {'generic' | 'baton'} StringLinkMode
+ *
+ * @typedef {Object} StringLink
+ * @property {string} id
+ * @property {string} sourceId - Source terminal tile ID
+ * @property {string} targetId - Target terminal tile ID
+ * @property {StringFilterMode} filter
+ * @property {StringLinkMode} [mode]
+ * @property {boolean} active - Can be paused/resumed
+ * @property {string} [triggerPattern] - Regex; string only activates when source output matches
+ * @property {boolean} [triggered] - Whether the trigger has fired
+ */
+
+/** @type {StringLink[]} */
+export const strings = [];
+
+let stringIdCounter = 0;
+
+export function generateStringId() {
+	stringIdCounter++;
+	return `string-${Date.now()}-${stringIdCounter}`;
+}
+
+function transportFromLegacyString(link) {
+	return link.mode === "baton" ? "pty-baton" : "pty-generic";
+}
+
+function syncLegacyStringConnection(link) {
+	const existing = getConnection(link.id);
+	if (!existing) {
+		addConnection({
+			id: link.id,
+			sourceId: link.sourceId,
+			targetId: link.targetId,
+			endpointKind: "agent",
+			transport: transportFromLegacyString(link),
+			active: link.active,
+			lastError: null,
+			lastErrorAt: null,
+			clientRequestId: existing?.clientRequestId,
+			triggerPattern: link.triggerPattern,
+			triggered: link.triggered,
+		});
+		return;
+	}
+	existing.sourceId = link.sourceId;
+	existing.targetId = link.targetId;
+	existing.endpointKind = "agent";
+	existing.transport = transportFromLegacyString(link);
+	existing.active = link.active;
+	existing.triggerPattern = link.triggerPattern;
+	existing.triggered = link.triggered;
+}
+
+/** @param {StringLink} link */
+export function addString(link) {
+	const mode = link.mode === "baton" ? "baton" : "generic";
+	const normalized = {
+		...link,
+		mode,
+		filter: mode === "baton" ? "framed" : link.filter,
+	};
+	strings.push(normalized);
+	syncLegacyStringConnection(normalized);
+	return normalized;
+}
+
+/** @param {string} id */
+export function removeString(id) {
+	const idx = strings.findIndex((s) => s.id === id);
+	if (idx !== -1) strings.splice(idx, 1);
+	removeConnection(id);
+}
+
+/** @param {string} id */
+export function getString(id) {
+	return strings.find((s) => s.id === id) || null;
+}
+
+/** @param {string} id */
+export function toggleString(id) {
+	const link = getString(id);
+	if (link) link.active = !link.active;
+	const connection = getConnection(id);
+	if (connection && link) {
+		connection.active = link.active;
+	}
+	return link;
+}
+
+/** @param {string} tileId */
+export function getStringsForSource(tileId) {
+	return strings.filter((s) => s.sourceId === tileId);
+}
+
+/** @param {string} tileId */
+export function getStringsForTarget(tileId) {
+	return strings.filter((s) => s.targetId === tileId);
+}
+
+/** @param {string} tileId */
+export function getStringsForTile(tileId) {
+	return strings.filter((s) => s.sourceId === tileId || s.targetId === tileId);
+}
+
+export function getActiveStrings() {
+	return strings.filter((s) => s.active);
+}
+
+/**
+ * Detect if adding a string from sourceId to targetId would create a cycle.
+ * Uses BFS to check reachability from targetId back to sourceId.
+ */
+export function wouldCreateCycle(sourceId, targetId) {
+	return wouldCreateConnectionCycle(sourceId, targetId);
+}
+
+/**
+ * Remove all strings referencing a tile (called when tile is closed).
+ * @param {string} tileId
+ * @returns {string[]} ids of removed string links (for main-process PTY registry sync)
+ */
+export function removeStringsForTile(tileId) {
+	/** @type {string[]} */
+	const removedIds = [];
+	for (let i = strings.length - 1; i >= 0; i--) {
+		if (strings[i].sourceId === tileId || strings[i].targetId === tileId) {
+			removedIds.push(strings[i].id);
+			strings.splice(i, 1);
+		}
+	}
+	for (const id of removedIds) {
+		removeConnection(id);
+	}
+	return removedIds;
+}
+
 let nextZIndex = 1;
 
 const DEFAULT_TILE_SIZES = {

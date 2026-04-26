@@ -3,6 +3,7 @@ import "./tooltip.js";
 import {
 	tiles, getTile, defaultSize, inferTileType, tileAtPoint,
 	selectTile, clearSelection, getSelectedTiles,
+	addConnection, addString, setCanvasRevision,
 } from "./canvas-state.js";
 import { attachMarquee } from "./tile-interactions.js";
 import { initDarkMode, applyCanvasOpacity } from "./dark-mode.js";
@@ -14,6 +15,15 @@ import { createPanel } from "./panel-manager.js";
 import { createWorkspaceManager } from "./workspace-manager.js";
 import { createCanvasRpc } from "./canvas-rpc.js";
 import { createTileManager } from "./tile-manager.js";
+import { createConnectionOverlay } from "./connection-overlay.js";
+import {
+	syncAllShellStringsToMain,
+	syncStringsTouchingTile,
+} from "./string-link-main-sync.js";
+import {
+	syncAllShellConnectionsToMain,
+	syncConnectionsTouchingTile,
+} from "./connection-main-sync.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
@@ -502,11 +512,12 @@ async function init() {
 	// -- Tile manager --
 
 	let minimapRef = null;
+	let connectionOverlayRef = null;
 	const tileManager = createTileManager({
 		tileLayer, viewportState, configs,
 		getAllWebviews,
 		isSpaceHeld: () => spaceHeld,
-		onReposition: () => { viewport.redrawGrid(); minimapRef?.update(); },
+		onReposition: () => { viewport.redrawGrid(); minimapRef?.update(); connectionOverlayRef?.update(); },
 		onSaveDebounced(state) {
 			window.shellApi.canvasSaveState(
 				toCenterPointState(state),
@@ -530,6 +541,9 @@ async function init() {
 			syncTerminalTileMeta(tile, session?.meta);
 			tileManager.saveCanvasDebounced();
 			syncTileList();
+			await syncStringsTouchingTile(tile.id);
+			await syncConnectionsTouchingTile(tile.id, { emitEvent: false });
+			await connectionOverlay.refreshRuntimeTelemetry();
 		},
 		onTerminalCwdChanged(cwd) {
 			setLastTerminalCwd(cwd);
@@ -576,8 +590,31 @@ async function init() {
 
 	// -- Canvas RPC --
 
-	const handleCanvasRpc = createCanvasRpc({
+	const canvasRpc = createCanvasRpc({
 		tileManager, viewportState, viewport, edgeIndicators,
+	});
+
+	// -- Connection overlay --
+
+	const connectionOverlay = createConnectionOverlay({
+		panelViewer,
+		viewportState,
+		tileManager,
+		invokeCanvasMutation(method, params) {
+			return canvasRpc.invokeLocal(method, params);
+		},
+	});
+
+	connectionOverlayRef = connectionOverlay;
+
+	window.addEventListener("connections-changed", () => {
+		void connectionOverlay.refreshRuntimeTelemetry();
+		connectionOverlay.update();
+	});
+
+	window.addEventListener("strings-changed", () => {
+		void connectionOverlay.refreshRuntimeTelemetry();
+		connectionOverlay.update();
 	});
 
 	// -- Wire viewport updates --
@@ -586,11 +623,14 @@ async function init() {
 		tileManager.repositionAllTiles();
 		edgeIndicators.update();
 		minimap.update();
+		connectionOverlay.update();
 		tileManager.saveCanvasDebounced();
 	});
 
 	edgeIndicators.update();
 	minimap.update();
+	connectionOverlay.update();
+	void connectionOverlay.refreshRuntimeTelemetry();
 
 	// -- Agent panel init (after tileManager, since getAllWebviews references it) --
 
@@ -1190,7 +1230,7 @@ async function init() {
 
 	// -- Canvas RPC --
 
-	window.shellApi.onCanvasRpcRequest(handleCanvasRpc);
+	window.shellApi.onCanvasRpcRequest(canvasRpc.handleRequest);
 
 	// -- PTY lifecycle forwarding --
 
@@ -1256,6 +1296,12 @@ async function init() {
 				const tileId = event.args[0];
 				const newTitle = event.args[1];
 				tileManager.renameTile(tileId, newTitle);
+			} else if (event.channel === "tile-list:close-tile") {
+				const tileId = event.args[0];
+				const tile = getTile(tileId);
+				if (tile) {
+					tileManager.closeCanvasTile(tileId);
+				}
 			}
 		},
 	);
@@ -1558,7 +1604,35 @@ async function init() {
 			? h / 2 - centerY * viewportState.zoom
 			: 0;
 		viewport.updateCanvas();
+		setCanvasRevision(savedState.revision ?? 1);
 		tileManager.restoreCanvasState(savedState.tiles);
+
+		if (Array.isArray(savedState.connections)) {
+			for (const connection of savedState.connections) {
+				if (
+					connection.transport === "pty-baton"
+					|| connection.transport === "pty-generic"
+				) {
+					addString({
+						id: connection.id,
+						sourceId: connection.sourceId,
+						targetId: connection.targetId,
+						filter: connection.transport === "pty-baton" ? "framed" : "framed",
+						mode: connection.transport === "pty-baton" ? "baton" : "generic",
+						active: connection.active,
+						triggerPattern: connection.triggerPattern,
+						triggered: connection.triggered,
+					});
+				} else {
+					addConnection(connection);
+				}
+			}
+		} else if (Array.isArray(savedState.strings)) {
+			for (const s of savedState.strings) {
+				addString(s);
+			}
+		}
+
 		viewport.redrawGrid();
 		minimap.update();
 
@@ -1576,6 +1650,16 @@ async function init() {
 				syncTerminalTileMeta(tile, session?.meta);
 			}
 			tileManager.saveCanvasDebounced();
+		}
+
+		if (Array.isArray(savedState.connections) && savedState.connections.length > 0) {
+			await syncAllShellConnectionsToMain({ emitEvent: false });
+			await syncAllShellStringsToMain();
+			await connectionOverlay.refreshRuntimeTelemetry();
+		} else if (Array.isArray(savedState.strings) && savedState.strings.length > 0) {
+			await syncAllShellStringsToMain();
+			await syncAllShellConnectionsToMain({ emitEvent: false });
+			await connectionOverlay.refreshRuntimeTelemetry();
 		}
 	}
 

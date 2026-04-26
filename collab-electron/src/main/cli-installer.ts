@@ -19,8 +19,10 @@ const INSTALL_DIR = IS_WIN
     "bin",
   )
   : join(homedir(), ".local", "bin");
-const WRAPPER_PATH = join(INSTALL_DIR, IS_WIN ? "collab-canvas.cmd" : "collab-canvas");
 const MJS_PATH = join(INSTALL_DIR, "collab-cli.mjs");
+const WRAPPER_NAMES = IS_WIN
+  ? ["collaborator.cmd", "collab-canvas.cmd"]
+  : ["collaborator", "collab-canvas"];
 
 function getMjsSource(): string {
   if (app.isPackaged) {
@@ -78,9 +80,12 @@ export function installCli(): void {
   copyFileSync(mjsSource, MJS_PATH);
 
   const wrapper = IS_WIN ? generateWindowsWrapper() : generateUnixWrapper();
-  writeFileSync(WRAPPER_PATH, wrapper, "utf-8");
-  if (!IS_WIN) {
-    chmodSync(WRAPPER_PATH, 0o755);
+  for (const wrapperName of WRAPPER_NAMES) {
+    const wrapperPath = join(INSTALL_DIR, wrapperName);
+    writeFileSync(wrapperPath, wrapper, "utf-8");
+    if (!IS_WIN) {
+      chmodSync(wrapperPath, 0o755);
+    }
   }
 
   if (IS_WIN) {

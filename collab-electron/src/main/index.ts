@@ -50,6 +50,12 @@ import { stopImageWorker } from "./image-service";
 import { installCli } from "./cli-installer";
 import { listTerminalTargets } from "./terminal-target";
 import { readSessionMeta } from "./tmux";
+import {
+  initializeChannelService,
+  listConnectionRuntime,
+  removeCanvasConnection,
+  upsertCanvasConnection,
+} from "./channel-service";
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -686,6 +692,117 @@ ipcMain.handle(
   ) => pty.captureSession(sessionId, lines),
 );
 
+ipcMain.handle(
+  "pty:string-link-upsert",
+  (
+    _event,
+    payload: {
+      id: string;
+      sourceSessionId: string;
+      targetSessionId: string;
+      filter: "none" | "ansi-strip" | "framed";
+      mode?: "generic" | "baton";
+      active: boolean;
+      triggerPattern?: string;
+      triggered?: boolean;
+    },
+  ) => {
+    pty.upsertStringLink(payload);
+  },
+);
+
+ipcMain.handle(
+  "pty:string-link-remove",
+  (_event, stringId: string) => {
+    pty.unregisterStringLink(stringId);
+  },
+);
+
+ipcMain.handle(
+  "pty:string-link-list",
+  () => pty.listStringLinks(),
+);
+
+ipcMain.handle(
+  "pty:string-link-set-active",
+  (
+    _event,
+    { stringId, active }: { stringId: string; active: boolean },
+  ) => {
+    pty.setStringLinkActive(stringId, active);
+  },
+);
+
+ipcMain.handle(
+  "pty:string-link-set-filter",
+  (
+    _event,
+    {
+      stringId,
+      filter,
+    }: { stringId: string; filter: "none" | "ansi-strip" | "framed" },
+  ) => {
+    pty.setStringLinkFilter(stringId, filter);
+  },
+);
+
+ipcMain.handle(
+  "pty:string-link-set-mode",
+  (
+    _event,
+    {
+      stringId,
+      mode,
+    }: { stringId: string; mode: "generic" | "baton" },
+  ) => {
+    pty.setStringLinkMode(stringId, mode);
+  },
+);
+
+ipcMain.handle(
+  "canvas:connection-upsert",
+  (
+    _event,
+    payload: {
+      id: string;
+      sourceId: string;
+      targetId: string;
+      transport: "agent-channel" | "pty-baton" | "pty-generic";
+      endpointKind: "agent" | "note" | "browser";
+      active: boolean;
+      lastError?: string | null;
+      lastErrorAt?: number | null;
+      emitEvent?: boolean;
+    },
+  ) => {
+    upsertCanvasConnection(
+      {
+        id: payload.id,
+        sourceId: payload.sourceId,
+        targetId: payload.targetId,
+        transport: payload.transport,
+        endpointKind: payload.endpointKind,
+        active: payload.active,
+        lastError: payload.lastError ?? null,
+        lastErrorAt: payload.lastErrorAt ?? null,
+      },
+      { emitEvent: payload.emitEvent },
+    );
+  },
+);
+
+ipcMain.handle(
+  "canvas:connection-remove",
+  (_event, connectionId: string) => {
+    removeCanvasConnection(connectionId);
+  },
+);
+
+ipcMain.handle(
+  "canvas:connection-runtime-list",
+  () => listConnectionRuntime(),
+);
+
 let settingsOpen = false;
 
 function setSettingsOpen(open: boolean): void {
@@ -812,6 +929,7 @@ app.whenReady().then(async () => {
 
   config = loadConfig();
   installCli();
+  await initializeChannelService();
   watcher.startWorker();
   registerIpcHandlers(config);
   registerIntegrationsIpc();

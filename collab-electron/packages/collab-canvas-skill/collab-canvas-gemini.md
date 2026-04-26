@@ -1,6 +1,6 @@
 # Collaborator Canvas — Gemini CLI Instructions
 
-You have access to the `collab-canvas` CLI for controlling Collaborator's spatial canvas.
+You have access to the `collaborator` CLI for controlling Collaborator's spatial canvas and semantic agent channels. `collab-canvas` remains a compatibility alias.
 The canvas is a pannable, zoomable surface where tiles display terminals, files, images, and graphs.
 
 ## Coordinate System

@@ -25,9 +25,35 @@ interface TileState {
   zIndex: number;
 }
 
+interface ConnectionState {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  transport?: "agent-channel" | "pty-baton" | "pty-generic";
+  endpointKind?: "agent" | "note" | "browser";
+  active: boolean;
+  clientRequestId?: string;
+  lastError?: string | null;
+  lastErrorAt?: number | null;
+  triggerPattern?: string;
+  triggered?: boolean;
+}
+
 interface CanvasState {
   version: 1;
+  revision?: number;
   tiles: TileState[];
+  connections?: ConnectionState[];
+  strings?: Array<{
+    id: string;
+    sourceId: string;
+    targetId: string;
+    filter: "none" | "ansi-strip" | "framed";
+    mode?: "generic" | "baton";
+    active: boolean;
+    triggerPattern?: string;
+    triggered?: boolean;
+  }>;
   viewport: {
     centerX: number;
     centerY: number;

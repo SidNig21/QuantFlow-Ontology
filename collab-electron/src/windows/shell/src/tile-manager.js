@@ -3,6 +3,8 @@ import {
 	generateId, defaultSize, inferTileType, snapToGrid,
 	selectTile, deselectTile, toggleTileSelection,
 	clearSelection, isSelected, getSelectedTiles,
+	removeConnectionsForTile, connections,
+	bumpCanvasRevision, getCanvasRevision,
 } from "./canvas-state.js";
 import {
 	createTileDOM, positionTile, updateTileTitle, getTileLabel,
@@ -53,6 +55,7 @@ export function createTileManager({
 	function getCanvasStateForSave() {
 		return {
 			version: 1,
+			revision: getCanvasRevision(),
 			tiles: tiles.map((t) => ({
 				id: t.id,
 				type: t.type,
@@ -69,6 +72,19 @@ export function createTileManager({
 				userTitle: t.userTitle,
 				autoTitle: t.autoTitle,
 			})),
+			connections: connections.map((c) => ({
+				id: c.id,
+				sourceId: c.sourceId,
+				targetId: c.targetId,
+				transport: c.transport,
+				endpointKind: c.endpointKind,
+				active: c.active,
+				clientRequestId: c.clientRequestId,
+				lastError: c.lastError,
+				lastErrorAt: c.lastErrorAt,
+				triggerPattern: c.triggerPattern,
+				triggered: c.triggered,
+			})),
 			viewport: {
 				panX: viewportState.panX,
 				panY: viewportState.panY,
@@ -78,6 +94,7 @@ export function createTileManager({
 	}
 
 	function saveCanvasDebounced() {
+		bumpCanvasRevision();
 		clearTimeout(saveTimer);
 		saveTimer = setTimeout(() => {
 			onSaveDebounced(getCanvasStateForSave());
@@ -85,6 +102,7 @@ export function createTileManager({
 	}
 
 	function saveCanvasImmediate() {
+		bumpCanvasRevision();
 		clearTimeout(saveTimer);
 		onSaveImmediate(getCanvasStateForSave());
 	}
@@ -572,13 +590,18 @@ export function createTileManager({
 		return tile;
 	}
 
-	function closeCanvasTile(id) {
+	async function closeCanvasTile(id) {
 		const dom = tileDOMs.get(id);
 		if (dom) {
 			dom.container.remove();
 			tileDOMs.delete(id);
 		}
 		deselectTile(id);
+		const removedConnectionIds = removeConnectionsForTile(id);
+		for (const sid of removedConnectionIds) {
+			await window.shellApi?.ptyStringLinkRemove?.(sid);
+			await window.shellApi?.canvasConnectionRemove?.(sid);
+		}
 		const tile = getTile(id);
 		if (tile) {
 			window.shellApi.trackEvent(

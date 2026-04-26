@@ -1,7 +1,11 @@
 import { describe, test, expect, beforeEach } from "bun:test";
 import {
   tiles,
+  strings,
+  connections,
   addTile,
+  addString,
+  addConnection,
   removeTile,
   getTile,
   bringToFront,
@@ -16,13 +20,25 @@ import {
   clearSelection,
   isSelected,
   getSelectedTiles,
+  bumpCanvasRevision,
+  findConnectionByClientRequestId,
+  getCanvasRevision,
+  getConnection,
+  removeConnectionsForTile,
+  setCanvasRevision,
+  setConnectionTransport,
+  wouldCreateCycle,
+  wouldCreateConnectionCycle,
 } from "./canvas-state.js";
 
 // Reset tiles array between tests by splicing out all entries.
 // The module uses a shared mutable array, so we need to drain it.
 beforeEach(() => {
   tiles.splice(0, tiles.length);
+  strings.splice(0, strings.length);
+  connections.splice(0, connections.length);
   clearSelection();
+  setCanvasRevision(1);
 });
 
 // -- defaultSize --
@@ -270,6 +286,54 @@ describe("tileAtPoint", () => {
   });
 });
 
+describe("string links", () => {
+  test("addString defaults mode to generic", () => {
+    const link = addString({
+      id: "s1",
+      sourceId: "a",
+      targetId: "b",
+      filter: "framed",
+      active: true,
+    });
+
+    expect(link.mode).toBe("generic");
+  });
+
+  test("addString forces framed filter for baton mode", () => {
+    const link = addString({
+      id: "s2",
+      sourceId: "a",
+      targetId: "b",
+      filter: "ansi-strip",
+      mode: "baton",
+      active: true,
+    });
+
+    expect(link.mode).toBe("baton");
+    expect(link.filter).toBe("framed");
+  });
+
+  test("wouldCreateCycle detects string loops", () => {
+    addString({
+      id: "s3",
+      sourceId: "a",
+      targetId: "b",
+      filter: "framed",
+      active: true,
+    });
+    addString({
+      id: "s4",
+      sourceId: "b",
+      targetId: "c",
+      filter: "framed",
+      active: true,
+    });
+
+    expect(wouldCreateCycle("c", "a")).toBe(true);
+    expect(wouldCreateCycle("c", "d")).toBe(false);
+  });
+});
+
 // -- Selection state --
 
 describe("selection", () => {
@@ -329,5 +393,92 @@ describe("selection", () => {
     selectTile("t1");
     removeTile("t1");
     expect(getSelectedTiles()).toHaveLength(0);
+  });
+});
+
+describe("connections", () => {
+  test("addConnection stores semantic metadata and clientRequestId", () => {
+    const connection = addConnection({
+      id: "c1",
+      sourceId: "a",
+      targetId: "b",
+      transport: "agent-channel",
+      endpointKind: "agent",
+      active: true,
+      clientRequestId: "req-1",
+    });
+
+    expect(getConnection("c1")).toEqual(connection);
+    expect(findConnectionByClientRequestId("req-1")?.id).toBe("c1");
+  });
+
+  test("setConnectionTransport preserves connection identity", () => {
+    addConnection({
+      id: "c2",
+      sourceId: "a",
+      targetId: "b",
+      transport: "agent-channel",
+      endpointKind: "agent",
+      active: true,
+    });
+
+    const updated = setConnectionTransport("c2", "pty-baton");
+
+    expect(updated?.id).toBe("c2");
+    expect(updated?.transport).toBe("pty-baton");
+  });
+
+  test("wouldCreateConnectionCycle detects semantic loops", () => {
+    addConnection({
+      id: "c3",
+      sourceId: "a",
+      targetId: "b",
+      transport: "agent-channel",
+      endpointKind: "agent",
+      active: true,
+    });
+    addConnection({
+      id: "c4",
+      sourceId: "b",
+      targetId: "c",
+      transport: "agent-channel",
+      endpointKind: "agent",
+      active: true,
+    });
+
+    expect(wouldCreateConnectionCycle("c", "a")).toBe(true);
+    expect(wouldCreateConnectionCycle("c", "d")).toBe(false);
+  });
+
+  test("removeConnectionsForTile clears semantic and legacy links for a tile", () => {
+    addConnection({
+      id: "c5",
+      sourceId: "a",
+      targetId: "b",
+      transport: "agent-channel",
+      endpointKind: "agent",
+      active: true,
+    });
+    addString({
+      id: "s5",
+      sourceId: "a",
+      targetId: "c",
+      filter: "framed",
+      active: true,
+    });
+
+    const removed = removeConnectionsForTile("a");
+
+    expect(removed).toContain("c5");
+    expect(getConnection("c5")).toBeNull();
+    expect(strings.find((entry) => entry.id === "s5")).toBeUndefined();
+  });
+});
+
+describe("canvas revision", () => {
+  test("bumpCanvasRevision increments the authoritative graph revision", () => {
+    expect(getCanvasRevision()).toBe(1);
+    expect(bumpCanvasRevision()).toBe(2);
+    expect(getCanvasRevision()).toBe(2);
   });
 });

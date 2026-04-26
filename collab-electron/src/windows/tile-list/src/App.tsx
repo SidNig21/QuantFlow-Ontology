@@ -48,6 +48,7 @@ function TileEntryRow({
   onClick,
   onDoubleClick,
   onContextMenu,
+  onClose,
   onRenameChange,
   onRenameConfirm,
   onRenameCancel,
@@ -59,6 +60,7 @@ function TileEntryRow({
   onClick: () => void;
   onDoubleClick: () => void;
   onContextMenu: (e: React.MouseEvent) => void;
+  onClose: () => void;
   onRenameChange: (value: string) => void;
   onRenameConfirm: () => void;
   onRenameCancel: () => void;
@@ -107,6 +109,23 @@ function TileEntryRow({
       ) : (
         <div className="tile-title">{entry.title}</div>
       )}
+      <button
+        type="button"
+        className="tile-close-btn"
+        title="Close tile"
+        aria-label={`Close ${entry.title}`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onClose();
+        }}
+      >
+        x
+      </button>
     </div>
   );
 }
@@ -161,6 +180,14 @@ function App() {
     setFocusedId(id);
     window.api.sendToHost("tile-list:focus-tile", id);
   }, []);
+
+  const handleClose = useCallback((id: string) => {
+    if (renamingId === id) {
+      setRenamingId(null);
+      setRenameValue("");
+    }
+    window.api.sendToHost("tile-list:close-tile", id);
+  }, [renamingId]);
 
   const handleContextMenu = useCallback(
     async (id: string, e: React.MouseEvent) => {
@@ -224,6 +251,7 @@ function App() {
           onClick={() => handleClick(entry.id)}
           onDoubleClick={() => handleDoubleClick(entry.id)}
           onContextMenu={(e) => handleContextMenu(entry.id, e)}
+          onClose={() => handleClose(entry.id)}
           onRenameChange={setRenameValue}
           onRenameConfirm={() => commitRename(entry.id)}
           onRenameCancel={cancelRename}

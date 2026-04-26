@@ -3,6 +3,7 @@ import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
 const BASE = join(homedir(), ".collaborator");
+const OVERRIDE = process.env["COLLAB_DIR_OVERRIDE"];
 
 function normalizeWindowsPath(path: string): string {
   if (process.platform !== "win32") return path;
@@ -31,6 +32,8 @@ export const DEV_WORKTREE_ID = import.meta.env?.DEV
   ? `worktree-${getDevWorktreeId()}`
   : null;
 
-export const COLLAB_DIR = import.meta.env?.DEV
-  ? join(BASE, "dev", DEV_WORKTREE_ID ?? "worktree-unknown")
-  : BASE;
+export const COLLAB_DIR = OVERRIDE
+  ? resolve(normalizeWindowsPath(OVERRIDE))
+  : import.meta.env?.DEV
+    ? join(BASE, "dev", DEV_WORKTREE_ID ?? "worktree-unknown")
+    : BASE;
