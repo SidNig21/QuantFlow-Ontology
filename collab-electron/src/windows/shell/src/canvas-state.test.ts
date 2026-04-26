@@ -410,6 +410,9 @@ describe("connections", () => {
 
     expect(getConnection("c1")).toEqual(connection);
     expect(findConnectionByClientRequestId("req-1")?.id).toBe("c1");
+    expect(connection.connectionSchemaVersion).toBe(1);
+    expect(connection.verbs).toEqual(["ask", "notify", "wake"]);
+    expect(connection.ownerKind).toBe("user");
   });
 
   test("setConnectionTransport preserves connection identity", () => {

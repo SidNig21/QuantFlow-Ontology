@@ -71,14 +71,23 @@ export function createTileManager({
 				zIndex: t.zIndex,
 				userTitle: t.userTitle,
 				autoTitle: t.autoTitle,
+				role: t.role,
 			})),
 			connections: connections.map((c) => ({
 				id: c.id,
 				sourceId: c.sourceId,
 				targetId: c.targetId,
+				connectionSchemaVersion: c.connectionSchemaVersion,
 				transport: c.transport,
 				endpointKind: c.endpointKind,
 				active: c.active,
+				verbs: c.verbs,
+				ownerKind: c.ownerKind,
+				ownerTileId: c.ownerTileId,
+				sessionId: c.sessionId,
+				createdBy: c.createdBy,
+				createdAt: c.createdAt,
+				updatedAt: c.updatedAt,
 				clientRequestId: c.clientRequestId,
 				lastError: c.lastError,
 				lastErrorAt: c.lastErrorAt,
@@ -215,12 +224,15 @@ export function createTileManager({
 		const termConfig = configs.terminalTile;
 		const params = new URLSearchParams();
 		params.set("tileId", tile.id);
-		if (tile.ptySessionId) {
-			params.set("sessionId", tile.ptySessionId);
-			params.set("restored", "1");
-		} else if (tile.cwd) {
-			params.set("cwd", tile.cwd);
-		}
+			if (tile.ptySessionId) {
+				params.set("sessionId", tile.ptySessionId);
+				params.set("restored", "1");
+			} else if (tile.cwd) {
+				params.set("cwd", tile.cwd);
+			}
+			if (!tile.ptySessionId && tile.startupCommand) {
+				params.set("startupCommand", tile.startupCommand);
+			}
 		const qs = params.toString();
 		wv.setAttribute(
 			"src",
@@ -242,12 +254,13 @@ export function createTileManager({
 			wv.addEventListener("before-input-event", () => {});
 		});
 
-		wv.addEventListener("ipc-message", (event) => {
-			if (event.channel === "pty-session-id") {
-				tile.ptySessionId = event.args[0];
-				saveCanvasDebounced();
-				if (onTerminalSessionCreated) {
-					onTerminalSessionCreated(tile);
+			wv.addEventListener("ipc-message", (event) => {
+				if (event.channel === "pty-session-id") {
+					tile.ptySessionId = event.args[0];
+					delete tile.startupCommand;
+					saveCanvasDebounced();
+					if (onTerminalSessionCreated) {
+						onTerminalSessionCreated(tile);
 				}
 			}
 			if (event.channel === "pty-cwd-changed") {
@@ -497,19 +510,31 @@ export function createTileManager({
 				spawnBrowserWebview(t);
 				saveCanvasImmediate();
 			},
-			onDuplicate: (id) => {
-				const t = getTile(id);
-				if (!t) return;
-				const gap = 40;
+				onDuplicate: (id) => {
+					const t = getTile(id);
+					if (!t) return;
+					const gap = 40;
 				const newTile = createCanvasTile("term", t.x + t.width + gap, t.y, {
 					cwd: t.cwd,
 					width: t.width,
 					height: t.height,
 				});
-				spawnTerminalWebview(newTile, true);
-				saveCanvasImmediate();
-			},
-			onRename: (id) => {
+					spawnTerminalWebview(newTile, true);
+					saveCanvasImmediate();
+				},
+				onSetRole: (id, role) => {
+					const t = getTile(id);
+					const d = tileDOMs.get(id);
+					if (!t || !d) return;
+					if (role) {
+						t.role = role;
+					} else {
+						delete t.role;
+					}
+					updateTileTitle(d, t);
+					saveCanvasImmediate();
+				},
+				onRename: (id) => {
 				const t = getTile(id);
 				const d = tileDOMs.get(id);
 				if (!t || !d) return;
@@ -714,6 +739,7 @@ export function createTileManager({
 						ptySessionId: saved.ptySessionId,
 						userTitle: saved.userTitle,
 						autoTitle: saved.autoTitle,
+						role: saved.role,
 					},
 				);
 				spawnTerminalWebview(tile);

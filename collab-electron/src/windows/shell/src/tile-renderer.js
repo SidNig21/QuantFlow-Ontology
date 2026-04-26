@@ -30,6 +30,7 @@ function resolveInput(raw) {
  * @param {((id: string, url: string) => void)|null} [callbacks.onNavigate]
  * @param {((id: string) => void)|null} [callbacks.onRename]
  * @param {((id: string) => void)|null} [callbacks.onDuplicate]
+ * @param {((id: string, role: string | null) => void)|null} [callbacks.onSetRole]
  */
 export function createTileDOM(tile, callbacks) {
   const container = document.createElement("div");
@@ -54,6 +55,12 @@ export function createTileDOM(tile, callbacks) {
   if (tile.filePath) titleText.title = tile.filePath;
   if (tile.folderPath) titleText.title = tile.folderPath;
   titleBar.appendChild(titleText);
+  if (tile.role) {
+    const roleBadge = document.createElement("span");
+    roleBadge.className = "tile-role-badge";
+    roleBadge.textContent = tile.role;
+    titleBar.appendChild(roleBadge);
+  }
 
   // For browser tiles, add nav controls and a URL input to the title bar
   let urlInput;
@@ -188,11 +195,21 @@ export function createTileDOM(tile, callbacks) {
       const selected = await window.shellApi.showContextMenu([
         { id: "rename", label: "Rename" },
         { id: "duplicate", label: "Duplicate" },
+        {
+          id: tile.role === "hermes" ? "clear-role" : "mark-hermes",
+          label: tile.role === "hermes"
+            ? "Clear Hermes role"
+            : "Mark as Hermes",
+        },
       ]);
       if (selected === "rename" && callbacks.onRename) {
         callbacks.onRename(tile.id);
       } else if (selected === "duplicate" && callbacks.onDuplicate) {
         callbacks.onDuplicate(tile.id);
+      } else if (selected === "mark-hermes" && callbacks.onSetRole) {
+        callbacks.onSetRole(tile.id, "hermes");
+      } else if (selected === "clear-role" && callbacks.onSetRole) {
+        callbacks.onSetRole(tile.id, null);
       }
     });
   }
@@ -251,6 +268,14 @@ export function updateTileTitle(dom, tile) {
   titleText.appendChild(parentSpan);
   titleText.appendChild(nameSpan);
   titleText.title = tile.filePath || tile.folderPath || tile.cwd || "";
+  const existingBadge = dom.titleBar.querySelector(".tile-role-badge");
+  if (existingBadge) existingBadge.remove();
+  if (tile.role) {
+    const roleBadge = document.createElement("span");
+    roleBadge.className = "tile-role-badge";
+    roleBadge.textContent = tile.role;
+    dom.titleBar.insertBefore(roleBadge, dom.titleBar.querySelector(".tile-btn-group"));
+  }
 }
 
 export function startInlineRename(dom, tile, onCommit) {

@@ -17,6 +17,7 @@ export type ThreadState =
   | "queued"
   | "delivered"
   | "waiting"
+  | "blocked_review"
   | "replied"
   | "failed"
   | "cancelled";
@@ -25,9 +26,17 @@ export interface ConnectionMirror {
   id: string;
   sourceId: string;
   targetId: string;
+  connectionSchemaVersion?: number;
   transport: ConnectionTransport;
   endpointKind: ConnectionEndpointKind;
   active: boolean;
+  verbs?: string[];
+  ownerKind?: "user" | "session" | "mixed";
+  ownerTileId?: string;
+  sessionId?: string;
+  createdBy?: string;
+  createdAt?: number;
+  updatedAt?: number;
   lastError?: string | null;
   lastErrorAt?: number | null;
 }
@@ -46,18 +55,26 @@ const events: PersistedChannelEvent[] = [];
 const agentStatuses = new Map<string, PersistedAgentStatus>();
 const waiters = new Map<string, Set<Waiter>>();
 const dedupeIndex = new Map<string, string>();
+const clientRequestIndex = new Map<
+  string,
+  { connectionId: string; payloadHash: string; threadId: string }
+>();
 const MAX_EVENTS = 500;
+const DEFAULT_BLOCKED_REVIEW_TIMEOUT_MS = 15 * 60 * 1000;
 
 let nextEventId = 1;
 let persistChain: Promise<void> = Promise.resolve();
 let persistenceEnabled = true;
 
-function normalizeBody(body: string): string {
-  return body.replace(/\r\n/g, "\n").trim();
+function canonicalizeBody(body: string): string {
+  return body
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\s+$/u, "");
 }
 
 function payloadHash(body: string): string {
-  return createHash("sha1").update(normalizeBody(body)).digest("hex");
+  return createHash("sha1").update(canonicalizeBody(body), "utf8").digest("hex");
 }
 
 function buildDedupeKey(
@@ -67,6 +84,49 @@ function buildDedupeKey(
 ): string | null {
   if (!clientRequestId) return null;
   return `${clientRequestId}:${connectionId}:${payloadHash(body)}`;
+}
+
+function indexThreadRequest(thread: PersistedThreadRecord): void {
+  const hash = thread.payloadHash ?? payloadHash(thread.request.body);
+  thread.payloadHash = hash;
+  const dedupeKey = buildDedupeKey(
+    thread.clientRequestId,
+    thread.connectionId,
+    thread.request.body,
+  );
+  if (dedupeKey) dedupeIndex.set(dedupeKey, thread.id);
+  if (thread.clientRequestId) {
+    clientRequestIndex.set(thread.clientRequestId, {
+      connectionId: thread.connectionId,
+      payloadHash: hash,
+      threadId: thread.id,
+    });
+  }
+}
+
+function assertClientRequestReuse(
+  clientRequestId: string | undefined,
+  connectionId: string,
+  body: string,
+): void {
+  if (!clientRequestId) return;
+  const existing = clientRequestIndex.get(clientRequestId);
+  if (!existing) return;
+  const hash = payloadHash(body);
+  if (
+    existing.connectionId !== connectionId
+    || existing.payloadHash !== hash
+  ) {
+    throw new RpcError(
+      "INVALID_ARGUMENT",
+      `clientRequestId ${clientRequestId} was already used for a different channel request`,
+      {
+        clientRequestId,
+        originalConnectionId: existing.connectionId,
+        requestedConnectionId: connectionId,
+      },
+    );
+  }
 }
 
 function enqueuePersist(): void {
@@ -168,6 +228,69 @@ function formatReplyEnvelope(params: {
   ].join("\n");
 }
 
+async function deliverRequestThread(params: {
+  thread: PersistedThreadRecord;
+  fromLabel?: string;
+  body: string;
+  sendTerminalInput: (tileId: string, input: string) => Promise<void>;
+}): Promise<void> {
+  const { thread } = params;
+  thread.state = "queued";
+  thread.deliveryAttempt = (thread.deliveryAttempt ?? 0) + 1;
+  thread.updatedAt = Date.now();
+  thread.lastDeliveryError = null;
+  pushEvent("message.queued", {
+    connectionId: thread.connectionId,
+    threadId: thread.id,
+    tileId: thread.request.toTileId,
+    payload: { deliveryAttempt: thread.deliveryAttempt },
+  });
+
+  try {
+    await params.sendTerminalInput(
+      thread.request.toTileId,
+      formatRequestEnvelope({
+        threadId: thread.id,
+        connectionId: thread.connectionId,
+        fromLabel: params.fromLabel ?? thread.request.fromTileId,
+        body: params.body,
+      }),
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    thread.state = "failed";
+    thread.updatedAt = Date.now();
+    thread.lastDeliveryError = message;
+    setConnectionError(thread.connectionId, message);
+    pushEvent("message.failed", {
+      connectionId: thread.connectionId,
+      threadId: thread.id,
+      payload: {
+        error: message,
+        deliveryAttempt: thread.deliveryAttempt,
+      },
+    });
+    enqueuePersist();
+    throw new RpcError(
+      "INTERNAL_ERROR",
+      `Failed to inject channel request: ${message}`,
+      { threadId: thread.id, connectionId: thread.connectionId },
+    );
+  }
+
+  thread.state = "delivered";
+  thread.updatedAt = Date.now();
+  thread.lastDeliveryError = null;
+  setConnectionError(thread.connectionId, null);
+  pushEvent("message.delivered", {
+    connectionId: thread.connectionId,
+    threadId: thread.id,
+    tileId: thread.request.toTileId,
+    payload: { deliveryAttempt: thread.deliveryAttempt },
+  });
+  enqueuePersist();
+}
+
 export async function initializeChannelService(): Promise<void> {
   const persisted = await loadChannelState();
   nextEventId = persisted.nextEventId;
@@ -175,15 +298,11 @@ export async function initializeChannelService(): Promise<void> {
   events.splice(0, events.length, ...persisted.events);
   agentStatuses.clear();
   dedupeIndex.clear();
+  clientRequestIndex.clear();
 
   for (const thread of persisted.threads) {
     threads.set(thread.id, thread);
-    const key = buildDedupeKey(
-      thread.clientRequestId,
-      thread.connectionId,
-      thread.request.body,
-    );
-    if (key) dedupeIndex.set(key, thread.id);
+    indexThreadRequest(thread);
   }
 
   for (const status of persisted.agentStatuses) {
@@ -200,6 +319,7 @@ export function resetChannelServiceForTests(options: {
   agentStatuses.clear();
   waiters.clear();
   dedupeIndex.clear();
+  clientRequestIndex.clear();
   nextEventId = 1;
   persistChain = Promise.resolve();
   persistenceEnabled = options.persistenceEnabled ?? false;
@@ -263,9 +383,10 @@ export function getTerminalHealth(
   tileId: string,
   hasSession: boolean,
 ): TerminalHealth {
+  if (!hasSession) return "offline";
   const explicit = agentStatuses.get(tileId);
   if (explicit) return explicit.status;
-  return hasSession ? "idle" : "offline";
+  return "idle";
 }
 
 export function buildConnectionRuntimeSnapshot(): Map<
@@ -288,6 +409,7 @@ export function buildConnectionRuntimeSnapshot(): Map<
         thread.state === "queued"
         || thread.state === "delivered"
         || thread.state === "waiting"
+        || thread.state === "blocked_review"
       ).length,
       lastThreadPreview: relevant[0]?.reply?.body
         ?? relevant[0]?.request.body
@@ -341,18 +463,12 @@ export async function channelSend(params: {
     );
   }
   const matchesConnectionEndpoints =
-    (
-      connection.sourceId === params.fromTileId
-      && connection.targetId === params.toTileId
-    )
-    || (
-      connection.sourceId === params.toTileId
-      && connection.targetId === params.fromTileId
-    );
+    connection.sourceId === params.fromTileId
+    && connection.targetId === params.toTileId;
   if (!matchesConnectionEndpoints) {
     throw new RpcError(
-      "INVALID_ARGUMENT",
-      `Tiles ${params.fromTileId} and ${params.toTileId} are not the endpoints of connection ${params.connectionId}`,
+      "PERMISSION_DENIED",
+      `Connection ${params.connectionId} only allows ${connection.sourceId} to initiate to ${connection.targetId}`,
       {
         connectionId: params.connectionId,
         fromTileId: params.fromTileId,
@@ -360,6 +476,12 @@ export async function channelSend(params: {
       },
     );
   }
+
+  assertClientRequestReuse(
+    params.clientRequestId,
+    params.connectionId,
+    params.body,
+  );
 
   const dedupeKey = buildDedupeKey(
     params.clientRequestId,
@@ -371,6 +493,29 @@ export async function channelSend(params: {
     if (existingThreadId) {
       const existing = threads.get(existingThreadId);
       if (existing) {
+        if (existing.state === "failed" && !existing.reply) {
+          const targetHealth = params.getTargetHealth(params.toTileId);
+          if (targetHealth === "blocked") {
+            throw new RpcError(
+              "TARGET_BUSY",
+              `Target ${params.toTileId} is blocked`,
+              { tileId: params.toTileId, retryable: true },
+            );
+          }
+          if (targetHealth === "offline") {
+            throw new RpcError(
+              "TARGET_OFFLINE",
+              `Target ${params.toTileId} is offline`,
+              { tileId: params.toTileId },
+            );
+          }
+          await deliverRequestThread({
+            thread: existing,
+            fromLabel: params.fromLabel,
+            body: params.body,
+            sendTerminalInput: params.sendTerminalInput,
+          });
+        }
         return { threadId: existing.id, state: existing.state };
       }
     }
@@ -401,58 +546,23 @@ export async function channelSend(params: {
     request: {
       fromTileId: params.fromTileId,
       toTileId: params.toTileId,
-      body: normalizeBody(params.body),
+      body: canonicalizeBody(params.body),
       createdAt: now,
     },
     clientRequestId: params.clientRequestId,
     payloadHash: payloadHash(params.body),
+    deliveryAttempt: 0,
+    lastDeliveryError: null,
     updatedAt: now,
   };
   threads.set(threadId, thread);
-  if (dedupeKey) dedupeIndex.set(dedupeKey, threadId);
-  pushEvent("message.queued", {
-    connectionId: params.connectionId,
-    threadId,
-    tileId: params.toTileId,
+  indexThreadRequest(thread);
+  await deliverRequestThread({
+    thread,
+    fromLabel: params.fromLabel,
+    body: params.body,
+    sendTerminalInput: params.sendTerminalInput,
   });
-
-  try {
-    await params.sendTerminalInput(
-      params.toTileId,
-      formatRequestEnvelope({
-        threadId,
-        connectionId: params.connectionId,
-        fromLabel: params.fromLabel ?? params.fromTileId,
-        body: params.body,
-      }),
-    );
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    thread.state = "failed";
-    thread.updatedAt = Date.now();
-    setConnectionError(params.connectionId, message);
-    pushEvent("message.failed", {
-      connectionId: params.connectionId,
-      threadId,
-      payload: { error: message },
-    });
-    enqueuePersist();
-    throw new RpcError(
-      "INTERNAL_ERROR",
-      `Failed to inject channel request: ${message}`,
-      { threadId, connectionId: params.connectionId },
-    );
-  }
-
-  thread.state = "delivered";
-  thread.updatedAt = Date.now();
-  setConnectionError(params.connectionId, null);
-  pushEvent("message.delivered", {
-    connectionId: params.connectionId,
-    threadId,
-    tileId: params.toTileId,
-  });
-  enqueuePersist();
   return { threadId, state: thread.state };
 }
 
@@ -487,7 +597,7 @@ export async function channelReply(params: {
   thread.reply = {
     fromTileId: params.fromTileId,
     toTileId: replyTarget,
-    body: normalizeBody(params.body),
+    body: canonicalizeBody(params.body),
     createdAt: Date.now(),
   };
   thread.state = "replied";
@@ -612,12 +722,13 @@ export function channelWait(params: {
   if (
     thread.state === "replied"
     || thread.state === "failed"
+    || thread.state === "blocked_review"
     || thread.state === "cancelled"
   ) {
     return Promise.resolve({ ...thread });
   }
 
-  const timeoutMs = params.timeoutMs ?? 30_000;
+  const timeoutMs = params.timeoutMs ?? DEFAULT_BLOCKED_REVIEW_TIMEOUT_MS;
   return new Promise((resolve, reject) => {
     const waiter: Waiter = {
       resolve,
@@ -625,6 +736,23 @@ export function channelWait(params: {
       timer: setTimeout(() => {
         const bucket = waiters.get(params.threadId);
         bucket?.delete(waiter);
+        const latest = threads.get(params.threadId);
+        if (
+          latest
+          && (latest.state === "delivered" || latest.state === "waiting")
+        ) {
+          latest.state = "blocked_review";
+          latest.updatedAt = Date.now();
+          pushEvent("message.blocked_review", {
+            connectionId: latest.connectionId,
+            threadId: latest.id,
+            tileId: latest.request.toTileId,
+            payload: { timeoutMs },
+          });
+          enqueuePersist();
+          resolve({ ...latest });
+          return;
+        }
         reject(
           new RpcError(
             "TIMEOUT",
@@ -644,7 +772,11 @@ export function channelInbox(tileId: string): ChannelThreadSummary[] {
   return [...threads.values()]
     .filter((thread) =>
       thread.request.toTileId === tileId
-      && (thread.state === "delivered" || thread.state === "waiting")
+      && (
+        thread.state === "delivered"
+        || thread.state === "waiting"
+        || thread.state === "blocked_review"
+      )
     )
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }

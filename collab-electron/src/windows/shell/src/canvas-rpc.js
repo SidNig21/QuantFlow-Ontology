@@ -156,6 +156,28 @@ export function createCanvasRpc({
 		return null;
 	}
 
+	function connectionMainPayload(connection, emitEvent = false) {
+		return {
+			id: connection.id,
+			sourceId: connection.sourceId,
+			targetId: connection.targetId,
+			connectionSchemaVersion: connection.connectionSchemaVersion ?? 1,
+			transport: connection.transport,
+			endpointKind: connection.endpointKind,
+			active: connection.active,
+			verbs: connection.verbs,
+			ownerKind: connection.ownerKind,
+			ownerTileId: connection.ownerTileId,
+			sessionId: connection.sessionId,
+			createdBy: connection.createdBy,
+			createdAt: connection.createdAt,
+			updatedAt: connection.updatedAt,
+			lastError: connection.lastError,
+			lastErrorAt: connection.lastErrorAt,
+			emitEvent,
+		};
+	}
+
 	async function connectionCreateMutation(params, requestId = null) {
 		if (!requireRevision(requestId, params.ifRevision)) return null;
 		const srcTile = requireTile(requestId, params.sourceTileId);
@@ -306,22 +328,17 @@ export function createCanvasRpc({
 				transport,
 				endpointKind,
 				active: true,
+				verbs: params.verbs,
+				ownerKind: params.ownerKind,
+				ownerTileId: params.ownerTileId,
+				sessionId: params.sessionId,
+				createdBy: params.createdBy,
 				clientRequestId: params.clientRequestId,
 				lastError: null,
 				lastErrorAt: null,
 			});
 		}
-		await connectionUpsertToMain({
-			id: connection.id,
-			sourceId: connection.sourceId,
-			targetId: connection.targetId,
-			transport: connection.transport,
-			endpointKind: connection.endpointKind,
-			active: connection.active,
-			lastError: connection.lastError,
-			lastErrorAt: connection.lastErrorAt,
-			emitEvent: true,
-		});
+		await connectionUpsertToMain(connectionMainPayload(connection, true));
 		tileManager.saveCanvasImmediate();
 		window.dispatchEvent(new CustomEvent("connections-changed"));
 		return {
@@ -390,17 +407,7 @@ export function createCanvasRpc({
 				connection.active,
 			);
 		}
-		await connectionUpsertToMain({
-			id: connection.id,
-			sourceId: connection.sourceId,
-			targetId: connection.targetId,
-			transport: connection.transport,
-			endpointKind: connection.endpointKind,
-			active: connection.active,
-			lastError: connection.lastError,
-			lastErrorAt: connection.lastErrorAt,
-			emitEvent: true,
-		});
+		await connectionUpsertToMain(connectionMainPayload(connection, true));
 		tileManager.saveCanvasImmediate();
 		window.dispatchEvent(new CustomEvent("connections-changed"));
 		return {
@@ -484,16 +491,24 @@ export function createCanvasRpc({
 				triggered: legacy.triggered,
 			});
 		} else {
-			const snapshot = {
-				id: current.id,
-				sourceId: current.sourceId,
-				targetId: current.targetId,
-				active: current.active,
-				endpointKind: current.endpointKind,
-				clientRequestId: current.clientRequestId,
-				lastError: current.lastError,
-				lastErrorAt: current.lastErrorAt,
-			};
+				const snapshot = {
+					id: current.id,
+					sourceId: current.sourceId,
+					targetId: current.targetId,
+					active: current.active,
+					endpointKind: current.endpointKind,
+					connectionSchemaVersion: current.connectionSchemaVersion,
+					verbs: current.verbs,
+					ownerKind: current.ownerKind,
+					ownerTileId: current.ownerTileId,
+					sessionId: current.sessionId,
+					createdBy: current.createdBy,
+					createdAt: current.createdAt,
+					updatedAt: current.updatedAt,
+					clientRequestId: current.clientRequestId,
+					lastError: current.lastError,
+					lastErrorAt: current.lastErrorAt,
+				};
 			if (getString(params.connectionId)) {
 				removeString(params.connectionId);
 				await ptyStringLinkRemoveFromMain(params.connectionId);
@@ -508,17 +523,7 @@ export function createCanvasRpc({
 				);
 			}
 		}
-		await connectionUpsertToMain({
-			id: connection.id,
-			sourceId: connection.sourceId,
-			targetId: connection.targetId,
-			transport: connection.transport,
-			endpointKind: connection.endpointKind,
-			active: connection.active,
-			lastError: connection.lastError,
-			lastErrorAt: connection.lastErrorAt,
-			emitEvent: true,
-		});
+		await connectionUpsertToMain(connectionMainPayload(connection, true));
 		tileManager.saveCanvasImmediate();
 		window.dispatchEvent(new CustomEvent("connections-changed"));
 		return {
@@ -593,6 +598,7 @@ export function createCanvasRpc({
 							url: t.url ?? null,
 							cwd: t.cwd ?? null,
 							ptySessionId: t.ptySessionId ?? null,
+							role: t.role ?? null,
 							position: { x: t.x, y: t.y },
 							size: { width: t.width, height: t.height },
 						})),
@@ -600,9 +606,17 @@ export function createCanvasRpc({
 						id: c.id,
 						sourceId: c.sourceId,
 						targetId: c.targetId,
+						connectionSchemaVersion: c.connectionSchemaVersion ?? 1,
 						transport: c.transport,
 						endpointKind: c.endpointKind,
 						active: c.active,
+						verbs: c.verbs,
+						ownerKind: c.ownerKind,
+						ownerTileId: c.ownerTileId,
+						sessionId: c.sessionId,
+						createdBy: c.createdBy,
+						createdAt: c.createdAt,
+						updatedAt: c.updatedAt,
 						clientRequestId: c.clientRequestId,
 						lastError: c.lastError ?? null,
 						lastErrorAt: c.lastErrorAt ?? null,
@@ -632,8 +646,21 @@ export function createCanvasRpc({
 
 					let tile;
 					if (tileType === "term") {
+						const extra = {};
+						if (typeof params.cwd === "string" && params.cwd.trim()) {
+							extra.cwd = params.cwd;
+						}
+						if (typeof params.role === "string" && params.role.trim()) {
+							extra.role = params.role.trim().toLowerCase();
+						}
+						if (typeof params.userTitle === "string" && params.userTitle.trim()) {
+							extra.userTitle = params.userTitle.trim();
+						}
+						if (typeof params.startupCommand === "string" && params.startupCommand.trim()) {
+							extra.startupCommand = params.startupCommand;
+						}
 						tile = tileManager.createCanvasTile(
-							"term", pos.x, pos.y,
+							"term", pos.x, pos.y, extra,
 						);
 						tileManager.spawnTerminalWebview(tile);
 					} else if (tileType === "graph") {
@@ -648,6 +675,45 @@ export function createCanvasRpc({
 					}
 					tileManager.saveCanvasImmediate();
 					result = { tileId: tile.id };
+					break;
+				}
+				case "tileSetRole": {
+					const tile = requireTile(requestId, params.tileId);
+					if (!tile) return;
+					const role = String(params.role || "").trim().toLowerCase();
+					if (role) {
+						tile.role = role;
+					} else {
+						delete tile.role;
+					}
+					tileManager.saveCanvasImmediate();
+					result = { tileId: tile.id, role: tile.role ?? null };
+					break;
+				}
+				case "cleanSlate": {
+					const hermesTiles = tiles.filter(
+						(t) => t.type === "term" && t.role === "hermes",
+					);
+					if (hermesTiles.length === 0 && !params.confirmNoHermes) {
+						respondError(
+							requestId,
+							"PERMISSION_DENIED",
+							"Clean Slate found no tile marked role=hermes; pass confirmNoHermes to close all terminals",
+							{},
+						);
+						return;
+					}
+					const toClose = tiles
+						.filter((t) => t.type === "term" && t.role !== "hermes")
+						.map((t) => t.id);
+					for (const id of toClose) {
+						await tileManager.closeCanvasTile(id);
+					}
+					result = {
+						closedTileIds: toClose,
+						preservedHermesTileIds: hermesTiles.map((t) => t.id),
+						revision: getCanvasRevision(),
+					};
 					break;
 				}
 				case "tileRemove": {
@@ -878,17 +944,7 @@ export function createCanvasRpc({
 					triggerPattern: params.triggerPattern || undefined,
 					triggered: !params.triggerPattern,
 				});
-				await connectionUpsertToMain({
-					id: connection.id,
-					sourceId: connection.sourceId,
-					targetId: connection.targetId,
-					transport: connection.transport,
-					endpointKind: connection.endpointKind,
-					active: connection.active,
-					lastError: connection.lastError,
-					lastErrorAt: connection.lastErrorAt,
-					emitEvent: true,
-				});
+				await connectionUpsertToMain(connectionMainPayload(connection, true));
 				tileManager.saveCanvasImmediate();
 				window.dispatchEvent(new CustomEvent("strings-changed"));
 				window.dispatchEvent(new CustomEvent("connections-changed"));
@@ -948,17 +1004,7 @@ export function createCanvasRpc({
 				);
 				const connection = getConnection(params.stringId);
 				if (connection) {
-					await connectionUpsertToMain({
-						id: connection.id,
-						sourceId: connection.sourceId,
-						targetId: connection.targetId,
-						transport: connection.transport,
-						endpointKind: connection.endpointKind,
-						active: connection.active,
-						lastError: connection.lastError,
-						lastErrorAt: connection.lastErrorAt,
-						emitEvent: true,
-					});
+					await connectionUpsertToMain(connectionMainPayload(connection, true));
 				}
 				tileManager.saveCanvasImmediate();
 				window.dispatchEvent(new CustomEvent("strings-changed"));

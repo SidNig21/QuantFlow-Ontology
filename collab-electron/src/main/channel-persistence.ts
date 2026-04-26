@@ -16,7 +16,14 @@ export interface PersistedAgentStatus {
 export interface PersistedThreadRecord {
   id: string;
   connectionId: string;
-  state: "queued" | "delivered" | "waiting" | "replied" | "failed" | "cancelled";
+  state:
+    | "queued"
+    | "delivered"
+    | "waiting"
+    | "blocked_review"
+    | "replied"
+    | "failed"
+    | "cancelled";
   request: {
     fromTileId: string;
     toTileId: string;
@@ -31,6 +38,8 @@ export interface PersistedThreadRecord {
   };
   clientRequestId?: string;
   payloadHash?: string;
+  deliveryAttempt?: number;
+  lastDeliveryError?: string | null;
   updatedAt: number;
 }
 
@@ -95,4 +104,3 @@ export async function saveChannelState(
   await writeFile(tmp, JSON.stringify(state, null, 2), "utf-8");
   await rename(tmp, STATE_FILE);
 }
-

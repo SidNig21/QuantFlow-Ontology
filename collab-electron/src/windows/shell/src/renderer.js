@@ -142,6 +142,16 @@ async function init() {
 	const settingsModal = document.getElementById("settings-modal");
 	const newTileBtn = document.getElementById("new-tile-btn");
 	const settingsBtn = document.getElementById("settings-btn");
+	const toolboxBtn = document.getElementById("toolbox-btn");
+	const cleanSlateBtn = document.getElementById("clean-slate-btn");
+	const toolboxOverlay = document.getElementById("toolbox-overlay");
+	const toolboxBackdrop = document.getElementById("toolbox-backdrop");
+	const toolboxClose = document.getElementById("toolbox-close");
+	const toolboxEditor = document.getElementById("toolbox-editor");
+	const toolboxPath = document.getElementById("toolbox-path");
+	const toolboxError = document.getElementById("toolbox-error");
+	const toolboxReload = document.getElementById("toolbox-reload");
+	const toolboxSave = document.getElementById("toolbox-save");
 	const updatePill = document.getElementById("update-pill");
 	const dragDropOverlay =
 		document.getElementById("drag-drop-overlay");
@@ -158,6 +168,7 @@ async function init() {
 
 	let dragCounter = 0;
 	let settingsModalOpen = false;
+	let toolboxModalOpen = false;
 	let activeSurface = "canvas";
 	let lastNonModalSurface = "canvas";
 	let shiftHeld = false;
@@ -563,6 +574,85 @@ async function init() {
 			edgeIndicators.panToTile(tile);
 		},
 	});
+
+	function setToolboxError(message = "") {
+		toolboxError.textContent = message;
+	}
+
+	async function reloadToolboxEditor() {
+		setToolboxError("");
+		const toolbox = await window.shellApi.toolboxList();
+		toolboxPath.textContent = toolbox.path || "";
+		toolboxEditor.value = JSON.stringify(
+			{ entries: toolbox.entries || [] },
+			null,
+			2,
+		);
+	}
+
+	async function openToolboxModal() {
+		toolboxModalOpen = true;
+		blurNonModalSurfaces();
+		setUnderlyingShellInert(true);
+		toolboxOverlay.classList.add("visible");
+		await reloadToolboxEditor();
+		toolboxEditor.focus();
+	}
+
+	function closeToolboxModal() {
+		toolboxModalOpen = false;
+		toolboxOverlay.classList.remove("visible");
+		setUnderlyingShellInert(settingsModalOpen);
+		if (!settingsModalOpen) focusSurface(lastNonModalSurface);
+	}
+
+	async function saveToolboxEditor() {
+		setToolboxError("");
+		let parsed;
+		try {
+			parsed = JSON.parse(toolboxEditor.value || "{}");
+		} catch (err) {
+			setToolboxError(`Invalid JSON: ${err.message}`);
+			return;
+		}
+		const saved = await window.shellApi.toolboxSave(parsed);
+		toolboxPath.textContent = saved.path || "";
+		toolboxEditor.value = JSON.stringify(
+			{ entries: saved.entries || [] },
+			null,
+			2,
+		);
+		setToolboxError("Saved.");
+	}
+
+	async function runCleanSlateFromUi() {
+		const hermesTiles = tiles.filter(
+			(t) => t.type === "term" && t.role === "hermes",
+		);
+		if (hermesTiles.length === 0) {
+			const selected = await window.shellApi.showConfirmDialog({
+				message: "Clean Slate found no Hermes tile.",
+				detail:
+					"No terminal is marked role=hermes. Continue only if you intend to close every terminal tile.",
+				buttons: ["Close all terminals", "Cancel"],
+			});
+			if (selected !== 0) return;
+		}
+		const toClose = tiles
+			.filter((t) => t.type === "term" && t.role !== "hermes")
+			.map((t) => t.id);
+		for (const id of toClose) {
+			await tileManager.closeCanvasTile(id);
+		}
+		tileManager.saveCanvasImmediate();
+		await window.shellApi.runtimeRecordEvent({
+			type: "canvas.clean_slate.ui",
+			payload: {
+				closedTileIds: toClose,
+				preservedHermesTileIds: hermesTiles.map((t) => t.id),
+			},
+		});
+	}
 
 	// -- Edge indicators --
 
@@ -1439,6 +1529,31 @@ async function init() {
 		}
 		tileManager.saveCanvasImmediate();
 		minimap.update();
+	});
+
+	toolboxBtn.addEventListener("click", () => {
+		openToolboxModal().catch((err) => {
+			setToolboxError(err.message || "Failed to open toolbox.");
+		});
+	});
+
+	toolboxBackdrop.addEventListener("click", closeToolboxModal);
+	toolboxClose.addEventListener("click", closeToolboxModal);
+	toolboxReload.addEventListener("click", () => {
+		reloadToolboxEditor().catch((err) => {
+			setToolboxError(err.message || "Failed to reload toolbox.");
+		});
+	});
+	toolboxSave.addEventListener("click", () => {
+		saveToolboxEditor().catch((err) => {
+			setToolboxError(err.message || "Failed to save toolbox.");
+		});
+	});
+
+	cleanSlateBtn.addEventListener("click", () => {
+		runCleanSlateFromUi().catch((err) => {
+			console.error("[runtime] clean slate failed", err);
+		});
 	});
 
 	settingsBtn.addEventListener("click", () => {

@@ -287,6 +287,14 @@ contextBridge.exposeInMainWorld("shellApi", {
     transport: "agent-channel" | "pty-baton" | "pty-generic";
     endpointKind: "agent" | "note" | "browser";
     active: boolean;
+    connectionSchemaVersion?: number;
+    verbs?: string[];
+    ownerKind?: "user" | "session" | "mixed";
+    ownerTileId?: string;
+    sessionId?: string;
+    createdBy?: string;
+    createdAt?: number;
+    updatedAt?: number;
     lastError?: string | null;
     lastErrorAt?: number | null;
     sourcePtySessionId?: string | null;
@@ -307,6 +315,25 @@ contextBridge.exposeInMainWorld("shellApi", {
     lastErrorAt: number | null;
   }>> =>
     ipcRenderer.invoke("canvas:connection-runtime-list"),
+
+  toolboxList: (): Promise<{
+    path: string;
+    entries: Array<Record<string, unknown>>;
+  }> => ipcRenderer.invoke("toolbox:list"),
+
+  toolboxSave: (value: unknown): Promise<{
+    path: string;
+    entries: Array<Record<string, unknown>>;
+  }> => ipcRenderer.invoke("toolbox:save", value),
+
+  runtimeRecordEvent: (params: {
+    type: string;
+    actorTileId?: string;
+    tileId?: string;
+    connectionId?: string;
+    threadId?: string;
+    payload?: unknown;
+  }): Promise<unknown> => ipcRenderer.invoke("runtime:record-event", params),
 
   ptyWrite: (sessionId: string, data: string): void => {
     ipcRenderer.send("pty:write", { sessionId, data });

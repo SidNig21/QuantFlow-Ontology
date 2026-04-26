@@ -56,6 +56,11 @@ import {
   removeCanvasConnection,
   upsertCanvasConnection,
 } from "./channel-service";
+import {
+  listToolboxEntries,
+  saveToolboxEntries,
+} from "./toolbox-service";
+import { recordRuntimeEvent } from "./runtime-state-service";
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -770,6 +775,14 @@ ipcMain.handle(
       transport: "agent-channel" | "pty-baton" | "pty-generic";
       endpointKind: "agent" | "note" | "browser";
       active: boolean;
+      connectionSchemaVersion?: number;
+      verbs?: string[];
+      ownerKind?: "user" | "session" | "mixed";
+      ownerTileId?: string;
+      sessionId?: string;
+      createdBy?: string;
+      createdAt?: number;
+      updatedAt?: number;
       lastError?: string | null;
       lastErrorAt?: number | null;
       emitEvent?: boolean;
@@ -780,9 +793,17 @@ ipcMain.handle(
         id: payload.id,
         sourceId: payload.sourceId,
         targetId: payload.targetId,
+        connectionSchemaVersion: payload.connectionSchemaVersion,
         transport: payload.transport,
         endpointKind: payload.endpointKind,
         active: payload.active,
+        verbs: payload.verbs,
+        ownerKind: payload.ownerKind,
+        ownerTileId: payload.ownerTileId,
+        sessionId: payload.sessionId,
+        createdBy: payload.createdBy,
+        createdAt: payload.createdAt,
+        updatedAt: payload.updatedAt,
         lastError: payload.lastError ?? null,
         lastErrorAt: payload.lastErrorAt ?? null,
       },
@@ -801,6 +822,28 @@ ipcMain.handle(
 ipcMain.handle(
   "canvas:connection-runtime-list",
   () => listConnectionRuntime(),
+);
+
+ipcMain.handle(
+  "toolbox:list",
+  () => listToolboxEntries(),
+);
+
+ipcMain.handle(
+  "toolbox:save",
+  (_event, value: unknown) => saveToolboxEntries(value),
+);
+
+ipcMain.handle(
+  "runtime:record-event",
+  (_event, params: {
+    type: string;
+    actorTileId?: string;
+    tileId?: string;
+    connectionId?: string;
+    threadId?: string;
+    payload?: unknown;
+  }) => recordRuntimeEvent(params),
 );
 
 let settingsOpen = false;

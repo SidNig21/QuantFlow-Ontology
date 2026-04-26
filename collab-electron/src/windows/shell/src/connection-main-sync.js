@@ -51,9 +51,17 @@ export async function syncOneShellConnectionToMain(connectionId, options = {}) {
 		id: connection.id,
 		sourceId: connection.sourceId,
 		targetId: connection.targetId,
+		connectionSchemaVersion: connection.connectionSchemaVersion ?? 1,
 		transport: connection.transport,
 		endpointKind: connection.endpointKind,
 		active: connection.active,
+		verbs: connection.verbs,
+		ownerKind: connection.ownerKind,
+		ownerTileId: connection.ownerTileId,
+		sessionId: connection.sessionId,
+		createdBy: connection.createdBy,
+		createdAt: connection.createdAt,
+		updatedAt: connection.updatedAt,
 		lastError: connection.lastError ?? null,
 		lastErrorAt: connection.lastErrorAt ?? null,
 		sourcePtySessionId: srcTile?.ptySessionId ?? null,
@@ -61,4 +69,3 @@ export async function syncOneShellConnectionToMain(connectionId, options = {}) {
 		emitEvent: options.emitEvent ?? true,
 	});
 }
-

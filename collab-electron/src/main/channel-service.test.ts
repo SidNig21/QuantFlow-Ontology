@@ -6,6 +6,7 @@ import {
   channelThreadList,
   channelWait,
   eventTail,
+  getTerminalHealth,
   reportAgentStatus,
   resetChannelServiceForTests,
   upsertCanvasConnection,
@@ -56,6 +57,126 @@ describe("channel-service", () => {
     expect(writes).toHaveLength(1);
   });
 
+  test("payload hash canonicalizes CRLF and trailing whitespace only", async () => {
+    const writes: Array<{ tileId: string; input: string }> = [];
+    const first = await channelSend({
+      connectionId: "connection-1",
+      fromTileId: "tile-a",
+      toTileId: "tile-b",
+      body: "review this folder\r\n",
+      clientRequestId: "req-canon",
+      sendTerminalInput: async (tileId, input) => {
+        writes.push({ tileId, input });
+      },
+      getTargetHealth: () => "idle",
+    });
+    const second = await channelSend({
+      connectionId: "connection-1",
+      fromTileId: "tile-a",
+      toTileId: "tile-b",
+      body: "review this folder\n   ",
+      clientRequestId: "req-canon",
+      sendTerminalInput: async (tileId, input) => {
+        writes.push({ tileId, input });
+      },
+      getTargetHealth: () => "idle",
+    });
+
+    expect(second.threadId).toBe(first.threadId);
+    expect(writes).toHaveLength(1);
+  });
+
+  test("same clientRequestId with a different payload is rejected", async () => {
+    await channelSend({
+      connectionId: "connection-1",
+      fromTileId: "tile-a",
+      toTileId: "tile-b",
+      body: "first task",
+      clientRequestId: "req-conflict",
+      sendTerminalInput: async () => undefined,
+      getTargetHealth: () => "idle",
+    });
+
+    try {
+      await channelSend({
+        connectionId: "connection-1",
+        fromTileId: "tile-a",
+        toTileId: "tile-b",
+        body: "second task",
+        clientRequestId: "req-conflict",
+        sendTerminalInput: async () => undefined,
+        getTargetHealth: () => "idle",
+      });
+      expect.unreachable("conflicting clientRequestId should reject");
+    } catch (error) {
+      expect(error.code).toBe("INVALID_ARGUMENT");
+    }
+  });
+
+  test("failed pre-delivery sends retry the same thread", async () => {
+    let fail = true;
+    const writes: string[] = [];
+    let firstThreadId = "";
+    try {
+      await channelSend({
+        connectionId: "connection-1",
+        fromTileId: "tile-a",
+        toTileId: "tile-b",
+        body: "retry me",
+        clientRequestId: "req-retry",
+        sendTerminalInput: async (_tileId, input) => {
+          if (fail) throw new Error("terminal unavailable");
+          writes.push(input);
+        },
+        getTargetHealth: () => "idle",
+      });
+      expect.unreachable("first send should fail");
+    } catch (error) {
+      const err = error as { code: string; data: { threadId: string } };
+      firstThreadId = err.data.threadId;
+      expect(err.code).toBe("INTERNAL_ERROR");
+    }
+
+    fail = false;
+    const retry = await channelSend({
+      connectionId: "connection-1",
+      fromTileId: "tile-a",
+      toTileId: "tile-b",
+      body: "retry me",
+      clientRequestId: "req-retry",
+      sendTerminalInput: async (_tileId, input) => {
+        writes.push(input);
+      },
+      getTargetHealth: () => "idle",
+    });
+
+    expect(retry.threadId).toBe(firstThreadId);
+    expect(retry.state).toBe("delivered");
+    expect(writes).toHaveLength(1);
+  });
+
+  test("agent-channel sends are one-way from source to target", async () => {
+    try {
+      await channelSend({
+        connectionId: "connection-1",
+        fromTileId: "tile-b",
+        toTileId: "tile-a",
+        body: "reverse",
+        sendTerminalInput: async () => undefined,
+        getTargetHealth: () => "idle",
+      });
+      expect.unreachable("reverse sends should reject");
+    } catch (error) {
+      expect(error.code).toBe("PERMISSION_DENIED");
+    }
+  });
+
+  test("missing terminal session overrides stale explicit status", () => {
+    reportAgentStatus("tile-b", "working");
+    expect(getTerminalHealth("tile-b", false)).toBe("offline");
+    expect(getTerminalHealth("tile-b", true)).toBe("working");
+  });
+
   test("channelAcknowledge moves delivered requests to waiting", async () => {
     const sent = await channelSend({
       connectionId: "connection-1",
@@ -102,6 +223,26 @@ describe("channel-service", () => {
     expect(reply.state).toBe("replied");
     expect(resolved.reply?.body).toBe("done");
     expect(writes.at(-1)?.tileId).toBe("tile-a");
+  });
+
+  test("channelWait marks delivered silent work blocked_review on timeout", async () => {
+    const sent = await channelSend({
+      connectionId: "connection-1",
+      fromTileId: "tile-a",
+      toTileId: "tile-b",
+      body: "wait for review",
+      sendTerminalInput: async () => undefined,
+      getTargetHealth: () => "idle",
+    });
+
+    const resolved = await channelWait({
+      threadId: sent.threadId,
+      timeoutMs: 1,
+    });
+
+    expect(resolved.state).toBe("blocked_review");
+    expect(channelThreadList({ connectionId: "connection-1" })[0]?.state)
+      .toBe("blocked_review");
   });
 
   test("blocked targets fail with TARGET_BUSY", async () => {

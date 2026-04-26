@@ -42,6 +42,10 @@
 					<path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/>
 				</svg>
 			</button>
+			<div id="runtime-controls">
+				<button type="button" id="toolbox-btn" data-tooltip="Edit toolbox">Toolbox</button>
+				<button type="button" id="clean-slate-btn" data-tooltip="Close non-Hermes terminals">Clean Slate</button>
+			</div>
 			<canvas id="grid-canvas"></canvas>
 			<div id="tile-layer"></div>
 			<div id="edge-indicators"></div>
@@ -57,6 +61,26 @@
 	<div id="settings-overlay">
 		<div id="settings-backdrop"></div>
 		<div id="settings-modal"></div>
+	</div>
+
+	<div id="toolbox-overlay">
+		<div id="toolbox-backdrop"></div>
+		<div id="toolbox-modal">
+			<div id="toolbox-header">
+				<div>
+					<h2>Runtime Toolbox</h2>
+					<p id="toolbox-path"></p>
+				</div>
+				<button type="button" id="toolbox-close" aria-label="Close toolbox">&times;</button>
+			</div>
+			<p id="toolbox-help">Human-editable JSON stored in Collaborator app data. Hermes can read these entries but cannot mutate them through CLI/RPC in V1.</p>
+			<textarea id="toolbox-editor" spellcheck="false"></textarea>
+			<div id="toolbox-error"></div>
+			<div id="toolbox-actions">
+				<button type="button" id="toolbox-reload">Reload</button>
+				<button type="button" id="toolbox-save">Save</button>
+			</div>
+		</div>
 	</div>
 
 	<div id="canvas-skill-dialog" class="hidden">

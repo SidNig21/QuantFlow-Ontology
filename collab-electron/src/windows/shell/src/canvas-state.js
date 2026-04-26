@@ -15,6 +15,8 @@
  * @property {string} [ptySessionId] - PTY session ID for terminal tiles
  * @property {string} [userTitle] - Manual title override set by user
  * @property {string} [autoTitle] - Auto-computed title from terminal session
+ * @property {string} [role] - Optional orchestration role, e.g. "hermes"
+ * @property {string} [startupCommand] - One-shot command for a fresh terminal
  * @property {number} zIndex - Stacking order
  */
 
@@ -39,6 +41,14 @@ let canvasRevision = 1;
  * @property {string} [clientRequestId]
  * @property {string} [triggerPattern]
  * @property {boolean} [triggered]
+ * @property {number} [connectionSchemaVersion]
+ * @property {string[]} [verbs]
+ * @property {'user' | 'session' | 'mixed'} [ownerKind]
+ * @property {string} [ownerTileId]
+ * @property {string} [sessionId]
+ * @property {string} [createdBy]
+ * @property {number} [createdAt]
+ * @property {number} [updatedAt]
  */
 
 /** @type {Connection[]} */
@@ -90,15 +100,31 @@ export function addConnection(link) {
 	const endpointKind = normalizeEndpointKind(link);
 	const normalized = {
 		...link,
+		connectionSchemaVersion: link.connectionSchemaVersion ?? 1,
 		endpointKind,
 		transport: normalizeConnectionTransport(link.transport, endpointKind),
 		active: link.active ?? true,
+		verbs: Array.isArray(link.verbs) && link.verbs.length > 0
+			? [...link.verbs]
+			: defaultConnectionVerbs(endpointKind),
+		ownerKind: link.ownerKind ?? "user",
 		lastError: link.lastError ?? null,
 		lastErrorAt: link.lastErrorAt ?? null,
 		clientRequestId: link.clientRequestId,
+		ownerTileId: link.ownerTileId,
+		sessionId: link.sessionId,
+		createdBy: link.createdBy,
+		createdAt: link.createdAt ?? Date.now(),
+		updatedAt: link.updatedAt ?? Date.now(),
 	};
 	connections.push(normalized);
 	return normalized;
+}
+
+function defaultConnectionVerbs(endpointKind) {
+	if (endpointKind === "browser") return ["browser-control"];
+	if (endpointKind === "note") return ["note-write"];
+	return ["ask", "notify", "wake"];
 }
 
 /** @param {string} id */
@@ -115,7 +141,10 @@ export function getConnection(id) {
 /** @param {string} id */
 export function toggleConnection(id) {
 	const link = getConnection(id);
-	if (link) link.active = !link.active;
+	if (link) {
+		link.active = !link.active;
+		link.updatedAt = Date.now();
+	}
 	return link;
 }
 
@@ -127,6 +156,7 @@ export function setConnectionTransport(id, transport) {
 	const link = getConnection(id);
 	if (!link) return null;
 	link.transport = normalizeConnectionTransport(transport, link.endpointKind);
+	link.updatedAt = Date.now();
 	return link;
 }
 
@@ -139,6 +169,7 @@ export function setConnectionLastError(id, error) {
 	if (!link) return null;
 	link.lastError = error || null;
 	link.lastErrorAt = error ? Date.now() : null;
+	link.updatedAt = Date.now();
 	return link;
 }
 
@@ -261,6 +292,7 @@ function syncLegacyStringConnection(link) {
 	existing.active = link.active;
 	existing.triggerPattern = link.triggerPattern;
 	existing.triggered = link.triggered;
+	existing.updatedAt = Date.now();
 }
 
 /** @param {StringLink} link */

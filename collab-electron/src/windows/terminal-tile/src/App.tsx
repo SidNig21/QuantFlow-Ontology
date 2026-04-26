@@ -32,6 +32,8 @@ function App() {
     const isRestored = params.get("restored") === "1";
     const cwd = params.get("cwd") || undefined;
     const tileId = params.get("tileId") || undefined;
+    const startupCommand =
+      params.get("startupCommand")?.trim() || undefined;
 
     const createFreshSession = (
       target?: string,
@@ -45,6 +47,11 @@ function App() {
           window.api.notifyPtySessionId(
             result.sessionId,
           );
+          if (startupCommand) {
+            setTimeout(() => {
+              window.api.ptyWrite(result.sessionId, `${startupCommand}\r`);
+            }, 350);
+          }
         })
         .catch(() => {
           setExited(true);

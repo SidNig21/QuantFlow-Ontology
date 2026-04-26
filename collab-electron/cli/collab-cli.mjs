@@ -182,12 +182,10 @@ function resolveConnectedEndpoint(snapshot, actorTileId, ref, endpointKind) {
     .filter((connection) =>
       connection.active
       && connection.endpointKind === endpointKind
-      && (connection.sourceId === actorTileId || connection.targetId === actorTileId)
+      && connection.sourceId === actorTileId
     )
     .map((connection) => {
-      const resourceTileId = connection.sourceId === actorTileId
-        ? connection.targetId
-        : connection.sourceId;
+      const resourceTileId = connection.targetId;
       const resourceTile = snapshot.tiles.find((tile) => tile.id === resourceTileId);
       return resourceTile ? { connection, resourceTile } : null;
     })
@@ -235,12 +233,10 @@ function resolveAgentPeer(snapshot, actorTileId, peerRef) {
       connection.active
       && connection.transport === "agent-channel"
       && connection.endpointKind === "agent"
-      && (connection.sourceId === actorTileId || connection.targetId === actorTileId)
+      && connection.sourceId === actorTileId
     )
     .map((connection) => {
-      const peerTileId = connection.sourceId === actorTileId
-        ? connection.targetId
-        : connection.sourceId;
+      const peerTileId = connection.targetId;
       const peerTile = snapshot.tiles.find((tile) => tile.id === peerTileId);
       return peerTile ? { connection, peerTile } : null;
     })
@@ -375,6 +371,90 @@ async function cmdTileFocus(args) {
   console.log(`focused ${args.join(" ")}`);
 }
 
+async function cmdTileRole(args) {
+  if (args.length < 1) die("tile role requires <id> [role]");
+  const tileId = args[0];
+  const role = args[1] || "";
+  const result = await rpcCall("canvas.tileSetRole", { tileId, role });
+  console.log(pretty(result));
+}
+
+async function cmdCleanSlate(args) {
+  const confirmNoHermes = args.includes("--confirm-no-hermes");
+  const unknown = args.filter((arg) => arg !== "--confirm-no-hermes");
+  if (unknown.length > 0) {
+    die(`unknown option: ${unknown[0]}`);
+  }
+  const result = await rpcCall("canvas.cleanSlate", {
+    confirmNoHermes,
+  });
+  console.log(pretty(result));
+}
+
+async function cmdCanvasSnapshot() {
+  console.log(pretty(await rpcCall("canvas.snapshot")));
+}
+
+async function cmdCanvasEventTail(args) {
+  const { flags } = parseFlags(args, new Set(["--after", "--limit"]));
+  const afterEventId = flags.after ? Number(flags.after) : undefined;
+  const limit = flags.limit ? Number(flags.limit) : undefined;
+  if (afterEventId != null && (!Number.isInteger(afterEventId) || afterEventId < 0)) {
+    die("--after must be a non-negative integer");
+  }
+  if (limit != null && (!Number.isInteger(limit) || limit <= 0)) {
+    die("--limit must be a positive integer");
+  }
+  console.log(pretty(await rpcCall("canvas.eventTail", { afterEventId, limit })));
+}
+
+async function cmdConnectionCreate(args) {
+  const { flags, positional } = parseFlags(
+    args,
+    new Set(["--transport", "--kind", "--request-id"]),
+  );
+  if (positional.length !== 2) {
+    die("connection create requires <source> <target>");
+  }
+  const snapshot = await getSnapshot();
+  const source = exactTileMatches(snapshot, positional[0]);
+  const target = exactTileMatches(snapshot, positional[1]);
+  if (!source) die(`TILE_NOT_FOUND: ${positional[0]}`);
+  if (!target) die(`TILE_NOT_FOUND: ${positional[1]}`);
+  const result = await rpcCall("canvas.connectionCreate", {
+    sourceTileId: source.id,
+    targetTileId: target.id,
+    transport: flags.transport,
+    endpointKind: flags.kind,
+    clientRequestId: flags["request-id"],
+  });
+  console.log(pretty(result));
+}
+
+async function cmdConnectionRemove(args) {
+  if (args.length !== 1) die("connection remove requires <connection-id>");
+  console.log(pretty(await rpcCall("canvas.connectionRemove", {
+    connectionId: args[0],
+  })));
+}
+
+async function cmdConnectionToggle(args) {
+  if (args.length !== 1) die("connection toggle requires <connection-id>");
+  console.log(pretty(await rpcCall("canvas.connectionToggle", {
+    connectionId: args[0],
+  })));
+}
+
+async function cmdConnectionSetTransport(args) {
+  if (args.length !== 2) {
+    die("connection set-transport requires <connection-id> <transport>");
+  }
+  console.log(pretty(await rpcCall("canvas.connectionSetTransport", {
+    connectionId: args[0],
+    transport: args[1],
+  })));
+}
+
 async function cmdTerminalWrite(args) {
   if (args.length < 2) die("terminal write requires <id> <input>");
   const tileId = args[0];
@@ -404,6 +484,15 @@ async function cmdTerminalRead(args) {
   console.log(pretty(result));
 }
 
+async function cmdTerminalHealth(args) {
+  const { flags, positional } = parseFlags(args, new Set(["--tile"]));
+  const tileId = positional[0] || flags.tile || CURRENT_TILE_ID;
+  if (!tileId) {
+    die("terminal health requires <id>, --tile ID, or COLLAB_TILE_ID");
+  }
+  console.log(pretty(await rpcCall("canvas.terminalHealth", { tileId })));
+}
+
 async function cmdPeersList(args) {
   const { flags } = parseFlags(args, new Set(["--tile"]));
   const snapshot = await getSnapshot();
@@ -425,12 +514,10 @@ async function cmdPeersList(args) {
       connection.active
       && connection.transport === "agent-channel"
       && connection.endpointKind === "agent"
-      && (connection.sourceId === tileId || connection.targetId === tileId)
+      && connection.sourceId === tileId
     )
     .map((connection) => {
-      const peerTileId = connection.sourceId === tileId
-        ? connection.targetId
-        : connection.sourceId;
+      const peerTileId = connection.targetId;
       const peerTile = snapshot.tiles.find((tile) => tile.id === peerTileId);
       return peerTile
         ? {
@@ -673,6 +760,55 @@ async function cmdBrowserSnapshot(args) {
   console.log(pretty(result));
 }
 
+async function cmdToolboxList() {
+  console.log(pretty(await rpcCall("canvas.toolboxList")));
+}
+
+async function cmdToolboxSpawn(args) {
+  const { flags, positional } = parseFlags(
+    args,
+    new Set(["--from", "--role", "--label", "--cwd", "--command", "--pos", "--size"]),
+  );
+  if (positional.length !== 1) {
+    die("toolbox spawn requires <entry-id>");
+  }
+  const params = {
+    entryId: positional[0],
+    controllerTileId: flags.from || CURRENT_TILE_ID || undefined,
+    role: flags.role,
+    label: flags.label,
+    cwd: flags.cwd,
+    command: flags.command,
+  };
+  if (flags.pos) {
+    const { x, y } = parsePos(flags.pos);
+    params.position = { x: x * GRID, y: y * GRID };
+  }
+  if (flags.size) {
+    const { w, h } = parseSize(flags.size);
+    params.size = { width: w * GRID, height: h * GRID };
+  }
+  console.log(pretty(await rpcCall("canvas.workerSpawnFromToolbox", params)));
+}
+
+async function cmdRuntimeState() {
+  console.log(pretty(await rpcCall("canvas.runtimeState")));
+}
+
+async function cmdRuntimeStart(args) {
+  const { flags } = parseFlags(args, new Set(["--from"]));
+  console.log(pretty(await rpcCall("canvas.runtimeRunStart", {
+    controllerTileId: flags.from || CURRENT_TILE_ID || undefined,
+  })));
+}
+
+async function cmdRuntimeClose(args) {
+  if (args.length !== 1) die("runtime close requires <run-id>");
+  console.log(pretty(await rpcCall("canvas.runtimeRunClose", {
+    runId: args[0],
+  })));
+}
+
 function usage() {
   console.log(`${CLI_NAME} — control Collaborator from the command line
 
@@ -681,6 +817,15 @@ USAGE
 
 PRIMARY COMMANDS
   peers list [--tile ID]                           List connected peers for a terminal tile
+  canvas snapshot                                  Print authoritative canvas snapshot
+  canvas event-tail [--after ID] [--limit N]       Print recent machine-readable events
+  runtime state                                    Print app-data runtime session/event records
+  runtime start [--from ID]                        Start a runtime run record
+  runtime close <run-id>                           Close a runtime run record
+  clean-slate [--confirm-no-hermes]                Close non-Hermes terminal tiles
+  toolbox list                                     List human-maintained toolbox entries
+  toolbox spawn [--from ID] [--role R] [--label L] [--cwd DIR] [--command CMD] <entry-id>
+                                                   Spawn a worker terminal from a toolbox entry
   channel ask [--from ID] [--request-id ID] <peer> <message>
                                                    Send a semantic request to a connected peer
   channel reply [--from ID] <thread-id> <message> Reply to a semantic request thread
@@ -688,6 +833,12 @@ PRIMARY COMMANDS
   channel inbox [--tile ID]                       List pending semantic requests
   channel threads [--tile ID] [--connection ID]   List semantic threads
   agent status [--tile ID] <status>               Report agent status (idle/working/blocked/done)
+
+CONNECTION COMMANDS
+  connection create [--transport T] [--kind K] [--request-id ID] <source> <target>
+  connection remove <connection-id>
+  connection toggle <connection-id>
+  connection set-transport <connection-id> <transport>
 
 RESOURCE COMMANDS
   note read [--from ID] <resource>
@@ -704,8 +855,10 @@ CANVAS COMPATIBILITY COMMANDS
   tile move <id> --pos x,y
   tile resize <id> --size w,h
   tile focus <id> [<id>...]
+  tile role <id> [role]
   terminal write <id> <input>
   terminal read <id> [--lines N]
+  terminal health [<id>|--tile ID]
 
 NOTES
   - Exact tile IDs or exact display labels are accepted. Ambiguity fails closed.
@@ -735,6 +888,78 @@ try {
     case "peers": {
       if (argv[1] !== "list") die("peers requires the subcommand: list");
       await cmdPeersList(argv.slice(2));
+      break;
+    }
+    case "canvas": {
+      const sub = argv[1];
+      const rest = argv.slice(2);
+      switch (sub) {
+        case "snapshot":
+          await cmdCanvasSnapshot();
+          break;
+        case "event-tail":
+          await cmdCanvasEventTail(rest);
+          break;
+        default:
+          die("canvas requires a subcommand: snapshot, event-tail");
+      }
+      break;
+    }
+    case "clean-slate":
+      await cmdCleanSlate(argv.slice(1));
+      break;
+    case "runtime": {
+      const sub = argv[1];
+      const rest = argv.slice(2);
+      switch (sub) {
+        case "state":
+          await cmdRuntimeState();
+          break;
+        case "start":
+          await cmdRuntimeStart(rest);
+          break;
+        case "close":
+          await cmdRuntimeClose(rest);
+          break;
+        default:
+          die("runtime requires a subcommand: state, start, close");
+      }
+      break;
+    }
+    case "toolbox": {
+      const sub = argv[1];
+      const rest = argv.slice(2);
+      switch (sub) {
+        case "list":
+          await cmdToolboxList();
+          break;
+        case "spawn":
+          await cmdToolboxSpawn(rest);
+          break;
+        default:
+          die("toolbox requires a subcommand: list, spawn");
+      }
+      break;
+    }
+    case "connection": {
+      const sub = argv[1];
+      const rest = argv.slice(2);
+      switch (sub) {
+        case "create":
+          await cmdConnectionCreate(rest);
+          break;
+        case "remove":
+          await cmdConnectionRemove(rest);
+          break;
+        case "toggle":
+          await cmdConnectionToggle(rest);
+          break;
+        case "set-transport":
+          await cmdConnectionSetTransport(rest);
+          break;
+        default:
+          die("connection requires a subcommand: create, remove, toggle, set-transport");
+      }
       break;
     }
     case "channel": {
@@ -824,8 +1049,11 @@ try {
         case "focus":
           await cmdTileFocus(rest);
           break;
+        case "role":
+          await cmdTileRole(rest);
+          break;
         default:
-          die("tile requires a subcommand: list, create, rm, move, resize, focus");
+          die("tile requires a subcommand: list, create, rm, move, resize, focus, role");
       }
       break;
     }
@@ -839,8 +1067,11 @@ try {
         case "read":
           await cmdTerminalRead(rest);
           break;
+        case "health":
+          await cmdTerminalHealth(rest);
+          break;
         default:
-          die("terminal requires a subcommand: write, read");
+          die("terminal requires a subcommand: write, read, health");
       }
       break;
     }

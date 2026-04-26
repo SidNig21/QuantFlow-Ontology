@@ -22,6 +22,7 @@ interface TileState {
   ptySessionId?: string;
   userTitle?: string;
   autoTitle?: string;
+  role?: string;
   zIndex: number;
 }
 
@@ -29,9 +30,17 @@ interface ConnectionState {
   id: string;
   sourceId: string;
   targetId: string;
+  connectionSchemaVersion?: number;
   transport?: "agent-channel" | "pty-baton" | "pty-generic";
   endpointKind?: "agent" | "note" | "browser";
   active: boolean;
+  verbs?: string[];
+  ownerKind?: "user" | "session" | "mixed";
+  ownerTileId?: string;
+  sessionId?: string;
+  createdBy?: string;
+  createdAt?: number;
+  updatedAt?: number;
   clientRequestId?: string;
   lastError?: string | null;
   lastErrorAt?: number | null;

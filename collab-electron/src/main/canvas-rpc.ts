@@ -17,6 +17,18 @@ import {
   getTerminalHealth,
   reportAgentStatus,
 } from "./channel-service";
+import {
+  findToolboxEntry,
+  listToolboxEntries,
+} from "./toolbox-service";
+import {
+  closeRuntimeSessionsForTiles,
+  closeRuntimeRun,
+  listRuntimeState,
+  recordRuntimeEvent,
+  recordRuntimeSession,
+  startRuntimeRun,
+} from "./runtime-state-service";
 
 type PendingRequest = {
   resolve: (value: unknown) => void;
@@ -154,6 +166,23 @@ export function registerCanvasRpc(win: BrowserWindow): void {
         folderPath: "(optional) Absolute path to folder",
         position: "(optional) {x, y} canvas coordinates",
         size: "(optional) {width, height} in pixels",
+        cwd: "(optional) Working directory for terminal tiles",
+        role: '(optional) Tile role, e.g. "hermes" or "worker"',
+        userTitle: "(optional) Human-readable terminal title",
+        startupCommand:
+          "(optional) Command to submit once for a fresh terminal session",
+      },
+    },
+  );
+
+  registerMethod(
+    "canvas.tileSetRole",
+    (params) => sendToShell("canvas.tileSetRole", params),
+    {
+      description: "Set or clear an orchestration role on a canvas tile",
+      params: {
+        tileId: "ID of the tile",
+        role: 'Role string, e.g. "hermes"; empty clears the role',
       },
     },
   );
@@ -224,6 +253,34 @@ export function registerCanvasRpc(win: BrowserWindow): void {
         "then flash their focus rings",
       params: {
         tileIds: "Array of tile IDs to bring into view",
+      },
+    },
+  );
+
+  registerMethod(
+    "canvas.cleanSlate",
+    async (params) => {
+      const result = await sendToShell("canvas.cleanSlate", params) as {
+        closedTileIds?: string[];
+        preservedHermesTileIds?: string[];
+        revision?: number;
+      };
+      const closedTileIds = Array.isArray(result.closedTileIds)
+        ? result.closedTileIds
+        : [];
+      await closeRuntimeSessionsForTiles(closedTileIds, "clean_slate");
+      await recordRuntimeEvent({
+        type: "canvas.clean_slate",
+        payload: result,
+      });
+      return result;
+    },
+    {
+      description:
+        "Close all non-Hermes terminal tiles while preserving tiles marked role=hermes",
+      params: {
+        confirmNoHermes:
+          "(optional) true to close all terminals when no Hermes role is marked",
       },
     },
   );
@@ -514,6 +571,160 @@ export function registerCanvasRpc(win: BrowserWindow): void {
       params: {
         afterEventId: "(optional) Event cursor to resume from",
         limit: "(optional) Maximum number of events to return",
+      },
+    },
+  );
+
+  registerMethod(
+    "canvas.runtimeState",
+    async () => listRuntimeState(),
+    {
+      description:
+        "List additive app-data runtime run/session/event records for debugging orchestration",
+      params: {},
+    },
+  );
+
+  registerMethod(
+    "canvas.runtimeRunStart",
+    async (params) => {
+      const p = params as { controllerTileId?: string };
+      return startRuntimeRun({ controllerTileId: p.controllerTileId });
+    },
+    {
+      description:
+        "Start an additive app-data runtime run record for a Hermes-led task",
+      params: {
+        controllerTileId: "(optional) Hermes/controller tile id",
+      },
+    },
+  );
+
+  registerMethod(
+    "canvas.runtimeRunClose",
+    async (params) => {
+      const p = params as { runId?: string };
+      if (!p.runId) {
+        throw new RpcError(
+          "INVALID_ARGUMENT",
+          "runtimeRunClose requires runId",
+        );
+      }
+      const run = await closeRuntimeRun(p.runId);
+      if (!run) {
+        throw new RpcError(
+          "RUN_NOT_FOUND",
+          `Runtime run not found: ${p.runId}`,
+          { runId: p.runId },
+        );
+      }
+      return run;
+    },
+    {
+      description: "Close an app-data runtime run record",
+      params: {
+        runId: "Runtime run id",
+      },
+    },
+  );
+
+  registerMethod(
+    "canvas.toolboxList",
+    async () => listToolboxEntries(),
+    {
+      description:
+        "List human-maintained toolbox entries that Hermes may inspect",
+      params: {},
+    },
+  );
+
+  registerMethod(
+    "canvas.workerSpawnFromToolbox",
+    async (params) => {
+      const p = params as {
+        entryId?: string;
+        controllerTileId?: string;
+        role?: string;
+        label?: string;
+        cwd?: string;
+        command?: string;
+        position?: { x: number; y: number };
+        size?: { width: number; height: number };
+      };
+      const entryId = typeof p.entryId === "string" ? p.entryId.trim() : "";
+      if (!entryId) {
+        throw new RpcError(
+          "INVALID_ARGUMENT",
+          "workerSpawnFromToolbox requires entryId",
+        );
+      }
+      const entry = await findToolboxEntry(entryId);
+      if (!entry) {
+        throw new RpcError(
+          "TOOLBOX_ENTRY_NOT_FOUND",
+          `Toolbox entry not found: ${entryId}`,
+          { entryId },
+        );
+      }
+      const role = typeof p.role === "string" && p.role.trim()
+        ? p.role.trim().toLowerCase()
+        : "worker";
+      const command = typeof p.command === "string"
+        ? p.command
+        : entry.command;
+      const cwd = typeof p.cwd === "string" ? p.cwd : entry.cwd;
+      const result = await callCanvasShell<{ tileId: string }>(
+        "canvas.tileCreate",
+        {
+          tileType: "term",
+          cwd,
+          role,
+          userTitle: p.label || entry.name,
+          startupCommand: command,
+          position: p.position,
+          size: p.size,
+        },
+      );
+      const runtimeSession = await recordRuntimeSession({
+        tileId: result.tileId,
+        role,
+        toolboxEntryId: entry.id,
+        toolboxEntryName: entry.name,
+        command,
+        cwd,
+        createdBy: p.controllerTileId,
+      });
+      await recordRuntimeEvent({
+        type: "toolbox.worker.spawned",
+        actorTileId: p.controllerTileId,
+        tileId: result.tileId,
+        payload: {
+          toolboxEntryId: entry.id,
+          toolboxEntryName: entry.name,
+          runtimeSessionId: runtimeSession.id,
+        },
+      });
+      return {
+        tileId: result.tileId,
+        runtimeSession,
+        toolboxEntry: {
+          id: entry.id,
+          name: entry.name,
+          kind: entry.kind,
+        },
+      };
+    },
+    {
+      description:
+        "Spawn a worker terminal from a human-maintained toolbox entry without mutating the toolbox",
+      params: {
+        entryId: "Toolbox entry id",
+        controllerTileId: "(optional) Hermes/controller tile id",
+        role: '(optional) Tile role, default "worker"',
+        label: "(optional) Terminal title override",
+        cwd: "(optional) Override toolbox cwd for this spawn",
+        command:
+          "(optional) Override toolbox command for this spawn without changing the toolbox",
       },
     },
   );
@@ -836,6 +1047,7 @@ type SnapshotTile = {
   position?: { x: number; y: number };
   size?: { width: number; height: number };
   ptySessionId?: string | null;
+  role?: string | null;
   cwd?: string | null;
   filePath?: string | null;
   url?: string | null;
@@ -848,6 +1060,14 @@ type SnapshotConnection = {
   transport: "agent-channel" | "pty-baton" | "pty-generic";
   endpointKind: "agent" | "note" | "browser";
   active: boolean;
+  connectionSchemaVersion?: number;
+  verbs?: string[];
+  ownerKind?: "user" | "session" | "mixed";
+  ownerTileId?: string;
+  sessionId?: string;
+  createdBy?: string;
+  createdAt?: number;
+  updatedAt?: number;
   clientRequestId?: string;
   lastError?: string | null;
   lastErrorAt?: number | null;
@@ -922,15 +1142,14 @@ function resolveConnectedResource(
   const actingTileId = actorTileId ?? connection.sourceId;
   const actorTile = findTile(snapshot, actingTileId);
   const actorIsSource = connection.sourceId === actorTile.id;
-  const actorIsTarget = connection.targetId === actorTile.id;
-  if (!actorIsSource && !actorIsTarget) {
+  if (!actorIsSource) {
     throw new RpcError(
       "PERMISSION_DENIED",
-      `Tile ${actorTile.id} is not part of connection ${connectionId}`,
+      `Connection ${connectionId} only allows ${connection.sourceId} to use ${connection.targetId}`,
       { connectionId, tileId: actorTile.id },
     );
   }
-  const resourceTileId = actorIsSource ? connection.targetId : connection.sourceId;
+  const resourceTileId = connection.targetId;
   const resourceTile = findTile(snapshot, resourceTileId);
   if (
     (endpointKind === "browser" && resourceTile.type !== "browser")
