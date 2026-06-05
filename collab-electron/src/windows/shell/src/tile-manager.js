@@ -488,15 +488,6 @@ export function createTileManager({
 				syncSelectionVisuals();
 				focusCanvasTile(id, e);
 			},
-			onOpenInViewer: (id) => {
-				const t = getTile(id);
-				if (t?.filePath) {
-					window.shellApi.trackEvent(
-						"tile_opened_in_viewer", { type: t.type },
-					);
-					window.shellApi.selectFile(t.filePath);
-				}
-			},
 			onNavigate: (id, url) => {
 				const t = getTile(id);
 				if (!t || t.type !== "browser") return;

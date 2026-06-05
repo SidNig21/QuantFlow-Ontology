@@ -898,6 +898,13 @@ body.platform-win {
 	cursor: grabbing;
 }
 
+.tile-title-group {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+}
+
 .tile-title-text {
 	font-size: 13px;
 	line-height: 1;
@@ -927,6 +934,7 @@ body.platform-win {
 	align-items: center;
 	gap: 2px;
 	flex-shrink: 0;
+	cursor: default;
 }
 
 .tile-action-btn {
@@ -934,7 +942,7 @@ body.platform-win {
 	line-height: 1;
 	color: var(--fg);
 	opacity: 0.4;
-	cursor: pointer;
+	cursor: default;
 	padding: 0 2px;
 	border-radius: 4px;
 	display: flex;
@@ -1041,8 +1049,15 @@ body.platform-win {
 }
 
 .canvas-tile.tile-fullscreen .tile-title-bar {
-	padding-left: 86px;
 	min-height: 38px;
+}
+
+#panel-viewer:not(.nav-open) .canvas-tile.tile-fullscreen .tile-title-bar {
+	padding-left: 86px;
+}
+
+.canvas-tile.tile-fullscreen .tile-close-btn {
+	display: none;
 }
 
 .canvas-tile.tile-fullscreen .tile-btn-group {
