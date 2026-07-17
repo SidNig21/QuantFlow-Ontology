@@ -1,0 +1,25 @@
+name: ci
+on:
+  push:
+    branches: [quantflow, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install
+        working-directory: collab-electron
+        run: bun install --frozen-lockfile
+      - name: Unit tests (bare-environment suite)
+        working-directory: collab-electron
+        run: ./scripts/test-unit.sh
+      - name: Build (main + preload + renderer)
+        working-directory: collab-electron
+        run: bun run build
+      - name: QA gates
+        run: bun qa/run.ts --all
