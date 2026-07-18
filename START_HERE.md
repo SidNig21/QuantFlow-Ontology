@@ -16,6 +16,8 @@ Research-only: QuantFlow **never places bets or executes trades**. It proposes, 
 
 **The Kernel owns truth. Everything else is a projection or a cache.** The Kernel is a typed ontology (objects · links · actions) in local SQLite. Any change that makes something remember state outside the Kernel is rejected on sight.
 
+At the canvas seam this rule is spelled out as **Canvas-seam Laws A–E** (`docs/BLUEPRINT.md`), which carry the same weight as this section. Short form: **a tile that remembers is a bug**; `Tile = render(projection) + dispatch(action)`.
+
 ## 2. The defining v1 workflow (everything else is scope creep until this runs)
 
 ```

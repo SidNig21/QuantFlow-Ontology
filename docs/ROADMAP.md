@@ -13,10 +13,10 @@
 |---|---|---|
 | 1 | Stack decided — exact tool per layer | ✅ 2026-07-18, `BLUEPRINT.md` |
 | 2 | Schema v0.1 frozen as `experimental` | ✅ 2026-07-18, `ONTOLOGY_SCHEMA.md` |
-| 3 | Canvas-seam laws A–E adopted | ⏳ slot reserved in `BLUEPRINT.md` |
+| 3 | Canvas-seam laws A–E adopted | ✅ 2026-07-18, `BLUEPRINT.md` |
 | 4 | Docs graduated + roadmap ladder | ✅ this file (WO-002) |
 
-When #3 lands, foundation is **closed**. Further research is reference material (`vault/Research/`), never a gate.
+**Foundation is CLOSED (2026-07-18).** Further research is reference material (`vault/Research/`), never a gate. From here the only path forward is the ladder below.
 
 ---
 
@@ -30,8 +30,8 @@ Gate: one real agent path streaming into a tile · cancel/fail/retry/close · on
 | WO-002 | Docs graduation + roadmap (this order) | The plan is repo-visible | done |
 | WO-003 | Schema expansion to full v0.1 + `qa` schema-lint gate (descriptions, lifecycle, no-removal-on-active) | The whole frozen schema compiles and lints | open, depends WO-001 |
 | WO-004 | Runtime ownership proof: AgentOS session → ACP agent → `ToolLoopAgent`, one session ID, no second Eve server | The L2 bet — or triggers the named Mastra fallback | open |
-| WO-005 | Kernel v0: SQLite from generated migrations + trace context on every command + ledger table | L0/L1 substrate under real writes | open, depends WO-001/003 |
-| WO-006 | One agent path end-to-end: spawn from canvas, stream into tile, call one `qf_` tool, publish one Artifact; cancel/fail/retry/close | The v0.1 phase gate itself | open, depends WO-004/005 |
+| WO-005 | Kernel v0: SQLite from generated migrations + trace context on every command + ledger table; **Law E gates land here** (Kernel is sole SQLite owner; no domain writes via `canvas-state`/`canvas-persistence`) | L0/L1 substrate under real writes | open, depends WO-001/003 |
+| WO-006 | One agent path end-to-end: spawn from canvas, stream into tile, call one `qf_` tool, publish one Artifact; cancel/fail/retry/close. **Law D is the acceptance path**: create Artifact via Kernel action → kill and relaunch app → tile shows same Artifact from the Kernel. A demo passing on in-memory tile state fails the order. | The v0.1 phase gate itself | open, depends WO-004/005 |
 
 ## Phase v0.5 — "one real quant workflow" (~2–4 months) — placeholders, detailed after v0.1 ships
 

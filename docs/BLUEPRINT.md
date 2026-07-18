@@ -33,7 +33,28 @@ Hypothesis → Dataset (versioned, point-in-time fenced) → Backtest Run (local
 
 ## Canvas-seam laws
 
-> **SLOT RESERVED** — the founder is adopting the five canvas-seam laws (A–E) drafted in the Cursor review. They land here verbatim by a one-line follow-up to this order. Until then, the governing rules are the One Rule (`START_HERE.md` §1) and the L4 row above: tiles are adapters, pixels only, no tile-local truth. **A tile that remembers is a bug.**
+> **ADOPTED 2026-07-18 (WO-002a).** Governing contract for L4. Same weight as the One Rule (`START_HERE.md` §1). Collaborator stays; ownership inverts. **A tile that remembers is a bug.**
+
+**Law A — Projection boundary.**
+Anything a human or agent must reopen next week is a Kernel object, link, or action. `canvas-state.json` and shell `tiles[]` are never authoritative. Cold reopen hydrates the UI from the Kernel, not the reverse.
+
+**Law B — Write-path singularity.**
+All durable mutations go through Kernel actions. UI clicks and MCP/`qf_*` tool calls are two clients of the same actions. No tile shortcut writes. No durable domain state in React props, tile-local stores, or canvas JSON.
+
+**Law C — Ephemeral whitelist.**
+Only these may live outside the Kernel: scroll position, collapsed panels, caret, focus/selection, draft text not yet submitted as an action, and transient loading/error UI for the last dispatch. Anything else needs a schema type or it does not ship.
+
+**Law D — First vertical slice proves the seam.**
+The WO-006 acceptance path must include: create an Artifact via a Kernel action → kill and relaunch the app → the tile shows the same Artifact from the Kernel. If the demo works from in-memory tile state alone, the order fails.
+
+**Law E — Gates, not sermons.**
+These laws are enforced by runnable `qa/` checks as soon as the Kernel exists (and earlier by reject-on-sight in review): Kernel package is the only SQLite owner; no new durable writes for QuantFlow domain types through `canvas-state` / `canvas-persistence`; cold-reopen restores layout and objects. A rule that exists only in prose is not adopted.
+
+**Tile contract (canonical).**
+`Tile = render(projection) + dispatch(action)`. Projection is derived from the Kernel. Action is a Kernel action (or a thin UI command that becomes one). No other write path.
+
+**Collaborator adapters (not authorities).**
+`tile-manager` create/move/resize/close, `restoreCanvasState`, `canvas:save-state`, `canvas-rpc` mutations, and `syncTileList` become adapters over Kernel actions and projections. Persistence demotes to cache or dies; the Kernel commit is durability.
 
 ## Organ harvest from the predecessor repo (`SidNig21/QuantFlow`, read-only)
 
