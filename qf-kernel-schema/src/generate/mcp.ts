@@ -37,12 +37,12 @@ export function generateMcp(schema: Schema): string {
   for (const object of schema.objects) {
     tools.push({
       name: `qf_${object.name}_get`,
-      description: object.description,
+      description: `Fetch one ${object.name} by id. ${object.description}`,
       inputSchema: toInputJsonSchema(getInput),
     });
     tools.push({
       name: `qf_${object.name}_query`,
-      description: object.description,
+      description: `List ${object.name} rows with optional filters. ${object.description}`,
       inputSchema: toInputJsonSchema(queryInput),
     });
   }

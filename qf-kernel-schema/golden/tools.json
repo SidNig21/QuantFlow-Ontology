@@ -1,7 +1,7 @@
 [
   {
-    "name": "qf_hypothesis_get",
-    "description": "A falsifiable research claim that roots a betting-research lineage. Agents open one before building datasets, tickets, or evaluations so every subsequent artifact answers a named question.",
+    "name": "qf_competitor_get",
+    "description": "Fetch one competitor by id. A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -16,8 +16,8 @@
     }
   },
   {
-    "name": "qf_hypothesis_query",
-    "description": "A falsifiable research claim that roots a betting-research lineage. Agents open one before building datasets, tickets, or evaluations so every subsequent artifact answers a named question.",
+    "name": "qf_competitor_query",
+    "description": "List competitor rows with optional filters. A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -38,7 +38,7 @@
   },
   {
     "name": "qf_event_get",
-    "description": "A scheduled real-world contest (UFC bout, tennis match, football game) that markets and results attach to. Starts_at is the point-in-time fence for pre-event decisions.",
+    "description": "Fetch one event by id. A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -54,7 +54,7 @@
   },
   {
     "name": "qf_event_query",
-    "description": "A scheduled real-world contest (UFC bout, tennis match, football game) that markets and results attach to. Starts_at is the point-in-time fence for pre-event decisions.",
+    "description": "List event rows with optional filters. A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -75,7 +75,7 @@
   },
   {
     "name": "qf_market_get",
-    "description": "One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "description": "Fetch one market by id. One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -91,7 +91,155 @@
   },
   {
     "name": "qf_market_query",
-    "description": "One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "description": "List market rows with optional filters. One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_odds_series_get",
+    "description": "Fetch one odds_series by id. Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_odds_series_query",
+    "description": "List odds_series rows with optional filters. Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_result_get",
+    "description": "Fetch one result by id. Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_result_query",
+    "description": "List result rows with optional filters. Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_hypothesis_get",
+    "description": "Fetch one hypothesis by id. A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_hypothesis_query",
+    "description": "List hypothesis rows with optional filters. A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_strategy_get",
+    "description": "Fetch one strategy by id. A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_strategy_query",
+    "description": "List strategy rows with optional filters. A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -112,7 +260,7 @@
   },
   {
     "name": "qf_ticket_get",
-    "description": "The atomic proposed wager — a single or a parlay — emitted by strategies and graded in backtests. A one-leg ticket is still a ticket, never a separate type.",
+    "description": "Fetch one ticket by id. The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -128,7 +276,414 @@
   },
   {
     "name": "qf_ticket_query",
-    "description": "The atomic proposed wager — a single or a parlay — emitted by strategies and graded in backtests. A one-leg ticket is still a ticket, never a separate type.",
+    "description": "List ticket rows with optional filters. The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_dataset_get",
+    "description": "Fetch one dataset by id. A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_dataset_query",
+    "description": "List dataset rows with optional filters. A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_run_get",
+    "description": "Fetch one run by id. One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_run_query",
+    "description": "List run rows with optional filters. One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_artifact_get",
+    "description": "Fetch one artifact by id. An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_artifact_query",
+    "description": "List artifact rows with optional filters. An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_evaluation_get",
+    "description": "Fetch one evaluation by id. Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_evaluation_query",
+    "description": "List evaluation rows with optional filters. Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_workspace_get",
+    "description": "Fetch one workspace by id. One canvas of work — the spatial container for tiles, sessions, and connections in a research project.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_workspace_query",
+    "description": "List workspace rows with optional filters. One canvas of work — the spatial container for tiles, sessions, and connections in a research project.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_agent_definition_get",
+    "description": "Fetch one agent_definition by id. A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_agent_definition_query",
+    "description": "List agent_definition rows with optional filters. A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_agent_session_get",
+    "description": "Fetch one agent_session by id. One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_agent_session_query",
+    "description": "List agent_session rows with optional filters. One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_task_get",
+    "description": "Fetch one task by id. A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_task_query",
+    "description": "List task rows with optional filters. A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_tool_get",
+    "description": "Fetch one tool by id. A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_tool_query",
+    "description": "List tool rows with optional filters. A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_execution_environment_get",
+    "description": "Fetch one execution_environment by id. Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_execution_environment_query",
+    "description": "List execution_environment rows with optional filters. Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_connection_get",
+    "description": "Fetch one connection by id. A typed cable between tiles on the canvas — projection wiring, never a second truth store.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_connection_query",
+    "description": "List connection rows with optional filters. A typed cable between tiles on the canvas — projection wiring, never a second truth store.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -149,7 +704,7 @@
   },
   {
     "name": "qf_create_hypothesis",
-    "description": "Open a new research hypothesis with claim, success criteria, and optional sources before any downstream ticket or evaluation work.",
+    "description": "Open a new research hypothesis with claim, success criteria, and optional sources.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -176,44 +731,285 @@
     }
   },
   {
-    "name": "qf_submit_ticket",
-    "description": "Propose a single or parlay ticket with legs, combined price, and stake for simulated grading — never live order placement.",
+    "name": "qf_register_dataset_version",
+    "description": "Register a new content-hashed, point-in-time dataset version in the Kernel.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "kind": {
           "type": "string",
           "enum": [
-            "single",
-            "parlay"
+            "odds_history",
+            "results",
+            "features",
+            "mixed"
           ],
-          "description": "Ticket shape: single leg or parlay."
+          "description": "Dataset kind being registered."
         },
-        "legs": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {}
+        "content_hash": {
+          "type": "string",
+          "description": "Hash of the underlying Parquet set."
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "Point-in-time boundary for this version."
+        },
+        "coverage": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
           },
-          "description": "Leg payloads (market, side, price, captured_at) as JSON objects."
-        },
-        "combined_price": {
-          "type": "number",
-          "description": "Combined odds for the proposed ticket."
-        },
-        "stake": {
-          "type": "number",
-          "description": "Simulated stake amount."
+          "additionalProperties": {},
+          "description": "Sufficiency summary for agents."
         }
       },
       "required": [
         "kind",
-        "legs",
-        "combined_price",
-        "stake"
+        "content_hash",
+        "as_of",
+        "coverage"
+      ]
+    }
+  },
+  {
+    "name": "qf_start_run",
+    "description": "Start a queued run (queued → running). Rejectable if the transition is illegal.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id of the queued run to start."
+        }
+      },
+      "required": [
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_cancel_run",
+    "description": "Cancel a running run (running → cancelled).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id of the running run to cancel."
+        }
+      },
+      "required": [
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_retry_run",
+    "description": "Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id of the failed or cancelled run to retry from."
+        }
+      },
+      "required": [
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_close_run",
+    "description": "Operator close/ack for a terminal run (no status change — succeeded/failed/cancelled are already terminal).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id of the terminal run to close/ack."
+        }
+      },
+      "required": [
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_publish_artifact",
+    "description": "Publish an immutable content-addressed artifact (must land before sandbox death).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "strategy_spec",
+            "code",
+            "result_set",
+            "report",
+            "trajectory"
+          ],
+          "description": "Artifact kind to publish."
+        },
+        "content_hash": {
+          "type": "string",
+          "description": "Content hash of the bytes."
+        },
+        "storage_ref": {
+          "type": "string",
+          "description": "Durable storage location."
+        }
+      },
+      "required": [
+        "kind",
+        "content_hash",
+        "storage_ref"
+      ]
+    }
+  },
+  {
+    "name": "qf_record_evaluation",
+    "description": "Record a structured evaluation verdict with metrics against a hypothesis lineage.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {},
+          "description": "Metric set for this evaluation."
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "supports",
+            "rejects",
+            "inconclusive"
+          ],
+          "description": "Verdict relative to the hypothesis."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence in the verdict (0–1)."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Rationale text."
+        },
+        "critic_findings_ref": {
+          "type": "string",
+          "description": "Optional Critic findings artifact id."
+        }
+      },
+      "required": [
+        "metrics",
+        "verdict",
+        "confidence",
+        "rationale"
+      ]
+    }
+  },
+  {
+    "name": "qf_resolve_hypothesis",
+    "description": "Resolve an open hypothesis to supported|rejected|inconclusive; evaluation-gated at the Kernel.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "hypothesis_id": {
+          "type": "string",
+          "description": "Hypothesis to resolve."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "rejected",
+            "inconclusive"
+          ],
+          "description": "Resolved status to write."
+        }
+      },
+      "required": [
+        "hypothesis_id",
+        "status"
+      ]
+    }
+  },
+  {
+    "name": "qf_request_approval",
+    "description": "Request operator approval for a pending context item (L2 gate).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "subject_ref": {
+          "type": "string",
+          "description": "Id of the subject awaiting approval."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why approval is required."
+        }
+      },
+      "required": [
+        "subject_ref",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "qf_approve",
+    "description": "Approve a pending approval request.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "description": "Approval request id to approve."
+        }
+      },
+      "required": [
+        "request_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_deny",
+    "description": "Deny a pending approval request.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "description": "Approval request id to deny."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Optional denial reason."
+        }
+      },
+      "required": [
+        "request_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_promote_type",
+    "description": "Promote a schema type from experimental to active (schema governance action).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "type_name": {
+          "type": "string",
+          "description": "Object, link, or action name to promote."
+        }
+      },
+      "required": [
+        "type_name"
       ]
     }
   }

@@ -62,6 +62,24 @@ const gates: Gate[] = [
       return true;
     },
   },
+  {
+    name: "schema",
+    description:
+      "qf-kernel-schema tests green (lint, golden, determinism, conformance)",
+    run: async () => {
+      const proc = Bun.spawn(["bun", "test"], {
+        cwd: join(REPO_ROOT, "qf-kernel-schema"),
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      const code = await proc.exited;
+      if (code !== 0) {
+        console.error(`schema: bun test exited ${code}`);
+        return false;
+      }
+      return true;
+    },
+  },
 ];
 
 async function main() {

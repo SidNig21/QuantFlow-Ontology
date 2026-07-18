@@ -3,21 +3,21 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-003**
+## Current order: **WO-004**
 
-Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-003.md` exactly.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-004.md` exactly.
 
-- Work on a new branch named `wo-003`.
+- Work on a new branch named `wo-004`.
 - Stay strictly inside the order's scope — anything not listed in its Deliverables is out.
 - Run every acceptance gate and paste the full, unedited output in your report, using the order's Report-back format.
 - Commit to your branch and push it. **Do not merge.**
 - If anything in the order is ambiguous, stop and say so instead of improvising.
 
-WO-003 expands the `qf-kernel-schema/` package (delivered by WO-001, merged and green) into the full v0.2 ontology with generated state-transition conformance tests. `docs/ONTOLOGY_SCHEMA.md` is the specification you implement — it is authoritative and you may not edit it.
+WO-004 is a **proof order**, not a feature order: it tests whether AgentOS → ACP → `ToolLoopAgent` can hold one session ID with one server process. A clean, well-evidenced failure is a successful outcome and is what the order asks for if the chain doesn't hold — do not force a pass.
 
 ## Parallel-eligible (second builder only, never the same builder)
 
-*none — WO-004 (runtime ownership proof) becomes parallel-eligible once its order file is detailed.*
+**WO-005 — Kernel v0** (SQLite from the generated migrations + trace context + ledger table + Law E gates) is unblocked: its dependencies WO-001 and WO-003 are both `done`. Its order file is written on request — ask the architect for it before starting a second builder. Do not begin WO-005 from the roadmap line alone; no order file, no work.
 
 ---
 

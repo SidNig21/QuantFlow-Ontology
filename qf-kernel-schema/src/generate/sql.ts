@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { propertyDescription, unwrapZodType, type DefinedObject, type Schema } from "../define.ts";
+import {
+  enumValues,
+  propertyDescription,
+  unwrapZodType,
+  type DefinedObject,
+  type Schema,
+} from "../define.ts";
 
 type SqlColumn = {
   name: string;
@@ -32,13 +38,6 @@ function isNullable(schema: z.ZodType): boolean {
   }
 }
 
-function enumValues(schema: z.ZodType): string[] | null {
-  const def = (schema as { _zod?: { def?: { type?: string; entries?: Record<string, string> } } })._zod
-    ?.def;
-  if (def?.type !== "enum" || !def.entries) return null;
-  return Object.values(def.entries);
-}
-
 function mapZodToSql(field: z.ZodType): { sqlType: string; check?: string } {
   const inner = unwrapZodType(field);
   const type = zodDefType(inner);
@@ -57,7 +56,6 @@ function mapZodToSql(field: z.ZodType): { sqlType: string; check?: string } {
   }
   if (type === "string") return { sqlType: "TEXT" };
 
-  // z.iso.datetime and other string brands still report as string; fallback TEXT
   return { sqlType: "TEXT" };
 }
 
@@ -74,13 +72,6 @@ function columnsForObject(object: DefinedObject): SqlColumn[] {
       sqlType: "TEXT",
       notNull: true,
       comment: "ISO-8601 UTC timestamp when the row was created.",
-    },
-    {
-      name: "lifecycle",
-      sqlType: "TEXT",
-      notNull: true,
-      check: `IN ('experimental', 'active')`,
-      comment: `Schema lifecycle for ${object.name} (default '${object.lifecycle}').`,
     },
   ];
 
@@ -114,18 +105,13 @@ function emitObjectTable(object: DefinedObject): string {
     const pk = col.name === "id" ? " PRIMARY KEY" : "";
     body.push(`  ${col.name} ${col.sqlType}${pk}${nullSql},`);
   }
-  // trim trailing comma from last column line, then add table checks
   const lastColIdx = body.length - 1;
   body[lastColIdx] = body[lastColIdx]!.replace(/,$/, "");
 
   const checks: string[] = [];
   for (const col of cols) {
     if (col.check) {
-      if (col.name === "lifecycle") {
-        checks.push(`  CHECK (lifecycle ${col.check})`);
-      } else {
-        checks.push(`  CHECK (${col.check})`);
-      }
+      checks.push(`  CHECK (${col.check})`);
     }
   }
 
@@ -143,6 +129,44 @@ function emitObjectTable(object: DefinedObject): string {
   return lines.join("\n");
 }
 
+function sqlString(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+function emitSchemaMeta(schema: Schema): string {
+  const lines: string[] = [];
+  lines.push("-- Type-level lifecycle and descriptions (not per-row data).");
+  lines.push("CREATE TABLE schema_meta (");
+  lines.push("  -- Object, link, or action name.");
+  lines.push("  type_name TEXT PRIMARY KEY NOT NULL,");
+  lines.push("  -- Schema kind: object | link | action.");
+  lines.push("  kind TEXT NOT NULL,");
+  lines.push("  -- Type lifecycle governing modify-vs-extend rules.");
+  lines.push("  lifecycle TEXT NOT NULL CHECK (lifecycle IN ('experimental', 'active')),");
+  lines.push("  -- Agent-facing description of the type.");
+  lines.push("  description TEXT NOT NULL");
+  lines.push(");");
+  lines.push("");
+
+  for (const object of schema.objects) {
+    lines.push(
+      `INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES (${sqlString(object.name)}, 'object', ${sqlString(object.lifecycle)}, ${sqlString(object.description)});`,
+    );
+  }
+  for (const link of schema.links) {
+    lines.push(
+      `INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES (${sqlString(link.name)}, 'link', ${sqlString(link.lifecycle)}, ${sqlString(link.description)});`,
+    );
+  }
+  for (const action of schema.actions) {
+    lines.push(
+      `INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES (${sqlString(action.name)}, 'action', ${sqlString(action.lifecycle)}, ${sqlString(action.description)});`,
+    );
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
 /**
  * Pure generator: schema in → migration SQL string out.
  * Deterministic; does not touch the filesystem.
@@ -153,16 +177,20 @@ export function generateSql(schema: Schema): string {
   parts.push("-- DO NOT EDIT — regenerate with `bun run generate`.");
   parts.push("");
 
+  parts.push(emitSchemaMeta(schema));
+
   for (const object of schema.objects) {
     parts.push(emitObjectTable(object));
   }
+
+  const linkKinds = schema.links.map((l) => `'${l.name.replaceAll("'", "''")}'`).join(", ");
 
   parts.push("-- Typed directed edges between ontology objects.");
   parts.push("CREATE TABLE links (");
   parts.push("  -- Primary key for this link instance.");
   parts.push("  id TEXT PRIMARY KEY NOT NULL,");
   parts.push("  -- Link kind (schema link name), e.g. offered_on.");
-  parts.push("  kind TEXT NOT NULL,");
+  parts.push(`  kind TEXT NOT NULL CHECK (kind IN (${linkKinds})),`);
   parts.push("  -- Source object id.");
   parts.push("  from_id TEXT NOT NULL,");
   parts.push("  -- Target object id.");
