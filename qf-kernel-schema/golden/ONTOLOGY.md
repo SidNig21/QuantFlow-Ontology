@@ -4,27 +4,26 @@
 
 ## Objects
 
-### `hypothesis`
+### `competitor`
 
-A falsifiable research claim that roots a betting-research lineage. Agents open one before building datasets, tickets, or evaluations so every subsequent artifact answers a named question.
+A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `claim` — The statement under test in betting-research terms, e.g. a priced inefficiency or independence assumption.
-- `success_criteria` — What evaluation outcome would support the claim (metrics, sample size, risk bounds) so Critic/Evaluation can grade it.
-- `sources` — Citations grounding the claim (papers, articles, prior reports) that agents must carry into lineage.
-- `status` — Lifecycle of the claim; only evaluation-backed resolution should leave open.
+- `kind` — Competitor species; a team's sport comes from the events it plays.
+- `name` — Canonical display name used in markets and reports.
+- `external_refs` — Source-system IDs (Bovada participant id, dataset keys) for entity resolution.
 
 ### `event`
 
-A scheduled real-world contest (UFC bout, tennis match, football game) that markets and results attach to. Starts_at is the point-in-time fence for pre-event decisions.
+A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `sport` — Which sport domain this contest belongs to; drives prop vocabularies and dataset coverage.
+- `sport` — Sport domain for this contest; drives prop vocabularies and coverage.
 - `starts_at` — Scheduled start as ISO-8601 UTC; no post-start data may inform a pre-event ticket.
 - `status` — Contest state from schedule through settlement or void.
-- `competition` — Tournament or league context (UFC 320, Wimbledon R16, NFL Week 3) for agent filtering.
+- `competition` — Tournament or league context (UFC 320, Wimbledon R16, NFL Week 3).
 
 ### `market`
 
@@ -33,53 +32,283 @@ One bettable proposition on an event. Moneyline, spread, total, and prop are kin
 - **lifecycle:** `experimental`
 - **properties:**
 - `kind` — Market family; props carry sport-specific structure in params.
-- `params` — Kind-specific parameters (lines, prop category/method/round, handicaps) as a JSON object.
+- `params` — Kind-specific parameters (lines, prop category/method/round, handicaps) as JSON.
 - `sides` — Named outcomes offered, e.g. ["Jones","Miocic"] or ["over","under"].
 - `correlation_group` — Shared key for same-event markets with dependent outcomes; null when independence is assumed.
 
+### `odds_series`
+
+Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `book` — Sportsbook source; Pinnacle series are the sharp CLV benchmark.
+- `data_ref` — Content hash plus path of the Parquet segment(s) holding timestamped quotes.
+- `coverage` — Sufficiency summary: first/last captured timestamps and quote count for agent judgment.
+
+### `result`
+
+Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `outcome` — Structured result (winner, score/method, per-market grading win|loss|push|void).
+- `settled_at` — When truth became known (ISO-8601 UTC); also a point-in-time fence.
+
+### `hypothesis`
+
+A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `claim` — The statement under test in betting-research terms.
+- `success_criteria` — What evaluation outcome would support the claim (metrics, n, risk bounds).
+- `sources` — Citations grounding the claim (arXiv IDs, papers, articles).
+- `status` — Claim lifecycle; only evaluation-backed resolution leaves open.
+
+### `strategy`
+
+A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `spec_ref` — Artifact id whose content defines this strategy's rules/code.
+- `version` — Monotonic version number; new versions are new objects derived_from the old.
+- `stake_model` — How positions are sized in backtests.
+
 ### `ticket`
 
-The atomic proposed wager — a single or a parlay — emitted by strategies and graded in backtests. A one-leg ticket is still a ticket, never a separate type.
+The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.
 
 - **lifecycle:** `experimental`
 - **properties:**
 - `kind` — Whether this wager is one leg or a multi-leg parlay.
-- `legs` — Structured legs: each entry is market ref + side + price-at-selection (+ captured_at) as JSON objects.
-- `combined_price` — Total odds for the ticket as offered or computed across legs.
+- `legs` — Structured legs: market ref + side + price-at-selection + captured_at as JSON objects.
+- `combined_price` — Total odds for the ticket as offered or computed.
 - `stake` — Simulated stake under the strategy stake model.
+- `correlation_note` — Declared dependence among legs (same-event legs must reference correlation_group keys).
 - `grade` — Settlement grade once results land; pending until then.
+
+### `dataset`
+
+A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — What kind of research data this snapshot holds.
+- `content_hash` — Hash over the underlying Parquet set; byte-identical data shares this hash.
+- `as_of` — Point-in-time boundary this dataset respects (ISO-8601 UTC).
+- `coverage` — Agent-readable sufficiency: sports, date range, event count.
+
+### `run`
+
+One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — Which execution pipeline this run performs.
+- `status` — Operational run state; actor-internal THINKING/TOOL_CALLING are never stored here.
+- `params` — Full invocation parameters — the reproducibility contract.
+- `trace_id` — Root of this run's span tree in the trace layer (L5).
+
+### `artifact`
+
+An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — Artifact family; trajectory/report must be distilled, never raw transcripts.
+- `content_hash` — Content hash of the durable bytes.
+- `storage_ref` — Durable location of the bytes (exported before any sandbox dies).
+
+### `evaluation`
+
+Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `metrics` — Typed metric set: per-leg CLV/hit/price-beat, per-ticket ROI, Monte Carlo bankroll, OOS consistency.
+- `critic_findings_ref` — Artifact id of triaged Critic findings weighed in this verdict.
+- `verdict` — Overall evaluation verdict relative to the hypothesis.
+- `confidence` — Confidence in the verdict on a 0–1 scale.
+- `rationale` — Human/agent-readable rationale for the verdict.
+
+### `workspace`
+
+One canvas of work — the spatial container for tiles, sessions, and connections in a research project.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `name` — Short workspace name shown on the canvas.
+- `title` — Human-readable title for the research workspace.
+
+### `agent_definition`
+
+A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `name` — Species name agents and operators use to request a spawn.
+- `role` — Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
+- `system_prompt_ref` — Artifact or prompt id that defines this species' instructions.
+
+### `agent_session`
+
+One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `status` — Operational session state enforced by the transition table.
+- `label` — Optional operator-facing label for the live session.
+
+### `task`
+
+A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `title` — Short task title for the operator and agents.
+- `description` — What done looks like for this unit of work.
+
+### `tool`
+
+A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `name` — Tool name as exposed to agents (typically qf_*).
+- `summary` — One-line summary of what the tool does for an agent reader.
+
+### `execution_environment`
+
+Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — Execution substrate for runs linked via executes_in.
+- `label` — Operator-facing label for this environment instance.
+
+### `connection`
+
+A typed cable between tiles on the canvas — projection wiring, never a second truth store.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — Cable/connection kind (data, control, or view projection).
+- `from_ref` — Source tile or object id for this cable.
+- `to_ref` — Target tile or object id for this cable.
 
 ## Links
 
+### `participates_in`
+
+Roster/matchup edge: which competitors take part in an event.
+
+- **lifecycle:** `experimental`
+- **from:** `competitor`
+- **to:** `event`
+
 ### `offered_on`
 
-Attaches a market to the event it is offered on so agents can discover every proposition for a contest.
+Attaches a market to the event it is offered on for per-contest discovery.
 
 - **lifecycle:** `experimental`
 - **from:** `market`
 - **to:** `event`
 
+### `quotes`
+
+Price-history lookup: which market an odds_series records.
+
+- **lifecycle:** `experimental`
+- **from:** `odds_series`
+- **to:** `market`
+
+### `settles`
+
+Truth attachment: which event a result settles.
+
+- **lifecycle:** `experimental`
+- **from:** `result`
+- **to:** `event`
+
+### `tests`
+
+Why this run or strategy exists — it tests a named hypothesis.
+
+- **lifecycle:** `experimental`
+- **from:** `run` | `strategy`
+- **to:** `hypothesis`
+
 ### `has_leg`
 
-Connects a ticket to each market it bets so correlation traversal and per-market ticket queries stay typed.
+Which markets a ticket bets; enables correlation traversal.
 
 - **lifecycle:** `experimental`
 - **from:** `ticket`
 - **to:** `market`
 
-### `tests`
+### `uses`
 
-Declares that a ticket exists to test a hypothesis, keeping wager proposals inside a falsifiable research chain.
+Full input manifest for a run: datasets, strategies, and tools consumed.
 
 - **lifecycle:** `experimental`
-- **from:** `ticket`
-- **to:** `hypothesis`
+- **from:** `run`
+- **to:** `dataset` | `strategy` | `tool`
+
+### `executes_in`
+
+Where computation for a run happened.
+
+- **lifecycle:** `experimental`
+- **from:** `run`
+- **to:** `execution_environment`
+
+### `produces`
+
+Output provenance: datasets or artifacts produced by a run or agent session.
+
+- **lifecycle:** `experimental`
+- **from:** `run` | `agent_session`
+- **to:** `dataset` | `artifact`
+
+### `derived_from`
+
+Version and transformation lineage among datasets, artifacts, and strategies.
+
+- **lifecycle:** `experimental`
+- **from:** `dataset` | `artifact` | `strategy`
+- **to:** `dataset` | `artifact` | `strategy`
+
+### `evaluated_by`
+
+Verdict attachment: which evaluation judged an artifact or run.
+
+- **lifecycle:** `experimental`
+- **from:** `artifact` | `run`
+- **to:** `evaluation`
+
+### `assigned_to`
+
+Work routing: which agent session owns a task.
+
+- **lifecycle:** `experimental`
+- **from:** `task`
+- **to:** `agent_session`
+
+### `delegates_to`
+
+Session-to-session delegation on the canvas.
+
+- **lifecycle:** `experimental`
+- **from:** `agent_session`
+- **to:** `agent_session`
 
 ## Actions
 
 ### `create_hypothesis`
 
-Open a new research hypothesis with claim, success criteria, and optional sources before any downstream ticket or evaluation work.
+Open a new research hypothesis with claim, success criteria, and optional sources.
 
 - **lifecycle:** `experimental`
 - **input:**
@@ -87,13 +316,110 @@ Open a new research hypothesis with claim, success criteria, and optional source
 - `success_criteria` — How an evaluation would support this claim.
 - `sources` — Optional citations grounding the claim.
 
-### `submit_ticket`
+### `register_dataset_version`
 
-Propose a single or parlay ticket with legs, combined price, and stake for simulated grading — never live order placement.
+Register a new content-hashed, point-in-time dataset version in the Kernel.
 
 - **lifecycle:** `experimental`
 - **input:**
-- `kind` — Ticket shape: single leg or parlay.
-- `legs` — Leg payloads (market, side, price, captured_at) as JSON objects.
-- `combined_price` — Combined odds for the proposed ticket.
-- `stake` — Simulated stake amount.
+- `kind` — Dataset kind being registered.
+- `content_hash` — Hash of the underlying Parquet set.
+- `as_of` — Point-in-time boundary for this version.
+- `coverage` — Sufficiency summary for agents.
+
+### `start_run`
+
+Start a queued run (queued → running). Rejectable if the transition is illegal.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id of the queued run to start.
+
+### `cancel_run`
+
+Cancel a running run (running → cancelled).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id of the running run to cancel.
+
+### `retry_run`
+
+Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id of the failed or cancelled run to retry from.
+
+### `close_run`
+
+Operator close/ack for a terminal run (no status change — succeeded/failed/cancelled are already terminal).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id of the terminal run to close/ack.
+
+### `publish_artifact`
+
+Publish an immutable content-addressed artifact (must land before sandbox death).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `kind` — Artifact kind to publish.
+- `content_hash` — Content hash of the bytes.
+- `storage_ref` — Durable storage location.
+
+### `record_evaluation`
+
+Record a structured evaluation verdict with metrics against a hypothesis lineage.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `metrics` — Metric set for this evaluation.
+- `verdict` — Verdict relative to the hypothesis.
+- `confidence` — Confidence in the verdict (0–1).
+- `rationale` — Rationale text.
+- `critic_findings_ref` — Optional Critic findings artifact id.
+
+### `resolve_hypothesis`
+
+Resolve an open hypothesis to supported|rejected|inconclusive; evaluation-gated at the Kernel.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `hypothesis_id` — Hypothesis to resolve.
+- `status` — Resolved status to write.
+
+### `request_approval`
+
+Request operator approval for a pending context item (L2 gate).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `subject_ref` — Id of the subject awaiting approval.
+- `reason` — Why approval is required.
+
+### `approve`
+
+Approve a pending approval request.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `request_id` — Approval request id to approve.
+
+### `deny`
+
+Deny a pending approval request.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `request_id` — Approval request id to deny.
+- `reason` — Optional denial reason.
+
+### `promote_type`
+
+Promote a schema type from experimental to active (schema governance action).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `type_name` — Object, link, or action name to promote.

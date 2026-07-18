@@ -10,6 +10,10 @@ function propertyLines(shape: Record<string, unknown>): string[] {
   return lines;
 }
 
+function formatEndpoints(names: string[]): string {
+  return names.map((n) => `\`${n}\``).join(" | ");
+}
+
 /**
  * Pure generator: schema in → ONTOLOGY.md string out.
  * Deterministic; does not touch the filesystem.
@@ -42,8 +46,8 @@ export function generateDocs(schema: Schema): string {
     lines.push(link.description);
     lines.push("");
     lines.push(`- **lifecycle:** \`${link.lifecycle}\``);
-    lines.push(`- **from:** \`${link.from}\``);
-    lines.push(`- **to:** \`${link.to}\``);
+    lines.push(`- **from:** ${formatEndpoints(link.from)}`);
+    lines.push(`- **to:** ${formatEndpoints(link.to)}`);
     lines.push("");
   }
 

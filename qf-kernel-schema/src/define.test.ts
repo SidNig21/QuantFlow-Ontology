@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "zod";
-import { defineAction, defineLink, defineObject } from "./define.ts";
+import {
+  defineAction,
+  defineLink,
+  defineObject,
+  lintSchema,
+  type Schema,
+} from "./define.ts";
 
 describe("schema lint", () => {
   test("object missing description fails naming the offender", () => {
@@ -82,5 +88,95 @@ describe("schema lint", () => {
         }),
       }),
     ).toThrow('Action "do_thing" is missing a required non-empty description');
+  });
+
+  test("multi-endpoint link preserves declaration order", () => {
+    const a = defineObject({
+      name: "alpha",
+      description: "Alpha object.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const b = defineObject({
+      name: "beta",
+      description: "Beta object.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const c = defineObject({
+      name: "gamma",
+      description: "Gamma object.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const link = defineLink({
+      name: "joins",
+      description: "Multi endpoint link.",
+      lifecycle: "experimental",
+      from: [a, b],
+      to: c,
+    });
+    expect(link.from).toEqual(["alpha", "beta"]);
+    expect(link.to).toEqual(["gamma"]);
+  });
+
+  test("lintSchema rejects duplicate names", () => {
+    const obj = defineObject({
+      name: "dup_name",
+      description: "An object.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const action = defineAction({
+      name: "dup_name",
+      description: "An action.",
+      lifecycle: "experimental",
+      input: z.object({ value: z.string().describe("Value.") }),
+    });
+    const schema: Schema = { objects: [obj], links: [], actions: [action] };
+    expect(() => lintSchema(schema, {})).toThrow('Duplicate action name "dup_name"');
+  });
+
+  test("lintSchema rejects unknown link endpoints", () => {
+    const a = defineObject({
+      name: "alpha",
+      description: "Alpha object.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const b = defineObject({
+      name: "beta",
+      description: "Beta object.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const link = defineLink({
+      name: "points_to",
+      description: "A link.",
+      lifecycle: "experimental",
+      from: a,
+      to: b,
+    });
+    const schema: Schema = { objects: [a], links: [link], actions: [] };
+    expect(() => lintSchema(schema, {})).toThrow(
+      'Link "points_to" to endpoint "beta" does not reference an object in the schema',
+    );
+  });
+
+  test("lintSchema rejects status enum missing from transition table", () => {
+    const widget = defineObject({
+      name: "widget",
+      description: "A stateful widget.",
+      lifecycle: "experimental",
+      properties: z.object({
+        status: z.enum(["a", "b"]).describe("Status."),
+      }),
+    });
+    const schema: Schema = { objects: [widget], links: [], actions: [] };
+    expect(() =>
+      lintSchema(schema, {
+        widget: { a: ["b"] },
+      }),
+    ).toThrow('Object "widget" state "b" is missing from the transition table');
   });
 });
