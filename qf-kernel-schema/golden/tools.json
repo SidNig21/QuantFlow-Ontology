@@ -1,0 +1,220 @@
+[
+  {
+    "name": "qf_hypothesis_get",
+    "description": "A falsifiable research claim that roots a betting-research lineage. Agents open one before building datasets, tickets, or evaluations so every subsequent artifact answers a named question.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_hypothesis_query",
+    "description": "A falsifiable research claim that roots a betting-research lineage. Agents open one before building datasets, tickets, or evaluations so every subsequent artifact answers a named question.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_event_get",
+    "description": "A scheduled real-world contest (UFC bout, tennis match, football game) that markets and results attach to. Starts_at is the point-in-time fence for pre-event decisions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_event_query",
+    "description": "A scheduled real-world contest (UFC bout, tennis match, football game) that markets and results attach to. Starts_at is the point-in-time fence for pre-event decisions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_market_get",
+    "description": "One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_market_query",
+    "description": "One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_ticket_get",
+    "description": "The atomic proposed wager — a single or a parlay — emitted by strategies and graded in backtests. A one-leg ticket is still a ticket, never a separate type.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_ticket_query",
+    "description": "The atomic proposed wager — a single or a parlay — emitted by strategies and graded in backtests. A one-leg ticket is still a ticket, never a separate type.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_create_hypothesis",
+    "description": "Open a new research hypothesis with claim, success criteria, and optional sources before any downstream ticket or evaluation work.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "The falsifiable claim to register."
+        },
+        "success_criteria": {
+          "type": "string",
+          "description": "How an evaluation would support this claim."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional citations grounding the claim."
+        }
+      },
+      "required": [
+        "claim",
+        "success_criteria"
+      ]
+    }
+  },
+  {
+    "name": "qf_submit_ticket",
+    "description": "Propose a single or parlay ticket with legs, combined price, and stake for simulated grading — never live order placement.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "single",
+            "parlay"
+          ],
+          "description": "Ticket shape: single leg or parlay."
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "description": "Leg payloads (market, side, price, captured_at) as JSON objects."
+        },
+        "combined_price": {
+          "type": "number",
+          "description": "Combined odds for the proposed ticket."
+        },
+        "stake": {
+          "type": "number",
+          "description": "Simulated stake amount."
+        }
+      },
+      "required": [
+        "kind",
+        "legs",
+        "combined_price",
+        "stake"
+      ]
+    }
+  }
+]
