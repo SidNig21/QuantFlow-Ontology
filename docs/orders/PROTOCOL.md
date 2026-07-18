@@ -44,3 +44,11 @@ depends: WO-MMM
 ## The shared-truth rule (binding on every agent, including the architect)
 
 **The repo is the shared memory. Agent memories, chat transcripts, and vault notes are private caches — useful, never authoritative.** A decision, law, schema change, or order that is not committed to this repo does not exist, no matter which agent "remembers" it. If two sources disagree, the repo wins; if the repo is missing something an agent believes, the fix is a commit through an order — never "it's logged in my session." This is the same rule the product enforces at the tile seam, applied to the process that builds it: *an agent that remembers is a bug; the repo is the Kernel of the build.*
+
+## Handing an order to a builder (the founder's script)
+
+Hand out **one order at a time**, and only one whose `depends` are all `done` in the log. Fresh builder chat per order — the WO file is the entire context by design. Paste this, changing only the order number:
+
+> Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-NNN.md` exactly. Work on a new branch named `wo-NNN`. Stay strictly inside the order's scope — anything not listed in Deliverables is out. Run every acceptance gate and paste the full, unedited output in your report, using the order's Report-back format. Commit to your branch and push it. Do not merge. If anything in the order is ambiguous, stop and say so instead of improvising.
+
+Rules of the loop: builders work on branches and never merge; status in the order log flips only when the verifier re-runs the gates and passes the work; a builder question is an order defect — the answer lands as an edit to the WO file, never as chat-only guidance; two failed rework cycles stop the order for a rewrite, never a third lap.
