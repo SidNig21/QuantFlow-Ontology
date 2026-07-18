@@ -2,7 +2,7 @@
 
 > **The single front door to QuantFlow. Read this in full before doing anything — human or AI.**
 > If any other document, comment, or prior message contradicts this file, **this file wins.**
-> Born 2026-07-17 · Base: fork of collaborator-ai/collab-public (v0.8.3) · Working branch: `quantflow`
+> Born 2026-07-17 · Base: fork of collaborator-ai/collab-public (v0.8.3) · Working branch: `QuantFlow` · Docs graduated 2026-07-18 (WO-002)
 
 ---
 
@@ -28,8 +28,8 @@ Hypothesis → Dataset (versioned, point-in-time fenced) → Backtest Run (local
 
 1. **This file** — mission and rules.
 2. **`DOC_AUTHORITY_MAP.md`** — is any doc CURRENT / REFERENCE / ARCHIVE.
-3. **The Rebuild Blueprint and Ontology Schema v0.1** (founder's vault; graduating into `docs/` as they freeze) — the seven-layer architecture (L0 Kernel-ontology → L6 Evolve-equivalent) and the typed schema.
-4. **`docs/orders/`** — active work orders. Work happens **only** through a work order.
+3. **`docs/BLUEPRINT.md`** — the seven-layer architecture and decided stack. **`docs/ONTOLOGY_SCHEMA.md`** — the typed schema, frozen v0.1. **`docs/ROADMAP.md`** — the work-order ladder and phase gates.
+4. **`docs/orders/`** — active work orders (`PROTOCOL.md` = rules of engagement). Work happens **only** through a work order.
 
 The predecessor repo (`SidNig21/QuantFlow`) is the **parts shop**: read-only reference, organ harvest by explicit order only. Never copy code from it without an order saying so.
 
@@ -45,7 +45,7 @@ Bun + TypeScript strict (orchestration) · Electron shell inherited from Collabo
 4. **No self-approval** — the agent that built a change is never its verifier.
 5. Lockfiles are committed. Descriptions on every schema entity. LF line endings (.gitattributes enforces).
 6. Windows-era thinking is dead: this repo is Linux-first from birth; platform-dependent code takes an injectable `platform` parameter.
-7. Upstream (`collaborator-ai/collab-public`) stays a configured remote: `main` tracks it pristine for future pulls; QuantFlow work lives on `quantflow`.
+7. Upstream (`collaborator-ai/collab-public`) stays a configured remote: `main` tracks it pristine for future pulls; QuantFlow work lives on `QuantFlow`.
 
 ## 6. License
 

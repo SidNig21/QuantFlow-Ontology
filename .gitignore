@@ -5,6 +5,9 @@
 docs/*
 !docs/orders/
 !docs/orders/**
+!docs/BLUEPRINT.md
+!docs/ONTOLOGY_SCHEMA.md
+!docs/ROADMAP.md
 .collaborator
 .superpowers
 .claude/
