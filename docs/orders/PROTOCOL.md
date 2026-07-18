@@ -52,3 +52,7 @@ Hand out **one order at a time**, and only one whose `depends` are all `done` in
 > Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-NNN.md` exactly. Work on a new branch named `wo-NNN`. Stay strictly inside the order's scope — anything not listed in Deliverables is out. Run every acceptance gate and paste the full, unedited output in your report, using the order's Report-back format. Commit to your branch and push it. Do not merge. If anything in the order is ambiguous, stop and say so instead of improvising.
 
 Rules of the loop: builders work on branches and never merge; status in the order log flips only when the verifier re-runs the gates and passes the work; a builder question is an order defect — the answer lands as an edit to the WO file, never as chat-only guidance; two failed rework cycles stop the order for a rewrite, never a third lap.
+
+## The NEXT.md rotation (verifier duty)
+
+`docs/orders/NEXT.md` is the standing handoff: it always contains the full builder instructions for the single currently-unblocked order, so the founder feeds every fresh builder window the same file forever. It is updated **only by the verifier**: the verification commit that passes an order must, atomically — merge the builder branch, flip the order's status in the `README.md` log, and rewrite `NEXT.md` to the next unblocked rung (including its parallel-eligible note if a second builder may start an independent order). If `NEXT.md` and the log ever disagree, the log wins and the mismatch is a defect to fix in the same sitting.
