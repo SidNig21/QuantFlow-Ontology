@@ -67,8 +67,23 @@ const gates: Gate[] = [
     description:
       "qf-kernel-schema tests green (lint, golden, determinism, conformance)",
     run: async () => {
+      const cwd = join(REPO_ROOT, "qf-kernel-schema");
+      // Sub-packages carry their own lockfile; the root install does not reach
+      // them. Install here so the gate behaves identically on a fresh clone
+      // (CI) and on a machine where deps happen to be present. Frozen means
+      // this can never silently drift from the committed lockfile.
+      const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+        cwd,
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      const installCode = await install.exited;
+      if (installCode !== 0) {
+        console.error(`schema: bun install exited ${installCode}`);
+        return false;
+      }
       const proc = Bun.spawn(["bun", "test"], {
-        cwd: join(REPO_ROOT, "qf-kernel-schema"),
+        cwd,
         stdout: "inherit",
         stderr: "inherit",
       });
