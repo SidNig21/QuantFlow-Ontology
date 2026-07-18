@@ -40,3 +40,7 @@ depends: WO-MMM
 ## Out of scope — explicit, to stop helpful drift.
 ## Report back — the exact format the builder must return.
 ```
+
+## The shared-truth rule (binding on every agent, including the architect)
+
+**The repo is the shared memory. Agent memories, chat transcripts, and vault notes are private caches — useful, never authoritative.** A decision, law, schema change, or order that is not committed to this repo does not exist, no matter which agent "remembers" it. If two sources disagree, the repo wins; if the repo is missing something an agent believes, the fix is a commit through an order — never "it's logged in my session." This is the same rule the product enforces at the tile seam, applied to the process that builds it: *an agent that remembers is a bug; the repo is the Kernel of the build.*

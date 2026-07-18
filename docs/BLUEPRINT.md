@@ -50,6 +50,9 @@ The WO-006 acceptance path must include: create an Artifact via a Kernel action 
 **Law E — Gates, not sermons.**
 These laws are enforced by runnable `qa/` checks as soon as the Kernel exists (and earlier by reject-on-sight in review): Kernel package is the only SQLite owner; no new durable writes for QuantFlow domain types through `canvas-state` / `canvas-persistence`; cold-reopen restores layout and objects. A rule that exists only in prose is not adopted.
 
+**Law F — Two-level state boundary.**
+The Kernel models *operational* states with legal-transition tables (`run: queued → running → succeeded`); commands are rejectable intents, events are replayable facts, and the append-only event log is the receipt log. Actor-internal states (`THINKING → TOOL_CALLING`) stay in the runtime, visible only as L5 trace spans — modeling agent internals in the ontology is the God Object path. Corollary: actor state is forkable up to the first side effect; ingestion and publication are walls forking never crosses. (Details: `docs/ONTOLOGY_SCHEMA.md` §State machines; enforced via WO-003's generated conformance tests.)
+
 **Tile contract (canonical).**
 `Tile = render(projection) + dispatch(action)`. Projection is derived from the Kernel. Action is a Kernel action (or a thin UI command that becomes one). No other write path.
 

@@ -1,6 +1,6 @@
-# QuantFlow ontology schema — v0.1
+# QuantFlow ontology schema — v0.2
 
-> **FROZEN 2026-07-18 as `experimental` (WO-002).** All types below carry lifecycle `experimental`: they may be refined by work order during the codegen era, but drift without an order is a defect. Promotion to `active` closes a type for modification (extension via links/kinds only) and happens by the `promote_type` action, per order.
+> **FROZEN 2026-07-18 as `experimental` (WO-002); amended to v0.2 same day (WO-002b: state machines — transition tables, command/event split, fork boundary).** All types below carry lifecycle `experimental`: they may be refined by work order during the codegen era, but drift without an order is a defect. Promotion to `active` closes a type for modification (extension via links/kinds only) and happens by the `promote_type` action, per order.
 > Scope: **research-only v1** (no order execution), **sports betting first** (Bovada: UFC, tennis, football), with a market-agnostic core so other markets later arrive as new `kind` values — never as clone types.
 
 **Design laws applied:** domain first, data last · one canonical type per real thing · lifecycle `experimental → active`, closed for modification once active · every object/property/action described, because agents reason over this schema.
@@ -131,6 +131,29 @@ Properties drafted at codegen time under the same laws (see ROADMAP WO-003/WO-00
 ## Actions (initial command surface — MCP tools generate from these)
 
 `create_hypothesis` · `register_dataset_version` · `start_run` / `cancel_run` / `retry_run` / `close_run` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated) · `request_approval` / `approve` / `deny` (pending-context-item gate, L2) · `promote_type` (`experimental → active`, schema governance itself as an action)
+
+---
+
+## State machines (v0.2 amendment)
+
+**Every stateful type carries a legal-transition table, not a flat enum.** The Kernel must answer: *what state is this in, and what transitions are legal from here?* Illegal transitions are rejected at the command layer. The tables live beside the Zod types and **generate the conformance tests** — for every state, every illegal transition gets an auto-generated rejection test (lands via WO-003).
+
+```
+run:            queued → running → (succeeded | failed | cancelled); terminal → ∅
+hypothesis:     open → (supported | rejected | inconclusive), only via record_evaluation-backed action; resolved → ∅
+ticket:         pending → (win | loss | push | void), only via result settlement; graded → ∅
+event:          scheduled → live → settled; scheduled → void; settled/void → ∅
+agent_session:  starting → running ⇄ blocked; running|blocked → (cancelled | failed) → closed; running → closed; closed → ∅
+dataset / artifact / strategy: immutable once registered — new versions are new objects via DERIVED_FROM (no machine needed)
+```
+
+**Command vs event — the split that makes the ledger real.** A **command** is an intent that can be *rejected* (`start_run`, `submit_ticket`). An **event** is a fact that already happened and can be *replayed* (`run.started`, `ticket.graded`). Flow: command in → validate against transition table → emit event → commit → project. Actors **report** state; the Kernel **decides** it. **There is no separate Receipt type — the append-only event log is the receipt log.** A parallel receipt object would be a duplicate-truth Silo.
+
+**Two-level boundary (Law F, `docs/BLUEPRINT.md`).** The Kernel models *operational* states only (`run: queued → running`). Actor-internal states (`THINKING → TOOL_CALLING → WAITING`) are the runtime's private business, visible only as L5 trace spans — never as ontology types.
+
+**Fork boundary.** Actor state is forkable **up to the first side effect**. Ingestion runs (external fetches) and artifact publication are hard boundaries forking never crosses — an API call cannot be un-sent. Research-only v1 keeps the side-effect surface small, which is what makes forked counterfactual trajectories (the RL-v2 substrate) viable.
+
+**Distilled-artifact obligation (recall-layer seed).** `trajectory` and `report` artifacts are stored **distilled** (question / approach / resolution / systems touched) — never as raw transcripts — so the future recall layer inherits an embed-ready corpus. Iron rule reserved with it: retrieval results are evidence, never state; corpus content enters the Kernel only through a command.
 
 ---
 
