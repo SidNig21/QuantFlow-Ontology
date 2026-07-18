@@ -5,7 +5,7 @@
 
 ## Definition of done (one sentence)
 
-**QuantFlow v1 is done when it is the founder's daily driver for his own betting research** — a console he opens each week to run Hypothesis → Report on real markets and trusts enough to act on. The demo bar (v1.0 gates below) is the proof, not the point.
+**QuantFlow v1 is done when it is the founder's daily driver for making predictions in a market of his choosing** — a console he opens each week to run Hypothesis → Report on real markets and trusts enough to act on. Market-agnostic core; sports betting (Bovada) is domain pack #1, not the identity. The demo bar (v1.0 gates below) is the proof, not the point.
 
 ## Foundation checklist (closes the "research forever" door)
 
@@ -53,4 +53,4 @@ Workspace recipes · save/reopen · lineage view · evaluation tile · guardrail
 
 ## Post-v1 (reserved, deliberately unbuilt)
 
-RL strategy discovery (PufferLib) · recall layer "L5.5" (distill-then-embed over reports/trajectories; evidence, never state) · L6 Evolve-equivalent (experiment search with backtest metrics as fitness). Substrate for all three already exists in the schema.
+RL strategy discovery (PufferLib) · recall layer "L5.5" (distill-then-embed over reports/trajectories; evidence, never state) · L6 Evolve-equivalent (experiment search with backtest metrics as fitness) · **second domain pack** (proves the market-agnostic core: a new market arrives as `kind` values + ingestion runs, zero new object types) · **the dogfood flip** (the build process moves onto the Kernel: work orders become `task` objects with transition tables, builders run as `agent_session` tiles, reports land as `artifact`s, verification as `evaluation`s — git keeps the code, QuantFlow takes the coordination; the substrate is already in the schema, and the flip is the product's own proof: if QuantFlow can orchestrate its construction, it can orchestrate research). Substrate for all of these already exists in the schema.
