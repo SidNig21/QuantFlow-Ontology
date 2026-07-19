@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { commands } from "./commands.ts";
+import { commands, creationCommands } from "./commands.ts";
 import {
   defineAction,
   defineLink,
@@ -772,4 +772,4 @@ export const schema: Schema = {
 };
 
 lintSchema(schema, transitions);
-lintCommands(schema, transitions, commands);
+lintCommands(schema, transitions, commands, creationCommands);

@@ -1,5 +1,10 @@
-import { commands, type TransitionCommand } from "qf-kernel-schema/commands";
+import {
+  commands,
+  creationCommands,
+  type TransitionCommand,
+} from "qf-kernel-schema/commands";
 import { assertTransition } from "qf-kernel-schema/validate";
+import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
 import { IllegalTransitionError, KernelError } from "./errors.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
@@ -117,8 +122,8 @@ export type ExecuteResult = {
 };
 
 /**
- * Validate intent against the transition table, append an event, commit.
- * On rejection: typed error naming type/from/to — and write nothing.
+ * Execute a Kernel command: creation (insert + event) or transition (assert + update + event).
+ * On rejection: typed error — and write nothing.
  */
 export function execute(
   db: KernelDb,
@@ -127,6 +132,11 @@ export function execute(
   ctx: Partial<TraceContext>,
 ): ExecuteResult {
   const trace = requireTrace(ctx);
+
+  const creation = creationCommands.find((c) => c.action === command);
+  if (creation) {
+    return executeCreation(db, creation, input, trace);
+  }
 
   // Peek type from any command row with this action (for id field lookup before load).
   const sample = commands.find((c) => c.action === command);

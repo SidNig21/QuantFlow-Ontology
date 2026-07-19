@@ -36,3 +36,18 @@ export class KernelError extends Error {
     this.name = "KernelError";
   }
 }
+
+/** Caller-supplied content_hash disagrees with Kernel-computed hash — nothing written. */
+export class ContentHashMismatchError extends Error {
+  readonly supplied: string;
+  readonly computed: string;
+
+  constructor(supplied: string, computed: string) {
+    super(
+      `Content hash mismatch: supplied=${supplied} computed=${computed}`,
+    );
+    this.name = "ContentHashMismatchError";
+    this.supplied = supplied;
+    this.computed = computed;
+  }
+}
