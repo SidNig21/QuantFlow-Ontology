@@ -3,7 +3,7 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006c — one agent path end-to-end** *(closes v0.1)*
+## Current order: **WO-006c — one agent path end-to-end** *(closes v0.1; amended 2026-07-19 after the doc-index audit — legacy ACP freeze, IPC allowlist + sender check)*
 
 Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006c.md`](WO-006c.md) exactly.
 
