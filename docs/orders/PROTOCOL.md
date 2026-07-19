@@ -9,18 +9,40 @@ Solves the real constraint: **founder usage limits**. The architect (Fable, prem
 | **Architect/Verifier** | Fable (main account) | Writes work orders · makes design calls · re-runs gates independently · inspects contracts/seams · maintains roadmap | Bulk code generation |
 | **Builders** | Codex · Cursor · Claude #2 | Execute one work order on one branch · run gates before submitting · report in the required format | Self-certify · touch schema semantics without an order · exceed order scope |
 | **Machine verifier** | qa gates + GitHub Actions CI | Runs on every push, forever | Sleep |
+| **Reviewer** | An agent that is **neither the builder nor the verifier** of the work under review | Reads merged work and draft orders adversarially · reports findings only | Edit code · edit orders · merge · be the same eyes that built or passed the thing |
 
 **Founder = PM.** Verifies outcomes (demos, gate boards, the order log) — never diffs. Trust flows from receipts.
+
+## The reviewer role (added 2026-07-18, after the fourth incident)
+
+**Decorrelation is the active ingredient — not extra scrutiny.** The reviewer must be a *different agent* from both the builder and the verifier of the work in question. This is the same lesson as the cold-install bug, applied one level up: correlated environments mask defects, and **correlated cognition masks them the same way**. A second pass by the same mind re-runs the same blind spot. "Whichever builder didn't write it" is not sufficient — if the verifier wrote the order or passed the work, the verifier's eyes are also spent on it.
+
+Two triggers:
+
+**1 · Post-merge review — every two or three merged orders.** Reads what actually shipped. Findings only, ranked, no edits.
+
+**2 · Pre-build order read — the higher-leverage one.** Post-merge review catches what shipped; **orders are where the defects are born.** Measured over WO-001→005: three of four code orders carried a defect, all three authored by the architect (a per-row column that conflated governance with data, an acceptance step that masked its own gate, an assertion against an API surface that does not exist). Any new order may get a five-minute adversarial read asking **exactly two questions**:
+
+- **Can each acceptance gate actually fail?** Name what would have to break for it to go red. A gate satisfiable by construction is not a gate.
+- **Does each deliverable have exactly one meaning?** If two competent builders could implement it differently and both be "right," it is underspecified.
+
+Nothing else. The read is deliberately narrow so it stays cheap enough to actually happen.
+
+**Reviews are testimony, not verdicts.** A review is a claim like any other and gets verified before it is acted on — the same standard applied to a builder's report. This is not ceremony: the review that produced this role was itself partly wrong (it proposed binding a real session ID into `ToolLoopAgent`, which has no session concept — the `sessionId` it found belongs to React hooks). Two blockers were confirmed by measurement; one proposed remedy was not achievable. **Precedence, always: measurements beat prose — the reviewer's, the builder's, the verifier's, and the architect's alike.**
 
 ## The loop
 
 ```
 Architect writes WO-NNN (self-contained file, no chat context needed)
+  → [optional] Reviewer pre-build read: can each gate fail? one meaning per deliverable?
   → Founder points a builder at the WO file
   → Builder works a branch: build → run gates → commit with evidence → report
   → Founder brings the report back (or architect reads the branch)
   → Architect verifies: re-run gates + inspect seams → PASS (merge) or REWORK (numbered defects appended to WO)
+  → [every 2–3 merges] Reviewer reads shipped work adversarially — findings only, verified before acted on
 ```
+
+**Gate-falsification rule (learned the hard way, WO-004):** every gate an order adds must be shown to **fail** before it is trusted — neuter what it guards, watch it go red, restore, watch it go green. Both outputs go in the report. A forged assertion (`toolLoopSessionId: acpSessionId` — a value compared to itself) passed the builder, the verifier, and CI simultaneously, because each layer did its job as defined and the defect lived in the definition. Unfalsifiable checks are invisible to every downstream verifier by construction; this is the only rule that catches them.
 
 **Cheap-verification rule:** every order's acceptance is **runnable commands**, so verification burns minutes, not budget. If verifying something requires reading all the code, the order was written wrong.
 

@@ -21,6 +21,15 @@ WO-005 builds the **Kernel** — the one place durable truth lives, and the dire
 
 An adversarial review found WO-004's P1 asserted a value against itself. WO-004a replaces the overstated assertions with measured ones and requires the builder to **prove its own gate can fail**. WO-006 remains blocked on the Kernel.
 
+## Reviewer (standing role, `PROTOCOL.md`)
+
+A **third** agent — neither the builder nor the verifier of the work in question — may be handed either job at any time:
+
+- **Pre-build read of an order** (five minutes, two questions): *can each acceptance gate actually fail?* and *does each deliverable have exactly one meaning?* This is where three of four order defects were born, so it is the higher-leverage trigger.
+- **Post-merge adversarial read** every two or three merged orders. Findings only, no edits.
+
+Decorrelation is the point: correlated cognition masks defects exactly as correlated environments do. Reviews are testimony — they get verified before they are acted on, like any other claim.
+
 ---
 
 *Rotation rule: when the verifier passes the current order, the same verification commit flips the log status in `README.md` and rewrites this file to the next unblocked order. If this file and the order log disagree, the log wins — report the discrepancy instead of building.*
