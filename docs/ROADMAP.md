@@ -33,6 +33,21 @@ Gate: one real agent path streaming into a tile · cancel/fail/retry/close · on
 | WO-005 | Kernel v0: SQLite from generated migrations + trace context on every command + ledger table; **Law E gates land here** (Kernel is sole SQLite owner; no domain writes via `canvas-state`/`canvas-persistence`) | L0/L1 substrate under real writes | **open — current** |
 | WO-006 | One agent path end-to-end: spawn from canvas, stream into tile, call one `qf_` tool, publish one Artifact; cancel/fail/retry/close. **Law D is the acceptance path**: create Artifact via Kernel action → kill and relaunch app → tile shows same Artifact from the Kernel. A demo passing on in-memory tile state fails the order. | The v0.1 phase gate itself | open, depends WO-004/005 |
 
+### Known debt (adversarial review of WO-001→004, 2026-07-18)
+
+Tracked so it is not rediscovered. None blocks the ladder; each lands by order when it starts costing more than it saves.
+
+| # | Debt | Lands in |
+|---|---|---|
+| 1 | `commands.ts` drift — third unlinted catalog | **WO-005** (deliverable 9) |
+| 2 | P1 forged third layer · soft P4 · `/tmp` receipt oracle · fixture cost | **WO-004a** |
+| 3 | `define.ts`/`sql.ts` walk private Zod internals (`_zod`) — introduce a `FieldSpec` IR so generators are dumb printers | order TBD, before the next generator change |
+| 4 | `stateFieldName` `status\|grade` heuristic — replace with an explicit `stateField` | WO-005 if it touches the state field, else with #3 |
+| 5 | `schema.ts` at 645 lines — split by plane (domain / research / ops / links / actions) before the next expansion crosses 1k | before any schema growth order |
+| 6 | `golden/tools.json` 1k+ dump — compact golden + determinism check | with #5 |
+| 7 | `qa/run.ts` install→test copy-paste — extract one `bunPackageGate` helper | next gate added |
+| 8 | `validate.ts` takes bare `string` — should take `StatefulType` | WO-005 (it consumes `validate`) |
+
 ## Phase v0.5 — "one real quant workflow" (~2–4 months) — placeholders, detailed after v0.1 ships
 
 Gate: the defining workflow end-to-end on real data — Hypothesis → Dataset → Backtest → Artifact → Critic → Evaluation (CLV, ROI, Monte Carlo bankroll) → Report with full lineage. Plus: 12 sessions / 4 concurrent turns · typed delegation · trace timeline · object inspector.

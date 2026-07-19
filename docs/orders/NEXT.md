@@ -17,7 +17,9 @@ WO-005 builds the **Kernel** — the one place durable truth lives, and the dire
 
 ## Parallel-eligible (second builder only, never the same builder)
 
-*none — WO-006 depends on WO-005 and cannot start until the Kernel exists.*
+**WO-004a — proof correction** ([`WO-004a.md`](WO-004a.md)) is unblocked and touches only `tools/runtime-proof/`, which WO-005 is forbidden to enter. A second builder may take it now.
+
+An adversarial review found WO-004's P1 asserted a value against itself. WO-004a replaces the overstated assertions with measured ones and requires the builder to **prove its own gate can fail**. WO-006 remains blocked on the Kernel.
 
 ---
 
