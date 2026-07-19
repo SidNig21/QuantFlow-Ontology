@@ -29,7 +29,11 @@ Hypothesis → Dataset (versioned, point-in-time fenced) → Backtest Run (local
 
 **Supporting cast:** Python sidecar (uv-managed: polars + backtest engine) as an `ExecutionEnvironment` — TypeScript orchestrates, Python computes. Parquet + DuckDB hold bulk odds series; the Kernel holds only hashed pointers. Cloudflare sandboxes for disposable CPU work only (GPU stays local). Bun + strict TypeScript; GitHub Actions gates on every push.
 
-**Runtime proof gate (the L2 bet):** AgentOS owns the public session lifecycle → custom ACP agent → Vercel `ToolLoopAgent` owns the model/tool loop. One session ID, no second Eve server. **Mastra is the named fallback** if the proof fails — the proof gets early work-order pressure (see ROADMAP WO-004).
+**Runtime proof gate (the L2 bet) — PROVEN 2026-07-18 by WO-004.** AgentOS owns the public session lifecycle → custom ACP agent → Vercel `ToolLoopAgent` owns the model/tool loop. One session ID, no second Eve server. Mastra was the named fallback; **it is not needed and is now off the table** unless a later order reopens the question.
+
+**Session identity flows guest → host, corrected 2026-07-18.** This paragraph previously said AgentOS is the *source* of the session ID. It is not: ACP's `session/new` returns the ID by protocol, so the **ACP agent mints it and AgentOS adopts it**. AgentOS still owns the lifecycle (create · cancel · destroy) and the ID is single across all three layers — the invariant holds — but anything that records session identity (the Kernel's `agent_session`, WO-005) must **adopt** the guest-minted ID, never mint its own. Measured, not assumed: `tools/runtime-proof` asserts equality across the three layers from a guest-written receipt.
+
+**How the agent runs:** as a **stdio child process** under one embedded AgentOS (`AgentOs.create`), not a socket server. That is why there is no second listener and no second session registry — the structural fix for the predecessor's Eve split.
 
 ## Canvas-seam laws
 
