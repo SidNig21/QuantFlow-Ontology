@@ -1,5 +1,7 @@
 # Work orders
 
+**Builders** start at [`NEXT.md`](NEXT.md). **Verifiers** start at [`VERIFYING.md`](VERIFYING.md).
+
 Work happens **only** through a work order. Builders: read `/START_HERE.md`, then `PROTOCOL.md`, then your order, then nothing else. The roadmap ladder lives in `/docs/ROADMAP.md`.
 
 ## Log
