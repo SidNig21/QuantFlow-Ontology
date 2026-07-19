@@ -9,6 +9,7 @@ import {
   attachKernel,
   execute,
   listArtifacts,
+  listAgentSessions,
   type ExecuteResult,
   type KernelDb,
   type TraceContext,
@@ -79,3 +80,9 @@ export function kernelExecute(
 export function kernelListArtifacts(): Record<string, unknown>[] {
   return listArtifacts(getKernelDb());
 }
+
+export function kernelListAgentSessions(): Record<string, unknown>[] {
+  return listAgentSessions(getKernelDb());
+}
+
+export type { TraceContext };

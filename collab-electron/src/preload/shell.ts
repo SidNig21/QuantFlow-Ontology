@@ -12,6 +12,7 @@ interface AllViewConfigs {
   terminalTile: ViewConfig;
   graphTile: ViewConfig;
   artifactTile: ViewConfig;
+  sessionTile: ViewConfig;
   settings: ViewConfig;
   tileList: ViewConfig;
   agentChat: ViewConfig;
@@ -20,6 +21,7 @@ interface AllViewConfigs {
 const ALLOWED_PANELS = new Set([
   "nav", "viewer", "terminal", "terminalTile",
   "graphTile", "artifactTile", "artifact-tile",
+  "sessionTile", "session-tile",
   "settings", "tile-list", "agent-chat",
 ]);
 
@@ -54,6 +56,11 @@ contextBridge.exposeInMainWorld("shellApi", {
       trace: { trace_id: string; span_id: string },
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+    listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
+    spawnSession: (args?: { species?: string; prompt?: string }) =>
+      ipcRenderer.invoke("qf:sessions:spawn", args),
+    cancelSession: (sessionId: string) =>
+      ipcRenderer.invoke("qf:sessions:cancel", { sessionId }),
   },
 
   getPref: (key: string): Promise<unknown> =>

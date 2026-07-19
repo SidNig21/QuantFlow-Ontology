@@ -945,6 +945,33 @@
     }
   },
   {
+    "name": "qf_create_agent_session",
+    "description": "Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Guest-minted ACP session id — adopted as the Kernel row id, never re-minted."
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "Operator-facing label; v0.1 stores the species name here."
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "session_id"
+      ]
+    }
+  },
+  {
     "name": "qf_start_agent_session",
     "description": "Bring a starting agent session into running (starting → running).",
     "inputSchema": {
@@ -1010,7 +1037,7 @@
   },
   {
     "name": "qf_fail_agent_session",
-    "description": "Fail a running or blocked agent session (→ failed).",
+    "description": "Fail a starting, running, or blocked agent session (→ failed). Used for guest crash and boot reconciliation.",
     "inputSchema": {
       "type": "object",
       "properties": {

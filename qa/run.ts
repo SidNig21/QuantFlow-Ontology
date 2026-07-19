@@ -8,6 +8,7 @@
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { runAgentPathGate } from "./gates/agent-path.ts";
 import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
@@ -198,6 +199,15 @@ const gates: Gate[] = [
       "Debt #0: ONTOLOGY_SCHEMA.md §Actions equals schema.ts actions (names both directions)",
     run: () => {
       const { ok } = checkDocActionSurface();
+      return ok;
+    },
+  },
+  {
+    name: "agent-path",
+    description:
+      "WO-006c: headless spawn→stream→tool→artifact, concurrency, cancel, orphans, reconcile",
+    run: async () => {
+      const { ok } = await runAgentPathGate();
       return ok;
     },
   },

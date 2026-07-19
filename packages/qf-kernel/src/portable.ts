@@ -5,6 +5,7 @@
 export {
   attachKernel,
   listArtifacts,
+  listAgentSessions,
   migrationSqlPath,
   type KernelDb,
   type KernelStatement,

@@ -348,6 +348,10 @@ describe("agent_session transitions", () => {
     expect(canTransition("agent_session", "starting", "running")).toBe(true);
     expect(() => assertTransition("agent_session", "starting", "running")).not.toThrow();
   });
+  test("accepts starting → failed", () => {
+    expect(canTransition("agent_session", "starting", "failed")).toBe(true);
+    expect(() => assertTransition("agent_session", "starting", "failed")).not.toThrow();
+  });
   test("rejects starting → starting", () => {
     expect(canTransition("agent_session", "starting", "starting")).toBe(false);
     expect(() => assertTransition("agent_session", "starting", "starting")).toThrow(/agent_session.*starting.*starting/);
@@ -359,10 +363,6 @@ describe("agent_session transitions", () => {
   test("rejects starting → cancelled", () => {
     expect(canTransition("agent_session", "starting", "cancelled")).toBe(false);
     expect(() => assertTransition("agent_session", "starting", "cancelled")).toThrow(/agent_session.*starting.*cancelled/);
-  });
-  test("rejects starting → failed", () => {
-    expect(canTransition("agent_session", "starting", "failed")).toBe(false);
-    expect(() => assertTransition("agent_session", "starting", "failed")).toThrow(/agent_session.*starting.*failed/);
   });
   test("rejects starting → closed", () => {
     expect(canTransition("agent_session", "starting", "closed")).toBe(false);
@@ -490,4 +490,4 @@ describe("agent_session transitions", () => {
   });
 });
 
-// meta: accept=24 reject=94 total=118
+// meta: accept=25 reject=93 total=118

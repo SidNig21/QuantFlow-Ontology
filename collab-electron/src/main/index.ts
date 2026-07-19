@@ -52,6 +52,7 @@ import { listTerminalTargets } from "./terminal-target";
 import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
 import { registerAgentIpc } from "./acp-agent";
+import { reconcileStaleSessions, runAgentHostSmoke } from "./agent-host";
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -363,6 +364,10 @@ function buildAppMenu(): void {
           label: "Publish Artifact\u2026",
           click: () => sendShortcut("publish-artifact"),
         },
+        {
+          label: "Spawn Agent Session",
+          click: () => sendShortcut("spawn-agent-session"),
+        },
       ],
     },
     {
@@ -547,6 +552,7 @@ ipcMain.handle("shell:get-view-config", () => {
     terminalTile: { src: getRendererURL("terminal-tile"), preload },
     graphTile: { src: getRendererURL("graph-tile"), preload },
     artifactTile: { src: getRendererURL("artifact-tile"), preload },
+    sessionTile: { src: getRendererURL("session-tile"), preload },
     settings: { src: getRendererURL("settings"), preload },
     tileList: { src: getRendererURL("tile-list"), preload },
     agentChat: { src: getRendererURL("agent-chat"), preload },
@@ -834,6 +840,15 @@ app.whenReady().then(async () => {
   updateManager.init({
     onBeforeQuit: () => shutdownBackgroundServices(),
   });
+
+  // WO-006c: reconcile phantoms, then prove AgentOS hosts under Electron.
+  try {
+    reconcileStaleSessions();
+    await runAgentHostSmoke();
+  } catch (err) {
+    console.error("agent-host: smoke FAILED", err);
+    throw err;
+  }
 
   try {
     await pty.ensureSidecar();

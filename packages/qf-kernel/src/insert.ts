@@ -72,7 +72,12 @@ export function insertAgentSession(
       type: "agent_session.created",
       object_type: "agent_session",
       object_id: id,
-      payload: { status, label: row.label ?? null },
+      // v0.1: species rides in label + payload until agent_definition (WO-007).
+      payload: {
+        status,
+        label: row.label ?? null,
+        species: row.label ?? null,
+      },
       trace_id: trace.trace_id,
     });
     return db.query(`SELECT * FROM agent_session WHERE id = ?`).get(id) as Record<

@@ -1,5 +1,5 @@
 /**
- * @typedef {'term' | 'note' | 'code' | 'image' | 'graph' | 'browser' | 'pdf' | 'artifact'} TileType
+ * @typedef {'term' | 'note' | 'code' | 'image' | 'graph' | 'browser' | 'pdf' | 'artifact' | 'session'} TileType
  *
  * @typedef {Object} Tile
  * @property {string} id
@@ -11,6 +11,7 @@
  * @property {string} [filePath] - For file tiles
  * @property {string} [folderPath] - For graph tiles
  * @property {string} [artifactId] - Kernel artifact id (layout ref only)
+ * @property {string} [sessionId] - Kernel agent_session id (layout ref only)
  * @property {string} [url] - URL for browser tiles
  * @property {string} [cwd] - Working directory for terminal tiles
  * @property {string} [ptySessionId] - PTY session ID for terminal tiles
@@ -33,6 +34,7 @@ const DEFAULT_TILE_SIZES = {
 	browser: { width: 800, height: 650 },
 	pdf: { width: 600, height: 800 },
 	artifact: { width: 420, height: 220 },
+	session: { width: 420, height: 280 },
 };
 
 /** @param {TileType} type */

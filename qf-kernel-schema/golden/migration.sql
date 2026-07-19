@@ -57,11 +57,12 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grade
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_event', 'action', 'experimental', 'Move a scheduled event to live (scheduled → live).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settle_event', 'action', 'experimental', 'Settle a live event (live → settled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('void_event', 'action', 'experimental', 'Void a scheduled event that will not be contested (scheduled → void).');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_agent_session', 'action', 'experimental', 'Bring a starting agent session into running (starting → running).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('block_agent_session', 'action', 'experimental', 'Block a running agent session (running → blocked).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('unblock_agent_session', 'action', 'experimental', 'Return a blocked agent session to running (blocked → running).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cancel_agent_session', 'action', 'experimental', 'Cancel a running or blocked agent session (→ cancelled).');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('fail_agent_session', 'action', 'experimental', 'Fail a running or blocked agent session (→ failed).');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('fail_agent_session', 'action', 'experimental', 'Fail a starting, running, or blocked agent session (→ failed). Used for guest crash and boot reconciliation.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('close_agent_session', 'action', 'experimental', 'Close a running, cancelled, or failed agent session (→ closed).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('publish_artifact', 'action', 'experimental', 'Publish an immutable content-addressed artifact (must land before sandbox death).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('record_evaluation', 'action', 'experimental', 'Record a structured evaluation verdict with metrics against a hypothesis lineage.');

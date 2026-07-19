@@ -568,6 +568,23 @@ export const void_event = defineAction({
   }),
 });
 
+export const create_agent_session = defineAction({
+  name: "create_agent_session",
+  description:
+    "Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z
+      .string()
+      .describe("Guest-minted ACP session id — adopted as the Kernel row id, never re-minted."),
+    label: z
+      .string()
+      .describe("Operator-facing label; v0.1 stores the species name here.")
+      .nullable()
+      .optional(),
+  }),
+});
+
 export const start_agent_session = defineAction({
   name: "start_agent_session",
   description: "Bring a starting agent session into running (starting → running).",
@@ -606,7 +623,8 @@ export const cancel_agent_session = defineAction({
 
 export const fail_agent_session = defineAction({
   name: "fail_agent_session",
-  description: "Fail a running or blocked agent session (→ failed).",
+  description:
+    "Fail a starting, running, or blocked agent session (→ failed). Used for guest crash and boot reconciliation.",
   lifecycle: "experimental",
   input: z.object({
     session_id: z.string().describe("Agent session to fail."),
@@ -755,6 +773,7 @@ export const schema: Schema = {
     start_event,
     settle_event,
     void_event,
+    create_agent_session,
     start_agent_session,
     block_agent_session,
     unblock_agent_session,

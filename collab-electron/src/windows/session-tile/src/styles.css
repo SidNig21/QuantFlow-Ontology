@@ -1,0 +1,70 @@
+:root {
+  color-scheme: dark;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  background: #12141a;
+  color: #e8e6e3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.session-tile {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100vh;
+}
+
+.session-tile__row {
+  display: flex;
+  gap: 8px;
+}
+
+.session-tile__label {
+  color: #8a8680;
+  min-width: 64px;
+}
+
+.session-tile__value {
+  word-break: break-all;
+}
+
+.session-tile__stream {
+  flex: 1;
+  overflow: auto;
+  white-space: pre-wrap;
+  border-top: 1px solid #2a2e38;
+  padding-top: 8px;
+  color: #c8c4be;
+  min-height: 60px;
+}
+
+.session-tile__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.session-tile__actions button {
+  background: #2a2e38;
+  color: #e8e6e3;
+  border: 1px solid #3a3f4a;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.session-tile__actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.session-tile--error {
+  padding: 12px;
+  color: #f07178;
+}

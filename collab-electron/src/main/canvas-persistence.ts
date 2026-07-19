@@ -10,7 +10,15 @@ const STATE_FILE = join(STATE_DIR, "canvas-state.json");
 
 interface TileState {
   id: string;
-  type: "term" | "note" | "code" | "image" | "graph" | "browser" | "artifact";
+  type:
+    | "term"
+    | "note"
+    | "code"
+    | "image"
+    | "graph"
+    | "browser"
+    | "artifact"
+    | "session";
   x: number;
   y: number;
   width: number;
@@ -22,6 +30,8 @@ interface TileState {
   ptySessionId?: string;
   /** Kernel artifact id — layout projection only; metadata re-fetched on mount. */
   artifactId?: string;
+  /** Kernel agent_session id — layout projection only. */
+  sessionId?: string;
   userTitle?: string;
   autoTitle?: string;
   zIndex: number;

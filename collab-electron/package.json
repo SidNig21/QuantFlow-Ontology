@@ -10,6 +10,7 @@
   "main": "out/main/index.js",
   "scripts": {
     "dev": "bun ./scripts/dev.mjs",
+    "pack-agent": "bun run --cwd ../tools/runtime-proof pack-agent",
     "build": "node ./scripts/run-local-bin.mjs electron-vite build",
     "preview": "node ./scripts/run-local-bin.mjs electron-vite preview",
     "clean": "bun ./scripts/clean.mjs",
@@ -132,6 +133,7 @@
     "@lezer/python": "^1.1.18",
     "@parcel/watcher": "2.5.6",
     "@postlight/parser": "^2.2.3",
+    "@rivet-dev/agentos-core": "0.2.7",
     "dependency-cruiser": "^17.3.8",
     "electron-log": "5.4.3",
     "electron-updater": "6.8.3",
