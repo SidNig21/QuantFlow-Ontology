@@ -13,9 +13,9 @@ Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders
 - Commit and push. **Do not merge.**
 - Anything ambiguous or unmappable: stop and say so.
 
-## Founder ceremony available now
+## Founder acceptance checkpoint (founder decision, 2026-07-19)
 
-**v0.1 is code-complete and merged.** The phase-closing demo is yours to run: `docs/demos/agent-path.md` — spawn from the UI, watch the stream, cancel one session, force-kill mid-run, relaunch, see honest terminal states and the artifact intact. Report the verdict and it goes in the log.
+The founder demos **once, at the milestone that matters**: skin (WO-006d) -> dock (WO-007) -> Hermes wrapped as an AgentOS species in a tile (WO-008), with A2A following. `docs/demos/agent-path.md` remains valid and runs then, alongside the dock's own cold-reopen test. v0.1 is machine-verified and merged; its human half is folded into that checkpoint deliberately, not skipped.
 
 ## Parallel-eligible
 
