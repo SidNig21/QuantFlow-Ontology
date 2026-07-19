@@ -806,6 +806,38 @@
     }
   },
   {
+    "name": "qf_complete_run",
+    "description": "Mark a running run as succeeded (running → succeeded).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id of the running run to complete."
+        }
+      },
+      "required": [
+        "run_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_fail_run",
+    "description": "Mark a running run as failed (running → failed).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id of the running run that failed."
+        }
+      },
+      "required": [
+        "run_id"
+      ]
+    }
+  },
+  {
     "name": "qf_retry_run",
     "description": "Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).",
     "inputSchema": {
@@ -834,6 +866,177 @@
       },
       "required": [
         "run_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_grade_ticket",
+    "description": "Grade a pending ticket to win|loss|push|void after result settlement.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "type": "string",
+          "description": "Ticket to grade."
+        },
+        "grade": {
+          "type": "string",
+          "enum": [
+            "win",
+            "loss",
+            "push",
+            "void"
+          ],
+          "description": "Settlement grade to write."
+        }
+      },
+      "required": [
+        "ticket_id",
+        "grade"
+      ]
+    }
+  },
+  {
+    "name": "qf_start_event",
+    "description": "Move a scheduled event to live (scheduled → live).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Event to start."
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_settle_event",
+    "description": "Settle a live event (live → settled).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Event to settle."
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_void_event",
+    "description": "Void a scheduled event that will not be contested (scheduled → void).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Event to void."
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_start_agent_session",
+    "description": "Bring a starting agent session into running (starting → running).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Agent session id (guest-minted; adopted, never minted)."
+        }
+      },
+      "required": [
+        "session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_block_agent_session",
+    "description": "Block a running agent session (running → blocked).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Agent session to block."
+        }
+      },
+      "required": [
+        "session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_unblock_agent_session",
+    "description": "Return a blocked agent session to running (blocked → running).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Agent session to unblock."
+        }
+      },
+      "required": [
+        "session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_cancel_agent_session",
+    "description": "Cancel a running or blocked agent session (→ cancelled).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Agent session to cancel."
+        }
+      },
+      "required": [
+        "session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_fail_agent_session",
+    "description": "Fail a running or blocked agent session (→ failed).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Agent session to fail."
+        }
+      },
+      "required": [
+        "session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_close_agent_session",
+    "description": "Close a running, cancelled, or failed agent session (→ closed).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string",
+          "description": "Agent session to close."
+        }
+      },
+      "required": [
+        "session_id"
       ]
     }
   },

@@ -8,6 +8,8 @@
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
+import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -140,6 +142,53 @@ const gates: Gate[] = [
         return false;
       }
       return true;
+    },
+  },
+  {
+    name: "kernel",
+    description:
+      "qf-kernel tests green (migration, commands, replay, session id, trace) — installs own deps",
+    run: async () => {
+      const cwd = join(REPO_ROOT, "packages/qf-kernel");
+      const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+        cwd,
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      const installCode = await install.exited;
+      if (installCode !== 0) {
+        console.error(`kernel: bun install exited ${installCode}`);
+        return false;
+      }
+      const proc = Bun.spawn(["bun", "test"], {
+        cwd,
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      const code = await proc.exited;
+      if (code !== 0) {
+        console.error(`kernel: bun test exited ${code}`);
+        return false;
+      }
+      return true;
+    },
+  },
+  {
+    name: "kernel-sole-writer",
+    description:
+      "Law E: no SQLite/DDL/DML for domain types outside packages/qf-kernel (+ schema allowlist)",
+    run: () => {
+      const { ok } = checkKernelSoleWriter();
+      return ok;
+    },
+  },
+  {
+    name: "no-canvas-domain-writes",
+    description:
+      "Law E: no QuantFlow domain type persisted via canvas-state / canvas-persistence",
+    run: () => {
+      const { ok } = checkNoCanvasDomainWrites();
+      return ok;
     },
   },
 ];

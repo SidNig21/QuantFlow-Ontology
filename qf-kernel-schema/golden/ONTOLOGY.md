@@ -343,6 +343,22 @@ Cancel a running run (running → cancelled).
 - **input:**
 - `run_id` — Id of the running run to cancel.
 
+### `complete_run`
+
+Mark a running run as succeeded (running → succeeded).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id of the running run to complete.
+
+### `fail_run`
+
+Mark a running run as failed (running → failed).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id of the running run that failed.
+
 ### `retry_run`
 
 Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).
@@ -358,6 +374,87 @@ Operator close/ack for a terminal run (no status change — succeeded/failed/can
 - **lifecycle:** `experimental`
 - **input:**
 - `run_id` — Id of the terminal run to close/ack.
+
+### `grade_ticket`
+
+Grade a pending ticket to win|loss|push|void after result settlement.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `ticket_id` — Ticket to grade.
+- `grade` — Settlement grade to write.
+
+### `start_event`
+
+Move a scheduled event to live (scheduled → live).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `event_id` — Event to start.
+
+### `settle_event`
+
+Settle a live event (live → settled).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `event_id` — Event to settle.
+
+### `void_event`
+
+Void a scheduled event that will not be contested (scheduled → void).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `event_id` — Event to void.
+
+### `start_agent_session`
+
+Bring a starting agent session into running (starting → running).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Agent session id (guest-minted; adopted, never minted).
+
+### `block_agent_session`
+
+Block a running agent session (running → blocked).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Agent session to block.
+
+### `unblock_agent_session`
+
+Return a blocked agent session to running (blocked → running).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Agent session to unblock.
+
+### `cancel_agent_session`
+
+Cancel a running or blocked agent session (→ cancelled).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Agent session to cancel.
+
+### `fail_agent_session`
+
+Fail a running or blocked agent session (→ failed).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Agent session to fail.
+
+### `close_agent_session`
+
+Close a running, cancelled, or failed agent session (→ closed).
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Agent session to close.
 
 ### `publish_artifact`
 

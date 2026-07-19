@@ -1,5 +1,13 @@
 import { z } from "zod";
-import { defineAction, defineLink, defineObject, lintSchema, type Schema } from "./define.ts";
+import { commands } from "./commands.ts";
+import {
+  defineAction,
+  defineLink,
+  defineObject,
+  lintCommands,
+  lintSchema,
+  type Schema,
+} from "./define.ts";
 import { transitions } from "./transitions.ts";
 
 const jsonObject = z.record(z.string(), z.unknown());
@@ -485,6 +493,24 @@ export const cancel_run = defineAction({
   }),
 });
 
+export const complete_run = defineAction({
+  name: "complete_run",
+  description: "Mark a running run as succeeded (running → succeeded).",
+  lifecycle: "experimental",
+  input: z.object({
+    run_id: z.string().describe("Id of the running run to complete."),
+  }),
+});
+
+export const fail_run = defineAction({
+  name: "fail_run",
+  description: "Mark a running run as failed (running → failed).",
+  lifecycle: "experimental",
+  input: z.object({
+    run_id: z.string().describe("Id of the running run that failed."),
+  }),
+});
+
 export const retry_run = defineAction({
   name: "retry_run",
   description:
@@ -502,6 +528,97 @@ export const close_run = defineAction({
   lifecycle: "experimental",
   input: z.object({
     run_id: z.string().describe("Id of the terminal run to close/ack."),
+  }),
+});
+
+export const grade_ticket = defineAction({
+  name: "grade_ticket",
+  description: "Grade a pending ticket to win|loss|push|void after result settlement.",
+  lifecycle: "experimental",
+  input: z.object({
+    ticket_id: z.string().describe("Ticket to grade."),
+    grade: z.enum(["win", "loss", "push", "void"]).describe("Settlement grade to write."),
+  }),
+});
+
+export const start_event = defineAction({
+  name: "start_event",
+  description: "Move a scheduled event to live (scheduled → live).",
+  lifecycle: "experimental",
+  input: z.object({
+    event_id: z.string().describe("Event to start."),
+  }),
+});
+
+export const settle_event = defineAction({
+  name: "settle_event",
+  description: "Settle a live event (live → settled).",
+  lifecycle: "experimental",
+  input: z.object({
+    event_id: z.string().describe("Event to settle."),
+  }),
+});
+
+export const void_event = defineAction({
+  name: "void_event",
+  description: "Void a scheduled event that will not be contested (scheduled → void).",
+  lifecycle: "experimental",
+  input: z.object({
+    event_id: z.string().describe("Event to void."),
+  }),
+});
+
+export const start_agent_session = defineAction({
+  name: "start_agent_session",
+  description: "Bring a starting agent session into running (starting → running).",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z.string().describe("Agent session id (guest-minted; adopted, never minted)."),
+  }),
+});
+
+export const block_agent_session = defineAction({
+  name: "block_agent_session",
+  description: "Block a running agent session (running → blocked).",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z.string().describe("Agent session to block."),
+  }),
+});
+
+export const unblock_agent_session = defineAction({
+  name: "unblock_agent_session",
+  description: "Return a blocked agent session to running (blocked → running).",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z.string().describe("Agent session to unblock."),
+  }),
+});
+
+export const cancel_agent_session = defineAction({
+  name: "cancel_agent_session",
+  description: "Cancel a running or blocked agent session (→ cancelled).",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z.string().describe("Agent session to cancel."),
+  }),
+});
+
+export const fail_agent_session = defineAction({
+  name: "fail_agent_session",
+  description: "Fail a running or blocked agent session (→ failed).",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z.string().describe("Agent session to fail."),
+  }),
+});
+
+export const close_agent_session = defineAction({
+  name: "close_agent_session",
+  description: "Close a running, cancelled, or failed agent session (→ closed).",
+  lifecycle: "experimental",
+  input: z.object({
+    session_id: z.string().describe("Agent session to close."),
   }),
 });
 
@@ -630,8 +747,20 @@ export const schema: Schema = {
     register_dataset_version,
     start_run,
     cancel_run,
+    complete_run,
+    fail_run,
     retry_run,
     close_run,
+    grade_ticket,
+    start_event,
+    settle_event,
+    void_event,
+    start_agent_session,
+    block_agent_session,
+    unblock_agent_session,
+    cancel_agent_session,
+    fail_agent_session,
+    close_agent_session,
     publish_artifact,
     record_evaluation,
     resolve_hypothesis,
@@ -643,3 +772,4 @@ export const schema: Schema = {
 };
 
 lintSchema(schema, transitions);
+lintCommands(schema, transitions, commands);

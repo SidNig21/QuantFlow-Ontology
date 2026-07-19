@@ -4,6 +4,7 @@ import {
   defineAction,
   defineLink,
   defineObject,
+  lintCommands,
   lintSchema,
   type Schema,
 } from "./define.ts";
@@ -178,5 +179,51 @@ describe("schema lint", () => {
         widget: { a: ["b"] },
       }),
     ).toThrow('Object "widget" state "b" is missing from the transition table');
+  });
+
+  test("lintCommands rejects a command that is not a schema action", () => {
+    const widget = defineObject({
+      name: "widget",
+      description: "A stateful widget.",
+      lifecycle: "experimental",
+      properties: z.object({
+        status: z.enum(["a", "b"]).describe("Status."),
+      }),
+    });
+    const go = defineAction({
+      name: "go",
+      description: "Advance.",
+      lifecycle: "experimental",
+      input: z.object({ id: z.string().describe("Id.") }),
+    });
+    const schema: Schema = { objects: [widget], links: [], actions: [go] };
+    const tables = { widget: { a: ["b"], b: [] } };
+    expect(() =>
+      lintCommands(schema, tables, [
+        { action: "invented", type: "widget", from: "a", to: "b" },
+      ]),
+    ).toThrow('Command action "invented" is not a schema action');
+  });
+
+  test("lintCommands rejects a legal transition with no command", () => {
+    const widget = defineObject({
+      name: "widget",
+      description: "A stateful widget.",
+      lifecycle: "experimental",
+      properties: z.object({
+        status: z.enum(["a", "b"]).describe("Status."),
+      }),
+    });
+    const go = defineAction({
+      name: "go",
+      description: "Advance.",
+      lifecycle: "experimental",
+      input: z.object({ id: z.string().describe("Id.") }),
+    });
+    const schema: Schema = { objects: [widget], links: [], actions: [go] };
+    const tables = { widget: { a: ["b"], b: [] } };
+    expect(() => lintCommands(schema, tables, [])).toThrow(
+      "Legal transition has no command: widget:a->b",
+    );
   });
 });
