@@ -1,0 +1,11 @@
+{
+  "name": "qf-toolloop",
+  "version": "0.1.0",
+  "agent": {
+    "acpEntrypoint": "qf-toolloop-acp"
+  },
+  "registry": {
+    "title": "QF ToolLoop",
+    "description": "WO-004 proof agent: ACP bridge over Vercel ToolLoopAgent with a mock model."
+  }
+}
