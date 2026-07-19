@@ -32,8 +32,8 @@ Gate: one real agent path streaming into a tile · cancel/fail/retry/close · on
 | WO-004 | Runtime ownership proof: AgentOS session → ACP agent → `ToolLoopAgent`, one session ID, no second Eve server | The L2 bet — **PROOF HELD**; Mastra fallback not needed | **done** 2026-07-18 |
 | WO-005 | Kernel v0: SQLite from generated migrations + trace context on every command + ledger table; **Law E gates land here** (Kernel is sole SQLite owner; no domain writes via `canvas-state`/`canvas-persistence`) | L0/L1 substrate under real writes | **done** 2026-07-18 |
 | WO-006a | **Creation commands** — the Kernel can bring an object into existence through the command/event layer; `publish_artifact` is the first, with content-addressing computed and enforced. Carries debt #0 (doc↔code action-surface gate). | Law D needs an Artifact the Kernel can create; Kernel v0 could not | **done** — merged 2026-07-18 |
-| WO-006b | **Kernel in the app** — Artifact tile + the Law D cold-reopen demo; app's domain truth crosses one IPC seam into `kernel.db`; first founder-verifiable order | Law D is the v0.1 phase gate's substance | open, depends WO-006a |
-| WO-006c | **One agent path end-to-end** — spawn from canvas, stream into tile, publish an Artifact through the Kernel; cancel/fail/retry/close | completes the v0.1 phase gate | blocked on WO-006b — order not yet written |
+| WO-006b | **Kernel in the app** — Artifact tile + the Law D cold-reopen demo; app's domain truth crosses one IPC seam into `kernel.db`; first founder-verifiable order | Law D is the v0.1 phase gate's substance | **done** 2026-07-19 — **Law D PASSED**, hashes independently verified |
+| WO-006c | **One agent path end-to-end** — spawn from canvas, stream into tile, publish an Artifact through the Kernel; cancel/fail/retry/close | completes the v0.1 phase gate | **next** — unblocked; order being written against the swappable ACP seam |
 
 **Why WO-006b/c split (2026-07-18, verifier).** Measured before drafting: the app runs Node (Electron 40), so the Kernel needed a driver seam before it can live in-process, and the agent seam (`acp-agent.ts`, 430 lines) is a separate integration from the persistence seam. Law D — the founder-verifiable demo — needs only the persistence seam; coupling it to agent streaming would put the phase gate behind the riskiest integration. WO-006b lands Law D; WO-006c lands the agent path on top of it.
 
@@ -57,6 +57,8 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 | 9 | `golden/tools.json` 1k+ dump — compact golden + determinism check | with #5 |
 | 10 | `qa/run.ts` install→test copy-paste — extract one `bunPackageGate` helper | next gate added |
 | 11 | `validate.ts` takes bare `string` — should take `StatefulType` | WO-005 (it consumes `validate`) |
+| 12 | `no-canvas-domain-writes` matches property-key syntax only — a dot-assignment (`tile.content_hash = x`) evades it (measured, WO-006b round 2). Realistic shapes (declared interface + object literals) are caught | next order touching that gate |
+| 13 | Deliverable 6 unexercised — File → Publish Artifact never clicked by a human; Law D's seam is proven via the identical `qf:execute` IPC | founder, one menu publish |
 
 ## Phase v0.5 — "one real quant workflow" (~2–4 months) — **gates detailed 2026-07-19** (founder request)
 

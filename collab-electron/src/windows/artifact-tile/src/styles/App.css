@@ -1,0 +1,45 @@
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+.artifact-tile {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--foreground, #e8e8e8);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.artifact-tile--muted,
+.artifact-tile--error {
+  color: var(--muted-foreground, #888);
+  padding: 16px;
+}
+
+.artifact-tile--error {
+  color: var(--destructive, #e66);
+}
+
+.artifact-tile__row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.artifact-tile__label {
+  color: var(--muted-foreground, #888);
+}
+
+.artifact-tile__value {
+  word-break: break-all;
+}

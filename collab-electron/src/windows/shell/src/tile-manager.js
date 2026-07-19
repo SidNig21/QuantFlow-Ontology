@@ -63,6 +63,7 @@ export function createTileManager({
 				filePath: t.filePath,
 				folderPath: t.folderPath,
 				workspacePath: t.workspacePath,
+				artifactId: t.artifactId,
 				ptySessionId: t.ptySessionId,
 				url: t.url,
 				zIndex: t.zIndex,
@@ -295,6 +296,41 @@ export function createTileManager({
 		wv.style.width = "100%";
 		wv.style.height = "100%";
 		wv.style.border = "none";
+
+		dom.contentArea.appendChild(wv);
+		dom.webview = wv;
+	}
+
+	function spawnArtifactWebview(tile) {
+		const dom = tileDOMs.get(tile.id);
+		if (!dom) return;
+
+		const wv = document.createElement("webview");
+		const artifactConfig = configs.artifactTile;
+		if (!artifactConfig) {
+			console.error("spawnArtifactWebview: configs.artifactTile missing");
+			return;
+		}
+		const params = new URLSearchParams();
+		params.set("artifactId", tile.artifactId ?? "");
+		const qs = params.toString();
+		wv.setAttribute("src", `${artifactConfig.src}?${qs}`);
+		wv.setAttribute("preload", artifactConfig.preload);
+		wv.setAttribute(
+			"webpreferences", "contextIsolation=yes, sandbox=yes",
+		);
+		wv.style.width = "100%";
+		wv.style.height = "100%";
+		wv.style.border = "none";
+
+		wv.addEventListener("console-message", (event) => {
+			window.shellApi.logFromWebview(
+				"artifact-tile",
+				event.level,
+				event.message,
+				event.sourceId,
+			);
+		});
 
 		dom.contentArea.appendChild(wv);
 		dom.webview = wv;
@@ -678,6 +714,15 @@ export function createTileManager({
 		return tile;
 	}
 
+	function createArtifactTile(cx, cy, artifactId) {
+		const tile = createCanvasTile("artifact", cx, cy, {
+			artifactId,
+		});
+		spawnArtifactWebview(tile);
+		saveCanvasImmediate();
+		return tile;
+	}
+
 	function clearCanvas(viewportObj) {
 		const tileIds = tiles.map((t) => t.id);
 		for (const id of tileIds) {
@@ -730,6 +775,17 @@ export function createTileManager({
 					},
 				);
 				spawnGraphWebview(tile);
+			} else if (saved.type === "artifact" && saved.artifactId) {
+				const tile = createCanvasTile(
+					"artifact", cx, cy, {
+						id: saved.id,
+						width: saved.width,
+						height: saved.height,
+						zIndex: saved.zIndex,
+						artifactId: saved.artifactId,
+					},
+				);
+				spawnArtifactWebview(tile);
 			} else if (saved.type === "browser") {
 				const tile = createCanvasTile(
 					"browser", cx, cy, {
@@ -831,9 +887,11 @@ export function createTileManager({
 		syncSelectionVisuals,
 		spawnTerminalWebview,
 		spawnGraphWebview,
+		spawnArtifactWebview,
 		spawnBrowserWebview,
 		createFileTile,
 		createGraphTile,
+		createArtifactTile,
 		clearCanvas,
 		getCanvasStateForSave,
 		restoreCanvasState,

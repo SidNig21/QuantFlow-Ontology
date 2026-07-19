@@ -1,20 +1,43 @@
-import { Database } from "bun:sqlite";
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 
 /** Path to the generated migration — never a hand-written fork. */
 export function migrationSqlPath(): string {
-  return join(HERE, "../../../qf-kernel-schema/golden/migration.sql");
+  const candidates = [
+    () => {
+      // Resolve via package exports ("." → src/schema.ts), then sibling golden/.
+      const schemaEntry = require.resolve("qf-kernel-schema");
+      return join(dirname(schemaEntry), "../golden/migration.sql");
+    },
+    // packages/qf-kernel/src → repo qf-kernel-schema
+    () => join(HERE, "../../../qf-kernel-schema/golden/migration.sql"),
+    // collab-electron/out/main (bundled) → repo qf-kernel-schema
+    () => join(HERE, "../../qf-kernel-schema/golden/migration.sql"),
+    () => join(process.cwd(), "qf-kernel-schema/golden/migration.sql"),
+    () => join(process.cwd(), "../qf-kernel-schema/golden/migration.sql"),
+  ];
+  for (const candidate of candidates) {
+    try {
+      const path = candidate();
+      readFileSync(path, "utf8");
+      return path;
+    } catch {
+      // try next
+    }
+  }
+  throw new Error("qf-kernel: migration.sql not found");
 }
 
 /**
  * Kernel infrastructure table: append-only event log (= receipt log).
  * Not an ontology type — ontology DDL comes only from the generated migration.
  */
-const EVENTS_DDL = `
+export const EVENTS_DDL = `
 CREATE TABLE IF NOT EXISTS events (
   id TEXT PRIMARY KEY NOT NULL,
   type TEXT NOT NULL,
@@ -26,18 +49,44 @@ CREATE TABLE IF NOT EXISTS events (
 );
 `;
 
-export type KernelDb = Database;
+/** Statement surface used by Kernel query sites (bun:sqlite + node:sqlite adapters). */
+export interface KernelStatement {
+  run(...params: unknown[]): unknown;
+  get(...params: unknown[]): unknown;
+  all(...params: unknown[]): unknown;
+}
 
-/** Open (or create) a Kernel database and apply the generated migration + events ledger. */
-export function openKernel(path: string | ":memory:" = ":memory:"): KernelDb {
-  const db = new Database(path);
+/**
+ * Driver-agnostic DB surface. Matches what Kernel code already calls.
+ * bun:sqlite's Database satisfies this; Electron wraps node:sqlite DatabaseSync.
+ */
+export interface KernelDb {
+  query(sql: string): KernelStatement;
+  exec(sql: string): unknown;
+  transaction<T>(fn: () => T): () => T;
+}
+
+/** Apply migration + events DDL idempotently on an injected connection. */
+export function attachKernel(db: KernelDb): KernelDb {
   db.exec("PRAGMA foreign_keys = ON;");
-  const migration = readFileSync(migrationSqlPath(), "utf8");
-  db.exec(migration);
+  // Generated migration.sql uses bare CREATE TABLE (not IF NOT EXISTS) for
+  // schema_meta — skip when already applied so relaunch / attach is safe.
+  const already = db
+    .query(
+      `SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'schema_meta'`,
+    )
+    .get() as { ok: number } | null | undefined;
+  if (!already) {
+    const migration = readFileSync(migrationSqlPath(), "utf8");
+    db.exec(migration);
+  }
   db.exec(EVENTS_DDL);
   return db;
 }
 
-export function closeKernel(db: KernelDb): void {
-  db.close();
+/** Read-only listing for the app tile / IPC surface. */
+export function listArtifacts(db: KernelDb): Record<string, unknown>[] {
+  return db
+    .query(`SELECT * FROM artifact ORDER BY created_at DESC`)
+    .all() as Record<string, unknown>[];
 }

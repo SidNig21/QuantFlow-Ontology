@@ -16,5 +16,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-004a](WO-004a.md) | Proof correction: assert what is actually true | **done** — verified + merged 2026-07-18; D1 fixed in rework round 1, falsified red/green by builder and verifier independently | builder (Cursor) |
 | [WO-005](WO-005.md) | Kernel v0: SQLite from generated migration, command/event layer, Law E gates | **done** — verified + merged 2026-07-18 | builder (Cursor) |
 | [WO-006a](WO-006a.md) | Creation commands: the Kernel can publish an Artifact (+ debt #0 gate) | **done** — verified + merged 2026-07-18 after 3 rounds (D1–D5); doc↔code gate falsified both directions | builder (Cursor) |
-| [WO-006b](WO-006b.md) | Kernel in the app: Artifact tile + Law D cold-reopen demo | **open** | builder |
+| [WO-006b](WO-006b.md) | Kernel in the app: Artifact tile + Law D cold-reopen demo | **done** — verified + merged 2026-07-19 (round 2); **Law D PASSED** | builder (Cursor) |
 | WO-006c | One agent path end-to-end from canvas | blocked on WO-006b — order not yet written | builder |

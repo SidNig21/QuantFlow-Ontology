@@ -1,3 +1,7 @@
+/**
+ * Electron-safe entry: no top-level bun:sqlite import.
+ * App code must import only from "qf-kernel/portable".
+ */
 export {
   attachKernel,
   listArtifacts,
@@ -5,7 +9,6 @@ export {
   type KernelDb,
   type KernelStatement,
 } from "./db.ts";
-export { closeKernel, openKernel } from "./db-bun.ts";
 export {
   assertCreationHandlersComplete,
   creationHandlers,

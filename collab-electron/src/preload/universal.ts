@@ -147,6 +147,18 @@ ipcRenderer.on("nav-visibility", navVisBuffer);
 contextBridge.exposeInMainWorld("api", {
   // Shared
   getPlatform: (): NodeJS.Platform => process.platform,
+
+  /** WO-006b: Kernel command / artifact read surface (main process only). */
+  qf: {
+    execute: (
+      command: string,
+      input: Record<string, unknown>,
+      trace: { trace_id: string; span_id: string },
+    ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
+    listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+  },
+  openFileDialog: (): Promise<string | null> =>
+    ipcRenderer.invoke("dialog:open-file"),
   getConfig: () => ipcRenderer.invoke("config:get"),
   getAppVersion: () => ipcRenderer.invoke("app:version"),
   getDeviceId: () =>

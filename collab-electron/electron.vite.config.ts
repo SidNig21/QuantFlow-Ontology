@@ -18,10 +18,40 @@ export default defineConfig({
     resolve: {
       alias: {
         "@collab/shared": resolve(__dirname, "packages/shared/src"),
+        // Bundle Kernel into main — package.json deps are auto-externalized by
+        // electron-vite, and the file: package ships TypeScript source.
+        "qf-kernel/portable": resolve(
+          __dirname,
+          "../packages/qf-kernel/src/portable.ts",
+        ),
+        "qf-kernel-schema/commands": resolve(
+          __dirname,
+          "../qf-kernel-schema/src/commands.ts",
+        ),
+        "qf-kernel-schema/validate": resolve(
+          __dirname,
+          "../qf-kernel-schema/src/validate.ts",
+        ),
+        "qf-kernel-schema/transitions": resolve(
+          __dirname,
+          "../qf-kernel-schema/src/transitions.ts",
+        ),
+        "qf-kernel-schema/define": resolve(
+          __dirname,
+          "../qf-kernel-schema/src/define.ts",
+        ),
+        "qf-kernel-schema": resolve(
+          __dirname,
+          "../qf-kernel-schema/src/schema.ts",
+        ),
       },
     },
     build: {
       outDir: resolve(__dirname, outDir, "main"),
+      // file: TS packages must be bundled — Node cannot import their .ts sources.
+      externalizeDeps: {
+        exclude: ["qf-kernel", "qf-kernel-schema"],
+      },
       rollupOptions: {
         external: ["node-pty", "@parcel/watcher", "typescript", "sharp"],
         input: {
@@ -87,6 +117,10 @@ export default defineConfig({
           "graph-tile": resolve(
             __dirname,
             "src/windows/graph-tile/index.html",
+          ),
+          "artifact-tile": resolve(
+            __dirname,
+            "src/windows/artifact-tile/index.html",
           ),
           "tile-list": resolve(__dirname, "src/windows/tile-list/index.html"),
           "agent-chat": resolve(

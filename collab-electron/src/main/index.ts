@@ -358,6 +358,11 @@ function buildAppMenu(): void {
           registerAccelerator: false,
           click: () => sendShortcut("add-workspace"),
         },
+        { type: "separator" },
+        {
+          label: "Publish Artifact\u2026",
+          click: () => sendShortcut("publish-artifact"),
+        },
       ],
     },
     {
@@ -541,6 +546,7 @@ ipcMain.handle("shell:get-view-config", () => {
     terminal: { src: getRendererURL("terminal"), preload },
     terminalTile: { src: getRendererURL("terminal-tile"), preload },
     graphTile: { src: getRendererURL("graph-tile"), preload },
+    artifactTile: { src: getRendererURL("artifact-tile"), preload },
     settings: { src: getRendererURL("settings"), preload },
     tileList: { src: getRendererURL("tile-list"), preload },
     agentChat: { src: getRendererURL("agent-chat"), preload },

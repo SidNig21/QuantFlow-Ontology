@@ -233,6 +233,11 @@ export function getTileLabel(tile) {
     if (tile.folderPath) return splitFilepath(tile.folderPath);
     return { parent: "", name: "Graph" };
   }
+  if (tile.type === "artifact") {
+    const id = tile.artifactId ?? "";
+    const short = id.length <= 12 ? id : `${id.slice(0, 8)}…`;
+    return { parent: "Artifact", name: short || "Artifact" };
+  }
   if (tile.filePath) return splitFilepath(tile.filePath);
   return { parent: "", name: tile.type };
 }

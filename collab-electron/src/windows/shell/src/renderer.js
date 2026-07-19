@@ -1093,6 +1093,48 @@ async function init() {
 			});
 		} else if (action === "add-workspace") {
 			window.shellApi.workspaceAdd();
+		} else if (action === "publish-artifact") {
+			void (async () => {
+				const filePath = await window.shellApi.openFileDialog();
+				if (!filePath) return;
+				const trace = {
+					trace_id: crypto.randomUUID(),
+					span_id: crypto.randomUUID(),
+				};
+				const res = await window.shellApi.qf.execute(
+					"publish_artifact",
+					{
+						path: filePath,
+						kind: "report",
+						storage_ref: filePath,
+					},
+					trace,
+				);
+				if (!res.ok) {
+					console.error(
+						"publish_artifact failed",
+						res.error,
+					);
+					return;
+				}
+				const id = res.result.object_id;
+				const hash =
+					res.result.state?.content_hash ?? id;
+				console.log(
+					"publish_artifact",
+					JSON.stringify({ id, hash }),
+				);
+				const size = defaultSize("artifact");
+				const rect = canvasEl.getBoundingClientRect();
+				const cx =
+					(rect.width / 2 - viewportState.panX) /
+					viewportState.zoom - size.width / 2;
+				const cy =
+					(rect.height / 2 - viewportState.panY) /
+					viewportState.zoom - size.height / 2;
+				tileManager.createArtifactTile(cx, cy, id);
+				minimap.update();
+			})();
 		} else if (action === "new-tile") {
 			const rect = canvasEl.getBoundingClientRect();
 			const size = getTerminalSize();
@@ -1289,6 +1331,21 @@ async function init() {
 						workspaceData.workspaces[0] ?? "";
 					tileManager.createGraphTile(
 						cx, cy, folderPath, wsPath,
+					);
+					minimap.update();
+				}
+				if (channel === "create-artifact-tile") {
+					const artifactId = args[0];
+					const size = defaultSize("artifact");
+					const rect = canvasEl.getBoundingClientRect();
+					const cx =
+						(rect.width / 2 - viewportState.panX) /
+						viewportState.zoom - size.width / 2;
+					const cy =
+						(rect.height / 2 - viewportState.panY) /
+						viewportState.zoom - size.height / 2;
+					tileManager.createArtifactTile(
+						cx, cy, artifactId,
 					);
 					minimap.update();
 				}
