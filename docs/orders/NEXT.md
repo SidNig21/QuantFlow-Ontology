@@ -3,17 +3,22 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006c — one agent path end-to-end** *(order being written)*
+## Current order: **WO-006c — one agent path end-to-end** *(closes v0.1)*
 
-**WO-006b is merged and Law D PASSED.** The Kernel is in the app; domain truth survives a force-kill. v0.1's phase gate needs exactly one more rung.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006c.md`](WO-006c.md) exactly.
 
-**Do not start from this line — there is no order file yet.** The architect is writing `WO-006c.md` against the **swappable ACP seam** (`BLUEPRINT.md` §open-host), not against `ToolLoopAgent`, so a later Hermes swap is a package change rather than a rework. It will carry: spawn from the canvas → stream into a tile → call one tool → publish an Artifact through the Kernel → cancel/fail/retry/close. No order file, no work.
+- Work on a new branch named `wo-006c`, cut from current `origin/QuantFlow`.
+- **Deliverable 0 first**: prove AgentOS runs inside Electron's main process before touching UI. If it does not, stop and report the exact error — that is a successful outcome for a proof step, and it redirects the order cheaply.
+- Stay strictly inside the Deliverables; the Out-of-scope list is binding. The only schema-surface edits permitted are the ones deliverable 1 authorizes verbatim.
+- Run the **builder-run** gates only; paste full unedited output, including every red/green falsification pair. **Never `bun qa/run.ts --all`, never delete `node_modules`.**
+- Commit to your branch and push. **Do not merge.**
+- If anything is ambiguous or unbuildable as written, **stop and say so.**
 
-**Founder item, 30 seconds:** File → **Publish Artifact** has never been clicked by a human. Law D's substance is proven through the identical `qf:execute` IPC, so nothing is blocked — but the GUI affordance itself is unverified. One menu-driven publish closes deliverable 6.
+> **Founder — before handing this to the builder:** give the order a five-minute **pre-build read** by a *third* agent (neither the builder nor the verifier; two questions only: can each gate actually fail? does each deliverable have exactly one meaning?). The last two pre-build reads caught five and three architect defects respectively, and this is the phase gate.
 
 ## Parallel-eligible
 
-Nothing until WO-006c exists. After v0.1 closes, the v0.5 ladder opens **two lanes that can run at once** (`ROADMAP.md`): dock/agent (WO-007 → 008 → 012) and data (WO-009 → 010/011), with no file overlap until WO-013 joins them.
+Nothing — this is the last v0.1 rung. When it merges, the v0.5 ladder opens **two lanes that run at once** (`ROADMAP.md`): dock/agent (WO-007 → 008 → 012) and data (WO-009 → 010/011).
 
 ---
 

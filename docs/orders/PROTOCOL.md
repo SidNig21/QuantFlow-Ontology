@@ -92,6 +92,10 @@ Hand out **one order at a time**, and only one whose `depends` are all `done` in
 
 Rules of the loop: builders work on branches and never merge; status in the order log flips only when the verifier re-runs the gates and passes the work; a builder question is an order defect — the answer lands as an edit to the WO file, never as chat-only guidance; two failed rework cycles stop the order for a rewrite, never a third lap.
 
+## Rework records go to the builder's branch (added 2026-07-19)
+
+When a verification round ends in REWORK, the verifier appends the record to the WO file **and pushes that docs-only commit to the builder's branch**, not only to `QuantFlow`. Reason, measured on WO-006b: the record went to `QuantFlow` while the builder's checkout of `wo-006b` kept a stale `NEXT.md` that still said "build" — the builder had to detect the contradiction and choose. The rotation rule's "log wins" clause resolved it correctly, but the ambiguity was avoidable. Builder's first step on any rework remains `git pull`.
+
 ## The NEXT.md rotation (verifier duty)
 
 `docs/orders/NEXT.md` is the standing handoff: it always contains the full builder instructions for the single currently-unblocked order, so the founder feeds every fresh builder window the same file forever. It is updated **only by the verifier**: the verification commit that passes an order must, atomically — merge the builder branch, flip the order's status in the `README.md` log, and rewrite `NEXT.md` to the next unblocked rung (including its parallel-eligible note if a second builder may start an independent order). If `NEXT.md` and the log ever disagree, the log wins and the mismatch is a defect to fix in the same sitting.
