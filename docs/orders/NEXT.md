@@ -15,7 +15,7 @@ Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders
 
 This is the first order whose acceptance the **founder** verifies hands-on: publish an Artifact, kill the app, relaunch, and the tile must show the same Artifact served from `kernel.db` (`docs/demos/law-d.md` is part of the deliverables).
 
-> **Note to the founder:** WO-006b was written by the verifier against measured app code, but has **not** had a pre-build reviewer read. The five-minute two-question read from `PROTOCOL.md` (can each gate fail? one meaning per deliverable?) caught D1 on WO-006a before it was built — worth repeating here before handing this out.
+> **Note:** Pre-build read (2026-07-18) caught five blockers; the order was amended on QuantFlow before build. See the bottom of `WO-006b.md`.
 
 ## Parallel-eligible
 
