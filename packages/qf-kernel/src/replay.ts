@@ -58,3 +58,82 @@ export function replayRunAndAssert(db: KernelDb, runId: string): {
 
   return { live, rebuilt, equal: true };
 }
+
+/**
+ * Rebuild artifact existence from the event log alone and assert it equals
+ * the live table row (two independent derivations).
+ */
+export function replayArtifactAndAssert(
+  db: KernelDb,
+  artifactId: string,
+): {
+  live: Record<string, unknown>;
+  rebuilt: { id: string; kind: string; content_hash: string; storage_ref: string };
+  equal: true;
+} {
+  const live = db.query(`SELECT * FROM artifact WHERE id = ?`).get(artifactId) as
+    | Record<string, unknown>
+    | null;
+  if (!live) throw new KernelError(`artifact "${artifactId}" not found for replay`);
+
+  const events = db
+    .query(
+      `SELECT type, object_type, object_id, payload FROM events
+       WHERE object_type = 'artifact' AND object_id = ?
+       ORDER BY rowid ASC`,
+    )
+    .all(artifactId) as EventRow[];
+
+  let rebuilt: {
+    id: string;
+    kind: string;
+    content_hash: string;
+    storage_ref: string;
+  } | null = null;
+
+  for (const ev of events) {
+    if (ev.type !== "artifact.published") continue;
+    const payload = JSON.parse(ev.payload) as {
+      kind?: string;
+      content_hash?: string;
+      storage_ref?: string;
+    };
+    if (
+      typeof payload.kind !== "string" ||
+      typeof payload.content_hash !== "string" ||
+      typeof payload.storage_ref !== "string"
+    ) {
+      throw new KernelError(`replay: malformed artifact.published for "${artifactId}"`);
+    }
+    // id rebuilt from event payload (identity rule: id = content_hash), not the query key.
+    rebuilt = {
+      id: payload.content_hash,
+      kind: payload.kind,
+      content_hash: payload.content_hash,
+      storage_ref: payload.storage_ref,
+    };
+  }
+
+  if (!rebuilt) {
+    throw new KernelError(`replay: no artifact.published events for "${artifactId}"`);
+  }
+
+  if (rebuilt.id !== artifactId) {
+    throw new KernelError(
+      `replay: event content_hash≠requested id for artifact "${artifactId}"`,
+    );
+  }
+
+  if (
+    live.id !== rebuilt.id ||
+    live.kind !== rebuilt.kind ||
+    live.content_hash !== rebuilt.content_hash ||
+    live.storage_ref !== rebuilt.storage_ref
+  ) {
+    throw new KernelError(
+      `replay mismatch for artifact "${artifactId}": live≠rebuilt`,
+    );
+  }
+
+  return { live, rebuilt, equal: true };
+}

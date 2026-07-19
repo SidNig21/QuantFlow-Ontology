@@ -1,29 +1,7 @@
 import type { KernelDb } from "./db.ts";
 import { KernelError, MissingSessionIdError } from "./errors.ts";
+import { appendEvent } from "./events.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
-
-function appendCreatedEvent(
-  db: KernelDb,
-  object_type: string,
-  object_id: string,
-  payload: Record<string, unknown>,
-  trace_id: string,
-): void {
-  const id = crypto.randomUUID();
-  const created_at = new Date().toISOString();
-  db.query(
-    `INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    id,
-    `${object_type}.created`,
-    object_type,
-    object_id,
-    JSON.stringify(payload),
-    trace_id,
-    created_at,
-  );
-}
 
 /**
  * Insert a run row (v0 helper for tests and bootstrapping).
@@ -52,7 +30,13 @@ export function insertRun(
       `INSERT INTO run (id, created_at, kind, status, params, trace_id)
        VALUES (?, ?, ?, ?, ?, ?)`,
     ).run(row.id, created_at, row.kind, status, params, runTrace);
-    appendCreatedEvent(db, "run", row.id, { kind: row.kind, status }, trace.trace_id);
+    appendEvent(db, {
+      type: "run.created",
+      object_type: "run",
+      object_id: row.id,
+      payload: { kind: row.kind, status },
+      trace_id: trace.trace_id,
+    });
     return db.query(`SELECT * FROM run WHERE id = ?`).get(row.id) as Record<string, unknown>;
   });
   return tx();
@@ -84,13 +68,13 @@ export function insertAgentSession(
       `INSERT INTO agent_session (id, created_at, status, label)
        VALUES (?, ?, ?, ?)`,
     ).run(id, created_at, status, row.label ?? null);
-    appendCreatedEvent(
-      db,
-      "agent_session",
-      id,
-      { status, label: row.label ?? null },
-      trace.trace_id,
-    );
+    appendEvent(db, {
+      type: "agent_session.created",
+      object_type: "agent_session",
+      object_id: id,
+      payload: { status, label: row.label ?? null },
+      trace_id: trace.trace_id,
+    });
     return db.query(`SELECT * FROM agent_session WHERE id = ?`).get(id) as Record<
       string,
       unknown

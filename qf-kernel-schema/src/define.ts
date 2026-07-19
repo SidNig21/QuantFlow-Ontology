@@ -293,16 +293,27 @@ export type CommandEdge = {
   to: string;
 };
 
+/** Creation command: names a schema action and an object type (no transition edge). */
+export type CreationCommandEdge = {
+  action: string;
+  object_type: string;
+  event: string;
+};
+
 /**
- * Join lint: every command names a real schema action and a legal transition;
- * every legal transition has a command. Prevents a fourth parallel catalog.
+ * Join lint: every transition command names a real schema action and a legal
+ * transition; every legal transition has a command; every creation command
+ * names a real schema action and object. Prevents a fourth parallel catalog.
+ * Creation coverage does not relax either transition direction.
  */
 export function lintCommands(
   schema: Schema,
   tables: TransitionTables,
   commandList: readonly CommandEdge[],
+  creationList: readonly CreationCommandEdge[] = [],
 ): void {
   const actionNames = new Set(schema.actions.map((a) => a.name));
+  const objectNames = new Set(schema.objects.map((o) => o.name));
   const covered = new Set<string>();
 
   for (const cmd of commandList) {
@@ -336,6 +347,22 @@ export function lintCommands(
           throw new Error(`Legal transition has no command: ${key}`);
         }
       }
+    }
+  }
+
+  for (const cmd of creationList) {
+    if (!actionNames.has(cmd.action)) {
+      throw new Error(
+        `Creation command action "${cmd.action}" is not a schema action (object_type=${cmd.object_type})`,
+      );
+    }
+    if (!objectNames.has(cmd.object_type)) {
+      throw new Error(
+        `Creation command "${cmd.action}" object_type "${cmd.object_type}" is not a schema object`,
+      );
+    }
+    if (typeof cmd.event !== "string" || cmd.event.trim().length === 0) {
+      throw new Error(`Creation command "${cmd.action}" is missing event type`);
     }
   }
 }

@@ -8,6 +8,7 @@
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
+import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
 
@@ -178,6 +179,15 @@ const gates: Gate[] = [
       "Law E: no QuantFlow domain type persisted via canvas-state / canvas-persistence",
     run: () => {
       const { ok } = checkNoCanvasDomainWrites();
+      return ok;
+    },
+  },
+  {
+    name: "doc-action-surface",
+    description:
+      "Debt #0: ONTOLOGY_SCHEMA.md §Actions equals schema.ts actions (names both directions)",
+    run: () => {
+      const { ok } = checkDocActionSurface();
       return ok;
     },
   },

@@ -1,7 +1,13 @@
-import { commands, type TransitionCommand } from "qf-kernel-schema/commands";
+import {
+  commands,
+  creationCommands,
+  type TransitionCommand,
+} from "qf-kernel-schema/commands";
 import { assertTransition } from "qf-kernel-schema/validate";
+import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
 import { IllegalTransitionError, KernelError } from "./errors.ts";
+import { appendEvent } from "./events.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
 
 const ID_FIELD: Record<TransitionCommand["type"], string> = {
@@ -81,32 +87,6 @@ function readState(
   return { field, value: row.state };
 }
 
-function appendEvent(
-  db: KernelDb,
-  opts: {
-    type: string;
-    object_type: string;
-    object_id: string;
-    payload: Record<string, unknown>;
-    trace_id: string;
-  },
-): void {
-  const id = crypto.randomUUID();
-  const created_at = new Date().toISOString();
-  db.query(
-    `INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    id,
-    opts.type,
-    opts.object_type,
-    opts.object_id,
-    JSON.stringify(opts.payload),
-    opts.trace_id,
-    created_at,
-  );
-}
-
 export type ExecuteResult = {
   object_type: string;
   object_id: string;
@@ -117,8 +97,8 @@ export type ExecuteResult = {
 };
 
 /**
- * Validate intent against the transition table, append an event, commit.
- * On rejection: typed error naming type/from/to — and write nothing.
+ * Execute a Kernel command: creation (insert + event) or transition (assert + update + event).
+ * On rejection: typed error — and write nothing.
  */
 export function execute(
   db: KernelDb,
@@ -127,6 +107,11 @@ export function execute(
   ctx: Partial<TraceContext>,
 ): ExecuteResult {
   const trace = requireTrace(ctx);
+
+  const creation = creationCommands.find((c) => c.action === command);
+  if (creation) {
+    return executeCreation(db, creation, input, trace);
+  }
 
   // Peek type from any command row with this action (for id field lookup before load).
   const sample = commands.find((c) => c.action === command);

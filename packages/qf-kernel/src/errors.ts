@@ -36,3 +36,38 @@ export class KernelError extends Error {
     this.name = "KernelError";
   }
 }
+
+/** Caller-supplied content_hash disagrees with Kernel-computed hash — nothing written. */
+export class ContentHashMismatchError extends Error {
+  readonly supplied: string;
+  readonly computed: string;
+
+  constructor(supplied: string, computed: string) {
+    super(
+      `Content hash mismatch: supplied=${supplied} computed=${computed}`,
+    );
+    this.name = "ContentHashMismatchError";
+    this.supplied = supplied;
+    this.computed = computed;
+  }
+}
+
+/**
+ * Same content bytes already published under different kind/storage_ref —
+ * nothing written. Content-addressing is idempotent; metadata conflict is not.
+ */
+export class ArtifactMetadataConflictError extends Error {
+  readonly field: "kind" | "storage_ref";
+  readonly existing: string;
+  readonly attempted: string;
+
+  constructor(field: "kind" | "storage_ref", existing: string, attempted: string) {
+    super(
+      `Artifact metadata conflict on ${field}: existing=${existing} attempted=${attempted}`,
+    );
+    this.name = "ArtifactMetadataConflictError";
+    this.field = field;
+    this.existing = existing;
+    this.attempted = attempted;
+  }
+}

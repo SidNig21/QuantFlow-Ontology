@@ -129,6 +129,27 @@ export const commands: readonly TransitionCommand[] = [
   },
 ] as const;
 
+/**
+ * Creation commands — bring an object into existence (no from→to edge).
+ * `action` MUST name a schema action. Lint joins these to schema.actions without
+ * relaxing the transition-edge coverage rules.
+ */
+export type CreationCommand = {
+  action: string;
+  /** Ontology object table the command inserts into. */
+  object_type: string;
+  /** Domain event emitted on success (dotted type.verb). */
+  event: string;
+};
+
+export const creationCommands: readonly CreationCommand[] = [
+  {
+    action: "publish_artifact",
+    object_type: "artifact",
+    event: "artifact.published",
+  },
+] as const;
+
 /** All legal (type, from, to) edges from the transition tables. */
 export function allTransitionEdges(): Array<{ type: StatefulType; from: string; to: string }> {
   const edges: Array<{ type: StatefulType; from: string; to: string }> = [];

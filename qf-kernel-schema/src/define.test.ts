@@ -226,4 +226,19 @@ describe("schema lint", () => {
       "Legal transition has no command: widget:a->b",
     );
   });
+
+  test("lintCommands rejects a creation command that is not a schema action", () => {
+    const blob = defineObject({
+      name: "blob",
+      description: "A blob.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const schema: Schema = { objects: [blob], links: [], actions: [] };
+    expect(() =>
+      lintCommands(schema, {}, [], [
+        { action: "publish_blob", object_type: "blob", event: "blob.published" },
+      ]),
+    ).toThrow('Creation command action "publish_blob" is not a schema action');
+  });
 });

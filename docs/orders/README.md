@@ -15,5 +15,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-004](WO-004.md) | Runtime ownership proof: one session ID, no second server | **done** — PROOF HELD (NARROWED); P1 overstated, see WO-004a | builder (Cursor) |
 | [WO-004a](WO-004a.md) | Proof correction: assert what is actually true | **done** — verified + merged 2026-07-18; D1 fixed in rework round 1, falsified red/green by builder and verifier independently | builder (Cursor) |
 | [WO-005](WO-005.md) | Kernel v0: SQLite from generated migration, command/event layer, Law E gates | **done** — verified + merged 2026-07-18 | builder (Cursor) |
-| [WO-006a](WO-006a.md) | Creation commands: the Kernel can publish an Artifact (+ debt #0 gate) | **rework round 2 (final)** — D1–D4 fixed and confirmed 2026-07-18; one new defect D5 (falsification env flag left as a production off-switch in the Kernel) sent back; three-line deletion | builder (Cursor) |
+| [WO-006a](WO-006a.md) | Creation commands: the Kernel can publish an Artifact (+ debt #0 gate) | **done** — verified + merged 2026-07-18 after 3 rounds (D1–D5); doc↔code gate falsified both directions | builder (Cursor) |
 | WO-006b | One agent path end-to-end + Law D cold-reopen | blocked on WO-006a — order not yet written | builder |

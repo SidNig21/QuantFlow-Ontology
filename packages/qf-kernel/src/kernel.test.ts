@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import {
+  ArtifactMetadataConflictError,
+  assertCreationHandlersComplete,
   closeKernel,
+  contentHash,
+  ContentHashMismatchError,
   eventCount,
   execute,
   IllegalTransitionError,
@@ -9,6 +13,7 @@ import {
   MissingSessionIdError,
   MissingTraceError,
   openKernel,
+  replayArtifactAndAssert,
   replayRunAndAssert,
   type KernelDb,
 } from "./index.ts";
@@ -133,5 +138,170 @@ describe("qf-kernel", () => {
       .query(`SELECT trace_id, type FROM events WHERE type = 'run.started'`)
       .get() as { trace_id: string; type: string };
     expect(ev.trace_id).toBe("T-99");
+  });
+
+  test("publish_artifact creates content-addressed row via event log", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("strategy v1 body");
+    const hash = contentHash(bytes);
+    const result = execute(
+      db,
+      "publish_artifact",
+      {
+        kind: "strategy_spec",
+        bytes,
+        storage_ref: "file:///tmp/strat-v1.bin",
+        content_hash: hash,
+      },
+      ctx,
+    );
+    expect(result.object_type).toBe("artifact");
+    expect(result.object_id).toBe(hash);
+    expect(result.event).toBe("artifact.published");
+    expect(result.state.content_hash).toBe(hash);
+    expect(result.state.kind).toBe("strategy_spec");
+
+    const rows = db.query(`SELECT COUNT(*) AS n FROM artifact`).get() as { n: number };
+    expect(rows.n).toBe(1);
+  });
+
+  test("publish_artifact rejects hash mismatch and writes nothing", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("payload-a");
+    try {
+      execute(
+        db,
+        "publish_artifact",
+        {
+          kind: "code",
+          bytes,
+          storage_ref: "file:///tmp/a.bin",
+          content_hash: "0".repeat(64),
+        },
+        ctx,
+      );
+      throw new Error("expected ContentHashMismatchError");
+    } catch (e) {
+      expect(e).toBeInstanceOf(ContentHashMismatchError);
+    }
+    const rows = db.query(`SELECT COUNT(*) AS n FROM artifact`).get() as { n: number };
+    expect(rows.n).toBe(0);
+    expect(eventCount(db)).toBe(0);
+  });
+
+  test("publish_artifact identical bytes twice is idempotent (one row, no second event)", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("same-bytes");
+    const input = {
+      kind: "report" as const,
+      bytes,
+      storage_ref: "file:///tmp/report.bin",
+    };
+    execute(db, "publish_artifact", input, ctx);
+    const afterFirst = eventCount(db);
+    execute(db, "publish_artifact", input, { ...ctx, span_id: "span-2" });
+    const afterSecond = eventCount(db);
+    const rows = db.query(`SELECT COUNT(*) AS n FROM artifact`).get() as { n: number };
+    expect(rows.n).toBe(1);
+    expect(afterSecond).toBe(afterFirst);
+    console.log(`artifact_row_count_after_double_publish=${rows.n}`);
+    console.log(`artifact_event_count_after_double_publish=${afterSecond}`);
+  });
+
+  test("replay rebuilds artifact from events and equals live table", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("replay-me");
+    const published = execute(
+      db,
+      "publish_artifact",
+      { kind: "result_set", bytes, storage_ref: "file:///tmp/rs.bin" },
+      ctx,
+    );
+    const result = replayArtifactAndAssert(db, published.object_id);
+    expect(result.equal).toBe(true);
+    expect(result.rebuilt.content_hash).toBe(published.object_id);
+    console.log(
+      `artifact_replay_assertion=equal id=${result.rebuilt.id} kind=${result.rebuilt.kind}`,
+    );
+  });
+
+  test("publish_artifact requires trace context", () => {
+    db = openKernel(":memory:");
+    expect(() =>
+      execute(
+        db,
+        "publish_artifact",
+        {
+          kind: "code",
+          bytes: new TextEncoder().encode("x"),
+          storage_ref: "file:///tmp/x",
+        },
+        {},
+      ),
+    ).toThrow(MissingTraceError);
+  });
+
+  test("D1 · republish same bytes with different metadata rejects", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("meta-conflict");
+    execute(
+      db,
+      "publish_artifact",
+      { kind: "report", bytes, storage_ref: "file:///a" },
+      ctx,
+    );
+    const before = eventCount(db);
+    expect(() =>
+      execute(
+        db,
+        "publish_artifact",
+        { kind: "strategy_spec", bytes, storage_ref: "file:///b" },
+        { ...ctx, span_id: "span-meta" },
+      ),
+    ).toThrow(ArtifactMetadataConflictError);
+    expect(eventCount(db)).toBe(before);
+    const row = db.query(`SELECT kind, storage_ref FROM artifact`).get() as {
+      kind: string;
+      storage_ref: string;
+    };
+    expect(row.kind).toBe("report");
+    expect(row.storage_ref).toBe("file:///a");
+  });
+
+  test("D2 · replay fails when event content_hash disagrees with identity", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("replay-corrupt");
+    const published = execute(
+      db,
+      "publish_artifact",
+      { kind: "code", bytes, storage_ref: "file:///tmp/rc.bin" },
+      ctx,
+    );
+    const badPayload = JSON.stringify({
+      command: "publish_artifact",
+      kind: "code",
+      content_hash: "0".repeat(64),
+      storage_ref: "file:///tmp/rc.bin",
+    });
+    db.query(`UPDATE events SET payload = ? WHERE object_id = ? AND type = 'artifact.published'`).run(
+      badPayload,
+      published.object_id,
+    );
+    expect(() => replayArtifactAndAssert(db, published.object_id)).toThrow(
+      /content_hash≠requested id|live≠rebuilt/,
+    );
+  });
+
+  test("D3 · every creationCommands entry has a handler", () => {
+    assertCreationHandlersComplete();
+    expect(() =>
+      assertCreationHandlersComplete([
+        {
+          action: "wo006a_bait_create",
+          object_type: "artifact",
+          event: "artifact.bait",
+        },
+      ]),
+    ).toThrow('Creation command "wo006a_bait_create" has no handler');
   });
 });

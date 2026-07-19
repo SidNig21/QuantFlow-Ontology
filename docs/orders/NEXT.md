@@ -3,21 +3,17 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006a — rework round 2 (final lap)**
+## Current order: **none — WO-006b is being drafted by the verifier**
 
-Read `docs/orders/WO-006a.md`, bottom verification record ("round 2"). D1–D4 are **fixed and accepted** — do not touch them.
+WO-006a merged 2026-07-18 (three rounds; see its verification records). Nothing is unblocked for a builder right now.
 
-- Continue on the existing branch `wo-006a`. First: `git fetch origin && git merge origin/QuantFlow`.
-- **Fix D5 only:** delete the `QF_PROOF_SKIP_ARTIFACT_META_CHECK` env check in `packages/qf-kernel/src/create.ts` so the two metadata comparisons run unconditionally. Touch nothing else.
-- **Proof:** temporarily comment out the metadata comparison, show the D1 test red; restore; show green; show `git diff` empty. Paste all three.
-- Run builder gates (`bun test` in `packages/qf-kernel`, `tsc --noEmit`). **Never `bun qa/run.ts --all`, never delete `node_modules`.**
-- Commit and push. **Do not merge.**
+**WO-006b** is next: one agent path end-to-end — spawn from canvas, stream into a tile, publish one Artifact through the Kernel — with **Law D as the acceptance path**: create an Artifact, kill and relaunch the app, and the tile shows the same Artifact served from the Kernel. A demo passing on in-memory tile state fails the order. It is the v0.1 phase gate, and the first order the founder verifies hands-on.
 
-Why: an env flag that disables a Kernel integrity check is a runtime bypass seam. Proof plumbing lives in proof harnesses; the Kernel carries none. Per `PROTOCOL.md` this is the second and final rework lap — if it comes back wrong, the order stops for a rewrite.
+The verifier is measuring the app side (canvas, dock, Electron seams) before writing it — the defect class this workshop keeps paying for is orders written against imagined code. When the order lands, this file will point at it.
 
-## Parallel-eligible
+## Builder rules (standing)
 
-Nothing. WO-006b is blocked on WO-006a; the verifier drafts it while this lap runs.
+**Never run `bun qa/run.ts --all`, never delete `node_modules`.** The cold run belongs to the verifier.
 
 ---
 
