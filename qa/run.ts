@@ -12,6 +12,8 @@ import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
+// agent-path: cold-safe launcher only (no heavy top-level imports)
+import { runAgentPathGate } from "./gates/agent-path.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -198,6 +200,15 @@ const gates: Gate[] = [
       "Debt #0: ONTOLOGY_SCHEMA.md §Actions equals schema.ts actions (names both directions)",
     run: () => {
       const { ok } = checkDocActionSurface();
+      return ok;
+    },
+  },
+  {
+    name: "agent-path",
+    description:
+      "WO-006c: headless spawn→stream→tool→artifact, concurrency, cancel, orphans, reconcile",
+    run: async () => {
+      const { ok } = await runAgentPathGate();
       return ok;
     },
   },

@@ -30,7 +30,7 @@ export const transitions = {
     void: [],
   },
   agent_session: {
-    starting: ["running"],
+    starting: ["running", "failed"],
     running: ["blocked", "cancelled", "failed", "closed"],
     blocked: ["running", "cancelled", "failed"],
     cancelled: ["closed"],

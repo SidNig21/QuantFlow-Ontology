@@ -318,7 +318,7 @@ export interface CollabApi {
   onCdTo: (cb: CdToCb) => void;
   offCdTo: (cb: CdToCb) => void;
 
-  // QuantFlow Kernel (WO-006b)
+  // QuantFlow Kernel (WO-006b/c)
   qf: {
     execute: (
       command: string,
@@ -332,6 +332,43 @@ export interface CollabApi {
       | { ok: true; artifacts: Record<string, unknown>[] }
       | { ok: false; error: { name: string; message: string } }
     >;
+    listSessions: () => Promise<
+      | { ok: true; sessions: Record<string, unknown>[] }
+      | { ok: false; error: { name: string; message: string } }
+    >;
+    spawnSession: (args?: {
+      species?: string;
+      prompt?: string;
+    }) => Promise<
+      | { ok: true; result: Record<string, unknown> }
+      | { ok: false; error: { name: string; message: string } }
+    >;
+    cancelSession: (
+      sessionId: string,
+    ) => Promise<
+      | { ok: true }
+      | { ok: false; error: { name: string; message: string } }
+    >;
+    onSessionChunk?: (
+      cb: (payload: { sessionId: string; text: string }) => void,
+    ) => (() => void) | void;
+    offSessionChunk?: (
+      cb: (payload: { sessionId: string; text: string }) => void,
+    ) => void;
+    onSessionDone?: (
+      cb: (payload: {
+        sessionId: string;
+        status: string;
+        artifactId?: string;
+      }) => void,
+    ) => (() => void) | void;
+    offSessionDone?: (
+      cb: (payload: {
+        sessionId: string;
+        status: string;
+        artifactId?: string;
+      }) => void,
+    ) => void;
   };
   openFileDialog: () => Promise<string | null>;
 

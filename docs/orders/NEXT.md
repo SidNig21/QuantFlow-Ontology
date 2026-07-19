@@ -3,18 +3,23 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006c — rework round 1**
+## Current order: **WO-006d — one skin** *(first order after v0.1 closed)*
 
-Read `docs/orders/WO-006c.md`, bottom verification record ("Verification — round 1"). Everything except D1 is verified and accepted — do not touch it.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006d.md`](WO-006d.md) exactly.
 
-- Continue on the existing branch `wo-006c`. First: `git fetch origin && git merge origin/QuantFlow`.
-- **Fix D1 only:** make the `agent-path` gate cold-safe — its own installable dependency closure (own `package.json`, `file:` deps, install step per the existing package-gate pattern in `qa/run.ts`), heavy imports loaded only after install so a missing dependency fails the gate, never the runner.
-- **Proof:** simulate cold in a throwaway `git worktree` of your own (allowed for this one proof — never delete `node_modules` in the shared tree): fresh worktree, `bun qa/run.ts --all` → 10/10 green from zero installs. Paste the header and the `agent-path OK` line. If you cannot, defer the cold proof to the verifier and paste your wiring diff instead.
+- Work on a new branch named `wo-006d`, cut from current `origin/QuantFlow`.
+- **Restyle only** — the order's contract forbids behavior, layout, and dependency changes.
+- Run the builder-run gates; paste unedited output including the one-skin bait red/green pair, and include the screenshots — the founder personally judges the look.
 - Commit and push. **Do not merge.**
+- Anything ambiguous or unmappable: stop and say so.
+
+## Founder ceremony available now
+
+**v0.1 is code-complete and merged.** The phase-closing demo is yours to run: `docs/demos/agent-path.md` — spawn from the UI, watch the stream, cancel one session, force-kill mid-run, relaunch, see honest terminal states and the artifact intact. Report the verdict and it goes in the log.
 
 ## Parallel-eligible
 
-Nothing — this is the last v0.1 rung. When it merges, the v0.5 ladder opens **two lanes that run at once** (`ROADMAP.md`): dock/agent (WO-007 → 008 → 012) and data (WO-009 → 010/011).
+Nothing — WO-006d touches all of `windows/`, so a parallel order would collide. WO-007 (dock) follows it.
 
 ---
 

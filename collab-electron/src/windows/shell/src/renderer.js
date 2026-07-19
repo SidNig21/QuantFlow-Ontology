@@ -1135,6 +1135,22 @@ async function init() {
 				tileManager.createArtifactTile(cx, cy, id);
 				minimap.update();
 			})();
+		} else if (action === "spawn-agent-session") {
+			void (async () => {
+				const res = await window.shellApi.qf.spawnSession({
+					species: "qf-toolloop",
+					prompt: "uppercase quantflow",
+				});
+				if (!res.ok) {
+					console.error("spawnSession failed", res.error);
+					return;
+				}
+				console.log(
+					"spawn_agent_session",
+					JSON.stringify(res.result),
+				);
+				minimap.update();
+			})();
 		} else if (action === "new-tile") {
 			const rect = canvasEl.getBoundingClientRect();
 			const size = getTerminalSize();
@@ -1346,6 +1362,21 @@ async function init() {
 						viewportState.zoom - size.height / 2;
 					tileManager.createArtifactTile(
 						cx, cy, artifactId,
+					);
+					minimap.update();
+				}
+				if (channel === "create-session-tile") {
+					const sessionId = args[0];
+					const size = defaultSize("session");
+					const rect = canvasEl.getBoundingClientRect();
+					const cx =
+						(rect.width / 2 - viewportState.panX) /
+						viewportState.zoom - size.width / 2;
+					const cy =
+						(rect.height / 2 - viewportState.panY) /
+						viewportState.zoom - size.height / 2;
+					tileManager.createSessionTile(
+						cx, cy, sessionId,
 					);
 					minimap.update();
 				}

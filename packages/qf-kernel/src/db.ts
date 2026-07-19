@@ -90,3 +90,10 @@ export function listArtifacts(db: KernelDb): Record<string, unknown>[] {
     .query(`SELECT * FROM artifact ORDER BY created_at DESC`)
     .all() as Record<string, unknown>[];
 }
+
+/** Read-only listing for session tiles / IPC / reconciliation. */
+export function listAgentSessions(db: KernelDb): Record<string, unknown>[] {
+  return db
+    .query(`SELECT * FROM agent_session ORDER BY created_at DESC`)
+    .all() as Record<string, unknown>[];
+}

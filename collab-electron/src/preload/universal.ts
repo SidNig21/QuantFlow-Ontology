@@ -148,7 +148,7 @@ contextBridge.exposeInMainWorld("api", {
   // Shared
   getPlatform: (): NodeJS.Platform => process.platform,
 
-  /** WO-006b: Kernel command / artifact read surface (main process only). */
+  /** WO-006b/c: Kernel + agent session surface (main process only). */
   qf: {
     execute: (
       command: string,
@@ -156,6 +156,55 @@ contextBridge.exposeInMainWorld("api", {
       trace: { trace_id: string; span_id: string },
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+    listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
+    spawnSession: (args?: { species?: string; prompt?: string }) =>
+      ipcRenderer.invoke("qf:sessions:spawn", args),
+    cancelSession: (sessionId: string) =>
+      ipcRenderer.invoke("qf:sessions:cancel", { sessionId }),
+    onSessionChunk: (
+      cb: (payload: { sessionId: string; text: string }) => void,
+    ) => {
+      const handler = (
+        _e: unknown,
+        payload: { sessionId: string; text: string },
+      ) => cb(payload);
+      ipcRenderer.on("qf:session:chunk", handler);
+      return () => ipcRenderer.removeListener("qf:session:chunk", handler);
+    },
+    offSessionChunk: (
+      cb: (payload: { sessionId: string; text: string }) => void,
+    ) => {
+      ipcRenderer.removeAllListeners("qf:session:chunk");
+      void cb;
+    },
+    onSessionDone: (
+      cb: (payload: {
+        sessionId: string;
+        status: string;
+        artifactId?: string;
+      }) => void,
+    ) => {
+      const handler = (
+        _e: unknown,
+        payload: {
+          sessionId: string;
+          status: string;
+          artifactId?: string;
+        },
+      ) => cb(payload);
+      ipcRenderer.on("qf:session:done", handler);
+      return () => ipcRenderer.removeListener("qf:session:done", handler);
+    },
+    offSessionDone: (
+      cb: (payload: {
+        sessionId: string;
+        status: string;
+        artifactId?: string;
+      }) => void,
+    ) => {
+      ipcRenderer.removeAllListeners("qf:session:done");
+      void cb;
+    },
   },
   openFileDialog: (): Promise<string | null> =>
     ipcRenderer.invoke("dialog:open-file"),

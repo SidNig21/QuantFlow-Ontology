@@ -95,6 +95,13 @@ export const commands: readonly TransitionCommand[] = [
   {
     action: "fail_agent_session",
     type: "agent_session",
+    from: "starting",
+    to: "failed",
+    event: "agent_session.failed",
+  },
+  {
+    action: "fail_agent_session",
+    type: "agent_session",
     from: "running",
     to: "failed",
     event: "agent_session.failed",
@@ -147,6 +154,11 @@ export const creationCommands: readonly CreationCommand[] = [
     action: "publish_artifact",
     object_type: "artifact",
     event: "artifact.published",
+  },
+  {
+    action: "create_agent_session",
+    object_type: "agent_session",
+    event: "agent_session.created",
   },
 ] as const;
 

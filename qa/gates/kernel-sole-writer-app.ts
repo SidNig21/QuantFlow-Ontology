@@ -1,20 +1,34 @@
 /**
- * WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel / sqlite
- * or mention kernel.db under collab-electron/src.
+ * WO-006b/c: Kernel SQLite sole-writer + AgentOS sole-host under collab-electron/src.
+ * - Only kernel.ts may import qf-kernel / sqlite / mention kernel.db
+ * - Only agent-host.ts may import @rivet-dev/agentos*
+ * - acp-agent.ts is a frozen exception for @agentclientprotocol (debt #14)
+ * - No new ai / ToolLoopAgent imports anywhere in the app
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "../..");
 const APP_SRC = join(REPO_ROOT, "collab-electron/src");
-const ALLOWED = "collab-electron/src/main/kernel.ts";
 
-const PATTERNS: Array<{ name: string; re: RegExp }> = [
+const KERNEL_ALLOWED = "collab-electron/src/main/kernel.ts";
+const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
+/** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
+const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
+
+const KERNEL_PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: "qf-kernel", re: /qf-kernel/ },
   { name: "node:sqlite", re: /node:sqlite/ },
   { name: "bun:sqlite", re: /bun:sqlite/ },
   { name: "better-sqlite3", re: /better-sqlite3/ },
   { name: "kernel.db", re: /kernel\.db/ },
+];
+
+const AGENT_PATTERNS: Array<{ name: string; re: RegExp }> = [
+  { name: "@rivet-dev/agentos", re: /@rivet-dev\/agentos/ },
+  { name: "@agentclientprotocol", re: /@agentclientprotocol/ },
+  { name: "ToolLoopAgent", re: /\bToolLoopAgent\b/ },
+  { name: "from ai", re: /from\s+["']ai["']/ },
 ];
 
 const CODE_EXT = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
@@ -64,19 +78,30 @@ export function checkKernelSoleWriterApp(): {
 
   for (const full of files) {
     const rel = relative(REPO_ROOT, full).split("\\").join("/");
-    if (rel === ALLOWED) continue;
-    // This gate file is outside collab-electron/src — not walked.
     let text: string;
     try {
       text = readFileSync(full, "utf8");
     } catch {
       continue;
     }
-    for (const p of PATTERNS) {
-      if (p.re.test(text)) {
-        offenders.push(`${rel} (${p.name})`);
-        break;
+
+    if (rel !== KERNEL_ALLOWED) {
+      for (const p of KERNEL_PATTERNS) {
+        if (p.re.test(text)) {
+          offenders.push(`${rel} (${p.name})`);
+          break;
+        }
       }
+    }
+
+    for (const p of AGENT_PATTERNS) {
+      if (!p.re.test(text)) continue;
+      if (p.name === "@rivet-dev/agentos" && rel === AGENTOS_ALLOWED) continue;
+      if (p.name === "@agentclientprotocol" && rel === ACP_FROZEN) continue;
+      // debt #14: frozen file must not gain ToolLoopAgent/ai either beyond what it has —
+      // ToolLoopAgent lives in the guest pack, not acp-agent.ts (legacy uses ACP SDK only).
+      offenders.push(`${rel} (${p.name})`);
+      break;
     }
   }
 

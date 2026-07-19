@@ -9,6 +9,7 @@ import {
 import { appendEvent } from "./events.ts";
 import type { ExecuteResult } from "./execute.ts";
 import { contentHash } from "./hash.ts";
+import { insertAgentSession } from "./insert.ts";
 import type { TraceContext } from "./trace.ts";
 
 function resolveBytes(input: Record<string, unknown>): Uint8Array {
@@ -121,9 +122,45 @@ function publishArtifact(
   };
 }
 
+/**
+ * create_agent_session — adopt guest-minted id; one INSERT + one created event
+ * via insertAgentSession (do not double-write).
+ */
+function createAgentSession(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+): ExecuteResult {
+  const session_id = input.session_id;
+  if (typeof session_id !== "string" || session_id.length === 0) {
+    throw new KernelError(
+      'create_agent_session requires non-empty "session_id" (guest-minted, adopted)',
+    );
+  }
+  let label: string | null = null;
+  if (input.label !== undefined && input.label !== null) {
+    if (typeof input.label !== "string") {
+      throw new KernelError('create_agent_session "label" must be a string or null');
+    }
+    label = input.label;
+  }
+
+  const state = insertAgentSession(db, { id: session_id, label }, trace);
+  return {
+    object_type: cmd.object_type,
+    object_id: session_id,
+    from: "(none)",
+    to: String(state.status ?? "starting"),
+    event: cmd.event,
+    state,
+  };
+}
+
 /** Single dispatch table — catalog actions must have a handler here. */
 export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   publish_artifact: publishArtifact,
+  create_agent_session: createAgentSession,
 };
 
 /** Every creationCommands entry must have a handler (D3 join). */

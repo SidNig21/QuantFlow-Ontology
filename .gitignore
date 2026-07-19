@@ -18,3 +18,4 @@ Screenshots/
 .worktrees
 opencode.json
 /collab-electron/.antigravitycli
+qa/.tmp-agent-path/

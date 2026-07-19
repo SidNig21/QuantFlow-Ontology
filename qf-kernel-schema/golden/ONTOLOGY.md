@@ -408,6 +408,15 @@ Void a scheduled event that will not be contested (scheduled → void).
 - **input:**
 - `event_id` — Event to void.
 
+### `create_agent_session`
+
+Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `session_id` — Guest-minted ACP session id — adopted as the Kernel row id, never re-minted.
+- `label` — Operator-facing label; v0.1 stores the species name here.
+
 ### `start_agent_session`
 
 Bring a starting agent session into running (starting → running).
@@ -442,7 +451,7 @@ Cancel a running or blocked agent session (→ cancelled).
 
 ### `fail_agent_session`
 
-Fail a running or blocked agent session (→ failed).
+Fail a starting, running, or blocked agent session (→ failed). Used for guest crash and boot reconciliation.
 
 - **lifecycle:** `experimental`
 - **input:**

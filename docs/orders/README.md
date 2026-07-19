@@ -17,4 +17,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-005](WO-005.md) | Kernel v0: SQLite from generated migration, command/event layer, Law E gates | **done** — verified + merged 2026-07-18 | builder (Cursor) |
 | [WO-006a](WO-006a.md) | Creation commands: the Kernel can publish an Artifact (+ debt #0 gate) | **done** — verified + merged 2026-07-18 after 3 rounds (D1–D5); doc↔code gate falsified both directions | builder (Cursor) |
 | [WO-006b](WO-006b.md) | Kernel in the app: Artifact tile + Law D cold-reopen demo | **done** — verified + merged 2026-07-19 (round 2); **Law D PASSED** | builder (Cursor) |
-| [WO-006c](WO-006c.md) | One agent path end-to-end: spawn → stream → tool → Artifact → lifecycle | **rework** — verified 2026-07-19; falsifications/seam/allowlist confirmed; one defect (D1: agent-path gate not cold-safe — fresh checkout kills the qa runner) | builder (Cursor) |
+| [WO-006c](WO-006c.md) | One agent path end-to-end: spawn → stream → tool → Artifact → lifecycle | **done** — verified + merged 2026-07-19 (round 2); 10 gates cold from zero installs; **v0.1 phase gate closed**; founder demo (`docs/demos/agent-path.md`) pending | builder (Cursor) |
+| WO-006d | One skin: token sheet + one-skin gate (design coherence) | **open** — current | builder |

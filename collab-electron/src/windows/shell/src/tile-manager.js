@@ -64,6 +64,7 @@ export function createTileManager({
 				folderPath: t.folderPath,
 				workspacePath: t.workspacePath,
 				artifactId: t.artifactId,
+				sessionId: t.sessionId,
 				ptySessionId: t.ptySessionId,
 				url: t.url,
 				zIndex: t.zIndex,
@@ -326,6 +327,41 @@ export function createTileManager({
 		wv.addEventListener("console-message", (event) => {
 			window.shellApi.logFromWebview(
 				"artifact-tile",
+				event.level,
+				event.message,
+				event.sourceId,
+			);
+		});
+
+		dom.contentArea.appendChild(wv);
+		dom.webview = wv;
+	}
+
+	function spawnSessionWebview(tile) {
+		const dom = tileDOMs.get(tile.id);
+		if (!dom) return;
+
+		const wv = document.createElement("webview");
+		const sessionConfig = configs.sessionTile;
+		if (!sessionConfig) {
+			console.error("spawnSessionWebview: configs.sessionTile missing");
+			return;
+		}
+		const params = new URLSearchParams();
+		params.set("sessionId", tile.sessionId ?? "");
+		const qs = params.toString();
+		wv.setAttribute("src", `${sessionConfig.src}?${qs}`);
+		wv.setAttribute("preload", sessionConfig.preload);
+		wv.setAttribute(
+			"webpreferences", "contextIsolation=yes, sandbox=yes",
+		);
+		wv.style.width = "100%";
+		wv.style.height = "100%";
+		wv.style.border = "none";
+
+		wv.addEventListener("console-message", (event) => {
+			window.shellApi.logFromWebview(
+				"session-tile",
 				event.level,
 				event.message,
 				event.sourceId,
@@ -723,6 +759,15 @@ export function createTileManager({
 		return tile;
 	}
 
+	function createSessionTile(cx, cy, sessionId) {
+		const tile = createCanvasTile("session", cx, cy, {
+			sessionId,
+		});
+		spawnSessionWebview(tile);
+		saveCanvasImmediate();
+		return tile;
+	}
+
 	function clearCanvas(viewportObj) {
 		const tileIds = tiles.map((t) => t.id);
 		for (const id of tileIds) {
@@ -786,6 +831,17 @@ export function createTileManager({
 					},
 				);
 				spawnArtifactWebview(tile);
+			} else if (saved.type === "session" && saved.sessionId) {
+				const tile = createCanvasTile(
+					"session", cx, cy, {
+						id: saved.id,
+						width: saved.width,
+						height: saved.height,
+						zIndex: saved.zIndex,
+						sessionId: saved.sessionId,
+					},
+				);
+				spawnSessionWebview(tile);
 			} else if (saved.type === "browser") {
 				const tile = createCanvasTile(
 					"browser", cx, cy, {
@@ -888,10 +944,12 @@ export function createTileManager({
 		spawnTerminalWebview,
 		spawnGraphWebview,
 		spawnArtifactWebview,
+		spawnSessionWebview,
 		spawnBrowserWebview,
 		createFileTile,
 		createGraphTile,
 		createArtifactTile,
+		createSessionTile,
 		clearCanvas,
 		getCanvasStateForSave,
 		restoreCanvasState,

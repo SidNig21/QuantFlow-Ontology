@@ -122,6 +122,10 @@ export default defineConfig({
             __dirname,
             "src/windows/artifact-tile/index.html",
           ),
+          "session-tile": resolve(
+            __dirname,
+            "src/windows/session-tile/index.html",
+          ),
           "tile-list": resolve(__dirname, "src/windows/tile-list/index.html"),
           "agent-chat": resolve(
             __dirname,
