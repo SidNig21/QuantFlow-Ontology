@@ -1,187 +1,144 @@
+import { transitions, type StatefulType } from "./transitions.ts";
+
 /**
- * Command/event split for stateful types.
- * Commands are rejectable intents; events are replayable facts.
- * There is no Receipt type — the event log is the receipt log.
- *
- * Note: `retry_run` / `close_run` exist as schema actions but do not mutate the
- * same run's status under the v0.2 tables (terminals are closed; retry is a new run).
+ * Transition commands — derived from `transitions` (one row per legal edge).
+ * `action` MUST name a schema action. The Kernel executes these; MCP invents nothing else.
+ * There is no Receipt type — success appends the listed event to the Kernel event log.
  */
-export type CommandDef = {
-  name: string;
-  type: "run" | "hypothesis" | "ticket" | "event" | "agent_session";
-  /** States from which this command may be accepted. */
-  from: readonly string[];
-  /** State written on success. */
+export type TransitionCommand = {
+  /** Schema action name (must exist in schema.actions). */
+  action: string;
+  type: StatefulType;
+  from: string;
   to: string;
   /** Domain event emitted on success (dotted type.verb). */
   event: string;
-  description: string;
 };
 
-export const commands: readonly CommandDef[] = [
+/**
+ * Exhaustive edge catalog. Maintained as the join of transitions ↔ schema.actions;
+ * `lintCommands` fails the build if an edge lacks a command or a command invents an action.
+ */
+export const commands: readonly TransitionCommand[] = [
   // run
+  { action: "start_run", type: "run", from: "queued", to: "running", event: "run.started" },
+  { action: "complete_run", type: "run", from: "running", to: "succeeded", event: "run.succeeded" },
+  { action: "fail_run", type: "run", from: "running", to: "failed", event: "run.failed" },
+  { action: "cancel_run", type: "run", from: "running", to: "cancelled", event: "run.cancelled" },
+  // hypothesis (status chosen by input; same action covers three edges)
   {
-    name: "start_run",
-    type: "run",
-    from: ["queued"],
-    to: "running",
-    event: "run.started",
-    description: "Accept a queued run into the running state.",
-  },
-  {
-    name: "complete_run",
-    type: "run",
-    from: ["running"],
-    to: "succeeded",
-    event: "run.succeeded",
-    description: "Mark a running run as succeeded.",
-  },
-  {
-    name: "fail_run",
-    type: "run",
-    from: ["running"],
-    to: "failed",
-    event: "run.failed",
-    description: "Mark a running run as failed.",
-  },
-  {
-    name: "cancel_run",
-    type: "run",
-    from: ["running"],
-    to: "cancelled",
-    event: "run.cancelled",
-    description: "Cancel a running run.",
-  },
-  // hypothesis (resolve_hypothesis action chooses among these by input)
-  {
-    name: "resolve_hypothesis_supported",
+    action: "resolve_hypothesis",
     type: "hypothesis",
-    from: ["open"],
+    from: "open",
     to: "supported",
     event: "hypothesis.supported",
-    description: "Resolve an open hypothesis as supported (evaluation-gated).",
   },
   {
-    name: "resolve_hypothesis_rejected",
+    action: "resolve_hypothesis",
     type: "hypothesis",
-    from: ["open"],
+    from: "open",
     to: "rejected",
     event: "hypothesis.rejected",
-    description: "Resolve an open hypothesis as rejected (evaluation-gated).",
   },
   {
-    name: "resolve_hypothesis_inconclusive",
+    action: "resolve_hypothesis",
     type: "hypothesis",
-    from: ["open"],
+    from: "open",
     to: "inconclusive",
     event: "hypothesis.inconclusive",
-    description: "Resolve an open hypothesis as inconclusive (evaluation-gated).",
   },
-  // ticket (grade field; settlement-backed)
-  {
-    name: "grade_ticket_win",
-    type: "ticket",
-    from: ["pending"],
-    to: "win",
-    event: "ticket.graded",
-    description: "Grade a pending ticket as win after result settlement.",
-  },
-  {
-    name: "grade_ticket_loss",
-    type: "ticket",
-    from: ["pending"],
-    to: "loss",
-    event: "ticket.graded",
-    description: "Grade a pending ticket as loss after result settlement.",
-  },
-  {
-    name: "grade_ticket_push",
-    type: "ticket",
-    from: ["pending"],
-    to: "push",
-    event: "ticket.graded",
-    description: "Grade a pending ticket as push after result settlement.",
-  },
-  {
-    name: "grade_ticket_void",
-    type: "ticket",
-    from: ["pending"],
-    to: "void",
-    event: "ticket.graded",
-    description: "Grade a pending ticket as void after result settlement.",
-  },
+  // ticket (grade chosen by input)
+  { action: "grade_ticket", type: "ticket", from: "pending", to: "win", event: "ticket.graded" },
+  { action: "grade_ticket", type: "ticket", from: "pending", to: "loss", event: "ticket.graded" },
+  { action: "grade_ticket", type: "ticket", from: "pending", to: "push", event: "ticket.graded" },
+  { action: "grade_ticket", type: "ticket", from: "pending", to: "void", event: "ticket.graded" },
   // event
-  {
-    name: "start_event",
-    type: "event",
-    from: ["scheduled"],
-    to: "live",
-    event: "event.started",
-    description: "Move a scheduled event to live.",
-  },
-  {
-    name: "settle_event",
-    type: "event",
-    from: ["live"],
-    to: "settled",
-    event: "event.settled",
-    description: "Settle a live event.",
-  },
-  {
-    name: "void_event",
-    type: "event",
-    from: ["scheduled"],
-    to: "void",
-    event: "event.voided",
-    description: "Void a scheduled event that will not be contested.",
-  },
+  { action: "start_event", type: "event", from: "scheduled", to: "live", event: "event.started" },
+  { action: "settle_event", type: "event", from: "live", to: "settled", event: "event.settled" },
+  { action: "void_event", type: "event", from: "scheduled", to: "void", event: "event.voided" },
   // agent_session
   {
-    name: "start_agent_session",
+    action: "start_agent_session",
     type: "agent_session",
-    from: ["starting"],
+    from: "starting",
     to: "running",
     event: "agent_session.started",
-    description: "Bring a starting agent session into running.",
   },
   {
-    name: "block_agent_session",
+    action: "block_agent_session",
     type: "agent_session",
-    from: ["running"],
+    from: "running",
     to: "blocked",
     event: "agent_session.blocked",
-    description: "Block a running agent session (awaiting approval or input).",
   },
   {
-    name: "unblock_agent_session",
+    action: "unblock_agent_session",
     type: "agent_session",
-    from: ["blocked"],
+    from: "blocked",
     to: "running",
     event: "agent_session.unblocked",
-    description: "Return a blocked agent session to running.",
   },
   {
-    name: "cancel_agent_session",
+    action: "cancel_agent_session",
     type: "agent_session",
-    from: ["running", "blocked"],
+    from: "running",
     to: "cancelled",
     event: "agent_session.cancelled",
-    description: "Cancel a running or blocked agent session.",
   },
   {
-    name: "fail_agent_session",
+    action: "cancel_agent_session",
     type: "agent_session",
-    from: ["running", "blocked"],
+    from: "blocked",
+    to: "cancelled",
+    event: "agent_session.cancelled",
+  },
+  {
+    action: "fail_agent_session",
+    type: "agent_session",
+    from: "running",
     to: "failed",
     event: "agent_session.failed",
-    description: "Fail a running or blocked agent session.",
   },
   {
-    name: "close_agent_session",
+    action: "fail_agent_session",
     type: "agent_session",
-    from: ["running", "cancelled", "failed"],
+    from: "blocked",
+    to: "failed",
+    event: "agent_session.failed",
+  },
+  {
+    action: "close_agent_session",
+    type: "agent_session",
+    from: "running",
     to: "closed",
     event: "agent_session.closed",
-    description: "Close a running, cancelled, or failed agent session.",
+  },
+  {
+    action: "close_agent_session",
+    type: "agent_session",
+    from: "cancelled",
+    to: "closed",
+    event: "agent_session.closed",
+  },
+  {
+    action: "close_agent_session",
+    type: "agent_session",
+    from: "failed",
+    to: "closed",
+    event: "agent_session.closed",
   },
 ] as const;
+
+/** All legal (type, from, to) edges from the transition tables. */
+export function allTransitionEdges(): Array<{ type: StatefulType; from: string; to: string }> {
+  const edges: Array<{ type: StatefulType; from: string; to: string }> = [];
+  for (const type of Object.keys(transitions) as StatefulType[]) {
+    const table = transitions[type] as Record<string, readonly string[]>;
+    for (const [from, tos] of Object.entries(table)) {
+      for (const to of tos) {
+        edges.push({ type, from, to });
+      }
+    }
+  }
+  return edges;
+}

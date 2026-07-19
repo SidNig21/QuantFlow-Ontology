@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/schema.ts",
+    "./commands": "./src/commands.ts",
+    "./transitions": "./src/transitions.ts",
+    "./validate": "./src/validate.ts",
+    "./define": "./src/define.ts"
+  },
   "scripts": {
     "generate": "bun run scripts/generate.ts",
     "test": "bun test"

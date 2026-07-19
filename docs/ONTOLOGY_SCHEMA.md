@@ -130,7 +130,11 @@ Properties drafted at codegen time under the same laws (see ROADMAP WO-003/WO-00
 
 ## Actions (initial command surface — MCP tools generate from these)
 
-`create_hypothesis` · `register_dataset_version` · `start_run` / `cancel_run` / `retry_run` / `close_run` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated) · `request_approval` / `approve` / `deny` (pending-context-item gate, L2) · `promote_type` (`experimental → active`, schema governance itself as an action)
+`create_hypothesis` · `register_dataset_version` · `start_run` / `complete_run` / `fail_run` / `cancel_run` / `retry_run` / `close_run` · `start_event` / `settle_event` / `void_event` · `grade_ticket` · `start_agent_session` / `block_agent_session` / `unblock_agent_session` / `cancel_agent_session` / `fail_agent_session` / `close_agent_session` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated) · `request_approval` / `approve` / `deny` (pending-context-item gate, L2) · `promote_type` (`experimental → active`, schema governance itself as an action)
+
+> **Reconciled with code 2026-07-18 (WO-005).** This list previously held 13 actions while `qf-kernel-schema/src/schema.ts` held 25. WO-005's derive-and-lint deliverable requires **every legal transition to have a command and every command to be a real schema action** — unsatisfiable with 13 actions against 24 legal transitions, so the transition verbs above were added in code. That contradiction was an order defect (the same order called this doc authoritative and unmodifiable); the doc is corrected here by the architect rather than reworked onto the builder.
+>
+> **`close_run` is deprecated pending removal.** WO-005's recommendation, accepted: `run`'s terminals are already `succeeded | failed | cancelled`, so a `closed` state would invent a second terminal and fight Law F, and a no-status-change ack does not belong beside rejectable transition actions. Removal from code lands by order — it is not a builder edit.
 
 ---
 

@@ -30,7 +30,7 @@ Gate: one real agent path streaming into a tile · cancel/fail/retry/close · on
 | WO-002 | Docs graduation + roadmap (this order) | The plan is repo-visible | done |
 | WO-003 | Schema expansion to full v0.2 + `qa` schema-lint gate (descriptions, lifecycle, no-removal-on-active) + **legal-transition tables with generated conformance tests** + **command/event split** (§State machines in `docs/ONTOLOGY_SCHEMA.md`) | The whole frozen schema compiles, lints, and rejects every illegal transition | **done** 2026-07-18 |
 | WO-004 | Runtime ownership proof: AgentOS session → ACP agent → `ToolLoopAgent`, one session ID, no second Eve server | The L2 bet — **PROOF HELD**; Mastra fallback not needed | **done** 2026-07-18 |
-| WO-005 | Kernel v0: SQLite from generated migrations + trace context on every command + ledger table; **Law E gates land here** (Kernel is sole SQLite owner; no domain writes via `canvas-state`/`canvas-persistence`) | L0/L1 substrate under real writes | **open — current** |
+| WO-005 | Kernel v0: SQLite from generated migrations + trace context on every command + ledger table; **Law E gates land here** (Kernel is sole SQLite owner; no domain writes via `canvas-state`/`canvas-persistence`) | L0/L1 substrate under real writes | **done** 2026-07-18 |
 | WO-006 | One agent path end-to-end: spawn from canvas, stream into tile, call one `qf_` tool, publish one Artifact; cancel/fail/retry/close. **Law D is the acceptance path**: create Artifact via Kernel action → kill and relaunch app → tile shows same Artifact from the Kernel. A demo passing on in-memory tile state fails the order. | The v0.1 phase gate itself | open, depends WO-004/005 |
 
 ### Known debt (adversarial review of WO-001→004, 2026-07-18)
@@ -39,7 +39,8 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 
 | # | Debt | Lands in |
 |---|---|---|
-| 1 | `commands.ts` drift — third unlinted catalog | **WO-005** (deliverable 9) |
+| 0 | **doc↔code action-surface drift** — nothing asserts `ONTOLOGY_SCHEMA.md` §Actions equals `schema.ts`; WO-005 shipped 25 actions against a 13-action doc and only a human reading two lists caught it | **next order touching the schema surface** |
+| 1 | ~~`commands.ts` drift~~ — **killed** by WO-005's bidirectional lint, falsified both directions in verification | done |
 | 2 | P1 forged third layer · soft P4 · `/tmp` receipt oracle · fixture cost | **WO-004a** |
 | 3 | `define.ts`/`sql.ts` walk private Zod internals (`_zod`) — introduce a `FieldSpec` IR so generators are dumb printers | order TBD, before the next generator change |
 | 4 | `stateFieldName` `status\|grade` heuristic — replace with an explicit `stateField` | WO-005 if it touches the state field, else with #3 |

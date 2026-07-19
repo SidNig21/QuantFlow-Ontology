@@ -14,4 +14,4 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-003](WO-003.md) | Full schema v0.2 + transition tables + conformance tests | **done** — verified + merged 2026-07-18 | builder (Cursor) |
 | [WO-004](WO-004.md) | Runtime ownership proof: one session ID, no second server | **done** — PROOF HELD (NARROWED); P1 overstated, see WO-004a | builder (Cursor) |
 | [WO-004a](WO-004a.md) | Proof correction: assert what is actually true | **open** — parallel-eligible | builder |
-| [WO-005](WO-005.md) | Kernel v0: SQLite from generated migration, command/event layer, Law E gates | **open** — current | builder |
+| [WO-005](WO-005.md) | Kernel v0: SQLite from generated migration, command/event layer, Law E gates | **done** — verified + merged 2026-07-18 | builder (Cursor) |

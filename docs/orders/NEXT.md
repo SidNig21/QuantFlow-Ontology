@@ -3,23 +3,21 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-005**
+## Current order: **WO-004a**
 
-Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-005.md` exactly.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute `docs/orders/WO-004a.md` exactly.
 
-- Work on a new branch named `wo-005`.
+- Work on a new branch named `wo-004a`.
 - Stay strictly inside the order's scope — anything not listed in its Deliverables is out.
 - Run every acceptance gate and paste the full, unedited output in your report, using the order's Report-back format.
 - Commit to your branch and push it. **Do not merge.**
 - If anything in the order is ambiguous, stop and say so instead of improvising.
 
-WO-005 builds the **Kernel** — the one place durable truth lives, and the direct expression of `START_HERE.md`'s One Rule. It consumes `qf-kernel-schema`'s generated migration and transition tables; it never hand-writes schema. Two of its gates enforce Law E: nothing outside the Kernel may own SQLite or persist a domain type.
+**The Kernel exists (WO-005, merged).** WO-004a is a correction order: WO-004's P1 asserted a value against itself, and this replaces the overstated assertions with measured ones. It requires you to **prove your own gate can fail** — neuter the cancel path, show red, restore, show green.
 
 ## Parallel-eligible (second builder only, never the same builder)
 
-**WO-004a — proof correction** ([`WO-004a.md`](WO-004a.md)) is unblocked and touches only `tools/runtime-proof/`, which WO-005 is forbidden to enter. A second builder may take it now.
-
-An adversarial review found WO-004's P1 asserted a value against itself. WO-004a replaces the overstated assertions with measured ones and requires the builder to **prove its own gate can fail**. WO-006 remains blocked on the Kernel.
+*none right now.* **WO-006 — one agent path end-to-end** is unblocked by the Kernel but **its order file is not yet written** (architect owes it). It is the v0.1 phase gate: spawn from canvas, stream into a tile, publish one Artifact, and satisfy **Law D** — create an Artifact, kill and relaunch the app, the tile shows it from the Kernel. Do not start it from the roadmap line; no order file, no work.
 
 ## Reviewer (standing role, `PROTOCOL.md`)
 

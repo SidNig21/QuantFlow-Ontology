@@ -284,3 +284,58 @@ export function lintSchema(schema: Schema, tables: TransitionTables): void {
   assertLinkEndpointsExist(schema);
   assertTransitionCoverage(schema, tables);
 }
+
+/** One legal edge covered by a transition command. */
+export type CommandEdge = {
+  action: string;
+  type: string;
+  from: string;
+  to: string;
+};
+
+/**
+ * Join lint: every command names a real schema action and a legal transition;
+ * every legal transition has a command. Prevents a fourth parallel catalog.
+ */
+export function lintCommands(
+  schema: Schema,
+  tables: TransitionTables,
+  commandList: readonly CommandEdge[],
+): void {
+  const actionNames = new Set(schema.actions.map((a) => a.name));
+  const covered = new Set<string>();
+
+  for (const cmd of commandList) {
+    if (!actionNames.has(cmd.action)) {
+      throw new Error(
+        `Command action "${cmd.action}" is not a schema action (type=${cmd.type} ${cmd.from}→${cmd.to})`,
+      );
+    }
+    const table = tables[cmd.type];
+    if (!table) {
+      throw new Error(`Command "${cmd.action}" references unknown type "${cmd.type}"`);
+    }
+    const allowed = table[cmd.from];
+    if (!allowed || !allowed.includes(cmd.to)) {
+      throw new Error(
+        `Command "${cmd.action}" is not a legal transition for ${cmd.type}: ${cmd.from} → ${cmd.to}`,
+      );
+    }
+    const key = `${cmd.type}:${cmd.from}->${cmd.to}`;
+    if (covered.has(key)) {
+      throw new Error(`Duplicate command coverage for ${key}`);
+    }
+    covered.add(key);
+  }
+
+  for (const [typeName, table] of Object.entries(tables)) {
+    for (const [from, targets] of Object.entries(table)) {
+      for (const to of targets) {
+        const key = `${typeName}:${from}->${to}`;
+        if (!covered.has(key)) {
+          throw new Error(`Legal transition has no command: ${key}`);
+        }
+      }
+    }
+  }
+}
