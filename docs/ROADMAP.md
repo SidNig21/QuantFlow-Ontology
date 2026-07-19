@@ -48,6 +48,8 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 | 3 | `define.ts`/`sql.ts` walk private Zod internals (`_zod`) — introduce a `FieldSpec` IR so generators are dumb printers | order TBD, before the next generator change |
 | 4 | `stateFieldName` `status\|grade` heuristic — replace with an explicit `stateField` | WO-005 if it touches the state field, else with #3 |
 | 5 | `schema.ts` at 645 lines — split by plane (domain / research / ops / links / actions) before the next expansion crosses 1k | before any schema growth order |
+| 6 | Zod↔Kernel `content_hash` contract disagreement — `publish_artifact`'s schema input requires it, Kernel treats it as advisory-but-verified; softening the Zod field is a schema-surface edit and needs an order | order TBD, before MCP exposure |
+| 7 | Creation-path cleanup — `ARTIFACT_KINDS` duplicates the schema enum inside the Kernel; `from:"(none)"`/`to:"exists"` sentinel fields fake a transition shape for creations (discriminated result type instead) | WO-006b or first creation-path touch after it |
 | 6 | `golden/tools.json` 1k+ dump — compact golden + determinism check | with #5 |
 | 7 | `qa/run.ts` install→test copy-paste — extract one `bunPackageGate` helper | next gate added |
 | 8 | `validate.ts` takes bare `string` — should take `StatefulType` | WO-005 (it consumes `validate`) |
