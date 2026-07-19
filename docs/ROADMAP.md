@@ -58,16 +58,92 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 | 7 | `qa/run.ts` install→test copy-paste — extract one `bunPackageGate` helper | next gate added |
 | 8 | `validate.ts` takes bare `string` — should take `StatefulType` | WO-005 (it consumes `validate`) |
 
-## Phase v0.5 — "one real quant workflow" (~2–4 months) — placeholders, detailed after v0.1 ships
+## Phase v0.5 — "one real quant workflow" (~2–4 months) — **gates detailed 2026-07-19** (founder request)
 
-Gate: the defining workflow end-to-end on real data — Hypothesis → Dataset → Backtest → Artifact → Critic → Evaluation (CLV, ROI, Monte Carlo bankroll) → Report with full lineage. Plus: 12 sessions / 4 concurrent turns · typed delegation · trace timeline · object inspector.
+**Phase gate (unchanged, closes the phase):** the defining workflow end-to-end on real data — Hypothesis → Dataset → Backtest → Artifact → Critic → Evaluation (CLV, ROI, Monte Carlo bankroll) → Report with full lineage. Plus: 12 sessions / 4 concurrent turns · typed delegation · trace timeline · object inspector.
 
-- **Data reality** — bootstrap datasets (tennis-data.co.uk, Kaggle UFC, NFL odds archives), then the Bovada capture pipeline (the forward moat); entity resolution; freshness/failure modes
-- **Python sidecar** — uv + polars + backtest engine as `execution_environment`; Parquet/DuckDB store
-- **Agent contracts** — Researcher / Backtester / Critic: prompts, tool allowlists, handoff rules. The ACP guest is a **swappable species** behind the seam WO-004 proved: `ToolLoopAgent` (v0.1) and **Hermes via `hermes acp`** (recorded candidate) plug into the same socket — species choice, not architecture change (`BLUEPRINT.md` §open-host principle)
-- **Dock rebuild** — the spawn surface for agent species and tiles, the founder's access point to the canvas. Rebuilt as a Kernel projection per Laws A–C; the predecessor's dock is reference-only, visuals recreated via Claude design
-- **Cloudflare sandbox execution** — disposable CPU runs; artifact export enforced by `produces` before sandbox death
-- **The defining workflow order** — the E2E cut that closes the phase
+> **How to read this section.** These gates are **binding acceptance criteria, fixed now** so they are not relitigated order by order. Order *files* are still written just-in-time by the architect when each rung starts (one-meaning-per-deliverable needs current code context) — an order file may **refine** its gate, never weaken it. Every order inherits the standing rules without restatement: cold-state, gate-falsification (neuter → red → restore → green, both outputs in the report), Laws A–F, builders never handle credentials, builder-run vs verifier-run gate split per `PROTOCOL.md`. Entry into this phase = WO-006c verified + the founder's Law D demo passed.
+
+### The dock contract (binds WO-007/008 and every species forever)
+
+The dock is QuantFlow's access point — the surface where **species become sessions become tiles**. Plug-and-play is a *measurable property*, not a slogan:
+
+1. **A "plug" is data, not code.** One species = an AgentOS software package (any ACP guest) + an `agent_definition` row (name, package ref, description, tool allowlist) + a deny-by-default permissions manifest. **Admitting a new species requires zero changes to dock or canvas source** — this is gated by diff, not assumed.
+2. **The dock is a projection** (Laws A–C). It renders `agent_definition` (the registry) and `agent_session` (live sessions in their transition-table states). It stores nothing; cold reopen rebuilds it from the Kernel alone.
+3. **Session lifecycle on the dock IS the schema's state machine.** `starting → running ⇄ blocked → cancelled | failed → closed`, projected live; cancel/close actionable from the dock; every change is a Kernel event row.
+4. **Guests are species behind the WO-004 seam.** `ToolLoopAgent`, Hermes (`hermes acp`), and whatever the founder finds next are packages. Guest-private memory stays agent-private; the Kernel remains sole writer (Law E gates already enforce this mechanically).
+
+### Order ladder + gates (v0.5 numbering starts at WO-007)
+
+**WO-007 · Dock v1 — species registry + spawn surface.** *Depends: WO-006c.*
+- Dock lists species from `agent_definition` rows; **no hardcoded species list in renderer** — falsify: insert a row via Kernel command, dock shows it without rebuild.
+- Spawn from dock → AgentOS session + `agent_session` (guest-minted ID adopted) + streaming tile; all three carry the same session ID (WO-004a's measured assertions reused, not re-proven).
+- Live state per transition table; cancel and close actionable from the dock; each transition lands as a Kernel event.
+- **Law D for the dock:** force-kill + relaunch rebuilds registry and sessions from the Kernel alone; in-flight sessions surface as terminal (`failed`/`cancelled` per policy), never phantom `running`.
+- Zero new listeners; zero orphan child processes after close (WO-004a pattern, asserted).
+
+**WO-008 · The plug test — a second species through the same socket.** *Depends: WO-007. This is the plug-and-play proof.*
+- A second, materially different guest registered **as data only**. Target: **Hermes via `hermes acp`**; if Hermes is unavailable offline, a structurally distinct fallback package — the choice recorded in the order file, founder consulted.
+- **The diff is the gate:** `git diff` for the admitting commit shows zero changes under dock/canvas source.
+- Both species spawn side by side in one workspace; per-species allowlists enforced deny-by-default — falsify: guest calls an unlisted tool → rejected + event row.
+- Guest-private storage (e.g. Hermes' own SQLite) never appears in `kernel.db`; Law E gates stay green with the new guest live.
+
+**WO-009 · Datasets I — bootstrap ingestion.** *Independent of 007/008 — parallel-eligible.*
+- `ingestion` Runs pull tennis-data.co.uk / Kaggle UFC / NFL odds archives → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
+- `as_of` + `coverage` populated; DuckDB reads Parquet via the pointer; **no bulk rows in SQLite** — gated, not assumed.
+- Failure honesty: truncated/malformed source → run `failed`, **zero partial Kernel writes**.
+- Lineage: `produces` / `derived_from` edges traversable from every dataset.
+
+**WO-010 · Python sidecar (uv + polars).** *Depends: WO-009.*
+- `execution_environment` kind `local_python`; TS orchestrates, Python computes. A `feature_build` Run round-trips: input Dataset → sidecar → output Dataset/Artifact, hashes verified.
+- Sidecar crash / nonzero exit → run `failed` with stderr captured; **no orphan python processes** (counted before/after).
+- The sidecar has **no Kernel write path** — results enter only through commands (Law E falsified with a planted direct write).
+
+**WO-011 · Datasets II — Bovada capture (the moat).** *Depends: WO-009.*
+- Capture runs as `ingestion` Runs → `odds_series` pointers + Parquet ticks; quote timestamps captured at fetch time (the point-in-time fence's raw material).
+- Entity resolution v0 via `external_refs`; an unresolvable entity is **flagged, never silently invented**.
+- Site-shape change → loud failure, zero partial writes; re-runs idempotent per idempotency key; capture is rate-limited and research-only.
+
+**WO-012 · Agent contracts — Researcher / Backtester / Critic.** *Depends: WO-008.*
+- Three species **as data** (agent_definition + versioned prompt/spec Artifact + allowlist): Researcher may create hypotheses/tickets but not grade; Backtester may start backtest runs; Critic is read-mostly + findings Artifact. Cross-permission attempts rejected — falsified per species.
+- Typed delegation: Researcher→Backtester handoff is a Kernel-mediated `task`/`connection` with events — **no guest-to-guest side channel**.
+- Contract changes version via `derived_from`, never mutate.
+
+**WO-013 · Backtest engine v0 + CLV.** *Depends: WO-010, WO-012.*
+- `backtest` Run: Strategy spec + Dataset → graded Tickets + `result_set` Artifact; **deterministic** — same inputs → identical result hash (falsify via seed/data mutation).
+- **Point-in-time enforcement is a hard failure:** any feature timestamped after event start aborts the run naming the leak — falsified by planting one.
+- Per-leg CLV vs Pinnacle close where the reference exists; missing reference → explicitly null, **never imputed**.
+- Parlay pricing carries the correlation-aware fields the schema defines.
+
+**WO-014 · Critic + Evaluation (Monte Carlo bankroll).** *Depends: WO-013.*
+- Critic session over a backtest Artifact → triaged findings Artifact; must catch the planted leak from WO-013's falsification corpus.
+- `record_evaluation` writes the full metric set (clv_avg, roi, risk_of_ruin, expected_max_drawdown, losing-streak length, p5/p50/p95 trajectories, kelly_growth, oos_consistency); MC deterministic under a fixed seed.
+- `resolve_hypothesis` stays Evaluation-gated — falsify: resolution without an evaluation → rejected.
+
+**WO-015 · Trace timeline + object inspector (L5).** *Depends: WO-007; parallel-eligible thereafter.*
+- Span tree persisted under the existing per-command `trace_id`; click any tile → its timeline (spawn → turn → tool → run → artifact → evaluation).
+- **"Where did this number come from"** answerable by clicks alone — scripted founder demo like `law-d.md` is the acceptance.
+- Object inspector: any Kernel object → fields + links traversal both directions. Emission is zero-config (runtime-emitted, never agent-authored).
+
+**WO-016 · Cloudflare CPU sandboxes.** *Deferrable — founder decides at order time whether local suffices for v0.5.*
+- `execution_environment` kind `cloudflare_sandbox`; one real Run executes remotely; **artifact export before teardown enforced by `produces`** — falsify: skip export → run fails.
+- Credentials: founder-exported env only; CI/offline → gate skips with a clear message.
+
+**WO-017 · The defining workflow E2E — closes v0.5.** *Depends: all non-deferred above.*
+- From the dock, on real data, one operator flow: Hypothesis → Dataset → Backtest → Artifact → Critic → Evaluation → Report; lineage traversable from the Report back to every source.
+- Concurrency bar: 12 live sessions · 4 concurrent turns · 30–60 min soak · independent cancellation · zero orphans · bounded queues.
+- **Founder-run demo script is the acceptance** (like `law-d.md`), including a Law D pass across the whole board.
+
+### Sequencing at a glance
+
+```
+WO-006c ─→ 007 ─→ 008 ─→ 012 ─→ 013 ─→ 014 ─┐
+                 └→ 015 (parallel after 007)  ├─→ 017
+009 ─→ 010 ──────────────────┬→ 013           │
+  └──→ 011 ──────────────────┘   016 (optional)┘
+```
+
+Two builders can run continuously: the dock/agent lane (007→008→012) and the data lane (009→010/011) never touch the same files until WO-013 joins them.
 
 ## Phase v1.0 — "daily driver" (~4–8 months) — gates only
 
