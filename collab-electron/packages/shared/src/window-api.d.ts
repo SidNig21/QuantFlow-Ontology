@@ -318,6 +318,23 @@ export interface CollabApi {
   onCdTo: (cb: CdToCb) => void;
   offCdTo: (cb: CdToCb) => void;
 
+  // QuantFlow Kernel (WO-006b)
+  qf: {
+    execute: (
+      command: string,
+      input: Record<string, unknown>,
+      trace: { trace_id: string; span_id: string },
+    ) => Promise<
+      | { ok: true; result: Record<string, unknown> }
+      | { ok: false; error: { name: string; message: string } }
+    >;
+    listArtifacts: () => Promise<
+      | { ok: true; artifacts: Record<string, unknown>[] }
+      | { ok: false; error: { name: string; message: string } }
+    >;
+  };
+  openFileDialog: () => Promise<string | null>;
+
   // Navigation
   openInTerminal: (path: string) => void;
   revealInFinder: (path: string) => void;

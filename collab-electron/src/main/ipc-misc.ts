@@ -74,6 +74,19 @@ export function registerMiscHandlers(
     return result.filePaths[0]!;
   });
 
+  // Dialog: open any file (WO-006b demo publish lever)
+  ipcMain.handle("dialog:open-file", async () => {
+    const win = ctx.mainWindow();
+    if (!win) return null;
+    const result = await dialog.showOpenDialog(win, {
+      properties: ["openFile"],
+    });
+    if (result.canceled || result.filePaths.length === 0) {
+      return null;
+    }
+    return result.filePaths[0]!;
+  });
+
   // Dialog: confirm
   ipcMain.handle(
     "dialog:confirm",

@@ -11,6 +11,7 @@ interface AllViewConfigs {
   terminal: ViewConfig;
   terminalTile: ViewConfig;
   graphTile: ViewConfig;
+  artifactTile: ViewConfig;
   settings: ViewConfig;
   tileList: ViewConfig;
   agentChat: ViewConfig;
@@ -18,7 +19,8 @@ interface AllViewConfigs {
 
 const ALLOWED_PANELS = new Set([
   "nav", "viewer", "terminal", "terminalTile",
-  "graphTile", "settings", "tile-list", "agent-chat",
+  "graphTile", "artifactTile", "artifact-tile",
+  "settings", "tile-list", "agent-chat",
 ]);
 
 // Buffer loading-done signal so it isn't lost if it arrives before
@@ -41,6 +43,18 @@ contextBridge.exposeInMainWorld("shellApi", {
 
   getViewConfig: (): Promise<AllViewConfigs> =>
     ipcRenderer.invoke("shell:get-view-config"),
+
+  /** WO-006b: Kernel IPC (shell hosts the publish demo lever). */
+  openFileDialog: (): Promise<string | null> =>
+    ipcRenderer.invoke("dialog:open-file"),
+  qf: {
+    execute: (
+      command: string,
+      input: Record<string, unknown>,
+      trace: { trace_id: string; span_id: string },
+    ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
+    listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+  },
 
   getPref: (key: string): Promise<unknown> =>
     ipcRenderer.invoke("pref:get", key),

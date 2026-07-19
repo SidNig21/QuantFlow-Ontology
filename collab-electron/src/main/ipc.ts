@@ -16,7 +16,9 @@ import {
 } from "./ipc-workspace";
 import { registerKnowledgeHandlers } from "./ipc-knowledge";
 import { registerCanvasHandlers } from "./ipc-canvas";
+import { registerKernelHandlers } from "./ipc-kernel";
 import { registerMiscHandlers } from "./ipc-misc";
+import { openAppKernel } from "./kernel";
 
 const FS_CHANGE_DELETED = 3;
 
@@ -127,6 +129,8 @@ export function registerIpcHandlers(config: AppConfig): void {
   };
 
   // Register domain handlers
+  openAppKernel();
+  registerKernelHandlers();
   registerFilesystemHandlers(fsCtx);
   registerWorkspaceHandlers(wsCtx, appConfig, fileFilterRef);
   registerKnowledgeHandlers(knowledgeCtx);

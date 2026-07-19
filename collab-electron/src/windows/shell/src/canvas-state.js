@@ -1,5 +1,5 @@
 /**
- * @typedef {'term' | 'note' | 'code' | 'image' | 'graph' | 'browser' | 'pdf'} TileType
+ * @typedef {'term' | 'note' | 'code' | 'image' | 'graph' | 'browser' | 'pdf' | 'artifact'} TileType
  *
  * @typedef {Object} Tile
  * @property {string} id
@@ -10,6 +10,7 @@
  * @property {number} height - Canvas height
  * @property {string} [filePath] - For file tiles
  * @property {string} [folderPath] - For graph tiles
+ * @property {string} [artifactId] - Kernel artifact id (layout ref only)
  * @property {string} [url] - URL for browser tiles
  * @property {string} [cwd] - Working directory for terminal tiles
  * @property {string} [ptySessionId] - PTY session ID for terminal tiles
@@ -31,6 +32,7 @@ const DEFAULT_TILE_SIZES = {
 	graph: { width: 600, height: 500 },
 	browser: { width: 800, height: 650 },
 	pdf: { width: 600, height: 800 },
+	artifact: { width: 420, height: 220 },
 };
 
 /** @param {TileType} type */

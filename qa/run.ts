@@ -10,6 +10,7 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
+import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
@@ -170,6 +171,15 @@ const gates: Gate[] = [
       "Law E: no SQLite/DDL/DML for domain types outside packages/qf-kernel (+ schema allowlist)",
     run: () => {
       const { ok } = checkKernelSoleWriter();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-sole-writer-app",
+    description:
+      "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference kernel.db",
+    run: () => {
+      const { ok } = checkKernelSoleWriterApp();
       return ok;
     },
   },
