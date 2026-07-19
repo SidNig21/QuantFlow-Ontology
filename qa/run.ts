@@ -8,11 +8,12 @@
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
-import { runAgentPathGate } from "./gates/agent-path.ts";
 import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
+// agent-path: cold-safe launcher only (no heavy top-level imports)
+import { runAgentPathGate } from "./gates/agent-path.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
