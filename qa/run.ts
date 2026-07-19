@@ -100,7 +100,7 @@ const gates: Gate[] = [
   {
     name: "runtime-proof",
     description:
-      "WO-004 AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps)",
+      "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",
     run: async () => {
       const cwd = join(REPO_ROOT, "tools/runtime-proof");
       const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
@@ -113,17 +113,7 @@ const gates: Gate[] = [
         console.error(`runtime-proof: bun install exited ${installCode}`);
         return false;
       }
-      // Pack the ACP agent (bun test does not run npm pretest hooks), then P1–P4.
-      const pack = Bun.spawn(["bun", "run", "pack-agent"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-      });
-      const packCode = await pack.exited;
-      if (packCode !== 0) {
-        console.error(`runtime-proof: pack-agent exited ${packCode}`);
-        return false;
-      }
+      // Pack happens once inside the suite beforeAll — do not pack again here.
       const proc = Bun.spawn(["bun", "test", "src"], {
         cwd,
         stdout: "inherit",

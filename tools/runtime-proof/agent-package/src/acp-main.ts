@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * ACP stdio agent for AgentOS (WO-004).
- * Carries the ACP session id adopted by AgentOS createSession, runs ToolLoopAgent
- * with a mock model (no API keys), writes a proof receipt for host-side P1 reads.
+ * ACP stdio agent for AgentOS (WO-004 / WO-004a).
+ * Mints the session ID in newSession (adopted by AgentOS). Runs ToolLoopAgent
+ * with a mock model (no API keys). Session identity is carried only via ACP —
+ * ToolLoopAgent has no session concept; we do not forge one.
  */
 import {
   AgentSideConnection,
@@ -17,10 +18,7 @@ import {
 } from "@agentclientprotocol/sdk";
 import { stepCountIs, tool, ToolLoopAgent } from "ai";
 import { MockLanguageModelV3, simulateReadableStream } from "ai/test";
-import { writeFileSync } from "node:fs";
 import { z } from "zod";
-
-const RECEIPT_PATH = "/tmp/qf-runtime-proof-receipt.json";
 
 type SessionState = {
   sessionId: string;
@@ -86,14 +84,6 @@ const echoUpper = tool({
   execute: async ({ text }) => text.toUpperCase(),
 });
 
-function writeReceipt(payload: Record<string, unknown>) {
-  try {
-    writeFileSync(RECEIPT_PATH, `${JSON.stringify(payload)}\n`, "utf8");
-  } catch {
-    // best-effort inside the guest
-  }
-}
-
 class ToolLoopAcpAgent implements Agent {
   constructor(private readonly conn: Conn) {}
 
@@ -113,11 +103,6 @@ class ToolLoopAcpAgent implements Agent {
   async newSession(_params: NewSessionRequest) {
     const sessionId = crypto.randomUUID();
     sessions.set(sessionId, { sessionId, pending: null });
-    writeReceipt({
-      phase: "session_new",
-      acpSessionId: sessionId,
-      toolLoopSessionId: null,
-    });
     return { sessionId };
   }
 
@@ -134,7 +119,6 @@ class ToolLoopAcpAgent implements Agent {
     session.pending = new AbortController();
     const signal = session.pending.signal;
 
-    // ACP carries params.sessionId — ToolLoopAgent must use this exact id (never mint another).
     const acpSessionId = params.sessionId;
     const slowChunkMs = Number(process.env.QF_PROOF_SLOW_CHUNK_MS ?? "40");
 
@@ -144,12 +128,7 @@ class ToolLoopAcpAgent implements Agent {
       stopWhen: stepCountIs(5),
     });
 
-    let toolOutput: string | null = null;
-    let text = "";
-    let chunkCount = 0;
-
     try {
-      // Session identity for the tool-loop turn is params.sessionId (written to receipt).
       const result = await agent.stream({
         prompt: extractPromptText(params),
         abortSignal: signal,
@@ -158,7 +137,6 @@ class ToolLoopAcpAgent implements Agent {
       for await (const part of result.fullStream) {
         if (signal.aborted) break;
         if (part.type === "text-delta") {
-          chunkCount += 1;
           await this.conn.sessionUpdate({
             sessionId: acpSessionId,
             update: {
@@ -169,31 +147,15 @@ class ToolLoopAcpAgent implements Agent {
         }
       }
 
-      const toolResults = await result.toolResults;
-      const first = toolResults[0];
-      toolOutput =
-        first && "output" in first && typeof first.output === "string" ? first.output : null;
-      text = await result.text;
-
-      writeReceipt({
-        phase: signal.aborted ? "cancelled" : "prompt_done",
-        acpSessionId,
-        toolLoopSessionId: acpSessionId,
-        toolOutput,
-        text,
-        chunkCount,
-      });
+      // Drain tool/text so the mock completes cleanly when not cancelled.
+      await result.toolResults;
+      await result.text;
 
       if (signal.aborted) {
         return { stopReason: "cancelled" as const };
       }
       return { stopReason: "end_turn" as const };
     } catch {
-      writeReceipt({
-        phase: "error",
-        acpSessionId,
-        toolLoopSessionId: acpSessionId,
-      });
       if (signal.aborted) {
         return { stopReason: "cancelled" as const };
       }

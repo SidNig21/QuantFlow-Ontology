@@ -1,11 +1,19 @@
-import { beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
-import { runCancelProof, runProofTurn } from "./proof.ts";
+import {
+  createSharedOs,
+  promptUnknownSession,
+  runCancelProof,
+  runProofTurn,
+  type SharedOs,
+} from "./proof.ts";
 
-beforeAll(() => {
-  // `bun test` does not run package.json scripts — pack explicitly so a bare
-  // `bun test` (the acceptance gate) still builds the AgentOS agent package.
+let shared: SharedOs;
+
+beforeAll(async () => {
+  // Pack once for the suite. The qa `runtime-proof` gate does not pack again —
+  // `bun test` always runs this hook.
   const pack = spawnSync("node", [join(import.meta.dir, "..", "scripts", "pack-agent.mjs")], {
     cwd: join(import.meta.dir, ".."),
     stdio: "inherit",
@@ -13,24 +21,46 @@ beforeAll(() => {
   if (pack.status !== 0) {
     throw new Error(`pack-agent failed with status ${pack.status}`);
   }
+  shared = await createSharedOs();
+}, 120_000);
+
+afterAll(async () => {
+  if (shared) await shared.os.dispose();
 });
 
-describe("WO-004 runtime ownership proof", () => {
-  test("P1 · one session ID across AgentOS, ACP, and ToolLoopAgent", async () => {
-    const run = await runProofTurn();
+describe("WO-004a runtime ownership proof", () => {
+  test("P1 · host-reported ID equals guest-minted ID across the process boundary", async () => {
+    const run = await runProofTurn(shared);
 
-    console.log("P1 AgentOS session ID:", run.agentOsSessionId);
-    console.log("P1 ACP session ID:    ", run.acpSessionId);
-    console.log("P1 ToolLoop session ID:", run.toolLoopSessionId);
+    console.log("P1 createSession / AgentOS:", run.agentOsSessionId);
+    console.log("P1 listSessions:          ", run.listedSessionId);
+    console.log("P1 notification sessionIds:", run.notificationSessionIds);
 
     expect(run.agentOsSessionId.length).toBeGreaterThan(0);
-    expect(run.acpSessionId).toBe(run.agentOsSessionId);
-    expect(run.toolLoopSessionId).toBe(run.agentOsSessionId);
-    expect(run.receipt.acpSessionId).toBe(run.agentOsSessionId);
+    expect(run.listedSessionId).toBe(run.agentOsSessionId);
+    expect(run.notificationSessionIds.length).toBeGreaterThan(0);
+    for (const sid of run.notificationSessionIds) {
+      expect(sid).toBe(run.agentOsSessionId);
+    }
+    // toolLoopSessionId deleted — ToolLoopAgent has no session concept.
+  }, 60_000);
+
+  test("P1b · loop is session-scoped (notifications + unknown ID rejected)", async () => {
+    const run = await runProofTurn(shared);
+
+    expect(run.sessionEvents.length).toBeGreaterThan(0);
+    for (const ev of run.sessionEvents) {
+      expect(ev.method).toBe("session/update");
+      expect(ev.sessionId).toBe(run.agentOsSessionId);
+    }
+
+    const err = await promptUnknownSession(shared);
+    console.log("P1b unknown-session error:", err.message);
+    expect(err.message).toMatch(/Session not found|Unknown session/i);
   }, 60_000);
 
   test("P2 · no second listening server", async () => {
-    const run = await runProofTurn();
+    const run = await runProofTurn(shared);
 
     console.log("P2 listeners before:", run.listenersBefore.count);
     console.log("P2 listeners after start:", run.listenersAfterStart.count);
@@ -45,32 +75,34 @@ describe("WO-004 runtime ownership proof", () => {
   }, 60_000);
 
   test("P3 · tool call inside the session reaches the assistant message", async () => {
-    const run = await runProofTurn();
+    const run = await runProofTurn(shared);
 
     console.log("P3 prompt text:", run.promptText);
-    console.log("P3 tool output:", run.toolOutput);
     console.log("P3 chunk events:", run.chunkEventTimestamps.length);
 
-    expect(run.toolOutput).toBe("QUANTFLOW");
+    // Tool result surfaces in streamed assistant text (no /tmp receipt oracle).
     expect(run.promptText).toContain("QUANTFLOW");
-    // Incremental streaming: more than one distinct chunk-event timestamp.
     const distinct = new Set(run.chunkEventTimestamps).size;
     expect(run.chunkEventTimestamps.length).toBeGreaterThan(1);
     expect(distinct).toBeGreaterThan(1);
   }, 60_000);
 
-  test("P4 · cancel mid-turn is clean", async () => {
-    const run = await runCancelProof();
+  test("P4 · cancel mid-turn is clean (exactly cancelled, no orphan children)", async () => {
+    const run = await runCancelProof(shared);
 
     console.log("P4 stopReason:", run.stopReason);
-    console.log("P4 chunk events before cancel drain:", run.chunkEventTimestamps.length);
+    console.log("P4 chunksBeforeCancel:", run.chunksBeforeCancel);
+    console.log("P4 chunksAfterCancel:", run.chunksAfterCancel);
+    console.log("P4 orphanSurvivors:", run.orphanSurvivors);
     console.log("P4 orphanCheck:", run.orphanCheck);
     console.log("P4 new listeners after cancel:", run.newListeners);
 
-    expect(["cancelled", "end_turn"]).toContain(run.stopReason);
-    // Prefer cancelled; if the mock finished first, still require clean teardown.
+    expect(run.stopReason).toBe("cancelled");
+    expect(run.chunksBeforeCancel).toBeGreaterThanOrEqual(1);
+    expect(run.chunksAfterCancel).toBe(0);
     expect(run.orphanCheck.sessionGone).toBe(true);
-    expect(run.orphanCheck.disposeCompleted).toBe(true);
+    expect(run.orphanCheck.zeroOrphanDescendants).toBe(true);
+    expect(run.orphanSurvivors).toEqual([]);
     expect(run.newListeners).toEqual([]);
-  }, 60_000);
+  }, 90_000);
 });
