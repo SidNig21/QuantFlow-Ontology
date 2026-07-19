@@ -63,7 +63,7 @@ The Kernel models *operational* states with legal-transition tables (`run: queue
 
 | Ports | How |
 |---|---|
-| `tools/agentos-host` | Wholesale — standalone, 16/16 tests green on Linux |
+| `tools/agentos-host` | **Reference only — do NOT port.** Corrected 2026-07-18: previously listed as "wholesale — standalone." Measurement says otherwise — `host.js` is 1542 lines with 90 Eve references and 175 tile/cable/connection-graph references. Its *tests* are standalone; its *architecture* is the predecessor's integration layer, carrying both the second-Eve-server pattern and canvas coupling that Laws A–C forbid. Build against `@rivet-dev/agentos` directly. |
 | `qa/` gate runner + proof discipline | As pattern; gates rewritten against new schema |
 | `tools/quantflow-mcp` | As reference for generated v2 |
 | Kernel schema/migrations/receipts | Reference only — the new schema is the quant ontology |
