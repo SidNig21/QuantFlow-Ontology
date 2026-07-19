@@ -1,6 +1,6 @@
 :root {
-  --idle-color: #34d399;
-  --busy-color: #fbbf24;
+  --idle-color: var(--qf-ok);
+  --busy-color: var(--qf-warn);
   --focus-bg: rgba(255, 255, 255, 0.06);
   --border-focus: rgb(250, 250, 250);
 }
@@ -19,9 +19,9 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--qf-sans);
   font-size: 12px;
-  color: var(--text, #ccc);
+  color: var(--text, var(--qf-text));
   background: transparent;
   overflow-y: auto;
   overflow-x: hidden;
@@ -40,7 +40,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--muted, #888);
+  color: var(--muted, var(--qf-muted));
 }
 
 .terminal-entry {
@@ -104,7 +104,7 @@ body {
 
 .status-label {
   font-size: 11px;
-  color: var(--muted, #888);
+  color: var(--muted, var(--qf-muted));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -112,7 +112,7 @@ body {
 
 .entry-cwd {
   font-size: 10px;
-  color: var(--muted, #666);
+  color: var(--muted, var(--qf-muted));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

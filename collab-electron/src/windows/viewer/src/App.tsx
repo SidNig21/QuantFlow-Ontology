@@ -568,7 +568,7 @@ export default function App() {
 					</div>
 				)}
 				{fileError && (
-					<div className="empty-state" style={{ color: "#ef4444" }}>
+					<div className="empty-state" style={{ color: "var(--qf-fail)" }}>
 						{fileError}
 					</div>
 				)}

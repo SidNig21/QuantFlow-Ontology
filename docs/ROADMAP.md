@@ -60,6 +60,8 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 | 12 | `no-canvas-domain-writes` matches property-key syntax only — a dot-assignment (`tile.content_hash = x`) evades it (measured, WO-006b round 2). Realistic shapes (declared interface + object literals) are caught | next order touching that gate |
 | 13 | Deliverable 6 unexercised — File → Publish Artifact never clicked by a human; Law D's seam is proven via the identical `qf:execute` IPC | founder, one menu publish |
 | 14 | **Legacy agent path** — `collab-electron/src/main/acp-agent.ts` (registered at `index.ts:54`) predates the species seam, imports `@agentclientprotocol/sdk` directly, and auto-approves permissions; frozen by WO-006c's gate exception. Removal order: delete the registration + file (or port agent-chat onto the seam) and delete the gate exception with it | first order after WO-006c proves the seam |
+| 15 | `one-skin` gate scans hex only — `rgb()`/`rgba()`/`hsl()` evade it (remnants in `shell.css`); extend the scan and migrate | **WO-007** |
+| 16 | `.js` files outside the `one-skin` scan — the shell's legacy canvas palette is exempt by extension; scan `.js` + migrate the canvas palette to tokens | **WO-007** |
 
 ## Phase v0.5 — "one real quant workflow" (~2–4 months) — **gates detailed 2026-07-19** (founder request)
 

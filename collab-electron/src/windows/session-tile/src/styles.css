@@ -1,9 +1,9 @@
 :root {
   color-scheme: dark;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-family: var(--qf-mono);
   font-size: 12px;
-  background: #12141a;
-  color: #e8e6e3;
+  background: var(--qf-ink);
+  color: var(--qf-text);
 }
 
 * {
@@ -28,7 +28,7 @@ body {
 }
 
 .session-tile__label {
-  color: #8a8680;
+  color: var(--qf-muted);
   min-width: 64px;
 }
 
@@ -40,9 +40,9 @@ body {
   flex: 1;
   overflow: auto;
   white-space: pre-wrap;
-  border-top: 1px solid #2a2e38;
+  border-top: 1px solid var(--qf-line);
   padding-top: 8px;
-  color: #c8c4be;
+  color: var(--qf-text);
   min-height: 60px;
 }
 
@@ -52,9 +52,9 @@ body {
 }
 
 .session-tile__actions button {
-  background: #2a2e38;
-  color: #e8e6e3;
-  border: 1px solid #3a3f4a;
+  background: var(--qf-raised);
+  color: var(--qf-text);
+  border: 1px solid var(--qf-line);
   padding: 4px 10px;
   cursor: pointer;
 }
@@ -66,5 +66,7 @@ body {
 
 .session-tile--error {
   padding: 12px;
-  color: #f07178;
+  color: var(--qf-fail);
 }
+
+

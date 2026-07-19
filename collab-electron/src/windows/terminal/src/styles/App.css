@@ -6,7 +6,7 @@
 
 :root {
 	--foreground: rgb(220, 220, 220);
-	--background: #121212;
+	--background: var(--qf-ink);
 	--border: rgba(255, 255, 255, 0.2);
 	--muted-foreground: rgb(132, 132, 132);
 	--font-mono: 'Geist Mono';
@@ -15,7 +15,7 @@
 @media (prefers-color-scheme: light) {
 	:root {
 		--foreground: rgb(32, 32, 32);
-		--background: #f8f8f8;
+		--background: var(--qf-text);
 		--border: rgb(206, 206, 206);
 		--muted-foreground: rgb(113, 113, 123);
 	}

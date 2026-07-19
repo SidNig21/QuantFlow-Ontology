@@ -52,7 +52,7 @@
 	color: var(--muted-foreground);
 	cursor: pointer;
 	transition: all 0.15s ease;
-	font-family: var(--font-sans);
+	font-family: var(--qf-sans);
 	letter-spacing: 0.02em;
 }
 
@@ -70,7 +70,7 @@
    ============================================================================ */
 
 :root {
-	font-family: var(--font-sans);
+	font-family: var(--qf-sans);
 	font-size: 16px;
 	font-weight: 450;
 	font-synthesis: none;
@@ -195,7 +195,7 @@ textarea.item-title-input,
 	border-radius: 6px;
 	border: none;
 	padding: 1rem 0;
-	/* font-family: inherit;
+	/* font-family: var(--qf-sans);
 	font-size: inherit;
 	color: inherit; */
 	resize: none;
@@ -250,18 +250,18 @@ textarea.item-title-input,
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	font-family: var(--font-mono);
+	font-family: var(--qf-mono);
 	font-size: 0.7rem;
 	line-height: 1.5;
 	margin-bottom: 0;
 	min-width: 0;
 	padding: 4px 8px;
-	background: #000;
+	background: var(--qf-ink);
 	color: rgba(255, 255, 255, 0.85);
 }
 
 html:not(.dark) .item-filepath {
-	background: #e7e7e7;
+	background: var(--qf-text);
 	color: rgba(0, 0, 0, 0.85);
 }
 
@@ -297,7 +297,7 @@ html:not(.dark) .filepath-parent {
 	display: grid;
 	grid-template-columns: max-content minmax(0, 1fr);
 	gap: 6px 8px;
-	font-family: var(--font-mono);
+	font-family: var(--qf-mono);
 	font-size: 0.75rem;
 	color: var(--color-text-secondary);
 	line-height: 1;
@@ -323,14 +323,14 @@ html:not(.dark) .filepath-parent {
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	font-size: 0.75rem;
-	font-family: inherit;
+	font-family: var(--qf-sans);
 	opacity: 0.7;
 	white-space: nowrap;
 }
 
 .metadata-value {
 	color: var(--foreground);
-	font-family: inherit;
+	font-family: var(--qf-sans);
 	font-size: inherit;
 	font-weight: 400;
 	display: flex;
@@ -363,7 +363,7 @@ html:not(.dark) .filepath-parent {
 }
 
 .id-text {
-	font-family: inherit;
+	font-family: var(--qf-sans);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -392,7 +392,7 @@ html:not(.dark) .filepath-parent {
 	margin-bottom: 8px;
 	background-color: transparent;
 	border: 1px solid var(--item-type-note);
-	font-family: inherit;
+	font-family: var(--qf-sans);
 }
 
 /* Item type badge variants */
@@ -789,11 +789,11 @@ html:not(.dark) .filepath-parent {
 }
 
 .copy-button.copy-success {
-	color: #22c55e;
+	color: var(--qf-ok);
 }
 
 .copy-button.copy-success:hover {
-	color: #16a34a;
+	color: var(--qf-ok);
 }
 
 /* Pin button */
@@ -816,11 +816,11 @@ html:not(.dark) .filepath-parent {
 }
 
 .pin-button.pinned {
-	color: var(--color-primary, #3b82f6);
+	color: var(--color-primary, var(--qf-teal));
 }
 
 .pin-button.pinned:hover {
-	color: var(--color-primary-hover, #2563eb);
+	color: var(--color-primary-hover, var(--qf-teal));
 }
 
 .pin-button:disabled {
@@ -833,7 +833,7 @@ html:not(.dark) .filepath-parent {
    ============================================================================ */
 
 .item-readonly-content {
-	font-family: var(--font-sans);
+	font-family: var(--qf-sans);
 	color: var(--foreground);
 	white-space: normal;
 	word-wrap: break-word;
@@ -850,7 +850,7 @@ html:not(.dark) .filepath-parent {
 
 /* Use serif font for PDF content */
 [data-item-type="pdf"] .item-readonly-content {
-	font-family: 'Georgia', 'Times New Roman', 'Times', serif;
+	font-family: var(--qf-sans);
 	font-size: 1.08rem;
 	line-height: 1.6;
 }
@@ -1086,7 +1086,7 @@ button {
 	align-items: center;
 	gap: 8px;
 	height: 28px;
-	font-family: var(--font-mono);
+	font-family: var(--qf-mono);
 }
 
 .convert-confirm-inline .convert-confirm-text {
@@ -1181,7 +1181,7 @@ button {
 	user-select: none;
 	pointer-events: none;
 	opacity: 0.25;
-	font-family: var(--font-mono);
+	font-family: var(--qf-mono);
 }
 
 /* ============================================================================
@@ -1215,16 +1215,16 @@ button {
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	font-family: var(--font-mono);
+	font-family: var(--qf-mono);
 	font-size: 0.7rem;
 	line-height: 1.5;
 	padding: 4px 8px;
-	background: #000;
+	background: var(--qf-ink);
 	color: rgba(255, 255, 255, 0.85);
 }
 
 html:not(.dark) .image-view-banner {
-	background: #fff;
+	background: var(--qf-text);
 	color: rgba(0, 0, 0, 0.85);
 }
 

@@ -3,15 +3,17 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006d — one skin** *(first order after v0.1 closed)*
+## Current order: **WO-007 — Dock v1** *(rung 1 of 3 to the founder checkpoint)*
 
-Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006d.md`](WO-006d.md) exactly.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-007.md`](WO-007.md) exactly.
 
-- Work on a new branch named `wo-006d`, cut from current `origin/QuantFlow`.
-- **Restyle only** — the order's contract forbids behavior, layout, and dependency changes.
-- Run the builder-run gates; paste unedited output including the one-skin bait red/green pair, and include the screenshots — the founder personally judges the look.
-- Commit and push. **Do not merge.**
-- Anything ambiguous or unmappable: stop and say so.
+- Work on a new branch named `wo-007`, cut from current `origin/QuantFlow`.
+- The dock contract in `ROADMAP.md` is binding: species from `agent_definition` rows, dock stores nothing, no hardcoded species strings in renderer source.
+- Deliverable 1's schema amendment is authorized **verbatim and only as written**.
+- Run builder gates; paste every red/green falsification pair. **Never `bun qa/run.ts --all`, never delete `node_modules`.**
+- Commit and push. **Do not merge.** Stop and report anything ambiguous.
+
+> **Founder — pre-build read recommended:** the verifier wrote WO-007 and the verifier's eyes are spent on it. Same two questions as always; the last two pre-reads caught eight findings and two blockers between them.
 
 ## Founder acceptance checkpoint (founder decision, 2026-07-19)
 

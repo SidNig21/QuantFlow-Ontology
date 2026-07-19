@@ -32,12 +32,12 @@ function isTileEntry(value: unknown): value is TileEntry {
 }
 
 const TYPE_ICONS: Record<TileType, { icon: Icon; color: string }> = {
-  term: { icon: Terminal, color: "#7aab6e" },
-  browser: { icon: Browser, color: "#5c9bcf" },
-  graph: { icon: ChartLineUp, color: "#c8a35a" },
-  note: { icon: Note, color: "#8a7aab" },
-  code: { icon: Code, color: "#7a8aab" },
-  image: { icon: Image, color: "#c07a6e" },
+  term: { icon: Terminal, color: "var(--qf-ok)" },
+  browser: { icon: Browser, color: "var(--qf-teal)" },
+  graph: { icon: ChartLineUp, color: "var(--qf-warn)" },
+  note: { icon: Note, color: "var(--qf-violet)" },
+  code: { icon: Code, color: "var(--qf-muted)" },
+  image: { icon: Image, color: "var(--qf-fail)" },
 };
 
 function TileEntryRow({
@@ -82,7 +82,7 @@ function TileEntryRow({
         {(() => {
           const def = TYPE_ICONS[entry.type];
           const IconComp = def?.icon ?? Terminal;
-          const color = def?.color ?? "#7a8aab";
+          const color = def?.color ?? "var(--qf-muted)";
           return <IconComp size={14} weight="regular" style={{ color }} />;
         })()}
       </div>

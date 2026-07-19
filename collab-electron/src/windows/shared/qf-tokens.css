@@ -1,0 +1,32 @@
+:root {
+  /* ground & surfaces */
+  --qf-ink: #07090C;
+  --qf-surface: #0B0F14;
+  --qf-raised: #111721;
+  --qf-line: #1D2530;
+  --qf-line-soft: #141B24;
+
+  /* accent & spectrum */
+  --qf-accent: #B7FF00;
+  --qf-teal: #2FE6CF;
+  --qf-violet: #C79BFF;
+
+  /* text */
+  --qf-text: #E7ECF2;
+  --qf-muted: #69758A;
+  --qf-faint: #3A4252;
+
+  /* semantic */
+  --qf-ok: #4FC98B;
+  --qf-warn: #E0A63C;
+  --qf-fail: #E5604C;
+
+  /* rhythm */
+  --qf-u: 8px;
+  --qf-r: 10px;
+
+  /* type */
+  --qf-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --qf-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+    sans-serif;
+}

@@ -39,7 +39,7 @@
 	--item-type-bookmark: oklch(70.5% 0.213 47.604);
 	--item-type-pdf: oklch(63.7% 0.237 25.331);
 	--item-type-concept: oklch(54.6% 0.245 262.881);
-	--item-type-default: #6b7280;
+	--item-type-default: var(--qf-muted);
 }
 
 .dark {
@@ -245,7 +245,7 @@
 	body {
 		background-color: transparent;
 		@apply text-foreground;
-		font-family: var(--font-sans);
+		font-family: var(--qf-sans);
 	}
 
 	.scrollbar-hover {
