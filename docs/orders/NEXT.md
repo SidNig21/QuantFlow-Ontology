@@ -3,18 +3,14 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006c — one agent path end-to-end** *(closes v0.1; amended ×2 on 2026-07-19 — doc-index audit, then the pre-build reviewer read: all 8 findings measured and folded in. The order is cleared for build.)*
+## Current order: **WO-006c — rework round 1**
 
-Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006c.md`](WO-006c.md) exactly.
+Read `docs/orders/WO-006c.md`, bottom verification record ("Verification — round 1"). Everything except D1 is verified and accepted — do not touch it.
 
-- Work on a new branch named `wo-006c`, cut from current `origin/QuantFlow`.
-- **Deliverable 0 first**: prove AgentOS runs inside Electron's main process before touching UI. If it does not, stop and report the exact error — that is a successful outcome for a proof step, and it redirects the order cheaply.
-- Stay strictly inside the Deliverables; the Out-of-scope list is binding. The only schema-surface edits permitted are the ones deliverable 1 authorizes verbatim.
-- Run the **builder-run** gates only; paste full unedited output, including every red/green falsification pair. **Never `bun qa/run.ts --all`, never delete `node_modules`.**
-- Commit to your branch and push. **Do not merge.**
-- If anything is ambiguous or unbuildable as written, **stop and say so.**
-
-> **Pre-build read: done 2026-07-19** (third agent, doc indexes in hand) — 8 findings, 2 confirmed blockers (`starting→failed` transition gap; creation-catalog shape), all re-measured by the verifier and folded into the order. ~~Founder — before handing this to the builder: give the order a five-minute **pre-build read** by a *third* agent (neither the builder nor the verifier; two questions only: can each gate actually fail? does each deliverable have exactly one meaning?). The last two pre-build reads caught five and three architect defects respectively, and this is the phase gate.~~
+- Continue on the existing branch `wo-006c`. First: `git fetch origin && git merge origin/QuantFlow`.
+- **Fix D1 only:** make the `agent-path` gate cold-safe — its own installable dependency closure (own `package.json`, `file:` deps, install step per the existing package-gate pattern in `qa/run.ts`), heavy imports loaded only after install so a missing dependency fails the gate, never the runner.
+- **Proof:** simulate cold in a throwaway `git worktree` of your own (allowed for this one proof — never delete `node_modules` in the shared tree): fresh worktree, `bun qa/run.ts --all` → 10/10 green from zero installs. Paste the header and the `agent-path OK` line. If you cannot, defer the cold proof to the verifier and paste your wiring diff instead.
+- Commit and push. **Do not merge.**
 
 ## Parallel-eligible
 
