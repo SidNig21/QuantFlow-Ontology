@@ -3,36 +3,29 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-006a — creation commands**
+## Current order: **WO-006a — rework round 1**
 
-Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006a.md`](WO-006a.md) exactly.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then `docs/orders/WO-006a.md` — including the **verification record appended at the bottom**, which is your actual task.
 
-- Work on a new branch named `wo-006a`.
-- Stay strictly inside the order's scope: `packages/qf-kernel/`, `qf-kernel-schema/src/commands.ts`, and `qa/`. Anything not listed in Deliverables is out.
-- Run the order's **builder-run gates** and paste full, unedited output in your report, using the order's Report-back format.
-- Commit to your branch and push. **Do not merge.**
-- If anything in the order is ambiguous, stop and say so instead of improvising — a builder question is an order defect, and the fix lands in the WO file.
+- Continue on the existing branch `wo-006a`.
+- **Fix defects D1–D4 only.** Everything else in WO-006a is verified and accepted; do not touch it.
+- Each defect's record states its fix and its falsification proof. Paste every red/green pair.
+- Run the builder-run gates (both packages' `bun test` + `tsc --noEmit`). **Never run `bun qa/run.ts --all`, never delete `node_modules`** — the cold run belongs to the verifier.
+- Commit and push. **Do not merge.**
 
-Why this order exists: the Kernel's `execute()` handles state transitions only; object creation currently bypasses the event log entirely, and the `artifact` table has no status column. WO-006a gives the Kernel a creation-command path — `publish_artifact` first, with content-addressing *computed by the Kernel*, never accepted on faith — and carries **debt #0** (the doc↔code action-surface gate). **WO-006b** (canvas slice + the Law D cold-reopen demo, the v0.1 phase gate) is blocked on it; its order file is not yet written.
-
-> **Note to the founder:** WO-006a was written by the verifier and has **not** had a pre-build reviewer read. Before handing it to a builder, consider giving a third agent (e.g. Codex) the five-minute read from `PROTOCOL.md`: *can each acceptance gate actually fail?* and *does each deliverable have exactly one meaning?* Five of five order-defects so far were architect-authored — this is the cheap insurance against the sixth.
+The four in one line each:
+- **D1** — republishing the same bytes with a different `kind`/`storage_ref` silently returns the first publish's row; it must reject with a typed error instead.
+- **D2** — `replayArtifactAndAssert` sets `rebuilt.id` from its own argument; rebuild it from the event payload's `content_hash` so the identity rule is actually asserted.
+- **D3** — the creation catalog and the handler `if` are two registries with no join; one dispatch table plus a test that every catalog entry has a handler.
+- **D4** — three copies of the event-append INSERT; one exported `appendEvent`, one occurrence of `INSERT INTO events` in the Kernel source.
 
 ## Parallel-eligible
 
-Nothing. WO-006b is blocked on WO-006a and unwritten; the verifier writes it while WO-006a builds.
-
-## Standing rule for every builder (added 2026-07-18)
-
-**Never run `bun qa/run.ts --all`, and never delete `node_modules`.** You are working in the founder's shared tree, which holds ~1.9 GB of installed dependencies. The cold run belongs to the verifier, in a throwaway worktree. Run your order's package-level gates plus its falsification proof, then report — and say that you deferred the cold run.
+Nothing. WO-006b is blocked on WO-006a; the verifier drafts it while the rework runs.
 
 ## Reviewer (standing role, `PROTOCOL.md`)
 
-A **third** agent — neither the builder nor the verifier of the work in question — may be handed either job at any time:
-
-- **Pre-build read of an order** (five minutes, two questions): *can each acceptance gate actually fail?* and *does each deliverable have exactly one meaning?* Orders are where the defects are born — this is the higher-leverage trigger, and WO-006a is the standing candidate (see the note above).
-- **Post-merge adversarial read** every two or three merged orders. Six orders have now merged (WO-001…WO-005, WO-004a); a post-merge read is due when convenient.
-
-Decorrelation is the point: correlated cognition masks defects exactly as correlated environments do. Reviews are testimony — they get verified before they are acted on, like any other claim.
+The pre-merge review of WO-006a earned its keep: it caught D1 — an architect underspecification — before merge, the first time that has happened before collision with reality. Reviews remain testimony: every finding was re-measured by the verifier before becoming a defect, and one was found overstated. The next scheduled touchpoint is a post-merge read after WO-006a lands.
 
 ---
 
