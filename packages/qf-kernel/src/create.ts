@@ -68,18 +68,15 @@ function publishArtifact(
     | Record<string, unknown>
     | null;
   if (existing) {
-    // Set QF_PROOF_SKIP_ARTIFACT_META_CHECK=1 to prove D1's test can fail.
-    if (process.env.QF_PROOF_SKIP_ARTIFACT_META_CHECK !== "1") {
-      if (String(existing.kind) !== kind) {
-        throw new ArtifactMetadataConflictError("kind", String(existing.kind), kind);
-      }
-      if (String(existing.storage_ref) !== storage_ref) {
-        throw new ArtifactMetadataConflictError(
-          "storage_ref",
-          String(existing.storage_ref),
-          storage_ref,
-        );
-      }
+    if (String(existing.kind) !== kind) {
+      throw new ArtifactMetadataConflictError("kind", String(existing.kind), kind);
+    }
+    if (String(existing.storage_ref) !== storage_ref) {
+      throw new ArtifactMetadataConflictError(
+        "storage_ref",
+        String(existing.storage_ref),
+        storage_ref,
+      );
     }
     return {
       object_type: cmd.object_type,
