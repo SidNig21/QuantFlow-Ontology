@@ -78,6 +78,12 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 ### Order ladder + gates (v0.5 numbering starts at WO-007)
 
+**WO-006d · One skin — design coherence as a gate.** *Depends: WO-006c. Slots before the dock so WO-007 is born coherent.*
+- `windows/shared/qf-tokens.css`: the founder-approved token set (ground `#07090C`, surface/raised/line neutrals, accent `#B7FF00` reserved for live state, node spectrum `#2FE6CF`/`#C79BFF`, semantic ok/warn/fail, Geist + Geist Mono, 8px unit, 10px radius) plus shared primitives (buttons, inputs, chips, status dots, dialog, scrollbar, empty state). Values come from the founder's own design corpus (old canvas, `logo/cube3d.js`, flow-cube-v2 spectrum) — the builder styles nothing from imagination.
+- Every window imports the shared sheet; hardcoded colors/fonts in `windows/**` migrated to tokens.
+- **Gate `one-skin` (falsifiable):** red on any raw hex color or `font-family` declared outside the tokens file (measured allowlist for generated/vendor files, each entry justified in the gate). Bait a rogue hex → red; remove → green.
+- The founder's aesthetic verdict is the acceptance for *look* (screenshots in the report); the gate is the acceptance for *coherence* — the part that outlives everyone's taste.
+
 **WO-007 · Dock v1 — species registry + spawn surface.** *Depends: WO-006c.*
 - Dock lists species from `agent_definition` rows; **no hardcoded species list in renderer** — falsify: insert a row via Kernel command, dock shows it without rebuild.
 - Spawn from dock → AgentOS session + `agent_session` (guest-minted ID adopted) + streaming tile; all three carry the same session ID (WO-004a's measured assertions reused, not re-proven).
