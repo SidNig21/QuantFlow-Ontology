@@ -3,17 +3,23 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **none — WO-006b is being drafted by the verifier**
+## Current order: **WO-006b — Kernel in the app (Law D)**
 
-WO-006a merged 2026-07-18 (three rounds; see its verification records). Nothing is unblocked for a builder right now.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-006b.md`](WO-006b.md) exactly.
 
-**WO-006b** is next: one agent path end-to-end — spawn from canvas, stream into a tile, publish one Artifact through the Kernel — with **Law D as the acceptance path**: create an Artifact, kill and relaunch the app, and the tile shows the same Artifact served from the Kernel. A demo passing on in-memory tile state fails the order. It is the v0.1 phase gate, and the first order the founder verifies hands-on.
+- Work on a new branch named `wo-006b`, cut from current `origin/QuantFlow`.
+- Stay strictly inside the order's Deliverables; its Out-of-scope list is binding.
+- Run the **builder-run** gates only and paste full, unedited output in the order's Report-back format. **Never `bun qa/run.ts --all`, never delete `node_modules`.**
+- Commit to your branch and push. **Do not merge.**
+- If anything is ambiguous or unbuildable as written, **stop and say so** — that is a fast path, not a failure.
 
-The verifier is measuring the app side (canvas, dock, Electron seams) before writing it — the defect class this workshop keeps paying for is orders written against imagined code. When the order lands, this file will point at it.
+This is the first order whose acceptance the **founder** verifies hands-on: publish an Artifact, kill the app, relaunch, and the tile must show the same Artifact served from `kernel.db` (`docs/demos/law-d.md` is part of the deliverables).
 
-## Builder rules (standing)
+> **Note to the founder:** WO-006b was written by the verifier against measured app code, but has **not** had a pre-build reviewer read. The five-minute two-question read from `PROTOCOL.md` (can each gate fail? one meaning per deliverable?) caught D1 on WO-006a before it was built — worth repeating here before handing this out.
 
-**Never run `bun qa/run.ts --all`, never delete `node_modules`.** The cold run belongs to the verifier.
+## Parallel-eligible
+
+Nothing. WO-006c (agent path from canvas) is blocked on this order; the verifier writes it while WO-006b builds.
 
 ---
 
