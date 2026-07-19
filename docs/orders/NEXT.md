@@ -21,7 +21,7 @@ The founder demos **once, at the milestone that matters**: skin (WO-006d) -> doc
 
 ## Parallel-eligible
 
-Nothing — WO-006d touches all of `windows/`, so a parallel order would collide. WO-007 (dock) follows it.
+Nothing — WO-007 touches shell, host, schema, and gates; WO-008 (Hermes) is blocked on it and its order is being drafted by the verifier.
 
 ---
 
