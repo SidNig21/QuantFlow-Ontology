@@ -54,9 +54,9 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 | 6 | Zod↔Kernel `content_hash` contract disagreement — `publish_artifact`'s schema input requires it, Kernel treats it as advisory-but-verified; softening the Zod field is a schema-surface edit and needs an order | order TBD, before MCP exposure |
 | 7 | Creation-path cleanup — `ARTIFACT_KINDS` duplicates the schema enum inside the Kernel; `from:"(none)"`/`to:"exists"` sentinel fields fake a transition shape for creations (discriminated result type instead) | WO-006b or first creation-path touch after it |
 | 8 | **Post-v0.1 tooling evaluation** — `anomalyco/terminal-control` as first driver behind a QuantFlow `ExecutionEnvironment` interface (its recording layer maps to receipts/trajectories), plus Cloudflare Code Mode and `UsefulSoftwareCo/executor`. Deliberately deferred: none is needed for Law D, and each is an unmeasured external claim until audited | evaluation order after the v0.1 phase gate |
-| 6 | `golden/tools.json` 1k+ dump — compact golden + determinism check | with #5 |
-| 7 | `qa/run.ts` install→test copy-paste — extract one `bunPackageGate` helper | next gate added |
-| 8 | `validate.ts` takes bare `string` — should take `StatefulType` | WO-005 (it consumes `validate`) |
+| 9 | `golden/tools.json` 1k+ dump — compact golden + determinism check | with #5 |
+| 10 | `qa/run.ts` install→test copy-paste — extract one `bunPackageGate` helper | next gate added |
+| 11 | `validate.ts` takes bare `string` — should take `StatefulType` | WO-005 (it consumes `validate`) |
 
 ## Phase v0.5 — "one real quant workflow" (~2–4 months) — **gates detailed 2026-07-19** (founder request)
 
