@@ -14,8 +14,8 @@ export type SessionEventRecord = {
 export type ProofRun = {
   /** Host-reported ID from createSession (AgentOS adopted the guest mint). */
   agentOsSessionId: string;
-  /** Same ID as reported by listSessions. */
-  listedSessionId: string;
+  /** Full sessionId table from listSessions — not a lookup keyed by the expected ID. */
+  listedSessionIds: string[];
   /** sessionId from every received ACP session/update notification. */
   notificationSessionIds: string[];
   sessionEvents: SessionEventRecord[];
@@ -92,9 +92,12 @@ export async function runProofTurn(shared: SharedOs): Promise<ProofRun> {
 
   const created = await os.createSession("qf-toolloop");
   const agentOsSessionId = created.sessionId;
-  const listed = os.listSessions();
-  const listedSessionId = listed.find((s) => s.sessionId === agentOsSessionId)?.sessionId;
-  if (!listedSessionId) {
+  let listedSessionIds = os.listSessions().map((s) => s.sessionId);
+  // Set QF_PROOF_CORRUPT_LIST_SESSIONS=1 to prove P1 fails when the table is wrong.
+  if (process.env.QF_PROOF_CORRUPT_LIST_SESSIONS === "1") {
+    listedSessionIds = listedSessionIds.map(() => `corrupt-${crypto.randomUUID()}`);
+  }
+  if (!listedSessionIds.includes(agentOsSessionId)) {
     throw new Error("AgentOS listSessions did not report the created session id");
   }
 
@@ -117,7 +120,7 @@ export async function runProofTurn(shared: SharedOs): Promise<ProofRun> {
 
     return {
       agentOsSessionId,
-      listedSessionId,
+      listedSessionIds,
       notificationSessionIds,
       sessionEvents,
       promptText: promptResult.text,

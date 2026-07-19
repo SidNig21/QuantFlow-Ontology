@@ -33,11 +33,12 @@ describe("WO-004a runtime ownership proof", () => {
     const run = await runProofTurn(shared);
 
     console.log("P1 createSession / AgentOS:", run.agentOsSessionId);
-    console.log("P1 listSessions:          ", run.listedSessionId);
+    console.log("P1 listSessions table:    ", run.listedSessionIds);
     console.log("P1 notification sessionIds:", run.notificationSessionIds);
 
     expect(run.agentOsSessionId.length).toBeGreaterThan(0);
-    expect(run.listedSessionId).toBe(run.agentOsSessionId);
+    // Assert against the table's contents — not a find keyed by the expected value.
+    expect(run.listedSessionIds).toContain(run.agentOsSessionId);
     expect(run.notificationSessionIds.length).toBeGreaterThan(0);
     for (const sid of run.notificationSessionIds) {
       expect(sid).toBe(run.agentOsSessionId);
