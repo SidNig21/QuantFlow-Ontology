@@ -44,7 +44,7 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 |---|---|---|
 | 0 | **doc↔code action-surface drift** — nothing asserts `ONTOLOGY_SCHEMA.md` §Actions equals `schema.ts`; WO-005 shipped 25 actions against a 13-action doc and only a human reading two lists caught it | **WO-006a** (deliverable 7) |
 | 1 | ~~`commands.ts` drift~~ — **killed** by WO-005's bidirectional lint, falsified both directions in verification | done |
-| 2 | P1 forged third layer · soft P4 · `/tmp` receipt oracle · fixture cost | **WO-004a** |
+| 2 | ~~P1 forged third layer · soft P4 · `/tmp` receipt oracle · fixture cost~~ — **killed** by WO-004a: forged assertion replaced with honest table membership, P4 hardened, receipt oracle deleted | done |
 | 3 | `define.ts`/`sql.ts` walk private Zod internals (`_zod`) — introduce a `FieldSpec` IR so generators are dumb printers | order TBD, before the next generator change |
 | 4 | `stateFieldName` `status\|grade` heuristic — replace with an explicit `stateField` | WO-005 if it touches the state field, else with #3 |
 | 5 | `schema.ts` at 645 lines — split by plane (domain / research / ops / links / actions) before the next expansion crosses 1k | before any schema growth order |
