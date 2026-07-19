@@ -64,7 +64,8 @@ Gate: the defining workflow end-to-end on real data — Hypothesis → Dataset �
 
 - **Data reality** — bootstrap datasets (tennis-data.co.uk, Kaggle UFC, NFL odds archives), then the Bovada capture pipeline (the forward moat); entity resolution; freshness/failure modes
 - **Python sidecar** — uv + polars + backtest engine as `execution_environment`; Parquet/DuckDB store
-- **Agent contracts** — Researcher / Backtester / Critic: prompts, tool allowlists, handoff rules (species, not just names)
+- **Agent contracts** — Researcher / Backtester / Critic: prompts, tool allowlists, handoff rules. The ACP guest is a **swappable species** behind the seam WO-004 proved: `ToolLoopAgent` (v0.1) and **Hermes via `hermes acp`** (recorded candidate) plug into the same socket — species choice, not architecture change (`BLUEPRINT.md` §open-host principle)
+- **Dock rebuild** — the spawn surface for agent species and tiles, the founder's access point to the canvas. Rebuilt as a Kernel projection per Laws A–C; the predecessor's dock is reference-only, visuals recreated via Claude design
 - **Cloudflare sandbox execution** — disposable CPU runs; artifact export enforced by `produces` before sandbox death
 - **The defining workflow order** — the E2E cut that closes the phase
 
