@@ -105,8 +105,9 @@ export function replayArtifactAndAssert(
     ) {
       throw new KernelError(`replay: malformed artifact.published for "${artifactId}"`);
     }
+    // id rebuilt from event payload (identity rule: id = content_hash), not the query key.
     rebuilt = {
-      id: artifactId,
+      id: payload.content_hash,
       kind: payload.kind,
       content_hash: payload.content_hash,
       storage_ref: payload.storage_ref,
@@ -115,6 +116,12 @@ export function replayArtifactAndAssert(
 
   if (!rebuilt) {
     throw new KernelError(`replay: no artifact.published events for "${artifactId}"`);
+  }
+
+  if (rebuilt.id !== artifactId) {
+    throw new KernelError(
+      `replay: event content_hash≠requested id for artifact "${artifactId}"`,
+    );
   }
 
   if (

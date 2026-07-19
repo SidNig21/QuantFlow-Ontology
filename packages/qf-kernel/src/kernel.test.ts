@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import {
+  ArtifactMetadataConflictError,
+  assertCreationHandlersComplete,
   closeKernel,
   contentHash,
   ContentHashMismatchError,
@@ -237,5 +239,69 @@ describe("qf-kernel", () => {
         {},
       ),
     ).toThrow(MissingTraceError);
+  });
+
+  test("D1 · republish same bytes with different metadata rejects", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("meta-conflict");
+    execute(
+      db,
+      "publish_artifact",
+      { kind: "report", bytes, storage_ref: "file:///a" },
+      ctx,
+    );
+    const before = eventCount(db);
+    expect(() =>
+      execute(
+        db,
+        "publish_artifact",
+        { kind: "strategy_spec", bytes, storage_ref: "file:///b" },
+        { ...ctx, span_id: "span-meta" },
+      ),
+    ).toThrow(ArtifactMetadataConflictError);
+    expect(eventCount(db)).toBe(before);
+    const row = db.query(`SELECT kind, storage_ref FROM artifact`).get() as {
+      kind: string;
+      storage_ref: string;
+    };
+    expect(row.kind).toBe("report");
+    expect(row.storage_ref).toBe("file:///a");
+  });
+
+  test("D2 · replay fails when event content_hash disagrees with identity", () => {
+    db = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("replay-corrupt");
+    const published = execute(
+      db,
+      "publish_artifact",
+      { kind: "code", bytes, storage_ref: "file:///tmp/rc.bin" },
+      ctx,
+    );
+    const badPayload = JSON.stringify({
+      command: "publish_artifact",
+      kind: "code",
+      content_hash: "0".repeat(64),
+      storage_ref: "file:///tmp/rc.bin",
+    });
+    db.query(`UPDATE events SET payload = ? WHERE object_id = ? AND type = 'artifact.published'`).run(
+      badPayload,
+      published.object_id,
+    );
+    expect(() => replayArtifactAndAssert(db, published.object_id)).toThrow(
+      /content_hash≠requested id|live≠rebuilt/,
+    );
+  });
+
+  test("D3 · every creationCommands entry has a handler", () => {
+    assertCreationHandlersComplete();
+    expect(() =>
+      assertCreationHandlersComplete([
+        {
+          action: "wo006a_bait_create",
+          object_type: "artifact",
+          event: "artifact.bait",
+        },
+      ]),
+    ).toThrow('Creation command "wo006a_bait_create" has no handler');
   });
 });

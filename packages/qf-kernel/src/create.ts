@@ -1,36 +1,15 @@
 import { readFileSync } from "node:fs";
-import type { CreationCommand } from "qf-kernel-schema/commands";
+import { creationCommands, type CreationCommand } from "qf-kernel-schema/commands";
 import type { KernelDb } from "./db.ts";
-import { ContentHashMismatchError, KernelError } from "./errors.ts";
+import {
+  ArtifactMetadataConflictError,
+  ContentHashMismatchError,
+  KernelError,
+} from "./errors.ts";
+import { appendEvent } from "./events.ts";
+import type { ExecuteResult } from "./execute.ts";
 import { contentHash } from "./hash.ts";
 import type { TraceContext } from "./trace.ts";
-import type { ExecuteResult } from "./execute.ts";
-
-function appendEvent(
-  db: KernelDb,
-  opts: {
-    type: string;
-    object_type: string;
-    object_id: string;
-    payload: Record<string, unknown>;
-    trace_id: string;
-  },
-): void {
-  const id = crypto.randomUUID();
-  const created_at = new Date().toISOString();
-  db.query(
-    `INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    id,
-    opts.type,
-    opts.object_type,
-    opts.object_id,
-    JSON.stringify(opts.payload),
-    opts.trace_id,
-    created_at,
-  );
-}
 
 function resolveBytes(input: Record<string, unknown>): Uint8Array {
   if (input.bytes instanceof Uint8Array) return input.bytes;
@@ -48,10 +27,16 @@ const ARTIFACT_KINDS = new Set([
   "trajectory",
 ]);
 
+type CreationHandler = (
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+) => ExecuteResult;
+
 /**
- * publish_artifact — Kernel computes content_hash; id = hash; identical bytes are idempotent.
- * Second publish of the same bytes is a no-op (no second event): content-addressed identity
- * means republish recognizes an existing fact rather than asserting a new one.
+ * publish_artifact — Kernel computes content_hash; id = hash; identical bytes +
+ * identical metadata are a no-op. Same bytes with different kind/storage_ref reject.
  */
 function publishArtifact(
   db: KernelDb,
@@ -83,6 +68,19 @@ function publishArtifact(
     | Record<string, unknown>
     | null;
   if (existing) {
+    // Set QF_PROOF_SKIP_ARTIFACT_META_CHECK=1 to prove D1's test can fail.
+    if (process.env.QF_PROOF_SKIP_ARTIFACT_META_CHECK !== "1") {
+      if (String(existing.kind) !== kind) {
+        throw new ArtifactMetadataConflictError("kind", String(existing.kind), kind);
+      }
+      if (String(existing.storage_ref) !== storage_ref) {
+        throw new ArtifactMetadataConflictError(
+          "storage_ref",
+          String(existing.storage_ref),
+          storage_ref,
+        );
+      }
+    }
     return {
       object_type: cmd.object_type,
       object_id: id,
@@ -126,15 +124,33 @@ function publishArtifact(
   };
 }
 
-/** Dispatch a creation command. Handlers are keyed by action name, not object type. */
+/** Single dispatch table — catalog actions must have a handler here. */
+export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
+  publish_artifact: publishArtifact,
+};
+
+/** Every creationCommands entry must have a handler (D3 join). */
+export function assertCreationHandlersComplete(
+  catalog: readonly CreationCommand[] = creationCommands,
+  handlers: Readonly<Record<string, CreationHandler>> = creationHandlers,
+): void {
+  for (const cmd of catalog) {
+    if (typeof handlers[cmd.action] !== "function") {
+      throw new Error(`Creation command "${cmd.action}" has no handler`);
+    }
+  }
+}
+
+/** Dispatch a creation command via the one dispatch table. */
 export function executeCreation(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
   trace: TraceContext,
 ): ExecuteResult {
-  if (cmd.action === "publish_artifact") {
-    return publishArtifact(db, cmd, input, trace);
+  const handler = creationHandlers[cmd.action];
+  if (!handler) {
+    throw new KernelError(`No creation handler for action "${cmd.action}"`);
   }
-  throw new KernelError(`No creation handler for action "${cmd.action}"`);
+  return handler(db, cmd, input, trace);
 }

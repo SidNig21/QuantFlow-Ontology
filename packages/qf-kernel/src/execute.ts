@@ -7,6 +7,7 @@ import { assertTransition } from "qf-kernel-schema/validate";
 import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
 import { IllegalTransitionError, KernelError } from "./errors.ts";
+import { appendEvent } from "./events.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
 
 const ID_FIELD: Record<TransitionCommand["type"], string> = {
@@ -84,32 +85,6 @@ function readState(
     throw new KernelError(`${type} "${id}" not found`);
   }
   return { field, value: row.state };
-}
-
-function appendEvent(
-  db: KernelDb,
-  opts: {
-    type: string;
-    object_type: string;
-    object_id: string;
-    payload: Record<string, unknown>;
-    trace_id: string;
-  },
-): void {
-  const id = crypto.randomUUID();
-  const created_at = new Date().toISOString();
-  db.query(
-    `INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    id,
-    opts.type,
-    opts.object_type,
-    opts.object_id,
-    JSON.stringify(opts.payload),
-    opts.trace_id,
-    created_at,
-  );
 }
 
 export type ExecuteResult = {

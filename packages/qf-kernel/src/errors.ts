@@ -51,3 +51,23 @@ export class ContentHashMismatchError extends Error {
     this.computed = computed;
   }
 }
+
+/**
+ * Same content bytes already published under different kind/storage_ref —
+ * nothing written. Content-addressing is idempotent; metadata conflict is not.
+ */
+export class ArtifactMetadataConflictError extends Error {
+  readonly field: "kind" | "storage_ref";
+  readonly existing: string;
+  readonly attempted: string;
+
+  constructor(field: "kind" | "storage_ref", existing: string, attempted: string) {
+    super(
+      `Artifact metadata conflict on ${field}: existing=${existing} attempted=${attempted}`,
+    );
+    this.name = "ArtifactMetadataConflictError";
+    this.field = field;
+    this.existing = existing;
+    this.attempted = attempted;
+  }
+}
