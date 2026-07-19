@@ -50,6 +50,17 @@ Architect writes WO-NNN (self-contained file, no chat context needed)
 
 **Cold-state rule (learned the hard way, WO-003):** a gate may not depend on ambient machine state — it installs whatever it needs. Verify gates **cold**, not after a convenience install: the machine that already has dependencies present will pass a gate that a fresh CI checkout fails. If an order's acceptance steps install something before running the gates, the gates are being masked and the order is written wrong.
 
+**Cold-run-is-verifier-only rule (learned the hard way, WO-004a — an order-authoring defect, three occurrences):** the cold run belongs to the **verifier**, in a throwaway worktree. **No order may instruct a builder to delete `node_modules`.**
+
+The reason is that builders share the founder's single working tree. WO-005 and WO-004a both carried `rm -rf tools/*/node_modules qf-kernel-schema/node_modules packages/*/node_modules` as a builder step — correct for a builder with a private clone, destructive where the builders actually stand (~1.9 GB of installed dependencies, `tools/runtime-proof` alone 1.8 GB). Two builders independently noticed and routed around it: WO-005's deferred the cold run to the verifier, WO-004a's invented a clean-room worktree. Both were right *in spite of* the order. The third would have run it.
+
+So the split is now fixed:
+
+- **Builder** runs package-level gates only (`bun install && bun test`, `bunx tsc --noEmit`) plus the gate-falsification proof, then reports. A builder that cannot run the cold gate says so; that is compliance, not a gap.
+- **Verifier** runs `bun qa/run.ts --all` in a fresh worktree. Use `git worktree add --detach <path> origin/wo-NNN` so the builder's branch can stay checked out in the founder's tree. **A fresh worktree has no `node_modules` by construction — there is nothing to delete, and the `rm` was always a no-op there anyway.**
+
+The general lesson, and the reason this is a rule rather than a fix: an instruction that is safe in the environment the author imagined can be destructive in the environment the builder occupies. Orders state *what* must be true, not *where* someone must stand to check it.
+
 ## Work order format (template)
 
 ```markdown
@@ -63,6 +74,8 @@ depends: WO-MMM
 ## Deliverables — concrete files/behaviors.
 ## Contract — constraints that may not be violated (types, naming, laws).
 ## Acceptance gates — exact runnable commands + expected results.
+##   Builder-run: package-level only (install, test, typecheck) + the gate-falsification proof.
+##   Verifier-run: the cold `bun qa/run.ts --all`. Never ask a builder to delete node_modules.
 ## Out of scope — explicit, to stop helpful drift.
 ## Report back — the exact format the builder must return.
 ```
