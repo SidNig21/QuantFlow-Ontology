@@ -12,6 +12,7 @@ import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
+import { checkOneSkin } from "./gates/one-skin.ts";
 // agent-path: cold-safe launcher only (no heavy top-level imports)
 import { runAgentPathGate } from "./gates/agent-path.ts";
 
@@ -209,6 +210,15 @@ const gates: Gate[] = [
       "WO-006c: headless spawn→stream→tool→artifact, concurrency, cancel, orphans, reconcile",
     run: async () => {
       const { ok } = await runAgentPathGate();
+      return ok;
+    },
+  },
+  {
+    name: "one-skin",
+    description:
+      "WO-006d: no raw hex or non-token font-family outside windows/shared/qf-tokens.css",
+    run: () => {
+      const { ok } = checkOneSkin();
       return ok;
     },
   },

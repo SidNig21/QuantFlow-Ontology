@@ -16,7 +16,7 @@ button {
 	--color-active: color-mix(in srgb, var(--foreground) 12%, transparent);
 	--color-background-toggle-active: color-mix(in srgb, var(--card) 80%, var(--border) 20%);
 
-	font-family: var(--font-sans);
+	font-family: var(--qf-sans);
 	font-size: 15px;
 	font-weight: 400;
 	font-synthesis: none;
@@ -158,7 +158,7 @@ button {
 	border-radius: 3px;
 	padding: 1px 5px;
 	font-size: 0.7rem;
-	font-family: var(--font-mono);
+	font-family: var(--qf-mono);
 	color: color-mix(in srgb, var(--foreground) 40%, transparent);
 	margin-left: 4px;
 }

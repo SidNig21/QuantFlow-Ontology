@@ -19,6 +19,6 @@ body,
 	width: 100%;
 	height: 100%;
 	color: rgba(128, 128, 128, 0.7);
-	font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--qf-sans);
 	font-size: 12px;
 }

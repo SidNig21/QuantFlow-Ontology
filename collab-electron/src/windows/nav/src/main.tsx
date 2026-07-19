@@ -1,3 +1,5 @@
+import "../../shared/qf-tokens.css";
+import "../../shared/qf-base.css";
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initDarkMode } from '@collab/shared/dark-mode';

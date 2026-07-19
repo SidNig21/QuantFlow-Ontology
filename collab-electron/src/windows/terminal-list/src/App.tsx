@@ -168,7 +168,7 @@ function App() {
         <div
           style={{
             padding: "12px",
-            color: "var(--muted, #666)",
+            color: "var(--muted, var(--qf-muted))",
             fontSize: "11px",
           }}
         >

@@ -133,7 +133,7 @@ function ImportWebArticleModal({
 						<p
 							style={{
 								fontSize: '12px',
-								color: 'var(--destructive, #ef4444)',
+								color: 'var(--destructive, var(--qf-fail))',
 								margin: '-10px 0 12px',
 							}}
 						>
