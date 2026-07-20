@@ -1,3 +1,5 @@
+> **PARKED 2026-07-20 — founder pivoted to Palantir Foundry + AIP. See [`docs/orders/NEXT.md`](docs/orders/NEXT.md) for the true state at park time. Nothing below is being actively built.**
+
 # START_HERE.md
 
 > **The single front door to QuantFlow. Read this in full before doing anything — human or AI.**
