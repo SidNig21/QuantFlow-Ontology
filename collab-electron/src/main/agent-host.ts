@@ -10,8 +10,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   AgentOs,
+  createHostDirBackend,
   type JsonRpcNotification,
+  type MountConfig,
 } from "@rivet-dev/agentos-core";
+import {
+  resolveHostMountSpecs,
+  resolveSpeciesSessionEnv,
+} from "./host-mounts";
 import {
   getAgentDefinition,
   kernelExecute,
@@ -172,9 +178,18 @@ export async function ensureAgentOs(): Promise<AgentOs> {
       "agent-host: no resolvable agent_definition rows — boot-seed failed?",
     );
   }
+  const mounts: MountConfig[] = resolveHostMountSpecs().map((spec) => ({
+    path: spec.guestPath,
+    plugin: createHostDirBackend({
+      hostPath: spec.hostPath,
+      readOnly: spec.readOnly,
+    }),
+    readOnly: spec.readOnly,
+  }));
   os = await AgentOs.create({
     defaultSoftware: false,
     software,
+    ...(mounts.length > 0 ? { mounts } : {}),
   });
   for (const s of software) linkedPackages.add(s.packagePath);
   return os;
@@ -282,9 +297,15 @@ export async function admitAndStartSession(
   }
   const host = await ensureAgentOs();
   await admitSpecies(species);
+  // Species env: founder config + caller opts (host/species data only — never renderer).
+  const fromConfig = resolveSpeciesSessionEnv(species);
+  const env =
+    fromConfig || opts?.env
+      ? { ...fromConfig, ...opts?.env }
+      : undefined;
   const created = await host.createSession(
     species,
-    opts?.env ? { env: opts.env } : undefined,
+    env ? { env } : undefined,
   );
   const guestId = created.sessionId;
   const sessionId = opts?.corruptId ?? guestId;

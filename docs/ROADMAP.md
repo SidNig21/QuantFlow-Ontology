@@ -104,9 +104,11 @@ The dock is QuantFlow's access point — the surface where **species become sess
 - Post-merge findings land: session-tile Cancel gated to legal edges (dock is; tile isn't) · `closeSession` preload asymmetry fixed · renderer's `definitions[0]` singleton leftover removed.
 - **Extract-first guardrail:** `renderer.js` (~1767 lines) and `tile-manager.js` (~969) may not grow — extraction precedes any addition. Binding on WO-008a and A2A too.
 
-**WO-008b · Hermes reachability — bundle vs authorized mount.** *Depends: WO-007b. **Current rung.** Born from WO-008's Outcome B. Probe typed `AgentOsOptions.mounts` / `rootFilesystem` (not a public `hostMounts` API) vs packaging a self-contained Hermes; architect accepts either on probe evidence. Unblocks Outcome A; live turn still needs WO-008a.*
+**WO-008b · Hermes reachability — bundle vs authorized mount.** ***done — PROBE HELD 2026-07-20.*** Mounts work (narrow RO); guest exec is WASM-only — native Hermes/Python cannot run in-VM. Bundle same wall. Mount plumbing kept; Hermes exec → **WO-008c**.
 
-**WO-008a · Permission bridge + tool policy.** *Depends: WO-008 (+ WO-007b for handshake-only spawn). After WO-008b for the Hermes-live path.*
+**WO-008c · Hermes host-bridged ACP.** *Depends: WO-008b. **Current rung.** Spawn `hermes acp` as a host stdio child; Kernel adopts ACP id; dock Spawn → session tile (handshake only). AgentOS remains for Node/WASM species. Live turn still WO-008a.*
+
+**WO-008a · Permission bridge + tool policy.** *Depends: WO-008 (+ WO-007b). After WO-008c for the Hermes-live path.*
 - Host implements the ACP permission handler (`onPermissionRequest`): **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
 - Per-species tool allowlist on `agent_definition` (schema amendment), enforced at the host seam; falsify with an unlisted tool via the mock species.
 - Unblocks the founder's first real Hermes turn — and the A2A order after it.

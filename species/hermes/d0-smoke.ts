@@ -1,15 +1,23 @@
 /**
- * WO-008 deliverable 0 — fact-finding through the real admission path.
+ * WO-008 / WO-008b deliverable 0 — fact-finding through the real admission path.
  * linkSoftware → createSession("hermes", { env }) — NEVER prompt Hermes.
+ *
+ * WO-008b: authorized host_dir mounts (hermes-agent + uv cpython) so the guest
+ * can see HERMES_BIN. Mounts are narrowly scoped — not whole $HOME.
  *
  * Outcomes: A (handshake OK) · B (guest cannot reach host install) · C (protocol drift)
  * Exit codes: 0=A · 1=B · 2=C · 3=UNKNOWN · 4=preflight
  */
-import { existsSync } from "node:fs";
+import { existsSync, readlinkSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { AgentOs, type JsonRpcNotification } from "@rivet-dev/agentos-core";
+import {
+  AgentOs,
+  createHostDirBackend,
+  type JsonRpcNotification,
+  type MountConfig,
+} from "@rivet-dev/agentos-core";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const AOSPKG = join(HERE, "packed/hermes.aospkg");
@@ -22,6 +30,50 @@ const HERMES_BIN =
   process.env.HERMES_BIN ??
   join(homedir(), ".hermes/hermes-agent/venv/bin/hermes");
 const HOME = process.env.HOME ?? homedir();
+
+/**
+ * Narrow RO mounts so guest can exec the venv hermes shebang.
+ * - hermes-agent install (not ~/.hermes — auth.json stays off the guest)
+ * - uv cpython real + symlink path (venv/bin/python → cpython-3.11 → 3.11.15)
+ */
+function hermesReachabilityMounts(): MountConfig[] {
+  const hermesAgent = join(homedir(), ".hermes/hermes-agent");
+  const mounts: MountConfig[] = [];
+  if (existsSync(hermesAgent)) {
+    mounts.push({
+      path: hermesAgent,
+      plugin: createHostDirBackend({ hostPath: hermesAgent, readOnly: true }),
+      readOnly: true,
+    });
+  }
+  try {
+    const pyLink = readlinkSync(join(hermesAgent, "venv/bin/python"));
+    const pyLinkRoot = dirname(dirname(pyLink));
+    let pyRealRoot = pyLinkRoot;
+    try {
+      pyRealRoot = readlinkSync(pyLinkRoot);
+    } catch {
+      /* pyLinkRoot may already be the real directory */
+    }
+    if (existsSync(pyRealRoot)) {
+      mounts.push({
+        path: pyRealRoot,
+        plugin: createHostDirBackend({ hostPath: pyRealRoot, readOnly: true }),
+        readOnly: true,
+      });
+      if (pyLinkRoot !== pyRealRoot) {
+        mounts.push({
+          path: pyLinkRoot,
+          plugin: createHostDirBackend({ hostPath: pyRealRoot, readOnly: true }),
+          readOnly: true,
+        });
+      }
+    }
+  } catch (err) {
+    console.error("d0-smoke: could not resolve uv python mounts", err);
+  }
+  return mounts;
+}
 
 function sessionIdFromNotification(
   event: JsonRpcNotification,
@@ -84,6 +136,18 @@ async function main(): Promise<number> {
     return 3;
   }
 
+  const mounts = hermesReachabilityMounts();
+  console.log(
+    "d0-smoke: mounts=",
+    JSON.stringify(
+      mounts.map((m) => ({
+        path: m.path,
+        plugin: "host_dir",
+        readOnly: m.readOnly ?? true,
+      })),
+    ),
+  );
+
   const env = {
     HERMES_BIN,
     HOME,
@@ -96,6 +160,18 @@ async function main(): Promise<number> {
     os = await AgentOs.create({
       defaultSoftware: false,
       software: [],
+      mounts,
+      onAgentStderr: (ev) => {
+        const text =
+          typeof ev === "string"
+            ? ev
+            : String(
+                (ev as { data?: unknown })?.data ??
+                  (ev as { message?: unknown })?.message ??
+                  ev,
+              );
+        console.error("d0-smoke: agent stderr:", text.slice(0, 800));
+      },
     });
     await os.linkSoftware({ packagePath: AOSPKG });
     console.log("d0-smoke: linkSoftware ok");

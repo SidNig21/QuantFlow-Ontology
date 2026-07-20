@@ -1,6 +1,22 @@
-# species/hermes — WO-008 plug package
+# species/hermes — Hermes plug package
 
-## D0 fact-finding (no prompt)
+## Reachability status (WO-008b)
+
+**D0 chose authorized mount (1a).** Typed `AgentOs.create({ mounts })` +
+`createHostDirBackend` can project a **narrow RO** Hermes install (+ uv cpython)
+into the guest without exposing whole `$HOME` or `~/.hermes/auth.json`.
+
+**Outcome A is blocked on AgentOS 0.2.7:** after mounts make `HERMES_BIN` visible,
+guest `child_process.spawn` refuses both `#!` scripts and native ELF binaries
+(`ERR_NATIVE_BINARY_NOT_SUPPORTED` — WASM only). Bundling the same host binaries
+into the package tree cannot bypass that wall. Full probe:
+[`D0-MOUNT-PROBE.md`](./D0-MOUNT-PROBE.md).
+
+Founder mount config (app): `~/.collaborator/agentos-host-mounts.json`
+(example: `tools/examples/agentos-host-mounts.example.json`).
+Override with `QF_AGENTOS_HOST_MOUNTS`.
+
+## D0 smoke (handshake only — never prompt)
 
 ```bash
 bun install
@@ -8,18 +24,14 @@ bun run pack-agent
 bun run d0
 ```
 
-**Measured Outcome B (2026-07-19):** AgentOS guest overlay cannot see host `HERMES_BIN`. Exact stderr:
+With mounts: visibility OK; createSession currently exits **UNKNOWN (3)** on the
+WASM exec refuse (not Outcome B). Without mounts: still **Outcome B**.
 
-```
-hermes-acp-shim: HERMES_BIN not found: /home/sidnig21/.hermes/hermes-agent/venv/bin/hermes
-```
-
-`createSession` env keys (paths only): `HERMES_BIN`, `HOME`.
-
-## Register (listing only — do not dock-spawn Hermes)
+## Register + dock admit
 
 ```bash
 bun ./register.ts --db "$(ls ~/.collaborator/dev/worktree-*/kernel.db | head -1)"
 ```
 
-Dock listing of Hermes after registration is optional under Outcome B; the dock-path proof is `species/critic-mock/`.
+Dock Spawn is admit-only after WO-007b. Do **not** Run turn on Hermes until WO-008a.
+Handshake Outcome A waits on a guest-exec or host-bridge decision from the architect.
