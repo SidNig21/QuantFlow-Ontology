@@ -1,16 +1,18 @@
-# NEXT — the current order (updated only by the verifier)
+# PARKED — 2026-07-20
 
-> **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
-> **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
+**QuantFlow-Ontology is parked. The founder has pivoted to Palantir Foundry + AIP.**
 
-## Current order: **none — WO-009 re-parked; "Run Workflow v1" is being drafted (founder direction lock, 2026-07-20)**
+Not abandoned in failure: parked in a known-good, fully-verified state. CI is green, every merged order was verified cold in a clean room, and every verification record is appended to its `WO-*.md` file. If this is ever picked back up, `docs/orders/VERIFYING.md` is still a complete cold start.
 
-WO-008e (4-tile orchestra) is merged. The founder's call for the next rung: **Hermes commands the desk** — one task typed at the dock, an orchestrator Hermes staffs worker tiles, reviews, reports back (see the direction-lock note in `ROADMAP.md`). The verifier is measuring the merged A2A bus and drafting the order; it gets a doc-attached pre-build read before any builder touches it.
+## True state at park time
 
-**WO-009 (datasets) is parked** until Run Workflow v1 lands — it feeds the commander, it does not precede him.
+- **v0.1 phase gate: closed.** Kernel v0 (SQLite from generated schema, command/event layer, replay), Law D proven by founder acceptance (publish → force-kill → relaunch → artifact intact), creation commands with content-addressed artifacts, one agent path end-to-end.
+- **Agent stack: working.** Dock as a Kernel projection, species registry (`agent_definition` + `linkSoftware`), real Hermes running in native TUI tiles, deny-by-default permission bridge, 4-tile A2A bus with Kernel-mediated hops.
+- **Unmerged:** `wo-008f` (Run A2A button — architect-authored, never independently verified; do not merge without review).
+- **Never built:** the domain plane. `competitor`, `event`, `market`, `odds_series`, `result` exist as tables and have never held one real fact. This is the gap that ended the build — the machinery of an ontology without a world inside it.
 
-Builders: nothing to build right now. Do not start WO-009.
+## What the process produced
 
----
+Nine merged orders, ~14 defects caught before merge (five of them architect-authored order defects, caught by decorrelated pre-build reads), zero merges on testimony alone. The workshop protocol in `docs/orders/PROTOCOL.md` — cold verification, gate falsification, cite-or-probe on external surfaces, decorrelated reviewers — is the transferable artifact here, not the code.
 
-*Rotation rule: when the verifier passes the current order, the same verification commit flips the log status in `README.md` and rewrites this file to the next unblocked rung. If this file and the order log disagree, the log wins — report the discrepancy instead of building.*
+*Rotation duty ends here. No current order. Do not start one.*
