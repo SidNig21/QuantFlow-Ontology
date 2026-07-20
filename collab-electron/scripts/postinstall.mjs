@@ -103,4 +103,8 @@ if (process.platform === "win32") {
   }
 }
 
-execSync("bun x electron-rebuild -f -w node-pty", { stdio: "inherit" });
+// -o (--only) hard-restricts the rebuild to node-pty. -w does not under bun's
+// isolated node_modules layout: electron-rebuild walks into isolated-vm, which
+// fails to compile against newer V8 headers on CI runners (every run red at
+// Install, before any gate executes). Measured 2026-07-20.
+execSync("bun x electron-rebuild -f -o node-pty", { stdio: "inherit" });
