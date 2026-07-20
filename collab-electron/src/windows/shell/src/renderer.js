@@ -992,31 +992,10 @@ async function init() {
 				minimap.update();
 			})();
 		} else if (action === "spawn-agent-session") {
-			void (async () => {
-				const defs = await window.shellApi.qf.listDefinitions();
-				if (!defs.ok || !defs.definitions?.length) {
-					console.error(
-						"spawnSession failed: no species in registry",
-					);
-					return;
-				}
-				const species = String(
-					defs.definitions[0].name ?? defs.definitions[0].id,
-				);
-				const res = await window.shellApi.qf.spawnSession({
-					species,
-					prompt: "uppercase quantflow",
-				});
-				if (!res.ok) {
-					console.error("spawnSession failed", res.error);
-					return;
-				}
-				console.log(
-					"spawn_agent_session",
-					JSON.stringify(res.result),
-				);
-				minimap.update();
-			})();
+			// WO-007b: no definitions[0] special-case — use the dock to admit.
+			console.info(
+				"spawn-agent-session: use the dock to admit a species (no auto-pick)",
+			);
 		} else if (action === "new-tile") {
 			const rect = canvasEl.getBoundingClientRect();
 			const size = getTerminalSize();

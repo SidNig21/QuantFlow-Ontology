@@ -46,10 +46,16 @@ type DoneListener = (
 let os: AgentOs | null = null;
 /** Absolute package paths already admitted into the live AgentOs. */
 const linkedPackages = new Set<string>();
-const live = new Map<
-  string,
-  { cancelled: boolean; species: string; unsub?: () => void }
->();
+type LiveSession = {
+  cancelled: boolean;
+  species: string;
+  /** AgentOS session id (guest); may differ from Kernel id under corruptId falsify. */
+  guestId: string;
+  unsub?: () => void;
+  turnInFlight: boolean;
+};
+
+const live = new Map<string, LiveSession>();
 const chunkListeners = new Set<ChunkListener>();
 const doneListeners = new Set<DoneListener>();
 
@@ -239,7 +245,13 @@ export function reconcileStaleSessions(): void {
   console.log(`agent-host: reconcile closed ${n} stale session(s)`);
 }
 
-export type SpawnResult = {
+export type AdmitResult = {
+  sessionId: string;
+  guestId: string;
+  species: string;
+};
+
+export type TurnResult = {
   sessionId: string;
   artifactId?: string;
   stopReason: string;
@@ -247,34 +259,42 @@ export type SpawnResult = {
 };
 
 /**
- * Create + start Kernel row and AgentOS session, then run the prompt to completion.
+ * Admit species + create/start Kernel row and AgentOS session.
+ * Sends nothing to the agent — no prompt, no chunks, no artifacts.
  * Concurrent-safe (Map of live sessions — no singleton).
+ *
+ * Session env: species static defaults come from packed `agent.env`
+ * (WO-007b D0). Optional `opts.env` is host/species-sourced only — never
+ * from the renderer (IPC rejects renderer env).
  */
-export async function spawnAgentSession(
+export async function admitAndStartSession(
   species: string,
-  promptText = "uppercase quantflow",
   opts?: {
-    slowChunkMs?: number;
-    skipPublish?: boolean;
+    /** Host/species-sourced env merged with manifest agent.env. Never from renderer. */
+    env?: Record<string, string>;
     /** When set, host mints its own id (gate falsify — must go red). */
     corruptId?: string;
     onStarted?: (sessionId: string, species: string) => void;
   },
-): Promise<SpawnResult> {
+): Promise<AdmitResult> {
   if (!species || typeof species !== "string") {
-    throw new Error("agent-host: spawn requires a species name");
+    throw new Error("agent-host: admit requires a species name");
   }
   const host = await ensureAgentOs();
   await admitSpecies(species);
-  const env =
-    opts?.slowChunkMs != null
-      ? { QF_PROOF_SLOW_CHUNK_MS: String(opts.slowChunkMs) }
-      : undefined;
-  const created = await host.createSession(species, env ? { env } : undefined);
+  const created = await host.createSession(
+    species,
+    opts?.env ? { env: opts.env } : undefined,
+  );
   const guestId = created.sessionId;
   const sessionId = opts?.corruptId ?? guestId;
 
-  live.set(sessionId, { cancelled: false, species });
+  live.set(sessionId, {
+    cancelled: false,
+    species,
+    guestId,
+    turnInFlight: false,
+  });
 
   const trace = newTrace();
   kernelExecute(
@@ -291,22 +311,54 @@ export async function spawnAgentSession(
     { ...trace, span_id: crypto.randomUUID() },
   );
   opts?.onStarted?.(sessionId, species);
+  console.log(
+    `agent-host: admitted session=${sessionId} species=${species} (no prompt)`,
+  );
+  return { sessionId, guestId, species };
+}
 
-  const agentOsId = guestId;
+/**
+ * Prompt + stream + optional publish on an already-admitted session.
+ * Callable while the session remains live; default finalizes (close + destroy)
+ * after the turn so the mock demo matches pre-split one-shot behavior.
+ * Pass `finalize: false` to leave the session running for another turn.
+ */
+export async function runTurn(
+  sessionId: string,
+  promptText: string,
+  opts?: {
+    skipPublish?: boolean;
+    /** Default true — close Kernel row + destroy AgentOS session after the turn. */
+    finalize?: boolean;
+  },
+): Promise<TurnResult> {
+  const entry = live.get(sessionId);
+  if (!entry) {
+    throw new Error(`agent-host: runTurn — no live session ${sessionId}`);
+  }
+  if (entry.turnInFlight) {
+    throw new Error(`agent-host: runTurn — turn already in flight ${sessionId}`);
+  }
+  entry.turnInFlight = true;
+  entry.cancelled = false;
+
+  const host = await ensureAgentOs();
+  const guestId = entry.guestId;
+  const finalize = opts?.finalize !== false;
+
   let text = "";
-  const unsub = host.onSessionEvent(agentOsId, (event) => {
+  const unsub = host.onSessionEvent(guestId, (event) => {
     const chunk = chunkTextFromNotification(event);
     if (chunk) {
       text += chunk;
       for (const l of chunkListeners) l(sessionId, chunk);
     }
   });
-  const entry = live.get(sessionId);
-  if (entry) entry.unsub = unsub;
+  entry.unsub = unsub;
 
   let stopReason = "unknown";
   try {
-    const promptResult = await host.prompt(agentOsId, promptText);
+    const promptResult = await host.prompt(guestId, promptText);
     const response = promptResult.response as {
       result?: { stopReason?: string };
     };
@@ -316,13 +368,15 @@ export async function spawnAgentSession(
     console.error("agent-host: prompt failed", err);
   } finally {
     unsub();
+    entry.unsub = undefined;
+    entry.turnInFlight = false;
   }
 
   const wasCancelled =
     (live.get(sessionId)?.cancelled ?? false) || stopReason === "cancelled";
-  live.delete(sessionId);
 
   if (wasCancelled) {
+    live.delete(sessionId);
     try {
       kernelExecute(
         "cancel_agent_session",
@@ -341,7 +395,7 @@ export async function spawnAgentSession(
     } catch {
       /* ignore */
     }
-    await host.destroySession(agentOsId).catch(() => {});
+    await host.destroySession(guestId).catch(() => {});
     for (const l of doneListeners) {
       l(sessionId, { status: "cancelled", text });
     }
@@ -350,6 +404,7 @@ export async function spawnAgentSession(
   }
 
   if (stopReason !== "end_turn" && stopReason !== "unknown") {
+    live.delete(sessionId);
     try {
       kernelExecute(
         "fail_agent_session",
@@ -364,7 +419,7 @@ export async function spawnAgentSession(
     } catch {
       /* ignore */
     }
-    await host.destroySession(agentOsId).catch(() => {});
+    await host.destroySession(guestId).catch(() => {});
     for (const l of doneListeners) {
       l(sessionId, { status: "failed", text });
     }
@@ -389,23 +444,29 @@ export async function spawnAgentSession(
     artifactId = pub.object_id;
   }
 
-  try {
-    kernelExecute(
-      "close_agent_session",
-      { session_id: sessionId },
-      newTrace(),
+  if (finalize) {
+    live.delete(sessionId);
+    try {
+      kernelExecute(
+        "close_agent_session",
+        { session_id: sessionId },
+        newTrace(),
+      );
+    } catch {
+      /* ignore */
+    }
+    await host.destroySession(guestId).catch(() => {});
+    for (const l of doneListeners) {
+      l(sessionId, { status: "closed", artifactId, text });
+    }
+    console.log(
+      `agent-host: session complete ${sessionId} artifact=${artifactId ?? "none"}`,
     );
-  } catch {
-    /* ignore */
+  } else {
+    console.log(
+      `agent-host: turn complete (keep-alive) ${sessionId} artifact=${artifactId ?? "none"}`,
+    );
   }
-  await host.destroySession(agentOsId).catch(() => {});
-
-  for (const l of doneListeners) {
-    l(sessionId, { status: "closed", artifactId, text });
-  }
-  console.log(
-    `agent-host: session complete ${sessionId} artifact=${artifactId ?? "none"}`,
-  );
   return { sessionId, artifactId, stopReason, text };
 }
 
@@ -413,11 +474,20 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
   const entry = live.get(sessionId);
   if (entry) entry.cancelled = true;
   const host = await ensureAgentOs();
-  await host.cancelSession(sessionId).catch(() => {});
+  const guestId = entry?.guestId ?? sessionId;
+  await host.cancelSession(guestId).catch(() => {});
   console.log(`agent-host: cancel requested ${sessionId}`);
 }
 
 export function closeAgentSessionRow(sessionId: string): void {
+  const entry = live.get(sessionId);
+  if (entry) {
+    entry.unsub?.();
+    live.delete(sessionId);
+    void ensureAgentOs().then((host) =>
+      host.destroySession(entry.guestId).catch(() => {}),
+    );
+  }
   kernelExecute(
     "close_agent_session",
     { session_id: sessionId },

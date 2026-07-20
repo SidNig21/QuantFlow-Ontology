@@ -8,6 +8,10 @@
  * Direct use (falsify flags still work):
  *   bun qa/gates/agent-path.ts
  *   QF_AGENT_PATH_NEUTER_CANCEL=1 bun qa/gates/agent-path.ts
+ *   QF_AGENT_PATH_CORRUPT_ID=1 bun qa/gates/agent-path.ts
+ *   QF_AGENT_PATH_SKIP_PUBLISH=1 bun qa/gates/agent-path.ts
+ *   QF_AGENT_PATH_SERIALIZE=1 bun qa/gates/agent-path.ts
+ *   QF_AGENT_PATH_SKIP_TURN=1 bun qa/gates/agent-path.ts
  */
 import { join } from "node:path";
 

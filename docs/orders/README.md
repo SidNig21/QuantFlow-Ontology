@@ -21,6 +21,6 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-006d](WO-006d.md) | One skin: token sheet + one-skin gate (design coherence) | **done** — verified + merged 2026-07-19; hex 55→0, fonts 33→0; look-verdict at the post-008 checkpoint | builder (Cursor) |
 | [WO-007](WO-007.md) | Dock v1: species registry + spawn surface + cube empty-state | **done** — verified + merged 2026-07-19 (round 2); 12 gates cold; dock is a Kernel projection | builder (Cursor) |
 | [WO-008](WO-008.md) | The plug test: Hermes through the same socket — admitting diff is the gate | **done** — verified + merged 2026-07-19 (round 2); Outcome B (guest cannot see host install); admitting commits pure; D1–D3 fixed | builder (Cursor) |
-| [WO-007b](WO-007b.md) | Host seams: spawn split, generic env, tile-control parity | **open** — current; order written | builder |
-| WO-008b | Hermes reachability: bundle vs authorized mount (probe `hostMounts`) | blocked on WO-007b — order not yet written | builder |
-| WO-008a | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | blocked on WO-007b (WO-008 done) — order not yet written | builder |
+| [WO-007b](WO-007b.md) | Host seams: spawn split, generic env, tile-control parity | **done** — verified + merged 2026-07-20; admit≠turn; manifest env YES | builder (Cursor) |
+| [WO-008b](WO-008b.md) | Hermes reachability: bundle vs authorized mount (probe `mounts`) | **open** — current; order written | builder |
+| WO-008a | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | open — after WO-008b for Hermes live; order not yet written | builder |

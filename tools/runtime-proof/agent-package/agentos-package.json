@@ -2,7 +2,10 @@
   "name": "qf-toolloop",
   "version": "0.1.0",
   "agent": {
-    "acpEntrypoint": "qf-toolloop-acp"
+    "acpEntrypoint": "qf-toolloop-acp",
+    "env": {
+      "QF_PROOF_SLOW_CHUNK_MS": "40"
+    }
   },
   "registry": {
     "title": "QF ToolLoop",

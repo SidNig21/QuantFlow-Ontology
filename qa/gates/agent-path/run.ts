@@ -1,11 +1,14 @@
 /**
- * WO-006c headless E2E (runs inside this package after `bun install`).
+ * WO-006c / WO-007b headless E2E (runs inside this package after `bun install`).
+ *
+ * Host seams (WO-007b): admitAndStartSession + runTurn — connecting ≠ speaking.
  *
  * Falsify env flags (each must go red):
  *   QF_AGENT_PATH_NEUTER_CANCEL=1
  *   QF_AGENT_PATH_CORRUPT_ID=1
  *   QF_AGENT_PATH_SKIP_PUBLISH=1
  *   QF_AGENT_PATH_SERIALIZE=1
+ *   QF_AGENT_PATH_SKIP_TURN=1  — admit only; must go red (no chunks/artifact)
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -71,6 +74,11 @@ function sessionIdFromEvent(event: JsonRpcNotification): string | null {
   return typeof sid === "string" ? sid : null;
 }
 
+type AdmitOut = {
+  sessionId: string;
+  guestId: string;
+};
+
 type RunOut = {
   sessionId: string;
   guestId: string;
@@ -81,20 +89,22 @@ type RunOut = {
   status: string;
 };
 
-async function runOne(
+/**
+ * Mirror of collab-electron agent-host.admitAndStartSession (headless Kernel).
+ * Sends nothing to the agent.
+ */
+async function admitAndStartSession(
   os: AgentOs,
   db: KernelDb,
   opts: {
-    slowMs: number;
-    skipPublish?: boolean;
+    env?: Record<string, string>;
     corruptId?: boolean;
-    neuterCancel?: boolean;
-    cancelAfterChunk?: boolean;
-  },
-): Promise<RunOut> {
-  const created = await os.createSession(SPECIES, {
-    env: { QF_PROOF_SLOW_CHUNK_MS: String(opts.slowMs) },
-  });
+  } = {},
+): Promise<AdmitOut> {
+  const created = await os.createSession(
+    SPECIES,
+    opts.env ? { env: opts.env } : undefined,
+  );
   const guestId = created.sessionId;
   const sessionId = opts.corruptId
     ? `host-minted-${crypto.randomUUID()}`
@@ -107,7 +117,23 @@ async function runOne(
     trace(),
   );
   execute(db, "start_agent_session", { session_id: sessionId }, trace());
+  return { sessionId, guestId };
+}
 
+/**
+ * Mirror of collab-electron agent-host.runTurn (headless Kernel).
+ */
+async function runTurn(
+  os: AgentOs,
+  db: KernelDb,
+  admitted: AdmitOut,
+  opts: {
+    skipPublish?: boolean;
+    neuterCancel?: boolean;
+    cancelAfterChunk?: boolean;
+  } = {},
+): Promise<RunOut> {
+  const { sessionId, guestId } = admitted;
   let chunks = 0;
   let text = "";
   const unsub = os.onSessionEvent(guestId, (event) => {
@@ -192,6 +218,45 @@ async function runOne(
   };
 }
 
+async function runOne(
+  os: AgentOs,
+  db: KernelDb,
+  opts: {
+    slowMs: number;
+    skipPublish?: boolean;
+    corruptId?: boolean;
+    neuterCancel?: boolean;
+    cancelAfterChunk?: boolean;
+    skipTurn?: boolean;
+  },
+): Promise<RunOut> {
+  const admitted = await admitAndStartSession(os, db, {
+    env: { QF_PROOF_SLOW_CHUNK_MS: String(opts.slowMs) },
+    corruptId: opts.corruptId,
+  });
+
+  if (opts.skipTurn) {
+    // Spawn-only: event log must be created+started; zero chunks/artifacts.
+    const events = db
+      .query(
+        `SELECT type FROM events WHERE object_id = ? ORDER BY created_at, id`,
+      )
+      .all(admitted.sessionId) as { type: string }[];
+    const types = events.map((e) => e.type);
+    await os.destroySession(admitted.guestId).catch(() => {});
+    return {
+      sessionId: admitted.sessionId,
+      guestId: admitted.guestId,
+      chunks: 0,
+      text: types.join(","),
+      stopReason: "admit-only",
+      status: "running",
+    };
+  }
+
+  return runTurn(os, db, admitted, opts);
+}
+
 function reconcile(db: KernelDb): void {
   for (const row of listAgentSessions(db)) {
     const id = String(row.id);
@@ -227,8 +292,72 @@ async function main(): Promise<number> {
   const corruptId = process.env.QF_AGENT_PATH_CORRUPT_ID === "1";
   const skipPublish = process.env.QF_AGENT_PATH_SKIP_PUBLISH === "1";
   const serialize = process.env.QF_AGENT_PATH_SERIALIZE === "1";
+  const skipTurn = process.env.QF_AGENT_PATH_SKIP_TURN === "1";
 
   try {
+    // --- New WO-007b pair: admit-only yields no chunks until runTurn ---
+    {
+      const admitOnly = await runOne(os, db, { slowMs: 40, skipTurn: true });
+      const eventTypes = admitOnly.text.split(",").filter(Boolean);
+      const hasCreated = eventTypes.includes("agent_session.created");
+      const hasStarted = eventTypes.includes("agent_session.started");
+      if (!hasCreated || !hasStarted) {
+        console.error(
+          "agent-path FAIL: admit-only missing created/started events",
+          eventTypes,
+        );
+        return 1;
+      }
+      if (eventTypes.length !== 2) {
+        console.error(
+          "agent-path FAIL: admit-only expected exactly created+started",
+          eventTypes,
+        );
+        return 1;
+      }
+      if (admitOnly.chunks !== 0) {
+        console.error("agent-path FAIL: admit-only produced chunks");
+        return 1;
+      }
+      const artsAfterAdmit = listArtifacts(db);
+      if (artsAfterAdmit.length > 0) {
+        console.error("agent-path FAIL: admit-only produced artifacts");
+        return 1;
+      }
+      // Clean up admit-only row so later concurrency counts stay sane
+      execute(
+        db,
+        "close_agent_session",
+        { session_id: admitOnly.sessionId },
+        trace(),
+      );
+
+      if (skipTurn) {
+        // Falsify: stop after admit — green path requires runTurn chunks.
+        console.error(
+          "agent-path FAIL: skip turn (admit-only) — no chunks/artifact until runTurn (expected red)",
+        );
+        return 1;
+      }
+
+      // Green direction: runTurn on a fresh admit produces chunks
+      const admitted = await admitAndStartSession(os, db, {
+        env: { QF_PROOF_SLOW_CHUNK_MS: "40" },
+      });
+      const turned = await runTurn(os, db, admitted, { skipPublish: true });
+      if (turned.chunks < 1) {
+        console.error("agent-path FAIL: runTurn produced no chunks", turned);
+        return 1;
+      }
+      console.log(
+        "agent-path: spawn-only/turn pair OK",
+        JSON.stringify({
+          admitEvents: eventTypes,
+          turnChunks: turned.chunks,
+        }),
+      );
+    }
+
     let a: RunOut;
     let b: RunOut;
     if (serialize) {
