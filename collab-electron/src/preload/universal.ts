@@ -159,8 +159,12 @@ contextBridge.exposeInMainWorld("api", {
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
     spawnSession: (args?: { species?: string; prompt?: string }) =>
       ipcRenderer.invoke("qf:sessions:spawn", args),
+    runTurn: (args: { sessionId: string; prompt?: string }) =>
+      ipcRenderer.invoke("qf:sessions:runTurn", args),
     cancelSession: (sessionId: string) =>
       ipcRenderer.invoke("qf:sessions:cancel", { sessionId }),
+    closeSession: (sessionId: string) =>
+      ipcRenderer.invoke("qf:sessions:close", { sessionId }),
     onSessionChunk: (
       cb: (payload: { sessionId: string; text: string }) => void,
     ) => {

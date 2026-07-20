@@ -19,6 +19,7 @@ function App() {
   const [row, setRow] = useState<SessionRow | null>(null);
   const [stream, setStream] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [turnBusy, setTurnBusy] = useState(false);
 
   useEffect(() => {
     if (!sessionId) {
@@ -71,6 +72,21 @@ function App() {
     await window.api.qf.cancelSession(sessionId);
   };
 
+  const runDemoTurn = async () => {
+    setTurnBusy(true);
+    try {
+      const res = await window.api.qf.runTurn({
+        sessionId,
+        prompt: "uppercase quantflow",
+      });
+      if (!res.ok) {
+        setError(`${res.error.name}: ${res.error.message}`);
+      }
+    } finally {
+      setTurnBusy(false);
+    }
+  };
+
   if (error) {
     return <div className="session-tile session-tile--error">{error}</div>;
   }
@@ -78,7 +94,8 @@ function App() {
     return <div className="session-tile">Loading…</div>;
   }
 
-  const terminal = ["closed", "cancelled", "failed"].includes(row.status);
+  const canCancel = row.status === "running" || row.status === "blocked";
+  const canRunTurn = canCancel && !turnBusy;
 
   return (
     <div className="session-tile">
@@ -98,9 +115,16 @@ function App() {
       </div>
       <div className="session-tile__stream">{stream || "(streaming…)"}</div>
       <div className="session-tile__actions">
-        <button type="button" disabled={terminal} onClick={() => void cancel()}>
-          Cancel
-        </button>
+        {canRunTurn ? (
+          <button type="button" onClick={() => void runDemoTurn()}>
+            Run turn
+          </button>
+        ) : null}
+        {canCancel ? (
+          <button type="button" onClick={() => void cancel()}>
+            Cancel
+          </button>
+        ) : null}
       </div>
     </div>
   );

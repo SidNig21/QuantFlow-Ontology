@@ -5,11 +5,12 @@ import {
   type IpcMainInvokeEvent,
 } from "electron";
 import {
+  admitAndStartSession,
   cancelAgentSession,
   closeAgentSessionRow,
   onSessionChunk,
   onSessionDone,
-  spawnAgentSession,
+  runTurn,
 } from "./agent-host";
 import {
   kernelExecute,
@@ -125,11 +126,22 @@ export function registerKernelHandlers(): void {
     }
   });
 
+  /** Dock / UI spawn: admit + start only — never prompts. */
   ipcMain.handle(
     "qf:sessions:spawn",
-    async (event, args?: { species?: string; prompt?: string }) => {
+    async (event, args?: { species?: string; prompt?: string; env?: unknown }) => {
       try {
         assertTrustedSender(event);
+        if (args && "env" in args && args.env !== undefined) {
+          return {
+            ok: false as const,
+            error: {
+              name: "RendererEnvRejected",
+              message:
+                "qf:sessions:spawn rejects renderer-supplied env (species data / host only)",
+            },
+          };
+        }
         const species = args?.species;
         if (!species || typeof species !== "string") {
           return {
@@ -140,8 +152,9 @@ export function registerKernelHandlers(): void {
             },
           };
         }
-        const prompt = args?.prompt ?? "uppercase quantflow";
-        const result = await spawnAgentSession(species, prompt, {
+        // prompt ignored — connecting and speaking are different acts (WO-007b)
+        void args?.prompt;
+        const result = await admitAndStartSession(species, {
           onStarted: (sessionId, sp) => {
             invalidateDock();
             sendToShell(
@@ -153,6 +166,47 @@ export function registerKernelHandlers(): void {
             );
           },
         });
+        invalidateDock();
+        return { ok: true as const, result };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
+  ipcMain.handle(
+    "qf:sessions:runTurn",
+    async (
+      event,
+      args?: { sessionId?: string; prompt?: string; env?: unknown },
+    ) => {
+      try {
+        assertTrustedSender(event);
+        if (args && "env" in args && args.env !== undefined) {
+          return {
+            ok: false as const,
+            error: {
+              name: "RendererEnvRejected",
+              message:
+                "qf:sessions:runTurn rejects renderer-supplied env (species data / host only)",
+            },
+          };
+        }
+        const sessionId = args?.sessionId;
+        if (!sessionId || typeof sessionId !== "string") {
+          return {
+            ok: false as const,
+            error: {
+              name: "MissingSessionId",
+              message: "qf:sessions:runTurn requires args.sessionId",
+            },
+          };
+        }
+        const prompt =
+          typeof args?.prompt === "string" && args.prompt.length > 0
+            ? args.prompt
+            : "uppercase quantflow";
+        const result = await runTurn(sessionId, prompt);
         invalidateDock();
         return { ok: true as const, result };
       } catch (err) {
