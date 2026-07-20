@@ -108,14 +108,10 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 **WO-008c · Hermes host-bridged ACP.** ***done** — verified + merged 2026-07-20.* Host `hermes acp` stdio (Outcome A); `launch.json` + packed `*.meta.json` deploy-true; one shared `host-acp-client`; AgentOS kept for Node/WASM guests. Live turn → **WO-008a**.
 
-**WO-008a · Permission bridge + tool policy.** *Depends: WO-008c. **Current rung.***
-- Host implements the ACP permission handler: **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
-- Per-species tool allowlist enforced at the host seam; falsify with an unlisted tool via the mock species.
-- Unblocks the founder's first real Hermes turn — and the A2A order after it.
-- Also: make `kernel-sole-writer-app` see the real host ACP SDK import (carry-forward from WO-008c).
+**WO-008a · Permission bridge + tool policy.** ***done** — verified + merged 2026-07-20.* Host `runTurn` for Hermes; allowlist (`tools-allowlist.json`) before founder Allow once/always/Deny; sole-writer scans host ACP client. Founder live path: dock Spawn → Run turn. Soft carry-forwards in WO-008a verification record.
 
-**WO-009 · Datasets I — bootstrap ingestion.** *Independent of 007/008 — parallel-eligible.*
-- `ingestion` Runs pull tennis-data.co.uk / Kaggle UFC / NFL odds archives → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
+**WO-009 · Datasets I — bootstrap ingestion.** *Independent of 007/008. **Current rung.***
+- `ingestion` Runs → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
 - `as_of` + `coverage` populated; DuckDB reads Parquet via the pointer; **no bulk rows in SQLite** — gated, not assumed.
 - Failure honesty: truncated/malformed source → run `failed`, **zero partial Kernel writes**.
 - Lineage: `produces` / `derived_from` edges traversable from every dataset.

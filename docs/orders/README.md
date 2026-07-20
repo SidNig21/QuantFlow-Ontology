@@ -24,4 +24,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-007b](WO-007b.md) | Host seams: spawn split, generic env, tile-control parity | **done** — verified + merged 2026-07-20; admit≠turn; manifest env YES | builder (Cursor) |
 | [WO-008b](WO-008b.md) | Hermes reachability: bundle vs authorized mount (probe `mounts`) | **done** — PROBE HELD 2026-07-20; mounts YES; guest WASM-only blocks native Hermes; → WO-008c | builder (Cursor) |
 | [WO-008c](WO-008c.md) | Hermes host-bridged ACP (Outcome A outside guest exec) | **done** — verified + merged 2026-07-20 (rework D1–D2); host_acp + launch meta + one client | builder (Cursor) |
-| [WO-008a](WO-008a.md) | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | **open** — current; order written | builder |
+| [WO-008a](WO-008a.md) | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | **done** — verified + merged 2026-07-20; host runTurn + allowlist + founder permission UI | builder (Cursor) |
+| [WO-009](WO-009.md) | Datasets I: bootstrap ingestion (Parquet + Kernel pointer) | **open** — current; order written | builder |
