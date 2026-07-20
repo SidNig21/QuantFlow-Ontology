@@ -98,6 +98,12 @@ The dock is QuantFlow's access point — the surface where **species become sess
 - Kernel adopts the **ACP** session id (Hermes carries a second, internal id — never adopted).
 - No prompt in any builder gate; the founder's live Hermes turn happens after WO-008a.
 
+**WO-007b · Host seams — the spawn god-function dies.** *Depends: WO-007. **Parallel-eligible with WO-008** (host files vs `species/` — zero overlap). Source: pre-read-2 measurements + post-merge findings on shipped WO-007.*
+- Split `spawnAgentSession` (admit + create + always-prompt + publish, one function, default prompt `"uppercase quantflow"`) into `admitAndStartSession` and `runTurn` — a handshake-only spawn becomes a real host capability.
+- Generic session env: verify-or-reject the SDK's manifest-env-defaults mechanism (`agent-os.js:2689` comment; absent from typed surface); land `createSession` env passthrough sourced from species data — never renderer-supplied.
+- Post-merge findings land: session-tile Cancel gated to legal edges (dock is; tile isn't) · `closeSession` preload asymmetry fixed · renderer's `definitions[0]` singleton leftover removed.
+- **Extract-first guardrail:** `renderer.js` (~1767 lines) and `tile-manager.js` (~969) may not grow — extraction precedes any addition. Binding on WO-008a and A2A too.
+
 **WO-008a · Permission bridge + tool policy.** *Depends: WO-008. Moved here explicitly from the WO-007/008 plug split — was previously deferred twice; now a rung, not a footnote.*
 - Host implements the ACP permission handler (`onPermissionRequest`): **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
 - Per-species tool allowlist on `agent_definition` (schema amendment), enforced at the host seam; falsify with an unlisted tool via the mock species.
@@ -119,7 +125,7 @@ The dock is QuantFlow's access point — the surface where **species become sess
 - Entity resolution v0 via `external_refs`; an unresolvable entity is **flagged, never silently invented**.
 - Site-shape change → loud failure, zero partial writes; re-runs idempotent per idempotency key; capture is rate-limited and research-only.
 
-**WO-012 · Agent contracts — Researcher / Backtester / Critic.** *Depends: WO-008.*
+**WO-012 · Agent contracts — Researcher / Backtester / Critic.** *Depends: WO-008a.*
 - Three species **as data** (agent_definition + versioned prompt/spec Artifact + allowlist): Researcher may create hypotheses/tickets but not grade; Backtester may start backtest runs; Critic is read-mostly + findings Artifact. Cross-permission attempts rejected — falsified per species.
 - Typed delegation: Researcher→Backtester handoff is a Kernel-mediated `task`/`connection` with events — **no guest-to-guest side channel**.
 - Contract changes version via `derived_from`, never mutate.
