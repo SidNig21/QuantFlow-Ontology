@@ -112,9 +112,9 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 **Standing rule (founder 2026-07-20):** Interactive agents that ship a **native TUI** always surface that TUI in a QuantFlow **term tile**. QuantFlow does not invent a parallel chat UI for them. ACP/AgentOS session tiles remain for ACP-only guests (toolloop, etc.).
 
-**WO-008d · Hermes tile = real TUI.** *Depends: WO-008a. **Current rung.*** Dock Spawn Hermes → PTY term tile running `hermes --tui`; Kernel session + orphan hygiene; data-driven `surface: native_tui` for all future native-TUI species.
+**WO-008d · Hermes tile = real TUI.** ***done** — verified + merged 2026-07-20.* Dock Spawn Hermes → PTY term tile (`hermes --tui`); Kernel session + orphan hygiene; data-driven `surface: native_tui`.
 
-**WO-009 · Datasets I — bootstrap ingestion.** *Parked until WO-008d.*
+**WO-009 · Datasets I — bootstrap ingestion.** ***Current rung*** (unparked after WO-008d).*
 - `ingestion` Runs → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
 - `as_of` + `coverage` populated; DuckDB reads Parquet via the pointer; **no bulk rows in SQLite** — gated, not assumed.
 - Failure honesty: truncated/malformed source → run `failed`, **zero partial Kernel writes**.
