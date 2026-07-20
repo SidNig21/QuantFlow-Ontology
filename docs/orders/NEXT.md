@@ -3,21 +3,18 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-007 — Dock v1** *(rung 1 of 3 to the founder checkpoint)*
+## Current order: **WO-007 — rework round 1**
 
-Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-007.md`](WO-007.md) exactly.
+Read `docs/orders/WO-007.md`, bottom verification record. Everything except D1 is verified and accepted — touch nothing else.
 
-- Work on a new branch named `wo-007`, cut from current `origin/QuantFlow`.
-- The dock contract in `ROADMAP.md` is binding: species from `agent_definition` rows, dock stores nothing, no hardcoded species strings in renderer source.
-- Deliverable 1's schema amendment is authorized **verbatim and only as written**.
-- Run builder gates; paste every red/green falsification pair. **Never `bun qa/run.ts --all`, never delete `node_modules`.**
-- Commit and push. **Do not merge.** Stop and report anything ambiguous.
-
-> **Founder — pre-build read recommended:** the verifier wrote WO-007 and the verifier's eyes are spent on it. Same two questions as always; the last two pre-reads caught eight findings and two blockers between them.
+- Continue on the existing branch `wo-007`. First: `git fetch origin && git merge origin/QuantFlow`.
+- **Fix D1 only:** `agent-host.ts` must not import `qf-kernel` — route `getAgentDefinition` / `listAgentDefinitions` / `resolveSpeciesPackage` through `kernel.ts` re-exports; delete the direct import.
+- **Proof:** `bun qa/gates/kernel-sole-writer-app.ts` → green; plus **every static gate** (new standing rule in `PROTOCOL.md`): repo-shape, lockfile-committed, kernel-sole-writer, no-canvas-domain-writes, kernel-sole-writer-app, doc-action-surface, one-skin — paste all.
+- Commit and push. **Do not merge.**
 
 ## Founder acceptance checkpoint (founder decision, 2026-07-19)
 
-The founder demos **once, at the milestone that matters**: skin (WO-006d) -> dock (WO-007) -> Hermes wrapped as an AgentOS species in a tile (WO-008), with A2A following. `docs/demos/agent-path.md` remains valid and runs then, alongside the dock's own cold-reopen test. v0.1 is machine-verified and merged; its human half is folded into that checkpoint deliberately, not skipped.
+The founder demos **once, at the milestone that matters**: skin (WO-006d) -> dock (WO-007) -> Hermes in a tile (WO-008) -> **A2A working end-to-end** (the order after WO-008: second species + host binding, two agents collaborating live). The founder demos once, at A2A, and it includes everything beneath it. `docs/demos/agent-path.md` remains valid and runs then, alongside the dock's own cold-reopen test. v0.1 is machine-verified and merged; its human half is folded into that checkpoint deliberately, not skipped.
 
 ## Parallel-eligible
 

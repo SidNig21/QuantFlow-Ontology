@@ -50,6 +50,8 @@ Architect writes WO-NNN (self-contained file, no chat context needed)
 
 **External-surface rule (learned the hard way, 2026-07-19 doc-index audit):** an order may not assert external SDK behavior from inference. Every SDK-facing claim in an order carries one of: a citation to an indexed vendor doc actually in hand, a probe measured in this repo (with the command), or a deliverable-0-style smoke proof as the order's first step. Corollary for reviewers: a pre-build read of an SDK-facing order should be done by the agent holding the doc indexes — the architect is reliably blindest exactly where inference feels most like knowledge.
 
+**Static-gates rule (added 2026-07-19, WO-007 round 1):** gates that need no installs (`repo-shape`, `lockfile-committed`, `kernel-sole-writer`, `no-canvas-domain-writes`, `kernel-sole-writer-app`, `doc-action-surface`, `one-skin`) are **builder-run on every order, always** — they cost seconds and depend on nothing. The cold-run-is-verifier-only rule covers the installing gates, not these; a builder who cannot run the static gates green does not report done.
+
 **Cold-state rule (learned the hard way, WO-003):** a gate may not depend on ambient machine state — it installs whatever it needs. Verify gates **cold**, not after a convenience install: the machine that already has dependencies present will pass a gate that a fresh CI checkout fails. If an order's acceptance steps install something before running the gates, the gates are being masked and the order is written wrong.
 
 **Cold-run-is-verifier-only rule (learned the hard way, WO-004a — an order-authoring defect, three occurrences):** the cold run belongs to the **verifier**, in a throwaway worktree. **No order may instruct a builder to delete `node_modules`.**
