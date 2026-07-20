@@ -114,7 +114,7 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 **WO-008d · Hermes tile = real TUI.** ***done** — verified + merged 2026-07-20.* Dock Spawn Hermes → PTY term tile (`hermes --tui`); Kernel session + orphan hygiene; data-driven native TUI route.
 
-**WO-008e · A2A proof — two Hermes tiles.** *Depends: WO-008d. **Current rung.*** Two Hermes term tiles on the canvas; Kernel-mediated A→B handoff (no guest-to-guest side channel); B visibly receives. Founder: foundation before datasets.
+**WO-008e · A2A proof — 4 Hermes tiles.** *Depends: WO-008d. **Current rung.*** Orchestrator → Workers A+B (simultaneous fan-out) → Reviewer (both submissions) → talk-back to orchestrator. Kernel-mediated; no guest-to-guest side channel. Founder: foundation before datasets.
 
 **WO-009 · Datasets I — bootstrap ingestion.** *Parked until WO-008e.*
 - `ingestion` Runs → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
