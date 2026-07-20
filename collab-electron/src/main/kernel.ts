@@ -8,9 +8,11 @@ import { DatabaseSync } from "node:sqlite";
 import {
   attachKernel,
   execute,
+  getAgentDefinition as getAgentDefinitionRow,
   listArtifacts,
-  listAgentDefinitions,
+  listAgentDefinitions as listAgentDefinitionRows,
   listAgentSessions,
+  resolveSpeciesPackage as resolveSpeciesPackageRow,
   type ExecuteResult,
   type KernelDb,
   type TraceContext,
@@ -87,7 +89,27 @@ export function kernelListAgentSessions(): Record<string, unknown>[] {
 }
 
 export function kernelListAgentDefinitions(): Record<string, unknown>[] {
-  return listAgentDefinitions(getKernelDb());
+  return listAgentDefinitionRows(getKernelDb());
+}
+
+/** Read one agent_definition row by name (id = name). */
+export function getAgentDefinition(
+  name: string,
+): Record<string, unknown> | null {
+  return getAgentDefinitionRow(getKernelDb(), name);
+}
+
+/** List all agent_definition rows (dock / host registry). */
+export function listAgentDefinitions(): Record<string, unknown>[] {
+  return listAgentDefinitionRows(getKernelDb());
+}
+
+/** Resolve species name → package path against the open Kernel. */
+export function resolveSpeciesPackage(
+  species: string,
+  appRoot: string,
+): { row: Record<string, unknown>; packagePath: string } {
+  return resolveSpeciesPackageRow(getKernelDb(), species, appRoot);
 }
 
 export type { TraceContext };

@@ -14,13 +14,10 @@ import {
 } from "@rivet-dev/agentos-core";
 import {
   getAgentDefinition,
-  listAgentDefinitions,
-  resolveSpeciesPackage,
-} from "qf-kernel/portable";
-import {
-  getKernelDb,
   kernelExecute,
   kernelListAgentSessions,
+  listAgentDefinitions,
+  resolveSpeciesPackage,
   type TraceContext,
 } from "./kernel";
 
@@ -88,7 +85,7 @@ function chunkTextFromNotification(
 
 /** Resolve species name → absolute package path from Kernel rows. */
 export function getSpeciesPackagePath(name: string): string {
-  return resolveSpeciesPackage(getKernelDb(), name, appRoot()).packagePath;
+  return resolveSpeciesPackage(name, appRoot()).packagePath;
 }
 
 /**
@@ -96,9 +93,8 @@ export function getSpeciesPackagePath(name: string): string {
  * Never a direct INSERT.
  */
 export function seedBootSpecies(): void {
-  const db = getKernelDb();
-  const before = listAgentDefinitions(db).length;
-  if (getAgentDefinition(db, BOOT_SEED_SPECIES)) {
+  const before = listAgentDefinitions().length;
+  if (getAgentDefinition(BOOT_SEED_SPECIES)) {
     console.log(
       `agent-host: boot-seed skip (already present) definitions=${before}`,
     );
@@ -114,7 +110,7 @@ export function seedBootSpecies(): void {
     },
     newTrace(),
   );
-  const after = listAgentDefinitions(db).length;
+  const after = listAgentDefinitions().length;
   console.log(
     `agent-host: boot-seed registered definitions=${after}`,
   );
@@ -147,24 +143,19 @@ export async function admitPackage(packagePath: string): Promise<void> {
 }
 
 export async function admitSpecies(species: string): Promise<string> {
-  const { packagePath } = resolveSpeciesPackage(
-    getKernelDb(),
-    species,
-    appRoot(),
-  );
+  const { packagePath } = resolveSpeciesPackage(species, appRoot());
   await admitPackage(packagePath);
   return packagePath;
 }
 
 export async function ensureAgentOs(): Promise<AgentOs> {
   if (os) return os;
-  const db = getKernelDb();
-  const defs = listAgentDefinitions(db);
+  const defs = listAgentDefinitions();
   const software: { packagePath: string }[] = [];
   for (const row of defs) {
     const name = String(row.name);
     try {
-      const { packagePath } = resolveSpeciesPackage(db, name, appRoot());
+      const { packagePath } = resolveSpeciesPackage(name, appRoot());
       software.push({ packagePath });
     } catch (err) {
       console.error(`agent-host: skip unresolved definition ${name}`, err);
