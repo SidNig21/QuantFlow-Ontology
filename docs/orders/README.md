@@ -26,5 +26,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-008c](WO-008c.md) | Hermes host-bridged ACP (Outcome A outside guest exec) | **done** — verified + merged 2026-07-20 (rework D1–D2); host_acp + launch meta + one client | builder (Cursor) |
 | [WO-008a](WO-008a.md) | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | **done** — verified + merged 2026-07-20; host runTurn + allowlist + founder permission UI | builder (Cursor) |
 | [WO-008d](WO-008d.md) | Hermes tile = real TUI (standing: native TUI for all future interactive agents) | **done** — verified + merged 2026-07-20; Spawn → term tile `hermes --tui` | builder |
-| [WO-008e](WO-008e.md) | A2A proof: 4 Hermes tiles (orchestrate → fan-out → review → talk-back) | **open** — current; founder: foundation before datasets | builder |
+| [WO-008e](WO-008e.md) | A2A proof: 4 Hermes tiles (orchestrate → fan-out → review → talk-back) | **open** — REWORK round 1 @ `02e08c0` (D1–D5); do not merge | builder |
 | [WO-009](WO-009.md) | Datasets I: bootstrap ingestion (Parquet + Kernel pointer) | **parked** — after WO-008e (A2A first) | builder |
