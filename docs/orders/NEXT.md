@@ -1,18 +1,25 @@
-# PARKED — 2026-07-20
+# NEXT — the current order (updated for peer-bus canvas PASS)
 
-**QuantFlow-Ontology is parked. The founder has pivoted to Palantir Foundry + AIP.**
+> **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
+> **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-Not abandoned in failure: parked in a known-good, fully-verified state. CI is green, every merged order was verified cold in a clean room, and every verification record is appended to its `WO-*.md` file. If this is ever picked back up, `docs/orders/VERIFYING.md` is still a complete cold start.
+## Current order: **WO-PEER-BUS-CANVAS — peer-bus visual PASS**
 
-## True state at park time
+Park tip on `origin/QuantFlow` is **ignored for this PASS.** Active track is
+the plan + canvas seat spawn on `feat/peer-bus-canvas`.
 
-- **v0.1 phase gate: closed.** Kernel v0 (SQLite from generated schema, command/event layer, replay), Law D proven by founder acceptance (publish → force-kill → relaunch → artifact intact), creation commands with content-addressed artifacts, one agent path end-to-end.
-- **Agent stack: working.** Dock as a Kernel projection, species registry (`agent_definition` + `linkSoftware`), real Hermes running in native TUI tiles, deny-by-default permission bridge, 4-tile A2A bus with Kernel-mediated hops.
-- **Unmerged:** `wo-008f` (Run A2A button — architect-authored, never independently verified; do not merge without review).
-- **Never built:** the domain plane. `competitor`, `event`, `market`, `odds_series`, `result` exist as tables and have never held one real fact. This is the gap that ended the build — the machinery of an ontology without a world inside it.
+1. Read `docs/orders/WO-PEER-BUS-CANVAS.md` (checklist) and
+   `docs/plans/2026-07-20-001-req-peer-bus-canvas-pass-plan.md` (authority).
+2. Cold plane: `docs/orders/WO-PEER-BUS.md` + `tools/qf-peer-bus` harness.
+3. Product desk path: dock **Spawn Hermes Orchestrator** /
+   **Spawn Hermes Worker** — not the demoted Run A2A movie.
 
-## What the process produced
+## Parallel / parked
 
-Nine merged orders, ~14 defects caught before merge (five of them architect-authored order defects, caught by decorrelated pre-build reads), zero merges on testimony alone. The workshop protocol in `docs/orders/PROTOCOL.md` — cold verification, gate falsification, cite-or-probe on external surfaces, decorrelated reviewers — is the transferable artifact here, not the code.
+**WO-009** — domain datasets remain parked. **AIP / Foundry** — outside this
+product's identity for the PASS.
 
-*Rotation duty ends here. No current order. Do not start one.*
+---
+
+*When the founder marks AE1–AE3 accepted and cold gates stay green, rotate
+this file again. Until then, NEXT stays WO-PEER-BUS-CANVAS.*

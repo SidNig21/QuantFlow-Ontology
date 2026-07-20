@@ -6,7 +6,9 @@
   "scripts": {
     "postinstall": "cd ../../packages/qf-kernel && bun install",
     "harness": "bun src/harness.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "setup-seats": "bun scripts/setup-founder-seats.ts",
+    "setup-seats:dry": "bun scripts/setup-founder-seats.ts --dry-run"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

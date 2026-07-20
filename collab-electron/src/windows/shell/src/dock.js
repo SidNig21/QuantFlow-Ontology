@@ -115,22 +115,40 @@ export function initDock(panelEl) {
 		}
 	}
 
-	const runA2aBtn = panelEl.querySelector("#dock-run-a2a");
-	const a2aStatus = panelEl.querySelector("#dock-a2a-status");
-	if (runA2aBtn && a2aStatus) {
-		runA2aBtn.addEventListener("click", async () => {
-			runA2aBtn.disabled = true;
-			a2aStatus.textContent = "spawning 4 seats…";
-			try {
-				const res = await window.shellApi.qf.runA2aProof();
-				a2aStatus.textContent = res?.ok
-					? `talk-back delivered ✓ (dispatch ${shortId(res.summary.dispatchId)})`
-					: (res?.error?.message ?? "A2A failed");
-			} catch (err) {
-				a2aStatus.textContent = String((err && err.message) || err);
-			} finally {
-				runA2aBtn.disabled = false;
+	const seatsStatus = panelEl.querySelector("#dock-seats-status");
+	const orchBtn = panelEl.querySelector("#dock-spawn-orchestrator");
+	const workerBtn = panelEl.querySelector("#dock-spawn-worker");
+
+	async function spawnSeat(seatId, btn) {
+		if (!seatsStatus || !btn) return;
+		btn.disabled = true;
+		seatsStatus.textContent = `spawning ${seatId}…`;
+		try {
+			const res = await window.shellApi.qf.spawnSeat({ seatId });
+			if (res?.ok) {
+				const title = res.result?.displayName ?? seatId;
+				seatsStatus.textContent = `${title} ready`;
+			} else {
+				const msg = res?.error?.message ?? "seat spawn failed";
+				seatsStatus.textContent = msg.includes("profile") || msg.includes("Hermes")
+					? `${msg} — run: cd tools/qf-peer-bus && bun run setup-seats`
+					: msg;
 			}
+		} catch (err) {
+			seatsStatus.textContent = String((err && err.message) || err);
+		} finally {
+			btn.disabled = false;
+		}
+	}
+
+	if (orchBtn) {
+		orchBtn.addEventListener("click", () => {
+			void spawnSeat("orchestrator", orchBtn);
+		});
+	}
+	if (workerBtn) {
+		workerBtn.addEventListener("click", () => {
+			void spawnSeat("worker", workerBtn);
 		});
 	}
 

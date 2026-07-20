@@ -54,6 +54,13 @@ export async function admitNativeTuiSpecies(opts: {
   corruptId?: string;
   /** Kernel agent_session.label (e.g. hermes:orchestrator). Default: species. */
   sessionLabel?: string;
+  /**
+   * Host-only argv override (seat registry). Never from renderer free-text.
+   * When set, replaces surface.argv entirely.
+   */
+  argvOverride?: string[];
+  /** Term-tile chrome title. Default: `${species}-tui`. */
+  displayName?: string;
   newTrace: () => TraceContext;
   liveSet: (sessionId: string, entry: NativeTuiLive) => void;
   onStarted?: (
@@ -81,7 +88,13 @@ export async function admitNativeTuiSpecies(opts: {
     ],
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
-  const argv = surface.argv.length > 0 ? surface.argv : ["--tui"];
+  const argv =
+    opts.argvOverride && opts.argvOverride.length > 0
+      ? opts.argvOverride
+      : surface.argv.length > 0
+        ? surface.argv
+        : ["--tui"];
+  const displayName = opts.displayName ?? `${species}-tui`;
 
   const pty = await createHostCommandSession({
     command,
@@ -93,7 +106,7 @@ export async function admitNativeTuiSpecies(opts: {
       HOME: home,
       TERM: "xterm-256color",
     },
-    displayName: `${species}-tui`,
+    displayName,
   });
 
   const sessionId = opts.corruptId ?? crypto.randomUUID();

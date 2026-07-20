@@ -44,57 +44,70 @@ mocked transport, no mocked Kernel — real subprocess stdio MCP, real
 bun run typecheck   # tsc --noEmit
 ```
 
+## Canvas seat spawn (QuantFlow desk)
+
+On branch `feat/peer-bus-canvas`, the dock lists **Spawn Hermes Orchestrator**
+and **Spawn Hermes Worker**. Each button admits `hermes -p <profile> --tui`
+into its own native term tile. Collaboration is over this MCP plane — not
+PTY-injected A2A movie hops. Cable UI is deferred.
+
 ## Founder-live proof (two Hermes seats — founder runs this, not a builder)
 
 This layer needs credentials that belong to the founder alone. It is
 documented here, not run by whoever builds this package, and it is never a
 gate.
 
-Pick one shared, persistent pair of absolute paths for the two db files —
-both seats must point at the *same* files so their server subprocesses see
-one shared inbox and one shared Kernel:
+### One-command MCP rewrite + Kernel init
+
+Profiles `qf-orchestrator` / `qf-worker` must already exist (one-time clone
+from a working `default` + Blank Slate / SOUL — see
+`docs/orders/WO-PEER-BUS-CANVAS.md`). Then, from this checkout:
+
+```sh
+cd tools/qf-peer-bus
+bun install
+bun run setup-seats          # rewrite MCP + openKernel ~/.qf-peer-bus/kernel.db
+# bun run setup-seats:dry    # CI-safe: print intended config only
+```
+
+The helper is idempotent: it upserts `mcp_servers.qf-peer-bus` in each
+profile's `config.yaml` (non-interactive — `hermes mcp add` is TTY-gated),
+pointing at **this checkout's** `tools/qf-peer-bus/src/server.ts` and shared
+absolute dbs under `~/.qf-peer-bus/`. Then it runs
+`hermes -p <profile> mcp test qf-peer-bus`.
+
+### Manual recipe (same shape the helper applies)
 
 ```sh
 mkdir -p ~/.qf-peer-bus
+# Kernel schema must exist before live sends:
+#   bun -e 'import { openKernel, closeKernel } from "qf-kernel"; const d=openKernel(process.env.HOME+"/.qf-peer-bus/kernel.db"); closeKernel(d)'
 ```
 
-**Seat A** — a Hermes session acting as `orchestrator`:
+**Orchestrator profile** (`QF_PEER_ROLE=orchestrator`):
 
 ```sh
-hermes mcp add qf-peer-bus \
+hermes -p qf-orchestrator mcp remove qf-peer-bus   # ok if missing
+hermes -p qf-orchestrator mcp add qf-peer-bus \
   --command bun \
-  --args /absolute/path/to/tools/qf-peer-bus/src/server.ts \
-  --env QF_PEER_ROLE=orchestrator QF_KERNEL_DB=$HOME/.qf-peer-bus/kernel.db QF_PEER_BUS_DB=$HOME/.qf-peer-bus/peer-bus.db
+  --env QF_PEER_ROLE=orchestrator \
+        QF_KERNEL_DB=$HOME/.qf-peer-bus/kernel.db \
+        QF_PEER_BUS_DB=$HOME/.qf-peer-bus/peer-bus.db \
+  --args /absolute/path/to/QuantFlow-Ontology/tools/qf-peer-bus/src/server.ts
 ```
 
-**Seat B** — a second, independent Hermes session acting as `worker`:
+**Worker profile** — same with `qf-worker` / `QF_PEER_ROLE=worker`.
 
-```sh
-hermes mcp add qf-peer-bus \
-  --command bun \
-  --args /absolute/path/to/tools/qf-peer-bus/src/server.ts \
-  --env QF_PEER_ROLE=worker QF_KERNEL_DB=$HOME/.qf-peer-bus/kernel.db QF_PEER_BUS_DB=$HOME/.qf-peer-bus/peer-bus.db
-```
+### Live turns (founder)
 
-Use the real absolute path to this checkout's `tools/qf-peer-bus/src/server.ts`
-in both `--args`, not the placeholder above.
+In QuantFlow: spawn both seat tiles. In each TUI (plain language — the model
+decides when to call the tool):
 
-Then, in the chat with each Hermes seat (plain language — the model decides
-when to call the tool):
+- **Orchestrator:** ask it to `send_to_peer` the worker a short TASK.
+- **Worker:** ask it to `read_inbox`, then `send_to_peer` a RESULT back.
+- Query `~/.qf-peer-bus/kernel.db` for both `trajectory` artifacts.
 
-- In **Seat A**: ask it to use its `send_to_peer` tool to message the
-  worker, e.g. "Use send_to_peer to tell the worker peer to summarize
-  today's plan." Hermes's reply will include the Kernel artifact id that
-  message was recorded under.
-- In **Seat B**: ask it to check its inbox, e.g. "Use read_inbox to check
-  your qf-peer-bus inbox." It should surface the message from Seat A, and
-  the same artifact id.
-- Either seat can call `list_peers` to see the known roles.
-
-That artifact id is independently queryable — open `~/.qf-peer-bus/kernel.db`
-and `SELECT * FROM artifact WHERE id = '<the id>'` — exactly like the cold
-harness does for itself, except this time the message was composed by a real
-model, not a scripted harness.
+Full checklist: `docs/orders/WO-PEER-BUS-CANVAS.md`.
 
 ## Honest scope line
 

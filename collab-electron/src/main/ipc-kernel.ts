@@ -6,6 +6,7 @@ import {
 } from "electron";
 import {
   admitAndStartSession,
+  appRoot,
   cancelAgentSession,
   closeAgentSessionRow,
   onSessionChunk,
@@ -17,8 +18,10 @@ import {
   getRegisteredBus,
   type PublishAndDeliverOpts,
 } from "./a2a-bus";
-import { runPacedFourTileMovie, spawnA2aFourSeats } from "./a2a-orchestra";
+import { spawnA2aFourSeats } from "./a2a-orchestra";
+import { resolveHermesSeat } from "./hermes-seats";
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
+import { resolveSpeciesSurface } from "./species-surface";
 import {
   kernelExecute,
   kernelListAgentDefinitions,
@@ -193,7 +196,84 @@ export function registerKernelHandlers(): void {
     },
   );
 
-  /** WO-008e: spawn 4 Hermes TUI seats on a fresh instance-scoped bus. */
+  /**
+   * Peer-bus canvas PASS: spawn one profiled Hermes native_tui seat.
+   * seatId only — host allowlist supplies argv (never renderer free-text).
+   */
+  ipcMain.handle(
+    "qf:seats:spawn",
+    async (event, args?: { seatId?: string }) => {
+      try {
+        assertTrustedSender(event);
+        if (!args?.seatId || typeof args.seatId !== "string") {
+          return {
+            ok: false as const,
+            error: {
+              name: "InvalidArgs",
+              message: "qf:seats:spawn requires seatId:string",
+            },
+          };
+        }
+        let seat;
+        try {
+          seat = resolveHermesSeat(args.seatId);
+        } catch (err) {
+          return { ok: false as const, error: serializeError(err) };
+        }
+        const surface = resolveSpeciesSurface("hermes", appRoot());
+        if (surface.surface !== "native_tui") {
+          return {
+            ok: false as const,
+            error: {
+              name: "NativeTuiRequired",
+              message:
+                "qf:seats:spawn requires hermes surface=native_tui (check launch.json route/surface + packed hermes.meta.json). Do not open ACP.",
+            },
+          };
+        }
+        const result = await admitAndStartSession("hermes", {
+          sessionLabel: seat.sessionLabel,
+          argvOverride: seat.argv,
+          displayName: seat.displayName,
+          onStarted: (sessionId, sp, info) => {
+            invalidateDock();
+            if (info?.surface === "native_tui" && info.ptySessionId) {
+              sendToShell(
+                "shell:forward",
+                "canvas",
+                "create-term-tile",
+                info.ptySessionId,
+                sessionId,
+                sp,
+              );
+            }
+          },
+        });
+        if (result.surface !== "native_tui" || !result.ptySessionId) {
+          return {
+            ok: false as const,
+            error: {
+              name: "NativeTuiRequired",
+              message: `qf:seats:spawn expected native_tui, got ${result.surface}`,
+            },
+          };
+        }
+        invalidateDock();
+        return {
+          ok: true as const,
+          result: {
+            ...result,
+            seatId: seat.seatId,
+            displayName: seat.displayName,
+          },
+        };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
+  /** Cold/harness only — not product dock. Spawn 4 A2A seats without the paced movie. */
   ipcMain.handle("qf:a2a:spawnSeats", async (event) => {
     try {
       assertTrustedSender(event);
@@ -213,34 +293,6 @@ export function registerKernelHandlers(): void {
       });
       invalidateDock();
       return { ok: true as const, busId, seats };
-    } catch (err) {
-      return { ok: false as const, error: serializeError(err) };
-    }
-  });
-
-  /** WO-008f: founder button — spawn 4 seats, then run the paced movie on them. */
-  ipcMain.handle("qf:a2a:runProof", async (event) => {
-    try {
-      assertTrustedSender(event);
-      const { busId, bus } = createRegisteredElectronBus();
-      const seats = await spawnA2aFourSeats(bus, {
-        onTile: (sessionId, sp, ptySessionId) => {
-          invalidateDock();
-          sendToShell(
-            "shell:forward",
-            "canvas",
-            "create-term-tile",
-            ptySessionId,
-            sessionId,
-            sp,
-          );
-        },
-      });
-      invalidateDock();
-      // Let the four TUIs boot and draw before banners land.
-      await new Promise<void>((r) => setTimeout(r, 4000));
-      const summary = await runPacedFourTileMovie(bus);
-      return { ok: true as const, busId, seats, summary };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

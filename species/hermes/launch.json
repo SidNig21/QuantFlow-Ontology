@@ -1,5 +1,4 @@
 {
-  "launch": "host_acp",
-  "surface": "native_tui",
+  "route": "native_tui",
   "argv": ["--tui"]
 }

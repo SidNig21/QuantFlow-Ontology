@@ -27,4 +27,6 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-008a](WO-008a.md) | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | **done** — verified + merged 2026-07-20; host runTurn + allowlist + founder permission UI | builder (Cursor) |
 | [WO-008d](WO-008d.md) | Hermes tile = real TUI (standing: native TUI for all future interactive agents) | **done** — verified + merged 2026-07-20; Spawn → term tile `hermes --tui` | builder |
 | [WO-008e](WO-008e.md) | A2A proof: 4 Hermes tiles (orchestrate → fan-out → review → talk-back) | **done** — verified + merged 2026-07-20 (rework D1–D5); `a2a-core` + spawn/dispatch IPC | builder |
-| [WO-009](WO-009.md) | Datasets I: bootstrap ingestion (Parquet + Kernel pointer) | **open** — current; unparked after WO-008e | builder |
+| [WO-PEER-BUS](WO-PEER-BUS.md) | MCP peer plane beside the TUI (cold harness) | **done** — verified cold 2026-07-20 | builder |
+| [WO-PEER-BUS-CANVAS](WO-PEER-BUS-CANVAS.md) | Peer-bus visual PASS — dock seat spawn + founder live turns | **open** — current (park ignored for this PASS); plan `docs/plans/2026-07-20-001-req-peer-bus-canvas-pass-plan.md` | builder |
+| [WO-009](WO-009.md) | Datasets I: bootstrap ingestion (Parquet + Kernel pointer) | **parked** until canvas PASS holds | builder |

@@ -1,4 +1,4 @@
-> **PARKED 2026-07-20 — founder pivoted to Palantir Foundry + AIP. See [`docs/orders/NEXT.md`](docs/orders/NEXT.md) for the true state at park time. Nothing below is being actively built.**
+> **Active track (park tip ignored for this PASS):** peer-bus canvas visual PASS — see [`docs/orders/NEXT.md`](docs/orders/NEXT.md) and [`docs/orders/WO-PEER-BUS-CANVAS.md`](docs/orders/WO-PEER-BUS-CANVAS.md). `origin/QuantFlow` still carries the 2026-07-20 park record; do not treat that tip as the base for this desk work.
 
 # START_HERE.md
 

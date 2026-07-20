@@ -318,6 +318,10 @@ export async function admitAndStartSession(
     corruptId?: string;
     /** Kernel session label override (WO-008e roles). */
     sessionLabel?: string;
+    /** Host-only argv override (seat registry). Never from renderer free-text. */
+    argvOverride?: string[];
+    /** Term-tile chrome title for native_tui. */
+    displayName?: string;
     onStarted?: (
       sessionId: string,
       species: string,
@@ -337,6 +341,8 @@ export async function admitAndStartSession(
       env: opts?.env,
       corruptId: opts?.corruptId,
       sessionLabel: opts?.sessionLabel,
+      argvOverride: opts?.argvOverride,
+      displayName: opts?.displayName,
       newTrace,
       liveSet: (sessionId, entry) => {
         live.set(sessionId, entry);
@@ -345,6 +351,11 @@ export async function admitAndStartSession(
         ? (sessionId, sp, info) => opts.onStarted?.(sessionId, sp, info)
         : undefined,
     });
+  }
+  if (opts?.argvOverride || opts?.displayName) {
+    throw new Error(
+      `agent-host: seat/native_tui overrides require surface=native_tui (got ${surface.surface})`,
+    );
   }
   const launch = resolveSpeciesLaunch(species, appRoot());
   if (launch === "host_acp") {

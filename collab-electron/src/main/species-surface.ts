@@ -26,6 +26,8 @@ export type SpeciesSurfaceSpec = {
 
 type SurfaceDoc = {
   surface?: string;
+  /** Alias of `surface` (packed meta / WIP launch.json may emit `route`). */
+  route?: string;
   argv?: unknown;
 };
 
@@ -47,7 +49,8 @@ function readSurfaceDoc(path: string): SpeciesSurfaceSpec | null {
   if (!existsSync(path)) return null;
   try {
     const doc = JSON.parse(readFileSync(path, "utf8")) as SurfaceDoc;
-    const surface = asSurface(doc.surface);
+    // Prefer `surface`; accept `route` as alias (A4 / peer-bus canvas PASS).
+    const surface = asSurface(doc.surface) ?? asSurface(doc.route);
     if (!surface) return null;
     const argv = parseArgv(doc.argv);
     if (surface === "native_tui") {
