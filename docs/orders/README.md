@@ -20,4 +20,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-006c](WO-006c.md) | One agent path end-to-end: spawn → stream → tool → Artifact → lifecycle | **done** — verified + merged 2026-07-19 (round 2); 10 gates cold from zero installs; **v0.1 phase gate closed**; founder demo folded into the post-WO-008 checkpoint (founder decision 2026-07-19) | builder (Cursor) |
 | [WO-006d](WO-006d.md) | One skin: token sheet + one-skin gate (design coherence) | **done** — verified + merged 2026-07-19; hex 55→0, fonts 33→0; look-verdict at the post-008 checkpoint | builder (Cursor) |
 | [WO-007](WO-007.md) | Dock v1: species registry + spawn surface + cube empty-state | **done** — verified + merged 2026-07-19 (round 2); 12 gates cold; dock is a Kernel projection | builder (Cursor) |
-| [WO-008](WO-008.md) | The plug test: Hermes through the same socket — admitting diff is the gate | **open** — current; Hermes v0.18.2 installed (founder prereq done) | builder |
+| [WO-008](WO-008.md) | The plug test: Hermes through the same socket — admitting diff is the gate | **open** — current; **rewritten** after pre-build review (F1 confirmed in SDK: guest env is caller-supplied only) | builder |
+| WO-008a | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | blocked on WO-008 — order not yet written | builder |

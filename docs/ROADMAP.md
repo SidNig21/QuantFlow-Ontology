@@ -93,11 +93,15 @@ The dock is QuantFlow's access point — the surface where **species become sess
 - **Law D for the dock:** force-kill + relaunch rebuilds registry and sessions from the Kernel alone; in-flight sessions surface as terminal (`failed`/`cancelled` per policy), never phantom `running`.
 - Zero new listeners; zero orphan child processes after close (WO-004a pattern, asserted).
 
-**WO-008 · The plug test — a second species through the same socket.** *Depends: WO-007. This is the plug-and-play proof.*
-- A second, materially different guest registered **as data only**. Target: **Hermes via `hermes acp`**; if Hermes is unavailable offline, a structurally distinct fallback package — the choice recorded in the order file, founder consulted.
-- **The diff is the gate:** `git diff` for the admitting commit shows zero changes under dock/canvas source.
-- Both species spawn side by side in one workspace; per-species allowlists enforced deny-by-default — falsify: guest calls an unlisted tool → rejected + event row.
-- Guest-private storage (e.g. Hermes' own SQLite) never appears in `kernel.db`; Law E gates stay green with the new guest live.
+**WO-008 · The plug test — Hermes through the same socket.** *Depends: WO-007. Rewritten 2026-07-19 (pre-build review): fact-finding deliverable 0 settles host-install-in-guest-space; named outcomes A/B/C; fallback mock species keeps the plug proof alive if Hermes needs packaging work.*
+- **The diff is the gate:** the admitting commit touches only `species/**` — zero dock/canvas/host/kernel/gate changes.
+- Kernel adopts the **ACP** session id (Hermes carries a second, internal id — never adopted).
+- No prompt in any builder gate; the founder's live Hermes turn happens after WO-008a.
+
+**WO-008a · Permission bridge + tool policy.** *Depends: WO-008. Moved here explicitly from the WO-007/008 plug split — was previously deferred twice; now a rung, not a footnote.*
+- Host implements the ACP permission handler (`onPermissionRequest`): **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
+- Per-species tool allowlist on `agent_definition` (schema amendment), enforced at the host seam; falsify with an unlisted tool via the mock species.
+- Unblocks the founder's first real Hermes turn — and the A2A order after it.
 
 **WO-009 · Datasets I — bootstrap ingestion.** *Independent of 007/008 — parallel-eligible.*
 - `ingestion` Runs pull tennis-data.co.uk / Kaggle UFC / NFL odds archives → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).

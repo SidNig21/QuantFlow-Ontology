@@ -8,12 +8,12 @@
 Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-008.md`](WO-008.md) exactly.
 
 - Work on a new branch named `wo-008`, cut from current `origin/QuantFlow`.
-- **Founder prerequisites are satisfied** (measured: Hermes v0.18.2 on PATH at `~/.local/bin/hermes`). You still never touch credentials — deliverable 0 stops at the ACP handshake; no prompt is sent by you or any gate.
+- **The order was rewritten after the pre-build review** — re-read it fully even if you saw an earlier version. Deliverable 0 is fact-finding with named outcomes A/B/C; stopping at 0 with a precise finding is a success. No prompt is ever sent; credentials never touched.
 - **The admitting commit is the gate:** the final commit contains only `species/hermes/**`. Needing to touch dock/host/kernel/gates to admit Hermes is a WO-007 defect to report, not to patch.
 - Run the builder gates including **every static gate** (PROTOCOL standing rule); paste unedited.
 - Commit and push. **Do not merge.** Stop on anything ambiguous — especially any deviation of `hermes acp` from the proven ACP shape.
 
-> **Founder — pre-build read strongly recommended for this one:** attach the Hermes docs (hermes-agent.nousresearch.com/docs) and AgentOS indexes to a third agent for the two-question read plus the external-surface check. This is the most vendor-dependent order on the ladder; the last three pre-reads caught 8, 2, and 8 findings.
+> **Pre-build read: done 2026-07-19** — 9 findings; the blocker (host-PATH shim vs. caller-supplied guest env) was confirmed by measurement in the SDK and the order rewritten around it. Ladder note: **WO-008a (permission bridge + tool policy)** now sits between this order and the A2A order; the founder checkpoint remains at A2A.
 
 ## Founder acceptance checkpoint (founder decision, 2026-07-19)
 
