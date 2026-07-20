@@ -116,6 +116,8 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 **WO-008e · A2A proof — 4 Hermes tiles.** ***done** — verified + merged 2026-07-20 (rework).* Shared `a2a-core`; spawnSeats + dispatch IPC; PTY display fail-closed; scripted proof harness-only.
 
+> **Direction lock (founder, 2026-07-20): after WO-008e merges, the next rung is "Run Workflow v1" — Hermes commands the desk.** One task typed at the dock → an orchestrator Hermes decomposes it, spawns/staffs worker tiles through Kernel-mediated levers, collects and reviews results, and reports back. WO-008e's fan-out/review/talk-back is the scripted rehearsal; Run Workflow generalizes it to founder-driven tasks. The order gets drafted only after 008e's merged shape is measured, with a doc-attached pre-build read (how Hermes best receives levers — MCP server vs ACP bridge — is an external-surface question, cite-or-probe). Datasets (WO-009) follow, feeding the commander real research work.
+
 **WO-009 · Datasets I — bootstrap ingestion.** ***Current rung*** (unparked after WO-008e).*
 - `ingestion` Runs → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
 - `as_of` + `coverage` populated; DuckDB reads Parquet via the pointer; **no bulk rows in SQLite** — gated, not assumed.
