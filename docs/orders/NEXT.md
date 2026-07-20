@@ -21,7 +21,7 @@ The founder demos **once, at the milestone that matters**: skin (WO-006d) -> doc
 
 ## Parallel-eligible
 
-**WO-007b (host seams)** becomes parallel-eligible with WO-008 once its order file lands — zero file overlap (`species/` vs host). Until then, one builder on WO-008.
+**WO-007b — host seams** ([`WO-007b.md`](WO-007b.md)) is parallel-eligible **now**: zero file overlap with WO-008 (`species/**` vs host files; the order forbids each lane from touching the other's). A second builder may take it immediately with the standard script, branch `wo-007b`. Its pre-build read is recommended (verifier-authored).
 ---
 
 *Rotation rule: when the verifier passes the current order, the same verification commit flips the log status in `README.md` and rewrites this file to the next unblocked rung. If this file and the order log disagree, the log wins — report the discrepancy instead of building.*

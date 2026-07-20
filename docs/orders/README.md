@@ -21,5 +21,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-006d](WO-006d.md) | One skin: token sheet + one-skin gate (design coherence) | **done** — verified + merged 2026-07-19; hex 55→0, fonts 33→0; look-verdict at the post-008 checkpoint | builder (Cursor) |
 | [WO-007](WO-007.md) | Dock v1: species registry + spawn surface + cube empty-state | **done** — verified + merged 2026-07-19 (round 2); 12 gates cold; dock is a Kernel projection | builder (Cursor) |
 | [WO-008](WO-008.md) | The plug test: Hermes through the same socket — admitting diff is the gate | **open** — current; **rewritten** after pre-build review (F1 confirmed in SDK: guest env is caller-supplied only) | builder |
-| WO-007b | Host seams: spawn split, generic env, tile-control parity | **open** — parallel-eligible with WO-008; order not yet written (verifier drafting) | builder |
+| [WO-007b](WO-007b.md) | Host seams: spawn split, generic env, tile-control parity | **open** — parallel-eligible with WO-008; order written | builder |
 | WO-008a | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | blocked on WO-008 + WO-007b — order not yet written | builder |
