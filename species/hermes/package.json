@@ -1,0 +1,19 @@
+{
+  "name": "species-hermes-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pack-agent": "node ./scripts/pack-agent.mjs",
+    "register": "bun ./register.ts",
+    "d0": "bun ./d0-smoke.ts"
+  },
+  "dependencies": {
+    "@rivet-dev/agentos-core": "0.2.7",
+    "qf-kernel": "file:../../packages/qf-kernel"
+  },
+  "devDependencies": {
+    "@rivet-dev/agentos-toolchain": "0.2.7",
+    "@types/bun": "^1.3.14"
+  }
+}
