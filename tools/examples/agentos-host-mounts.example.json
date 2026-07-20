@@ -1,0 +1,25 @@
+{
+  "mounts": [
+    {
+      "hostPath": "/ABS/PATH/TO/.hermes/hermes-agent",
+      "guestPath": "/ABS/PATH/TO/.hermes/hermes-agent",
+      "readOnly": true
+    },
+    {
+      "hostPath": "/ABS/PATH/TO/.local/share/uv/python/cpython-3.11.15-linux-x86_64-gnu",
+      "guestPath": "/ABS/PATH/TO/.local/share/uv/python/cpython-3.11.15-linux-x86_64-gnu",
+      "readOnly": true
+    },
+    {
+      "hostPath": "/ABS/PATH/TO/.local/share/uv/python/cpython-3.11.15-linux-x86_64-gnu",
+      "guestPath": "/ABS/PATH/TO/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu",
+      "readOnly": true
+    }
+  ],
+  "speciesEnv": {
+    "hermes": {
+      "HERMES_BIN": "/ABS/PATH/TO/.hermes/hermes-agent/venv/bin/hermes",
+      "HOME": "/ABS/PATH/TO/HOME"
+    }
+  }
+}
