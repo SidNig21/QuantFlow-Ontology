@@ -106,12 +106,13 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 **WO-008b · Hermes reachability — bundle vs authorized mount.** ***done — PROBE HELD 2026-07-20.*** Mounts work (narrow RO); guest exec is WASM-only — native Hermes/Python cannot run in-VM. Bundle same wall. Mount plumbing kept; Hermes exec → **WO-008c**.
 
-**WO-008c · Hermes host-bridged ACP.** *Depends: WO-008b. **Current rung.** Spawn `hermes acp` as a host stdio child; Kernel adopts ACP id; dock Spawn → session tile (handshake only). AgentOS remains for Node/WASM species. Live turn still WO-008a.*
+**WO-008c · Hermes host-bridged ACP.** ***done** — verified + merged 2026-07-20.* Host `hermes acp` stdio (Outcome A); `launch.json` + packed `*.meta.json` deploy-true; one shared `host-acp-client`; AgentOS kept for Node/WASM guests. Live turn → **WO-008a**.
 
-**WO-008a · Permission bridge + tool policy.** *Depends: WO-008 (+ WO-007b). After WO-008c for the Hermes-live path.*
-- Host implements the ACP permission handler (`onPermissionRequest`): **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
-- Per-species tool allowlist on `agent_definition` (schema amendment), enforced at the host seam; falsify with an unlisted tool via the mock species.
+**WO-008a · Permission bridge + tool policy.** *Depends: WO-008c. **Current rung.***
+- Host implements the ACP permission handler: **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
+- Per-species tool allowlist enforced at the host seam; falsify with an unlisted tool via the mock species.
 - Unblocks the founder's first real Hermes turn — and the A2A order after it.
+- Also: make `kernel-sole-writer-app` see the real host ACP SDK import (carry-forward from WO-008c).
 
 **WO-009 · Datasets I — bootstrap ingestion.** *Independent of 007/008 — parallel-eligible.*
 - `ingestion` Runs pull tennis-data.co.uk / Kaggle UFC / NFL odds archives → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
