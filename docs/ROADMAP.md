@@ -108,9 +108,13 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 **WO-008c · Hermes host-bridged ACP.** ***done** — verified + merged 2026-07-20.* Host `hermes acp` stdio (Outcome A); `launch.json` + packed `*.meta.json` deploy-true; one shared `host-acp-client`; AgentOS kept for Node/WASM guests. Live turn → **WO-008a**.
 
-**WO-008a · Permission bridge + tool policy.** ***done** — verified + merged 2026-07-20.* Host `runTurn` for Hermes; allowlist (`tools-allowlist.json`) before founder Allow once/always/Deny; sole-writer scans host ACP client. Founder live path: dock Spawn → Run turn. Soft carry-forwards in WO-008a verification record.
+**WO-008a · Permission bridge + tool policy.** ***done** — verified + merged 2026-07-20.* Host `runTurn` for Hermes; allowlist + founder Allow/Deny. Plumbing held; **UX rejected by founder** — session-tile Run turn ≠ Hermes.
 
-**WO-009 · Datasets I — bootstrap ingestion.** *Independent of 007/008. **Current rung.***
+**Standing rule (founder 2026-07-20):** Interactive agents that ship a **native TUI** always surface that TUI in a QuantFlow **term tile**. QuantFlow does not invent a parallel chat UI for them. ACP/AgentOS session tiles remain for ACP-only guests (toolloop, etc.).
+
+**WO-008d · Hermes tile = real TUI.** *Depends: WO-008a. **Current rung.*** Dock Spawn Hermes → PTY term tile running `hermes --tui`; Kernel session + orphan hygiene; data-driven `surface: native_tui` for all future native-TUI species.
+
+**WO-009 · Datasets I — bootstrap ingestion.** *Parked until WO-008d.*
 - `ingestion` Runs → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
 - `as_of` + `coverage` populated; DuckDB reads Parquet via the pointer; **no bulk rows in SQLite** — gated, not assumed.
 - Failure honesty: truncated/malformed source → run `failed`, **zero partial Kernel writes**.
