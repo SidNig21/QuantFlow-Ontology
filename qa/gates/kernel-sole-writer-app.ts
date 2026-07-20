@@ -15,6 +15,8 @@ const KERNEL_ALLOWED = "collab-electron/src/main/kernel.ts";
 const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
+/** WO-008c host-bridged ACP (deny-by-default) — sole new ACP client surface. */
+const HOST_ACP_BRIDGE = "collab-electron/src/main/host-acp-bridge.ts";
 
 const KERNEL_PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: "qf-kernel", re: /qf-kernel/ },
@@ -97,7 +99,12 @@ export function checkKernelSoleWriterApp(): {
     for (const p of AGENT_PATTERNS) {
       if (!p.re.test(text)) continue;
       if (p.name === "@rivet-dev/agentos" && rel === AGENTOS_ALLOWED) continue;
-      if (p.name === "@agentclientprotocol" && rel === ACP_FROZEN) continue;
+      if (
+        p.name === "@agentclientprotocol" &&
+        (rel === ACP_FROZEN || rel === HOST_ACP_BRIDGE)
+      ) {
+        continue;
+      }
       // debt #14: frozen file must not gain ToolLoopAgent/ai either beyond what it has —
       // ToolLoopAgent lives in the guest pack, not acp-agent.ts (legacy uses ACP SDK only).
       offenders.push(`${rel} (${p.name})`);

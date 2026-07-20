@@ -1,11 +1,12 @@
 {
   "name": "hermes",
   "version": "0.1.0",
+  "launch": "host_acp",
   "agent": {
     "acpEntrypoint": "hermes-acp-shim"
   },
   "registry": {
     "title": "Hermes",
-    "description": "WO-008 species: ACP shim that spawns host Hermes from HERMES_BIN (paths only, never secrets)."
+    "description": "WO-008c: host-bridged ACP (hermes acp on host). launch=host_acp — not AgentOS guest exec."
   }
 }

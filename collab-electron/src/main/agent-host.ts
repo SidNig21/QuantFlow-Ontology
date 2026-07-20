@@ -6,6 +6,7 @@
  * (collab-electron script `pack-agent` forwards there).
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -14,6 +15,13 @@ import {
   type JsonRpcNotification,
   type MountConfig,
 } from "@rivet-dev/agentos-core";
+import {
+  admitHostAcp,
+  cancelHostAcp,
+  resolveHostAcpCommand,
+  tearDownHostAcp,
+  type HostAcpHandle,
+} from "./host-acp-bridge";
 import {
   resolveHostMountSpecs,
   resolveSpeciesSessionEnv,
@@ -26,6 +34,7 @@ import {
   resolveSpeciesPackage,
   type TraceContext,
 } from "./kernel";
+import { resolveSpeciesLaunch } from "./species-launch";
 
 /** Boot-seed species name — main-process only (never a renderer literal). */
 export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
@@ -55,8 +64,10 @@ const linkedPackages = new Set<string>();
 type LiveSession = {
   cancelled: boolean;
   species: string;
-  /** AgentOS session id (guest); may differ from Kernel id under corruptId falsify. */
+  /** AgentOS guest id, or ACP session id for host_acp. */
   guestId: string;
+  kind: "agentos" | "host_acp";
+  hostAcp?: HostAcpHandle;
   unsub?: () => void;
   turnInFlight: boolean;
 };
@@ -274,18 +285,16 @@ export type TurnResult = {
 };
 
 /**
- * Admit species + create/start Kernel row and AgentOS session.
+ * Admit species + create/start Kernel row.
+ * Launch route from package manifest `launch` (WO-008c):
+ *   - host_acp → host stdio ACP (Hermes); never AgentOS guest exec
+ *   - agentos (default) → AgentOS createSession
  * Sends nothing to the agent — no prompt, no chunks, no artifacts.
- * Concurrent-safe (Map of live sessions — no singleton).
- *
- * Session env: species static defaults come from packed `agent.env`
- * (WO-007b D0). Optional `opts.env` is host/species-sourced only — never
- * from the renderer (IPC rejects renderer env).
  */
 export async function admitAndStartSession(
   species: string,
   opts?: {
-    /** Host/species-sourced env merged with manifest agent.env. Never from renderer. */
+    /** Host/species-sourced env. Never from renderer. */
     env?: Record<string, string>;
     /** When set, host mints its own id (gate falsify — must go red). */
     corruptId?: string;
@@ -295,9 +304,85 @@ export async function admitAndStartSession(
   if (!species || typeof species !== "string") {
     throw new Error("agent-host: admit requires a species name");
   }
+  const launch = resolveSpeciesLaunch(species, appRoot());
+  if (launch === "host_acp") {
+    return admitHostAcpSpecies(species, opts);
+  }
+  return admitAgentOsSpecies(species, opts);
+}
+
+async function admitHostAcpSpecies(
+  species: string,
+  opts?: {
+    env?: Record<string, string>;
+    corruptId?: string;
+    onStarted?: (sessionId: string, species: string) => void;
+  },
+): Promise<AdmitResult> {
+  const fromConfig = resolveSpeciesSessionEnv(species);
+  const env = { ...fromConfig, ...opts?.env };
+  // Generic host ACP binary: HOST_ACP_BIN, or speciesEnv HERMES_BIN for Hermes.
+  const command = resolveHostAcpCommand(
+    env.HOST_ACP_BIN ?? env.HERMES_BIN ?? process.env.HOST_ACP_BIN ??
+      process.env.HERMES_BIN,
+    [
+      join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
+      join(homedir(), ".local/bin/hermes"),
+    ],
+  );
+  const home = env.HOME ?? process.env.HOME ?? homedir();
+  const handle = await admitHostAcp({
+    command,
+    args: ["acp"],
+    env: { HERMES_BIN: command, HOME: home, HOST_ACP_BIN: command },
+    cwd: home,
+    clientName: "quantflow-host-acp",
+  });
+  const guestId = handle.sessionId;
+  const sessionId = opts?.corruptId ?? guestId;
+
+  live.set(sessionId, {
+    cancelled: false,
+    species,
+    guestId,
+    kind: "host_acp",
+    hostAcp: handle,
+    turnInFlight: false,
+  });
+
+  const trace = newTrace();
+  kernelExecute(
+    "create_agent_session",
+    { session_id: sessionId, label: species },
+    trace,
+  );
+  if (sessionId !== guestId && !opts?.corruptId) {
+    await tearDownHostAcp(handle).catch(() => {});
+    live.delete(sessionId);
+    throw new Error("agent-host: session id adoption failed");
+  }
+  kernelExecute(
+    "start_agent_session",
+    { session_id: sessionId },
+    { ...trace, span_id: crypto.randomUUID() },
+  );
+  opts?.onStarted?.(sessionId, species);
+  console.log(
+    `agent-host: admitted host_acp session=${sessionId} species=${species} cmd=${command} (no prompt)`,
+  );
+  return { sessionId, guestId, species };
+}
+
+async function admitAgentOsSpecies(
+  species: string,
+  opts?: {
+    env?: Record<string, string>;
+    corruptId?: string;
+    onStarted?: (sessionId: string, species: string) => void;
+  },
+): Promise<AdmitResult> {
   const host = await ensureAgentOs();
   await admitSpecies(species);
-  // Species env: founder config + caller opts (host/species data only — never renderer).
   const fromConfig = resolveSpeciesSessionEnv(species);
   const env =
     fromConfig || opts?.env
@@ -314,6 +399,7 @@ export async function admitAndStartSession(
     cancelled: false,
     species,
     guestId,
+    kind: "agentos",
     turnInFlight: false,
   });
 
@@ -333,7 +419,7 @@ export async function admitAndStartSession(
   );
   opts?.onStarted?.(sessionId, species);
   console.log(
-    `agent-host: admitted session=${sessionId} species=${species} (no prompt)`,
+    `agent-host: admitted agentos session=${sessionId} species=${species} (no prompt)`,
   );
   return { sessionId, guestId, species };
 }
@@ -356,6 +442,11 @@ export async function runTurn(
   const entry = live.get(sessionId);
   if (!entry) {
     throw new Error(`agent-host: runTurn — no live session ${sessionId}`);
+  }
+  if (entry.kind === "host_acp") {
+    throw new Error(
+      "agent-host: runTurn forbidden on host_acp sessions (WO-008a permissions)",
+    );
   }
   if (entry.turnInFlight) {
     throw new Error(`agent-host: runTurn — turn already in flight ${sessionId}`);
@@ -494,6 +585,33 @@ export async function runTurn(
 export async function cancelAgentSession(sessionId: string): Promise<void> {
   const entry = live.get(sessionId);
   if (entry) entry.cancelled = true;
+  if (entry?.kind === "host_acp" && entry.hostAcp) {
+    await cancelHostAcp(entry.hostAcp).catch(() => {});
+    try {
+      kernelExecute(
+        "cancel_agent_session",
+        { session_id: sessionId },
+        newTrace(),
+      );
+    } catch {
+      /* already terminal */
+    }
+    try {
+      kernelExecute(
+        "close_agent_session",
+        { session_id: sessionId },
+        newTrace(),
+      );
+    } catch {
+      /* ignore */
+    }
+    live.delete(sessionId);
+    for (const l of doneListeners) {
+      l(sessionId, { status: "cancelled", text: "" });
+    }
+    console.log(`agent-host: host_acp cancel+close ${sessionId}`);
+    return;
+  }
   const host = await ensureAgentOs();
   const guestId = entry?.guestId ?? sessionId;
   await host.cancelSession(guestId).catch(() => {});
@@ -505,9 +623,13 @@ export function closeAgentSessionRow(sessionId: string): void {
   if (entry) {
     entry.unsub?.();
     live.delete(sessionId);
-    void ensureAgentOs().then((host) =>
-      host.destroySession(entry.guestId).catch(() => {}),
-    );
+    if (entry.kind === "host_acp" && entry.hostAcp) {
+      void tearDownHostAcp(entry.hostAcp).catch(() => {});
+    } else {
+      void ensureAgentOs().then((host) =>
+        host.destroySession(entry.guestId).catch(() => {}),
+      );
+    }
   }
   kernelExecute(
     "close_agent_session",
@@ -518,10 +640,15 @@ export function closeAgentSessionRow(sessionId: string): void {
 }
 
 export async function disposeAgentOs(): Promise<void> {
+  for (const [id, entry] of live) {
+    if (entry.kind === "host_acp" && entry.hostAcp) {
+      await tearDownHostAcp(entry.hostAcp).catch(() => {});
+    }
+    live.delete(id);
+  }
   if (!os) return;
   const current = os;
   os = null;
-  live.clear();
   linkedPackages.clear();
   await current.dispose?.().catch(() => {});
 }

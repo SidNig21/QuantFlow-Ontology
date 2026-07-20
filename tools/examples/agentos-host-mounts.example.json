@@ -18,6 +18,7 @@
   ],
   "speciesEnv": {
     "hermes": {
+      "HOST_ACP_BIN": "/ABS/PATH/TO/.hermes/hermes-agent/venv/bin/hermes",
       "HERMES_BIN": "/ABS/PATH/TO/.hermes/hermes-agent/venv/bin/hermes",
       "HOME": "/ABS/PATH/TO/HOME"
     }

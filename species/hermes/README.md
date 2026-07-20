@@ -1,37 +1,28 @@
-# species/hermes — Hermes plug package
+# species/hermes — host-bridged ACP (WO-008c)
 
-## Reachability status (WO-008b)
+Hermes speaks ACP as a **host** process (`hermes acp`). QuantFlow does **not**
+exec Hermes inside the AgentOS WASM guest (WO-008b measured that dead end).
 
-**D0 chose authorized mount (1a).** Typed `AgentOs.create({ mounts })` +
-`createHostDirBackend` can project a **narrow RO** Hermes install (+ uv cpython)
-into the guest without exposing whole `$HOME` or `~/.hermes/auth.json`.
+Launch routing: package manifest field `"launch": "host_acp"` in
+`agent-package/agentos-package.json`. Host reads it via `species-launch.ts`.
+AgentOS packages (toolloop / critic-mock) omit the field → default `agentos`.
 
-**Outcome A is blocked on AgentOS 0.2.7:** after mounts make `HERMES_BIN` visible,
-guest `child_process.spawn` refuses both `#!` scripts and native ELF binaries
-(`ERR_NATIVE_BINARY_NOT_SUPPORTED` — WASM only). Bundling the same host binaries
-into the package tree cannot bypass that wall. Full probe:
-[`D0-MOUNT-PROBE.md`](./D0-MOUNT-PROBE.md).
-
-Founder mount config (app): `~/.collaborator/agentos-host-mounts.json`
-(example: `tools/examples/agentos-host-mounts.example.json`).
-Override with `QF_AGENTOS_HOST_MOUNTS`.
-
-## D0 smoke (handshake only — never prompt)
+## Smokes (never prompt)
 
 ```bash
 bun install
-bun run pack-agent
-bun run d0
+bun run pack-agent   # still packs shim for registry package_ref
+bun run d0           # Outcome A — host ACP handshake + orphan check
+bun ./host-admit-kernel.ts   # Kernel created+started (dock Spawn shape)
 ```
 
-With mounts: visibility OK; createSession currently exits **UNKNOWN (3)** on the
-WASM exec refuse (not Outcome B). Without mounts: still **Outcome B**.
-
-## Register + dock admit
+## Register + dock
 
 ```bash
 bun ./register.ts --db "$(ls ~/.collaborator/dev/worktree-*/kernel.db | head -1)"
 ```
 
-Dock Spawn is admit-only after WO-007b. Do **not** Run turn on Hermes until WO-008a.
-Handshake Outcome A waits on a guest-exec or host-bridge decision from the architect.
+Ensure `~/.collaborator/agentos-host-mounts.json` has `speciesEnv.hermes`
+(`HERMES_BIN`, `HOME`) — see `tools/examples/agentos-host-mounts.example.json`.
+
+Dock **Spawn** → admit-only session tile. Do **not** Run turn (WO-008a).

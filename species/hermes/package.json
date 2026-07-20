@@ -9,6 +9,7 @@
     "d0": "bun ./d0-smoke.ts"
   },
   "dependencies": {
+    "@agentclientprotocol/sdk": "0.18.2",
     "@rivet-dev/agentos-core": "0.2.7",
     "qf-kernel": "file:../../packages/qf-kernel"
   },
