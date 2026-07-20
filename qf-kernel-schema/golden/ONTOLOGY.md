@@ -150,6 +150,7 @@ A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) 
 - **properties:**
 - `name` — Species name agents and operators use to request a spawn.
 - `role` — Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
+- `package_ref` — AgentOS package this species launches — the plug half of the row.
 - `system_prompt_ref` — Artifact or prompt id that defines this species' instructions.
 
 ### `agent_session`
@@ -407,6 +408,17 @@ Void a scheduled event that will not be contested (scheduled → void).
 - **lifecycle:** `experimental`
 - **input:**
 - `event_id` — Event to void.
+
+### `register_agent_definition`
+
+Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `name` — Unique species name; becomes the row id.
+- `role` — Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
+- `package_ref` — AgentOS package this species launches — the plug half of the row.
+- `system_prompt_ref` — Artifact or prompt id that defines this species' instructions.
 
 ### `create_agent_session`
 

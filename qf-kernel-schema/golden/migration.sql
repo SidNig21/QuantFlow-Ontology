@@ -57,6 +57,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grade
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_event', 'action', 'experimental', 'Move a scheduled event to live (scheduled → live).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settle_event', 'action', 'experimental', 'Settle a live event (live → settled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('void_event', 'action', 'experimental', 'Void a scheduled event that will not be contested (scheduled → void).');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_agent_definition', 'action', 'experimental', 'Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_agent_session', 'action', 'experimental', 'Bring a starting agent session into running (starting → running).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('block_agent_session', 'action', 'experimental', 'Block a running agent session (running → blocked).');
@@ -294,6 +295,8 @@ CREATE TABLE agent_definition (
   name TEXT NOT NULL,
   -- Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
   role TEXT NOT NULL,
+  -- AgentOS package this species launches — the plug half of the row.
+  package_ref TEXT NOT NULL,
   -- Artifact or prompt id that defines this species' instructions.
   system_prompt_ref TEXT
 );

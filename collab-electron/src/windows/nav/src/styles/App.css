@@ -9,7 +9,7 @@ button {
 :root {
 	--top-spacing: 0px;
 	--nav-inset: 12px;
-	--card: rgb(242, 242, 242);
+	--card: var(--qf-raised);
 	--color-primary: var(--primary);
 	--color-text-secondary: color-mix(in srgb, var(--muted-foreground) 75%, var(--foreground) 25%);
 	--color-hover: color-mix(in srgb, var(--foreground) 6%, transparent);
@@ -28,7 +28,7 @@ button {
 }
 
 .dark {
-	--card: rgb(24, 24, 24);
+	--card: var(--qf-surface);
 	--color-background-toggle-active: color-mix(in srgb, var(--card) 80%, var(--border) 20%);
 }
 
@@ -176,7 +176,7 @@ button {
 .create-item-modal-overlay {
 	position: fixed;
 	inset: 0;
-	background: rgba(12, 15, 20, 0.12);
+	background: color-mix(in srgb, var(--qf-ink) 12%, transparent);
 	backdrop-filter: blur(14px);
 	display: flex;
 	align-items: center;
@@ -192,7 +192,7 @@ button {
 	max-width: 420px;
 	border-radius: 18px;
 	border: 1px solid var(--border);
-	box-shadow: 0 24px 48px rgba(15, 18, 26, 0.16);
+	box-shadow: 0 24px 48px color-mix(in srgb, var(--qf-ink) 16%, transparent);
 	overflow: hidden;
 	padding: 28px;
 	display: flex;
@@ -229,7 +229,7 @@ button {
 .create-item-modal-text-input:focus {
 	outline: none;
 	border-color: var(--foreground);
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--qf-teal) 12%, transparent);
 }
 
 .create-item-modal-actions {
@@ -263,13 +263,13 @@ button {
 	background: var(--foreground);
 	color: var(--background);
 	border: none;
-	box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+	box-shadow: 0 2px 4px color-mix(in srgb, var(--qf-teal) 20%, transparent);
 }
 
 .create-item-modal-button-primary:hover {
 	background: var(--foreground);
 	opacity: 0.9;
-	box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+	box-shadow: 0 4px 8px color-mix(in srgb, var(--qf-teal) 30%, transparent);
 }
 
 .create-item-modal-button-primary:disabled {
@@ -284,14 +284,14 @@ button {
 .nav-tooltip {
 	position: fixed;
 	z-index: 10000;
-	background: rgb(50, 50, 50);
-	border: 1px solid rgba(255, 255, 255, 0.12);
+	background: var(--qf-faint);
+	border: 1px solid color-mix(in srgb, var(--qf-text) 12%, transparent);
 	border-radius: 6px;
 	padding: 5px 10px;
 	font-size: 12px;
-	color: rgb(220, 220, 220);
+	color: var(--qf-text);
 	white-space: nowrap;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 2px 8px color-mix(in srgb, var(--qf-ink) 30%, transparent);
 	pointer-events: none;
 	opacity: 0;
 	transition: opacity 0.15s ease-in-out;
@@ -303,15 +303,15 @@ button {
 
 @media (prefers-color-scheme: dark) {
 	.create-item-modal-overlay {
-		background: rgba(10, 12, 16, 0.28);
+		background: color-mix(in srgb, var(--qf-ink) 28%, transparent);
 		backdrop-filter: blur(20px);
 	}
 
 	.create-item-modal-content {
-		box-shadow: 0 26px 52px rgba(0, 0, 0, 0.46);
+		box-shadow: 0 26px 52px color-mix(in srgb, var(--qf-ink) 46%, transparent);
 	}
 
 	.create-item-modal-button-secondary {
-		border-color: rgba(255, 255, 255, 0.08);
+		border-color: color-mix(in srgb, var(--qf-text) 8%, transparent);
 	}
 }

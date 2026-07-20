@@ -945,6 +945,43 @@
     }
   },
   {
+    "name": "qf_register_agent_definition",
+    "description": "Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique species name; becomes the row id."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role summary (researcher, critic, backtester, ingestion) for routing and prompts."
+        },
+        "package_ref": {
+          "type": "string",
+          "description": "AgentOS package this species launches — the plug half of the row."
+        },
+        "system_prompt_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "Artifact or prompt id that defines this species' instructions."
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "role",
+        "package_ref"
+      ]
+    }
+  },
+  {
     "name": "qf_create_agent_session",
     "description": "Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.",
     "inputSchema": {

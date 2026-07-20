@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import {
+  AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   assertCreationHandlersComplete,
   closeKernel,
@@ -303,5 +304,49 @@ describe("qf-kernel", () => {
         },
       ]),
     ).toThrow('Creation command "wo006a_bait_create" has no handler');
+  });
+
+  test("register_agent_definition inserts row with id=name", () => {
+    db = openKernel(":memory:");
+    const result = execute(
+      db,
+      "register_agent_definition",
+      {
+        name: "bait-species",
+        role: "test",
+        package_ref: "/tmp/bait.aospkg",
+      },
+      ctx,
+    );
+    expect(result.object_type).toBe("agent_definition");
+    expect(result.object_id).toBe("bait-species");
+    expect(result.event).toBe("agent_definition.registered");
+    expect(result.state.package_ref).toBe("/tmp/bait.aospkg");
+    const rows = db.query(`SELECT COUNT(*) AS n FROM agent_definition`).get() as {
+      n: number;
+    };
+    expect(rows.n).toBe(1);
+  });
+
+  test("register_agent_definition rejects duplicate name", () => {
+    db = openKernel(":memory:");
+    execute(
+      db,
+      "register_agent_definition",
+      { name: "dup", role: "a", package_ref: "/tmp/a.aospkg" },
+      ctx,
+    );
+    expect(() =>
+      execute(
+        db,
+        "register_agent_definition",
+        { name: "dup", role: "b", package_ref: "/tmp/b.aospkg" },
+        { ...ctx, span_id: "span-2" },
+      ),
+    ).toThrow(AgentDefinitionExistsError);
+    const rows = db.query(`SELECT COUNT(*) AS n FROM agent_definition`).get() as {
+      n: number;
+    };
+    expect(rows.n).toBe(1);
   });
 });

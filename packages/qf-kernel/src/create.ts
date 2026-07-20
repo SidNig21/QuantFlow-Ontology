@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { creationCommands, type CreationCommand } from "qf-kernel-schema/commands";
 import type { KernelDb } from "./db.ts";
 import {
+  AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
   KernelError,
@@ -123,6 +124,82 @@ function publishArtifact(
 }
 
 /**
+ * register_agent_definition — id = name; duplicate name is a typed rejection.
+ */
+function registerAgentDefinition(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+): ExecuteResult {
+  const name = input.name;
+  if (typeof name !== "string" || name.length === 0) {
+    throw new KernelError('register_agent_definition requires non-empty "name"');
+  }
+  const role = input.role;
+  if (typeof role !== "string" || role.length === 0) {
+    throw new KernelError('register_agent_definition requires non-empty "role"');
+  }
+  const package_ref = input.package_ref;
+  if (typeof package_ref !== "string" || package_ref.length === 0) {
+    throw new KernelError('register_agent_definition requires non-empty "package_ref"');
+  }
+  let system_prompt_ref: string | null = null;
+  if (input.system_prompt_ref !== undefined && input.system_prompt_ref !== null) {
+    if (typeof input.system_prompt_ref !== "string") {
+      throw new KernelError(
+        'register_agent_definition "system_prompt_ref" must be a string or null',
+      );
+    }
+    system_prompt_ref = input.system_prompt_ref;
+  }
+
+  const id = name;
+  const existing = db.query(`SELECT * FROM agent_definition WHERE id = ?`).get(id) as
+    | Record<string, unknown>
+    | null;
+  if (existing) {
+    throw new AgentDefinitionExistsError(name);
+  }
+
+  const created_at = new Date().toISOString();
+  const tx = db.transaction(() => {
+    db.query(
+      `INSERT INTO agent_definition (id, created_at, name, role, package_ref, system_prompt_ref)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(id, created_at, name, role, package_ref, system_prompt_ref);
+    appendEvent(db, {
+      type: cmd.event,
+      object_type: cmd.object_type,
+      object_id: id,
+      payload: {
+        command: cmd.action,
+        name,
+        role,
+        package_ref,
+        system_prompt_ref,
+        span_id: trace.span_id,
+      },
+      trace_id: trace.trace_id,
+    });
+    return db.query(`SELECT * FROM agent_definition WHERE id = ?`).get(id) as Record<
+      string,
+      unknown
+    >;
+  });
+
+  const state = tx();
+  return {
+    object_type: cmd.object_type,
+    object_id: id,
+    from: "(none)",
+    to: "exists",
+    event: cmd.event,
+    state,
+  };
+}
+
+/**
  * create_agent_session — adopt guest-minted id; one INSERT + one created event
  * via insertAgentSession (do not double-write).
  */
@@ -161,6 +238,7 @@ function createAgentSession(
 export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   publish_artifact: publishArtifact,
   create_agent_session: createAgentSession,
+  register_agent_definition: registerAgentDefinition,
 };
 
 /** Every creationCommands entry must have a handler (D3 join). */

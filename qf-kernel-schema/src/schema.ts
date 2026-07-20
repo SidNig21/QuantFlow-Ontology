@@ -271,6 +271,9 @@ export const agent_definition = defineObject({
     role: z
       .string()
       .describe("Role summary (researcher, critic, backtester, ingestion) for routing and prompts."),
+    package_ref: z
+      .string()
+      .describe("AgentOS package this species launches — the plug half of the row."),
     system_prompt_ref: z
       .string()
       .describe("Artifact or prompt id that defines this species' instructions.")
@@ -568,6 +571,27 @@ export const void_event = defineAction({
   }),
 });
 
+export const register_agent_definition = defineAction({
+  name: "register_agent_definition",
+  description:
+    "Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.",
+  lifecycle: "experimental",
+  input: z.object({
+    name: z.string().describe("Unique species name; becomes the row id."),
+    role: z
+      .string()
+      .describe("Role summary (researcher, critic, backtester, ingestion) for routing and prompts."),
+    package_ref: z
+      .string()
+      .describe("AgentOS package this species launches — the plug half of the row."),
+    system_prompt_ref: z
+      .string()
+      .describe("Artifact or prompt id that defines this species' instructions.")
+      .nullable()
+      .optional(),
+  }),
+});
+
 export const create_agent_session = defineAction({
   name: "create_agent_session",
   description:
@@ -773,6 +797,7 @@ export const schema: Schema = {
     start_event,
     settle_event,
     void_event,
+    register_agent_definition,
     create_agent_session,
     start_agent_session,
     block_agent_session,

@@ -6,13 +6,14 @@ import {
 } from "electron";
 import {
   cancelAgentSession,
+  closeAgentSessionRow,
   onSessionChunk,
   onSessionDone,
   spawnAgentSession,
-  DEFAULT_SPECIES,
 } from "./agent-host";
 import {
   kernelExecute,
+  kernelListAgentDefinitions,
   kernelListAgentSessions,
   kernelListArtifacts,
 } from "./kernel";
@@ -55,12 +56,17 @@ function broadcast(channel: string, ...args: unknown[]): void {
   }
 }
 
+function invalidateDock(): void {
+  broadcast("qf:dock:invalidate");
+}
+
 export function registerKernelHandlers(): void {
   onSessionChunk((sessionId, text) => {
     broadcast("qf:session:chunk", { sessionId, text });
   });
   onSessionDone((sessionId, info) => {
     broadcast("qf:session:done", { sessionId, ...info });
+    invalidateDock();
     if (info.artifactId) {
       sendToShell(
         "shell:forward",
@@ -110,15 +116,34 @@ export function registerKernelHandlers(): void {
     }
   });
 
+  ipcMain.handle("qf:definitions:list", (event) => {
+    try {
+      assertTrustedSender(event);
+      return { ok: true as const, definitions: kernelListAgentDefinitions() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
   ipcMain.handle(
     "qf:sessions:spawn",
     async (event, args?: { species?: string; prompt?: string }) => {
       try {
         assertTrustedSender(event);
-        const species = args?.species ?? DEFAULT_SPECIES;
+        const species = args?.species;
+        if (!species || typeof species !== "string") {
+          return {
+            ok: false as const,
+            error: {
+              name: "MissingSpecies",
+              message: "qf:sessions:spawn requires args.species",
+            },
+          };
+        }
         const prompt = args?.prompt ?? "uppercase quantflow";
         const result = await spawnAgentSession(species, prompt, {
           onStarted: (sessionId, sp) => {
+            invalidateDock();
             sendToShell(
               "shell:forward",
               "canvas",
@@ -128,6 +153,7 @@ export function registerKernelHandlers(): void {
             );
           },
         });
+        invalidateDock();
         return { ok: true as const, result };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };
@@ -141,6 +167,21 @@ export function registerKernelHandlers(): void {
       try {
         assertTrustedSender(event);
         await cancelAgentSession(args.sessionId);
+        invalidateDock();
+        return { ok: true as const };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
+  ipcMain.handle(
+    "qf:sessions:close",
+    (event, args: { sessionId: string }) => {
+      try {
+        assertTrustedSender(event);
+        closeAgentSessionRow(args.sessionId);
+        invalidateDock();
         return { ok: true as const };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };

@@ -506,7 +506,7 @@ export function createTileManager({
 			const errDiv = document.createElement("div");
 			errDiv.className = "tile-load-error";
 			errDiv.style.cssText =
-				"padding:20px;color:#888;font-size:13px;";
+				"padding:20px;color:var(--qf-muted);font-size:13px;";
 			errDiv.textContent =
 				`Failed to load: ${e.validatedURL || tile.url}`;
 			dom.contentArea.appendChild(errDiv);
@@ -515,7 +515,7 @@ export function createTileManager({
 		wv.addEventListener("render-process-gone", () => {
 			const crashDiv = document.createElement("div");
 			crashDiv.style.cssText =
-				"padding:20px;color:#888;font-size:13px;";
+				"padding:20px;color:var(--qf-muted);font-size:13px;";
 			crashDiv.textContent =
 				"Page crashed. Edit the URL and press Enter to reload.";
 			if (dom.webview) {

@@ -52,7 +52,11 @@ import { listTerminalTargets } from "./terminal-target";
 import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
 import { registerAgentIpc } from "./acp-agent";
-import { reconcileStaleSessions, runAgentHostSmoke } from "./agent-host";
+import {
+  reconcileStaleSessions,
+  runAgentHostSmoke,
+  seedBootSpecies,
+} from "./agent-host";
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -841,8 +845,10 @@ app.whenReady().then(async () => {
     onBeforeQuit: () => shutdownBackgroundServices(),
   });
 
-  // WO-006c: reconcile phantoms, then prove AgentOS hosts under Electron.
+  // WO-007: seed registry via execute, reconcile phantoms, AgentOS smoke.
   try {
+    seedBootSpecies();
+    seedBootSpecies(); // idempotence: second call must not add a row
     reconcileStaleSessions();
     await runAgentHostSmoke();
   } catch (err) {

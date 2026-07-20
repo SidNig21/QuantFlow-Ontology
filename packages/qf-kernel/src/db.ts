@@ -97,3 +97,22 @@ export function listAgentSessions(db: KernelDb): Record<string, unknown>[] {
     .query(`SELECT * FROM agent_session ORDER BY created_at DESC`)
     .all() as Record<string, unknown>[];
 }
+
+/** Read-only listing for the dock species registry. */
+export function listAgentDefinitions(db: KernelDb): Record<string, unknown>[] {
+  return db
+    .query(`SELECT * FROM agent_definition ORDER BY created_at ASC`)
+    .all() as Record<string, unknown>[];
+}
+
+/** Lookup one species row by name (id = name). */
+export function getAgentDefinition(
+  db: KernelDb,
+  name: string,
+): Record<string, unknown> | null {
+  return (
+    (db.query(`SELECT * FROM agent_definition WHERE id = ?`).get(name) as
+      | Record<string, unknown>
+      | null) ?? null
+  );
+}

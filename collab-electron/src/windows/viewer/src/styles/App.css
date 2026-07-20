@@ -257,12 +257,12 @@ textarea.item-title-input,
 	min-width: 0;
 	padding: 4px 8px;
 	background: var(--qf-ink);
-	color: rgba(255, 255, 255, 0.85);
+	color: color-mix(in srgb, var(--qf-text) 85%, transparent);
 }
 
 html:not(.dark) .item-filepath {
 	background: var(--qf-text);
-	color: rgba(0, 0, 0, 0.85);
+	color: color-mix(in srgb, var(--qf-ink) 85%, transparent);
 }
 
 .app:not(.nav-visible) .item-filepath {
@@ -278,14 +278,14 @@ html:not(.dark) .item-filepath {
 }
 
 .filepath-parent {
-	color: rgba(255, 255, 255, 0.5);
+	color: color-mix(in srgb, var(--qf-text) 50%, transparent);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	flex-shrink: 1;
 }
 
 html:not(.dark) .filepath-parent {
-	color: rgba(0, 0, 0, 0.5);
+	color: color-mix(in srgb, var(--qf-ink) 50%, transparent);
 }
 
 .filepath-name {
@@ -743,7 +743,7 @@ html:not(.dark) .filepath-parent {
 	max-width: 100%;
 	height: auto;
 	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 2px 8px color-mix(in srgb, var(--qf-ink) 10%, transparent);
 }
 
 .source-thumbnail {
@@ -840,10 +840,10 @@ html:not(.dark) .filepath-parent {
 	overflow-wrap: break-word;
 	word-break: break-word;
 	/* Subtle visual container for read-only content */
-	background-color: rgba(128, 128, 128, 0.04);
+	background-color: color-mix(in srgb, var(--qf-muted) 4%, transparent);
 	padding: 1rem 1.25rem;
 	border-radius: 6px;
-	border: 1px solid rgba(128, 128, 128, 0.12);
+	border: 1px solid color-mix(in srgb, var(--qf-muted) 12%, transparent);
 	cursor: default;
 	user-select: text;
 }
@@ -1220,12 +1220,12 @@ button {
 	line-height: 1.5;
 	padding: 4px 8px;
 	background: var(--qf-ink);
-	color: rgba(255, 255, 255, 0.85);
+	color: color-mix(in srgb, var(--qf-text) 85%, transparent);
 }
 
 html:not(.dark) .image-view-banner {
 	background: var(--qf-text);
-	color: rgba(0, 0, 0, 0.85);
+	color: color-mix(in srgb, var(--qf-ink) 85%, transparent);
 }
 
 .image-view-banner-item {
@@ -1233,12 +1233,12 @@ html:not(.dark) .image-view-banner {
 }
 
 .image-view-banner-key {
-	color: rgba(255, 255, 255, 0.45);
+	color: color-mix(in srgb, var(--qf-text) 45%, transparent);
 	margin-right: 4px;
 }
 
 html:not(.dark) .image-view-banner-key {
-	color: rgba(0, 0, 0, 0.4);
+	color: color-mix(in srgb, var(--qf-ink) 40%, transparent);
 }
 
 .image-view-error {
