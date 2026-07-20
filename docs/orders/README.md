@@ -23,5 +23,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-008](WO-008.md) | The plug test: Hermes through the same socket — admitting diff is the gate | **done** — verified + merged 2026-07-19 (round 2); Outcome B (guest cannot see host install); admitting commits pure; D1–D3 fixed | builder (Cursor) |
 | [WO-007b](WO-007b.md) | Host seams: spawn split, generic env, tile-control parity | **done** — verified + merged 2026-07-20; admit≠turn; manifest env YES | builder (Cursor) |
 | [WO-008b](WO-008b.md) | Hermes reachability: bundle vs authorized mount (probe `mounts`) | **done** — PROBE HELD 2026-07-20; mounts YES; guest WASM-only blocks native Hermes; → WO-008c | builder (Cursor) |
-| [WO-008c](WO-008c.md) | Hermes host-bridged ACP (Outcome A outside guest exec) | **open** — current; order written | builder |
+| [WO-008c](WO-008c.md) | Hermes host-bridged ACP (Outcome A outside guest exec) | **rework** — Outcome A host handshake accepted; D1 launch not in packed manifest; D2 ACP client triplicated | builder (Cursor) |
 | WO-008a | Permission bridge + tool policy (deny-by-default; unblocks the founder's live turn) | open — after WO-008c for Hermes live; order not yet written | builder |
