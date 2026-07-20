@@ -93,12 +93,12 @@ The dock is QuantFlow's access point — the surface where **species become sess
 - **Law D for the dock:** force-kill + relaunch rebuilds registry and sessions from the Kernel alone; in-flight sessions surface as terminal (`failed`/`cancelled` per policy), never phantom `running`.
 - Zero new listeners; zero orphan child processes after close (WO-004a pattern, asserted).
 
-**WO-008 · The plug test — Hermes through the same socket.** *Depends: WO-007. Rewritten 2026-07-19 (pre-build review): fact-finding deliverable 0 settles host-install-in-guest-space; named outcomes A/B/C; fallback mock species keeps the plug proof alive if Hermes needs packaging work.*
+**WO-008 · The plug test — Hermes through the same socket.** ***done** — verified + merged 2026-07-19 (round 2).* Outcome **B**: guest overlay cannot see the host Hermes install (`HERMES_BIN not found` while host file exists); critic-mock proved the dock path; admitting commits pure under `species/**` only. Reachability → WO-008b; live turn → WO-007b + WO-008a.
 - **The diff is the gate:** the admitting commit touches only `species/**` — zero dock/canvas/host/kernel/gate changes.
 - Kernel adopts the **ACP** session id (Hermes carries a second, internal id — never adopted).
 - No prompt in any builder gate; the founder's live Hermes turn happens after WO-008a.
 
-**WO-007b · Host seams — the spawn god-function dies.** *Depends: WO-007. **Parallel-eligible with WO-008** (host files vs `species/` — zero overlap). Source: pre-read-2 measurements + post-merge findings on shipped WO-007.*
+**WO-007b · Host seams — the spawn god-function dies.** *Depends: WO-007. **Current rung** after WO-008. Source: pre-read-2 measurements + post-merge findings on shipped WO-007.*
 - Split `spawnAgentSession` (admit + create + always-prompt + publish, one function, default prompt `"uppercase quantflow"`) into `admitAndStartSession` and `runTurn` — a handshake-only spawn becomes a real host capability.
 - Generic session env: verify-or-reject the SDK's manifest-env-defaults mechanism (`agent-os.js:2689` comment; absent from typed surface); land `createSession` env passthrough sourced from species data — never renderer-supplied.
 - Post-merge findings land: session-tile Cancel gated to legal edges (dock is; tile isn't) · `closeSession` preload asymmetry fixed · renderer's `definitions[0]` singleton leftover removed.

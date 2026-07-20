@@ -1,0 +1,9 @@
+{
+  "name": "hermes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "hermes-acp-shim": "./dist/acp-shim.js"
+  }
+}

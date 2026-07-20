@@ -1,0 +1,11 @@
+{
+  "name": "hermes",
+  "version": "0.1.0",
+  "agent": {
+    "acpEntrypoint": "hermes-acp-shim"
+  },
+  "registry": {
+    "title": "Hermes",
+    "description": "WO-008 species: ACP shim that spawns host Hermes from HERMES_BIN (paths only, never secrets)."
+  }
+}
