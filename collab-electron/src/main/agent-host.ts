@@ -28,6 +28,13 @@ import {
 } from "./host-acp-permission";
 import { runHostAcpTurn } from "./host-acp-turn";
 import {
+  admitNativeTuiSpecies,
+  cancelNativeTuiSession,
+  installNativeTuiPtyExitHook,
+  tearDownNativeTui,
+  type NativeTuiLive,
+} from "./host-native-tui";
+import {
   resolveHostMountSpecs,
   resolveSpeciesSessionEnv,
 } from "./host-mounts";
@@ -40,6 +47,7 @@ import {
   type TraceContext,
 } from "./kernel";
 import { resolveSpeciesLaunch } from "./species-launch";
+import { resolveSpeciesSurface } from "./species-surface";
 import { resolveSpeciesToolAllowlist } from "./species-tools";
 
 /** Boot-seed species name — main-process only (never a renderer literal). */
@@ -70,10 +78,11 @@ const linkedPackages = new Set<string>();
 type LiveSession = {
   cancelled: boolean;
   species: string;
-  /** AgentOS guest id, or ACP session id for host_acp. */
+  /** AgentOS guest id, ACP session id, or PTY session id for native_tui. */
   guestId: string;
-  kind: "agentos" | "host_acp";
+  kind: "agentos" | "host_acp" | "native_tui";
   hostAcp?: HostAcpHandle;
+  ptySessionId?: string;
   unsub?: () => void;
   turnInFlight: boolean;
 };
@@ -281,6 +290,8 @@ export type AdmitResult = {
   sessionId: string;
   guestId: string;
   species: string;
+  surface: "acp_session" | "native_tui";
+  ptySessionId?: string;
 };
 
 export type TurnResult = {
@@ -292,10 +303,11 @@ export type TurnResult = {
 
 /**
  * Admit species + create/start Kernel row.
- * Launch route from package manifest `launch` (WO-008c):
- *   - host_acp → host stdio ACP (Hermes); never AgentOS guest exec
+ * Surface (WO-008d) first:
+ *   - native_tui → host PTY term tile (e.g. hermes --tui)
+ * Launch (WO-008c) for ACP/AgentOS paths:
+ *   - host_acp → host stdio ACP
  *   - agentos (default) → AgentOS createSession
- * Sends nothing to the agent — no prompt, no chunks, no artifacts.
  */
 export async function admitAndStartSession(
   species: string,
@@ -304,11 +316,32 @@ export async function admitAndStartSession(
     env?: Record<string, string>;
     /** When set, host mints its own id (gate falsify — must go red). */
     corruptId?: string;
-    onStarted?: (sessionId: string, species: string) => void;
+    onStarted?: (
+      sessionId: string,
+      species: string,
+      info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
+    ) => void;
   },
 ): Promise<AdmitResult> {
   if (!species || typeof species !== "string") {
     throw new Error("agent-host: admit requires a species name");
+  }
+  const surface = resolveSpeciesSurface(species, appRoot());
+  if (surface.surface === "native_tui") {
+    return admitNativeTuiSpecies({
+      species,
+      surface,
+      appRoot: appRoot(),
+      env: opts?.env,
+      corruptId: opts?.corruptId,
+      newTrace,
+      liveSet: (sessionId, entry) => {
+        live.set(sessionId, entry);
+      },
+      onStarted: opts?.onStarted
+        ? (sessionId, sp, info) => opts.onStarted?.(sessionId, sp, info)
+        : undefined,
+    });
   }
   const launch = resolveSpeciesLaunch(species, appRoot());
   if (launch === "host_acp") {
@@ -322,7 +355,11 @@ async function admitHostAcpSpecies(
   opts?: {
     env?: Record<string, string>;
     corruptId?: string;
-    onStarted?: (sessionId: string, species: string) => void;
+    onStarted?: (
+      sessionId: string,
+      species: string,
+      info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
+    ) => void;
   },
 ): Promise<AdmitResult> {
   const fromConfig = resolveSpeciesSessionEnv(species);
@@ -377,11 +414,11 @@ async function admitHostAcpSpecies(
     { session_id: sessionId },
     { ...trace, span_id: crypto.randomUUID() },
   );
-  opts?.onStarted?.(sessionId, species);
+  opts?.onStarted?.(sessionId, species, { surface: "acp_session" });
   console.log(
     `agent-host: admitted host_acp session=${sessionId} species=${species} cmd=${command} (no prompt)`,
   );
-  return { sessionId, guestId, species };
+  return { sessionId, guestId, species, surface: "acp_session" };
 }
 
 async function admitAgentOsSpecies(
@@ -389,7 +426,11 @@ async function admitAgentOsSpecies(
   opts?: {
     env?: Record<string, string>;
     corruptId?: string;
-    onStarted?: (sessionId: string, species: string) => void;
+    onStarted?: (
+      sessionId: string,
+      species: string,
+      info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
+    ) => void;
   },
 ): Promise<AdmitResult> {
   const host = await ensureAgentOs();
@@ -428,11 +469,11 @@ async function admitAgentOsSpecies(
     { session_id: sessionId },
     { ...trace, span_id: crypto.randomUUID() },
   );
-  opts?.onStarted?.(sessionId, species);
+  opts?.onStarted?.(sessionId, species, { surface: "acp_session" });
   console.log(
     `agent-host: admitted agentos session=${sessionId} species=${species} (no prompt)`,
   );
-  return { sessionId, guestId, species };
+  return { sessionId, guestId, species, surface: "acp_session" };
 }
 
 /**
@@ -460,6 +501,11 @@ export async function runTurn(
 
   const finalize = opts?.finalize !== false;
 
+  if (entry.kind === "native_tui") {
+    throw new Error(
+      "agent-host: runTurn forbidden on native_tui sessions (use the TUI tile)",
+    );
+  }
   if (entry.kind === "host_acp") {
     return runHostAcpTurn({
       sessionId,
@@ -612,6 +658,18 @@ export async function runTurn(
 export async function cancelAgentSession(sessionId: string): Promise<void> {
   const entry = live.get(sessionId);
   if (entry) entry.cancelled = true;
+  if (entry?.kind === "native_tui" && entry.ptySessionId) {
+    await cancelNativeTuiSession(
+      sessionId,
+      entry as NativeTuiLive,
+      newTrace,
+    );
+    live.delete(sessionId);
+    for (const l of doneListeners) {
+      l(sessionId, { status: "cancelled", text: "" });
+    }
+    return;
+  }
   if (entry?.kind === "host_acp" && entry.hostAcp) {
     cancelPendingPermissions(sessionId);
     await cancelHostAcp(entry.hostAcp).catch(() => {});
@@ -648,29 +706,47 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
 
 export function closeAgentSessionRow(sessionId: string): void {
   const entry = live.get(sessionId);
-  if (entry) {
-    entry.unsub?.();
-    live.delete(sessionId);
-    if (entry.kind === "host_acp" && entry.hostAcp) {
-      cancelPendingPermissions(sessionId);
-      void tearDownHostAcp(entry.hostAcp).catch(() => {});
-    } else {
-      void ensureAgentOs().then((host) =>
-        host.destroySession(entry.guestId).catch(() => {}),
+  if (!entry) {
+    try {
+      kernelExecute(
+        "close_agent_session",
+        { session_id: sessionId },
+        newTrace(),
       );
+    } catch {
+      /* already closed */
     }
+    return;
   }
-  kernelExecute(
-    "close_agent_session",
-    { session_id: sessionId },
-    newTrace(),
-  );
+  entry.unsub?.();
+  live.delete(sessionId);
+  if (entry.kind === "native_tui") {
+    void tearDownNativeTui(entry as NativeTuiLive).catch(() => {});
+  } else if (entry.kind === "host_acp" && entry.hostAcp) {
+    cancelPendingPermissions(sessionId);
+    void tearDownHostAcp(entry.hostAcp).catch(() => {});
+  } else if (entry.kind === "agentos") {
+    void ensureAgentOs().then((host) =>
+      host.destroySession(entry.guestId).catch(() => {}),
+    );
+  }
+  try {
+    kernelExecute(
+      "close_agent_session",
+      { session_id: sessionId },
+      newTrace(),
+    );
+  } catch {
+    /* ignore */
+  }
   console.log(`agent-host: close ${sessionId}`);
 }
 
 export async function disposeAgentOs(): Promise<void> {
   for (const [id, entry] of live) {
-    if (entry.kind === "host_acp" && entry.hostAcp) {
+    if (entry.kind === "native_tui") {
+      await tearDownNativeTui(entry as NativeTuiLive).catch(() => {});
+    } else if (entry.kind === "host_acp" && entry.hostAcp) {
       await tearDownHostAcp(entry.hostAcp).catch(() => {});
     }
     live.delete(id);
@@ -681,3 +757,7 @@ export async function disposeAgentOs(): Promise<void> {
   linkedPackages.clear();
   await current.dispose?.().catch(() => {});
 }
+
+installNativeTuiPtyExitHook((sessionId) => {
+  closeAgentSessionRow(sessionId);
+});

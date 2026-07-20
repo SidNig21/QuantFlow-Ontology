@@ -1,21 +1,24 @@
-# species/hermes — host-bridged ACP (WO-008c)
+# species/hermes — native TUI (default) + host ACP (substrate)
 
-Hermes speaks ACP as a **host** process (`hermes acp`). QuantFlow does **not**
-exec Hermes inside the AgentOS WASM guest (WO-008b measured that dead end).
+**Default desk UX (WO-008d):** Dock **Spawn** opens a **term tile** running
+`hermes --tui` (real Hermes TUI). Declared as `surface: "native_tui"` in
+`launch.json` — standing rule for any future interactive agent with a native TUI.
 
-Launch routing (deploy-true, WO-008c D1): committed `launch.json` +
-`packed/hermes.meta.json` (written by `pack-agent`). The AgentOS toolchain
-strips unknown fields from packed `agentos-package.json`, so runtime does
-**not** depend on unpackaged `agent-package/`. Optional founder override:
-`speciesLaunch` in `~/.collaborator/agentos-host-mounts.json`.
+**Host ACP remains** (`hermes acp`, allowlist, permission bridge from WO-008a/c)
+as substrate / secondary path. It is **not** the founder Hermes desk UX.
 
-## Smokes (never prompt)
+Launch + surface (deploy-true): committed `launch.json` + packed `*.meta.json`
+(written by `pack-agent`). Optional founder env: `speciesEnv.hermes`
+(`HERMES_BIN`, `HOME`) in `~/.collaborator/agentos-host-mounts.json`.
+
+## Smokes
 
 ```bash
 bun install
-bun run pack-agent   # still packs shim for registry package_ref
-bun run d0           # Outcome A — host ACP handshake + orphan check
-bun ./host-admit-kernel.ts   # Kernel created+started (dock Spawn shape)
+bun run pack-agent
+bun run d0                 # host ACP handshake (substrate)
+bun ./host-admit-kernel.ts # Kernel created+started (ACP admit shape)
+bun ./tui-pty-smoke.ts     # host PTY argv `--tui` + orphan check
 ```
 
 ## Register + dock
@@ -24,7 +27,4 @@ bun ./host-admit-kernel.ts   # Kernel created+started (dock Spawn shape)
 bun ./register.ts --db "$(ls ~/.collaborator/dev/worktree-*/kernel.db | head -1)"
 ```
 
-Ensure `~/.collaborator/agentos-host-mounts.json` has `speciesEnv.hermes`
-(`HERMES_BIN`, `HOME`) — see `tools/examples/agentos-host-mounts.example.json`.
-
-Dock **Spawn** → admit-only session tile. Do **not** Run turn (WO-008a).
+Dock **Spawn Hermes** → term tile with Hermes TUI chrome (not ACP “Run turn”).

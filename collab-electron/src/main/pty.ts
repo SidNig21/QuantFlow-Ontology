@@ -30,6 +30,7 @@ import { SidecarClient } from "./sidecar/client";
 import {
   SIDECAR_SOCKET_PATH,
   SIDECAR_PID_PATH,
+  type SessionCreateParams,
 } from "./sidecar/protocol";
 import { COLLAB_DIR } from "./paths";
 import { resolveTerminalTarget } from "./terminal-target";
@@ -219,6 +220,28 @@ function withOptionalFields<T extends object>(
   return base;
 }
 
+type PtyExitListener = (sessionId: string, exitCode: number) => void;
+const ptyExitListeners = new Set<PtyExitListener>();
+
+/** Host modules (e.g. agent-host native_tui) subscribe for Kernel hygiene. */
+export function onPtySessionExit(listener: PtyExitListener): () => void {
+  ptyExitListeners.add(listener);
+  return () => {
+    ptyExitListeners.delete(listener);
+  };
+}
+
+function emitPtySessionExit(sessionId: string, exitCode: number): void {
+  for (const l of ptyExitListeners) {
+    try {
+      l(sessionId, exitCode);
+    } catch (err) {
+      console.error("[pty] exit listener error", err);
+    }
+  }
+  sendToMainWindow("pty:exit", { sessionId, exitCode });
+}
+
 let sidecarStarting: Promise<void> | null = null;
 
 export async function ensureSidecar(): Promise<void> {
@@ -270,7 +293,7 @@ async function doEnsureSidecar(): Promise<void> {
         dataSockets.delete(sessionId);
         sidecarPowerShellSessionIds.delete(sessionId);
         deleteSessionMeta(sessionId);
-        sendToMainWindow("pty:exit", { sessionId, exitCode });
+        emitPtySessionExit(sessionId, exitCode);
       }
     });
   }
@@ -690,6 +713,101 @@ export async function createSession(
   }, {
     cwdGuestPath: resolvedTarget.cwdGuestPath,
   });
+}
+
+/**
+ * WO-008d: host-only PTY for a concrete command (e.g. `hermes --tui`).
+ * Not exposed on `pty:create` IPC — never takes renderer free-text command/env.
+ * Measured: public createSession is shell-only via resolveTerminalTarget; sidecar
+ * already accepts arbitrary command/args/env (SessionCreateParams).
+ */
+export async function createHostCommandSession(opts: {
+  command: string;
+  args?: string[];
+  cwd?: string;
+  env?: Record<string, string>;
+  cols?: number;
+  rows?: number;
+  displayName?: string;
+  senderWebContentsId?: number;
+}): Promise<{
+  sessionId: string;
+  command: string;
+  args: string[];
+  cwdHostPath: string;
+  displayName: string;
+}> {
+  const command = opts.command;
+  if (!command.startsWith("/") || !fs.existsSync(command)) {
+    throw new Error(
+      `pty: createHostCommandSession requires absolute existing command (got ${command})`,
+    );
+  }
+  const args = opts.args ?? [];
+  const requestedCwd = opts.cwd || os.homedir();
+  const resolvedCwd = nearestExistingDir(requestedCwd);
+  const c = opts.cols || 80;
+  const r = opts.rows || 24;
+  const displayName =
+    opts.displayName ?? displayBasename(command) ?? "host-cmd";
+
+  await ensureSidecar();
+  const client = getSidecarClient();
+  const sidecarEnv = {
+    ...utf8Env(),
+    ...opts.env,
+    TERM: opts.env?.TERM ?? "xterm-256color",
+  };
+
+  const createParams: SessionCreateParams = {
+    command,
+    args,
+    shell: command,
+    displayName,
+    target: "host_command",
+    cwd: resolvedCwd,
+    cwdHostPath: resolvedCwd,
+    cols: c,
+    rows: r,
+    env: sidecarEnv,
+  };
+  console.log(
+    `[pty] createHostCommandSession command=${command}`
+    + ` args=${JSON.stringify(args)} cwd=${resolvedCwd}`,
+  );
+  const { sessionId, socketPath } = await client.createSession(createParams);
+  console.log(`[pty] createHostCommandSession ok sessionId=${sessionId}`);
+
+  const dataSock = await client.attachDataSocket(
+    socketPath,
+    (data) => {
+      forwardPtyData(sessionId, opts.senderWebContentsId, data);
+    },
+  );
+  dataSockets.set(sessionId, dataSock);
+
+  writeSessionMeta(sessionId, {
+    shell: command,
+    cwd: resolvedCwd,
+    createdAt: new Date().toISOString(),
+    target: "host_command",
+    displayName,
+    command,
+    args,
+    cwdHostPath: resolvedCwd,
+    backend: "sidecar",
+  });
+
+  sidecarSessionIds.add(sessionId);
+  // No OSC7 shell hook — this is an app TUI, not an interactive shell.
+
+  return {
+    sessionId,
+    command,
+    args,
+    cwdHostPath: resolvedCwd,
+    displayName,
+  };
 }
 
 function stripTrailingBlanks(text: string): string {

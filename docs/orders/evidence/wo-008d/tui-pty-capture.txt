@@ -1,0 +1,8 @@
+command=/home/sidnig21/.hermes/hermes-agent/venv/bin/hermes
+args=["--tui"]
+cwd=/home/sidnig21
+bytes=1171
+--- plain preview ---
+(node:922372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[<u[>4m…Tr[>0q                                      …

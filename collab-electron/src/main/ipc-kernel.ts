@@ -157,8 +157,19 @@ export function registerKernelHandlers(): void {
         // prompt ignored — connecting and speaking are different acts (WO-007b)
         void args?.prompt;
         const result = await admitAndStartSession(species, {
-          onStarted: (sessionId, sp) => {
+          onStarted: (sessionId, sp, info) => {
             invalidateDock();
+            if (info?.surface === "native_tui" && info.ptySessionId) {
+              sendToShell(
+                "shell:forward",
+                "canvas",
+                "create-term-tile",
+                info.ptySessionId,
+                sessionId,
+                sp,
+              );
+              return;
+            }
             sendToShell(
               "shell:forward",
               "canvas",

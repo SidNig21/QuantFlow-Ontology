@@ -96,7 +96,30 @@ try {
 } catch {
   /* optional */
 }
-const meta = { launch, name: "hermes", package: "hermes.aospkg", tools };
+let surface = "acp_session";
+let argv = [];
+try {
+  if (existsSync(launchJson)) {
+    const doc = JSON.parse(readFileSync(launchJson, "utf8"));
+    if (doc.surface === "native_tui" || doc.surface === "acp_session") {
+      surface = doc.surface;
+    }
+    if (Array.isArray(doc.argv)) {
+      argv = doc.argv.filter((a) => typeof a === "string");
+    }
+  }
+} catch {
+  /* optional */
+}
+if (surface === "native_tui" && argv.length === 0) argv = ["--tui"];
+const meta = {
+  launch,
+  name: "hermes",
+  package: "hermes.aospkg",
+  tools,
+  surface,
+  argv,
+};
 writeFileSync(metaOut, `${JSON.stringify(meta, null, 2)}\n`);
 console.log("pack-agent: wrote", metaOut, JSON.stringify(meta));
 

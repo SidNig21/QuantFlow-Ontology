@@ -17,6 +17,7 @@ import { createTileManager } from "./tile-manager.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
 import { initDock } from "./dock.js";
 import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
+import { centerCanvasCoords } from "./canvas-place.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -1196,33 +1197,31 @@ async function init() {
 					minimap.update();
 				}
 				if (channel === "create-artifact-tile") {
-					const artifactId = args[0];
 					const size = defaultSize("artifact");
-					const rect = canvasEl.getBoundingClientRect();
-					const cx =
-						(rect.width / 2 - viewportState.panX) /
-						viewportState.zoom - size.width / 2;
-					const cy =
-						(rect.height / 2 - viewportState.panY) /
-						viewportState.zoom - size.height / 2;
-					tileManager.createArtifactTile(
-						cx, cy, artifactId,
+					const { cx, cy } = centerCanvasCoords(
+						canvasEl, viewportState, size,
 					);
+					tileManager.createArtifactTile(cx, cy, args[0]);
 					minimap.update();
 				}
 				if (channel === "create-session-tile") {
-					const sessionId = args[0];
 					const size = defaultSize("session");
-					const rect = canvasEl.getBoundingClientRect();
-					const cx =
-						(rect.width / 2 - viewportState.panX) /
-						viewportState.zoom - size.width / 2;
-					const cy =
-						(rect.height / 2 - viewportState.panY) /
-						viewportState.zoom - size.height / 2;
-					tileManager.createSessionTile(
-						cx, cy, sessionId,
+					const { cx, cy } = centerCanvasCoords(
+						canvasEl, viewportState, size,
 					);
+					tileManager.createSessionTile(cx, cy, args[0]);
+					minimap.update();
+				}
+				if (channel === "create-term-tile") {
+					const ptySessionId = args[0];
+					const size = defaultSize("term");
+					const { cx, cy } = centerCanvasCoords(
+						canvasEl, viewportState, size,
+					);
+					const tile = tileManager.createCanvasTile(
+						"term", cx, cy, { ptySessionId },
+					);
+					tileManager.spawnTerminalWebview(tile, true);
 					minimap.update();
 				}
 			}
