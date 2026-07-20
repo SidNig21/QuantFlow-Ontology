@@ -3,9 +3,11 @@
 Hermes speaks ACP as a **host** process (`hermes acp`). QuantFlow does **not**
 exec Hermes inside the AgentOS WASM guest (WO-008b measured that dead end).
 
-Launch routing: package manifest field `"launch": "host_acp"` in
-`agent-package/agentos-package.json`. Host reads it via `species-launch.ts`.
-AgentOS packages (toolloop / critic-mock) omit the field → default `agentos`.
+Launch routing (deploy-true, WO-008c D1): committed `launch.json` +
+`packed/hermes.meta.json` (written by `pack-agent`). The AgentOS toolchain
+strips unknown fields from packed `agentos-package.json`, so runtime does
+**not** depend on unpackaged `agent-package/`. Optional founder override:
+`speciesLaunch` in `~/.collaborator/agentos-host-mounts.json`.
 
 ## Smokes (never prompt)
 

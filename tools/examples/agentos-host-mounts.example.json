@@ -22,5 +22,8 @@
       "HERMES_BIN": "/ABS/PATH/TO/.hermes/hermes-agent/venv/bin/hermes",
       "HOME": "/ABS/PATH/TO/HOME"
     }
+  },
+  "speciesLaunch": {
+    "hermes": "host_acp"
   }
 }

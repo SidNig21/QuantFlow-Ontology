@@ -15,7 +15,10 @@ const KERNEL_ALLOWED = "collab-electron/src/main/kernel.ts";
 const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
-/** WO-008c host-bridged ACP (deny-by-default) — sole new ACP client surface. */
+/**
+ * WO-008c: Electron re-exports shared client from species/hermes/host-acp-client.ts.
+ * Allowlist kept so a thin bridge may import the SDK if needed; prefer the species module.
+ */
 const HOST_ACP_BRIDGE = "collab-electron/src/main/host-acp-bridge.ts";
 
 const KERNEL_PATTERNS: Array<{ name: string; re: RegExp }> = [

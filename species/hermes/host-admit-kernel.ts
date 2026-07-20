@@ -1,57 +1,39 @@
 /**
- * WO-008c — host_acp admit → Kernel create/start (dock path without Electron UI).
- * Proves created+started events and cancel tear-down. Never prompts.
+ * WO-008c — host_acp admit → Kernel create/start (dock Spawn shape).
+ * Uses shared host-acp-client.ts (D2). Never prompts.
  *
  *   bun ./host-admit-kernel.ts
  */
-import { spawn as nodeSpawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Readable, Writable } from "node:stream";
-import {
-  ClientSideConnection,
-  ndJsonStream,
-  type Client,
-  type RequestPermissionRequest,
-  type RequestPermissionResponse,
-  type SessionNotification,
-} from "@agentclientprotocol/sdk";
 import {
   closeKernel,
   execute,
   openKernel,
   type TraceContext,
 } from "qf-kernel";
+import {
+  admitHostAcp,
+  cancelHostAcp,
+  resolveHostAcpCommand,
+} from "./host-acp-client.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, "../..");
 const PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
-const HERMES_BIN =
-  process.env.HERMES_BIN ??
-  join(homedir(), ".hermes/hermes-agent/venv/bin/hermes");
+const HERMES_BIN = resolveHostAcpCommand(
+  process.env.HERMES_BIN ?? process.env.HOST_ACP_BIN,
+  [
+    join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
+    join(homedir(), ".local/bin/hermes"),
+  ],
+);
 const HOME = process.env.HOME ?? homedir();
 
 function trace(): TraceContext {
   return { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() };
-}
-
-function denyClient(): Client {
-  return {
-    async sessionUpdate(_p: SessionNotification): Promise<void> {},
-    async requestPermission(
-      params: RequestPermissionRequest,
-    ): Promise<RequestPermissionResponse> {
-      const reject = params.options.find(
-        (o) => o.kind === "reject_once" || o.kind === "reject_always",
-      );
-      if (reject) {
-        return { outcome: { outcome: "selected", optionId: reject.optionId } };
-      }
-      return { outcome: { outcome: "cancelled" } };
-    },
-  };
 }
 
 async function main(): Promise<number> {
@@ -73,33 +55,15 @@ async function main(): Promise<number> {
     trace(),
   );
 
-  const proc = nodeSpawn(HERMES_BIN, ["acp"], {
-    stdio: ["pipe", "pipe", "inherit"],
-    cwd: HOME,
-    env: { PATH: process.env.PATH ?? "/usr/bin:/bin", HOME, HERMES_BIN },
-  });
-  if (!proc.stdin || !proc.stdout) {
-    console.error("host-admit: no stdio");
-    return 1;
-  }
-  const connection = new ClientSideConnection(
-    () => denyClient(),
-    ndJsonStream(
-      Writable.toWeb(proc.stdin) as WritableStream<Uint8Array>,
-      Readable.toWeb(proc.stdout) as ReadableStream<Uint8Array>,
-    ),
-  );
-
   try {
-    await connection.initialize({
-      protocolVersion: 1,
-      clientCapabilities: { fs: { readTextFile: false, writeTextFile: false } },
-      clientInfo: { name: "quantflow-host-admit", version: "0.1.0" },
-    });
-    const { sessionId } = await connection.newSession({
+    const handle = await admitHostAcp({
+      command: HERMES_BIN,
+      args: ["acp"],
+      env: { HERMES_BIN, HOME },
       cwd: HOME,
-      mcpServers: [],
+      clientName: "quantflow-host-admit",
     });
+    const sessionId = handle.sessionId;
     console.log("host-admit: ACP sessionId=", sessionId);
 
     execute(
@@ -122,6 +86,7 @@ async function main(): Promise<number> {
       !types.includes("agent_session.started")
     ) {
       console.error("host-admit FAIL: missing created/started");
+      await cancelHostAcp(handle).catch(() => {});
       return 1;
     }
     const arts = db.query(`SELECT COUNT(*) AS n FROM artifact`).get() as {
@@ -129,25 +94,19 @@ async function main(): Promise<number> {
     };
     if (arts.n !== 0) {
       console.error("host-admit FAIL: unexpected artifacts");
+      await cancelHostAcp(handle).catch(() => {});
       return 1;
     }
     console.log(
       "host-admit OK — Kernel created+started, zero artifacts (dock Spawn equivalent)",
     );
 
-    try {
-      await connection.cancel({ sessionId });
-    } catch {
-      /* ignore */
-    }
     execute(db, "cancel_agent_session", { session_id: sessionId }, trace());
     execute(db, "close_agent_session", { session_id: sessionId }, trace());
-    proc.kill("SIGTERM");
-    await Bun.sleep(400);
+    await cancelHostAcp(handle);
     return 0;
   } catch (err) {
     console.error("host-admit FAIL", err);
-    proc.kill("SIGTERM");
     return 1;
   } finally {
     closeKernel(db);

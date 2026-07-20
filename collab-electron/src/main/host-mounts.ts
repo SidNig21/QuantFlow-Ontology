@@ -32,6 +32,8 @@ export type HostMountsFile = {
   mounts?: HostMountSpec[];
   /** Optional per-species createSession env (paths only — never secrets). */
   speciesEnv?: Record<string, Record<string, string>>;
+  /** Optional per-species launch override: "host_acp" | "agentos" (WO-008c). */
+  speciesLaunch?: Record<string, string>;
 };
 
 function configPath(): string {
