@@ -1,10 +1,9 @@
 /**
  * Sole app module that imports @rivet-dev/agentos* (mirror of kernel.ts).
- * Species registry is data: name → packed .aospkg path.
+ * Species come from agent_definition rows (package_ref); no in-code registry map.
  *
  * Pack: `cd tools/runtime-proof && bun run pack-agent`
- * (collab-electron script `pack-agent` forwards there). Dev/build consume
- * `tools/runtime-proof/packed/qf-toolloop.aospkg`.
+ * (collab-electron script `pack-agent` forwards there).
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -14,28 +13,25 @@ import {
   type JsonRpcNotification,
 } from "@rivet-dev/agentos-core";
 import {
+  getAgentDefinition,
   kernelExecute,
   kernelListAgentSessions,
+  listAgentDefinitions,
+  resolveSpeciesPackage,
   type TraceContext,
 } from "./kernel";
 
-export const DEFAULT_SPECIES = "qf-toolloop" as const;
+/** Boot-seed species name — main-process only (never a renderer literal). */
+export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
 
 function repoRoot(): string {
   const here = dirname(fileURLToPath(import.meta.url));
   return join(here, "../../..");
 }
 
-function defaultPackagePath(): string {
-  return join(
-    repoRoot(),
-    "tools/runtime-proof/packed/qf-toolloop.aospkg",
-  );
+export function appRoot(): string {
+  return repoRoot();
 }
-
-const speciesRegistry: Record<string, string> = {
-  [DEFAULT_SPECIES]: defaultPackagePath(),
-};
 
 type ChunkListener = (sessionId: string, text: string) => void;
 type DoneListener = (
@@ -48,6 +44,8 @@ type DoneListener = (
 ) => void;
 
 let os: AgentOs | null = null;
+/** Absolute package paths already admitted into the live AgentOs. */
+const linkedPackages = new Set<string>();
 const live = new Map<
   string,
   { cancelled: boolean; species: string; unsub?: () => void }
@@ -85,10 +83,37 @@ function chunkTextFromNotification(
   return typeof text === "string" ? text : null;
 }
 
+/** Resolve species name → absolute package path from Kernel rows. */
 export function getSpeciesPackagePath(name: string): string {
-  const path = speciesRegistry[name];
-  if (!path) throw new Error(`unknown species: ${name}`);
-  return path;
+  return resolveSpeciesPackage(name, appRoot()).packagePath;
+}
+
+/**
+ * Idempotent boot seed: register BOOT_SEED_SPECIES via execute if missing.
+ * Never a direct INSERT.
+ */
+export function seedBootSpecies(): void {
+  const before = listAgentDefinitions().length;
+  if (getAgentDefinition(BOOT_SEED_SPECIES)) {
+    console.log(
+      `agent-host: boot-seed skip (already present) definitions=${before}`,
+    );
+    return;
+  }
+  const package_ref = "tools/runtime-proof/packed/qf-toolloop.aospkg";
+  kernelExecute(
+    "register_agent_definition",
+    {
+      name: BOOT_SEED_SPECIES,
+      role: "toolloop-proof",
+      package_ref,
+    },
+    newTrace(),
+  );
+  const after = listAgentDefinitions().length;
+  console.log(
+    `agent-host: boot-seed registered definitions=${after}`,
+  );
 }
 
 export function onSessionChunk(listener: ChunkListener): () => void {
@@ -105,24 +130,54 @@ export function onSessionDone(listener: DoneListener): () => void {
   };
 }
 
+/** Admit a package into the live host (create-time list or linkSoftware). */
+export async function admitPackage(packagePath: string): Promise<void> {
+  const host = await ensureAgentOs();
+  if (linkedPackages.has(packagePath)) return;
+  if (!existsSync(packagePath)) {
+    throw new Error(`agent-host: missing species package at ${packagePath}`);
+  }
+  await host.linkSoftware({ packagePath });
+  linkedPackages.add(packagePath);
+  console.log(`agent-host: linkSoftware ${packagePath}`);
+}
+
+export async function admitSpecies(species: string): Promise<string> {
+  const { packagePath } = resolveSpeciesPackage(species, appRoot());
+  await admitPackage(packagePath);
+  return packagePath;
+}
+
 export async function ensureAgentOs(): Promise<AgentOs> {
   if (os) return os;
-  const packagePath = getSpeciesPackagePath(DEFAULT_SPECIES);
-  if (!existsSync(packagePath)) {
+  const defs = listAgentDefinitions();
+  const software: { packagePath: string }[] = [];
+  for (const row of defs) {
+    const name = String(row.name);
+    try {
+      const { packagePath } = resolveSpeciesPackage(name, appRoot());
+      software.push({ packagePath });
+    } catch (err) {
+      console.error(`agent-host: skip unresolved definition ${name}`, err);
+    }
+  }
+  if (software.length === 0) {
     throw new Error(
-      `agent-host: missing species package at ${packagePath} — run pack-agent`,
+      "agent-host: no resolvable agent_definition rows — boot-seed failed?",
     );
   }
   os = await AgentOs.create({
     defaultSoftware: false,
-    software: [{ packagePath }],
+    software,
   });
+  for (const s of software) linkedPackages.add(s.packagePath);
   return os;
 }
 
 export async function runAgentHostSmoke(): Promise<void> {
   const host = await ensureAgentOs();
-  const created = await host.createSession(DEFAULT_SPECIES);
+  await admitSpecies(BOOT_SEED_SPECIES);
+  const created = await host.createSession(BOOT_SEED_SPECIES);
   const session = created.sessionId;
 
   let guestMinted: string | null = null;
@@ -196,7 +251,7 @@ export type SpawnResult = {
  * Concurrent-safe (Map of live sessions — no singleton).
  */
 export async function spawnAgentSession(
-  species: string = DEFAULT_SPECIES,
+  species: string,
   promptText = "uppercase quantflow",
   opts?: {
     slowChunkMs?: number;
@@ -206,7 +261,11 @@ export async function spawnAgentSession(
     onStarted?: (sessionId: string, species: string) => void;
   },
 ): Promise<SpawnResult> {
+  if (!species || typeof species !== "string") {
+    throw new Error("agent-host: spawn requires a species name");
+  }
   const host = await ensureAgentOs();
+  await admitSpecies(species);
   const env =
     opts?.slowChunkMs != null
       ? { QF_PROOF_SLOW_CHUNK_MS: String(opts.slowChunkMs) }
@@ -223,7 +282,6 @@ export async function spawnAgentSession(
     { session_id: sessionId, label: species },
     trace,
   );
-  // Adoption invariant: Kernel id must equal guest mint (unless corrupt falsify).
   if (sessionId !== guestId && !opts?.corruptId) {
     throw new Error("agent-host: session id adoption failed");
   }
@@ -234,7 +292,6 @@ export async function spawnAgentSession(
   );
   opts?.onStarted?.(sessionId, species);
 
-  // Prompt must use the AgentOS id (guest mint), even if Kernel was corrupted.
   const agentOsId = guestId;
   let text = "";
   const unsub = host.onSessionEvent(agentOsId, (event) => {
@@ -356,9 +413,17 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
   const entry = live.get(sessionId);
   if (entry) entry.cancelled = true;
   const host = await ensureAgentOs();
-  // Cancel the AgentOS session (guest id === Kernel id when not corrupted).
   await host.cancelSession(sessionId).catch(() => {});
   console.log(`agent-host: cancel requested ${sessionId}`);
+}
+
+export function closeAgentSessionRow(sessionId: string): void {
+  kernelExecute(
+    "close_agent_session",
+    { session_id: sessionId },
+    newTrace(),
+  );
+  console.log(`agent-host: close ${sessionId}`);
 }
 
 export async function disposeAgentOs(): Promise<void> {
@@ -366,5 +431,6 @@ export async function disposeAgentOs(): Promise<void> {
   const current = os;
   os = null;
   live.clear();
+  linkedPackages.clear();
   await current.dispose?.().catch(() => {});
 }

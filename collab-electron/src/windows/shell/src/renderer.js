@@ -15,6 +15,8 @@ import { createWorkspaceManager } from "./workspace-manager.js";
 import { createCanvasRpc } from "./canvas-rpc.js";
 import { createTileManager } from "./tile-manager.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
+import { initDock } from "./dock.js";
+import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -60,6 +62,10 @@ window.shellApi.onPrefChanged((key, value) => {
 // -- Viewport --
 
 const viewport = createViewport(canvasEl, gridCanvas, tiles);
+
+createFlowCubeWatermark(document.getElementById("canvas-watermark"), {
+	getTileCount: () => tiles.length,
+});
 
 /** Convert in-memory panX/panY state to a center-point for persistence. */
 function toCenterPointState(state) {
@@ -237,152 +243,9 @@ async function init() {
 	});
 	panelManager.initPrefs(prefNavWidth, prefSidebarMode);
 
-	const useAgentGui = prefSidebarAgentGui === true;
 	let agentWebview = null;
 
-	let agentPtySessionId = prefAgentPty || null;
-
-	function ensureAgentTerminal() {
-		if (agentWebview) return;
-
-		const termConfig = configs.terminalTile;
-		const params = new URLSearchParams();
-		params.set("tileId", "agent");
-
-		if (agentPtySessionId) {
-			params.set("sessionId", agentPtySessionId);
-			params.set("restored", "1");
-		} else {
-			const homeDir = window.shellApi.getHomePath?.() || "~";
-			params.set("cwd", `${homeDir}/.collaborator`);
-		}
-
-		const qs = params.toString();
-		const wv = document.createElement("webview");
-		wv.setAttribute(
-			"src", `${termConfig.src}?${qs}`,
-		);
-		wv.setAttribute("preload", termConfig.preload);
-		wv.setAttribute(
-			"webpreferences", "contextIsolation=yes, sandbox=yes",
-		);
-		wv.classList.add("agent-terminal");
-		wv.style.flex = "1";
-		wv.style.border = "none";
-
-		wv.addEventListener("dom-ready", () => {
-			if (agentPanel.isVisible()) {
-				wv.focus();
-				noteSurfaceFocus("agent");
-			}
-		});
-
-		wv.addEventListener("ipc-message", (event) => {
-			if (event.channel === "pty-session-id") {
-				agentPtySessionId = event.args[0];
-				window.shellApi.setPref(
-					"agent-pty-session", agentPtySessionId,
-				);
-			}
-		});
-
-		wv.addEventListener("console-message", (event) => {
-			window.shellApi.logFromWebview(
-				"agent-term", event.level,
-				event.message, event.sourceId,
-			);
-		});
-
-		wv.addEventListener("focus", () => {
-			noteSurfaceFocus("agent");
-		});
-
-		panelAgent.appendChild(wv);
-		agentWebview = {
-			webview: wv,
-			send(ch, ...args) { wv.send(ch, ...args); },
-		};
-	}
-
-	function ensureAgentChat() {
-		if (agentWebview) return;
-
-		const chatConfig = configs.agentChat;
-		const homeDir = window.shellApi.getHomePath?.() || "~";
-		const cwd = `${homeDir}/.collaborator`;
-		const src = `${chatConfig.src}?cwd=${encodeURIComponent(cwd)}`;
-		const wv = document.createElement("webview");
-		wv.setAttribute("src", src);
-		wv.setAttribute("preload", chatConfig.preload);
-		wv.setAttribute(
-			"webpreferences", "contextIsolation=yes, sandbox=yes",
-		);
-		wv.style.flex = "1";
-		wv.style.border = "none";
-
-		let ready = false;
-		const pendingMessages = [];
-
-		wv.addEventListener("dom-ready", () => {
-			ready = true;
-			for (const [ch, args] of pendingMessages) {
-				wv.send(ch, ...args);
-			}
-			pendingMessages.length = 0;
-			if (agentPanel.isVisible()) {
-				wv.focus();
-				noteSurfaceFocus("agent");
-			}
-		});
-
-		wv.addEventListener("console-message", (event) => {
-			window.shellApi.logFromWebview(
-				"agent-chat", event.level,
-				event.message, event.sourceId,
-			);
-		});
-
-		wv.addEventListener("focus", () => {
-			noteSurfaceFocus("agent");
-		});
-
-		panelAgent.appendChild(wv);
-		agentWebview = {
-			webview: wv,
-			send(ch, ...args) {
-				if (ready) wv.send(ch, ...args);
-				else pendingMessages.push([ch, args]);
-			},
-		};
-
-		// Forward agent IPC from shell to the chat webview
-		window.shellApi.onAgentUpdate((data) => {
-			agentWebview.send("agent:update", data);
-		});
-		window.shellApi.onAgentPromptComplete((data) => {
-			agentWebview.send(
-				"agent:prompt-complete", data,
-			);
-		});
-		window.shellApi.onAgentPromptError((data) => {
-			agentWebview.send(
-				"agent:prompt-error", data,
-			);
-		});
-		window.shellApi.onAgentExit((data) => {
-			agentWebview.send("agent:exit", data);
-		});
-		window.shellApi.onAgentSessionReady((data) => {
-			agentWebview.send(
-				"agent:session-ready", data,
-			);
-		});
-		window.shellApi.onAgentSessionFailed((data) => {
-			agentWebview.send(
-				"agent:session-failed", data,
-			);
-		});
-	}
+	initDock(panelAgent);
 
 	const agentPanel = createPanel("agent", {
 		panel: panelAgent,
@@ -392,19 +255,12 @@ async function init() {
 		defaultWidth: 400,
 		direction: -1,
 		validModes: ["closed", "open"],
-		defaultMode: "closed",
+		defaultMode: "open",
 		prefKey: "sidebar-mode-agent",
 		getAllWebviews,
 		onVisibilityChanged(visible) {
 			panelViewer.classList.toggle("agent-open", visible);
-			if (visible) {
-				if (useAgentGui) ensureAgentChat();
-				else ensureAgentTerminal();
-				if (agentWebview) {
-					agentWebview.webview.focus();
-					noteSurfaceFocus("agent");
-				}
-			} else {
+			if (!visible) {
 				canvasEl.focus();
 			}
 		},
@@ -1137,8 +993,18 @@ async function init() {
 			})();
 		} else if (action === "spawn-agent-session") {
 			void (async () => {
+				const defs = await window.shellApi.qf.listDefinitions();
+				if (!defs.ok || !defs.definitions?.length) {
+					console.error(
+						"spawnSession failed: no species in registry",
+					);
+					return;
+				}
+				const species = String(
+					defs.definitions[0].name ?? defs.definitions[0].id,
+				);
 				const res = await window.shellApi.qf.spawnSession({
-					species: "qf-toolloop",
+					species,
 					prompt: "uppercase quantflow",
 				});
 				if (!res.ok) {

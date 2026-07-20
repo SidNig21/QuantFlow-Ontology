@@ -17,7 +17,7 @@
 	<button type="button" id="nav-toggle" class="panel-toggle" aria-pressed="true" aria-label="Hide Navigator"
 		data-tooltip="Toggle Nav" data-shortcut="Cmd+B"></button>
 
-	<button type="button" id="agent-toggle" class="panel-toggle" aria-pressed="false" aria-label="Show Agent"
+	<button type="button" id="agent-toggle" class="panel-toggle" aria-pressed="true" aria-label="Hide Agent"
 		data-tooltip="Toggle Agent" data-shortcut="Opt+Cmd+B"></button>
 
 	<div id="panels">
@@ -43,6 +43,7 @@
 				</svg>
 			</button>
 			<canvas id="grid-canvas"></canvas>
+			<div id="canvas-watermark"></div>
 			<div id="tile-layer"></div>
 			<div id="edge-indicators"></div>
 			<div id="zoom-indicator">100%</div>
@@ -51,7 +52,18 @@
 			</div>
 		</div>
 		<div id="agent-resize" class="resize-handle" data-panel="agent"></div>
-		<div id="panel-agent"></div>
+		<div id="panel-agent">
+			<div id="dock">
+				<section class="dock-section" id="dock-species">
+					<div class="qf-label dock-section-label">Species</div>
+					<div id="dock-species-list"></div>
+				</section>
+				<section class="dock-section" id="dock-sessions">
+					<div class="qf-label dock-section-label">Sessions</div>
+					<div id="dock-sessions-list"></div>
+				</section>
+			</div>
+		</div>
 	</div>
 
 	<div id="settings-overlay">

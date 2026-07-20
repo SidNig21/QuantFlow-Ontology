@@ -56,11 +56,19 @@ contextBridge.exposeInMainWorld("shellApi", {
       trace: { trace_id: string; span_id: string },
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+    listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
-    spawnSession: (args?: { species?: string; prompt?: string }) =>
+    spawnSession: (args: { species: string; prompt?: string }) =>
       ipcRenderer.invoke("qf:sessions:spawn", args),
     cancelSession: (sessionId: string) =>
       ipcRenderer.invoke("qf:sessions:cancel", { sessionId }),
+    closeSession: (sessionId: string) =>
+      ipcRenderer.invoke("qf:sessions:close", { sessionId }),
+    onDockInvalidate: (cb: () => void) => {
+      const handler = () => cb();
+      ipcRenderer.on("qf:dock:invalidate", handler);
+      return () => ipcRenderer.removeListener("qf:dock:invalidate", handler);
+    },
   },
 
   getPref: (key: string): Promise<unknown> =>

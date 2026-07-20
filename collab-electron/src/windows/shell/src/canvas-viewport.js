@@ -14,6 +14,12 @@ function isDark() {
 	return document.documentElement.classList.contains("dark");
 }
 
+function cssToken(name) {
+	return getComputedStyle(document.documentElement)
+		.getPropertyValue(name)
+		.trim();
+}
+
 export function createViewport(canvasEl, gridCanvas, tilesRef) {
 	const gridCtx = gridCanvas.getContext("2d");
 	let state = null;
@@ -76,8 +82,9 @@ export function createViewport(canvasEl, gridCanvas, tilesRef) {
 		if (minorFade > 0) {
 			const minorAlpha = dark ? 0.15 * minorFade : 0.25 * minorFade;
 			gridCtx.fillStyle = dark
-				? `rgba(255,255,255,${minorAlpha})`
-				: `rgba(0,0,0,${minorAlpha})`;
+				? cssToken("--qf-text")
+				: cssToken("--qf-ink");
+			gridCtx.globalAlpha = minorAlpha;
 			const halfDot = dotSize / 2;
 			for (let x = dotOffX; x <= w; x += step) {
 				for (let y = dotOffY; y <= h; y += step) {
@@ -87,6 +94,7 @@ export function createViewport(canvasEl, gridCanvas, tilesRef) {
 					gridCtx.fillRect(px, py, dotSize, dotSize);
 				}
 			}
+			gridCtx.globalAlpha = 1;
 		}
 
 		const majorFade = Math.min(1, Math.max(0,
@@ -97,8 +105,9 @@ export function createViewport(canvasEl, gridCanvas, tilesRef) {
 			const halfMajor = majorDotSize / 2;
 			const majorAlpha = dark ? 0.25 * majorFade : 0.40 * majorFade;
 			gridCtx.fillStyle = dark
-				? `rgba(255,255,255,${majorAlpha})`
-				: `rgba(0,0,0,${majorAlpha})`;
+				? cssToken("--qf-text")
+				: cssToken("--qf-ink");
+			gridCtx.globalAlpha = majorAlpha;
 			for (let x = offX; x <= w; x += majorStep) {
 				for (let y = offY; y <= h; y += majorStep) {
 					const px = Math.round(x - halfMajor);
@@ -107,6 +116,7 @@ export function createViewport(canvasEl, gridCanvas, tilesRef) {
 					gridCtx.fillRect(px, py, majorDotSize, majorDotSize);
 				}
 			}
+			gridCtx.globalAlpha = 1;
 		}
 	}
 

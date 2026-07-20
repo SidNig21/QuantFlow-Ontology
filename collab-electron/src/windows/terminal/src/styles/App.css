@@ -5,19 +5,19 @@
 }
 
 :root {
-	--foreground: rgb(220, 220, 220);
+	--foreground: var(--qf-text);
 	--background: var(--qf-ink);
-	--border: rgba(255, 255, 255, 0.2);
-	--muted-foreground: rgb(132, 132, 132);
+	--border: color-mix(in srgb, var(--qf-text) 20%, transparent);
+	--muted-foreground: var(--qf-muted);
 	--font-mono: 'Geist Mono';
 }
 
 @media (prefers-color-scheme: light) {
 	:root {
-		--foreground: rgb(32, 32, 32);
+		--foreground: var(--qf-ink);
 		--background: var(--qf-text);
-		--border: rgb(206, 206, 206);
-		--muted-foreground: rgb(113, 113, 123);
+		--border: var(--qf-line);
+		--muted-foreground: var(--qf-muted);
 	}
 }
 
@@ -56,12 +56,12 @@ body,
 }
 
 .tab-bar::-webkit-scrollbar-thumb {
-	background: rgba(121, 121, 121, 0.4);
+	background: color-mix(in srgb, var(--qf-muted) 40%, transparent);
 	border-radius: 4px;
 }
 
 .tab-bar::-webkit-scrollbar-thumb:hover {
-	background: rgba(121, 121, 121, 0.7);
+	background: color-mix(in srgb, var(--qf-muted) 70%, transparent);
 }
 
 .tab-bar::-webkit-scrollbar-track {

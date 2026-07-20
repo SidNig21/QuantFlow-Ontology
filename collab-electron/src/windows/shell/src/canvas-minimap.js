@@ -5,14 +5,21 @@ const MIN_TILE_W = 4;
 const MIN_TILE_H = 3;
 const MIN_EXTENT_FACTOR = 3;
 
-const TILE_COLORS = {
-	term: "#4144e3",
-	note: "#0bbac6",
-	code: "#c9f82c",
-	image: "#e12b3f",
-	browser: "#9750e3",
-	graph: "#e28143",
+/** Token names resolved at paint time via getComputedStyle. */
+const TILE_COLOR_VARS = {
+	term: "--qf-violet",
+	note: "--qf-teal",
+	code: "--qf-accent",
+	image: "--qf-fail",
+	browser: "--qf-violet",
+	graph: "--qf-warn",
 };
+
+function cssToken(name) {
+	return getComputedStyle(document.documentElement)
+		.getPropertyValue(name)
+		.trim();
+}
 
 const TILE_OPACITY = 0.6;
 const VP_BORDER_OPACITY = 0.55;
@@ -133,9 +140,9 @@ export function createMinimap({ viewportEl, wrapperEl, viewportState, getTiles, 
 			w = Math.max(w, MIN_TILE_W);
 			h = Math.max(h, MIN_TILE_H);
 
-			const hex = TILE_COLORS[tile.type] || "#888888";
+			const token = TILE_COLOR_VARS[tile.type] || "--qf-muted";
 			ctx.globalAlpha = TILE_OPACITY;
-			ctx.fillStyle = hex;
+			ctx.fillStyle = cssToken(token);
 			const gap = 0.5;
 			ctx.fillRect(pos.x + gap, pos.y + gap, w - gap * 2, h - gap * 2);
 		}
@@ -162,7 +169,7 @@ export function createMinimap({ viewportEl, wrapperEl, viewportState, getTiles, 
 		const vpVisible = vpW > 0 && vpH > 0;
 
 		ctx.globalAlpha = SCRIM_OPACITY;
-		ctx.fillStyle = isDark ? "#000000" : "#ffffff";
+		ctx.fillStyle = isDark ? cssToken("--qf-ink") : cssToken("--qf-text");
 		ctx.beginPath();
 		ctx.rect(0, 0, MINIMAP_W, MINIMAP_H);
 		if (vpVisible) {
@@ -172,7 +179,7 @@ export function createMinimap({ viewportEl, wrapperEl, viewportState, getTiles, 
 
 		if (vpVisible) {
 			ctx.globalAlpha = VP_BORDER_OPACITY;
-			ctx.strokeStyle = isDark ? "#ffffff" : "#000000";
+			ctx.strokeStyle = isDark ? cssToken("--qf-text") : cssToken("--qf-ink");
 			ctx.lineWidth = 1;
 			ctx.beginPath();
 			drawRoundRect(vpX, vpY, vpW, vpH, 4);

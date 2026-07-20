@@ -13,8 +13,9 @@ import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
 import { checkOneSkin } from "./gates/one-skin.ts";
-// agent-path: cold-safe launcher only (no heavy top-level imports)
+// agent-path / dock-registry: cold-safe launchers only (no heavy top-level imports)
 import { runAgentPathGate } from "./gates/agent-path.ts";
+import { runDockRegistryGate } from "./gates/dock-registry.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -216,9 +217,18 @@ const gates: Gate[] = [
   {
     name: "one-skin",
     description:
-      "WO-006d: no raw hex or non-token font-family outside windows/shared/qf-tokens.css",
+      "WO-006d/007: no raw hex/rgb/hsl or non-token font-family outside windows/shared/qf-tokens.css",
     run: () => {
       const { ok } = checkOneSkin();
+      return ok;
+    },
+  },
+  {
+    name: "dock-registry",
+    description:
+      "WO-007: agent_definition registry list/resolve, species-literal scan, linkSoftware admission",
+    run: async () => {
+      const { ok } = await runDockRegistryGate();
       return ok;
     },
   },

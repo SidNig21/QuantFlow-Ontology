@@ -160,6 +160,11 @@ export const creationCommands: readonly CreationCommand[] = [
     object_type: "agent_session",
     event: "agent_session.created",
   },
+  {
+    action: "register_agent_definition",
+    object_type: "agent_definition",
+    event: "agent_definition.registered",
+  },
 ] as const;
 
 /** All legal (type, from, to) edges from the transition tables. */

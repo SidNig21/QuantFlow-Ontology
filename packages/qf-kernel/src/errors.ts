@@ -71,3 +71,42 @@ export class ArtifactMetadataConflictError extends Error {
     this.attempted = attempted;
   }
 }
+
+/** Registry name already taken (id = name) — nothing written. */
+export class AgentDefinitionExistsError extends Error {
+  readonly species: string;
+
+  constructor(species: string) {
+    super(`agent_definition already registered: name=${species}`);
+    this.name = "AgentDefinitionExistsError";
+    this.species = species;
+  }
+}
+
+/** Species package_ref does not resolve on disk — spawn must fail loudly. */
+export class PackageRefUnresolvedError extends Error {
+  readonly species: string;
+  readonly packageRef: string;
+  readonly resolved: string;
+
+  constructor(species: string, packageRef: string, resolved: string) {
+    super(
+      `package_ref unresolved for species=${species} ref=${packageRef} resolved=${resolved}`,
+    );
+    this.name = "PackageRefUnresolvedError";
+    this.species = species;
+    this.packageRef = packageRef;
+    this.resolved = resolved;
+  }
+}
+
+/** No agent_definition row for the requested species name. */
+export class UnknownSpeciesError extends Error {
+  readonly species: string;
+
+  constructor(species: string) {
+    super(`unknown species: ${species}`);
+    this.name = "UnknownSpeciesError";
+    this.species = species;
+  }
+}

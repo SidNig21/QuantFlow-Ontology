@@ -3,14 +3,17 @@
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-007 — rework round 1**
+## Current order: **WO-008 — the plug test** *(rung 2 of 3; the first real agent)*
 
-Read `docs/orders/WO-007.md`, bottom verification record. Everything except D1 is verified and accepted — touch nothing else.
+Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders/WO-008.md`](WO-008.md) exactly.
 
-- Continue on the existing branch `wo-007`. First: `git fetch origin && git merge origin/QuantFlow`.
-- **Fix D1 only:** `agent-host.ts` must not import `qf-kernel` — route `getAgentDefinition` / `listAgentDefinitions` / `resolveSpeciesPackage` through `kernel.ts` re-exports; delete the direct import.
-- **Proof:** `bun qa/gates/kernel-sole-writer-app.ts` → green; plus **every static gate** (new standing rule in `PROTOCOL.md`): repo-shape, lockfile-committed, kernel-sole-writer, no-canvas-domain-writes, kernel-sole-writer-app, doc-action-surface, one-skin — paste all.
-- Commit and push. **Do not merge.**
+- Work on a new branch named `wo-008`, cut from current `origin/QuantFlow`.
+- **Founder prerequisites are satisfied** (measured: Hermes v0.18.2 on PATH at `~/.local/bin/hermes`). You still never touch credentials — deliverable 0 stops at the ACP handshake; no prompt is sent by you or any gate.
+- **The admitting commit is the gate:** the final commit contains only `species/hermes/**`. Needing to touch dock/host/kernel/gates to admit Hermes is a WO-007 defect to report, not to patch.
+- Run the builder gates including **every static gate** (PROTOCOL standing rule); paste unedited.
+- Commit and push. **Do not merge.** Stop on anything ambiguous — especially any deviation of `hermes acp` from the proven ACP shape.
+
+> **Founder — pre-build read strongly recommended for this one:** attach the Hermes docs (hermes-agent.nousresearch.com/docs) and AgentOS indexes to a third agent for the two-question read plus the external-surface check. This is the most vendor-dependent order on the ladder; the last three pre-reads caught 8, 2, and 8 findings.
 
 ## Founder acceptance checkpoint (founder decision, 2026-07-19)
 

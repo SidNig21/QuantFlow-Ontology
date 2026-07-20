@@ -142,7 +142,10 @@ export function createTileDOM(tile, callbacks) {
   const copyablePath = tile.filePath || tile.folderPath;
   if (copyablePath) {
     const copySvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 0 1 2 9.5V3.5A1.5 1.5 0 0 1 3.5 2h6A1.5 1.5 0 0 1 11 3.5V5"/></svg>`;
-    const checkSvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`;
+    const okStroke = getComputedStyle(document.documentElement)
+      .getPropertyValue("--qf-ok")
+      .trim();
+    const checkSvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="${okStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`;
     const copyBtn = document.createElement("button");
     copyBtn.className = "tile-action-btn tile-copy-path-btn";
     copyBtn.innerHTML = copySvg;

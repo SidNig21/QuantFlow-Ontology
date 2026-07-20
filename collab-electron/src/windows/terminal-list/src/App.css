@@ -1,14 +1,14 @@
 :root {
   --idle-color: var(--qf-ok);
   --busy-color: var(--qf-warn);
-  --focus-bg: rgba(255, 255, 255, 0.06);
-  --border-focus: rgb(250, 250, 250);
+  --focus-bg: color-mix(in srgb, var(--qf-text) 6%, transparent);
+  --border-focus: var(--qf-text);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --focus-bg: rgba(0, 0, 0, 0.04);
-    --border-focus: rgb(24, 24, 27);
+    --focus-bg: color-mix(in srgb, var(--qf-ink) 4%, transparent);
+    --border-focus: var(--qf-surface);
   }
 }
 
