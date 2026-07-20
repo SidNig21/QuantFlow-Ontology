@@ -19,4 +19,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-006b](WO-006b.md) | Kernel in the app: Artifact tile + Law D cold-reopen demo | **done** — verified + merged 2026-07-19 (round 2); **Law D PASSED** | builder (Cursor) |
 | [WO-006c](WO-006c.md) | One agent path end-to-end: spawn → stream → tool → Artifact → lifecycle | **done** — verified + merged 2026-07-19 (round 2); 10 gates cold from zero installs; **v0.1 phase gate closed**; founder demo folded into the post-WO-008 checkpoint (founder decision 2026-07-19) | builder (Cursor) |
 | [WO-006d](WO-006d.md) | One skin: token sheet + one-skin gate (design coherence) | **done** — verified + merged 2026-07-19; hex 55→0, fonts 33→0; look-verdict at the post-008 checkpoint | builder (Cursor) |
-| [WO-007](WO-007.md) | Dock v1: species registry + spawn surface + cube empty-state | **open** — current | builder |
+| [WO-007](WO-007.md) | Dock v1: species registry + spawn surface + cube empty-state | **rework** — verified 2026-07-19; schema/registry/gates confirmed; one defect (D1: agent-host imports qf-kernel directly, seam gate red) | builder (Cursor) |
+| [WO-008](WO-008.md) | The plug test: Hermes through the same socket — admitting diff is the gate | **open** — blocked on WO-007; founder prerequisites listed in the order | builder |
