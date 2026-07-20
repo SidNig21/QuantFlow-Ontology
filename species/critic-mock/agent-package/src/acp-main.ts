@@ -94,7 +94,7 @@ class ToolLoopAcpAgent implements Agent {
         loadSession: false,
       },
       agentInfo: {
-        name: "qf-toolloop",
+        name: "critic-mock",
         version: "0.1.0",
       },
     };

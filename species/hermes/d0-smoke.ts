@@ -3,6 +3,7 @@
  * linkSoftware → createSession("hermes", { env }) — NEVER prompt Hermes.
  *
  * Outcomes: A (handshake OK) · B (guest cannot reach host install) · C (protocol drift)
+ * Exit codes: 0=A · 1=B · 2=C · 3=UNKNOWN · 4=preflight
  */
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
@@ -12,6 +13,9 @@ import { AgentOs, type JsonRpcNotification } from "@rivet-dev/agentos-core";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const AOSPKG = join(HERE, "packed/hermes.aospkg");
+
+/** Typed stderr prefix from acp-shim.ts — B requires this exact family. */
+const SHIM_NOT_FOUND_PREFIX = "hermes-acp-shim: HERMES_BIN not found:";
 
 /** Absolute Hermes executable — venv binary (no PATH / env-bash wrapper). */
 const HERMES_BIN =
@@ -29,6 +33,39 @@ function sessionIdFromNotification(
   return typeof sid === "string" && sid.length > 0 ? sid : null;
 }
 
+/**
+ * Positive classification only.
+ * B = host binary exists ∧ createSession failed ∧ shim typed not-found in error text.
+ * C = protocol-shape signatures (without the shim not-found evidence).
+ * UNKNOWN = anything else — never claim B.
+ */
+function classifyCreateSessionFailure(
+  err: unknown,
+  hostBinaryExists: boolean,
+): { outcome: "B" | "C" | "UNKNOWN"; exit: number } {
+  const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  const shimNotFound = msg.includes(SHIM_NOT_FOUND_PREFIX);
+
+  if (hostBinaryExists && shimNotFound) {
+    return { outcome: "B", exit: 1 };
+  }
+
+  const lower = msg.toLowerCase();
+  const protocolShape =
+    (lower.includes("unsupported method") ||
+      lower.includes("parse error") ||
+      lower.includes("invalid request") ||
+      lower.includes("protocol version") ||
+      lower.includes("jsonrpc")) &&
+    !shimNotFound;
+
+  if (protocolShape) {
+    return { outcome: "C", exit: 2 };
+  }
+
+  return { outcome: "UNKNOWN", exit: 3 };
+}
+
 async function main(): Promise<number> {
   console.log("d0-smoke: HERMES_BIN=", HERMES_BIN);
   console.log("d0-smoke: HOME=", HOME);
@@ -36,11 +73,15 @@ async function main(): Promise<number> {
 
   if (!existsSync(AOSPKG)) {
     console.error("d0-smoke: missing packed package — run bun run pack-agent");
-    return 1;
+    return 4;
   }
-  if (!existsSync(HERMES_BIN)) {
-    console.error("d0-smoke: HERMES_BIN not found:", HERMES_BIN);
-    return 1;
+  const hostBinaryExists = existsSync(HERMES_BIN);
+  if (!hostBinaryExists) {
+    console.error("d0-smoke: HERMES_BIN not found on host:", HERMES_BIN);
+    console.error(
+      "OUTCOME UNKNOWN — cannot claim B without a host binary present for comparison",
+    );
+    return 3;
   }
 
   const env = {
@@ -48,6 +89,7 @@ async function main(): Promise<number> {
     HOME,
   };
   console.log("d0-smoke: createSession env keys=", Object.keys(env).join(","));
+  console.log("d0-smoke: hostBinaryExists=", hostBinaryExists);
 
   let os: AgentOs | null = null;
   try {
@@ -75,30 +117,26 @@ async function main(): Promise<number> {
     await Bun.sleep(2000);
     unsub();
 
-    // listSessions is also evidence of a live session
     const listed = os.listSessions().map((s) => s.sessionId);
     console.log("d0-smoke: listSessions=", JSON.stringify(listed));
 
     if (!listed.includes(session)) {
       console.error(
-        "OUTCOME C or B: createSession id not in listSessions after handshake window",
+        "OUTCOME UNKNOWN — createSession returned an id not in listSessions",
       );
       console.error("d0-smoke: session=", session, "listed=", listed);
       await os.destroySession(session).catch(() => {});
-      return 1;
+      return 3;
     }
 
-    // Prefer notification ACP id when present; otherwise createSession id is the ACP id.
     const acpId = guestMinted ?? session;
-    console.log(
-      `d0-smoke: session=${session} guestMinted=${acpId}`,
-    );
+    console.log(`d0-smoke: session=${session} guestMinted=${acpId}`);
     if (session !== acpId) {
       console.error(
-        `OUTCOME C: ID adoption failed session=${session} guestMinted=${acpId}`,
+        `OUTCOME C — ID adoption failed session=${session} guestMinted=${acpId}`,
       );
       await os.destroySession(session).catch(() => {});
-      return 1;
+      return 2;
     }
 
     console.log(
@@ -116,32 +154,21 @@ async function main(): Promise<number> {
     console.error("d0-smoke: ERROR", msg);
     if (stack) console.error(stack);
 
-    const lower = msg.toLowerCase();
-    // Guest isolation / missing host binary is B even when ACP "initialize" is in the error text.
-    if (
-      lower.includes("hermes_bin not found") ||
-      lower.includes("not found:") ||
-      lower.includes("enoent") ||
-      lower.includes("guest") ||
-      lower.includes("cannot reach")
-    ) {
+    // createSession failed (we are in catch) — classify positively.
+    const { outcome, exit } = classifyCreateSessionFailure(err, hostBinaryExists);
+    if (outcome === "B") {
       console.error(
-        "OUTCOME B — guest space cannot reach host install (or spawn/handshake failed)",
+        "OUTCOME B — positive: hostBinaryExists ∧ createSession failed ∧ shim typed stderr",
       );
-    } else if (
-      lower.includes("protocol") ||
-      lower.includes("jsonrpc") ||
-      lower.includes("parse") ||
-      lower.includes("unsupported") ||
-      (lower.includes("initialize") && !lower.includes("not found"))
-    ) {
+      console.error(`d0-smoke: matched prefix=${JSON.stringify(SHIM_NOT_FOUND_PREFIX)}`);
+    } else if (outcome === "C") {
       console.error("OUTCOME C — protocol drift (unstable ACP vs SDK)");
     } else {
       console.error(
-        "OUTCOME B — guest space cannot reach host install (or spawn/handshake failed)",
+        "OUTCOME UNKNOWN — createSession failed without B or C evidence; do not claim B",
       );
     }
-    return 1;
+    return exit;
   } finally {
     if (os) await os.dispose?.().catch(() => {});
   }
