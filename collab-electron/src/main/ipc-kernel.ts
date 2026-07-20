@@ -17,7 +17,7 @@ import {
   getRegisteredBus,
   type PublishAndDeliverOpts,
 } from "./a2a-bus";
-import { spawnA2aFourSeats } from "./a2a-orchestra";
+import { runPacedFourTileMovie, spawnA2aFourSeats } from "./a2a-orchestra";
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import {
   kernelExecute,
@@ -213,6 +213,34 @@ export function registerKernelHandlers(): void {
       });
       invalidateDock();
       return { ok: true as const, busId, seats };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  /** WO-008f: founder button — spawn 4 seats, then run the paced movie on them. */
+  ipcMain.handle("qf:a2a:runProof", async (event) => {
+    try {
+      assertTrustedSender(event);
+      const { busId, bus } = createRegisteredElectronBus();
+      const seats = await spawnA2aFourSeats(bus, {
+        onTile: (sessionId, sp, ptySessionId) => {
+          invalidateDock();
+          sendToShell(
+            "shell:forward",
+            "canvas",
+            "create-term-tile",
+            ptySessionId,
+            sessionId,
+            sp,
+          );
+        },
+      });
+      invalidateDock();
+      // Let the four TUIs boot and draw before banners land.
+      await new Promise<void>((r) => setTimeout(r, 4000));
+      const summary = await runPacedFourTileMovie(bus);
+      return { ok: true as const, busId, seats, summary };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

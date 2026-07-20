@@ -115,6 +115,25 @@ export function initDock(panelEl) {
 		}
 	}
 
+	const runA2aBtn = panelEl.querySelector("#dock-run-a2a");
+	const a2aStatus = panelEl.querySelector("#dock-a2a-status");
+	if (runA2aBtn && a2aStatus) {
+		runA2aBtn.addEventListener("click", async () => {
+			runA2aBtn.disabled = true;
+			a2aStatus.textContent = "spawning 4 seats…";
+			try {
+				const res = await window.shellApi.qf.runA2aProof();
+				a2aStatus.textContent = res?.ok
+					? `talk-back delivered ✓ (dispatch ${shortId(res.summary.dispatchId)})`
+					: (res?.error?.message ?? "A2A failed");
+			} catch (err) {
+				a2aStatus.textContent = String((err && err.message) || err);
+			} finally {
+				runA2aBtn.disabled = false;
+			}
+		});
+	}
+
 	window.shellApi.qf.onDockInvalidate(() => {
 		void refresh();
 	});

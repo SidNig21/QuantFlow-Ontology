@@ -7,6 +7,7 @@ import {
   type A2aBus,
   type A2aRole,
   type ElectronA2aSeat,
+  type PublishAndDeliverResult,
 } from "./a2a-bus";
 import { admitAndStartSession, cancelAgentSession } from "./agent-host";
 import {
@@ -66,6 +67,85 @@ export async function spawnA2aFourSeats(
     out.push(seat);
   }
   return out;
+}
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+export type A2aMovieSummary = {
+  dispatchId: string;
+  hops: Array<{ hop: string; from: A2aRole; to: A2aRole[]; artifactId: string }>;
+};
+
+/**
+ * WO-008f (founder button): the four-hop movie, paced so it can be watched
+ * landing on live TUI tiles. Bodies are host-choreographed (same scope the
+ * WO-008e harness was accepted under); real Hermes-driven replies arrive with
+ * Run Workflow v1.
+ */
+export async function runPacedFourTileMovie(
+  bus: A2aBus,
+  opts?: { stepMs?: number },
+): Promise<A2aMovieSummary> {
+  const stepMs = opts?.stepMs ?? 1500;
+  const seats = bus.listSeats();
+  if (seats.length !== 4) {
+    throw new Error(`a2a movie needs 4 seats (have ${seats.length})`);
+  }
+  bus.setDeliveryEnabled(true);
+  const task = "Demo task: each worker returns one short finding labeled A or B.";
+  const hops: A2aMovieSummary["hops"] = [];
+  const record = (
+    hop: string,
+    from: A2aRole,
+    to: A2aRole[],
+    r: PublishAndDeliverResult,
+  ) => hops.push({ hop, from, to, artifactId: r.artifactId });
+
+  const fanOut = bus.publishAndDeliver({
+    hop: "fan_out",
+    fromRole: "orchestrator",
+    toRoles: ["worker_a", "worker_b"],
+    task,
+    body: `TASK from Orchestrator\n${task}`,
+  });
+  record("fan_out", "orchestrator", ["worker_a", "worker_b"], fanOut);
+  await sleep(stepMs);
+
+  const subA = bus.publishAndDeliver({
+    hop: "submission",
+    fromRole: "worker_a",
+    toRoles: ["reviewer"],
+    dispatchId: fanOut.dispatchId,
+    attr: "A",
+    body: "SUBMISSION A\nFINDING A: alpha-ready",
+  });
+  record("submission", "worker_a", ["reviewer"], subA);
+  await sleep(stepMs);
+
+  const subB = bus.publishAndDeliver({
+    hop: "submission",
+    fromRole: "worker_b",
+    toRoles: ["reviewer"],
+    dispatchId: fanOut.dispatchId,
+    attr: "B",
+    body: "SUBMISSION B\nFINDING B: beta-ready",
+  });
+  record("submission", "worker_b", ["reviewer"], subB);
+  await sleep(stepMs);
+
+  const talkBack = bus.publishAndDeliver({
+    hop: "talk_back",
+    fromRole: "reviewer",
+    toRoles: ["orchestrator"],
+    dispatchId: fanOut.dispatchId,
+    body:
+      `REVIEW talk-back to Orchestrator (dispatch=${fanOut.dispatchId})\n` +
+      `- Worker A: alpha-ready [artifact ${subA.artifactId.slice(0, 12)}…]\n` +
+      `- Worker B: beta-ready [artifact ${subB.artifactId.slice(0, 12)}…]`,
+  });
+  record("talk_back", "reviewer", ["orchestrator"], talkBack);
+
+  return { dispatchId: fanOut.dispatchId, hops };
 }
 
 /**
