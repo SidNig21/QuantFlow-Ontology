@@ -104,6 +104,8 @@ The dock is QuantFlow's access point — the surface where **species become sess
 - Post-merge findings land: session-tile Cancel gated to legal edges (dock is; tile isn't) · `closeSession` preload asymmetry fixed · renderer's `definitions[0]` singleton leftover removed.
 - **Extract-first guardrail:** `renderer.js` (~1767 lines) and `tile-manager.js` (~969) may not grow — extraction precedes any addition. Binding on WO-008a and A2A too.
 
+**WO-008b · Hermes reachability — bundle vs authorized mount.** *Depends: WO-007b. Born from WO-008's Outcome B (guest overlay cannot see the host install; measured). Probe the SDK's `hostMounts`/`rootFilesystem` options vs packaging a self-contained Hermes; the architect decides on the probe's evidence. Unblocks the live Hermes turn together with WO-008a.*
+
 **WO-008a · Permission bridge + tool policy.** *Depends: WO-008. Moved here explicitly from the WO-007/008 plug split — was previously deferred twice; now a rung, not a footnote.*
 - Host implements the ACP permission handler (`onPermissionRequest`): **deny-by-default**, explicit founder-visible grant surface, no auto-approve (the legacy `acp-agent.ts` auto-allow is the anti-pattern, debt #14).
 - Per-species tool allowlist on `agent_definition` (schema amendment), enforced at the host seam; falsify with an unlisted tool via the mock species.
