@@ -1,8 +1,8 @@
 /**
  * WO-008e — Kernel-mediated 4-seat A2A proof (headless).
  *
- * D0: Kernel has no create_task / assigned_to / delegates_to commands.
- * Bus: publish_artifact + host PTY inject (no guest side-channel).
+ * Shared core: a2a-core.ts. Delivery proof = inject-file bytes observed
+ * outside publish (not a self-appended diary). Capture files are read.
  *
  * Exit 0 = green.
  */
@@ -12,6 +12,7 @@ import {
   readFileSync,
   writeFileSync,
   appendFileSync,
+  rmSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -22,6 +23,13 @@ import {
   openKernel,
   type TraceContext,
 } from "qf-kernel";
+import {
+  assertFanOutSimultaneous,
+  createA2aBus,
+  type A2aRole,
+  type DeliveryChannel,
+} from "./a2a-core.ts";
+import { runScriptedFourTileProof } from "./a2a-proof-script.ts";
 import { resolveHostAcpCommand } from "./host-acp-client.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -29,12 +37,21 @@ const REPO = join(HERE, "../..");
 const EVIDENCE = join(REPO, "docs/orders/evidence/wo-008e");
 const HOME = process.env.HOME ?? homedir();
 
-type Role = "orchestrator" | "worker_a" | "worker_b" | "reviewer";
+type Role = A2aRole;
 
 type Seat = {
   role: Role;
   sessionId: string;
   pid: number;
+};
+
+type DeliveryObs = {
+  role: Role;
+  hop: string;
+  dispatchId: string;
+  text: string;
+  /** Byte length of inject file after this deliver call. */
+  injectBytesAfter: number;
 };
 
 function trace(): TraceContext {
@@ -154,13 +171,21 @@ function inject(injectPath: string, text: string): void {
   appendFileSync(injectPath, text, "utf8");
 }
 
+function readUtf8(path: string): string {
+  try {
+    return readFileSync(path, "utf8");
+  } catch {
+    return "";
+  }
+}
+
 async function main(): Promise<number> {
-  console.log("a2a-4tile-smoke: WO-008e");
+  console.log("a2a-4tile-smoke: WO-008e (rework D1–D5)");
   console.log(
     "a2a-4tile-smoke: D0 — Kernel commands missing: create_task, assigned_to, delegates_to.",
   );
   console.log(
-    "a2a-4tile-smoke: D0 — smallest bus: publish_artifact (report) + host PTY inject.",
+    "a2a-4tile-smoke: D0 — smallest bus: publish_artifact (report) + host delivery adapter.",
   );
 
   let hermesBin: string;
@@ -178,6 +203,13 @@ async function main(): Promise<number> {
   }
 
   mkdirSync(EVIDENCE, { recursive: true });
+  // Drop stale self-logging evidence from round-1 tip.
+  try {
+    rmSync(join(EVIDENCE, "delivered"), { recursive: true, force: true });
+  } catch {
+    /* */
+  }
+
   const before = await snapshotHermesPids();
   const db = openKernel(":memory:");
   execute(
@@ -222,138 +254,112 @@ async function main(): Promise<number> {
 
   await Bun.sleep(2500);
 
-  let delivery = true;
-  const dispatchId = crypto.randomUUID();
   const a2aDir = join(EVIDENCE, "artifacts");
-  const deliveryDir = join(EVIDENCE, "delivered");
   mkdirSync(a2aDir, { recursive: true });
-  mkdirSync(deliveryDir, { recursive: true });
-  const deliveredAt: Record<string, string> = {};
+
+  /** Independent observer — populated only by the deliver adapter, not publish. */
+  const deliveryObs: DeliveryObs[] = [];
+  const channel: DeliveryChannel = "stdin";
+
+  const bus = createA2aBus({
+    artifactDir: a2aDir,
+    defaultChannel: channel,
+    joinPath: join,
+    writeFile: (path, bytes) => {
+      writeFileSync(path, bytes);
+    },
+    publishArtifact: ({ storagePath }) => {
+      const pub = execute(
+        db,
+        "publish_artifact",
+        { kind: "report", path: storagePath, storage_ref: storagePath },
+        trace(),
+      );
+      return { artifactId: String(pub.object_id) };
+    },
+    deliver: ({ seat, text, envelope }) => {
+      // Real delivery boundary: PTY inject file only (no diary log).
+      inject(helpers[seat.role as Role].injectPath, text);
+      const injectBytesAfter = readFileSync(
+        helpers[seat.role as Role].injectPath,
+      ).byteLength;
+      deliveryObs.push({
+        role: seat.role,
+        hop: envelope.hop,
+        dispatchId: envelope.dispatch_id,
+        text,
+        injectBytesAfter,
+      });
+    },
+  });
+
+  for (const s of seats) {
+    bus.registerSeat({
+      role: s.role,
+      sessionId: s.sessionId,
+      deliveryId: helpers[s.role].injectPath,
+    });
+  }
+
+  const script = runScriptedFourTileProof(bus);
+  assertFanOutSimultaneous(script.fanOut, ["worker_a", "worker_b"]);
+
+  await Bun.sleep(1200);
+
+  // Observe inject files after the fact (adapter side-effect, not publish diary).
+  const injectSnap: Record<string, string> = {};
+  const captureSnap: Record<string, string> = {};
   for (const role of roles) {
-    writeFileSync(join(deliveryDir, `${role}.log`), "");
+    injectSnap[role] = readUtf8(helpers[role].injectPath);
+    captureSnap[role] = readUtf8(helpers[role].capturePath);
   }
 
-  function publish(
-    hop: string,
-    from: Role,
-    to: Role[],
-    body: string,
-    attr?: string,
-  ): string {
-    const fromSeat = seats.find((s) => s.role === from)!;
-    const toSeats = to.map((r) => seats.find((s) => s.role === r)!);
-    const envelope = {
-      a2a: "1",
-      hop,
-      dispatch_id: dispatchId,
-      from_role: from,
-      to_roles: to,
-      from_session: fromSeat.sessionId,
-      to_sessions: toSeats.map((s) => s.sessionId),
-      body,
-      attr,
-    };
-    const path = join(
-      a2aDir,
-      `${hop}-${attr ?? "x"}-${dispatchId.slice(0, 8)}.json`,
-    );
-    writeFileSync(path, JSON.stringify(envelope, null, 2));
-    const pub = execute(
-      db,
-      "publish_artifact",
-      { kind: "report", path, storage_ref: path },
-      trace(),
-    );
-    const marker =
-      `\r\n── QF-A2A ${hop} dispatch=${dispatchId}` +
-      (attr ? ` attr=${attr}` : "") +
-      ` ──\r\n${body}\r\n── end QF-A2A ──\r\n`;
-    if (delivery) {
-      const at = new Date().toISOString();
-      for (const s of toSeats) {
-        // Host delivery: inject into PTY + record host-side delivery log
-        // (TUI often does not echo stdin; Electron uses displayOnSession).
-        inject(helpers[s.role].injectPath, marker);
-        appendFileSync(join(deliveryDir, `${s.role}.log`), marker, "utf8");
-        deliveredAt[`${hop}:${s.role}`] = at;
-      }
-    }
-    return String(pub.object_id);
-  }
+  const obsFor = (role: Role, needle: string) =>
+    deliveryObs.some((o) => o.role === role && o.text.includes(needle));
 
-  const fanOutArt = publish(
-    "fan_out",
-    "orchestrator",
-    ["worker_a", "worker_b"],
-    "TASK: return FINDING A/B",
-  );
-  console.log(
-    `a2a-4tile-smoke: fan_out artifact=${fanOutArt} dispatch=${dispatchId}`,
-  );
-  console.log(
-    `a2a-4tile-smoke: simultaneous deliver worker_a@${deliveredAt["fan_out:worker_a"]} worker_b@${deliveredAt["fan_out:worker_b"]}`,
-  );
+  const injectHas = (role: Role, needle: string) =>
+    injectSnap[role]!.includes(needle);
 
-  const subA = publish(
-    "submission",
-    "worker_a",
-    ["reviewer"],
-    `FINDING A: alpha-ready session=${seats[1]!.sessionId}`,
-    "A",
-  );
-  const subB = publish(
-    "submission",
-    "worker_b",
-    ["reviewer"],
-    `FINDING B: beta-ready session=${seats[2]!.sessionId}`,
-    "B",
-  );
-  const talk = publish(
-    "talk_back",
-    "reviewer",
-    ["orchestrator"],
-    `REVIEW both: A=${subA.slice(0, 12)} B=${subB.slice(0, 12)}`,
-  );
-  console.log(
-    `a2a-4tile-smoke: submissions A=${subA} B=${subB} talk_back=${talk}`,
-  );
+  const workerAGot =
+    obsFor("worker_a", "QF-A2A fan_out") &&
+    injectHas("worker_a", "QF-A2A fan_out");
+  const workerBGot =
+    obsFor("worker_b", "QF-A2A fan_out") &&
+    injectHas("worker_b", "QF-A2A fan_out");
+  const reviewerGotA =
+    obsFor("reviewer", "attr=A") && injectHas("reviewer", "attr=A");
+  const reviewerGotB =
+    obsFor("reviewer", "attr=B") && injectHas("reviewer", "attr=B");
+  const orchGotTalk =
+    obsFor("orchestrator", "talk_back") &&
+    injectHas("orchestrator", "talk_back");
 
-  await Bun.sleep(1000);
-
-  delivery = false;
-  publish(
-    "fan_out",
-    "orchestrator",
-    ["worker_a", "worker_b"],
-    "FALSIFY MARKER — must not deliver",
-  );
-  delivery = true;
-  publish(
-    "fan_out",
-    "orchestrator",
-    ["worker_a", "worker_b"],
-    "RESTORE MARKER — delivery on",
-  );
-  await Bun.sleep(800);
-
-  const caps: Record<string, string> = {};
-  for (const role of roles) {
-    caps[role] = readFileSync(join(deliveryDir, `${role}.log`), "utf8");
-  }
-
-  const workerAGot = caps.worker_a.includes("QF-A2A fan_out");
-  const workerBGot = caps.worker_b.includes("QF-A2A fan_out");
-  const reviewerGotA = caps.reviewer.includes("attr=A");
-  const reviewerGotB = caps.reviewer.includes("attr=B");
-  const orchGotTalk = caps.orchestrator.includes("talk_back");
   const falsifySilent =
-    !caps.worker_a.includes("FALSIFY MARKER") &&
-    !caps.worker_b.includes("FALSIFY MARKER");
+    script.falsify.red.deliveredRoles.length === 0 &&
+    !injectHas("worker_a", "FALSIFY MARKER") &&
+    !injectHas("worker_b", "FALSIFY MARKER") &&
+    !obsFor("worker_a", "FALSIFY MARKER") &&
+    !obsFor("worker_b", "FALSIFY MARKER");
+
   const restoreOk =
-    caps.worker_a.includes("RESTORE MARKER") &&
-    caps.worker_b.includes("RESTORE MARKER");
-  const sameDispatchTs =
-    deliveredAt["fan_out:worker_a"] === deliveredAt["fan_out:worker_b"];
+    script.falsify.green.deliveredRoles.includes("worker_a") &&
+    script.falsify.green.deliveredRoles.includes("worker_b") &&
+    injectHas("worker_a", "RESTORE MARKER") &&
+    injectHas("worker_b", "RESTORE MARKER");
+
+  // D5: one dispatch_id → N targets (not ISO string equality).
+  const fanOutOneDispatch =
+    script.fanOut.envelope.to_roles.length === 2 &&
+    script.fanOut.deliveredRoles.length === 2 &&
+    script.fanOut.envelope.dispatch_id === script.fanOut.dispatchId;
+
+  // Capture files are read (even if TUI does not echo markers).
+  const captureBytes = Object.fromEntries(
+    roles.map((r) => [r, captureSnap[r]!.length]),
+  );
+  const captureSawQf = Object.fromEntries(
+    roles.map((r) => [r, captureSnap[r]!.includes("QF-A2A")]),
+  );
 
   const summary = {
     sessions: seats.map((s) => ({
@@ -361,12 +367,14 @@ async function main(): Promise<number> {
       sessionId: s.sessionId,
       pid: s.pid,
     })),
-    dispatchId,
-    fanOutArt,
-    subA,
-    subB,
-    talk,
-    deliveredAt,
+    dispatchId: script.fanOut.dispatchId,
+    fanOutArt: script.fanOut.artifactId,
+    subA: script.submissions.worker_a.artifactId,
+    subB: script.submissions.worker_b.artifactId,
+    talk: script.talkBack.artifactId,
+    deliveryObsCount: deliveryObs.length,
+    captureBytes,
+    captureSawQf,
     checks: {
       workerAGot,
       workerBGot,
@@ -375,9 +383,9 @@ async function main(): Promise<number> {
       orchGotTalk,
       falsifySilent,
       restoreOk,
-      sameDispatchTs,
+      fanOutOneDispatch,
     },
-    d0: "Kernel: no create_task/assigned_to/delegates_to; bus=publish_artifact + host inject/display",
+    d0: "Kernel: no create_task/assigned_to/delegates_to; bus=a2a-core + publish_artifact + inject adapter",
   };
   console.log(JSON.stringify(summary.checks));
   writeFileSync(join(EVIDENCE, "proof.json"), JSON.stringify(summary, null, 2));
@@ -429,7 +437,7 @@ async function main(): Promise<number> {
     orchGotTalk &&
     falsifySilent &&
     restoreOk &&
-    sameDispatchTs &&
+    fanOutOneDispatch &&
     orphans.length === 0;
 
   if (!ok) {

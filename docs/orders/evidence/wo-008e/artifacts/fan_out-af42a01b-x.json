@@ -1,0 +1,17 @@
+{
+  "a2a": "1",
+  "hop": "fan_out",
+  "dispatch_id": "af42a01b-a952-4624-be2a-19836b384172",
+  "from_role": "orchestrator",
+  "to_roles": [
+    "worker_a",
+    "worker_b"
+  ],
+  "from_session": "bb1bf6dd-0c1a-44cb-96cc-7a703b2db9f9",
+  "to_sessions": [
+    "e5cdf74c-461d-470e-851f-e6a1a882449d",
+    "4cf60b65-562e-4082-a111-a4fdf4874e68"
+  ],
+  "task": "falsify-restore",
+  "body": "RESTORE MARKER — delivery back on"
+}

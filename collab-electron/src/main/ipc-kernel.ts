@@ -12,11 +12,12 @@ import {
   onSessionDone,
   runTurn,
 } from "./agent-host";
-import { setA2aDeliveryEnabled } from "./a2a-bus";
 import {
-  runA2aFourTileProof,
-  spawnA2aFourSeats,
-} from "./a2a-orchestra";
+  createRegisteredElectronBus,
+  getRegisteredBus,
+  type PublishAndDeliverOpts,
+} from "./a2a-bus";
+import { spawnA2aFourSeats } from "./a2a-orchestra";
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import {
   kernelExecute,
@@ -192,30 +193,63 @@ export function registerKernelHandlers(): void {
     },
   );
 
-  /** WO-008e: spawn 4 Hermes TUI seats + run Kernel-mediated A2A proof. */
+  /** WO-008e: spawn 4 Hermes TUI seats on a fresh instance-scoped bus. */
+  ipcMain.handle("qf:a2a:spawnSeats", async (event) => {
+    try {
+      assertTrustedSender(event);
+      const { busId, bus } = createRegisteredElectronBus();
+      const seats = await spawnA2aFourSeats(bus, {
+        onTile: (sessionId, sp, ptySessionId) => {
+          invalidateDock();
+          sendToShell(
+            "shell:forward",
+            "canvas",
+            "create-term-tile",
+            ptySessionId,
+            sessionId,
+            sp,
+          );
+        },
+      });
+      invalidateDock();
+      return { ok: true as const, busId, seats };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  /** WO-008e: one Kernel publish + host delivery to target seats. */
   ipcMain.handle(
-    "qf:a2a:runProof",
-    async (event, args?: { cancelOne?: boolean }) => {
+    "qf:a2a:dispatch",
+    (
+      event,
+      args?: PublishAndDeliverOpts & { busId?: string },
+    ) => {
       try {
         assertTrustedSender(event);
-        const seats = await spawnA2aFourSeats({
-          onTile: (sessionId, sp, ptySessionId) => {
-            invalidateDock();
-            sendToShell(
-              "shell:forward",
-              "canvas",
-              "create-term-tile",
-              ptySessionId,
-              sessionId,
-              sp,
-            );
-          },
-        });
-        const proof = await runA2aFourTileProof({
-          cancelOne: args?.cancelOne !== false,
-        });
-        invalidateDock();
-        return { ok: true as const, seats, proof };
+        if (!args?.busId || typeof args.busId !== "string") {
+          return {
+            ok: false as const,
+            error: {
+              name: "InvalidArgs",
+              message: "qf:a2a:dispatch requires busId:string",
+            },
+          };
+        }
+        if (!args.hop || !args.fromRole || !args.toRoles || !args.body) {
+          return {
+            ok: false as const,
+            error: {
+              name: "InvalidArgs",
+              message:
+                "qf:a2a:dispatch requires hop, fromRole, toRoles, body",
+            },
+          };
+        }
+        const bus = getRegisteredBus(args.busId);
+        const { busId: _busId, ...opts } = args;
+        const result = bus.publishAndDeliver(opts);
+        return { ok: true as const, result };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };
       }
@@ -224,10 +258,19 @@ export function registerKernelHandlers(): void {
 
   ipcMain.handle(
     "qf:a2a:setDelivery",
-    (event, args?: { enabled?: boolean }) => {
+    (event, args?: { busId?: string; enabled?: boolean }) => {
       try {
         assertTrustedSender(event);
-        if (typeof args?.enabled !== "boolean") {
+        if (!args?.busId || typeof args.busId !== "string") {
+          return {
+            ok: false as const,
+            error: {
+              name: "InvalidArgs",
+              message: "qf:a2a:setDelivery requires busId:string",
+            },
+          };
+        }
+        if (typeof args.enabled !== "boolean") {
           return {
             ok: false as const,
             error: {
@@ -236,7 +279,7 @@ export function registerKernelHandlers(): void {
             },
           };
         }
-        setA2aDeliveryEnabled(args.enabled);
+        getRegisteredBus(args.busId).setDeliveryEnabled(args.enabled);
         return { ok: true as const, enabled: args.enabled };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };

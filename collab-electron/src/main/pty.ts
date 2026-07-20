@@ -33,8 +33,17 @@ import {
   type SessionCreateParams,
 } from "./sidecar/protocol";
 import { COLLAB_DIR } from "./paths";
+import {
+  bindPtyDisplay,
+  clearAllPtyViewers,
+  forgetPtyViewer,
+  getPtyViewer,
+  rememberPtyViewer,
+} from "./pty-display";
 import { resolveTerminalTarget } from "./terminal-target";
 import { nearestExistingDir } from "./cwd-fallback";
+
+export { displayOnSession } from "./pty-display";
 
 interface PtySession {
   pty: pty.IPty;
@@ -93,37 +102,17 @@ function getWebContents(): typeof import("electron").webContents | null {
   }
 }
 
-/** sessionId → last webContents that attached (reconnect / create). */
-const sessionViewers = new Map<string, number>();
-
-function rememberViewer(
-  sessionId: string,
-  senderWebContentsId: number | undefined,
-): void {
-  if (senderWebContentsId != null) {
-    sessionViewers.set(sessionId, senderWebContentsId);
-  }
-}
-
 function sendToSender(
   senderWebContentsId: number | undefined,
   channel: string,
   payload: unknown,
 ): void {
+  if (senderWebContentsId == null) return;
   const wc = getWebContents();
   if (!wc) return;
-  if (senderWebContentsId != null) {
-    const sender = wc.fromId(senderWebContentsId);
-    if (sender && !sender.isDestroyed()) {
-      sender.send(channel, payload);
-      return;
-    }
-  }
-  // Fallback: broadcast (tiles filter by sessionId).
-  for (const contents of wc.getAllWebContents()) {
-    if (!contents.isDestroyed()) {
-      contents.send(channel, payload);
-    }
+  const sender = wc.fromId(senderWebContentsId);
+  if (sender && !sender.isDestroyed()) {
+    sender.send(channel, payload);
   }
 }
 
@@ -205,6 +194,11 @@ function forwardPtyData(
     );
   }
 }
+
+bindPtyDisplay({
+  forwardPtyData,
+  getWebContents,
+});
 
 function utf8Env(): Record<string, string> {
   const env = { ...process.env } as Record<string, string>;
@@ -408,6 +402,7 @@ function attachClient(
 ): pty.IPty {
   const tmuxBin = getTmuxBin();
   const name = tmuxSessionName(sessionId);
+  rememberPtyViewer(sessionId, senderWebContentsId);
 
   const ptyProcess = pty.spawn(
     tmuxBin,
@@ -420,7 +415,7 @@ function attachClient(
   disposables.push(
     ptyProcess.onData((data: string) => {
       sendToSender(
-        senderWebContentsId,
+        getPtyViewer(sessionId) ?? senderWebContentsId,
         "pty:data",
         { sessionId, data },
       );
@@ -798,13 +793,13 @@ export async function createHostCommandSession(opts: {
   const { sessionId, socketPath } = await client.createSession(createParams);
   console.log(`[pty] createHostCommandSession ok sessionId=${sessionId}`);
 
-  rememberViewer(sessionId, opts.senderWebContentsId);
+  rememberPtyViewer(sessionId, opts.senderWebContentsId);
   const dataSock = await client.attachDataSocket(
     socketPath,
     (data) => {
       forwardPtyData(
         sessionId,
-        sessionViewers.get(sessionId) ?? opts.senderWebContentsId,
+        getPtyViewer(sessionId) ?? opts.senderWebContentsId,
         data,
       );
     },
@@ -874,13 +869,13 @@ export async function reconnectSession(
       sessionId, cols, rows,
     );
 
-    rememberViewer(sessionId, senderWebContentsId);
+    rememberPtyViewer(sessionId, senderWebContentsId);
     const dataSock = await client.attachDataSocket(
       socketPath,
       (data) => {
         forwardPtyData(
           sessionId,
-          sessionViewers.get(sessionId) ?? senderWebContentsId,
+          getPtyViewer(sessionId) ?? senderWebContentsId,
           data,
         );
       },
@@ -977,19 +972,6 @@ export function writeToSession(
   session.pty.write(data);
 }
 
-/**
- * WO-008e: push bytes to the term tile display (xterm) without relying on
- * guest echo. Used for Kernel-mediated A2A delivery visibility.
- */
-export function displayOnSession(sessionId: string, data: string): void {
-  const viewer = sessionViewers.get(sessionId);
-  forwardPtyData(
-    sessionId,
-    viewer,
-    Buffer.from(data, "utf8"),
-  );
-}
-
 export function sendRawKeys(
   sessionId: string,
   data: string,
@@ -1040,6 +1022,7 @@ export async function killSession(
   sessionId: string,
 ): Promise<void> {
   clearForegroundCache(sessionId);
+  forgetPtyViewer(sessionId);
   const backend = sessionBackend(sessionId);
   if (backend === "sidecar") {
     dataSockets.get(sessionId)?.destroy();
@@ -1082,6 +1065,7 @@ export function listSessions(): string[] {
 
 export function killAll(): void {
   shuttingDown = true;
+  clearAllPtyViewers();
   for (const [, sock] of dataSockets) {
     sock.destroy();
   }
@@ -1102,6 +1086,7 @@ const KILL_ALL_TIMEOUT_MS = 2000;
 
 export function killAllAndWait(): Promise<void> {
   shuttingDown = true;
+  clearAllPtyViewers();
   if (sessions.size === 0) return Promise.resolve();
 
   const pending: Promise<void>[] = [];

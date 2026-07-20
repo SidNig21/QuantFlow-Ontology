@@ -2,35 +2,42 @@
   "sessions": [
     {
       "role": "orchestrator",
-      "sessionId": "1359a010-1980-4313-b28d-15c6068e9158",
-      "pid": 940337
+      "sessionId": "bb1bf6dd-0c1a-44cb-96cc-7a703b2db9f9",
+      "pid": 951051
     },
     {
       "role": "worker_a",
-      "sessionId": "a22da578-5b10-42ea-9440-8e87244569b6",
-      "pid": 940340
+      "sessionId": "e5cdf74c-461d-470e-851f-e6a1a882449d",
+      "pid": 951056
     },
     {
       "role": "worker_b",
-      "sessionId": "aa1aaaa3-ef4d-45c3-a327-553887770dec",
-      "pid": 940345
+      "sessionId": "4cf60b65-562e-4082-a111-a4fdf4874e68",
+      "pid": 951059
     },
     {
       "role": "reviewer",
-      "sessionId": "31b46557-827e-4a4b-b14d-55f04cbd9f05",
-      "pid": 940350
+      "sessionId": "7eaf105f-1ab2-4817-a56b-6e4c9f0a2fdb",
+      "pid": 951066
     }
   ],
-  "dispatchId": "b0125a2d-9cce-4917-a193-472f33a8b28d",
-  "fanOutArt": "02899618b6860f023b627d605f7b533742ee90328cc4ba807cdc2267238715d5",
-  "subA": "3f069fc4478bbaaa6214a25bba8fb21b562827c2480dfe1430db5b8f7e3f664a",
-  "subB": "13297b1b239b48cd8635ff9498b2bc82d7b014ede6ae84f6235e117056ea9901",
-  "talk": "295a9200dd1a4d686b6b6a274c656bbea2eca7b5d2d862879d63295a5a6869dd",
-  "deliveredAt": {
-    "fan_out:worker_a": "2026-07-20T04:49:41.944Z",
-    "fan_out:worker_b": "2026-07-20T04:49:41.944Z",
-    "submission:reviewer": "2026-07-20T04:49:40.942Z",
-    "talk_back:orchestrator": "2026-07-20T04:49:40.943Z"
+  "dispatchId": "afeebe64-2b70-41c3-bdde-99f85971022a",
+  "fanOutArt": "8dd8e722e55c584305ea6bb12c1f004141d890b987a596f81707e8758c2a094f",
+  "subA": "4f8dfaa5a7e42392589da4d218e33661df439a03392948111a4e1f7d44b438ac",
+  "subB": "1a9c2f8d6826b60898d7b0b8fbce9a84f081553245474f5175bfad6bec4c59b6",
+  "talk": "33c46268cb245d8b6bb666768b9ea28ce32e6e6753c171095f1b1e2d88c38e95",
+  "deliveryObsCount": 7,
+  "captureBytes": {
+    "orchestrator": 2868,
+    "worker_a": 2868,
+    "worker_b": 405,
+    "reviewer": 2868
+  },
+  "captureSawQf": {
+    "orchestrator": false,
+    "worker_a": false,
+    "worker_b": false,
+    "reviewer": false
   },
   "checks": {
     "workerAGot": true,
@@ -40,7 +47,7 @@
     "orchGotTalk": true,
     "falsifySilent": true,
     "restoreOk": true,
-    "sameDispatchTs": true
+    "fanOutOneDispatch": true
   },
-  "d0": "Kernel: no create_task/assigned_to/delegates_to; bus=publish_artifact + host inject/display"
+  "d0": "Kernel: no create_task/assigned_to/delegates_to; bus=a2a-core + publish_artifact + inject adapter"
 }

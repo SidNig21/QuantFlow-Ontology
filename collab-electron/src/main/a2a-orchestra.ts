@@ -1,17 +1,18 @@
 /**
- * WO-008e — spawn four Hermes native_tui seats and run fan-out → fan-in → talk-back.
+ * WO-008e — spawn four Hermes native_tui seats onto an instance-scoped bus.
+ * Proof choreography lives in species/hermes/a2a-proof-script.ts (harness only).
  */
 import {
-  clearA2aSeats,
-  getA2aSeat,
-  listA2aSeats,
-  publishAndDeliver,
-  registerA2aSeat,
-  setA2aDeliveryEnabled,
+  toCoreSeat,
+  type A2aBus,
   type A2aRole,
-  type A2aSeat,
+  type ElectronA2aSeat,
 } from "./a2a-bus";
 import { admitAndStartSession, cancelAgentSession } from "./agent-host";
+import {
+  runScriptedFourTileProof,
+  type A2aProofScriptResult,
+} from "../../../species/hermes/a2a-proof-script.ts";
 
 const ROLES: A2aRole[] = [
   "orchestrator",
@@ -20,42 +21,28 @@ const ROLES: A2aRole[] = [
   "reviewer",
 ];
 
-const TASK =
-  "WO-008e demo task: each worker returns one short finding labeled A or B.";
-
-export type A2aProofResult = {
-  seats: A2aSeat[];
-  fanOut: {
-    artifactId: string;
-    dispatchId: string;
-    deliveredAt: Record<string, string>;
-  };
-  submissions: {
-    worker_a: { artifactId: string };
-    worker_b: { artifactId: string };
-  };
-  talkBack: { artifactId: string; dispatchId: string };
-  falsify: {
-    redSkipped: string[];
-    greenDelivered: Record<string, string>;
-  };
+export type A2aProofResult = A2aProofScriptResult & {
+  seats: ElectronA2aSeat[];
   cancelCheck?: {
     cancelledRole: A2aRole;
     remaining: A2aRole[];
   };
 };
 
-/** Admit four Hermes native_tui sessions and register A2A seats. */
-export async function spawnA2aFourSeats(opts?: {
-  onTile?: (
-    sessionId: string,
-    species: string,
-    ptySessionId: string,
-    role: A2aRole,
-  ) => void;
-}): Promise<A2aSeat[]> {
-  clearA2aSeats();
-  const out: A2aSeat[] = [];
+/** Admit four Hermes native_tui sessions and register them on `bus`. */
+export async function spawnA2aFourSeats(
+  bus: A2aBus,
+  opts?: {
+    onTile?: (
+      sessionId: string,
+      species: string,
+      ptySessionId: string,
+      role: A2aRole,
+    ) => void;
+  },
+): Promise<ElectronA2aSeat[]> {
+  bus.clearSeats();
+  const out: ElectronA2aSeat[] = [];
   for (const role of ROLES) {
     const result = await admitAndStartSession("hermes", {
       sessionLabel: `hermes:${role}`,
@@ -70,90 +57,27 @@ export async function spawnA2aFourSeats(opts?: {
         `a2a-orchestra: expected native_tui for ${role}, got ${result.surface}`,
       );
     }
-    const seat: A2aSeat = {
+    const seat: ElectronA2aSeat = {
       role,
       sessionId: result.sessionId,
       ptySessionId: result.ptySessionId,
     };
-    registerA2aSeat(seat);
+    bus.registerSeat(toCoreSeat(seat));
     out.push(seat);
   }
   return out;
 }
 
 /**
- * Full proof: fan-out (one dispatch → A+B), submissions → reviewer, talk-back,
- * then falsify delivery off/on. Optional cancel of worker_b for orphan check.
+ * Harness-only: run the scripted 4-tile movie on an already-spawned bus.
+ * Not exposed as product IPC — use spawnSeats + dispatch from the shell.
  */
-export async function runA2aFourTileProof(opts?: {
-  cancelOne?: boolean;
-}): Promise<A2aProofResult> {
-  const seats = listA2aSeats();
-  if (seats.length !== 4) {
-    throw new Error(
-      `a2a-orchestra: need 4 seats registered (have ${seats.length}) — spawn first`,
-    );
-  }
-
-  setA2aDeliveryEnabled(true);
-
-  const fanOut = publishAndDeliver({
-    hop: "fan_out",
-    fromRole: "orchestrator",
-    toRoles: ["worker_a", "worker_b"],
-    task: TASK,
-    body: `TASK from Orchestrator\n${TASK}\nRespond with one line: FINDING <A|B>: …`,
-  });
-
-  const sessionA = getA2aSeat("worker_a")!.sessionId;
-  const sessionB = getA2aSeat("worker_b")!.sessionId;
-
-  const subA = publishAndDeliver({
-    hop: "submission",
-    fromRole: "worker_a",
-    toRoles: ["reviewer"],
-    dispatchId: fanOut.dispatchId,
-    attr: "A",
-    body: `SUBMISSION A (session=${sessionA})\nFINDING A: alpha-ready`,
-  });
-
-  const subB = publishAndDeliver({
-    hop: "submission",
-    fromRole: "worker_b",
-    toRoles: ["reviewer"],
-    dispatchId: fanOut.dispatchId,
-    attr: "B",
-    body: `SUBMISSION B (session=${sessionB})\nFINDING B: beta-ready`,
-  });
-
-  const talkBack = publishAndDeliver({
-    hop: "talk_back",
-    fromRole: "reviewer",
-    toRoles: ["orchestrator"],
-    dispatchId: fanOut.dispatchId,
-    body:
-      `REVIEW talk-back to Orchestrator (dispatch=${fanOut.dispatchId})\n` +
-      `- Worker A (${sessionA}): alpha-ready [artifact ${subA.artifactId.slice(0, 12)}…]\n` +
-      `- Worker B (${sessionB}): beta-ready [artifact ${subB.artifactId.slice(0, 12)}…]\n` +
-      `Both attributed; no guest side-channel.`,
-  });
-
-  setA2aDeliveryEnabled(false);
-  const red = publishAndDeliver({
-    hop: "fan_out",
-    fromRole: "orchestrator",
-    toRoles: ["worker_a", "worker_b"],
-    task: "falsify-should-be-silent",
-    body: "FALSIFY MARKER — must not appear if delivery off",
-  });
-  setA2aDeliveryEnabled(true);
-  const green = publishAndDeliver({
-    hop: "fan_out",
-    fromRole: "orchestrator",
-    toRoles: ["worker_a", "worker_b"],
-    task: "falsify-restore",
-    body: "RESTORE MARKER — delivery back on",
-  });
+export async function runA2aFourTileProof(
+  bus: A2aBus,
+  seats: ElectronA2aSeat[],
+  opts?: { cancelOne?: boolean },
+): Promise<A2aProofResult> {
+  const script = runScriptedFourTileProof(bus);
 
   let cancelCheck: A2aProofResult["cancelCheck"];
   if (opts?.cancelOne) {
@@ -169,25 +93,5 @@ export async function runA2aFourTileProof(opts?: {
     }
   }
 
-  return {
-    seats,
-    fanOut: {
-      artifactId: fanOut.artifactId,
-      dispatchId: fanOut.dispatchId,
-      deliveredAt: fanOut.deliveredAt,
-    },
-    submissions: {
-      worker_a: { artifactId: subA.artifactId },
-      worker_b: { artifactId: subB.artifactId },
-    },
-    talkBack: {
-      artifactId: talkBack.artifactId,
-      dispatchId: talkBack.dispatchId,
-    },
-    falsify: {
-      redSkipped: red.skipped,
-      greenDelivered: green.deliveredAt,
-    },
-    cancelCheck,
-  };
+  return { ...script, seats, cancelCheck };
 }

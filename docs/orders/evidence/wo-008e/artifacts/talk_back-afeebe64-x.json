@@ -1,0 +1,14 @@
+{
+  "a2a": "1",
+  "hop": "talk_back",
+  "dispatch_id": "afeebe64-2b70-41c3-bdde-99f85971022a",
+  "from_role": "reviewer",
+  "to_roles": [
+    "orchestrator"
+  ],
+  "from_session": "7eaf105f-1ab2-4817-a56b-6e4c9f0a2fdb",
+  "to_sessions": [
+    "bb1bf6dd-0c1a-44cb-96cc-7a703b2db9f9"
+  ],
+  "body": "REVIEW talk-back to Orchestrator (dispatch=afeebe64-2b70-41c3-bdde-99f85971022a)\n- Worker A (e5cdf74c-461d-470e-851f-e6a1a882449d): alpha-ready [artifact 4f8dfaa5a7e4…]\n- Worker B (4cf60b65-562e-4082-a111-a4fdf4874e68): beta-ready [artifact 1a9c2f8d6826…]\nBoth attributed; no guest side-channel."
+}

@@ -1,0 +1,15 @@
+{
+  "a2a": "1",
+  "hop": "submission",
+  "dispatch_id": "afeebe64-2b70-41c3-bdde-99f85971022a",
+  "from_role": "worker_b",
+  "to_roles": [
+    "reviewer"
+  ],
+  "from_session": "4cf60b65-562e-4082-a111-a4fdf4874e68",
+  "to_sessions": [
+    "7eaf105f-1ab2-4817-a56b-6e4c9f0a2fdb"
+  ],
+  "body": "SUBMISSION B (session=4cf60b65-562e-4082-a111-a4fdf4874e68)\nFINDING B: beta-ready",
+  "attr": "B"
+}
