@@ -93,17 +93,37 @@ function getWebContents(): typeof import("electron").webContents | null {
   }
 }
 
+/** sessionId → last webContents that attached (reconnect / create). */
+const sessionViewers = new Map<string, number>();
+
+function rememberViewer(
+  sessionId: string,
+  senderWebContentsId: number | undefined,
+): void {
+  if (senderWebContentsId != null) {
+    sessionViewers.set(sessionId, senderWebContentsId);
+  }
+}
+
 function sendToSender(
   senderWebContentsId: number | undefined,
   channel: string,
   payload: unknown,
 ): void {
-  if (senderWebContentsId == null) return;
   const wc = getWebContents();
   if (!wc) return;
-  const sender = wc.fromId(senderWebContentsId);
-  if (sender && !sender.isDestroyed()) {
-    sender.send(channel, payload);
+  if (senderWebContentsId != null) {
+    const sender = wc.fromId(senderWebContentsId);
+    if (sender && !sender.isDestroyed()) {
+      sender.send(channel, payload);
+      return;
+    }
+  }
+  // Fallback: broadcast (tiles filter by sessionId).
+  for (const contents of wc.getAllWebContents()) {
+    if (!contents.isDestroyed()) {
+      contents.send(channel, payload);
+    }
   }
 }
 
@@ -778,10 +798,15 @@ export async function createHostCommandSession(opts: {
   const { sessionId, socketPath } = await client.createSession(createParams);
   console.log(`[pty] createHostCommandSession ok sessionId=${sessionId}`);
 
+  rememberViewer(sessionId, opts.senderWebContentsId);
   const dataSock = await client.attachDataSocket(
     socketPath,
     (data) => {
-      forwardPtyData(sessionId, opts.senderWebContentsId, data);
+      forwardPtyData(
+        sessionId,
+        sessionViewers.get(sessionId) ?? opts.senderWebContentsId,
+        data,
+      );
     },
   );
   dataSockets.set(sessionId, dataSock);
@@ -849,10 +874,15 @@ export async function reconnectSession(
       sessionId, cols, rows,
     );
 
+    rememberViewer(sessionId, senderWebContentsId);
     const dataSock = await client.attachDataSocket(
       socketPath,
       (data) => {
-        forwardPtyData(sessionId, senderWebContentsId, data);
+        forwardPtyData(
+          sessionId,
+          sessionViewers.get(sessionId) ?? senderWebContentsId,
+          data,
+        );
       },
     );
 
@@ -945,6 +975,19 @@ export function writeToSession(
   const session = sessions.get(sessionId);
   if (!session) return;
   session.pty.write(data);
+}
+
+/**
+ * WO-008e: push bytes to the term tile display (xterm) without relying on
+ * guest echo. Used for Kernel-mediated A2A delivery visibility.
+ */
+export function displayOnSession(sessionId: string, data: string): void {
+  const viewer = sessionViewers.get(sessionId);
+  forwardPtyData(
+    sessionId,
+    viewer,
+    Buffer.from(data, "utf8"),
+  );
 }
 
 export function sendRawKeys(

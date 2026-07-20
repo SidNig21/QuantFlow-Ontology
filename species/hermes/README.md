@@ -28,3 +28,14 @@ bun ./register.ts --db "$(ls ~/.collaborator/dev/worktree-*/kernel.db | head -1)
 ```
 
 Dock **Spawn Hermes** → term tile with Hermes TUI chrome (not ACP “Run turn”).
+
+## A2A 4-tile proof (WO-008e)
+
+Kernel bus = `publish_artifact` + host `displayOnSession` / `writeToSession`
+(no `create_task` yet). Electron: `qf:a2a:runProof`. Headless:
+
+```bash
+bun run a2a-smoke
+```
+
+Evidence: `docs/orders/evidence/wo-008e/`.

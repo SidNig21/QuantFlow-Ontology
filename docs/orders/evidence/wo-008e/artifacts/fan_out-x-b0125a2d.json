@@ -1,0 +1,16 @@
+{
+  "a2a": "1",
+  "hop": "fan_out",
+  "dispatch_id": "b0125a2d-9cce-4917-a193-472f33a8b28d",
+  "from_role": "orchestrator",
+  "to_roles": [
+    "worker_a",
+    "worker_b"
+  ],
+  "from_session": "1359a010-1980-4313-b28d-15c6068e9158",
+  "to_sessions": [
+    "a22da578-5b10-42ea-9440-8e87244569b6",
+    "aa1aaaa3-ef4d-45c3-a327-553887770dec"
+  ],
+  "body": "RESTORE MARKER — delivery on"
+}

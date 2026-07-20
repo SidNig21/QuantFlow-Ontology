@@ -52,6 +52,8 @@ export async function admitNativeTuiSpecies(opts: {
   appRoot: string;
   env?: Record<string, string>;
   corruptId?: string;
+  /** Kernel agent_session.label (e.g. hermes:orchestrator). Default: species. */
+  sessionLabel?: string;
   newTrace: () => TraceContext;
   liveSet: (sessionId: string, entry: NativeTuiLive) => void;
   onStarted?: (
@@ -67,6 +69,7 @@ export async function admitNativeTuiSpecies(opts: {
   ptySessionId: string;
 }> {
   const { species, surface } = opts;
+  const label = opts.sessionLabel ?? species;
   const fromConfig = resolveSpeciesSessionEnv(species);
   const env = { ...fromConfig, ...opts.env };
   const command = resolveHostAcpCommand(
@@ -109,7 +112,7 @@ export async function admitNativeTuiSpecies(opts: {
   const trace = opts.newTrace();
   kernelExecute(
     "create_agent_session",
-    { session_id: sessionId, label: species },
+    { session_id: sessionId, label },
     trace,
   );
   kernelExecute(

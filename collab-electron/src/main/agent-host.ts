@@ -316,6 +316,8 @@ export async function admitAndStartSession(
     env?: Record<string, string>;
     /** When set, host mints its own id (gate falsify — must go red). */
     corruptId?: string;
+    /** Kernel session label override (WO-008e roles). */
+    sessionLabel?: string;
     onStarted?: (
       sessionId: string,
       species: string,
@@ -334,6 +336,7 @@ export async function admitAndStartSession(
       appRoot: appRoot(),
       env: opts?.env,
       corruptId: opts?.corruptId,
+      sessionLabel: opts?.sessionLabel,
       newTrace,
       liveSet: (sessionId, entry) => {
         live.set(sessionId, entry);

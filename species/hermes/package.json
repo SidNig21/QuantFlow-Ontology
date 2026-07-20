@@ -7,7 +7,8 @@
     "pack-agent": "node ./scripts/pack-agent.mjs",
     "register": "bun ./register.ts",
     "d0": "bun ./d0-smoke.ts",
-    "tui-smoke": "bun ./tui-pty-smoke.ts"
+    "tui-smoke": "bun ./tui-pty-smoke.ts",
+    "a2a-smoke": "bun ./a2a-4tile-smoke.ts"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "0.18.2",

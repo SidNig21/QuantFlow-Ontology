@@ -1,0 +1,46 @@
+{
+  "sessions": [
+    {
+      "role": "orchestrator",
+      "sessionId": "1359a010-1980-4313-b28d-15c6068e9158",
+      "pid": 940337
+    },
+    {
+      "role": "worker_a",
+      "sessionId": "a22da578-5b10-42ea-9440-8e87244569b6",
+      "pid": 940340
+    },
+    {
+      "role": "worker_b",
+      "sessionId": "aa1aaaa3-ef4d-45c3-a327-553887770dec",
+      "pid": 940345
+    },
+    {
+      "role": "reviewer",
+      "sessionId": "31b46557-827e-4a4b-b14d-55f04cbd9f05",
+      "pid": 940350
+    }
+  ],
+  "dispatchId": "b0125a2d-9cce-4917-a193-472f33a8b28d",
+  "fanOutArt": "02899618b6860f023b627d605f7b533742ee90328cc4ba807cdc2267238715d5",
+  "subA": "3f069fc4478bbaaa6214a25bba8fb21b562827c2480dfe1430db5b8f7e3f664a",
+  "subB": "13297b1b239b48cd8635ff9498b2bc82d7b014ede6ae84f6235e117056ea9901",
+  "talk": "295a9200dd1a4d686b6b6a274c656bbea2eca7b5d2d862879d63295a5a6869dd",
+  "deliveredAt": {
+    "fan_out:worker_a": "2026-07-20T04:49:41.944Z",
+    "fan_out:worker_b": "2026-07-20T04:49:41.944Z",
+    "submission:reviewer": "2026-07-20T04:49:40.942Z",
+    "talk_back:orchestrator": "2026-07-20T04:49:40.943Z"
+  },
+  "checks": {
+    "workerAGot": true,
+    "workerBGot": true,
+    "reviewerGotA": true,
+    "reviewerGotB": true,
+    "orchGotTalk": true,
+    "falsifySilent": true,
+    "restoreOk": true,
+    "sameDispatchTs": true
+  },
+  "d0": "Kernel: no create_task/assigned_to/delegates_to; bus=publish_artifact + host inject/display"
+}

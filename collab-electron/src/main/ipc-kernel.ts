@@ -12,6 +12,11 @@ import {
   onSessionDone,
   runTurn,
 } from "./agent-host";
+import { setA2aDeliveryEnabled } from "./a2a-bus";
+import {
+  runA2aFourTileProof,
+  spawnA2aFourSeats,
+} from "./a2a-orchestra";
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import {
   kernelExecute,
@@ -181,6 +186,58 @@ export function registerKernelHandlers(): void {
         });
         invalidateDock();
         return { ok: true as const, result };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
+  /** WO-008e: spawn 4 Hermes TUI seats + run Kernel-mediated A2A proof. */
+  ipcMain.handle(
+    "qf:a2a:runProof",
+    async (event, args?: { cancelOne?: boolean }) => {
+      try {
+        assertTrustedSender(event);
+        const seats = await spawnA2aFourSeats({
+          onTile: (sessionId, sp, ptySessionId) => {
+            invalidateDock();
+            sendToShell(
+              "shell:forward",
+              "canvas",
+              "create-term-tile",
+              ptySessionId,
+              sessionId,
+              sp,
+            );
+          },
+        });
+        const proof = await runA2aFourTileProof({
+          cancelOne: args?.cancelOne !== false,
+        });
+        invalidateDock();
+        return { ok: true as const, seats, proof };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
+  ipcMain.handle(
+    "qf:a2a:setDelivery",
+    (event, args?: { enabled?: boolean }) => {
+      try {
+        assertTrustedSender(event);
+        if (typeof args?.enabled !== "boolean") {
+          return {
+            ok: false as const,
+            error: {
+              name: "InvalidArgs",
+              message: "qf:a2a:setDelivery requires enabled:boolean",
+            },
+          };
+        }
+        setA2aDeliveryEnabled(args.enabled);
+        return { ok: true as const, enabled: args.enabled };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };
       }
