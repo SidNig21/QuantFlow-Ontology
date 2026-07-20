@@ -1,0 +1,11 @@
+{
+  "name": "critic-mock",
+  "version": "0.1.0",
+  "agent": {
+    "acpEntrypoint": "critic-mock-acp"
+  },
+  "registry": {
+    "title": "Critic Mock",
+    "description": "WO-008 dock-path plug proof: ACP guest with mock model (safe to prompt)."
+  }
+}

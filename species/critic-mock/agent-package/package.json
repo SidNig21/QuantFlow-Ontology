@@ -1,0 +1,14 @@
+{
+  "name": "critic-mock",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "critic-mock-acp": "./dist/acp-main.js"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "1.2.1",
+    "ai": "^7.0.31",
+    "zod": "^4.4.3"
+  }
+}
