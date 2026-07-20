@@ -46,9 +46,24 @@ body {
   min-height: 60px;
 }
 
+.session-tile__permission {
+  border: 1px solid var(--qf-line);
+  background: var(--qf-raised);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.session-tile__permission-title {
+  color: var(--qf-text);
+  word-break: break-word;
+}
+
 .session-tile__actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .session-tile__actions button {

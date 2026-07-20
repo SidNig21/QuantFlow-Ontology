@@ -350,6 +350,13 @@ export interface CollabApi {
       | { ok: true; result: Record<string, unknown> }
       | { ok: false; error: { name: string; message: string } }
     >;
+    permissionDecision?: (args: {
+      requestId: string;
+      decision: "allow_once" | "allow_always" | "deny";
+    }) => Promise<
+      | { ok: true }
+      | { ok: false; error: { name: string; message: string } }
+    >;
     cancelSession: (
       sessionId: string,
     ) => Promise<
@@ -362,6 +369,18 @@ export interface CollabApi {
       | { ok: true }
       | { ok: false; error: { name: string; message: string } }
     >;
+    onSessionPermission?: (
+      cb: (payload: {
+        requestId: string;
+        sessionId: string;
+        toolCall: {
+          toolCallId: string;
+          title: string | null;
+          kind: string | null;
+        };
+        options: Array<{ optionId: string; kind: string; name: string }>;
+      }) => void,
+    ) => (() => void) | void;
     onSessionChunk?: (
       cb: (payload: { sessionId: string; text: string }) => void,
     ) => (() => void) | void;

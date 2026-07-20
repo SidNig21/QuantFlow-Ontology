@@ -23,6 +23,11 @@ import {
   type HostAcpHandle,
 } from "./host-acp-bridge";
 import {
+  cancelPendingPermissions,
+  requestFounderPermission,
+} from "./host-acp-permission";
+import { runHostAcpTurn } from "./host-acp-turn";
+import {
   resolveHostMountSpecs,
   resolveSpeciesSessionEnv,
 } from "./host-mounts";
@@ -35,6 +40,7 @@ import {
   type TraceContext,
 } from "./kernel";
 import { resolveSpeciesLaunch } from "./species-launch";
+import { resolveSpeciesToolAllowlist } from "./species-tools";
 
 /** Boot-seed species name — main-process only (never a renderer literal). */
 export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
@@ -331,15 +337,20 @@ async function admitHostAcpSpecies(
     ],
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
+  const toolAllowlist = resolveSpeciesToolAllowlist(species, appRoot());
   const handle = await admitHostAcp({
     command,
     args: ["acp"],
     env: { HERMES_BIN: command, HOME: home, HOST_ACP_BIN: command },
     cwd: home,
     clientName: "quantflow-host-acp",
+    toolAllowlist,
   });
   const guestId = handle.sessionId;
   const sessionId = opts?.corruptId ?? guestId;
+
+  handle.hooks.onPermission = (params) =>
+    requestFounderPermission(sessionId, params, handle.hooks.permissionTimeoutMs);
 
   live.set(sessionId, {
     cancelled: false,
@@ -443,20 +454,36 @@ export async function runTurn(
   if (!entry) {
     throw new Error(`agent-host: runTurn — no live session ${sessionId}`);
   }
-  if (entry.kind === "host_acp") {
-    throw new Error(
-      "agent-host: runTurn forbidden on host_acp sessions (WO-008a permissions)",
-    );
-  }
   if (entry.turnInFlight) {
     throw new Error(`agent-host: runTurn — turn already in flight ${sessionId}`);
   }
+
+  const finalize = opts?.finalize !== false;
+
+  if (entry.kind === "host_acp") {
+    return runHostAcpTurn({
+      sessionId,
+      entry,
+      promptText,
+      finalize,
+      newTrace,
+      onChunk: (sid, chunk) => {
+        for (const l of chunkListeners) l(sid, chunk);
+      },
+      onDone: (sid, info) => {
+        for (const l of doneListeners) l(sid, info);
+      },
+      liveDelete: (sid) => {
+        live.delete(sid);
+      },
+    });
+  }
+
   entry.turnInFlight = true;
   entry.cancelled = false;
 
   const host = await ensureAgentOs();
   const guestId = entry.guestId;
-  const finalize = opts?.finalize !== false;
 
   let text = "";
   const unsub = host.onSessionEvent(guestId, (event) => {
@@ -586,6 +613,7 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
   const entry = live.get(sessionId);
   if (entry) entry.cancelled = true;
   if (entry?.kind === "host_acp" && entry.hostAcp) {
+    cancelPendingPermissions(sessionId);
     await cancelHostAcp(entry.hostAcp).catch(() => {});
     try {
       kernelExecute(
@@ -624,6 +652,7 @@ export function closeAgentSessionRow(sessionId: string): void {
     entry.unsub?.();
     live.delete(sessionId);
     if (entry.kind === "host_acp" && entry.hostAcp) {
+      cancelPendingPermissions(sessionId);
       void tearDownHostAcp(entry.hostAcp).catch(() => {});
     } else {
       void ensureAgentOs().then((host) =>

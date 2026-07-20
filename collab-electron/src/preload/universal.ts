@@ -161,10 +161,43 @@ contextBridge.exposeInMainWorld("api", {
       ipcRenderer.invoke("qf:sessions:spawn", args),
     runTurn: (args: { sessionId: string; prompt?: string }) =>
       ipcRenderer.invoke("qf:sessions:runTurn", args),
+    permissionDecision: (args: {
+      requestId: string;
+      decision: "allow_once" | "allow_always" | "deny";
+    }) => ipcRenderer.invoke("qf:sessions:permissionDecision", args),
     cancelSession: (sessionId: string) =>
       ipcRenderer.invoke("qf:sessions:cancel", { sessionId }),
     closeSession: (sessionId: string) =>
       ipcRenderer.invoke("qf:sessions:close", { sessionId }),
+    onSessionPermission: (
+      cb: (payload: {
+        requestId: string;
+        sessionId: string;
+        toolCall: {
+          toolCallId: string;
+          title: string | null;
+          kind: string | null;
+        };
+        options: Array<{ optionId: string; kind: string; name: string }>;
+      }) => void,
+    ) => {
+      const handler = (
+        _e: unknown,
+        payload: {
+          requestId: string;
+          sessionId: string;
+          toolCall: {
+            toolCallId: string;
+            title: string | null;
+            kind: string | null;
+          };
+          options: Array<{ optionId: string; kind: string; name: string }>;
+        },
+      ) => cb(payload);
+      ipcRenderer.on("qf:session:permission", handler);
+      return () =>
+        ipcRenderer.removeListener("qf:session:permission", handler);
+    },
     onSessionChunk: (
       cb: (payload: { sessionId: string; text: string }) => void,
     ) => {

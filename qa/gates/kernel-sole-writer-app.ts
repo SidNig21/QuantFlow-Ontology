@@ -3,6 +3,8 @@
  * - Only kernel.ts may import qf-kernel / sqlite / mention kernel.db
  * - Only agent-host.ts may import @rivet-dev/agentos*
  * - acp-agent.ts is a frozen exception for @agentclientprotocol (debt #14)
+ * - WO-008a: species/hermes/host-acp-client.ts is the sole live ACP SDK home
+ *   (scanned explicitly; collab-electron bridge must not import the SDK)
  * - No new ai / ToolLoopAgent imports anywhere in the app
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
@@ -16,9 +18,11 @@ const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
 /**
- * WO-008c: Electron re-exports shared client from species/hermes/host-acp-client.ts.
- * Allowlist kept so a thin bridge may import the SDK if needed; prefer the species module.
+ * WO-008a: sole live host ACP client (outside APP_SRC walk — scanned explicitly).
+ * Thin Electron bridge may re-export but must not import the SDK itself.
  */
+const HOST_ACP_CLIENT = "species/hermes/host-acp-client.ts";
+const HOST_ACP_POLICY = "species/hermes/host-acp-policy.ts";
 const HOST_ACP_BRIDGE = "collab-electron/src/main/host-acp-bridge.ts";
 
 const KERNEL_PATTERNS: Array<{ name: string; re: RegExp }> = [
@@ -73,12 +77,36 @@ function walk(dir: string, out: string[]): void {
   }
 }
 
+function scanAgentPatterns(
+  rel: string,
+  text: string,
+  offenders: string[],
+): void {
+  for (const p of AGENT_PATTERNS) {
+    if (!p.re.test(text)) continue;
+    if (p.name === "@rivet-dev/agentos" && rel === AGENTOS_ALLOWED) continue;
+    if (
+      p.name === "@agentclientprotocol" &&
+      (rel === ACP_FROZEN ||
+        rel === HOST_ACP_CLIENT ||
+        rel === HOST_ACP_POLICY)
+    ) {
+      continue;
+    }
+    offenders.push(`${rel} (${p.name})`);
+    break;
+  }
+}
+
 export function checkKernelSoleWriterApp(): {
   ok: boolean;
   offenders: string[];
 } {
   const files: string[] = [];
   walk(APP_SRC, files);
+  // WO-008a: real SDK import lives outside collab-electron/src — scan it.
+  files.push(join(REPO_ROOT, HOST_ACP_CLIENT));
+  files.push(join(REPO_ROOT, HOST_ACP_POLICY));
   const offenders: string[] = [];
 
   for (const full of files) {
@@ -99,20 +127,19 @@ export function checkKernelSoleWriterApp(): {
       }
     }
 
-    for (const p of AGENT_PATTERNS) {
-      if (!p.re.test(text)) continue;
-      if (p.name === "@rivet-dev/agentos" && rel === AGENTOS_ALLOWED) continue;
-      if (
-        p.name === "@agentclientprotocol" &&
-        (rel === ACP_FROZEN || rel === HOST_ACP_BRIDGE)
-      ) {
-        continue;
-      }
-      // debt #14: frozen file must not gain ToolLoopAgent/ai either beyond what it has —
-      // ToolLoopAgent lives in the guest pack, not acp-agent.ts (legacy uses ACP SDK only).
-      offenders.push(`${rel} (${p.name})`);
-      break;
+    scanAgentPatterns(rel, text, offenders);
+  }
+
+  // Bridge must stay a re-export — no direct SDK import (gate hygiene).
+  try {
+    const bridgeText = readFileSync(join(REPO_ROOT, HOST_ACP_BRIDGE), "utf8");
+    if (/@agentclientprotocol/.test(bridgeText)) {
+      offenders.push(
+        `${HOST_ACP_BRIDGE} (@agentclientprotocol — use species client)`,
+      );
     }
+  } catch {
+    offenders.push(`${HOST_ACP_BRIDGE} (missing)`);
   }
 
   if (offenders.length > 0) {

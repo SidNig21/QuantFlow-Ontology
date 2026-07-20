@@ -12,6 +12,7 @@ import {
   onSessionDone,
   runTurn,
 } from "./agent-host";
+import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import {
   kernelExecute,
   kernelListAgentDefinitions,
@@ -62,6 +63,7 @@ function invalidateDock(): void {
 }
 
 export function registerKernelHandlers(): void {
+  registerHostAcpPermissionHandlers();
   onSessionChunk((sessionId, text) => {
     broadcast("qf:session:chunk", { sessionId, text });
   });

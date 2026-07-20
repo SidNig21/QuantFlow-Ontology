@@ -24,6 +24,7 @@ const outDir = join(root, "packed");
 const aospkg = join(outDir, "hermes.aospkg");
 const metaOut = join(outDir, "hermes.meta.json");
 const launchJson = join(root, "launch.json");
+const toolsJson = join(root, "tools-allowlist.json");
 const toolchain = join(
   root,
   "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs",
@@ -84,7 +85,18 @@ try {
 } catch {
   /* keep default host_acp for hermes */
 }
-const meta = { launch, name: "hermes", package: "hermes.aospkg" };
+let tools = [];
+try {
+  if (existsSync(toolsJson)) {
+    const doc = JSON.parse(readFileSync(toolsJson, "utf8"));
+    if (Array.isArray(doc.tools)) {
+      tools = doc.tools.filter((t) => typeof t === "string");
+    }
+  }
+} catch {
+  /* optional */
+}
+const meta = { launch, name: "hermes", package: "hermes.aospkg", tools };
 writeFileSync(metaOut, `${JSON.stringify(meta, null, 2)}\n`);
 console.log("pack-agent: wrote", metaOut, JSON.stringify(meta));
 
