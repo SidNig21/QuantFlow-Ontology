@@ -13,7 +13,7 @@ Read `START_HERE.md`, then `docs/orders/PROTOCOL.md`, then execute [`docs/orders
 - Run the builder gates including **every static gate** (PROTOCOL standing rule); paste unedited.
 - Commit and push. **Do not merge.** Stop on anything ambiguous — especially any deviation of `hermes acp` from the proven ACP shape.
 
-> **Pre-build read: done 2026-07-19** — 9 findings; the blocker (host-PATH shim vs. caller-supplied guest env) was confirmed by measurement in the SDK and the order rewritten around it. Ladder note: **WO-008a (permission bridge + tool policy)** now sits between this order and the A2A order; the founder checkpoint remains at A2A.
+> **Pre-build reads: two rounds, both folded in.** Round 2 caught the shipped host's always-prompting spawn — so **Hermes is never spawned from the dock in this order** (registration + listing only; the critic-mock proves the full dock path safely). Ladder: **WO-007b (host seams, parallel-eligible with this order) → WO-008a (permissions) → A2A**; founder checkpoint at A2A. Re-read the amended order in full.
 
 ## Founder acceptance checkpoint (founder decision, 2026-07-19)
 
@@ -21,8 +21,7 @@ The founder demos **once, at the milestone that matters**: skin (WO-006d) -> doc
 
 ## Parallel-eligible
 
-Nothing — WO-007 touches shell, host, schema, and gates; WO-008 (Hermes) is blocked on it and its order is being drafted by the verifier.
-
+**WO-007b (host seams)** becomes parallel-eligible with WO-008 once its order file lands — zero file overlap (`species/` vs host). Until then, one builder on WO-008.
 ---
 
 *Rotation rule: when the verifier passes the current order, the same verification commit flips the log status in `README.md` and rewrites this file to the next unblocked rung. If this file and the order log disagree, the log wins — report the discrepancy instead of building.*
