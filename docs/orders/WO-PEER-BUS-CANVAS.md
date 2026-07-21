@@ -61,3 +61,20 @@ sqlite3 ~/.qf-peer-bus/kernel.db "SELECT id, kind FROM artifact ORDER BY created
 
 Canvas cable UI · permissions on the bus · more roles · Hermes Kanban ·
 skill packs · AIP/Foundry as truth backend for this PASS.
+
+---
+
+## Delivery bridge — accepted debt (2026-07-21, overrides AE3 for the desk UX)
+
+The thermo-review is right that host→TUI push (peer-delivery.ts) is not the ordered
+pull-inbox path. It is accepted as an **explicit, temporary desk-UX bridge**, not the
+long-term architecture:
+
+- It relays only **real agent messages** (send_to_peer output) — never host-authored
+  content. That is why it is delivery, not the banned scripted movie.
+- It writes **only `pushed_at`**, never `delivered`; pull-inbox stays intact and the two
+  paths cannot race (proven: after push, `delivered=0`, read_inbox still sees it).
+- It marks `pushed_at` **only after the Enter is written**, with an in-flight guard.
+- **DEBT / kill-date:** replace with a wake/notify path (Hermes-native interrupt, or a
+  host cue that prompts read_inbox) so pull-inbox is the sole delivery truth. Remove the
+  PTY injection and `SUBMIT_DELAY_MS` when that lands. Tracked in peer-delivery.ts header.

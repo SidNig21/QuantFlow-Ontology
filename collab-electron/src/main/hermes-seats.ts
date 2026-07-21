@@ -48,7 +48,7 @@ export function isHermesSeatId(value: unknown): value is HermesSeatId {
 export function resolveHermesSeat(seatId: unknown): HermesSeatSpec {
   if (!isHermesSeatId(seatId)) {
     throw new Error(
-      `hermes-seats: unknown seatId ${JSON.stringify(seatId)} (want orchestrator|worker)`,
+      `hermes-seats: unknown seatId ${JSON.stringify(seatId)} (want orchestrator|worker|worker2)`,
     );
   }
   return SEATS[seatId];

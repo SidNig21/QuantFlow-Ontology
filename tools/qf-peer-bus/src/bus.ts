@@ -50,9 +50,21 @@ CREATE TABLE IF NOT EXISTS messages (
   artifact_id TEXT,
   body TEXT,
   created_at TEXT,
-  delivered INTEGER DEFAULT 0
+  delivered INTEGER DEFAULT 0,
+  pushed_at TEXT
 );
 `;
+
+/**
+ * `delivered` and `pushed_at` are INDEPENDENT consumers of a message, by design:
+ *   - `delivered`  → the pull path (read_inbox drains it). Owned by this class.
+ *   - `pushed_at`  → the push path (the Electron desk bridge injects into a live
+ *                    TUI and stamps this AFTER the turn is submitted). The bridge
+ *                    only ever writes THIS column, never `delivered`, so the two
+ *                    paths can never race on one bit.
+ * The bus owns the schema; it adds `pushed_at` to older transport dbs here.
+ */
+const ENSURE_PUSHED_AT = `ALTER TABLE messages ADD COLUMN pushed_at TEXT`;
 
 export type PeerBusOptions = {
   /** Absolute path to the Kernel db, or ":memory:". Defaults to env QF_KERNEL_DB. */
@@ -87,6 +99,12 @@ export class PeerBus {
     this.busDb = new Database(busDbPath);
     this.busDb.exec("PRAGMA journal_mode = WAL;");
     this.busDb.exec(MESSAGES_DDL);
+    // Backfill pushed_at on transport dbs created before the push bridge existed.
+    try {
+      this.busDb.exec(ENSURE_PUSHED_AT);
+    } catch {
+      // Column already present (SQLite has no ADD COLUMN IF NOT EXISTS) — fine.
+    }
   }
 
   /**
