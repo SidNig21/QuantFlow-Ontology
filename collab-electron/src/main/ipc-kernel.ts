@@ -20,6 +20,14 @@ import {
 } from "./a2a-bus";
 import { spawnA2aFourSeats } from "./a2a-orchestra";
 import { resolveHermesSeat } from "./hermes-seats";
+import { registerSeatPty, startPeerDelivery } from "./peer-delivery";
+import { homedir } from "node:os";
+import { join } from "node:path";
+
+/** Transport db the qf-peer-bus seats write to (setup-founder-seats.ts). */
+function peerBusDbPath(): string {
+  return join(homedir(), ".qf-peer-bus", "peer-bus.db");
+}
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import { resolveSpeciesSurface } from "./species-surface";
 import {
@@ -258,6 +266,11 @@ export function registerKernelHandlers(): void {
             },
           };
         }
+        // Visible collaboration: register this seat's live PTY under its peer
+        // role and start the push-delivery watcher, so a peer message from the
+        // other seat lands directly in this seat's TUI instead of an inbox.
+        registerSeatPty(seat.seatId, result.ptySessionId);
+        startPeerDelivery(peerBusDbPath());
         invalidateDock();
         return {
           ok: true as const,

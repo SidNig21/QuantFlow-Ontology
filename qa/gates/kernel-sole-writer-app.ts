@@ -14,6 +14,12 @@ const REPO_ROOT = join(import.meta.dir, "../..");
 const APP_SRC = join(REPO_ROOT, "collab-electron/src");
 
 const KERNEL_ALLOWED = "collab-electron/src/main/kernel.ts";
+/**
+ * peer-delivery.ts reads the TRANSPORT db (peer-bus.db) via node:sqlite to push
+ * peer messages into recipient TUIs. Exempt ONLY from the node:sqlite pattern —
+ * still flagged if it ever references the Kernel db or imports the Kernel pkg.
+ */
+const TRANSPORT_SQLITE_ALLOWED = "collab-electron/src/main/peer-delivery.ts";
 const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
@@ -121,6 +127,11 @@ export function checkKernelSoleWriterApp(): {
     if (rel !== KERNEL_ALLOWED) {
       for (const p of KERNEL_PATTERNS) {
         if (p.re.test(text)) {
+          // Transport reader may match node:sqlite only; kernel.db / qf-kernel
+          // still bite so it can never quietly touch domain truth.
+          if (rel === TRANSPORT_SQLITE_ALLOWED && p.name === "node:sqlite") {
+            continue;
+          }
           offenders.push(`${rel} (${p.name})`);
           break;
         }
