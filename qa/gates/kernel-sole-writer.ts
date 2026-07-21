@@ -24,7 +24,7 @@ const ALLOW_PREFIXES = [
   "qa/gates/kernel-sole-writer-app.ts",
   // WO-PEER-BUS: transport inbox SQLite only — never opens kernel.db for DDL/DML;
   // domain truth still goes through qf-kernel publish_artifact.
-  "tools/qf-peer-bus/",
+  "tools/qf-peer-bus/src/bus.ts",
 ];
 
 const SKIP_DIR_NAMES = new Set([
