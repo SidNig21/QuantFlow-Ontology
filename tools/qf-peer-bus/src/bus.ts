@@ -39,8 +39,8 @@ export type SendResult = {
   delivered: boolean;
 };
 
-/** Baseline peer roles this order is scoped to (orchestrator + worker, two peers). */
-const KNOWN_PEERS = ["orchestrator", "worker"] as const;
+/** Peer roles list_peers advertises so an agent can target a specific colleague. */
+const KNOWN_PEERS = ["orchestrator", "worker", "worker2"] as const;
 
 const MESSAGES_DDL = `
 CREATE TABLE IF NOT EXISTS messages (

@@ -3,7 +3,7 @@
  * Renderer may send seatId only — never free-text argv/env.
  */
 
-export type HermesSeatId = "orchestrator" | "worker";
+export type HermesSeatId = "orchestrator" | "worker" | "worker2";
 
 export type HermesSeatSpec = {
   seatId: HermesSeatId;
@@ -31,10 +31,17 @@ const SEATS: Record<HermesSeatId, HermesSeatSpec> = {
     sessionLabel: "Hermes Worker",
     displayName: "Hermes Worker",
   },
+  worker2: {
+    seatId: "worker2",
+    profile: "qf-worker-2",
+    argv: ["-p", "qf-worker-2", "--tui"],
+    sessionLabel: "Hermes Worker 2",
+    displayName: "Hermes Worker 2",
+  },
 };
 
 export function isHermesSeatId(value: unknown): value is HermesSeatId {
-  return value === "orchestrator" || value === "worker";
+  return value === "orchestrator" || value === "worker" || value === "worker2";
 }
 
 /** Allowlisted seat only — unknown ids throw. */

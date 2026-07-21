@@ -58,7 +58,8 @@ contextBridge.exposeInMainWorld("shellApi", {
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
-    spawnSeat: (args: { seatId: "orchestrator" | "worker" }) =>
+    listSeats: () => ipcRenderer.invoke("qf:seats:list"),
+    spawnSeat: (args: { seatId: string }) =>
       ipcRenderer.invoke("qf:seats:spawn", args),
     spawnSession: (args: { species: string; prompt?: string }) =>
       ipcRenderer.invoke("qf:sessions:spawn", args),

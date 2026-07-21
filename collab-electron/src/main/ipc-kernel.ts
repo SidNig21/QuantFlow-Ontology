@@ -19,7 +19,7 @@ import {
   type PublishAndDeliverOpts,
 } from "./a2a-bus";
 import { spawnA2aFourSeats } from "./a2a-orchestra";
-import { resolveHermesSeat } from "./hermes-seats";
+import { listHermesSeats, resolveHermesSeat } from "./hermes-seats";
 import { registerSeatPty, startPeerDelivery } from "./peer-delivery";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -203,6 +203,20 @@ export function registerKernelHandlers(): void {
       }
     },
   );
+
+  /** The dock renders one spawn button per seat from this list (data, not hardcoded UI). */
+  ipcMain.handle("qf:seats:list", (event) => {
+    try {
+      assertTrustedSender(event);
+      const seats = listHermesSeats().map((s) => ({
+        seatId: s.seatId,
+        displayName: s.displayName,
+      }));
+      return { ok: true as const, seats };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
 
   /**
    * Peer-bus canvas PASS: spawn one profiled Hermes native_tui seat.

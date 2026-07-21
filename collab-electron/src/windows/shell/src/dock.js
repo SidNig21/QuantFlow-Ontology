@@ -116,12 +116,11 @@ export function initDock(panelEl) {
 	}
 
 	const seatsStatus = panelEl.querySelector("#dock-seats-status");
-	const orchBtn = panelEl.querySelector("#dock-spawn-orchestrator");
-	const workerBtn = panelEl.querySelector("#dock-spawn-worker");
+	const seatsList = panelEl.querySelector("#dock-seats-list");
 
 	async function spawnSeat(seatId, btn) {
-		if (!seatsStatus || !btn) return;
-		btn.disabled = true;
+		if (!seatsStatus) return;
+		if (btn) btn.disabled = true;
 		seatsStatus.textContent = `spawning ${seatId}…`;
 		try {
 			const res = await window.shellApi.qf.spawnSeat({ seatId });
@@ -137,23 +136,33 @@ export function initDock(panelEl) {
 		} catch (err) {
 			seatsStatus.textContent = String((err && err.message) || err);
 		} finally {
-			btn.disabled = false;
+			if (btn) btn.disabled = false;
 		}
 	}
 
-	if (orchBtn) {
-		orchBtn.addEventListener("click", () => {
-			void spawnSeat("orchestrator", orchBtn);
-		});
-	}
-	if (workerBtn) {
-		workerBtn.addEventListener("click", () => {
-			void spawnSeat("worker", workerBtn);
-		});
+	// One spawn button per seat, generated from the seat registry — adding a
+	// species is a data change (hermes-seats.ts), never UI surgery here.
+	async function renderSeatButtons() {
+		if (!seatsList) return;
+		const res = await window.shellApi.qf.listSeats();
+		seatsList.replaceChildren();
+		if (!res?.ok) {
+			seatsList.appendChild(el("div", "qf-empty", res?.error?.message ?? "Failed to list seats"));
+			return;
+		}
+		for (const seat of res.seats ?? []) {
+			const btn = el("button", "qf-btn qf-btn-primary", `Spawn ${seat.displayName}`);
+			btn.type = "button";
+			btn.addEventListener("click", () => {
+				void spawnSeat(seat.seatId, btn);
+			});
+			seatsList.appendChild(btn);
+		}
 	}
 
 	window.shellApi.qf.onDockInvalidate(() => {
 		void refresh();
 	});
+	void renderSeatButtons();
 	void refresh();
 }

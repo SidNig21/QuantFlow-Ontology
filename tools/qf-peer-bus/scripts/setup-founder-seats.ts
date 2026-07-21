@@ -25,6 +25,7 @@ const PEER_BUS_DB = join(BUS_DIR, "peer-bus.db");
 const PROFILES = [
   { profile: "qf-orchestrator", role: "orchestrator" },
   { profile: "qf-worker", role: "worker" },
+  { profile: "qf-worker-2", role: "worker2" },
 ] as const;
 
 function which(bin: string): string | null {
