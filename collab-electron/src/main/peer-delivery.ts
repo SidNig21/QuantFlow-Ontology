@@ -43,16 +43,20 @@ type PendingRow = {
   body: string;
 };
 
-/**
- * How a peer message lands in the recipient's TUI. Collapsed to one line and
- * terminated with a carriage return (Enter) so the TUI submits it as a turn.
- * If a given TUI does not submit on \r, the fallback is `hermes chat --resume`
- * (see WO-PEER-BUS delivery notes) — swap the submit sequence here.
- */
+/** The message text that appears in the recipient's TUI (no Enter — see below). */
 function formatIncoming(fromRole: string, body: string): string {
   const oneLine = body.replace(/\s*\n\s*/g, " ").trim();
-  return `[peer message from ${fromRole}] ${oneLine}\r`;
+  return `[peer message from ${fromRole}] ${oneLine}`;
 }
+
+/**
+ * Delay before the Enter keystroke. The text and the Enter MUST be separate
+ * writes: sent as one burst, the TUI's paste-detection treats the trailing
+ * carriage return as pasted content and never submits (proven — the text
+ * appeared but did not send). Writing "\r" as a distinct keystroke after the
+ * text lands submits the turn (proven: the worker's model then reasons over it).
+ */
+const SUBMIT_DELAY_MS = 400;
 
 let timer: ReturnType<typeof setInterval> | null = null;
 let busDbPath = "";
@@ -78,11 +82,23 @@ function poll(): void {
     for (const row of rows) {
       const pty = seatPtyByRole.get(row.to_role);
       if (!pty) continue; // recipient seat not spawned yet — leave undelivered.
+      // Split write: text now, Enter as a separate keystroke (defeats the TUI's
+      // paste-detection). One message per tick so a second message's text can
+      // never land between this text and its Enter on the same PTY.
       writeToSession(pty, formatIncoming(row.from_role, row.body));
+      const submitPty = pty;
+      setTimeout(() => {
+        try {
+          writeToSession(submitPty, "\r");
+        } catch {
+          /* seat may have closed between text and Enter */
+        }
+      }, SUBMIT_DELAY_MS);
       db.prepare(`UPDATE messages SET delivered = 1 WHERE id = ?`).run(row.id);
       console.log(
         `peer-delivery: pushed ${row.id} ${row.from_role}→${row.to_role} into live TUI`,
       );
+      break; // deliver one per tick; the rest land on the next poll.
     }
   } catch {
     // Transient (db locked by the bus mid-write, etc.) — next tick retries.
