@@ -1,292 +1,113 @@
-# Collaborator
+# QuantFlow
 
-Collaborator is a place to build with agents.
+**An AI-native quantitative research platform: heterogeneous AI agents collaborating on a spatial canvas, over a governed ontology.**
 
-![Collaborator](screenshot.png)
+QuantFlow doesn't compete with agent frameworks — it's the surface they land on. Claude Code, Codex, Hermes, a scraper, an RL worker: anything with a CLI is a *candidate species* that spawns as a seat on the canvas, collaborates with its peers over an MCP bus, and acts on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
 
-Collaborator is an end-to-end environment for agentic development. Terminals, context files, and running code — all arranged on an infinite canvas in one place. No context switching, no tab hunting. Just your agents and your work, side by side.
+> **It plugs into your world; it doesn't become your world.**
 
-The app is early-stage and in active development, with native desktop targets for macOS, Windows, and Linux. On Windows, terminal sessions can target both PowerShell and WSL2 distros.
+Built solo, in the open, on Linux first. Early-stage and honest about it — see [Status](#status).
 
-## Install
+---
 
-**[Download the latest release](https://github.com/collaborator-ai/collab-public/releases/latest)** for macOS, Windows, or Linux.
+## What works today (verified, not aspirational)
 
-macOS and Linux also support command-line install:
+Every claim below is backed by a falsified `qa/` gate or a recorded proof in the Kernel. If it's not on this list, it doesn't exist yet.
+
+- **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel commands; a gate (`qa/gates/kernel-sole-writer*`) fails the build if any other code path writes to it — and the gate has been bait-tested red before being trusted green.
+- **The canvas + dock** — an infinite pan/zoom surface (Electron) where agent seats spawn as terminal tiles. The dock renders one spawn button per registered seat, driven by the seat registry, not hardcoded.
+- **Agent seats** — named Hermes seats (`orchestrator`, `worker`, `worker2`), each a real TUI process in its own PTY session with its own profile and tool grants.
+- **The peer bus** (`tools/qf-peer-bus`) — a stdio MCP server exposing `send_to_peer` / `read_inbox` / `list_peers`. Every peer message is recorded to the Kernel as a content-addressed `trajectory` artifact (which doubles as a finetuning trace store). Transport routing lives in its own SQLite db, separate from the Kernel.
+- **Live delivery** — a host-side watcher pushes incoming peer messages into the recipient's *live TUI* as a real conversation turn. Proven end-to-end: an orchestrator message injected into a worker's native TUI was auto-processed and answered via `send_to_peer`, with both legs recorded as Kernel artifacts.
+- **Verification culture** — changes land through work orders verified in cold git worktrees; gates are falsified (bait → red → restore → green) before they count; artifact hashes are recomputed, not trusted.
+
+## The end goal: a real ontology
+
+The destination is a **Palantir-grade ontology built with tools anyone can install** — object types, properties, links, and actions over the Kernel, with the agents' tool surface *generated from* the schema rather than hand-written. The doctrine (borrowed from Palantir's own published talks, built on none of their platform):
+
+1. **One governed system of record.** The Kernel is the sole writer. Retrieval, scraping, and agent chatter never become truth without passing through a Kernel command.
+2. **Tools follow the ontology.** Model the object/link/action graph correctly and CRUD + action tools fall out of codegen for free — that's what lets agents one-shot cross-object work instead of being hand-held verb by verb.
+3. **Names and descriptions are load-bearing.** Agents reason over the schema. Every object type and property carries a mandatory description, enforced by lint, or it doesn't merge.
+
+The ontology has three planes:
+
+- **Research plane** (invariant, market-agnostic): `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`. Identical whether the instrument is a game line, a perp contract, or an equity.
+- **Market plane** (pluggable, pipeline-fed): `Venue / Instrument / Quote / MarketEvent`. A new market adds *rows*, never new object types.
+- **Agent plane** (largely live already): `AgentDefinition / AgentSession` + trajectory artifacts.
+
+**The proof standard** — the day this repo gets to call itself an ontology: an orchestrator seat answers *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* in one pass, using only tools generated from the schema, with every step recorded to the Kernel.
+
+## Status
+
+| Phase | Scope | Status |
+|---|---|---|
+| 0 | Substrate: Kernel, canvas/dock, seats, peer bus, live TUI delivery | ✅ Done, verified |
+| 1 | Ontology charter as code (~14 described object types, lint-enforced governance) | 🔜 Next |
+| 2 | Tool plane generated from the charter (MCP read + action tools via codegen) | Planned |
+| 3 | First market pipeline (`Instrument`/`Quote`/`MarketEvent` via Kernel commands) | Planned |
+| 4 | Defining research loop run end-to-end by agents — the one-shot proof | Planned |
+| 5 | Recall layer (FTS5 + sqlite-vec hybrid retrieval) + trust boundaries | Later |
+| 6 | Evaluation-history-driven optimization | Later |
+
+No claim in this README runs ahead of this table.
+
+## Architecture
+
+```
+┌───────────────────────────────────────────────────────┐
+│  CANVAS + DOCK (Electron)          the surface        │
+│  seat spawn rail · terminal tiles · live PTY sessions │
+├───────────────────────────────────────────────────────┤
+│  COLLABORATION PLANE               agent ↔ agent      │
+│  qf-peer-bus (stdio MCP) · host push into live TUIs   │
+├───────────────────────────────────────────────────────┤
+│  WORLD MODEL                       agent ↔ world      │
+│  SQLite Kernel · sole writer · append-only event log  │
+│  content-addressed artifacts · schema-generated code  │
+└───────────────────────────────────────────────────────┘
+```
+
+Runtime split worth knowing: the Electron main process is Node (`node:sqlite`); Bun code (tools, tests, gates) uses `bun:sqlite`. The Kernel is opened through a single driver seam — only one file in the app may import it, and a gate enforces that.
+
+## Repo layout
+
+| Path | What it is |
+|---|---|
+| `collab-electron/` | The desktop app — canvas, dock, seat spawning, peer delivery watcher |
+| `qf-kernel-schema/` | Schema → generated Kernel code (the codegen seam the ontology charter will extend) |
+| `tools/qf-peer-bus/` | The MCP peer bus: server, transport db, Kernel recording, cold-harness proofs |
+| `species/` | Agent definitions |
+| `qa/` | Gates. Falsifiable by construction — if a gate can't go red, it isn't a gate |
+| `docs/orders/` | Work orders + verification records (the build's audit trail) |
+
+## Development
+
+Prerequisites: **Node.js 24+**, **Bun**, **tmux** (Linux-first; macOS/Windows carried by upstream but untested here).
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/collaborator-ai/collab-public/main/install.sh | bash
-```
-
-Windows: use the `.exe` installer from the releases page.
-
-## Stack
-
-Collaborator is a native desktop app built with:
-
-* **Electron 40** — desktop shell with multi-webview architecture
-
-* **React 19** — UI framework
-
-* **Tailwind CSS 4** — styling
-
-* **electron-vite** — build tooling with hot reload
-
-* **xterm.js** — terminal emulation backed by a persistent node-pty sidecar
-
-* **Monaco Editor** — code editing with syntax highlighting
-
-* **BlockNote / TipTap** — rich text markdown editing
-
-* **D3** — force-directed graph visualization
-
-* **sharp** — image processing
-
-* **KaTeX** — math rendering in markdown
-
-All data is stored locally on disk.
-
-## Quickstart
-
-1. Open Collaborator
-
-2. Add a workspace — click the workspace dropdown in the navigator and choose "Add workspace", or press Cmd+Shift+O, then select a local folder
-
-3. Double-click the canvas to create a terminal, and start an agent
-
-4. Drag files from the navigator onto the canvas to open them as tiles alongside your running agents
-
-***
-
-## Specification
-
-### Application overview
-
-Collaborator is a single-window application for macOS, Windows, and Linux. It operates primarily on local files with no accounts required. Anonymous, non-identifying usage analytics are collected via PostHog.
-
-The window is divided into two regions:
-
-* **Navigator** — a resizable sidebar on the left containing a file tree and workspace switcher
-
-* **Main area** — the canvas, an infinite pan-and-zoom surface where tiles are arranged; also hosts the viewer, which displays the content of the file selected in the navigator
-
-All application state is stored as JSON files in `~/.collaborator/`.
-
-### Multiworkspace navigation
-
-The navigator sidebar displays a file tree rooted at the active workspace folder. Users can maintain multiple workspaces and switch between them.
-
-#### Workspace management
-
-A dropdown at the top of the navigator shows the active workspace name. It provides:
-
-* A list of all workspaces for quick switching
-
-* "Add workspace" to open a new local folder (also available via Cmd+Shift+O)
-
-* "Remove workspace" to remove a workspace from the list (does not delete files)
-
-Each workspace gets its own independent file tree. The canvas and viewer are shared across workspaces.
-
-#### File tree
-
-The file tree shows all files and folders in the active workspace. It supports:
-
-* **Expand/collapse** folders by clicking
-
-* **Two view modes**: hierarchical tree view, and a chronological feed view sorted by date
-
-* **Sorting**: cycles through created (newest/oldest), modified (newest/oldest), and name (A-Z/Z-A)
-
-* **File operations**: create new note (generates `Untitled.md`), create new folder, rename (F2), delete (moves to trash)
-
-* **Move files** by dragging between folders
-
-* **Multi-select** with Shift+click and Cmd+click
-
-* **Search** via Cmd+K
-
-Selecting a file in the tree opens it in the viewer. Dragging a file from the tree onto the canvas creates a tile.
-
-### Canvas
-
-The canvas is an infinite pan-and-zoom surface that fills the main area. It uses a dot grid background for spatial orientation.
-
-#### Viewport controls
-
-| Action     | Input                                             |
-| ---------- | ------------------------------------------------- |
-| Pan        | Scroll wheel, or Space+drag, or middle-click+drag |
-| Zoom in    | Cmd+= or Ctrl+scroll up                           |
-| Zoom out   | Cmd+- or Ctrl+scroll down                         |
-| Reset zoom | Cmd+0                                             |
-
-* **Zoom range**: 33% to 100%, with rubber-band effect when overshooting limits
-
-* **Zoom indicator**: appears briefly in the bottom-right corner after zoom changes, showing the current percentage
-
-#### Grid
-
-* Minor grid dots at regular intervals
-
-* Major grid dots at every 4th interval
-
-* All tile positions and sizes snap to the grid
-
-#### Data model
-
-Tiles are live views, not standalone containers.
-
-* **File tiles** (note, code, image) are bound to a file on disk by absolute path. If the file is renamed, the tile updates to track the new path. If the file is deleted, the tile is closed. If the file's content changes on disk, the tile reloads.
-
-* **Terminal tiles** are bound to a persistent sidecar-backed PTY session. Each terminal tile creates and manages its own session, which persists independently of the tile's lifecycle on the canvas.
-
-#### Tile management
-
-Tiles are the content units on the canvas. Each tile has:
-
-* A **title bar** for dragging
-
-* **Eight resize handles** (four edges, four corners)
-
-* A **z-index** for layering — clicking a tile brings it to front
-
-Tiles are created by:
-
-* **Double-clicking** empty canvas space — creates a terminal tile at that position
-
-* **Dragging a file** from the navigator onto the canvas — creates a note, code, or image tile depending on file type
-
-Tiles can be closed via their title bar. Holding Shift while scrolling passes scroll events through tiles to the canvas.
-
-### Tile types
-
-#### Terminal
-
-An interactive terminal session. Created by double-clicking empty canvas space. The terminal's working directory is set to the active workspace path.
-
-Terminals are the primary interface for running AI agents. Each terminal tile manages its own independent session.
-
-#### Note
-
-A rich markdown editor. Created by dragging a `.md` file from the navigator onto the canvas. Supports inline editing with live rendering.
-
-#### Code
-
-A syntax-highlighted code editor. Created by dragging any non-markdown, non-image file from the navigator onto the canvas. Supports inline editing with language detection.
-
-#### Image
-
-A read-only image display. Created by dragging an image file (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`) from the navigator onto the canvas.
-
-### Viewer
-
-The viewer displays the content of the currently selected file in the navigator. It occupies the main area alongside the canvas.
-
-| File type                                                | Display                                                                       |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Markdown (`.md`, `.mdx`, `.markdown`, `.txt`)            | Rich text editor with frontmatter support, cover images, and wiki-style links |
-| Code (all other text files)                              | Syntax-highlighted editor with line numbers                                   |
-| Image (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`) | Image display with metadata                                                   |
-
-Markdown and code files support inline editing in the viewer. The viewer watches for external file changes on disk and reloads automatically.
-
-Pressing Escape closes the viewer (when not actively editing).
-
-### Persistence
-
-All state is stored locally in `~/.collaborator/`.
-
-#### Canvas state (`canvas-state.json`)
-
-```json
-{
-  "version": 1,
-  "tiles": [
-    {
-      "id": "tile-<timestamp>-<index>",
-      "type": "term | note | code | image",
-      "x": 0,
-      "y": 0,
-      "width": 440,
-      "height": 540,
-      "filePath": "/absolute/path/to/file",
-      "zIndex": 1
-    }
-  ],
-  "viewport": {
-    "panX": 0,
-    "panY": 0,
-    "zoom": 1.0
-  }
-}
-```
-
-Canvas state is saved 500ms after each change (debounced) and immediately when tiles are created or closed.
-
-#### App config (`config.json`)
-
-```json
-{
-  "workspaces": ["/path/to/workspace1", "/path/to/workspace2"],
-  "active_workspace": 0,
-  "window_state": {
-    "x": 0,
-    "y": 0,
-    "width": 1440,
-    "height": 900,
-    "isMaximized": false
-  },
-  "ui": {}
-}
-```
-
-## Development | Electron App
-
-### Prerequisites
-
-Install:
-
-* Node.js 22+
-
-* Bun
-
-Platform notes:
-
-* macOS: Homebrew is the simplest way to install Node.js and Bun.
-
-* Windows: PowerShell 7 is recommended; WSL2 support requires at least one installed distro.
-
-* Linux: install Node.js and Bun from your distro packages or upstream installers.
-
-### Setup
-
-Once the prerequisites are installed, clone the repo and install dependencies:
-
-```sh
-git clone https://github.com/collaborator-ai/collab-public.git
-cd collab-public/collab-electron
+git clone <this repo>
+cd QuantFlow-Ontology/collab-electron
 bun install
+bun run dev     # Electron app with hot reload
+bun test        # tests
+bun run build   # production build
 ```
 
-### Run in dev mode
+Gates run from `qa/` and are wired into CI. Agent seats require a local [Hermes](https://github.com/NousResearch/hermes-agent) install with per-seat profiles; the peer bus MCP block is written into each profile by `tools/qf-peer-bus/scripts/setup-founder-seats.ts`.
 
-```sh
-bun run dev
-```
+## Doctrine (the rules this repo is built under)
 
-This starts the Electron app with hot reload via electron-vite.
+- **Stop building engines.** The substrate is done. New effort goes into the world model and the loop that runs over it.
+- **Kernel is the sole writer.** Everything else asks.
+- **One canonical type per real-world entity.** `Run` with a `kind` property — never `BacktestRun`/`ScreenerRun` clones. Extension via new linked types, not mutation of shipped ones.
+- **Pipeline-shaped data gets pipelines, not actions.** Quotes and events flow in through ingest scripts with provenance; no manual write verbs for them.
+- **Descriptions are enforced, not encouraged.** The schema is agent context.
+- **Measurements beat prose.** Nothing is "done" by narrative — gates go red or the claim doesn't exist.
 
-### Run tests
+## Lineage
 
-```sh
-bun test
-```
+QuantFlow is a fork of [Collaborator](https://github.com/collaborator-ai/collab-public) (`collab-electron`), whose canvas, tile system, and terminal architecture form the surface layer — see `LICENSE.md` and `NOTICE.md`. The Kernel, peer bus, seats, gates, and the ontology direction are QuantFlow's own.
 
-### Build
+## License
 
-```sh
-bun run build
-```
-
-⠀
+See [LICENSE.md](LICENSE.md).
