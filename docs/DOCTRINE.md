@@ -256,6 +256,38 @@ Pivoting marketing to "ontology" means backing it up. Never claim ahead of what 
 
 ---
 
+## Amendments — v1.1 (2026-07-24, founder-ratified)
+
+The v1 text above is preserved untouched. These amendments record decisions made after it, and win where they conflict.
+
+### A1 · Decision log (settled, do not re-litigate)
+
+- **Research and advisor only.** QuantFlow never places bets or executes trades — the operator acts in the world. `Position` remains in the charter as a *record* (`record_position`, the operator reporting their own fill — required for CLV against the close), never an execution. Duplicate-order risk is out of scope by construction.
+- **Deployment: local, on the founder's tower, Tailscale for reach.** No cloud. Measured 2026-07-24: the client/server seam already exists (`pty-sidecar` is a socket server; the canvas is a Law-A projection), so the entire domain is deployment-agnostic. Migrate only on the measured trigger: *screen-sharing into the tower to babysit a seat has become the bottleneck.* See the Venn: the left circle held no capabilities, the center held the whole product.
+- **Charter location: `qf-kernel-schema` evolved in place, split by plane** (`research` / `market` / `agent`). Part IV's `ontology/` code sample prescribes *shape*, not a directory. This preserves the conformance machinery (118 generated tests) and the codegen seam, and retires ROADMAP debt #5. Part III already said it: "qf-kernel-schema codegen — HAVE (EXTEND)."
+- **Substrate triage** (`START_HERE.md` §5.8): dock item / underlayer / neither, decided per *layer* by the dependency arrow, never per brand name. Substrate proposals get logged, not evaluated, until the Research plane exists. Worked example: agentOS (`docs/RESEARCH.md`).
+
+### A2 · Phase 2 exit gate, sharpened (the Coyle two-gate spec)
+
+Every codegen'd action tool is **two gates around one dumb tool**: **GATE 1 · input** — Zod-parse of the call shape at `execute()` (closes the "no Zod at execute" audit gap); **GATE 2 · output** — the transition-table/ontology check on the result (built: WO-005's conformance layer). *The agent proposes; the ontology permits.* Phase 2 does not exit until both gates are proven to reject — a malformed call dies at Gate 1 before touching the Kernel, an illegal transition dies at Gate 2 before commit, both bait-tested.
+
+### A3 · RL scope (Phase 7 seed — expands Phase 6, changes nothing before it)
+
+RL is **in scope** as the doctrine's continuation, not a rival direction. Standing references: `docs/RESEARCH.md` (RL shelf) and the vault `Research/` folder (source of record; founder hand-picks priorities).
+
+- **Two tracks, split explicitly** — conflating them costs months. **Track A · playbook**: versioned skills/prompts/configs mined from trajectories, selected by Evaluation history (bandit machinery, no GPU). Improvement lives in the *Kernel*, so it survives species swaps — the desk's institutional memory, portable across whatever CLI agent ships next. **Track B · weights**: LoRA/RL finetuning on trajectory data (GPU, owned models only); improvement is locked to one species. Which is first-class is an **open founder call**; neither blocks Phases 1–4.
+- **Charter cost today: names only.** Phase 1 seeds `Policy` and `Environment` as `status: "experimental"` (described, unimplemented). `Run.kind` gains `training`. `Trajectory` is **not** a type — it is `Artifact.kind`, per this doctrine's own Silo rule.
+- **Reward is proposal quality, never execution P&L** — CLV capture, hit-rate, calibration of what was *advised* against what happened. Follows from A1 and is the cleaner signal regardless.
+- **The leakage gate** (new anti-pattern row): a `Policy` whose lineage contains a `Dataset` fence timestamp later than the target `MarketEvent` fails promotion, mechanically. Every RL failure in markets is a provenance failure; this is the one the ontology is uniquely placed to kill.
+- **Orchestrator = a seat like any other.** Promote/rollback are Kernel actions (`promote_policy` / `rollback_policy`), founder-approved at first. Continual-learning guards when Track B activates: off-policy evaluation before promotion, distribution-shift detection, replay buffer against forgetting.
+- **Stated caution:** RL on financial markets has a brutal overfit record. That is the argument *for* provenance-first, not against the ambition.
+
+### A4 · Phase-gate bookkeeping
+
+Phase numbering unchanged (P1–P6; P7 = RL per A3). The forward WO ladder implementing these phases lives in `docs/ROADMAP.md` and is the build authority; this document stays the *why*.
+
+---
+
 ## Sources
 - [[00 - The Integration Question]] — verdict: borrow doctrine, don't build on platform
 - [[05 - DevX SuperRepo & Agent Development]] — local embedded ontology, ontology-as-code, schema-drift-as-lint, worktrees

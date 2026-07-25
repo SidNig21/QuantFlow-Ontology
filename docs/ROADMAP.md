@@ -65,7 +65,64 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 | 17 | **Durable execution — logged, not evaluated.** Candidates: RivetKit (library, in-process), Restate (single self-hostable binary), Temporal (server + Postgres), DBOS (needs Postgres — splits the system of record, likely disqualifying). Licensing **probed 2026-07-24 via `gh repo view`**: `rivet-dev/rivet` and `rivet-dev/agentos` are both **Apache-2.0** (confirmed at source, active repos). Restate-BSL-1.1 / Inngest-SSPL claims remain unprobed — verify at adoption if they're ever candidates; licenses change. **The Kernel write path already exists** (`execute()` + `kernel-sole-writer` gate), so an external executor is a *caller*, not a re-plumb. **Adoption rule if it ever lands:** actors own execution state (workflow pointer, retries, queue position, scratch); the Kernel owns ontology state. Test — *if losing it makes a Report unreproducible it is Kernel; if losing it just means redoing work, let the actor keep it.* Naive per-actor SQLite would be the Silo anti-pattern arrived at through infrastructure. | **Trigger:** the first orchestrator run that dies mid-flight and cannot resume. Not before |
 | 18 | **Workflow-step idempotency** — object-level idempotence exists (content-addressed `publish_artifact`, `ArtifactMetadataConflictError`, idempotent boot seed), and `BLUEPRINT.md` L1 already names idempotency keys. Missing: a step-level key from (workflow, step, attempt) so a *replayed* step commits once. Small, and only required once durable execution replays steps. Note: duplicate-order risk is **out of scope by decision** — QuantFlow is research-and-advisor-only, the operator places all bets and trades. Residual risk is duplicate vendor API calls and duplicate rows on replay | with #17, or Phase 4 if Runs get long first |
 
-## Phase v0.5 — "one real quant workflow" (~2–4 months) — **gates detailed 2026-07-19** (founder request)
+## THE FORWARD LADDER — doctrine phases P1–P7 (ratified 2026-07-24; this is the build path)
+
+> **This section is the build authority from 2026-07-25 onward.** It implements `docs/DOCTRINE.md` (v1.1, incl. amendments A1–A4). Each rung is one Cursor-sized order; the architect writes each order file just-in-time (one phase ahead only), and an order may **refine** its gate here, never weaken it. All standing rules inherit without restatement: cold-state, gate falsification (bait → red → restore → green), Laws A–F, no credentials in builder hands, `PROTOCOL.md` roles. The **dock contract** below remains binding on every species forever.
+>
+> Charter location per doctrine A1: **`qf-kernel-schema` evolved in place, split by plane** — never a parallel `ontology/` truth store.
+
+### P1 · The charter — one week
+
+**WO-101 · Research + Agent plane charter.** Split `schema.ts` by plane (`research` / `market` / `agent` — retires debt #5). Add `Report` (+ `publish_report` action stub rejecting without a passing Evaluation). Rewrite every Research/Agent-plane description as **agent context** (what an agent must know to act, not what a human finds pretty). Seed `Policy` + `Environment` as `experimental`, add `Run.kind: training`, `Mission` naming decision (`workspace` rename vs alias). Anti-pattern lints per doctrine Part VI: no-subtype-of-Run, no-property-removal-on-active, description-required (exists — extend to properties).
+→ **Gate 1 (lint):** each of three sabotages goes red — missing description, `BacktestRun` clone, property removed from an active type. Bait-tested.
+→ **Gate 2 (fixture):** hand an agent *only* the schema module + hand-written fixture rows; it answers "which Runs from Hypothesis X produced Evaluations above threshold Y?" unaided — or a description is underspecified and gets fixed. This gate is the description-quality test the lint can't do.
+
+**WO-102 · Market plane reframe.** `Competitor/Event/Market/OddsSeries/Result` → `Venue/Instrument/Quote/MarketEvent` (betting becomes rows and properties, never types — typed prop vocabularies live in property enums). Market-plane types declare `pipelineFed: true` (codegen will emit no write tools for them — Golden Hammer rule, machine-enforced). Old types retire through the schema-diff discipline (experimental types may be removed; the conformance suite regenerates green).
+→ **Gate:** full conformance suite regenerated and green; fixture gate re-run with a cross-plane question (Hypothesis TARGETS Instrument); a grep proves no sport-specific noun survives as a *type name*.
+
+### P2 · The generated tool plane — weeks 2–3
+
+**WO-103 · Read tools from the charter.** Codegen emits `get / search / traverse-links` per object type as an MCP server on the `@modelcontextprotocol/sdk` stack qf-peer-bus proved.
+→ **Gate:** add a brand-new `experimental` type in a test fixture → its three read tools exist with **zero hand-written tool code** (the doctrine Phase 2 exit, falsified by diff).
+
+**WO-104 · Action tools + the two gates (doctrine A2).** Per-action write tools with **GATE 1** (Zod-parse of call shape at `execute()` — closes the audit gap) and **GATE 2** (transition-table check on the result — WO-005 machinery).
+→ **Gate:** a malformed call dies at GATE 1 before touching the Kernel; an illegal transition dies at GATE 2 before commit; both proven by bait, both directions.
+
+**WO-105 · Cold seat + retirement.** A live Hermes seat lists and calls the generated tools **cold** (no priming beyond the seat profile); hand-grown `qf_*` verbs retire as generated equivalents land.
+→ **Gate:** the cold seat completes one real task through generated tools only; grep proves retired verbs are gone from the tool surface.
+
+### P3 · The first market plane — week ~4
+
+**WO-106 · One pipeline, one market.** Founder picks the market on the day (odds or perps — the ontology doesn't care). One Bun cron script ingests `Instrument / Quote / MarketEvent` rows **through Kernel commands** with an ingest trace. Codegen emits no write-actions for `pipelineFed` types (gate carried from WO-102).
+→ **Gate:** every market row's provenance recomputes to an ingest event; a seat answers a cross-object question about **real** data through generated tools only.
+
+**WO-107 · The second market, structurally different.** A game line *and* a perp (or equivalent pair) load into the same four types.
+→ **Gate: zero new object types.** If either market needs a special type, the abstraction failed — fix it now. (The one good gate from the retired HTML roadmap, kept.)
+
+### P4 · The defining loop, agent-run — weeks 5–8
+
+**WO-108 · The loop's lower half.** Orchestrator + worker seats run `Hypothesis → Dataset → Run → Artifact` over the peer bus using generated tools; every step a Kernel action, every conversation a trajectory artifact.
+**WO-109 · The Critic + the mechanical gate.** A Critic seat scores Artifacts vs the Hypothesis's criteria (`record_evaluation`); `publish_report` **mechanically rejects** without a passing Evaluation (bait-tested).
+**WO-110 · The one-shot proof.** *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* — answered correctly, one pass, tools-only, every step recorded.
+→ **Phase gate = the doctrine's proof standard. This is the day QuantFlow is a real ontology**, and the claims ladder (doctrine Part VII) advances one rung.
+
+### P5–P7 · Sketched, ordered at their phase entry (plan one phase ahead only)
+
+- **P5 · Recall + trust (months 2–3):** FTS5 + sqlite-vec hybrid retrieval, RRF k=60, age decay, Mission-scoped; retrieval never becomes truth without a Kernel command; category deny-list at first external agent. Orders drafted at P4 exit.
+- **P6 · Evolve:** Evaluation history as fitness. Deferred until months of history exist — measure before optimizing.
+- **P7 · RL (doctrine A3):** first the founder's track call (playbook vs weights), then `Environment` binding, leakage gate, founder-approved `promote_policy`/`rollback_policy`. Standing references: `docs/RESEARCH.md` RL shelf + vault `Research/`.
+
+### Parallel tracks (founder-gated, off the critical path)
+
+- **Visual pass** — WO-006d one-skin + dock/canvas redesign when the founder's designs land; tokens-first, gate `one-skin`.
+- **Durable execution** — debt #17, on its written trigger only.
+- **Workflow-step idempotency** — debt #18, with #17 or at P4 if Runs get long.
+
+---
+
+## Phase v0.5 — "one real quant workflow" — **[HISTORICAL — absorbed 2026-07-24]**
+
+> **Superseded as a route by the forward ladder above.** Kept because: the **dock contract** below remains binding; completed orders (WO-006d…WO-008f series) keep their verification records here; and unfinished rungs were either absorbed into P1–P7 or parked (WO-009 domain datasets → absorbed by WO-106's market pick). Do not start work from this section.
 
 **Phase gate (unchanged, closes the phase):** the defining workflow end-to-end on real data — Hypothesis → Dataset → Backtest → Artifact → Critic → Evaluation (CLV, ROI, Monte Carlo bankroll) → Report with full lineage. Plus: 12 sessions / 4 concurrent turns · typed delegation · trace timeline · object inspector.
 

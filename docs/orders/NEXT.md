@@ -1,25 +1,25 @@
-# NEXT — the current order (updated for peer-bus canvas PASS)
+# NEXT — the current order (rotated 2026-07-24: the doctrine ladder begins)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-PEER-BUS-CANVAS — peer-bus visual PASS**
+## Current order: **WO-101 — Research + Agent plane charter**
 
-Park tip on `origin/QuantFlow` is **ignored for this PASS.** Active track is
-the plan + canvas seat spawn on `feat/peer-bus-canvas`.
+The Ontology Doctrine (`docs/DOCTRINE.md`, v1.1) is the plan of record; the forward ladder in `docs/ROADMAP.md` is the build path; WO-101 is its first rung.
 
-1. Read `docs/orders/WO-PEER-BUS-CANVAS.md` (checklist) and
-   `docs/plans/2026-07-20-001-req-peer-bus-canvas-pass-plan.md` (authority).
-2. Cold plane: `docs/orders/WO-PEER-BUS.md` + `tools/qf-peer-bus` harness.
-3. Product desk path: dock **Spawn Hermes Orchestrator** /
-   **Spawn Hermes Worker** — not the demoted Run A2A movie.
+1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
+2. Read `docs/orders/WO-101.md` — the complete order.
+3. Branch `wo-101` from current `main`. Commit from a worktree, never the shared tree.
+4. Report back per `PROTOCOL.md`; the verifier runs G2 and the cold suite.
 
-## Parallel / parked
+## Queued behind (do not start)
 
-**WO-009** — domain datasets remain parked. **AIP / Foundry** — outside this
-product's identity for the PASS.
+**WO-102** — Market plane reframe (order written when WO-101 verifies). Then P2: WO-103/104/105 — the generated tool plane.
+
+## Parked / parallel
+
+**Visual pass** (WO-006d one-skin + dock redesign) — founder-gated, off the critical path. **WO-009** — absorbed into WO-106's market pick. **Durable execution** — ROADMAP debt #17, trigger-gated. The old peer-bus PASS notes are history, not routes — peer delivery is merged to main (`a17ea16`…`7a20f0c`), with AE3 carried as labeled debt in that commit, and the `origin/QuantFlow` park record is superseded.
 
 ---
 
-*When the founder marks AE1–AE3 accepted and cold gates stay green, rotate
-this file again. Until then, NEXT stays WO-PEER-BUS-CANVAS.*
+*Rotation rule unchanged: the verifier rotates this file when the current order verifies. Until then, NEXT stays WO-101.*

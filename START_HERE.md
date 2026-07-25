@@ -1,4 +1,4 @@
-> **Active track (park tip ignored for this PASS):** peer-bus canvas visual PASS — see [`docs/orders/NEXT.md`](docs/orders/NEXT.md) and [`docs/orders/WO-PEER-BUS-CANVAS.md`](docs/orders/WO-PEER-BUS-CANVAS.md). `origin/QuantFlow` still carries the 2026-07-20 park record; do not treat that tip as the base for this desk work.
+> **Active track (2026-07-24):** the Ontology Doctrine ladder — `docs/DOCTRINE.md` is the plan of record, `docs/ROADMAP.md` carries the forward build ladder, and [`docs/orders/NEXT.md`](docs/orders/NEXT.md) points at the one unblocked order. Work happens on `main` via short-lived order branches. The old `origin/QuantFlow` park record and the peer-bus PASS notes are history, not routes.
 
 # START_HERE.md
 
