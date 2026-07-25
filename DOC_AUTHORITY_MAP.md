@@ -24,7 +24,8 @@
 |---|---|
 | `README.md` | Rewritten 2026-07-24 (`48d321e`) — the public front door. Marketing-facing; `START_HERE.md` still wins on rules |
 | `collab-electron/docs/**` | Inherited upstream docs — true for the shell, silent on QuantFlow |
-| Founder's vault (`~/Vaults/Personal/Projects/QuantFlow/`) | Research archive only — everything binding has graduated into `docs/`. The vault copy of the doctrine is now a stale cache; `docs/DOCTRINE.md` is authority |
+| Founder's vault (`~/Vaults/Personal/Projects/QuantFlow/`) | Research archive + **the founder's operating notes**. Everything *binding* has graduated into `docs/`. The vault copy of the doctrine is a stale cache; `docs/DOCTRINE.md` is authority |
+| ↳ `QUANTFLOW_QUICKSTART.md` · `QuantFlow Hub.md` | **Navigation, not authority — the distinction is load-bearing.** These are how the founder finds the right door and runs the loop: which seat does what, the copy-paste prompt for each, the four founder checks. They decide nothing. **They must contain no state** — no gate counts, no order numbers, no type counts — because a cached fact with no mechanism to stay true is exactly the failure this map exists to prevent (the Hub was caught 9 days stale on 2026-07-25, naming the wrong repo and a reversed decision). If you want to know where things stand, run the commands; if you want to know why, read `docs/` |
 | `~/Vaults/.../quantflow-ontology-roadmap.html` | **Not authority.** A Stage 1–8 ladder that contradicts the doctrine's Phase 0–6 (defers governance to Stage 6). Founder verdict 2026-07-24: questionable |
 
 ## ARCHIVE — do not follow
