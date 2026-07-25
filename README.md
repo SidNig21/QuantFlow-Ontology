@@ -51,6 +51,21 @@ The ontology has three planes:
 
 No claim in this README runs ahead of this table.
 
+**Measured 2026-07-25 — what "Phase 0 done" does and does not mean.** The Kernel is real: one
+write path, content-addressed artifacts, generated migrations, trace on every command, twelve
+green QA gates. It is *not* yet able to record the defining workflow. Of 19 declared object
+types **3 can be created**; of 27 declared actions **9 throw `Unknown command`**; of 13 declared
+link types **none are writable** — the `links` table is generated and constrained, with zero
+reads and zero writes anywhere in the repo. So `Hypothesis → Dataset → Run → Artifact →
+Evaluation → Report` has one creatable stage and no connective tissue.
+
+This is a *sequencing* fact, not a broken foundation — nothing above was built on sand, and
+Phase 0's own gates all still pass. But it means the write path is the next real rung, and it
+is why the build ladder is eleven orders rather than ten. **Declaration is not capability:**
+anywhere in this repo, `schema.ts` states what is *declared* — `commands.ts` and
+`transitions.ts` state what is *wired*, and the second is a strict subset. See
+[`docs/orders/SCOPES.md`](docs/orders/SCOPES.md) and `docs/DOCTRINE.md` amendment A5.
+
 ## Architecture
 
 ```

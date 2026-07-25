@@ -40,7 +40,7 @@ Only tools serving a **named** doctrine phase gate or charter action appear here
 | **1 · charter** | `BuilderIO/agent-native` (one schema → many surfaces: steal the *shape*), skills repos (how to write descriptions agents act on), `konsistent` (lint charter/codegen shape) | Patterns only. Do not install hosts |
 | **2 · tool plane** | `@modelcontextprotocol/sdk` (already in stack via qf-peer-bus), `agent0ai/dox` (regen `AGENTS.md` when the tool surface changes), `kontinuo` / `entireio/skills` (builder handoffs — desk tooling, not ontology truth) | Prefer extending `qf-kernel-schema` over any new framework |
 | **3 · first market** | Databento↔LEAN as an *ingest pattern*, Hyperliquid or odds source as the data, Jesse indicators (compute in the Python sidecar → Artifact), DuckDB for bulk series | Rows, never new object types. No write-actions for pipeline-fed data |
-| **4 · defining loop** | **Effect** (doctrine-named: typed retries on long Runs), **Ragas** + eve.dev eval patterns (Critic scores → `record_evaluation` → gates `publish_report`), ArkSim (cold seat test of generated tools) | Skip meta-harness competitors entirely |
+| **4 · defining loop** | **Effect** (doctrine-named: typed retries on long Runs), **Ragas** + eve.dev eval patterns (Critic scores → `record_evaluation` → gates `publish_artifact` for `kind: "report"`), ArkSim (cold seat test of generated tools) | Skip meta-harness competitors entirely |
 | **5 · recall** | Cerebras KB pattern on SQLite, WrenAI (NL query *through* generated tools), Citation-Network (papers → Artifacts) | Retrieval never becomes truth |
 | **6–7 · evolve / RL** | See below | Gated on months of Evaluation history |
 
