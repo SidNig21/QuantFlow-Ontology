@@ -112,7 +112,7 @@ flowchart LR
     H -->|TESTED_BY| R["Run"]
     R -->|PRODUCES| A["Artifact"]
     A -->|EVALUATED_BY| E["Evaluation"]
-    E -->|GATES| REP["Report"]
+    E -->|GATES| REP["Report<br/>(artifact.kind — not a type)"]
   end
   subgraph AP["AGENT PLANE"]
     AD["AgentDefinition"] -->|SPAWNS| AS["AgentSession"]
@@ -136,8 +136,8 @@ flowchart LR
 | R | `Dataset` | A point-in-time-fenced snapshot of market data a Run may read. Immutable once fenced | SNAPSHOTS Quote/MarketEvent |
 | R | `Run` | **One canonical type.** Execution of a Hypothesis against a Dataset. Backtest vs screen vs sim is a *property*, never a subtype | TESTED_BY←Hypothesis · PRODUCES Artifact · DRIVEN_BY AgentSession |
 | R | `Artifact` | Content-addressed output — trajectory, result table, chart, report body. Already live | PRODUCED_BY Run · EVALUATED_BY Evaluation |
-| R | `Evaluation` | A Critic's scored judgment of an Artifact vs the Hypothesis's criteria. Gates publication | GATES Report |
-| R | `Report` | The publishable synthesis. Cannot exist without a passing Evaluation — enforced | DERIVED_FROM Artifact |
+| R | `Evaluation` | A Critic's scored judgment of an Artifact vs the Hypothesis's criteria. Gates publication | EVALUATES Artifact · gates `kind: report` publication |
+| R | ~~`Report`~~ | **Not a type — see A5.** The publishable synthesis is `artifact.kind: "report"`, gated by a passing Evaluation. A `Report` object type fails the Silo rule in Part VI | — |
 | R | `Mission` | Workspace-level intent: the standing questions this desk works. Scopes search/recall | CONTAINS Hypothesis |
 | A | `AgentDefinition` | A species: harness, model, profile, tool grants. Already Kernel rows | SPAWNS AgentSession |
 | A | `AgentSession` | A live seat on the canvas. Owns trajectories it emits | DRIVES Run · EMITS Artifact |
@@ -145,12 +145,12 @@ flowchart LR
 | M | `Instrument` | A tradeable/betable thing: a game line, a perp, a ticker. The market-agnostic pivot | QUOTED_BY Quote · HAS MarketEvent |
 | M | `Quote` | A priced observation at a timestamp: odds, bid/ask, close. Pipeline-fed only | OF Instrument |
 | M | `MarketEvent` | A discrete occurrence: kickoff, injury news, funding event, settlement | ON Instrument |
-| M | `Position` | *(Later — only when real capital exists.)* An actual stake on an Instrument per a Report | JUSTIFIED_BY Report |
+| M | `Position` | *(Later — only when real capital exists.)* An actual stake on an Instrument the operator placed, per a published report | JUSTIFIED_BY Artifact (`kind: report`) |
 
 ### Actions (governed verbs — deliberately few)
 Coherent verbs, not property-level sprawl. Pipeline-shaped data (quotes, events) gets **no** action — the Golden Hammer rule.
 
-`propose_hypothesis` · `fence_dataset` · `start_run` / `complete_run` · `publish_artifact` (exists) · `record_evaluation` · `publish_report` (rejects without passing Evaluation) · `register_instrument`
+`propose_hypothesis` · `fence_dataset` · `start_run` / `complete_run` · `publish_artifact` (exists; **rejects `kind: "report"` without a passing Evaluation** — the gate is a condition on the existing verb, not a new one) · `record_evaluation` · `register_instrument`
 
 ### The charter as code (Phase 1's deliverable)
 
@@ -256,7 +256,7 @@ Pivoting marketing to "ontology" means backing it up. Never claim ahead of what 
 
 ---
 
-## Amendments — v1.1 (2026-07-24, founder-ratified)
+## Amendments — v1.2 (A1–A4 2026-07-24, founder-ratified · A5 2026-07-25, architect-issued on measurement, awaiting founder ratification)
 
 The v1 text above is preserved untouched. These amendments record decisions made after it, and win where they conflict.
 
@@ -285,6 +285,26 @@ RL is **in scope** as the doctrine's continuation, not a rival direction. Standi
 ### A4 · Phase-gate bookkeeping
 
 Phase numbering unchanged (P1–P6; P7 = RL per A3). The forward WO ladder implementing these phases lives in `docs/ROADMAP.md` and is the build authority; this document stays the *why*.
+
+### A5 · Report is not a type — and the write path does not exist yet (2026-07-25)
+
+Two corrections, both forced by measurement rather than argument. Part IV above has been patched in place to match; this amendment records *why*, so the reasoning survives the next reader who wonders whether the charter table was simply wrong.
+
+**1 · `Report` is `artifact.kind`, not an object type.** Part IV's charter table listed `Report` as its own type while Part VI's Silo rule forbids exactly that shape, and the live schema had already settled it: `artifact.kind` contains `"report"`, and `artifact`'s description reads *"Reports are artifacts, not a separate type."* **Part VI governs.** The publication gate survives intact but as a *condition on an existing verb* — `publish_artifact` rejects `kind: "report"` without a linked Evaluation whose `verdict === "supports"`. There is no `publish_report` action. Input-conditional actions are already precedented here by `grade_ticket` and `resolve_hypothesis`.
+
+No confidence floor is written into the Kernel. `evaluation.confidence` is a 0–1 field; the *bar* belongs in `hypothesis.success_criteria`, which already exists. A magic number in the type system hard-codes a research judgment into the ontology, which is the Silo mistake wearing a different hat.
+
+**2 · The Kernel cannot yet record the defining workflow.** Measured 2026-07-25 against `origin/main`:
+
+- **19 object types, 3 creatable** — only `artifact`, `agent_session`, `agent_definition` have `creationCommands` entries.
+- **27 actions, 9 dead** — `create_hypothesis`, `register_dataset_version`, `record_evaluation`, `retry_run`, `close_run`, `request_approval`, `approve`, `deny`, `promote_type` all throw `Unknown command` at `execute()`. `retry_run` and `close_run` have no legal edge in the transition table at all.
+- **13 link types, 0 writable** — `links` is generated with a CHECK over all 13 names (`golden/migration.sql:369`); a repo-wide grep finds zero reads and zero writes. `execute()` branches twice, creation and transition. There is no link branch.
+
+So of `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`, exactly one stage can be brought into existence, and none can be connected. **The ontology has nodes and no edges, and most of the nodes are unreachable.**
+
+This does not change the doctrine — it changes the *order of construction*. A rung was inserted at position 3 of the build ladder (**the write path**), and the ladder is eleven rungs, not ten. See `docs/orders/SCOPES.md`.
+
+**The lesson worth keeping.** Both errors have one shape: a thing was *declared* and therefore assumed *operational*. Thirteen links existed in the schema, so links were treated as a capability. The charter named `Report`, so `Report` was treated as a type. **Declaration is not capability.** Every future order that says "X has Y" must cite the measurement, not the declaration — `PROTOCOL.md` §51 already says this and it was still missed twice in one night.
 
 ---
 

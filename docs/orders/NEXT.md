@@ -5,16 +5,24 @@
 
 ## Current order: **WO-101 — Research + Agent plane charter**
 
-The Ontology Doctrine (`docs/DOCTRINE.md`, v1.1) is the plan of record; the forward ladder in `docs/ROADMAP.md` is the build path; WO-101 is its first rung.
+The Ontology Doctrine (`docs/DOCTRINE.md`, v1.1) is the plan of record; `docs/orders/SCOPES.md` is the rung-by-rung ladder; WO-101 is its first rung.
 
+0. Read `AGENTS.md` at repo root — the cold-start briefing, including the commands and the `golden/` ritual.
 1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
-2. Read `docs/orders/WO-101.md` — the complete order.
+2. Read `docs/orders/WO-101.md` — the complete order. **Read its revision note first**: this order was cut down on 2026-07-25 after measurement disproved three of its assumptions.
 3. Branch `wo-101` from current `main`. Commit from a worktree, never the shared tree.
-4. Report back per `PROTOCOL.md`; the verifier runs G2 and the cold suite.
+4. **Commit deliverable 1 alone, first.** Its proof is destroyed if bundled with the rest.
+5. Report back per `PROTOCOL.md`; the verifier runs G2 and the cold suite.
+
+**WO-101 is schema-only.** Zero `packages/qf-kernel` changes, zero new actions, zero link work. If you find yourself editing `commands.ts` or `execute.ts`, you have left scope — stop and report.
 
 ## Queued behind (do not start)
 
-**WO-102** — Market plane reframe (order written when WO-101 verifies). Then P2: WO-103/104/105 — the generated tool plane.
+**WO-102** — Market plane reframe (schema-only; larger than it reads — `event` is a stateful type, so the rename moves a transition table and three commands).
+
+**WO-103 — the write path.** Added 2026-07-25 after measurement: of 19 object types only 3 can be created, 9 defined actions throw `Unknown command`, and **no link in this repo is writable** — the `links` table is generated but has zero reads and zero writes. Until this rung lands, read tools would read empty tables and the closing proof is a traversal over edges that cannot exist. Full reasoning in `docs/orders/SCOPES.md`.
+
+Then P3 (WO-104/105/106, the generated tool plane), P4 (markets), P5 (the loop, the critic, the proof). Eleven rungs, not ten — see SCOPES.md for why.
 
 ## Parked / parallel
 
