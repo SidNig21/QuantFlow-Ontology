@@ -50,6 +50,17 @@ Architect writes WO-NNN (self-contained file, no chat context needed)
 
 **External-surface rule (learned the hard way, 2026-07-19 doc-index audit):** an order may not assert external SDK behavior from inference. Every SDK-facing claim in an order carries one of: a citation to an indexed vendor doc actually in hand, a probe measured in this repo (with the command), or a deliverable-0-style smoke proof as the order's first step. Corollary for reviewers: a pre-build read of an SDK-facing order should be done by the agent holding the doc indexes — the architect is reliably blindest exactly where inference feels most like knowledge.
 
+**Plain-language rule (added 2026-07-25, at the founder's request):** every order, finding, and report carries **one sentence a non-programmer can read** — what it means and what breaks if it is wrong. No type names, no file paths, no jargon. It is a *translation*, not a summary: "reports can't be published without a passing review, and today nothing stops that" — not "the publication gate is unenforced."
+
+The reason is structural, not courtesy. **The founder is the only role that can authorize work, and the only role that cannot check the technical claims.** An artifact that only the founder may approve, written in a register only its author can read, turns approval into a rubber stamp — and a rubber stamp is not a control, however many gates sit behind it. Measured over 2026-07-24/25: six defects of one shape, every one of them approved by a founder who had no way to see them, and every one caught by a *different agent* instead. The loop worked; the founder's seat in it did not.
+
+Corollary — **the founder's four checks, which need no technical knowledge.** These are the founder's actual job; catching type errors is not.
+
+1. **Is there a receipt?** A claim carries a file and line, or a command and its output. A confident claim with nothing attached is the one to distrust.
+2. **Did someone who didn't write it check it?** Same session authoring and blessing is not a check.
+3. **Did a command print PASS?** That is what the gate board is *for* — it converts "trust me" into something readable without knowing any of this.
+4. **Told, or shown?** "Done" versus pasted output. "The gate works" versus the transcript of it going red on purpose and green again.
+
 **Static-gates rule (added 2026-07-19, WO-007 round 1):** gates that need no installs (`repo-shape`, `lockfile-committed`, `kernel-sole-writer`, `no-canvas-domain-writes`, `kernel-sole-writer-app`, `doc-action-surface`, `one-skin`) are **builder-run on every order, always** — they cost seconds and depend on nothing. The cold-run-is-verifier-only rule covers the installing gates, not these; a builder who cannot run the static gates green does not report done.
 
 **Cold-state rule (learned the hard way, WO-003):** a gate may not depend on ambient machine state — it installs whatever it needs. Verify gates **cold**, not after a convenience install: the machine that already has dependencies present will pass a gate that a fresh CI checkout fails. If an order's acceptance steps install something before running the gates, the gates are being masked and the order is written wrong.
@@ -74,6 +85,7 @@ assignee: builder | fable
 depends: WO-MMM
 
 ## Objective — one sentence.
+## In plain terms — one sentence, no jargon: what this means and what breaks if it is wrong.
 ## Context pack — links/files the builder must read first (keep short).
 ## Deliverables — concrete files/behaviors.
 ## Contract — constraints that may not be violated (types, naming, laws).

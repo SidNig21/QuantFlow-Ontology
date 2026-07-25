@@ -120,5 +120,10 @@ proves it, and the output. For each gate: the bait transcript. Then one paragrap
 place you exercised judgment — where the order was silent and you chose. That paragraph is
 the most valuable thing in your report, because it is where the next defect is hiding.
 
+**Open your report with one sentence a non-programmer can read** — what you did and what it
+means, no type names, no file paths, no jargon (`PROTOCOL.md`, plain-language rule). The person
+who decides whether your work ships is the one person in the loop who cannot check your
+technical claims. A report only its author can read is a report nobody approved.
+
 If you could not finish, say exactly where you stopped and why. A partial order honestly
 reported is useful. A partial order reported as complete costs a day.
