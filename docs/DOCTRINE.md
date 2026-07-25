@@ -2,7 +2,7 @@
 tags: [quantflow, ontology, doctrine, roadmap, palantir]
 created: 2026-07-22
 author: Claude (architect/verifier seat)
-status: v1 — for founder decision
+status: v1.2 — PLAN OF RECORD (graduated into the repo 2026-07-24, `3b20c0d`). A1–A4 founder-ratified; A5 architect-issued on measurement, awaiting ratification.
 artifact: https://claude.ai/code/artifact/ec99620c-b327-4fae-be9e-3e9a97128542
 sources: [DevCon6 00-09, Cerebras KB, INSPIRE-USECASES, repo audit]
 ---
