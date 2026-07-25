@@ -49,7 +49,13 @@ Bun + TypeScript strict (orchestration) · Electron shell inherited from Collabo
 4. **No self-approval** — the agent that built a change is never its verifier.
 5. Lockfiles are committed. Descriptions on every schema entity. LF line endings (.gitattributes enforces).
 6. Windows-era thinking is dead: this repo is Linux-first from birth; platform-dependent code takes an injectable `platform` parameter.
-7. Upstream (`collaborator-ai/collab-public`) stays a configured remote: `main` tracks it pristine for future pulls; QuantFlow work lives on `QuantFlow`.
+7. Upstream (`collaborator-ai/collab-public`) stays a configured remote for future pulls. QuantFlow work lives on `main`.
+8. **Substrate triage — three buckets, five minutes, no reconciliation weeks.** Every new tool the ecosystem ships gets classified on sight, never "evaluated":
+   - **Dock item** — has a CLI, spawns as a seat, acts on the Kernel. *It depends on QuantFlow.* **Adopt freely; it is inventory.**
+   - **Underlayer** — wants to run beneath all dock items. *QuantFlow would depend on it.* **Log it. Adopt only on a measured failure, with the trigger written down.**
+   - **Neither** — logged, not evaluated.
+
+   The dependency arrow is the whole test. A thing that plugs into the desk is free; a thing the desk plugs into is expensive. **Substrate proposals get logged, not evaluated, until the Research plane exists** — the ecosystem generates one of these every week and none of them advance the world model.
 
 ## 6. License
 
