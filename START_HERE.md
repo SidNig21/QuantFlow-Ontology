@@ -57,6 +57,8 @@ Bun + TypeScript strict (orchestration) · Electron shell inherited from Collabo
 
    The dependency arrow is the whole test. A thing that plugs into the desk is free; a thing the desk plugs into is expensive. **Substrate proposals get logged, not evaluated, until the Research plane exists** — the ecosystem generates one of these every week and none of them advance the world model.
 
+   The test runs **per layer, never per brand name** — one product can span all three buckets. Worked example (probed 2026-07-24, full case study in `docs/RESEARCH.md`): **agentOS** = its cargo agents (Claude Code, Codex, OpenCode — CLIs, dock items with or without agentOS) + its Rivet Actor durability layer (underlayer, logged as ROADMAP debt #17) + its VM isolation layer (absorbed, if ever needed, as an `execution_environment` row — the quarantine tier for unvetted species — never as the floor).
+
 ## 6. License
 
 FSL-1.1-ALv2 (inherited). Free to build on; do not position QuantFlow as a general-purpose Collaborator substitute. Each upstream release converts to Apache-2.0 after two years.
