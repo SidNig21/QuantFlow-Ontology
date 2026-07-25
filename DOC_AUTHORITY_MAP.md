@@ -1,7 +1,7 @@
 # DOC_AUTHORITY_MAP.md
 
 > The "is this doc current?" answer key. If this map and another doc disagree about a doc's status, this map wins.
-> Last updated: 2026-07-18 (WO-002) · Branch: `QuantFlow`
+> Last updated: 2026-07-24 (doctrine graduation) · Branch: `main`
 
 ## CURRENT — binding
 
@@ -9,18 +9,20 @@
 |---|---|
 | `START_HERE.md` | Front door; wins all conflicts |
 | `DOC_AUTHORITY_MAP.md` | This file |
+| `docs/DOCTRINE.md` | **Plan of record.** The ontology doctrine — charter, six phases, anti-pattern lint. Graduated verbatim from the vault 2026-07-24; `QuantFlow-Ontology-Doctrine.pdf` at repo root is an export of it, not a source. Where it and an older doc disagree on *direction*, this wins |
 | `docs/BLUEPRINT.md` | Architecture + decided stack + laws |
 | `docs/ONTOLOGY_SCHEMA.md` | Frozen schema v0.1 (`experimental`) |
-| `docs/ROADMAP.md` | Phase gates + work-order ladder |
+| `docs/ROADMAP.md` | Phase gates + work-order ladder; carries the **definition of done** |
 | `docs/orders/**` (status: open/building/verifying) | The only source of active work; `PROTOCOL.md` = process |
 
 ## REFERENCE — informs, not authority
 
 | Doc | Why |
 |---|---|
-| `README.md` | Upstream Collaborator's readme (to be rewritten by order) |
-| `collab-electron/docs/**`, `docs/**` | Inherited upstream docs — true for the shell, silent on QuantFlow |
-| Founder's vault (`~/Vaults/Personal/Projects/QuantFlow/`) | Research archive only — everything binding has graduated into `docs/` |
+| `README.md` | Rewritten 2026-07-24 (`48d321e`) — the public front door. Marketing-facing; `START_HERE.md` still wins on rules |
+| `collab-electron/docs/**` | Inherited upstream docs — true for the shell, silent on QuantFlow |
+| Founder's vault (`~/Vaults/Personal/Projects/QuantFlow/`) | Research archive only — everything binding has graduated into `docs/`. The vault copy of the doctrine is now a stale cache; `docs/DOCTRINE.md` is authority |
+| `~/Vaults/.../quantflow-ontology-roadmap.html` | **Not authority.** A Stage 1–8 ladder that contradicts the doctrine's Phase 0–6 (defers governance to Stage 6). Founder verdict 2026-07-24: questionable |
 
 ## ARCHIVE — do not follow
 

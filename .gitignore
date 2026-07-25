@@ -7,6 +7,7 @@ docs/*
 !docs/orders/**
 !docs/demos/
 !docs/demos/**
+!docs/DOCTRINE.md
 !docs/BLUEPRINT.md
 !docs/ONTOLOGY_SCHEMA.md
 !docs/ROADMAP.md
