@@ -86,6 +86,14 @@ pipeline-fed rows reach the Kernel without an action (see WO-103).
 **Gate.** No sport-specific noun survives as a type name · golden regenerated and committed ·
 suite green.
 
+**Stated ritual, not a builder's surprise: this rung invalidates every existing `kernel.db`.**
+The generated migration is bare `CREATE TABLE` applied only to fresh databases — there is no
+`ALTER` story and no migration runner. Renaming market tables means older databases simply no
+longer match the schema. That is acceptable pre-v1 and it is **not** a defect to fix here, but
+the order must say plainly that existing local databases get wiped and recreated, and the
+builder must confirm a fresh `kernel.db` opens clean afterward. Silently breaking the founder's
+local data would be discovered at the worst possible moment.
+
 **The trap this order must not walk into.** `event` is a **stateful type** —
 `transitions.ts` carries an `event` table (`scheduled → live → settled | void`) and `commands.ts`
 carries `start_event` / `settle_event` / `void_event`. Renaming `event` → `market_event` is
@@ -145,6 +153,16 @@ doing it twice).
 
 **Out.** MCP tools of any kind (WO-104) · real market data (WO-107) · the report gate (WO-110) ·
 retries, durability, or workflow engines (ROADMAP debt #17 — trigger-gated, not now).
+
+**An undeclared seam this rung inherits.** `QF_EXECUTE_ALLOWLIST`
+(`collab-electron/src/main/qf-execute-allowlist.ts:2`) is `["publish_artifact"]` — one command
+wide — and is enforced at `ipc-kernel.ts:110`, rejecting anything else with
+`CommandNotAllowlisted`. **It guards the renderer→IPC path only.** Main-process callers reach
+`kernelExecute` directly and are not filtered: `host-acp-turn.ts` (five call sites) and
+`a2a-bus.ts`. That asymmetry is defensible as a trust tier — the renderer is untrusted, the main
+process is not — but it must be a stated decision rather than an accident. This rung adds
+creation commands, so it must answer: does any new command need to reach a canvas tile? If yes,
+the allowlist grows here and the order says so. If no, say that too, and the list stays at one.
 
 **The core design call — decide in the order, not in the builder's head.** Are edges written
 (a) by a generic `link` command, or (b) as link fields on the creation input, written in the
@@ -208,9 +226,19 @@ tools nobody hand-wrote, served by a real process.
   test** — `generate.test.ts:66` asserts that exact wording. Either filters become real or the
   description tells the truth; a description that misleads an agent is a schema defect by
   doctrine, and this one is currently test-enforced.
+- **A generated read layer.** The hidden third job, and why this is the fattest rung on the
+  ladder. A read surface *does* exist — `packages/qf-kernel/src/index.ts` exports
+  `listArtifacts`, `listAgentSessions`, `listAgentDefinitions`, `getAgentDefinition`, consumed
+  live at `collab-electron/src/main/kernel.ts:83-99`. But it is **hand-written, per-type, and
+  covers 3 of 19 types** — exactly the three creatable ones. Generated tools for 19 types have
+  nothing to call for the other 16. Generalizing it is a deliverable, not a detail.
 - **A running server.** `golden/tools.json` is a definitions file; nothing binds a tool name to
   a Kernel read. Use `tools/qf-peer-bus/src/server.ts` as the working in-repo template —
   `McpServer` + `StdioServerTransport`, dependency already present.
+
+**Expect to split this rung when its order is written.** Traversal codegen, real filters, a
+generated read layer, and a server is more than one builder session. Codegen versus serving is
+the natural seam.
 
 **Out.** Write/action tools (WO-105) · authz or deny-lists · any hand-written per-type tool.
 
@@ -248,6 +276,14 @@ complete a real task — and the hand-written verbs it replaces are deleted.
 
 **In.** One cold seat, one real task, tools discovered from the MCP surface alone. Hand-written
 tool code deleted as its generated replacement lands.
+
+**The named retirement targets** — do not leave the builder to find them. `listArtifacts`,
+`listAgentSessions`, `listAgentDefinitions`, `getAgentDefinition` in
+`packages/qf-kernel/src/db.ts`, plus their four wrappers in
+`collab-electron/src/main/kernel.ts:83-99`. These are the hand-written 3-of-19 read surface
+WO-104 generalizes; once generated equivalents serve all 19 types, keeping them is the
+two-tools-for-one-job problem. **Deleting them requires updating their Electron call sites**, so
+this rung touches `collab-electron` — the only rung before P5 that does.
 
 **Out.** Multi-agent anything (P5) · new capability of any kind.
 

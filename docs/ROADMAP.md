@@ -71,42 +71,42 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 >
 > Charter location per doctrine A1: **`qf-kernel-schema` evolved in place, split by plane** — never a parallel `ontology/` truth store.
 >
-> **SUPERSEDED ON SEQUENCE, 2026-07-25 — see [`docs/orders/SCOPES.md`](orders/SCOPES.md).** This section's *phase intent and gates* stand. Its *rung numbering* does not. Measurement on 2026-07-25 found the Kernel cannot record the workflow this ladder is built on: of 19 object types only **3** are creatable, **9** defined actions throw `Unknown command` at `execute()`, and **no link is writable** — the `links` table is generated with zero reads and zero writes repo-wide. A rung was inserted at position 3 (**WO-103 · the write path**) and everything below it shifted by one; the ladder is **eleven** rungs. Where this section and SCOPES.md disagree on a number, SCOPES.md wins. Where they disagree on a *gate*, the stricter one wins.
+> **SUPERSEDED ON SEQUENCE, 2026-07-25 — see [`docs/orders/SCOPES.md`](orders/SCOPES.md).** This section's *phase intent and gates* stand. Its *rung numbering* does not. Measurement on 2026-07-25 found the Kernel cannot record the workflow this ladder is built on: of 19 object types only **3** are creatable, **9** defined actions throw `Unknown command` at `execute()`, and **no link is writable** — the `links` table is generated with zero reads and zero writes repo-wide. A rung was inserted at position 3 (**the write path**, `SCOPES WO-103`) and everything below it shifted by one; the ladder is **eleven** rungs. Where this section and SCOPES.md disagree on a number, SCOPES.md wins. Where they disagree on a *gate*, the stricter one wins.
 
 ### P1 · The charter — one week
 
-**WO-101 · Research + Agent plane charter.** Split `schema.ts` by plane (`research` / `market` / `agent` — retires debt #5). Rewrite every Research/Agent-plane description as **agent context** (what an agent must know to act, not what a human finds pretty). Seed `Policy` + `Environment` as `experimental`, add `Run.kind: training`, `Mission` naming decision (`workspace` rename vs alias). Anti-pattern lints per doctrine Part VI: no-subtype-of-Run, no-property-removal-on-active, description-required (exists at `define.ts:52` — cite it, do not rebuild).
-*Report and its publication gate were **cut from this rung on 2026-07-25** and moved to WO-110: `report` is already `artifact.kind`, and the gate reads a link that is not writable until WO-103. Schema-only rung — zero Kernel changes.*
+**Charter — research + agent planes.** Split `schema.ts` by plane (`research` / `market` / `agent` — retires debt #5). Rewrite every Research/Agent-plane description as **agent context** (what an agent must know to act, not what a human finds pretty). Seed `Policy` + `Environment` as `experimental`, add `Run.kind: training`, `Mission` naming decision (`workspace` rename vs alias). Anti-pattern lints per doctrine Part VI: no-subtype-of-Run, no-property-removal-on-active, description-required (exists at `define.ts:52` — cite it, do not rebuild).
+*Report and its publication gate were **cut from this rung on 2026-07-25** and moved to `SCOPES WO-110`: `report` is already `artifact.kind`, and the gate reads a link that is not writable until `SCOPES WO-103`. Schema-only rung — zero Kernel changes.*
 → **Gate 1 (lint):** each of three sabotages goes red — missing description, `backtest_run` clone, property removed from an active fixture type. Bait-tested.
 → **Gate 2 (cold read):** hand an agent *only* the three plane files; it names the right types, links, and `evaluation.verdict === "supports"` unaided — or a description is underspecified and gets fixed. Tests descriptions, not data, so it needs no rows. This is the description-quality test the lint can't do.
 
-**WO-102 · Market plane reframe.** `Competitor/Event/Market/OddsSeries/Result` → `Venue/Instrument/Quote/MarketEvent` (betting becomes rows and properties, never types — typed prop vocabularies live in property enums). Market-plane types declare `pipelineFed: true` (codegen will emit no write tools for them — Golden Hammer rule, machine-enforced). Old types retire through the schema-diff discipline (experimental types may be removed; the conformance suite regenerates green).
+**Market plane reframe.** `Competitor/Event/Market/OddsSeries/Result` → `Venue/Instrument/Quote/MarketEvent` (betting becomes rows and properties, never types — typed prop vocabularies live in property enums). Market-plane types declare `pipelineFed: true` (codegen will emit no write tools for them — Golden Hammer rule, machine-enforced). Old types retire through the schema-diff discipline (experimental types may be removed; the conformance suite regenerates green).
 → **Gate:** full conformance suite regenerated and green; fixture gate re-run with a cross-plane question (Hypothesis TARGETS Instrument); a grep proves no sport-specific noun survives as a *type name*.
 
 ### P2 · The generated tool plane — weeks 2–3
 
-**WO-103 · Read tools from the charter.** Codegen emits `get / search / traverse-links` per object type as an MCP server on the `@modelcontextprotocol/sdk` stack qf-peer-bus proved.
+**Read tools from the charter.** Codegen emits `get / search / traverse-links` per object type as an MCP server on the `@modelcontextprotocol/sdk` stack qf-peer-bus proved.
 → **Gate:** add a brand-new `experimental` type in a test fixture → its three read tools exist with **zero hand-written tool code** (the doctrine Phase 2 exit, falsified by diff).
 
-**WO-104 · Action tools + the two gates (doctrine A2).** Per-action write tools with **GATE 1** (Zod-parse of call shape at `execute()` — closes the audit gap) and **GATE 2** (transition-table check on the result — WO-005 machinery).
+**Action tools + the two gates (doctrine A2).** Per-action write tools with **GATE 1** (Zod-parse of call shape at `execute()` — closes the audit gap) and **GATE 2** (transition-table check on the result — WO-005 machinery).
 → **Gate:** a malformed call dies at GATE 1 before touching the Kernel; an illegal transition dies at GATE 2 before commit; both proven by bait, both directions.
 
-**WO-105 · Cold seat + retirement.** A live Hermes seat lists and calls the generated tools **cold** (no priming beyond the seat profile); hand-grown `qf_*` verbs retire as generated equivalents land.
+**Cold seat + retirement.** A live Hermes seat lists and calls the generated tools **cold** (no priming beyond the seat profile); hand-grown `qf_*` verbs retire as generated equivalents land.
 → **Gate:** the cold seat completes one real task through generated tools only; grep proves retired verbs are gone from the tool surface.
 
 ### P3 · The first market plane — week ~4
 
-**WO-106 · One pipeline, one market.** Founder picks the market on the day (odds or perps — the ontology doesn't care). One Bun cron script ingests `Instrument / Quote / MarketEvent` rows **through Kernel commands** with an ingest trace. Codegen emits no write-actions for `pipelineFed` types (gate carried from WO-102).
+**One pipeline, one market.** Founder picks the market on the day (odds or perps — the ontology doesn't care). One Bun cron script ingests `Instrument / Quote / MarketEvent` rows **through Kernel commands** with an ingest trace. Codegen emits no write-actions for `pipelineFed` types (gate carried from the market-plane reframe rung above).
 → **Gate:** every market row's provenance recomputes to an ingest event; a seat answers a cross-object question about **real** data through generated tools only.
 
-**WO-107 · The second market, structurally different.** A game line *and* a perp (or equivalent pair) load into the same four types.
+**The second market, structurally different.** A game line *and* a perp (or equivalent pair) load into the same four types.
 → **Gate: zero new object types.** If either market needs a special type, the abstraction failed — fix it now. (The one good gate from the retired HTML roadmap, kept.)
 
 ### P4 · The defining loop, agent-run — weeks 5–8
 
-**WO-108 · The loop's lower half.** Orchestrator + worker seats run `Hypothesis → Dataset → Run → Artifact` over the peer bus using generated tools; every step a Kernel action, every conversation a trajectory artifact.
-**WO-109 · The Critic + the mechanical gate.** *(= WO-110 in SCOPES.md.)* A Critic seat scores Artifacts vs the Hypothesis's criteria (`record_evaluation`, wired at WO-103); **`publish_artifact` mechanically rejects `kind: "report"`** without a linked Evaluation whose `verdict === "supports"` (bait-tested). No confidence floor — the bar lives in `hypothesis.success_criteria`, not in the type system. There is no `publish_report` verb and no `Report` type: the gate is a condition on the existing verb.
-**WO-110 · The one-shot proof.** *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* — answered correctly, one pass, tools-only, every step recorded.
+**The loop's lower half.** Orchestrator + worker seats run `Hypothesis → Dataset → Run → Artifact` over the peer bus using generated tools; every step a Kernel action, every conversation a trajectory artifact.
+**The Critic + the mechanical gate.** A Critic seat scores Artifacts vs the Hypothesis's criteria (`record_evaluation`, wired at `SCOPES WO-103`); **`publish_artifact` mechanically rejects `kind: "report"`** without a linked Evaluation whose `verdict === "supports"` (bait-tested). No confidence floor — the bar lives in `hypothesis.success_criteria`, not in the type system. There is no `publish_report` verb and no `Report` type: the gate is a condition on the existing verb.
+**The one-shot proof.** *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* — answered correctly, one pass, tools-only, every step recorded.
 → **Phase gate = the doctrine's proof standard. This is the day QuantFlow is a real ontology**, and the claims ladder (doctrine Part VII) advances one rung.
 
 ### P5–P7 · Sketched, ordered at their phase entry (plan one phase ahead only)
