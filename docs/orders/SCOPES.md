@@ -77,6 +77,9 @@ market-agnostic so a game line and a perpetual future are the same four types.
 **In.** `competitor` · `event` · `market` · `odds_series` · `result` → `venue` · `instrument` ·
 `quote` · `market_event`. Market-plane descriptions rewritten to the WO-101 register.
 `pipelineFed` marking: quotes and market events get **no** action — the Golden Hammer rule.
+**Note: `pipelineFed` has zero occurrences in the codebase.** It is doctrine vocabulary, not an
+existing mechanism — this order builds it or drops it. If it is built, WO-103 must say how
+pipeline-fed rows reach the Kernel without an action (see WO-103).
 
 **Out.** Ingesting anything real (WO-107) · any Kernel change · new planes.
 
@@ -115,6 +118,22 @@ doing it twice).
 - Creation commands for the workflow's missing stages: `hypothesis`, `dataset`, `run`,
   `evaluation`, plus `mission` if WO-101 added it. Each needs a `creationCommands` entry, a
   domain event, and a lint join.
+- **Market-plane writes, or an explicit ruling that they are not commands.** WO-107 says
+  instruments and quotes "land in the Kernel through commands." No rung creates them, and the
+  doctrine says pipeline-shaped data gets **no action** (Golden Hammer rule). Both cannot be
+  true. `pipelineFed` is the named escape hatch and it **does not exist in code** — zero
+  occurrences repo-wide; it is vocabulary awaiting machinery. This order resolves it: either
+  market types get creation commands like everything else, or a bulk ingest path exists that is
+  not an action but still goes through `execute()` (it must, or `kernel-sole-writer` fails).
+  Decide it here; do not let WO-107 discover it.
+- **A gating edge — `evaluation` is currently a pure sink.** Measured: `evaluation` has
+  **zero outbound links**; the only edge touching it is `evaluated_by`
+  (`from: [artifact, run] → to: [evaluation]`), pointing *at* it. So "which evaluation
+  authorized this publication" is **not expressible today**, and `derived_from` cannot carry it
+  — two report artifacts may derive from one result set and one evaluation, with nothing marking
+  which publication was authorized. **WO-110's gate reads a fact the schema cannot state.** Add
+  a `gates` link (`evaluation → artifact`) or an evaluation reference on the report artifact.
+  This is a hard prerequisite for WO-110, not a nicety.
 - **Link writes.** `execute()` gains the ability to persist edges into the existing `links`
   table (`golden/migration.sql:369`, already CHECK-constrained over all 13 link names).
 - **Adjudicate the nine dead actions**, one by one, wire-or-delete: `create_hypothesis`,
@@ -131,11 +150,23 @@ retries, durability, or workflow engines (ROADMAP debt #17 — trigger-gated, no
 (a) by a generic `link` command, or (b) as link fields on the creation input, written in the
 same transaction as the row?
 
-*Recommendation: (b).* Canvas-seam Law B is write-path singularity, and the One Rule says the
-Kernel owns truth. Option (b) keeps one write path and makes an edge atomic with its node — a
-run cannot exist for one instant unattached to its hypothesis. Option (a) adds a second write
-verb and permits orphan states the ontology has no way to describe. If the order author picks
-(a), the burden is to explain what an orphan node *means*.
+**Ruling: neither alone — layer them** (verifier proposal, 2026-07-25, adopted). Creation input
+accepts **optional link fields**, implemented internally by **one generic link writer** that
+validates every edge against the schema's already-declared endpoints — `derived_from` states
+`from: [dataset, artifact, strategy]`, `evaluated_by` states `from: [artifact, run] → to:
+[evaluation]`, and all 13 links carry the same declarations.
+
+Why this beats either option alone:
+
+- Keeps **write-path singularity** (Law B) — one writer, not a second verb.
+- Makes an edge **atomic with its node** — a run never exists, even for an instant, unattached
+  to its hypothesis. No orphan state the ontology cannot describe.
+- It is **generatable**, which is what matters at WO-104: one generic traversal tool over
+  declared endpoints, rather than a per-type tool shape that churns every time a link is added.
+- It is the pattern `execute()` **already uses** — generated transition tables validating
+  transitions — applied to generated endpoint tables validating edges. Nothing new is invented.
+
+The endpoint validator is therefore the deliverable, not the link-writing convenience.
 
 **Gate.**
 1. The full six-stage chain is created and linked through `execute()`, and a raw SQL read shows
@@ -278,7 +309,15 @@ publication becomes mechanically impossible without a passing evaluation. **This
 gate cut from WO-101 finally lands** — here it is buildable, because evaluations can be recorded
 and edges can be written.
 
-**Depends on.** WO-103 (recordable evaluations, writable edges), WO-109.
+**Depends on.** WO-103 (recordable evaluations, writable edges, **and the gating edge** — see
+below), WO-109.
+
+**Hard prerequisite, easy to miss.** `evaluation` is a pure sink in today's schema: zero
+outbound links, and the only edge touching it points *inward*. "Which evaluation authorized this
+publication" is not expressible, and `derived_from` cannot stand in for it. **If WO-103 does not
+add a gating edge, this rung is unbuildable for the same reason WO-101's version was** — a gate
+that reads something the schema cannot say. Confirm the edge exists before promoting this scope
+to an order.
 
 **In.** A critic seat · `record_evaluation` wired · `publish_artifact` refuses `kind: "report"`
 unless a linked evaluation with **`verdict === "supports"`** exists.
