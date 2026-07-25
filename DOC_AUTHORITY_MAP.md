@@ -1,7 +1,7 @@
 # DOC_AUTHORITY_MAP.md
 
 > The "is this doc current?" answer key. If this map and another doc disagree about a doc's status, this map wins.
-> Last updated: 2026-07-24 (doctrine graduation) · Branch: `main`
+> Last updated: 2026-07-25 (AGENTS.md + SCOPES.md added; ROADMAP superseded on numbering) · Branch: `main`
 
 ## CURRENT — binding
 
