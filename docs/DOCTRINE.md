@@ -256,7 +256,7 @@ Pivoting marketing to "ontology" means backing it up. Never claim ahead of what 
 
 ---
 
-## Amendments — v1.2 (A1–A4 2026-07-24, founder-ratified · A5 2026-07-25, architect-issued on measurement, awaiting founder ratification)
+## Amendments — v1.3 (A1–A4 2026-07-24 founder-ratified · A5 **split** 2026-07-25 · A6 2026-07-25 founder-stated)
 
 The v1 text above is preserved untouched. These amendments record decisions made after it, and win where they conflict.
 
@@ -288,6 +288,15 @@ Phase numbering unchanged (P1–P6; P7 = RL per A3). The forward WO ladder imple
 
 ### A5 · Report is not a type — and the write path does not exist yet (2026-07-25)
 
+> **RATIFICATION STATUS, 2026-07-25.** Ruling 2 (no confidence floor) is **founder-ratified**.
+> Ruling 1 (report is `artifact.kind`, not an object type) is **held open at the founder's
+> request** — not rejected. The founder's stated reservation is not about storage shape but
+> about the artifact system as a whole and how it serves *"the collaboration and culmination of
+> agent ideas and data."* Nothing is blocked: no `Report` type exists or is being built, and the
+> rung that depends on the ruling is several out. **Do not treat ruling 1 as settled, and do not
+> re-argue it — it resolves when the founder can picture the system it belongs to.** The
+> write-path findings recorded below are measurements, not rulings, and stand regardless.
+
 Two corrections, both forced by measurement rather than argument. Part IV above has been patched in place to match; this amendment records *why*, so the reasoning survives the next reader who wonders whether the charter table was simply wrong.
 
 **1 · `Report` is `artifact.kind`, not an object type.** Part IV's charter table listed `Report` as its own type while Part VI's Silo rule forbids exactly that shape, and the live schema had already settled it: `artifact.kind` contains `"report"`, and `artifact`'s description reads *"Reports are artifacts, not a separate type."* **Part VI governs.** The publication gate survives intact but as a *condition on an existing verb* — `publish_artifact` rejects `kind: "report"` without a linked Evaluation whose `verdict === "supports"`. There is no `publish_report` action. Input-conditional actions are already precedented here by `grade_ticket` and `resolve_hypothesis`.
@@ -305,6 +314,26 @@ So of `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`, e
 This does not change the doctrine — it changes the *order of construction*. A rung was inserted at position 3 of the build ladder (**the write path**), and the ladder is eleven rungs, not ten. See `docs/orders/SCOPES.md`.
 
 **The lesson worth keeping.** Both errors have one shape: a thing was *declared* and therefore assumed *operational*. Thirteen links existed in the schema, so links were treated as a capability. The charter named `Report`, so `Report` was treated as a type. **Declaration is not capability.** Every future order that says "X has Y" must cite the measurement, not the declaration — `PROTOCOL.md` §51 already says this and it was still missed twice in one night.
+
+### A6 · Founder direction (founder-stated 2026-07-25 — not an architect proposal)
+
+Recorded verbatim in substance because it was stated directly by the founder. Unlike A5, this needs no ratification; it *is* the ratification. Where a later design decision contradicts anything here, this wins and the design changes.
+
+**1 · Tiles are for active things only.** A tile is a CLI agent, a script, an RL training run — something *doing* work. **Tiles are not document viewers.** This makes the canvas a *process* workspace, not a document workspace, and it contradicts the shipped `collab-electron/src/windows/artifact-tile/` (built for WO-006b's Law D demo, before this rule existed). That tile is now legacy pending a decision, not a pattern to copy.
+
+**Open question this creates, deliberately unanswered:** if reports do not live on tiles, **where does the founder read them?** No document specifies this. Do not invent an answer; it needs the founder.
+
+**2 · The two primary use cases are one loop, reversed.**
+- **Backward — post-mortem:** the founder supplies a real, already-settled betting slip; the loop analyses why it cashed or bricked.
+- **Forward — the product:** for an upcoming event, the loop builds parlays and judges each leg good or bad.
+
+Same machinery both directions (`Hypothesis → Dataset → Run → Artifact → Evaluation → Report`). The forward direction is the product; the backward direction is how its judgment gets calibrated, because the answer is already known. **Both are served by the existing eleven rungs — they add no rung.** They did surface two concrete `ticket` defects; see `docs/orders/SCOPES.md`.
+
+**3 · PufferLib is a headline goal, not a footnote.** *"The biggest thing I want to use for RL, with custom gym environments"*, plus finetuning models for parlay/sports data analysis. It currently sits in `ROADMAP.md`'s later bucket as one clause. **What changed is priority, not existence** — reconciling "biggest thing I want" against "after everything else" is a founder scheduling call that is not yet made.
+
+*Triage honesty:* PufferLib does **not** fit the three substrate buckets (`START_HERE.md` §5.8). It is not a dock item — no CLI seat, does not act on the Kernel — and not an underlayer, since nothing runs on top of it. It is a **workload library**, like numpy: something a `run.kind: "training"` imports inside a sandbox. The triage rule has a genuine gap here and forcing a bucket would be worse than recording the gap.
+
+**4 · Recall layer stays local.** `FTS5 + sqlite-vec` as already specced. Hosted vector services were considered and dropped 2026-07-25 — data leaving the tower reverses the local-only decision, and price was never the binding constraint.
 
 ---
 

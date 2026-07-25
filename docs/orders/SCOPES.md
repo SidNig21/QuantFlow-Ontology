@@ -102,10 +102,24 @@ generated conformance test that names them. The order must say so explicitly, an
 must regenerate conformance and state the count delta. Estimate this rung as larger than it
 reads.
 
-**Open question for the order author.** `ticket` and `strategy` currently sit in the Research
-plane. Under advisor-only, a `ticket` is *the operator's own recorded stake*, not an instruction
-to a venue. Decide whether it stays in Research (a record of what was acted on) or moves to
-Market (a market-side object). Do not leave this to the builder.
+**DECIDED 2026-07-25 — `ticket` stays in the Research plane.** The founder's own use case settles
+it: *"I provide an old betting slip, and the workflow analyses why it cashed or bricked."* A slip
+the operator placed is a **record of what was acted on** — a research artifact with an audit
+trail — not a market-side fact. `strategy` stays in Research with it.
+
+**Two `ticket` defects surfaced by that same use case (doctrine A6) — fix them here.**
+
+1. **The description points away from the primary use case.** WO-101 rewrote it to *"one proposed
+   wager **emitted by a strategy**."* The founder's first use case is the exact inverse: a real
+   slip, already placed, supplied by a human, already graded by reality. An agent handed a real
+   slip and reading that description has been told this type is not for it. Rewrite so it covers
+   **both origins** — strategy-proposed and operator-supplied — because both are primary.
+2. **The state machine has no entry point for a settled slip.** `ticket` is
+   `pending → win|loss|push|void`. A historical slip *arrives* already won or lost. The only
+   available path is to create it `pending` and immediately transition, which writes a state the
+   ticket was never in into the event log — a fabricated fact in the ledger the whole design
+   exists to keep honest. Either the table gains a settled-on-arrival entry, or creation accepts
+   a terminal grade directly. **Coordinate with the write-path rung**, which owns creation.
 
 ---
 
@@ -144,6 +158,21 @@ doing it twice).
   This is a hard prerequisite for WO-110, not a nicety.
 - **Link writes.** `execute()` gains the ability to persist edges into the existing `links`
   table (`golden/migration.sql:369`, already CHECK-constrained over all 13 link names).
+- **A creation path for objects that arrive already settled** (doctrine A6, use case 1). The
+  founder supplies a real betting slip that is *already* won or lost. Today `ticket` can only be
+  created `pending` and immediately transitioned — writing a state it was never in into the event
+  log. Creation must be able to accept a terminal state for externally-sourced facts, **without**
+  opening a hole that lets agents fabricate arbitrary states for objects they generate. That
+  distinction — *observed fact* versus *system-produced state* — is this order's sharpest design
+  call, and it generalizes past `ticket` to every object ingested from the outside world.
+- **`record_evaluation` needs lineage fields, not just a command.** Its input is `metrics`,
+  `verdict`, `confidence`, `rationale` — **no `hypothesis_id`, `run_id`, or `artifact_id`**
+  (confirmed 2026-07-25). Registering the command alone still leaves an evaluation attachable to
+  nothing. Action *inputs* change here, not only `commands.ts`.
+- **`request_approval` / `approve` / `deny` reference object types that do not exist.** No
+  `approval_request` or `approval` type is defined anywhere. They cannot be wired as written —
+  wire-or-delete applies, and deleting is the cheaper answer until an approval flow is actually
+  wanted.
 - **Adjudicate the nine dead actions**, one by one, wire-or-delete: `create_hypothesis`,
   `register_dataset_version`, `record_evaluation`, `retry_run`, `close_run`, `request_approval`,
   `approve`, `deny`, `promote_type`. Note that `retry_run` and `close_run` have **no legal edge
