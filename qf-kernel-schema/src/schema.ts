@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { commands, creationCommands } from "./commands.ts";
 import {
+  type ActiveSchemaBaseline,
   lintCommands,
   lintSchema,
   type Schema,
@@ -19,6 +22,9 @@ import {
   void_event,
 } from "./ontology/market.ts";
 import {
+  mission,
+  policy,
+  environment,
   hypothesis,
   strategy,
   ticket,
@@ -83,7 +89,10 @@ export const schema: Schema = {
     market,
     odds_series,
     result,
+    mission,
     hypothesis,
+    policy,
+    environment,
     strategy,
     ticket,
     dataset,
@@ -144,5 +153,10 @@ export const schema: Schema = {
   ],
 };
 
-lintSchema(schema, transitions);
+const schemaBaselinePath = join(import.meta.dir, "..", "schema-baseline.json");
+const baselineJson = readFileSync(schemaBaselinePath, "utf8");
+const activeSchemaBaseline = JSON.parse(baselineJson) as ActiveSchemaBaseline;
+const skipActiveFreeze = process.env.QF_SCHEMA_SKIP_ACTIVE_FREEZE === "1";
+
+lintSchema(schema, transitions, activeSchemaBaseline, { skipActiveFreeze });
 lintCommands(schema, transitions, commands, creationCommands);

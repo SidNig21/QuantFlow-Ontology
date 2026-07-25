@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "zod";
 import {
+  buildActiveSchemaBaseline,
   defineAction,
   defineLink,
   defineObject,
@@ -240,5 +241,95 @@ describe("schema lint", () => {
         { action: "publish_blob", object_type: "blob", event: "blob.published" },
       ]),
     ).toThrow('Creation command action "publish_blob" is not a schema action');
+  });
+
+  test("lintSchema rejects silo clone object names that embed another kind enum value", () => {
+    const run = defineObject({
+      name: "run",
+      description: "A canonical execution object.",
+      lifecycle: "experimental",
+      properties: z.object({
+        kind: z.enum(["backtest", "analysis"]).describe("Run kind."),
+      }),
+    });
+    const backtestRun = defineObject({
+      name: "backtest_run",
+      description: "A silo clone object.",
+      lifecycle: "experimental",
+      properties: z.object({
+        note: z.string().describe("Notes."),
+      }),
+    });
+    const schema: Schema = { objects: [run, backtestRun], links: [], actions: [] };
+    expect(() => lintSchema(schema, {})).toThrow(
+      'Object "backtest_run" embeds kind value "backtest" from "run.kind"',
+    );
+  });
+
+  test("lintSchema active-freeze rejects removed baseline property", () => {
+    const stableV1 = defineObject({
+      name: "stable_fixture",
+      description: "A fixture object for active-freeze coverage.",
+      lifecycle: "active",
+      properties: z.object({
+        title: z.string().describe("Stable title."),
+        weight: z.number().describe("Stable weight."),
+      }),
+    });
+    const baseline = buildActiveSchemaBaseline({
+      objects: [stableV1],
+      links: [],
+      actions: [],
+    });
+
+    const stableV2MissingWeight = defineObject({
+      name: "stable_fixture",
+      description: "A fixture object for active-freeze coverage.",
+      lifecycle: "active",
+      properties: z.object({
+        title: z.string().describe("Stable title."),
+      }),
+    });
+
+    expect(() =>
+      lintSchema(
+        { objects: [stableV2MissingWeight], links: [], actions: [] },
+        {},
+        baseline,
+      ),
+    ).toThrow('Active object "stable_fixture" removed baseline property "weight"');
+  });
+
+  test("lintSchema active-freeze rejects retyped baseline property", () => {
+    const stableV1 = defineObject({
+      name: "stable_fixture",
+      description: "A fixture object for active-freeze coverage.",
+      lifecycle: "active",
+      properties: z.object({
+        title: z.string().describe("Stable title."),
+      }),
+    });
+    const baseline = buildActiveSchemaBaseline({
+      objects: [stableV1],
+      links: [],
+      actions: [],
+    });
+
+    const stableV2Retyped = defineObject({
+      name: "stable_fixture",
+      description: "A fixture object for active-freeze coverage.",
+      lifecycle: "active",
+      properties: z.object({
+        title: z.number().describe("Stable title."),
+      }),
+    });
+
+    expect(() =>
+      lintSchema(
+        { objects: [stableV2Retyped], links: [], actions: [] },
+        {},
+        baseline,
+      ),
+    ).toThrow('Active object "stable_fixture" retyped baseline property "title"');
   });
 });

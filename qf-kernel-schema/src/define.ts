@@ -37,6 +37,16 @@ export type Schema = {
   actions: DefinedAction[];
 };
 
+export type ActiveSchemaBaseline = {
+  version: 1;
+  active_objects: Record<
+    string,
+    {
+      properties: Record<string, string>;
+    }
+  >;
+};
+
 /** Transition table: every enum state → legal next states (terminal → []). */
 export type TransitionTable = Record<string, readonly string[]>;
 export type TransitionTables = Record<string, TransitionTable>;
@@ -97,6 +107,40 @@ export function enumValues(schema: z.ZodType): string[] | null {
     ?.def;
   if (def?.type !== "enum" || !def.entries) return null;
   return Object.values(def.entries);
+}
+
+function stripSchemaMetadata(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => stripSchemaMetadata(entry));
+  }
+  if (!value || typeof value !== "object") return value;
+  const record = value as Record<string, unknown>;
+  const next: Record<string, unknown> = {};
+  for (const key of Object.keys(record)) {
+    if (key === "description" || key === "title" || key === "$schema" || key === "examples") {
+      continue;
+    }
+    next[key] = stripSchemaMetadata(record[key]);
+  }
+  return next;
+}
+
+function sortJsonKeys(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => sortJsonKeys(entry));
+  }
+  if (!value || typeof value !== "object") return value;
+  const record = value as Record<string, unknown>;
+  const sortedEntries = Object.keys(record)
+    .sort()
+    .map((key) => [key, sortJsonKeys(record[key])] as const);
+  return Object.fromEntries(sortedEntries);
+}
+
+function propertyTypeFingerprint(field: z.ZodType): string {
+  const asJsonSchema = z.toJSONSchema(unwrapZodType(field));
+  const normalized = sortJsonKeys(stripSchemaMetadata(asJsonSchema));
+  return JSON.stringify(normalized);
 }
 
 /**
@@ -278,11 +322,122 @@ function assertTransitionCoverage(schema: Schema, tables: TransitionTables): voi
   }
 }
 
+function containsKindValueTokenSequence(objectName: string, kindValue: string): boolean {
+  const objectTokens = objectName.split("_");
+  const kindTokens = kindValue.split("_");
+  if (kindTokens.length === 0 || kindTokens.length > objectTokens.length) {
+    return false;
+  }
+  const maxStart = objectTokens.length - kindTokens.length;
+  for (let start = 0; start <= maxStart; start++) {
+    let allMatch = true;
+    for (let offset = 0; offset < kindTokens.length; offset++) {
+      if (objectTokens[start + offset] !== kindTokens[offset]) {
+        allMatch = false;
+        break;
+      }
+    }
+    if (allMatch) return true;
+  }
+  return false;
+}
+
+function assertNoKindSilos(schema: Schema): void {
+  const kindValuesByObject = new Map<string, string[]>();
+  for (const object of schema.objects) {
+    const kindField = object.properties.shape.kind as z.ZodType | undefined;
+    if (!kindField) continue;
+    const values = enumValues(kindField);
+    if (!values) continue;
+    kindValuesByObject.set(object.name, values);
+  }
+
+  for (const candidate of schema.objects) {
+    for (const [owner, kindValues] of kindValuesByObject.entries()) {
+      if (owner === candidate.name) continue;
+      for (const value of kindValues) {
+        if (!containsKindValueTokenSequence(candidate.name, value)) continue;
+        throw new Error(
+          `Object "${candidate.name}" embeds kind value "${value}" from "${owner}.kind"; keep "${owner}" as the type and encode "${value}" in kind`,
+        );
+      }
+    }
+  }
+}
+
+export function buildActiveSchemaBaseline(schema: Schema): ActiveSchemaBaseline {
+  const active_objects: ActiveSchemaBaseline["active_objects"] = {};
+  for (const object of schema.objects) {
+    if (object.lifecycle !== "active") continue;
+    const properties: Record<string, string> = {};
+    for (const [propertyName, field] of Object.entries(object.properties.shape)) {
+      properties[propertyName] = propertyTypeFingerprint(field as z.ZodType);
+    }
+    active_objects[object.name] = { properties };
+  }
+  return { version: 1, active_objects };
+}
+
+function assertActiveFreeze(schema: Schema, baseline: ActiveSchemaBaseline): void {
+  if (baseline.version !== 1) {
+    throw new Error(
+      `Unsupported schema baseline version "${String(baseline.version)}"; run update-schema-baseline`,
+    );
+  }
+
+  const objectsByName = new Map(schema.objects.map((object) => [object.name, object]));
+
+  for (const [objectName, baselineObject] of Object.entries(baseline.active_objects)) {
+    const currentObject = objectsByName.get(objectName);
+    if (!currentObject) {
+      throw new Error(`Active baseline object "${objectName}" no longer exists in the schema`);
+    }
+    if (currentObject.lifecycle !== "active") {
+      throw new Error(
+        `Active baseline object "${objectName}" changed lifecycle to "${currentObject.lifecycle}"`,
+      );
+    }
+
+    for (const [propertyName, baselineFingerprint] of Object.entries(baselineObject.properties)) {
+      const field = currentObject.properties.shape[propertyName];
+      if (!field) {
+        throw new Error(
+          `Active object "${objectName}" removed baseline property "${propertyName}"`,
+        );
+      }
+      const currentFingerprint = propertyTypeFingerprint(field as z.ZodType);
+      if (currentFingerprint !== baselineFingerprint) {
+        throw new Error(
+          `Active object "${objectName}" retyped baseline property "${propertyName}"`,
+        );
+      }
+    }
+  }
+
+  for (const object of schema.objects) {
+    if (object.lifecycle !== "active") continue;
+    if (!(object.name in baseline.active_objects)) {
+      throw new Error(
+        `Active object "${object.name}" is missing from schema-baseline.json; regenerate baseline with the explicit update script`,
+      );
+    }
+  }
+}
+
 /** Schema-level lint: duplicates, link endpoints, transition↔enum coverage. */
-export function lintSchema(schema: Schema, tables: TransitionTables): void {
+export function lintSchema(
+  schema: Schema,
+  tables: TransitionTables,
+  baseline?: ActiveSchemaBaseline,
+  options?: { skipActiveFreeze?: boolean },
+): void {
   assertNoDuplicateNames(schema);
   assertLinkEndpointsExist(schema);
+  assertNoKindSilos(schema);
   assertTransitionCoverage(schema, tables);
+  if (!options?.skipActiveFreeze && baseline) {
+    assertActiveFreeze(schema, baseline);
+  }
 }
 
 /** One legal edge covered by a transition command. */

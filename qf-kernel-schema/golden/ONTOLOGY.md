@@ -55,149 +55,176 @@ Settled truth of an event and the grading of its markets. Point-in-time fenced b
 - `outcome` — Structured result (winner, score/method, per-market grading win|loss|push|void).
 - `settled_at` — When truth became known (ISO-8601 UTC); also a point-in-time fence.
 
-### `hypothesis`
+### `mission`
 
-A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.
+A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `claim` — The statement under test in betting-research terms.
-- `success_criteria` — What evaluation outcome would support the claim (metrics, n, risk bounds).
-- `sources` — Citations grounding the claim (arXiv IDs, papers, articles).
-- `status` — Claim lifecycle; only evaluation-backed resolution leaves open.
+- `name` — Operator-facing mission label. Keep this stable across revisions so lineage queries stay anchored to one intent.
+- `objective` — The decision goal this mission serves. It must be concrete enough for an agent to reject work that is out of charter.
+
+### `hypothesis`
+
+A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `claim` — The claim being tested in domain language. Phrase it so a supporting or rejecting verdict is objectively distinguishable.
+- `success_criteria` — The evidence bar for support. This defines the gate so confidence alone cannot silently override the research contract.
+- `sources` — Citations that justify the claim's priors. Treat this as provenance for why the claim exists, not as proof that it is true.
+- `status` — Current lifecycle state for the claim. Only evaluation-backed resolution should move it away from open.
+
+### `policy`
+
+A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — Which implementation track the policy uses. This keeps playbook-level and model-weight policies comparable without splitting object types.
+- `spec_ref` — Artifact id that defines the policy behavior. Every policy revision must point to immutable bytes so evaluations can be reproduced.
+
+### `environment`
+
+An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.
+
+- **lifecycle:** `experimental`
+- **properties:**
+- `kind` — Execution context used for training/evaluation. Agents must not compare outcomes across kinds without an explicit normalization rule.
+- `contract_ref` — Artifact id describing observations, actions, and reward semantics. Keep this immutable so results remain interpretable after schema evolution.
 
 ### `strategy`
 
-A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.
+A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `spec_ref` — Artifact id whose content defines this strategy's rules/code.
-- `version` — Monotonic version number; new versions are new objects derived_from the old.
-- `stake_model` — How positions are sized in backtests.
+- `spec_ref` — Artifact id whose content defines the strategy logic. This reference is the canonical source of behavior for replay and audit.
+- `version` — Monotonic strategy revision number. New revisions must become new objects linked by derived_from instead of in-place edits.
+- `stake_model` — Position sizing approach the strategy assumes. Use custom only when the sizing function is encoded in the referenced artifact.
 
 ### `ticket`
 
-The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.
+A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `kind` — Whether this wager is one leg or a multi-leg parlay.
-- `legs` — Structured legs: market ref + side + price-at-selection + captured_at as JSON objects.
-- `combined_price` — Total odds for the ticket as offered or computed.
-- `stake` — Simulated stake under the strategy stake model.
-- `correlation_note` — Declared dependence among legs (same-event legs must reference correlation_group keys).
-- `grade` — Settlement grade once results land; pending until then.
+- `kind` — Whether the wager has one leg or multiple legs. Treat single as a first-class ticket, not a separate type.
+- `legs` — Structured per-leg selections and timestamps. Each leg entry must retain selection-time price so CLV and drift can be recomputed.
+- `combined_price` — Aggregate ticket price at selection. Keep the source price so downstream evaluation does not infer payout assumptions.
+- `stake` — Simulated stake assigned by the sizing policy. This is an execution input, not a post-hoc evaluation output.
+- `correlation_note` — Declared dependence assumptions among legs. Same-event legs should reference known correlation groups to avoid false independence.
+- `grade` — Settlement outcome for the ticket. It stays pending until settled truth is available from result lineage.
 
 ### `dataset`
 
-A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.
+A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `kind` — What kind of research data this snapshot holds.
-- `content_hash` — Hash over the underlying Parquet set; byte-identical data shares this hash.
-- `as_of` — Point-in-time boundary this dataset respects (ISO-8601 UTC).
-- `coverage` — Agent-readable sufficiency: sports, date range, event count.
+- `kind` — Primary data family captured by this snapshot. Mixed should only be used when cross-family coupling is deliberate and documented.
+- `content_hash` — Hash over the underlying bytes for this snapshot. Equal hashes mean byte-identical data and therefore equivalent replay input.
+- `as_of` — Latest timestamp allowed in this snapshot (ISO-8601 UTC). Agents must treat it as a leakage boundary for pre-event decisions.
+- `coverage` — Machine-readable coverage summary (sports, range, counts). This is a sufficiency hint and must never override missing raw lineage.
 
 ### `run`
 
-One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.
+A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `kind` — Which execution pipeline this run performs.
-- `status` — Operational run state; actor-internal THINKING/TOOL_CALLING are never stored here.
-- `params` — Full invocation parameters — the reproducibility contract.
-- `trace_id` — Root of this run's span tree in the trace layer (L5).
+- `kind` — Execution mode for this run. Add new modes here rather than cloning the run type per pipeline step.
+- `status` — Operational lifecycle state of execution. Never store actor-internal thinking/tool-calling states in this field.
+- `params` — Full invocation arguments captured at launch. This is the reproducibility contract for re-run and audit.
+- `trace_id` — Root span identifier for this run in tracing systems. Keep it stable across child spans so causality can be reconstructed.
 
 ### `artifact`
 
-An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.
+An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `kind` — Artifact family; trajectory/report must be distilled, never raw transcripts.
-- `content_hash` — Content hash of the durable bytes.
-- `storage_ref` — Durable location of the bytes (exported before any sandbox dies).
+- `kind` — Artifact family discriminator. Trajectory and report entries should contain distilled outputs, never raw transcript dumps.
+- `content_hash` — Hash of the durable bytes referenced by this artifact. This is the canonical identity for dedupe and provenance checks.
+- `storage_ref` — Durable location that stores the referenced bytes. Publication should occur before ephemeral sandboxes can be reclaimed.
 
 ### `evaluation`
 
-Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.
+An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `metrics` — Typed metric set: per-leg CLV/hit/price-beat, per-ticket ROI, Monte Carlo bankroll, OOS consistency.
-- `critic_findings_ref` — Artifact id of triaged Critic findings weighed in this verdict.
-- `verdict` — Overall evaluation verdict relative to the hypothesis.
-- `confidence` — Confidence in the verdict on a 0–1 scale.
-- `rationale` — Human/agent-readable rationale for the verdict.
+- `metrics` — Typed metric payload used to justify the verdict. Include enough detail for replayed judging without reconstructing hidden intermediate state.
+- `critic_findings_ref` — Artifact id containing critic findings considered in this judgment. Leave null only when no critic pass was available for this evaluation.
+- `verdict` — Disposition of the evidence against the hypothesis. This field carries gating semantics; confidence does not override it.
+- `confidence` — Confidence score for the selected verdict on a 0-1 scale. Use it for prioritization and review, not as a substitute for verdict semantics.
+- `rationale` — Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.
 
 ### `workspace`
 
-One canvas of work — the spatial container for tiles, sessions, and connections in a research project.
+A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `name` — Short workspace name shown on the canvas.
-- `title` — Human-readable title for the research workspace.
+- `name` — Short workspace slug shown in compact UI surfaces. Keep it stable so linked session labels and automation references do not drift.
+- `title` — Long human-readable heading for the workspace. Use this for operator readability while keeping machine references on name.
 
 ### `agent_definition`
 
-A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.
+An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `name` — Species name agents and operators use to request a spawn.
-- `role` — Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
-- `package_ref` — AgentOS package this species launches — the plug half of the row.
-- `system_prompt_ref` — Artifact or prompt id that defines this species' instructions.
+- `name` — Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.
+- `role` — Role summary used for planner routing and prompt selection. Keep role labels aligned with actual task boundaries, not model branding.
+- `package_ref` — Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.
+- `system_prompt_ref` — Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
 
 ### `agent_session`
 
-One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.
+An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `status` — Operational session state enforced by the transition table.
-- `label` — Optional operator-facing label for the live session.
+- `status` — Operational lifecycle state enforced by transition policy. Status transitions must follow the transition table rather than ad-hoc writes.
+- `label` — Optional operator-facing label for this live session. Use it for readability only; lifecycle and routing authority remain on stable ids.
 
 ### `task`
 
-A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.
+A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `title` — Short task title for the operator and agents.
-- `description` — What done looks like for this unit of work.
+- `title` — Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.
+- `description` — Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.
 
 ### `tool`
 
-A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.
+A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `name` — Tool name as exposed to agents (typically qf_*).
-- `summary` — One-line summary of what the tool does for an agent reader.
+- `name` — Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.
+- `summary` — One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.
 
 ### `execution_environment`
 
-Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.
+An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `kind` — Execution substrate for runs linked via executes_in.
-- `label` — Operator-facing label for this environment instance.
+- `kind` — Execution substrate category used by runs linked through executes_in. Choose the narrowest accurate kind so failure domains stay interpretable.
+- `label` — Operator-facing name for this environment instance. Keep labels specific enough to distinguish local and remote contexts at a glance.
 
 ### `connection`
 
-A typed cable between tiles on the canvas — projection wiring, never a second truth store.
+A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `kind` — Cable/connection kind (data, control, or view projection).
-- `from_ref` — Source tile or object id for this cable.
-- `to_ref` — Target tile or object id for this cable.
+- `kind` — Connection category such as data, control, or view. Use a constrained vocabulary in higher layers so traversal semantics stay predictable.
+- `from_ref` — Source tile or object identifier for this connection. It should reference existing canvas entities rather than inferred placeholders.
+- `to_ref` — Target tile or object identifier for this connection. Keep directional intent explicit so reverse traversals are computed, not guessed.
 
 ## Links
 

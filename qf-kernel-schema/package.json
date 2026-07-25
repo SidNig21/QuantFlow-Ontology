@@ -12,6 +12,7 @@
   },
   "scripts": {
     "generate": "bun run scripts/generate.ts",
+    "update-schema-baseline": "bun run scripts/update-schema-baseline.ts",
     "test": "bun test"
   },
   "dependencies": {

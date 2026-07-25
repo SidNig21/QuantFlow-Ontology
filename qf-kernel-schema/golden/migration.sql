@@ -18,20 +18,23 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('event
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('market', 'object', 'experimental', 'One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('odds_series', 'object', 'experimental', 'Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('result', 'object', 'experimental', 'Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('hypothesis', 'object', 'experimental', 'A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('strategy', 'object', 'experimental', 'A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ticket', 'object', 'experimental', 'The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('dataset', 'object', 'experimental', 'A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('run', 'object', 'experimental', 'One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('artifact', 'object', 'experimental', 'An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluation', 'object', 'experimental', 'Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('workspace', 'object', 'experimental', 'One canvas of work — the spatial container for tiles, sessions, and connections in a research project.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_definition', 'object', 'experimental', 'A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_session', 'object', 'experimental', 'One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('task', 'object', 'experimental', 'A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('tool', 'object', 'experimental', 'A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execution_environment', 'object', 'experimental', 'Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('connection', 'object', 'experimental', 'A typed cable between tiles on the canvas — projection wiring, never a second truth store.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('mission', 'object', 'experimental', 'A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('hypothesis', 'object', 'experimental', 'A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('policy', 'object', 'experimental', 'A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('environment', 'object', 'experimental', 'An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('strategy', 'object', 'experimental', 'A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ticket', 'object', 'experimental', 'A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('dataset', 'object', 'experimental', 'A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('run', 'object', 'experimental', 'A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('artifact', 'object', 'experimental', 'An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluation', 'object', 'experimental', 'An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('workspace', 'object', 'experimental', 'A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_definition', 'object', 'experimental', 'An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_session', 'object', 'experimental', 'An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('task', 'object', 'experimental', 'A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('tool', 'object', 'experimental', 'A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execution_environment', 'object', 'experimental', 'An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('connection', 'object', 'experimental', 'A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('participates_in', 'link', 'experimental', 'Roster/matchup edge: which competitors take part in an event.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('offered_on', 'link', 'experimental', 'Attaches a market to the event it is offered on for per-contest discovery.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('quotes', 'link', 'experimental', 'Price-history lookup: which market an odds_series records.');
@@ -150,218 +153,256 @@ CREATE TABLE result (
   settled_at TEXT NOT NULL
 );
 
--- A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.
+-- A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.
+CREATE TABLE mission (
+  -- Primary key for this ontology object instance.
+  id TEXT PRIMARY KEY NOT NULL,
+  -- ISO-8601 UTC timestamp when the row was created.
+  created_at TEXT NOT NULL,
+  -- Operator-facing mission label. Keep this stable across revisions so lineage queries stay anchored to one intent.
+  name TEXT NOT NULL,
+  -- The decision goal this mission serves. It must be concrete enough for an agent to reject work that is out of charter.
+  objective TEXT NOT NULL
+);
+
+-- A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.
 CREATE TABLE hypothesis (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- The statement under test in betting-research terms.
+  -- The claim being tested in domain language. Phrase it so a supporting or rejecting verdict is objectively distinguishable.
   claim TEXT NOT NULL,
-  -- What evaluation outcome would support the claim (metrics, n, risk bounds).
+  -- The evidence bar for support. This defines the gate so confidence alone cannot silently override the research contract.
   success_criteria TEXT NOT NULL,
-  -- Citations grounding the claim (arXiv IDs, papers, articles).
+  -- Citations that justify the claim's priors. Treat this as provenance for why the claim exists, not as proof that it is true.
   sources TEXT NOT NULL,
-  -- Claim lifecycle; only evaluation-backed resolution leaves open.
+  -- Current lifecycle state for the claim. Only evaluation-backed resolution should move it away from open.
   status TEXT NOT NULL,
   CHECK (status IN ('open', 'supported', 'rejected', 'inconclusive'))
 );
 
--- A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.
+-- A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.
+CREATE TABLE policy (
+  -- Primary key for this ontology object instance.
+  id TEXT PRIMARY KEY NOT NULL,
+  -- ISO-8601 UTC timestamp when the row was created.
+  created_at TEXT NOT NULL,
+  -- Which implementation track the policy uses. This keeps playbook-level and model-weight policies comparable without splitting object types.
+  kind TEXT NOT NULL,
+  -- Artifact id that defines the policy behavior. Every policy revision must point to immutable bytes so evaluations can be reproduced.
+  spec_ref TEXT NOT NULL,
+  CHECK (kind IN ('prompt_playbook', 'trained_weights'))
+);
+
+-- An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.
+CREATE TABLE environment (
+  -- Primary key for this ontology object instance.
+  id TEXT PRIMARY KEY NOT NULL,
+  -- ISO-8601 UTC timestamp when the row was created.
+  created_at TEXT NOT NULL,
+  -- Execution context used for training/evaluation. Agents must not compare outcomes across kinds without an explicit normalization rule.
+  kind TEXT NOT NULL,
+  -- Artifact id describing observations, actions, and reward semantics. Keep this immutable so results remain interpretable after schema evolution.
+  contract_ref TEXT NOT NULL,
+  CHECK (kind IN ('offline_replay', 'paper_market', 'live_shadow'))
+);
+
+-- A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.
 CREATE TABLE strategy (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Artifact id whose content defines this strategy's rules/code.
+  -- Artifact id whose content defines the strategy logic. This reference is the canonical source of behavior for replay and audit.
   spec_ref TEXT NOT NULL,
-  -- Monotonic version number; new versions are new objects derived_from the old.
+  -- Monotonic strategy revision number. New revisions must become new objects linked by derived_from instead of in-place edits.
   version REAL NOT NULL,
-  -- How positions are sized in backtests.
+  -- Position sizing approach the strategy assumes. Use custom only when the sizing function is encoded in the referenced artifact.
   stake_model TEXT NOT NULL,
   CHECK (stake_model IN ('flat', 'fractional_kelly', 'custom'))
 );
 
--- The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.
+-- A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.
 CREATE TABLE ticket (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Whether this wager is one leg or a multi-leg parlay.
+  -- Whether the wager has one leg or multiple legs. Treat single as a first-class ticket, not a separate type.
   kind TEXT NOT NULL,
-  -- Structured legs: market ref + side + price-at-selection + captured_at as JSON objects.
+  -- Structured per-leg selections and timestamps. Each leg entry must retain selection-time price so CLV and drift can be recomputed.
   legs TEXT NOT NULL,
-  -- Total odds for the ticket as offered or computed.
+  -- Aggregate ticket price at selection. Keep the source price so downstream evaluation does not infer payout assumptions.
   combined_price REAL NOT NULL,
-  -- Simulated stake under the strategy stake model.
+  -- Simulated stake assigned by the sizing policy. This is an execution input, not a post-hoc evaluation output.
   stake REAL NOT NULL,
-  -- Declared dependence among legs (same-event legs must reference correlation_group keys).
+  -- Declared dependence assumptions among legs. Same-event legs should reference known correlation groups to avoid false independence.
   correlation_note TEXT NOT NULL,
-  -- Settlement grade once results land; pending until then.
+  -- Settlement outcome for the ticket. It stays pending until settled truth is available from result lineage.
   grade TEXT NOT NULL,
   CHECK (kind IN ('single', 'parlay')),
   CHECK (grade IN ('pending', 'win', 'loss', 'push', 'void'))
 );
 
--- A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.
+-- A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.
 CREATE TABLE dataset (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- What kind of research data this snapshot holds.
+  -- Primary data family captured by this snapshot. Mixed should only be used when cross-family coupling is deliberate and documented.
   kind TEXT NOT NULL,
-  -- Hash over the underlying Parquet set; byte-identical data shares this hash.
+  -- Hash over the underlying bytes for this snapshot. Equal hashes mean byte-identical data and therefore equivalent replay input.
   content_hash TEXT NOT NULL,
-  -- Point-in-time boundary this dataset respects (ISO-8601 UTC).
+  -- Latest timestamp allowed in this snapshot (ISO-8601 UTC). Agents must treat it as a leakage boundary for pre-event decisions.
   as_of TEXT NOT NULL,
-  -- Agent-readable sufficiency: sports, date range, event count.
+  -- Machine-readable coverage summary (sports, range, counts). This is a sufficiency hint and must never override missing raw lineage.
   coverage TEXT NOT NULL,
   CHECK (kind IN ('odds_history', 'results', 'features', 'mixed'))
 );
 
--- One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.
+-- A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.
 CREATE TABLE run (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Which execution pipeline this run performs.
+  -- Execution mode for this run. Add new modes here rather than cloning the run type per pipeline step.
   kind TEXT NOT NULL,
-  -- Operational run state; actor-internal THINKING/TOOL_CALLING are never stored here.
+  -- Operational lifecycle state of execution. Never store actor-internal thinking/tool-calling states in this field.
   status TEXT NOT NULL,
-  -- Full invocation parameters — the reproducibility contract.
+  -- Full invocation arguments captured at launch. This is the reproducibility contract for re-run and audit.
   params TEXT NOT NULL,
-  -- Root of this run's span tree in the trace layer (L5).
+  -- Root span identifier for this run in tracing systems. Keep it stable across child spans so causality can be reconstructed.
   trace_id TEXT NOT NULL,
-  CHECK (kind IN ('ingestion', 'feature_build', 'backtest', 'analysis')),
+  CHECK (kind IN ('ingestion', 'feature_build', 'backtest', 'analysis', 'training')),
   CHECK (status IN ('queued', 'running', 'succeeded', 'failed', 'cancelled'))
 );
 
--- An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.
+-- An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.
 CREATE TABLE artifact (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Artifact family; trajectory/report must be distilled, never raw transcripts.
+  -- Artifact family discriminator. Trajectory and report entries should contain distilled outputs, never raw transcript dumps.
   kind TEXT NOT NULL,
-  -- Content hash of the durable bytes.
+  -- Hash of the durable bytes referenced by this artifact. This is the canonical identity for dedupe and provenance checks.
   content_hash TEXT NOT NULL,
-  -- Durable location of the bytes (exported before any sandbox dies).
+  -- Durable location that stores the referenced bytes. Publication should occur before ephemeral sandboxes can be reclaimed.
   storage_ref TEXT NOT NULL,
   CHECK (kind IN ('strategy_spec', 'code', 'result_set', 'report', 'trajectory'))
 );
 
--- Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.
+-- An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.
 CREATE TABLE evaluation (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Typed metric set: per-leg CLV/hit/price-beat, per-ticket ROI, Monte Carlo bankroll, OOS consistency.
+  -- Typed metric payload used to justify the verdict. Include enough detail for replayed judging without reconstructing hidden intermediate state.
   metrics TEXT NOT NULL,
-  -- Artifact id of triaged Critic findings weighed in this verdict.
+  -- Artifact id containing critic findings considered in this judgment. Leave null only when no critic pass was available for this evaluation.
   critic_findings_ref TEXT,
-  -- Overall evaluation verdict relative to the hypothesis.
+  -- Disposition of the evidence against the hypothesis. This field carries gating semantics; confidence does not override it.
   verdict TEXT NOT NULL,
-  -- Confidence in the verdict on a 0–1 scale.
+  -- Confidence score for the selected verdict on a 0-1 scale. Use it for prioritization and review, not as a substitute for verdict semantics.
   confidence REAL NOT NULL,
-  -- Human/agent-readable rationale for the verdict.
+  -- Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.
   rationale TEXT NOT NULL,
   CHECK (verdict IN ('supports', 'rejects', 'inconclusive'))
 );
 
--- One canvas of work — the spatial container for tiles, sessions, and connections in a research project.
+-- A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.
 CREATE TABLE workspace (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Short workspace name shown on the canvas.
+  -- Short workspace slug shown in compact UI surfaces. Keep it stable so linked session labels and automation references do not drift.
   name TEXT NOT NULL,
-  -- Human-readable title for the research workspace.
+  -- Long human-readable heading for the workspace. Use this for operator readability while keeping machine references on name.
   title TEXT NOT NULL
 );
 
--- A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.
+-- An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.
 CREATE TABLE agent_definition (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Species name agents and operators use to request a spawn.
+  -- Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.
   name TEXT NOT NULL,
-  -- Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
+  -- Role summary used for planner routing and prompt selection. Keep role labels aligned with actual task boundaries, not model branding.
   role TEXT NOT NULL,
-  -- AgentOS package this species launches — the plug half of the row.
+  -- Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.
   package_ref TEXT NOT NULL,
-  -- Artifact or prompt id that defines this species' instructions.
+  -- Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
   system_prompt_ref TEXT
 );
 
--- One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.
+-- An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.
 CREATE TABLE agent_session (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Operational session state enforced by the transition table.
+  -- Operational lifecycle state enforced by transition policy. Status transitions must follow the transition table rather than ad-hoc writes.
   status TEXT NOT NULL,
-  -- Optional operator-facing label for the live session.
+  -- Optional operator-facing label for this live session. Use it for readability only; lifecycle and routing authority remain on stable ids.
   label TEXT,
   CHECK (status IN ('starting', 'running', 'blocked', 'cancelled', 'failed', 'closed'))
 );
 
--- A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.
+-- A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.
 CREATE TABLE task (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Short task title for the operator and agents.
+  -- Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.
   title TEXT NOT NULL,
-  -- What done looks like for this unit of work.
+  -- Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.
   description TEXT NOT NULL
 );
 
--- A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.
+-- A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.
 CREATE TABLE tool (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Tool name as exposed to agents (typically qf_*).
+  -- Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.
   name TEXT NOT NULL,
-  -- One-line summary of what the tool does for an agent reader.
+  -- One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.
   summary TEXT NOT NULL
 );
 
--- Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.
+-- An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.
 CREATE TABLE execution_environment (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Execution substrate for runs linked via executes_in.
+  -- Execution substrate category used by runs linked through executes_in. Choose the narrowest accurate kind so failure domains stay interpretable.
   kind TEXT NOT NULL,
-  -- Operator-facing label for this environment instance.
+  -- Operator-facing name for this environment instance. Keep labels specific enough to distinguish local and remote contexts at a glance.
   label TEXT NOT NULL,
   CHECK (kind IN ('local_process', 'local_python', 'cloudflare_sandbox'))
 );
 
--- A typed cable between tiles on the canvas — projection wiring, never a second truth store.
+-- A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.
 CREATE TABLE connection (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Cable/connection kind (data, control, or view projection).
+  -- Connection category such as data, control, or view. Use a constrained vocabulary in higher layers so traversal semantics stay predictable.
   kind TEXT NOT NULL,
-  -- Source tile or object id for this cable.
+  -- Source tile or object identifier for this connection. It should reference existing canvas entities rather than inferred placeholders.
   from_ref TEXT NOT NULL,
-  -- Target tile or object id for this cable.
+  -- Target tile or object identifier for this connection. Keep directional intent explicit so reverse traversals are computed, not guessed.
   to_ref TEXT NOT NULL
 );
 

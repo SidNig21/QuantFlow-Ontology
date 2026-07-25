@@ -6,30 +6,48 @@ import { defineAction, defineLink, defineObject } from "../define.ts";
 export const workspace = defineObject({
   name: "workspace",
   description:
-    "One canvas of work — the spatial container for tiles, sessions, and connections in a research project.",
+    "A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.",
   lifecycle: "experimental",
   properties: z.object({
-    name: z.string().describe("Short workspace name shown on the canvas."),
-    title: z.string().describe("Human-readable title for the research workspace."),
+    name: z
+      .string()
+      .describe(
+        "Short workspace slug shown in compact UI surfaces. Keep it stable so linked session labels and automation references do not drift.",
+      ),
+    title: z
+      .string()
+      .describe(
+        "Long human-readable heading for the workspace. Use this for operator readability while keeping machine references on name.",
+      ),
   }),
 });
 
 export const agent_definition = defineObject({
   name: "agent_definition",
   description:
-    "A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.",
+    "An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.",
   lifecycle: "experimental",
   properties: z.object({
-    name: z.string().describe("Species name agents and operators use to request a spawn."),
+    name: z
+      .string()
+      .describe(
+        "Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.",
+      ),
     role: z
       .string()
-      .describe("Role summary (researcher, critic, backtester, ingestion) for routing and prompts."),
+      .describe(
+        "Role summary used for planner routing and prompt selection. Keep role labels aligned with actual task boundaries, not model branding.",
+      ),
     package_ref: z
       .string()
-      .describe("AgentOS package this species launches — the plug half of the row."),
+      .describe(
+        "Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.",
+      ),
     system_prompt_ref: z
       .string()
-      .describe("Artifact or prompt id that defines this species' instructions.")
+      .describe(
+        "Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.",
+      )
       .nullable(),
   }),
 });
@@ -37,15 +55,19 @@ export const agent_definition = defineObject({
 export const agent_session = defineObject({
   name: "agent_session",
   description:
-    "One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.",
+    "An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.",
   lifecycle: "experimental",
   properties: z.object({
     status: z
       .enum(["starting", "running", "blocked", "cancelled", "failed", "closed"])
-      .describe("Operational session state enforced by the transition table."),
+      .describe(
+        "Operational lifecycle state enforced by transition policy. Status transitions must follow the transition table rather than ad-hoc writes.",
+      ),
     label: z
       .string()
-      .describe("Optional operator-facing label for the live session.")
+      .describe(
+        "Optional operator-facing label for this live session. Use it for readability only; lifecycle and routing authority remain on stable ids.",
+      )
       .nullable(),
   }),
 });
@@ -53,47 +75,81 @@ export const agent_session = defineObject({
 export const task = defineObject({
   name: "task",
   description:
-    "A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.",
+    "A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.",
   lifecycle: "experimental",
   properties: z.object({
-    title: z.string().describe("Short task title for the operator and agents."),
-    description: z.string().describe("What done looks like for this unit of work."),
+    title: z
+      .string()
+      .describe(
+        "Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.",
+      ),
+    description: z
+      .string()
+      .describe(
+        "Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.",
+      ),
   }),
 });
 
 export const tool = defineObject({
   name: "tool",
   description:
-    "A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.",
+    "A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.",
   lifecycle: "experimental",
   properties: z.object({
-    name: z.string().describe("Tool name as exposed to agents (typically qf_*)."),
-    summary: z.string().describe("One-line summary of what the tool does for an agent reader."),
+    name: z
+      .string()
+      .describe(
+        "Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.",
+      ),
+    summary: z
+      .string()
+      .describe(
+        "One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.",
+      ),
   }),
 });
 
 export const execution_environment = defineObject({
   name: "execution_environment",
   description:
-    "Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.",
+    "An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.",
   lifecycle: "experimental",
   properties: z.object({
     kind: z
       .enum(["local_process", "local_python", "cloudflare_sandbox"])
-      .describe("Execution substrate for runs linked via executes_in."),
-    label: z.string().describe("Operator-facing label for this environment instance."),
+      .describe(
+        "Execution substrate category used by runs linked through executes_in. Choose the narrowest accurate kind so failure domains stay interpretable.",
+      ),
+    label: z
+      .string()
+      .describe(
+        "Operator-facing name for this environment instance. Keep labels specific enough to distinguish local and remote contexts at a glance.",
+      ),
   }),
 });
 
 export const connection = defineObject({
   name: "connection",
   description:
-    "A typed cable between tiles on the canvas — projection wiring, never a second truth store.",
+    "A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.",
   lifecycle: "experimental",
   properties: z.object({
-    kind: z.string().describe("Cable/connection kind (data, control, or view projection)."),
-    from_ref: z.string().describe("Source tile or object id for this cable."),
-    to_ref: z.string().describe("Target tile or object id for this cable."),
+    kind: z
+      .string()
+      .describe(
+        "Connection category such as data, control, or view. Use a constrained vocabulary in higher layers so traversal semantics stay predictable.",
+      ),
+    from_ref: z
+      .string()
+      .describe(
+        "Source tile or object identifier for this connection. It should reference existing canvas entities rather than inferred placeholders.",
+      ),
+    to_ref: z
+      .string()
+      .describe(
+        "Target tile or object identifier for this connection. Keep directional intent explicit so reverse traversals are computed, not guessed.",
+      ),
   }),
 });
 
