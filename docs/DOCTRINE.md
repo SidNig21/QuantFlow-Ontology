@@ -349,16 +349,32 @@ ontology shape, which is a claim about *types* — markets are rows, never types
 claim about what order to build in. `SCOPES WO-107` already read "one venue, one market, founder
 picks."
 
-**2 · WO-108's falsification survives, reduced from a pipeline to a fixture.** The second-market
-rung exists to answer a question Bovada cannot answer about itself: *is this an abstraction, or is
-it Bovada's schema wearing generic names?* Both look identical from inside Bovada. The only
-discriminator is pointing something structurally unlike it at the same four types and seeing
-whether a fifth type is needed.
+**2 · WO-108's falsification survives — and it moves inside the sportsbook.** *(Revised same day,
+after the founder restated the direction more sharply: "lets not get confused and only focus on
+bovada sportsbook.")*
 
-So the test is kept and the cost is cut: **a hand-written perpetual-future fixture of roughly
-twenty rows, landed in WO-102's gates (G3), rather than a second ingest pipeline.** A day instead
-of a week, and no attention leaves sports. `SCOPES WO-108`'s full pipeline is correspondingly
-demoted — if the fixture passes, the second market becomes a data-source task rather than a rung.
+The second-market rung exists to answer a question one bet shape cannot answer about itself: *is
+this an abstraction, or is it Bovada's schema wearing generic names?* Both look identical from
+inside a single fight. The discriminator is a **structurally different** bet pointed at the same
+four types.
+
+The first draft of this amendment used a crypto perpetual as that specimen. **That is struck.** It
+was the wrong instrument for a correct instinct — it imported the exact distraction the founder's
+direction exists to prevent, when the discriminator was available inside Bovada all along:
+
+> A method-of-victory pick hangs off **one bounded bout**. A season outright hangs off **none**.
+> If `instrument` cannot exist without a `market_event`, these four types describe *bouts*, not
+> *markets* — and every rung above inherits that.
+
+So the test lands as **WO-102's G3: two Bovada bet shapes, a single-bout selection and a
+season-long futures, roughly twenty hand-written rows, asserting zero new object types.** A day
+instead of a week, zero crypto, zero attention off sports. `SCOPES WO-108`'s full second-market
+pipeline is correspondingly demoted — if the fixture passes, a future market is a data-source
+task, not a rung.
+
+*Worth keeping as a method note:* the crypto perp and the season outright are the **same shape** —
+an instrument with no bounded event. The architect reached for the far example when a near one was
+sitting in the founder's own account. Prefer the specimen the operator already has.
 
 **3 · The founder's real slips are the modelling source of record, and they do not enter the
 repo.** Four settled Bovada slips supplied 2026-07-25 decided the market plane's shape: the same

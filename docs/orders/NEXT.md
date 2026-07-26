@@ -5,7 +5,7 @@
 
 ## Current order: **WO-102 — Market plane reframe**
 
-WO-101 is done (verified + merged 2026-07-25, `d4356cc`). WO-102 turns betting from *types* into *rows*, so a UFC fight and a crypto perpetual are the same four things carrying different data.
+WO-101 is done (verified + merged 2026-07-25, `d4356cc`). WO-102 turns betting from *types* into *rows*, so a single UFC bout and a season-long futures bet are the same four things carrying different data. **Bovada sportsbook only** — doctrine A7.
 
 0. Read `AGENTS.md` at repo root — the cold-start briefing, including the commands and the `golden/` ritual.
 1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
@@ -18,7 +18,7 @@ WO-101 is done (verified + merged 2026-07-25, `d4356cc`). WO-102 turns betting f
 - **It is larger than it reads.** `market_event` (today `event`) is a **stateful** type: renaming it moves a transition table, three command edges in `commands.ts`, and 33 generated conformance lines. This is the one place the order legitimately touches `commands.ts`.
 - **It invalidates every existing `kernel.db`.** Bare `CREATE TABLE`, no migration runner, by design. **Founder consent obtained 2026-07-25** — measured first: the two live databases hold agent-session and trajectory history with **zero market rows**, so the rename touches nothing in them. **You delete nothing.** You confirm a *fresh* database opens clean.
 - **`pipelineFed` does not exist in code** — zero occurrences. It is doctrine vocabulary awaiting machinery. This order builds it *with its enforcing lint*, or it does not ship. A flag without a consumer is the `declaration is not capability` failure doctrine A5 names.
-- **G3 is the gate that matters.** A hand-written perpetual-future fixture must fit the same four types with **zero new object types**. Roughly twenty rows. If it does not fit, **that is the finding** — report it, do not invent a fifth type to make it pass.
+- **G3 is the gate that matters, and it is Bovada-only.** Two hand-written bet shapes — a single-bout selection and a **season-long futures** — must fit the same four types with **zero new object types**. Roughly twenty rows. The futures bet is the discriminator: it has **no bounded `market_event`**, so if `instrument` can't exist without one, these types describe bouts rather than markets. If it does not fit, **that is the finding** — report it, do not invent a fifth type to make it pass. **No crypto, no perpetuals, no second venue** (doctrine A7).
 
 ### One thing WO-101 proved that this order must not repeat
 
@@ -30,11 +30,11 @@ WO-101's G3 read *"the suite must grow — new types generate new rows in the go
 
 Its brief grew on 2026-07-25 from real betting slips: **a parlay leg carries its own price and its own outcome, and the schema cannot say it.** `has_leg` is a property-less edge; `legs` is an untraversable JSON blob. That is the strongest argument on the board for link properties, and it comes from the founder's own primary use case. Findings 1–5 in [`WO-102.md`](WO-102.md), plus 1–10 in [`WO-101.md`](WO-101.md).
 
-Then P3 (WO-104/105/106, the generated tool plane), P4 (markets — Bovada only, per doctrine A7), P5 (the loop, the critic, the proof). See [`SCOPES.md`](SCOPES.md).
+Then P3 (WO-104/105/106, the generated tool plane), P4 (markets — **Bovada sportsbook only**, per doctrine A7), P5 (the loop, the critic, the proof). See [`SCOPES.md`](SCOPES.md).
 
 ## Parked / parallel
 
-**WO-108's full second-market pipeline** — demoted by doctrine A7 to WO-102's G3 fixture. If the fixture passes, the second market is a data-source task, not a rung. **Visual pass** (WO-006d one-skin + dock redesign) — founder-gated, off the critical path. **WO-009** — absorbed into WO-106's market pick. **Durable execution** — ROADMAP debt #17, trigger-gated. **Promotion authority + the freeze-lint bypass** — ROADMAP debt #19, triggered by the first proposal to promote any type to `active`; nothing is close.
+**WO-108's full second-market pipeline** — demoted by doctrine A7 to WO-102's G3 fixture (two Bovada bet shapes, no crypto). If the fixture passes, a future market is a data-source task, not a rung. **Visual pass** (WO-006d one-skin + dock redesign) — founder-gated, off the critical path. **WO-009** — absorbed into WO-106's market pick. **Durable execution** — ROADMAP debt #17, trigger-gated. **Promotion authority + the freeze-lint bypass** — ROADMAP debt #19, triggered by the first proposal to promote any type to `active`; nothing is close.
 
 ---
 

@@ -349,12 +349,14 @@ data through generated tools.
 
 ### WO-108 · The second market
 
-> **DEMOTED 2026-07-25 by doctrine A7 (founder direction).** Sports betting is the only market
-> through the loop; crypto is explicitly later. The falsification this rung exists for is **kept
-> and moved forward** — it lands as **WO-102's G3**, a hand-written perpetual-future fixture of
-> roughly twenty rows asserting zero new object types. A day, not a week. If that fixture passes,
-> the second market becomes a data-source task rather than a rung; if it fails, that is the
-> finding and it surfaces four rungs earlier than it otherwise would.
+> **DEMOTED 2026-07-25 by doctrine A7 (founder direction).** Bovada sportsbook is the only market;
+> crypto is explicitly out, not merely later. The falsification this rung exists for is **kept and
+> moved forward, and its specimen moved inside the sportsbook** — it lands as **WO-102's G3**: two
+> Bovada bet shapes, a single-bout selection and a season-long futures, roughly twenty hand-written
+> rows asserting zero new object types. The discriminator is the same one a crypto perpetual would
+> have provided — *an instrument with no bounded `market_event`* — with none of the distraction.
+> A day, not a week. If the fixture passes, a future market is a data-source task rather than a
+> rung; if it fails, that is the finding, and it surfaces six rungs earlier than it otherwise would.
 
 **Objective.** Prove the market abstraction by loading something structurally unlike the first —
 a game line and a perpetual future through the same four types.
