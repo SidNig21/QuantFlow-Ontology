@@ -726,14 +726,14 @@ export function assertCreationHandlersComplete(
 export function executeCreation(
   db: KernelDb,
   cmd: CreationCommand,
-  input: Record<string, unknown>,
+  body: Record<string, unknown>,
   trace: TraceContext,
+  links: LinkSpec[],
 ): ExecuteResult {
   const handler = creationHandlers[cmd.action];
   if (!handler) {
     throw new KernelError(`No creation handler for action "${cmd.action}"`);
   }
-  const { body, links } = extractLinkSpecs(input);
   return handler(db, cmd, body, trace, links);
 }
 
