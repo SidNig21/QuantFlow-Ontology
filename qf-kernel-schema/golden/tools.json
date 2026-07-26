@@ -2303,17 +2303,20 @@
           "description": "Artifact kind to publish."
         },
         "content_hash": {
-          "type": "string",
-          "description": "Content hash of the bytes."
+          "description": "Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.",
+          "type": "string"
         },
         "storage_ref": {
           "type": "string",
           "description": "Durable storage location."
+        },
+        "path": {
+          "description": "Filesystem path to read artifact bytes from.",
+          "type": "string"
         }
       },
       "required": [
         "kind",
-        "content_hash",
         "storage_ref"
       ]
     }

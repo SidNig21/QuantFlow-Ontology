@@ -576,8 +576,9 @@ Publish an immutable content-addressed artifact (must land before sandbox death)
 - **lifecycle:** `experimental`
 - **input:**
 - `kind` — Artifact kind to publish.
-- `content_hash` — Content hash of the bytes.
+- `content_hash` — Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.
 - `storage_ref` — Durable storage location.
+- `path` — Filesystem path to read artifact bytes from.
 
 ### `record_evaluation`
 

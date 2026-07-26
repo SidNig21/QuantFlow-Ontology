@@ -500,13 +500,26 @@ export const publish_artifact = defineAction({
   name: "publish_artifact",
   description: "Publish an immutable content-addressed artifact (must land before sandbox death).",
   lifecycle: "experimental",
-  input: z.object({
-    kind: z
-      .enum(["strategy_spec", "code", "result_set", "report", "trajectory"])
-      .describe("Artifact kind to publish."),
-    content_hash: z.string().describe("Content hash of the bytes."),
-    storage_ref: z.string().describe("Durable storage location."),
-  }),
+  input: z
+    .object({
+      kind: z
+        .enum(["strategy_spec", "code", "result_set", "report", "trajectory"])
+        .describe("Artifact kind to publish."),
+      content_hash: z
+        .string()
+        .optional()
+        .describe(
+          "Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.",
+        ),
+      storage_ref: z.string().describe("Durable storage location."),
+      path: z
+        .string()
+        .optional()
+        .describe("Filesystem path to read artifact bytes from."),
+    })
+    .refine((v) => typeof v.path === "string" && v.path.length > 0, {
+      message: 'publish_artifact requires "bytes" (kernel envelope) or "path"',
+    }),
 });
 
 export const record_evaluation = defineAction({
