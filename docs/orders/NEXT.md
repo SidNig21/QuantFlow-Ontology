@@ -1,46 +1,46 @@
-# NEXT — no builder-cuttable order right now (rotated 2026-07-26: WO-104 verified + merged)
+# NEXT — the current order (rotated 2026-07-26: WO-105 written and read, P3 continues)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## There is no order to cut. This is the honest state, not an oversight.
+## Current order: **WO-105 — Action tools and the two gates**
 
-**WO-104 is done** (verified + merged 2026-07-26, one rework round). The read half of P3 is served:
-69 read tools over real MCP, the `_links` traversal exists and answers, and a permanent gate now
-asserts on every run that zero action tools are served. The next rung is **WO-105**, and its order
-file **has not been written yet** — it is a contract in [`SCOPES.md`](SCOPES.md). Writing it is the
-architect's job.
+WO-104 is done (verified + merged 2026-07-26): 69 read tools served, zero action tools, permanent
+gate. WO-105 is P3's middle rung: agents get **write** tools — every one a dumb tool between two
+machine checks — and the operator's observe door is structurally excluded from every agent
+catalogue.
 
-**If you are a builder reading this: stop here and tell the founder.** No work without an order
-(`AGENTS.md` rule 1). A file that says "nothing to do" is doing its job.
+0. Read `AGENTS.md` at repo root — the cold-start briefing, the commands, the `golden/` ritual.
+1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
+2. Read [`WO-105.md`](WO-105.md) — the complete order, end to end, **including the pre-build read
+   record at the bottom**, before any edit.
+3. Branch `wo-105` from current `main`. **Commit from a worktree, never the shared tree.**
+4. Run every gate and paste full unedited output. Report per [`PROTOCOL.md`](PROTOCOL.md); the
+   verifier runs the cold `bun qa/run.ts --all`.
 
-## What the architect writes next: WO-105 — action tools and the two gates
+### Four things about this rung specifically
 
-Its contract (`SCOPES.md`) plus three obligations this ladder has since attached:
+- **The observe ruling is made and final.** `observe_ticket` is served to no agent seat; exclusion
+  by an `operatorOnly` schema flag welded to observation semantics by a generic lint — never by
+  name. Do not relitigate it; the reasoning and six failed alternatives are in the order.
+- **GATE 1 does not exist today.** `execute()` validates nothing about input shape — the Zod
+  schemas exist, are published to MCP, and are enforced nowhere. That gap is the core of the rung.
+- **The order was adversarially read before you saw it: ten findings, four High, all fixed** —
+  including a literal deadlock between G5 and the current `read-tools` gate, and two gates
+  satisfiable by the WO-004 forged-assertion shape. The fixes are visible inline; read them as
+  constraints, not commentary.
+- **Expect 15 gates, not 16.** `read-tools` is renamed `tool-plane` and its zero-action assertion
+  is superseded by set-equality over the schema. The supersession is deliberate and stated; the
+  verifier checks it got stronger, not deleted.
 
-- **The `qf_observe_ticket` serving ruling — the decision this rung exists to force.** The read
-  plane could not open the door (registration never visits `schema.actions`, structurally). The
-  action plane must decide: is `qf_observe_ticket` served at all, and to whom? Debt #22 is the
-  context: the gate is an alarm on known routes — **six** boundary evasions have now fallen to
-  readers who did not write them, the sixth recorded at WO-104 verification — and the lock is
-  caller identity, which does not exist. Serving `observe_*` to any agent seat before caller
-  identity exists means the alarm fires with no lock behind it. The order must say which way it
-  rules and why, in plain language, because this is the founder's fabricated-bet risk.
-- **GATE 1 and GATE 2** (Zod-parse at `execute()`; transition check against the generated tables) —
-  the two machine gates SCOPES names for this rung.
-- **Any new server must land inside the `read-tools` gate's coverage or extend it.** That gate
-  asserts the *served set*; a second server outside its reach recreates the one-shot-transcript
-  hole WO-104's rework just closed.
+## Queued behind (do not start)
 
-**Strong recommendation carried from measurement, not preference: run the pre-build adversarial
-read.** The scoreboard is now — WO-103, no read: three order-text defects, two rework rounds.
-WO-103b, read: zero rework. WO-104, read: eight defects caught pre-build (including the phase-exit
-gate), one rework round for post-build findings. WO-105 makes the single most consequential ruling
-on the ladder so far; it is the last order to skip the read on.
-
-Queued behind: **WO-106** (cold seat + retirement of hand-grown verbs), **WO-107b** (market
-ingest — unblocks four link kinds including `has_leg`), **WO-107** (first market — **Bovada
-sportsbook only**, doctrine A7), then the loop, the critic, and the one-shot proof.
+**WO-106** — the cold seat proves discovery (no priming, generated tools only) and the hand-grown
+verbs retire; the only pre-P5 rung touching `collab-electron`. Then **WO-107b** (market ingest —
+the bulk command with ingest trace; unblocks four link kinds), then **WO-107** (first market —
+**Bovada sportsbook only**, doctrine A7; its order may not be written until the external-surface
+probe runs — a candidate instrument is triaged in `docs/RESEARCH.md`), then the loop, the critic,
+and the one-shot proof. See [`SCOPES.md`](SCOPES.md).
 
 ## Standing seat constraint (founder, 2026-07-26)
 
@@ -52,9 +52,9 @@ trust one. One model builds, a different one verifies; no model checks its own w
 **Design overhaul** — founder-run, off the critical path; returns as a brief with measured scope
 and falsifiable gates, and must fit `one-skin`. **Market-abstraction test** — debt #20,
 trigger-gated. **Durable execution** — debt #17, trigger-gated. **Promotion authority +
-freeze-lint bypass** — debt #19 (`promote_type` was deleted by WO-103b; its fixing order re-adds
-the action). **Caller identity** — debt #22, gated by `bun qa/run.ts observe-door` +
-`bun qa/run.ts read-tools`, not closed.
+freeze-lint bypass** — debt #19 (`promote_type` deleted by WO-103b; its fixing order re-adds the
+action). **Caller identity** — debt #22; WO-105 narrows the served surface but the lock is still
+unbuilt.
 
 ---
 

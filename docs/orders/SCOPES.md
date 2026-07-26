@@ -441,11 +441,15 @@ ontology permits.**
 
 **Depends on.** WO-103 (the writes) and WO-104 (the server).
 
-**In.** GATE 1, input: Zod validates the call shape before anything touches the Kernel. GATE 2,
-output: the transition table validates the result before it commits.
+**In.** GATE 1, input: Zod validates the call shape **inside `execute()`, before any DB read or
+write** *(wording corrected 2026-07-26 at WO-105's pre-build read — the original "before anything
+touches the Kernel" was literally unsatisfiable, since `execute()` is the Kernel and is exactly
+where the sole-write-path boundary lives)*. GATE 2, output: the transition table validates the
+result before it commits.
 
 **Measured starting point.** GATE 2 substantially exists — `execute()` calls `assertTransition`
-at `execute.ts:128` and throws `IllegalTransitionError`. **GATE 1 does not** — `execute()` takes
+at `execute.ts:116-120` *(cite corrected from `:128`, drifted by WO-103's edits)* and throws
+`IllegalTransitionError`. **GATE 1 does not** — `execute()` takes
 `input: Record<string, unknown>` and never validates it against the action's declared Zod
 schema. The action schemas exist and are already exported as JSON Schema to MCP; they are simply
 not enforced at the boundary. That gap is this rung's core.
