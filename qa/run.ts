@@ -170,6 +170,36 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "typecheck",
+    description:
+      "TypeScript strict check for every package that declares a typecheck script",
+    run: async () => {
+      const packages = [
+        join(REPO_ROOT, "packages/qf-kernel"),
+        join(REPO_ROOT, "tools/qf-peer-bus"),
+      ];
+      for (const cwd of packages) {
+        const pkgPath = join(cwd, "package.json");
+        if (!existsSync(pkgPath)) continue;
+        const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
+          scripts?: { typecheck?: string };
+        };
+        if (!pkg.scripts?.typecheck) continue;
+        const proc = Bun.spawn(["bun", "run", "typecheck"], {
+          cwd,
+          stdout: "inherit",
+          stderr: "inherit",
+        });
+        const code = await proc.exited;
+        if (code !== 0) {
+          console.error(`typecheck: ${cwd} exited ${code}`);
+          return false;
+        }
+      }
+      return true;
+    },
+  },
+  {
     name: "kernel-sole-writer",
     description:
       "Law E: no SQLite/DDL/DML for domain types outside packages/qf-kernel (+ schema allowlist)",

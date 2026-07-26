@@ -349,4 +349,23 @@ describe("qf-kernel", () => {
     };
     expect(rows.n).toBe(1);
   });
+
+  test("market_event start_event transition end to end (WO-103 D0)", () => {
+    db = openKernel(":memory:");
+    const created_at = new Date().toISOString();
+    db.query(
+      `INSERT INTO market_event (id, created_at, sport, starts_at, status, competition)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run("me1", created_at, "ufc", "2026-07-26T00:00:00.000Z", "scheduled", "UFC 300");
+    const result = execute(db, "start_event", { event_id: "me1" }, ctx);
+    expect(result.object_type).toBe("market_event");
+    expect(result.object_id).toBe("me1");
+    expect(result.from).toBe("scheduled");
+    expect(result.to).toBe("live");
+    expect(result.event).toBe("market_event.started");
+    const row = db.query(`SELECT status FROM market_event WHERE id = ?`).get("me1") as {
+      status: string;
+    };
+    expect(row.status).toBe("live");
+  });
 });
