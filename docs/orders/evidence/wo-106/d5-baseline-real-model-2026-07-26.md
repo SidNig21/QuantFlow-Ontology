@@ -2,6 +2,14 @@
 
 **Date:** 2026-07-26 · **Run by:** the checking seat, founder present and requesting it
 **Model:** `kimi-k3` via **OpenCode Go** (founder's subscription) driving **Hermes Agent**
+
+> **Provenance, stated precisely.** `hermes sessions export` does not record the provider per message,
+> so this was **not directly observed** for the two calls below. It is established by exclusion:
+> `~/.local/share/opencode/auth.json` holds exactly one provider (`opencode-go`), `hermes status`
+> reports `Model: kimi-k3 / Provider: OpenCode Go`, and **every other provider's key is unset**
+> (OpenRouter, OpenAI, Google, DeepSeek, xAI, NVIDIA, Z.AI, Kimi, StepFun, MiniMax ×2, DeepInfra).
+> Nothing else was credentialed to serve the request. Prior runs on 2026-07-19/20 do log it directly:
+> `provider=opencode-go base_url=https://opencode.ai/zen/go/v1 model=kimi-k3`.
 **Server:** `tools/qf-read-tools/src/server.ts` over stdio MCP, registered in Hermes as `quantflow`
 **Tools offered:** **93/93 enabled** (69 read + 24 action; `qf_observe_ticket` absent as designed)
 
