@@ -18,6 +18,29 @@ catalogue.
 4. Run every gate and paste full unedited output. Report per [`PROTOCOL.md`](PROTOCOL.md); the
    verifier runs the cold `bun qa/run.ts --all`.
 
+### STOP — read this before you branch (added 2026-07-26 after a builder correctly halted)
+
+**WO-105 was cut, hit a hard blocker in its own text, and the builder stopped rather than
+improvised. That was the right call.** The order has since been amended with a **Deliverable 0**
+that must land first, in its own commit. If you are a fresh builder, you are picking up a partly
+built rung:
+
+- **Already done and green on branch `wo-105`** (`8f8ed26`): deliverable 2 — the `operatorOnly`
+  flag and its generic lint, independently re-baited against the *real* schema, `golden/`
+  byte-stable, `tools.json` at 94.
+- **Preserved, deliberately unmerged, on `wo-105-d1-blocked`** (`cd2032e`): a working GATE 1 that
+  proves the order was unsatisfiable as written. Inspect it; do not merge it as-is.
+- **Do deliverable 0 first.** It corrects a schema that has misdescribed `publish_artifact` since
+  WO-006a and closes ROADMAP debt #6. GATE 1 is unbuildable until it lands.
+
+Two measured traps that cost the last seat time, both now logged:
+
+- **`agent-path` gives a false FAIL in a sandboxed shell** (ROADMAP debt #23) — its self-install
+  exits 0 but leaves no `node_modules`. Pre-install before any before/after measurement or you
+  will compare against a phantom red.
+- **Never pipe the gate runner.** The last seat piped it and read `tail`'s exit code 0 while the
+  gate had failed. Unpiped, `$?` on its own line, every time.
+
 ### Four things about this rung specifically
 
 - **The observe ruling is made and final.** `observe_ticket` is served to no agent seat; exclusion
