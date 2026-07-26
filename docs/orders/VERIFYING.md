@@ -26,7 +26,7 @@
 
 ```bash
 git fetch origin wo-NNN
-git diff --stat origin/QuantFlow...origin/wo-NNN        # scope: anything outside the order is a defect
+git diff --stat origin/main...origin/wo-NNN             # scope: anything outside the order is a defect
 git worktree add /tmp/verify-NNN origin/wo-NNN          # clean room, never the working tree
 ```
 

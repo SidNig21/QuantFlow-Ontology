@@ -4,7 +4,7 @@
 
 > **The single front door to QuantFlow. Read this in full before doing anything — human or AI.**
 > If any other document, comment, or prior message contradicts this file, **this file wins.**
-> Born 2026-07-17 · Base: fork of collaborator-ai/collab-public (v0.8.3) · Working branch: `QuantFlow` · Docs graduated 2026-07-18 (WO-002)
+> Born 2026-07-17 · Base: fork of collaborator-ai/collab-public (v0.8.3) · Work: `main` via short-lived order branches (`QuantFlow` branch retired 2026-07-24; history only) · Docs graduated 2026-07-18 (WO-002)
 
 ---
 
