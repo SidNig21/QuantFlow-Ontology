@@ -258,7 +258,23 @@ direction named. WO-104's tools are generated from that answer.
 > undefined` at runtime. A `typecheck` script exists in `packages/qf-kernel/package.json` and **no
 > gate has ever run it**; WO-103 adds that gate.
 >
-> ### WO-103b · The write path, part 2 — policy and surface *(contract; write after WO-103 reports)*
+> ### WO-103b · The write path, part 2 — policy and surface
+>
+> **WRITTEN 2026-07-26 — the order is [`WO-103b.md`](WO-103b.md) and it supersedes this contract
+> where the two differ.** Two changes the architect made when turning contract into order, both
+> recorded here so the delta is visible rather than silent:
+>
+> 1. **The ingest seam is decided here, not built here.** The contract said "resolve it"; the order
+> rules on it (`pipelineFed` stays; ingest goes through `execute()` via a bulk command carrying an
+> ingest trace) and makes the deliverable a *SCOPES contract for its own rung*. Reason: WO-103 was
+> split for size and still took two rework rounds plus a correction — mixing adjudication with new
+> machinery is how that happened.
+> 2. **A gate was added the contract did not have:** `observe-door`, covering ROADMAP debt #22.
+> Reason: `qf_observe_ticket` is already generated at `golden/tools.json:1060` and unserved, so
+> WO-104's codegen opens that door with nobody deciding. Three seats hand-wrote three triggers for
+> it on 2026-07-26 and all three read "safe" while exposed.
+>
+> *Original contract follows.*
 >
 > **Objective.** Everything WO-103 deliberately left alone, in one coherent diff whose blast
 > radius is the action surface and the docs that mirror it.
