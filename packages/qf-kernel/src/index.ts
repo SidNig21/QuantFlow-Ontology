@@ -17,6 +17,8 @@ export {
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
+  FabricatedStateError,
+  IllegalLinkError,
   IllegalTransitionError,
   KernelError,
   MissingSessionIdError,

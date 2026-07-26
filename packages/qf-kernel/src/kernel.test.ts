@@ -8,6 +8,8 @@ import {
   ContentHashMismatchError,
   eventCount,
   execute,
+  FabricatedStateError,
+  IllegalLinkError,
   IllegalTransitionError,
   insertAgentSession,
   insertRun,
@@ -367,5 +369,224 @@ describe("qf-kernel", () => {
       status: string;
     };
     expect(row.status).toBe("live");
+  });
+
+  test("G2 · six-stage chain created and linked through execute() only", () => {
+    db = openKernel(":memory:");
+    const hyp = execute(
+      db,
+      "create_hypothesis",
+      { claim: "edge exists", success_criteria: "CLV > 0" },
+      ctx,
+    );
+    const dsHash = "a".repeat(64);
+    const ds = execute(
+      db,
+      "register_dataset_version",
+      {
+        kind: "odds_history",
+        content_hash: dsHash,
+        as_of: "2026-07-25T00:00:00.000Z",
+        coverage: { sports: ["ufc"] },
+      },
+      { ...ctx, span_id: "span-ds" },
+    );
+    const run = execute(
+      db,
+      "create_run",
+      {
+        run_id: "run-chain-1",
+        kind: "backtest",
+        params: { strategy: "v1" },
+        links: [
+          { kind: "tests", to_id: hyp.object_id },
+          { kind: "uses", to_id: ds.object_id },
+        ],
+      },
+      { ...ctx, span_id: "span-run" },
+    );
+    const bytes = new TextEncoder().encode("result-set-bytes");
+    const art = execute(
+      db,
+      "publish_artifact",
+      {
+        kind: "result_set",
+        bytes,
+        storage_ref: "file:///tmp/rs-chain.bin",
+        links: [{ kind: "produces", from_id: run.object_id }],
+      },
+      { ...ctx, span_id: "span-art" },
+    );
+    const ev = execute(
+      db,
+      "record_evaluation",
+      {
+        metrics: { clv: 0.04 },
+        verdict: "supports",
+        confidence: 0.8,
+        rationale: "positive edge",
+        artifact_id: art.object_id,
+        hypothesis_id: hyp.object_id,
+      },
+      { ...ctx, span_id: "span-ev" },
+    );
+    const reportBytes = new TextEncoder().encode("report-body");
+    execute(
+      db,
+      "publish_artifact",
+      {
+        kind: "report",
+        bytes: reportBytes,
+        storage_ref: "file:///tmp/report-chain.bin",
+        links: [{ kind: "gates", from_id: ev.object_id }],
+      },
+      { ...ctx, span_id: "span-report" },
+    );
+
+    const objects = db
+      .query(
+        `SELECT 'hypothesis' AS t, id FROM hypothesis
+         UNION ALL SELECT 'dataset', id FROM dataset
+         UNION ALL SELECT 'run', id FROM run
+         UNION ALL SELECT 'artifact', id FROM artifact
+         UNION ALL SELECT 'evaluation', id FROM evaluation
+         ORDER BY t, id`,
+      )
+      .all() as Array<{ t: string; id: string }>;
+    console.log("G2_objects=" + JSON.stringify(objects));
+
+    const links = db
+      .query(`SELECT kind, from_id, to_id FROM links ORDER BY kind, from_id, to_id`)
+      .all() as Array<{ kind: string; from_id: string; to_id: string }>;
+    console.log("G2_links=" + JSON.stringify(links));
+
+    expect(objects.length).toBeGreaterThanOrEqual(5);
+    expect(links.some((l) => l.kind === "tests")).toBe(true);
+    expect(links.some((l) => l.kind === "uses")).toBe(true);
+    expect(links.some((l) => l.kind === "produces")).toBe(true);
+    expect(links.some((l) => l.kind === "evaluated_by")).toBe(true);
+    expect(links.some((l) => l.kind === "gates")).toBe(true);
+  });
+
+  test("G3 · illegal link kind rejected by endpoint validator before commit", () => {
+    db = openKernel(":memory:");
+    const hyp = execute(
+      db,
+      "create_hypothesis",
+      { claim: "x", success_criteria: "y" },
+      ctx,
+    );
+    const before = eventCount(db);
+    expect(() =>
+      execute(
+        db,
+        "create_run",
+        {
+          run_id: "run-bad-link",
+          kind: "backtest",
+          links: [{ kind: "not_a_real_link", to_id: hyp.object_id }],
+        },
+        { ...ctx, span_id: "span-bad-kind" },
+      ),
+    ).toThrow(IllegalLinkError);
+    expect(eventCount(db)).toBe(before);
+    const runs = db.query(`SELECT COUNT(*) AS n FROM run`).get() as { n: number };
+    expect(runs.n).toBe(0);
+  });
+
+  test("G3 · wrong endpoint type rejected by validator not sqlite", () => {
+    db = openKernel(":memory:");
+    const hyp = execute(
+      db,
+      "create_hypothesis",
+      { claim: "x", success_criteria: "y" },
+      ctx,
+    );
+    const dsHash = "b".repeat(64);
+    execute(
+      db,
+      "register_dataset_version",
+      {
+        kind: "results",
+        content_hash: dsHash,
+        as_of: "2026-07-25T00:00:00.000Z",
+        coverage: {},
+      },
+      { ...ctx, span_id: "span-ds2" },
+    );
+    const before = eventCount(db);
+    try {
+      execute(
+        db,
+        "record_evaluation",
+        {
+          metrics: {},
+          verdict: "inconclusive",
+          confidence: 0.5,
+          rationale: "n/a",
+          artifact_id: dsHash,
+        },
+        { ...ctx, span_id: "span-bad-endpoint" },
+      );
+      throw new Error("expected IllegalLinkError");
+    } catch (e) {
+      expect(e).toBeInstanceOf(IllegalLinkError);
+      const err = e as IllegalLinkError;
+      expect(err.layer).toBe("endpoint");
+      expect(err.detail).toContain("dataset");
+    }
+    expect(eventCount(db)).toBe(before);
+    const evals = db.query(`SELECT COUNT(*) AS n FROM evaluation`).get() as { n: number };
+    expect(evals.n).toBe(0);
+  });
+
+  test("G4 · strategy_proposed terminal grade rejected; operator_supplied observed", () => {
+    db = openKernel(":memory:");
+    expect(() =>
+      execute(
+        db,
+        "create_ticket",
+        {
+          origin: "strategy_proposed",
+          kind: "single",
+          external_ref: "slip-fabricated",
+          placed_at: "2026-07-25T12:00:00.000Z",
+          legs: [{ selection: "A", price: 1.9 }],
+          combined_price: 1.9,
+          stake: 100,
+          correlation_note: "",
+          grade: "win",
+        },
+        ctx,
+      ),
+    ).toThrow(FabricatedStateError);
+
+    execute(
+      db,
+      "create_ticket",
+      {
+        origin: "operator_supplied",
+        kind: "single",
+        external_ref: "slip-real",
+        placed_at: "2026-07-25T12:00:00.000Z",
+        legs: [{ selection: "A", price: 1.9 }],
+        combined_price: 1.9,
+        stake: 100,
+        payout: 190,
+        correlation_note: "",
+        grade: "win",
+      },
+      { ...ctx, span_id: "span-slip" },
+    );
+    const events = db
+      .query(`SELECT type, payload FROM events WHERE object_type = 'ticket' ORDER BY created_at`)
+      .all() as Array<{ type: string; payload: string }>;
+    console.log("G4_events=" + JSON.stringify(events));
+    expect(events.length).toBe(1);
+    expect(events[0]!.type).toBe("ticket.observed");
+    expect(events[0]!.type).not.toBe("ticket.graded");
+    const payload = JSON.parse(events[0]!.payload) as { observation?: boolean; grade?: string };
+    expect(payload.observation).toBe(true);
+    expect(payload.grade).toBe("win");
   });
 });

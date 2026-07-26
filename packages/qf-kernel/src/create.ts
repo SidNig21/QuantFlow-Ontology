@@ -5,13 +5,22 @@ import {
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
+  FabricatedStateError,
   KernelError,
 } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import type { ExecuteResult } from "./execute.ts";
 import { contentHash } from "./hash.ts";
 import { insertAgentSession } from "./insert.ts";
+import {
+  extractLinkSpecs,
+  lineageFieldsToLinks,
+  type LinkSpec,
+  writeLinks,
+} from "./links.ts";
 import type { TraceContext } from "./trace.ts";
+
+const TERMINAL_TICKET_GRADES = new Set(["win", "loss", "push", "void"]);
 
 function resolveBytes(input: Record<string, unknown>): Uint8Array {
   if (input.bytes instanceof Uint8Array) return input.bytes;
@@ -34,17 +43,62 @@ type CreationHandler = (
   cmd: CreationCommand,
   input: Record<string, unknown>,
   trace: TraceContext,
+  links: LinkSpec[],
 ) => ExecuteResult;
 
-/**
- * publish_artifact — Kernel computes content_hash; id = hash; identical bytes +
- * identical metadata are a no-op. Same bytes with different kind/storage_ref reject.
- */
+function creationResult(
+  cmd: CreationCommand,
+  id: string,
+  event: string,
+  state: Record<string, unknown>,
+  to = "exists",
+): ExecuteResult {
+  return {
+    object_type: cmd.object_type,
+    object_id: id,
+    from: "(none)",
+    to,
+    event,
+    state,
+  };
+}
+
+function commitCreation(
+  db: KernelDb,
+  opts: {
+    object_type: string;
+    object_id: string;
+    event: string;
+    payload: Record<string, unknown>;
+    trace: TraceContext;
+    links: readonly LinkSpec[];
+    insert: () => void;
+  },
+): Record<string, unknown> {
+  const tx = db.transaction(() => {
+    opts.insert();
+    writeLinks(db, opts.object_type, opts.object_id, opts.links);
+    appendEvent(db, {
+      type: opts.event,
+      object_type: opts.object_type,
+      object_id: opts.object_id,
+      payload: { ...opts.payload, span_id: opts.trace.span_id },
+      trace_id: opts.trace.trace_id,
+    });
+    return db.query(`SELECT * FROM ${opts.object_type} WHERE id = ?`).get(opts.object_id) as Record<
+      string,
+      unknown
+    >;
+  });
+  return tx();
+}
+
 function publishArtifact(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
   trace: TraceContext,
+  links: LinkSpec[],
 ): ExecuteResult {
   const kind = input.kind;
   if (typeof kind !== "string" || !ARTIFACT_KINDS.has(kind)) {
@@ -80,57 +134,38 @@ function publishArtifact(
         storage_ref,
       );
     }
-    return {
-      object_type: cmd.object_type,
-      object_id: id,
-      from: "(none)",
-      to: "exists",
-      event: cmd.event,
-      state: existing,
-    };
+    return creationResult(cmd, id, cmd.event, existing);
   }
 
-  const created_at = new Date().toISOString();
-  const tx = db.transaction(() => {
-    db.query(
-      `INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
-       VALUES (?, ?, ?, ?, ?)`,
-    ).run(id, created_at, kind, computed, storage_ref);
-    appendEvent(db, {
-      type: cmd.event,
-      object_type: cmd.object_type,
-      object_id: id,
-      payload: {
-        command: cmd.action,
-        kind,
-        content_hash: computed,
-        storage_ref,
-        span_id: trace.span_id,
-      },
-      trace_id: trace.trace_id,
-    });
-    return db.query(`SELECT * FROM artifact WHERE id = ?`).get(id) as Record<string, unknown>;
-  });
-
-  const state = tx();
-  return {
+  const state = commitCreation(db, {
     object_type: cmd.object_type,
     object_id: id,
-    from: "(none)",
-    to: "exists",
     event: cmd.event,
-    state,
-  };
+    trace,
+    links,
+    payload: {
+      command: cmd.action,
+      kind,
+      content_hash: computed,
+      storage_ref,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
+         VALUES (?, ?, ?, ?, ?)`,
+      ).run(id, created_at, kind, computed, storage_ref);
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state);
 }
 
-/**
- * register_agent_definition — id = name; duplicate name is a typed rejection.
- */
 function registerAgentDefinition(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
   trace: TraceContext,
+  links: LinkSpec[],
 ): ExecuteResult {
   const name = input.name;
   if (typeof name !== "string" || name.length === 0) {
@@ -162,52 +197,36 @@ function registerAgentDefinition(
     throw new AgentDefinitionExistsError(name);
   }
 
-  const created_at = new Date().toISOString();
-  const tx = db.transaction(() => {
-    db.query(
-      `INSERT INTO agent_definition (id, created_at, name, role, package_ref, system_prompt_ref)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-    ).run(id, created_at, name, role, package_ref, system_prompt_ref);
-    appendEvent(db, {
-      type: cmd.event,
-      object_type: cmd.object_type,
-      object_id: id,
-      payload: {
-        command: cmd.action,
-        name,
-        role,
-        package_ref,
-        system_prompt_ref,
-        span_id: trace.span_id,
-      },
-      trace_id: trace.trace_id,
-    });
-    return db.query(`SELECT * FROM agent_definition WHERE id = ?`).get(id) as Record<
-      string,
-      unknown
-    >;
-  });
-
-  const state = tx();
-  return {
+  const state = commitCreation(db, {
     object_type: cmd.object_type,
     object_id: id,
-    from: "(none)",
-    to: "exists",
     event: cmd.event,
-    state,
-  };
+    trace,
+    links,
+    payload: {
+      command: cmd.action,
+      name,
+      role,
+      package_ref,
+      system_prompt_ref,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, system_prompt_ref)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      ).run(id, created_at, name, role, package_ref, system_prompt_ref);
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state);
 }
 
-/**
- * create_agent_session — adopt guest-minted id; one INSERT + one created event
- * via insertAgentSession (do not double-write).
- */
 function createAgentSession(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
   trace: TraceContext,
+  links: LinkSpec[],
 ): ExecuteResult {
   const session_id = input.session_id;
   if (typeof session_id !== "string" || session_id.length === 0) {
@@ -223,15 +242,400 @@ function createAgentSession(
     label = input.label;
   }
 
-  const state = insertAgentSession(db, { id: session_id, label }, trace);
-  return {
+  const tx = db.transaction(() => {
+    const state = insertAgentSession(db, { id: session_id, label }, trace);
+    writeLinks(db, cmd.object_type, session_id, links);
+    return state;
+  });
+  const state = tx();
+  return creationResult(cmd, session_id, cmd.event, state, String(state.status ?? "starting"));
+}
+
+function createHypothesis(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const claim = input.claim;
+  if (typeof claim !== "string" || claim.length === 0) {
+    throw new KernelError('create_hypothesis requires non-empty "claim"');
+  }
+  const success_criteria = input.success_criteria;
+  if (typeof success_criteria !== "string" || success_criteria.length === 0) {
+    throw new KernelError('create_hypothesis requires non-empty "success_criteria"');
+  }
+  const sources =
+    input.sources === undefined
+      ? []
+      : Array.isArray(input.sources)
+        ? input.sources.map(String)
+        : (() => {
+            throw new KernelError('create_hypothesis "sources" must be an array of strings');
+          })();
+
+  const id = crypto.randomUUID();
+  const state = commitCreation(db, {
     object_type: cmd.object_type,
-    object_id: session_id,
-    from: "(none)",
-    to: String(state.status ?? "starting"),
+    object_id: id,
     event: cmd.event,
-    state,
-  };
+    trace,
+    links,
+    payload: { command: cmd.action, claim, success_criteria, sources, status: "open" },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO hypothesis (id, created_at, claim, success_criteria, sources, status)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      ).run(id, created_at, claim, success_criteria, JSON.stringify(sources), "open");
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state, "open");
+}
+
+function registerDatasetVersion(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const kind = input.kind;
+  if (
+    kind !== "odds_history" &&
+    kind !== "results" &&
+    kind !== "features" &&
+    kind !== "mixed"
+  ) {
+    throw new KernelError(
+      'register_dataset_version requires kind in odds_history|results|features|mixed',
+    );
+  }
+  const content_hash = input.content_hash;
+  if (typeof content_hash !== "string" || content_hash.length === 0) {
+    throw new KernelError('register_dataset_version requires non-empty "content_hash"');
+  }
+  const as_of = input.as_of;
+  if (typeof as_of !== "string" || as_of.length === 0) {
+    throw new KernelError('register_dataset_version requires "as_of" ISO datetime');
+  }
+  const coverage = input.coverage;
+  if (!coverage || typeof coverage !== "object" || Array.isArray(coverage)) {
+    throw new KernelError('register_dataset_version requires object "coverage"');
+  }
+
+  const id = content_hash;
+  const existing = db.query(`SELECT * FROM dataset WHERE id = ?`).get(id) as
+    | Record<string, unknown>
+    | null;
+  if (existing) {
+    return creationResult(cmd, id, cmd.event, existing);
+  }
+
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: id,
+    event: cmd.event,
+    trace,
+    links,
+    payload: { command: cmd.action, kind, content_hash, as_of, coverage },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO dataset (id, created_at, kind, content_hash, as_of, coverage)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      ).run(id, created_at, kind, content_hash, as_of, JSON.stringify(coverage));
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state);
+}
+
+function createRun(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const run_id = input.run_id;
+  if (typeof run_id !== "string" || run_id.length === 0) {
+    throw new KernelError('create_run requires non-empty "run_id"');
+  }
+  const kind = input.kind;
+  if (
+    kind !== "ingestion" &&
+    kind !== "feature_build" &&
+    kind !== "backtest" &&
+    kind !== "analysis" &&
+    kind !== "training"
+  ) {
+    throw new KernelError(
+      'create_run requires kind in ingestion|feature_build|backtest|analysis|training',
+    );
+  }
+  const params =
+    input.params === undefined
+      ? {}
+      : typeof input.params === "object" && input.params !== null && !Array.isArray(input.params)
+        ? (input.params as Record<string, unknown>)
+        : (() => {
+            throw new KernelError('create_run "params" must be an object');
+          })();
+  const runTrace =
+    typeof input.trace_id === "string" && input.trace_id.length > 0
+      ? input.trace_id
+      : trace.trace_id;
+
+  const existing = db.query(`SELECT * FROM run WHERE id = ?`).get(run_id) as
+    | Record<string, unknown>
+    | null;
+  if (existing) {
+    throw new KernelError(`run "${run_id}" already exists`);
+  }
+
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: run_id,
+    event: cmd.event,
+    trace,
+    links,
+    payload: { command: cmd.action, kind, status: "queued", params, trace_id: runTrace },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO run (id, created_at, kind, status, params, trace_id)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      ).run(run_id, created_at, kind, "queued", JSON.stringify(params), runTrace);
+    },
+  });
+  return creationResult(cmd, run_id, cmd.event, state, "queued");
+}
+
+function recordEvaluation(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const metrics = input.metrics;
+  if (!metrics || typeof metrics !== "object" || Array.isArray(metrics)) {
+    throw new KernelError('record_evaluation requires object "metrics"');
+  }
+  const verdict = input.verdict;
+  if (verdict !== "supports" && verdict !== "rejects" && verdict !== "inconclusive") {
+    throw new KernelError('record_evaluation requires verdict supports|rejects|inconclusive');
+  }
+  const confidence = input.confidence;
+  if (typeof confidence !== "number") {
+    throw new KernelError('record_evaluation requires numeric "confidence"');
+  }
+  const rationale = input.rationale;
+  if (typeof rationale !== "string" || rationale.length === 0) {
+    throw new KernelError('record_evaluation requires non-empty "rationale"');
+  }
+  let critic_findings_ref: string | null = null;
+  if (input.critic_findings_ref !== undefined && input.critic_findings_ref !== null) {
+    if (typeof input.critic_findings_ref !== "string") {
+      throw new KernelError('record_evaluation "critic_findings_ref" must be string or null');
+    }
+    critic_findings_ref = input.critic_findings_ref;
+  }
+
+  const mergedLinks = [...lineageFieldsToLinks(input), ...links];
+  const id = crypto.randomUUID();
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: id,
+    event: cmd.event,
+    trace,
+    links: mergedLinks,
+    payload: {
+      command: cmd.action,
+      metrics,
+      verdict,
+      confidence,
+      rationale,
+      critic_findings_ref,
+      hypothesis_id: input.hypothesis_id ?? null,
+      run_id: input.run_id ?? null,
+      artifact_id: input.artifact_id ?? null,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO evaluation (id, created_at, metrics, critic_findings_ref, verdict, confidence, rationale)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        id,
+        created_at,
+        JSON.stringify(metrics),
+        critic_findings_ref,
+        verdict,
+        confidence,
+        rationale,
+      );
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state);
+}
+
+function createMission(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const name = input.name;
+  if (typeof name !== "string" || name.length === 0) {
+    throw new KernelError('create_mission requires non-empty "name"');
+  }
+  const objective = input.objective;
+  if (typeof objective !== "string" || objective.length === 0) {
+    throw new KernelError('create_mission requires non-empty "objective"');
+  }
+  const id =
+    typeof input.mission_id === "string" && input.mission_id.length > 0
+      ? input.mission_id
+      : crypto.randomUUID();
+
+  const existing = db.query(`SELECT * FROM mission WHERE id = ?`).get(id) as
+    | Record<string, unknown>
+    | null;
+  if (existing) {
+    throw new KernelError(`mission "${id}" already exists`);
+  }
+
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: id,
+    event: cmd.event,
+    trace,
+    links,
+    payload: { command: cmd.action, name, objective },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(`INSERT INTO mission (id, created_at, name, objective) VALUES (?, ?, ?, ?)`).run(
+        id,
+        created_at,
+        name,
+        objective,
+      );
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state);
+}
+
+function createTicket(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const origin = input.origin;
+  if (origin !== "strategy_proposed" && origin !== "operator_supplied") {
+    throw new KernelError('create_ticket requires origin strategy_proposed|operator_supplied');
+  }
+  const kind = input.kind;
+  if (kind !== "single" && kind !== "parlay") {
+    throw new KernelError('create_ticket requires kind single|parlay');
+  }
+  const external_ref = input.external_ref;
+  if (typeof external_ref !== "string" || external_ref.length === 0) {
+    throw new KernelError('create_ticket requires non-empty "external_ref"');
+  }
+  const placed_at = input.placed_at;
+  if (typeof placed_at !== "string" || placed_at.length === 0) {
+    throw new KernelError('create_ticket requires "placed_at" ISO datetime');
+  }
+  if (!Array.isArray(input.legs)) {
+    throw new KernelError('create_ticket requires array "legs"');
+  }
+  const combined_price = input.combined_price;
+  if (typeof combined_price !== "number") {
+    throw new KernelError('create_ticket requires numeric "combined_price"');
+  }
+  const stake = input.stake;
+  if (typeof stake !== "number") {
+    throw new KernelError('create_ticket requires numeric "stake"');
+  }
+  const correlation_note = input.correlation_note;
+  if (typeof correlation_note !== "string") {
+    throw new KernelError('create_ticket requires string "correlation_note"');
+  }
+  let payout: number | null = null;
+  if (input.payout !== undefined && input.payout !== null) {
+    if (typeof input.payout !== "number") {
+      throw new KernelError('create_ticket "payout" must be number or null');
+    }
+    payout = input.payout;
+  }
+
+  const grade =
+    input.grade === undefined || input.grade === null ? "pending" : String(input.grade);
+  if (
+    grade !== "pending" &&
+    grade !== "win" &&
+    grade !== "loss" &&
+    grade !== "push" &&
+    grade !== "void"
+  ) {
+    throw new KernelError('create_ticket grade must be pending|win|loss|push|void');
+  }
+
+  if (origin === "strategy_proposed" && TERMINAL_TICKET_GRADES.has(grade)) {
+    throw new FabricatedStateError("ticket", origin, grade);
+  }
+
+  const isObservation = origin === "operator_supplied" && TERMINAL_TICKET_GRADES.has(grade);
+  const eventType = isObservation ? "ticket.observed" : cmd.event;
+
+  const id = external_ref;
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: id,
+    event: eventType,
+    trace,
+    links,
+    payload: {
+      command: cmd.action,
+      origin,
+      kind,
+      external_ref,
+      placed_at,
+      legs: input.legs,
+      combined_price,
+      stake,
+      payout,
+      correlation_note,
+      grade,
+      observation: isObservation,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO ticket (id, created_at, origin, kind, external_ref, placed_at, legs, combined_price, stake, payout, correlation_note, grade)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        id,
+        created_at,
+        origin,
+        kind,
+        external_ref,
+        placed_at,
+        JSON.stringify(input.legs),
+        combined_price,
+        stake,
+        payout,
+        correlation_note,
+        grade,
+      );
+    },
+  });
+  return creationResult(cmd, id, eventType, state, grade);
 }
 
 /** Single dispatch table — catalog actions must have a handler here. */
@@ -239,6 +643,12 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   publish_artifact: publishArtifact,
   create_agent_session: createAgentSession,
   register_agent_definition: registerAgentDefinition,
+  create_hypothesis: createHypothesis,
+  register_dataset_version: registerDatasetVersion,
+  create_run: createRun,
+  record_evaluation: recordEvaluation,
+  create_mission: createMission,
+  create_ticket: createTicket,
 };
 
 /** Every creationCommands entry must have a handler (D3 join). */
@@ -264,5 +674,8 @@ export function executeCreation(
   if (!handler) {
     throw new KernelError(`No creation handler for action "${cmd.action}"`);
   }
-  return handler(db, cmd, input, trace);
+  const { body, links } = extractLinkSpecs(input);
+  return handler(db, cmd, body, trace, links);
 }
+
+export { extractLinkSpecs };

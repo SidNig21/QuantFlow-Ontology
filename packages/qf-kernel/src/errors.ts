@@ -83,6 +83,38 @@ export class AgentDefinitionExistsError extends Error {
   }
 }
 
+/** Link kind unknown or endpoints violate schema declarations — nothing written. */
+export class IllegalLinkError extends Error {
+  readonly layer: "kind" | "endpoint";
+  readonly detail: string;
+  readonly expected: string;
+
+  constructor(layer: "kind" | "endpoint", detail: string, expected: string) {
+    super(`Illegal link (${layer}): ${detail} — expected ${expected}`);
+    this.name = "IllegalLinkError";
+    this.layer = layer;
+    this.detail = detail;
+    this.expected = expected;
+  }
+}
+
+/** System-produced object cannot arrive in a fabricated terminal state — nothing written. */
+export class FabricatedStateError extends Error {
+  readonly object_type: string;
+  readonly origin: string;
+  readonly grade: string;
+
+  constructor(object_type: string, origin: string, grade: string) {
+    super(
+      `${object_type} with origin=${origin} cannot be created in terminal grade=${grade}`,
+    );
+    this.name = "FabricatedStateError";
+    this.object_type = object_type;
+    this.origin = origin;
+    this.grade = grade;
+  }
+}
+
 /** Species package_ref does not resolve on disk — spawn must fail loudly. */
 export class PackageRefUnresolvedError extends Error {
   readonly species: string;

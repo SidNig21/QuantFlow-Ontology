@@ -183,6 +183,36 @@ export const creationCommands: readonly CreationCommand[] = [
     object_type: "agent_definition",
     event: "agent_definition.registered",
   },
+  {
+    action: "create_hypothesis",
+    object_type: "hypothesis",
+    event: "hypothesis.created",
+  },
+  {
+    action: "register_dataset_version",
+    object_type: "dataset",
+    event: "dataset.registered",
+  },
+  {
+    action: "create_run",
+    object_type: "run",
+    event: "run.created",
+  },
+  {
+    action: "record_evaluation",
+    object_type: "evaluation",
+    event: "evaluation.recorded",
+  },
+  {
+    action: "create_mission",
+    object_type: "mission",
+    event: "mission.created",
+  },
+  {
+    action: "create_ticket",
+    object_type: "ticket",
+    event: "ticket.created",
+  },
 ] as const;
 
 /** All legal (type, from, to) edges from the transition tables. */

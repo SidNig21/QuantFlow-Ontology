@@ -337,6 +337,14 @@ Verdict attachment: which evaluation judged an artifact or run.
 - **from:** `artifact` | `run`
 - **to:** `evaluation`
 
+### `gates`
+
+Publication authorization: which evaluation approved an artifact for release. Ends evaluation's sink status so WO-110 can read the gating fact.
+
+- **lifecycle:** `experimental`
+- **from:** `evaluation`
+- **to:** `artifact`
+
 ### `assigned_to`
 
 Work routing: which agent session owns a task.
@@ -375,6 +383,44 @@ Register a new content-hashed, point-in-time dataset version in the Kernel.
 - `content_hash` — Hash of the underlying Parquet set.
 - `as_of` — Point-in-time boundary for this version.
 - `coverage` — Sufficiency summary for agents.
+
+### `create_run`
+
+Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Id for the new run row (caller-supplied, adopted).
+- `kind` — Execution mode for this run.
+- `params` — Full invocation arguments captured at launch.
+- `trace_id` — Root span id; defaults to ctx.trace_id when omitted.
+
+### `create_mission`
+
+Register a standing research mission with name and objective.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `mission_id` — Optional id; Kernel mints a UUID when omitted.
+- `name` — Operator-facing mission label.
+- `objective` — Decision goal this mission serves.
+
+### `create_ticket`
+
+Record a ticket at creation. Operator-supplied rows may arrive in a terminal grade; strategy-proposed rows must start pending.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `origin` — How this ticket entered the system.
+- `kind` — Single or parlay wager.
+- `external_ref` — Venue-issued idempotency key.
+- `placed_at` — Placement timestamp (ISO-8601 UTC).
+- `legs` — Per-leg selections with selection-time prices.
+- `combined_price` — Aggregate price at selection.
+- `stake` — Amount risked.
+- `payout` — Realized return when settled.
+- `correlation_note` — Declared leg dependence assumptions.
+- `grade` — Settlement grade at arrival; operator_supplied may be terminal.
 
 ### `start_run`
 
@@ -546,6 +592,9 @@ Record a structured evaluation verdict with metrics against a hypothesis lineage
 - `confidence` — Confidence in the verdict (0–1).
 - `rationale` — Rationale text.
 - `critic_findings_ref` — Optional Critic findings artifact id.
+- `hypothesis_id` — Hypothesis this evaluation answers (lineage; also writable as tests link).
+- `run_id` — Run evaluated (lineage; also writable as evaluated_by link).
+- `artifact_id` — Artifact evaluated (lineage; also writable as evaluated_by link).
 
 ### `resolve_hypothesis`
 

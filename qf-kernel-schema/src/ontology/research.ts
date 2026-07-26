@@ -343,6 +343,15 @@ export const evaluated_by = defineLink({
   to: evaluation,
 });
 
+export const gates = defineLink({
+  name: "gates",
+  description:
+    "Publication authorization: which evaluation approved an artifact for release. Ends evaluation's sink status so WO-110 can read the gating fact.",
+  lifecycle: "experimental",
+  from: evaluation,
+  to: artifact,
+});
+
 export const create_hypothesis = defineAction({
   name: "create_hypothesis",
   description:
@@ -366,6 +375,64 @@ export const register_dataset_version = defineAction({
     content_hash: z.string().describe("Hash of the underlying Parquet set."),
     as_of: z.iso.datetime().describe("Point-in-time boundary for this version."),
     coverage: jsonObject.describe("Sufficiency summary for agents."),
+  }),
+});
+
+export const create_run = defineAction({
+  name: "create_run",
+  description:
+    "Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.",
+  lifecycle: "experimental",
+  input: z.object({
+    run_id: z.string().describe("Id for the new run row (caller-supplied, adopted)."),
+    kind: z
+      .enum(["ingestion", "feature_build", "backtest", "analysis", "training"])
+      .describe("Execution mode for this run."),
+    params: jsonObject
+      .describe("Full invocation arguments captured at launch.")
+      .optional(),
+    trace_id: z
+      .string()
+      .describe("Root span id; defaults to ctx.trace_id when omitted.")
+      .optional(),
+  }),
+});
+
+export const create_mission = defineAction({
+  name: "create_mission",
+  description: "Register a standing research mission with name and objective.",
+  lifecycle: "experimental",
+  input: z.object({
+    mission_id: z
+      .string()
+      .describe("Optional id; Kernel mints a UUID when omitted.")
+      .optional(),
+    name: z.string().describe("Operator-facing mission label."),
+    objective: z.string().describe("Decision goal this mission serves."),
+  }),
+});
+
+export const create_ticket = defineAction({
+  name: "create_ticket",
+  description:
+    "Record a ticket at creation. Operator-supplied rows may arrive in a terminal grade; strategy-proposed rows must start pending.",
+  lifecycle: "experimental",
+  input: z.object({
+    origin: z
+      .enum(["strategy_proposed", "operator_supplied"])
+      .describe("How this ticket entered the system."),
+    kind: z.enum(["single", "parlay"]).describe("Single or parlay wager."),
+    external_ref: z.string().describe("Venue-issued idempotency key."),
+    placed_at: z.iso.datetime().describe("Placement timestamp (ISO-8601 UTC)."),
+    legs: jsonArray.describe("Per-leg selections with selection-time prices."),
+    combined_price: z.number().describe("Aggregate price at selection."),
+    stake: z.number().describe("Amount risked."),
+    payout: z.number().describe("Realized return when settled.").nullable().optional(),
+    correlation_note: z.string().describe("Declared leg dependence assumptions."),
+    grade: z
+      .enum(["pending", "win", "loss", "push", "void"])
+      .describe("Settlement grade at arrival; operator_supplied may be terminal.")
+      .optional(),
   }),
 });
 
@@ -462,6 +529,18 @@ export const record_evaluation = defineAction({
     critic_findings_ref: z
       .string()
       .describe("Optional Critic findings artifact id.")
+      .optional(),
+    hypothesis_id: z
+      .string()
+      .describe("Hypothesis this evaluation answers (lineage; also writable as tests link).")
+      .optional(),
+    run_id: z
+      .string()
+      .describe("Run evaluated (lineage; also writable as evaluated_by link).")
+      .optional(),
+    artifact_id: z
+      .string()
+      .describe("Artifact evaluated (lineage; also writable as evaluated_by link).")
       .optional(),
   }),
 });

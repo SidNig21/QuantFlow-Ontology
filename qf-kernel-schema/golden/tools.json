@@ -922,6 +922,161 @@
     }
   },
   {
+    "name": "qf_create_run",
+    "description": "Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "description": "Id for the new run row (caller-supplied, adopted)."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ingestion",
+            "feature_build",
+            "backtest",
+            "analysis",
+            "training"
+          ],
+          "description": "Execution mode for this run."
+        },
+        "params": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {},
+          "description": "Full invocation arguments captured at launch."
+        },
+        "trace_id": {
+          "type": "string",
+          "description": "Root span id; defaults to ctx.trace_id when omitted."
+        }
+      },
+      "required": [
+        "run_id",
+        "kind"
+      ]
+    }
+  },
+  {
+    "name": "qf_create_mission",
+    "description": "Register a standing research mission with name and objective.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "mission_id": {
+          "type": "string",
+          "description": "Optional id; Kernel mints a UUID when omitted."
+        },
+        "name": {
+          "type": "string",
+          "description": "Operator-facing mission label."
+        },
+        "objective": {
+          "type": "string",
+          "description": "Decision goal this mission serves."
+        }
+      },
+      "required": [
+        "name",
+        "objective"
+      ]
+    }
+  },
+  {
+    "name": "qf_create_ticket",
+    "description": "Record a ticket at creation. Operator-supplied rows may arrive in a terminal grade; strategy-proposed rows must start pending.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "enum": [
+            "strategy_proposed",
+            "operator_supplied"
+          ],
+          "description": "How this ticket entered the system."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "single",
+            "parlay"
+          ],
+          "description": "Single or parlay wager."
+        },
+        "external_ref": {
+          "type": "string",
+          "description": "Venue-issued idempotency key."
+        },
+        "placed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "Placement timestamp (ISO-8601 UTC)."
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "description": "Per-leg selections with selection-time prices."
+        },
+        "combined_price": {
+          "type": "number",
+          "description": "Aggregate price at selection."
+        },
+        "stake": {
+          "type": "number",
+          "description": "Amount risked."
+        },
+        "payout": {
+          "anyOf": [
+            {
+              "type": "number",
+              "description": "Realized return when settled."
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "correlation_note": {
+          "type": "string",
+          "description": "Declared leg dependence assumptions."
+        },
+        "grade": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "win",
+            "loss",
+            "push",
+            "void"
+          ],
+          "description": "Settlement grade at arrival; operator_supplied may be terminal."
+        }
+      },
+      "required": [
+        "origin",
+        "kind",
+        "external_ref",
+        "placed_at",
+        "legs",
+        "combined_price",
+        "stake",
+        "correlation_note"
+      ]
+    }
+  },
+  {
     "name": "qf_start_run",
     "description": "Start a queued run (queued → running). Rejectable if the transition is illegal.",
     "inputSchema": {
@@ -1319,6 +1474,18 @@
         "critic_findings_ref": {
           "type": "string",
           "description": "Optional Critic findings artifact id."
+        },
+        "hypothesis_id": {
+          "type": "string",
+          "description": "Hypothesis this evaluation answers (lineage; also writable as tests link)."
+        },
+        "run_id": {
+          "type": "string",
+          "description": "Run evaluated (lineage; also writable as evaluated_by link)."
+        },
+        "artifact_id": {
+          "type": "string",
+          "description": "Artifact evaluated (lineage; also writable as evaluated_by link)."
         }
       },
       "required": [
