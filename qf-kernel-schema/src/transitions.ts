@@ -23,7 +23,7 @@ export const transitions = {
     push: [],
     void: [],
   },
-  event: {
+  market_event: {
     scheduled: ["live", "void"],
     live: ["settled"],
     settled: [],

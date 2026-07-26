@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defineAction, defineLink, defineObject } from "../define.ts";
 import { agent_session, execution_environment, tool } from "./agent.ts";
-import { market } from "./market.ts";
+import { instrument } from "./market.ts";
 
 const jsonObject = z.record(z.string(), z.unknown());
 const jsonArray = z.array(jsonObject);
@@ -276,10 +276,10 @@ export const tests = defineLink({
 
 export const has_leg = defineLink({
   name: "has_leg",
-  description: "Which markets a ticket bets; enables correlation traversal.",
+  description: "Which instruments a ticket bets; enables correlation traversal.",
   lifecycle: "experimental",
   from: ticket,
-  to: market,
+  to: instrument,
 });
 
 export const uses = defineLink({
