@@ -21,21 +21,62 @@ const REPO_ROOT = join(import.meta.dir, "..");
 
 const SKIP_DIRS = new Set(["node_modules", ".git"]);
 
-/** Walk the repo for directories that carry a committed bun.lock. */
-function discoverLockfilePackages(root: string): string[] {
+type PackageManifest = {
+  scripts?: { typecheck?: string };
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+};
+
+function readPackageManifest(dir: string): PackageManifest | null {
+  const pkgPath = join(dir, "package.json");
+  if (!existsSync(pkgPath)) return null;
+  return JSON.parse(readFileSync(pkgPath, "utf8")) as PackageManifest;
+}
+
+/** Collect local `file:` dependency paths declared in a package manifest. */
+function localFileDeps(pkg: PackageManifest): string[] {
   const found: string[] = [];
-  function walk(dir: string): void {
-    const base = dir.slice(dir.lastIndexOf("/") + 1);
-    if (SKIP_DIRS.has(base)) return;
-    if (existsSync(join(dir, "bun.lock"))) found.push(dir);
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      if (!entry.isDirectory()) continue;
-      if (SKIP_DIRS.has(entry.name)) continue;
-      walk(join(dir, entry.name));
+  for (const section of [
+    pkg.dependencies,
+    pkg.devDependencies,
+    pkg.peerDependencies,
+    pkg.optionalDependencies,
+  ]) {
+    if (!section) continue;
+    for (const value of Object.values(section)) {
+      if (value.startsWith("file:")) found.push(value.slice("file:".length));
     }
   }
-  walk(root);
-  return found.sort();
+  return found;
+}
+
+/**
+ * Packages to install before typecheck: each typecheck target plus the
+ * transitive closure of its local `file:` dependencies (read from manifests).
+ */
+function discoverTypecheckInstallPackages(root: string): string[] {
+  const installDirs = new Set<string>();
+  const queue = [...discoverTypecheckPackages(root)];
+
+  while (queue.length > 0) {
+    const dir = queue.pop()!;
+    if (installDirs.has(dir)) continue;
+    installDirs.add(dir);
+
+    const pkg = readPackageManifest(dir);
+    if (!pkg) continue;
+
+    for (const relPath of localFileDeps(pkg)) {
+      const resolved = join(dir, relPath);
+      if (existsSync(join(resolved, "package.json")) && !installDirs.has(resolved)) {
+        queue.push(resolved);
+      }
+    }
+  }
+
+  return [...installDirs].sort();
 }
 
 /** Walk the repo for package.json files that declare a typecheck script. */
@@ -221,7 +262,7 @@ const gates: Gate[] = [
         console.error("typecheck: no packages with a typecheck script found");
         return false;
       }
-      for (const cwd of discoverLockfilePackages(REPO_ROOT)) {
+      for (const cwd of discoverTypecheckInstallPackages(REPO_ROOT)) {
         const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
           cwd,
           stdout: "inherit",
