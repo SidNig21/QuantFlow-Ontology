@@ -24,6 +24,26 @@ the no-self-verification rule actually protects. This seat did not author WO-101
 different Fable session did. What this seat *cannot* do is be the final authority on its own
 checking, which is why this file is written as testimony and the branch is left unmerged.
 
+## Read before grading: two things changed after this report was written
+
+Both landed after the build, both are already handled, and both could otherwise produce a wrong
+verdict.
+
+1. **A G2 pass criterion was corrected by the architect** (`fcb36e2`). It originally required the
+   cold reader to name `derived_from`; that requirement was wrong and is struck, marked in place
+   in [`WO-101.md`](../../WO-101.md). The section below was written against the *old* criteria,
+   which is why it records Q1 as "three of four links." Under the corrected bar Q1 names every
+   required link. **The correction is itself yours to accept or reject.**
+
+2. **The `ticket` description this order wrote is known-defective, and is already routed to
+   WO-102** — `SCOPES.md` line 110, *"fix them here."* Deliverable 2 rewrote it to *"one proposed
+   wager emitted by a strategy"*; doctrine A6 (`c6c26f5`) then established that the founder's
+   primary use case is the inverse — a real slip, already placed, supplied by a human. The
+   description must cover both origins. **This is not a WO-101 defect to fail the rung on, and
+   not a thing to fix on this branch.** Flagged here because `VERIFYING.md`'s reading order does
+   not include `SCOPES.md`, so a verifier following it literally would meet this description with
+   no idea it is already owned elsewhere.
+
 ## Commits
 
 | Commit | Contents |
