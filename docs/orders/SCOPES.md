@@ -245,6 +245,63 @@ The endpoint validator is therefore the deliverable, not the link-writing conven
 an object id and a link kind, what comes back, in which direction, and how is the reverse
 direction named. WO-104's tools are generated from that answer.
 
+> **SPLIT 2026-07-25 when the order was written.** This contract is two orders. The seam is
+> **mechanism versus policy**, and it is forced by a gate: *deleting* an action changes the action
+> surface, trips `doc-action-surface`, and drags `docs/ONTOLOGY_SCHEMA.md` (debt #21) in with it;
+> *wiring* an existing action changes no names and trips nothing.
+>
+> **[`WO-103.md`](WO-103.md) — the mechanism (written, cuttable).** Creation commands for
+> `hypothesis`/`dataset`/`run`/`evaluation`/`mission`; the generic endpoint-validated link writer;
+> the `gates` edge that ends `evaluation`'s sink status; arrival-settled creation; and
+> **deliverable 0 — a live Kernel regression**: WO-102's rename left `event` hardcoded in
+> `execute.ts:13` and `:21`, so all three market commands throw `Command "start_event" requires
+> undefined` at runtime. A `typecheck` script exists in `packages/qf-kernel/package.json` and **no
+> gate has ever run it**; WO-103 adds that gate.
+>
+> ### WO-103b · The write path, part 2 — policy and surface *(contract; write after WO-103 reports)*
+>
+> **Objective.** Everything WO-103 deliberately left alone, in one coherent diff whose blast
+> radius is the action surface and the docs that mirror it.
+>
+> **Depends on.** WO-103 (do not write this until it reports — half of what this order must say is
+> what the mechanism actually produced).
+>
+> **In.**
+> - **Adjudicate the six remaining dead actions, wire-or-delete:** `retry_run`, `close_run`,
+>   `request_approval`, `approve`, `deny`, `promote_type`. Measured: `run`'s terminal states are
+>   all `[]`, so `retry_run`/`close_run` have **no legal edge to wire** — either the table gains
+>   edges or the actions go. No `approval` or `approval_request` type exists **anywhere**, so
+>   `approve`/`deny` take a `request_id` for a type that was never defined. `promote_type` is
+>   debt #19's subject and has no named authority. *A defined action that can never execute is a
+>   lie in the tool surface.*
+> - **`docs/ONTOLOGY_SCHEMA.md` — ROADMAP debt #21**, forced here because deletions trip
+>   `doc-action-surface`. Choose: regenerate-and-gate the object surface as well, or formally
+>   demote the file to design prose in `DOC_AUTHORITY_MAP.md` and point readers at the generated,
+>   gate-checked `golden/ONTOLOGY.md`.
+> - **The market-plane ingest seam.** `instrument` and `quote` are `pipelineFed`, so
+>   `lintCommands` (`define.ts:535`) *rejects creation commands for them by design*. WO-107 says
+>   their rows "land through Kernel commands." Both cannot be true. Resolve it: a bulk ingest path
+>   that still goes through `execute()` (it must, or `kernel-sole-writer` fails) and carries an
+>   ingest trace. **Decide it here; do not let WO-107 discover it.**
+> - **The `connection` ruling.** Measured: `connection` carries `kind` / `from_ref` / `to_ref` —
+>   **a link stored as an object**, duplicating the `links` table WO-103 just made writable. Same
+>   dual-truth shape as `legs`/`has_leg`. Either it is the cable/canvas connection type with a
+>   distinct job (see the cable principle above — the founder's drag-to-browser-tile use case is
+>   the argument *for* keeping it) or it is a second truth store and goes. **The founder's cable
+>   use case makes this a real decision, not a cleanup.**
+> - **The IPC allowlist.** `QF_EXECUTE_ALLOWLIST` is one command wide (`publish_artifact`),
+>   enforced at `ipc-kernel.ts:115` on the renderer path only; main-process callers
+>   (`host-acp-turn.ts`, `a2a-bus.ts`) are unfiltered. Defensible as a trust tier — but it must be
+>   a **stated decision**, not an accident. Does any new creation command need to reach a canvas
+>   tile? Answer it either way.
+>
+> **Out.** Anything WO-103 built · MCP tools (WO-104) · real data (WO-107).
+>
+> **Gate.** Zero defined-but-unwired actions remain, **or** each survivor is named in the report
+> with the rung that will wire it and why it is not a lie today · `doc-action-surface` green
+> against whatever the doc surface became · the ingest seam proven by a fixture that writes a
+> `quote` row through `execute()` without a creation command · `qa/run.ts --all` green.
+
 ---
 
 ## P3 · The generated tool plane

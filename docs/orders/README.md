@@ -37,6 +37,7 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 |---|---|---|---|
 | [WO-101](WO-101.md) | Research + agent plane charter (P1 rung 1) | **done** — verified + merged 2026-07-25; both new lints re-baited by the verifier against the live schema; G2 re-run cold with two fresh readers | builder (Cursor `gpt-5.3-codex-high`) |
 | [WO-102](WO-102.md) | Market plane reframe — betting becomes rows, not types | **done** — verified + merged 2026-07-25; G1 re-baited both shapes, G3 pin falsified (24 vs 23), G4 re-run, all four count predictions matched before reading reports | builder (Cursor) |
-| WO-103 | The write path — creation commands and edges | **next — order not yet written**; architect sitting required (brief: WO-102 findings 1–4 + G3 enumeration) | builder |
+| [WO-103](WO-103.md) | The write path (1/2) — creation, edges, and a Kernel regression | **open — current**; written 2026-07-25. Carries deliverable 0: WO-102's rename left `event` hardcoded at `execute.ts:13`/`:21`, market commands throw at runtime, no gate typechecks | builder |
+| WO-103b | The write path (2/2) — dead-action adjudication, doc surface, ingest seam, `connection` | contract in `SCOPES.md`; **write after WO-103 reports** | builder |
 | [WO-H1](WO-H1.md) | Debt register audit and sweep (housekeeping, **off-ladder**) | **open** — cuttable now, parallel-eligible with WO-103; merge H1 first if both are open (shared: ROADMAP debt table) | builder |
 | WO-104…WO-111 | Tool plane · markets · the loop · the one-shot proof | contracts only, promoted one rung ahead | — |
