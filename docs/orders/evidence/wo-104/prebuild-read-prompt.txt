@@ -1,0 +1,39 @@
+You are performing an adversarial PRE-BUILD READ on a work order, per the reviewer role defined in docs/orders/PROTOCOL.md (read that role definition first, lines 12 and 16-31).
+
+You are NOT the author, builder, or verifier of this order. REPORT FINDINGS ONLY. Do not edit any file. Do not fix anything. Do not create a branch. Do not commit. Do not merge. If you catch yourself about to write to a file, stop — that is the one thing this role never does.
+
+THE ORDER UNDER REVIEW: docs/orders/WO-104.md
+
+Read that file in full, end to end, before forming any opinion. THE ORDER FILE WINS OVER THIS MESSAGE. This message tells you what job to do; the order file is the artifact under review and nothing here paraphrases it. If this message and the order ever seem to disagree about what the order says, the order is right and this message is wrong.
+
+Repo state: branch is a detached worktree at commit 6d7c765, identical to main. The order was authored by the architect on 2026-07-26 and has never been read by anyone but its author.
+
+MEASURED FACTS THE ORDER CITES. Verify these against the code — do not assume they are true because they are written down. If any is wrong, that is itself a finding:
+- 23 object types; golden/tools.json holds 71 tool definitions = 46 read (23 x 2) + 25 action
+- ZERO tool definitions are served: no MCP server exists, zero ListTools handlers repo-wide
+- The Kernel's public read surface is 4 hand-written functions covering 3 object types (packages/qf-kernel/src/index.ts)
+- No production code reads the links table; the only "FROM links" is kernel.test.ts:458
+- 25 tables in golden/migration.sql = 23 object + schema_meta + links
+- golden/tools.json is 1,555 lines / 46,589 bytes
+- qa/run.ts defines 14 gates
+- qa/gates/observe-door.ts clause 2 begins `if (rel.startsWith("qf-kernel-schema/")) continue;`
+- tools/qf-peer-bus/src/server.ts:28-109 builds McpServer + StdioServerTransport on @modelcontextprotocol/sdk ^1.29.0
+
+ANSWER EXACTLY TWO QUESTIONS. Nothing else. This read is deliberately narrow so that it stays cheap enough to actually happen — do not expand it into a general review, a code review, or a style critique.
+
+QUESTION 1: CAN EACH ACCEPTANCE GATE ACTUALLY FAIL?
+For every gate G1 through G6 in the order, name specifically what would have to break for that gate to go red. A gate that is satisfiable by construction is not a gate. Look hardest at:
+- G2, the doctrine phase-exit gate ("zero hand-written tool code"), which is falsified by DIFF rather than by a red test. Can it actually fail? What would a builder have to do to make it pass while still hand-writing tool registration?
+- G4, which requires proving zero action tools are served by enumerating the served list. Is the enumeration itself defeatable?
+- G1, which asks the builder to re-run two attacks described in deliverable 0. Are those attacks specified precisely enough that a builder reproduces the SAME attack, or could they build a weaker one that passes?
+
+QUESTION 2: DOES EACH DELIVERABLE HAVE EXACTLY ONE MEANING?
+For each of deliverables 1 through 5, could two competent builders implement it differently and both honestly claim to have satisfied it? If yes, it is underspecified. Likeliest offenders, in the author's own estimation:
+- Deliverable 1, which demands a "type-agnostic" read layer without defining what disqualifies an implementation as non-generic
+- Deliverable 3, which says serve zero action tools and separately says registration must be schema-driven — check whether those two can be satisfied together without a filter the order never names
+- Deliverable 4, which lets the builder decline the work with a stated reason
+
+OUTPUT FORMAT:
+Rank findings by severity (High / Medium / Low). For each: what is wrong, why it matters, and what would fix it. Mark each finding as load-bearing (it will cause a defect or a false pass) or cosmetic (it is merely imprecise). If you find nothing in a category, say so plainly — do not manufacture findings to appear thorough. An honest "G3 is sound and here is why it can fail" is worth more than a padded list.
+
+CONTEXT THAT SHOULD RAISE YOUR SUSPICION: on the immediately preceding order in this repo, three of five defects were born in the ORDER TEXT, and the immediately preceding order's pre-build read found seven more rather than in the code, and a single adversarial read found five more in minutes. The author of WO-103b knows this and wrote the order anyway, and put a line in it saying "assume this order contains one too." Take that seriously — it is not modesty, it is a measured base rate.

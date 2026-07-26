@@ -36,9 +36,13 @@ link-traversal tool, and an MCP server that serves **read tools only**.
 ### One thing WO-103b proved that this order keeps
 
 WO-103b was the first rung to get PROTOCOL's pre-build adversarial read and the first to need
-**zero rework rounds** — seven order-text defects fixed before a builder saw the file. WO-104 gets
-the same read; when it lands, its findings and fixes are recorded at the bottom of the order. **If
-that section is missing, the read has not run yet — say so before starting.**
+**zero rework rounds** — seven order-text defects fixed before a builder saw the file.
+
+**WO-104 has had the same read: eight findings, three of them High, all in the order text, all
+fixed before you.** One of the three was the doctrine phase-exit gate itself, which as first
+written would have gone green against 69 hand-written tool registrations. The record is the last
+section of the order — read it, because it tells you which parts of this order were nearly wrong
+and why the gates are shaped the way they are.
 
 ## Queued behind (do not start)
 
