@@ -47,6 +47,13 @@ function fieldKeyPattern(field: string): RegExp {
   );
 }
 
+/** Dot assignment like `tile.content_hash = value` in canvas persistence code. */
+function dotAssignmentPattern(field: string): RegExp {
+  return new RegExp(
+    `\\b[A-Za-z_$][\\w$]*(?:\\.[A-Za-z_$][\\w$]*)*\\.${field}\\s*=\\s*(?!=)`,
+  );
+}
+
 export function checkNoCanvasDomainWrites(): { ok: boolean; offenders: string[] } {
   const offenders: string[] = [];
   const files = new Set<string>(TARGET_FILES);
@@ -74,8 +81,15 @@ export function checkNoCanvasDomainWrites(): { ok: boolean; offenders: string[] 
     }
 
     for (const field of DOMAIN_FIELDS) {
-      if (fieldKeyPattern(field).test(text)) {
-        offenders.push(`${rel} (domain field "${field}")`);
+      const keyMatch = fieldKeyPattern(field).test(text);
+      const dotAssignMatch = dotAssignmentPattern(field).test(text);
+      if (keyMatch || dotAssignMatch) {
+        const reason = keyMatch && dotAssignMatch
+          ? "property key + dot-assignment"
+          : keyMatch
+            ? "property key"
+            : "dot-assignment";
+        offenders.push(`${rel} (domain field "${field}" via ${reason})`);
       }
     }
   }
