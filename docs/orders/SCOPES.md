@@ -397,6 +397,19 @@ orchestrator run that dies mid-flight and cannot resume; not before).
 **Gate.** The chain completes with every step **recorded, not narrated**. A transcript saying it
 happened is not evidence; Kernel rows and edges are.
 
+> **Founder-stated concern, recorded 2026-07-25 — binds this rung's order when it is written.**
+> The founder's biggest stated risk for the whole build is that **agent collaboration and the dock
+> catalog don't work as intended — easy plug-in, real compatibility.** So this rung must prove
+> plug-and-play *inside* the loop, not beside it: **a second species — not the incumbent — is
+> admitted mid-build via a `species/**`-only diff (the WO-008 plug test, re-run live) and takes a
+> worker seat in the running loop, its steps landing as Kernel rows like everyone else's.** The
+> dock contract (`ROADMAP.md`, binding forever) and the substrate-triage rule (`START_HERE.md`
+> §5.8) are the standing law; this gate is where they get exercised together with the generated
+> tool surface for the first time. Known gaps the order must route or close, not rediscover:
+> the A2A proof was **scripted, harness-only** (WO-008e); WO-008a's turn UX was **rejected by the
+> founder** and never replaced; debt #14's legacy auto-approving agent path is still frozen in the
+> tree.
+
 ### WO-110 · The critic, and the refusal
 
 **Objective.** A critic seat scores artifacts against the hypothesis's own criteria, and
