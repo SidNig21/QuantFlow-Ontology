@@ -2,7 +2,7 @@
 tags: [quantflow, ontology, doctrine, roadmap, palantir]
 created: 2026-07-22
 author: Claude (architect/verifier seat)
-status: v1.2 — PLAN OF RECORD (graduated into the repo 2026-07-24, `3b20c0d`). A1–A4 founder-ratified; A5 architect-issued on measurement, awaiting ratification.
+status: v1.4 — PLAN OF RECORD (graduated into the repo 2026-07-24, `3b20c0d`). A1–A4 founder-ratified; A5 split (ruling 2 ratified, ruling 1 held open); A6–A7 founder-stated.
 artifact: https://claude.ai/code/artifact/ec99620c-b327-4fae-be9e-3e9a97128542
 sources: [DevCon6 00-09, Cerebras KB, INSPIRE-USECASES, repo audit]
 ---
@@ -256,7 +256,7 @@ Pivoting marketing to "ontology" means backing it up. Never claim ahead of what 
 
 ---
 
-## Amendments — v1.3 (A1–A4 2026-07-24 founder-ratified · A5 **split** 2026-07-25 · A6 2026-07-25 founder-stated)
+## Amendments — v1.4 (A1–A4 2026-07-24 founder-ratified · A5 **split** 2026-07-25 · A6–A7 2026-07-25 founder-stated)
 
 The v1 text above is preserved untouched. These amendments record decisions made after it, and win where they conflict.
 
@@ -334,6 +334,44 @@ Same machinery both directions (`Hypothesis → Dataset → Run → Artifact →
 *Triage honesty:* PufferLib does **not** fit the three substrate buckets (`START_HERE.md` §5.8). It is not a dock item — no CLI seat, does not act on the Kernel — and not an underlayer, since nothing runs on top of it. It is a **workload library**, like numpy: something a `run.kind: "training"` imports inside a sandbox. The triage rule has a genuine gap here and forcing a bucket would be worse than recording the gap.
 
 **4 · Recall layer stays local.** `FTS5 + sqlite-vec` as already specced. Hosted vector services were considered and dropped 2026-07-25 — data leaving the tower reverses the local-only decision, and price was never the binding constraint.
+
+### A7 · Sports betting first, crypto later (founder-stated 2026-07-25)
+
+Like A6, this is founder-stated and needs no ratification; it *is* the ratification.
+
+**1 · Bovada sports betting is the first and only market through the loop.** Crypto/HyperLiquid is
+explicitly a later market, not a parallel one. In the founder's words: *prove the ontology system
+works, then pivot to other markets.* The market pick that `ROADMAP.md` and `SCOPES WO-107` left
+"to the founder on the day" is hereby made.
+
+**This is a sequencing decision and nothing more.** It does not touch Part IV's market-agnostic
+ontology shape, which is a claim about *types* — markets are rows, never types — and was never a
+claim about what order to build in. `SCOPES WO-107` already read "one venue, one market, founder
+picks."
+
+**2 · WO-108's falsification survives, reduced from a pipeline to a fixture.** The second-market
+rung exists to answer a question Bovada cannot answer about itself: *is this an abstraction, or is
+it Bovada's schema wearing generic names?* Both look identical from inside Bovada. The only
+discriminator is pointing something structurally unlike it at the same four types and seeing
+whether a fifth type is needed.
+
+So the test is kept and the cost is cut: **a hand-written perpetual-future fixture of roughly
+twenty rows, landed in WO-102's gates (G3), rather than a second ingest pipeline.** A day instead
+of a week, and no attention leaves sports. `SCOPES WO-108`'s full pipeline is correspondingly
+demoted — if the fixture passes, the second market becomes a data-source task rather than a rung.
+
+**3 · The founder's real slips are the modelling source of record, and they do not enter the
+repo.** Four settled Bovada slips supplied 2026-07-25 decided the market plane's shape: the same
+bout carries many distinct selections, so the bout (`market_event`) and the betable selection
+(`instrument`) are different objects; market category is a property value, never a type. The slips
+themselves stay out of the repo — it is public and they carry reference numbers and amounts. Only
+de-identified structure is committed, in `WO-102.md`.
+
+*The finding worth keeping:* those slips surfaced something no amount of doctrine reading had —
+**a parlay leg carries its own price and its own outcome, and the schema has no way to say it.**
+`has_leg` is a property-less edge and `legs` is an untraversable JSON blob. The founder's own
+primary use case is the strongest argument on the board for link properties, and it is now
+`WO-103`'s to answer.
 
 ---
 
