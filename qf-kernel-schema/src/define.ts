@@ -29,6 +29,7 @@ export type DefinedAction<T extends z.ZodRawShape = z.ZodRawShape> = {
   name: string;
   description: string;
   lifecycle: Lifecycle;
+  operatorOnly?: boolean;
   input: z.ZodObject<T>;
 };
 
@@ -210,6 +211,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
   name: string;
   description: string;
   lifecycle: Lifecycle;
+  operatorOnly?: boolean;
   input: z.ZodObject<T>;
 }): DefinedAction<T> {
   assertSnakeCase(opts.name, "Action name");
@@ -221,6 +223,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
     name: opts.name,
     description: opts.description,
     lifecycle: opts.lifecycle,
+    operatorOnly: opts.operatorOnly,
     input: opts.input,
   };
 }
@@ -449,6 +452,8 @@ export type CommandEdge = {
   type: string;
   from: string;
   to: string;
+  /** Domain event emitted on success (dotted type.verb). */
+  event: string;
 };
 
 /** Creation command: names a schema action and an object type (no transition edge). */
@@ -534,6 +539,62 @@ export function lintCommands(
       throw new Error(
         `Pipeline-fed type "${cmd.object_type}" must not have creation commands (${cmd.action})`,
       );
+    }
+  }
+
+  assertOperatorOnlyCoupling(schema, commandList, creationList);
+}
+
+function isObservationEvent(event: string): boolean {
+  return event.endsWith(".observed");
+}
+
+/**
+ * operatorOnly must match observation coupling over all command events, both directions.
+ * A flagged action's every command event must end `.observed` — no half-observation.
+ */
+function assertOperatorOnlyCoupling(
+  schema: Schema,
+  commandList: readonly CommandEdge[],
+  creationList: readonly CreationCommandEdge[],
+): void {
+  const eventsByAction = new Map<string, string[]>();
+
+  for (const cmd of commandList) {
+    const events = eventsByAction.get(cmd.action) ?? [];
+    events.push(cmd.event);
+    eventsByAction.set(cmd.action, events);
+  }
+  for (const cmd of creationList) {
+    const events = eventsByAction.get(cmd.action) ?? [];
+    events.push(cmd.event);
+    eventsByAction.set(cmd.action, events);
+  }
+
+  for (const action of schema.actions) {
+    const events = eventsByAction.get(action.name) ?? [];
+    const observationCoupled = events.some((event) => isObservationEvent(event));
+    const operatorOnly = action.operatorOnly === true;
+
+    if (operatorOnly !== observationCoupled) {
+      if (observationCoupled) {
+        throw new Error(
+          `Action "${action.name}" is observation-coupled (command event ends ".observed") but operatorOnly is not true`,
+        );
+      }
+      throw new Error(
+        `Action "${action.name}" has operatorOnly but is not observation-coupled (no command event ends ".observed")`,
+      );
+    }
+
+    if (operatorOnly) {
+      for (const event of events) {
+        if (!isObservationEvent(event)) {
+          throw new Error(
+            `Action "${action.name}" is operatorOnly but command event "${event}" does not end ".observed"`,
+          );
+        }
+      }
     }
   }
 }

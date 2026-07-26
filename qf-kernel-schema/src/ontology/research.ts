@@ -434,6 +434,7 @@ export const observe_ticket = defineAction({
   description:
     "Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.",
   lifecycle: "experimental",
+  operatorOnly: true,
   input: z.object({
     kind: z.enum(["single", "parlay"]).describe("Single or parlay wager."),
     external_ref: z.string().describe("Venue-issued idempotency key."),
