@@ -349,32 +349,45 @@ ontology shape, which is a claim about *types* — markets are rows, never types
 claim about what order to build in. `SCOPES WO-107` already read "one venue, one market, founder
 picks."
 
-**2 · WO-108's falsification survives — and it moves inside the sportsbook.** *(Revised same day,
-after the founder restated the direction more sharply: "lets not get confused and only focus on
-bovada sportsbook.")*
+**2 · Single bets and parlays only — and the abstraction test is therefore dropped, not faked.**
+*(Revised twice on 2026-07-25 as the founder sharpened the direction. The revisions are kept
+visible because the reasoning is the useful part.)*
 
-The second-market rung exists to answer a question one bet shape cannot answer about itself: *is
-this an abstraction, or is it Bovada's schema wearing generic names?* Both look identical from
-inside a single fight. The discriminator is a **structurally different** bet pointed at the same
-four types.
+The second-market rung existed to answer a question one bet shape cannot answer about itself: *is
+this a market abstraction, or Bovada's schema wearing generic names?* The discriminator is a bet
+where an `instrument` has **no bounded `market_event`**.
 
-The first draft of this amendment used a crypto perpetual as that specimen. **That is struck.** It
-was the wrong instrument for a correct instinct — it imported the exact distraction the founder's
-direction exists to prevent, when the discriminator was available inside Bovada all along:
+Two specimens were proposed and both are struck. A **crypto perpetual** — struck for importing the
+exact distraction this amendment exists to prevent. A **season-long outright** — struck because
+the founder does not place them: *"i dont need this, just mainly single bet and parlay."*
 
-> A method-of-victory pick hangs off **one bounded bout**. A season outright hangs off **none**.
-> If `instrument` cannot exist without a `market_event`, these four types describe *bouts*, not
-> *markets* — and every rung above inherits that.
+**There is no third candidate.** Within singles and parlays on bout-like events, no structural
+discriminator exists: a parlay differs from a single at the *ticket* level, not at the
+instrument-to-event level. So the honest conclusion is not a cleverer gate — it is that **the
+abstraction claim cannot be tested inside the product's scope, and must therefore be recorded as
+untested rather than asserted.** Logged as **ROADMAP debt #20** with a trigger: the first bet shape
+that is not one-bounded-event-with-selections.
 
-So the test lands as **WO-102's G3: two Bovada bet shapes, a single-bout selection and a
-season-long futures, roughly twenty hand-written rows, asserting zero new object types.** A day
-instead of a week, zero crypto, zero attention off sports. `SCOPES WO-108`'s full second-market
-pipeline is correspondingly demoted — if the fixture passes, a future market is a data-source
-task, not a rung.
+Until that trigger fires, the claim this project may make is *"a sportsbook plane with
+market-agnostic names."* Part IV's market-agnostic language describes an **intention**, not a
+verified property. `SCOPES WO-108` is demoted accordingly.
 
-*Worth keeping as a method note:* the crypto perp and the season outright are the **same shape** —
-an instrument with no bounded event. The architect reached for the far example when a near one was
-sitting in the founder's own account. Prefer the specimen the operator already has.
+**What replaces the gate.** WO-102's G3 becomes a *representability* test rather than a
+falsification one: hand-write a real single and a real five-leg parlay **including its void leg**,
+and prove the schema can hold them. That is a better gate for this product anyway — it asks
+whether the ontology can carry the founder's actual bets, and its known partial failure (per-leg
+price and outcome have no structural home) hands WO-103 a precise brief drawn from real use rather
+than from doctrine.
+
+**One cheap hedge, kept:** `instrument` carries no hard dependency on `market_event` — no
+non-nullable link, no required field. That is the whole difference between *untested* and
+*foreclosed*, and it costs nothing.
+
+*Method note worth keeping:* the architect proposed the far specimen (a crypto perp), then a nearer
+one (an outright), and was right about the danger both times and wrong about the remedy both times.
+The founder was right that neither belonged in the build. **The correct move when a test cannot be
+run in scope is to log it as untested with a trigger — never to keep a weakened version that
+reports green.**
 
 **3 · The founder's real slips are the modelling source of record, and they do not enter the
 repo.** Four settled Bovada slips supplied 2026-07-25 decided the market plane's shape: the same

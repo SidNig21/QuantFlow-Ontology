@@ -8,9 +8,9 @@
 > an order must say is *"here is what the last one actually produced."* Orders written far ahead
 > are orders written from inference, and this repo has already paid for that once.
 >
-> **Rule: an order is written at most one rung ahead of the build front.** WO-101 is written and
-> **done**. Everything below — WO-102 included — is a contract, promoted to an order when its
-> predecessor reports.
+> **Rule: an order is written at most one rung ahead of the build front.** WO-101 is **done**;
+> WO-102 is **written and open** ([`WO-102.md`](WO-102.md)). Everything below WO-102 is a contract,
+> promoted to an order when its predecessor reports.
 >
 > **Corrected 2026-07-25 during WO-101 verification.** This line previously read *"WO-101 and
 > WO-102 are written."* `docs/orders/WO-102.md` does not exist and never did. The claim is the
@@ -77,8 +77,15 @@ Full order: [`WO-101.md`](WO-101.md).
 
 ### WO-102 · Market plane reframe
 
-**Objective.** Betting stops being types and becomes rows. The market plane becomes
-market-agnostic so a game line and a perpetual future are the same four types.
+**Objective.** Betting stops being types and becomes rows: a sportsbook gets a home, market
+category becomes a property value, and the plane is renamed to neutral vocabulary. **Written as
+[`WO-102.md`](WO-102.md) on 2026-07-25** — the order supersedes this contract where they differ.
+
+**Note on the original framing.** This contract said the plane becomes "market-agnostic so a game
+line and a perpetual future are the same four types." The names land; **the claim goes untested** —
+doctrine A7 rules crypto and outrights out of scope, and no discriminator exists inside
+singles-and-parlays. ROADMAP debt #20 carries it with a trigger. The order says this out loud and
+so must anything downstream.
 
 **Depends on.** WO-101 (the plane files must exist to rewrite).
 
@@ -349,14 +356,19 @@ data through generated tools.
 
 ### WO-108 · The second market
 
-> **DEMOTED 2026-07-25 by doctrine A7 (founder direction).** Bovada sportsbook is the only market;
-> crypto is explicitly out, not merely later. The falsification this rung exists for is **kept and
-> moved forward, and its specimen moved inside the sportsbook** — it lands as **WO-102's G3**: two
-> Bovada bet shapes, a single-bout selection and a season-long futures, roughly twenty hand-written
-> rows asserting zero new object types. The discriminator is the same one a crypto perpetual would
-> have provided — *an instrument with no bounded `market_event`* — with none of the distraction.
-> A day, not a week. If the fixture passes, a future market is a data-source task rather than a
-> rung; if it fails, that is the finding, and it surfaces six rungs earlier than it otherwise would.
+> **DEMOTED TO A LOGGED RISK, 2026-07-25, doctrine A7.** The founder places **single bets and
+> parlays** on Bovada — nothing else. This rung's falsification needs a bet where an `instrument`
+> has no bounded `market_event`; a crypto perpetual and a season-long outright were both proposed
+> and both ruled out, and **no third candidate exists inside singles-and-parlays** (a parlay
+> differs from a single at the *ticket* level, not the instrument-to-event level).
+>
+> So the test is **not weakened into something that reports green** — it is recorded as untested:
+> **ROADMAP debt #20**, trigger = the first bet shape that is not one-bounded-event-with-selections.
+> WO-102's G3 becomes a *representability* gate instead (a real single and a real five-leg parlay
+> with a void leg), and WO-102 keeps the one cheap hedge: `instrument` carries no hard dependency
+> on `market_event`, so the question stays open rather than foreclosed.
+>
+> **Do not promote this scope to an order** until that trigger fires.
 
 **Objective.** Prove the market abstraction by loading something structurally unlike the first —
 a game line and a perpetual future through the same four types.
