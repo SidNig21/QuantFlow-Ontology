@@ -318,6 +318,57 @@ direction named. WO-104's tools are generated from that answer.
 > against whatever the doc surface became · the ingest seam proven by a fixture that writes a
 > `quote` row through `execute()` without a creation command · `qa/run.ts --all` green.
 
+**Rulings shipped by WO-103b (2026-07-26).** The order is done when the verifier passes; these
+are the policy decisions it records for downstream rungs.
+
+**What is a cable?** A cable is a visible canvas gesture between tiles — it wires projection and
+control, not ontology meaning.
+
+**`connection` ruling (option a — canvas presentation).** `connection` exists to draw a cable and
+carries no ontology meaning; `links` stays the only relationship store for research facts. Under
+this ruling the founder's drag-to-browser-tile use case ("draw a cable to grant an agent control
+of that tile") is a **canvas gesture**: the cable object records which tiles are visually wired
+and what control/data/view channel is active between them, while any durable research relationship
+(if one is needed) still lands in `links` through `execute()`. Under option (b) — treating
+`connection` as a real edge — it would duplicate `links` and its removal would be scheduled on a
+dedicated rung that migrates existing `connection` rows into typed link kinds. **Ruling: (a).**
+Reason: the cable design system is being built for presentation and control routing; storing the
+same fact twice (once as `connection`, once as a link) is the dual-truth shape the One Rule
+forbids. The `connection` type is frozen until the cable design lands; no schema diff in WO-103b.
+
+**Market-plane ingest seam (decided, not built).** `pipelineFed` stays on `instrument` and
+`quote`. Ingest goes through `execute()` via a dedicated bulk command that carries an ingest trace
+— not by dropping `pipelineFed` (which would let any caller hand-author a fabricated price) and
+not by bypassing `execute()` (which would fail `kernel-sole-writer`). See **WO-107b** contract
+below.
+
+**IPC allowlist decision.** `QF_EXECUTE_ALLOWLIST` (`collab-electron/src/main/qf-execute-allowlist.ts`)
+is a **renderer trust tier**: the Electron renderer is untrusted, so only `publish_artifact` may
+cross the renderer→main IPC boundary (`ipc-kernel.ts:110`). Main-process callers (`host-acp-turn.ts`,
+`a2a-bus.ts`, `agent-host.ts`, and ~28 further `kernelExecute` sites) reach the Kernel unfiltered
+because they run in our process. That asymmetry is intentional — not an accident to paper over. A
+second command may be added to the allowlist only when a canvas tile must invoke it from the
+renderer; that addition is now debt #22's trigger alongside any `observe_ticket` callsite. WO-103b
+changes nothing in `collab-electron`.
+
+### WO-107b · Market-plane bulk ingest · **contract only (WO-103b)**
+
+**Objective.** Pipeline-fed market rows (`instrument`, `quote`) land in the Kernel through one
+bulk ingest command on `execute()`, carrying an ingest trace — without dropping `pipelineFed` and
+without a second write path.
+
+**Depends on.** WO-103 (link writer), WO-103b (ruling recorded here).
+
+**In.** One bulk ingest action + command wired through `execute()` · ingest trace on every row ·
+fixture proving a `quote` row and an `instrument` row arrive without per-type creation commands ·
+link kinds `quotes` and `has_leg` writable end to end after ingest (and `offered_on` / `lists`
+partially unblocked — `market_event` and `venue` still need their own creation verbs).
+
+**Out.** Real vendor data (WO-107) · dropping `pipelineFed` · any write path outside `execute()`.
+
+**Gate.** Fixture writes `quote` + `instrument` through the bulk command; `has_leg` and `quotes`
+edges creatable end to end; `kernel-sole-writer` still passes.
+
 ---
 
 ## P3 · The generated tool plane

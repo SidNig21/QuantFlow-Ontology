@@ -1,7 +1,7 @@
 # DOC_AUTHORITY_MAP.md
 
 > The "is this doc current?" answer key. If this map and another doc disagree about a doc's status, this map wins.
-> Last updated: 2026-07-25 (AGENTS.md + SCOPES.md added; ROADMAP superseded on numbering) · Branch: `main`
+> Last updated: 2026-07-26 (WO-103b: ONTOLOGY_SCHEMA.md demoted to REFERENCE) · Branch: `main`
 
 ## CURRENT — binding
 
@@ -12,7 +12,6 @@
 | `DOC_AUTHORITY_MAP.md` | This file |
 | `docs/DOCTRINE.md` | **Plan of record.** The ontology doctrine — charter, six phases, anti-pattern lint. Graduated verbatim from the vault 2026-07-24; `QuantFlow-Ontology-Doctrine.pdf` at repo root is an export of it, not a source. Where it and an older doc disagree on *direction*, this wins |
 | `docs/BLUEPRINT.md` | Architecture + decided stack + laws |
-| `docs/ONTOLOGY_SCHEMA.md` | Frozen schema v0.1 (`experimental`) |
 | `docs/ROADMAP.md` | Phase gates + work-order ladder; carries the **definition of done** and the **debt register** |
 | `docs/RESEARCH.md` | The keystone: borrowed principles + the phase-correlated tool shelf. Reference, not direction — but binding on *how to shop* |
 | `docs/orders/SCOPES.md` | **The build sequence.** All eleven rungs as scope contracts (objective · depends · in · out · gate). Where it and `docs/ROADMAP.md` disagree on *rung numbering*, SCOPES wins; where they disagree on a *gate*, the stricter wins. Orders are written at most one rung ahead of the build front |
@@ -22,6 +21,7 @@
 
 | Doc | Why |
 |---|---|
+| `docs/ONTOLOGY_SCHEMA.md` | **Demoted 2026-07-26 (WO-103b, debt #21).** Design-history prose; stale object names. Live surface: `qf-kernel-schema/golden/ONTOLOGY.md` |
 | `README.md` | Rewritten 2026-07-24 (`48d321e`) — the public front door. Marketing-facing; `START_HERE.md` still wins on rules |
 | `collab-electron/docs/**` | Inherited upstream docs — true for the shell, silent on QuantFlow |
 | Founder's vault (`~/Vaults/Personal/Projects/QuantFlow/`) | Research archive + **the founder's operating notes**. Everything *binding* has graduated into `docs/`. The vault copy of the doctrine is a stale cache; `docs/DOCTRINE.md` is authority |

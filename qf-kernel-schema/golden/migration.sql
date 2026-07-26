@@ -61,8 +61,6 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cancel_run', 'action', 'experimental', 'Cancel a running run (running → cancelled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_run', 'action', 'experimental', 'Mark a running run as succeeded (running → succeeded).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('fail_run', 'action', 'experimental', 'Mark a running run as failed (running → failed).');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('retry_run', 'action', 'experimental', 'Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('close_run', 'action', 'experimental', 'Operator close/ack for a terminal run (no status change — succeeded/failed/cancelled are already terminal).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grade_ticket', 'action', 'experimental', 'Grade a pending ticket to win|loss|push|void after result settlement.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_event', 'action', 'experimental', 'Move a scheduled event to live (scheduled → live).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settle_event', 'action', 'experimental', 'Settle a live event (live → settled).');
@@ -78,10 +76,6 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('close
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('publish_artifact', 'action', 'experimental', 'Publish an immutable content-addressed artifact (must land before sandbox death).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('record_evaluation', 'action', 'experimental', 'Record a structured evaluation verdict with metrics against a hypothesis lineage.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('resolve_hypothesis', 'action', 'experimental', 'Resolve an open hypothesis to supported|rejected|inconclusive; evaluation-gated at the Kernel.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('request_approval', 'action', 'experimental', 'Request operator approval for a pending context item (L2 gate).');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('approve', 'action', 'experimental', 'Approve a pending approval request.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('deny', 'action', 'experimental', 'Deny a pending approval request.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('promote_type', 'action', 'experimental', 'Promote a schema type from experimental to active (schema governance action).');
 
 -- A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.
 CREATE TABLE competitor (

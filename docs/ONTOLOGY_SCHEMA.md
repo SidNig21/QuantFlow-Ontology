@@ -1,6 +1,8 @@
 # QuantFlow ontology schema — v0.2
 
-> **FROZEN 2026-07-18 as `experimental` (WO-002); amended to v0.2 same day (WO-002b: state machines — transition tables, command/event split, fork boundary).** All types below carry lifecycle `experimental`: they may be refined by work order during the codegen era, but drift without an order is a defect. Promotion to `active` closes a type for modification (extension via links/kinds only) and happens by the `promote_type` action, per order.
+> **REFERENCE ONLY — demoted 2026-07-26 (WO-103b, debt #21).** The live, gate-checked action and object surface is [`qf-kernel-schema/golden/ONTOLOGY.md`](../qf-kernel-schema/golden/ONTOLOGY.md), generated from the schema. This file retains design history and prose; do not treat it as the current type catalog.
+>
+> **FROZEN 2026-07-18 as `experimental` (WO-002); amended to v0.2 same day (WO-002b: state machines — transition tables, command/event split, fork boundary).** All types below carry lifecycle `experimental`: they may be refined by work order during the codegen era, but drift without an order is a defect. Promotion to `active` closes a type for modification (extension via links/kinds only) and happens by order, per debt #19.
 > Scope: **research-only v1** (no order execution), **sports betting first** (Bovada: UFC, tennis, football), with a market-agnostic core so other markets later arrive as new `kind` values — never as clone types.
 
 **Design laws applied:** domain first, data last · one canonical type per real thing · lifecycle `experimental → active`, closed for modification once active · every object/property/action described, because agents reason over this schema.
@@ -130,11 +132,9 @@ Properties drafted at codegen time under the same laws (see ROADMAP WO-003/WO-00
 
 ## Actions (initial command surface — MCP tools generate from these)
 
-`create_hypothesis` · `register_dataset_version` · `create_run` · `create_mission` · `create_ticket` · `observe_ticket` · `start_run` / `complete_run` / `fail_run` / `cancel_run` / `retry_run` / `close_run` · `start_event` / `settle_event` / `void_event` · `grade_ticket` · `register_agent_definition` · `create_agent_session` / `start_agent_session` / `block_agent_session` / `unblock_agent_session` / `cancel_agent_session` / `fail_agent_session` / `close_agent_session` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated) · `request_approval` / `approve` / `deny` (pending-context-item gate, L2) · `promote_type` (`experimental → active`, schema governance itself as an action)
+`create_hypothesis` · `register_dataset_version` · `create_run` · `create_mission` · `create_ticket` · `observe_ticket` · `start_run` / `complete_run` / `fail_run` / `cancel_run` · `start_event` / `settle_event` / `void_event` · `grade_ticket` · `register_agent_definition` · `create_agent_session` / `start_agent_session` / `block_agent_session` / `unblock_agent_session` / `cancel_agent_session` / `fail_agent_session` / `close_agent_session` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated)
 
-> **Reconciled with code 2026-07-18 (WO-005).** This list previously held 13 actions while `qf-kernel-schema/src/schema.ts` held 25. WO-005's derive-and-lint deliverable requires **every legal transition to have a command and every command to be a real schema action** — unsatisfiable with 13 actions against 24 legal transitions, so the transition verbs above were added in code. That contradiction was an order defect (the same order called this doc authoritative and unmodifiable); the doc is corrected here by the architect rather than reworked onto the builder.
->
-> **`close_run` is deprecated pending removal.** WO-005's recommendation, accepted: `run`'s terminals are already `succeeded | failed | cancelled`, so a `closed` state would invent a second terminal and fight Law F, and a no-status-change ack does not belong beside rejectable transition actions. Removal from code lands by order — it is not a builder edit.
+> **Reconciled with code 2026-07-26 (WO-103b).** Six dead actions removed (`retry_run`, `close_run`, `request_approval`, `approve`, `deny`, `promote_type`) — see WO-103b deliverable 1. Prior reconciliation note (WO-005) retained below.
 
 ---
 

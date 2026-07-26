@@ -537,3 +537,33 @@ export function lintCommands(
     }
   }
 }
+
+/**
+ * Action-surface lint: every schema action must be wired through a transition or
+ * creation command, and every command must name a schema action — set equality,
+ * not cardinality. Prevents declared-but-unexecutable actions from shipping.
+ */
+export function lintActionSurface(
+  schema: Schema,
+  commandList: readonly CommandEdge[],
+  creationList: readonly CreationCommandEdge[] = [],
+): void {
+  const actionNames = new Set(schema.actions.map((a) => a.name));
+  const wired = new Set<string>();
+  for (const cmd of commandList) wired.add(cmd.action);
+  for (const cmd of creationList) wired.add(cmd.action);
+
+  const unwired = [...actionNames].filter((n) => !wired.has(n)).sort();
+  if (unwired.length > 0) {
+    throw new Error(
+      `Schema actions have no command wiring: ${unwired.join(", ")}`,
+    );
+  }
+
+  const orphanCommands = [...wired].filter((n) => !actionNames.has(n)).sort();
+  if (orphanCommands.length > 0) {
+    throw new Error(
+      `Commands reference actions not in schema: ${orphanCommands.join(", ")}`,
+    );
+  }
+}

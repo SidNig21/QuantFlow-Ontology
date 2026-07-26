@@ -1203,38 +1203,6 @@
     }
   },
   {
-    "name": "qf_retry_run",
-    "description": "Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "run_id": {
-          "type": "string",
-          "description": "Id of the failed or cancelled run to retry from."
-        }
-      },
-      "required": [
-        "run_id"
-      ]
-    }
-  },
-  {
-    "name": "qf_close_run",
-    "description": "Operator close/ack for a terminal run (no status change — succeeded/failed/cancelled are already terminal).",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "run_id": {
-          "type": "string",
-          "description": "Id of the terminal run to close/ack."
-        }
-      },
-      "required": [
-        "run_id"
-      ]
-    }
-  },
-  {
     "name": "qf_grade_ticket",
     "description": "Grade a pending ticket to win|loss|push|void after result settlement.",
     "inputSchema": {
@@ -1581,79 +1549,6 @@
       "required": [
         "hypothesis_id",
         "status"
-      ]
-    }
-  },
-  {
-    "name": "qf_request_approval",
-    "description": "Request operator approval for a pending context item (L2 gate).",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "subject_ref": {
-          "type": "string",
-          "description": "Id of the subject awaiting approval."
-        },
-        "reason": {
-          "type": "string",
-          "description": "Why approval is required."
-        }
-      },
-      "required": [
-        "subject_ref",
-        "reason"
-      ]
-    }
-  },
-  {
-    "name": "qf_approve",
-    "description": "Approve a pending approval request.",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "request_id": {
-          "type": "string",
-          "description": "Approval request id to approve."
-        }
-      },
-      "required": [
-        "request_id"
-      ]
-    }
-  },
-  {
-    "name": "qf_deny",
-    "description": "Deny a pending approval request.",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "request_id": {
-          "type": "string",
-          "description": "Approval request id to deny."
-        },
-        "reason": {
-          "type": "string",
-          "description": "Optional denial reason."
-        }
-      },
-      "required": [
-        "request_id"
-      ]
-    }
-  },
-  {
-    "name": "qf_promote_type",
-    "description": "Promote a schema type from experimental to active (schema governance action).",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "type_name": {
-          "type": "string",
-          "description": "Object, link, or action name to promote."
-        }
-      },
-      "required": [
-        "type_name"
       ]
     }
   }
