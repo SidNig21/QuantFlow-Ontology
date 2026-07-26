@@ -21,6 +21,23 @@ const REPO_ROOT = join(import.meta.dir, "..");
 
 const SKIP_DIRS = new Set(["node_modules", ".git"]);
 
+/** Walk the repo for directories that carry a committed bun.lock. */
+function discoverLockfilePackages(root: string): string[] {
+  const found: string[] = [];
+  function walk(dir: string): void {
+    const base = dir.slice(dir.lastIndexOf("/") + 1);
+    if (SKIP_DIRS.has(base)) return;
+    if (existsSync(join(dir, "bun.lock"))) found.push(dir);
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      if (SKIP_DIRS.has(entry.name)) continue;
+      walk(join(dir, entry.name));
+    }
+  }
+  walk(root);
+  return found.sort();
+}
+
 /** Walk the repo for package.json files that declare a typecheck script. */
 function discoverTypecheckPackages(root: string): string[] {
   const found: string[] = [];
@@ -199,25 +216,24 @@ const gates: Gate[] = [
     description:
       "TypeScript strict check for every package that declares a typecheck script",
     run: async () => {
-      const packages = discoverTypecheckPackages(REPO_ROOT);
-      if (packages.length === 0) {
+      const typecheckPackages = discoverTypecheckPackages(REPO_ROOT);
+      if (typecheckPackages.length === 0) {
         console.error("typecheck: no packages with a typecheck script found");
         return false;
       }
-      for (const cwd of packages) {
-        const lock = join(cwd, "bun.lock");
-        if (existsSync(lock)) {
-          const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-            cwd,
-            stdout: "inherit",
-            stderr: "inherit",
-          });
-          const installCode = await install.exited;
-          if (installCode !== 0) {
-            console.error(`typecheck: bun install in ${cwd} exited ${installCode}`);
-            return false;
-          }
+      for (const cwd of discoverLockfilePackages(REPO_ROOT)) {
+        const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+          cwd,
+          stdout: "inherit",
+          stderr: "inherit",
+        });
+        const installCode = await install.exited;
+        if (installCode !== 0) {
+          console.error(`typecheck: bun install in ${cwd} exited ${installCode}`);
+          return false;
         }
+      }
+      for (const cwd of typecheckPackages) {
         const proc = Bun.spawn(["bunx", "tsc", "--noEmit"], {
           cwd,
           stdout: "inherit",
