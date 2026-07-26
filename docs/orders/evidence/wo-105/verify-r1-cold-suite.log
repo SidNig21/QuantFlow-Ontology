@@ -1,0 +1,241 @@
+PASS  repo-shape
+PASS  lockfile-committed
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ zod@4.4.3
+
+6 packages installed [10.00ms]
+bun test v1.3.14 (0d9b296a)
+
+ 152 pass
+ 0 fail
+ 561 expect() calls
+Ran 152 tests across 3 files. [128.00ms]
+PASS  schema
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos@0.2.7
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ zod@4.4.3
+
+418 packages installed [292.00ms]
+bun test v1.3.14 (0d9b296a)
+Bundled 119 modules in 30ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/tools/runtime-proof/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack-agent: ready /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/tools/runtime-proof/packed/qf-toolloop.aospkg
+
+src/proof.test.ts:
+P1 createSession / AgentOS: cfd45a5a-89bc-49da-b66e-476a31c742c5
+P1 listSessions table:     [ "cfd45a5a-89bc-49da-b66e-476a31c742c5" ]
+P1 notification sessionIds: [ "cfd45a5a-89bc-49da-b66e-476a31c742c5", "cfd45a5a-89bc-49da-b66e-476a31c742c5",
+  "cfd45a5a-89bc-49da-b66e-476a31c742c5"
+]
+P1b unknown-session error: Session not found: unknown-session-d553f784-2a59-4d65-ae6a-460c1bec58ea
+P2 listeners before: 4
+P2 listeners after start: 4
+P2 listeners after session: 4
+P2 new after start: []
+P2 new after session: []
+P3 prompt text: Calling echo_upper. Tool said QUANTFLOW.
+P3 chunk events: 3
+P4 stopReason: cancelled
+P4 chunksBeforeCancel: 1
+P4 chunksAfterCancel: 0
+P4 orphanSurvivors: []
+P4 orphanCheck: {
+  sessionGone: true,
+  disposeCompleted: true,
+  listenerCountFinal: 4,
+  zeroOrphanDescendants: true,
+}
+P4 new listeners after cancel: []
+
+ 5 pass
+ 0 fail
+ 28 expect() calls
+Ran 5 tests across 1 file. [6.14s]
+PASS  runtime-proof
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+7 packages installed [26.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/kernel.test.ts:
+illegal_transitions_rejected=7
+replay_assertion=equal live.status=failed rebuilt.status=failed
+artifact_row_count_after_double_publish=1
+artifact_event_count_after_double_publish=1
+artifact_replay_assertion=equal id=229eb2b779d77cfcd8460c1c04c8641f6c43ae35f14a121be52fafadff29de0e kind=result_set
+G2_objects=[{"t":"artifact","id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"t":"artifact","id":"c0859dc18ea5362b301848a42221a47f42ef15a0af85c498d8da1945e37f503a"},{"t":"dataset","id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{"t":"evaluation","id":"278d9291-91c2-4b5d-ae3e-53fb1b87bba0"},{"t":"hypothesis","id":"d106337b-791a-41e1-8172-109386ac380f"},{"t":"run","id":"run-chain-1"}]
+G2_links=[{"kind":"evaluated_by","from_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689","to_id":"278d9291-91c2-4b5d-ae3e-53fb1b87bba0"},{"kind":"gates","from_id":"278d9291-91c2-4b5d-ae3e-53fb1b87bba0","to_id":"c0859dc18ea5362b301848a42221a47f42ef15a0af85c498d8da1945e37f503a"},{"kind":"produces","from_id":"run-chain-1","to_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"kind":"tests","from_id":"run-chain-1","to_id":"d106337b-791a-41e1-8172-109386ac380f"},{"kind":"uses","from_id":"run-chain-1","to_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]
+G4_events=[{"type":"ticket.observed","payload":"{\"command\":\"observe_ticket\",\"origin\":\"operator_supplied\",\"kind\":\"single\",\"external_ref\":\"slip-real\",\"placed_at\":\"2026-07-25T12:00:00.000Z\",\"legs\":[{\"selection\":\"A\",\"price\":1.9}],\"combined_price\":1.9,\"stake\":100,\"payout\":190,\"correlation_note\":\"\",\"grade\":\"win\",\"observation\":true,\"span_id\":\"span-slip\"}"}]
+
+ 28 pass
+ 0 fail
+ 95 expect() calls
+Ran 28 tests across 1 file. [126.00ms]
+PASS  kernel
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [19.00ms]
+bun install v1.3.14 (0d9b296a)
+
+Checked 6 installs across 7 packages (no changes) [1.00ms]
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [21.00ms]
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @modelcontextprotocol/sdk@1.29.0
++ qf-kernel@../../packages/qf-kernel
++ zod@4.4.3
+
+99 packages installed [75.00ms]
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [22.00ms]
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @modelcontextprotocol/sdk@1.29.0
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+99 packages installed [98.00ms]
+src/harness.ts(170,38): error TS2345: Argument of type '{ [x: string]: unknown; content: ({ type: "text"; text: string; annotations?: { audience?: ("user" | "assistant")[] | undefined; priority?: number | undefined; lastModified?: string | undefined; } | undefined; _meta?: Record<...> | undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]; _meta?: { ...; } | undef...' is not assignable to parameter of type '{ content: unknown; }'.
+  Property 'content' is missing in type '{ [x: string]: unknown; toolResult: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; "io.modelcontextprotocol/related-task"?: { taskId: string; } | undefined; } | undefined; }' but required in type '{ content: unknown; }'.
+src/harness.ts(212,28): error TS2345: Argument of type '{ [x: string]: unknown; content: ({ type: "text"; text: string; annotations?: { audience?: ("user" | "assistant")[] | undefined; priority?: number | undefined; lastModified?: string | undefined; } | undefined; _meta?: Record<...> | undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]; _meta?: { ...; } | undef...' is not assignable to parameter of type '{ content: unknown; }'.
+  Property 'content' is missing in type '{ [x: string]: unknown; toolResult: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; "io.modelcontextprotocol/related-task"?: { taskId: string; } | undefined; } | undefined; }' but required in type '{ content: unknown; }'.
+src/harness.ts(236,77): error TS2345: Argument of type '{ [x: string]: unknown; content: ({ type: "text"; text: string; annotations?: { audience?: ("user" | "assistant")[] | undefined; priority?: number | undefined; lastModified?: string | undefined; } | undefined; _meta?: Record<...> | undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]; _meta?: { ...; } | undef...' is not assignable to parameter of type '{ content: unknown; }'.
+  Property 'content' is missing in type '{ [x: string]: unknown; toolResult: unknown; _meta?: { [x: string]: unknown; progressToken?: string | number | undefined; "io.modelcontextprotocol/related-task"?: { taskId: string; } | undefined; } | undefined; }' but required in type '{ content: unknown; }'.
+typecheck: bunx tsc --noEmit in /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/tools/qf-read-tools exited 2
+FAIL  typecheck
+PASS  kernel-sole-writer
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+no-canvas-domain-writes OK
+PASS  no-canvas-domain-writes
+PASS  doc-action-surface
+PASS  observe-door
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ qf-kernel@../../../packages/qf-kernel
++ zod@4.4.3
+
+366 packages installed [285.00ms]
+$ node ./pack.mjs
+Bundled 119 modules in 28ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/agent-path/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack: ready /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/agent-path/packed/qf-toolloop.aospkg
+agent-path: spawn-only/turn pair OK {"admitEvents":["agent_session.created","agent_session.started"],"turnChunks":3}
+agent-path OK
+{"cancelled":"847db990-4302-4359-9b2f-d8d3e13555d6","completed":"2ef6d2f9-78c6-4ffe-a33c-f17fec046488","artifactId":"2964065d5232f6b41512538a1ed123cebb410b30bba442358c15628392ed6ce7","chunksA":1,"chunksB":3}
+PASS  agent-path
+one-skin OK
+totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
+PASS  one-skin
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ qf-kernel@../../../packages/qf-kernel
++ zod@4.4.3
+
+366 packages installed [292.00ms]
+$ node ./pack.mjs
+Bundled 119 modules in 31ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/dock-registry/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack: ready /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/dock-registry/packed/qf-toolloop.aospkg
+dock-registry OK
+{"baitA":"dock-registry-bait-a","baitB":"qf-toolloop","packagePath":"/tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/dock-registry/packed/qf-toolloop.aospkg","literalHits":0}
+PASS  dock-registry
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [21.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [64.00ms]
+$ bun src/harness.ts
+[harness] work dir: /tmp/qf-tool-plane-harness-yem8BN
+[harness] kernel db: /tmp/qf-tool-plane-harness-yem8BN/kernel.db
+
+=== G2 doctrine phase-exit gate ===
+tool_plane_expected_count=97 served_count=97 read=72 actions=25
+tool_plane_operator_only_leaks=[]
+G2_experimental_tools=["qf_experimental_get","qf_experimental_links","qf_experimental_query"]
+G2_experimental_get_response={"content":[{"type":"text","text":"{\n  \"id\": \"exp-probe-1\",\n  \"created_at\": \"2026-07-26T12:00:00.000Z\",\n  \"label\": \"gate-fixture\"\n}"}]}
+
+=== G3 links traversal ===
+tool_plane_expected_count=93 served_count=93 read=69 actions=24
+tool_plane_operator_only_leaks=[]
+G3_tool_response={"content":[{"type":"text","text":"[\n  {\n    \"id\": \"07d6a472-4087-4fb4-bf3f-b3f8de84e040\",\n    \"kind\": \"tests\",\n    \"from_id\": \"harness-run-1\",\n    \"to_id\": \"a977ec7c-fde0-4dea-bace-8bf331275378\",\n    \"created_at\": \"2026-07-26T19:53:09.199Z\"\n  }\n]"}]}
+G3_sql_rows=[{"kind":"tests","from_id":"harness-run-1","to_id":"a977ec7c-fde0-4dea-bace-8bf331275378"}]
+
+=== tool-plane action surface ===
+tool_plane_expected_count=93 served_count=93 read=69 actions=24
+tool_plane_operator_only_leaks=[]
+tool_plane_action_bad={"content":[{"type":"text","text":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"bogus_gate1_field\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"bogus_gate1_field\\\"\"\n  }\n]"}],"isError":true}
+tool_plane_events_before_after_bad=4 4
+tool_plane_run_status_after_bad=queued
+tool_plane_action_ok={"content":[{"type":"text","text":"{\n  \"object_type\": \"run\",\n  \"object_id\": \"harness-run-action-ok\",\n  \"from\": \"queued\",\n  \"to\": \"running\",\n  \"event\": \"run.started\",\n  \"state\": {\n    \"id\": \"harness-run-action-ok\",\n    \"created_at\": \"2026-07-26T19:53:10.329Z\",\n    \"kind\": \"backtest\",\n    \"status\": \"running\",\n    \"params\": \"{}\",\n    \"trace_id\": \"harness-trace\"\n  }\n}"}]}
+
+=== GATE 2 via action tool ===
+tool_plane_illegal_transition={"content":[{"type":"text","text":"IllegalTransitionError: Illegal transition for run: queued → succeeded"}],"isError":true}
+tool_plane_illegal_events_before_after=6 6
+tool_plane_illegal_status=queued
+
+[harness] tool-plane PASS
+PASS  tool-plane
