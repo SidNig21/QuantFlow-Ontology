@@ -8,9 +8,10 @@
 > an order must say is *"here is what the last one actually produced."* Orders written far ahead
 > are orders written from inference, and this repo has already paid for that once.
 >
-> **Rule: an order is written at most one rung ahead of the build front.** WO-101 is **done**;
-> WO-102 is **written and open** ([`WO-102.md`](WO-102.md)). Everything below WO-102 is a contract,
-> promoted to an order when its predecessor reports.
+> **Rule: an order is written at most one rung ahead of the build front.** WO-101 and WO-102 are
+> **done** (verified + merged 2026-07-25 — records in their order files). Everything below WO-102
+> is a contract, promoted to an order when its predecessor reports; **WO-103 is the next order to
+> write**, and `docs/orders/WO-103.md` does not exist yet.
 >
 > **Corrected 2026-07-25 during WO-101 verification.** This line previously read *"WO-101 and
 > WO-102 are written."* `docs/orders/WO-102.md` does not exist and never did. The claim is the

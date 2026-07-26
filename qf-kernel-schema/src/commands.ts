@@ -52,10 +52,28 @@ export const commands: readonly TransitionCommand[] = [
   { action: "grade_ticket", type: "ticket", from: "pending", to: "loss", event: "ticket.graded" },
   { action: "grade_ticket", type: "ticket", from: "pending", to: "push", event: "ticket.graded" },
   { action: "grade_ticket", type: "ticket", from: "pending", to: "void", event: "ticket.graded" },
-  // event
-  { action: "start_event", type: "event", from: "scheduled", to: "live", event: "event.started" },
-  { action: "settle_event", type: "event", from: "live", to: "settled", event: "event.settled" },
-  { action: "void_event", type: "event", from: "scheduled", to: "void", event: "event.voided" },
+  // market_event
+  {
+    action: "start_event",
+    type: "market_event",
+    from: "scheduled",
+    to: "live",
+    event: "market_event.started",
+  },
+  {
+    action: "settle_event",
+    type: "market_event",
+    from: "live",
+    to: "settled",
+    event: "market_event.settled",
+  },
+  {
+    action: "void_event",
+    type: "market_event",
+    from: "scheduled",
+    to: "void",
+    event: "market_event.voided",
+  },
   // agent_session
   {
     action: "start_agent_session",

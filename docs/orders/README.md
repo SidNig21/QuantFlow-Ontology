@@ -36,6 +36,6 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | Order | Title | Status | Assignee |
 |---|---|---|---|
 | [WO-101](WO-101.md) | Research + agent plane charter (P1 rung 1) | **done** — verified + merged 2026-07-25; both new lints re-baited by the verifier against the live schema; G2 re-run cold with two fresh readers | builder (Cursor `gpt-5.3-codex-high`) |
-| [WO-102](WO-102.md) | Market plane reframe — betting becomes rows, not types | **open** — current; written 2026-07-25 from four real Bovada slips + founder direction A7 | builder |
-| WO-103 | The write path — creation commands and edges | blocked on WO-102 | builder |
+| [WO-102](WO-102.md) | Market plane reframe — betting becomes rows, not types | **done** — verified + merged 2026-07-25; G1 re-baited both shapes, G3 pin falsified (24 vs 23), G4 re-run, all four count predictions matched before reading reports | builder (Cursor) |
+| WO-103 | The write path — creation commands and edges | **next — order not yet written**; architect sitting required (brief: WO-102 findings 1–4 + G3 enumeration) | builder |
 | WO-104…WO-111 | Tool plane · markets · the loop · the one-shot proof | contracts only, promoted one rung ahead | — |

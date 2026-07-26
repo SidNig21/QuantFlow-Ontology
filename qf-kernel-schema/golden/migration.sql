@@ -13,17 +13,18 @@ CREATE TABLE schema_meta (
   description TEXT NOT NULL
 );
 
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('competitor', 'object', 'experimental', 'A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('event', 'object', 'experimental', 'A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('market', 'object', 'experimental', 'One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('odds_series', 'object', 'experimental', 'Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('result', 'object', 'experimental', 'Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('competitor', 'object', 'experimental', 'A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('market_event', 'object', 'experimental', 'A market_event is the bounded real-world occurrence that instruments resolve against. Treat starts_at and status as the governing fence for legal pre-event decisions and lifecycle transitions.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('instrument', 'object', 'experimental', 'An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('quote', 'object', 'experimental', 'A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('venue', 'object', 'experimental', 'A venue is the listing and pricing source where instruments are offered. Represent sportsbooks and exchanges as rows here so tickets can reference a concrete origin.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('result', 'object', 'experimental', 'A result is the settled truth payload for a market_event and its instruments. Treat settled_at as the governing timestamp that closes uncertainty and enables final grading.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('mission', 'object', 'experimental', 'A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('hypothesis', 'object', 'experimental', 'A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('policy', 'object', 'experimental', 'A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('environment', 'object', 'experimental', 'An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('strategy', 'object', 'experimental', 'A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ticket', 'object', 'experimental', 'A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ticket', 'object', 'experimental', 'A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('dataset', 'object', 'experimental', 'A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('run', 'object', 'experimental', 'A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('artifact', 'object', 'experimental', 'An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.');
@@ -35,12 +36,13 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('task'
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('tool', 'object', 'experimental', 'A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execution_environment', 'object', 'experimental', 'An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('connection', 'object', 'experimental', 'A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('participates_in', 'link', 'experimental', 'Roster/matchup edge: which competitors take part in an event.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('offered_on', 'link', 'experimental', 'Attaches a market to the event it is offered on for per-contest discovery.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('quotes', 'link', 'experimental', 'Price-history lookup: which market an odds_series records.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settles', 'link', 'experimental', 'Truth attachment: which event a result settles.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('participates_in', 'link', 'experimental', 'Roster edge from each competitor to the market_event it contests.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('offered_on', 'link', 'experimental', 'Attachment edge from an instrument to the market_event it is offered on.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('quotes', 'link', 'experimental', 'Price-history edge from a quote record to the instrument it prices.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('lists', 'link', 'experimental', 'Listing edge from a venue to each instrument it offers.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settles', 'link', 'experimental', 'Truth edge from a result row to the market_event it settles.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('tests', 'link', 'experimental', 'Why this run or strategy exists — it tests a named hypothesis.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('has_leg', 'link', 'experimental', 'Which markets a ticket bets; enables correlation traversal.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('has_leg', 'link', 'experimental', 'Which instruments a ticket bets; enables correlation traversal.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('uses', 'link', 'experimental', 'Full input manifest for a run: datasets, strategies, and tools consumed.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('executes_in', 'link', 'experimental', 'Where computation for a run happened.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('produces', 'link', 'experimental', 'Output provenance: datasets or artifacts produced by a run or agent session.');
@@ -76,80 +78,93 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('appro
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('deny', 'action', 'experimental', 'Deny a pending approval request.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('promote_type', 'action', 'experimental', 'Promote a schema type from experimental to active (schema governance action).');
 
--- A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.
+-- A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.
 CREATE TABLE competitor (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Competitor species; a team's sport comes from the events it plays.
+  -- This field classifies the participant species used for matching and grouping. Derive sport context from linked market events instead of hard-coding it on the competitor row.
   kind TEXT NOT NULL,
-  -- Canonical display name used in markets and reports.
+  -- This field stores the canonical display name for the participant. Keep this stable so historical instruments and results stay joined to one identity.
   name TEXT NOT NULL,
-  -- Source-system IDs (Bovada participant id, dataset keys) for entity resolution.
+  -- This field stores source-system identifiers used for entity resolution. Add new upstream identifiers here instead of creating duplicate competitor rows.
   external_refs TEXT NOT NULL,
   CHECK (kind IN ('ufc_fighter', 'tennis_player', 'team'))
 );
 
--- A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.
-CREATE TABLE event (
+-- A market_event is the bounded real-world occurrence that instruments resolve against. Treat starts_at and status as the governing fence for legal pre-event decisions and lifecycle transitions.
+CREATE TABLE market_event (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Sport domain for this contest; drives prop vocabularies and coverage.
+  -- This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type.
   sport TEXT NOT NULL,
-  -- Scheduled start as ISO-8601 UTC; no post-start data may inform a pre-event ticket.
+  -- This field records the scheduled start timestamp in ISO-8601 UTC. Do not use data timestamped after this moment for pre-event decisions.
   starts_at TEXT NOT NULL,
-  -- Contest state from schedule through settlement or void.
+  -- This field records the operational lifecycle state for the occurrence. Move it only through declared transition actions, never by ad-hoc writes.
   status TEXT NOT NULL,
-  -- Tournament or league context (UFC 320, Wimbledon R16, NFL Week 3).
+  -- This field stores the competition context such as league, card, or tournament round. Keep the value operator-legible so slips and reports can be reconciled without external decoding.
   competition TEXT NOT NULL,
   CHECK (sport IN ('ufc', 'tennis', 'football')),
   CHECK (status IN ('scheduled', 'live', 'settled', 'void'))
 );
 
--- One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.
-CREATE TABLE market (
+-- An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.
+CREATE TABLE instrument (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Market family; props carry sport-specific structure in params.
+  -- This field identifies the instrument family needed to interpret pricing semantics. Extend the enum by order rather than cloning new object types per category.
   kind TEXT NOT NULL,
-  -- Kind-specific parameters (lines, prop category/method/round, handicaps) as JSON.
+  -- This field stores kind-specific parameters such as lines, methods, rounds, or handicaps. Keep it machine-readable and deterministic so equivalent instruments compare cleanly.
   params TEXT NOT NULL,
-  -- Named outcomes offered, e.g. ["Jones","Miocic"] or ["over","under"].
+  -- This field lists the named outcomes offered for the instrument, such as ["Jones","Miocic"] or ["over","under"]. Preserve provider wording so grading and reconciliation can be traced exactly.
   sides TEXT NOT NULL,
-  -- Shared key for same-event markets with dependent outcomes; null when independence is assumed.
+  -- This field groups instruments with known dependent outcomes. Leave it null only when no declared dependence key is available.
   correlation_group TEXT,
   CHECK (kind IN ('moneyline', 'spread', 'total', 'prop'))
 );
 
--- Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.
-CREATE TABLE odds_series (
+-- A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.
+CREATE TABLE quote (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Sportsbook source; Pinnacle series are the sharp CLV benchmark.
+  -- This field identifies the source venue or book that published the prices. Use stable lowercase identifiers so cross-source joins remain deterministic.
   book TEXT NOT NULL,
-  -- Content hash plus path of the Parquet segment(s) holding timestamped quotes.
+  -- This field points to the content-addressed segment containing timestamped quotes. Treat it as immutable evidence for replay and audit.
   data_ref TEXT NOT NULL,
-  -- Sufficiency summary: first/last captured timestamps and quote count for agent judgment.
+  -- This field summarizes temporal and count coverage for the referenced quote data. Use it as a sufficiency hint, not as a replacement for inspecting underlying rows.
   coverage TEXT NOT NULL,
   CHECK (book IN ('bovada', 'pinnacle'))
 );
 
--- Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.
+-- A venue is the listing and pricing source where instruments are offered. Represent sportsbooks and exchanges as rows here so tickets can reference a concrete origin.
+CREATE TABLE venue (
+  -- Primary key for this ontology object instance.
+  id TEXT PRIMARY KEY NOT NULL,
+  -- ISO-8601 UTC timestamp when the row was created.
+  created_at TEXT NOT NULL,
+  -- This field identifies the venue class that governs listing and settlement behavior. Add new classes by order so downstream assumptions remain explicit.
+  kind TEXT NOT NULL,
+  -- This field stores the operator-visible venue name, such as Bovada. Keep names stable so external references can be re-imported idempotently.
+  name TEXT NOT NULL,
+  CHECK (kind IN ('sportsbook', 'exchange'))
+);
+
+-- A result is the settled truth payload for a market_event and its instruments. Treat settled_at as the governing timestamp that closes uncertainty and enables final grading.
 CREATE TABLE result (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Structured result (winner, score/method, per-market grading win|loss|push|void).
+  -- This field stores structured settlement facts such as winner, method, and per-instrument grading. Keep the structure explicit so grading decisions are reproducible.
   outcome TEXT NOT NULL,
-  -- When truth became known (ISO-8601 UTC); also a point-in-time fence.
+  -- This field records when settled truth became known in ISO-8601 UTC. Do not allow grading decisions to cite truth timestamps after this boundary.
   settled_at TEXT NOT NULL
 );
 
@@ -223,24 +238,33 @@ CREATE TABLE strategy (
   CHECK (stake_model IN ('flat', 'fractional_kelly', 'custom'))
 );
 
--- A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.
+-- A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.
 CREATE TABLE ticket (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
+  -- How this ticket entered the system. Strategy-proposed rows express planned intent, while operator-supplied rows are venue facts that must preserve external provenance exactly.
+  origin TEXT NOT NULL,
   -- Whether the wager has one leg or multiple legs. Treat single as a first-class ticket, not a separate type.
   kind TEXT NOT NULL,
+  -- Venue-issued ticket reference for this wager. Use it as the idempotency key so re-importing the same operator-supplied slip updates one row instead of duplicating it.
+  external_ref TEXT NOT NULL,
+  -- Timestamp when the wager was placed in ISO-8601 UTC. This is required input for CLV because selection-time price must be compared to market state at placement.
+  placed_at TEXT NOT NULL,
   -- Structured per-leg selections and timestamps. Each leg entry must retain selection-time price so CLV and drift can be recomputed.
   legs TEXT NOT NULL,
   -- Aggregate ticket price at selection. Keep the source price so downstream evaluation does not infer payout assumptions.
   combined_price REAL NOT NULL,
-  -- Simulated stake assigned by the sizing policy. This is an execution input, not a post-hoc evaluation output.
+  -- Amount risked on the wager. Store the actual stake for operator-supplied slips and the proposed stake for strategy-origin tickets without changing field semantics.
   stake REAL NOT NULL,
+  -- Realized return from settlement, distinct from stake and combined_price assumptions. Keep it null while grade is pending and set it once the venue-grade is known.
+  payout REAL,
   -- Declared dependence assumptions among legs. Same-event legs should reference known correlation groups to avoid false independence.
   correlation_note TEXT NOT NULL,
   -- Settlement outcome for the ticket. It stays pending until settled truth is available from result lineage.
   grade TEXT NOT NULL,
+  CHECK (origin IN ('strategy_proposed', 'operator_supplied')),
   CHECK (kind IN ('single', 'parlay')),
   CHECK (grade IN ('pending', 'win', 'loss', 'push', 'void'))
 );
@@ -411,7 +435,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'assigned_to', 'delegates_to')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'assigned_to', 'delegates_to')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.

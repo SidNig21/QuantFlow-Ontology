@@ -1,7 +1,7 @@
 [
   {
     "name": "qf_competitor_get",
-    "description": "Fetch one competitor by id. A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.",
+    "description": "Fetch one competitor by id. A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -17,7 +17,7 @@
   },
   {
     "name": "qf_competitor_query",
-    "description": "List competitor rows with optional filters. A participant that can be bet on — fighter, player, or team. One identity per real competitor; aliases stay as links, not duplicate rows.",
+    "description": "List competitor rows with optional filters. A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -37,8 +37,8 @@
     }
   },
   {
-    "name": "qf_event_get",
-    "description": "Fetch one event by id. A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.",
+    "name": "qf_market_event_get",
+    "description": "Fetch one market_event by id. A market_event is the bounded real-world occurrence that instruments resolve against. Treat starts_at and status as the governing fence for legal pre-event decisions and lifecycle transitions.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -53,8 +53,8 @@
     }
   },
   {
-    "name": "qf_event_query",
-    "description": "List event rows with optional filters. A scheduled real-world contest (UFC bout, tennis match, football game). starts_at is the point-in-time fence for pre-event decisions.",
+    "name": "qf_market_event_query",
+    "description": "List market_event rows with optional filters. A market_event is the bounded real-world occurrence that instruments resolve against. Treat starts_at and status as the governing fence for legal pre-event decisions and lifecycle transitions.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -74,8 +74,8 @@
     }
   },
   {
-    "name": "qf_market_get",
-    "description": "Fetch one market by id. One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "name": "qf_instrument_get",
+    "description": "Fetch one instrument by id. An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -90,8 +90,8 @@
     }
   },
   {
-    "name": "qf_market_query",
-    "description": "List market rows with optional filters. One bettable proposition on an event. Moneyline, spread, total, and prop are kinds of this single type — never separate object types.",
+    "name": "qf_instrument_query",
+    "description": "List instrument rows with optional filters. An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -111,8 +111,8 @@
     }
   },
   {
-    "name": "qf_odds_series_get",
-    "description": "Fetch one odds_series by id. Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.",
+    "name": "qf_quote_get",
+    "description": "Fetch one quote by id. A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -127,8 +127,45 @@
     }
   },
   {
-    "name": "qf_odds_series_query",
-    "description": "List odds_series rows with optional filters. Recorded price history of one market at one book. Pointer object: data_ref points at hashed Parquet quote segments; the Kernel never stores tick rows.",
+    "name": "qf_quote_query",
+    "description": "List quote rows with optional filters. A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_venue_get",
+    "description": "Fetch one venue by id. A venue is the listing and pricing source where instruments are offered. Represent sportsbooks and exchanges as rows here so tickets can reference a concrete origin.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_venue_query",
+    "description": "List venue rows with optional filters. A venue is the listing and pricing source where instruments are offered. Represent sportsbooks and exchanges as rows here so tickets can reference a concrete origin.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -149,7 +186,7 @@
   },
   {
     "name": "qf_result_get",
-    "description": "Fetch one result by id. Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.",
+    "description": "Fetch one result by id. A result is the settled truth payload for a market_event and its instruments. Treat settled_at as the governing timestamp that closes uncertainty and enables final grading.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -165,7 +202,7 @@
   },
   {
     "name": "qf_result_query",
-    "description": "List result rows with optional filters. Settled truth of an event and the grading of its markets. Point-in-time fenced by settled_at.",
+    "description": "List result rows with optional filters. A result is the settled truth payload for a market_event and its instruments. Treat settled_at as the governing timestamp that closes uncertainty and enables final grading.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -371,7 +408,7 @@
   },
   {
     "name": "qf_ticket_get",
-    "description": "Fetch one ticket by id. A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
+    "description": "Fetch one ticket by id. A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -387,7 +424,7 @@
   },
   {
     "name": "qf_ticket_query",
-    "description": "List ticket rows with optional filters. A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
+    "description": "List ticket rows with optional filters. A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.",
     "inputSchema": {
       "type": "object",
       "properties": {

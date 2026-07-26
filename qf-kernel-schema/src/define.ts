@@ -9,6 +9,7 @@ export type DefinedObject<T extends z.ZodRawShape = z.ZodRawShape> = {
   name: string;
   description: string;
   lifecycle: Lifecycle;
+  pipelineFed?: boolean;
   properties: z.ZodObject<T>;
 };
 
@@ -156,6 +157,7 @@ export function defineObject<T extends z.ZodRawShape>(opts: {
   name: string;
   description: string;
   lifecycle: Lifecycle;
+  pipelineFed?: boolean;
   properties: z.ZodObject<T>;
 }): DefinedObject<T> {
   assertSnakeCase(opts.name, "Object name");
@@ -167,6 +169,7 @@ export function defineObject<T extends z.ZodRawShape>(opts: {
     name: opts.name,
     description: opts.description,
     lifecycle: opts.lifecycle,
+    pipelineFed: opts.pipelineFed,
     properties: opts.properties,
   };
 }
@@ -469,6 +472,9 @@ export function lintCommands(
 ): void {
   const actionNames = new Set(schema.actions.map((a) => a.name));
   const objectNames = new Set(schema.objects.map((o) => o.name));
+  const pipelineFedTypes = new Set(
+    schema.objects.filter((object) => object.pipelineFed).map((object) => object.name),
+  );
   const covered = new Set<string>();
 
   for (const cmd of commandList) {
@@ -485,6 +491,11 @@ export function lintCommands(
     if (!allowed || !allowed.includes(cmd.to)) {
       throw new Error(
         `Command "${cmd.action}" is not a legal transition for ${cmd.type}: ${cmd.from} → ${cmd.to}`,
+      );
+    }
+    if (pipelineFedTypes.has(cmd.type)) {
+      throw new Error(
+        `Pipeline-fed type "${cmd.type}" must not have transition command edges (${cmd.action}: ${cmd.from}→${cmd.to})`,
       );
     }
     const key = `${cmd.type}:${cmd.from}->${cmd.to}`;
@@ -518,6 +529,11 @@ export function lintCommands(
     }
     if (typeof cmd.event !== "string" || cmd.event.trim().length === 0) {
       throw new Error(`Creation command "${cmd.action}" is missing event type`);
+    }
+    if (pipelineFedTypes.has(cmd.object_type)) {
+      throw new Error(
+        `Pipeline-fed type "${cmd.object_type}" must not have creation commands (${cmd.action})`,
+      );
     }
   }
 }

@@ -276,70 +276,70 @@ describe("ticket transitions", () => {
   });
 });
 
-describe("event transitions", () => {
+describe("market_event transitions", () => {
   test("accepts scheduled → live", () => {
-    expect(canTransition("event", "scheduled", "live")).toBe(true);
-    expect(() => assertTransition("event", "scheduled", "live")).not.toThrow();
+    expect(canTransition("market_event", "scheduled", "live")).toBe(true);
+    expect(() => assertTransition("market_event", "scheduled", "live")).not.toThrow();
   });
   test("accepts scheduled → void", () => {
-    expect(canTransition("event", "scheduled", "void")).toBe(true);
-    expect(() => assertTransition("event", "scheduled", "void")).not.toThrow();
+    expect(canTransition("market_event", "scheduled", "void")).toBe(true);
+    expect(() => assertTransition("market_event", "scheduled", "void")).not.toThrow();
   });
   test("rejects scheduled → scheduled", () => {
-    expect(canTransition("event", "scheduled", "scheduled")).toBe(false);
-    expect(() => assertTransition("event", "scheduled", "scheduled")).toThrow(/event.*scheduled.*scheduled/);
+    expect(canTransition("market_event", "scheduled", "scheduled")).toBe(false);
+    expect(() => assertTransition("market_event", "scheduled", "scheduled")).toThrow(/market_event.*scheduled.*scheduled/);
   });
   test("rejects scheduled → settled", () => {
-    expect(canTransition("event", "scheduled", "settled")).toBe(false);
-    expect(() => assertTransition("event", "scheduled", "settled")).toThrow(/event.*scheduled.*settled/);
+    expect(canTransition("market_event", "scheduled", "settled")).toBe(false);
+    expect(() => assertTransition("market_event", "scheduled", "settled")).toThrow(/market_event.*scheduled.*settled/);
   });
   test("accepts live → settled", () => {
-    expect(canTransition("event", "live", "settled")).toBe(true);
-    expect(() => assertTransition("event", "live", "settled")).not.toThrow();
+    expect(canTransition("market_event", "live", "settled")).toBe(true);
+    expect(() => assertTransition("market_event", "live", "settled")).not.toThrow();
   });
   test("rejects live → scheduled", () => {
-    expect(canTransition("event", "live", "scheduled")).toBe(false);
-    expect(() => assertTransition("event", "live", "scheduled")).toThrow(/event.*live.*scheduled/);
+    expect(canTransition("market_event", "live", "scheduled")).toBe(false);
+    expect(() => assertTransition("market_event", "live", "scheduled")).toThrow(/market_event.*live.*scheduled/);
   });
   test("rejects live → live", () => {
-    expect(canTransition("event", "live", "live")).toBe(false);
-    expect(() => assertTransition("event", "live", "live")).toThrow(/event.*live.*live/);
+    expect(canTransition("market_event", "live", "live")).toBe(false);
+    expect(() => assertTransition("market_event", "live", "live")).toThrow(/market_event.*live.*live/);
   });
   test("rejects live → void", () => {
-    expect(canTransition("event", "live", "void")).toBe(false);
-    expect(() => assertTransition("event", "live", "void")).toThrow(/event.*live.*void/);
+    expect(canTransition("market_event", "live", "void")).toBe(false);
+    expect(() => assertTransition("market_event", "live", "void")).toThrow(/market_event.*live.*void/);
   });
   test("rejects settled → scheduled", () => {
-    expect(canTransition("event", "settled", "scheduled")).toBe(false);
-    expect(() => assertTransition("event", "settled", "scheduled")).toThrow(/event.*settled.*scheduled/);
+    expect(canTransition("market_event", "settled", "scheduled")).toBe(false);
+    expect(() => assertTransition("market_event", "settled", "scheduled")).toThrow(/market_event.*settled.*scheduled/);
   });
   test("rejects settled → live", () => {
-    expect(canTransition("event", "settled", "live")).toBe(false);
-    expect(() => assertTransition("event", "settled", "live")).toThrow(/event.*settled.*live/);
+    expect(canTransition("market_event", "settled", "live")).toBe(false);
+    expect(() => assertTransition("market_event", "settled", "live")).toThrow(/market_event.*settled.*live/);
   });
   test("rejects settled → settled", () => {
-    expect(canTransition("event", "settled", "settled")).toBe(false);
-    expect(() => assertTransition("event", "settled", "settled")).toThrow(/event.*settled.*settled/);
+    expect(canTransition("market_event", "settled", "settled")).toBe(false);
+    expect(() => assertTransition("market_event", "settled", "settled")).toThrow(/market_event.*settled.*settled/);
   });
   test("rejects settled → void", () => {
-    expect(canTransition("event", "settled", "void")).toBe(false);
-    expect(() => assertTransition("event", "settled", "void")).toThrow(/event.*settled.*void/);
+    expect(canTransition("market_event", "settled", "void")).toBe(false);
+    expect(() => assertTransition("market_event", "settled", "void")).toThrow(/market_event.*settled.*void/);
   });
   test("rejects void → scheduled", () => {
-    expect(canTransition("event", "void", "scheduled")).toBe(false);
-    expect(() => assertTransition("event", "void", "scheduled")).toThrow(/event.*void.*scheduled/);
+    expect(canTransition("market_event", "void", "scheduled")).toBe(false);
+    expect(() => assertTransition("market_event", "void", "scheduled")).toThrow(/market_event.*void.*scheduled/);
   });
   test("rejects void → live", () => {
-    expect(canTransition("event", "void", "live")).toBe(false);
-    expect(() => assertTransition("event", "void", "live")).toThrow(/event.*void.*live/);
+    expect(canTransition("market_event", "void", "live")).toBe(false);
+    expect(() => assertTransition("market_event", "void", "live")).toThrow(/market_event.*void.*live/);
   });
   test("rejects void → settled", () => {
-    expect(canTransition("event", "void", "settled")).toBe(false);
-    expect(() => assertTransition("event", "void", "settled")).toThrow(/event.*void.*settled/);
+    expect(canTransition("market_event", "void", "settled")).toBe(false);
+    expect(() => assertTransition("market_event", "void", "settled")).toThrow(/market_event.*void.*settled/);
   });
   test("rejects void → void", () => {
-    expect(canTransition("event", "void", "void")).toBe(false);
-    expect(() => assertTransition("event", "void", "void")).toThrow(/event.*void.*void/);
+    expect(canTransition("market_event", "void", "void")).toBe(false);
+    expect(() => assertTransition("market_event", "void", "void")).toThrow(/market_event.*void.*void/);
   });
 });
 
