@@ -5,7 +5,6 @@ import {
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
-  FabricatedStateError,
   KernelError,
 } from "./errors.ts";
 import { appendEvent } from "./events.ts";
@@ -19,8 +18,14 @@ import {
   writeLinks,
 } from "./links.ts";
 import type { TraceContext } from "./trace.ts";
+import {
+  observationEvent,
+  rejectSuppliedInitialState,
+  requireObservedGrade,
+  TICKET_ORIGIN,
+} from "./creation-policy.ts";
 
-const TERMINAL_TICKET_GRADES = new Set(["win", "loss", "push", "void"]);
+const TICKET_GRADES = ["pending", "win", "loss", "push", "void"] as const;
 
 function resolveBytes(input: Record<string, unknown>): Uint8Array {
   if (input.bytes instanceof Uint8Array) return input.bytes;
@@ -387,6 +392,8 @@ function createRun(
       ? input.trace_id
       : trace.trace_id;
 
+  rejectSuppliedInitialState(input, "status", cmd.action);
+
   const existing = db.query(`SELECT * FROM run WHERE id = ?`).get(run_id) as
     | Record<string, unknown>
     | null;
@@ -528,6 +535,102 @@ function createMission(
   return creationResult(cmd, id, cmd.event, state);
 }
 
+function parseTicketFields(
+  input: Record<string, unknown>,
+  action: string,
+): {
+  kind: "single" | "parlay";
+  external_ref: string;
+  placed_at: string;
+  legs: unknown[];
+  combined_price: number;
+  stake: number;
+  payout: number | null;
+  correlation_note: string;
+} {
+  rejectSuppliedInitialState(input, "origin", action);
+  const kind = input.kind;
+  if (kind !== "single" && kind !== "parlay") {
+    throw new KernelError(`${action} requires kind single|parlay`);
+  }
+  const external_ref = input.external_ref;
+  if (typeof external_ref !== "string" || external_ref.length === 0) {
+    throw new KernelError(`${action} requires non-empty "external_ref"`);
+  }
+  const placed_at = input.placed_at;
+  if (typeof placed_at !== "string" || placed_at.length === 0) {
+    throw new KernelError(`${action} requires "placed_at" ISO datetime`);
+  }
+  if (!Array.isArray(input.legs)) {
+    throw new KernelError(`${action} requires array "legs"`);
+  }
+  const combined_price = input.combined_price;
+  if (typeof combined_price !== "number") {
+    throw new KernelError(`${action} requires numeric "combined_price"`);
+  }
+  const stake = input.stake;
+  if (typeof stake !== "number") {
+    throw new KernelError(`${action} requires numeric "stake"`);
+  }
+  const correlation_note = input.correlation_note;
+  if (typeof correlation_note !== "string") {
+    throw new KernelError(`${action} requires string "correlation_note"`);
+  }
+  let payout: number | null = null;
+  if (input.payout !== undefined && input.payout !== null) {
+    if (typeof input.payout !== "number") {
+      throw new KernelError(`${action} "payout" must be number or null`);
+    }
+    payout = input.payout;
+  }
+  return {
+    kind,
+    external_ref,
+    placed_at,
+    legs: input.legs,
+    combined_price,
+    stake,
+    payout,
+    correlation_note,
+  };
+}
+
+function insertTicketRow(
+  db: KernelDb,
+  opts: {
+    id: string;
+    origin: "strategy_proposed" | "operator_supplied";
+    kind: "single" | "parlay";
+    external_ref: string;
+    placed_at: string;
+    legs: unknown[];
+    combined_price: number;
+    stake: number;
+    payout: number | null;
+    correlation_note: string;
+    grade: string;
+  },
+): void {
+  const created_at = new Date().toISOString();
+  db.query(
+    `INSERT INTO ticket (id, created_at, origin, kind, external_ref, placed_at, legs, combined_price, stake, payout, correlation_note, grade)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    opts.id,
+    created_at,
+    opts.origin,
+    opts.kind,
+    opts.external_ref,
+    opts.placed_at,
+    JSON.stringify(opts.legs),
+    opts.combined_price,
+    opts.stake,
+    opts.payout,
+    opts.correlation_note,
+    opts.grade,
+  );
+}
+
 function createTicket(
   db: KernelDb,
   cmd: CreationCommand,
@@ -535,65 +638,44 @@ function createTicket(
   trace: TraceContext,
   links: LinkSpec[],
 ): ExecuteResult {
-  const origin = input.origin;
-  if (origin !== "strategy_proposed" && origin !== "operator_supplied") {
-    throw new KernelError('create_ticket requires origin strategy_proposed|operator_supplied');
-  }
-  const kind = input.kind;
-  if (kind !== "single" && kind !== "parlay") {
-    throw new KernelError('create_ticket requires kind single|parlay');
-  }
-  const external_ref = input.external_ref;
-  if (typeof external_ref !== "string" || external_ref.length === 0) {
-    throw new KernelError('create_ticket requires non-empty "external_ref"');
-  }
-  const placed_at = input.placed_at;
-  if (typeof placed_at !== "string" || placed_at.length === 0) {
-    throw new KernelError('create_ticket requires "placed_at" ISO datetime');
-  }
-  if (!Array.isArray(input.legs)) {
-    throw new KernelError('create_ticket requires array "legs"');
-  }
-  const combined_price = input.combined_price;
-  if (typeof combined_price !== "number") {
-    throw new KernelError('create_ticket requires numeric "combined_price"');
-  }
-  const stake = input.stake;
-  if (typeof stake !== "number") {
-    throw new KernelError('create_ticket requires numeric "stake"');
-  }
-  const correlation_note = input.correlation_note;
-  if (typeof correlation_note !== "string") {
-    throw new KernelError('create_ticket requires string "correlation_note"');
-  }
-  let payout: number | null = null;
-  if (input.payout !== undefined && input.payout !== null) {
-    if (typeof input.payout !== "number") {
-      throw new KernelError('create_ticket "payout" must be number or null');
-    }
-    payout = input.payout;
-  }
+  rejectSuppliedInitialState(input, "grade", cmd.action);
+  const fields = parseTicketFields(input, cmd.action);
+  const grade = "pending";
+  const origin = TICKET_ORIGIN.system;
 
-  const grade =
-    input.grade === undefined || input.grade === null ? "pending" : String(input.grade);
-  if (
-    grade !== "pending" &&
-    grade !== "win" &&
-    grade !== "loss" &&
-    grade !== "push" &&
-    grade !== "void"
-  ) {
-    throw new KernelError('create_ticket grade must be pending|win|loss|push|void');
-  }
+  const id = fields.external_ref;
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: id,
+    event: cmd.event,
+    trace,
+    links,
+    payload: {
+      command: cmd.action,
+      origin,
+      ...fields,
+      grade,
+    },
+    insert: () => {
+      insertTicketRow(db, { id, origin, ...fields, grade });
+    },
+  });
+  return creationResult(cmd, id, cmd.event, state, grade);
+}
 
-  if (origin === "strategy_proposed" && TERMINAL_TICKET_GRADES.has(grade)) {
-    throw new FabricatedStateError("ticket", origin, grade);
-  }
+function observeTicket(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ExecuteResult {
+  const fields = parseTicketFields(input, cmd.action);
+  const grade = requireObservedGrade(input, cmd.action, TICKET_GRADES);
+  const origin = TICKET_ORIGIN.observed;
+  const eventType = observationEvent(cmd.object_type);
 
-  const isObservation = origin === "operator_supplied" && TERMINAL_TICKET_GRADES.has(grade);
-  const eventType = isObservation ? "ticket.observed" : cmd.event;
-
-  const id = external_ref;
+  const id = fields.external_ref;
   const state = commitCreation(db, {
     object_type: cmd.object_type,
     object_id: id,
@@ -603,36 +685,12 @@ function createTicket(
     payload: {
       command: cmd.action,
       origin,
-      kind,
-      external_ref,
-      placed_at,
-      legs: input.legs,
-      combined_price,
-      stake,
-      payout,
-      correlation_note,
+      ...fields,
       grade,
-      observation: isObservation,
+      observation: true,
     },
     insert: () => {
-      const created_at = new Date().toISOString();
-      db.query(
-        `INSERT INTO ticket (id, created_at, origin, kind, external_ref, placed_at, legs, combined_price, stake, payout, correlation_note, grade)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).run(
-        id,
-        created_at,
-        origin,
-        kind,
-        external_ref,
-        placed_at,
-        JSON.stringify(input.legs),
-        combined_price,
-        stake,
-        payout,
-        correlation_note,
-        grade,
-      );
+      insertTicketRow(db, { id, origin, ...fields, grade });
     },
   });
   return creationResult(cmd, id, eventType, state, grade);
@@ -649,6 +707,7 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   record_evaluation: recordEvaluation,
   create_mission: createMission,
   create_ticket: createTicket,
+  observe_ticket: observeTicket,
 };
 
 /** Every creationCommands entry must have a handler (D3 join). */

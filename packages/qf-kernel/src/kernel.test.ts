@@ -8,7 +8,6 @@ import {
   ContentHashMismatchError,
   eventCount,
   execute,
-  FabricatedStateError,
   IllegalLinkError,
   IllegalTransitionError,
   insertAgentSession,
@@ -540,14 +539,13 @@ describe("qf-kernel", () => {
     expect(evals.n).toBe(0);
   });
 
-  test("G4 · strategy_proposed terminal grade rejected; operator_supplied observed", () => {
+  test("G4 · create_ticket rejects grade; observe_ticket records observation", () => {
     db = openKernel(":memory:");
     expect(() =>
       execute(
         db,
         "create_ticket",
         {
-          origin: "strategy_proposed",
           kind: "single",
           external_ref: "slip-fabricated",
           placed_at: "2026-07-25T12:00:00.000Z",
@@ -559,13 +557,12 @@ describe("qf-kernel", () => {
         },
         ctx,
       ),
-    ).toThrow(FabricatedStateError);
+    ).toThrow(/does not accept "grade"/);
 
     execute(
       db,
-      "create_ticket",
+      "observe_ticket",
       {
-        origin: "operator_supplied",
         kind: "single",
         external_ref: "slip-real",
         placed_at: "2026-07-25T12:00:00.000Z",
@@ -588,5 +585,39 @@ describe("qf-kernel", () => {
     const payload = JSON.parse(events[0]!.payload) as { observation?: boolean; grade?: string };
     expect(payload.observation).toBe(true);
     expect(payload.grade).toBe("win");
+  });
+
+  test("G4b · creation-policy rejects supplied run status; mechanism is reusable", () => {
+    db = openKernel(":memory:");
+    expect(() =>
+      execute(
+        db,
+        "create_run",
+        {
+          run_id: "run-bad-status",
+          kind: "backtest",
+          status: "succeeded",
+        },
+        ctx,
+      ),
+    ).toThrow(/does not accept "status"/);
+
+    const pending = execute(
+      db,
+      "create_ticket",
+      {
+        kind: "single",
+        external_ref: "slip-pending",
+        placed_at: "2026-07-25T12:00:00.000Z",
+        legs: [{ selection: "B", price: 2.0 }],
+        combined_price: 2.0,
+        stake: 50,
+        correlation_note: "",
+      },
+      { ...ctx, span_id: "span-pending" },
+    );
+    expect(pending.state.grade).toBe("pending");
+    expect(pending.state.origin).toBe("strategy_proposed");
+    expect(pending.event).toBe("ticket.created");
   });
 });

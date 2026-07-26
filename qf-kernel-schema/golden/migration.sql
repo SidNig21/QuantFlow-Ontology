@@ -55,7 +55,8 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('creat
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_dataset_version', 'action', 'experimental', 'Register a new content-hashed, point-in-time dataset version in the Kernel.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_run', 'action', 'experimental', 'Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_mission', 'action', 'experimental', 'Register a standing research mission with name and objective.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_ticket', 'action', 'experimental', 'Record a ticket at creation. Operator-supplied rows may arrive in a terminal grade; strategy-proposed rows must start pending.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_ticket', 'action', 'experimental', 'Record a strategy-proposed ticket starting pending. Does not accept a grade; use observe_ticket for externally observed slips.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('observe_ticket', 'action', 'experimental', 'Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_run', 'action', 'experimental', 'Start a queued run (queued → running). Rejectable if the transition is illegal.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cancel_run', 'action', 'experimental', 'Cancel a running run (running → cancelled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_run', 'action', 'experimental', 'Mark a running run as succeeded (running → succeeded).');

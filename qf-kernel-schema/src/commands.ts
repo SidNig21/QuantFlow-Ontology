@@ -213,6 +213,11 @@ export const creationCommands: readonly CreationCommand[] = [
     object_type: "ticket",
     event: "ticket.created",
   },
+  {
+    action: "observe_ticket",
+    object_type: "ticket",
+    event: "ticket.observed",
+  },
 ] as const;
 
 /** All legal (type, from, to) edges from the transition tables. */

@@ -6,7 +6,7 @@
  *   bun qa/run.ts <gate-name>
  *   bun qa/run.ts --all
  */
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
@@ -18,6 +18,31 @@ import { runAgentPathGate } from "./gates/agent-path.ts";
 import { runDockRegistryGate } from "./gates/dock-registry.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
+
+const SKIP_DIRS = new Set(["node_modules", ".git"]);
+
+/** Walk the repo for package.json files that declare a typecheck script. */
+function discoverTypecheckPackages(root: string): string[] {
+  const found: string[] = [];
+  function walk(dir: string): void {
+    const base = dir.slice(dir.lastIndexOf("/") + 1);
+    if (SKIP_DIRS.has(base)) return;
+    const pkgPath = join(dir, "package.json");
+    if (existsSync(pkgPath)) {
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
+        scripts?: { typecheck?: string };
+      };
+      if (pkg.scripts?.typecheck) found.push(dir);
+    }
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      if (SKIP_DIRS.has(entry.name)) continue;
+      walk(join(dir, entry.name));
+    }
+  }
+  walk(root);
+  return found.sort();
+}
 
 type Gate = {
   name: string;
@@ -174,25 +199,33 @@ const gates: Gate[] = [
     description:
       "TypeScript strict check for every package that declares a typecheck script",
     run: async () => {
-      const packages = [
-        join(REPO_ROOT, "packages/qf-kernel"),
-        join(REPO_ROOT, "tools/qf-peer-bus"),
-      ];
+      const packages = discoverTypecheckPackages(REPO_ROOT);
+      if (packages.length === 0) {
+        console.error("typecheck: no packages with a typecheck script found");
+        return false;
+      }
       for (const cwd of packages) {
-        const pkgPath = join(cwd, "package.json");
-        if (!existsSync(pkgPath)) continue;
-        const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
-          scripts?: { typecheck?: string };
-        };
-        if (!pkg.scripts?.typecheck) continue;
-        const proc = Bun.spawn(["bun", "run", "typecheck"], {
+        const lock = join(cwd, "bun.lock");
+        if (existsSync(lock)) {
+          const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+            cwd,
+            stdout: "inherit",
+            stderr: "inherit",
+          });
+          const installCode = await install.exited;
+          if (installCode !== 0) {
+            console.error(`typecheck: bun install in ${cwd} exited ${installCode}`);
+            return false;
+          }
+        }
+        const proc = Bun.spawn(["bunx", "tsc", "--noEmit"], {
           cwd,
           stdout: "inherit",
           stderr: "inherit",
         });
         const code = await proc.exited;
         if (code !== 0) {
-          console.error(`typecheck: ${cwd} exited ${code}`);
+          console.error(`typecheck: bunx tsc --noEmit in ${cwd} exited ${code}`);
           return false;
         }
       }

@@ -415,12 +415,26 @@ export const create_mission = defineAction({
 export const create_ticket = defineAction({
   name: "create_ticket",
   description:
-    "Record a ticket at creation. Operator-supplied rows may arrive in a terminal grade; strategy-proposed rows must start pending.",
+    "Record a strategy-proposed ticket starting pending. Does not accept a grade; use observe_ticket for externally observed slips.",
   lifecycle: "experimental",
   input: z.object({
-    origin: z
-      .enum(["strategy_proposed", "operator_supplied"])
-      .describe("How this ticket entered the system."),
+    kind: z.enum(["single", "parlay"]).describe("Single or parlay wager."),
+    external_ref: z.string().describe("Venue-issued idempotency key."),
+    placed_at: z.iso.datetime().describe("Placement timestamp (ISO-8601 UTC)."),
+    legs: jsonArray.describe("Per-leg selections with selection-time prices."),
+    combined_price: z.number().describe("Aggregate price at selection."),
+    stake: z.number().describe("Amount risked."),
+    payout: z.number().describe("Realized return when settled.").nullable().optional(),
+    correlation_note: z.string().describe("Declared leg dependence assumptions."),
+  }),
+});
+
+export const observe_ticket = defineAction({
+  name: "observe_ticket",
+  description:
+    "Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.",
+  lifecycle: "experimental",
+  input: z.object({
     kind: z.enum(["single", "parlay"]).describe("Single or parlay wager."),
     external_ref: z.string().describe("Venue-issued idempotency key."),
     placed_at: z.iso.datetime().describe("Placement timestamp (ISO-8601 UTC)."),
@@ -431,8 +445,7 @@ export const create_ticket = defineAction({
     correlation_note: z.string().describe("Declared leg dependence assumptions."),
     grade: z
       .enum(["pending", "win", "loss", "push", "void"])
-      .describe("Settlement grade at arrival; operator_supplied may be terminal.")
-      .optional(),
+      .describe("Observed settlement grade at ingestion; terminal grades allowed."),
   }),
 });
 

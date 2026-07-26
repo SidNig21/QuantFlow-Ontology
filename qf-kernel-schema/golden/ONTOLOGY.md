@@ -407,11 +407,10 @@ Register a standing research mission with name and objective.
 
 ### `create_ticket`
 
-Record a ticket at creation. Operator-supplied rows may arrive in a terminal grade; strategy-proposed rows must start pending.
+Record a strategy-proposed ticket starting pending. Does not accept a grade; use observe_ticket for externally observed slips.
 
 - **lifecycle:** `experimental`
 - **input:**
-- `origin` — How this ticket entered the system.
 - `kind` — Single or parlay wager.
 - `external_ref` — Venue-issued idempotency key.
 - `placed_at` — Placement timestamp (ISO-8601 UTC).
@@ -420,7 +419,22 @@ Record a ticket at creation. Operator-supplied rows may arrive in a terminal gra
 - `stake` — Amount risked.
 - `payout` — Realized return when settled.
 - `correlation_note` — Declared leg dependence assumptions.
-- `grade` — Settlement grade at arrival; operator_supplied may be terminal.
+
+### `observe_ticket`
+
+Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `kind` — Single or parlay wager.
+- `external_ref` — Venue-issued idempotency key.
+- `placed_at` — Placement timestamp (ISO-8601 UTC).
+- `legs` — Per-leg selections with selection-time prices.
+- `combined_price` — Aggregate price at selection.
+- `stake` — Amount risked.
+- `payout` — Realized return when settled.
+- `correlation_note` — Declared leg dependence assumptions.
+- `grade` — Observed settlement grade at ingestion; terminal grades allowed.
 
 ### `start_run`
 

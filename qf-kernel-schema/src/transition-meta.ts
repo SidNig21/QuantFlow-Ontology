@@ -9,26 +9,35 @@ function objectIdFieldFromAction(actionName: string): string {
   if (!action) {
     throw new Error(`transition-meta: action "${actionName}" not in schema`);
   }
-  for (const key of Object.keys(action.input.shape)) {
-    if (key.endsWith("_id")) return key;
+  const idKeys = Object.keys(action.input.shape).filter((key) => key.endsWith("_id"));
+  if (idKeys.length === 0) {
+    throw new Error(`transition-meta: action "${actionName}" has no *_id input field`);
   }
-  throw new Error(`transition-meta: action "${actionName}" has no *_id input field`);
+  if (idKeys.length > 1) {
+    throw new Error(
+      `transition-meta: action "${actionName}" has multiple *_id fields: ${idKeys.join(", ")}`,
+    );
+  }
+  return idKeys[0]!;
 }
 
 function buildTransitionIdFields(): Record<StatefulType, string> {
   const map = {} as Record<StatefulType, string>;
   for (const type of Object.keys(transitions) as StatefulType[]) {
-    const cmd = commands.find((c) => c.type === type);
-    if (!cmd) {
+    const cmds = commands.filter((c) => c.type === type);
+    if (cmds.length === 0) {
       throw new Error(`transition-meta: no transition command for type "${type}"`);
     }
-    const idField = objectIdFieldFromAction(cmd.action);
-    if (type in map && map[type] !== idField) {
-      throw new Error(
-        `transition-meta: conflicting id fields for "${type}": ${map[type]} vs ${idField}`,
-      );
+    const idFields = cmds.map((cmd) => objectIdFieldFromAction(cmd.action));
+    const first = idFields[0]!;
+    for (const field of idFields.slice(1)) {
+      if (field !== first) {
+        throw new Error(
+          `transition-meta: conflicting id fields for "${type}": ${first} vs ${field}`,
+        );
+      }
     }
-    map[type] = idField;
+    map[type] = first;
   }
   return map;
 }
