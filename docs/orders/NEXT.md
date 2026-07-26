@@ -1,85 +1,64 @@
-# NEXT — the current order (rotated 2026-07-26: WO-105 built, verified, **rework round 1**)
+# NEXT — no order is currently cuttable (rotated 2026-07-26: WO-105 verified + merged)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-105 rework round 1 — two blocking defects**
+## STOP — there is no builder work right now
 
-**You are not starting this rung. You are finishing it.** WO-105 was built to `dabcc34`, pushed,
-and independently re-measured by the checking seat. Most of it is genuinely green and **must not be
-rebuilt**. Two defects block the merge.
+**WO-105 is done** (verified + merged 2026-07-26 after 1 rework round; 15 gates cold,
+`GATE_RUNNER_EXIT=0`). P3 rung 2 of 3 is closed: GATE 1 exists at `execute.ts:122`, 24 action tools
+are served, and `qf_observe_ticket` is structurally absent from every agent catalogue.
 
-### Start here, in this order
+**The next rung — WO-106 — is blocked on a founder decision (ROADMAP debt #24) and may not be
+written or cut until that decision is made.** If you are a builder and you arrived here, stop and
+report that; do not select another order, and do not start WO-106.
 
-1. **`git fetch && git checkout wo-105`** — the branch is on origin at `dabcc34`. Do **not** branch
-   from `main`; `main` does not have this work.
-2. Read `AGENTS.md` at repo root, then `START_HERE.md` in full (note §5.8).
-3. Read [`WO-105.md`](WO-105.md) **end to end, including the two records at the bottom** — the
-   pre-build adversarial read, and then **`VERIFICATION ROUND 1`**, which is your actual work order.
-   Every finding there was re-measured; the file:line cites are exact.
-4. Fix **only** the two blockers below. Commit from a worktree, never the shared tree.
-5. Run every gate unpiped and paste full unedited output. Report per [`PROTOCOL.md`](PROTOCOL.md).
+## What the decision is
 
-### BLOCKER 1 — GATE 1 breaks the Electron app's boot path
+WO-105 shipped 24 working write tools. **They advertise no parameters.** `qf_create_ticket`'s
+transport `inputSchema` has zero properties; its real eight-field shape survives only in
+`_meta["qf/inputSchema"]`, which standard MCP clients ignore.
 
-`fail_agent_session` declares only `session_id`, but three live callers pass `reason`
-(`agent-host.ts:270`, `agent-host.ts:608`, `host-acp-turn.ts:105`). `reconcileStaleSessions()` runs
-at boot inside a rethrowing catch (`index.ts:849-857`), so **after any unclean shutdown the app now
-fails to start.** A sweep of all 28 `kernelExecute` callsites found exactly these 3 breaking.
+This is not a defect to assign. In `@modelcontextprotocol/sdk@1.29.0`, `registerTool` **derives**
+the advertised JSON Schema from the same object it validates with — so advertising the true shape
+would make MCP a second validator, masking GATE 1 and violating WO-105 D3, which the order
+mandated. The fork is real:
 
-**The ruling is made — implement it, do not redesign it:** declare `reason` as an **optional
-string** on `fail_agent_session` (the same class of correction D0 already made this rung), and
-**revert the `qa/gates/agent-path/run.ts` edit in the same commit**. Do not delete `reason` from
-the app. The previous seat deleted the field from the *gate that models* that boot function instead
-of fixing the function — that is how a red became green while the product broke.
+- **Leave it** — tools are callable but not self-describing; an agent must be told the shape.
+- **Serve `tools/list` from a low-level handler** that emits the real JSON Schema while
+  `registerTool` keeps the permissive validator. The write path stays single; only the
+  *advertisement* changes. Real work, and a change to the agent-facing contract.
 
-### BLOCKER 2 — `FAIL typecheck`, the rung's own gate is red
+**It gates WO-106 because WO-106's entire premise is "the cold seat proves discovery — no priming,
+generated tools only."** A cold seat cannot discover parameters that are not advertised. Deciding
+this after WO-106 is written means rewriting it.
 
-Cold `bun qa/run.ts --all` at `dabcc34` → **`GATE_RUNNER_EXIT=1`**, 14 PASS / 1 FAIL / 15 gates.
-Three `TS2345` errors in `tools/qf-read-tools/src/harness.ts` lines **170, 212, 236** — a
-`CallToolResult` union (may carry `toolResult` instead of `content`) passed into a helper typed
-`{ content: unknown }`. Narrow the union or type the parameter as the SDK result type.
+Full statement: ROADMAP debt #24. Measurements behind it:
+[`evidence/wo-105/VERIFICATION.md`](evidence/wo-105/VERIFICATION.md).
 
-**This also fails in the previous builder's own warm worktree** (`TSC_EXIT=2`). It is not a cold
-artifact — the full suite was not run, or its output was misread. **Never pipe the gate runner**; a
-prior seat read `tail`'s exit 0 while the gate had failed. Unpiped, `$?` on its own line.
+## Where the ladder stands
 
-### Do not touch — verified green, re-measured by the checking seat
+**5 of 11 rungs done** (`SCOPES.md` is authoritative on numbering). P1 closed, P2 closed, P3 at
+2 of 3. Remaining: **WO-106** (cold seat + verb retirement — the only pre-P5 rung touching
+`collab-electron`), then **WO-107b** (market ingest; unblocks four link kinds), **WO-107** (first
+market — **Bovada sportsbook only**, doctrine A7; its order may not be written until the
+external-surface probe runs — candidate instrument triaged in `docs/RESEARCH.md`), **WO-108**
+(second market), then **WO-109/110/111** — the loop, the critic, and the one-shot proof.
 
-24 action tools served with `qf_observe_ticket` **absent**; counts genuinely derived (the same
-assertion emits `97/72/25` against the fixture schema and `93/69/24` against the real one); GATE 1
-rejects and writes nothing (`events_before_after 4 4`); GATE 2 survives the transport; `golden/
-tools.json` correctly stays at **94** while the served plane is 93; the single parse site at
-`execute.ts:122` sits before the creation/transition fork. **Rebuilding any of this is a defect.**
-
-### Out of scope — do not attempt
-
-Action tools advertise **no parameters** (real shape is only in `_meta`). This is logged as
-**ROADMAP debt #24**, is trigger-gated to WO-106, and is a **founder decision** — it changes the
-agent-facing contract and is deliberately not delegated. Leave it alone.
-
-Two standing traps, both logged: **`agent-path` gives a false FAIL in a sandboxed shell** (debt
-#23) — pre-install before any before/after measurement. **Never pipe the gate runner** (above).
-
-## After this rework
-
-The checking seat verifies independently — cold suite in a throwaway worktree, gates re-baited by
-hand, no transcripts taken as evidence — then merges and rotates. **Do not merge to `main`
-yourself.**
-
-## Queued behind (do not start)
-
-**WO-106** — the cold seat proves discovery (no priming, generated tools only) and the hand-grown
-verbs retire; the only pre-P5 rung touching `collab-electron`. **Blocked on debt #24 above.** Then
-**WO-107b** (market ingest — the bulk command with ingest trace; unblocks four link kinds), then
-**WO-107** (first market — **Bovada sportsbook only**, doctrine A7; its order may not be written
-until the external-surface probe runs — a candidate instrument is triaged in `docs/RESEARCH.md`),
-then the loop, the critic, and the one-shot proof. See [`SCOPES.md`](SCOPES.md).
+Rung count is not effort. The remaining six rungs include every one that touches real external
+data and the closing proof; they are heavier than the five behind us.
 
 ## Standing seat constraint (founder, 2026-07-26)
 
 Builder seats run **`composer-2.5` or `cursor-grok-4.5-high` only** — an API-cost decision, not a
 trust one. One model builds, a different one verifies; no model checks its own work.
+
+## Two standing traps, both measured and logged
+
+- **`agent-path` gives a false FAIL in a sandboxed shell** (debt #23) — its self-install exits 0 but
+  leaves no `node_modules`. Pre-install before any before/after measurement.
+- **Never pipe the gate runner.** It has now cost two seats: one read `tail`'s exit 0 while the gate
+  had failed. Unpiped, `$?` on its own line, every time.
 
 ## Parked / parallel
 
@@ -87,7 +66,7 @@ trust one. One model builds, a different one verifies; no model checks its own w
 and falsifiable gates, and must fit `one-skin`. **Market-abstraction test** — debt #20,
 trigger-gated. **Durable execution** — debt #17, trigger-gated. **Promotion authority +
 freeze-lint bypass** — debt #19 (`promote_type` deleted by WO-103b; its fixing order re-adds the
-action). **Caller identity** — debt #22; WO-105 narrows the served surface but the lock is still
+action). **Caller identity** — debt #22; WO-105 narrowed the served surface but the lock is still
 unbuilt.
 
 ---

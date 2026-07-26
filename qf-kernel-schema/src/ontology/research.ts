@@ -434,6 +434,7 @@ export const observe_ticket = defineAction({
   description:
     "Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.",
   lifecycle: "experimental",
+  operatorOnly: true,
   input: z.object({
     kind: z.enum(["single", "parlay"]).describe("Single or parlay wager."),
     external_ref: z.string().describe("Venue-issued idempotency key."),
@@ -499,13 +500,25 @@ export const publish_artifact = defineAction({
   name: "publish_artifact",
   description: "Publish an immutable content-addressed artifact (must land before sandbox death).",
   lifecycle: "experimental",
-  input: z.object({
-    kind: z
-      .enum(["strategy_spec", "code", "result_set", "report", "trajectory"])
-      .describe("Artifact kind to publish."),
-    content_hash: z.string().describe("Content hash of the bytes."),
-    storage_ref: z.string().describe("Durable storage location."),
-  }),
+  input: z
+    .object({
+      kind: z
+        .enum(["strategy_spec", "code", "result_set", "report", "trajectory"])
+        .describe("Artifact kind to publish."),
+      content_hash: z
+        .string()
+        .optional()
+        .describe(
+          "Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.",
+        ),
+      storage_ref: z.string().describe("Durable storage location."),
+      path: z
+        .string()
+        .optional()
+        .describe(
+          "Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.",
+        ),
+    }),
 });
 
 export const record_evaluation = defineAction({

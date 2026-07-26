@@ -560,6 +560,7 @@ Fail a starting, running, or blocked agent session (→ failed). Used for guest 
 - **lifecycle:** `experimental`
 - **input:**
 - `session_id` — Agent session to fail.
+- `reason` — Diagnostic label for why the session failed (crash code, stop reason, or boot reconciliation). Optional; recorded in the event payload when supplied and does not affect transition legality.
 
 ### `close_agent_session`
 
@@ -576,8 +577,9 @@ Publish an immutable content-addressed artifact (must land before sandbox death)
 - **lifecycle:** `experimental`
 - **input:**
 - `kind` — Artifact kind to publish.
-- `content_hash` — Content hash of the bytes.
+- `content_hash` — Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.
 - `storage_ref` — Durable storage location.
+- `path` — Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.
 
 ### `record_evaluation`
 

@@ -560,7 +560,7 @@ describe("qf-kernel", () => {
         },
         ctx,
       ),
-    ).toThrow(/does not accept "grade"/);
+    ).toThrow(/"grade"/);
 
     execute(
       db,
@@ -603,7 +603,7 @@ describe("qf-kernel", () => {
         },
         ctx,
       ),
-    ).toThrow(/does not accept "status"/);
+    ).toThrow(/"status"/);
 
     const pending = execute(
       db,

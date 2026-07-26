@@ -84,6 +84,21 @@ export function queryToolInputForObject(object: DefinedObject): z.ZodObject<z.Zo
   return queryInputForObject(object);
 }
 
+type ActionLike = {
+  name: string;
+  description: string;
+  input: z.ZodType;
+};
+
+/** Build one action-tool definition for discovery (not transport validation). */
+export function actionToolForAction(action: ActionLike): McpToolDefinition {
+  return {
+    name: `qf_${action.name}`,
+    description: action.description,
+    inputSchema: toInputJsonSchema(action.input),
+  };
+}
+
 /** Build the three read-tool definitions for one schema object. */
 export function readToolsForObject(object: DefinedObject): McpToolDefinition[] {
   return [
@@ -117,11 +132,7 @@ export function generateMcp(schema: Schema): string {
   }
 
   for (const action of schema.actions) {
-    tools.push({
-      name: `qf_${action.name}`,
-      description: action.description,
-      inputSchema: toInputJsonSchema(action.input),
-    });
+    tools.push(actionToolForAction(action));
   }
 
   return `${JSON.stringify(tools, null, 2)}\n`;

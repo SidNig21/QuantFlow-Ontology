@@ -205,7 +205,7 @@ describe("schema lint", () => {
     const tables = { widget: { a: ["b"], b: [] } };
     expect(() =>
       lintCommands(schema, tables, [
-        { action: "invented", type: "widget", from: "a", to: "b" },
+        { action: "invented", type: "widget", from: "a", to: "b", event: "widget.advanced" },
       ]),
     ).toThrow('Command action "invented" is not a schema action');
   });
@@ -267,7 +267,13 @@ describe("schema lint", () => {
     const tables = { feed_event: { ingested: ["archived"], archived: [] } };
     expect(() =>
       lintCommands(schema, tables, [
-        { action: "archive_feed_event", type: "feed_event", from: "ingested", to: "archived" },
+        {
+          action: "archive_feed_event",
+          type: "feed_event",
+          from: "ingested",
+          to: "archived",
+          event: "feed_event.archived",
+        },
       ]),
     ).toThrow('Pipeline-fed type "feed_event" must not have transition command edges');
   });
@@ -302,6 +308,97 @@ describe("schema lint", () => {
         },
       ]),
     ).toThrow('Pipeline-fed type "feed_snapshot" must not have creation commands');
+  });
+
+  test("lintCommands rejects observation-coupled action without operatorOnly (generic rule)", () => {
+    const run = defineObject({
+      name: "run",
+      description: "A run.",
+      lifecycle: "experimental",
+      properties: z.object({
+        status: z.enum(["queued", "done"]).describe("Status."),
+      }),
+    });
+    const observe_run = defineAction({
+      name: "observe_run",
+      description: "Observe a run at settlement.",
+      lifecycle: "experimental",
+      input: z.object({ run_id: z.string().describe("Run id.") }),
+    });
+    const schema: Schema = { objects: [run], links: [], actions: [observe_run] };
+    expect(() =>
+      lintCommands(schema, {}, [], [
+        { action: "observe_run", object_type: "run", event: "run.observed" },
+      ]),
+    ).toThrow(
+      'Action "observe_run" is observation-coupled (command event ends ".observed") but operatorOnly is not true',
+    );
+  });
+
+  test("lintCommands rejects operatorOnly on action with no observation event", () => {
+    const blob = defineObject({
+      name: "blob",
+      description: "A blob.",
+      lifecycle: "experimental",
+      properties: z.object({ label: z.string().describe("Label.") }),
+    });
+    const publish_blob = defineAction({
+      name: "publish_blob",
+      description: "Publish a blob.",
+      lifecycle: "experimental",
+      operatorOnly: true,
+      input: z.object({ label: z.string().describe("Label.") }),
+    });
+    const schema: Schema = { objects: [blob], links: [], actions: [publish_blob] };
+    expect(() =>
+      lintCommands(schema, {}, [], [
+        { action: "publish_blob", object_type: "blob", event: "blob.published" },
+      ]),
+    ).toThrow(
+      'Action "publish_blob" has operatorOnly but is not observation-coupled (no command event ends ".observed")',
+    );
+  });
+
+  test("lintCommands rejects operatorOnly action with a non-observation command event", () => {
+    const ticket = defineObject({
+      name: "ticket",
+      description: "A ticket.",
+      lifecycle: "experimental",
+      properties: z.object({
+        grade: z.enum(["pending", "win"]).describe("Grade."),
+      }),
+    });
+    const observe_and_grade = defineAction({
+      name: "observe_and_grade",
+      description: "Half-observation action.",
+      lifecycle: "experimental",
+      operatorOnly: true,
+      input: z.object({ ticket_id: z.string().describe("Ticket id.") }),
+    });
+    const schema: Schema = {
+      objects: [ticket],
+      links: [],
+      actions: [observe_and_grade],
+    };
+    const tables = { ticket: { pending: ["win"], win: [] } };
+    expect(() =>
+      lintCommands(
+        schema,
+        tables,
+        [
+          {
+            action: "observe_and_grade",
+            type: "ticket",
+            from: "pending",
+            to: "win",
+            event: "ticket.graded",
+          },
+        ],
+        [{ action: "observe_and_grade", object_type: "ticket", event: "ticket.observed" }],
+      ),
+    ).toThrow(
+      'Action "observe_and_grade" is operatorOnly but command event "ticket.graded" does not end ".observed"',
+    );
   });
 
   test("lintActionSurface rejects a schema action with no command wiring", () => {

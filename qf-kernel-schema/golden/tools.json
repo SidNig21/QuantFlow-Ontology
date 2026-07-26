@@ -2262,6 +2262,10 @@
         "session_id": {
           "type": "string",
           "description": "Agent session to fail."
+        },
+        "reason": {
+          "description": "Diagnostic label for why the session failed (crash code, stop reason, or boot reconciliation). Optional; recorded in the event payload when supplied and does not affect transition legality.",
+          "type": "string"
         }
       },
       "required": [
@@ -2303,17 +2307,20 @@
           "description": "Artifact kind to publish."
         },
         "content_hash": {
-          "type": "string",
-          "description": "Content hash of the bytes."
+          "description": "Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.",
+          "type": "string"
         },
         "storage_ref": {
           "type": "string",
           "description": "Durable storage location."
+        },
+        "path": {
+          "description": "Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.",
+          "type": "string"
         }
       },
       "required": [
         "kind",
-        "content_hash",
         "storage_ref"
       ]
     }

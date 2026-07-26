@@ -250,6 +250,12 @@ export const fail_agent_session = defineAction({
   lifecycle: "experimental",
   input: z.object({
     session_id: z.string().describe("Agent session to fail."),
+    reason: z
+      .string()
+      .optional()
+      .describe(
+        "Diagnostic label for why the session failed (crash code, stop reason, or boot reconciliation). Optional; recorded in the event payload when supplied and does not affect transition legality.",
+      ),
   }),
 });
 

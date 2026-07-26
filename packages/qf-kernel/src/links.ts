@@ -8,14 +8,22 @@ export type LinkSpec = {
   to_id?: string;
 };
 
-/** Strip kernel-only `links` from command input before action-field validation. */
-export function extractLinkSpecs(input: Record<string, unknown>): {
+/** Strip kernel-only envelope fields (`links`, `bytes`) before action-field validation. */
+export function extractCreationEnvelope(input: Record<string, unknown>): {
   body: Record<string, unknown>;
   links: LinkSpec[];
+  bytes?: Uint8Array;
 } {
-  const { links, ...body } = input;
+  const { links, bytes, ...body } = input;
+  let extractedBytes: Uint8Array | undefined;
+  if (bytes !== undefined) {
+    if (!(bytes instanceof Uint8Array)) {
+      throw new KernelError('Optional "bytes" must be a Uint8Array');
+    }
+    extractedBytes = bytes;
+  }
   if (links === undefined) {
-    return { body, links: [] };
+    return { body, links: [], bytes: extractedBytes };
   }
   if (!Array.isArray(links)) {
     throw new KernelError('Optional "links" must be an array of { kind, from_id?, to_id? }');
@@ -35,7 +43,16 @@ export function extractLinkSpecs(input: Record<string, unknown>): {
       to_id: typeof row.to_id === "string" ? row.to_id : undefined,
     });
   }
-  return { body, links: specs };
+  return { body, links: specs, bytes: extractedBytes };
+}
+
+/** @deprecated Use extractCreationEnvelope — kept for callers that only need links. */
+export function extractLinkSpecs(input: Record<string, unknown>): {
+  body: Record<string, unknown>;
+  links: LinkSpec[];
+} {
+  const { body, links } = extractCreationEnvelope(input);
+  return { body, links };
 }
 
 function objectTypeOf(db: KernelDb, id: string): string | null {

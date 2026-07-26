@@ -1,3 +1,4 @@
+import { schema } from "qf-kernel-schema";
 import {
   commands,
   creationCommands,
@@ -12,7 +13,10 @@ import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
 import { IllegalTransitionError, KernelError } from "./errors.ts";
 import { appendEvent } from "./events.ts";
+import { extractCreationEnvelope, type LinkSpec } from "./links.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
+
+const actionByName = new Map(schema.actions.map((action) => [action.name, action]));
 
 function objectId(cmd: TransitionCommand, input: Record<string, unknown>): string {
   const key = transitionIdFields[cmd.type];
@@ -97,19 +101,36 @@ export function execute(
   const trace = requireTrace(ctx);
 
   const creation = creationCommands.find((c) => c.action === command);
-  if (creation) {
-    return executeCreation(db, creation, input, trace);
-  }
-
-  // Peek type from any command row with this action (for id field lookup before load).
-  const sample = commands.find((c) => c.action === command);
-  if (!sample) {
+  const transitionSample = creation ? undefined : commands.find((c) => c.action === command);
+  if (!creation && !transitionSample) {
     throw new KernelError(`Unknown command "${command}"`);
   }
 
-  const id = objectId(sample, input);
-  const { field, value: from } = readState(db, sample.type, id);
-  const hint = toHint(command, input);
+  const actionDef = actionByName.get(command);
+  if (!actionDef) {
+    throw new KernelError(`Unknown command "${command}"`);
+  }
+
+  let bodyForParse = input;
+  let linkSpecs: LinkSpec[] = [];
+  let envelopeBytes: Uint8Array | undefined;
+  if (creation) {
+    ({ body: bodyForParse, links: linkSpecs, bytes: envelopeBytes } =
+      extractCreationEnvelope(input));
+  }
+
+  let validatedInput = actionDef.input.strict().parse(bodyForParse) as Record<string, unknown>;
+  if (envelopeBytes !== undefined) {
+    validatedInput = { ...validatedInput, bytes: envelopeBytes };
+  }
+
+  if (creation) {
+    return executeCreation(db, creation, validatedInput, trace, linkSpecs);
+  }
+
+  const id = objectId(transitionSample!, validatedInput);
+  const { field, value: from } = readState(db, transitionSample!.type, id);
+  const hint = toHint(command, validatedInput);
   const cmd = resolveCommand(command, from, hint);
 
   try {
@@ -124,7 +145,7 @@ export function execute(
       type: cmd.event,
       object_type: cmd.type,
       object_id: id,
-      payload: { command, input, from, to: cmd.to, span_id: trace.span_id },
+      payload: { command, input: validatedInput, from, to: cmd.to, span_id: trace.span_id },
       trace_id: trace.trace_id,
     });
     const row = db.query(`SELECT * FROM ${cmd.type} WHERE id = ?`).get(id) as Record<

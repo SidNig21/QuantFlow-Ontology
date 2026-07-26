@@ -12,7 +12,8 @@
     "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
-    "qf-kernel-schema": "file:../../qf-kernel-schema"
+    "qf-kernel-schema": "file:../../qf-kernel-schema",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/bun": "^1.3.14",

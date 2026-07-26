@@ -12,7 +12,6 @@ import type { ExecuteResult } from "./execute.ts";
 import { contentHash } from "./hash.ts";
 import { insertAgentSession } from "./insert.ts";
 import {
-  extractLinkSpecs,
   lineageFieldsToLinks,
   type LinkSpec,
   writeLinks,
@@ -728,13 +727,11 @@ export function executeCreation(
   cmd: CreationCommand,
   input: Record<string, unknown>,
   trace: TraceContext,
+  links: LinkSpec[] = [],
 ): ExecuteResult {
   const handler = creationHandlers[cmd.action];
   if (!handler) {
     throw new KernelError(`No creation handler for action "${cmd.action}"`);
   }
-  const { body, links } = extractLinkSpecs(input);
-  return handler(db, cmd, body, trace, links);
+  return handler(db, cmd, input, trace, links);
 }
-
-export { extractLinkSpecs };
