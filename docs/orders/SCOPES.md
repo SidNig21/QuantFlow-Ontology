@@ -8,8 +8,16 @@
 > an order must say is *"here is what the last one actually produced."* Orders written far ahead
 > are orders written from inference, and this repo has already paid for that once.
 >
-> **Rule: an order is written at most one rung ahead of the build front.** WO-101 and WO-102
-> are written. Everything below is a contract, promoted to an order when its predecessor reports.
+> **Rule: an order is written at most one rung ahead of the build front.** WO-101 is written and
+> **done**. Everything below — WO-102 included — is a contract, promoted to an order when its
+> predecessor reports.
+>
+> **Corrected 2026-07-25 during WO-101 verification.** This line previously read *"WO-101 and
+> WO-102 are written."* `docs/orders/WO-102.md` does not exist and never did. The claim is the
+> exact failure `DOCTRINE.md` A5 names — *declaration is not capability* — committed by the file
+> that exists to sequence the work. Writing WO-102 is the next architect sitting; no builder may
+> start from this contract, because a contract is not an order (`START_HERE.md` §3, `PROTOCOL.md`
+> loop).
 
 Authority: `docs/DOCTRINE.md` is *why*, `docs/ROADMAP.md` is the debt register and phase gates,
 this file is the sequence, `docs/orders/` is the work. `START_HERE.md` beats all four.

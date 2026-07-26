@@ -30,3 +30,12 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-PEER-BUS](WO-PEER-BUS.md) | MCP peer plane beside the TUI (cold harness) | **done** — verified cold 2026-07-20 | builder |
 | [WO-PEER-BUS-CANVAS](WO-PEER-BUS-CANVAS.md) | Peer-bus visual PASS — dock seat spawn + founder live turns | **open** — current (park ignored for this PASS); plan `docs/plans/2026-07-20-001-req-peer-bus-canvas-pass-plan.md` | builder |
 | [WO-009](WO-009.md) | Datasets I: bootstrap ingestion (Parquet + Kernel pointer) | **parked** until canvas PASS holds | builder |
+
+## Doctrine ladder (P1→P5, eleven rungs — `SCOPES.md`)
+
+| Order | Title | Status | Assignee |
+|---|---|---|---|
+| [WO-101](WO-101.md) | Research + agent plane charter (P1 rung 1) | **done** — verified + merged 2026-07-25; both new lints re-baited by the verifier against the live schema; G2 re-run cold with two fresh readers | builder (Cursor `gpt-5.3-codex-high`) |
+| WO-102 | Market plane reframe — betting becomes rows, not types | **not written** — scope contract only (`SCOPES.md`); the order file does not exist. Next architect sitting | fable |
+| WO-103 | The write path — creation commands and edges | blocked on WO-102 | builder |
+| WO-104…WO-111 | Tool plane · markets · the loop · the one-shot proof | contracts only, promoted one rung ahead | — |

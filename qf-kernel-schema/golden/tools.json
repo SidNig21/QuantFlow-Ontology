@@ -185,8 +185,45 @@
     }
   },
   {
+    "name": "qf_mission_get",
+    "description": "Fetch one mission by id. A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_mission_query",
+    "description": "List mission rows with optional filters. A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
     "name": "qf_hypothesis_get",
-    "description": "Fetch one hypothesis by id. A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.",
+    "description": "Fetch one hypothesis by id. A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -202,7 +239,81 @@
   },
   {
     "name": "qf_hypothesis_query",
-    "description": "List hypothesis rows with optional filters. A falsifiable research claim that roots every lineage chain. Open one before datasets, tickets, or evaluations so work answers a named question.",
+    "description": "List hypothesis rows with optional filters. A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_policy_get",
+    "description": "Fetch one policy by id. A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_policy_query",
+    "description": "List policy rows with optional filters. A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "description": "Maximum rows to return.",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "offset": {
+          "description": "Rows to skip before returning results.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  },
+  {
+    "name": "qf_environment_get",
+    "description": "Fetch one environment by id. An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id to fetch."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "qf_environment_query",
+    "description": "List environment rows with optional filters. An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -223,7 +334,7 @@
   },
   {
     "name": "qf_strategy_get",
-    "description": "Fetch one strategy by id. A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.",
+    "description": "Fetch one strategy by id. A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -239,7 +350,7 @@
   },
   {
     "name": "qf_strategy_query",
-    "description": "List strategy rows with optional filters. A versioned, parameterized betting rule set under test. Identity lives here; the code/rules content lives in a linked artifact.",
+    "description": "List strategy rows with optional filters. A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -260,7 +371,7 @@
   },
   {
     "name": "qf_ticket_get",
-    "description": "Fetch one ticket by id. The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.",
+    "description": "Fetch one ticket by id. A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -276,7 +387,7 @@
   },
   {
     "name": "qf_ticket_query",
-    "description": "List ticket rows with optional filters. The atomic proposed wager — single or parlay. Strategies emit tickets; backtests grade them; evaluations aggregate them. A one-leg bet is still a ticket.",
+    "description": "List ticket rows with optional filters. A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -297,7 +408,7 @@
   },
   {
     "name": "qf_dataset_get",
-    "description": "Fetch one dataset by id. A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.",
+    "description": "Fetch one dataset by id. A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -313,7 +424,7 @@
   },
   {
     "name": "qf_dataset_query",
-    "description": "List dataset rows with optional filters. A versioned, content-hashed, point-in-time-correct data snapshot. Identical content_hash means identical bytes.",
+    "description": "List dataset rows with optional filters. A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -334,7 +445,7 @@
   },
   {
     "name": "qf_run_get",
-    "description": "Fetch one run by id. One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.",
+    "description": "Fetch one run by id. A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -350,7 +461,7 @@
   },
   {
     "name": "qf_run_query",
-    "description": "List run rows with optional filters. One canonical execution type — ingestion, feature build, backtest, or analysis via kind. Never clone types per pipeline step.",
+    "description": "List run rows with optional filters. A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -371,7 +482,7 @@
   },
   {
     "name": "qf_artifact_get",
-    "description": "Fetch one artifact by id. An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.",
+    "description": "Fetch one artifact by id. An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -387,7 +498,7 @@
   },
   {
     "name": "qf_artifact_query",
-    "description": "List artifact rows with optional filters. An immutable, content-addressed published output (strategy_spec, code, result_set, report, trajectory). Reports are artifacts, not a separate type.",
+    "description": "List artifact rows with optional filters. An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -408,7 +519,7 @@
   },
   {
     "name": "qf_evaluation_get",
-    "description": "Fetch one evaluation by id. Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.",
+    "description": "Fetch one evaluation by id. An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -424,7 +535,7 @@
   },
   {
     "name": "qf_evaluation_query",
-    "description": "List evaluation rows with optional filters. Structured verdict on an artifact/run against a hypothesis. Parlay-aware metrics: per-leg edge and bankroll survival, not raw win rate.",
+    "description": "List evaluation rows with optional filters. An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -445,7 +556,7 @@
   },
   {
     "name": "qf_workspace_get",
-    "description": "Fetch one workspace by id. One canvas of work — the spatial container for tiles, sessions, and connections in a research project.",
+    "description": "Fetch one workspace by id. A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -461,7 +572,7 @@
   },
   {
     "name": "qf_workspace_query",
-    "description": "List workspace rows with optional filters. One canvas of work — the spatial container for tiles, sessions, and connections in a research project.",
+    "description": "List workspace rows with optional filters. A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -482,7 +593,7 @@
   },
   {
     "name": "qf_agent_definition_get",
-    "description": "Fetch one agent_definition by id. A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.",
+    "description": "Fetch one agent_definition by id. An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -498,7 +609,7 @@
   },
   {
     "name": "qf_agent_definition_query",
-    "description": "List agent_definition rows with optional filters. A spawnable agent species (Researcher, Ingestion-Collector, Backtester, Critic) — the template, not a live instance.",
+    "description": "List agent_definition rows with optional filters. An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -519,7 +630,7 @@
   },
   {
     "name": "qf_agent_session_get",
-    "description": "Fetch one agent_session by id. One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.",
+    "description": "Fetch one agent_session by id. An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -535,7 +646,7 @@
   },
   {
     "name": "qf_agent_session_query",
-    "description": "List agent_session rows with optional filters. One durable live agent instance (L1 ledger identity). Operational states only — never actor-internal THINKING/TOOL_CALLING.",
+    "description": "List agent_session rows with optional filters. An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -556,7 +667,7 @@
   },
   {
     "name": "qf_task_get",
-    "description": "Fetch one task by id. A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.",
+    "description": "Fetch one task by id. A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -572,7 +683,7 @@
   },
   {
     "name": "qf_task_query",
-    "description": "List task rows with optional filters. A unit of assigned work on the canvas, routed to agent sessions via assigned_to / delegates_to links.",
+    "description": "List task rows with optional filters. A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -593,7 +704,7 @@
   },
   {
     "name": "qf_tool_get",
-    "description": "Fetch one tool by id. A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.",
+    "description": "Fetch one tool by id. A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -609,7 +720,7 @@
   },
   {
     "name": "qf_tool_query",
-    "description": "List tool rows with optional filters. A capability exposed via MCP and generated from this schema — agents call tools; they do not invent ad-hoc side channels.",
+    "description": "List tool rows with optional filters. A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -630,7 +741,7 @@
   },
   {
     "name": "qf_execution_environment_get",
-    "description": "Fetch one execution_environment by id. Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.",
+    "description": "Fetch one execution_environment by id. An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -646,7 +757,7 @@
   },
   {
     "name": "qf_execution_environment_query",
-    "description": "List execution_environment rows with optional filters. Where a run executes: local process, local Python sidecar, or disposable Cloudflare sandbox.",
+    "description": "List execution_environment rows with optional filters. An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -667,7 +778,7 @@
   },
   {
     "name": "qf_connection_get",
-    "description": "Fetch one connection by id. A typed cable between tiles on the canvas — projection wiring, never a second truth store.",
+    "description": "Fetch one connection by id. A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -683,7 +794,7 @@
   },
   {
     "name": "qf_connection_query",
-    "description": "List connection rows with optional filters. A typed cable between tiles on the canvas — projection wiring, never a second truth store.",
+    "description": "List connection rows with optional filters. A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.",
     "inputSchema": {
       "type": "object",
       "properties": {
