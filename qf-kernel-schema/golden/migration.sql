@@ -24,7 +24,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('hypot
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('policy', 'object', 'experimental', 'A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('environment', 'object', 'experimental', 'An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('strategy', 'object', 'experimental', 'A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ticket', 'object', 'experimental', 'A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ticket', 'object', 'experimental', 'A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('dataset', 'object', 'experimental', 'A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('run', 'object', 'experimental', 'A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('artifact', 'object', 'experimental', 'An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.');
@@ -238,24 +238,33 @@ CREATE TABLE strategy (
   CHECK (stake_model IN ('flat', 'fractional_kelly', 'custom'))
 );
 
--- A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.
+-- A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.
 CREATE TABLE ticket (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
+  -- How this ticket entered the system. Strategy-proposed rows express planned intent, while operator-supplied rows are venue facts that must preserve external provenance exactly.
+  origin TEXT NOT NULL,
   -- Whether the wager has one leg or multiple legs. Treat single as a first-class ticket, not a separate type.
   kind TEXT NOT NULL,
+  -- Venue-issued ticket reference for this wager. Use it as the idempotency key so re-importing the same operator-supplied slip updates one row instead of duplicating it.
+  external_ref TEXT NOT NULL,
+  -- Timestamp when the wager was placed in ISO-8601 UTC. This is required input for CLV because selection-time price must be compared to market state at placement.
+  placed_at TEXT NOT NULL,
   -- Structured per-leg selections and timestamps. Each leg entry must retain selection-time price so CLV and drift can be recomputed.
   legs TEXT NOT NULL,
   -- Aggregate ticket price at selection. Keep the source price so downstream evaluation does not infer payout assumptions.
   combined_price REAL NOT NULL,
-  -- Simulated stake assigned by the sizing policy. This is an execution input, not a post-hoc evaluation output.
+  -- Amount risked on the wager. Store the actual stake for operator-supplied slips and the proposed stake for strategy-origin tickets without changing field semantics.
   stake REAL NOT NULL,
+  -- Realized return from settlement, distinct from stake and combined_price assumptions. Keep it null while grade is pending and set it once the venue-grade is known.
+  payout REAL,
   -- Declared dependence assumptions among legs. Same-event legs should reference known correlation groups to avoid false independence.
   correlation_note TEXT NOT NULL,
   -- Settlement outcome for the ticket. It stays pending until settled truth is available from result lineage.
   grade TEXT NOT NULL,
+  CHECK (origin IN ('strategy_proposed', 'operator_supplied')),
   CHECK (kind IN ('single', 'parlay')),
   CHECK (grade IN ('pending', 'win', 'loss', 'push', 'void'))
 );

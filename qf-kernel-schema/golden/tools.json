@@ -408,7 +408,7 @@
   },
   {
     "name": "qf_ticket_get",
-    "description": "Fetch one ticket by id. A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
+    "description": "Fetch one ticket by id. A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -424,7 +424,7 @@
   },
   {
     "name": "qf_ticket_query",
-    "description": "List ticket rows with optional filters. A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
+    "description": "List ticket rows with optional filters. A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.",
     "inputSchema": {
       "type": "object",
       "properties": {

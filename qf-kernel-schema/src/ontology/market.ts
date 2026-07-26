@@ -61,6 +61,7 @@ export const instrument = defineObject({
   description:
     "An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.",
   lifecycle: "experimental",
+  pipelineFed: true,
   properties: z.object({
     kind: z
       .enum(["moneyline", "spread", "total", "prop"])
@@ -89,6 +90,7 @@ export const quote = defineObject({
   description:
     "A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.",
   lifecycle: "experimental",
+  pipelineFed: true,
   properties: z.object({
     book: z
       .enum(["bovada", "pinnacle"])

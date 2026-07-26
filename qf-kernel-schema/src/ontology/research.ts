@@ -121,13 +121,28 @@ export const strategy = defineObject({
 export const ticket = defineObject({
   name: "ticket",
   description:
-    "A ticket is one proposed wager emitted by a strategy, including single-leg and parlay structures. It governs settlement by preserving per-leg structure until final grading.",
+    "A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.",
   lifecycle: "experimental",
   properties: z.object({
+    origin: z
+      .enum(["strategy_proposed", "operator_supplied"])
+      .describe(
+        "How this ticket entered the system. Strategy-proposed rows express planned intent, while operator-supplied rows are venue facts that must preserve external provenance exactly.",
+      ),
     kind: z
       .enum(["single", "parlay"])
       .describe(
         "Whether the wager has one leg or multiple legs. Treat single as a first-class ticket, not a separate type.",
+      ),
+    external_ref: z
+      .string()
+      .describe(
+        "Venue-issued ticket reference for this wager. Use it as the idempotency key so re-importing the same operator-supplied slip updates one row instead of duplicating it.",
+      ),
+    placed_at: z.iso
+      .datetime()
+      .describe(
+        "Timestamp when the wager was placed in ISO-8601 UTC. This is required input for CLV because selection-time price must be compared to market state at placement.",
       ),
     legs: jsonArray.describe(
       "Structured per-leg selections and timestamps. Each leg entry must retain selection-time price so CLV and drift can be recomputed.",
@@ -140,8 +155,14 @@ export const ticket = defineObject({
     stake: z
       .number()
       .describe(
-        "Simulated stake assigned by the sizing policy. This is an execution input, not a post-hoc evaluation output.",
+        "Amount risked on the wager. Store the actual stake for operator-supplied slips and the proposed stake for strategy-origin tickets without changing field semantics.",
       ),
+    payout: z
+      .number()
+      .describe(
+        "Realized return from settlement, distinct from stake and combined_price assumptions. Keep it null while grade is pending and set it once the venue-grade is known.",
+      )
+      .nullable(),
     correlation_note: z
       .string()
       .describe(
