@@ -17,6 +17,9 @@ import {
   openKernel,
   replayArtifactAndAssert,
   replayRunAndAssert,
+  getLinks,
+  getObject,
+  queryObjects,
   type KernelDb,
 } from "./index.ts";
 
@@ -619,5 +622,62 @@ describe("qf-kernel", () => {
     expect(pending.state.grade).toBe("pending");
     expect(pending.state.origin).toBe("strategy_proposed");
     expect(pending.event).toBe("ticket.created");
+  });
+});
+
+describe("read layer", () => {
+  test("getObject returns row by id", () => {
+    db = openKernel(":memory:");
+    insertRun(db, { id: "run-read-1", kind: "backtest" }, ctx);
+    const row = getObject(db, "run", "run-read-1");
+    expect(row).not.toBeNull();
+    expect(row!.id).toBe("run-read-1");
+  });
+
+  test("queryObjects filters by declared property equality", () => {
+    db = openKernel(":memory:");
+    insertRun(db, { id: "run-a", kind: "backtest" }, ctx);
+    insertRun(db, { id: "run-b", kind: "analysis" }, { ...ctx, span_id: "span-b" });
+    const rows = queryObjects(db, "run", { kind: "backtest" });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.id).toBe("run-a");
+  });
+
+  test("getLinks returns edges in either direction", () => {
+    db = openKernel(":memory:");
+    const hyp = execute(
+      db,
+      "create_hypothesis",
+      {
+        claim: "probe",
+        success_criteria: "bar",
+        sources: ["src"],
+      },
+      ctx,
+    );
+    execute(
+      db,
+      "create_run",
+      {
+        run_id: "run-read-links",
+        kind: "backtest",
+        params: {},
+        links: [{ kind: "tests", to_id: hyp.object_id }],
+      },
+      { ...ctx, span_id: "span-run" },
+    );
+    const links = getLinks(db, hyp.object_id);
+    expect(links.length).toBeGreaterThan(0);
+    expect(links.some((l) => l.kind === "tests")).toBe(true);
+  });
+
+  test("unknown type name errors before SQL", () => {
+    db = openKernel(":memory:");
+    expect(() => getObject(db, "not_a_real_type", "x")).toThrow(/Unknown object type/);
+  });
+
+  test("unknown filter key errors before SQL", () => {
+    db = openKernel(":memory:");
+    expect(() => queryObjects(db, "run", { not_a_column: "x" })).toThrow(/Unknown filter key/);
   });
 });

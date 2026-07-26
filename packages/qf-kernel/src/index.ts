@@ -8,6 +8,13 @@ export {
   type KernelDb,
   type KernelStatement,
 } from "./db.ts";
+export {
+  getLinks,
+  getObject,
+  queryObjects,
+  type GetLinksOptions,
+  type LinkRow,
+} from "./read.ts";
 export { closeKernel, openKernel } from "./db-bun.ts";
 export {
   assertCreationHandlersComplete,
@@ -35,4 +42,4 @@ export {
   resolvePackageRef,
   resolveSpeciesPackage,
 } from "./species.ts";
-export { requireTrace, type TraceContext } from "./trace.ts";
+export { seedExperimentalFixtureTable } from "./fixtures.ts";

@@ -83,8 +83,14 @@ function scanObserveStrings(): Array<{ rel: string; needle: string }> {
   return violations;
 }
 
-/** Paths exempt from clause 2 serving-surface scan (gate implementation mentions patterns). */
-const SERVING_EXEMPT = new Set([
+/**
+ * Clause 2 allowlist: only these paths may reference golden/tools.json or call generateMcp().
+ * Replaces the former directory-wide trust of qf-kernel-schema/.
+ */
+const SERVING_ALLOWLIST = new Set([
+  "qf-kernel-schema/scripts/generate.ts",
+  "qf-kernel-schema/src/generate.test.ts",
+  "qf-kernel-schema/src/generate/mcp.ts",
   "qa/gates/observe-door.ts",
 ]);
 
@@ -94,11 +100,10 @@ function scanServingSurface(): Array<{ rel: string; pattern: string }> {
   walk(REPO_ROOT, files);
   for (const full of files) {
     const rel = relative(REPO_ROOT, full).replace(/\\/g, "/");
-    if (rel.startsWith("qf-kernel-schema/")) continue;
-    if (SERVING_EXEMPT.has(rel)) continue;
+    if (SERVING_ALLOWLIST.has(rel)) continue;
     if (isDocPath(rel)) continue;
     const ext = rel.slice(rel.lastIndexOf("."));
-    if (!CODE_EXT.has(ext) || ext === ".json") continue;
+    if (!CODE_EXT.has(ext)) continue;
     const text = readFileSync(full, "utf8");
     if (/golden\/tools\.json/.test(text)) {
       violations.push({ rel, pattern: "golden/tools.json" });

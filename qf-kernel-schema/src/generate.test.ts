@@ -54,18 +54,36 @@ describe("determinism", () => {
 });
 
 describe("mcp tool descriptions", () => {
-  test("get and query descriptions are distinct per object", () => {
+  test("get, query, and links descriptions are distinct per object", () => {
     const tools = JSON.parse(generateMcp(schema)) as Array<{ name: string; description: string }>;
     for (const object of schema.objects) {
       const get = tools.find((t) => t.name === `qf_${object.name}_get`);
       const query = tools.find((t) => t.name === `qf_${object.name}_query`);
+      const links = tools.find((t) => t.name === `qf_${object.name}_links`);
       expect(get).toBeDefined();
       expect(query).toBeDefined();
+      expect(links).toBeDefined();
       expect(get!.description).not.toBe(query!.description);
+      expect(get!.description).not.toBe(links!.description);
+      expect(query!.description).not.toBe(links!.description);
       expect(get!.description.startsWith(`Fetch one ${object.name} by id.`)).toBe(true);
       expect(query!.description.startsWith(`List ${object.name} rows with optional filters.`)).toBe(
         true,
       );
+      expect(
+        links!.description.startsWith(`Traverse links touching one ${object.name} by id.`),
+      ).toBe(true);
+    }
+  });
+
+  test("read tool count is three per object plus one action per action", () => {
+    const tools = JSON.parse(generateMcp(schema)) as Array<{ name: string }>;
+    expect(tools).toHaveLength(schema.objects.length * 3 + schema.actions.length);
+    const readSuffixes = ["_get", "_query", "_links"] as const;
+    for (const object of schema.objects) {
+      for (const suffix of readSuffixes) {
+        expect(tools.some((t) => t.name === `qf_${object.name}${suffix}`)).toBe(true);
+      }
     }
   });
 });
