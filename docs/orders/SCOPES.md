@@ -409,6 +409,15 @@ happened is not evidence; Kernel rows and edges are.
 > the A2A proof was **scripted, harness-only** (WO-008e); WO-008a's turn UX was **rejected by the
 > founder** and never replaced; debt #14's legacy auto-approving agent path is still frozen in the
 > tree.
+>
+> **Founder weighting on those gaps (stated 2026-07-25):** gap 1 — live, unscripted A2A — is
+> **central to the founder's intended workflows**, not a nice-to-have; gap 2 — the replacement for
+> the rejected turn UX — is **possibly the seam for the cable design system** (the canvas-level
+> connection surface), so its redesign should be coordinated with the founder's design corpus, not
+> improvised. Measured context the order inherits: typed delegation is vocabulary today — the A2A
+> proof's own code records `"Kernel: no create_task/assigned_to/delegates_to; bus=a2a-core +
+> publish_artifact + inject adapter"` (`species/hermes/a2a-4tile-smoke.ts:388`). WO-103 makes the
+> edges writable; this rung makes them the recorded loop.
 
 ### WO-110 · The critic, and the refusal
 
