@@ -3,6 +3,10 @@ import {
   creationCommands,
   type TransitionCommand,
 } from "qf-kernel-schema/commands";
+import {
+  transitionIdFields,
+  transitionStateFields,
+} from "qf-kernel-schema/transition-meta";
 import { assertTransition } from "qf-kernel-schema/validate";
 import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
@@ -10,24 +14,8 @@ import { IllegalTransitionError, KernelError } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
 
-const ID_FIELD: Record<TransitionCommand["type"], string> = {
-  run: "run_id",
-  hypothesis: "hypothesis_id",
-  ticket: "ticket_id",
-  event: "event_id",
-  agent_session: "session_id",
-};
-
-const STATE_FIELD: Record<TransitionCommand["type"], "status" | "grade"> = {
-  run: "status",
-  hypothesis: "status",
-  ticket: "grade",
-  event: "status",
-  agent_session: "status",
-};
-
 function objectId(cmd: TransitionCommand, input: Record<string, unknown>): string {
-  const key = ID_FIELD[cmd.type];
+  const key = transitionIdFields[cmd.type];
   const id = input[key];
   if (typeof id !== "string" || id.length === 0) {
     throw new KernelError(`Command "${cmd.action}" requires ${key}`);
@@ -77,7 +65,7 @@ function readState(
   type: TransitionCommand["type"],
   id: string,
 ): { field: "status" | "grade"; value: string } {
-  const field = STATE_FIELD[type];
+  const field = transitionStateFields[type];
   const row = db.query(`SELECT ${field} AS state FROM ${type} WHERE id = ?`).get(id) as
     | { state: string }
     | null;

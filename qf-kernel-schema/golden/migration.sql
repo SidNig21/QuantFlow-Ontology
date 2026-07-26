@@ -48,10 +48,15 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execu
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('produces', 'link', 'experimental', 'Output provenance: datasets or artifacts produced by a run or agent session.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('derived_from', 'link', 'experimental', 'Version and transformation lineage among datasets, artifacts, and strategies.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluated_by', 'link', 'experimental', 'Verdict attachment: which evaluation judged an artifact or run.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assigned_to', 'link', 'experimental', 'Work routing: which agent session owns a task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Session-to-session delegation on the canvas.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_hypothesis', 'action', 'experimental', 'Open a new research hypothesis with claim, success criteria, and optional sources.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_dataset_version', 'action', 'experimental', 'Register a new content-hashed, point-in-time dataset version in the Kernel.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_run', 'action', 'experimental', 'Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_mission', 'action', 'experimental', 'Register a standing research mission with name and objective.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_ticket', 'action', 'experimental', 'Record a strategy-proposed ticket starting pending. Does not accept a grade; use observe_ticket for externally observed slips.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('observe_ticket', 'action', 'experimental', 'Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_run', 'action', 'experimental', 'Start a queued run (queued → running). Rejectable if the transition is illegal.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cancel_run', 'action', 'experimental', 'Cancel a running run (running → cancelled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_run', 'action', 'experimental', 'Mark a running run as succeeded (running → succeeded).');
@@ -435,7 +440,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'assigned_to', 'delegates_to')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'gates', 'assigned_to', 'delegates_to')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.
