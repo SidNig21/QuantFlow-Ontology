@@ -418,6 +418,18 @@ happened is not evidence; Kernel rows and edges are.
 > proof's own code records `"Kernel: no create_task/assigned_to/delegates_to; bus=a2a-core +
 > publish_artifact + inject adapter"` (`species/hermes/a2a-4tile-smoke.ts:388`). WO-103 makes the
 > edges writable; this rung makes them the recorded loop.
+>
+> **Cable principle — founder leaning, 2026-07-25 (exploratory, ratify at the visual pass):**
+> cables are **strictly cosmetic in storage, semantic only as gesture**. *Seeing* a cable =
+> `render(projection)` of a Kernel link row (`delegates_to` / `assigned_to` / `connection`);
+> *drawing* one = `dispatch(action)` — a command the Kernel may reject, whereupon the cable snaps
+> back and nothing is stored. A cable that holds its own state anywhere is the
+> tile-that-remembers bug. Two consequences: **the cable layer is blocked on WO-103's writable
+> links** (today there is nothing true to draw — rendering the A2A side-channel would depict the
+> exact un-recorded traffic); and the founder's drag-to-browser-tile use case ("agent drives that
+> tile") is the first real argument for **wiring `connection` rather than deleting it** when
+> WO-103 adjudicates the dead actions. Stated use cases: see which agents are connected on the
+> plane; grant an agent control of a future browser tile by drawing to it.
 
 ### WO-110 · The critic, and the refusal
 
