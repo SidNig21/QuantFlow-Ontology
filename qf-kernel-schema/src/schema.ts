@@ -4,6 +4,7 @@ import { commands, creationCommands } from "./commands.ts";
 import {
   type ActiveSchemaBaseline,
   lintCommands,
+  lintActionSurface,
   lintSchema,
   type Schema,
 } from "./define.ts";
@@ -52,8 +53,6 @@ import {
   cancel_run,
   complete_run,
   fail_run,
-  retry_run,
-  close_run,
   grade_ticket,
   publish_artifact,
   record_evaluation,
@@ -77,10 +76,6 @@ import {
   cancel_agent_session,
   fail_agent_session,
   close_agent_session,
-  request_approval,
-  approve,
-  deny,
-  promote_type,
 } from "./ontology/agent.ts";
 import { transitions } from "./transitions.ts";
 
@@ -143,8 +138,6 @@ export const schema: Schema = {
     cancel_run,
     complete_run,
     fail_run,
-    retry_run,
-    close_run,
     grade_ticket,
     start_event,
     settle_event,
@@ -160,10 +153,6 @@ export const schema: Schema = {
     publish_artifact,
     record_evaluation,
     resolve_hypothesis,
-    request_approval,
-    approve,
-    deny,
-    promote_type,
   ],
 };
 
@@ -174,3 +163,4 @@ const skipActiveFreeze = process.env.QF_SCHEMA_SKIP_ACTIVE_FREEZE === "1";
 
 lintSchema(schema, transitions, activeSchemaBaseline, { skipActiveFreeze });
 lintCommands(schema, transitions, commands, creationCommands);
+lintActionSurface(schema, commands, creationCommands);

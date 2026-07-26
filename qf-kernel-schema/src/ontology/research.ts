@@ -485,26 +485,6 @@ export const fail_run = defineAction({
   }),
 });
 
-export const retry_run = defineAction({
-  name: "retry_run",
-  description:
-    "Request another attempt after failure/cancellation by creating a new queued run derived_from the prior (terminals do not reopen).",
-  lifecycle: "experimental",
-  input: z.object({
-    run_id: z.string().describe("Id of the failed or cancelled run to retry from."),
-  }),
-});
-
-export const close_run = defineAction({
-  name: "close_run",
-  description:
-    "Operator close/ack for a terminal run (no status change — succeeded/failed/cancelled are already terminal).",
-  lifecycle: "experimental",
-  input: z.object({
-    run_id: z.string().describe("Id of the terminal run to close/ack."),
-  }),
-});
-
 export const grade_ticket = defineAction({
   name: "grade_ticket",
   description: "Grade a pending ticket to win|loss|push|void after result settlement.",

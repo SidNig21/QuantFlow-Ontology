@@ -6,6 +6,7 @@ import {
   defineLink,
   defineObject,
   lintCommands,
+  lintActionSurface,
   lintSchema,
   type Schema,
 } from "./define.ts";
@@ -301,6 +302,38 @@ describe("schema lint", () => {
         },
       ]),
     ).toThrow('Pipeline-fed type "feed_snapshot" must not have creation commands');
+  });
+
+  test("lintActionSurface rejects a schema action with no command wiring", () => {
+    const widget = defineObject({
+      name: "widget",
+      description: "A stateful widget.",
+      lifecycle: "experimental",
+      properties: z.object({
+        status: z.enum(["a", "b"]).describe("Status."),
+      }),
+    });
+    const go = defineAction({
+      name: "go",
+      description: "Advance.",
+      lifecycle: "experimental",
+      input: z.object({ id: z.string().describe("Id.") }),
+    });
+    const dead = defineAction({
+      name: "dead_action",
+      description: "Declared but unwired.",
+      lifecycle: "experimental",
+      input: z.object({ id: z.string().describe("Id.") }),
+    });
+    const schema: Schema = { objects: [widget], links: [], actions: [go, dead] };
+    const tables = { widget: { a: ["b"], b: [] } };
+    const commands = [{ action: "go", type: "widget", from: "a", to: "b", event: "widget.advanced" }];
+    expect(() => lintActionSurface(schema, commands, [])).toThrow(
+      "Schema actions have no command wiring: dead_action",
+    );
+    expect(() =>
+      lintActionSurface({ objects: [widget], links: [], actions: [go] }, commands, []),
+    ).not.toThrow();
   });
 
   test("lintSchema rejects silo clone object names that embed another kind enum value", () => {

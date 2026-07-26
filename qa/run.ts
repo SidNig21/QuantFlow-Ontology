@@ -9,6 +9,7 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
+import { checkObserveDoor } from "./gates/observe-door.ts";
 import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
 import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
 import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
@@ -315,6 +316,15 @@ const gates: Gate[] = [
       "Debt #0: ONTOLOGY_SCHEMA.md §Actions equals schema.ts actions (names both directions)",
     run: () => {
       const { ok } = checkDocActionSurface();
+      return ok;
+    },
+  },
+  {
+    name: "observe-door",
+    description:
+      "Debt #22: observe_ticket strings only on allowlist; no tools.json reads or generateMcp calls outside qf-kernel-schema/",
+    run: () => {
+      const { ok } = checkObserveDoor();
       return ok;
     },
   },
