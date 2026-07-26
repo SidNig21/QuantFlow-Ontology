@@ -578,7 +578,7 @@ Publish an immutable content-addressed artifact (must land before sandbox death)
 - `kind` — Artifact kind to publish.
 - `content_hash` — Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.
 - `storage_ref` — Durable storage location.
-- `path` — Filesystem path to read artifact bytes from.
+- `path` — Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.
 
 ### `record_evaluation`
 

@@ -2311,7 +2311,7 @@
           "description": "Durable storage location."
         },
         "path": {
-          "description": "Filesystem path to read artifact bytes from.",
+          "description": "Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.",
           "type": "string"
         }
       },

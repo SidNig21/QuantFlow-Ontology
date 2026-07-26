@@ -515,10 +515,9 @@ export const publish_artifact = defineAction({
       path: z
         .string()
         .optional()
-        .describe("Filesystem path to read artifact bytes from."),
-    })
-    .refine((v) => typeof v.path === "string" && v.path.length > 0, {
-      message: 'publish_artifact requires "bytes" (kernel envelope) or "path"',
+        .describe(
+          "Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.",
+        ),
     }),
 });
 
