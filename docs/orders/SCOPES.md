@@ -376,6 +376,25 @@ edges creatable end to end; `kernel-sole-writer` still passes.
 The rule for this whole phase: **tools fall out of the schema.** A tool that had to be
 hand-written is a schema that failed to describe itself.
 
+> **SPLIT THREE WAYS, 2026-07-26, before the build.** WO-104 = **read tools only** ·
+> WO-105 = **action tools + GATE 1/GATE 2** · WO-106 = **cold seat + verb retirement**.
+> WO-104's order is written ([`WO-104.md`](WO-104.md)) and supersedes this contract where they
+> differ; 105 and 106 stay contracts until 104 reports.
+>
+> **The boundary is safety, not size.** `observe_ticket` is an action, so a rung that serves only
+> read tools cannot open the door ROADMAP debt #22 names. That forces the serving decision into
+> WO-105 — the rung that has to make it — instead of letting a generator loop make it by default.
+> WO-103 was split for size *during* the build and still cost two rework rounds; this split
+> happened before a builder saw anything.
+>
+> **Measured when the order was written:** 71 tool definitions exist and **zero are served**; the
+> Kernel has 4 hand-written read functions covering **3 of 23** object types; the `links` table has
+> had a writer since WO-103 and **no reader outside a test**. WO-104 also carries a **deliverable
+> 0** the contract below does not have — the `observe-door` gate trusts the whole
+> `qf-kernel-schema/` tree, which is exactly where a tool server would sit (verified by probe).
+>
+> *Original contract follows.*
+
 ### WO-104 · Read tools, generated
 
 **Objective.** An MCP-speaking agent can read the entire graph — objects and edges — through
