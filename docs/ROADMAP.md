@@ -110,7 +110,15 @@ tests. D3/D4 were confirmed by other measurements instead.*
 **Market plane reframe.** `Competitor/Event/Market/OddsSeries/Result` → `Venue/Instrument/Quote/MarketEvent` (betting becomes rows and properties, never types — typed prop vocabularies live in property enums). Market-plane types declare `pipelineFed: true` (codegen will emit no write tools for them — Golden Hammer rule, machine-enforced). Old types retire through the schema-diff discipline (experimental types may be removed; the conformance suite regenerates green).
 → **Gate:** full conformance suite regenerated and green; fixture gate re-run with a cross-plane question (Hypothesis TARGETS Instrument); a grep proves no sport-specific noun survives as a *type name*.
 
-### P2 · The generated tool plane — weeks 2–3
+### P2 · The generated tool plane — weeks 2–3 · **= SCOPES P3 — NOT the "P2" that is complete**
+
+> **Phase-number drift, reconciled 2026-07-26.** Inserting the write-path rung shifted the *phase*
+> numbers here as well as the rung numbers, and only the rung shift was ever written down. This
+> section's `P2` is **SCOPES' P3**; its `P3` is SCOPES' `P4`; its `P4` is SCOPES' `P5`. SCOPES has
+> a phase this section does not: **P2 · The Kernel can record the workflow** (WO-103 + WO-103b),
+> which is the phase `NEXT.md` reports complete. **Nothing in this heading is built.** Read
+> `SCOPES.md` for the live numbering — it wins (`DOC_AUTHORITY_MAP.md`). Caught when a reader could
+> have concluded from "P2 complete" that the tool plane exists; it does not.
 
 **Read tools from the charter.** Codegen emits `get / search / traverse-links` per object type as an MCP server on the `@modelcontextprotocol/sdk` stack qf-peer-bus proved.
 → **Gate:** add a brand-new `experimental` type in a test fixture → its three read tools exist with **zero hand-written tool code** (the doctrine Phase 2 exit, falsified by diff).
@@ -121,7 +129,7 @@ tests. D3/D4 were confirmed by other measurements instead.*
 **Cold seat + retirement.** A live Hermes seat lists and calls the generated tools **cold** (no priming beyond the seat profile); hand-grown `qf_*` verbs retire as generated equivalents land.
 → **Gate:** the cold seat completes one real task through generated tools only; grep proves retired verbs are gone from the tool surface.
 
-### P3 · The first market plane — week ~4
+### P3 · The first market plane — week ~4 · **= SCOPES P4 ("Real data")**
 
 **One pipeline, one market.** Founder picks the market on the day (odds or perps — the ontology doesn't care). One Bun cron script ingests `Instrument / Quote / MarketEvent` rows **through Kernel commands** with an ingest trace. Codegen emits no write-actions for `pipelineFed` types (gate carried from the market-plane reframe rung above). **WO-103b ruling:** ingest is a bulk command on `execute()` (`SCOPES.md` WO-107b contract); it unblocks link kinds `quotes`, `has_leg`, `offered_on`, and `lists` from the `pipelineFed` blocker — `offered_on` and `lists` still need `market_event` / `venue` creation verbs after ingest lands.
 → **Gate:** every market row's provenance recomputes to an ingest event; a seat answers a cross-object question about **real** data through generated tools only.
@@ -129,14 +137,14 @@ tests. D3/D4 were confirmed by other measurements instead.*
 **The second market, structurally different.** A game line *and* a perp (or equivalent pair) load into the same four types.
 → **Gate: zero new object types.** If either market needs a special type, the abstraction failed — fix it now. (The one good gate from the retired HTML roadmap, kept.)
 
-### P4 · The defining loop, agent-run — weeks 5–8
+### P4 · The defining loop, agent-run — weeks 5–8 · **= SCOPES P5 ("The loop runs itself")**
 
 **The loop's lower half.** Orchestrator + worker seats run `Hypothesis → Dataset → Run → Artifact` over the peer bus using generated tools; every step a Kernel action, every conversation a trajectory artifact.
 **The Critic + the mechanical gate.** A Critic seat scores Artifacts vs the Hypothesis's criteria (`record_evaluation`, wired at `SCOPES WO-103`); **`publish_artifact` mechanically rejects `kind: "report"`** without a linked Evaluation whose `verdict === "supports"` (bait-tested). No confidence floor — the bar lives in `hypothesis.success_criteria`, not in the type system. There is no `publish_report` verb and no `Report` type: the gate is a condition on the existing verb.
 **The one-shot proof.** *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* — answered correctly, one pass, tools-only, every step recorded.
 → **Phase gate = the doctrine's proof standard. This is the day QuantFlow is a real ontology**, and the claims ladder (doctrine Part VII) advances one rung.
 
-### P5–P7 · Sketched, ordered at their phase entry (plan one phase ahead only)
+### P5–P7 · Sketched, ordered at their phase entry (plan one phase ahead only) · **= SCOPES P6+**
 
 - **P5 · Recall + trust (months 2–3):** FTS5 + sqlite-vec hybrid retrieval, RRF k=60, age decay, Mission-scoped; retrieval never becomes truth without a Kernel command; category deny-list at first external agent. Orders drafted at P4 exit.
 - **P6 · Evolve:** Evaluation history as fitness. Deferred until months of history exist — measure before optimizing.
