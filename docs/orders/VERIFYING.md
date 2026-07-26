@@ -4,12 +4,19 @@
 
 ## Read in this order
 
-1. `/START_HERE.md` — mission, the One Rule, hard rules.
-2. `docs/orders/PROTOCOL.md` — roles, the loop, and the four standing rules you enforce.
-3. `docs/BLUEPRINT.md` — decided stack, Laws A–F, corrections log.
-4. `docs/ROADMAP.md` — the ladder, phase gates, and the known-debt register.
-5. `docs/orders/README.md` — order log. **The log wins on status**, always.
-6. The specific `WO-NNN.md` you are verifying — including the verification records appended to closed orders. Those records are where the reasoning lives.
+1. `/START_HERE.md` — mission, the One Rule, hard rules. Wins every conflict.
+2. `/AGENTS.md` — the cold-start briefing every agent here operates under, including the commands and the `golden/` ritual.
+3. `docs/orders/PROTOCOL.md` — roles, the loop, and the standing rules you enforce.
+4. **`docs/DOCTRINE.md` — plan of record.** Read the **amendments** section in full. It carries founder-ratified decisions and founder-stated direction, and a build that contradicts it is wrong no matter how green its gates are.
+5. **`docs/orders/SCOPES.md` — the build sequence.** Eleven rungs as scope contracts. **Check it before failing an order for a defect you find**: a known defect already routed to a later rung is *correct scoping*, not an escape. Failing an order for something another rung owns costs a cycle and teaches builders to fix out of scope.
+6. `docs/BLUEPRINT.md` — decided stack, Laws A–F, corrections log.
+7. `docs/ROADMAP.md` — phase gates, definition of done, debt register. **SCOPES wins on rung numbering; the stricter wins on gates.**
+8. `docs/orders/README.md` — order log. **The log wins on status**, always.
+9. The specific `WO-NNN.md` you are verifying — including verification records appended to closed orders. Those records are where the reasoning lives.
+
+**Also check what moved.** A branch cut days ago does not contain decisions made since. Run `git log --oneline <branch-base>..origin/main` before grading — direction may have landed after the builder started, and it binds anyway.
+
+> **Why steps 2, 4 and 5 are here (added 2026-07-25, found by a verifier).** This file sat unchanged from 2026-07-18 while `AGENTS.md`, `DOCTRINE.md` and `SCOPES.md` were all created around it. Meanwhile `NEXT.md` — the *builder's* door — is rotated on every pass because that is a named verifier duty, so it stayed current by construction. Nothing performed the same service for this file, so the seat with **more** authority was entering through the **worse** map. A verifier following the old list met a `ticket` description already known-defective and already routed, with nothing telling them so — and would have failed the order or fixed it out of scope. See the rotation duty below.
 
 ## Your job in one sentence
 

@@ -5,7 +5,7 @@
 
 ## Current order: **WO-101 — Research + Agent plane charter**
 
-The Ontology Doctrine (`docs/DOCTRINE.md`, v1.1) is the plan of record; `docs/orders/SCOPES.md` is the rung-by-rung ladder; WO-101 is its first rung.
+The Ontology Doctrine (`docs/DOCTRINE.md`, currently v1.3 — **read its amendments section, it carries founder direction**) is the plan of record; `docs/orders/SCOPES.md` is the rung-by-rung ladder; WO-101 is its first rung.
 
 0. Read `AGENTS.md` at repo root — the cold-start briefing, including the commands and the `golden/` ritual.
 1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
