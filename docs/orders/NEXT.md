@@ -1,74 +1,60 @@
-# NEXT — the current order (rotated 2026-07-26: WO-104 written, P3 opens)
+# NEXT — no builder-cuttable order right now (rotated 2026-07-26: WO-104 verified + merged)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-104 — The read plane**
+## There is no order to cut. This is the honest state, not an oversight.
 
-P2 is complete (WO-103 + WO-103b, both verified and merged). WO-104 opens **P3, the generated tool
-plane**, and builds its reading half: a schema-driven read layer in the Kernel, the missing
-link-traversal tool, and an MCP server that serves **read tools only**.
+**WO-104 is done** (verified + merged 2026-07-26, one rework round). The read half of P3 is served:
+69 read tools over real MCP, the `_links` traversal exists and answers, and a permanent gate now
+asserts on every run that zero action tools are served. The next rung is **WO-105**, and its order
+file **has not been written yet** — it is a contract in [`SCOPES.md`](SCOPES.md). Writing it is the
+architect's job.
 
-0. Read `AGENTS.md` at repo root — the cold-start briefing, the commands, the `golden/` ritual.
-1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
-2. Read [`WO-104.md`](WO-104.md) — the complete order, end to end, before any edit.
-3. Branch `wo-104` from current `main`. **Commit from a worktree, never the shared tree.**
-4. Run every gate and paste full unedited output. Report per [`PROTOCOL.md`](PROTOCOL.md); the
-   verifier runs the cold `bun qa/run.ts --all`.
+**If you are a builder reading this: stop here and tell the founder.** No work without an order
+(`AGENTS.md` rule 1). A file that says "nothing to do" is doing its job.
 
-### Four things about this rung specifically
+## What the architect writes next: WO-105 — action tools and the two gates
 
-- **P3 was split three ways before the build, not during it.** WO-104 = read tools · WO-105 =
-  action tools + the two gates · WO-106 = cold seat + verb retirement. WO-103 was split for size
-  and still took two rework rounds; this split is that lesson applied earlier.
-- **The split boundary is safety, not tidiness.** `observe_ticket` is an *action*. Serving only
-  read tools means this rung **cannot** open the door ROADMAP debt #22 names — so that decision
-  lands in WO-105, which is forced to make it, instead of being made by a generator loop nobody
-  reads. **Zero action tools in this order.**
-- **It is the biggest `declaration is not capability` gap in the repo** (doctrine A5). 71 tool
-  definitions exist and **none is served**; the Kernel can read **3 of 23** object types; and the
-  `links` table has had a writer since WO-103 and **no reader at all**. The graph the whole
-  ontology exists for cannot currently be walked.
-- **Deliverable 0 fixes a gate this rung would otherwise walk through.** `observe-door` clause 2
-  trusts the entire `qf-kernel-schema/` tree — a tool server placed inside it passes green
-  (verified by probe, ROADMAP debt #22). This order builds a tool server, so the fix comes first.
+Its contract (`SCOPES.md`) plus three obligations this ladder has since attached:
 
-### One thing WO-103b proved that this order keeps
+- **The `qf_observe_ticket` serving ruling — the decision this rung exists to force.** The read
+  plane could not open the door (registration never visits `schema.actions`, structurally). The
+  action plane must decide: is `qf_observe_ticket` served at all, and to whom? Debt #22 is the
+  context: the gate is an alarm on known routes — **six** boundary evasions have now fallen to
+  readers who did not write them, the sixth recorded at WO-104 verification — and the lock is
+  caller identity, which does not exist. Serving `observe_*` to any agent seat before caller
+  identity exists means the alarm fires with no lock behind it. The order must say which way it
+  rules and why, in plain language, because this is the founder's fabricated-bet risk.
+- **GATE 1 and GATE 2** (Zod-parse at `execute()`; transition check against the generated tables) —
+  the two machine gates SCOPES names for this rung.
+- **Any new server must land inside the `read-tools` gate's coverage or extend it.** That gate
+  asserts the *served set*; a second server outside its reach recreates the one-shot-transcript
+  hole WO-104's rework just closed.
 
-WO-103b was the first rung to get PROTOCOL's pre-build adversarial read and the first to need
-**zero rework rounds** — seven order-text defects fixed before a builder saw the file.
+**Strong recommendation carried from measurement, not preference: run the pre-build adversarial
+read.** The scoreboard is now — WO-103, no read: three order-text defects, two rework rounds.
+WO-103b, read: zero rework. WO-104, read: eight defects caught pre-build (including the phase-exit
+gate), one rework round for post-build findings. WO-105 makes the single most consequential ruling
+on the ladder so far; it is the last order to skip the read on.
 
-**WO-104 has had the same read: eight findings, three of them High, all in the order text, all
-fixed before you.** One of the three was the doctrine phase-exit gate itself, which as first
-written would have gone green against 69 hand-written tool registrations. The record is the last
-section of the order — read it, because it tells you which parts of this order were nearly wrong
-and why the gates are shaped the way they are.
-
-## Queued behind (do not start)
-
-**WO-105** — action tools, GATE 1 (Zod-parse at `execute()`), GATE 2 (transition check), and the
-`qf_observe_ticket` serving ruling. **WO-106** — a cold seat calls generated tools; hand-grown
-`qf_*` verbs retire. Then **`WO-107b`** (market ingest — unblocks four link kinds including
-`has_leg`, which is why a parlay's legs cannot be recorded as a graph today), then **WO-107** (the
-first market — **Bovada sportsbook only**, doctrine A7), then the loop, the critic, and the
-one-shot proof. See [`SCOPES.md`](SCOPES.md).
+Queued behind: **WO-106** (cold seat + retirement of hand-grown verbs), **WO-107b** (market
+ingest — unblocks four link kinds including `has_leg`), **WO-107** (first market — **Bovada
+sportsbook only**, doctrine A7), then the loop, the critic, and the one-shot proof.
 
 ## Standing seat constraint (founder, 2026-07-26)
 
 Builder seats run **`composer-2.5` or `cursor-grok-4.5-high` only** — an API-cost decision, not a
-trust one. Other models `cursor-agent` lists are not authorized. Decorrelation still holds with the
-seats that remain: one model builds, a different one verifies, and no model ever checks its own work.
+trust one. One model builds, a different one verifies; no model checks its own work.
 
 ## Parked / parallel
 
-**Design overhaul** — brand, tokens, cables, settings; founder-run, in progress 2026-07-26, off the
-critical path. Returns as a *brief*, not an order: it needs measured scope and falsifiable gates
-before anyone builds it, and it must fit the `one-skin` rule. **Market-abstraction test** — debt
-#20, trigger: the first bet shape that is not one-bounded-event-with-selections. **Durable
-execution** — debt #17, trigger-gated. **Promotion authority + freeze-lint bypass** — debt #19;
-note `promote_type` was **deleted** by WO-103b, so that debt's fixing order re-adds the action
-rather than wiring an existing one. **Caller identity** — debt #22, gated by
-`bun qa/run.ts observe-door`, not closed.
+**Design overhaul** — founder-run, off the critical path; returns as a brief with measured scope
+and falsifiable gates, and must fit `one-skin`. **Market-abstraction test** — debt #20,
+trigger-gated. **Durable execution** — debt #17, trigger-gated. **Promotion authority +
+freeze-lint bypass** — debt #19 (`promote_type` was deleted by WO-103b; its fixing order re-adds
+the action). **Caller identity** — debt #22, gated by `bun qa/run.ts observe-door` +
+`bun qa/run.ts read-tools`, not closed.
 
 ---
 

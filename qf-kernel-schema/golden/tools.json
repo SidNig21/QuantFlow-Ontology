@@ -32,8 +32,41 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. This field classifies the participant species used for matching and grouping. Derive sport context from linked market events instead of hard-coding it on the competitor row.",
+          "type": "string",
+          "enum": [
+            "ufc_fighter",
+            "tennis_player",
+            "team"
+          ]
+        },
+        "name": {
+          "description": "Equality filter on name. This field stores the canonical display name for the participant. Keep this stable so historical instruments and results stay joined to one identity.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_competitor_links",
+    "description": "Traverse links touching one competitor by id. A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -69,8 +102,57 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "sport": {
+          "description": "Equality filter on sport. This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type.",
+          "type": "string",
+          "enum": [
+            "ufc",
+            "tennis",
+            "football"
+          ]
+        },
+        "starts_at": {
+          "description": "Equality filter on starts_at. This field records the scheduled start timestamp in ISO-8601 UTC. Do not use data timestamped after this moment for pre-event decisions.",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "status": {
+          "description": "Equality filter on status. This field records the operational lifecycle state for the occurrence. Move it only through declared transition actions, never by ad-hoc writes.",
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "live",
+            "settled",
+            "void"
+          ]
+        },
+        "competition": {
+          "description": "Equality filter on competition. This field stores the competition context such as league, card, or tournament round. Keep the value operator-legible so slips and reports can be reconciled without external decoding.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_market_event_links",
+    "description": "Traverse links touching one market_event by id. A market_event is the bounded real-world occurrence that instruments resolve against. Treat starts_at and status as the governing fence for legal pre-event decisions and lifecycle transitions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -106,8 +188,49 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. This field identifies the instrument family needed to interpret pricing semantics. Extend the enum by order rather than cloning new object types per category.",
+          "type": "string",
+          "enum": [
+            "moneyline",
+            "spread",
+            "total",
+            "prop"
+          ]
+        },
+        "sides": {
+          "description": "Equality filter on sides. This field lists the named outcomes offered for the instrument, such as [\"Jones\",\"Miocic\"] or [\"over\",\"under\"]. Preserve provider wording so grading and reconciliation can be traced exactly.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "correlation_group": {
+          "description": "Equality filter on correlation_group. This field groups instruments with known dependent outcomes. Leave it null only when no declared dependence key is available.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_instrument_links",
+    "description": "Traverse links touching one instrument by id. An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -143,8 +266,40 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "book": {
+          "description": "Equality filter on book. This field identifies the source venue or book that published the prices. Use stable lowercase identifiers so cross-source joins remain deterministic.",
+          "type": "string",
+          "enum": [
+            "bovada",
+            "pinnacle"
+          ]
+        },
+        "data_ref": {
+          "description": "Equality filter on data_ref. This field points to the content-addressed segment containing timestamped quotes. Treat it as immutable evidence for replay and audit.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_quote_links",
+    "description": "Traverse links touching one quote by id. A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -180,8 +335,40 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. This field identifies the venue class that governs listing and settlement behavior. Add new classes by order so downstream assumptions remain explicit.",
+          "type": "string",
+          "enum": [
+            "sportsbook",
+            "exchange"
+          ]
+        },
+        "name": {
+          "description": "Equality filter on name. This field stores the operator-visible venue name, such as Bovada. Keep names stable so external references can be re-imported idempotently.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_venue_links",
+    "description": "Traverse links touching one venue by id. A venue is the listing and pricing source where instruments are offered. Represent sportsbooks and exchanges as rows here so tickets can reference a concrete origin.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -217,8 +404,34 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "settled_at": {
+          "description": "Equality filter on settled_at. This field records when settled truth became known in ISO-8601 UTC. Do not allow grading decisions to cite truth timestamps after this boundary.",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
         }
       }
+    }
+  },
+  {
+    "name": "qf_result_links",
+    "description": "Traverse links touching one result by id. A result is the settled truth payload for a market_event and its instruments. Treat settled_at as the governing timestamp that closes uncertainty and enables final grading.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -254,8 +467,36 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "name": {
+          "description": "Equality filter on name. Operator-facing mission label. Keep this stable across revisions so lineage queries stay anchored to one intent.",
+          "type": "string"
+        },
+        "objective": {
+          "description": "Equality filter on objective. The decision goal this mission serves. It must be concrete enough for an agent to reject work that is out of charter.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_mission_links",
+    "description": "Traverse links touching one mission by id. A mission is the standing research intent for a desk or workspace. It governs which hypotheses belong together so agents preserve one coherent question stream.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -291,8 +532,53 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "claim": {
+          "description": "Equality filter on claim. The claim being tested in domain language. Phrase it so a supporting or rejecting verdict is objectively distinguishable.",
+          "type": "string"
+        },
+        "success_criteria": {
+          "description": "Equality filter on success_criteria. The evidence bar for support. This defines the gate so confidence alone cannot silently override the research contract.",
+          "type": "string"
+        },
+        "sources": {
+          "description": "Equality filter on sources. Citations that justify the claim's priors. Treat this as provenance for why the claim exists, not as proof that it is true.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "description": "Equality filter on status. Current lifecycle state for the claim. Only evaluation-backed resolution should move it away from open.",
+          "type": "string",
+          "enum": [
+            "open",
+            "supported",
+            "rejected",
+            "inconclusive"
+          ]
         }
       }
+    }
+  },
+  {
+    "name": "qf_hypothesis_links",
+    "description": "Traverse links touching one hypothesis by id. A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -328,8 +614,40 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Which implementation track the policy uses. This keeps playbook-level and model-weight policies comparable without splitting object types.",
+          "type": "string",
+          "enum": [
+            "prompt_playbook",
+            "trained_weights"
+          ]
+        },
+        "spec_ref": {
+          "description": "Equality filter on spec_ref. Artifact id that defines the policy behavior. Every policy revision must point to immutable bytes so evaluations can be reproduced.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_policy_links",
+    "description": "Traverse links touching one policy by id. A policy is a versioned decision strategy intended for training or recommendation experiments. It governs promotion by requiring explicit lineage to the artifact that defines the policy.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -365,8 +683,41 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Execution context used for training/evaluation. Agents must not compare outcomes across kinds without an explicit normalization rule.",
+          "type": "string",
+          "enum": [
+            "offline_replay",
+            "paper_market",
+            "live_shadow"
+          ]
+        },
+        "contract_ref": {
+          "description": "Equality filter on contract_ref. Artifact id describing observations, actions, and reward semantics. Keep this immutable so results remain interpretable after schema evolution.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_environment_links",
+    "description": "Traverse links touching one environment by id. An environment is the bounded world a policy is trained or evaluated against. It governs comparability by declaring the data and reward contract a run assumes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -402,8 +753,45 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "spec_ref": {
+          "description": "Equality filter on spec_ref. Artifact id whose content defines the strategy logic. This reference is the canonical source of behavior for replay and audit.",
+          "type": "string"
+        },
+        "version": {
+          "description": "Equality filter on version. Monotonic strategy revision number. New revisions must become new objects linked by derived_from instead of in-place edits.",
+          "type": "number"
+        },
+        "stake_model": {
+          "description": "Equality filter on stake_model. Position sizing approach the strategy assumes. Use custom only when the sizing function is encoded in the referenced artifact.",
+          "type": "string",
+          "enum": [
+            "flat",
+            "fractional_kelly",
+            "custom"
+          ]
         }
       }
+    }
+  },
+  {
+    "name": "qf_strategy_links",
+    "description": "Traverse links touching one strategy by id. A strategy is a versioned betting decision recipe under evaluation. It governs execution by separating durable identity here from executable content in artifacts.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -439,8 +827,81 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "origin": {
+          "description": "Equality filter on origin. How this ticket entered the system. Strategy-proposed rows express planned intent, while operator-supplied rows are venue facts that must preserve external provenance exactly.",
+          "type": "string",
+          "enum": [
+            "strategy_proposed",
+            "operator_supplied"
+          ]
+        },
+        "kind": {
+          "description": "Equality filter on kind. Whether the wager has one leg or multiple legs. Treat single as a first-class ticket, not a separate type.",
+          "type": "string",
+          "enum": [
+            "single",
+            "parlay"
+          ]
+        },
+        "external_ref": {
+          "description": "Equality filter on external_ref. Venue-issued ticket reference for this wager. Use it as the idempotency key so re-importing the same operator-supplied slip updates one row instead of duplicating it.",
+          "type": "string"
+        },
+        "placed_at": {
+          "description": "Equality filter on placed_at. Timestamp when the wager was placed in ISO-8601 UTC. This is required input for CLV because selection-time price must be compared to market state at placement.",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "combined_price": {
+          "description": "Equality filter on combined_price. Aggregate ticket price at selection. Keep the source price so downstream evaluation does not infer payout assumptions.",
+          "type": "number"
+        },
+        "stake": {
+          "description": "Equality filter on stake. Amount risked on the wager. Store the actual stake for operator-supplied slips and the proposed stake for strategy-origin tickets without changing field semantics.",
+          "type": "number"
+        },
+        "payout": {
+          "description": "Equality filter on payout. Realized return from settlement, distinct from stake and combined_price assumptions. Keep it null while grade is pending and set it once the venue-grade is known.",
+          "type": "number"
+        },
+        "correlation_note": {
+          "description": "Equality filter on correlation_note. Declared dependence assumptions among legs. Same-event legs should reference known correlation groups to avoid false independence.",
+          "type": "string"
+        },
+        "grade": {
+          "description": "Equality filter on grade. Settlement outcome for the ticket. It stays pending until settled truth is available from result lineage.",
+          "type": "string",
+          "enum": [
+            "pending",
+            "win",
+            "loss",
+            "push",
+            "void"
+          ]
         }
       }
+    }
+  },
+  {
+    "name": "qf_ticket_links",
+    "description": "Traverse links touching one ticket by id. A ticket is one wager record, whether strategy-proposed before placement or operator-supplied after placement. It governs grading lineage by preserving selection-time terms and settlement facts in one object.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -476,8 +937,48 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Primary data family captured by this snapshot. Mixed should only be used when cross-family coupling is deliberate and documented.",
+          "type": "string",
+          "enum": [
+            "odds_history",
+            "results",
+            "features",
+            "mixed"
+          ]
+        },
+        "content_hash": {
+          "description": "Equality filter on content_hash. Hash over the underlying bytes for this snapshot. Equal hashes mean byte-identical data and therefore equivalent replay input.",
+          "type": "string"
+        },
+        "as_of": {
+          "description": "Equality filter on as_of. Latest timestamp allowed in this snapshot (ISO-8601 UTC). Agents must treat it as a leakage boundary for pre-event decisions.",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
         }
       }
+    }
+  },
+  {
+    "name": "qf_dataset_links",
+    "description": "Traverse links touching one dataset by id. A dataset is a versioned, point-in-time-fenced snapshot consumed by runs. It governs replay by binding every run to immutable bytes and an as-of boundary.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -513,8 +1014,54 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Execution mode for this run. Add new modes here rather than cloning the run type per pipeline step.",
+          "type": "string",
+          "enum": [
+            "ingestion",
+            "feature_build",
+            "backtest",
+            "analysis",
+            "training"
+          ]
+        },
+        "status": {
+          "description": "Equality filter on status. Operational lifecycle state of execution. Never store actor-internal thinking/tool-calling states in this field.",
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "trace_id": {
+          "description": "Equality filter on trace_id. Root span identifier for this run in tracing systems. Keep it stable across child spans so causality can be reconstructed.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_run_links",
+    "description": "Traverse links touching one run by id. A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -550,8 +1097,47 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Artifact family discriminator. Trajectory and report entries should contain distilled outputs, never raw transcript dumps.",
+          "type": "string",
+          "enum": [
+            "strategy_spec",
+            "code",
+            "result_set",
+            "report",
+            "trajectory"
+          ]
+        },
+        "content_hash": {
+          "description": "Equality filter on content_hash. Hash of the durable bytes referenced by this artifact. This is the canonical identity for dedupe and provenance checks.",
+          "type": "string"
+        },
+        "storage_ref": {
+          "description": "Equality filter on storage_ref. Durable location that stores the referenced bytes. Publication should occur before ephemeral sandboxes can be reclaimed.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_artifact_links",
+    "description": "Traverse links touching one artifact by id. An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -587,8 +1173,49 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "critic_findings_ref": {
+          "description": "Equality filter on critic_findings_ref. Artifact id containing critic findings considered in this judgment. Leave null only when no critic pass was available for this evaluation.",
+          "type": "string"
+        },
+        "verdict": {
+          "description": "Equality filter on verdict. Disposition of the evidence against the hypothesis. This field carries gating semantics; confidence does not override it.",
+          "type": "string",
+          "enum": [
+            "supports",
+            "rejects",
+            "inconclusive"
+          ]
+        },
+        "confidence": {
+          "description": "Equality filter on confidence. Confidence score for the selected verdict on a 0-1 scale. Use it for prioritization and review, not as a substitute for verdict semantics.",
+          "type": "number"
+        },
+        "rationale": {
+          "description": "Equality filter on rationale. Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_evaluation_links",
+    "description": "Traverse links touching one evaluation by id. An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -624,8 +1251,36 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "name": {
+          "description": "Equality filter on name. Short workspace slug shown in compact UI surfaces. Keep it stable so linked session labels and automation references do not drift.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Equality filter on title. Long human-readable heading for the workspace. Use this for operator readability while keeping machine references on name.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_workspace_links",
+    "description": "Traverse links touching one workspace by id. A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -661,8 +1316,44 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "name": {
+          "description": "Equality filter on name. Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.",
+          "type": "string"
+        },
+        "role": {
+          "description": "Equality filter on role. Role summary used for planner routing and prompt selection. Keep role labels aligned with actual task boundaries, not model branding.",
+          "type": "string"
+        },
+        "package_ref": {
+          "description": "Equality filter on package_ref. Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.",
+          "type": "string"
+        },
+        "system_prompt_ref": {
+          "description": "Equality filter on system_prompt_ref. Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_agent_definition_links",
+    "description": "Traverse links touching one agent_definition by id. An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -698,8 +1389,44 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "status": {
+          "description": "Equality filter on status. Operational lifecycle state enforced by transition policy. Status transitions must follow the transition table rather than ad-hoc writes.",
+          "type": "string",
+          "enum": [
+            "starting",
+            "running",
+            "blocked",
+            "cancelled",
+            "failed",
+            "closed"
+          ]
+        },
+        "label": {
+          "description": "Equality filter on label. Optional operator-facing label for this live session. Use it for readability only; lifecycle and routing authority remain on stable ids.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_agent_session_links",
+    "description": "Traverse links touching one agent_session by id. An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -735,8 +1462,36 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "title": {
+          "description": "Equality filter on title. Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Equality filter on description. Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_task_links",
+    "description": "Traverse links touching one task by id. A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -772,8 +1527,36 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "name": {
+          "description": "Equality filter on name. Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.",
+          "type": "string"
+        },
+        "summary": {
+          "description": "Equality filter on summary. One-line capability summary for agent selection. Explain what decision this tool enables, not just its transport mechanism.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_tool_links",
+    "description": "Traverse links touching one tool by id. A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -809,8 +1592,41 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Execution substrate category used by runs linked through executes_in. Choose the narrowest accurate kind so failure domains stay interpretable.",
+          "type": "string",
+          "enum": [
+            "local_process",
+            "local_python",
+            "cloudflare_sandbox"
+          ]
+        },
+        "label": {
+          "description": "Equality filter on label. Operator-facing name for this environment instance. Keep labels specific enough to distinguish local and remote contexts at a glance.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_execution_environment_links",
+    "description": "Traverse links touching one execution_environment by id. An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {
@@ -846,8 +1662,40 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "kind": {
+          "description": "Equality filter on kind. Connection category such as data, control, or view. Use a constrained vocabulary in higher layers so traversal semantics stay predictable.",
+          "type": "string"
+        },
+        "from_ref": {
+          "description": "Equality filter on from_ref. Source tile or object identifier for this connection. It should reference existing canvas entities rather than inferred placeholders.",
+          "type": "string"
+        },
+        "to_ref": {
+          "description": "Equality filter on to_ref. Target tile or object identifier for this connection. Keep directional intent explicit so reverse traversals are computed, not guessed.",
+          "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "qf_connection_links",
+    "description": "Traverse links touching one connection by id. A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object id whose links to traverse."
+        },
+        "kind": {
+          "description": "Optional link kind filter — only edges of this kind are returned.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   {

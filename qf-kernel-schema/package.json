@@ -10,7 +10,8 @@
     "./validate": "./src/validate.ts",
     "./define": "./src/define.ts",
     "./transition-meta": "./src/transition-meta.ts",
-    "./link-endpoints": "./src/link-endpoints.ts"
+    "./link-endpoints": "./src/link-endpoints.ts",
+    "./mcp": "./src/generate/mcp.ts"
   },
   "scripts": {
     "generate": "bun run scripts/generate.ts",
