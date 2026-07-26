@@ -108,6 +108,39 @@ type Gate = {
   run: () => boolean | Promise<boolean>;
 };
 
+/**
+ * Shared package gate runner: frozen install, then package-local test command.
+ * Keeps per-gate error prefixes so failures still report as `schema:`/`kernel:`.
+ */
+async function bunPackageGate(
+  gateName: string,
+  cwd: string,
+  testCommand: readonly [string, ...string[]] = ["bun", "test"],
+): Promise<boolean> {
+  const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+    cwd,
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  const installCode = await install.exited;
+  if (installCode !== 0) {
+    console.error(`${gateName}: bun install exited ${installCode}`);
+    return false;
+  }
+
+  const proc = Bun.spawn([...testCommand], {
+    cwd,
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  const code = await proc.exited;
+  if (code !== 0) {
+    console.error(`${gateName}: ${testCommand.join(" ")} exited ${code}`);
+    return false;
+  }
+  return true;
+}
+
 const gates: Gate[] = [
   {
     name: "repo-shape",
@@ -163,27 +196,7 @@ const gates: Gate[] = [
       // them. Install here so the gate behaves identically on a fresh clone
       // (CI) and on a machine where deps happen to be present. Frozen means
       // this can never silently drift from the committed lockfile.
-      const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-      });
-      const installCode = await install.exited;
-      if (installCode !== 0) {
-        console.error(`schema: bun install exited ${installCode}`);
-        return false;
-      }
-      const proc = Bun.spawn(["bun", "test"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-      });
-      const code = await proc.exited;
-      if (code !== 0) {
-        console.error(`schema: bun test exited ${code}`);
-        return false;
-      }
-      return true;
+      return bunPackageGate("schema", cwd);
     },
   },
   {
@@ -229,27 +242,7 @@ const gates: Gate[] = [
       "qf-kernel tests green (migration, commands, replay, session id, trace) — installs own deps",
     run: async () => {
       const cwd = join(REPO_ROOT, "packages/qf-kernel");
-      const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-      });
-      const installCode = await install.exited;
-      if (installCode !== 0) {
-        console.error(`kernel: bun install exited ${installCode}`);
-        return false;
-      }
-      const proc = Bun.spawn(["bun", "test"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-      });
-      const code = await proc.exited;
-      if (code !== 0) {
-        console.error(`kernel: bun test exited ${code}`);
-        return false;
-      }
-      return true;
+      return bunPackageGate("kernel", cwd);
     },
   },
   {
