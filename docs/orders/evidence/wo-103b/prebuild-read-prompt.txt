@@ -1,0 +1,34 @@
+You are performing an adversarial PRE-BUILD READ on a work order, per the reviewer role defined in docs/orders/PROTOCOL.md (read that role definition first, lines 12 and 16-31).
+
+You are NOT the author, builder, or verifier of this order. REPORT FINDINGS ONLY. Do not edit any file. Do not fix anything. Do not create a branch. Do not commit. Do not merge. If you catch yourself about to write to a file, stop — that is the one thing this role never does.
+
+THE ORDER UNDER REVIEW: docs/orders/WO-103b.md
+
+Read that file in full, end to end, before forming any opinion. THE ORDER FILE WINS OVER THIS MESSAGE. This message tells you what job to do; the order file is the artifact under review and nothing here paraphrases it. If this message and the order ever seem to disagree about what the order says, the order is right and this message is wrong.
+
+Repo state: branch is a detached worktree at commit b59c55b, identical to main. The order was authored by the architect on 2026-07-26 and has never been read by anyone but its author.
+
+MEASURED FACTS THE ORDER CITES. Verify these against the code — do not assume they are true because they are written down. If any is wrong, that is itself a finding:
+- 23 object types; 9 creatable via creationCommands
+- 15 link kinds; 7 writable end to end
+- 31 actions; 25 transition commands + 10 creation commands; 6 dead actions (retry_run, close_run, request_approval, approve, deny, promote_type)
+- qf-kernel-schema/golden/tools.json contains 77 tools = 23 objects x 2 (_get,_query) + 31 actions x 1
+- qa/run.ts defines 13 gates
+- qf_observe_ticket exists at golden/tools.json:1060 and nothing serves it at runtime
+
+ANSWER EXACTLY TWO QUESTIONS. Nothing else. This read is deliberately narrow so that it stays cheap enough to actually happen — do not expand it into a general review, a code review, or a style critique.
+
+QUESTION 1: CAN EACH ACCEPTANCE GATE ACTUALLY FAIL?
+For every gate G1 through G5 in the order, name specifically what would have to break for that gate to go red. A gate that is satisfiable by construction is not a gate. Look hardest at:
+- G2, the new observe-door gate, which has two clauses and must be falsifiable in both
+- G4, which asserts count predictions (31->25 actions, 77->71 tools, 13->14 gates). A count that matches its prediction may prove nothing on its own — say whether each count can be reached by a wrong implementation.
+
+QUESTION 2: DOES EACH DELIVERABLE HAVE EXACTLY ONE MEANING?
+For each of deliverables 1 through 5, could two competent builders implement it differently and both honestly claim to have satisfied it? If yes, it is underspecified. Likeliest offenders, in the author's own estimation:
+- Deliverable 2, the connection ruling, which asks for a decision rather than a specific diff
+- Deliverable 5, which says "record these rulings, build no machinery" and may not draw that line sharply enough
+
+OUTPUT FORMAT:
+Rank findings by severity (High / Medium / Low). For each: what is wrong, why it matters, and what would fix it. Mark each finding as load-bearing (it will cause a defect or a false pass) or cosmetic (it is merely imprecise). If you find nothing in a category, say so plainly — do not manufacture findings to appear thorough. An honest "G3 is sound and here is why it can fail" is worth more than a padded list.
+
+CONTEXT THAT SHOULD RAISE YOUR SUSPICION: on the immediately preceding order in this repo, three of five defects were born in the ORDER TEXT rather than in the code, and a single adversarial read found five more in minutes. The author of WO-103b knows this and wrote the order anyway, and put a line in it saying "assume this order contains one too." Take that seriously — it is not modesty, it is a measured base rate.
