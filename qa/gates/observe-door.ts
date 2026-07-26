@@ -36,6 +36,56 @@ const SKIP_DIR_NAMES = new Set([
 
 const CODE_EXT = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".sql", ".json", ".md"]);
 
+/**
+ * Strip line comments, block comments, and markdown-fenced blocks so clause
+ * scanners match live code only — not documentation in comments.
+ */
+function stripNonCodeContent(source: string): string {
+  let out = "";
+  let i = 0;
+  const len = source.length;
+  while (i < len) {
+    if (source[i] === "/" && source[i + 1] === "*") {
+      i += 2;
+      while (i < len && !(source[i] === "*" && source[i + 1] === "/")) i++;
+      i += 2;
+      continue;
+    }
+    if (source[i] === "/" && source[i + 1] === "/") {
+      while (i < len && source[i] !== "\n") i++;
+      continue;
+    }
+    if (source.slice(i, i + 3) === "```") {
+      i += 3;
+      while (i < len && source.slice(i, i + 3) !== "```") i++;
+      i += 3;
+      continue;
+    }
+    const q = source[i];
+    if (q === '"' || q === "'" || q === "`") {
+      out += source[i];
+      i++;
+      while (i < len) {
+        if (source[i] === "\\") {
+          out += source[i] + (source[i + 1] ?? "");
+          i += 2;
+          continue;
+        }
+        out += source[i];
+        if (source[i] === q) {
+          i++;
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+    out += source[i];
+    i++;
+  }
+  return out;
+}
+
 function isDocPath(rel: string): boolean {
   return rel.startsWith("docs/") || rel.endsWith(".md");
 }
@@ -73,7 +123,7 @@ function scanObserveStrings(): Array<{ rel: string; needle: string }> {
     if (isDocPath(rel)) continue;
     const ext = rel.slice(rel.lastIndexOf("."));
     if (!CODE_EXT.has(ext)) continue;
-    const text = readFileSync(full, "utf8");
+    const text = stripNonCodeContent(readFileSync(full, "utf8"));
     for (const needle of OBSERVE_STRINGS) {
       if (text.includes(needle) && !OBSERVE_ALLOWLIST.has(rel)) {
         violations.push({ rel, needle });
@@ -104,7 +154,7 @@ function scanServingSurface(): Array<{ rel: string; pattern: string }> {
     if (isDocPath(rel)) continue;
     const ext = rel.slice(rel.lastIndexOf("."));
     if (!CODE_EXT.has(ext)) continue;
-    const text = readFileSync(full, "utf8");
+    const text = stripNonCodeContent(readFileSync(full, "utf8"));
     if (/golden\/tools\.json/.test(text)) {
       violations.push({ rel, pattern: "golden/tools.json" });
     }
