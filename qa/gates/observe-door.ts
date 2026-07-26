@@ -22,6 +22,8 @@ const OBSERVE_ALLOWLIST = new Set([
   "qf-kernel-schema/golden/tools.json",
   "qa/gates/observe-door.ts",
   "qa/run.ts",
+  "tools/qf-read-tools/src/harness.ts",
+  "tools/qf-read-tools/src/fixtures/observe-leak-schema.ts",
 ]);
 
 const SKIP_DIR_NAMES = new Set([

@@ -2,16 +2,15 @@
 /**
  * qf-read-tools MCP stdio server.
  *
- * Serves schema-generated read tools (_get, _query, _links) for every object type.
- * Action tools are excluded by construction: registration iterates schema.objects only
- * and never visits schema.actions.
+ * Serves schema-generated read tools (_get, _query, _links) for every object type
+ * and action tools for every non-operatorOnly action. Writes go through execute().
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { schema as defaultSchema } from "qf-kernel-schema";
 import type { Schema } from "qf-kernel-schema/define";
 import { closeKernel, openKernel, type KernelDb } from "qf-kernel";
-import { registerReadTools } from "./register.ts";
+import { registerActionTools, registerReadTools } from "./register.ts";
 
 async function loadSchema(): Promise<Schema> {
   const modPath = process.env.QF_READ_SCHEMA_MODULE;
@@ -29,10 +28,11 @@ if (!kernelDbPath) {
 }
 
 const schema = await loadSchema();
-const db: KernelDb = openKernel(kernelDbPath, { readonly: true });
+const db: KernelDb = openKernel(kernelDbPath);
 
 const server = new McpServer({ name: "qf-read-tools", version: "0.1.0" });
 registerReadTools(server, db, schema);
+registerActionTools(server, db, schema);
 
 process.on("SIGINT", () => {
   closeKernel(db);

@@ -356,12 +356,12 @@ const gates: Gate[] = [
     },
   },
   {
-    name: "read-tools",
+    name: "tool-plane",
     description:
-      "WO-104: MCP read-tools harness (G2 schema-driven serve, G3 links, G4 zero action tools)",
+      "WO-105: MCP tool-plane harness (read + action tools, set-equality served surface, GATE 1/2 at transport)",
     run: async () => {
       const cwd = join(REPO_ROOT, "tools/qf-read-tools");
-      return bunPackageGate("read-tools", cwd, ["bun", "run", "harness"]);
+      return bunPackageGate("tool-plane", cwd, ["bun", "run", "harness"]);
     },
   },
 ];
