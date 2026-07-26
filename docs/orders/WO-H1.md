@@ -34,6 +34,14 @@ The determinism half **already exists and is fully green** — four tests at
 re-reads the register. That is one confirmed stale entry found by spot-check; this order checks the
 rest.
 
+> **Re-based 2026-07-25 after WO-103 merged.** This order was written while WO-103 was open, so
+> several of its facts referenced a `main` that no longer exists. Corrections are struck through
+> inline below and in the gates. **Re-measured against the post-merge `main`:** register entries
+> **22**, struck through **4**, open **18** — all unchanged, because WO-103 did not touch the debt
+> table. Gates **12 → 13**. Treat every number below as testimony and re-measure it anyway; that is
+> literally this order's deliverable, and an order that asks you to audit stale claims while
+> carrying its own is the joke that writes itself.
+
 ## Context (measured 2026-07-25 against `main` at `235d029` — cite these, do not re-estimate)
 
 | Fact | Value | Where |
@@ -53,9 +61,9 @@ say so rather than force them. Pre-measured exclusions, each with its reason:
 | # | Why it is NOT swept here |
 |---|---|
 | 3 | `_zod` internals → `FieldSpec` IR is a real refactor of `define.ts`/`sql.ts` — both are WO-103/WO-104 territory |
-| 4 | `stateFieldName` → explicit `stateField` is a **schema-surface change** (regenerates `golden/`), and all 3 call sites are in `define.ts`, which WO-103 edits |
+| 4 | `stateFieldName` → explicit `stateField` is a **schema-surface change** (regenerates `golden/`). ~~all 3 call sites are in `define.ts`, which WO-103 edits~~ — **the collision reason expired when WO-103 merged (2026-07-25), but the exclusion stands on the schema-surface reason alone**, which this order forbids outright. Note WO-103 added a *fourth* consumer, `qf-kernel-schema/src/transition-meta.ts`, which derives state fields from it — audit the entry against that, do not sweep it |
 | 9 | determinism half **already done**; the "compact golden" half collides with WO-104, which rewrites the whole tool surface |
-| 11 | `validate.ts` signature touches `packages/qf-kernel/src/execute.ts:6` — WO-103's core file — and raises a real question (does `execute()` narrow, or does the boundary stay permissive?) |
+| 11 | `validate.ts` signature touches `packages/qf-kernel/src/execute.ts:6` and raises a real question (does `execute()` narrow, or does the boundary stay permissive?). ~~WO-103's core file~~ — **that collision expired on merge; the open design question is the live reason and it is not a housekeeping call.** WO-103 made it sharper, not simpler: `execute()` now has a third branch (links) and a shared creation-policy layer. Audit and route; do not sweep |
 | 13 | founder action, not builder work |
 | 15, 16 | routed to WO-007, which is founder-gated on the visual pass |
 | 17, 18, 19, 20 | trigger-gated by design. **Do not touch.** A trigger-gated debt is not an overdue task |
@@ -107,8 +115,10 @@ matches working**; this is an addition, not a rewrite.
 
 ## Declared dependencies (do not discover these at commit time)
 
-- **`docs/ROADMAP.md` is shared with WO-103**, which will close debts as it lands. If both are
-  open, **merge WO-H1 first** — it is smaller and its diff is confined to the debt table.
+- ~~`docs/ROADMAP.md` is shared with WO-103; merge WO-H1 first if both are open.~~ **Moot as of
+  2026-07-25: WO-103 is verified and merged.** You branch from a `main` that already contains it.
+  WO-103 added a status paragraph to the P2 section of `ROADMAP.md` and **did not touch the debt
+  table** — so the register you audit is unchanged, but re-measure rather than trusting this line.
 - **No gate may be weakened to make a sweep pass.** If hardening #12 makes an existing gate red,
   that is a finding to report, not a threshold to relax.
 - **`qa/run.ts` is the gate runner itself.** A mistake here disables the whole safety net silently.
@@ -128,9 +138,10 @@ remove → **green**. Paste both. Also confirm the previously-caught shapes stil
 
 **G3 · Suite green, cold (verifier-run).** `bun qa/run.ts --all` from a fresh worktree, exit code
 stated explicitly. **Do not pipe the runner's output** — a pipe reports the pipe's exit code, not
-the runner's (measured error, WO-102 verification). Expect **12/12 and no count change**: this
-order adds no tests to the schema or kernel suites, and a change there means something was touched
-that should not have been.
+the runner's (measured error, WO-102 verification). Expect ~~12/12~~ **13/13 and no count change**
+(corrected 2026-07-25 — WO-103 merged after this order was written and added the `typecheck` gate;
+measured `bun qa/run.ts --list` → 13). This order adds no tests to the schema or kernel suites, and
+a change there means something was touched that should not have been.
 
 ## Evidence required in the report
 
