@@ -89,3 +89,22 @@ Licensing probed at source via `gh repo view`: `rivet-dev/rivet` and `rivet-dev/
 ---
 
 *Condensed 2026-07-24 from two existing sweep passes. When a phase starts, read that phase's row here, then the matching section of `DOCTRINE-LIBRARY-CORRELATIONS.md`. Never the raw 286.*
+
+## Triage — cli-printing-press (mvanhorn), classified 2026-07-26
+
+Probed at source: GitHub README only, five minutes, per §5.8. MIT, 4.3k stars, active.
+What it is: a generator — point it at an API spec, a website, or a HAR capture and it emits a
+CLI tool + MCP server for that API, with a bundled SQLite data layer.
+
+Per-layer, per the rule:
+
+| Layer | What it is | Bucket |
+|---|---|---|
+| The generator itself | A CLI you invoke per task; depends on nothing of ours | **Dock item — inventory.** Adopt freely if/when a rung wants it |
+| Each generated CLI/MCP server | A new standalone tool per API | **Dock item each, individually** — but see the flag below |
+| The bundled SQLite data layer in its outputs | A per-tool local store | **Flag, not a bucket:** pointed at Kernel-domain data this is a second truth store on sight. Any adopted output's SQLite stays a cache/projection outside Kernel domain, or the output is not adoptable |
+
+One line of forward relevance, logged not decided: its "browser-sniff gate" (launch a browser,
+capture traffic, reverse-engineer the undocumented API) is exactly the shape of the **WO-107
+external-surface probe** — the thing PROTOCOL requires before anyone may write an order asserting
+how Bovada data arrives. Candidate probe instrument. Nothing turns on it until WO-107 is scoped.
