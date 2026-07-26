@@ -20,6 +20,12 @@ Someone in the architect seat writes `docs/orders/WO-103.md`. Its brief is unusu
 - **Routed to WO-103 at the latest — ROADMAP debt #21:** `docs/ONTOLOGY_SCHEMA.md` describes the pre-rename schema (`event` ×12, zero `market_event`). Regenerate-and-gate the object surface, or demote the file to design prose in `DOC_AUTHORITY_MAP.md`. Edit-by-order-only.
 - **Routed to WO-104's author, not this one:** whether `start_event` / `settle_event` / `void_event` rename to match `market_event` — that decision belongs where actions become agent-facing tool vocabulary, and `doc-action-surface` will force the doc update in the same commit.
 
+## One thing a builder *can* start right now, off-ladder
+
+**[WO-H1](WO-H1.md) — debt register audit and sweep.** Written and cuttable. It is **not a rung**: `qa/` and the `ROADMAP.md` debt table only, zero schema and zero Kernel changes, blocks nothing and is blocked by nothing. It audits all 18 open debt entries against real code (one already turned out half-done and nobody had noticed), corrects the stale ones, and sweeps the two that are genuinely small.
+
+**Parallel-eligible with WO-103**, sharing one file — the `ROADMAP.md` debt table. If both are open, merge WO-H1 first; it is much the smaller diff.
+
 ## Queued behind (do not start)
 
 **WO-104/105** — the generated tool plane (P2's remaining rungs). **WO-106/107** — the first market, **Bovada sportsbook only** per doctrine A7. Then the loop, the critic, the one-shot proof. See [`SCOPES.md`](SCOPES.md).
