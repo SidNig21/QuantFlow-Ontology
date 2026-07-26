@@ -1,42 +1,48 @@
-# NEXT — no order is currently cuttable (rotated 2026-07-26: WO-105 verified + merged)
+# NEXT — the current order (rotated 2026-07-26: WO-105 merged, WO-106 written and read)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## STOP — there is no builder work right now
+## Current order: **WO-106 — The cold seat, and retirement**
 
-**WO-105 is done** (verified + merged 2026-07-26 after 1 rework round; 15 gates cold,
-`GATE_RUNNER_EXIT=0`). P3 rung 2 of 3 is closed: GATE 1 exists at `execute.ts:122`, 24 action tools
-are served, and `qf_observe_ticket` is structurally absent from every agent catalogue.
+WO-105 is done (verified + merged 2026-07-26; 15 gates cold, exit 0). WO-106 closes P3: the write
+tools learn to describe themselves, and the four hand-written read verbs are deleted.
 
-**The next rung — WO-106 — is blocked on a founder decision (ROADMAP debt #24) and may not be
-written or cut until that decision is made.** If you are a builder and you arrived here, stop and
-report that; do not select another order, and do not start WO-106.
+0. Read `AGENTS.md` at repo root — the cold-start briefing, the commands, the `golden/` ritual.
+1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
+2. Read [`WO-106.md`](WO-106.md) — the complete order, end to end, **including the pre-build read
+   record at the bottom**, before any edit.
+3. Branch `wo-106` from current `main`. **Commit from a worktree, never the shared tree.**
+4. Run every gate unpiped, `$?` on its own line, and paste full unedited output. Report per
+   [`PROTOCOL.md`](PROTOCOL.md); the verifier runs the cold suite independently.
 
-## What the decision is
+### Four things about this rung specifically
 
-WO-105 shipped 24 working write tools. **They advertise no parameters.** `qf_create_ticket`'s
-transport `inputSchema` has zero properties; its real eight-field shape survives only in
-`_meta["qf/inputSchema"]`, which standard MCP clients ignore.
+- **ROADMAP debt #24 is decided — do not relitigate it.** The founder ruled: fix the advertisement.
+  The mechanism is Ruling 1, and it was **probed end-to-end before the order was cut** (the override
+  handler runs, advertises real properties and `required`, and a bogus key still reaches the handler
+  untouched). Do not "simplify" it by passing the real Zod schema to `registerTool` — that makes MCP
+  a second validator and masks GATE 1, which WO-105 exists to prevent.
+- **The migration census in the order is a floor, not a closed list.** The first draft said "8
+  callsites, 5 files"; measured, it is **16 files**, including a fifth wrapper the draft did not know
+  about and **two QA gates** that break the suite if missed. Delete the definitions, then fix every
+  compile break. Typecheck and the full suite are the authority on completeness.
+- **`golden/` changes in this rung, deliberately.** D2 adds `order` and nullable `limit` to the query
+  tools. G6 requires *determinism, not stasis* — after your regeneration is committed, `bun run
+  generate` must produce no further diff. An earlier draft demanded byte-identity and contradicted
+  D2; that is fixed, but read G6 carefully.
+- **The order was adversarially read before you saw it: thirteen findings, seven High, all fixed** —
+  including three cases where the order contradicted *itself*, the defect class that cost WO-105 a
+  full rework round. The fixes are inline; read them as constraints, not commentary.
 
-This is not a defect to assign. In `@modelcontextprotocol/sdk@1.29.0`, `registerTool` **derives**
-the advertised JSON Schema from the same object it validates with — so advertising the true shape
-would make MCP a second validator, masking GATE 1 and violating WO-105 D3, which the order
-mandated. The fork is real:
+### Two standing traps, both measured and logged
 
-- **Leave it** — tools are callable but not self-describing; an agent must be told the shape.
-- **Serve `tools/list` from a low-level handler** that emits the real JSON Schema while
-  `registerTool` keeps the permissive validator. The write path stays single; only the
-  *advertisement* changes. Real work, and a change to the agent-facing contract.
+- **`agent-path` gives a false FAIL in a sandboxed shell** (debt #23) — its self-install exits 0 but
+  leaves no `node_modules`. Pre-install before any before/after measurement.
+- **Never pipe the gate runner.** It has now cost two seats: one read `tail`'s exit 0 while the gate
+  had failed. Unpiped, `$?` on its own line, every time.
 
-**It gates WO-106 because WO-106's entire premise is "the cold seat proves discovery — no priming,
-generated tools only."** A cold seat cannot discover parameters that are not advertised. Deciding
-this after WO-106 is written means rewriting it.
-
-Full statement: ROADMAP debt #24. Measurements behind it:
-[`evidence/wo-105/VERIFICATION.md`](evidence/wo-105/VERIFICATION.md).
-
-## Where the ladder stands
+## Where the ladder stands, and what is queued behind (do not start)
 
 **5 of 11 rungs done** (`SCOPES.md` is authoritative on numbering). P1 closed, P2 closed, P3 at
 2 of 3. Remaining: **WO-106** (cold seat + verb retirement — the only pre-P5 rung touching
@@ -52,13 +58,6 @@ data and the closing proof; they are heavier than the five behind us.
 
 Builder seats run **`composer-2.5` or `cursor-grok-4.5-high` only** — an API-cost decision, not a
 trust one. One model builds, a different one verifies; no model checks its own work.
-
-## Two standing traps, both measured and logged
-
-- **`agent-path` gives a false FAIL in a sandboxed shell** (debt #23) — its self-install exits 0 but
-  leaves no `node_modules`. Pre-install before any before/after measurement.
-- **Never pipe the gate runner.** It has now cost two seats: one read `tail`'s exit 0 while the gate
-  had failed. Unpiped, `$?` on its own line, every time.
 
 ## Parked / parallel
 
