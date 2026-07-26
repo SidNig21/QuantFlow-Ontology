@@ -560,6 +560,7 @@ Fail a starting, running, or blocked agent session (→ failed). Used for guest 
 - **lifecycle:** `experimental`
 - **input:**
 - `session_id` — Agent session to fail.
+- `reason` — Diagnostic label for why the session failed (crash code, stop reason, or boot reconciliation). Optional; recorded in the event payload when supplied and does not affect transition legality.
 
 ### `close_agent_session`
 

@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import type { CompatibilityCallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import {
   closeKernel,
   eventCount,
@@ -61,10 +62,11 @@ function expectedServedToolNames(schema: Schema): Set<string> {
   return names;
 }
 
-function toolText(result: { content: unknown }): string {
-  const text = (result.content as Array<{ type: string; text?: string }>).find(
-    (c) => c.type === "text",
-  )?.text;
+function toolText(result: CompatibilityCallToolResult): string {
+  if ("toolResult" in result) {
+    throw new Error("tool returned toolResult instead of content blocks");
+  }
+  const text = result.content.find((c) => c.type === "text")?.text;
   if (!text) throw new Error("tool returned no text");
   return text;
 }

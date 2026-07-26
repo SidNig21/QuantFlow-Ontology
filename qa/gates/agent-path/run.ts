@@ -265,7 +265,7 @@ function reconcile(db: KernelDb): void {
       execute(
         db,
         "fail_agent_session",
-        { session_id: id },
+        { session_id: id, reason: "app_terminated" },
         trace(),
       );
       execute(db, "close_agent_session", { session_id: id }, trace());

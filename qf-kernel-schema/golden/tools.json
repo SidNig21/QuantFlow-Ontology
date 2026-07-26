@@ -2262,6 +2262,10 @@
         "session_id": {
           "type": "string",
           "description": "Agent session to fail."
+        },
+        "reason": {
+          "description": "Diagnostic label for why the session failed (crash code, stop reason, or boot reconciliation). Optional; recorded in the event payload when supplied and does not affect transition legality.",
+          "type": "string"
         }
       },
       "required": [
