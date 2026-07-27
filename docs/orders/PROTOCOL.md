@@ -119,3 +119,43 @@ When a verification round ends in REWORK, the verifier appends the record to the
 **Both doors get rotated, not just the builder's (added 2026-07-25).** The same passing commit must also confirm `docs/orders/VERIFYING.md` still names every authority document a verifier needs **and that every pasteable command in it resolves against live refs** (widened 2026-07-25: the first door-rot fix covered the doc list and missed a dead `origin/QuantFlow` diff base eight lines below it — a stale ref inside a runnable command is the same rot in executable form, and worse, because it gets pasted, not read). This exists because it failed exactly once and silently: `VERIFYING.md` sat untouched from 2026-07-18 while `AGENTS.md`, `DOCTRINE.md` and `SCOPES.md` were created around it, so for a week **the seat with more authority entered through the worse map** — a verifier following it literally would have met a known-defective, already-routed type description with nothing telling them it was owned by a later rung, and failed the order or fixed it out of scope.
 
 The general rule, which is the same one the product enforces at the tile seam: **a document with no duty attached to it will rot, and nobody will notice, because a stale entry point reads exactly like a current one.** `NEXT.md` stayed true only because rotating it was somebody's named job. Any file that must stay current needs a named owner and a trigger, or it is a cache pretending to be truth.
+
+## The third seat: post-merge review (added 2026-07-26)
+
+Two seats already look at every rung — a pre-build adversarial reader checks the order's text before
+it is built, and a verifier re-measures the builder's claims before it merges. **WO-105 shipped two
+real vulnerabilities through both.** So a third seat now reviews merged code, and its job is defined
+by subtraction: find what the other two missed.
+
+**What it caught that the others structurally could not.** `publish_artifact` reads any filesystem
+path it is given, and WO-105 served that action to every agent — so anything speaking MCP could name
+any path the process could open and have its bytes stored as a durable artifact. Measured with a
+canary file: accepted, read, stored. **Neither half was a defect.** Declaring `path` was correct and
+closed debt #6; serving the action was correct and was the rung's entire purpose. The hole is the
+*composition*, and a review that walks deliverables one at a time cannot see it. That is the class
+this seat exists for, and it must be asked for by name.
+
+**Three rules make it productive rather than noise:**
+
+1. **Hand the reviewer the known-limits list and forbid re-reporting it.** Every verification record
+   ends with honestly-recorded limits. Without this instruction the reviewer returns them and nothing
+   is learned.
+2. **Ask for composition defects explicitly** — "is there a hole created by two changes that are each
+   individually correct?" — alongside correctness, gate-vs-code gaps, and trust-boundary changes.
+   Name what changed posture: a database opened read-write that used to be read-only, an in-process
+   function that is now served.
+3. **Re-measure every finding, with a control.** The review is testimony. When testing "does X break
+   this lint," first confirm the *unmodified* input passes — a malformed fixture throws a `TypeError`
+   that reads exactly like a real failure. Two measurements in one sitting were discarded for this
+   reason. And a confirmed finding can still be less severe than it looks: WO-105's dead bait fixture
+   was real, but measuring further showed the schema lint refuses to load when the flag is stripped,
+   so the posture held. Report the mechanism, not the alarm.
+
+**Findings route like any other measurement:** confirmed ones to the ROADMAP debt register with a
+trigger naming their owning rung; corrections to the verification record appended under a POST-MERGE
+REVIEW heading, stating the overclaim plainly. *A record that admits a weak gate is worth more than
+one rewritten to look strong.*
+
+The reviewer must be a different model from both the builder and the verifier. Note for anyone
+automating this: **Cursor CLI has no skill mechanism** — the prompt must be passed in full; a Claude
+Code skill cannot be invoked from inside it.
