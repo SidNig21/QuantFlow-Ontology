@@ -15,9 +15,8 @@ import { join } from "node:path";
 import { AgentOs, type JsonRpcNotification } from "@rivet-dev/agentos-core";
 import {
   execute,
-  listAgentSessions,
-  listArtifacts,
   openKernel,
+  queryObjects,
   type KernelDb,
   type TraceContext,
 } from "qf-kernel";
@@ -258,7 +257,7 @@ async function runOne(
 }
 
 function reconcile(db: KernelDb): void {
-  for (const row of listAgentSessions(db)) {
+  for (const row of queryObjects(db, "agent_session", undefined, null)) {
     const id = String(row.id);
     const status = String(row.status);
     if (status === "starting" || status === "running" || status === "blocked") {
@@ -319,7 +318,7 @@ async function main(): Promise<number> {
         console.error("agent-path FAIL: admit-only produced chunks");
         return 1;
       }
-      const artsAfterAdmit = listArtifacts(db);
+      const artsAfterAdmit = queryObjects(db, "artifact", undefined, null);
       if (artsAfterAdmit.length > 0) {
         console.error("agent-path FAIL: admit-only produced artifacts");
         return 1;
@@ -380,7 +379,7 @@ async function main(): Promise<number> {
       const poll = (async () => {
         const deadline = Date.now() + 20_000;
         while (Date.now() < deadline) {
-          const live = listAgentSessions(db).filter((r) =>
+          const live = queryObjects(db, "agent_session", undefined, null).filter((r) =>
             ["starting", "running", "blocked"].includes(String(r.status)),
           );
           if (live.length >= 2) {
@@ -447,7 +446,7 @@ async function main(): Promise<number> {
       console.error("agent-path FAIL: completion did not publish artifact");
       return 1;
     }
-    const arts = listArtifacts(db);
+    const arts = queryObjects(db, "artifact", undefined, null);
     if (!arts.some((x) => x.id === b.artifactId)) {
       console.error("agent-path FAIL: artifact row missing");
       return 1;
@@ -473,7 +472,7 @@ async function main(): Promise<number> {
       trace(),
     );
     reconcile(db);
-    const stale = listAgentSessions(db).filter((r) =>
+    const stale = queryObjects(db, "agent_session", undefined, null).filter((r) =>
       ["stale-starting", "stale-running"].includes(String(r.id)),
     );
     for (const s of stale) {

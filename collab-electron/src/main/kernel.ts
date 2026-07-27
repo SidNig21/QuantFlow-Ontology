@@ -8,10 +8,8 @@ import { DatabaseSync } from "node:sqlite";
 import {
   attachKernel,
   execute,
-  getAgentDefinition as getAgentDefinitionRow,
-  listArtifacts,
-  listAgentDefinitions as listAgentDefinitionRows,
-  listAgentSessions,
+  getObject,
+  queryObjects,
   resolveSpeciesPackage as resolveSpeciesPackageRow,
   type ExecuteResult,
   type KernelDb,
@@ -57,7 +55,7 @@ export function openAppKernel(): KernelDb {
   kernelPath = join(COLLAB_DIR, "kernel.db");
   const raw = new DatabaseSync(kernelPath);
   kernelDb = attachKernel(wrapDatabaseSync(raw));
-  const n = listArtifacts(kernelDb).length;
+  const n = queryObjects(kernelDb, "artifact", undefined, null).length;
   console.log(`kernel: opened ${kernelPath}, artifacts=${n}`);
   return kernelDb;
 }
@@ -80,28 +78,35 @@ export function kernelExecute(
   return execute(getKernelDb(), command, input, trace);
 }
 
+/** Unbounded artifact listing for IPC / boot logging (created_at DESC). */
 export function kernelListArtifacts(): Record<string, unknown>[] {
-  return listArtifacts(getKernelDb());
+  return queryObjects(getKernelDb(), "artifact", undefined, null);
 }
 
+/** Unbounded agent_session listing for IPC / reconciliation (created_at DESC). */
 export function kernelListAgentSessions(): Record<string, unknown>[] {
-  return listAgentSessions(getKernelDb());
+  return queryObjects(getKernelDb(), "agent_session", undefined, null);
 }
 
+/** Unbounded agent_definition listing for dock registry (created_at ASC). */
 export function kernelListAgentDefinitions(): Record<string, unknown>[] {
-  return listAgentDefinitionRows(getKernelDb());
+  return queryObjects(
+    getKernelDb(),
+    "agent_definition",
+    undefined,
+    null,
+    0,
+    undefined,
+    "asc",
+  );
 }
 
-/** Read one agent_definition row by name (id = name). */
-export function getAgentDefinition(
-  name: string,
+/** Fetch one ontology row by type and id. */
+export function kernelGetObject(
+  type: string,
+  id: string,
 ): Record<string, unknown> | null {
-  return getAgentDefinitionRow(getKernelDb(), name);
-}
-
-/** List all agent_definition rows (dock / host registry). */
-export function listAgentDefinitions(): Record<string, unknown>[] {
-  return listAgentDefinitionRows(getKernelDb());
+  return getObject(getKernelDb(), type, id);
 }
 
 /** Resolve species name → package path against the open Kernel. */

@@ -1,9 +1,5 @@
 export {
   attachKernel,
-  getAgentDefinition,
-  listArtifacts,
-  listAgentDefinitions,
-  listAgentSessions,
   migrationSqlPath,
   type KernelDb,
   type KernelStatement,

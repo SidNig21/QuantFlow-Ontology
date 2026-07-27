@@ -77,14 +77,18 @@ export function getObject(
 /**
  * List rows for a schema object type with optional equality filters (AND-combined).
  * Only declared properties may be filtered; unknown keys error before SQL runs.
+ *
+ * `limit`: omit for default 100, `null` for no LIMIT clause, a positive number otherwise.
+ * `order`: sort direction on created_at; defaults to "desc".
  */
 export function queryObjects(
   db: KernelDb,
   type: string,
   filters?: Record<string, unknown>,
-  limit = 100,
+  limit: number | null | undefined = 100,
   offset = 0,
   schema: Schema = defaultSchema,
+  order: "asc" | "desc" = "desc",
 ): Record<string, unknown>[] {
   const object = assertKnownType(schema, type);
   const safeFilters = assertDeclaredFilters(object, filters);
@@ -99,8 +103,19 @@ export function queryObjects(
   }
 
   const where = clauses.length > 0 ? ` WHERE ${clauses.join(" AND ")}` : "";
-  const sql = `SELECT * FROM ${type}${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
-  params.push(limit, offset);
+  const orderClause = ` ORDER BY created_at ${order === "asc" ? "ASC" : "DESC"}`;
+  if (limit === null) {
+    if (offset === 0) {
+      const sql = `SELECT * FROM ${type}${where}${orderClause}`;
+      return db.query(sql).all(...params) as Record<string, unknown>[];
+    }
+    const sql = `SELECT * FROM ${type}${where}${orderClause} LIMIT -1 OFFSET ?`;
+    params.push(offset);
+    return db.query(sql).all(...params) as Record<string, unknown>[];
+  }
+  const effectiveLimit = limit === undefined ? 100 : limit;
+  const sql = `SELECT * FROM ${type}${where}${orderClause} LIMIT ? OFFSET ?`;
+  params.push(effectiveLimit, offset);
   return db.query(sql).all(...params) as Record<string, unknown>[];
 }
 

@@ -8,7 +8,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { getAgentDefinition } from "./kernel";
+import { kernelGetObject } from "./kernel";
 
 type AllowlistDoc = {
   tools?: unknown;
@@ -55,7 +55,7 @@ export function resolveSpeciesToolAllowlist(
   species: string,
   appRoot: string,
 ): string[] {
-  const row = getAgentDefinition(species);
+  const row = kernelGetObject("agent_definition", species);
   if (!row) return [];
   const packageRef = String(row.package_ref ?? "");
   if (!packageRef) return [];

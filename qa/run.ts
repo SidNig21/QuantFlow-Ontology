@@ -17,6 +17,10 @@ import { checkOneSkin } from "./gates/one-skin.ts";
 // agent-path / dock-registry: cold-safe launchers only (no heavy top-level imports)
 import { runAgentPathGate } from "./gates/agent-path.ts";
 import { runDockRegistryGate } from "./gates/dock-registry.ts";
+import { runActionTransportGate } from "./gates/action-transport.ts";
+import { runBootReconcileGate } from "./gates/boot-reconcile.ts";
+import { checkVerbRetirement } from "./gates/verb-retirement.ts";
+import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -362,6 +366,42 @@ const gates: Gate[] = [
     run: async () => {
       const cwd = join(REPO_ROOT, "tools/qf-read-tools");
       return bunPackageGate("tool-plane", cwd, ["bun", "run", "harness"]);
+    },
+  },
+  {
+    name: "tool-discovery",
+    description:
+      "WO-106 D4/G1/G3: tools/list sufficiency, schema equality, operator door set relations",
+    run: async () => {
+      const { ok } = await runToolDiscoveryGate();
+      return ok;
+    },
+  },
+  {
+    name: "action-transport",
+    description:
+      "WO-106 G2: action tools stay permissive at MCP transport; Kernel rejects unknown keys",
+    run: async () => {
+      const { ok } = await runActionTransportGate();
+      return ok;
+    },
+  },
+  {
+    name: "verb-retirement",
+    description:
+      "WO-106 G4: retired read verbs and renamed hand-written SQL stay deleted",
+    run: () => {
+      const { ok } = checkVerbRetirement();
+      return ok;
+    },
+  },
+  {
+    name: "boot-reconcile",
+    description:
+      "WO-106 G5: boot reconciliation closes every acted-on session above 100 rows",
+    run: async () => {
+      const { ok } = await runBootReconcileGate();
+      return ok;
     },
   },
 ];

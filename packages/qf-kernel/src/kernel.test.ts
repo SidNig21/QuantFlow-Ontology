@@ -643,6 +643,35 @@ describe("read layer", () => {
     expect(rows[0]!.id).toBe("run-a");
   });
 
+  test("queryObjects limit null returns all rows without cap", () => {
+    db = openKernel(":memory:");
+    for (let i = 0; i < 105; i++) {
+      insertRun(db, { id: `run-cap-${i}`, kind: "backtest" }, { ...ctx, span_id: `span-${i}` });
+    }
+    const capped = queryObjects(db, "run", undefined, 100);
+    expect(capped).toHaveLength(100);
+    const all = queryObjects(db, "run", undefined, null);
+    expect(all).toHaveLength(105);
+  });
+
+  test("queryObjects order asc reverses created_at sort", () => {
+    db = openKernel(":memory:");
+    insertRun(db, { id: "run-old", kind: "backtest" }, ctx);
+    insertRun(db, { id: "run-new", kind: "backtest" }, { ...ctx, span_id: "span-new" });
+    db.query(`UPDATE run SET created_at = ? WHERE id = ?`).run(
+      "2020-01-01T00:00:00.000Z",
+      "run-old",
+    );
+    db.query(`UPDATE run SET created_at = ? WHERE id = ?`).run(
+      "2025-01-01T00:00:00.000Z",
+      "run-new",
+    );
+    const desc = queryObjects(db, "run", undefined, undefined, 0, undefined, "desc");
+    const asc = queryObjects(db, "run", undefined, undefined, 0, undefined, "asc");
+    expect(desc[0]!.id).toBe("run-new");
+    expect(asc[0]!.id).toBe("run-old");
+  });
+
   test("getLinks returns edges in either direction", () => {
     db = openKernel(":memory:");
     const hyp = execute(

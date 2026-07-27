@@ -45,14 +45,19 @@ function queryInputForObject(object: DefinedObject): z.ZodObject<z.ZodRawShape> 
       .number()
       .int()
       .positive()
+      .nullable()
       .optional()
-      .describe("Maximum rows to return."),
+      .describe("Maximum rows to return. Omit for default 100; pass null for no limit."),
     offset: z
       .number()
       .int()
       .nonnegative()
       .optional()
       .describe("Rows to skip before returning results."),
+    order: z
+      .enum(["asc", "desc"])
+      .optional()
+      .describe("Sort order on created_at. Defaults to desc when omitted."),
   };
   for (const [key, field] of Object.entries(object.properties.shape)) {
     const zodField = field as z.ZodType;
@@ -89,6 +94,19 @@ type ActionLike = {
   description: string;
   input: z.ZodType;
 };
+
+/** Build MCP tool definitions for the served set (read tools + non-operatorOnly actions). */
+export function servedToolsForSchema(schema: Schema): McpToolDefinition[] {
+  const tools: McpToolDefinition[] = [];
+  for (const object of schema.objects) {
+    tools.push(...readToolsForObject(object));
+  }
+  for (const action of schema.actions) {
+    if (action.operatorOnly === true) continue;
+    tools.push(actionToolForAction(action));
+  }
+  return tools;
+}
 
 /** Build one action-tool definition for discovery (not transport validation). */
 export function actionToolForAction(action: ActionLike): McpToolDefinition {

@@ -1,58 +1,55 @@
-# NEXT — the current order (rotated 2026-07-26: WO-105 merged, WO-106 written and read)
+# NEXT — the current order (rotated 2026-07-26: WO-106 merged, P3 CLOSED)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-106 — The cold seat, and retirement**
+## Current order: **WO-106b — close the `publish_artifact` file-read surface**
 
-WO-105 is done (verified + merged 2026-07-26; 15 gates cold, exit 0). WO-106 closes P3: the write
-tools learn to describe themselves, and the four hand-written read verbs are deleted.
+**Phase P3 is closed.** WO-106 merged 2026-07-26 with zero rework rounds: 19 gates cold, exit 0, and
+the write catalogue now describes itself (0 of 24 action tools advertise zero properties, down from
+24 of 24). A real model that previously needed four attempts and dropped a field now does the same
+task in one.
+
+WO-106b is a **small, single-purpose security order** carrying a ruling that is already made. It is
+the split-out D6 — see below for why it is its own order.
 
 0. Read `AGENTS.md` at repo root — the cold-start briefing, the commands, the `golden/` ritual.
 1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
-2. Read [`WO-106.md`](WO-106.md) — the complete order, end to end, **including the pre-build read
-   record at the bottom**, before any edit.
-3. Branch `wo-106` from current `main`. **Commit from a worktree, never the shared tree.**
+2. Read [`WO-106b.md`](WO-106b.md) end to end, **including the pre-build read record at the bottom**.
+3. Branch `wo-106b` from current `main`. **Commit from a worktree, never the shared tree.**
 4. Run every gate unpiped, `$?` on its own line, and paste full unedited output. Report per
    [`PROTOCOL.md`](PROTOCOL.md); the verifier runs the cold suite independently.
 
-### Five things about this rung specifically
+### Why this is its own order — read this before you judge its size
 
-- **ROADMAP debt #24 is decided — do not relitigate it.** The founder ruled: fix the advertisement.
-  The mechanism is Ruling 1, and it was **probed end-to-end before the order was cut** (the override
-  handler runs, advertises real properties and `required`, and a bogus key still reaches the handler
-  untouched). Do not "simplify" it by passing the real Zod schema to `registerTool` — that makes MCP
-  a second validator and masks GATE 1, which WO-105 exists to prevent.
-- **The migration census in the order is a floor, not a closed list.** The first draft said "8
-  callsites, 5 files"; measured, it is **16 files**, including a fifth wrapper the draft did not know
-  about and **two QA gates** that break the suite if missed. Delete the definitions, then fix every
-  compile break. Typecheck and the full suite are the authority on completeness.
-- **`golden/` changes in this rung, deliberately.** D2 adds `order` and nullable `limit` to the query
-  tools. G6 requires *determinism, not stasis* — after your regeneration is committed, `bun run
-  generate` must produce no further diff. An earlier draft demanded byte-identity and contradicted
-  D2; that is fixed, but read G6 carefully.
-- **D6 and G7 were added AFTER that read, and they close a live security hole.** The WO-105
-  post-merge review found that `publish_artifact` does `readFileSync` on any string `path`, and
-  WO-105 served that action to every agent — measured with a canary file: accepted, read, stored as a
-  durable artifact. ROADMAP debt #25, trigger fired. Neither the builder nor the pre-build read caught
-  it because neither half was a defect: declaring `path` was right, serving the action was right, the
-  *composition* is the hole. Treat D6/G7 as first-class, not an afterthought.
-- **The order was adversarially read before you saw it: thirteen findings, seven High, all fixed** —
-  including three cases where the order contradicted *itself*, the defect class that cost WO-105 a
-  full rework round. The fixes are inline; read them as constraints, not commentary.
+It was `WO-106 D6`, added **after** WO-106's adversarial read. It was therefore the one deliverable
+nobody reviewed, and it was **wrong in three measured ways**: it claimed the Electron app publishes
+through `bytes` (every app callsite uses `path`), it referred to "a declared staging root" that had
+no spelling, and it demanded a Kernel-wide rejection that would have broken the founder's own
+file-picker publish. The builder-preparer seat stopped before writing any of it. **A deliverable
+added after the read is a deliverable with no read** — so this one gets its own.
 
-### Two standing traps, both measured and logged
+### Three standing traps, all measured and logged
 
 - **`agent-path` gives a false FAIL in a sandboxed shell** (debt #23) — its self-install exits 0 but
   leaves no `node_modules`. Pre-install before any before/after measurement.
-- **Never pipe the gate runner.** It has now cost two seats: one read `tail`'s exit 0 while the gate
-  had failed. Unpiped, `$?` on its own line, every time.
+- **Never pipe the gate runner.** It has cost two seats: one read `tail`'s exit 0 while the gate had
+  failed. Unpiped, `$?` on its own line, every time.
+- **Do not run the suite while another agent is running** (new, WO-106) — a concurrent Cursor session
+  makes `runtime-proof` fail on foreign sockets. Run quiet, or you will chase a phantom red.
+
+### The standard this rung set — match it
+
+WO-106's builder **falsified every gate it wrote by editing shipping code**, not by flipping a
+fixture switch, and sent back five defects in its own gates. Three were the same shape: *a check
+whose two sides come from one source*. It also proved one gate this architect specified was
+**modelling** the boot path rather than watching it — the real edit passed all 19 gates. That is the
+bar now.
 
 ## Where the ladder stands, and what is queued behind (do not start)
 
-**5 of 11 rungs done** (`SCOPES.md` is authoritative on numbering). P1 closed, P2 closed, P3 at
-2 of 3. Remaining: **WO-106** (cold seat + verb retirement — the only pre-P5 rung touching
-`collab-electron`), then **WO-107b** (market ingest; unblocks four link kinds), **WO-107** (first
+**6 of 11 rungs done** (`SCOPES.md` is authoritative on numbering). **P1, P2 and P3 all closed.**
+Next on the ladder after WO-106b: **WO-107b** (market ingest; unblocks four link kinds), **WO-107** (first
 market — **Bovada sportsbook only**, doctrine A7; its order may not be written until the
 external-surface probe runs — candidate instrument triaged in `docs/RESEARCH.md`), **WO-108**
 (second market), then **WO-109/110/111** — the loop, the critic, and the one-shot proof.

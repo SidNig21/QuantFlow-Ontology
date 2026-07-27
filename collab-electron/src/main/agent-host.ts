@@ -39,10 +39,10 @@ import {
   resolveSpeciesSessionEnv,
 } from "./host-mounts";
 import {
-  getAgentDefinition,
   kernelExecute,
+  kernelGetObject,
   kernelListAgentSessions,
-  listAgentDefinitions,
+  kernelListAgentDefinitions,
   resolveSpeciesPackage,
   type TraceContext,
 } from "./kernel";
@@ -131,8 +131,8 @@ export function getSpeciesPackagePath(name: string): string {
  * Never a direct INSERT.
  */
 export function seedBootSpecies(): void {
-  const before = listAgentDefinitions().length;
-  if (getAgentDefinition(BOOT_SEED_SPECIES)) {
+  const before = kernelListAgentDefinitions().length;
+  if (kernelGetObject("agent_definition", BOOT_SEED_SPECIES)) {
     console.log(
       `agent-host: boot-seed skip (already present) definitions=${before}`,
     );
@@ -148,7 +148,7 @@ export function seedBootSpecies(): void {
     },
     newTrace(),
   );
-  const after = listAgentDefinitions().length;
+  const after = kernelListAgentDefinitions().length;
   console.log(
     `agent-host: boot-seed registered definitions=${after}`,
   );
@@ -188,7 +188,7 @@ export async function admitSpecies(species: string): Promise<string> {
 
 export async function ensureAgentOs(): Promise<AgentOs> {
   if (os) return os;
-  const defs = listAgentDefinitions();
+  const defs = kernelListAgentDefinitions();
   const software: { packagePath: string }[] = [];
   for (const row of defs) {
     const name = String(row.name);

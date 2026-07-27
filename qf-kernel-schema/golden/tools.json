@@ -22,16 +22,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. This field classifies the participant species used for matching and grouping. Derive sport context from linked market events instead of hard-coding it on the competitor row.",
@@ -92,16 +107,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "sport": {
           "description": "Equality filter on sport. This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type.",
@@ -178,16 +208,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. This field identifies the instrument family needed to interpret pricing semantics. Extend the enum by order rather than cloning new object types per category.",
@@ -256,16 +301,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "book": {
           "description": "Equality filter on book. This field identifies the source venue or book that published the prices. Use stable lowercase identifiers so cross-source joins remain deterministic.",
@@ -325,16 +385,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. This field identifies the venue class that governs listing and settlement behavior. Add new classes by order so downstream assumptions remain explicit.",
@@ -394,16 +469,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "settled_at": {
           "description": "Equality filter on settled_at. This field records when settled truth became known in ISO-8601 UTC. Do not allow grading decisions to cite truth timestamps after this boundary.",
@@ -457,16 +547,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "name": {
           "description": "Equality filter on name. Operator-facing mission label. Keep this stable across revisions so lineage queries stay anchored to one intent.",
@@ -522,16 +627,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "claim": {
           "description": "Equality filter on claim. The claim being tested in domain language. Phrase it so a supporting or rejecting verdict is objectively distinguishable.",
@@ -604,16 +724,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Which implementation track the policy uses. This keeps playbook-level and model-weight policies comparable without splitting object types.",
@@ -673,16 +808,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Execution context used for training/evaluation. Agents must not compare outcomes across kinds without an explicit normalization rule.",
@@ -743,16 +893,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "spec_ref": {
           "description": "Equality filter on spec_ref. Artifact id whose content defines the strategy logic. This reference is the canonical source of behavior for replay and audit.",
@@ -817,16 +982,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "origin": {
           "description": "Equality filter on origin. How this ticket entered the system. Strategy-proposed rows express planned intent, while operator-supplied rows are venue facts that must preserve external provenance exactly.",
@@ -927,16 +1107,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Primary data family captured by this snapshot. Mixed should only be used when cross-family coupling is deliberate and documented.",
@@ -1004,16 +1199,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Execution mode for this run. Add new modes here rather than cloning the run type per pipeline step.",
@@ -1087,16 +1297,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Artifact family discriminator. Trajectory and report entries should contain distilled outputs, never raw transcript dumps.",
@@ -1163,16 +1388,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "critic_findings_ref": {
           "description": "Equality filter on critic_findings_ref. Artifact id containing critic findings considered in this judgment. Leave null only when no critic pass was available for this evaluation.",
@@ -1241,16 +1481,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "name": {
           "description": "Equality filter on name. Short workspace slug shown in compact UI surfaces. Keep it stable so linked session labels and automation references do not drift.",
@@ -1306,16 +1561,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "name": {
           "description": "Equality filter on name. Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.",
@@ -1379,16 +1649,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "status": {
           "description": "Equality filter on status. Operational lifecycle state enforced by transition policy. Status transitions must follow the transition table rather than ad-hoc writes.",
@@ -1452,16 +1737,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "title": {
           "description": "Equality filter on title. Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.",
@@ -1517,16 +1817,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "name": {
           "description": "Equality filter on name. Tool identifier exposed to agents (typically qf_*). Keep naming stable because prompts and automations may reference it directly.",
@@ -1582,16 +1897,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Execution substrate category used by runs linked through executes_in. Choose the narrowest accurate kind so failure domains stay interpretable.",
@@ -1652,16 +1982,31 @@
       "type": "object",
       "properties": {
         "limit": {
-          "description": "Maximum rows to return.",
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "description": "Maximum rows to return. Omit for default 100; pass null for no limit.",
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "offset": {
           "description": "Rows to skip before returning results.",
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "order": {
+          "description": "Sort order on created_at. Defaults to desc when omitted.",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "kind": {
           "description": "Equality filter on kind. Connection category such as data, control, or view. Use a constrained vocabulary in higher layers so traversal semantics stay predictable.",
