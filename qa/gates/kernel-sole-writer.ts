@@ -38,7 +38,7 @@ const ALLOW_PREFIXES = [
   "qf-kernel-schema/",
   "qa/gates/kernel-sole-writer.ts", // this file mentions the patterns
   "qa/gates/kernel-sole-writer-app.ts",
-  // WO-PEER-BUS: transport inbox SQLite only — never opens kernel.db for DDL/DML;
+  // WO-PEER-BUS: transport inbox SQLite only — never opens the Kernel for DDL/DML;
   // domain truth still goes through qf-kernel publish_artifact.
   "tools/qf-peer-bus/src/bus.ts",
   // Delegated 2026-07-25 to kernel-sole-writer-app.ts, which scans this tree

@@ -11,7 +11,7 @@ function parseDbArg(argv: string[]): string {
   if (i < 0 || !argv[i + 1]) {
     console.error("register.ts: --db PATH is required");
     console.error(
-      "Find the app DB: ls ~/.collaborator/dev/worktree-*/kernel.db",
+      "Find the platform Kernel under ~/.quantflow/",
     );
     process.exit(1);
   }

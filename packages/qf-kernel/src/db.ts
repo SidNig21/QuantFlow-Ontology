@@ -66,9 +66,90 @@ export interface KernelDb {
   transaction<T>(fn: () => T): () => T;
 }
 
+export type AttachKernelOptions = {
+  /**
+   * When true, skip journal_mode / synchronous (those are writes).
+   * busy_timeout still applies. Default false — writers, including Electron.
+   */
+  readonly?: boolean;
+  /** Absolute path or ":memory:" — included in the D4 boot line when set. */
+  path?: string;
+  /** Why this path was chosen — included in the D4 boot line when set. */
+  provenance?: "env" | "default" | "explicit";
+};
+
+const BUSY_TIMEOUT_MS = 5000;
+const SYNC_FULL = "FULL";
+const SYNC_NORMAL = "NORMAL";
+const UNSAFE_SYNC_ENV = "QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY";
+
+function pragmaValue(db: KernelDb, name: string): string {
+  const row = db.query(`PRAGMA ${name}`).get() as
+    | Record<string, unknown>
+    | null
+    | undefined;
+  if (!row) return "unknown";
+  const first = Object.values(row)[0];
+  return first === undefined || first === null ? "unknown" : String(first);
+}
+
+function schemaMetaCount(db: KernelDb): number {
+  try {
+    const row = db
+      .query(`SELECT COUNT(*) AS n FROM schema_meta`)
+      .get() as { n: number } | null | undefined;
+    return row?.n ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * One greppable boot line (stderr — safe for MCP stdio). Carries path,
+ * provenance, journal mode, sync, and schema_meta count.
+ */
+export function logKernelBoot(
+  db: KernelDb,
+  opts: {
+    path?: string;
+    provenance?: "env" | "default" | "explicit";
+    syncUnsafe?: boolean;
+  } = {},
+): void {
+  const path = opts.path ?? "(unspecified)";
+  const provenance = opts.provenance ?? "explicit";
+  const journal = pragmaValue(db, "journal_mode");
+  const sync = pragmaValue(db, "synchronous");
+  const meta = schemaMetaCount(db);
+  const unsafe =
+    opts.syncUnsafe === true ? ` ${UNSAFE_SYNC_ENV}=1` : "";
+  process.stderr.write(
+    `kernel: path=${path} provenance=${provenance} journal=${journal} sync=${sync}${unsafe} schema_meta=${meta}\n`,
+  );
+}
+
 /** Apply migration + events DDL idempotently on an injected connection. */
-export function attachKernel(db: KernelDb): KernelDb {
+export function attachKernel(
+  db: KernelDb,
+  opts: AttachKernelOptions = {},
+): KernelDb {
+  const readonly = opts.readonly === true;
+  const syncUnsafe =
+    !readonly && process.env[UNSAFE_SYNC_ENV] === "1";
+
   db.exec("PRAGMA foreign_keys = ON;");
+  // busy_timeout is what makes writers take turns (WO-K1 RULING 2). Always set.
+  db.exec(`PRAGMA busy_timeout = ${BUSY_TIMEOUT_MS};`);
+
+  // journal_mode and synchronous are writes — skip on readonly handles so
+  // WO-K2's readonly opens do not die inside attachKernel.
+  if (!readonly) {
+    db.exec("PRAGMA journal_mode = WAL;");
+    db.exec(
+      `PRAGMA synchronous = ${syncUnsafe ? SYNC_NORMAL : SYNC_FULL};`,
+    );
+  }
+
   // Generated migration.sql uses bare CREATE TABLE (not IF NOT EXISTS) for
   // schema_meta — skip when already applied so relaunch / attach is safe.
   const already = db
@@ -81,5 +162,12 @@ export function attachKernel(db: KernelDb): KernelDb {
     db.exec(migration);
   }
   db.exec(EVENTS_DDL);
+
+  logKernelBoot(db, {
+    path: opts.path,
+    provenance: opts.provenance,
+    syncUnsafe,
+  });
+
   return db;
 }

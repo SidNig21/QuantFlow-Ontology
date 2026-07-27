@@ -22,6 +22,7 @@ import { runBootReconcileGate } from "./gates/boot-reconcile.ts";
 import { checkVerbRetirement } from "./gates/verb-retirement.ts";
 import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
 import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
+import { runKernelOnePathGate } from "./gates/kernel-one-path.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -300,9 +301,18 @@ const gates: Gate[] = [
   {
     name: "kernel-sole-writer-app",
     description:
-      "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference kernel.db",
+      "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference the Kernel db file",
     run: () => {
       const { ok } = checkKernelSoleWriterApp();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-one-path",
+    description:
+      "WO-K1: one Kernel resolver; WAL/busy_timeout; MCP seat shares the default world",
+    run: async () => {
+      const { ok } = await runKernelOnePathGate();
       return ok;
     },
   },

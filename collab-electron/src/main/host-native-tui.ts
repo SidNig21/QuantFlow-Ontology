@@ -105,6 +105,9 @@ export async function admitNativeTuiSpecies(opts: {
       HOST_ACP_BIN: command,
       HOME: home,
       TERM: "xterm-256color",
+      ...(process.env.QF_KERNEL_DB
+        ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
+        : {}),
     },
     displayName,
   });
