@@ -50,6 +50,12 @@ const ALLOW_PREFIXES = [
   // what bait IS. They cannot be forced through execute() without losing the
   // ability to test what execute() refuses.
   "qa/gates/dock-registry/run.ts",
+  // WO-V1: fixture Kernel seeding that execute() cannot express —
+  // forcing identical created_at (G4 tied-timestamp fixture; execute() always
+  // stamps new Date().toISOString()) and reshuffling physical row order via
+  // DELETE+INSERT (G4(c) stable-tiebreak proof; storage order is not a domain
+  // operation). Links go through execute()'s links: envelope — not here.
+  "qa/gates/vault-projection/fixture-seed.ts",
 ];
 
 const SKIP_DIR_NAMES = new Set([
