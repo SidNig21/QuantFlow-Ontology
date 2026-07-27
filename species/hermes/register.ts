@@ -1,10 +1,9 @@
 /**
  * Register Hermes into a Kernel DB via the front door.
  *
- *   bun ./register.ts --db <absolute-path-to-kernel.db>
+ *   bun ./register.ts --db <absolute-path-to-kernel-file>
  *
- * Find the app DB (measured): ~/.collaborator/dev/worktree-<12hex>/kernel.db
- * e.g. ls ~/.collaborator/dev/worktree-*/kernel.db
+ * Platform Kernel (WO-K1): ~/.quantflow/  (single file inside that directory)
  */
 import { existsSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
@@ -18,7 +17,7 @@ function parseDbArg(argv: string[]): string {
   if (i < 0 || !argv[i + 1]) {
     console.error("register.ts: --db <path> is required");
     console.error(
-      "Find the app DB: ls ~/.collaborator/dev/worktree-*/kernel.db",
+      "Find the platform Kernel under ~/.quantflow/",
     );
     process.exit(1);
   }

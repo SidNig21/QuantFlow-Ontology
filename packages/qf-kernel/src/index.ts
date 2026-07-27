@@ -1,9 +1,16 @@
 export {
   attachKernel,
+  logKernelBoot,
   migrationSqlPath,
+  type AttachKernelOptions,
   type KernelDb,
   type KernelStatement,
 } from "./db.ts";
+export {
+  resolveKernelPath,
+  type KernelPathProvenance,
+  type ResolvedKernelPath,
+} from "./resolve-path.ts";
 export {
   getLinks,
   getObject,

@@ -1,26 +1,24 @@
 # WO-K1 — One Kernel path, and they take turns
 
-status: **open — three adversarial reads run (each returned DO NOT CUT; every finding fixed in this
-text), then the final G4 fix probed live by a fourth seat.** Round 1 2026-07-27 (`grok-4.5-high`): 5 High, plus 1 Critical the architect found while
-verifying them. Round 2 2026-07-27 (`composer-2.5`, decorrelated): graded round 1's fixes — 6 FIXED,
-**2 only ACKNOWLEDGED** — and found 3 further High in the new material. Records:
-[`evidence/wo-k1/prebuild-read.md`](evidence/wo-k1/prebuild-read.md) and
-[`evidence/wo-k1/prebuild-read-round2.md`](evidence/wo-k1/prebuild-read-round2.md).
-Round 3 2026-07-27 (`grok-4.5-high`, `/thermo-review` shape): graded round 2's four fixes — 2 FIXED,
-1 ACKNOWLEDGED, **1 WORSE** — and returned **DO NOT BUILD** on three changes, all now applied
-([`prebuild-read-round3.md`](evidence/wo-k1/prebuild-read-round3.md)). The WORSE was a composition
-defect between this order's own D6 and G4.
-**Cuttable.** Three reads, every finding fixed and re-measured by the architect seat. A fourth read
-would now be grading the third seat's own requirements, which is the decorrelation rule this order
-has followed throughout.
-2026-07-27, fresh architect seat: the round-3 G4 fix was **probed against the live SDK rather than
-re-read** — REAL, both halves, with the WORSE reproduced as the control and one SDK merge fact fed
-back into G4 and report-back 5 ([`evidence/wo-k1/architect-probe-g4.md`](evidence/wo-k1/architect-probe-g4.md)).
-Status flipped draft → **open**.
-assignee: builder
+status: **done — verified + merged 2026-07-27**, zero rework rounds.
+Record: [`evidence/wo-k1/VERIFICATION.md`](evidence/wo-k1/VERIFICATION.md).
+Pre-build trail: three adversarial reads (each DO NOT CUT; all findings fixed) plus a live SDK
+probe of the G4 fix ([`evidence/wo-k1/`](evidence/wo-k1/)). Builder tip `20488f8`.
+assignee: builder (verified by architect seat)
 depends: nothing — this is the floor
 closes: the WO-K1 half of ROADMAP debt #29; **does not** close #28 (WO-K2) or #27 (WO-K3)
 blocks: WO-K2, WO-K3, and therefore WO-107b
+
+---
+
+## VERIFICATION (2026-07-27)
+
+**PASS.** Cold `/tmp/verify-k1` @ `20488f8`, `GATE_RUNNER_EXIT=0` (21 gates, `kernel-one-path`
+added). G1 bait red→green re-run; G2 control `codes [0,2]` locked; independent `openKernel`
+contention probe both writers exit 0; G4 child `provenance=default` under sandboxed HOME;
+D8 pins absent; three Hermes seats Connected ×3 tools. Allowlist additions for acp-shim /
+G2·G4 fixtures accepted as an order composition finding the builder reported honestly.
+Full receipts: [`evidence/wo-k1/VERIFICATION.md`](evidence/wo-k1/VERIFICATION.md).
 
 ## Objective
 

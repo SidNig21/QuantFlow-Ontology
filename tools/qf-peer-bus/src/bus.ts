@@ -8,7 +8,7 @@
  *      regardless of whether delivery is enabled.
  *   2. Transport bookkeeping — WHETHER it was routed. A small SQLite file
  *      (`peer-bus.db`) that this class owns exclusively, holding an inbox
- *      table. This file never touches kernel.db and is not domain truth —
+ *      table. This file never opens the Kernel and is not domain truth —
  *      it is routing state, exactly like an MTA's queue.
  *
  * The `QF_PEER_DELIVERY=off` lever falsifies concern (2) only: the artifact
@@ -19,7 +19,13 @@
  * are two independent mechanisms, not one conflated write.
  */
 import { Database } from "bun:sqlite";
-import { closeKernel, execute, openKernel, type KernelDb } from "qf-kernel";
+import {
+  closeKernel,
+  execute,
+  openKernel,
+  resolveKernelPath,
+  type KernelDb,
+} from "qf-kernel";
 
 /** One row of the bus's own inbox table (transport state, not domain truth). */
 export type PeerMessage = {
@@ -67,7 +73,10 @@ CREATE TABLE IF NOT EXISTS messages (
 const ENSURE_PUSHED_AT = `ALTER TABLE messages ADD COLUMN pushed_at TEXT`;
 
 export type PeerBusOptions = {
-  /** Absolute path to the Kernel db, or ":memory:". Defaults to env QF_KERNEL_DB. */
+  /**
+   * Absolute path to the Kernel db, or ":memory:".
+   * When omitted, resolveKernelPath() is the sole answer (WO-K1).
+   */
   kernelDbPath?: string;
   /** Absolute path to the bus's own transport db, or ":memory:". Defaults to env QF_PEER_BUS_DB. */
   busDbPath?: string;
@@ -78,13 +87,11 @@ export class PeerBus {
   private readonly kernelDb: KernelDb;
 
   constructor(opts: PeerBusOptions = {}) {
-    const kernelDbPath = opts.kernelDbPath ?? process.env.QF_KERNEL_DB;
+    const resolved =
+      opts.kernelDbPath !== undefined
+        ? { path: opts.kernelDbPath, provenance: "explicit" as const }
+        : resolveKernelPath();
     const busDbPath = opts.busDbPath ?? process.env.QF_PEER_BUS_DB;
-    if (!kernelDbPath) {
-      throw new Error(
-        "PeerBus requires a Kernel db path — set QF_KERNEL_DB (absolute path, or ':memory:')",
-      );
-    }
     if (!busDbPath) {
       throw new Error(
         "PeerBus requires a bus db path — set QF_PEER_BUS_DB (absolute path, or ':memory:')",
@@ -92,10 +99,12 @@ export class PeerBus {
     }
 
     // Kernel db: domain truth. openKernel() creates + migrates via qf-kernel.
-    this.kernelDb = openKernel(kernelDbPath);
+    this.kernelDb = openKernel(resolved.path, {
+      provenance: resolved.provenance,
+    });
 
     // Bus db: transport bookkeeping, owned exclusively by this class, never
-    // shares a connection or a schema with kernel.db.
+    // shares a connection or a schema with the Kernel.
     this.busDb = new Database(busDbPath);
     this.busDb.exec("PRAGMA journal_mode = WAL;");
     this.busDb.exec(MESSAGES_DDL);

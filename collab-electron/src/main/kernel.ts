@@ -3,13 +3,13 @@
  * All other main-process code goes through getKernelDb() / helpers here.
  */
 import { mkdirSync } from "node:fs";
-import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import {
   attachKernel,
   execute,
   getObject,
   queryObjects,
+  resolveKernelPath,
   resolveSpeciesPackage as resolveSpeciesPackageRow,
   type ExecuteResult,
   type KernelDb,
@@ -51,12 +51,18 @@ let kernelPath: string | null = null;
 
 export function openAppKernel(): KernelDb {
   if (kernelDb) return kernelDb;
+  // App-local state (canvas, PTY, sockets) still lives under COLLAB_DIR.
+  // Kernel truth does not — see WO-K1 RULING 1.
   mkdirSync(COLLAB_DIR, { recursive: true });
-  kernelPath = join(COLLAB_DIR, "kernel.db");
+  const resolved = resolveKernelPath();
+  kernelPath = resolved.path;
+  // D6: every agent spawn inherits this once the parent process carries it.
+  process.env.QF_KERNEL_DB = resolved.path;
   const raw = new DatabaseSync(kernelPath);
-  kernelDb = attachKernel(wrapDatabaseSync(raw));
-  const n = queryObjects(kernelDb, "artifact", undefined, null).length;
-  console.log(`kernel: opened ${kernelPath}, artifacts=${n}`);
+  kernelDb = attachKernel(wrapDatabaseSync(raw), {
+    path: resolved.path,
+    provenance: resolved.provenance,
+  });
   return kernelDb;
 }
 

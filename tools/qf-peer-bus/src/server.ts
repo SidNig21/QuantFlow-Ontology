@@ -8,7 +8,7 @@
  * WO-PEER-BUS — any MCP-speaking agent (Hermes, Claude Code, Codex, the
  * cold harness in src/harness.ts, ...) can connect to this over stdio and
  * collaborate with whichever peer is on the other end of the shared
- * peer-bus.db + kernel.db.
+ * peer-bus.db + the platform Kernel.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
