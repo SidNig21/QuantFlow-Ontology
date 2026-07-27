@@ -466,22 +466,34 @@ complete a real task — and the hand-written verbs it replaces are deleted.
 
 **Depends on.** WO-104, WO-105.
 
-**In.** One cold seat, one real task, tools discovered from the MCP surface alone. Hand-written
-tool code deleted as its generated replacement lands.
+**In.** Self-describing tool advertisement (`tools/list` carries real generated JSON Schema for
+every served tool) · hand-written read verbs retired once generated equivalents cover every
+caller · a founder-witnessed demo with a real model (evidence, not a gate).
 
 **The named retirement targets** — do not leave the builder to find them. `listArtifacts`,
 `listAgentSessions`, `listAgentDefinitions`, `getAgentDefinition` in
-`packages/qf-kernel/src/db.ts`, plus their four wrappers in
-`collab-electron/src/main/kernel.ts:83-99`. These are the hand-written 3-of-19 read surface
-WO-104 generalizes; once generated equivalents serve all 19 types, keeping them is the
-two-tools-for-one-job problem. **Deleting them requires updating their Electron call sites**, so
-this rung touches `collab-electron` — the only rung before P5 that does.
+`packages/qf-kernel/src/db.ts`, plus their **five** wrappers in
+`collab-electron/src/main/kernel.ts` (including `listAgentDefinitions` at `:102`). These are the
+hand-written 3-of-19 read surface WO-104 generalizes; once generated equivalents serve all 19
+types, keeping them is the two-tools-for-one-job problem. **Deleting them requires updating their
+Electron call sites**, so this rung touches `collab-electron` — the only rung before P5 that does.
 
 **Out.** Multi-agent anything (P5) · new capability of any kind.
 
-**Gate.** The cold seat finishes the task through generated tools only, with no prompt naming a
-tool. **Deletion is part of the gate** — a replaced verb still in the tree means the rung is not
-done. Two tools for one job is the second-truth-store rule wearing a different hat.
+**Gate — split per Ruling 2 (machine vs human).**
+
+1. **Machine half — `tool-discovery` (permanent, cold-runnable).** Everything required to call
+   every served tool is present in `tools/list` alone: non-empty descriptions, advertised
+   `inputSchema` deep-equals the generator's output per tool, the advertised set equals the served
+   set and excludes `operatorOnly` actions, and the named four-step task (create run → start →
+   publish artifact linked to it → read artifact back) has every required field reachable from the
+   advertisement. Proves sufficiency; does **not** claim a model discovered anything.
+2. **Human half — founder demo (evidence, explicitly not a gate).** One real-model run, no tool
+   named in the prompt, completing the named task through the served plane. Transcript archived
+   under `docs/orders/evidence/wo-106/`. Non-determinism stated; no gate depends on it.
+
+**Deletion is part of the rung** — a replaced verb still in the tree means the rung is not done.
+Two tools for one job is the second-truth-store rule wearing a different hat.
 
 ---
 
