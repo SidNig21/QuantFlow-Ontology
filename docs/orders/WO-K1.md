@@ -1,7 +1,7 @@
 # WO-K1 — One Kernel path, and they take turns
 
-status: **draft — two adversarial reads run, both returned DO NOT CUT; all findings now fixed in this
-text.** Round 1 2026-07-27 (`grok-4.5-high`): 5 High, plus 1 Critical the architect found while
+status: **open — three adversarial reads run (each returned DO NOT CUT; every finding fixed in this
+text), then the final G4 fix probed live by a fourth seat.** Round 1 2026-07-27 (`grok-4.5-high`): 5 High, plus 1 Critical the architect found while
 verifying them. Round 2 2026-07-27 (`composer-2.5`, decorrelated): graded round 1's fixes — 6 FIXED,
 **2 only ACKNOWLEDGED** — and found 3 further High in the new material. Records:
 [`evidence/wo-k1/prebuild-read.md`](evidence/wo-k1/prebuild-read.md) and
@@ -12,7 +12,11 @@ Round 3 2026-07-27 (`grok-4.5-high`, `/thermo-review` shape): graded round 2's f
 defect between this order's own D6 and G4.
 **Cuttable.** Three reads, every finding fixed and re-measured by the architect seat. A fourth read
 would now be grading the third seat's own requirements, which is the decorrelation rule this order
-has followed throughout
+has followed throughout.
+2026-07-27, fresh architect seat: the round-3 G4 fix was **probed against the live SDK rather than
+re-read** — REAL, both halves, with the WORSE reproduced as the control and one SDK merge fact fed
+back into G4 and report-back 5 ([`evidence/wo-k1/architect-probe-g4.md`](evidence/wo-k1/architect-probe-g4.md)).
+Status flipped draft → **open**.
 assignee: builder
 depends: nothing — this is the floor
 closes: the WO-K1 half of ROADMAP debt #29; **does not** close #28 (WO-K2) or #27 (WO-K3)
@@ -485,6 +489,25 @@ missed:
    halves are required. Without the `HOME` sandbox the gate either writes into the real platform
    Kernel, or the builder avoids that by pinning the app and thereby "proves" a split.
 
+   **The SDK merges under whatever the gate passes — measured, not inferred (external-surface
+   rule).** `StdioClientTransport` does not spawn with the caller's env verbatim: it spawns with
+   `{ ...getDefaultEnvironment(), ...serverParams.env }` (SDK `client/stdio.js:73-77`), and the
+   default inherits `HOME, LOGNAME, PATH, SHELL, TERM, USER` from the parent. Probed live
+   2026-07-27 with the parent carrying a canary pin
+   ([`evidence/wo-k1/architect-probe-g4.md`](evidence/wo-k1/architect-probe-g4.md)):
+
+   ```
+   [A-envFor-spread]  QF_KERNEL_DB=/tmp/LEAK-CANARY/kernel.db          <- the WORSE, reproduced
+   [B-explicit-omit]  QF_KERNEL_DB=null  HOME=homedir()=<sandbox>  6 keys  <- this recipe, real
+   [C-sdk-default]    QF_KERNEL_DB=null  HOME=<founder's real home>        <- why the sandbox is load-bearing
+   ```
+
+   The recipe holds: `QF_KERNEL_DB` is not on the SDK's inherited safe-list, so omission keeps it
+   out, and an explicit `HOME` wins the merge. But the child's **effective** env carries six keys,
+   not the two the gate passed. Do not "fix" that by passing more keys, and do not assert on the
+   constructed object — the constructed env and the child's reality are one merge apart. Assert
+   from inside the child; see report-back 5.
+
    This is a composition defect between D6 and G4 — each correct alone — found one turn after this
    order congratulated itself for catching the same class between K1 and K2. Recorded rather than
    quietly fixed, because the recurrence is the finding.
@@ -551,8 +574,13 @@ Per `VERIFYING.md`. In addition, this order requires:
 4. The four D8 config files, before and after, showing the pins removed **and the `args` paths
    rewritten**. Pins alone are not sufficient evidence — see D8.
 5. Proof that G4's child process had **no** `QF_KERNEL_DB` in its environment, and that `HOME` was
-   sandboxed. Print the child env the gate actually constructed. A row round-tripping is not
-   sufficient on its own; it is exactly what a key-inheriting child would also produce.
+   sandboxed — **reported from inside the child, not from the gate.** The gate-side env object is
+   not sufficient: the SDK merges a default environment underneath it (see G4's probe), so the
+   constructed object and the child's reality are one merge apart — one-source-two-sides in
+   miniature. The child's own D4 boot line is the natural receipt: `provenance=default` is precisely
+   the statement that no `QF_KERNEL_DB` reached it, and the resolved path shows it landed inside the
+   sandboxed `HOME`. A row round-tripping is not sufficient on its own; it is exactly what a
+   key-inheriting child would also produce.
 6. Confirmation that `git status` is clean after every bait file is removed.
 
 **One accepted behaviour change, recorded so it is a decision and not a discovery.**
