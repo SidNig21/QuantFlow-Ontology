@@ -12,7 +12,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { loadHostMountsFile } from "./host-mounts";
-import { getAgentDefinition } from "./kernel";
+import { kernelGetObject } from "./kernel";
 
 export type SpeciesLaunch = "agentos" | "host_acp";
 
@@ -82,7 +82,7 @@ export function resolveSpeciesLaunch(
   species: string,
   appRoot: string,
 ): SpeciesLaunch {
-  const row = getAgentDefinition(species);
+  const row = kernelGetObject("agent_definition", species);
   if (!row) return "agentos";
   const packageRef = String(row.package_ref ?? "");
   if (!packageRef) return "agentos";

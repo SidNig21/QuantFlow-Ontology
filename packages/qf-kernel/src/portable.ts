@@ -4,14 +4,17 @@
  */
 export {
   attachKernel,
-  getAgentDefinition,
-  listArtifacts,
-  listAgentDefinitions,
-  listAgentSessions,
   migrationSqlPath,
   type KernelDb,
   type KernelStatement,
 } from "./db.ts";
+export {
+  getLinks,
+  getObject,
+  queryObjects,
+  type GetLinksOptions,
+  type LinkRow,
+} from "./read.ts";
 export {
   assertCreationHandlersComplete,
   creationHandlers,

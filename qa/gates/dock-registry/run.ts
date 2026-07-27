@@ -14,9 +14,9 @@ import { AgentOs } from "@rivet-dev/agentos-core";
 import {
   AgentDefinitionExistsError,
   execute,
-  listAgentDefinitions,
   openKernel,
   PackageRefUnresolvedError,
+  queryObjects,
   resolveSpeciesPackage,
   type KernelDb,
   type TraceContext,
@@ -41,7 +41,7 @@ function definitionsFromDb(db: KernelDb): Record<string, unknown>[] {
   if (process.env.QF_DOCK_REGISTRY_LIST_FAKE === "1") {
     return [];
   }
-  return listAgentDefinitions(db);
+  return queryObjects(db, "agent_definition", undefined, null, 0, undefined, "asc");
 }
 
 function scanWindowsForSpeciesLiteral(): string[] {
@@ -95,7 +95,7 @@ async function main(): Promise<number> {
 
   const db = openKernel(":memory:");
 
-  // ── (a) register bait → appears in listAgentDefinitions ──
+  // ── (a) register bait → appears in agent_definition listing ──
   if (!skipRegister) {
     execute(
       db,
@@ -113,7 +113,7 @@ async function main(): Promise<number> {
   const foundA = listed.some((r) => String(r.name ?? r.id) === BAIT_A);
   if (!foundA) {
     console.error(
-      "dock-registry FAIL: bait species missing from listAgentDefinitions",
+      "dock-registry FAIL: bait species missing from agent_definition listing",
       { skipRegister, listFake, listed: listed.map((r) => r.name) },
     );
     return 1;

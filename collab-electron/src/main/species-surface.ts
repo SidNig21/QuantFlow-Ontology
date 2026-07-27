@@ -14,7 +14,7 @@ import {
   committedLaunchPathForPackageRef,
   packedMetaPathForPackageRef,
 } from "./species-launch";
-import { getAgentDefinition } from "./kernel";
+import { kernelGetObject } from "./kernel";
 
 export type SpeciesSurface = "acp_session" | "native_tui";
 
@@ -67,7 +67,7 @@ export function resolveSpeciesSurface(
   species: string,
   appRoot: string,
 ): SpeciesSurfaceSpec {
-  const row = getAgentDefinition(species);
+  const row = kernelGetObject("agent_definition", species);
   if (!row) return { surface: "acp_session", argv: [] };
   const packageRef = String(row.package_ref ?? "");
   if (!packageRef) return { surface: "acp_session", argv: [] };

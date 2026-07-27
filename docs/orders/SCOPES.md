@@ -492,7 +492,7 @@ Electron call sites**, so this rung touches `collab-electron` — the only rung 
    named in the prompt, completing the named task through the served plane. Transcript archived
    under `docs/orders/evidence/wo-106/`. Non-determinism stated; no gate depends on it.
 
-**Deletion is part of the rung** — a replaced verb still in the tree means the rung is not done.
+**Deletion is part of the gate** — a replaced verb still in the tree means the rung is not done.
 Two tools for one job is the second-truth-store rule wearing a different hat.
 
 ---

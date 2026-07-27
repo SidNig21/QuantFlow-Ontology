@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import type { KernelDb } from "./db.ts";
-import { getAgentDefinition } from "./db.ts";
+import { getObject } from "./read.ts";
 import {
   PackageRefUnresolvedError,
   UnknownSpeciesError,
@@ -31,7 +31,7 @@ export function resolveSpeciesPackage(
   species: string,
   appRoot: string,
 ): { row: Record<string, unknown>; packagePath: string } {
-  const row = getAgentDefinition(db, species);
+  const row = getObject(db, "agent_definition", species);
   if (!row) throw new UnknownSpeciesError(species);
   const packageRef = String(row.package_ref ?? "");
   if (!packageRef) {
