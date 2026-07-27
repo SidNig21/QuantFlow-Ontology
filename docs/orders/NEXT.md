@@ -59,6 +59,15 @@ data and the closing proof; they are heavier than the five behind us.
 Builder seats run **`composer-2.5` or `cursor-grok-4.5-high` only** — an API-cost decision, not a
 trust one. One model builds, a different one verifies; no model checks its own work.
 
+## Parallel-eligible, off-ladder — a second builder may take this
+
+**[WO-V1](WO-V1.md) — the reading vault.** A one-way projection of the Kernel into
+`~/Vaults/QuantFlow Ontology`, so the founder can read every artifact, session and run in Obsidian
+with the ontology's links as backlinks. **Written; its pre-build read has not run yet — do not cut
+until that record is appended.** It touches no ladder rung, blocks nothing, and is blocked by
+nothing. Its hard rule: **Kernel → vault, never back**, and artifact content renders only when its
+hash verifies against `content_hash` (the Kernel stores a pointer, not the bytes).
+
 ## Parked / parallel
 
 **Design overhaul** — founder-run, off the critical path; returns as a brief with measured scope
