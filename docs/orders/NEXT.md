@@ -16,7 +16,7 @@ tools learn to describe themselves, and the four hand-written read verbs are del
 4. Run every gate unpiped, `$?` on its own line, and paste full unedited output. Report per
    [`PROTOCOL.md`](PROTOCOL.md); the verifier runs the cold suite independently.
 
-### Four things about this rung specifically
+### Five things about this rung specifically
 
 - **ROADMAP debt #24 is decided — do not relitigate it.** The founder ruled: fix the advertisement.
   The mechanism is Ruling 1, and it was **probed end-to-end before the order was cut** (the override
@@ -31,6 +31,12 @@ tools learn to describe themselves, and the four hand-written read verbs are del
   tools. G6 requires *determinism, not stasis* — after your regeneration is committed, `bun run
   generate` must produce no further diff. An earlier draft demanded byte-identity and contradicted
   D2; that is fixed, but read G6 carefully.
+- **D6 and G7 were added AFTER that read, and they close a live security hole.** The WO-105
+  post-merge review found that `publish_artifact` does `readFileSync` on any string `path`, and
+  WO-105 served that action to every agent — measured with a canary file: accepted, read, stored as a
+  durable artifact. ROADMAP debt #25, trigger fired. Neither the builder nor the pre-build read caught
+  it because neither half was a defect: declaring `path` was right, serving the action was right, the
+  *composition* is the hole. Treat D6/G7 as first-class, not an afterthought.
 - **The order was adversarially read before you saw it: thirteen findings, seven High, all fixed** —
   including three cases where the order contradicted *itself*, the defect class that cost WO-105 a
   full rework round. The fixes are inline; read them as constraints, not commentary.
