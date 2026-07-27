@@ -9,6 +9,7 @@ import {
 } from "qf-kernel-schema/mcp";
 import type { Schema } from "qf-kernel-schema/define";
 import { z } from "zod";
+import { installToolsListHandler } from "./discovery.ts";
 
 const getToolInput = z.object({
   id: z.string().describe("Object id to fetch."),
@@ -79,14 +80,15 @@ export function registerReadTools(
         inputSchema: querySchema.shape,
       },
       async (input) => {
-        const { limit, offset, ...filters } = input as Record<string, unknown>;
+        const { limit, offset, order, ...filters } = input as Record<string, unknown>;
         const rows = queryObjects(
           db,
           object.name,
           filters,
-          typeof limit === "number" ? limit : undefined,
-          typeof offset === "number" ? offset : undefined,
+          limit === null ? null : typeof limit === "number" ? limit : undefined,
+          typeof offset === "number" ? offset : 0,
           schema,
+          order === "asc" || order === "desc" ? order : "desc",
         );
         return toolResult(rows);
       },
@@ -126,9 +128,8 @@ export function registerActionTools(
       {
         description: def.description,
         inputSchema: actionTransportInput,
-        _meta: { "qf/inputSchema": def.inputSchema },
       },
-      async (args) => {
+      async (args: Record<string, unknown>) => {
         try {
           const result = execute(
             db,
@@ -145,4 +146,19 @@ export function registerActionTools(
   }
 
   return registered;
+}
+
+/**
+ * Register read and action tools, then install the tools/list override.
+ * Call once per server after openKernel.
+ */
+export function registerAllTools(
+  server: McpServer,
+  db: KernelDb,
+  schema: Schema,
+): McpToolDefinition[] {
+  const read = registerReadTools(server, db, schema);
+  const actions = registerActionTools(server, db, schema);
+  installToolsListHandler(server, schema);
+  return [...read, ...actions];
 }
