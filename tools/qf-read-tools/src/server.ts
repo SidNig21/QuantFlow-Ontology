@@ -10,6 +10,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { schema as defaultSchema } from "qf-kernel-schema";
 import type { Schema } from "qf-kernel-schema/define";
 import { closeKernel, openKernel, type KernelDb } from "qf-kernel";
+import { loadArtifactRoot } from "./artifact-root.ts";
 import { registerAllTools } from "./register.ts";
 
 async function loadSchema(): Promise<Schema> {
@@ -29,9 +30,10 @@ if (!kernelDbPath) {
 
 const schema = await loadSchema();
 const db: KernelDb = openKernel(kernelDbPath);
+const artifactRoot = loadArtifactRoot();
 
 const server = new McpServer({ name: "qf-read-tools", version: "0.1.0" });
-registerAllTools(server, db, schema);
+registerAllTools(server, db, schema, artifactRoot);
 
 process.on("SIGINT", () => {
   closeKernel(db);

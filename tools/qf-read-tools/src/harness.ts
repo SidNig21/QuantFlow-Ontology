@@ -2,7 +2,7 @@
 /**
  * WO-105 tool-plane harness: read + action tools over real MCP transport.
  */
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -21,6 +21,8 @@ import type { Schema } from "qf-kernel-schema/define";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-tool-plane-harness-"));
 const kernelDbPath = join(workDir, "kernel.db");
+const artifactRootPath = join(workDir, "artifact-root");
+mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "server.ts");
 const fixtureSchema = join(import.meta.dir, "fixtures/experimental-schema.ts");
 const observeLeakSchema = join(import.meta.dir, "fixtures/observe-leak-schema.ts");
@@ -40,7 +42,7 @@ async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client
   const transport = new StdioClientTransport({
     command: "bun",
     args: [serverEntry],
-    env: envFor({ QF_KERNEL_DB: kernelDbPath, ...extraEnv }),
+    env: envFor({ QF_KERNEL_DB: kernelDbPath, QF_ARTIFACT_ROOT: artifactRootPath, ...extraEnv }),
   });
   const client = new Client({ name: "qf-tool-plane-harness", version: "0.1.0" });
   await client.connect(transport);

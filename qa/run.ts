@@ -20,6 +20,7 @@ import { runDockRegistryGate } from "./gates/dock-registry.ts";
 import { runActionTransportGate } from "./gates/action-transport.ts";
 import { runBootReconcileGate } from "./gates/boot-reconcile.ts";
 import { checkVerbRetirement } from "./gates/verb-retirement.ts";
+import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
 import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
@@ -383,6 +384,15 @@ const gates: Gate[] = [
       "WO-106 G2: action tools stay permissive at MCP transport; Kernel rejects unknown keys",
     run: async () => {
       const { ok } = await runActionTransportGate();
+      return ok;
+    },
+  },
+  {
+    name: "publish-artifact-root",
+    description:
+      "WO-106b G1/G2/G3: publish_artifact path confined to QF_ARTIFACT_ROOT; fail closed without root",
+    run: async () => {
+      const { ok } = await runPublishArtifactRootGate();
       return ok;
     },
   },
