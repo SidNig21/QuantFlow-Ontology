@@ -6,8 +6,13 @@ verifying them. Round 2 2026-07-27 (`composer-2.5`, decorrelated): graded round 
 **2 only ACKNOWLEDGED** — and found 3 further High in the new material. Records:
 [`evidence/wo-k1/prebuild-read.md`](evidence/wo-k1/prebuild-read.md) and
 [`evidence/wo-k1/prebuild-read-round2.md`](evidence/wo-k1/prebuild-read-round2.md).
-**Cuttable once an architect confirms round 2's four required changes are present** — they are
-written into D3, D6, D8 and G4 below and did not change any ruling
+Round 3 2026-07-27 (`grok-4.5-high`, `/thermo-review` shape): graded round 2's four fixes — 2 FIXED,
+1 ACKNOWLEDGED, **1 WORSE** — and returned **DO NOT BUILD** on three changes, all now applied
+([`prebuild-read-round3.md`](evidence/wo-k1/prebuild-read-round3.md)). The WORSE was a composition
+defect between this order's own D6 and G4.
+**Cuttable.** Three reads, every finding fixed and re-measured by the architect seat. A fourth read
+would now be grading the third seat's own requirements, which is the decorrelation rule this order
+has followed throughout
 assignee: builder
 depends: nothing — this is the floor
 closes: the WO-K1 half of ROADMAP debt #29; **does not** close #28 (WO-K2) or #27 (WO-K3)
@@ -357,10 +362,26 @@ now.** Measured 2026-07-27 — all three seat profiles launch from a path that n
 ```
 
 That is a scratchpad from a long-finished session. **The founder's three peer-bus seats cannot start
-at all**, independently of the Kernel pin. It is the same defect shape — a generator writing a
-session-local absolute path into durable config — so D8 covers both: the emitted config must carry no
-path that is local to the machine state of the moment it ran. Removing the Kernel pin without this
-would leave three seats that resolve the right Kernel and still fail to launch.
+at all**, independently of the Kernel pin. Removing the Kernel pin without fixing this leaves three
+seats that resolve the right Kernel and still fail to launch.
+
+**The mechanism, because "the config must carry no machine-local path" is a property, not a fix.**
+Round 3 graded the previous wording ACKNOWLEDGED for exactly the reason round 2 graded the readonly
+pragma ACKNOWLEDGED — a stated property with nothing a builder can execute. **That is three times in
+this order.** The cause is measured: `setup-founder-seats.ts:16-19` derives
+`PKG_ROOT` from `import.meta.url` and writes `SERVER_TS = join(PKG_ROOT, "src/server.ts")` into the
+YAML at `:46`. Run the generator from a copy of the repo and it faithfully bakes the copy's path.
+That is not a bug in the run that produced the dead paths; it is the generator working as written.
+
+So:
+
+1. **The generator refuses to emit a path outside a real checkout.** Assert `SERVER_TS` resolves
+   inside a git work tree before writing any config, and fail loudly naming the path if not. This is
+   what would have stopped the scratchpad bake, and it is the only part that prevents recurrence.
+2. **Re-run it from the real tree** to repair the three live profiles.
+3. **Report-back shows `args` before and after, not only the pins.** The previous report-back listed
+   pins alone, so a builder could strip four pins, satisfy every written requirement, and leave three
+   seats pointing at a deleted directory.
 
 **One latent vector, named so it is not rediscovered.** `~/.collaborator/agentos-host-mounts.json`
 carries a `speciesEnv` map that `resolveSpeciesSessionEnv` (`host-mounts.ts:103-113`) forwards
@@ -448,8 +469,25 @@ missed:
    must start `tools/qf-read-tools/src/server.ts` as a **subprocess over stdio MCP with no
    `QF_KERNEL_DB` in its environment** — that is the configuration D8 creates, and the one that must
    land on the resolver default. Assert that a row written through the app's handle is returned by a
-   read tool served from that subprocess. Use the existing `StdioClientTransport` harness pattern in
-   `tools/qf-read-tools/src/harness.ts` rather than inventing a second one.
+   read tool served from that subprocess.
+
+   **Do NOT reuse `tools/qf-read-tools/src/harness.ts`.** The second draft of this gate said to, and
+   round 3 graded that **WORSE than the original wording.** `envFor` (`harness.ts:33-39`) spreads
+   `process.env` and then applies overrides — `{ ...base, ...overrides }` can add or replace a key
+   but **cannot delete one.** Combined with D6, which puts `QF_KERNEL_DB` in the parent by design,
+   the child inherits the key no matter what the gate passes. G4 would then prove *that injection
+   works* — which D6 already guarantees — and would **never once exercise the no-pin fall-through
+   that D8 creates and that the live split came from.** Five green gates, four pins still on disk.
+
+   Build it as `StdioClientTransport` directly, with (1) an **explicitly constructed** child env that
+   omits `QF_KERNEL_DB` rather than overriding it, and (2) **`HOME` pointed at a temp directory** so
+   the resolver default lands inside the fixture instead of the founder's real `~/.quantflow/`. Both
+   halves are required. Without the `HOME` sandbox the gate either writes into the real platform
+   Kernel, or the builder avoids that by pinning the app and thereby "proves" a split.
+
+   This is a composition defect between D6 and G4 — each correct alone — found one turn after this
+   order congratulated itself for catching the same class between K1 and K2. Recorded rather than
+   quietly fixed, because the recurrence is the finding.
 
    **Do not make the gate depend on the `hermes` binary being installed.** The property under test is
    "a seat-shaped MCP subprocess with no Kernel env resolves the same world," not "Hermes works."
@@ -477,6 +515,16 @@ this lands. Say so plainly in the report rather than letting it be discovered.
 **The stale `.wo008-home` Kernel is not touched.** It holds the only history that exists and is held
 open by a week-old Electron process. It is read and retired deliberately, later, on purpose.
 
+**The wipe-and-recreate ritual's blast radius changes, and this is not only about an empty canvas.**
+Debt #27's documented remedy (`SCOPES.md:105`) is to delete a Kernel and let it rebuild. Before this
+order that destroyed *one of three* indexes while the artifact bytes at
+`~/.collaborator/agent-artifacts` survived. **After this order it destroys the only index there is**,
+and the bytes still survive outside it until WO-K3 moves them. The orphan shape of debt #29 now
+applies to the canonical Kernel rather than a per-worktree one. This is not a reason to pull WO-K3
+forward — the measured instance is 2 files of test data — but between K1 and K3 every new
+`storage_ref` points at the old shelf and will need moving or breaking when K3 relocates the root.
+Say so in the report; do not let it be discovered.
+
 **WAL introduces sidecar files, and the hazard is narrower than first stated.** Measured 2026-07-27:
 `-wal` and `-shm` exist **while a handle is open**; after a clean close SQLite checkpoints and removes
 them, leaving a single file. So a cleanly-closed Kernel still copies as one file, and **hot-copying a
@@ -500,8 +548,12 @@ Per `VERIFYING.md`. In addition, this order requires:
    MCP seat launched from a Hermes profile.
 2. G2's control output — the failing `busy_timeout = 0` run — not only the passing run.
 3. The measured create time and per-write time after D3, against RULING 2's table.
-4. The four D8 config files, before and after, showing the pins removed.
-5. Confirmation that `git status` is clean after every bait file is removed.
+4. The four D8 config files, before and after, showing the pins removed **and the `args` paths
+   rewritten**. Pins alone are not sufficient evidence — see D8.
+5. Proof that G4's child process had **no** `QF_KERNEL_DB` in its environment, and that `HOME` was
+   sandboxed. Print the child env the gate actually constructed. A row round-tripping is not
+   sufficient on its own; it is exactly what a key-inheriting child would also produce.
+6. Confirmation that `git status` is clean after every bait file is removed.
 
 **One accepted behaviour change, recorded so it is a decision and not a discovery.**
 `server.ts:25-27` today *requires* `QF_KERNEL_DB` and exits when it is absent. After D2 it resolves

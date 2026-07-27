@@ -389,8 +389,17 @@ The One Rule is one sentence. Operationally it needs six properties:
    Unifying the path without the concurrency settings points a long-lived Electron write handle
    (`kernel.ts:49-61`, `BEGIN IMMEDIATE` at `:35`), the `qf-read-tools` server (`server.ts:32`,
    read-write today) and `qf-peer-bus` at one file with zero wait — and, under a rollback journal,
-   a writer locks readers out entirely. The failures would be **intermittent**, because app writes
-   are brief. WO-K1 must not ship the path unification alone.
+   the loser fails instantly rather than waiting. The failures would be **intermittent**, because app
+   writes are brief. WO-K1 must not ship the path unification alone.
+
+   **Corrected 2026-07-27 at WO-K1's third read.** This paragraph previously ended "under a rollback
+   journal, a writer locks readers out entirely." That is **wrong** — readers proceed for the whole
+   `BEGIN IMMEDIATE` window and blip only during the brief exclusive phase of commit. Measured twice,
+   by two seats: **`busy_timeout` is what makes writers take turns; WAL alone does nothing for
+   writer-versus-writer.** The correction was made in `WO-K1.md` and *not* here, leaving the contract
+   and the order teaching different models of the same mechanism — one-source-two-sides, committed in
+   the section written to name that defect. A builder reading only this contract for "why WAL" would
+   under-weight G2's `busy_timeout = 0` control, which is the load-bearing falsifier.
 2. **WO-K2 is a hard prerequisite for WO-K3, not a stylistic preference.** The architect's recorded
    ruling on debt #27 is *fail hard on write handles, warn on readonly handles*. Measured here:
    **not one of the 22 file-backed `openKernel` call sites outside `packages/qf-kernel` passes
