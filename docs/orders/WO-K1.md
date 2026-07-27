@@ -1,10 +1,13 @@
 # WO-K1 — One Kernel path, and they take turns
 
-status: **draft — NOT CUTTABLE.** Pre-build read run 2026-07-27 (`grok-4.5-high`): **do not cut**,
-5 High, plus 1 Critical the architect found while verifying them. All fixed in this text; record at
-[`evidence/wo-k1/prebuild-read.md`](evidence/wo-k1/prebuild-read.md). **A second read is required
-before this is cuttable** — the fixes changed a ruling, added two deliverables and rewrote the gates,
-which is more change than the first read covered
+status: **draft — two adversarial reads run, both returned DO NOT CUT; all findings now fixed in this
+text.** Round 1 2026-07-27 (`grok-4.5-high`): 5 High, plus 1 Critical the architect found while
+verifying them. Round 2 2026-07-27 (`composer-2.5`, decorrelated): graded round 1's fixes — 6 FIXED,
+**2 only ACKNOWLEDGED** — and found 3 further High in the new material. Records:
+[`evidence/wo-k1/prebuild-read.md`](evidence/wo-k1/prebuild-read.md) and
+[`evidence/wo-k1/prebuild-read-round2.md`](evidence/wo-k1/prebuild-read-round2.md).
+**Cuttable once an architect confirms round 2's four required changes are present** — they are
+written into D3, D6, D8 and G4 below and did not change any ruling
 assignee: builder
 depends: nothing — this is the floor
 closes: the WO-K1 half of ROADMAP debt #29; **does not** close #28 (WO-K2) or #27 (WO-K3)
@@ -255,6 +258,22 @@ So: `busy_timeout` unconditionally; `journal_mode` and `synchronous` only on a h
 cross-order composition defect caught before either order shipped — the class these rungs exist to
 close, nearly recurring inside them.
 
+**The mechanism, because round 2 correctly refused to accept the requirement without one.**
+`attachKernel(db: KernelDb)` takes no options today, and `openKernel`'s `{ readonly?: true }`
+(`db-bun.ts:4-14`) never reaches it. Mandating a conditional pragma without saying how the condition
+is known is how a builder ends up setting WAL unconditionally anyway. Therefore:
+
+- `attachKernel` gains an options parameter carrying a `readonly` flag, and `openKernel` passes its
+  own flag through. Do not infer readonly by catching the throw — a `try`/`catch` around a pragma
+  swallows real failures and cannot distinguish "reader, expected" from "the file is broken."
+- The Electron `wrapDatabaseSync` path (`kernel.ts:20-47`) has no readonly option today and does not
+  need one in this order; it is always a writer. Give the parameter a writable default so that call
+  site is unchanged.
+- The same options parameter is where `QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY` (D5) selects
+  `synchronous`. **`attachKernel` reads it; nothing else does.** Round 2 flagged that D5 named the
+  variable and D3 named the pragma while nothing joined them — stated here so the join is not left to
+  inference.
+
 ### D4 — every process says which Kernel it opened
 
 One greppable line at boot from every process that opens a Kernel, carrying at minimum: the resolved
@@ -275,10 +294,11 @@ production.
 The first draft named one edit point. The pre-build read found four more, and the correction is the
 difference between "agents share a world" being true and being a comment.
 
-**First, the app's own process must carry the resolved path** — set it in the main process once the
-resolver has run. The first draft claimed `acp-agent.ts` "inherits the key automatically"; that was
-**false**, because nothing ever put the key in the parent environment. Every row below depends on
-this one.
+**First, the app's own process must carry the resolved path** — set it in `openAppKernel`
+(`kernel.ts:52`) immediately after the resolver returns, which is the one place guaranteed to run
+before any agent is spawned and is already the app's single Kernel seam. The first draft claimed
+`acp-agent.ts` "inherits the key automatically"; that was **false**, because nothing ever put the key
+in the parent environment. Every row below depends on this one.
 
 | Spawner | Policy | What D6 must do |
 |---|---|---|
@@ -320,6 +340,34 @@ documented remedy that disagrees with the thing that generates the state is the 
 already records against this codebase.
 
 **`QF_PEER_BUS_DB` stays.** It is transport, not truth, and it is legitimately per-bus.
+
+**`setup-founder-seats.ts` must resolve, not construct.** Round 2 found that stopping the YAML
+emission at `:47-49` leaves `:22` (`KERNEL_DB = join(BUS_DIR, "kernel.db")`) and `:148`
+(`openKernel(KERNEL_DB)`) intact — and that file is deliberately **not** on G1's allowlist, so the
+gate reddens on it. That is not an oversight to route around with a quiet allowlist entry; it is G1
+correctly catching a real second path. **Fix the file: call the resolver.** If the builder believes an
+exemption is needed instead, that is a finding to report, not a line to add.
+
+**The same generator bakes in a second kind of dead absolute path, and the seats are broken right
+now.** Measured 2026-07-27 — all three seat profiles launch from a path that no longer exists:
+
+```
+~/.hermes/profiles/{qf-orchestrator,qf-worker,qf-worker-2}/config.yaml  args:
+  /tmp/claude-1000/…/7336e31a-…/scratchpad/scope-w2/tools/qf-peer-bus/src/server.ts   MISSING
+```
+
+That is a scratchpad from a long-finished session. **The founder's three peer-bus seats cannot start
+at all**, independently of the Kernel pin. It is the same defect shape — a generator writing a
+session-local absolute path into durable config — so D8 covers both: the emitted config must carry no
+path that is local to the machine state of the moment it ran. Removing the Kernel pin without this
+would leave three seats that resolve the right Kernel and still fail to launch.
+
+**One latent vector, named so it is not rediscovered.** `~/.collaborator/agentos-host-mounts.json`
+carries a `speciesEnv` map that `resolveSpeciesSessionEnv` (`host-mounts.ts:103-113`) forwards
+wholesale into the AgentOS merged env (`agent-host.ts:452-456`). Measured today it holds only
+`HERMES_BIN`, `HOME`, `HOST_ACP_BIN` — **no Kernel pin, so there is nothing to strip.** But a pin
+added there in future would reach AgentOS and *not* the host-ACP literal at `:395`, producing another
+half-split. D4's boot line is the defence; no change is required in this order.
 
 **Out-of-repo state cannot be gated**, so this deliverable is defended by D4's boot line and by G4,
 never by G1. Say so in the report rather than implying coverage that cannot exist.
@@ -396,6 +444,18 @@ missed:
    in this repo. A G4 that only exercises `agent-host.ts:395` would go green while
    `~/.hermes/profiles/*` kept three seats on the old Kernel.
 
+   **Spelled out, because round 2 showed this requirement was not buildable as stated.** The gate
+   must start `tools/qf-read-tools/src/server.ts` as a **subprocess over stdio MCP with no
+   `QF_KERNEL_DB` in its environment** — that is the configuration D8 creates, and the one that must
+   land on the resolver default. Assert that a row written through the app's handle is returned by a
+   read tool served from that subprocess. Use the existing `StdioClientTransport` harness pattern in
+   `tools/qf-read-tools/src/harness.ts` rather than inventing a second one.
+
+   **Do not make the gate depend on the `hermes` binary being installed.** The property under test is
+   "a seat-shaped MCP subprocess with no Kernel env resolves the same world," not "Hermes works."
+   Binding CI to a founder-local binary would produce the false-red class debt #23 already records
+   against `agent-path`.
+
 **Corrected overclaim.** The first draft called G4 "the only gate that would have caught the original
 defect." False — G1 would have reddened on `setup-founder-seats.ts`'s `join(…, "kernel.db")` and on
 the direct env reads in `server.ts` and `bus.ts`, which is the tool-side half of the measured split.
@@ -445,9 +505,16 @@ Per `VERIFYING.md`. In addition, this order requires:
 
 **One accepted behaviour change, recorded so it is a decision and not a discovery.**
 `server.ts:25-27` today *requires* `QF_KERNEL_DB` and exits when it is absent. After D2 it resolves
-the default instead, so a process with no env — a forgotten CI job, say — opens the real platform
-Kernel rather than refusing to start. That is the intended consequence of having a default at all,
-and it is the point of the order. The half that is genuinely uncomfortable is that such a process
-could also **create** it; **WO-K2 closes that** by making `openKernel` stop creating by default. Do
-not pull that forward, and do not paper over it here with a second guard that WO-K2 would then have
-to remove.
+the default instead, so a process with no env opens the platform Kernel rather than refusing to start.
+
+**The log settles whether that is a loss.** `~/.hermes/logs/mcp-stderr.log` shows the `quantflow`
+server failing to start four times on 2026-07-26 (15:58:56 → 15:59:04) with
+`QF_KERNEL_DB env var is required`, then starting clean from 15:59:46 — which is the pin in D8 being
+added. `server.ts:25-27` is a **fail-closed guard with no default**. Offering an operator no answer
+leaves exactly one way forward, hardcoding an absolute path, and that is what happened four files
+over. **The guard did not prevent the split; the guard caused it.** A default is what removes the
+pressure to hardcode, which is why D8 strips the pins rather than correcting them.
+
+The half that remains genuinely uncomfortable is that such a process could also **create** a Kernel.
+**WO-K2 closes that** by making `openKernel` stop creating by default. Do not pull it forward, and do
+not paper over it here with a second guard WO-K2 would then have to remove.

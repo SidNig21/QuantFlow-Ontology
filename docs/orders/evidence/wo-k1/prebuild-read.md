@@ -43,6 +43,31 @@ override the resolver default by construction. WO-K1 as originally written would
 seat the founder actually uses.** The order would report success against a split that survived it
 intact.
 
+### A1a — how the pin was born, from the log · MEASURED
+
+`~/.hermes/logs/mcp-stderr.log` records the `quantflow` MCP server failing to start **four times** on
+2026-07-26 between 15:58:56 and 15:59:04:
+
+```
+===== [2026-07-26 15:58:56] starting MCP server 'quantflow' =====
+qf-read-tools server: QF_KERNEL_DB env var is required
+```
+
+From 15:59:46 onward the starts are clean and the message never recurs. **That is the pin being added.**
+
+The provenance matters more than the timestamp. `server.ts:25-27` is a **fail-closed guard with no
+default**: it refuses to run rather than open the wrong Kernel, which is correct as far as it goes.
+But offering an operator no answer at all leaves exactly one way forward — hardcode an absolute path
+— and that is what happened, four files over. **The guard did not prevent the split. The guard caused
+it.**
+
+This retires a doubt about D2. Round 1 flagged as a Medium that after D2 `server.ts` stops requiring
+the variable and falls through to the resolver, calling it a fail-open behaviour change. The log
+inverts that reading: **a default is what removes the pressure to hardcode.** The uncomfortable half
+was never the default, it was that such a process could also *create* a Kernel — and WO-K2 closes
+that by making `openKernel` stop creating. Accepted as designed, with the reasoning now measured
+rather than asserted.
+
 **Consequences accepted into the order:**
 
 1. A deliverable that strips the pins rather than rewriting them — a pinned absolute path is the
