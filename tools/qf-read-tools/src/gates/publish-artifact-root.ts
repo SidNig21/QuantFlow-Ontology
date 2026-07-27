@@ -21,6 +21,7 @@ import {
   type KernelDb,
 } from "qf-kernel";
 import { schema as productionSchema } from "qf-kernel-schema";
+import type { Schema } from "qf-kernel-schema/define";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-publish-artifact-root-"));
 const kernelDbPath = join(workDir, "kernel.db");
@@ -28,10 +29,38 @@ const artifactRootPath = join(workDir, "artifact-root");
 mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "..", "server.ts");
 
-const servedActionCountWithRoot = productionSchema.actions.filter(
-  (a) => a.operatorOnly !== true,
-).length;
-const servedActionCountWithoutRoot = servedActionCountWithRoot - 1;
+/** Action tool names from schema.actions — mirrors registerActionTools / discovery filtering. */
+function expectedActionToolNames(schema: Schema, includePublishArtifact: boolean): Set<string> {
+  return new Set(
+    schema.actions
+      .filter((a) => a.operatorOnly !== true)
+      .filter((a) => includePublishArtifact || a.name !== "publish_artifact")
+      .map((a) => `qf_${a.name}`),
+  );
+}
+
+/** Pick action tools out of a tools/list name list by schema membership, not name suffix. */
+function actionToolsFromListed(names: Iterable<string>, schema: Schema): Set<string> {
+  const allActions = new Set(
+    schema.actions
+      .filter((a) => a.operatorOnly !== true)
+      .map((a) => `qf_${a.name}`),
+  );
+  return new Set([...names].filter((n) => allActions.has(n)));
+}
+
+function assertActionToolSetEqual(
+  actual: Set<string>,
+  expected: Set<string>,
+  label: string,
+): void {
+  const missing = [...expected].filter((n) => !actual.has(n)).sort();
+  const extra = [...actual].filter((n) => !expected.has(n)).sort();
+  if (missing.length === 0 && extra.length === 0) return;
+  throw new Error(
+    `G3: ${label} action tool set mismatch — missing [${missing.join(", ")}], extra [${extra.join(", ")}]`,
+  );
+}
 
 function envFor(overrides: Record<string, string>): Record<string, string> {
   const base: Record<string, string> = {};
@@ -209,22 +238,20 @@ async function gateG3(): Promise<void> {
   await client.connect(transport);
 
   const listed = await client.listTools();
-  const actionTools = listed.tools
-    .map((t) => t.name)
-    .filter((n) => n.startsWith("qf_") && !n.endsWith("_get") && !n.endsWith("_query") && !n.endsWith("_links"));
+  const expectedWithoutRoot = expectedActionToolNames(productionSchema, false);
+  const actionTools = actionToolsFromListed(
+    listed.tools.map((t) => t.name),
+    productionSchema,
+  );
   console.log(`G3_total_tools=${listed.tools.length}`);
-  console.log(`G3_action_tools=${actionTools.length}`);
-  console.log(`G3_action_tool_names=${JSON.stringify(actionTools.sort())}`);
+  console.log(`G3_action_tools=${actionTools.size}`);
+  console.log(`G3_action_tool_names=${JSON.stringify([...actionTools].sort())}`);
   console.log(`G3_publish_present=${listed.tools.some((t) => t.name === "qf_publish_artifact")}`);
 
   if (listed.tools.some((t) => t.name === "qf_publish_artifact")) {
     throw new Error("G3: qf_publish_artifact must be absent from tools/list without QF_ARTIFACT_ROOT");
   }
-  if (actionTools.length !== servedActionCountWithoutRoot) {
-    throw new Error(
-      `G3: expected ${servedActionCountWithoutRoot} action tools without root, got ${actionTools.length}`,
-    );
-  }
+  assertActionToolSetEqual(actionTools, expectedWithoutRoot, "without root");
 
   const call = await client.callTool({
     name: "qf_publish_artifact",
@@ -261,33 +288,31 @@ async function gateG3(): Promise<void> {
 
   const clientWithRoot = await makeClient();
   const listedWithRoot = await clientWithRoot.listTools();
-  const actionToolsWithRoot = listedWithRoot.tools
-    .map((t) => t.name)
-    .filter((n) => n.startsWith("qf_") && !n.endsWith("_get") && !n.endsWith("_query") && !n.endsWith("_links"));
-  console.log(`G3_with_root_action_tools=${actionToolsWithRoot.length}`);
+  const expectedWithRoot = expectedActionToolNames(productionSchema, true);
+  const actionToolsWithRoot = actionToolsFromListed(
+    listedWithRoot.tools.map((t) => t.name),
+    productionSchema,
+  );
+  console.log(`G3_with_root_action_tools=${actionToolsWithRoot.size}`);
   if (!listedWithRoot.tools.some((t) => t.name === "qf_publish_artifact")) {
     throw new Error("G3: qf_publish_artifact must be present when QF_ARTIFACT_ROOT is configured");
   }
-  if (actionToolsWithRoot.length !== servedActionCountWithRoot) {
-    throw new Error(
-      `G3: expected ${servedActionCountWithRoot} action tools with root, got ${actionToolsWithRoot.length}`,
-    );
-  }
+  assertActionToolSetEqual(actionToolsWithRoot, expectedWithRoot, "with root");
   await clientWithRoot.close();
   await client.close();
 }
 
 async function measureServedActionCounts(): Promise<void> {
   console.log("\n=== served action counts ===");
+  const expectedWithRoot = expectedActionToolNames(productionSchema, true);
+  const expectedWithoutRoot = expectedActionToolNames(productionSchema, false);
+
   const clientWithRoot = await makeClient();
   const withRoot = await clientWithRoot.listTools();
-  const actionsWithRoot = withRoot.tools.filter(
-    (t) =>
-      t.name.startsWith("qf_") &&
-      !t.name.endsWith("_get") &&
-      !t.name.endsWith("_query") &&
-      !t.name.endsWith("_links"),
-  ).length;
+  const actionsWithRoot = actionToolsFromListed(
+    withRoot.tools.map((t) => t.name),
+    productionSchema,
+  );
   await clientWithRoot.close();
 
   const transport = new StdioClientTransport({
@@ -298,23 +323,16 @@ async function measureServedActionCounts(): Promise<void> {
   const clientNoRoot = new Client({ name: "qf-publish-artifact-root-count", version: "0.1.0" });
   await clientNoRoot.connect(transport);
   const withoutRoot = await clientNoRoot.listTools();
-  const actionsWithoutRoot = withoutRoot.tools.filter(
-    (t) =>
-      t.name.startsWith("qf_") &&
-      !t.name.endsWith("_get") &&
-      !t.name.endsWith("_query") &&
-      !t.name.endsWith("_links"),
-  ).length;
+  const actionsWithoutRoot = actionToolsFromListed(
+    withoutRoot.tools.map((t) => t.name),
+    productionSchema,
+  );
   await clientNoRoot.close();
 
-  console.log(`served_action_count_with_root=${actionsWithRoot}`);
-  console.log(`served_action_count_without_root=${actionsWithoutRoot}`);
-  if (actionsWithRoot !== servedActionCountWithRoot) {
-    throw new Error(`expected ${servedActionCountWithRoot} action tools with root`);
-  }
-  if (actionsWithoutRoot !== servedActionCountWithoutRoot) {
-    throw new Error(`expected ${servedActionCountWithoutRoot} action tools without root`);
-  }
+  console.log(`served_action_count_with_root=${actionsWithRoot.size}`);
+  console.log(`served_action_count_without_root=${actionsWithoutRoot.size}`);
+  assertActionToolSetEqual(actionsWithRoot, expectedWithRoot, "with root");
+  assertActionToolSetEqual(actionsWithoutRoot, expectedWithoutRoot, "without root");
 }
 
 export async function runPublishArtifactRootGate(): Promise<void> {
