@@ -13,21 +13,9 @@ task in one.
 WO-106b is a **small, single-purpose security order** carrying a ruling that is already made. It is
 the split-out D6 — see below for why it is its own order.
 
-> **NOT YET CUTTABLE — the pre-build adversarial read is still running (started 2026-07-26).**
-> Do not hand this to a builder until the read record is appended at the bottom of `WO-106b.md` and
-> this notice is removed. The entire reason this order exists separately is that its predecessor
-> skipped that step; cutting it early would repeat the exact mistake.
->
-> One collision is already found and fixed by the author: a naive fail-closed implementation would
-> have reddened the shipped `tool-plane` and `tool-discovery` gates, because `expectedServedToolNames`
-> derives the served set from the schema alone and knows nothing about an artifact root. See D1.
-
-0. Read `AGENTS.md` at repo root — the cold-start briefing, the commands, the `golden/` ritual.
-1. Read `START_HERE.md` in full (note §5.8, the substrate-triage rule).
-2. Read [`WO-106b.md`](WO-106b.md) end to end, **including the pre-build read record at the bottom**.
-3. Branch `wo-106b` from current `main`. **Commit from a worktree, never the shared tree.**
-4. Run every gate unpiped, `$?` on its own line, and paste full unedited output. Report per
-   [`PROTOCOL.md`](PROTOCOL.md); the verifier runs the cold suite independently.
+**It is cuttable now** — its pre-build read returned **eight findings, three High, all fixed**,
+including one gate of mine that would have certified this security fix while the vulnerability
+stayed wide open.
 
 ### Why this is its own order — read this before you judge its size
 
