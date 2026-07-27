@@ -63,8 +63,9 @@ trust one. One model builds, a different one verifies; no model checks its own w
 
 **[WO-V1](WO-V1.md) — the reading vault.** A one-way projection of the Kernel into
 `~/Vaults/QuantFlow Ontology`, so the founder can read every artifact, session and run in Obsidian
-with the ontology's links as backlinks. **Written; its pre-build read has not run yet — do not cut
-until that record is appended.** It touches no ladder rung, blocks nothing, and is blocked by
+with the ontology's links as backlinks. **Read and cuttable** — its pre-build read
+returned **eleven findings, six High**, including a hash gate that could have passed while verifying
+nothing, and a Law E tripwire the order never mentioned. All fixed. It touches no ladder rung, blocks nothing, and is blocked by
 nothing. Its hard rule: **Kernel → vault, never back**, and artifact content renders only when its
 hash verifies against `content_hash` (the Kernel stores a pointer, not the bytes).
 
