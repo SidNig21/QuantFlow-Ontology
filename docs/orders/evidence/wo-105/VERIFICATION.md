@@ -101,3 +101,67 @@ against itself. Post-build verification caught **2 blockers the builder reported
 Running tally: WO-103 no read → 2 rework rounds. WO-103b read → 0. WO-104 read → 1.
 **WO-105 read → 1**, with the most severe defect (app fails to boot) invisible in every report and
 findable only by sweeping callsites.
+
+---
+
+## POST-MERGE REVIEW — 2026-07-26, after this record was written
+
+A third seat (Cursor `composer-2.5`) reviewed the merged result, told to skip the three limits already
+logged above and find what the builder *and this verifier* missed. **It found three real things, all
+re-measured and confirmed by the checking seat, and one of them is a miss in the record above.**
+
+### Confirmed — `publish_artifact` is an arbitrary file-read primitive, now served to agents
+
+`resolveBytes` (`create.ts:30-36`) does `readFileSync(input.path)` on any string `path`. GATE 1
+validates that it is a string and nothing further. Before this rung that was in-process only, and the
+renderer was fenced by the `qf:execute` allowlist — **WO-105 made `qf_publish_artifact` one of 24
+served action tools**, so anything speaking MCP can name any path the process can open and have its
+bytes hashed into a durable artifact. Re-measured with a canary file: **ACCEPTED, read, stored.**
+
+Neither the builder nor the pre-build read caught it because **neither half is a defect alone**: D0
+declaring `path` was correct (it closed debt #6), and D3 serving the action was correct. The
+composition is the hole — and a pre-build read that checks deliverables one at a time will not see it.
+Logged as **ROADMAP debt #25, trigger FIRED, routed to WO-106 D6/G7.**
+
+### Confirmed — GATE 1's strictness is top-level only
+
+`create_run` with `params: { legit: 1, TOTALLY_UNDECLARED_NESTED: "smuggled" }` was accepted and the
+smuggled key **persisted in the `run.params` column**. The suite exercises GATE 1 only against a
+transition with an unknown *top-level* key, so nested creation smuggling has no committed test. This
+qualifies the record above: "unknown keys are rejected, not stripped" is true at the top level and
+false inside free-form JSON fields. Logged as **ROADMAP debt #26**, trigger-gated to the first rung
+that reads a nested field's contents.
+
+### Confirmed, and a miss in the record above — the order's G3 bait (a) was never implemented
+
+The order required a bait proving the served set reddens if `operatorOnly` is stripped from
+`observe_ticket`. The fixture for it exists — `tools/qf-read-tools/src/fixtures/observe-leak-schema.ts`,
+whose own docstring says *"G3 bait (a)"* — and is **declared at `harness.ts:26` and never referenced.**
+Worse, wired naively it would not redden: `expectedServedToolNames` (`harness.ts:58`) derives expected
+names with `operatorOnly !== true` while `register.ts:120` serves with `operatorOnly === true`, so
+stripping the flag grows **both** sets and set-equality stays green. `operatorOnlyLeaks`
+(`harness.ts:116-122`) also fails open, since it only inspects actions still carrying the flag. The
+only runtime assertion that would catch it is a **hardcoded name check** at `harness.ts:204-206` — the
+route-naming pattern this order explicitly rejected.
+
+**This verifier claimed the exclusion was verified and flag-driven.** That claim was true of the
+*serving code* — `register.ts` really does filter on the flag, and enumerating the registration really
+did show 24 tools with the door absent. But the record implied the **gate** proves it, and the gate's
+own bait for that property is dead code. That is an overclaim and it is corrected here.
+
+**The security posture nevertheless holds, and this was measured with a valid control.** `lintCommands`
+is invoked at schema load (`schema.ts:165`), and stripping the flag throws:
+
+```
+Error: Action "observe_ticket" is observation-coupled (command event ends ".observed")
+       but operatorOnly is not true
+```
+
+So in production the flag cannot be removed at all — the schema module itself refuses to load, and
+every gate goes red. The door is protected by the generic, suffix-coupled, load-time lint exactly as
+the ruling intended; what is missing is the *tool-plane gate's* independent proof of it. The first
+attempt at this measurement used a malformed schema and threw a `TypeError`; it was only trusted after
+a control run confirmed the real schema lints clean.
+
+**Net:** the ruling's mechanism is sound and enforced. One required bait is unimplemented (gate
+hygiene, and WO-106's G3 re-specifies it), and one verification claim above was too strong.
