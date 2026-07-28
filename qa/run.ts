@@ -23,6 +23,7 @@ import { checkVerbRetirement } from "./gates/verb-retirement.ts";
 import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
 import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
 import { runKernelOnePathGate } from "./gates/kernel-one-path.ts";
+import { runVaultProjectionGate } from "./gates/vault-projection.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -421,6 +422,15 @@ const gates: Gate[] = [
       "WO-106 G5: boot reconciliation closes every acted-on session above 100 rows",
     run: async () => {
       const { ok } = await runBootReconcileGate();
+      return ok;
+    },
+  },
+  {
+    name: "vault-projection",
+    description:
+      "WO-V1: Kernel→Obsidian projection (one-direction, hash-verify, schema-driven, idempotent)",
+    run: async () => {
+      const { ok } = await runVaultProjectionGate();
       return ok;
     },
   },

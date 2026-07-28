@@ -1,8 +1,8 @@
 # WO-V1 — The reading vault (Kernel → Obsidian projection)
 
-status: open, cuttable — pre-build read run 2026-07-26 (`grok-4.5-high`), **eleven findings, six
-High, all fixed in this text**; record appended at the bottom
-assignee: builder
+status: **done** — verified PASS 2026-07-27 at `eaa5fa6` (two rework rounds). Record:
+[`evidence/wo-V1/VERIFICATION.md`](evidence/wo-V1/VERIFICATION.md)
+assignee: —
 depends: WO-104 (generated readers) — done, merged. **Not blocked by anything on the ladder.**
 ladder: **off-ladder.** This is not one of the eleven doctrine rungs (`SCOPES.md`) and must never
 be counted as one. It is founder-facing value that can land whenever it is worth having.
@@ -404,3 +404,14 @@ one-path allowlist the way `tools/qf-read-tools/src/harness.ts` and peer-bus har
 
 **Out of this round:** rewriting the gate to avoid the string `kernel.db`; renaming the projector;
 touching `resolveKernelPath`; WO-K3; product identity.
+
+---
+
+# VERIFICATION — PASS (2026-07-27)
+
+Merged at `eaa5fa6`. Cold `/tmp/verify-V1-r2v`: `GATE_RUNNER_EXIT=0`. Thermo PASS
+([review](95744dfd-b55b-4c1b-aab8-96ec6a3db407)). Full record:
+[`evidence/wo-V1/VERIFICATION.md`](evidence/wo-V1/VERIFICATION.md).
+
+Carry-forward: relocate vault `gate.ts` under `qa/gates/vault-projection/` before the next
+vault WO (thermo F1) — not a merge blocker.

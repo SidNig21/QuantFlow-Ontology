@@ -61,6 +61,12 @@ const DRIVER_SQL_ALLOW = [
   "tools/qf-peer-bus/src/bus.ts",
   "collab-electron/",
   "qa/gates/dock-registry/run.ts",
+  // WO-V1: fixture Kernel seeding that execute() cannot express —
+  // forcing identical created_at (G4 tied-timestamp fixture; execute() always
+  // stamps new Date().toISOString()) and reshuffling physical row order via
+  // DELETE+INSERT (G4(c) stable-tiebreak proof; storage order is not a domain
+  // operation). Links go through execute()'s links: envelope — not here.
+  "qa/gates/vault-projection/fixture-seed.ts",
 ];
 
 /**
@@ -75,6 +81,10 @@ const OPEN_ALLOW = [
   "tools/qf-read-tools/src/gates/action-transport.ts",
   "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
   "tools/qf-read-tools/src/gates/kernel-one-world.ts",
+  // WO-V1: read-only projector CLI + its fixture gate (open only; writes are
+  // separately allowlisted for the gate below).
+  "tools/qf-vault-projection/src/cli.ts",
+  "tools/qf-vault-projection/src/gate.ts",
   "tools/qf-peer-bus/src/bus.ts",
   "tools/qf-peer-bus/src/harness.ts",
   "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
@@ -98,6 +108,9 @@ const WRITE_ALLOW = [
   "tools/qf-read-tools/src/harness.ts",
   "tools/qf-read-tools/src/gates/action-transport.ts",
   "tools/qf-read-tools/src/gates/kernel-one-world.ts",
+  // WO-V1 gate seeds fixture Kernels through execute() (G1–G5); the projector
+  // CLI itself never writes.
+  "tools/qf-vault-projection/src/gate.ts",
   "tools/qf-peer-bus/src/bus.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
@@ -115,6 +128,8 @@ const PRODUCTION_NO_CREATE = [
   "tools/qf-peer-bus/src/bus.ts",
   "species/hermes/register.ts",
   "species/critic-mock/register.ts",
+  // WO-V1 projector: readonly open only; never create a Kernel as a side effect.
+  "tools/qf-vault-projection/src/cli.ts",
 ];
 
 const CODE_EXT = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".sql"]);

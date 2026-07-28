@@ -1,0 +1,54 @@
+=== BREAK (gate.ts not on kernel-one-path allowlist) ===
+kernel-one-path G1: offenders outside allowlist:
+  - tools/qf-vault-projection/src/gate.ts (kernel.db path construction/literal)
+FAIL  kernel-one-path
+RED_EXIT=1
+=== RESTORE (gate.ts allowlisted) ===
+kernel-one-path G1: PASS (no illicit env reads or kernel.db literals)
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [28.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/busy-timeout.test.ts:
+kernel: path=/tmp/qf-g2-ok-PWGkuO/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [1794.63ms]
+kernel: path=/tmp/qf-g2-ctrl-dyUSMR/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [1651.76ms]
+
+src/resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default [0.46ms]
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env [0.23ms]
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork) [0.26ms]
+(pass) resolveKernelPath > :memory: stays verbatim [0.93ms]
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing [0.44ms]
+(pass) resolveKernelPath > G3 control: default creates parent when missing [0.28ms]
+
+ 8 pass
+ 0 fail
+ 21 expect() calls
+Ran 8 tests across 2 files. [3.47s]
+kernel-one-path G2/G3: PASS
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [25.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [85.00ms]
+kernel: path=/tmp/qf-g4-home-Wz28Xd/.quantflow/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+kernel-one-world G4 PASS
+  child D4 boot line: kernel: path=/tmp/qf-g4-home-Wz28Xd/.quantflow/kernel.db provenance=default journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+  row round-trip id: 6c98a445-000c-4610-b098-14cb95ab7e9a
+PASS  kernel-one-path
+GREEN_EXIT=0

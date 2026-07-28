@@ -1,0 +1,11 @@
+Projection complete: 25 notes across 3 types.
+Skipped declared types (7) — no table in this database:
+  - environment: no table 'environment' in this database
+  - instrument: no table 'instrument' in this database
+  - market_event: no table 'market_event' in this database
+  - mission: no table 'mission' in this database
+  - policy: no table 'policy' in this database
+  - quote: no table 'quote' in this database
+  - venue: no table 'venue' in this database
+{"ok":true,"notesWritten":25,"typesProjected":["artifact","agent_definition","agent_session"],"typesSkipped":[{"name":"environment","reason":"no table 'environment' in this database"},{"name":"instrument","reason":"no table 'instrument' in this database"},{"name":"market_event","reason":"no table 'market_event' in this database"},{"name":"mission","reason":"no table 'mission' in this database"},{"name":"policy","reason":"no table 'policy' in this database"},{"name":"quote","reason":"no table 'quote' in this database"},{"name":"venue","reason":"no table 'venue' in this database"}]}
+EXIT:0

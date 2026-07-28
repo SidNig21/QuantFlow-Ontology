@@ -1,0 +1,709 @@
+PASS  repo-shape
+PASS  lockfile-committed
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ zod@4.4.3
+
+6 packages installed [11.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/generate.test.ts:
+(pass) golden outputs > SQL migration matches golden byte-for-byte [4.29ms]
+(pass) golden outputs > MCP tools match golden byte-for-byte [22.49ms]
+(pass) golden outputs > ONTOLOGY.md matches golden byte-for-byte [0.84ms]
+(pass) golden outputs > conformance.test.ts matches golden byte-for-byte [0.34ms]
+(pass) determinism > two consecutive SQL generations are identical [1.13ms]
+(pass) determinism > two consecutive MCP generations are identical [22.91ms]
+(pass) determinism > two consecutive docs generations are identical [0.83ms]
+(pass) determinism > two consecutive conformance generations are identical [0.40ms]
+(pass) mcp tool descriptions > get, query, and links descriptions are distinct per object [10.07ms]
+(pass) mcp tool descriptions > read tool count is three per object plus one action per action [10.27ms]
+(pass) conformance counts > generated file meta matches counted accept/reject totals [0.41ms]
+
+src/define.test.ts:
+(pass) schema lint > object missing description fails naming the offender [0.35ms]
+(pass) schema lint > object missing lifecycle fails naming the offender [0.10ms]
+(pass) schema lint > property missing description fails naming the offender [0.23ms]
+(pass) schema lint > link missing description fails naming the offender [0.26ms]
+(pass) schema lint > action missing description fails naming the offender [0.13ms]
+(pass) schema lint > multi-endpoint link preserves declaration order [0.27ms]
+(pass) schema lint > lintSchema rejects duplicate names [0.33ms]
+(pass) schema lint > lintSchema rejects unknown link endpoints [0.31ms]
+(pass) schema lint > lintSchema rejects status enum missing from transition table [0.35ms]
+(pass) schema lint > lintCommands rejects a command that is not a schema action [0.41ms]
+(pass) schema lint > lintCommands rejects a legal transition with no command [0.18ms]
+(pass) schema lint > lintCommands rejects a creation command that is not a schema action [0.14ms]
+(pass) schema lint > lintCommands rejects transition command edges for pipeline-fed types [0.19ms]
+(pass) schema lint > lintCommands rejects creation command coverage for pipeline-fed types [0.14ms]
+(pass) schema lint > lintCommands rejects observation-coupled action without operatorOnly (generic rule) [0.26ms]
+(pass) schema lint > lintCommands rejects operatorOnly on action with no observation event [0.17ms]
+(pass) schema lint > lintCommands rejects operatorOnly action with a non-observation command event [0.18ms]
+(pass) schema lint > lintActionSurface rejects a schema action with no command wiring [0.29ms]
+(pass) schema lint > lintSchema rejects silo clone object names that embed another kind enum value [0.28ms]
+(pass) schema lint > lintSchema active-freeze rejects removed baseline property [0.78ms]
+(pass) schema lint > lintSchema active-freeze rejects retyped baseline property [0.24ms]
+(pass) schema lint > real-slip representability fixture builds a single and a five-leg parlay with a void leg [3.61ms]
+(pass) schema lint > market-plane pipeline-fed flags are set only on instrument and quote [0.03ms]
+
+golden/conformance.test.ts:
+(pass) run transitions > accepts queued → running [0.09ms]
+(pass) run transitions > rejects queued → queued [0.11ms]
+(pass) run transitions > rejects queued → succeeded [0.06ms]
+(pass) run transitions > rejects queued → failed [0.05ms]
+(pass) run transitions > rejects queued → cancelled [0.06ms]
+(pass) run transitions > accepts running → succeeded [0.04ms]
+(pass) run transitions > accepts running → failed [0.02ms]
+(pass) run transitions > accepts running → cancelled [0.02ms]
+(pass) run transitions > rejects running → queued [0.04ms]
+(pass) run transitions > rejects running → running [0.04ms]
+(pass) run transitions > rejects succeeded → queued [0.06ms]
+(pass) run transitions > rejects succeeded → running [0.05ms]
+(pass) run transitions > rejects succeeded → succeeded [0.04ms]
+(pass) run transitions > rejects succeeded → failed [0.06ms]
+(pass) run transitions > rejects succeeded → cancelled [0.04ms]
+(pass) run transitions > rejects failed → queued [0.04ms]
+(pass) run transitions > rejects failed → running [0.04ms]
+(pass) run transitions > rejects failed → succeeded [0.06ms]
+(pass) run transitions > rejects failed → failed [0.04ms]
+(pass) run transitions > rejects failed → cancelled [0.04ms]
+(pass) run transitions > rejects cancelled → queued [0.05ms]
+(pass) run transitions > rejects cancelled → running [0.05ms]
+(pass) run transitions > rejects cancelled → succeeded [0.05ms]
+(pass) run transitions > rejects cancelled → failed [0.05ms]
+(pass) run transitions > rejects cancelled → cancelled [0.06ms]
+(pass) hypothesis transitions > accepts open → supported [0.06ms]
+(pass) hypothesis transitions > accepts open → rejected [0.04ms]
+(pass) hypothesis transitions > accepts open → inconclusive [0.04ms]
+(pass) hypothesis transitions > rejects open → open [0.05ms]
+(pass) hypothesis transitions > rejects supported → open [0.06ms]
+(pass) hypothesis transitions > rejects supported → supported [0.05ms]
+(pass) hypothesis transitions > rejects supported → rejected [0.05ms]
+(pass) hypothesis transitions > rejects supported → inconclusive [0.05ms]
+(pass) hypothesis transitions > rejects rejected → open [0.06ms]
+(pass) hypothesis transitions > rejects rejected → supported [0.06ms]
+(pass) hypothesis transitions > rejects rejected → rejected [0.05ms]
+(pass) hypothesis transitions > rejects rejected → inconclusive [0.06ms]
+(pass) hypothesis transitions > rejects inconclusive → open [0.06ms]
+(pass) hypothesis transitions > rejects inconclusive → supported [0.06ms]
+(pass) hypothesis transitions > rejects inconclusive → rejected [0.05ms]
+(pass) hypothesis transitions > rejects inconclusive → inconclusive [0.05ms]
+(pass) ticket transitions > accepts pending → win [0.05ms]
+(pass) ticket transitions > accepts pending → loss [0.04ms]
+(pass) ticket transitions > accepts pending → push [0.04ms]
+(pass) ticket transitions > accepts pending → void [0.04ms]
+(pass) ticket transitions > rejects pending → pending [0.05ms]
+(pass) ticket transitions > rejects win → pending [0.06ms]
+(pass) ticket transitions > rejects win → win [0.05ms]
+(pass) ticket transitions > rejects win → loss [0.05ms]
+(pass) ticket transitions > rejects win → push [0.05ms]
+(pass) ticket transitions > rejects win → void [0.07ms]
+(pass) ticket transitions > rejects loss → pending [0.06ms]
+(pass) ticket transitions > rejects loss → win [0.06ms]
+(pass) ticket transitions > rejects loss → loss [0.06ms]
+(pass) ticket transitions > rejects loss → push [0.06ms]
+(pass) ticket transitions > rejects loss → void [0.08ms]
+(pass) ticket transitions > rejects push → pending [0.05ms]
+(pass) ticket transitions > rejects push → win [0.05ms]
+(pass) ticket transitions > rejects push → loss [0.05ms]
+(pass) ticket transitions > rejects push → push [0.04ms]
+(pass) ticket transitions > rejects push → void [0.04ms]
+(pass) ticket transitions > rejects void → pending [0.04ms]
+(pass) ticket transitions > rejects void → win [0.05ms]
+(pass) ticket transitions > rejects void → loss [0.05ms]
+(pass) ticket transitions > rejects void → push [0.04ms]
+(pass) ticket transitions > rejects void → void [0.05ms]
+(pass) market_event transitions > accepts scheduled → live [0.04ms]
+(pass) market_event transitions > accepts scheduled → void [0.03ms]
+(pass) market_event transitions > rejects scheduled → scheduled [0.04ms]
+(pass) market_event transitions > rejects scheduled → settled [0.05ms]
+(pass) market_event transitions > accepts live → settled [0.03ms]
+(pass) market_event transitions > rejects live → scheduled [0.05ms]
+(pass) market_event transitions > rejects live → live [0.05ms]
+(pass) market_event transitions > rejects live → void [0.04ms]
+(pass) market_event transitions > rejects settled → scheduled [0.06ms]
+(pass) market_event transitions > rejects settled → live [0.04ms]
+(pass) market_event transitions > rejects settled → settled [0.04ms]
+(pass) market_event transitions > rejects settled → void [0.04ms]
+(pass) market_event transitions > rejects void → scheduled [0.04ms]
+(pass) market_event transitions > rejects void → live [0.04ms]
+(pass) market_event transitions > rejects void → settled [0.08ms]
+(pass) market_event transitions > rejects void → void [0.05ms]
+(pass) agent_session transitions > accepts starting → running [0.04ms]
+(pass) agent_session transitions > accepts starting → failed [0.04ms]
+(pass) agent_session transitions > rejects starting → starting [0.04ms]
+(pass) agent_session transitions > rejects starting → blocked [0.04ms]
+(pass) agent_session transitions > rejects starting → cancelled [0.05ms]
+(pass) agent_session transitions > rejects starting → closed [0.05ms]
+(pass) agent_session transitions > accepts running → blocked [0.03ms]
+(pass) agent_session transitions > accepts running → cancelled [0.02ms]
+(pass) agent_session transitions > accepts running → failed [0.03ms]
+(pass) agent_session transitions > accepts running → closed [0.03ms]
+(pass) agent_session transitions > rejects running → starting [0.04ms]
+(pass) agent_session transitions > rejects running → running [0.04ms]
+(pass) agent_session transitions > accepts blocked → running [0.03ms]
+(pass) agent_session transitions > accepts blocked → cancelled [0.02ms]
+(pass) agent_session transitions > accepts blocked → failed [0.02ms]
+(pass) agent_session transitions > rejects blocked → starting [0.05ms]
+(pass) agent_session transitions > rejects blocked → blocked [0.05ms]
+(pass) agent_session transitions > rejects blocked → closed [0.05ms]
+(pass) agent_session transitions > accepts cancelled → closed [0.03ms]
+(pass) agent_session transitions > rejects cancelled → starting [0.04ms]
+(pass) agent_session transitions > rejects cancelled → running [0.04ms]
+(pass) agent_session transitions > rejects cancelled → blocked [0.04ms]
+(pass) agent_session transitions > rejects cancelled → cancelled [0.04ms]
+(pass) agent_session transitions > rejects cancelled → failed [0.04ms]
+(pass) agent_session transitions > accepts failed → closed [0.04ms]
+(pass) agent_session transitions > rejects failed → starting [0.05ms]
+(pass) agent_session transitions > rejects failed → running [0.05ms]
+(pass) agent_session transitions > rejects failed → blocked [0.04ms]
+(pass) agent_session transitions > rejects failed → cancelled [0.04ms]
+(pass) agent_session transitions > rejects failed → failed [0.04ms]
+(pass) agent_session transitions > rejects closed → starting [0.04ms]
+(pass) agent_session transitions > rejects closed → running [0.04ms]
+(pass) agent_session transitions > rejects closed → blocked [0.04ms]
+(pass) agent_session transitions > rejects closed → cancelled [0.04ms]
+(pass) agent_session transitions > rejects closed → failed [0.04ms]
+(pass) agent_session transitions > rejects closed → closed [0.04ms]
+
+ 152 pass
+ 0 fail
+ 561 expect() calls
+Ran 152 tests across 3 files. [160.00ms]
+PASS  schema
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos@0.2.7
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ zod@4.4.3
+
+418 packages installed [313.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/proof.test.ts:
+Bundled 119 modules in 35ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /tmp/verify-V1-r2/tools/runtime-proof/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack-agent: ready /tmp/verify-V1-r2/tools/runtime-proof/packed/qf-toolloop.aospkg
+P1 createSession / AgentOS: ebd5ee20-3ee0-4882-9a15-a73071ba8909
+P1 listSessions table:     [ "ebd5ee20-3ee0-4882-9a15-a73071ba8909" ]
+P1 notification sessionIds: [ "ebd5ee20-3ee0-4882-9a15-a73071ba8909", "ebd5ee20-3ee0-4882-9a15-a73071ba8909",
+  "ebd5ee20-3ee0-4882-9a15-a73071ba8909"
+]
+(pass) WO-004a runtime ownership proof > P1 · host-reported ID equals guest-minted ID across the process boundary [988.15ms]
+P1b unknown-session error: Session not found: unknown-session-74cd4bae-b3cf-494e-afeb-12d51d5cda40
+(pass) WO-004a runtime ownership proof > P1b · loop is session-scoped (notifications + unknown ID rejected) [713.46ms]
+P2 listeners before: 5
+P2 listeners after start: 5
+P2 listeners after session: 5
+P2 new after start: []
+P2 new after session: []
+(pass) WO-004a runtime ownership proof > P2 · no second listening server [703.13ms]
+P3 prompt text: Calling echo_upper. Tool said QUANTFLOW.
+P3 chunk events: 3
+(pass) WO-004a runtime ownership proof > P3 · tool call inside the session reaches the assistant message [699.47ms]
+P4 stopReason: cancelled
+P4 chunksBeforeCancel: 1
+P4 chunksAfterCancel: 0
+P4 orphanSurvivors: []
+P4 orphanCheck: {
+  sessionGone: true,
+  disposeCompleted: true,
+  listenerCountFinal: 5,
+  zeroOrphanDescendants: true,
+}
+P4 new listeners after cancel: []
+(pass) WO-004a runtime ownership proof > P4 · cancel mid-turn is clean (exactly cancelled, no orphan children) [1332.37ms]
+
+ 5 pass
+ 0 fail
+ 28 expect() calls
+Ran 5 tests across 1 file. [6.73s]
+PASS  runtime-proof
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+7 packages installed [29.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/open-kernel-create.test.ts:
+(pass) WO-K2 openKernel create / readonly > G3: missing file without create throws and creates nothing [1.33ms]
+kernel: path=/tmp/qf-k2-open-KDdYTB/created.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+(pass) WO-K2 openKernel create / readonly > G3: { create: true } creates the file [802.17ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) WO-K2 openKernel create / readonly > G3: :memory: opens without create [3.43ms]
+(pass) WO-K2 openKernel create / readonly > G3: create + readonly together throws [0.37ms]
+(pass) WO-K2 openKernel create / readonly > G3: missing file with readonly throws (cannot create) [0.23ms]
+kernel: path=/tmp/qf-k2-open-DVpRe8/ro-write.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+kernel: path=/tmp/qf-k2-open-DVpRe8/ro-write.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-k2-open-DVpRe8/ro-write.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+(pass) WO-K2 openKernel create / readonly > G4: readonly handle cannot write; writable control succeeds [2380.75ms]
+
+src/kernel.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > applies generated migration (run + agent_session + events exist) [2.19ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > execute start_run; illegal retry writes nothing [3.50ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+illegal_transitions_rejected=7
+(pass) qf-kernel > counts illegal transition rejections under test [3.41ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > command without trace context is rejected [2.22ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > agent_session adopts supplied id and rejects missing id [2.27ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+replay_assertion=equal live.status=failed rebuilt.status=failed
+(pass) qf-kernel > replay rebuilds run status from events and equals live table [3.13ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > events carry trace_id from ctx [3.07ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > publish_artifact creates content-addressed row via event log [4.19ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > publish_artifact rejects hash mismatch and writes nothing [3.32ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+artifact_row_count_after_double_publish=1
+artifact_event_count_after_double_publish=1
+(pass) qf-kernel > publish_artifact identical bytes twice is idempotent (one row, no second event) [2.92ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+artifact_replay_assertion=equal id=229eb2b779d77cfcd8460c1c04c8641f6c43ae35f14a121be52fafadff29de0e kind=result_set
+(pass) qf-kernel > replay rebuilds artifact from events and equals live table [2.51ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > publish_artifact requires trace context [2.29ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > D1 · republish same bytes with different metadata rejects [2.64ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > D2 · replay fails when event content_hash disagrees with identity [2.74ms]
+(pass) qf-kernel > D3 · every creationCommands entry has a handler [0.18ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > register_agent_definition inserts row with id=name [2.56ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > register_agent_definition rejects duplicate name [2.74ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > market_event start_event transition end to end (WO-103 D0) [2.35ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+G2_objects=[{"t":"artifact","id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"t":"artifact","id":"c0859dc18ea5362b301848a42221a47f42ef15a0af85c498d8da1945e37f503a"},{"t":"dataset","id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{"t":"evaluation","id":"cf61d1b3-8c7f-4f14-b05e-f374f442ec10"},{"t":"hypothesis","id":"9ebdb640-c671-482a-9158-fc775b6bb56b"},{"t":"run","id":"run-chain-1"}]
+G2_links=[{"kind":"evaluated_by","from_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689","to_id":"cf61d1b3-8c7f-4f14-b05e-f374f442ec10"},{"kind":"gates","from_id":"cf61d1b3-8c7f-4f14-b05e-f374f442ec10","to_id":"c0859dc18ea5362b301848a42221a47f42ef15a0af85c498d8da1945e37f503a"},{"kind":"produces","from_id":"run-chain-1","to_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"kind":"tests","from_id":"run-chain-1","to_id":"9ebdb640-c671-482a-9158-fc775b6bb56b"},{"kind":"uses","from_id":"run-chain-1","to_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]
+(pass) qf-kernel > G2 · six-stage chain created and linked through execute() only [9.07ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > G3 · illegal link kind rejected by endpoint validator before commit [3.33ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > G3 · wrong endpoint type rejected by validator not sqlite [3.17ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+G4_events=[{"type":"ticket.observed","payload":"{\"command\":\"observe_ticket\",\"origin\":\"operator_supplied\",\"kind\":\"single\",\"external_ref\":\"slip-real\",\"placed_at\":\"2026-07-25T12:00:00.000Z\",\"legs\":[{\"selection\":\"A\",\"price\":1.9}],\"combined_price\":1.9,\"stake\":100,\"payout\":190,\"correlation_note\":\"\",\"grade\":\"win\",\"observation\":true,\"span_id\":\"span-slip\"}"}]
+(pass) qf-kernel > G4 · create_ticket rejects grade; observe_ticket records observation [5.28ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) qf-kernel > G4b · creation-policy rejects supplied run status; mechanism is reusable [3.36ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > getObject returns row by id [2.34ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > queryObjects filters by declared property equality [2.68ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > queryObjects limit null returns all rows without cap [4.84ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > queryObjects order asc reverses created_at sort [2.07ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > getLinks returns edges in either direction [2.95ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > unknown type name errors before SQL [2.32ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+(pass) read layer > unknown filter key errors before SQL [1.92ms]
+
+src/busy-timeout.test.ts:
+kernel: path=/tmp/qf-g2-ok-tz6Wvo/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [1833.18ms]
+kernel: path=/tmp/qf-g2-ctrl-cqEUSY/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [1421.85ms]
+
+src/resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default [0.36ms]
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env [0.17ms]
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork) [0.20ms]
+(pass) resolveKernelPath > :memory: stays verbatim [0.05ms]
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing [0.18ms]
+(pass) resolveKernelPath > G3 control: default creates parent when missing [0.19ms]
+
+ 44 pass
+ 0 fail
+ 130 expect() calls
+Ran 44 tests across 4 files. [6.61s]
+PASS  kernel
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [25.00ms]
+bun install v1.3.14 (0d9b296a)
+
+Checked 6 installs across 7 packages (no changes) [1.00ms]
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [20.00ms]
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @modelcontextprotocol/sdk@1.29.0
++ qf-kernel@../../packages/qf-kernel
++ zod@4.4.3
+
+99 packages installed [73.00ms]
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [21.00ms]
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @modelcontextprotocol/sdk@1.29.0
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+99 packages installed [98.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+8 packages installed [46.00ms]
+PASS  typecheck
+PASS  kernel-sole-writer
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+kernel-one-path G1: PASS (no illicit env reads or kernel.db literals)
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [21.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/busy-timeout.test.ts:
+kernel: path=/tmp/qf-g2-ok-0thdXY/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [1794.98ms]
+kernel: path=/tmp/qf-g2-ctrl-BVJJgi/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [1453.28ms]
+
+src/resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default [0.37ms]
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env [0.16ms]
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork) [0.19ms]
+(pass) resolveKernelPath > :memory: stays verbatim [0.04ms]
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing [0.19ms]
+(pass) resolveKernelPath > G3 control: default creates parent when missing [0.15ms]
+
+ 8 pass
+ 0 fail
+ 21 expect() calls
+Ran 8 tests across 2 files. [3.27s]
+kernel-one-path G2/G3: PASS
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [24.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [70.00ms]
+kernel: path=/tmp/qf-g4-home-vnARCf/.quantflow/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+kernel-one-world G4 PASS
+  child D4 boot line: kernel: path=/tmp/qf-g4-home-vnARCf/.quantflow/kernel.db provenance=default journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+  row round-trip id: b36548c1-6642-426a-be39-8ad875f67604
+PASS  kernel-one-path
+no-canvas-domain-writes OK
+PASS  no-canvas-domain-writes
+PASS  doc-action-surface
+PASS  observe-door
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ qf-kernel@../../../packages/qf-kernel
++ zod@4.4.3
+
+366 packages installed [306.00ms]
+$ node ./pack.mjs
+Bundled 119 modules in 34ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /tmp/verify-V1-r2/qa/gates/agent-path/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack: ready /tmp/verify-V1-r2/qa/gates/agent-path/packed/qf-toolloop.aospkg
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+agent-path: spawn-only/turn pair OK {"admitEvents":["agent_session.created","agent_session.started"],"turnChunks":3}
+agent-path OK
+{"cancelled":"4e8f6c4e-8d40-4362-b3bb-e5d3186eaf00","completed":"81bf82ab-cc1a-4eb3-bc4e-3aa48077f73c","artifactId":"2964065d5232f6b41512538a1ed123cebb410b30bba442358c15628392ed6ce7","chunksA":1,"chunksB":3}
+PASS  agent-path
+one-skin OK
+totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
+PASS  one-skin
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ qf-kernel@../../../packages/qf-kernel
++ zod@4.4.3
+
+366 packages installed [358.00ms]
+$ node ./pack.mjs
+Bundled 119 modules in 49ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /tmp/verify-V1-r2/qa/gates/dock-registry/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack: ready /tmp/verify-V1-r2/qa/gates/dock-registry/packed/qf-toolloop.aospkg
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+dock-registry OK
+{"baitA":"dock-registry-bait-a","baitB":"qf-toolloop","packagePath":"/tmp/verify-V1-r2/qa/gates/dock-registry/packed/qf-toolloop.aospkg","literalHits":0}
+PASS  dock-registry
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [21.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [70.00ms]
+$ bun src/harness.ts
+[harness] work dir: /tmp/qf-tool-plane-harness-IZLrQC
+[harness] kernel db: /tmp/qf-tool-plane-harness-IZLrQC/kernel.db
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+
+=== G2 doctrine phase-exit gate ===
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+tool_plane_expected_count=97 served_count=97 read=72 actions=25
+tool_plane_operator_only_leaks=[]
+G2_experimental_tools=["qf_experimental_get","qf_experimental_links","qf_experimental_query"]
+G2_experimental_get_response={"content":[{"type":"text","text":"{\n  \"id\": \"exp-probe-1\",\n  \"created_at\": \"2026-07-26T12:00:00.000Z\",\n  \"label\": \"gate-fixture\"\n}"}]}
+
+=== G3 links traversal ===
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+tool_plane_expected_count=93 served_count=93 read=69 actions=24
+tool_plane_operator_only_leaks=[]
+G3_tool_response={"content":[{"type":"text","text":"[\n  {\n    \"id\": \"a5cb7936-1942-4f63-bd42-932c9074d2ef\",\n    \"kind\": \"tests\",\n    \"from_id\": \"harness-run-1\",\n    \"to_id\": \"b613fc02-9803-4842-9eee-da31484ef86d\",\n    \"created_at\": \"2026-07-28T05:48:09.603Z\"\n  }\n]"}]}
+G3_sql_rows=[{"kind":"tests","from_id":"harness-run-1","to_id":"b613fc02-9803-4842-9eee-da31484ef86d"}]
+
+=== tool-plane action surface ===
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+tool_plane_expected_count=93 served_count=93 read=69 actions=24
+tool_plane_operator_only_leaks=[]
+tool_plane_action_bad={"content":[{"type":"text","text":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"bogus_gate1_field\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"bogus_gate1_field\\\"\"\n  }\n]"}],"isError":true}
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+tool_plane_events_before_after_bad=4 4
+tool_plane_run_status_after_bad=queued
+tool_plane_action_ok={"content":[{"type":"text","text":"{\n  \"object_type\": \"run\",\n  \"object_id\": \"harness-run-action-ok\",\n  \"from\": \"queued\",\n  \"to\": \"running\",\n  \"event\": \"run.started\",\n  \"state\": {\n    \"id\": \"harness-run-action-ok\",\n    \"created_at\": \"2026-07-28T05:48:10.095Z\",\n    \"kind\": \"backtest\",\n    \"status\": \"running\",\n    \"params\": \"{}\",\n    \"trace_id\": \"harness-trace\"\n  }\n}"}]}
+
+=== GATE 2 via action tool ===
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+tool_plane_illegal_transition={"content":[{"type":"text","text":"IllegalTransitionError: Illegal transition for run: queued → succeeded"}],"isError":true}
+kernel: path=/tmp/qf-tool-plane-harness-IZLrQC/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+tool_plane_illegal_events_before_after=6 6
+tool_plane_illegal_status=queued
+
+[harness] tool-plane PASS
+PASS  tool-plane
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [22.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [69.00ms]
+kernel: path=/tmp/qf-tool-discovery-5dRFb7/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-tool-discovery-5dRFb7/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+G3_advertised_count=93
+G3_served_count=93
+G3_generated_count=94
+G3_operator_only_qf_observe_ticket_in_generated=true
+G3_operator_only_qf_observe_ticket_in_advertised=false
+G3_operator_only_qf_observe_ticket_in_served=false
+named_task_fields_reachable=true
+tool-discovery PASS
+PASS  tool-discovery
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [22.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [81.00ms]
+kernel: path=/tmp/qf-action-transport-amt0zx/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-action-transport-amt0zx/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+G2_call_result={"content":[{"type":"text","text":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"bogus_unknown_key\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"bogus_unknown_key\\\"\"\n  }\n]"}],"isError":true}
+kernel: path=/tmp/qf-action-transport-amt0zx/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G2_events_before_after=1 1
+G2_rows_before_after=1 1
+G2_run_status=queued
+action-transport PASS
+PASS  action-transport
+bun install v1.3.14 (0d9b296a)
+
+$ cd ../../packages/qf-kernel && bun install
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [19.00ms]
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [73.00ms]
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+
+=== G1 hole closed ===
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_absolute_outside_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-WoBGGS/canary-outside.txt\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_absolute_outside_events_before_after=0 0
+G1_absolute_outside_rows_before_after=0 0
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_dotdot_traversal_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-WoBGGS/traversal-target.txt\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_dotdot_traversal_events_before_after=0 0
+G1_dotdot_traversal_rows_before_after=0 0
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_symlink_escape_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-WoBGGS/artifact-root/escape-link\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_symlink_escape_events_before_after=0 0
+G1_symlink_escape_rows_before_after=0 0
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_prefix_sibling_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-WoBGGS/artifact-root-evil/x\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G1_prefix_sibling_events_before_after=0 0
+G1_prefix_sibling_rows_before_after=0 0
+
+=== G2 inside-root publish ===
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+G2_publish_result={"content":[{"type":"text","text":"{\n  \"object_type\": \"artifact\",\n  \"object_id\": \"63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750\",\n  \"from\": \"(none)\",\n  \"to\": \"exists\",\n  \"event\": \"artifact.published\",\n  \"state\": {\n    \"id\": \"63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750\",\n    \"created_at\": \"2026-07-28T05:48:41.759Z\",\n    \"kind\": \"report\",\n    \"content_hash\": \"63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750\",\n    \"storage_ref\": \"gate-inside-root\"\n  }\n}"}]}
+G2_content_hash=63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750
+G2_expected_hash=63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750
+
+=== G3 fail closed ===
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+qf-read-tools server: QF_ARTIFACT_ROOT absent — publish_artifact will not be served
+G3_total_tools=92
+G3_action_tools=23
+G3_action_tool_names=["qf_block_agent_session","qf_cancel_agent_session","qf_cancel_run","qf_close_agent_session","qf_complete_run","qf_create_agent_session","qf_create_hypothesis","qf_create_mission","qf_create_run","qf_create_ticket","qf_fail_agent_session","qf_fail_run","qf_grade_ticket","qf_record_evaluation","qf_register_agent_definition","qf_register_dataset_version","qf_resolve_hypothesis","qf_settle_event","qf_start_agent_session","qf_start_event","qf_start_run","qf_unblock_agent_session","qf_void_event"]
+G3_publish_present=false
+G3_call_result={"content":[{"type":"text","text":"MCP error -32602: Tool qf_publish_artifact not found"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+G3_events_before_after=1 1
+G3_rows_before_after=1 1
+G3_canary_hash_present=false
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+G3_with_root_action_tools=24
+
+=== served action counts ===
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/qf-publish-artifact-root-WoBGGS/kernel.db provenance=env journal=wal sync=2 schema_meta=63
+qf-read-tools server: QF_ARTIFACT_ROOT absent — publish_artifact will not be served
+served_action_count_with_root=24
+served_action_count_without_root=23
+publish-artifact-root PASS
+PASS  publish-artifact-root
+PASS  verb-retirement
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ qf-kernel@../../../packages/qf-kernel
+
+8 packages installed [29.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=63
+boot-reconcile OK
+{"seeded":105,"actedOnBefore":105,"actedOnAfter":0,"listLimit":null}
+PASS  boot-reconcile
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [44.00ms]
+$ bun src/gate.ts
+vault-projection: D1 env refusal…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-pgJrbp/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+vault-projection: G1…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-nl9fzX/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-nl9fzX/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+vault-projection: G2…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-qy7hYV/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-qy7hYV/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+vault-projection: G3…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-AFViSQ/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-AFViSQ/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+vault-projection: G4…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-2GvtoX/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-2GvtoX/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-2GvtoX/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+vault-projection: G5…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-4VUpCs/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/kernel-4VUpCs/kernel.db provenance=explicit journal=wal sync=2 schema_meta=63
+vault-projection: missing-type skip…
+kernel: path=/tmp/verify-V1-r2/tools/qf-vault-projection/.gate-fixtures/incomplete-353msI/kernel.db provenance=explicit journal=delete sync=2 schema_meta=2
+vault-projection OK
+PASS  vault-projection
+GATE_RUNNER_EXIT=0

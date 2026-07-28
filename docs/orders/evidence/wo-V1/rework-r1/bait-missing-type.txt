@@ -1,0 +1,50 @@
+=== BREAK (disable missing-type skip) ===
+kernel: path=/home/sidnig21/qf-worktrees/wo-V1/tools/qf-vault-projection/.gate-fixtures/bait-G0bCMD/k.db provenance=explicit journal=delete sync=2 schema_meta=2
+105 |   const where = clauses.length > 0 ? ` WHERE ${clauses.join(" AND ")}` : "";
+106 |   const orderClause = ` ORDER BY created_at ${order === "asc" ? "ASC" : "DESC"}`;
+107 |   if (limit === null) {
+108 |     if (offset === 0) {
+109 |       const sql = `SELECT * FROM ${type}${where}${orderClause}`;
+110 |       return db.query(sql).all(...params) as Record<string, unknown>[];
+                      ^
+SQLiteError: no such table: competitor
+      errno: 1,
+ byteOffset: -1,
+
+      at prepare (bun:sqlite:345:37)
+      at query (bun:sqlite:367:28)
+      at queryObjects (/home/sidnig21/qf-worktrees/wo-V1/packages/qf-kernel/src/read.ts:110:17)
+      at projectVault (/home/sidnig21/qf-worktrees/wo-V1/tools/qf-vault-projection/src/project.ts:209:27)
+      at /home/sidnig21/qf-worktrees/wo-V1/tools/qf-vault-projection/src/cli.ts:27:18
+
+Bun v1.3.14 (Linux x64)
+EXIT=1
+BAIT_EXIT=1
+=== RESTORE (skip re-enabled) ===
+Projection complete: 2 notes across 2 types.
+Skipped declared types (21) — no table in this database:
+  - agent_definition: no table 'agent_definition' in this database
+  - competitor: no table 'competitor' in this database
+  - connection: no table 'connection' in this database
+  - dataset: no table 'dataset' in this database
+  - environment: no table 'environment' in this database
+  - evaluation: no table 'evaluation' in this database
+  - execution_environment: no table 'execution_environment' in this database
+  - hypothesis: no table 'hypothesis' in this database
+  - instrument: no table 'instrument' in this database
+  - market_event: no table 'market_event' in this database
+  - mission: no table 'mission' in this database
+  - policy: no table 'policy' in this database
+  - quote: no table 'quote' in this database
+  - result: no table 'result' in this database
+  - run: no table 'run' in this database
+  - strategy: no table 'strategy' in this database
+  - task: no table 'task' in this database
+  - ticket: no table 'ticket' in this database
+  - tool: no table 'tool' in this database
+  - venue: no table 'venue' in this database
+  - workspace: no table 'workspace' in this database
+{"ok":true,"notesWritten":2,"typesProjected":["artifact","agent_session"],"typesSkipped":[{"name":"agent_definition","reason":"no table 'agent_definition' in this database"},{"name":"competitor","reason":"no table 'competitor' in this database"},{"name":"connection","reason":"no table 'connection' in this database"},{"name":"dataset","reason":"no table 'dataset' in this database"},{"name":"environment","reason":"no table 'environment' in this database"},{"name":"evaluation","reason":"no table 'evaluation' in this database"},{"name":"execution_environment","reason":"no table 'execution_environment' in this database"},{"name":"hypothesis","reason":"no table 'hypothesis' in this database"},{"name":"instrument","reason":"no table 'instrument' in this database"},{"name":"market_event","reason":"no table 'market_event' in this database"},{"name":"mission","reason":"no table 'mission' in this database"},{"name":"policy","reason":"no table 'policy' in this database"},{"name":"quote","reason":"no table 'quote' in this database"},{"name":"result","reason":"no table 'result' in this database"},{"name":"run","reason":"no table 'run' in this database"},{"name":"strategy","reason":"no table 'strategy' in this database"},{"name":"task","reason":"no table 'task' in this database"},{"name":"ticket","reason":"no table 'ticket' in this database"},{"name":"tool","reason":"no table 'tool' in this database"},{"name":"venue","reason":"no table 'venue' in this database"},{"name":"workspace","reason":"no table 'workspace' in this database"}]}
+kernel: path=/home/sidnig21/qf-worktrees/wo-V1/tools/qf-vault-projection/.gate-fixtures/bait-OHGJJJ/k.db provenance=explicit journal=delete sync=2 schema_meta=2
+EXIT=0
+RESTORE_EXIT=0
