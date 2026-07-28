@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 /**
- * vault-projection gate — runs WO-V1 G1 through G5 assertions.
+ * vault-projection gate — runs WO-V1 G1 through G5 plus REWORK ROUND 1
+ * missing-type skip.
  *
  * Every projection uses a throwaway fixture vault and a temp Kernel.
  * Never points at ~/Vaults or ~/.collaborator.
@@ -31,6 +32,7 @@ import { schema as productionSchema } from "qf-kernel-schema";
 import {
   forceSessionCreatedAt,
   reversePhysicalSessionOrder,
+  createIncompleteKernelFixture,
 } from "../../../qa/gates/vault-projection/fixture-seed.ts";
 import { schema as experimentalSchema } from "../fixtures/experimental-schema.ts";
 
@@ -118,7 +120,8 @@ function makeFixtureVault(): string {
 function makeKernelDb(): { path: string; dir: string } {
   const dir = fixtureTemp("kernel-");
   const path = join(dir, "kernel.db");
-  const db = openKernel(path);
+  // WO-K2: file-backed create is opt-in.
+  const db = openKernel(path, { create: true });
   closeKernel(db);
   return { path, dir };
 }
@@ -702,6 +705,90 @@ async function assertG5(): Promise<void> {
   rmSync(vault, { recursive: true, force: true });
 }
 
+/**
+ * REWORK ROUND 1 — missing-type skip as robustness.
+ * Fixture DB is built from subset DDL in fixture-seed.ts, not from the live
+ * golden/migration.sql, so the gate cannot inherit schema/database agreement.
+ */
+async function assertMissingTypeSkip(): Promise<void> {
+  const dir = fixtureTemp("incomplete-");
+  const kernelPath = join(dir, "kernel.db");
+  createIncompleteKernelFixture(kernelPath);
+
+  // Confirm the fixture is incomplete relative to the production schema.
+  const db = openKernel(kernelPath, { readonly: true });
+  const present = new Set(
+    (
+      db
+        .query(`SELECT name FROM sqlite_master WHERE type = 'table'`)
+        .all() as Array<{ name: string }>
+    ).map((r) => r.name),
+  );
+  closeKernel(db);
+
+  const declared = productionSchema.objects.map((o) => o.name);
+  const expectedMissing = declared.filter((n) => !present.has(n));
+  if (expectedMissing.length === 0) {
+    fail(
+      "missing-type: fixture must lack at least one declared type table (built from subset DDL, not live migration)",
+    );
+  }
+  if (!present.has("artifact") || !present.has("agent_session")) {
+    fail("missing-type: fixture must still carry artifact and agent_session");
+  }
+
+  const vault = makeFixtureVault();
+  const run = await runProjectorAsync({
+    kernelDb: kernelPath,
+    vaultRoot: vault,
+  });
+  if (run.code !== 0) {
+    fail(`missing-type: projector must complete on incomplete DB: ${run.stderr}`);
+  }
+
+  // Projects types that exist
+  if (!existsSync(join(vault, "artifact"))) {
+    fail("missing-type: expected artifact/ folder for present table");
+  }
+  if (!existsSync(join(vault, "agent_session"))) {
+    fail("missing-type: expected agent_session/ folder for present table");
+  }
+  // Does not create folders for missing types
+  for (const name of expectedMissing) {
+    if (existsSync(join(vault, name))) {
+      fail(`missing-type: must not project folder for missing table ${name}`);
+    }
+  }
+
+  // Run summary names every skipped type
+  for (const name of expectedMissing) {
+    if (!run.stdout.includes(name)) {
+      fail(
+        `missing-type: run summary must name skipped type ${name}; stdout was:\n${run.stdout}`,
+      );
+    }
+  }
+  if (!/Skipped declared types \(\d+\)/.test(run.stdout)) {
+    fail("missing-type: run summary must report skipped declared types");
+  }
+
+  // Static: project.ts must query sqlite_master and skip, never drop readonly
+  const projectSrc = readFileSync(PROJECT_TS, "utf8");
+  if (!/sqlite_master/.test(projectSrc)) {
+    fail("missing-type: project.ts must query sqlite_master for present tables");
+  }
+  if (!/typesSkipped/.test(projectSrc)) {
+    fail("missing-type: project.ts must record typesSkipped");
+  }
+  const cliSrc = readFileSync(join(SRC_DIR, "cli.ts"), "utf8");
+  if (!/readonly:\s*true/.test(cliSrc)) {
+    fail("missing-type: cli must keep openKernel(..., { readonly: true })");
+  }
+
+  rmSync(dir, { recursive: true, force: true });
+  rmSync(vault, { recursive: true, force: true });
+}
+
 // --- main -------------------------------------------------------------
 
 async function main(): Promise<void> {
@@ -719,6 +806,8 @@ async function main(): Promise<void> {
     await assertG4();
     console.log("vault-projection: G5…");
     await assertG5();
+    console.log("vault-projection: missing-type skip…");
+    await assertMissingTypeSkip();
     console.log("vault-projection OK");
   } finally {
     clearFixtureRoot();

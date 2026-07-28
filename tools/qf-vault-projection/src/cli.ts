@@ -25,11 +25,26 @@ const db = openKernel(kernelDbPath, { readonly: true });
 
 try {
   const result = projectVault(db, vaultRoot, schema);
+  // Plain-text run summary — skipped types must be named, never silent.
+  console.log(
+    `Projection complete: ${result.notesWritten} notes across ${result.typesProjected.length} types.`,
+  );
+  if (result.typesSkipped.length === 0) {
+    console.log("Skipped declared types: none.");
+  } else {
+    console.log(
+      `Skipped declared types (${result.typesSkipped.length}) — no table in this database:`,
+    );
+    for (const skipped of result.typesSkipped) {
+      console.log(`  - ${skipped.name}: ${skipped.reason}`);
+    }
+  }
   console.log(
     JSON.stringify({
       ok: true,
       notesWritten: result.notesWritten,
       typesProjected: result.typesProjected,
+      typesSkipped: result.typesSkipped,
     }),
   );
 } finally {

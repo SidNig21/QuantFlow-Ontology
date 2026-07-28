@@ -156,13 +156,36 @@ function renderNote(
   return body;
 }
 
+export type SkippedType = {
+  name: string;
+  reason: string;
+};
+
+export type ProjectResult = {
+  notesWritten: number;
+  typesProjected: string[];
+  typesSkipped: SkippedType[];
+};
+
+/**
+ * Tables present in this database. Queried once so a declared type with no
+ * table is skipped rather than crashing queryObjects (REWORK ROUND 1 ruling).
+ */
+function presentTables(db: KernelDb): Set<string> {
+  const rows = db
+    .query(`SELECT name FROM sqlite_master WHERE type = 'table'`)
+    .all() as Array<{ name: string }>;
+  return new Set(rows.map((r) => r.name));
+}
+
 /** Clear every owned type folder (schema-driven), then write notes from the Kernel. */
 export function projectVault(
   db: KernelDb,
   vaultRoot: string,
   schema: Schema,
-): { notesWritten: number; typesProjected: string[] } {
+): ProjectResult {
   const ownedFolders = schema.objects.map((o) => o.name);
+  const tables = presentTables(db);
 
   // Clear owned folders without listing vault state: rm by known type names only.
   for (const typeName of ownedFolders) {
@@ -171,9 +194,17 @@ export function projectVault(
 
   let notesWritten = 0;
   const typesProjected: string[] = [];
+  const typesSkipped: SkippedType[] = [];
 
   for (const object of schema.objects) {
     const typeName = object.name;
+    if (!tables.has(typeName)) {
+      typesSkipped.push({
+        name: typeName,
+        reason: `no table '${typeName}' in this database`,
+      });
+      continue;
+    }
     // limit: null is mandatory — default 100 would silently truncate.
     const rows = sortRows(queryObjects(db, typeName, undefined, null, 0, schema));
     if (rows.length === 0) continue;
@@ -191,5 +222,6 @@ export function projectVault(
     }
   }
 
-  return { notesWritten, typesProjected };
+  typesSkipped.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  return { notesWritten, typesProjected, typesSkipped };
 }

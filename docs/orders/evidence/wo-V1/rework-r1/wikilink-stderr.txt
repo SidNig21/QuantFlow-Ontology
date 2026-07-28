@@ -1,0 +1,1 @@
+kernel: path=/home/sidnig21/qf-worktrees/wo-V1/docs/orders/evidence/wo-V1/rework-r1/tmp/real-with-link.db provenance=explicit journal=wal sync=2 schema_meta=59
