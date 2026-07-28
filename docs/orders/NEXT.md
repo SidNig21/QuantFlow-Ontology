@@ -1,107 +1,64 @@
-# NEXT — the current order (rotated 2026-07-27: WO-K1 verified PASS; ladder awaits WO-K2 order)
+# NEXT — the current order (rotated 2026-07-27: WO-K2 cuttable after pre-build read)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **[WO-V1](WO-V1.md) — the reading vault, REWORK ROUND 1**
+## Current order: **[WO-K2](WO-K2.md) — the gate can see the door, and readers are readers**
 
-**Read the order top to bottom, then the `REWORK ROUND 1` section at its end — that section is the
-round.** The branch is `wo-V1` at `52c435a`; nothing is merged.
+**Read the order top to bottom before touching anything — every ruling was paid for.**
+Branch: `wo-k2`.
 
-This is off-ladder and it is currently the **only cuttable builder work** — see *the ladder is
-blocked on an architect duty* below. It blocks nothing and is blocked by nothing.
+**In plain terms:** the test that is supposed to stop programs from opening the database the wrong
+way cannot see the real front door, so code walks through and the test stays green. Also, pointing
+a tool at a typo quietly creates a new empty database. This order makes the test see the door,
+makes create opt-in, and proves a read-only handle cannot write.
 
-**Scope of the round, in priority order:**
+**How this order was hardened:** one adversarial pre-build read returned **DO NOT CUT** (two
+Critical, composition class). All ten findings fixed in the order text before cut — especially:
+per-claim allowlists (never skip whole file), G1b open∩¬write bait, falsify through the real
+scanner (no bare `exit(1)`), and G3b so production servers never get `create: true`.
+Record: [`evidence/wo-k2/prebuild-read.md`](evidence/wo-k2/prebuild-read.md).
 
-1. **The two deliverables nobody has ever watched against real data** — artifact-body rendering and
-   wikilink emission. Both pass the suite against synthetic fixtures; neither has been observed
-   against the founder's Kernel, because round 1's crash meant no real run ever completed. **This is
-   the substance of the round.**
-2. **The missing-type ruling, as robustness.** Skip a declared type with no table, name every skipped
-   type in the run summary, never drop `readonly: true` to force a migration. Full ruling in the
-   order.
+**Depends on WO-K1** — already merged (`61ce90d`). Closes debt #28. Hard prerequisite for WO-K3's
+readonly carve-out API (production projection readers still arrive with WO-V1 — see RULING 3).
 
-**What changed since round 1 — do not scope this as a broken projector.** The crash was a symptom of
-database drift, not a defect in the projector. Both live Kernels were rebuilt 2026-07-27 01:18 and
-**WO-K1 then unified them onto `~/.quantflow/kernel.db`.** The platform Kernel now has **26 tables,
-7/7 formerly-missing types present**. The crash **is no longer reproducible on the Kernel now on
-disk.** It is robustness, not a blocker. Measure against `~/.quantflow/kernel.db` (or a deliberately
-incomplete fixture for the missing-type gate — see below).
+## Parallel-eligible: **[WO-V1](WO-V1.md) — the reading vault, REWORK ROUND 1**
 
-**The gate got harder, and that is the point.** Round 1 said "today's real Kernel is a valid fixture —
-7 of 23 missing." **That fixture no longer exists.** You must construct a deliberately incomplete
-database, and construct it from a source that is **not** the live schema — otherwise the gate inherits
-the exact blindness it exists to catch.
+Off-ladder, independent of WO-K2 (no shared files once K1 landed), branch `wo-V1` at `52c435a`.
+A second builder may take this **only if** they do not run the QA suite while the WO-K2 builder is
+active (standing trap). Read the order + `REWORK ROUND 1` section.
 
-## The ladder is blocked on an architect duty, not a builder one
+## Where the ladder stands
 
-**[WO-K1](WO-K1.md) verified PASS** 2026-07-27 at `20488f8` / merged `61ce90d`, zero rework rounds,
-21 gates cold, `GATE_RUNNER_EXIT=0`. One Kernel path, WAL turn-taking, pins stripped, seats start.
-**Debt #29 half-closed** (path); bytes/orphan remain for WO-K3.
+**WO-K1 PASS** · **WO-K2 open (this order)** · **WO-K3** contract only · then **WO-107b** (also
+contract-only until written) · **WO-107** Bovada (external-surface probe first) · **WO-108…111**.
 
-**[WO-K2](WO-K2.md) is drafted** — the gate sees `openKernel`, readers are readonly, create-on-miss
-is opt-in; closes debt #28. Status: **draft, awaiting one adversarial pre-build read before cut.**
-Not builder-ready until that read returns and findings (if any) are fixed in the order text.
+Market data still waits on K2 → K3 → WO-107b. That ordering is the protection.
 
-Behind a cut WO-K2: **WO-K3** (bytes follow truth; drift refuses writes), then **WO-107b**
-(market-plane bulk ingest — also contract-only until written), **WO-107** (first market —
-**Bovada sportsbook only**, doctrine A7; **its order may not be written until the external-surface
-probe runs**), **WO-108**, then **WO-109/110/111**.
+## Read this before you write a gate
 
-**Identity rung 1 of 3 done; rung 2 drafted.** Market data still waits on K2 → K3 → WO-107b.
+**A check whose two sides come from one source is not a check.** WO-K2's own pre-build read caught
+the next instance: an open allowlist that skipped the whole file would have blessed openers while
+gutting the SQL scan — each half correct, composition recreates the defect. Per-claim allowlists
+and G1b exist because of that. Match the standard: falsify by editing shipping behaviour or planting
+real bait, not by forging an exit code.
 
-## Read this before you write a gate — it cost the project a full verification round
+## Four standing traps
 
-Round 1 of WO-V1 crashed on the founder's real Kernel: the schema declared **23** object types, the
-database had **16**, and roughly a quarter of served MCP tools threw `no such table`. **Every gate
-stayed green throughout**, because gates build their fixture database from the same schema they are
-checking — both sides of every check came from one source and could never disagree. Reality was the
-only thing capable of disagreeing and nothing was watching it.
-
-This is the **third** time this exact shape has been found here: WO-103's arrival-settled rule (the
-gate that existed to catch it had passed), WO-106's boot-path gate (it *modelled* the boot path
-instead of watching it, and the real edit passed all 19 gates), and now this. **A check whose two
-sides come from one source is not a check.** If you can satisfy your own gate by construction, it is
-decoration.
-
-There is **no migration runner** — `SCOPES.md:105` makes wipe-and-recreate the ritual for a rung that
-renames types, with no `ALTER` story. Every future rename recreates this condition silently.
-
-## Four standing traps, all measured and logged
-
-- **`agent-path` gives a false FAIL in a sandboxed shell** (debt #23) — its self-install exits 0 but
-  leaves no `node_modules`. Pre-install before any before/after measurement.
-- **Never pipe the gate runner.** It has cost two seats: one read `tail`'s exit 0 while the gate had
-  failed. Unpiped, `$?` on its own line, every time.
-- **Do not run the suite while another agent is running** (WO-106) — a concurrent Cursor session makes
-  `runtime-proof` fail on foreign sockets. Run quiet, or you will chase a phantom red.
-- **A third Kernel exists and is not yours** (2026-07-27). A long-running Electron dev instance holds
-  a database at `QuantFlow-Ontology/.wo008-home/…`, a leftover from WO-008 testing that overrode
-  `HOME`. It was **not** rebuilt, was **not** touched by WO-K1, and is still at the old shape. Leave
-  it alone; do not measure against it and do not treat it as evidence of drift.
-- **Platform Kernel is now `~/.quantflow/kernel.db`** (WO-K1). Do not look under
-  `~/.collaborator/dev/worktree-*/` for truth anymore.
-
-## The standard this sequence set — match it
-
-WO-106's builder **falsified every gate it wrote by editing shipping code**, not by flipping a fixture
-switch. WO-106b took **eight pre-build findings, three High** and built with **zero rework rounds**.
-WO-K1 took **three DO-NOT-CUT reads plus a live SDK probe** and built with **zero rework rounds**.
-That is the bar.
+- **`agent-path` false FAIL in a sandboxed shell** (debt #23) — pre-install before measuring.
+- **Never pipe the gate runner.** Unpiped, `$?` on its own line.
+- **Do not run the suite while another agent is running.**
+- **`.wo008-home` Kernel is not yours** — stale, held open, untouched by K1/K2. Leave it alone.
+- **Platform Kernel is `~/.quantflow/kernel.db`** (WO-K1).
 
 ## Standing seat constraint (founder, 2026-07-26)
 
-Builder seats run **`composer-2.5` or `cursor-grok-4.5-high` only** — an API-cost decision, not a trust
-one. One model builds, a different one verifies; no model checks its own work.
+Builder seats: **`composer-2.5` or `cursor-grok-4.5-high` only**. One model builds, a different one
+verifies.
 
 ## Parked / parallel
 
-**Design overhaul** — founder-run, off the critical path; returns as a brief with measured scope and
-falsifiable gates, and must fit `one-skin`. **Market-abstraction test** — debt #20, trigger-gated.
-**Durable execution** — debt #17, trigger-gated. **Promotion authority + freeze-lint bypass** — debt
-#19 (`promote_type` deleted by WO-103b; its fixing order re-adds the action). **Caller identity** —
-debt #22; WO-105 narrowed the served surface but the lock is still unbuilt. **Nested-key smuggling** —
-debt #26; owned by whichever of WO-107b or WO-109/110 arrives first.
+Design overhaul · debt #20 · debt #17 · debt #19 · debt #22 · debt #26 — unchanged triggers.
 
 ---
 

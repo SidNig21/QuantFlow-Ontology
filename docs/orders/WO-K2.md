@@ -1,11 +1,13 @@
 # WO-K2 — The gate can see the door, and readers are readers
 
-status: **draft — awaiting one adversarial pre-build read before cut.** Contract from
-`SCOPES.md` §"The identity rungs"; facts re-measured 2026-07-27 on `main` @ `61ce90d` (WO-K1 merged).
+status: **open — cuttable.** One adversarial pre-build read (`cursor-grok-4.5-high-fast`) returned
+DO NOT CUT; all ten findings fixed in this text and re-measured by the architect seat.
+Record: [`evidence/wo-k2/prebuild-read.md`](evidence/wo-k2/prebuild-read.md).
 assignee: builder
 depends: WO-K1 — **done** (`61ce90d`)
 closes: ROADMAP debt #28
-blocks: WO-K3 (hard — readonly carve-out has nothing to apply to until this lands), and therefore WO-107b
+blocks: WO-K3 (this rung ships the readonly **API** and the gate teeth WO-K3's carve-out needs;
+production projection readers arrive with WO-V1 — see RULING 3). Still ahead of WO-107b.
 
 ## Objective
 
@@ -24,101 +26,112 @@ exist, it quietly creates a brand-new empty database instead of refusing.
 After this order the test can see the front door, programs that only read cannot write, and a typo
 fails closed.
 
-**If it goes wrong:** either the gate still cannot see `openKernel` (debt #28 survives), or every
-fixture harness breaks because create-on-miss flipped without an explicit create option, or a
-"reader" still holds a writable handle and WO-K3's drift carve-out has nowhere to land.
+**If it goes wrong:** either the gate still cannot see `openKernel` (debt #28 survives), or blessing
+legitimate openers accidentally stops the gate from checking them for raw SQL, or every fixture
+harness breaks because create-on-miss flipped without an explicit create option, or a "reader"
+still holds a writable handle.
 
 ---
 
-## RULING 1 — two claims, reported separately (architect, final)
+## RULING 1 — three claims, three allowlists, never one skip (architect, final)
 
-Today `kernel-sole-writer` conflates *opens the Kernel* and *writes domain rows*. Calling
-`execute()` from outside the package is the **sanctioned** write path — that is not a Law E
-violation. What is false is the docstring's weaker claim: *only `packages/qf-kernel` may open
-SQLite*.
+Today `kernel-sole-writer` conflates everything into one whole-file allowlist: if a file is
+allowed, **no pattern runs on it**. That is how adding an open allowlist would gut the SQL scan
+on every newly blessed opener — measured composition defect in the pre-build read.
 
-**Ruled:** the gate reports **two lists**:
+**Ruled: the gate evaluates three independent claims. Membership on one allowlist never skips the
+others.**
 
-1. **Open offenders** — files outside the allowlist that call `openKernel` / `openAppKernel`
-   (or import a SQLite driver / issue raw domain DDL/DML — the existing patterns stay).
-2. **Write offenders** — files outside the allowlist that call `execute(` on a Kernel handle,
-   *unless* they are on an explicit write-path allowlist (the sanctioned callers).
+| Claim | What it matches | Allowlist meaning |
+|---|---|---|
+| **Driver/SQL** | existing patterns (`bun:sqlite`, `INSERT INTO`, …) | today's narrow `ALLOW_PREFIXES` — who may talk to SQLite / issue raw DDL/DML |
+| **Open** | `\bopenKernel\s*\(` · `\bopenAppKernel\s*\(` | who may call the Kernel front door |
+| **Write** | `\bexecute\s*\(` on comment-stripped text | who may call the sanctioned write path |
 
-A file may appear on neither, one, or both. The gate must say which claim failed. A single
-"offender" blob that does not say *why* recreates the blindness.
+A file may fail any combination. The gate **must name which claim(s)** failed. Calling `execute()`
+from outside the package is the sanctioned write path — that is not a Law E spirit violation; it
+must appear on the write allowlist. What was false is the docstring's weaker claim that only
+`packages/qf-kernel` may *open* SQLite.
+
+**Mechanism for comment false-positives.** Before matching `execute(`, strip `//` line comments and
+`/* */` block comments from the file text. Measured: `server.ts:6` and `register.ts` doc comments
+contain the string `execute(` and would otherwise force `server.ts` onto the write list for no
+callsite.
 
 ## RULING 2 — create is opt-in; `:memory:` and the app boot are carved out (architect, final)
 
 **Ruled:** `openKernel(path)` on a **file** path that does not exist **throws**. Creating a new
-file-backed Kernel requires an explicit option: **`{ create: true }`**. The name is spelled here.
+file-backed Kernel requires **`{ create: true }`**. The name is spelled here.
 
-| Path | Missing file, no `create` | Missing file, `create: true` |
-|---|---|---|
-| File path | **throws** — creates nothing | creates + migrates (today's behaviour) |
-| `:memory:` | n/a — always opens | n/a |
+| Path / opts | Behaviour |
+|---|---|
+| File missing, no `create` | **throws** — creates nothing |
+| File missing, `{ create: true }` | creates + migrates (today's behaviour) |
+| `:memory:` | always opens; `create` irrelevant |
+| `{ create: true, readonly: true }` together | **throws** — mutually exclusive; do not invent a meaning |
+| File missing, `{ readonly: true }` | **throws** (readonly cannot create) |
 
 **`openAppKernel` keeps creating.** It does not call `openKernel`; it uses `DatabaseSync` after
 `resolveKernelPath()`. First-launch empty canvas is a stated ritual from WO-K1. Do not pull
-fail-closed create into the Electron boot in this order — that would strand a fresh machine.
+fail-closed create into the Electron boot in this order.
 
-**Mechanism, not a property:** `openKernel` in `db-bun.ts` checks `existsSync` (or equivalent) for
-non-`:memory:` paths when `opts.create !== true`, and throws a named error before `new Database`.
-Do not rely on SQLite's own failure mode — it creates.
+**Mechanism:** `openKernel` in `db-bun.ts` checks existence for non-`:memory:` paths when
+`opts.create !== true`, and throws a named error **before** `new Database`. Do not rely on
+SQLite's failure mode — it creates.
 
-## RULING 3 — reader vs writer is classified by what the process does, not by its package name
+**Type export:** `OpenKernelOptions` (or equivalent) exports from `qf-kernel` (`.`) only.
+`qf-kernel/portable` deliberately does not open bun:sqlite — do not pretend it exports `openKernel`.
 
-A call site is a **writer** if it ever calls `execute` or must apply migrations / create.
-A call site is a **reader** if it only queries and never needs to create.
+## RULING 3 — classify per call site; zero production readers today is honest, not a hole in this rung
 
-**Measured on `main` @ `61ce90d` — zero production readers today.** Every file-backed site either
-calls `execute` or creates fixtures. That is not a defect in this order; it is the starting census.
-The deliverable is still: classify every site, put `readonly: true` on every site classified
-reader, and prove a readonly handle cannot write.
+A **call site** is a **writer** if that site's process path calls `execute` or must create.
+A **call site** is a **reader** if it only queries an existing file and never creates.
 
-**Known future reader (do not implement here):** `tools/qf-vault-projection` on branch `wo-V1`
-already opens `{ readonly: true }` and asserts the file exists. This order must not break that
-shape — WO-K1 already made `attachKernel` skip WAL/synchronous on readonly. Re-confirm that path
-still works when you flip create-on-miss (readonly + missing file must throw, not create).
+**Measured on `main` @ `61ce90d`:** zero `{ readonly: true }` openKernel sites on the tree (only
+the option plumbing in `db-bun.ts`). Every production file-backed opener either calls `execute`
+(via itself or a collaborator in-process) or creates. That is the starting census, not a defect.
+
+**What this rung owes WO-K3:** the readonly **API** that already survives `attachKernel` (WO-K1),
+the fail-closed create flip, the D4 proof that readonly cannot write, and gate teeth that can see
+`openKernel`. **What it does not owe:** converting `qf-read-tools` into a read-only server (that
+would mean unserving actions — out of scope). Production projection readers arrive with **WO-V1**
+(`tools/qf-vault-projection` already opens `{ readonly: true }` on that branch). WO-K3's order must
+not assume every handle on the machine is readonly after this lands — only that the carve-out is
+implementable.
+
+**Per call site, not per file.** A harness that creates once and later re-opens the same path for
+queries: the create site gets `{ create: true }`; a later re-open of an existing file that never
+executes may pass neither `create` nor `readonly` (writer-shaped reopen) **or** `{ readonly: true }`
+if that site is classified reader. Pick one per site and record it. Do not classify a whole file as
+one thing when call sites differ.
 
 ---
 
 ## Context — measured facts (verify before use)
 
-Re-measured 2026-07-27 on `main` after WO-K1. Cite-or-probe: if a fact does not reproduce, stop.
+Re-measured 2026-07-27 on `main` after WO-K1 + pre-build read. Cite-or-probe.
 
 | Fact | Measured |
 |---|---|
-| `openKernel(..., { readonly: true })` call sites on `main` | **zero** |
-| `openKernel` creates a missing file today | **yes** — probed: before false → after true |
-| `attachKernel` already skips `journal_mode` / `synchronous` when `readonly` | yes (`db.ts`, WO-K1 D3) |
-| `busy_timeout` still set on readonly | yes — correct; keep |
-| `kernel-sole-writer` matches `openKernel` / `execute` | **no** — only driver strings + SQL keywords |
-| `QF_*_FALSIFY` path on `kernel-sole-writer` | **none** (unlike `dock-registry`) |
-| File-backed `openKernel` outside `packages/qf-kernel` | see census table below |
-| `openAppKernel` | always writer; creates via `DatabaseSync`; governed by `kernel-sole-writer-app` |
+| `openKernel(..., { readonly: true })` on `main` | **zero** call sites |
+| `openKernel` creates a missing file today | **yes** — before false → after true |
+| `attachKernel` skips `journal_mode` / `synchronous` when readonly | yes (WO-K1); `busy_timeout` still set — keep |
+| `kernel-sole-writer` whole-file skip | `isAllowed` → `continue` before any pattern — **the composition trap** |
+| `QF_*_FALSIFY` on `kernel-sole-writer` | **none** |
+| File-backed `openKernel` outside `packages/qf-kernel` | **23 call sites · 11 files** (was "22/10" in SCOPES — corrected here) |
+| `execute(` real callers outside package (excl. collab-electron, schema) | see write allowlist below; includes **`tools/qf-read-tools/src/register.ts`** which has **no** `openKernel` |
+| Comment false positives for `\bexecute\s*\(` | `server.ts:6`, `register.ts` docs, `harness.ts` header, gate comments |
 
-### Census — file-backed `openKernel` outside `packages/qf-kernel` (classify in the report)
+### Census — file-backed sites (builder confirms + classifies per call site)
 
-Every row must appear in the builder report as **writer** or **reader** with one-line reason.
-Counts are call sites, not files. Re-count before building — if the tree moved, update the table
-in the report, do not invent allowlist entries silently.
-
-| File | Role today (architect seed — builder confirms) |
+| File | Seed role |
 |---|---|
-| `tools/qf-read-tools/src/server.ts` | **writer** — serves action tools via `execute` |
-| `tools/qf-peer-bus/src/bus.ts` | **writer** — `execute` for `publish_artifact` |
-| `tools/qf-peer-bus/scripts/setup-founder-seats.ts` | **writer / creator** — must gain `{ create: true }` |
-| `species/hermes/register.ts` | **writer** — `execute` |
-| `species/critic-mock/register.ts` | **writer** — `execute` |
-| `tools/qf-read-tools/src/harness.ts` | **writer / creator** — fixture DB; `{ create: true }` |
-| `tools/qf-read-tools/src/gates/{tool-discovery,action-transport,publish-artifact-root,kernel-one-world}.ts` | **writer / creator** — fixtures; `{ create: true }` on first open |
-| `tools/qf-peer-bus/src/harness.ts` | **writer / creator** — fixtures; `{ create: true }` |
-
-`:memory:` call sites (qa gates, kernel tests, host-admit, a2a smoke) are **not** file-backed create
-hazards; they keep working without `create: true`.
-
-**If the builder finds a site that only reads** (no `execute`, no create need): classify **reader**,
-pass `{ readonly: true }`, and do **not** pass `create: true`.
+| `tools/qf-read-tools/src/server.ts` | **writer** (opens; actions run via `register.ts` → `execute`) — **no** `create: true` |
+| `tools/qf-read-tools/src/register.ts` | **write path only** — no open; must be on **write** allowlist |
+| `tools/qf-peer-bus/src/bus.ts` | **writer** — `execute`; **no** `create: true` (open existing) |
+| `tools/qf-peer-bus/scripts/setup-founder-seats.ts` | **creator** — `{ create: true }` |
+| `species/hermes/register.ts` · `species/critic-mock/register.ts` | **writer** — open existing path from CLI; **no** `create: true` |
+| Harnesses / gates listed under open allowlist | **creator** on first open — `{ create: true }`; re-opens classified per site |
 
 ---
 
@@ -126,64 +139,63 @@ pass `{ readonly: true }`, and do **not** pass `create: true`.
 
 ### D1 — `openKernel` create is opt-in
 
-`packages/qf-kernel/src/db-bun.ts`: file path + missing + `create !== true` → throw before open.
-Error message must name the path and say `create: true` is required. `:memory:` unchanged.
-Export the option type from `.` and `./portable` if callers need the type.
+`packages/qf-kernel/src/db-bun.ts` per RULING 2. Named throw before `new Database`. Mutual exclusion
+of `create` and `readonly`. `:memory:` unchanged. Type exported from `.` only.
 
-**Electron path out of scope for the throw** — see RULING 2.
+### D2 — every creator passes `{ create: true }`; production openers never do
 
-### D2 — every creator passes `{ create: true }`
+Same commit as D1.
 
-Same commit as D1. Every harness / gate / setup script that builds a fresh file-backed Kernel
-passes the flag. **If the suite reddens because a site was missed, that is a D2 defect, not a
-reason to weaken D1.**
-
-Spelled starters (re-grep; do not treat this as exhaustive if new sites appeared):
+**Must gain `{ create: true }` on first file-backed create** (re-grep; not exhaustive if tree moved):
 
 - `tools/qf-peer-bus/scripts/setup-founder-seats.ts`
-- `tools/qf-read-tools/src/harness.ts` and its gates listed in the census
-- `tools/qf-peer-bus/src/harness.ts`
-- `packages/qf-kernel/src/busy-timeout.test.ts` (file-backed setup opens)
+- `tools/qf-read-tools/src/harness.ts` and gates:
+  `tool-discovery.ts`, `action-transport.ts`, `publish-artifact-root.ts`, `kernel-one-world.ts`
+- `tools/qf-peer-bus/src/harness.ts` — **and sequencing (F10):** before spawning the bus subprocess,
+  the harness (or gate) must `openKernel(path, { create: true })` (then may close) so the child
+  `bus.ts` can open the existing file **without** `create: true`. Today create-on-miss hides this
+  order; after D1 the bus will fail closed if the harness does not pre-create.
+- `packages/qf-kernel/src/busy-timeout.test.ts` file-backed setups
 
-Production servers pointed at an **existing** platform Kernel (`server.ts`, `bus.ts`) must **not**
-pass `create: true` — a missing platform Kernel after WO-K1 is an operator error, not a cue to mint
-a second world.
+**Must NOT contain `create: true`:**
 
-### D3 — classify every file-backed site; readers get `{ readonly: true }`
+- `tools/qf-read-tools/src/server.ts`
+- `tools/qf-peer-bus/src/bus.ts`
+- `species/hermes/register.ts`
+- `species/critic-mock/register.ts`
 
-Report table: path · reader|writer · reason · opts passed.
-Every **reader** passes `{ readonly: true }`.
-Every **writer** that creates passes `{ create: true }`; writers that only open an existing file
-pass neither create nor readonly.
+If the suite reddens because a creator was missed, that is a D2 defect — fix the site, do not
+weaken D1.
+
+### D3 — classify every file-backed call site; readers get `{ readonly: true }`
+
+Report table: **file:line** · reader|writer|creator · opts · reason.
+Every **reader** → `{ readonly: true }`.
+Every **creator** → `{ create: true }`.
+Writers that only open an existing file → neither flag.
 
 ### D4 — readonly handle cannot write (proof site)
 
-A package test (in `packages/qf-kernel`): create a Kernel with `{ create: true }`, reopen
-`{ readonly: true }`, attempt a write (`exec` INSERT or `execute(...)`) → **must throw**.
-Control: same file reopened without readonly → write succeeds.
+Package test: `{ create: true }` → close → reopen `{ readonly: true }` → write (`exec` INSERT or
+`execute`) **throws**. Control: reopen without readonly → write succeeds.
 
-This is the property WO-K3's carve-out will need. Do not leave it as a comment.
+### D5 — `kernel-sole-writer` sees the front door (per-claim)
 
-### D5 — `kernel-sole-writer` sees the front door
+Rewrite `qa/gates/kernel-sole-writer.ts`:
 
-Extend `qa/gates/kernel-sole-writer.ts`:
+1. Keep driver/SQL patterns and **today's** narrow allowlist for that claim only
+   (`packages/qf-kernel/`, `qf-kernel-schema/`, the two gate files, `tools/qf-peer-bus/src/bus.ts`
+   transport exemption, `collab-electron/`, `qa/gates/dock-registry/run.ts` as today).
+2. Add **open** patterns + **open allowlist** (below).
+3. Add **write** pattern on **comment-stripped** text + **write allowlist** (below).
+4. **Never** `if (onOpenAllowlist || onWriteAllowlist) continue` before driver/SQL checks.
+5. Docstring matches reality. State grep limits. Do not replace one overclaim with another.
 
-1. Keep existing driver / SQL patterns.
-2. Add patterns for `\bopenKernel\s*\(` and `\bopenAppKernel\s*\(` (open claim).
-3. Add pattern for `\bexecute\s*\(` (write claim) — **with a separate allowlist** for sanctioned
-   write callers (RULING 1).
-4. Docstring rewritten to match what the gate actually proves. **A docstring that overclaims is
-   how debt #28 was born — do not replace one lie with another.** State the grep limits the same
-   way the file already admits for dynamic SQL.
+**Open allowlist** (who may call `openKernel` / `openAppKernel` outside `packages/qf-kernel/`):
 
-**Open allowlist** — who may call `openKernel` / `openAppKernel` outside `packages/qf-kernel/`:
+Adding an entry is a **finding to report**, not a quiet edit.
 
-Spelled here. Adding an entry is a **finding to report**, not a quiet edit — same rule as WO-K1 G1.
-
-- `packages/qf-kernel/` (definition)
-- `collab-electron/` (governed by `kernel-sole-writer-app`; do not duplicate)
-- `qf-kernel-schema/`
-- `qa/gates/kernel-sole-writer.ts`, `qa/gates/kernel-sole-writer-app.ts`
+- `collab-electron/` (still governed by `kernel-sole-writer-app` for app-tree rules)
 - `tools/qf-read-tools/src/server.ts`
 - `tools/qf-read-tools/src/harness.ts`
 - `tools/qf-read-tools/src/gates/tool-discovery.ts`
@@ -200,90 +212,121 @@ Spelled here. Adding an entry is a **finding to report**, not a quiet edit — s
 - `qa/gates/dock-registry/run.ts`
 - `qa/gates/boot-reconcile/run.ts`
 - `qa/gates/agent-path/run.ts`
+- `qa/gates/kernel-sole-writer.ts` / `qa/gates/kernel-sole-writer-app.ts` (if they mention the names)
 
-**Write allowlist** — who may call `execute(` outside `packages/qf-kernel/`:
+**Write allowlist** (who may call `execute(` outside `packages/qf-kernel/`, after comment-strip):
 
-Start from every current non-package `execute(` callsite the builder greps on day one; seed at
-minimum includes the tool plane, peer-bus, species register scripts, and qa gates that drive
-actions. **Publish the final list in the report.** If a file is on the open allowlist but not the
-write allowlist, it may open and query but must not call `execute`.
+- `tools/qf-read-tools/src/register.ts` — **required; has no openKernel**
+- `tools/qf-read-tools/src/harness.ts`
+- `tools/qf-read-tools/src/gates/action-transport.ts`
+- `tools/qf-read-tools/src/gates/kernel-one-world.ts`
+- `tools/qf-peer-bus/src/bus.ts`
+- `species/hermes/register.ts`
+- `species/hermes/host-admit-kernel.ts`
+- `species/hermes/a2a-4tile-smoke.ts`
+- `species/critic-mock/register.ts`
+- `qa/gates/dock-registry/run.ts`
+- `qa/gates/boot-reconcile/run.ts`
+- `qa/gates/agent-path/run.ts`
+- `collab-electron/` (app tree; `kernelExecute` → `execute`)
 
-`tools/qf-peer-bus/src/bus.ts` keeps its existing exemption for **transport** `bun:sqlite` (inbox
-DB) — that is not Kernel DDL. Do not collapse the two.
+**Not on write allowlist (open-only examples):** `server.ts`, `tool-discovery.ts`,
+`publish-artifact-root.ts`, `setup-founder-seats.ts` — they must not call `execute(` after
+comment-strip. G1b proves that.
 
-### D6 — durable falsify path
+`tools/qf-peer-bus/src/bus.ts` keeps its **driver/SQL** exemption for the transport inbox DB only
+— that exemption is claim-scoped, not a blanket skip.
 
-`kernel-sole-writer` gains an env-flag bait path, same shape as `dock-registry`:
+### D6 — durable falsify path through the real scanner
 
-- **`QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN=1`** — gate internally considers a synthetic open offender
-  (or writes a temp bait file under a scanned path, then removes it) and **must exit non-zero**.
-- **`QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE=1`** — same for the write claim.
+Env flags (document in the gate header):
 
-Both flags documented in the gate file header. Default (unset) → normal scan.
-A gate with no durable red path is decoration — that is half of debt #28.
+- `QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN=1`
+- `QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE=1`
 
-**Do not** leave bait files in the tree after the run. `git status` clean of bait.
+**Mechanism (dock-registry shape, not forged exit):** the flag causes the gate to plant a temp
+bait file under a **scanned, non-allowlisted** path (or neuter a real check so the real assertion
+fails), run the **same** offender accumulation/reporting path, exit non-zero naming the claim, then
+remove the bait. **`if (env) process.exit(1)` is forbidden** — that satisfies the flag text and
+proves nothing about G1's matcher (WO-004 class).
 
-### D7 — gate still catches raw SQL (regression control)
+`git status` clean of bait after the run.
 
-The existing Control 2 from the post-merge review must keep working: a file with `bun:sqlite` +
-`INSERT INTO` outside allowlists → red. Do not gut the old patterns while adding the new ones.
+### D7 — raw SQL regression still holds on allowlisted openers
+
+Control 2 remains: temp file with `bun:sqlite` + `INSERT INTO` outside **driver/SQL** allowlist →
+red.
+
+**Additional control (F1):** a file that is on the **open** allowlist but contains raw
+`INSERT INTO` (and is not on the driver/SQL allowlist) → **still red on the driver/SQL claim**.
+That is the proof that open membership does not skip SQL. Implement as a temp edit of a copy or a
+dedicated bait path the gate scans — not by permanently dirtying `server.ts`.
 
 ---
 
 ## Acceptance gates
 
-Every gate proven by bait. A gate whose red path was never observed is decoration.
+**G1 — front door visible.**
+- Control 1: unmodified tree → green.
+- Control 2: temp `bun:sqlite` + `INSERT INTO` under `tools/` outside driver/SQL allowlist → red.
+- Bait A: temp file with `openKernel(...); execute(...)`, no driver/SQL keyword, outside open and
+  write allowlists → **red**, naming open and/or write claims.
+- Restore → green, tree clean.
 
-**G1 — front door visible.** Control 1: unmodified tree → green.
-Control 2: file with `bun:sqlite` + `INSERT INTO` under `tools/` (temp) → red on driver/SQL claim.
-Bait: file with `openKernel(...); execute(...)` and **no** driver string / SQL keyword → **red**,
-naming the open and/or write claim. Remove bait → green, tree clean.
+**G1b — open∩¬write is enforceable.**
+Bait: a file **on the open allowlist** (use a path already listed, via temp overlay / scanned copy
+the gate will see, or a documented test double path) that contains a real `execute(` callsite and
+is **not** on the write allowlist → **red on the write claim only**. Restore. Without G1b, RULING 1
+is commentary.
 
-**G2 — falsify flags.**
-`QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN=1 bun qa/run.ts --only kernel-sole-writer` → non-zero.
-Same for `_FALSIFY_WRITE=1`. Unset → green.
+**G2 — falsify flags exercise the scanner.**
+`QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN=1` → non-zero **and** offender output names the open claim via
+the same reporting path as G1. Same for `_FALSIFY_WRITE=1`. Unset → green. Bare exit = fail the
+order.
 
 **G3 — create fail-closed.**
-`openKernel` on a missing file path without `create: true` → throws, file still absent.
-Control: `{ create: true }` → file appears and opens.
-`:memory:` still opens without `create`.
+Missing file without `create: true` → throws; path still absent.
+`{ create: true }` → file appears.
+`:memory:` opens without `create`.
+`{ create: true, readonly: true }` → throws.
 
-**G4 — readonly cannot write.** Package test from D4: readonly write throws; writable control
-succeeds.
+**G3b — production openers never create.**
+Gate or report-back grep: `server.ts`, `bus.ts`, `species/*/register.ts` contain **no**
+`create:\s*true`. Bait: add it to `server.ts` → red → restore → green.
+
+**G4 — readonly cannot write.** D4 package test + writable control.
 
 **G5 — no regression.** Full suite cold, `GATE_RUNNER_EXIT=0`. `kernel-one-path`,
-`kernel-sole-writer-app`, `publish-artifact-root` still green. If create-on-miss flip reddens a
-harness, that is D2 unfinished — fix the harness, do not revert D1.
+`kernel-sole-writer-app`, `publish-artifact-root` green. Missed `{ create: true }` on a fixture
+creator is D2 unfinished.
 
 ---
 
 ## Out of scope
 
-Drift detection / empty-`schema_meta` guard (WO-K3) · artifact root relocation (WO-K3) · changing
-`openAppKernel` create behaviour · widening `kernel-sole-writer-app` · migration runner · rewriting
-WO-V1 (lands on its own branch; this order must not break its `{ readonly: true }` shape) ·
-changing which MCP tools are served.
+Drift detection / empty-`schema_meta` (WO-K3) · artifact root relocation (WO-K3) · changing
+`openAppKernel` create behaviour · widening `kernel-sole-writer-app` · migration runner · unserving
+MCP action tools to make `server.ts` a reader · rewriting WO-V1 (must not break its
+`{ readonly: true }` shape when it merges).
 
 ## Report-back format
 
-Per `VERIFYING.md`. Additionally:
+1. Census table: **file:line** · reader|writer|creator · opts · reason.
+2. G1 + G1b + Control 2 transcripts (claims named); tree clean after.
+3. G2 falsify transcripts showing **offender lines**, not only exit codes.
+4. G3 throw + no file created; create control; create+readonly throw.
+5. G3b bait on `server.ts` red→restore.
+6. G4 readonly failure + writable control.
+7. Final open allowlist and write allowlist as shipped; any addition called out as a finding.
+8. Peer-bus harness sequencing note (pre-create before spawn).
+9. `GATE_RUNNER_EXIT=0` cold.
 
-1. Census table: every file-backed site · reader|writer · opts · reason.
-2. G1 bait transcript (Control 1, Control 2, openKernel+execute bait, restore) — both claims named.
-3. G2 falsify-flag transcripts for OPEN and WRITE.
-4. G3 throw message + proof the missing path was not created; create:true control.
-5. G4 readonly failure + writable control.
-6. Final open allowlist and write allowlist as shipped (diff against this order's seed called out).
-7. Confirmation `git status` clean of bait files.
-
-**Judgment the order expects you to surface:** if D5's seed allowlists are incomplete, **report the
-finding and propose the entry** — do not silently extend. Same discipline as WO-K1 G1.
+**Judgment rule:** if an allowlist entry is missing, **report and propose** — do not silently
+extend. Same discipline as WO-K1 G1.
 
 ---
 
 ## Stated ritual
 
 After this lands, a tool pointed at a wrong path **refuses** instead of creating a parallel empty
-Kernel. That closes the pressure valve that produced the four absolute pins WO-K1 stripped.
-First app launch on a fresh machine still creates via `openAppKernel` — unchanged.
+Kernel. First app launch on a fresh machine still creates via `openAppKernel` — unchanged.

@@ -402,7 +402,7 @@ The One Rule is one sentence. Operationally it needs six properties:
    under-weight G2's `busy_timeout = 0` control, which is the load-bearing falsifier.
 2. **WO-K2 is a hard prerequisite for WO-K3, not a stylistic preference.** The architect's recorded
    ruling on debt #27 is *fail hard on write handles, warn on readonly handles*. Measured here:
-   **not one of the 22 file-backed `openKernel` call sites outside `packages/qf-kernel` passes
+   **not one of the 23 file-backed `openKernel` call sites outside `packages/qf-kernel` passes
    `{ readonly: true }`** — not the vault projector, not the read-tool server that serves only read
    tools. Every handle in the system is a writer. Shipping WO-K3 first would therefore fail hard in
    every process, including the projection tools the carve-out was written to protect.
@@ -474,8 +474,7 @@ handle that cannot write.
 **In.** `kernel-sole-writer` matches `openKernel` / `openAppKernel` against an explicit reader
 allowlist, and **separates the two claims it currently conflates**: *opens the Kernel* and *writes
 domain rows*, reporting which it caught · the gate gets its first `QF_*_FALSIFY` bait path, which
-`dock-registry` and `agent-path` have and it does not · all **22 file-backed call sites across 10
-files** outside `packages/qf-kernel` classified reader or writer, with readers passing
+`dock-registry` and `agent-path` have and it does not · all **23 file-backed call sites across 11 files** outside `packages/qf-kernel` classified reader or writer, with readers passing
 `{ readonly: true }` · `openKernel` stops creating a database by default, so a read tool pointed at a
 typo fails instead of minting an empty world.
 
