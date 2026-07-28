@@ -173,8 +173,12 @@ type Offender = { rel: string; claim: "driver/sql" | "open" | "write" | "create-
 
 function plantFalsifyBaits(): string[] {
   const planted: string[] = [];
+  const wantOpen = process.env[FALSIFY_OPEN_ENV] === "1";
+  const wantWrite = process.env[FALSIFY_WRITE_ENV] === "1";
+  if (!wantOpen && !wantWrite) return planted;
+
   mkdirSync(FALSIFY_DIR, { recursive: true });
-  if (process.env[FALSIFY_OPEN_ENV] === "1") {
+  if (wantOpen) {
     const p = join(FALSIFY_DIR, "falsify-open.ts");
     writeFileSync(
       p,
@@ -182,7 +186,7 @@ function plantFalsifyBaits(): string[] {
     );
     planted.push(p);
   }
-  if (process.env[FALSIFY_WRITE_ENV] === "1") {
+  if (wantWrite) {
     const p = join(FALSIFY_DIR, "falsify-write.ts");
     // Build without a literal `execute(` in *this* file (not on write allowlist).
     const call = "execute" + "(";
@@ -211,6 +215,11 @@ function checkProductionCreateBan(offenders: Offender[]): void {
     try {
       text = readFileSync(full, "utf8");
     } catch {
+      offenders.push({
+        rel,
+        claim: "create-ban",
+        detail: "production opener path missing",
+      });
       continue;
     }
     if (createRe.test(stripComments(text))) {
@@ -224,7 +233,7 @@ function checkProductionCreateBan(offenders: Offender[]): void {
 }
 
 export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
-  const planted = plantFalsifyBaits();
+  plantFalsifyBaits();
   try {
     const files: string[] = [];
     walk(REPO_ROOT, files);
@@ -282,7 +291,9 @@ export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
     }
     return { ok: true, offenders: [] };
   } finally {
-    if (planted.length > 0) removeFalsifyBaits();
+    // Always remove: mkdir only happens when planting, but a prior leaked
+    // empty dir (pre-fix happy path) must not linger either.
+    removeFalsifyBaits();
   }
 }
 
