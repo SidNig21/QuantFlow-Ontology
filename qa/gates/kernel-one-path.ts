@@ -37,6 +37,8 @@ const ALLOW_PREFIXES = [
   "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
   "tools/qf-read-tools/src/gates/kernel-one-world.ts",
   "tools/qf-peer-bus/src/harness.ts",
+  // WO-V1: fixture gate constructs temp Kernel paths (join(dir, "kernel.db")).
+  "tools/qf-vault-projection/src/gate.ts",
   "collab-electron/",
   "qa/gates/kernel-one-path.ts",
   "species/hermes/agent-package/src/acp-shim.ts",
