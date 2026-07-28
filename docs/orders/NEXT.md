@@ -1,26 +1,29 @@
-# NEXT — the current order (rotated 2026-07-27: WO-K2 verified PASS; ladder awaits WO-K3 order)
+# NEXT — the current order (rotated 2026-07-27: WO-V1 REWORK ROUND 2)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **[WO-V1](WO-V1.md) — the reading vault, REWORK ROUND 1**
+## Current order: **[WO-V1](WO-V1.md) — the reading vault, REWORK ROUND 2**
 
-**Read the order top to bottom, then the `REWORK ROUND 1` section at its end — that section is the
-round.** The branch is `wo-V1` at `52c435a`; nothing is merged.
+**Read the order top to bottom, then the `REWORK ROUND 2` section at its end — that section is the
+round.** Continue on branch `wo-V1` (tip was `c2d69d2` at verification; Round 1 substance stays).
+Nothing is merged.
 
 This is off-ladder and currently the **only cuttable builder work** — see *the ladder is blocked on
-an architect duty* below. It blocks nothing and is blocked by nothing.
+an architect duty* below.
 
-**Scope of the round, in priority order:**
+**Scope of the round (one defect):**
 
-1. **Artifact-body rendering and wikilink emission** against real data (never observed — round 1
-   crashed before a real run completed).
-2. **Missing-type ruling as robustness** — skip declared types with no table, name them in the run
-   summary, never drop `readonly: true` to force a migration.
+1. Allowlist `tools/qf-vault-projection/src/gate.ts` on `qa/gates/kernel-one-path.ts` so the cold
+   board stops failing on fixture `kernel.db` path construction. Prove red → green, then cold
+   `GATE_RUNNER_EXIT=0`.
 
-**Kernel context after K1/K2:** platform Kernel is `~/.quantflow/kernel.db` (26 tables). Create is
-opt-in; readonly opens work. Measure against that Kernel or a deliberately incomplete fixture built
-from a source that is **not** the live schema.
+**Already verified — do not redo:** missing-type skip + bait; real artifact-body / wikilink
+observation against the pre-rebuild Kernel copy. Record:
+[`evidence/wo-V1/VERIFICATION-ROUND-2.md`](evidence/wo-V1/VERIFICATION-ROUND-2.md).
+
+**Kernel context:** platform Kernel is `~/.quantflow/kernel.db`. Create is opt-in; readonly opens
+work.
 
 ## The ladder is blocked on an architect duty, not a builder one
 
@@ -38,6 +41,8 @@ writes). **No builder can take the ladder until that order is written.** Behind 
 - Never pipe the gate runner · do not run the suite while another agent is active · `.wo008-home`
   is not yours · platform Kernel is `~/.quantflow/kernel.db` · sandboxed `agent-path` false red
   (debt #23).
+- After K2: Law E **and** `kernel-one-path` both have allowlists — a new fixture that says
+  `kernel.db` must be spelled on **both** (or neither, if it avoids the patterns).
 
 ## Standing seat constraint
 
