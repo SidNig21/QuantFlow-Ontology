@@ -47,7 +47,7 @@ function toolText(result: CompatibilityCallToolResult): string {
 }
 
 export async function runActionTransportGate(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   const ctx = { trace_id: "action-transport-gate", span_id: "span-1" };
   execute(db, "create_run", { run_id: "gate-run-1", kind: "backtest", params: {} }, ctx);
   const eventsBefore = eventCount(db);
@@ -72,7 +72,7 @@ export async function runActionTransportGate(): Promise<void> {
     throw new Error(`G2: Kernel strict-parse error not visible at transport: ${text}`);
   }
 
-  const dbAfter = openKernel(kernelDbPath);
+  const dbAfter = openKernel(kernelDbPath, { readonly: true });
   const eventsAfter = eventCount(dbAfter);
   const rowsAfter = (
     dbAfter.query(`SELECT COUNT(*) AS n FROM run`).get() as { n: number }

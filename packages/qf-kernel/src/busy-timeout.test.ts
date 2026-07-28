@@ -18,7 +18,7 @@ describe("WO-K1 G2 busy_timeout turn-taking", () => {
     process.env[FIXTURE_ENV] = "1";
     const dir = mkdtempSync(join(tmpdir(), "qf-g2-ok-"));
     const path = join(dir, "kernel.db");
-    const setup = openKernel(path);
+    const setup = openKernel(path, { create: true });
     closeKernel(setup);
 
     const worker = join(dir, "writer.ts");
@@ -73,7 +73,7 @@ console.log("ok " + id);
     process.env[FIXTURE_ENV] = "1";
     const dir = mkdtempSync(join(tmpdir(), "qf-g2-ctrl-"));
     const path = join(dir, "kernel.db");
-    const setup = openKernel(path);
+    const setup = openKernel(path, { create: true });
     closeKernel(setup);
 
     const worker = join(dir, "writer0.ts");

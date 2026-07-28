@@ -29,7 +29,7 @@ export async function runKernelOneWorldGate(): Promise<number> {
   process.env.HOME = sandboxHome;
   process.env.QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY = "1";
 
-  const writer = openKernel(dbPath, { provenance: "explicit" });
+  const writer = openKernel(dbPath, { create: true, provenance: "explicit" });
   const created = execute(
     writer,
     "create_hypothesis",

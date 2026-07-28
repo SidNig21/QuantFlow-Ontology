@@ -186,7 +186,7 @@ function assertNamedTaskReachable(tools: ListedTool[]): void {
 }
 
 export async function runToolDiscoveryGate(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   closeKernel(db);
 
   const schemaModule = process.env.QF_READ_SCHEMA_MODULE;

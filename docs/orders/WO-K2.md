@@ -1,13 +1,24 @@
 # WO-K2 — The gate can see the door, and readers are readers
 
-status: **open — cuttable.** One adversarial pre-build read (`cursor-grok-4.5-high-fast`) returned
-DO NOT CUT; all ten findings fixed in this text and re-measured by the architect seat.
-Record: [`evidence/wo-k2/prebuild-read.md`](evidence/wo-k2/prebuild-read.md).
-assignee: builder
+status: **done — verified + merged 2026-07-27**, zero rework rounds.
+Record: [`evidence/wo-k2/VERIFICATION.md`](evidence/wo-k2/VERIFICATION.md).
+Pre-build: one adversarial read (DO NOT CUT → ten findings fixed)
+([`evidence/wo-k2/prebuild-read.md`](evidence/wo-k2/prebuild-read.md)). Builder tip `c9c3bf0`.
+assignee: builder (verified by architect seat)
 depends: WO-K1 — **done** (`61ce90d`)
-closes: ROADMAP debt #28
-blocks: WO-K3 (this rung ships the readonly **API** and the gate teeth WO-K3's carve-out needs;
-production projection readers arrive with WO-V1 — see RULING 3). Still ahead of WO-107b.
+closes: ROADMAP debt #28 — **closed**
+blocks: WO-K3 (readonly API + gate teeth shipped; production projection readers arrive with WO-V1).
+Still ahead of WO-107b.
+
+---
+
+## VERIFICATION (2026-07-27)
+
+**PASS.** Cold `/tmp/verify-k2` @ `c9c3bf0`, `GATE_RUNNER_EXIT=0` (21 gates). All baits
+re-run by verifier: G1 controls, G1b open∩¬write, falsify OPEN/WRITE with offender lines,
+G3b create-ban, D7 F1 SQL-on-open-allowlisted, package create/readonly tests 6/6.
+Judgment accepted: query-only reopens as readers; create-ban claim inside same gate.
+Full receipts: [`evidence/wo-k2/VERIFICATION.md`](evidence/wo-k2/VERIFICATION.md).
 
 ## Objective
 
