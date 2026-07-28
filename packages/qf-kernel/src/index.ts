@@ -18,7 +18,13 @@ export {
   type GetLinksOptions,
   type LinkRow,
 } from "./read.ts";
-export { closeKernel, openKernel } from "./db-bun.ts";
+export {
+  closeKernel,
+  openKernel,
+  KernelMissingFileError,
+  OpenKernelOptionsError,
+  type OpenKernelOptions,
+} from "./db-bun.ts";
 export {
   assertCreationHandlersComplete,
   creationHandlers,

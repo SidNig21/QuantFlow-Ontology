@@ -218,6 +218,7 @@ async function main(): Promise<number> {
   if (!dryRun) {
     mkdirSync(BUS_DIR, { recursive: true });
     const db = openKernel(resolved.path, {
+      create: true,
       provenance: resolved.provenance,
     });
     closeKernel(db);

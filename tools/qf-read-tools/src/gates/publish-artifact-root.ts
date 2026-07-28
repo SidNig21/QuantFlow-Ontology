@@ -110,7 +110,7 @@ async function assertRejectedOutsideRoot(
   label: string,
   path: string,
 ): Promise<void> {
-  const dbBefore = openKernel(kernelDbPath);
+  const dbBefore = openKernel(kernelDbPath, { readonly: true });
   const eventsBefore = eventCount(dbBefore);
   const rowsBefore = artifactRowCount(dbBefore);
   closeKernel(dbBefore);
@@ -133,7 +133,7 @@ async function assertRejectedOutsideRoot(
     throw new Error(`G1 ${label}: expected rejection message, got ${text}`);
   }
 
-  const dbAfter = openKernel(kernelDbPath);
+  const dbAfter = openKernel(kernelDbPath, { readonly: true });
   const eventsAfter = eventCount(dbAfter);
   const rowsAfter = artifactRowCount(dbAfter);
   closeKernel(dbAfter);
@@ -223,7 +223,7 @@ async function gateG3(): Promise<void> {
   writeFileSync(canary, "qf-106b-g3-canary");
   const canaryHash = contentHash(new TextEncoder().encode("qf-106b-g3-canary"));
 
-  const dbBefore = openKernel(kernelDbPath);
+  const dbBefore = openKernel(kernelDbPath, { readonly: true });
   const eventsBefore = eventCount(dbBefore);
   const rowsBefore = artifactRowCount(dbBefore);
   const hashesBefore = artifactHashes(dbBefore);
@@ -266,7 +266,7 @@ async function gateG3(): Promise<void> {
     throw new Error("G3: callTool on unconfigured server should fail");
   }
 
-  const dbAfter = openKernel(kernelDbPath);
+  const dbAfter = openKernel(kernelDbPath, { readonly: true });
   const eventsAfter = eventCount(dbAfter);
   const rowsAfter = artifactRowCount(dbAfter);
   const hashesAfter = artifactHashes(dbAfter);
@@ -336,7 +336,7 @@ async function measureServedActionCounts(): Promise<void> {
 }
 
 export async function runPublishArtifactRootGate(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   closeKernel(db);
 
   await gateG1();

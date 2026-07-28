@@ -98,7 +98,7 @@ export class PeerBus {
       );
     }
 
-    // Kernel db: domain truth. openKernel() creates + migrates via qf-kernel.
+    // Kernel db: domain truth. Opens existing file via qf-kernel (no create).
     this.kernelDb = openKernel(resolved.path, {
       provenance: resolved.provenance,
     });

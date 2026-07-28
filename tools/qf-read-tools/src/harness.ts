@@ -127,7 +127,7 @@ async function assertServedSet(client: Client, schema: Schema): Promise<void> {
 
 async function gateG2(): Promise<void> {
   console.log("\n=== G2 doctrine phase-exit gate ===");
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath); // writer: file already created by runHarness
   seedExperimentalTable(db);
   closeKernel(db);
 
@@ -219,7 +219,7 @@ async function gateToolPlaneActions(): Promise<void> {
     throw new Error(`GATE 1 error not visible at transport: ${badText}`);
   }
 
-  const dbAfterBad = openKernel(kernelDbPath);
+  const dbAfterBad = openKernel(kernelDbPath, { readonly: true });
   const eventsAfterBad = eventCount(dbAfterBad);
   const statusAfterBad = (
     dbAfterBad.query(`SELECT status FROM run WHERE id = ?`).get("harness-run-action") as {
@@ -262,7 +262,7 @@ async function gateIllegalTransition(): Promise<void> {
   console.log("tool_plane_illegal_transition=" + JSON.stringify(result));
   if (!result.isError) throw new Error("illegal complete_run from queued should fail");
 
-  const dbAfter = openKernel(kernelDbPath);
+  const dbAfter = openKernel(kernelDbPath, { readonly: true });
   const eventsAfter = eventCount(dbAfter);
   const status = (
     dbAfter.query(`SELECT status FROM run WHERE id = ?`).get("harness-run-illegal") as {
@@ -278,7 +278,7 @@ async function gateIllegalTransition(): Promise<void> {
 }
 
 export async function runHarness(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   closeKernel(db);
 
   await gateG2();
