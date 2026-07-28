@@ -108,6 +108,9 @@ export async function admitNativeTuiSpecies(opts: {
       ...(process.env.QF_KERNEL_DB
         ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
         : {}),
+      ...(process.env.QF_ARTIFACT_ROOT
+        ? { QF_ARTIFACT_ROOT: process.env.QF_ARTIFACT_ROOT }
+        : {}),
     },
     displayName,
   });

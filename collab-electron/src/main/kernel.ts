@@ -9,6 +9,7 @@ import {
   execute,
   getObject,
   queryObjects,
+  resolveArtifactRoot,
   resolveKernelPath,
   resolveSpeciesPackage as resolveSpeciesPackageRow,
   type ExecuteResult,
@@ -58,12 +59,19 @@ export function openAppKernel(): KernelDb {
   kernelPath = resolved.path;
   // D6: every agent spawn inherits this once the parent process carries it.
   process.env.QF_KERNEL_DB = resolved.path;
+  // WO-K3: artifact bytes share the platform root; inject for MCP/child seats.
+  process.env.QF_ARTIFACT_ROOT = resolveArtifactRoot().path;
   const raw = new DatabaseSync(kernelPath);
   kernelDb = attachKernel(wrapDatabaseSync(raw), {
     path: resolved.path,
     provenance: resolved.provenance,
   });
   return kernelDb;
+}
+
+/** Resolved artifact store for publish paths (WO-K3). */
+export function getArtifactRoot(): string {
+  return resolveArtifactRoot().path;
 }
 
 export function getKernelDb(): KernelDb {

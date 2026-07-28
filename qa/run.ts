@@ -19,6 +19,8 @@ import { runAgentPathGate } from "./gates/agent-path.ts";
 import { runDockRegistryGate } from "./gates/dock-registry.ts";
 import { runActionTransportGate } from "./gates/action-transport.ts";
 import { runBootReconcileGate } from "./gates/boot-reconcile.ts";
+import { runKernelDriftGate } from "./gates/kernel-drift.ts";
+import { runArtifactRootGate } from "./gates/artifact-root.ts";
 import { checkVerbRetirement } from "./gates/verb-retirement.ts";
 import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
 import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
@@ -442,6 +444,24 @@ const gates: Gate[] = [
       "WO-106 G5: boot reconciliation closes every acted-on session above 100 rows",
     run: async () => {
       const { ok } = await runBootReconcileGate();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-drift",
+    description:
+      "WO-K3 G1–G3/G6: object-type registry drift detector, attachKernel enforcement, canary incomplete DB",
+    run: async () => {
+      const { ok } = await runKernelDriftGate();
+      return ok;
+    },
+  },
+  {
+    name: "artifact-root",
+    description:
+      "WO-K3 G4/D5: resolveArtifactRoot default, publish under root, agent-host path grep",
+    run: async () => {
+      const { ok } = await runArtifactRootGate();
       return ok;
     },
   },

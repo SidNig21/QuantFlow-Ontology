@@ -1,0 +1,15 @@
+{
+  "name": "qa-kernel-drift",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gate": "bun ./run.ts"
+  },
+  "dependencies": {
+    "qf-kernel": "file:../../../packages/qf-kernel"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14"
+  }
+}

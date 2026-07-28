@@ -142,3 +142,40 @@ export class UnknownSpeciesError extends Error {
     this.species = species;
   }
 }
+
+/**
+ * Object-type registry disagrees with the shipping schema (WO-K3).
+ * Writable opens throw this before any domain write.
+ */
+export class KernelRegistryDriftError extends Error {
+  readonly missing: string[];
+  readonly retired: string[];
+  readonly inconsistent: string[];
+
+  constructor(drift: {
+    missing: string[];
+    retired: string[];
+    inconsistent: string[];
+  }) {
+    super(
+      `Kernel object-type registry drift: missing=[${drift.missing.join(",")}] retired=[${drift.retired.join(",")}] inconsistent=[${drift.inconsistent.join(",")}]`,
+    );
+    this.name = "KernelRegistryDriftError";
+    this.missing = drift.missing;
+    this.retired = drift.retired;
+    this.inconsistent = drift.inconsistent;
+  }
+}
+
+/**
+ * Database has a schema_meta table but is not a completed Kernel initialization
+ * (WO-K3 RULING 3). Bare migration CREATE TABLE cannot repair it in place.
+ */
+export class KernelIncompleteInitializationError extends Error {
+  constructor(detail: string) {
+    super(
+      `Kernel incomplete initialization: ${detail}. Wipe-and-recreate (SCOPES.md); do not repair in place.`,
+    );
+    this.name = "KernelIncompleteInitializationError";
+  }
+}

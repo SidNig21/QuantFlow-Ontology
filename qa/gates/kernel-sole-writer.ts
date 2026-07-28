@@ -67,6 +67,10 @@ const DRIVER_SQL_ALLOW = [
   // DELETE+INSERT (G4(c) stable-tiebreak proof; storage order is not a domain
   // operation). Links go through execute()'s links: envelope — not here.
   "qa/gates/vault-projection/fixture-seed.ts",
+  // WO-K3: pinned prior-schema fixture SQL (RULING 4 strategy A) — gate-only.
+  "qa/fixtures/kernel-drift/",
+  "qa/gates/kernel-drift/run.ts",
+  "qa/gates/artifact-root/run.ts",
 ];
 
 /**
@@ -95,6 +99,8 @@ const OPEN_ALLOW = [
   "qa/gates/dock-registry/run.ts",
   "qa/gates/boot-reconcile/run.ts",
   "qa/gates/agent-path/run.ts",
+  "qa/gates/kernel-drift/run.ts",
+  "qa/gates/artifact-root/run.ts",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
 ];
@@ -119,6 +125,8 @@ const WRITE_ALLOW = [
   "qa/gates/dock-registry/run.ts",
   "qa/gates/boot-reconcile/run.ts",
   "qa/gates/agent-path/run.ts",
+  "qa/gates/kernel-drift/run.ts",
+  "qa/gates/artifact-root/run.ts",
   "collab-electron/",
 ];
 

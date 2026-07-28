@@ -39,6 +39,7 @@ import {
   resolveSpeciesSessionEnv,
 } from "./host-mounts";
 import {
+  getArtifactRoot,
   kernelExecute,
   kernelGetObject,
   kernelListAgentSessions,
@@ -397,6 +398,9 @@ async function admitHostAcpSpecies(
   if (process.env.QF_KERNEL_DB) {
     hostAcpEnv.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
   }
+  if (process.env.QF_ARTIFACT_ROOT) {
+    hostAcpEnv.QF_ARTIFACT_ROOT = process.env.QF_ARTIFACT_ROOT;
+  }
   const handle = await admitHostAcp({
     command,
     args: ["acp"],
@@ -461,6 +465,9 @@ async function admitAgentOsSpecies(
   const merged: Record<string, string> = { ...fromConfig, ...opts?.env };
   if (process.env.QF_KERNEL_DB && !merged.QF_KERNEL_DB) {
     merged.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
+  }
+  if (process.env.QF_ARTIFACT_ROOT && !merged.QF_ARTIFACT_ROOT) {
+    merged.QF_ARTIFACT_ROOT = process.env.QF_ARTIFACT_ROOT;
   }
   const env =
     Object.keys(merged).length > 0 ? merged : undefined;
@@ -637,11 +644,8 @@ export async function runTurn(
 
   let artifactId: string | undefined;
   if (!opts?.skipPublish) {
-    const dir = join(
-      process.env.HOME ?? "/tmp",
-      ".collaborator",
-      "agent-artifacts",
-    );
+    // WO-K3: bytes live under resolveArtifactRoot() — not the legacy collaborator shelf.
+    const dir = getArtifactRoot();
     mkdirSync(dir, { recursive: true });
     const path = join(dir, `${sessionId}.md`);
     writeFileSync(path, text.length > 0 ? text : "(empty agent output)", "utf8");

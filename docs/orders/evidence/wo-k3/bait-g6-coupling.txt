@@ -1,0 +1,23 @@
+=== G6 BREAK (remove detector call entirely) ===
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../../packages/qf-kernel
+
+1 package installed [30.00ms]
+kernel-drift FAIL: attachKernel must call enforceObjectTypeRegistryDrift()
+FAIL  kernel-drift
+G6_BREAK_EXIT=1
+=== G6 RESTORE ===
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../../packages/qf-kernel
+
+1 package installed [34.00ms]
+kernel-drift G6 coupling: PASS
+kernel-drift G1: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+kernel-drift G2: PASS
+kernel-drift G3: PASS
+kernel-drift OK
+PASS  kernel-drift
+G6_RESTORE_EXIT=0

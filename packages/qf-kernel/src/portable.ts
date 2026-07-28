@@ -4,6 +4,8 @@
  */
 export {
   attachKernel,
+  enforceObjectTypeRegistryDrift,
+  getKernelDrift,
   logKernelBoot,
   migrationSqlPath,
   type AttachKernelOptions,
@@ -15,6 +17,15 @@ export {
   type KernelPathProvenance,
   type ResolvedKernelPath,
 } from "./resolve-path.ts";
+export {
+  resolveArtifactRoot,
+  type ArtifactRootProvenance,
+  type ResolvedArtifactRoot,
+} from "./resolve-artifact-root.ts";
+export {
+  detectObjectTypeRegistryDrift,
+  type RegistryDriftReport,
+} from "./registry-drift.ts";
 export {
   getLinks,
   getObject,
@@ -32,6 +43,8 @@ export {
   ContentHashMismatchError,
   IllegalTransitionError,
   KernelError,
+  KernelIncompleteInitializationError,
+  KernelRegistryDriftError,
   MissingSessionIdError,
   MissingTraceError,
   PackageRefUnresolvedError,
