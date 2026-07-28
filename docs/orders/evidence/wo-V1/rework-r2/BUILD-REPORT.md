@@ -35,7 +35,12 @@ GREEN_EXIT=0
 
 ## Cold suite
 
-Detached worktree `/tmp/verify-V1-r2` at the fix commit, zero root `node_modules`, unpiped.
-Full board summary recorded in `cold-all.txt` / footer `GATE_RUNNER_EXIT=0`.
+Detached worktree `/tmp/verify-V1-r2` at `5408f71`, **zero `node_modules`**
+(`COLD_CONFIRMED`), unpiped. Full output: `cold-all.txt`.
+
+```
+PASS  repo-shape … vault-projection   (22 gates)
+GATE_RUNNER_EXIT=0
+```
 
 Round 1 skip / bodies / wikilinks not re-litigated.
