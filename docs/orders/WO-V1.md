@@ -355,3 +355,52 @@ deliverables have never been observed outside synthetic fixtures**: the artifact
 and wikilink emission. Both pass the suite; neither has been watched against the founder's Kernel.
 With the databases rebuilt, a real run can now complete — **these are the round's actual work**, and
 they must be re-verified against real data before this order can pass.
+
+---
+
+# REWORK ROUND 2 — cold board still red (one defect)
+
+**Status: rework.** Verification of tip `c2d69d2` on 2026-07-27 recorded REWORK
+([`evidence/wo-V1/VERIFICATION-ROUND-2.md`](evidence/wo-V1/VERIFICATION-ROUND-2.md)). Branch open,
+nothing merged. Round 1 substance (skip + real observation) was re-derived and holds; the cold
+board does not.
+
+## Defect 1 — `kernel-one-path` fails on the vault-projection gate
+
+**In plain terms:** a new test file for the vault builds temporary database paths using the
+filename `kernel.db`, and the gate that forbids inventing Kernel paths outside a short allowlist
+was never told that file is allowed — so the whole board stays red even though the projector itself
+is fine.
+
+**Measured (verifier, cold `/tmp/verify-V1` @ `c2d69d2`):**
+
+```
+kernel-one-path G1: offenders outside allowlist:
+  - tools/qf-vault-projection/src/gate.ts (kernel.db path construction/literal)
+FAIL  kernel-one-path
+GATE_RUNNER_EXIT=1
+```
+
+Control on `main` (no vault package): `kernel-one-path` **PASS**. So this is branch-introduced.
+
+Builder allowlisted the projector under **Law E** (`kernel-sole-writer` OPEN / WRITE /
+`PRODUCTION_NO_CREATE`) after merging K2, and ran that gate green — but never touch
+`qa/gates/kernel-sole-writer.ts`'s sibling **`qa/gates/kernel-one-path.ts`**, and did not run
+`kernel-one-path` in the static set they reported. Same composition class as K2 fallout: a new
+fixture gate that constructs `join(dir, "kernel.db")` (lines 122 and 715) must be spelled on the
+one-path allowlist the way `tools/qf-read-tools/src/harness.ts` and peer-bus harness already are.
+
+**Fix (this round only — do not widen):**
+
+1. Add `tools/qf-vault-projection/src/gate.ts` to `ALLOW_PREFIXES` in
+   `qa/gates/kernel-one-path.ts`, with a one-line comment that it is a fixture gate constructing
+   temp Kernel paths (same shape as other harnesses). Adding further vault-projection files is a
+   finding to report, not a quiet edit — only add what the greps actually hit.
+2. Prove: unmodified tip → `kernel-one-path` red on `gate.ts`; after allowlist → green; cold
+   `bun qa/run.ts --all` → `GATE_RUNNER_EXIT=0`.
+3. Do **not** re-litigate skip / bodies / wikilinks unless a gate goes red on them. Round 1
+   substance was independently re-observed (5 artifacts INLINE after hash match; bait
+   `no such table: competitor` → restore green).
+
+**Out of this round:** rewriting the gate to avoid the string `kernel.db`; renaming the projector;
+touching `resolveKernelPath`; WO-K3; product identity.
