@@ -35,22 +35,20 @@ the exact blindness it exists to catch.
 
 ## The ladder is blocked on an architect duty, not a builder one
 
-**[WO-K1](WO-K1.md) verified PASS** 2026-07-27 at `20488f8`, zero rework rounds, 21 gates cold,
-`GATE_RUNNER_EXIT=0`. One Kernel path, WAL turn-taking, pins stripped, seats start. **Debt #29
-half-closed** (path); bytes/orphan remain for WO-K3.
+**[WO-K1](WO-K1.md) verified PASS** 2026-07-27 at `20488f8` / merged `61ce90d`, zero rework rounds,
+21 gates cold, `GATE_RUNNER_EXIT=0`. One Kernel path, WAL turn-taking, pins stripped, seats start.
+**Debt #29 half-closed** (path); bytes/orphan remain for WO-K3.
 
-**The next ladder rung, WO-K2, has no order file.** `SCOPES.md` §"The identity rungs" carries it as a
-*contract only* (the gate can see who opens the Kernel; readers hold readonly handles; typo stops
-minting empty worlds). A contract is not an order. **No builder can take the ladder until that order
-is written** — an architect duty.
+**[WO-K2](WO-K2.md) is drafted** — the gate sees `openKernel`, readers are readonly, create-on-miss
+is opt-in; closes debt #28. Status: **draft, awaiting one adversarial pre-build read before cut.**
+Not builder-ready until that read returns and findings (if any) are fixed in the order text.
 
-Behind it: **WO-K3** (bytes follow truth; drift refuses writes), then **WO-107b** (market-plane bulk
-ingest — also contract-only until written), **WO-107** (first market — **Bovada sportsbook only**,
-doctrine A7; **its order may not be written until the external-surface probe runs**), **WO-108**,
-then **WO-109/110/111** — the loop, the critic, and the one-shot proof.
+Behind a cut WO-K2: **WO-K3** (bytes follow truth; drift refuses writes), then **WO-107b**
+(market-plane bulk ingest — also contract-only until written), **WO-107** (first market —
+**Bovada sportsbook only**, doctrine A7; **its order may not be written until the external-surface
+probe runs**), **WO-108**, then **WO-109/110/111**.
 
-**Identity rung 1 of 3 done.** Market data still waits on K2 → K3 → WO-107b. That ordering is the
-protection: fixtures from here come from someone else.
+**Identity rung 1 of 3 done; rung 2 drafted.** Market data still waits on K2 → K3 → WO-107b.
 
 ## Read this before you write a gate — it cost the project a full verification round
 
