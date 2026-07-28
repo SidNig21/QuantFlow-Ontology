@@ -534,6 +534,34 @@ rejected against the relocated root.
 
 ---
 
+## Product identity — parked until after WO-K3 (inserted 2026-07-27)
+
+**Why this exists.** The app still ships, publishes, and stores state as Collaborator while the
+mission is QuantFlow Ontology. Measured: `productName: Collaborator`, `appId: com.collaborator.desktop`,
+`publish` → `collabs-inc/collab-public`, app data under `~/.collaborator/` (`paths.ts:5`). That is
+product identity, not the fork seam.
+
+**Why not now.** Relocating `~/.collaborator/` while WO-K3 relocates artifact bytes is two migrations
+with no runner. Kernel is already at `~/.quantflow/kernel.db` (K1). Order: **K1 → K2 → K3 → WO-N1**.
+
+### WO-N1 · Product identity: QuantFlow, not Collaborator
+
+**Objective.** Every product-facing surface says QuantFlow; app-local data lives under
+`~/.quantflow/app/`; release target is this repo.
+
+**Depends on.** WO-K3 — hard.
+
+**In.** Packaging fields · `paths.ts` BASE + `COLLAB_DIR`→`QF_APP_DIR` · copy-on-first-boot from
+`~/.collaborator` · `install.sh` / CLI user-visible strings · static gate `product-identity` with bait.
+
+**Out (ruled, do not "helpfully" include).** Renaming directory `collab-electron/` · changing the
+`upstream` remote URL · erasing LICENSE / NOTICE / START_HERE lineage · Kernel or artifact paths
+(already owned by K1/K3) · historical evidence prose.
+
+**Full draft:** [`WO-N1.md`](WO-N1.md) — parked until K3 verifies; then cut with a pre-build read.
+
+---
+
 ### WO-107b · Market-plane bulk ingest · **contract only (WO-103b)**
 
 **Objective.** Pipeline-fed market rows (`instrument`, `quote`) land in the Kernel through one

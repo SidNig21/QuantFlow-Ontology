@@ -58,7 +58,16 @@ verifies.
 
 ## Parked / parallel
 
-Design overhaul · debt #20 · debt #17 · debt #19 · debt #22 · debt #26 — unchanged triggers.
+**WO-N1 — product identity** — parked until **after WO-K3**. Draft at [`WO-N1.md`](WO-N1.md). Fixes
+window name, appId, release target, and `~/.collaborator` → `~/.quantflow/app`. **Does not** rename
+`collab-electron/` or the `upstream` remote (fork seam). Debt #30.
+
+**Design overhaul** — founder-run, off the critical path; returns as a brief with measured scope and
+falsifiable gates, and must fit `one-skin`. **Market-abstraction test** — debt #20, trigger-gated.
+**Durable execution** — debt #17, trigger-gated. **Promotion authority + freeze-lint bypass** — debt
+#19 (`promote_type` deleted by WO-103b; its fixing order re-adds the action). **Caller identity** —
+debt #22; WO-105 narrowed the served surface but the lock is still unbuilt. **Nested-key smuggling** —
+debt #26; owned by whichever of WO-107b or WO-109/110 arrives first.
 
 ---
 
