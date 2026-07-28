@@ -74,6 +74,10 @@ const child = spawn(hermesBin, ["acp"], {
     HOME: home,
     // Minimal PATH so a shebang wrapper can find bash/env if HERMES_BIN is a script.
     PATH: process.env.PATH ?? "/usr/bin:/bin",
+    // WO-K1 D6: forward the Kernel path; do not spread process.env.
+    ...(process.env.QF_KERNEL_DB
+      ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
+      : {}),
   },
 }) as ChildProcessWithoutNullStreams;
 

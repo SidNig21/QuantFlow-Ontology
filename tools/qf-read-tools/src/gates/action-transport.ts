@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /** WO-106 G2 gate — MCP is not a validator for action tools. */
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -10,6 +10,8 @@ import { closeKernel, eventCount, execute, openKernel } from "qf-kernel";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-action-transport-"));
 const kernelDbPath = join(workDir, "kernel.db");
+const artifactRootPath = join(workDir, "artifact-root");
+mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "..", "server.ts");
 
 function envFor(overrides: Record<string, string>): Record<string, string> {
@@ -24,7 +26,11 @@ async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client
   const transport = new StdioClientTransport({
     command: "bun",
     args: [serverEntry],
-    env: envFor({ QF_KERNEL_DB: kernelDbPath, ...extraEnv }),
+    env: envFor({
+      QF_KERNEL_DB: kernelDbPath,
+      QF_ARTIFACT_ROOT: artifactRootPath,
+      ...extraEnv,
+    }),
   });
   const client = new Client({ name: "qf-action-transport-gate", version: "0.1.0" });
   await client.connect(transport);
@@ -41,7 +47,7 @@ function toolText(result: CompatibilityCallToolResult): string {
 }
 
 export async function runActionTransportGate(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   const ctx = { trace_id: "action-transport-gate", span_id: "span-1" };
   execute(db, "create_run", { run_id: "gate-run-1", kind: "backtest", params: {} }, ctx);
   const eventsBefore = eventCount(db);
@@ -66,7 +72,7 @@ export async function runActionTransportGate(): Promise<void> {
     throw new Error(`G2: Kernel strict-parse error not visible at transport: ${text}`);
   }
 
-  const dbAfter = openKernel(kernelDbPath);
+  const dbAfter = openKernel(kernelDbPath, { readonly: true });
   const eventsAfter = eventCount(dbAfter);
   const rowsAfter = (
     dbAfter.query(`SELECT COUNT(*) AS n FROM run`).get() as { n: number }

@@ -20,7 +20,9 @@ import { runDockRegistryGate } from "./gates/dock-registry.ts";
 import { runActionTransportGate } from "./gates/action-transport.ts";
 import { runBootReconcileGate } from "./gates/boot-reconcile.ts";
 import { checkVerbRetirement } from "./gates/verb-retirement.ts";
+import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
 import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
+import { runKernelOnePathGate } from "./gates/kernel-one-path.ts";
 import { runVaultProjectionGate } from "./gates/vault-projection.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
@@ -300,9 +302,18 @@ const gates: Gate[] = [
   {
     name: "kernel-sole-writer-app",
     description:
-      "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference kernel.db",
+      "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference the Kernel db file",
     run: () => {
       const { ok } = checkKernelSoleWriterApp();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-one-path",
+    description:
+      "WO-K1: one Kernel resolver; WAL/busy_timeout; MCP seat shares the default world",
+    run: async () => {
+      const { ok } = await runKernelOnePathGate();
       return ok;
     },
   },
@@ -384,6 +395,15 @@ const gates: Gate[] = [
       "WO-106 G2: action tools stay permissive at MCP transport; Kernel rejects unknown keys",
     run: async () => {
       const { ok } = await runActionTransportGate();
+      return ok;
+    },
+  },
+  {
+    name: "publish-artifact-root",
+    description:
+      "WO-106b G1/G2/G3: publish_artifact path confined to QF_ARTIFACT_ROOT; fail closed without root",
+    run: async () => {
+      const { ok } = await runPublishArtifactRootGate();
       return ok;
     },
   },

@@ -127,6 +127,11 @@ async function main(): Promise<void> {
   const taskBody = `TASK-${runId}: summarize the plan`;
   const resultBody = `RESULT-${runId}: done`;
 
+  // WO-K2 F10: pre-create Kernel so bus.ts children open the existing file
+  // without { create: true } (production openers must never create).
+  const preCreate = openKernel(kernelDbPath, { create: true });
+  closeKernel(preCreate);
+
   // -------------------------------------------------------------------
   // Round trip: two long-lived clients for this phase, one per role.
   // -------------------------------------------------------------------
@@ -178,7 +183,7 @@ async function main(): Promise<void> {
   // Kernel-computed content hashes matching the message bytes.
   // -------------------------------------------------------------------
   console.log("\n=== independent Kernel re-query ===");
-  let freshKernel: KernelDb = openKernel(kernelDbPath);
+  let freshKernel: KernelDb = openKernel(kernelDbPath, { readonly: true });
   try {
     const rows = freshKernel
       .query(`SELECT id, kind, content_hash, storage_ref FROM artifact ORDER BY created_at ASC`)
@@ -266,7 +271,7 @@ async function main(): Promise<void> {
   // delivered. This is the load-bearing claim of the whole order — the
   // Kernel is the domain-truth writer, the bus is just routing.
   // -------------------------------------------------------------------
-  const finalKernel = openKernel(kernelDbPath);
+  const finalKernel = openKernel(kernelDbPath, { readonly: true });
   try {
     const redHash = contentHash(new TextEncoder().encode(redBody));
     const row = finalKernel

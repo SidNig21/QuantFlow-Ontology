@@ -2,7 +2,7 @@
 /**
  * WO-105 tool-plane harness: read + action tools over real MCP transport.
  */
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -21,6 +21,8 @@ import type { Schema } from "qf-kernel-schema/define";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-tool-plane-harness-"));
 const kernelDbPath = join(workDir, "kernel.db");
+const artifactRootPath = join(workDir, "artifact-root");
+mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "server.ts");
 const fixtureSchema = join(import.meta.dir, "fixtures/experimental-schema.ts");
 const observeLeakSchema = join(import.meta.dir, "fixtures/observe-leak-schema.ts");
@@ -40,7 +42,7 @@ async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client
   const transport = new StdioClientTransport({
     command: "bun",
     args: [serverEntry],
-    env: envFor({ QF_KERNEL_DB: kernelDbPath, ...extraEnv }),
+    env: envFor({ QF_KERNEL_DB: kernelDbPath, QF_ARTIFACT_ROOT: artifactRootPath, ...extraEnv }),
   });
   const client = new Client({ name: "qf-tool-plane-harness", version: "0.1.0" });
   await client.connect(transport);
@@ -125,7 +127,7 @@ async function assertServedSet(client: Client, schema: Schema): Promise<void> {
 
 async function gateG2(): Promise<void> {
   console.log("\n=== G2 doctrine phase-exit gate ===");
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath); // writer: file already created by runHarness
   seedExperimentalTable(db);
   closeKernel(db);
 
@@ -217,7 +219,7 @@ async function gateToolPlaneActions(): Promise<void> {
     throw new Error(`GATE 1 error not visible at transport: ${badText}`);
   }
 
-  const dbAfterBad = openKernel(kernelDbPath);
+  const dbAfterBad = openKernel(kernelDbPath, { readonly: true });
   const eventsAfterBad = eventCount(dbAfterBad);
   const statusAfterBad = (
     dbAfterBad.query(`SELECT status FROM run WHERE id = ?`).get("harness-run-action") as {
@@ -260,7 +262,7 @@ async function gateIllegalTransition(): Promise<void> {
   console.log("tool_plane_illegal_transition=" + JSON.stringify(result));
   if (!result.isError) throw new Error("illegal complete_run from queued should fail");
 
-  const dbAfter = openKernel(kernelDbPath);
+  const dbAfter = openKernel(kernelDbPath, { readonly: true });
   const eventsAfter = eventCount(dbAfter);
   const status = (
     dbAfter.query(`SELECT status FROM run WHERE id = ?`).get("harness-run-illegal") as {
@@ -276,7 +278,7 @@ async function gateIllegalTransition(): Promise<void> {
 }
 
 export async function runHarness(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   closeKernel(db);
 
   await gateG2();

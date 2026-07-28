@@ -9,6 +9,11 @@ import {
 } from "qf-kernel-schema/mcp";
 import type { Schema } from "qf-kernel-schema/define";
 import { z } from "zod";
+import {
+  assertPathWithinArtifactRoot,
+  shouldServePublishArtifact,
+  type ArtifactRoot,
+} from "./artifact-root.ts";
 import { installToolsListHandler } from "./discovery.ts";
 
 const getToolInput = z.object({
@@ -115,11 +120,15 @@ export function registerActionTools(
   server: McpServer,
   db: KernelDb,
   schema: Schema,
+  artifactRoot: ArtifactRoot,
 ): McpToolDefinition[] {
   const registered: McpToolDefinition[] = [];
 
   for (const action of schema.actions) {
     if (action.operatorOnly === true) continue;
+    if (action.name === "publish_artifact" && !shouldServePublishArtifact(artifactRoot)) {
+      continue;
+    }
     const def = actionToolForAction(action);
     registered.push(def);
 
@@ -131,6 +140,14 @@ export function registerActionTools(
       },
       async (args: Record<string, unknown>) => {
         try {
+          if (
+            action.name === "publish_artifact" &&
+            artifactRoot !== null &&
+            typeof args.path === "string" &&
+            args.path.length > 0
+          ) {
+            assertPathWithinArtifactRoot(artifactRoot, args.path);
+          }
           const result = execute(
             db,
             action.name,
@@ -156,9 +173,10 @@ export function registerAllTools(
   server: McpServer,
   db: KernelDb,
   schema: Schema,
+  artifactRoot: ArtifactRoot,
 ): McpToolDefinition[] {
   const read = registerReadTools(server, db, schema);
-  const actions = registerActionTools(server, db, schema);
-  installToolsListHandler(server, schema);
+  const actions = registerActionTools(server, db, schema, artifactRoot);
+  installToolsListHandler(server, schema, artifactRoot);
   return [...read, ...actions];
 }

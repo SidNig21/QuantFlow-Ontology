@@ -4,14 +4,18 @@
  * Writes `mcp_servers.qf-peer-bus` into each profile's config.yaml directly
  * (Hermes `mcp add` is interactive / TTY-gated — not agent-safe).
  *
+ * WO-K1: does not emit QF_KERNEL_DB — seats fall through to resolveKernelPath().
+ * SERVER_TS must resolve inside a real git work tree (refuses scratchpad bakes).
+ *
  *   bun run setup-seats
  *   bun run setup-seats -- --dry-run
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { closeKernel, openKernel } from "qf-kernel";
+import { closeKernel, openKernel, resolveKernelPath } from "qf-kernel";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = resolve(HERE, "..");
@@ -19,8 +23,8 @@ const REPO_ROOT = resolve(PKG_ROOT, "../..");
 const SERVER_TS = join(PKG_ROOT, "src/server.ts");
 const HOME = process.env.HOME ?? homedir();
 const BUS_DIR = join(HOME, ".qf-peer-bus");
-const KERNEL_DB = join(BUS_DIR, "kernel.db");
 const PEER_BUS_DB = join(BUS_DIR, "peer-bus.db");
+const BASE_HERMES_CONFIG = join(HOME, ".hermes/config.yaml");
 
 const PROFILES = [
   { profile: "qf-orchestrator", role: "orchestrator" },
@@ -37,7 +41,49 @@ function which(bin: string): string | null {
   return null;
 }
 
+/**
+ * Refuse to bake a SERVER_TS that is not inside a real git work tree.
+ * Scratchpad / cursorfs copies produced the dead absolute paths measured 2026-07-27.
+ */
+function assertServerInsideGitWorkTree(serverTs: string): void {
+  if (!existsSync(serverTs)) {
+    throw new Error(
+      `setup-founder-seats: SERVER_TS does not exist: ${serverTs}`,
+    );
+  }
+  const dir = dirname(serverTs);
+  let inside: string;
+  let toplevel: string;
+  try {
+    inside = execFileSync("git", ["rev-parse", "--is-inside-work-tree"], {
+      cwd: dir,
+      encoding: "utf8",
+    }).trim();
+    toplevel = execFileSync("git", ["rev-parse", "--show-toplevel"], {
+      cwd: dir,
+      encoding: "utf8",
+    }).trim();
+  } catch {
+    throw new Error(
+      `setup-founder-seats: SERVER_TS is not inside a git work tree: ${serverTs}`,
+    );
+  }
+  if (inside !== "true") {
+    throw new Error(
+      `setup-founder-seats: SERVER_TS is not inside a git work tree: ${serverTs}`,
+    );
+  }
+  const realServer = realpathSync(serverTs);
+  const realRoot = realpathSync(toplevel);
+  if (realServer !== realRoot && !realServer.startsWith(realRoot + "/")) {
+    throw new Error(
+      `setup-founder-seats: SERVER_TS resolves outside git toplevel ${realRoot}: ${realServer}`,
+    );
+  }
+}
+
 function mcpBlock(role: string, bunBin: string): string {
+  // QF_KERNEL_DB deliberately omitted — child falls through to resolveKernelPath().
   return [
     "mcp_servers:",
     "  qf-peer-bus:",
@@ -46,11 +92,27 @@ function mcpBlock(role: string, bunBin: string): string {
     `      - ${SERVER_TS}`,
     "    env:",
     `      QF_PEER_ROLE: ${role}`,
-    `      QF_KERNEL_DB: ${KERNEL_DB}`,
     `      QF_PEER_BUS_DB: ${PEER_BUS_DB}`,
     "    enabled: true",
     "",
   ].join("\n");
+}
+
+/** Strip QF_KERNEL_DB pin lines from a YAML file (migration for out-of-repo configs). */
+function stripKernelDbPins(configPath: string, dryRun: boolean): boolean {
+  if (!existsSync(configPath)) return false;
+  const text = readFileSync(configPath, "utf8");
+  let next = text.replace(/^[ \t]*QF_KERNEL_DB:[^\n]*\n/gm, "");
+  // If env: is now empty (only the key left), drop the empty map entry.
+  next = next.replace(/^[ \t]*env:\n(?=[ \t]*[a-z_])/gm, "");
+  if (next === text) return false;
+  if (dryRun) {
+    console.log(`# would strip QF_KERNEL_DB pin(s) from ${configPath}`);
+    return true;
+  }
+  writeFileSync(configPath, next);
+  console.log(`setup-founder-seats: stripped QF_KERNEL_DB pin(s) from ${configPath}`);
+  return true;
 }
 
 /** Upsert mcp_servers.qf-peer-bus in a Hermes profile config.yaml. */
@@ -119,12 +181,23 @@ async function mcpTest(hermesBin: string, profile: string): Promise<boolean> {
 
 async function main(): Promise<number> {
   const dryRun = process.argv.includes("--dry-run");
+  const resolved = resolveKernelPath();
+
   console.log("setup-founder-seats: peer-bus canvas PASS");
   console.log(`setup-founder-seats: repo=${REPO_ROOT}`);
   console.log(`setup-founder-seats: server=${SERVER_TS}`);
-  console.log(`setup-founder-seats: kernel=${KERNEL_DB}`);
+  console.log(
+    `setup-founder-seats: kernel=${resolved.path} provenance=${resolved.provenance}`,
+  );
   console.log(`setup-founder-seats: bus=${PEER_BUS_DB}`);
   if (dryRun) console.log("setup-founder-seats: DRY-RUN (no writes)");
+
+  try {
+    assertServerInsideGitWorkTree(SERVER_TS);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    return 2;
+  }
 
   const bunBin = which("bun");
   if (!bunBin) {
@@ -138,18 +211,20 @@ async function main(): Promise<number> {
     );
     return 2;
   }
-  if (!existsSync(SERVER_TS)) {
-    console.error(`setup-founder-seats: missing server at ${SERVER_TS}`);
-    return 2;
-  }
+
+  // Base Hermes config (quantflow MCP) — strip any absolute Kernel pin.
+  stripKernelDbPins(BASE_HERMES_CONFIG, dryRun);
 
   if (!dryRun) {
     mkdirSync(BUS_DIR, { recursive: true });
-    const db = openKernel(KERNEL_DB);
+    const db = openKernel(resolved.path, {
+      create: true,
+      provenance: resolved.provenance,
+    });
     closeKernel(db);
-    console.log("setup-founder-seats: Kernel schema ready at", KERNEL_DB);
+    console.log("setup-founder-seats: Kernel schema ready at", resolved.path);
   } else {
-    console.log(`$ openKernel(${KERNEL_DB})`);
+    console.log(`$ openKernel(${resolved.path})`);
   }
 
   for (const { profile, role } of PROFILES) {

@@ -8,6 +8,7 @@
     "harness": "bun src/harness.ts",
     "gate:tool-discovery": "bun src/gates/tool-discovery.ts",
     "gate:action-transport": "bun src/gates/action-transport.ts",
+    "gate:publish-artifact-root": "bun src/gates/publish-artifact-root.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

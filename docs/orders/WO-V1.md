@@ -294,3 +294,64 @@ Scoreboard: WO-103 no read → 2 rework rounds; WO-103b → 0; WO-104 → 1; WO-
 structurally uncatchable blockers; WO-106 → 0; WO-106b read → 8 findings, 3 High; **WO-V1 read → 11
 findings, 6 High, including a hash gate that verified nothing and a Law E tripwire the order never
 mentioned.**
+
+---
+
+# REWORK ROUND 1 — the ruling, and what changed under it
+
+**Status: rework, scope reduced.** Verification round 1 recorded REWORK at `52c435a` on 2026-07-27
+([`evidence/wo-V1/VERIFICATION-ROUND-1.md`](evidence/wo-V1/VERIFICATION-ROUND-1.md)). Branch open,
+nothing merged. This section was added when the doors were rotated on 2026-07-27; the ruling below
+was made at verification time and had until then existed only in a commit message, which is not a
+place a builder reads. That is the defect this section closes.
+
+## The ruling (architect, final — unchanged)
+
+**A declared object type with no table in this database is skipped, not fatal.** Query
+`sqlite_master` once for the table set, project the intersection, and **write a plain-text note in
+the run summary naming every declared type that was skipped and why.** Silence is not acceptable — a
+projection that quietly omits seven types is the second-truth-store failure wearing a new costume.
+
+Do **not** fix this by dropping `readonly: true` so the migration runs. A read-only projection must
+never mutate the Kernel; migrating the founder's live database as a side effect of generating notes
+would be a far worse defect than the crash.
+
+**Gate:** point the projector at a database missing at least one declared type's table; assert it
+completes successfully, projects the types that do exist, and names the skipped ones. Bait: restore
+the crash-on-missing behaviour → red.
+
+## What changed after the ruling was made — read this before you scope the round
+
+The crash was a **symptom of database drift, not a bug in the projector.** Both live Kernels were
+rebuilt on 2026-07-27 at 01:18 (originals preserved alongside as
+`kernel.db.pre-wo102-20260727-011825`; restore is a `mv`). Re-measured independently during this
+rotation, against `~/.collaborator/dev/worktree-ada48d49dc49/kernel.db` and
+`~/.qf-peer-bus/kernel.db`:
+
+| | Before (verification round 1) | Now (measured 2026-07-27) |
+|---|---|---|
+| Tables | 16 of 23 declared | **26** |
+| `market_event` `instrument` `quote` `venue` `mission` `policy` `environment` | all **missing** | all **present** |
+| Stale `market` · `odds_series` · duplicate `event` | present | **gone** |
+
+**Three consequences for this round, in order:**
+
+1. **The crash is no longer reproducible on today's databases.** It is **robustness, not a blocker.**
+   Do not scope this round as though the projector is broken — it is not, on any Kernel now on disk.
+2. **The ruling still stands anyway.** There is no migration runner; `SCOPES.md:105` makes
+   wipe-and-recreate the ritual for a rung that renames types, with no `ALTER` story. The next rename
+   re-creates this exact condition, and **no gate can see it** — gates build their fixture database
+   from the same schema they check, so both sides always agree. The founder's real database was the
+   only thing in the system capable of disagreeing, and nothing was watching it.
+3. **The gate is now harder to build, and that is the point.** Round 1 noted "today's real Kernel is a
+   valid fixture — 7 of 23 missing." **That fixture no longer exists.** The gate must construct a
+   deliberately incomplete database rather than borrow a broken one, and it must do so from a source
+   that is *not* the live schema, or it inherits the very blindness it exists to catch.
+
+## The real substance of this round
+
+The crash prevented the checking seat from ever completing a run against real data, so **two
+deliverables have never been observed outside synthetic fixtures**: the artifact-body rendering path
+and wikilink emission. Both pass the suite; neither has been watched against the founder's Kernel.
+With the databases rebuilt, a real run can now complete — **these are the round's actual work**, and
+they must be re-verified against real data before this order can pass.

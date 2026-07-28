@@ -5,7 +5,7 @@
  * Fixture hook (set before launch):
  *   QF_READ_SCHEMA_MODULE=<fixture>  — G1 bait (b): fixture schema drives advertisement
  */
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -19,6 +19,8 @@ import type { Schema } from "qf-kernel-schema/define";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-tool-discovery-"));
 const kernelDbPath = join(workDir, "kernel.db");
+const artifactRootPath = join(workDir, "artifact-root");
+mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "..", "server.ts");
 
 function envFor(overrides: Record<string, string>): Record<string, string> {
@@ -33,7 +35,11 @@ async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client
   const transport = new StdioClientTransport({
     command: "bun",
     args: [serverEntry],
-    env: envFor({ QF_KERNEL_DB: kernelDbPath, ...extraEnv }),
+    env: envFor({
+      QF_KERNEL_DB: kernelDbPath,
+      QF_ARTIFACT_ROOT: artifactRootPath,
+      ...extraEnv,
+    }),
   });
   const client = new Client({ name: "qf-tool-discovery-gate", version: "0.1.0" });
   await client.connect(transport);
@@ -180,7 +186,7 @@ function assertNamedTaskReachable(tools: ListedTool[]): void {
 }
 
 export async function runToolDiscoveryGate(): Promise<void> {
-  const db = openKernel(kernelDbPath);
+  const db = openKernel(kernelDbPath, { create: true });
   closeKernel(db);
 
   const schemaModule = process.env.QF_READ_SCHEMA_MODULE;

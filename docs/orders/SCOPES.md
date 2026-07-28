@@ -351,6 +351,217 @@ second command may be added to the allowlist only when a canvas tile must invoke
 renderer; that addition is now debt #22's trigger alongside any `observe_ticket` callsite. WO-103b
 changes nothing in `collab-electron`.
 
+## The identity rungs — inserted 2026-07-27, all three before WO-107b
+
+**Why these exist.** The post-merge review of 2026-07-27
+([`evidence/post-merge-review-kernel-identity.md`](evidence/post-merge-review-kernel-identity.md),
+debt #28 and #29) measured the live machine and found **three Kernel files and zero shared events
+between them**. The app resolves one path, the agent seats another, and a third is a week-old
+copy holding the only history that exists. Every write path in P2 and P3 was built correctly and
+built in the wrong number of places.
+
+**This is not a defect in the write path.** Re-measured here: domain mutations in app and tool
+code still go through `execute()`; there is no ad-hoc SQL outside `packages/qf-kernel`. The
+model holds. What was never built is the sentence *"and there is exactly one of these, here."*
+
+The One Rule is one sentence. Operationally it needs six properties:
+
+| # | Property | State on 2026-07-27 | Closed by |
+|---|---|---|---|
+| 1 | One Kernel, one path, resolved identically by every process | ✗ three files, 0 shared events | **WO-K1** |
+| 2 | Every process resolves that path through **one function**, never its own arithmetic | ✗ `openAppKernel` derives its own from `COLLAB_DIR`; `getKernelPath()` (`kernel.ts:68`) has zero callers | **WO-K1** |
+| 3 | All writers go through `execute()` | ✓ true in practice | — already holds |
+| 4 | The gate can **prove** property 3 | ✗ blind to `openKernel` | **WO-K2** |
+| 5 | Bytes referenced by truth live under truth's root | ✗ global shelf vs per-worktree Kernel | **WO-K3** |
+| 6 | A drifted or fake Kernel refuses writes | ✗ an empty `schema_meta` is accepted | **WO-K3** |
+
+> **Property 2 is worded deliberately.** The review's draft read *"every process is TOLD the path,
+> never left to guess."* That is not what WO-K1 ships — WO-K1 ships a **default**, and a default is
+> a consistent guess rather than an injection. Stated as injection, a gate could pass while three
+> processes still resolved three paths. The falsifiable property is *one function computes it*.
+
+**Sequencing is load-bearing and is not a matter of taste.** Two couplings, both measured:
+
+1. **WAL and `busy_timeout` belong to WO-K1, not to a later rung.** Today the three processes never
+   contend, because they never share a file — the isolation defect is also the only thing
+   preventing a liveness defect. `packages/qf-kernel/src/db.ts:71` sets exactly one pragma
+   (`foreign_keys`), so SQLite runs at its defaults: rollback journal, and `busy_timeout = 0`.
+   Unifying the path without the concurrency settings points a long-lived Electron write handle
+   (`kernel.ts:49-61`, `BEGIN IMMEDIATE` at `:35`), the `qf-read-tools` server (`server.ts:32`,
+   read-write today) and `qf-peer-bus` at one file with zero wait — and, under a rollback journal,
+   the loser fails instantly rather than waiting. The failures would be **intermittent**, because app
+   writes are brief. WO-K1 must not ship the path unification alone.
+
+   **Corrected 2026-07-27 at WO-K1's third read.** This paragraph previously ended "under a rollback
+   journal, a writer locks readers out entirely." That is **wrong** — readers proceed for the whole
+   `BEGIN IMMEDIATE` window and blip only during the brief exclusive phase of commit. Measured twice,
+   by two seats: **`busy_timeout` is what makes writers take turns; WAL alone does nothing for
+   writer-versus-writer.** The correction was made in `WO-K1.md` and *not* here, leaving the contract
+   and the order teaching different models of the same mechanism — one-source-two-sides, committed in
+   the section written to name that defect. A builder reading only this contract for "why WAL" would
+   under-weight G2's `busy_timeout = 0` control, which is the load-bearing falsifier.
+2. **WO-K2 is a hard prerequisite for WO-K3, not a stylistic preference.** The architect's recorded
+   ruling on debt #27 is *fail hard on write handles, warn on readonly handles*. Measured here:
+   **not one of the 23 file-backed `openKernel` call sites outside `packages/qf-kernel` passes
+   `{ readonly: true }`** — not the vault projector, not the read-tool server that serves only read
+   tools. Every handle in the system is a writer. Shipping WO-K3 first would therefore fail hard in
+   every process, including the projection tools the carve-out was written to protect.
+
+**Severity, stated honestly.** As damage: near zero. Five events and one artifact of test data, all
+local, nothing of the founder's at risk, nothing to migrate. As a blocker: critical. The foundation
+claim is false and every rung above it inherits the falsehood — which is why debt #29 names WO-107b
+and not some later rung.
+
+### WO-K1 · One path, and they take turns
+
+**Objective.** Exactly one Kernel file, resolved by exactly one function, and safe for more than one
+process to hold open at once.
+
+**Depends on.** Nothing. It is the floor.
+
+**In.** One resolver in `packages/qf-kernel`, the **sole** reader of `QF_KERNEL_DB` and of `$HOME`
+for this purpose · default `~/.quantflow/kernel.db`, because the Kernel belongs to the platform and
+a dock does not own the harbour (`~/.quantflow/` exists and is empty — nothing to migrate) ·
+`journal_mode = WAL`, an explicit `busy_timeout` and an explicit `synchronous`, set in
+**`attachKernel`** because that is the one choke point both drivers already pass through (`db-bun.ts`
+and the Electron `wrapDatabaseSync`), and setting them at the two call sites instead would be the
+second-truth-store shape §5.2 forbids · `openAppKernel` stops deriving its path from `COLLAB_DIR`
+and calls the resolver · every process logs the resolved absolute path at boot · the app injects the
+resolved path into every agent process it spawns, which finally gives the resolver a caller ·
+per-worktree Kernel isolation survives **only** as an explicit, logged opt-in, never a silent hash of
+the launch directory.
+
+**Out.** The artifact store's location (WO-K3) · the gate's blindness to `openKernel` (WO-K2) ·
+readonly handles (WO-K2) · drift detection (WO-K3) · the stale `.wo008-home` Kernel, which holds the
+only history that exists and is held open by a week-old Electron process — it is read and retired
+deliberately, not swept up here · **app-local state** (canvas persistence, config, PTY logs, IPC
+sockets, terminals), which keeps per-worktree isolation and is correct as it stands. Per-worktree
+isolation is not the defect; per-worktree *truth* is.
+
+**Found while the order was being read, and it enlarges this rung: the split is written down outside
+the repo.** Measured 2026-07-27 — four config files pin `QF_KERNEL_DB` to **absolute** paths that
+override any default by construction: `~/.hermes/config.yaml:176` (the app's per-worktree Kernel) and
+`~/.hermes/profiles/{qf-orchestrator,qf-worker,qf-worker-2}/config.yaml:177` (the peer-bus Kernel).
+The founder's seats were *configured* to disagree. Unifying the path in the repo alone would pass
+every gate and change nothing for any real seat, so WO-K1 carries a deliverable that strips the pins
+and stops `setup-founder-seats.ts` re-emitting them. **No repo gate can see `~/.hermes/`** — this
+part is defended by boot logging and the end-to-end gate, never by a static check, and the order says
+so rather than implying coverage that cannot exist.
+
+**Gate.** Two properties, each falsified by bait, neither provable by reading code.
+*Single resolution:* exactly one function computes a Kernel path; bait a second file that reads
+`QF_KERNEL_DB` directly or joins a path ending in `kernel.db`, and the gate must go red.
+*Concurrency:* two processes hold the same Kernel and both write successfully — **with the control
+that the same test against `busy_timeout = 0` fails.** Without that control a green proves nothing,
+exactly as control 2 was load-bearing in the review of debt #28.
+
+**Stated ritual, not a builder's surprise.** The default path moves, so the app's current Kernel is
+left behind. It holds **0 events and 0 artifacts** (measured 2026-07-27), so nothing is lost. Say
+this plainly in the order rather than letting the founder discover an empty canvas.
+
+**Gotcha this rung introduces, on the record.** WAL leaves `-wal` and `-shm` sidecars **while a
+handle is open**; copying a *live* Kernel must copy all three. Measured 2026-07-27: after a clean
+close SQLite checkpoints and removes them, so a closed Kernel is still a single file. The review's
+draft stated the hazard unconditionally; the sharper form is that **hot-copy** is the danger.
+
+### WO-K2 · The gate can see the door, and readers are readers
+
+**Objective.** Law E's gate can prove its own stated property, and a process that only reads holds a
+handle that cannot write.
+
+**Depends on.** WO-K1 — there must be one path before it is worth policing who opens it.
+
+**In.** `kernel-sole-writer` matches `openKernel` / `openAppKernel` against an explicit reader
+allowlist, and **separates the two claims it currently conflates**: *opens the Kernel* and *writes
+domain rows*, reporting which it caught · the gate gets its first `QF_*_FALSIFY` bait path, which
+`dock-registry` and `agent-path` have and it does not · all **23 file-backed call sites across 11 files** outside `packages/qf-kernel` classified reader or writer, with readers passing
+`{ readonly: true }` · `openKernel` stops creating a database by default, so a read tool pointed at a
+typo fails instead of minting an empty world.
+
+**Out.** Drift detection and artifact locality (WO-K3) · widening `kernel-sole-writer-app`'s scope,
+which was re-measured 2026-07-27 and holds.
+
+**Note, carried from the review so it is not lost.** Calling `execute()` from outside the package is
+the **sanctioned** write path — a file doing so is not violating Law E's spirit. What is false today
+is the gate's own weaker docstring claim, *only `packages/qf-kernel` may open SQLite*, which the
+shipping tree contradicts eight times over. The severity is that the gate cannot tell the two cases
+apart at all.
+
+**Gate.** Three-way, with the control that makes the bait mean something. *Control 1:* unmodified
+tree → green, no confounder. *Control 2:* a file with `bun:sqlite` + `INSERT INTO` → red, proving the
+gate still works. *Bait:* `openKernel(...)` + `execute(...)` with no driver string and no SQL keyword
+→ **must go red**, where today it is invisible. Plus: a handle opened readonly attempts a write and
+fails.
+
+**Carried risk, to be named in the order rather than discovered.** Flipping create-on-miss changes
+behaviour at every creator at once — gates and harnesses that legitimately build fresh fixture
+databases must gain an explicit create in the same commit, or the suite reddens for the wrong reason.
+
+### WO-K3 · Bytes follow truth, and drift refuses writes
+
+**Objective.** The files truth points at live under truth's root, and a Kernel whose shape disagrees
+with the schema refuses to accept writes.
+
+**Depends on.** WO-K2, **hard** — see the sequencing note above. The recorded ruling has no readonly
+handles to apply its carve-out to until WO-K2 creates them.
+
+**In.** The artifact store moves under the same root as the Kernel, so rebuilding a Kernel can no
+longer orphan the bytes it indexed · the object-type registry detector from
+[`PROPOSAL-schema-drift-detector.md`](PROPOSAL-schema-drift-detector.md), called from `attachKernel`
+after the migration branch: **throws on a writable handle, warns to stderr and sets a queryable
+`drift` flag on a readonly handle** · the migration skip guard stops trusting the table *name* alone,
+which today accepts a file containing only `CREATE TABLE schema_meta` as an initialized Kernel.
+
+**Out.** A migration runner — still does not exist, and this rung does not create one · the six drift
+shapes the proposal's §4 explicitly does not cover.
+
+**Seam that must not be disturbed.** `QF_ARTIFACT_ROOT` and the `publish_artifact` confinement were
+verified at `2730a00` with six escape shapes falsified by hand (debt #25, WO-106b). Moving the
+artifact root **relocates** that root; it must not relax the confinement, and the order must re-run
+those six shapes against the new root rather than assuming they still hold.
+
+**Note on what WO-K1 already buys.** The measured orphaning — 2 files in
+`~/.collaborator/agent-artifacts`, 0 rows pointing at them — happened because the Kernel forks and
+the shelf does not. Once WO-K1 stops the Kernel forking, that instance stops recurring. What remains
+for this rung is the deeper coupling: **`SCOPES.md:105` wipe-and-recreate, the documented remedy for
+debt #27, destroys the index while the bytes survive outside it.** The remedy and the layout
+disagree, and that is what closes here.
+
+**Gate.** A Kernel built from a **pinned prior schema snapshot** — not from the live schema, or the
+gate inherits the exact blindness it exists to catch — refuses a write and warns on a readonly open ·
+a rebuild leaves no artifact row pointing at a missing file · the six WO-106b escape shapes still
+rejected against the relocated root.
+
+---
+
+## Product identity — parked until after WO-K3 (inserted 2026-07-27)
+
+**Why this exists.** The app still ships, publishes, and stores state as Collaborator while the
+mission is QuantFlow Ontology. Measured: `productName: Collaborator`, `appId: com.collaborator.desktop`,
+`publish` → `collabs-inc/collab-public`, app data under `~/.collaborator/` (`paths.ts:5`). That is
+product identity, not the fork seam.
+
+**Why not now.** Relocating `~/.collaborator/` while WO-K3 relocates artifact bytes is two migrations
+with no runner. Kernel is already at `~/.quantflow/kernel.db` (K1). Order: **K1 → K2 → K3 → WO-N1**.
+
+### WO-N1 · Product identity: QuantFlow, not Collaborator
+
+**Objective.** Every product-facing surface says QuantFlow; app-local data lives under
+`~/.quantflow/app/`; release target is this repo.
+
+**Depends on.** WO-K3 — hard.
+
+**In.** Packaging fields · `paths.ts` BASE + `COLLAB_DIR`→`QF_APP_DIR` · copy-on-first-boot from
+`~/.collaborator` · `install.sh` / CLI user-visible strings · static gate `product-identity` with bait.
+
+**Out (ruled, do not "helpfully" include).** Renaming directory `collab-electron/` · changing the
+`upstream` remote URL · erasing LICENSE / NOTICE / START_HERE lineage · Kernel or artifact paths
+(already owned by K1/K3) · historical evidence prose.
+
+**Full draft:** [`WO-N1.md`](WO-N1.md) — parked until K3 verifies; then cut with a pre-build read.
+
+---
+
 ### WO-107b · Market-plane bulk ingest · **contract only (WO-103b)**
 
 **Objective.** Pipeline-fed market rows (`instrument`, `quote`) land in the Kernel through one

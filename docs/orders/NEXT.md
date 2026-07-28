@@ -1,82 +1,52 @@
-# NEXT — the current order (rotated 2026-07-26: WO-106 merged, P3 CLOSED)
+# NEXT — the current order (rotated 2026-07-27: WO-K2 verified PASS; ladder awaits WO-K3 order)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder: feed this same file to every fresh builder window.** One line is enough: *"Follow the instructions in `docs/orders/NEXT.md`."*
 
-## Current order: **WO-106b — close the `publish_artifact` file-read surface**
+## Current order: **[WO-V1](WO-V1.md) — the reading vault, REWORK ROUND 1**
 
-**Phase P3 is closed.** WO-106 merged 2026-07-26 with zero rework rounds: 19 gates cold, exit 0, and
-the write catalogue now describes itself (0 of 24 action tools advertise zero properties, down from
-24 of 24). A real model that previously needed four attempts and dropped a field now does the same
-task in one.
+**Read the order top to bottom, then the `REWORK ROUND 1` section at its end — that section is the
+round.** The branch is `wo-V1` at `52c435a`; nothing is merged.
 
-WO-106b is a **small, single-purpose security order** carrying a ruling that is already made. It is
-the split-out D6 — see below for why it is its own order.
+This is off-ladder and currently the **only cuttable builder work** — see *the ladder is blocked on
+an architect duty* below. It blocks nothing and is blocked by nothing.
 
-**It is cuttable now** — its pre-build read returned **eight findings, three High, all fixed**,
-including one gate of mine that would have certified this security fix while the vulnerability
-stayed wide open.
+**Scope of the round, in priority order:**
 
-### Why this is its own order — read this before you judge its size
+1. **Artifact-body rendering and wikilink emission** against real data (never observed — round 1
+   crashed before a real run completed).
+2. **Missing-type ruling as robustness** — skip declared types with no table, name them in the run
+   summary, never drop `readonly: true` to force a migration.
 
-It was `WO-106 D6`, added **after** WO-106's adversarial read. It was therefore the one deliverable
-nobody reviewed, and it was **wrong in three measured ways**: it claimed the Electron app publishes
-through `bytes` (every app callsite uses `path`), it referred to "a declared staging root" that had
-no spelling, and it demanded a Kernel-wide rejection that would have broken the founder's own
-file-picker publish. The builder-preparer seat stopped before writing any of it. **A deliverable
-added after the read is a deliverable with no read** — so this one gets its own.
+**Kernel context after K1/K2:** platform Kernel is `~/.quantflow/kernel.db` (26 tables). Create is
+opt-in; readonly opens work. Measure against that Kernel or a deliberately incomplete fixture built
+from a source that is **not** the live schema.
 
-### Three standing traps, all measured and logged
+## The ladder is blocked on an architect duty, not a builder one
 
-- **`agent-path` gives a false FAIL in a sandboxed shell** (debt #23) — its self-install exits 0 but
-  leaves no `node_modules`. Pre-install before any before/after measurement.
-- **Never pipe the gate runner.** It has cost two seats: one read `tail`'s exit 0 while the gate had
-  failed. Unpiped, `$?` on its own line, every time.
-- **Do not run the suite while another agent is running** (new, WO-106) — a concurrent Cursor session
-  makes `runtime-proof` fail on foreign sockets. Run quiet, or you will chase a phantom red.
+**[WO-K1](WO-K1.md) PASS** · **[WO-K2](WO-K2.md) PASS** 2026-07-27 at `c9c3bf0`, zero rework,
+`GATE_RUNNER_EXIT=0`, **debt #28 closed**. Readonly API live; Law E gate sees `openKernel`/`execute`.
 
-### The standard this rung set — match it
+**[WO-K3](SCOPES.md) has no order file yet** — contract only (bytes follow truth; drift refuses
+writes). **No builder can take the ladder until that order is written.** Behind it: **WO-N1**
+(product identity — parked until after K3), **WO-107b** (bulk ingest — contract only), then Bovada.
 
-WO-106's builder **falsified every gate it wrote by editing shipping code**, not by flipping a
-fixture switch, and sent back five defects in its own gates. Three were the same shape: *a check
-whose two sides come from one source*. It also proved one gate this architect specified was
-**modelling** the boot path rather than watching it — the real edit passed all 19 gates. That is the
-bar now.
+**Identity rungs: 2 of 3 done.** Market data still waits on K3 → WO-107b.
 
-## Where the ladder stands, and what is queued behind (do not start)
+## Standing traps
 
-**6 of 11 rungs done** (`SCOPES.md` is authoritative on numbering). **P1, P2 and P3 all closed.**
-Next on the ladder after WO-106b: **WO-107b** (market ingest; unblocks four link kinds), **WO-107** (first
-market — **Bovada sportsbook only**, doctrine A7; its order may not be written until the
-external-surface probe runs — candidate instrument triaged in `docs/RESEARCH.md`), **WO-108**
-(second market), then **WO-109/110/111** — the loop, the critic, and the one-shot proof.
+- Never pipe the gate runner · do not run the suite while another agent is active · `.wo008-home`
+  is not yours · platform Kernel is `~/.quantflow/kernel.db` · sandboxed `agent-path` false red
+  (debt #23).
 
-Rung count is not effort. The remaining six rungs include every one that touches real external
-data and the closing proof; they are heavier than the five behind us.
+## Standing seat constraint
 
-## Standing seat constraint (founder, 2026-07-26)
-
-Builder seats run **`composer-2.5` or `cursor-grok-4.5-high` only** — an API-cost decision, not a
-trust one. One model builds, a different one verifies; no model checks its own work.
-
-## Parallel-eligible, off-ladder — a second builder may take this
-
-**[WO-V1](WO-V1.md) — the reading vault.** A one-way projection of the Kernel into
-`~/Vaults/QuantFlow Ontology`, so the founder can read every artifact, session and run in Obsidian
-with the ontology's links as backlinks. **Read and cuttable** — its pre-build read
-returned **eleven findings, six High**, including a hash gate that could have passed while verifying
-nothing, and a Law E tripwire the order never mentioned. All fixed. It touches no ladder rung, blocks nothing, and is blocked by
-nothing. Its hard rule: **Kernel → vault, never back**, and artifact content renders only when its
-hash verifies against `content_hash` (the Kernel stores a pointer, not the bytes).
+Builder seats: **`composer-2.5` or `cursor-grok-4.5-high` only**.
 
 ## Parked / parallel
 
-**Design overhaul** — founder-run, off the critical path; returns as a brief with measured scope
-and falsifiable gates, and must fit `one-skin`. **Market-abstraction test** — debt #20,
-trigger-gated. **Durable execution** — debt #17, trigger-gated. **Promotion authority +
-freeze-lint bypass** — debt #19 (`promote_type` deleted by WO-103b; its fixing order re-adds the
-action). **Caller identity** — debt #22; WO-105 narrowed the served surface but the lock is still
-unbuilt.
+**WO-N1** — product identity after K3 ([`WO-N1.md`](WO-N1.md), debt #30).
+Design overhaul · debt #20 · #17 · #19 · #22 · #26 — unchanged triggers.
 
 ---
 

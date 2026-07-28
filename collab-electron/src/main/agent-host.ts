@@ -389,10 +389,18 @@ async function admitHostAcpSpecies(
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
   const toolAllowlist = resolveSpeciesToolAllowlist(species, appRoot());
+  const hostAcpEnv: Record<string, string> = {
+    HERMES_BIN: command,
+    HOME: home,
+    HOST_ACP_BIN: command,
+  };
+  if (process.env.QF_KERNEL_DB) {
+    hostAcpEnv.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
+  }
   const handle = await admitHostAcp({
     command,
     args: ["acp"],
-    env: { HERMES_BIN: command, HOME: home, HOST_ACP_BIN: command },
+    env: hostAcpEnv,
     cwd: home,
     clientName: "quantflow-host-acp",
     toolAllowlist,
@@ -450,10 +458,12 @@ async function admitAgentOsSpecies(
   const host = await ensureAgentOs();
   await admitSpecies(species);
   const fromConfig = resolveSpeciesSessionEnv(species);
+  const merged: Record<string, string> = { ...fromConfig, ...opts?.env };
+  if (process.env.QF_KERNEL_DB && !merged.QF_KERNEL_DB) {
+    merged.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
+  }
   const env =
-    fromConfig || opts?.env
-      ? { ...fromConfig, ...opts?.env }
-      : undefined;
+    Object.keys(merged).length > 0 ? merged : undefined;
   const created = await host.createSession(
     species,
     env ? { env } : undefined,

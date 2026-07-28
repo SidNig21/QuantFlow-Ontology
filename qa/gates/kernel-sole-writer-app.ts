@@ -1,6 +1,6 @@
 /**
  * WO-006b/c: Kernel SQLite sole-writer + AgentOS sole-host under collab-electron/src.
- * - Only kernel.ts may import qf-kernel / sqlite / mention kernel.db
+ * - Only kernel.ts may import qf-kernel / sqlite / mention the Kernel db filename
  * - Only agent-host.ts may import @rivet-dev/agentos*
  * - acp-agent.ts is a frozen exception for @agentclientprotocol (debt #14)
  * - WO-008a: species/hermes/host-acp-client.ts is the sole live ACP SDK home
@@ -36,7 +36,7 @@ const KERNEL_PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: "node:sqlite", re: /node:sqlite/ },
   { name: "bun:sqlite", re: /bun:sqlite/ },
   { name: "better-sqlite3", re: /better-sqlite3/ },
-  { name: "kernel.db", re: /kernel\.db/ },
+  { name: "kernel-db-filename", re: /kernel\.db/ },
 ];
 
 const AGENT_PATTERNS: Array<{ name: string; re: RegExp }> = [
@@ -127,7 +127,7 @@ export function checkKernelSoleWriterApp(): {
     if (rel !== KERNEL_ALLOWED) {
       for (const p of KERNEL_PATTERNS) {
         if (p.re.test(text)) {
-          // Transport reader may match node:sqlite only; kernel.db / qf-kernel
+          // Transport reader may match node:sqlite only; Kernel filename / qf-kernel
           // still bite so it can never quietly touch domain truth.
           if (rel === TRANSPORT_SQLITE_ALLOWED && p.name === "node:sqlite") {
             continue;
