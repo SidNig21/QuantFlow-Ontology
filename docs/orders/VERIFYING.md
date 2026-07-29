@@ -34,8 +34,12 @@ Then, **cold** — with no `node_modules` anywhere, because a warm machine passe
 
 ```bash
 rm -rf /tmp/verify-NNN/**/node_modules
-cd /tmp/verify-NNN && bun qa/run.ts --all
+cd /tmp/verify-NNN && bun qa/verify-release.ts
 ```
+
+That canonical command is the same one CI runs. It owns the frozen Electron install, bare-environment
+unit suites, production main/preload/renderer build, and every QA gate, in that order. Running only
+`bun qa/run.ts --all` is useful for gate development but is not release verification.
 
 Then the part that earns the role — **seam inspection**, i.e. what the gates *cannot* prove:
 
@@ -69,7 +73,8 @@ Write the verification record for a stranger: what you re-ran, what you found be
 ## What you never do
 
 - Never pass on the strength of a report — re-run it yourself, cold.
-- Never verify warm, and never install before running the gates.
+- Never pre-install into the clean worktree. The canonical verifier owns its frozen install before
+  unit, build, and QA stages so ambient dependencies cannot make the proof green.
 - Never let the builder self-approve, and never approve work you authored the code for.
 - Never edit `docs/ONTOLOGY_SCHEMA.md` outside an order — a schema change is an order, not an edit.
 - Never hand a builder a credential. Orders are written so none is needed.

@@ -24,6 +24,8 @@ import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
 import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
 import { runKernelOnePathGate } from "./gates/kernel-one-path.ts";
 import { runVaultProjectionGate } from "./gates/vault-projection.ts";
+import { runSchemaBundleAliasesGate } from "./gates/schema-bundle-aliases.ts";
+import { runReleaseVerifierGate } from "./gates/release-verifier.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -205,6 +207,24 @@ const gates: Gate[] = [
       // (CI) and on a machine where deps happen to be present. Frozen means
       // this can never silently drift from the committed lockfile.
       return bunPackageGate("schema", cwd);
+    },
+  },
+  {
+    name: "schema-bundle-aliases",
+    description:
+      "WO-CI1: forbid private qf-kernel aliases; require bundle excludes and live package exports",
+    run: () => {
+      const { ok } = runSchemaBundleAliasesGate();
+      return ok;
+    },
+  },
+  {
+    name: "release-verifier",
+    description:
+      "WO-CI1: CI and verifier docs use the canonical install -> unit -> build -> QA command",
+    run: async () => {
+      const { ok } = await runReleaseVerifierGate();
+      return ok;
     },
   },
   {

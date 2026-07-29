@@ -1,7 +1,6 @@
 # WO-K3 — Bytes follow truth, and drift refuses writes
 
-status: open, cuttable — architect draft 2026-07-27 (no pre-build read yet; builder runs
-[`PROTOCOL.md`](PROTOCOL.md) adversarial read optional but recommended)
+status: open — REWORK after dishonest D5 proof; architect correction 2026-07-28
 assignee: builder
 depends: WO-K2 — **done** (`c9c3bf0`). WO-K1 — **done**. WO-V1 — **done** (readonly projector
 must keep working after drift carve-out lands).
@@ -197,8 +196,22 @@ tests pass.
 
 ### D5 — artifact root gate
 
-- Assert `publish_artifact` through `execute()` writes bytes under `resolveArtifactRoot()` and
-  `storage_ref` resolves to an existing file.
+- Correct the contract first: `execute("publish_artifact")` hashes and indexes bytes that already
+  exist; it does **not** write the artifact file. The first builder's gate called `writeFileSync`
+  itself and then called `execute()`, so it proved only publication of a gate-authored fixture while
+  claiming to prove the production writer. That is a false-green gate.
+- Extract the existing app write-and-publish seam into a small import-safe production helper used by
+  `agent-host.ts`. It may accept the Kernel publication callback as an argument so the helper stays
+  independent of Electron and of a specific SQLite adapter; it must resolve the artifact root,
+  create the bytes, and then call the one sanctioned publication action.
+- The gate starts with the target path absent, invokes that exact production helper, and only then
+  asserts the file exists under `resolveArtifactRoot()`, the artifact row's `storage_ref` resolves to
+  that file, and the row's content hash equals the bytes read back from disk.
+- The gate must not pre-create the accepted artifact file or call `writeFileSync`/`writeFile` on its
+  behalf. Fixture setup may create only the temp HOME/root directories and negative canaries.
+- Add a coupling assertion that `agent-host.ts` imports and calls the helper. Bait the real helper's
+  byte-write step to a no-op (or route it to the legacy shelf): the D5 gate must go red, naming the
+  missing/out-of-root production bytes; restore must go green.
 - Assert **no** `artifact` row in a fresh fixture points at a path outside the resolved root
   after a controlled publish sequence.
 
@@ -246,7 +259,8 @@ Law E allowlists — **report additions**, do not silently extend.
 - Default resolver → `~/.quantflow/artifacts/` (test uses temp HOME).
 - `agent-host` publish path grep: no `.collaborator/agent-artifacts` string left in production
   publish path.
-- D5 gate green.
+- Production-helper bait red → restore green; the accepted file is absent before the helper call and
+  exists afterward with row/hash/path agreement. A gate-authored accepted file is an automatic fail.
 
 **G5 — WO-106b six shapes** on relocated root — all red/accept as before.
 
