@@ -136,9 +136,11 @@ describe("attachKernel WO-K3 drift / incomplete init", () => {
     expect(err).toMatch(/object-type registry drift/i);
 
     const drift = getKernelDrift(db!);
-    expect(drift).not.toBeNull();
-    expect(drift!.ok).toBe(false);
-    if (!drift!.ok && "missing" in drift) {
+    if (drift === null) {
+      throw new Error("readonly drift fixture must expose getKernelDrift");
+    }
+    expect(drift.ok).toBe(false);
+    if ("missing" in drift) {
       expect(drift.missing.length).toBeGreaterThan(0);
     }
 

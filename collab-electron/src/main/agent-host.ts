@@ -5,7 +5,7 @@
  * Pack: `cd tools/runtime-proof && bun run pack-agent`
  * (collab-electron script `pack-agent` forwards there).
  */
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -50,6 +50,7 @@ import {
 import { resolveSpeciesLaunch } from "./species-launch";
 import { resolveSpeciesSurface } from "./species-surface";
 import { resolveSpeciesToolAllowlist } from "./species-tools";
+import { writeAgentReportArtifact } from "./agent-artifact-writer";
 
 /** Boot-seed species name — main-process only (never a renderer literal). */
 export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
@@ -644,17 +645,17 @@ export async function runTurn(
 
   let artifactId: string | undefined;
   if (!opts?.skipPublish) {
-    // WO-K3: bytes live under resolveArtifactRoot() — not the legacy collaborator shelf.
-    const dir = getArtifactRoot();
-    mkdirSync(dir, { recursive: true });
-    const path = join(dir, `${sessionId}.md`);
-    writeFileSync(path, text.length > 0 ? text : "(empty agent output)", "utf8");
-    const pub = kernelExecute(
-      "publish_artifact",
-      { path, kind: "report", storage_ref: path },
-      newTrace(),
-    );
-    artifactId = pub.object_id;
+    const artifact = writeAgentReportArtifact({
+      sessionId,
+      text,
+      artifactRoot: getArtifactRoot,
+      publish: (input) => kernelExecute(
+        "publish_artifact",
+        input,
+        newTrace(),
+      ),
+    });
+    artifactId = artifact.artifactId;
   }
 
   if (finalize) {

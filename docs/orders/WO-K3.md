@@ -234,7 +234,9 @@ Law E allowlists — **report additions**, do not silently extend.
 **Builder-run:** package tests (`packages/qf-kernel`), static gates (`kernel-sole-writer`,
 `kernel-one-path`, `repo-shape`, …), gate falsification transcripts below.
 
-**Verifier-run:** cold `bun qa/run.ts --all` in a detached worktree.
+**Verifier-run:** cold `bun qa/verify-release.ts` in a detached worktree. This is the canonical
+shipped-form verifier established by WO-CI1: frozen Electron install → unit suite → production
+Electron build → every QA gate.
 
 **G1 — drift detector cold.**
 
@@ -268,8 +270,8 @@ Law E allowlists — **report additions**, do not silently extend.
 
 - Remove detector call from `attachKernel` in a bait commit → coupling assertion red → restore.
 
-**G7 — no regression.** `GATE_RUNNER_EXIT=0` cold; `vault-projection` still green; WO-V1 readonly
-projector still opens drifted DB with warn-not-throw.
+**G7 — no regression.** `bun qa/verify-release.ts` exits 0 cold; `vault-projection` still green;
+WO-V1 readonly projector still opens drifted DB with warn-not-throw.
 
 ---
 
@@ -296,7 +298,8 @@ projector still opens drifted DB with warn-not-throw.
 6. G5 six-shape re-run summary (same labels as WO-106b).
 7. G6 coupling bait red→green.
 8. Allowlist additions with justification.
-9. `GATE_RUNNER_EXIT=0` cold deferred to verifier per PROTOCOL.
+9. Canonical `bun qa/verify-release.ts` result, cold and from a detached worktree, deferred to the
+   independent verifier.
 
 **Judgment rule:** if production needs a new allowlist entry, **report it** — do not quietly extend.
 
