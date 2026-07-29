@@ -16,35 +16,12 @@ export default defineConfig({
       __GIT_COMMIT_SHA__: JSON.stringify(gitCommitSha),
     },
     resolve: {
-      alias: {
-        "@collab/shared": resolve(__dirname, "packages/shared/src"),
-        // Bundle Kernel into main — package.json deps are auto-externalized by
-        // electron-vite, and the file: package ships TypeScript source.
-        "qf-kernel/portable": resolve(
-          __dirname,
-          "../packages/qf-kernel/src/portable.ts",
-        ),
-        "qf-kernel-schema/commands": resolve(
-          __dirname,
-          "../qf-kernel-schema/src/commands.ts",
-        ),
-        "qf-kernel-schema/validate": resolve(
-          __dirname,
-          "../qf-kernel-schema/src/validate.ts",
-        ),
-        "qf-kernel-schema/transitions": resolve(
-          __dirname,
-          "../qf-kernel-schema/src/transitions.ts",
-        ),
-        "qf-kernel-schema/define": resolve(
-          __dirname,
-          "../qf-kernel-schema/src/define.ts",
-        ),
-        "qf-kernel-schema": resolve(
-          __dirname,
-          "../qf-kernel-schema/src/schema.ts",
-        ),
-      },
+      alias: [
+        {
+          find: "@collab/shared",
+          replacement: resolve(__dirname, "packages/shared/src"),
+        },
+      ],
     },
     build: {
       outDir: resolve(__dirname, outDir, "main"),
