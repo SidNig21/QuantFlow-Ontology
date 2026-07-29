@@ -11,8 +11,8 @@ ladder: off-ladder repair
 
 ## Objective
 
-Make the Electron production bundle resolve every exported `qf-kernel-schema` subpath from one
-authoritative package manifest, and make drift fail a permanent gate.
+Make the Electron production bundle resolve `qf-kernel` and `qf-kernel-schema` through their
+authoritative package export maps, and make any new private alias mirror fail a permanent gate.
 
 ## In plain terms
 
@@ -34,9 +34,12 @@ Read before editing:
    <https://vite.dev/config/shared-options#resolve-alias>
 7. electron-vite official configuration documentation:
    <https://electron-vite.org/config/>
+8. Bun official isolated-install documentation:
+   <https://bun.sh/docs/pm/isolated-installs>
 
 External facts pinned by those docs: electron-vite's `main.resolve` accepts Vite configuration;
-filesystem alias replacements must be absolute; alias entry order is significant.
+Vite resolves packages through normal package resolution when no alias replaces them; Bun's
+isolated install gives declared `file:` packages their dependency graph under `node_modules/.bun`.
 
 ## Deliverable 0 — re-measure before repair
 
@@ -54,53 +57,41 @@ Confirm the build fails while resolving a live `qf-kernel-schema` export such as
 If the clean build does not fail for that mechanism, stop. Report the order as stale; do not make a
 speculative config change.
 
+**Rework exception after the architect correction below:** D0 is already satisfied by the committed
+builder report's pre-edit transcript. A rework builder starts from corrected D1/D2 and must not stop
+because the experimentally corrected config now builds green.
+
 ## Deliverables
 
-### D1 — one derived alias map
+### D1 — use package exports directly
 
-- Add `collab-electron/src/main/schema-export-aliases.ts` exporting
-  `derivePackageExportAliases(packageName, packageRoot)`.
-- The helper returns Vite's ordered array form:
-  `Array<{ find: string; replacement: string }>`.
-- Replace the hand-maintained `qf-kernel-schema` alias entries in
-  `collab-electron/electron.vite.config.ts`. The config imports
-  `derivePackageExportAliases`, assigns its result to `schemaAliases`, changes
-  `main.resolve.alias` to the ordered array form, and spreads `...schemaAliases` into that array.
-- Derive aliases at config load from `qf-kernel-schema/package.json`'s `exports` object.
-- Every declared string export, including `"."`, maps to its corresponding absolute filesystem
-  target. Export key `"."` maps to import specifier `qf-kernel-schema`; `"./commands"` maps to
-  `qf-kernel-schema/commands`, and the same rule applies to every other subpath.
-- Order entries longest import specifier first, so a bare-package alias cannot swallow a subpath.
-- Keep unrelated aliases as array entries with their current replacements. Place
-  `...schemaAliases` before the bare `qf-kernel/portable` and `@collab/shared` entries.
-- Keep `qf-kernel` bundling unchanged.
-- Add no dependency and do not create a second manifest or copied export list.
+- Remove every `qf-kernel-schema` alias and the `qf-kernel/portable` alias from
+  `collab-electron/electron.vite.config.ts`.
+- Keep both packages in `main.build.externalizeDeps.exclude`; that tells electron-vite to bundle
+  the installed TypeScript packages instead of externalizing them.
+- Keep the unrelated `@collab/shared` alias unchanged. Object or array form is acceptable.
+- Add no `zod` alias, dependency alias, or path into `node_modules/.bun`.
+- Add no dependency or lockfile change. The existing `file:` package manifests and Bun install
+  graph own package resolution.
 
-### D2 — focused tests and a production-coupling gate
+### D2 — production-coupling gate
 
-- Put the derivation in a small importable TypeScript helper with unit coverage for:
-  - root and subpath conversion;
-  - absolute targets;
-  - longest-first order;
-  - malformed/non-string export rejection.
 - Add a static, install-free `schema-bundle-aliases` QA gate and register it in `qa/run.ts`.
-- The gate imports the helper, reads the live schema package manifest, and reads the live Electron
-  config as source text without importing `electron-vite`.
-- The live-manifest check invokes `derivePackageExportAliases` and fails if an export target file is
-  absent, a replacement is non-absolute, ordering is not longest-first, or the alias count differs
-  from the manifest's string-export count.
-- The production-coupling checker fails unless the config source:
-  - imports `derivePackageExportAliases` from `./src/main/schema-export-aliases`;
-  - assigns the live result to `schemaAliases`;
-  - uses array-form `main.resolve.alias` and spreads `...schemaAliases` into it.
-- The same checker fails if the config's alias entries contain a hand-maintained
-  `find: "qf-kernel-schema/<subpath>"` or a quoted object key
-  `"qf-kernel-schema/<subpath>":`. Do not reject ordinary filesystem strings containing
-  `../qf-kernel-schema/`.
-- Add `QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=1`. It must plant an in-memory broken production-coupling
-  input by removing `...schemaAliases` from the source text passed to the real coupling checker.
-  The checker must fail with a message that names the missing spread; a bare forced exit is
-  forbidden.
+- The gate reads `electron.vite.config.ts` as source text without importing `electron-vite`.
+- Its production checker isolates the `main.resolve.alias` block and fails if that block contains
+  `qf-kernel` or `qf-kernel-schema` in any alias key, `find`, or replacement.
+- The same checker isolates `main.build.externalizeDeps.exclude` and fails unless it contains both
+  exact package names: `qf-kernel` and `qf-kernel-schema`.
+- The gate reads both live package manifests and fails unless `qf-kernel` exports `"./portable"`
+  and `qf-kernel-schema` has string `"."` plus string subpath exports. It does not copy or enumerate
+  the current schema subpath names.
+- Add three in-memory falsify values through the real checker; bare forced exits are forbidden:
+  - `QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=alias` adds a `qf-kernel-schema` alias to the alias block and
+    fails naming the forbidden private alias.
+  - `QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=exclude` removes `qf-kernel-schema` from the parsed
+    `externalizeDeps.exclude` block and fails naming the missing bundle exclude.
+  - `QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=manifest` removes `qf-kernel`'s `"./portable"` export from an
+    in-memory manifest passed to the real manifest checker and fails naming that export.
 
 ### D3 — restore the existing verifier chain
 
@@ -114,7 +105,8 @@ speculative config change.
 - No package, lockfile, schema, generated golden, Kernel, or runtime behavior changes.
 - The package manifest remains the sole declaration of exported schema subpaths.
 - Do not weaken bundling by externalizing `qf-kernel` or `qf-kernel-schema`.
-- Do not hand-copy the eight current export keys into code or tests.
+- Do not hand-copy the current export keys into code or tests.
+- Do not rely on Bun's internal `.bun` storage path; only the package manager may consume it.
 
 ## Acceptance gates
 
@@ -123,7 +115,6 @@ speculative config change.
 ```bash
 cd collab-electron
 bun install --frozen-lockfile
-bun test src/main/schema-export-aliases.test.ts
 bun run build
 cd ..
 bun qa/run.ts schema-bundle-aliases
@@ -142,12 +133,14 @@ Expected: all commands exit `0`.
 
 ```bash
 cd "$(git rev-parse --show-toplevel)"
-QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=1 bun qa/run.ts schema-bundle-aliases
+QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=alias bun qa/run.ts schema-bundle-aliases
+QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=exclude bun qa/run.ts schema-bundle-aliases
+QF_SCHEMA_BUNDLE_ALIASES_FALSIFY=manifest bun qa/run.ts schema-bundle-aliases
 bun qa/run.ts schema-bundle-aliases
 ```
 
-Expected: first command exits non-zero and names the missing production coupling; restored command
-exits `0`.
+Expected: the first three commands each exit non-zero and name, respectively, the forbidden alias,
+missing bundle exclude, and missing package export; restored command exits `0`.
 
 ### Verifier-run
 
@@ -178,8 +171,30 @@ The builder reports evidence and stops. A different seat decides PASS or REWORK.
 1. One plain-language sentence.
 2. Deliverable 0 failure command and the exact unresolved import.
 3. Changed files and why each belongs to this order.
-4. Derived alias count and ordered import specifiers.
-5. Unit, build, and static-gate outputs.
+4. Manual `qf-kernel*` alias count (`0`) and live package export counts.
+5. Build and static-gate outputs.
 6. Red bait output, restored green output.
 7. Judgment exercised; if none, say none.
 8. State that cold `--all` is deferred to the independent verifier.
+
+---
+
+## Architect correction — package resolution beats a generated alias mirror (2026-07-28)
+
+The first builder followed the original D1 and derived all schema aliases from the live manifest.
+That fixed `transition-meta`, then the bundle failed to resolve `zod` because aliasing source files
+outside `collab-electron/node_modules` bypassed Bun's installed dependency graph. A proposed
+`node_modules/.bun/node_modules/zod` alias made the build green but depended on package-manager
+internals and violated the unchanged-unrelated-alias contract.
+
+Control measurements in the same frozen install:
+
+1. Remove only schema aliases while retaining the source alias for `qf-kernel/portable` → build
+   fails resolving `qf-kernel-schema` from the source Kernel.
+2. Remove both private package aliases and retain both packages in
+   `externalizeDeps.exclude` → full main/preload/renderer build exits `0`; Vite transforms 177 main
+   modules and Bun's installed package graph supplies `zod`.
+
+Ruling: D1 is replaced by direct package-export resolution above. Delete the derived-alias helper
+and its unit test; rewrite the gate to forbid package aliases and protect the two bundle excludes.
+This is an order correction from measured behavior, not builder discretion.
