@@ -67,16 +67,15 @@ step." That is the bar.
 
 ## Commands (as CI runs them — `.github/workflows/ci.yml`)
 
-Note the working directories — the first three run **inside `collab-electron`**, the gates run
-at repo root. Sub-packages carry their own lockfiles; a root install does not reach them.
+From a clean worktree, run the one canonical release verifier from repo root:
 
 ```bash
-cd collab-electron && bun install --frozen-lockfile   # cold, from a clean worktree
-cd collab-electron && ./scripts/test-unit.sh          # unit suite
-cd collab-electron && bun run build
-bun qa/run.ts --all                                   # every QA gate, from repo root
-bun qa/run.ts --list                                  # what gates exist
+bun qa/verify-release.ts
 ```
+
+It runs the frozen `collab-electron` install, bare-environment unit suite, production build, and
+`bun qa/run.ts --all`, in that order. The last command alone checks ontology gates but does not
+prove the shipped Electron bundle. Use `bun qa/run.ts --list` to inspect the available gates.
 
 Schema work specifically:
 
@@ -86,8 +85,8 @@ bun test                           # 140 tests as of 2026-07-25
 bun run generate                   # regenerates golden/ — see below
 ```
 
-The `schema` QA gate (`qa/run.ts:74`) runs that suite with a frozen install, so
-`bun qa/run.ts --all` covers schema work even though the CI steps above don't name it.
+The `schema` QA gate runs that suite with a frozen install, so the canonical release verifier
+covers schema work through its final all-gates stage.
 
 **`golden/` is generated output, never hand-edited.** `bun run generate` writes
 `golden/migration.sql`, `golden/tools.json`, `golden/ONTOLOGY.md`, and

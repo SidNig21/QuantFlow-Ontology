@@ -95,7 +95,12 @@ because the experimentally corrected config now builds green.
 
 ### D3 — restore the existing verifier chain
 
-- The existing CI order remains Install → Unit tests → Build → QA gates.
+- Add one canonical root release-verification command whose internal order remains Install → Unit
+  tests → Build → QA gates.
+- CI, `AGENTS.md`, and `docs/orders/VERIFYING.md` must invoke that command instead of maintaining
+  separate command sequences.
+- Add an install-free `release-verifier` gate that checks the exact stage order and those three
+  authority entry points, including in-memory falsification for stage, workflow, and handbook drift.
 - A clean production build must succeed before the QA board is reported.
 - Do not change Bun pinning in this repair; the unpinned setup action remains WO-H2 audit scope.
 
@@ -147,12 +152,16 @@ missing bundle exclude, and missing package export; restored command exits `0`.
 In a detached clean worktree:
 
 ```bash
-cd collab-electron
-bun install --frozen-lockfile
-./scripts/test-unit.sh
-bun run build
-cd ..
-bun qa/run.ts --all
+bun qa/verify-release.ts
+```
+
+Required release-verifier bait transcript:
+
+```bash
+QF_RELEASE_VERIFIER_FALSIFY=stage bun qa/run.ts release-verifier
+QF_RELEASE_VERIFIER_FALSIFY=workflow bun qa/run.ts release-verifier
+QF_RELEASE_VERIFIER_FALSIFY=handbook bun qa/run.ts release-verifier
+bun qa/run.ts release-verifier
 ```
 
 The builder reports evidence and stops. A different seat decides PASS or REWORK.
@@ -198,3 +207,16 @@ Control measurements in the same frozen install:
 Ruling: D1 is replaced by direct package-export resolution above. Delete the derived-alias helper
 and its unit test; rewrite the gate to forbid package aliases and protect the two bundle excludes.
 This is an order correction from measured behavior, not builder discretion.
+
+---
+
+## Architect rework — a green QA board is not a shipped-app proof (2026-07-28)
+
+Independent verification re-ran the complete CI sequence successfully, but found that the verifier
+handbook prescribed only `bun qa/run.ts --all`. That command does not execute the Electron production
+build whose breakage created WO-CI1, so a verifier could legitimately report green while skipping the
+defect this order exists to prevent.
+
+Ruling: D3 is strengthened as written above. The release chain has one executable owner and a static,
+falsifiable drift gate. This does not alter runtime behavior, dependencies, package exports, or the
+existing schema-coupling repair; it makes the production proof durable.

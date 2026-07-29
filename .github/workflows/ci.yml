@@ -12,14 +12,5 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Install
-        working-directory: collab-electron
-        run: bun install --frozen-lockfile
-      - name: Unit tests (bare-environment suite)
-        working-directory: collab-electron
-        run: ./scripts/test-unit.sh
-      - name: Build (main + preload + renderer)
-        working-directory: collab-electron
-        run: bun run build
-      - name: QA gates
-        run: bun qa/run.ts --all
+      - name: Release verification (install + unit + production build + QA)
+        run: bun qa/verify-release.ts
