@@ -1,6 +1,6 @@
 # WO-N1 — Product identity: QuantFlow, not Collaborator
 
-status: **unblocked, queued behind WO-K3b — adversarial pre-build read incorporated.**
+status: **open — current after WO-K3b PASS; adversarial pre-build read incorporated.**
 Born 2026-07-27 from founder direction + a Claude diagnosis (accepted after measurement).
 assignee: — (not cuttable)
 depends: **WO-K3b** (hard) — every production artifact writer must live under `~/.quantflow/` before this

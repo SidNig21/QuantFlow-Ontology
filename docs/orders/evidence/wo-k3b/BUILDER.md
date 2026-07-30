@@ -3,7 +3,7 @@
 **In plain terms:** A2A collaboration reports now land on QuantFlow's durable artifact shelf, and a
 gate rejects any production report writer that tries to create a separate shelf.
 
-**Candidate branch:** `codex/wo-k3b`  
+**Candidate branch:** `codex/wo-k3b`
 **Implementation commit:** `97a275a`
 
 This is builder evidence, not a shipping verdict. A separate cold verifier decides PASS or REWORK.

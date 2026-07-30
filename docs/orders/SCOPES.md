@@ -534,7 +534,7 @@ rejected against the relocated root.
 
 ---
 
-## Product identity — queued after WO-K3b (inserted 2026-07-27; remeasured 2026-07-30)
+## Product identity — current after WO-K3b PASS (inserted 2026-07-27; remeasured 2026-07-30)
 
 **Why this exists.** The app still ships, publishes, and stores state as Collaborator while the
 mission is QuantFlow Ontology. Measured: `productName: Collaborator`, `appId: com.collaborator.desktop`,
@@ -561,7 +561,7 @@ migration · `install.sh` / CLI user-visible strings · source and shipped-packa
 `upstream` remote URL · erasing LICENSE / NOTICE / START_HERE lineage · Kernel or artifact paths
 (already owned by K1/K3) · historical evidence prose.
 
-**Full draft:** [`WO-N1.md`](WO-N1.md) — pre-build read incorporated; queued behind K3b.
+**Full order:** [`WO-N1.md`](WO-N1.md) — pre-build read incorporated; current after K3b PASS.
 
 ---
 

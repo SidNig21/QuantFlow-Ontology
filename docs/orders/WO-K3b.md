@@ -1,6 +1,6 @@
 # WO-K3b — every production artifact writer uses the canonical shelf
 
-**Status:** open — current after WO-D2b PASS; adversarial pre-build measurement incorporated  
+**Status:** done — independently verified at `1203ff2` and merged 2026-07-30
 **Depends on:** WO-K3 and WO-D2b PASS  
 **Size:** one Cursor-sized storage-path correction; no A2A redesign
 
@@ -87,3 +87,13 @@ worktree and independently repeats both baits.
 Existing artifact migration or deletion; Kernel/schema/golden changes; app/product rename; A2A
 protocol, role, prompt, delivery, or UI changes; dependencies; credentials; model/network calls;
 bets or trades.
+
+## Verification record
+
+Independent cold verification passed exact candidate
+`1203ff21210986a0d260b8fcc7ab29529e0b5b91` on 2026-07-30. The canonical verifier built and
+inspected the real unsigned Linux package and every QA gate passed. A separate source derivation
+found exactly the two governed production publishers, the explicit override bypassed the default,
+founder read-only counts remained `all_artifacts=0` / `old_refs=0`, and both production baits went
+red then restored green. Full receipts:
+[`evidence/wo-k3b/VERIFICATION.md`](evidence/wo-k3b/VERIFICATION.md).
