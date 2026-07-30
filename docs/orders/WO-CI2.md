@@ -1,6 +1,6 @@
 # WO-CI2 — The shipped app contains its required runtime files
 
-status: rewrite required — two verification rounds failed; rebuild in progress
+status: rewrite required — the clean rebuild also exhausted two verification rounds
 assignee: builder
 depends: WO-K3 — independently verified at `b0b7bc5`; merged 2026-07-29
 blocks: WO-N1 · Dock profile/runtime unification
@@ -439,6 +439,123 @@ temporary copy of the first worktree's submitted package and restores green ther
 - exact FileSet shape rejection and shared production auxiliary path rules remained incomplete.
 
 No verification PASS exists for either candidate.
+
+---
+
+## SECOND BINDING REWRITE — 2026-07-29
+
+This section supersedes the first clean-rebuild implementation at `599a7b1` and its rework at
+`5c49f6a`. Neither commit may merge. The implementation branch is closed after two failed
+verification rounds; the next builder starts again from merged `main` with this complete order and
+must not cherry-pick implementation code from either rejected candidate.
+
+### In plain terms
+
+The new checker still crashes before it can install what it needs, so it cannot prove that a fresh
+checkout produces a working shipped app.
+
+### Clean rebuild verification round 1 — REJECTED (`599a7b1`)
+
+In a pristine detached worktree, the literal first verifier command:
+
+```bash
+bun qa/run.ts package-closure
+```
+
+exited `1` before the standalone install and printed:
+
+```text
+Cannot find module 'qf-kernel/portable'
+```
+
+Inspection also found that the gate mutated process-global run-id state, derived its supposed
+independent release oracle from production construction, allowed receipt validation and inspection
+to collapse into one call, and did not bind every inspected path and FileSet output to the packaged
+resource root. The candidate therefore did not establish the rewritten contract.
+
+### Clean rebuild verification round 2 — REJECTED (`5c49f6a`)
+
+The rework moved the heavy import behind the top-level gate launcher but still executed
+`loadInspectModules()` before `executePackageClosureMode()` could call the standalone install.
+From a second pristine detached worktree at the submitted commit:
+
+```bash
+bun qa/run.ts package-closure
+```
+
+again exited `1` before any install, build, or package process and printed:
+
+```text
+error: Cannot find module 'qf-kernel/portable' from
+'.../collab-electron/scripts/package-lib/package-inspect.ts'
+```
+
+The added `qa/cold-import.test.ts` did not run the package-closure gate; it ran only
+`qa/run.ts --list`. It also renamed the shared `collab-electron/node_modules` directory during
+the test. That is not cold package proof and violates the protocol boundary against disturbing
+shared dependencies.
+
+### RW6 — the standalone installer must precede every collab dependency import
+
+The cold boundary is behavioral, not merely a dynamic-import style rule:
+
+1. Resolving the mode and constructing the standalone executor must load only Bun/Node built-ins and
+   dependency-free QA modules.
+2. In standalone ordinary mode, the first operation in the parent gate that can touch
+   `collab-electron/node_modules` is `bun install --frozen-lockfile`.
+3. Only after that install exits `0` may the parent gate import `package-inspect.ts`,
+   `package-receipt.ts`, `preflight.ts`, `extra-resources.ts`, or any module that imports
+   `qf-kernel/portable` or another dependency resolved from `collab-electron/node_modules`.
+4. The production sequence is exactly:
+   `install → build → package subprocess → parent loads inspection modules → validate receipt →
+   parent inspects`.
+5. An injected install exit `73` returns `73` from `executePackageClosureMode()`. The public
+   `bun qa/run.ts package-closure` command may normalize any failed gate to process exit `1`, but
+   no later import, build, package, validation, or inspection occurs.
+
+The `package:verify` child is explicitly allowed to statically import and use those package-library
+modules: it launches only after the standalone install and must retain its own post-Builder output
+inspection before writing the receipt. The ruled lazy-loader boundary applies to the parent
+`package-closure` gate, whose premature import caused both pristine failures. It does not remove
+the package child's defense-in-depth inspection.
+
+Construct the production executors around a lazy, memoized inspection-module loader. Creating the
+executors must not invoke that loader. Receipt validation, inspection, and the preflight bait may
+request it only at their ruled point in the selected mode. Canonical release mode remains valid
+because the earlier canonical `install` stage has already completed; it still performs zero second
+installs, builds, or packages.
+
+Add a dependency-free unit test with an injected loader and process executors. It must prove the
+exact standalone trace above, prove the loader is uncalled when install fails, and prove no heavy
+module path is resolved during mode selection or executor construction. A static source search by
+itself is not sufficient.
+
+This test is acceptance, not an orphan file. Put it under
+`qa/gates/package-closure/` and extend `collab-electron/scripts/test-unit.sh` to execute the root
+`qa/**/*.test.ts` suite after its existing collab suites. Add an automatically-discovered test
+under `collab-electron/scripts/package-lib/` that removes the root-QA invocation from an in-memory
+copy of the unit script and proves the coverage assertion red, then restores it green. Therefore the
+literal builder and canonical `unit` command in RW5 execute the lazy-loader test in CI.
+
+### RW7 — cold evidence may not disturb or borrow shared dependencies
+
+Delete `qa/cold-import.test.ts` and do not replace it with another simulated-cold test. The
+automatically-discovered package-library wiring test must assert that this exact rejected path is
+absent; falsify that assertion with an in-memory tracked-path fixture containing it, then restore
+green. A `qa/run.ts --list` subprocess proves only registry loading and must never be reported as
+a cold package-closure pass.
+
+The protocol already forbids a builder from renaming, moving, deleting, hiding, or borrowing an
+installed `node_modules` directory. RW7 adds no test that simulates a cold checkout and therefore
+creates no sanctioned dependency-mutation mechanism to police. The only accepted full cold proof is
+the pristine-worktree command below; the behavioral injected-loader test proves ordering but is not
+a substitute for that run.
+
+The only acceptance evidence for the full cold boundary remains RW5: the verifier creates a new
+detached worktree containing no `node_modules`, `out`, staging tree, receipt, or package and runs
+`bun qa/run.ts package-closure` as its first build-related command. The transcript must show the
+frozen install beginning before any package-inspection module is loaded and must end
+`PASS package-closure`.
 
 ---
 
