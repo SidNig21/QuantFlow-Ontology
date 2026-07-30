@@ -50,6 +50,11 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 > the canonical verifier packages the unsigned Linux app, and the artifact contains and resolves the
 > qf-toolloop plus Hermes runtime files. Debt **#30's trigger has fired**, but WO-N1 stays parked until
 > WO-D1/D2 replace the split Kernel/hardcoded Dock identity with one definition-driven profile path.
+>
+> **Status rotation — 2026-07-30, WO-D1 merge:** WO-D1 is CLOSED. Every new agent session now
+> links to its exact founder-visible profile and the shipped app carries the one-time compatibility
+> upgrade. Debt #30 remains triggered but parked until WO-D2 removes the hardcoded Peer Seats launch
+> path and makes `runtime_profile` operational.
 
 | # | Debt | Lands in |
 |---|---|---|
