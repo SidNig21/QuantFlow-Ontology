@@ -39,6 +39,8 @@ const ALLOW_PREFIXES = [
   "tools/qf-peer-bus/src/harness.ts",
   // WO-V1: fixture gate constructs temp Kernel paths (join(dir, "kernel.db")).
   "tools/qf-vault-projection/src/gate.ts",
+  // WO-N1: migration fixture proves legacy Kernel files are excluded, never opened.
+  "qa/gates/product-identity.ts",
   "collab-electron/",
   "qa/gates/kernel-one-path.ts",
   "species/hermes/agent-package/src/acp-shim.ts",
