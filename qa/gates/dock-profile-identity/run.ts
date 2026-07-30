@@ -225,13 +225,23 @@ function scanElectronCreateSessionCallsites(): string | null {
         walk(full);
         continue;
       }
-      if (!/\.tsx?$/.test(name)) continue;
+      if (!/\.tsx?$/.test(name) || /\.test\.tsx?$/.test(name)) continue;
       files.push(full);
     }
   }
   walk(ELECTRON_MAIN);
 
-  const failures: Array<{ file: string; line: number; definitionSymbol: string | null }> = [];
+  const expectedCreators = new Map([
+    ["native-tui-orchestration.ts", "opts.definitionId"],
+    ["runtime-kernel-admission.ts", "definitionId"],
+  ]);
+  const failures: Array<{
+    file: string;
+    line: number;
+    definitionExpression: string | null;
+    expectedExpression: string | null;
+  }> = [];
+  const discoveredFiles = new Set<string>();
   let discovered = 0;
   for (const file of files) {
     const source = readFileSync(file, "utf8");
@@ -247,37 +257,44 @@ function scanElectronCreateSessionCallsites(): string | null {
     function visit(node: ts.Node): void {
       if (
         ts.isCallExpression(node) &&
-        ts.isIdentifier(node.expression) &&
-        node.expression.text === "kernelExecute"
+        (
+          (ts.isIdentifier(node.expression) &&
+            (node.expression.text === "kernelExecute" || node.expression.text === "execute")) ||
+          (ts.isPropertyAccessExpression(node.expression) &&
+            node.expression.name.text === "execute")
+        )
       ) {
         const args = node.arguments;
         if (args.length >= 2 && ts.isStringLiteral(args[0]!) && args[0].text === "create_agent_session") {
           const pos = sf.getLineAndCharacterOfPosition(node.getStart());
-          let definitionSymbol: string | null = null;
+          let definitionExpression: string | null = null;
           let hasDefinitionId = false;
           if (ts.isObjectLiteralExpression(args[1]!)) {
             for (const prop of args[1].properties) {
               if (!ts.isPropertyAssignment(prop) || !ts.isIdentifier(prop.name)) continue;
               if (prop.name.text === "agent_definition_id") {
                 hasDefinitionId = true;
-                if (ts.isIdentifier(prop.initializer)) {
-                  definitionSymbol = prop.initializer.text;
-                }
+                definitionExpression = prop.initializer.getText(sf);
               }
             }
           }
           discovered += 1;
+          const productionFile = relative(ELECTRON_MAIN, file);
+          const expectedExpression = expectedCreators.get(productionFile) ?? null;
+          discoveredFiles.add(productionFile);
           if (!hasDefinitionId) {
             failures.push({
               file: relative(REPO, file),
               line: pos.line + 1,
-              definitionSymbol: null,
+              definitionExpression: null,
+              expectedExpression,
             });
-          } else if (definitionSymbol !== "definitionId") {
+          } else if (!expectedExpression || definitionExpression !== expectedExpression) {
             failures.push({
               file: relative(REPO, file),
               line: pos.line + 1,
-              definitionSymbol,
+              definitionExpression,
+              expectedExpression,
             });
           }
         }
@@ -288,15 +305,21 @@ function scanElectronCreateSessionCallsites(): string | null {
   }
 
   if (discovered === 0) {
-    return "no production create_agent_session kernelExecute callsites discovered";
+    return "no production create_agent_session execute callsites discovered";
+  }
+  for (const expected of expectedCreators.keys()) {
+    if (!discoveredFiles.has(expected)) {
+      return `missing production create_agent_session execute callsite in ${expected}`;
+    }
   }
   for (const hit of failures) {
-    if (!hit.definitionSymbol) {
+    if (!hit.definitionExpression) {
       return `create_agent_session at ${hit.file}:${hit.line} missing agent_definition_id`;
     }
-    if (hit.definitionSymbol !== "definitionId") {
-      return `create_agent_session at ${hit.file}:${hit.line} agent_definition_id must use definitionId symbol (got ${hit.definitionSymbol})`;
+    if (!hit.expectedExpression) {
+      return `create_agent_session at ${hit.file}:${hit.line} is outside the two production admission transactions`;
     }
+    return `create_agent_session at ${hit.file}:${hit.line} agent_definition_id must be ${hit.expectedExpression} (got ${hit.definitionExpression})`;
   }
   return null;
 }
