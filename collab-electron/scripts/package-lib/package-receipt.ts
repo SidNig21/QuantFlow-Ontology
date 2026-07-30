@@ -14,6 +14,10 @@ export type PackageReceipt = {
 
 export const RECEIPT_FILENAME = "package-verify.receipt.json";
 
+export function canonicalPackageVerifyLogPath(collabRoot: string): string {
+  return resolve(join(collabRoot, ".package-verify/electron-builder.log"));
+}
+
 function sha256File(path: string): string {
   const data = readFileSync(path);
   return createHash("sha256").update(data).digest("hex");
@@ -62,8 +66,8 @@ export function validatePackageReceipt(
   }
 
   const resolvedLog = resolve(parsed.logPath);
-  if (!resolvedLog.startsWith(resolve(collabRoot))) {
-    return { ok: false, reason: "package receipt log path out of root" };
+  if (resolvedLog !== canonicalPackageVerifyLogPath(collabRoot)) {
+    return { ok: false, reason: "package receipt logPath mismatch" };
   }
   if (!existsSync(resolvedLog) || statSync(resolvedLog).size === 0) {
     return { ok: false, reason: "package receipt log missing or empty" };

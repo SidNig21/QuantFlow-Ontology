@@ -4,15 +4,17 @@
  * Never reads credentials, signs, uploads, or builds an AppImage.
  */
 import { createWriteStream } from "node:fs";
-import { mkdirSync, rmSync, statSync } from "node:fs";
+import { mkdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadLinuxFileSets } from "./package-lib/extra-resources.ts";
 import { preflightLinuxExtraResources } from "./package-lib/preflight.ts";
 import {
+  canonicalPackageVerifyLogPath,
   createReceiptFromLog,
   writePackageReceipt,
 } from "./package-lib/package-receipt.ts";
+import { cleanPackageVerificationOutputs } from "./package-lib/package-cleanup.ts";
 import { prepareRuntimeStaging, RUNTIME_FILES } from "./package-lib/runtime-staging.ts";
 import { inspectPackagedResources } from "./package-lib/package-inspect.ts";
 import { createPackageRunId } from "./package-lib/run-id.ts";
@@ -24,7 +26,7 @@ const verifyDir = join(collabRoot, ".package-verify");
 const distDir = join(collabRoot, "dist");
 const packageRoot = join(distDir, "linux-unpacked");
 const resourcesRoot = join(packageRoot, "resources");
-const logPath = join(verifyDir, "electron-builder.log");
+const logPath = canonicalPackageVerifyLogPath(collabRoot);
 
 function fail(message: string): never {
   console.error(`package:verify: ${message}`);
@@ -38,9 +40,7 @@ if (process.platform !== "linux") {
 const runId = process.env.QF_RELEASE_RUN_ID?.trim() || createPackageRunId();
 console.log(`package:verify: runId=${runId}`);
 
-rmSync(distDir, { recursive: true, force: true });
-rmSync(stagingRoot, { recursive: true, force: true });
-rmSync(verifyDir, { recursive: true, force: true });
+cleanPackageVerificationOutputs({ packageRoot, stagingRoot, verifyDir });
 mkdirSync(verifyDir, { recursive: true });
 
 prepareRuntimeStaging({ stagingRoot, repoRoot });
