@@ -1,0 +1,35 @@
+{
+  "route": "native_tui",
+  "name": "hermes",
+  "argv": [
+    "--tui"
+  ],
+  "profile_argv": [
+    "-p",
+    "{runtime_profile}",
+    "--tui"
+  ],
+  "peer_delivery": {
+    "mode": "pty_role",
+    "runtime_profiles": [
+      "qf-orchestrator",
+      "qf-worker",
+      "qf-worker-2"
+    ]
+  },
+  "package": "hermes.aospkg",
+  "tools": [
+    "kind:think",
+    "kind:read",
+    "kind:search",
+    "kind:fetch",
+    "think",
+    "web_search",
+    "web_extract",
+    "browser_navigate",
+    "browser_snapshot",
+    "read_file",
+    "search_files",
+    "list_dir"
+  ]
+}

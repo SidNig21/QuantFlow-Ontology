@@ -1,0 +1,280 @@
+/**
+ * Package-owned Dock profile bootstrap inputs.
+ *
+ * Manifests are validated completely before the injected Kernel front door is
+ * called. They initialize missing rows only; runtime listing and launch must
+ * read the Kernel, never this module.
+ */
+import {
+  existsSync,
+  lstatSync,
+  readFileSync,
+  readdirSync,
+} from "node:fs";
+import { join, posix } from "node:path";
+import { resolveRuntimeAdapterMetadata } from "./runtime-adapter";
+
+export const REQUIRED_DOCK_PROFILE_MANIFESTS = [
+  "species/hermes/dock-profiles.json",
+  "tools/runtime-proof/dock-profiles.json",
+] as const;
+
+export type DockProfileRegistration = {
+  name: string;
+  role: string;
+  package_ref: string;
+  runtime_profile: string | null;
+  system_prompt_ref: string | null;
+};
+
+export type DockProfileManifest = {
+  manifestPath: string;
+  manifestRef: string;
+  adapterId: string;
+  packageRef: string;
+  profiles: DockProfileRegistration[];
+};
+
+export type BootstrapConflict = {
+  definitionId: string;
+  expected: DockProfileRegistration;
+  existing: Record<string, unknown>;
+};
+
+export type BootstrapDockProfilesResult = {
+  manifests: string[];
+  registered: string[];
+  skipped: string[];
+  conflicts: BootstrapConflict[];
+};
+
+export type BootstrapDockProfilesDependencies = {
+  getAgentDefinition: (definitionId: string) => Record<string, unknown> | null;
+  executeRegisterAgentDefinition: (input: DockProfileRegistration) => unknown;
+  reportConflict?: (conflict: BootstrapConflict) => void;
+};
+
+export class DockProfilesContractError extends Error {
+  override readonly name = "DockProfilesContractError";
+
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+function record(value: unknown, label: string): Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new DockProfilesContractError(`${label} must be an object`);
+  }
+  return value as Record<string, unknown>;
+}
+
+function exactKeys(
+  value: Record<string, unknown>,
+  expected: readonly string[],
+  label: string,
+): void {
+  const actual = Object.keys(value).sort();
+  const wanted = [...expected].sort();
+  if (actual.length !== wanted.length || actual.some((key, i) => key !== wanted[i])) {
+    throw new DockProfilesContractError(
+      `${label} keys must be exactly [${wanted.join(", ")}], got [${actual.join(", ")}]`,
+    );
+  }
+}
+
+function trimmedString(value: unknown, label: string): string {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new DockProfilesContractError(`${label} must be a non-empty string`);
+  }
+  return value.trim();
+}
+
+function nullableTrimmedString(value: unknown, label: string): string | null {
+  if (value === null) return null;
+  return trimmedString(value, label);
+}
+
+function normalizedPackagePath(value: unknown, label: string): string {
+  const path = trimmedString(value, label);
+  const segments = path.split("/");
+  if (
+    path.startsWith("/") ||
+    path.includes("\\") ||
+    path.includes(":") ||
+    /[*?[\]{}]/.test(path) ||
+    segments.some((segment) => segment === "" || segment === "." || segment === "..") ||
+    posix.normalize(path) !== path
+  ) {
+    throw new DockProfilesContractError(
+      `${label} must be a normalized relative POSIX path without traversal, glob, URI, or backslash`,
+    );
+  }
+  return path;
+}
+
+function requireRegularFile(path: string, label: string): void {
+  if (!existsSync(path) || !lstatSync(path).isFile()) {
+    throw new DockProfilesContractError(`${label} missing or not a regular file: ${path}`);
+  }
+}
+
+function readManifest(
+  appRoot: string,
+  rootName: "species" | "tools",
+  adapterDirectory: string,
+): DockProfileManifest {
+  const manifestRef = `${rootName}/${adapterDirectory}/dock-profiles.json`;
+  const manifestPath = join(appRoot, manifestRef);
+  requireRegularFile(manifestPath, "Dock profile manifest");
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(readFileSync(manifestPath, "utf8"));
+  } catch (error) {
+    throw new DockProfilesContractError(
+      `Dock profile manifest is not valid JSON: ${manifestPath}: ${String(error)}`,
+    );
+  }
+  const doc = record(raw, manifestPath);
+  exactKeys(doc, ["schema_version", "adapter", "profiles"], manifestPath);
+  if (doc.schema_version !== 1) {
+    throw new DockProfilesContractError(`${manifestPath}.schema_version must equal 1`);
+  }
+
+  const adapter = record(doc.adapter, `${manifestPath}.adapter`);
+  exactKeys(adapter, ["id", "package"], `${manifestPath}.adapter`);
+  const adapterId = trimmedString(adapter.id, `${manifestPath}.adapter.id`);
+  const adapterPackage = normalizedPackagePath(
+    adapter.package,
+    `${manifestPath}.adapter.package`,
+  );
+  const packageRef = `${rootName}/${adapterDirectory}/${adapterPackage}`;
+  requireRegularFile(join(appRoot, packageRef), "Dock profile runtime package");
+  const resolved = resolveRuntimeAdapterMetadata(packageRef, appRoot);
+  if (resolved.metadata.adapterId !== adapterId) {
+    throw new DockProfilesContractError(
+      `${manifestPath} adapter id mismatch: manifest=${adapterId} metadata=${resolved.metadata.adapterId}`,
+    );
+  }
+
+  if (!Array.isArray(doc.profiles) || doc.profiles.length === 0) {
+    throw new DockProfilesContractError(`${manifestPath}.profiles must be non-empty`);
+  }
+  const ids = new Set<string>();
+  const profiles = doc.profiles.map((value, index): DockProfileRegistration => {
+    const label = `${manifestPath}.profiles[${index}]`;
+    const profile = record(value, label);
+    exactKeys(
+      profile,
+      ["id", "role", "runtime_profile", "system_prompt_ref"],
+      label,
+    );
+    const name = trimmedString(profile.id, `${label}.id`);
+    if (ids.has(name)) {
+      throw new DockProfilesContractError(`${manifestPath} has duplicate profile id: ${name}`);
+    }
+    ids.add(name);
+    return {
+      name,
+      role: trimmedString(profile.role, `${label}.role`),
+      package_ref: packageRef,
+      runtime_profile: nullableTrimmedString(
+        profile.runtime_profile,
+        `${label}.runtime_profile`,
+      ),
+      system_prompt_ref: nullableTrimmedString(
+        profile.system_prompt_ref,
+        `${label}.system_prompt_ref`,
+      ),
+    };
+  });
+
+  return { manifestPath, manifestRef, adapterId, packageRef, profiles };
+}
+
+export function discoverDockProfileManifests(appRoot: string): DockProfileManifest[] {
+  const manifests: DockProfileManifest[] = [];
+  for (const rootName of ["species", "tools"] as const) {
+    const rootPath = join(appRoot, rootName);
+    if (!existsSync(rootPath) || !lstatSync(rootPath).isDirectory()) continue;
+    for (const entry of readdirSync(rootPath, { withFileTypes: true })
+      .filter((candidate) => candidate.isDirectory() && !candidate.isSymbolicLink())
+      .sort((a, b) => a.name.localeCompare(b.name))) {
+      const manifestPath = join(rootPath, entry.name, "dock-profiles.json");
+      if (!existsSync(manifestPath)) continue;
+      manifests.push(readManifest(appRoot, rootName, entry.name));
+    }
+  }
+
+  const refs = new Set(manifests.map((manifest) => manifest.manifestRef));
+  for (const required of REQUIRED_DOCK_PROFILE_MANIFESTS) {
+    if (!refs.has(required)) {
+      throw new DockProfilesContractError(`required Dock profile manifest missing: ${required}`);
+    }
+  }
+  const definitionIds = new Set<string>();
+  for (const manifest of manifests) {
+    for (const profile of manifest.profiles) {
+      if (definitionIds.has(profile.name)) {
+        throw new DockProfilesContractError(
+          `duplicate Dock profile id across manifests: ${profile.name}`,
+        );
+      }
+      definitionIds.add(profile.name);
+    }
+  }
+  return manifests;
+}
+
+function sameDefinition(
+  existing: Record<string, unknown>,
+  expected: DockProfileRegistration,
+): boolean {
+  return String(existing.id ?? "") === expected.name &&
+    String(existing.name ?? "") === expected.name &&
+    String(existing.role ?? "") === expected.role &&
+    String(existing.package_ref ?? "") === expected.package_ref &&
+    (existing.runtime_profile ?? null) === expected.runtime_profile &&
+    (existing.system_prompt_ref ?? null) === expected.system_prompt_ref;
+}
+
+export function bootstrapDockProfiles(
+  appRoot: string,
+  dependencies: BootstrapDockProfilesDependencies,
+): BootstrapDockProfilesResult {
+  // Load and validate the complete package-owned input set before any Kernel call.
+  const manifests = discoverDockProfileManifests(appRoot);
+  const registered: string[] = [];
+  const skipped: string[] = [];
+  const conflicts: BootstrapConflict[] = [];
+
+  for (const manifest of manifests) {
+    for (const profile of manifest.profiles) {
+      const existing = dependencies.getAgentDefinition(profile.name);
+      if (!existing) {
+        dependencies.executeRegisterAgentDefinition({ ...profile });
+        registered.push(profile.name);
+        continue;
+      }
+      if (sameDefinition(existing, profile)) {
+        skipped.push(profile.name);
+        continue;
+      }
+      const conflict = {
+        definitionId: profile.name,
+        expected: profile,
+        existing,
+      };
+      conflicts.push(conflict);
+      dependencies.reportConflict?.(conflict);
+    }
+  }
+
+  return {
+    manifests: manifests.map((manifest) => manifest.manifestRef),
+    registered,
+    skipped,
+    conflicts,
+  };
+}

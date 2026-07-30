@@ -30,8 +30,14 @@ import {
 } from "./package-resource-paths-reexport.ts";
 import { expandFileSetOutputs } from "./fileset-expand.ts";
 import type { FileSet } from "./extra-resources.ts";
+import { discoverDockProfileManifests } from "../../src/main/dock-profiles.ts";
 
 export const QF_TOOLLOOP_REF = "tools/runtime-proof/packed/qf-toolloop.aospkg";
+export const QF_TOOLLOOP_META =
+  "tools/runtime-proof/packed/qf-toolloop.meta.json";
+export const QF_TOOLLOOP_LAUNCH = "tools/runtime-proof/launch.json";
+export const QF_TOOLLOOP_DOCK_PROFILES =
+  "tools/runtime-proof/dock-profiles.json";
 export const QF_KERNEL_SCHEMA_MIGRATION =
   "node_modules/qf-kernel-schema/golden/migration.sql";
 export const QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY =
@@ -39,6 +45,18 @@ export const QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY =
 export const QF_KERNEL_SCHEMA_UPGRADE =
   "node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
 export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
+export const HERMES_META = "species/hermes/packed/hermes.meta.json";
+export const HERMES_LAUNCH = "species/hermes/launch.json";
+export const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
+
+export const RUNTIME_CONTROL_FILES = [
+  QF_TOOLLOOP_META,
+  QF_TOOLLOOP_LAUNCH,
+  QF_TOOLLOOP_DOCK_PROFILES,
+  HERMES_META,
+  HERMES_LAUNCH,
+  HERMES_DOCK_PROFILES,
+] as const;
 
 const REPO_SCHEMA_MIGRATION = "qf-kernel-schema/golden/migration.sql";
 const REPO_SCHEMA_PRE_D1_AUTHORITY =
@@ -84,6 +102,7 @@ function inspectAuxiliaryPaths(
   packageRef: string,
   resourcesRoot: string,
   checked: { path: string; bytes: number }[],
+  requireAllowlist: boolean,
 ): InspectFailure | null {
   const meta = packedMetaPathForPackageRef(packageRef, resourcesRoot);
   if (!meta) {
@@ -101,6 +120,8 @@ function inspectAuxiliaryPaths(
   if (launchFail) return launchFail;
   checked.push({ path: launch, bytes: fileSize(launch) });
 
+  if (!requireAllowlist) return null;
+
   const allowlist = committedAllowlistPathForPackageRef(packageRef, resourcesRoot);
   if (!allowlist) {
     return {
@@ -112,6 +133,36 @@ function inspectAuxiliaryPaths(
   if (allowFail) return allowFail;
   checked.push({ path: allowlist, bytes: fileSize(allowlist) });
 
+  return null;
+}
+
+function inspectRuntimeControlFiles(
+  resourcesRoot: string,
+  repoRoot: string,
+  checked: { path: string; bytes: number }[],
+): InspectFailure | null {
+  for (const rel of RUNTIME_CONTROL_FILES) {
+    const packagedPath = join(resourcesRoot, rel);
+    if (!existsSync(packagedPath)) {
+      return { ok: false, reason: `runtime control file missing: ${rel}` };
+    }
+    const sourcePath = join(repoRoot, rel);
+    if (!existsSync(sourcePath)) {
+      return { ok: false, reason: `runtime source control file missing: ${rel}` };
+    }
+    const packagedBytes = readFileSync(packagedPath);
+    const sourceBytes = readFileSync(sourcePath);
+    if (packagedBytes.compare(sourceBytes) !== 0) {
+      return {
+        ok: false,
+        reason:
+          `runtime control byte mismatch: ${rel}` +
+          ` packaged=${sha256Buffer(packagedBytes)}` +
+          ` source=${sha256Buffer(sourceBytes)}`,
+      };
+    }
+    checked.push({ path: packagedPath, bytes: packagedBytes.length });
+  }
   return null;
 }
 
@@ -172,10 +223,21 @@ export function inspectPackagedResources(
   if (packagedCheck) return packagedCheck;
 
   const checked: { path: string; bytes: number }[] = [];
+  const repoRoot = join(collabRoot, "..");
+
+  const controlFail = inspectRuntimeControlFiles(root, repoRoot, checked);
+  if (controlFail) return controlFail;
 
   try {
     const toolloopPath = resolvePackageRef(QF_TOOLLOOP_REF, root, "qf-toolloop");
     checked.push({ path: toolloopPath, bytes: fileSize(toolloopPath) });
+    const auxFail = inspectAuxiliaryPaths(
+      QF_TOOLLOOP_REF,
+      root,
+      checked,
+      false,
+    );
+    if (auxFail) return auxFail;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return { ok: false, reason: `unresolved qf-toolloop reference: ${message}` };
@@ -184,11 +246,18 @@ export function inspectPackagedResources(
   try {
     const hermesPath = resolvePackageRef(HERMES_REF, root, "hermes");
     checked.push({ path: hermesPath, bytes: fileSize(hermesPath) });
-    const auxFail = inspectAuxiliaryPaths(HERMES_REF, root, checked);
+    const auxFail = inspectAuxiliaryPaths(HERMES_REF, root, checked, true);
     if (auxFail) return auxFail;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return { ok: false, reason: `unresolved hermes reference: ${message}` };
+  }
+
+  try {
+    discoverDockProfileManifests(root);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { ok: false, reason: `runtime control validation failed: ${message}` };
   }
 
   for (const fileSet of fileSets) {
@@ -206,7 +275,7 @@ export function inspectPackagedResources(
     }
   }
 
-  const sqlInspect = inspectAsarSqlArtifacts(root, join(collabRoot, ".."));
+  const sqlInspect = inspectAsarSqlArtifacts(root, repoRoot);
   if ("ok" in sqlInspect && sqlInspect.ok === false) {
     return sqlInspect;
   }
@@ -307,6 +376,39 @@ export type AsarInventoryDiff = {
   removed: string[];
   added: string[];
 };
+
+function normalizedFileInventory(root: string, prefix = ""): string[] {
+  const paths: string[] = [];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      paths.push(...normalizedFileInventory(join(root, entry.name), rel));
+    } else if (entry.isFile()) {
+      paths.push(rel);
+    }
+  }
+  return paths.sort();
+}
+
+export function removeDockProfilesManifest(
+  baitPackageRoot: string,
+  manifestRef = HERMES_DOCK_PROFILES,
+): AsarInventoryDiff {
+  const resourcesRoot = join(baitPackageRoot, "resources");
+  const inventoryBefore = normalizedFileInventory(resourcesRoot);
+  const target = join(resourcesRoot, manifestRef);
+  if (!existsSync(target)) {
+    throw new Error(`missing Dock profile manifest before bait removal: ${manifestRef}`);
+  }
+  rmSync(target);
+  const inventoryAfter = normalizedFileInventory(resourcesRoot);
+  const beforeSet = new Set(inventoryBefore);
+  const afterSet = new Set(inventoryAfter);
+  return {
+    removed: [...beforeSet].filter((entry) => !afterSet.has(entry)).sort(),
+    added: [...afterSet].filter((entry) => !beforeSet.has(entry)).sort(),
+  };
+}
 
 function normalizedAsarInventory(asarPath: string): string[] {
   return listPackage(asarPath, { isPack: false })

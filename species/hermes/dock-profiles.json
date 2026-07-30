@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "adapter": {
+    "id": "hermes",
+    "package": "packed/hermes.aospkg"
+  },
+  "profiles": [
+    {
+      "id": "hermes-orchestrator",
+      "role": "orchestrator",
+      "runtime_profile": "qf-orchestrator",
+      "system_prompt_ref": null
+    },
+    {
+      "id": "hermes-worker",
+      "role": "worker",
+      "runtime_profile": "qf-worker",
+      "system_prompt_ref": null
+    },
+    {
+      "id": "hermes-worker-2",
+      "role": "worker2",
+      "runtime_profile": "qf-worker-2",
+      "system_prompt_ref": null
+    }
+  ]
+}

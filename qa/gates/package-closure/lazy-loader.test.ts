@@ -7,12 +7,14 @@ import { resolvePackageClosureMode } from "./modes.ts";
 
 const UPGRADE_PATH =
   "node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
+const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
 const FAKE_BAIT_ROOT = join(
   tmpdir(),
   `qf-package-closure-bait-test-${process.pid}`,
 );
 
 function fakeModules(): InspectionModules {
+  let removed: "upgrade" | "bootstrap" | null = null;
   return {
     loadLinuxFileSets: () => [],
     validatePackageReceipt: () => ({
@@ -25,21 +27,33 @@ function fakeModules(): InspectionModules {
       },
       resourcesRoot: "/pkg/resources",
     }),
-    inspectPackagedResources: (resourcesRoot) =>
-      resourcesRoot === join(FAKE_BAIT_ROOT, "resources")
+    inspectPackagedResources: (resourcesRoot) => {
+      if (resourcesRoot !== join(FAKE_BAIT_ROOT, "resources")) {
+        return { ok: true, checkedPaths: [] };
+      }
+      return removed === "bootstrap"
         ? {
             ok: false,
-            reason: `missing packaged SQL artifact: ${UPGRADE_PATH}`,
+            reason: `runtime control file missing: ${HERMES_DOCK_PROFILES}`,
           }
-        : { ok: true, checkedPaths: [] },
+        : {
+            ok: false,
+            reason: `missing packaged SQL artifact: ${UPGRADE_PATH}`,
+          };
+    },
     preflightLinuxExtraResources: () => ({ ok: true, fileSets: [] }),
     copyPackageForBait: () => FAKE_BAIT_ROOT,
     removeHermesPackage: () => {},
-    removeD1UpgradeFromAsar: async () => ({
-      removed: [UPGRADE_PATH],
-      added: [],
-    }),
+    removeD1UpgradeFromAsar: async () => {
+      removed = "upgrade";
+      return { removed: [UPGRADE_PATH], added: [] };
+    },
+    removeDockProfilesManifest: () => {
+      removed = "bootstrap";
+      return { removed: [HERMES_DOCK_PROFILES], added: [] };
+    },
     qfKernelSchemaUpgradePath: UPGRADE_PATH,
+    hermesDockProfilesPath: HERMES_DOCK_PROFILES,
     createPackageRunId: () => "fresh-run",
   };
 }
@@ -86,7 +100,7 @@ describe("executePackageClosureMode standalone ordering", () => {
     expect(loaderCalled).toBe(false);
   });
 
-  test("standalone success runs install, build, package, and copied-ASAR control", async () => {
+  test("standalone success runs build, package, and both copied-package controls", async () => {
     const result = await executePackageClosureMode({
       mode: { kind: "standalone" },
       executors: {
@@ -102,29 +116,20 @@ describe("executePackageClosureMode standalone ordering", () => {
       install: 1,
       build: 1,
       packageVerify: 1,
-      inspect: 2,
+      inspect: 3,
       preflight: 0,
       loaderCalls: 1,
     });
   });
 
-  test("canonical success requires the copied-package missing-upgrade control", async () => {
-    let mutationCalls = 0;
+  test("canonical success requires both copied-package controls", async () => {
     const result = await executePackageClosureMode({
       mode: { kind: "canonical", runId: "run" },
-      loadInspectionModules: () =>
-        Promise.resolve({
-          ...fakeModules(),
-          removeD1UpgradeFromAsar: async () => {
-            mutationCalls += 1;
-            return { removed: [UPGRADE_PATH], added: [] };
-          },
-        }),
+      loadInspectionModules: () => Promise.resolve(fakeModules()),
     });
 
     expect(result.code).toBe(0);
-    expect(result.trace.inspect).toBe(2);
-    expect(mutationCalls).toBe(1);
+    expect(result.trace.inspect).toBe(3);
   });
 
   test("canonical invalid receipt never installs or inspects", async () => {

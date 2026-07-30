@@ -68,6 +68,62 @@ type MissingUpgradeControlResult =
   | { ok: true; observedReason: string }
   | { ok: false; reason: string };
 
+type MissingBootstrapControlResult = MissingUpgradeControlResult;
+
+function runMissingBootstrapControl(
+  mods: InspectionModules,
+  packageRoot: string,
+  fileSets: Parameters<InspectionModules["inspectPackagedResources"]>[2],
+): MissingBootstrapControlResult {
+  const baitRoot = mods.copyPackageForBait(packageRoot);
+  try {
+    let inventory;
+    try {
+      inventory = mods.removeDockProfilesManifest(baitRoot);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        ok: false,
+        reason: `missing-bootstrap bait mutation failed: ${message}`,
+      };
+    }
+    const exactRemoval =
+      inventory.removed.length === 1 &&
+      inventory.removed[0] === mods.hermesDockProfilesPath &&
+      inventory.added.length === 0;
+    if (!exactRemoval) {
+      return {
+        ok: false,
+        reason:
+          "missing-bootstrap bait expected exactly one removed manifest path and no additions" +
+          `; removed=[${inventory.removed.join(",")}] added=[${inventory.added.join(",")}]`,
+      };
+    }
+    const baitResourcesRoot = join(baitRoot, "resources");
+    const inspect = mods.inspectPackagedResources(
+      baitResourcesRoot,
+      COLLAB_ELECTRON_ROOT,
+      fileSets,
+      { expectedResourcesRoot: baitResourcesRoot },
+    );
+    if (inspect.ok) {
+      return { ok: false, reason: "missing-bootstrap bait expected manifest failure" };
+    }
+    const expectedReason =
+      `runtime control file missing: ${mods.hermesDockProfilesPath}`;
+    if (inspect.reason !== expectedReason) {
+      return {
+        ok: false,
+        reason:
+          `missing-bootstrap bait expected ${expectedReason}, got: ${inspect.reason}`,
+      };
+    }
+    return { ok: true, observedReason: inspect.reason };
+  } finally {
+    rmSync(baitRoot, { recursive: true, force: true });
+  }
+}
+
 async function runMissingUpgradeControl(
   mods: InspectionModules,
   packageRoot: string,
@@ -256,6 +312,16 @@ export async function executePackageClosureMode(
       console.log(
         `package-closure: missing-upgrade control observed ${control.observedReason}`,
       );
+      trace.inspect += 1;
+      const bootstrapControl = runMissingBootstrapControl(
+        mods,
+        validation.receipt.packageRoot,
+        fileSets,
+      );
+      if (!bootstrapControl.ok) return fail(bootstrapControl.reason);
+      console.log(
+        `package-closure: missing-bootstrap control observed ${bootstrapControl.observedReason}`,
+      );
       return { code: 0, trace };
     }
 
@@ -312,6 +378,16 @@ export async function executePackageClosureMode(
       if (!control.ok) return fail(control.reason);
       console.log(
         `package-closure: missing-upgrade control observed ${control.observedReason}`,
+      );
+      trace.inspect += 1;
+      const bootstrapControl = runMissingBootstrapControl(
+        mods,
+        validation.receipt.packageRoot,
+        fileSets,
+      );
+      if (!bootstrapControl.ok) return fail(bootstrapControl.reason);
+      console.log(
+        `package-closure: missing-bootstrap control observed ${bootstrapControl.observedReason}`,
       );
       return { code: 0, trace };
     }

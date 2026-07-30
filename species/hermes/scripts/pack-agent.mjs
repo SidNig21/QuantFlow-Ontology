@@ -74,6 +74,10 @@ if (!existsSync(aospkg)) {
 let route = "native_tui";
 /** @type {string[]} */
 let argv = ["--tui"];
+/** @type {string[] | undefined} */
+let profileArgv;
+/** @type {{mode: string, runtime_profiles: string[]} | undefined} */
+let peerDelivery;
 try {
   if (existsSync(launchJson)) {
     const doc = JSON.parse(readFileSync(launchJson, "utf8"));
@@ -90,6 +94,16 @@ try {
     }
     if (Array.isArray(doc.argv)) {
       argv = doc.argv.filter((a) => typeof a === "string" && a.length > 0);
+    }
+    if (doc.name !== "hermes") {
+      console.error("pack-agent: launch.json name must be hermes");
+      process.exit(1);
+    }
+    if (Array.isArray(doc.profile_argv)) {
+      profileArgv = doc.profile_argv;
+    }
+    if (doc.peer_delivery && typeof doc.peer_delivery === "object") {
+      peerDelivery = doc.peer_delivery;
     }
   }
 } catch {
@@ -114,8 +128,10 @@ try {
 
 const meta = {
   route,
-  ...(route === "native_tui" ? { argv } : {}),
   name: "hermes",
+  ...(route === "native_tui" ? { argv } : {}),
+  ...(profileArgv ? { profile_argv: profileArgv } : {}),
+  ...(peerDelivery ? { peer_delivery: peerDelivery } : {}),
   package: "hermes.aospkg",
   tools,
 };

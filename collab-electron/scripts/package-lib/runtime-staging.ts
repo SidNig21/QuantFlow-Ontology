@@ -10,12 +10,17 @@ import {
   statSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
+import { discoverDockProfileManifests } from "../../src/main/dock-profiles.ts";
 
 export const RUNTIME_FILES = [
   "tools/runtime-proof/packed/qf-toolloop.aospkg",
+  "tools/runtime-proof/packed/qf-toolloop.meta.json",
+  "tools/runtime-proof/launch.json",
+  "tools/runtime-proof/dock-profiles.json",
   "species/hermes/packed/hermes.aospkg",
   "species/hermes/packed/hermes.meta.json",
   "species/hermes/launch.json",
+  "species/hermes/dock-profiles.json",
   "species/hermes/tools-allowlist.json",
 ] as const;
 
@@ -53,6 +58,8 @@ export function prepareRuntimeStaging(paths: RuntimeStagingPaths): void {
   runOrThrow("bun", ["install", "--frozen-lockfile"], hermesDir);
   runOrThrow("bun", ["run", "pack-agent"], hermesDir);
 
+  discoverDockProfileManifests(repoRoot);
+
   for (const rel of RUNTIME_FILES) {
     const source = join(repoRoot, rel);
     assertNonEmptyFile(source);
@@ -61,4 +68,6 @@ export function prepareRuntimeStaging(paths: RuntimeStagingPaths): void {
     copyFileSync(source, dest);
     assertNonEmptyFile(dest);
   }
+
+  discoverDockProfileManifests(stagingRoot);
 }

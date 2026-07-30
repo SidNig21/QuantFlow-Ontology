@@ -1,4 +1,10 @@
 {
   "route": "native_tui",
-  "argv": ["--tui"]
+  "name": "hermes",
+  "argv": ["--tui"],
+  "profile_argv": ["-p", "{runtime_profile}", "--tui"],
+  "peer_delivery": {
+    "mode": "pty_role",
+    "runtime_profiles": ["qf-orchestrator", "qf-worker", "qf-worker-2"]
+  }
 }

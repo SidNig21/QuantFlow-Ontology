@@ -1,16 +1,25 @@
 import { describe, expect, test } from "bun:test";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import {
+  copyFileSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join } from "node:path";
 import { finished } from "node:stream/promises";
 import { createPackage } from "@electron/asar";
 import {
   HERMES_REF,
+  HERMES_DOCK_PROFILES,
   inspectPackagedResources,
   QF_KERNEL_SCHEMA_MIGRATION,
   QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY,
   QF_KERNEL_SCHEMA_UPGRADE,
   QF_TOOLLOOP_REF,
+  RUNTIME_CONTROL_FILES,
   removeD1UpgradeFromAsar,
+  removeDockProfilesManifest,
   removeHermesPackage,
 } from "./package-inspect.ts";
 
@@ -30,11 +39,11 @@ function seedMinimalPackage(root: string): void {
   mkdirSync(join(resources, "species/hermes/packed"), { recursive: true });
   writeFileSync(join(resources, QF_TOOLLOOP_REF), "toolloop");
   writeFileSync(join(resources, HERMES_REF), "hermes");
-  writeFileSync(
-    join(resources, "species/hermes/packed/hermes.meta.json"),
-    "{}",
-  );
-  writeFileSync(join(resources, "species/hermes/launch.json"), "{}");
+  for (const rel of RUNTIME_CONTROL_FILES) {
+    const destination = join(resources, rel);
+    mkdirSync(dirname(destination), { recursive: true });
+    copyFileSync(join(repoRoot, rel), destination);
+  }
   writeFileSync(
     join(resources, "species/hermes/tools-allowlist.json"),
     "[]",
@@ -171,6 +180,64 @@ describe("inspectPackagedResources root rules", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.reason).toContain("root escape:");
+    }
+  });
+});
+
+describe("inspectPackagedResources runtime controls", () => {
+  test("copied-package control removes exactly one manifest and names it missing", async () => {
+    const root = testTmpPath("manifest-remove");
+    rmSync(root, { recursive: true, force: true });
+    seedMinimalPackage(root);
+    await seedSqlAsar(root);
+
+    try {
+      expect(removeDockProfilesManifest(root)).toEqual({
+        removed: [HERMES_DOCK_PROFILES],
+        added: [],
+      });
+      const result = inspectPackagedResources(
+        join(root, "resources"),
+        collabRoot,
+        [],
+        { expectedResourcesRoot: join(root, "resources") },
+      );
+      expect(result).toEqual({
+        ok: false,
+        reason: `runtime control file missing: ${HERMES_DOCK_PROFILES}`,
+      });
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("rejects a runtime control byte mismatch with both hashes", async () => {
+    const root = testTmpPath("manifest-mismatch");
+    rmSync(root, { recursive: true, force: true });
+    seedMinimalPackage(root);
+    await seedSqlAsar(root);
+    writeFileSync(
+      join(root, "resources", HERMES_DOCK_PROFILES),
+      "{\"mismatch\":true}\n",
+    );
+
+    try {
+      const result = inspectPackagedResources(
+        join(root, "resources"),
+        collabRoot,
+        [],
+        { expectedResourcesRoot: join(root, "resources") },
+      );
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toContain(
+          `runtime control byte mismatch: ${HERMES_DOCK_PROFILES}`,
+        );
+        expect(result.reason).toContain("packaged=");
+        expect(result.reason).toContain("source=");
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
     }
   });
 });
