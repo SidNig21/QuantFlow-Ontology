@@ -233,6 +233,19 @@ G6: read-only old-root artifact-reference count; never advise deletion unless ze
 Plain-language open · D1–D6 evidence · migration/failure/retry receipts · shipped identity · bucket
 A/B/C/D residual table · old-root artifact-reference count · judgment where the order was silent.
 
+## REWORK ROUND 1 — 2026-07-30 · ONE INTEGRATION ITEM
+
+Independent cold verification of exact candidate `c7f955a` passed frozen install, all unit tests,
+the production build, and real Linux package inspection. The all-QA stage then correctly failed:
+`kernel-one-path` found the intentional legacy `kernel.db` exclusion canary inside the new
+`product-identity` fixture outside its exact fixture allowlist.
+
+Repair `a710786` adds only `qa/gates/product-identity.ts` to the existing scanner's allowlist. A
+sibling QA bait containing the same literal still fails the scanner, proving the exception did not
+widen to `qa/gates/` or production code; removing the bait restores green. No packaged source,
+migration behavior, dependency, schema, Kernel path, or release configuration changed. The repaired
+candidate returns to independent verification; the failed cold run is not a shipping verdict.
+
 ---
 
 ## Why after K3b (do not pull forward)

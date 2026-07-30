@@ -8,6 +8,8 @@ it.
 
 **Implementation commit:** `9a0b63f`
 
+**Cold integration repair:** `a710786`
+
 This is builder evidence, not a shipping verdict. A separate cold verifier decides PASS or REWORK.
 
 ## Implementation
@@ -199,3 +201,22 @@ root. Global breadcrumbs and host-mount policy use `QF_APP_ROOT`, while canvas/c
 state uses `QF_APP_DIR`, preserving development isolation. The gate imports the exact production
 migration helper and scans the real boot call so a correct helper that is not called still fails.
 No dependency, schema, Kernel path, artifact root, release credential, or upstream seam changed.
+
+## Cold integration repair
+
+Independent verification of candidate `c7f955a` built and inspected the real Linux package, then
+found the new migration gate's intentional legacy `kernel.db` exclusion canary was not declared to
+the older `kernel-one-path` scanner. The scanner failed before later QA could run:
+
+```text
+kernel-one-path G1: offenders outside allowlist:
+  - qa/gates/product-identity.ts (kernel.db path construction/literal)
+FAIL  kernel-one-path
+```
+
+Repair `a710786` adds exactly `qa/gates/product-identity.ts` to that fixture allowlist, with a comment
+stating why. It does not allow a directory or production prefix. Focused falsification created a
+sibling QA file carrying the same literal: the scanner rejected that sibling, exit 1; removing it
+restored `kernel-one-path G1: PASS`. `product-identity` remained green with its full migration
+matrix. The first candidate's cold package receipts remain evidence, not a PASS verdict; the repaired
+exact candidate still requires independent verification.
