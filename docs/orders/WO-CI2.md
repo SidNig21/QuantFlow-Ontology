@@ -327,10 +327,14 @@ There are exactly three modes:
 Implement the mode decision through an exported pure function or injected executor so unit tests can
 prove call counts. Production tests must show:
 
-- canonical valid receipt: build `0`, package `0`, inspect `1`;
-- canonical missing/invalid/stale/out-of-root receipt: non-zero named failure, build `0`, package `0`;
-- standalone ordinary run: fresh run id, build `1`, package `1`, inspect `1`, even when an old receipt
-  is already present;
+- canonical valid receipt: install `0`, build `0`, package `0`, inspect `1`;
+- canonical missing/invalid/stale/out-of-root receipt: non-zero named failure and install `0`, build
+  `0`, package `0`, inspect `0`;
+- standalone ordinary run: fresh run id and install `1`, build `1`, package `1`, inspect `1`, even
+  when an old receipt is already present;
+- `missing-hermes` and `dev-root` bait modes: install `0`, build `0`, package `0`, inspect `1`;
+- `preflight-missing` bait mode: collab install `0`, production build `0`, Builder/package `0`,
+  inspect `0`, preflight `1`;
 - no path derived from receipt content is used before exact path validation.
 
 `package:verify` accepts the canonical run id when supplied. When invoked directly without one, it
@@ -369,15 +373,19 @@ gate call those same helpers. Required shared rules are:
 - committed `species|tools/<name>/tools-allowlist.json`.
 
 A unit bait changes one shared rule input and proves production and package inspection derive the
-same path. Parallel local copies or a hardcoded allowlist path are rejected.
+same path. Add a static dependency assertion proving both production and the gate import that one
+shared module, then inject/substitute the shared helper in a unit test and prove both consumers move
+together. Parallel local copies, textually-identical duplicate functions, and a hardcoded allowlist
+path are rejected.
 
 ### RW4 — configuration parsing fails closed
 
 `build.extraResources` and `build.linux.extraResources` may be absent or arrays. If present with any
 other type, parsing fails. Each active entry must be an object with exactly two own keys, `from` and
 `to`, both non-empty strings. Strings, arrays-as-entries, macros, filters, and every additional or
-unknown key fail. Focused tests cover top-level and Linux-specific non-array values plus `filter`,
-`macro`, and an arbitrary third key.
+unknown key fail. A macro means a Builder expansion token inside either value, including `${arch}`;
+reject any `${...}` token in both `from` and `to`. Focused tests cover top-level and Linux-specific
+non-array values, empty values, `filter`, an arbitrary third key, and `${arch}` in each field.
 
 ### RW5 — exact builder and verifier commands
 
@@ -392,16 +400,23 @@ bun run package:verify
 ```
 
 The direct `package:verify` command above must succeed without the builder inventing an environment
-variable. The verifier, not the builder, then creates a pristine detached worktree and runs:
+variable. The verifier, not the builder, creates **two different pristine detached worktrees**. In
+the first, with no prior install/build/package command, it runs:
 
 ```bash
 bun qa/run.ts package-closure
+```
+
+Only after that worktree reaches `PASS`, the verifier creates a second pristine detached worktree
+from the same submitted commit and runs:
+
+```bash
 bun qa/verify-release.ts
 ```
 
-Both commands must reach their final `PASS` from that pristine worktree without a prior manual build,
-ambient `node_modules`, copied `out/`, or copied receipt. The verifier then runs one non-zero bait
-against a temporary package copy and restores green.
+Both commands must reach their final `PASS` without inheriting a prior command's `node_modules`,
+`out/`, package, receipt, or staging tree. The verifier then runs one non-zero bait against a
+temporary copy of the first worktree's submitted package and restores green there.
 
 ### Verification round 1 — REJECTED (`a5779a5`)
 
