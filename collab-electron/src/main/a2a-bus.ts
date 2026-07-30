@@ -2,7 +2,6 @@
  * WO-008e — Electron adapter over shared A2A bus core.
  * Instance-scoped; default delivery channel is display-only.
  */
-import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   createA2aBus,
@@ -13,8 +12,8 @@ import {
   type PublishAndDeliverOpts,
   type PublishAndDeliverResult,
 } from "../../../species/hermes/a2a-core.ts";
-import { COLLAB_DIR } from "./paths";
-import { kernelExecute, type TraceContext } from "./kernel";
+import { createA2aArtifactStore } from "./a2a-artifact-store";
+import { getArtifactRoot, kernelExecute, type TraceContext } from "./kernel";
 import { displayOnSession } from "./pty-display";
 import { writeToSession } from "./pty";
 
@@ -53,28 +52,20 @@ export function createElectronA2aBus(opts?: {
   defaultChannel?: DeliveryChannel;
   artifactDir?: string;
 }): A2aBus {
-  const artifactDir = opts?.artifactDir ?? join(COLLAB_DIR, "a2a");
-  mkdirSync(artifactDir, { recursive: true });
+  const artifactStore = createA2aArtifactStore({
+    ...(opts?.artifactDir !== undefined
+      ? { artifactDir: opts.artifactDir }
+      : {}),
+    artifactRoot: getArtifactRoot,
+    publish: (input) => kernelExecute("publish_artifact", input, newTrace()),
+  });
 
   return createA2aBus({
-    artifactDir,
+    artifactDir: artifactStore.artifactDir,
     defaultChannel: opts?.defaultChannel ?? "display",
-    writeFile: (path, bytes) => {
-      writeFileSync(path, bytes);
-    },
+    writeFile: artifactStore.writeFile,
     joinPath: join,
-    publishArtifact: ({ storagePath }) => {
-      const pub = kernelExecute(
-        "publish_artifact",
-        {
-          kind: "report",
-          path: storagePath,
-          storage_ref: storagePath,
-        },
-        newTrace(),
-      );
-      return { artifactId: String(pub.object_id) };
-    },
+    publishArtifact: artifactStore.publishArtifact,
     deliver: ({ seat, text, channel }) => {
       if (channel === "display" || channel === "both") {
         displayOnSession(seat.deliveryId, text);

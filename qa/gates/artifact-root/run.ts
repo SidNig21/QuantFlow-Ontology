@@ -1,14 +1,17 @@
 /**
- * WO-K3 — artifact root gate (G4 / D5).
+ * WO-K3 / WO-K3b — artifact root gate (G4 / D5).
  *
  * - resolveArtifactRoot default under temp HOME
  * - production helper writes an absent file, then execute publishes the same bytes
- * - agent-host is statically coupled to that helper and the resolved root
+ * - the exact production A2A store writes and publishes beneath that root
+ * - both production publishers are statically coupled and exhaustively enumerated
  */
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   realpathSync,
   rmSync,
   writeFileSync,
@@ -25,6 +28,7 @@ import {
 } from "qf-kernel";
 import { buildArtifactRootInstallPlan } from "../artifact-root.ts";
 import { writeAgentReportArtifact } from "../../../collab-electron/src/main/agent-artifact-writer.ts";
+import { createA2aArtifactStore } from "../../../collab-electron/src/main/a2a-artifact-store.ts";
 
 const REPO_ROOT = join(import.meta.dir, "../../..");
 const FIXTURE_ENV = "QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY";
@@ -204,6 +208,114 @@ function gatePublishUnderRoot(): string | null {
   }
 }
 
+function gateA2aPublishUnderRoot(): string | null {
+  const savedHome = process.env.HOME;
+  const savedRoot = process.env.QF_ARTIFACT_ROOT;
+  const savedFixture = process.env[FIXTURE_ENV];
+  const home = mkdtempSync(join(tmpdir(), "qf-k3b-a2a-home-"));
+  const configuredRoot = join(home, "canonical-artifacts");
+  mkdirSync(configuredRoot, { recursive: true });
+  process.env.HOME = home;
+  process.env.QF_ARTIFACT_ROOT = configuredRoot;
+  process.env[FIXTURE_ENV] = "1";
+
+  const db = openKernel(":memory:");
+  try {
+    const resolved = resolveArtifactRoot();
+    if (resolved.path !== configuredRoot || resolved.provenance !== "env") {
+      return `artifact-root: A2A expected env root ${configuredRoot}, got ${resolved.path} (${resolved.provenance})`;
+    }
+
+    const store = createA2aArtifactStore({
+      artifactRoot: () => resolveArtifactRoot().path,
+      publish: (input) => execute(db, "publish_artifact", input, {
+        trace_id: "k3b-a2a-art-root",
+        span_id: "k3b-a2a-art-span",
+      }),
+    });
+    const expectedDir = join(configuredRoot, "a2a");
+    if (store.artifactDir !== expectedDir) {
+      return `artifact-root: A2A helper directory mismatch: ${store.artifactDir}`;
+    }
+
+    const explicitDir = join(home, "explicit-a2a-override");
+    let overrideConsultedRoot = false;
+    const explicitStore = createA2aArtifactStore({
+      artifactDir: explicitDir,
+      artifactRoot: () => {
+        overrideConsultedRoot = true;
+        return configuredRoot;
+      },
+      publish: (input) => execute(db, "publish_artifact", input, {
+        trace_id: "k3b-a2a-override",
+        span_id: "k3b-a2a-override-span",
+      }),
+    });
+    if (explicitStore.artifactDir !== explicitDir || overrideConsultedRoot) {
+      return "artifact-root: A2A explicit artifactDir override no longer bypasses the default root";
+    }
+
+    const storagePath = join(store.artifactDir, "gate-absent-envelope.json");
+    if (existsSync(storagePath)) {
+      return `artifact-root: A2A gate bytes existed before production writer call: ${storagePath}`;
+    }
+    const bytes = new TextEncoder().encode(
+      '{"a2a":"1","body":"k3b production helper proof"}\n',
+    );
+    store.writeFile(storagePath, bytes);
+    if (!existsSync(storagePath)) {
+      return `artifact-root: A2A production helper left no file: ${storagePath}`;
+    }
+
+    const publication = store.publishArtifact({ storagePath });
+    const rows = queryObjects(db, "artifact", undefined, null);
+    if (rows.length !== 1) {
+      return `artifact-root: A2A expected one artifact row, got ${rows.length}`;
+    }
+
+    const row = rows[0]!;
+    const diskBytes = readFileSync(storagePath);
+    const expectedHash = contentHash(diskBytes);
+    if (
+      row.id !== expectedHash ||
+      row.content_hash !== expectedHash ||
+      publication.artifactId !== expectedHash
+    ) {
+      return "artifact-root: A2A production bytes and Kernel identity/hash disagree";
+    }
+    if (row.storage_ref !== storagePath) {
+      return `artifact-root: A2A storage_ref mismatch: ${String(row.storage_ref)}`;
+    }
+    if (!Buffer.from(diskBytes).equals(Buffer.from(bytes))) {
+      return "artifact-root: A2A bytes on disk differ from the bytes given to the production helper";
+    }
+
+    const relativePath = relative(
+      realpathSync(configuredRoot),
+      realpathSync(String(row.storage_ref)),
+    );
+    if (
+      isAbsolute(relativePath) ||
+      relativePath === ".." ||
+      relativePath.startsWith(`..${sep}`)
+    ) {
+      return `artifact-root: A2A storage_ref outside resolved root: ${String(row.storage_ref)}`;
+    }
+
+    console.log("artifact-root K3b A2A production writer: PASS");
+    return null;
+  } finally {
+    closeKernel(db);
+    if (savedFixture === undefined) delete process.env[FIXTURE_ENV];
+    else process.env[FIXTURE_ENV] = savedFixture;
+    if (savedHome === undefined) delete process.env.HOME;
+    else process.env.HOME = savedHome;
+    if (savedRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
+    else process.env.QF_ARTIFACT_ROOT = savedRoot;
+    rmSync(home, { recursive: true, force: true });
+  }
+}
+
 function gateAgentHostCoupling(): string | null {
   const src = readFileSync(
     join(REPO_ROOT, "collab-electron/src/main/agent-host.ts"),
@@ -230,6 +342,87 @@ function gateAgentHostCoupling(): string | null {
     return "artifact-root: agent-host must not keep a second artifact byte-writer";
   }
   console.log("artifact-root G4 production coupling: PASS");
+  return null;
+}
+
+function gateA2aBusCoupling(): string | null {
+  const src = readFileSync(
+    join(REPO_ROOT, "collab-electron/src/main/a2a-bus.ts"),
+    "utf8",
+  );
+  const stripped = stripComments(src);
+  if (
+    !/import\s*\{\s*createA2aArtifactStore\s*\}\s*from\s*["']\.\/a2a-artifact-store(?:\.ts)?["']/.test(
+      stripped,
+    )
+  ) {
+    return "artifact-root: a2a-bus must import the production A2A artifact store";
+  }
+  if (!stripped.includes("createA2aArtifactStore({")) {
+    return "artifact-root: a2a-bus must call the production A2A artifact store";
+  }
+  if (!stripped.includes("artifactRoot: getArtifactRoot")) {
+    return "artifact-root: a2a-bus must give the production store getArtifactRoot";
+  }
+  if (
+    !stripped.includes("opts?.artifactDir !== undefined") ||
+    !stripped.includes("artifactDir: opts.artifactDir")
+  ) {
+    return "artifact-root: a2a-bus must preserve its explicit artifactDir override";
+  }
+  for (const forbidden of ["COLLAB_DIR", "QF_APP_ROOT", "QF_APP_DIR"]) {
+    if (new RegExp(`\\b${forbidden}\\b`).test(stripped)) {
+      return `artifact-root: a2a-bus must not derive its default from ${forbidden}`;
+    }
+  }
+  console.log("artifact-root K3b A2A production coupling: PASS");
+  return null;
+}
+
+function productionSourceFiles(root: string): string[] {
+  const files: string[] = [];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory()) {
+      if (["__tests__", "test", "tests"].includes(entry.name)) continue;
+      files.push(...productionSourceFiles(path));
+      continue;
+    }
+    if (!entry.isFile() || !/\.(?:[cm]?[jt]sx?)$/.test(entry.name)) continue;
+    if (/(?:^|\.)+(?:test|spec)\.[cm]?[jt]sx?$/.test(entry.name)) continue;
+    files.push(path);
+  }
+  return files;
+}
+
+function gateProductionPublishers(): string | null {
+  const mainRoot = join(REPO_ROOT, "collab-electron/src/main");
+  const directPublish = /\bkernelExecute\s*\(\s*["']publish_artifact["']/g;
+  const callsites: string[] = [];
+
+  for (const path of productionSourceFiles(mainRoot)) {
+    const relativePath = relative(mainRoot, path);
+    const stripped = stripComments(readFileSync(path, "utf8"));
+    const matches = stripped.match(directPublish) ?? [];
+    for (let index = 0; index < matches.length; index += 1) {
+      callsites.push(relativePath);
+    }
+  }
+
+  const expected = ["a2a-bus.ts", "agent-host.ts"];
+  const actual = [...callsites].sort();
+  if (
+    actual.length !== expected.length ||
+    actual.some((path, index) => path !== expected[index])
+  ) {
+    return `artifact-root: production publish_artifact callsites must be exactly ${expected.join(
+      ", ",
+    )}; got ${actual.length > 0 ? actual.join(", ") : "none"}`;
+  }
+
+  console.log(
+    `artifact-root K3b governed publishers: PASS (${actual.join(", ")})`,
+  );
   return null;
 }
 
@@ -275,7 +468,10 @@ async function main(): Promise<number> {
     gateDefaultResolver,
     gateEnvNotDirectory,
     gatePublishUnderRoot,
+    gateA2aPublishUnderRoot,
     gateAgentHostCoupling,
+    gateA2aBusCoupling,
+    gateProductionPublishers,
   ]) {
     const err = fn();
     if (err) {
