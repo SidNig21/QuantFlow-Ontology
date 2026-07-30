@@ -154,6 +154,9 @@ export async function cancelNativeTuiSession(
   entry: NativeTuiLive,
   newTrace: () => TraceContext,
 ): Promise<void> {
+  if (entry.peerRole) {
+    unregisterSeatPty(entry.peerRole, entry.ptySessionId);
+  }
   ptyToKernel.delete(entry.ptySessionId);
   await killSession(entry.ptySessionId).catch(() => {});
   try {
@@ -178,6 +181,9 @@ export async function cancelNativeTuiSession(
 }
 
 export async function tearDownNativeTui(entry: NativeTuiLive): Promise<void> {
+  if (entry.peerRole) {
+    unregisterSeatPty(entry.peerRole, entry.ptySessionId);
+  }
   ptyToKernel.delete(entry.ptySessionId);
   await killSession(entry.ptySessionId).catch(() => {});
 }

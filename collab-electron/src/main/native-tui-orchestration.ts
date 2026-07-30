@@ -6,6 +6,7 @@ export type NativeTuiLive = {
   guestId: string;
   kind: "native_tui";
   ptySessionId: string;
+  peerRole?: string;
   unsub?: () => void;
   turnInFlight: boolean;
 };
@@ -84,6 +85,7 @@ export async function orchestrateNativeTuiAdmission(
       guestId: pty.sessionId,
       kind: "native_tui",
       ptySessionId: pty.sessionId,
+      ...(peer ? { peerRole: peer.role } : {}),
       turnInFlight: false,
     });
     liveOwned = true;
@@ -108,9 +110,11 @@ export async function orchestrateNativeTuiAdmission(
     );
 
     if (peer) {
+      // Install the exit watcher before binding the role so a fast-exiting PTY
+      // cannot leave a destination that no future exit callback can remove.
+      deps.peerStart(peer.dbPath);
       deps.peerRegister(peer.role, pty.sessionId);
       peerOwned = true;
-      deps.peerStart(peer.dbPath);
     }
 
     opts.onStarted?.(sessionId, opts.definitionId, {

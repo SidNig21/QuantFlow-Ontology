@@ -52,6 +52,7 @@ import { bootstrapDockProfiles } from "./dock-profiles";
 import {
   collectUniqueRuntimeSoftware,
   resolveDefinitionRuntime,
+  runtimeSoftwareIdentity,
   type DefinitionRuntime,
 } from "./definition-runtime";
 import { allowsPtyRoleDelivery } from "./runtime-adapter";
@@ -169,15 +170,18 @@ export function onSessionDone(listener: DoneListener): () => void {
 /** Admit one adapter package into the live AgentOS host. */
 export async function admitPackage(runtime: DefinitionRuntime): Promise<void> {
   const host = await ensureAgentOs();
-  const key = `${runtime.metadata.adapterId}\0${runtime.packagePath}`;
-  if (linkedPackages.has(key)) return;
-  if (!existsSync(runtime.packagePath)) {
-    throw new Error(`agent-host: missing adapter package at ${runtime.packagePath}`);
+  const identity = runtimeSoftwareIdentity(
+    runtime.metadata.adapterId,
+    runtime.packagePath,
+  );
+  if (linkedPackages.has(identity.key)) return;
+  if (!existsSync(identity.packagePath)) {
+    throw new Error(`agent-host: missing adapter package at ${identity.packagePath}`);
   }
-  await host.linkSoftware({ packagePath: runtime.packagePath });
-  linkedPackages.add(key);
+  await host.linkSoftware({ packagePath: identity.packagePath });
+  linkedPackages.add(identity.key);
   console.log(
-    `agent-host: linkSoftware adapter=${runtime.metadata.adapterId} ${runtime.packagePath}`,
+    `agent-host: linkSoftware adapter=${identity.adapterId} ${identity.packagePath}`,
   );
 }
 
@@ -368,10 +372,12 @@ async function admitHostAcpDefinition(
   const command = resolveHostAcpCommand(
     env.HOST_ACP_BIN ?? env.HERMES_BIN ?? process.env.HOST_ACP_BIN ??
       process.env.HERMES_BIN,
-    [
-      join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
-      join(homedir(), ".local/bin/hermes"),
-    ],
+    adapterId === "hermes"
+      ? [
+          join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
+          join(homedir(), ".local/bin/hermes"),
+        ]
+      : [],
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
   const toolAllowlist = runtime.metadata.tools;

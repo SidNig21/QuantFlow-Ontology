@@ -42,6 +42,7 @@ import {
   collectUniqueRuntimeSoftware,
   parseDefinitionLaunchRequest,
   resolveDefinitionRuntime,
+  runtimeSoftwareIdentity,
 } from "../../../collab-electron/src/main/definition-runtime.ts";
 import {
   orchestrateNativeTuiAdmission,
@@ -421,6 +422,46 @@ function assertStaticLaunchSurface(): void {
   const ipc = readFileSync(join(REPO, "collab-electron/src/main/ipc-kernel.ts"), "utf8");
   assert(/parseDefinitionLaunchRequest\(args\)/.test(ipc), "IPC must call the pure closed launch parser");
   assert(/admitAndStartSession\(definitionId/.test(ipc), "IPC must admit the parsed definitionId");
+
+  const hostPath = join(REPO, "collab-electron/src/main/agent-host.ts");
+  const host = readFileSync(hostPath, "utf8");
+  assert(
+    /resolveDefinitionRuntime\(definitionId,\s*appRoot\(\),\s*getDefinition\)/.test(host),
+    "production admission must resolve the exact Kernel definition through the shared helper",
+  );
+  assert(
+    /collectUniqueRuntimeSoftware\(/.test(host),
+    "production AgentOS startup must use shared adapter/package deduplication",
+  );
+  assert(
+    /allowsPtyRoleDelivery\([\s\S]*runtime\.runtimeProfile/.test(host),
+    "production native-TUI admission must consult package-owned peer authorization",
+  );
+  assert(
+    /liveDelete:\s*\(sessionId\)[\s\S]*live\.delete\(sessionId\)/.test(host),
+    "production native-TUI admission must wire compensating live-map deletion",
+  );
+  assert(
+    /host\.createSession\(\s*adapterId/.test(host),
+    "AgentOS must create the packaged adapter id, not a profile definition id",
+  );
+  assert(
+    /runtimeSoftwareIdentity\([\s\S]*runtime\.metadata\.adapterId[\s\S]*runtime\.packagePath/.test(host),
+    "linkSoftware must use the shared normalized adapter/package identity",
+  );
+  assert(
+    /adapterId === "hermes"[\s\S]*\.hermes\/hermes-agent/.test(host),
+    "Hermes binary fallbacks must be guarded by exact adapter identity",
+  );
+
+  const nativeHost = readFileSync(
+    join(REPO, "collab-electron/src/main/host-native-tui.ts"),
+    "utf8",
+  );
+  assert(
+    /if \(entry\.peerRole\)[\s\S]*unregisterSeatPty\(entry\.peerRole, entry\.ptySessionId\)/.test(nativeHost),
+    "native-TUI cancel/teardown must owner-unregister peer roles directly",
+  );
 }
 
 async function main(): Promise<number> {
@@ -484,6 +525,16 @@ async function main(): Promise<number> {
     assert(uniqueSoftware.length === 2, "four defaults must dedupe to two runtime software entries", uniqueSoftware);
     const uniqueKeys = new Set(uniqueSoftware.map((entry) => `${entry.adapterId}\0${entry.packagePath}`));
     assert(uniqueKeys.size === 2, "runtime software entries are not unique by adapter/path", uniqueSoftware);
+    const canonical = runtimeSoftwareIdentity(
+      "hermes",
+      `${orchestrator.resolved.packagePath.replace(/\/hermes\.aospkg$/, "")}`
+      + "/ignored/../hermes.aospkg",
+    );
+    assert(
+      canonical.key === `hermes\0${orchestrator.resolved.packagePath}`,
+      "equivalent package paths do not share one admission identity",
+      canonical,
+    );
 
     const eventBeforeUnknown = eventCount(db);
     let spawnAttempts = 0;

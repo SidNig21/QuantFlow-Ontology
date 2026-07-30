@@ -91,6 +91,18 @@ export type RuntimeSoftware = {
   packagePath: string;
 };
 
+export function runtimeSoftwareIdentity(
+  adapterId: string,
+  packagePath: string,
+): RuntimeSoftware & { key: string } {
+  const normalizedPath = resolve(packagePath);
+  return {
+    adapterId,
+    packagePath: normalizedPath,
+    key: `${adapterId}\0${normalizedPath}`,
+  };
+}
+
 /** Collapse many profile definitions onto one admitted adapter package. */
 export function collectUniqueRuntimeSoftware(
   rows: readonly Record<string, unknown>[],
@@ -102,12 +114,14 @@ export function collectUniqueRuntimeSoftware(
     const definitionId = String(row.id ?? "");
     if (!definitionId) continue;
     const runtime = resolveDefinitionRuntime(definitionId, appRoot, getDefinition);
-    const packagePath = resolve(runtime.packagePath);
-    const key = `${runtime.metadata.adapterId}\0${packagePath}`;
-    if (!unique.has(key)) {
-      unique.set(key, {
-        adapterId: runtime.metadata.adapterId,
-        packagePath,
+    const identity = runtimeSoftwareIdentity(
+      runtime.metadata.adapterId,
+      runtime.packagePath,
+    );
+    if (!unique.has(identity.key)) {
+      unique.set(identity.key, {
+        adapterId: identity.adapterId,
+        packagePath: identity.packagePath,
       });
     }
   }

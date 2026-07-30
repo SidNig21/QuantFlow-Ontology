@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 const CWD = join(import.meta.dir, "dock-definition-launch");
 const KERNEL_PKG = join(import.meta.dir, "../../packages/qf-kernel");
+const SCHEMA_PKG = join(import.meta.dir, "../../qf-kernel-schema");
 
 async function install(name: string, cwd: string): Promise<number> {
   const child = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
@@ -18,6 +19,7 @@ async function install(name: string, cwd: string): Promise<number> {
 }
 
 async function run(): Promise<number> {
+  if ((await install("qf-kernel-schema", SCHEMA_PKG)) !== 0) return 1;
   if ((await install("qf-kernel", KERNEL_PKG)) !== 0) return 1;
   if ((await install("gate", CWD)) !== 0) return 1;
 
