@@ -1,6 +1,6 @@
 # WO-D1 — Every Dock profile has a Kernel identity
 
-status: open — current after WO-CI2
+status: independently verified PASS at `4617e06` on 2026-07-30 — merge pending; zero semantic rework rounds after two cold integration repairs
 assignee: builder
 depends: WO-CI2
 blocks: WO-D2 · WO-N1
