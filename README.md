@@ -15,10 +15,10 @@ Built solo, in the open, on Linux first. Early-stage and honest about it — see
 Every claim below is backed by a falsified `qa/` gate or a recorded proof in the Kernel. If it's not on this list, it doesn't exist yet.
 
 - **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel commands; a gate (`qa/gates/kernel-sole-writer*`) fails the build if any other code path writes to it — and the gate has been bait-tested red before being trusted green.
-- **The canvas + dock** — an infinite pan/zoom surface (Electron) where agent seats spawn as terminal tiles. Kernel-registered Dock profiles now carry distinct session identity; removal of the legacy hardcoded Peer Seats path is the next contracted rung (WO-D2).
-- **Agent seats** — named Hermes seats (`orchestrator`, `worker`, `worker2`), each a real TUI process in its own PTY session with its own profile and tool grants. The profile is Kernel identity; its package reference is the reusable runtime/adapter.
+- **The canvas + dock** — an infinite pan/zoom surface (Electron) where every agent card launches by exact Kernel definition id. The old hardcoded Peer Seats catalogue and its separate spawn IPC are gone: qf-toolloop and three Hermes profiles all use the same Dock path, and each session links back to the definition the founder clicked.
+- **Agent seats** — the packaged defaults are `qf-toolloop`, `hermes-orchestrator`, `hermes-worker`, and `hermes-worker-2`. The three Hermes definitions share one runtime package while package metadata expands their distinct `-p <profile> --tui` arguments; their Kernel identities do not collapse into a generic Hermes row.
 - **The peer bus** (`tools/qf-peer-bus`) — a stdio MCP server exposing `send_to_peer` / `read_inbox` / `list_peers`. Every peer message is recorded to the Kernel as a content-addressed `trajectory` artifact (which doubles as a finetuning trace store). Transport routing lives in its own SQLite db, separate from the Kernel.
-- **Live delivery** — a host-side watcher pushes incoming peer messages into the recipient's *live TUI* as a real conversation turn. Proven end-to-end: an orchestrator message injected into a worker's native TUI was auto-processed and answered via `send_to_peer`, with both legs recorded as Kernel artifacts.
+- **Live delivery** — package metadata opts the three ruled Hermes profiles into the existing host-side watcher, which binds the selected Kernel role to that profile's live PTY and pushes incoming peer messages into the TUI. D2 proves the binding and duplicate-role rejection without opening the founder's transport database; a prior founder-run proof observed a real orchestrator/worker round trip with both legs recorded as Kernel artifacts.
 - **Verification culture** — changes land through work orders verified in cold git worktrees; gates are falsified (bait → red → restore → green) before they count; artifact hashes are recomputed, not trusted.
 
 ## The end goal: a real ontology
@@ -108,7 +108,12 @@ bun test        # tests
 bun run build   # production build
 ```
 
-Gates run from `qa/` and are wired into CI. Agent seats require a local [Hermes](https://github.com/NousResearch/hermes-agent) install with per-seat profiles; the peer bus MCP block is written into each profile by `tools/qf-peer-bus/scripts/setup-founder-seats.ts`.
+Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap automatically from packaged manifests, but real Hermes turns still require the founder's local [Hermes](https://github.com/NousResearch/hermes-agent) install and matching `qf-orchestrator`, `qf-worker`, and `qf-worker-2` runtime profiles. The founder-only peer-bus helper is `tools/qf-peer-bus/scripts/setup-founder-seats.ts`.
+
+**Current collaboration limit:** D2 proves one catalogue, exact profile selection, session lineage,
+safe native-TUI cleanup, and metadata-authorized PTY delivery. It does not create Hermes profiles,
+handle credentials, enforce caller-bound QuantFlow tool grants, or prove an unscripted real-model
+research collaboration; those remain later rungs.
 
 ## Doctrine (the rules this repo is built under)
 

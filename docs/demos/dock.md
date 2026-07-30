@@ -1,30 +1,39 @@
-# Dock demo — species registry as a surface
+# Dock demo — one definition-driven agent catalogue
 
-Founder hands-on script for WO-007. The dock rail lists species from
-`agent_definition` and sessions from `agent_session`. Nothing is remembered in
-the renderer — Kernel IPC only. The flow-cube watermark is the canvas empty-state.
+Founder hands-on script for WO-D2. The Dock lists `agent_definition` rows and launches the exact
+definition clicked; qf-toolloop and all Hermes profiles use this one path. Nothing is remembered in
+the renderer, and there is no second Peer Seats catalogue.
 
 ## Steps
 
-1. From the repo, start the app in dev:
+1. Build both packaged adapters once, then start the app in dev:
    ```bash
-   cd collab-electron && bun run pack-agent   # once, if .aospkg missing
+   cd tools/runtime-proof && bun install --frozen-lockfile && bun run pack-agent
+   cd ../../species/hermes && bun install --frozen-lockfile && bun run pack-agent
+   cd ../../collab-electron
    env -u ELECTRON_RUN_AS_NODE bun run dev
    ```
 2. Wait for boot lines:
    - `kernel: opened …`
-   - `agent-host: seedBootSpecies` / register path (idempotent — row count stays 1 across relaunch)
+   - `agent-host: Dock bootstrap registered=… skipped=… conflicts=…`
    - dock invalidate / host ready
-3. Confirm the **Agent dock** (right rail) shows the ToolLoop species from the Kernel
-   (name + role from the row — not a hardcoded renderer list). Canvas empty → flow-cube bold.
-4. **Spawn** from the dock. Confirm:
+3. With a fresh Kernel, confirm the **Agent dock** shows exactly `qf-toolloop`,
+   `hermes-orchestrator`, `hermes-worker`, and `hermes-worker-2`. On an existing founder Kernel,
+   additional historical definitions remain visible and a differing same-id row is preserved and
+   reported as a bootstrap conflict.
+4. Spawn `hermes-orchestrator`, then `hermes-worker`. Confirm each opens a term tile and the host
+   log names the exact definition and argv:
+   - `hermes-orchestrator` → `["-p","qf-orchestrator","--tui"]`
+   - `hermes-worker` → `["-p","qf-worker","--tui"]`
+5. Confirm for each launch:
    - a session row appears with a state chip walking the transition table (`starting` → `running` → …)
    - a Session tile appears on the canvas (cube fades as tiles exist)
+   - the session has one `spawned_from` link to the exact Dock definition clicked
    - **Cancel** appears only while `running`/`blocked`; `starting` shows the chip only
-5. Cancel the live session from the dock; chip reaches a terminal state; **Close** appears on
+6. Cancel a live session from the dock; chip reaches a terminal state; **Close** appears on
    `cancelled`/`failed` and removes the actionable edge.
-6. Spawn again, then **force-kill** mid-run (`kill -9` the Electron PID — not Quit).
-7. Relaunch. Confirm the dock rebuilds species + sessions from `kernel.db` alone;
+7. Spawn again, then **force-kill** mid-run (`kill -9` the Electron PID — not Quit).
+8. Relaunch. Confirm the Dock rebuilds definitions and sessions from `kernel.db` alone;
    the interrupted session is terminal (`failed`/`cancelled` per policy), never phantom `running`.
 
 ## Receipt
@@ -35,14 +44,20 @@ From the repo root (replace `KERNEL_DB` with the boot-line path):
 KERNEL_DB="$HOME/.collaborator/dev/worktree-XXXXXXXXXXXX/kernel.db" bun -e '
 import { Database } from "bun:sqlite";
 const db = new Database(process.env.KERNEL_DB);
-const rows = db.query(
-  `SELECT type, object_id, trace_id, created_at FROM events
-   WHERE type = "agent_definition.registered"
-      OR type LIKE "agent_session.%"
-   ORDER BY created_at DESC LIMIT 30`
+const definitions = db.query(
+  `SELECT id, role, package_ref, runtime_profile FROM agent_definition ORDER BY id`
 ).all();
-console.log(JSON.stringify(rows, null, 2));
+const lineage = db.query(
+  `SELECT l.from_id AS session_id, l.to_id AS definition_id
+   FROM links l WHERE l.kind = "spawned_from" ORDER BY l.created_at DESC LIMIT 20`
+).all();
+console.log(JSON.stringify({ definitions, lineage }, null, 2));
 '
 ```
 
-`agent_definition.registered` plus the session lifecycle events on the same ledger are the receipt.
+The definition rows plus exact session-to-definition links are the receipt. The packaged manifests
+only initialize missing defaults; after bootstrap the Dock and launcher read the Kernel.
+
+Real Hermes turns require the founder's local profiles and credentials. This demo does not prove
+caller-bound tool grants or an unscripted model collaboration; D2's credential-free gate proves
+definition selection, argv, lineage, cleanup, and peer-role admission.

@@ -44,12 +44,13 @@ mocked transport, no mocked Kernel — real subprocess stdio MCP, real
 bun run typecheck   # tsc --noEmit
 ```
 
-## Canvas seat spawn (QuantFlow desk)
+## Dock launch (QuantFlow desk)
 
-On branch `feat/peer-bus-canvas`, the dock lists **Spawn Hermes Orchestrator**
-and **Spawn Hermes Worker**. Each button admits `hermes -p <profile> --tui`
-into its own native term tile. Collaboration is over this MCP plane — not
-PTY-injected A2A movie hops. Cable UI is deferred.
+The normal Dock reads Kernel definitions and includes `hermes-orchestrator`, `hermes-worker`, and
+`hermes-worker-2` from the packaged Hermes manifest. Each card uses the same definition-driven path
+and the shared package expands its exact `hermes -p <profile> --tui` argv. The old Peer Seats
+catalogue and separate spawn IPC no longer exist. This MCP plane still records and routes messages;
+the host PTY watcher is only a live delivery projection. Cable UI is deferred.
 
 ## Founder-live proof (two Hermes seats — founder runs this, not a builder)
 
@@ -59,9 +60,10 @@ gate.
 
 ### One-command MCP rewrite + Kernel init
 
-Profiles `qf-orchestrator` / `qf-worker` must already exist (one-time clone
-from a working `default` + Blank Slate / SOUL — see
-`docs/orders/WO-PEER-BUS-CANVAS.md`). Then, from this checkout:
+Hermes runtime profiles `qf-orchestrator` / `qf-worker` must already exist in the founder's Hermes
+installation. They are separate from the Kernel Dock definitions D2 bootstraps automatically;
+QuantFlow does not create or clone profile homes. See `docs/orders/WO-PEER-BUS-CANVAS.md` for the
+historical founder setup. Then, from this checkout:
 
 ```sh
 cd tools/qf-peer-bus
@@ -100,8 +102,8 @@ hermes -p qf-orchestrator mcp add qf-peer-bus \
 
 ### Live turns (founder)
 
-In QuantFlow: spawn both seat tiles. In each TUI (plain language — the model
-decides when to call the tool):
+In QuantFlow, click `hermes-orchestrator` and `hermes-worker` in the normal Dock. In each TUI (plain
+language — the model decides when to call the tool):
 
 - **Orchestrator:** ask it to `send_to_peer` the worker a short TASK.
 - **Worker:** ask it to `read_inbox`, then `send_to_peer` a RESULT back.
@@ -116,6 +118,11 @@ credentials, zero live model turns, fully re-runnable by anyone with `bun`.
 **Live proof = two real Hermes seats.** Model-driven, the founder's
 credentials, run live by the founder — never scripted, never touched by a
 builder, never a gate.
+
+WO-D2 additionally proves, without credentials or the founder transport database, that the exact
+Dock definition selects the expected runtime profile, creates exact session lineage, and binds only
+metadata-authorized roles to live PTYs. It does **not** prove caller-bound per-profile tool grants or
+a new unscripted research collaboration; those remain later rungs.
 
 ## Deviations from the order as written
 
