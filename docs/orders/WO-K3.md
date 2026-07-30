@@ -1,6 +1,6 @@
 # WO-K3 — Bytes follow truth, and drift refuses writes
 
-status: rework — ROUND 2: env artifact root accepts a regular file; verifier 2026-07-29
+status: verifying — PASS at `f525c3d`; merge withheld pending explicit founder approval
 assignee: builder
 depends: WO-K2 — **done** (`c9c3bf0`). WO-K1 — **done**. WO-V1 — **done** (readonly projector
 must keep working after drift carve-out lands).
@@ -370,3 +370,81 @@ resolution before that work begins.
 
 **Scope:** resolver, its package test, and the existing artifact-root gate only. No schema, drift,
 Electron, Dock, artifact-helper, allowlist, or doctrine changes. One rework commit.
+
+---
+
+# VERIFICATION AFTER REWORK ROUND 2 — PASS · 2026-07-29
+
+**Candidate:** `f525c3d` (`codex/wo-k3-rework`).
+**Verifier:** independent Codex seat; builder was Cursor `composer-2.5`.
+**Disposition:** PASS. Main was not modified; merge awaits explicit founder approval.
+
+**In plain terms:** QuantFlow now refuses an invalid artifact-storage file before work starts, the
+real application writer still creates and records files correctly, and the complete shipped app
+passes from a clean checkout.
+
+## Acceptance defect closed
+
+Independent production-resolver probe with `QF_ARTIFACT_ROOT` set to an existing regular file:
+
+```text
+Error: resolveArtifactRoot: QF_ARTIFACT_ROOT is not a directory: .../not-a-directory
+{"rejected":true,"isFile":true,"bytes":"bait-bytes"}
+EXIT=0
+```
+
+Package regression:
+
+```text
+bun test packages/qf-kernel/src/resolve-artifact-root.test.ts
+6 pass
+0 fail
+```
+
+Gate restore:
+
+```text
+bun qa/run.ts artifact-root
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+artifact-root D5 production writer: PASS
+artifact-root G4 production coupling: PASS
+PASS  artifact-root
+EXIT=0
+```
+
+Real-resolver bait:
+
+```text
+QF_ARTIFACT_ROOT_FALSIFY=skip-directory bun qa/run.ts artifact-root
+artifact-root FAIL: accepted non-directory QF_ARTIFACT_ROOT: .../not-a-directory
+FAIL  artifact-root
+EXIT=1
+```
+
+D5 writer bait remained live:
+
+```text
+QF_ARTIFACT_ROOT_FALSIFY=writer bun qa/run.ts artifact-root
+artifact-root FAIL: production writer did not create publishable bytes: ENOENT .../gate-report.md
+FAIL  artifact-root
+EXIT=1
+```
+
+## Canonical shipped-form verifier
+
+Fresh detached worktree `/tmp/qf-k3-final-verify.JOgeyZ` at exactly `f525c3d`:
+
+```text
+bun qa/verify-release.ts
+release:install  PASS (frozen Electron install)
+release:unit     PASS
+release:build    PASS (production Electron build)
+release:qa       PASS (all gates, including kernel-drift, artifact-root, vault-projection)
+PASS  release-verification
+EXIT=0
+```
+
+The accepted correction changed exactly three permitted files: the artifact-root resolver, its
+package regression test, and the existing artifact-root gate. No schema, Electron, Dock, drift,
+allowlist, doctrine, or main-branch change occurred.
