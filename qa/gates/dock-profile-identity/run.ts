@@ -231,7 +231,7 @@ function scanElectronCreateSessionCallsites(): string | null {
   }
   walk(ELECTRON_MAIN);
 
-  const failures: Array<{ file: string; line: number; speciesSymbol: string | null }> = [];
+  const failures: Array<{ file: string; line: number; definitionSymbol: string | null }> = [];
   let discovered = 0;
   for (const file of files) {
     const source = readFileSync(file, "utf8");
@@ -253,7 +253,7 @@ function scanElectronCreateSessionCallsites(): string | null {
         const args = node.arguments;
         if (args.length >= 2 && ts.isStringLiteral(args[0]!) && args[0].text === "create_agent_session") {
           const pos = sf.getLineAndCharacterOfPosition(node.getStart());
-          let speciesSymbol: string | null = null;
+          let definitionSymbol: string | null = null;
           let hasDefinitionId = false;
           if (ts.isObjectLiteralExpression(args[1]!)) {
             for (const prop of args[1].properties) {
@@ -261,7 +261,7 @@ function scanElectronCreateSessionCallsites(): string | null {
               if (prop.name.text === "agent_definition_id") {
                 hasDefinitionId = true;
                 if (ts.isIdentifier(prop.initializer)) {
-                  speciesSymbol = prop.initializer.text;
+                  definitionSymbol = prop.initializer.text;
                 }
               }
             }
@@ -271,13 +271,13 @@ function scanElectronCreateSessionCallsites(): string | null {
             failures.push({
               file: relative(REPO, file),
               line: pos.line + 1,
-              speciesSymbol: null,
+              definitionSymbol: null,
             });
-          } else if (speciesSymbol !== "species") {
+          } else if (definitionSymbol !== "definitionId") {
             failures.push({
               file: relative(REPO, file),
               line: pos.line + 1,
-              speciesSymbol,
+              definitionSymbol,
             });
           }
         }
@@ -291,11 +291,11 @@ function scanElectronCreateSessionCallsites(): string | null {
     return "no production create_agent_session kernelExecute callsites discovered";
   }
   for (const hit of failures) {
-    if (!hit.speciesSymbol) {
+    if (!hit.definitionSymbol) {
       return `create_agent_session at ${hit.file}:${hit.line} missing agent_definition_id`;
     }
-    if (hit.speciesSymbol !== "species") {
-      return `create_agent_session at ${hit.file}:${hit.line} agent_definition_id must use species symbol (got ${hit.speciesSymbol})`;
+    if (hit.definitionSymbol !== "definitionId") {
+      return `create_agent_session at ${hit.file}:${hit.line} agent_definition_id must use definitionId symbol (got ${hit.definitionSymbol})`;
     }
   }
   return null;

@@ -104,6 +104,7 @@ const OPEN_ALLOW = [
   "qa/gates/dock-registry/run.ts",
   // WO-D1: gate-only profile identity and frozen-upgrade proof.
   "qa/gates/dock-profile-identity/run.ts",
+  "qa/gates/dock-definition-launch/run.ts",
   "qa/gates/boot-reconcile/run.ts",
   "qa/gates/agent-path/run.ts",
   "qa/gates/kernel-drift/run.ts",
@@ -132,6 +133,8 @@ const WRITE_ALLOW = [
   "qa/gates/dock-registry/run.ts",
   // WO-D1: gate-only setup and assertions use the sanctioned write boundary.
   "qa/gates/dock-profile-identity/run.ts",
+  // WO-D2: gate-only definition bootstrap/session lineage fixtures.
+  "qa/gates/dock-definition-launch/run.ts",
   "qa/gates/boot-reconcile/run.ts",
   "qa/gates/agent-path/run.ts",
   "qa/gates/kernel-drift/run.ts",
