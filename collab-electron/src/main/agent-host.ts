@@ -5,7 +5,7 @@
  * Pack: `cd tools/runtime-proof && bun run pack-agent`
  * (collab-electron script `pack-agent` forwards there).
  */
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -39,6 +39,7 @@ import {
   resolveSpeciesSessionEnv,
 } from "./host-mounts";
 import {
+  getArtifactRoot,
   kernelExecute,
   kernelGetObject,
   kernelListAgentSessions,
@@ -49,6 +50,7 @@ import {
 import { resolveSpeciesLaunch } from "./species-launch";
 import { resolveSpeciesSurface } from "./species-surface";
 import { resolveSpeciesToolAllowlist } from "./species-tools";
+import { writeAgentReportArtifact } from "./agent-artifact-writer";
 
 /** Boot-seed species name — main-process only (never a renderer literal). */
 export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
@@ -397,6 +399,9 @@ async function admitHostAcpSpecies(
   if (process.env.QF_KERNEL_DB) {
     hostAcpEnv.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
   }
+  if (process.env.QF_ARTIFACT_ROOT) {
+    hostAcpEnv.QF_ARTIFACT_ROOT = process.env.QF_ARTIFACT_ROOT;
+  }
   const handle = await admitHostAcp({
     command,
     args: ["acp"],
@@ -461,6 +466,9 @@ async function admitAgentOsSpecies(
   const merged: Record<string, string> = { ...fromConfig, ...opts?.env };
   if (process.env.QF_KERNEL_DB && !merged.QF_KERNEL_DB) {
     merged.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
+  }
+  if (process.env.QF_ARTIFACT_ROOT && !merged.QF_ARTIFACT_ROOT) {
+    merged.QF_ARTIFACT_ROOT = process.env.QF_ARTIFACT_ROOT;
   }
   const env =
     Object.keys(merged).length > 0 ? merged : undefined;
@@ -637,20 +645,17 @@ export async function runTurn(
 
   let artifactId: string | undefined;
   if (!opts?.skipPublish) {
-    const dir = join(
-      process.env.HOME ?? "/tmp",
-      ".collaborator",
-      "agent-artifacts",
-    );
-    mkdirSync(dir, { recursive: true });
-    const path = join(dir, `${sessionId}.md`);
-    writeFileSync(path, text.length > 0 ? text : "(empty agent output)", "utf8");
-    const pub = kernelExecute(
-      "publish_artifact",
-      { path, kind: "report", storage_ref: path },
-      newTrace(),
-    );
-    artifactId = pub.object_id;
+    const artifact = writeAgentReportArtifact({
+      sessionId,
+      text,
+      artifactRoot: getArtifactRoot,
+      publish: (input) => kernelExecute(
+        "publish_artifact",
+        input,
+        newTrace(),
+      ),
+    });
+    artifactId = artifact.artifactId;
   }
 
   if (finalize) {

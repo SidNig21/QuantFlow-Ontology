@@ -1,0 +1,14 @@
+bun test v1.3.14 (0d9b296a)
+
+src/attach-kernel-drift.test.ts:
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable → KernelIncompleteInitializationError [1027.16ms]
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly → warn + getKernelDrift, no artifact table [563.98ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=63
+(pass) attachKernel WO-K3 drift / incomplete init > clean :memory: writable publish succeeds [8.49ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture writable → KernelRegistryDriftError [2738.28ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture readonly → warn + getKernelDrift [1931.36ms]
+
+ 5 pass
+ 0 fail
+ 14 expect() calls
+Ran 5 tests across 1 file. [6.33s]

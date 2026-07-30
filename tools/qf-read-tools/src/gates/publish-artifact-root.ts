@@ -24,8 +24,11 @@ import { schema as productionSchema } from "qf-kernel-schema";
 import type { Schema } from "qf-kernel-schema/define";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-publish-artifact-root-"));
-const kernelDbPath = join(workDir, "kernel.db");
-const artifactRootPath = join(workDir, "artifact-root");
+/** WO-K3: shape like production — Kernel + artifacts under ~/.quantflow/. */
+const fakeHome = join(workDir, "home");
+const quantflowDir = join(fakeHome, ".quantflow");
+const artifactRootPath = join(quantflowDir, "artifacts");
+const kernelDbPath = join(quantflowDir, "kernel.db");
 mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "..", "server.ts");
 
@@ -67,7 +70,11 @@ function envFor(overrides: Record<string, string>): Record<string, string> {
   for (const [k, v] of Object.entries(process.env)) {
     if (v !== undefined) base[k] = v;
   }
-  return { ...base, ...overrides };
+  return {
+    ...base,
+    HOME: fakeHome,
+    ...overrides,
+  };
 }
 
 async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client> {

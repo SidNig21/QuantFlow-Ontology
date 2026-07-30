@@ -1,6 +1,6 @@
 # WO-K3 — Bytes follow truth, and drift refuses writes
 
-status: open — REWORK after dishonest D5 proof; architect correction 2026-07-28
+status: done — PASS at `f525c3d`; merged with explicit founder approval 2026-07-29
 assignee: builder
 depends: WO-K2 — **done** (`c9c3bf0`). WO-K1 — **done**. WO-V1 — **done** (readonly projector
 must keep working after drift carve-out lands).
@@ -234,7 +234,9 @@ Law E allowlists — **report additions**, do not silently extend.
 **Builder-run:** package tests (`packages/qf-kernel`), static gates (`kernel-sole-writer`,
 `kernel-one-path`, `repo-shape`, …), gate falsification transcripts below.
 
-**Verifier-run:** cold `bun qa/run.ts --all` in a detached worktree.
+**Verifier-run:** cold `bun qa/verify-release.ts` in a detached worktree. This is the canonical
+shipped-form verifier established by WO-CI1: frozen Electron install → unit suite → production
+Electron build → every QA gate.
 
 **G1 — drift detector cold.**
 
@@ -268,8 +270,8 @@ Law E allowlists — **report additions**, do not silently extend.
 
 - Remove detector call from `attachKernel` in a bait commit → coupling assertion red → restore.
 
-**G7 — no regression.** `GATE_RUNNER_EXIT=0` cold; `vault-projection` still green; WO-V1 readonly
-projector still opens drifted DB with warn-not-throw.
+**G7 — no regression.** `bun qa/verify-release.ts` exits 0 cold; `vault-projection` still green;
+WO-V1 readonly projector still opens drifted DB with warn-not-throw.
 
 ---
 
@@ -296,7 +298,8 @@ projector still opens drifted DB with warn-not-throw.
 6. G5 six-shape re-run summary (same labels as WO-106b).
 7. G6 coupling bait red→green.
 8. Allowlist additions with justification.
-9. `GATE_RUNNER_EXIT=0` cold deferred to verifier per PROTOCOL.
+9. Canonical `bun qa/verify-release.ts` result, cold and from a detached worktree, deferred to the
+   independent verifier.
 
 **Judgment rule:** if production needs a new allowlist entry, **report it** — do not quietly extend.
 
@@ -307,3 +310,148 @@ projector still opens drifted DB with warn-not-throw.
 Wipe-and-recreate the Kernel (`SCOPES.md:105`) no longer orphans artifact bytes by default — new
 publishes and the index share `~/.quantflow/`. An obsolete Kernel fails loud on write instead of
 letting ingest or tools run against a lying registry. **WO-107b** may proceed after verify + merge.
+
+---
+
+# REWORK ROUND 2 — 2026-07-29 · ONE ITEM
+
+**Builder:** Cursor `composer-2.5`, rework commit `17effab` on `codex/wo-k3-rework`.
+**Findings by:** the independent Codex verifier. **This is round 2 of a permitted 2.** If the
+next verification finds another acceptance defect, stop this order for a rewrite; do not open a
+third rework lap.
+
+**In plain terms:** the artifact writer now proves it creates and records the real file, and the
+entire shipped application passes its automated board, but a path pointing to an ordinary file is
+still accepted as though it were the artifact directory. Publishing through that configuration
+would fail later and less clearly, instead of refusing the invalid root at startup as ordered.
+
+## Independently verified good — do not reopen in this round
+
+- Cold `bun qa/verify-release.ts` from detached worktree `/tmp/qf-k3-verify.cg3y1m` completed
+  frozen Electron install, unit suite, production Electron build, and all QA gates with
+  `PASS release-verification`, exit 0.
+- D5 production-writer bait:
+  `QF_ARTIFACT_ROOT_FALSIFY=writer bun qa/run.ts artifact-root` → exit 1, accepted file missing;
+  restore `bun qa/run.ts artifact-root` → exit 0, production writer and coupling assertions pass.
+- Drift baits independently reddened the real gate:
+  `QF_KERNEL_DRIFT_GATE_FALSIFY=1 bun qa/run.ts kernel-drift` → exit 1;
+  `QF_KERNEL_DRIFT_ENFORCE_OFF=1 bun qa/run.ts kernel-drift` → exit 1.
+
+## Defect 1 — an existing non-directory passes `resolveArtifactRoot()`
+
+D1 rules that an env-provided root must already be a **directory**. The implementation checks only
+`existsSync()` before `realpathSync()`, so an existing regular file is returned as a valid artifact
+root. The package tests cover a missing path and existing directories, but never this boundary.
+
+**Measured at `17effab` (exit 0):**
+
+```text
+bun -e '<create temp file; set QF_ARTIFACT_ROOT to it; call resolveArtifactRoot()>'
+{"path":".../not-a-directory","provenance":"env"}
+```
+
+This is not hypothetical configuration polish: the production helper joins an artifact filename
+onto the returned root, so it would fail only when work is published. D1 requires fail-closed
+resolution before that work begins.
+
+## Fix — this round only
+
+1. After resolving the env path, require the target to be a directory (`statSync(...).isDirectory()`
+   or an equivalent race-conscious check). Throw an error that names `QF_ARTIFACT_ROOT` and says
+   the resolved target is not a directory. Do not create, replace, or mutate the supplied path.
+2. Add a package regression test: existing regular file → resolver throws; the file remains a file
+   and its bytes remain unchanged.
+3. Extend the `artifact-root` gate with the same negative boundary so the shipped board, not only
+   the package suite, owns the contract. The gate may create the negative canary during fixture
+   setup; it must not weaken D5's prohibition on pre-creating the accepted artifact file.
+4. Falsify the new assertion through the real resolver: temporarily bypass the directory check →
+   gate red naming the accepted non-directory; restore → gate green. Then report package tests and
+   the canonical verifier for the independent verifier to re-run.
+
+**Scope:** resolver, its package test, and the existing artifact-root gate only. No schema, drift,
+Electron, Dock, artifact-helper, allowlist, or doctrine changes. One rework commit.
+
+---
+
+# VERIFICATION AFTER REWORK ROUND 2 — PASS · 2026-07-29
+
+**Candidate:** `f525c3d` (`codex/wo-k3-rework`).
+**Verifier:** independent Codex seat; builder was Cursor `composer-2.5`.
+**Disposition:** PASS. Main was not modified; merge awaits explicit founder approval.
+
+**In plain terms:** QuantFlow now refuses an invalid artifact-storage file before work starts, the
+real application writer still creates and records files correctly, and the complete shipped app
+passes from a clean checkout.
+
+## Acceptance defect closed
+
+Independent production-resolver probe with `QF_ARTIFACT_ROOT` set to an existing regular file:
+
+```text
+Error: resolveArtifactRoot: QF_ARTIFACT_ROOT is not a directory: .../not-a-directory
+{"rejected":true,"isFile":true,"bytes":"bait-bytes"}
+EXIT=0
+```
+
+Package regression:
+
+```text
+bun test packages/qf-kernel/src/resolve-artifact-root.test.ts
+6 pass
+0 fail
+```
+
+Gate restore:
+
+```text
+bun qa/run.ts artifact-root
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+artifact-root D5 production writer: PASS
+artifact-root G4 production coupling: PASS
+PASS  artifact-root
+EXIT=0
+```
+
+Real-resolver bait:
+
+```text
+QF_ARTIFACT_ROOT_FALSIFY=skip-directory bun qa/run.ts artifact-root
+artifact-root FAIL: accepted non-directory QF_ARTIFACT_ROOT: .../not-a-directory
+FAIL  artifact-root
+EXIT=1
+```
+
+D5 writer bait remained live:
+
+```text
+QF_ARTIFACT_ROOT_FALSIFY=writer bun qa/run.ts artifact-root
+artifact-root FAIL: production writer did not create publishable bytes: ENOENT .../gate-report.md
+FAIL  artifact-root
+EXIT=1
+```
+
+## Canonical shipped-form verifier
+
+Fresh detached worktree `/tmp/qf-k3-final-verify.JOgeyZ` at exactly `f525c3d`:
+
+```text
+bun qa/verify-release.ts
+release:install  PASS (frozen Electron install)
+release:unit     PASS
+release:build    PASS (production Electron build)
+release:qa       PASS (all gates, including kernel-drift, artifact-root, vault-projection)
+PASS  release-verification
+EXIT=0
+```
+
+The accepted correction changed exactly three permitted files: the artifact-root resolver, its
+package regression test, and the existing artifact-root gate. No schema, Electron, Dock, drift,
+allowlist, doctrine, or main-branch change occurred.
+
+## Merge disposition · 2026-07-29
+
+The founder explicitly approved the merge. Before main moved, a standalone cold invocation exposed
+that both new K3 gates borrowed `qf-kernel-schema` from earlier QA installs. That integration blocker
+was repaired and independently verified under [`WO-K3-COLD`](WO-K3-COLD.md) at `80eb866`. WO-K3 and
+that gate-closure repair land together; `NEXT.md` rotates to WO-CI2.

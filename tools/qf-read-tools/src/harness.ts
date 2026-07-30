@@ -38,11 +38,14 @@ function envFor(overrides: Record<string, string>): Record<string, string> {
   return { ...base, ...overrides };
 }
 
-async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client> {
+async function makeClient(
+  extraEnv: Record<string, string> = {},
+  dbPath = kernelDbPath,
+): Promise<Client> {
   const transport = new StdioClientTransport({
     command: "bun",
     args: [serverEntry],
-    env: envFor({ QF_KERNEL_DB: kernelDbPath, QF_ARTIFACT_ROOT: artifactRootPath, ...extraEnv }),
+    env: envFor({ QF_KERNEL_DB: dbPath, QF_ARTIFACT_ROOT: artifactRootPath, ...extraEnv }),
   });
   const client = new Client({ name: "qf-tool-plane-harness", version: "0.1.0" });
   await client.connect(transport);
@@ -127,12 +130,22 @@ async function assertServedSet(client: Client, schema: Schema): Promise<void> {
 
 async function gateG2(): Promise<void> {
   console.log("\n=== G2 doctrine phase-exit gate ===");
-  const db = openKernel(kernelDbPath); // writer: file already created by runHarness
-  seedExperimentalTable(db);
-  closeKernel(db);
+  // Keep the deliberately non-shipping object table in an isolated dirty fixture.
+  // The server must attach while its registry is still valid; WO-K3 correctly
+  // refuses any later attempt to reopen this fixture as a shipping Kernel.
+  const experimentalDbPath = join(workDir, "experimental-kernel.db");
+  const cleanFixture = openKernel(experimentalDbPath, { create: true });
+  closeKernel(cleanFixture);
 
   const mod = (await import(fixtureSchema)) as { schema: Schema };
-  const client = await makeClient({ QF_READ_SCHEMA_MODULE: fixtureSchema });
+  const client = await makeClient(
+    { QF_READ_SCHEMA_MODULE: fixtureSchema },
+    experimentalDbPath,
+  );
+
+  const fixtureWriter = openKernel(experimentalDbPath);
+  seedExperimentalTable(fixtureWriter);
+  closeKernel(fixtureWriter);
   await assertServedSet(client, mod.schema);
   const listed = await client.listTools();
   const experimentalTools = listed.tools.map((t) => t.name).filter((n) => n.startsWith("qf_experimental_"));

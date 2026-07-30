@@ -1,52 +1,56 @@
-# NEXT — the current order (rotated 2026-07-28 after WO-CI1 PASS)
+# NEXT — the current order (rotated 2026-07-29 after WO-K3 PASS)
 
 > **Builder: this file is your complete entry point.** It always points at the single order that is
 > currently unblocked. Do not choose your own order; do not proceed past this one.
 > **Founder:** feed this same file to every fresh builder window: *"Follow `docs/orders/NEXT.md`."*
 
-## Current order: **[WO-K3](WO-K3.md) — bytes follow truth, and drift refuses writes**
+## Current order: **[WO-CI2](WO-CI2.md) — the shipped app contains its required runtime files**
 
-**Read the order top to bottom before touching anything.** It is identity rung 3 of 3.
+**Read the order top to bottom before touching anything.** This is an off-ladder release repair
+required before product renaming or Dock profile/runtime unification.
 
-Branch state: existing `wo-k3` builder commit `ec51c34`, originally based at `9de0249`. Bring it
-forward onto the current verified `main` without force-pushing shared history, then perform only the
-documented rework. Do not treat its existing builder report as verification.
+Branch from the verified WO-K3 merge on `main`. Use Cursor CLI with **Composer 2.5 only** in an
+isolated worktree. The builder reports evidence and stops; it does not merge or self-verify.
 
-**In plain terms:** most of K3 may be sound, but its artifact gate created the file itself and then
-claimed the app created it. Rebuild that proof around the real production byte-writer, then re-run
-the entire canonical shipped-app verifier from the integrated branch.
+**In plain terms:** the source app builds, but the Linux package currently leaves out the agent
+runtime files used by its Dock paths, and the release check never notices. Package the actual app
+and make missing or stale runtime bytes turn the release check red.
 
-## Rework priority
+## Build priority
 
-1. Preserve and re-verify D1–D4 and D6–D7; do not rewrite working drift/root behavior speculatively.
-2. Implement corrected D5 exactly: absent file → real app helper writes bytes → `execute()` indexes
-   them → file, root, row, and content hash agree.
-3. Falsify the production helper, not a copied gate implementation: no-op or legacy-root mutation
-   must make D5 red, then restore green.
-4. Run `bun qa/verify-release.ts`. A green `bun qa/run.ts --all` without the Electron production
-   build is not verification.
+1. Add the credential-free unsigned Linux directory-package stage exactly as ordered.
+2. Prepare and stage the existing qf-toolloop and Hermes packs deterministically from frozen nested
+   installs; preserve the existing runtime references.
+3. Make packaged resolution use `process.resourcesPath`; keep development resolution at repo root.
+4. Move the two vendored tmux FileSets unchanged to macOS-only resources and preflight every active
+   Linux FileSet before Builder runs.
+5. Inspect only the finished package with the production resolver, a run-bound receipt, and the
+   same-process Builder log. Show every required bait red, restore, then green.
 
-## Why WO-CI1 is no longer blocking
+## What this order does not claim
 
-WO-CI1 independently passed and merged on 2026-07-28. CI, `AGENTS.md`, and the verifier handbook now
-use `bun qa/verify-release.ts`: frozen install → unit → production build → every QA gate. Package
-resolution uses the installed `qf-kernel*` export maps directly; private aliases are forbidden.
+WO-CI2 proves package closure, not a live Hermes turn. A fresh packaged Kernel still lacks the
+founder-defined Hermes-backed profiles, and the app still carries a separate hardcoded Peer Seats
+path. The next architect order will unify profile identity, runtime adapters, and the Dock Catalog
+after this package proof is honest.
 
 ## Hard boundaries
 
 - Never place, execute, or automate a real bet or trade; never handle credentials.
-- No migration runner, product rename, Node transaction repair, socket authentication, Hermes
-  profile redesign, live ingest, or WO-N1 work in K3.
-- Do not delete operator data, preserved Kernels, legacy artifact bytes, or `.wo008-home`.
-- Work in a short-lived worktree branch. Builder reports evidence and stops; another seat verifies.
+- No AppImage, signing, publishing, release upload, product rename, schema redesign, peer-bus fix,
+  MCP v2 migration, live ingest, or new runtime dependency.
+- Do not delete operator data, shared dependencies, preserved Kernels, or profile homes.
+- Do not broaden resource copying to whole source trees, credentials, profiles, or operator data.
 
-## Behind K3
+## Behind WO-CI2
 
-Do not promote another implementation order yet. The architect will re-measure the shipped Node
-session seam and Hermes profile identity after K3 evidence is honest, then cut only the next
-Cursor-sized order. WO-N1 and WO-107b remain blocked on K3.
+Do not promote WO-N1 merely because WO-K3 closed. The architect first cuts the measured
+Dock profile/runtime unification order: multiple Kernel definitions may share Hermes or use another
+CLI adapter, every session links to its exact profile, and adding a profile requires no Dock edit.
+The stale peer-bus delivery cache remains a separately measured blocker before unscripted WO-109
+collaboration.
 
 ---
 
 *The order log in [`README.md`](README.md) wins on status. The verifier rotates this file atomically
-with the merge, verification record, and roadmap/log updates.*
+with the merge, verification record, roadmap/log updates, and verifier-door check.*

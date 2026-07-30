@@ -2,6 +2,10 @@
 
 > **You are the architect/verifier.** This file is your complete cold start. Read it, then `PROTOCOL.md`, then the order you are verifying. You need no chat history — if something matters and isn't in the repo, it doesn't exist (`PROTOCOL.md`, shared-truth rule).
 
+**Door check 2026-07-29 (WO-K3):** the authority list below is current; its branch-diff,
+worktree, and canonical `bun qa/verify-release.ts` commands still resolve against live repository
+surfaces. WO-CI2 will deliberately extend that canonical command with a package stage.
+
 ## Read in this order
 
 1. `/START_HERE.md` — mission, the One Rule, hard rules. Wins every conflict.
@@ -50,7 +54,11 @@ Then the part that earns the role — **seam inspection**, i.e. what the gates *
 
 ## The rotation duty (atomic — one commit)
 
-When an order passes, the *same* commit must: **merge the branch · flip status in `README.md` and `ROADMAP.md` · append a verification record to the WO file · rewrite `NEXT.md` to the next unblocked order.** If `NEXT.md` and the log ever disagree, the log wins and the mismatch is a defect to fix in that sitting.
+When an order passes, the *same* commit must: **merge the branch · flip status in `README.md` and
+`ROADMAP.md` · append a verification record to the WO file · rewrite `NEXT.md` to the next unblocked
+order · confirm this verifier door still names every authority document and every pasteable command
+resolves against live refs.** If `NEXT.md` and the log ever disagree, the log wins and the mismatch
+is a defect to fix in that sitting.
 
 Write the verification record for a stranger: what you re-ran, what you found beyond the gates, what you accepted, and what you carried forward. Closed orders are the project's reasoning archive.
 

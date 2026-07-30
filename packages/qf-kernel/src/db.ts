@@ -2,6 +2,15 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { schema as shippingSchema } from "qf-kernel-schema";
+import {
+  KernelIncompleteInitializationError,
+  KernelRegistryDriftError,
+} from "./errors.ts";
+import {
+  detectObjectTypeRegistryDrift,
+  type RegistryDriftReport,
+} from "./registry-drift.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -82,6 +91,21 @@ const BUSY_TIMEOUT_MS = 5000;
 const SYNC_FULL = "FULL";
 const SYNC_NORMAL = "NORMAL";
 const UNSAFE_SYNC_ENV = "QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY";
+/** Gate bait only — skips drift enforcement so CI can prove the gate catches it. */
+const DRIFT_ENFORCE_OFF_ENV = "QF_KERNEL_DRIFT_ENFORCE_OFF";
+
+/** Readonly-handle drift / incomplete flag — WeakMap so KernelDb stays a plain surface. */
+const driftByDb = new WeakMap<KernelDb, RegistryDriftReport & { ok: false } | { ok: false; incomplete: string }>();
+
+/**
+ * Queryable drift flag set on readonly attaches that saw registry drift or
+ * incomplete initialization. Writable attaches throw instead of setting this.
+ */
+export function getKernelDrift(
+  db: KernelDb,
+): (RegistryDriftReport & { ok: false }) | { ok: false; incomplete: string } | null {
+  return driftByDb.get(db) ?? null;
+}
 
 function pragmaValue(db: KernelDb, name: string): string {
   const row = db.query(`PRAGMA ${name}`).get() as
@@ -104,6 +128,78 @@ function schemaMetaCount(db: KernelDb): number {
   }
 }
 
+function tableExists(db: KernelDb, name: string): boolean {
+  const row = db
+    .query(
+      `SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = ?`,
+    )
+    .get(name) as { ok: number } | null | undefined;
+  return row != null;
+}
+
+function objectMetaCount(db: KernelDb): number {
+  try {
+    const row = db
+      .query(
+        `SELECT COUNT(*) AS n FROM schema_meta WHERE kind = 'object'`,
+      )
+      .get() as { n: number } | null | undefined;
+    return row?.n ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Completed Kernel initialization (WO-K3 RULING 3) — not merely schema_meta name.
+ */
+function isCompletedInitialization(db: KernelDb): boolean {
+  if (!tableExists(db, "schema_meta")) return false;
+  if (!tableExists(db, "artifact")) return false;
+  return objectMetaCount(db) >= 1;
+}
+
+function readRegistrySets(db: KernelDb): {
+  declared: string[];
+  metaObjects: string[];
+  tables: string[];
+} {
+  const declared = shippingSchema.objects.map((o) => o.name);
+  const metaObjects = (
+    db
+      .query(`SELECT type_name AS n FROM schema_meta WHERE kind = 'object'`)
+      .all() as Array<{ n: string }>
+  ).map((r) => r.n);
+  const tables = (
+    db
+      .query(`SELECT name AS n FROM sqlite_master WHERE type = 'table'`)
+      .all() as Array<{ n: string }>
+  ).map((r) => r.n);
+  return { declared, metaObjects, tables };
+}
+
+/**
+ * Enforce object-type registry drift after migration/EVENTS (WO-K3 RULING 2).
+ * Exported for coupling bait — attachKernel must call this by name.
+ */
+export function enforceObjectTypeRegistryDrift(
+  db: KernelDb,
+  readonly: boolean,
+): void {
+  const sets = readRegistrySets(db);
+  const report = detectObjectTypeRegistryDrift(sets);
+  if (report.ok) return;
+  if (readonly) {
+    process.stderr.write(
+      `kernel: object-type registry drift (readonly warn): missing=[${report.missing.join(",")}] retired=[${report.retired.join(",")}] inconsistent=[${report.inconsistent.join(",")}]\n`,
+    );
+    driftByDb.set(db, report);
+    return;
+  }
+  if (process.env[DRIFT_ENFORCE_OFF_ENV] === "1") return;
+  throw new KernelRegistryDriftError(report);
+}
+
 /**
  * One greppable boot line (stderr — safe for MCP stdio). Carries path,
  * provenance, journal mode, sync, and schema_meta count.
@@ -123,8 +219,9 @@ export function logKernelBoot(
   const meta = schemaMetaCount(db);
   const unsafe =
     opts.syncUnsafe === true ? ` ${UNSAFE_SYNC_ENV}=1` : "";
+  const drift = driftByDb.has(db) ? " drift=yes" : "";
   process.stderr.write(
-    `kernel: path=${path} provenance=${provenance} journal=${journal} sync=${sync}${unsafe} schema_meta=${meta}\n`,
+    `kernel: path=${path} provenance=${provenance} journal=${journal} sync=${sync}${unsafe} schema_meta=${meta}${drift}\n`,
   );
 }
 
@@ -150,18 +247,32 @@ export function attachKernel(
     );
   }
 
-  // Generated migration.sql uses bare CREATE TABLE (not IF NOT EXISTS) for
-  // schema_meta — skip when already applied so relaunch / attach is safe.
-  const already = db
-    .query(
-      `SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'schema_meta'`,
-    )
-    .get() as { ok: number } | null | undefined;
-  if (!already) {
+  // WO-K3 RULING 3: skip migration only for a completed initialization, not
+  // merely because a table named schema_meta exists (canary incomplete DB).
+  const hasMeta = tableExists(db, "schema_meta");
+  if (!hasMeta) {
     const migration = readFileSync(migrationSqlPath(), "utf8");
     db.exec(migration);
+  } else if (!isCompletedInitialization(db)) {
+    const detail = !tableExists(db, "artifact")
+      ? "schema_meta present but artifact table absent"
+      : "schema_meta present but object meta count < 1";
+    if (!readonly) {
+      throw new KernelIncompleteInitializationError(detail);
+    }
+    process.stderr.write(
+      `kernel: incomplete initialization (readonly warn): ${detail}\n`,
+    );
+    driftByDb.set(db, { ok: false, incomplete: detail });
   }
+
   db.exec(EVENTS_DDL);
+
+  // Drift check after migration skip + EVENTS_DDL (WO-K3 RULING 2).
+  // Skip when we already flagged incomplete — that file has no trustworthy registry.
+  if (!driftByDb.has(db) && isCompletedInitialization(db)) {
+    enforceObjectTypeRegistryDrift(db, readonly);
+  }
 
   logKernelBoot(db, {
     path: opts.path,
