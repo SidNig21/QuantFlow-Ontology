@@ -1,6 +1,6 @@
 # WO-N1 — Product identity: QuantFlow, not Collaborator
 
-status: **open — current after WO-K3b PASS; adversarial pre-build read incorporated.**
+status: **done — independently verified + merged locally 2026-07-30.**
 Born 2026-07-27 from founder direction + a Claude diagnosis (accepted after measurement).
 assignee: — (not cuttable)
 depends: **WO-K3b** (hard) — every production artifact writer must live under `~/.quantflow/` before this
@@ -269,3 +269,19 @@ K3/K3b relocate every production artifact writer into `~/.quantflow/`. This orde
 `~/.collaborator/`. Running them together (or N1 first) creates two partial moves and no runner to
 reconcile `storage_ref` rows — the exact orphan class debt #29 names.
 **Sequence: K1 → K2 → K3 → K3b → N1.**
+
+## Verification record — 2026-07-30
+
+Candidate `1aaa82b4bbd24963cb01b0a7344d5ebaf7d38707` passed the canonical cold release verifier in a
+fresh detached worktree: frozen install, 314 unit tests, production build, real unsigned Linux
+package, and every QA gate (`runId 4327d8bb-524b-48e6-8684-45bc1a487ec5`). The package contained an
+executable `quantflow`, the `@quantflow/electron` ASAR manifest, and update metadata targeting
+`SidNig21/QuantFlow-Ontology`.
+
+The verifier independently drove all three required production baits red then restored them green:
+package identity, the real boot migration call, and the packaged update target. A widened migration
+probe confirmed persistent Electron state copies while Kernel, artifact, PID, socket, and breadcrumb
+canaries remain excluded and every source canary remains untouched. The founder Kernel was inspected
+read-only: zero artifacts and zero legacy-root references. The exact report is
+[`evidence/wo-n1/VERIFICATION.md`](evidence/wo-n1/VERIFICATION.md); report commit `94274c4` contains no
+product-code change.
