@@ -10,6 +10,8 @@ it.
 
 **Cold integration repair:** `a710786`
 
+**Electron migration repair:** `b3cbc1f`
+
 This is builder evidence, not a shipping verdict. A separate cold verifier decides PASS or REWORK.
 
 ## Implementation
@@ -220,3 +222,25 @@ sibling QA file carrying the same literal: the scanner rejected that sibling, ex
 restored `kernel-one-path G1: PASS`. `product-identity` remained green with its full migration
 matrix. The first candidate's cold package receipts remain evidence, not a PASS verdict; the repaired
 exact candidate still requires independent verification.
+
+## Electron migration repair
+
+Exact candidate `c69bb46` passed the full cold release verifier and all three required production
+baits. The independent verifier then widened the unsafe-entry probe to legacy Electron `userData`
+and found `kernel.db`, a PID file, and an artifact directory copied into the same staged app root.
+The helper passed the exclusion predicate for legacy app state but `null` for Electron state.
+
+Repair `b3cbc1f` passes the same `isExcludedGlobalEntry` predicate to the Electron subtree and adds
+four permanent Electron-source canaries: Kernel, PID, artifact, and generated socket breadcrumb.
+Focused production falsification changed only the Electron predicate back to `null`:
+
+```text
+product-identity: migration matrix failed: excluded Electron entry migrated: kernel.db
+FAIL  product-identity
+exit 1
+```
+
+Restoring the production predicate reran the complete old-only/both-exist/failure/retry/workspace
+matrix and printed `PASS product-identity`. Source hashes remained unchanged. No other migration,
+package, schema, dependency, Kernel, or artifact behavior changed; the new exact candidate still
+requires an independent cold verdict.

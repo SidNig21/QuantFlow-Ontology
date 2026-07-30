@@ -246,6 +246,21 @@ widen to `qa/gates/` or production code; removing the bait restores green. No pa
 migration behavior, dependency, schema, Kernel path, or release configuration changed. The repaired
 candidate returns to independent verification; the failed cold run is not a shipping verdict.
 
+## REWORK ROUND 2 — 2026-07-30 · ONE MIGRATION ITEM
+
+Exact candidate `c69bb46` passed the complete cold release verifier and the three required
+production baits. A separate verifier probe then found the unsafe-entry exclusion applied to the
+legacy app root but not to legacy Electron `userData`, even though both are published through the
+same staged `QF_APP_ROOT`. Kernel, PID, artifact, and breadcrumb canaries placed in the Electron
+source were copied.
+
+Repair `b3cbc1f` gives the Electron subtree the same production exclusion predicate and adds those
+canaries to the permanent migration matrix. Reverting only that predicate to `null` now fails on
+`excluded Electron entry migrated: kernel.db`; restoring it returns the full matrix green. No
+dependency, schema, release identity, Kernel path, or other app behavior changed. The repaired
+candidate returns to independent verification; the prior cold pass is evidence for its exact parent,
+not a verdict on the new commit.
+
 ---
 
 ## Why after K3b (do not pull forward)
