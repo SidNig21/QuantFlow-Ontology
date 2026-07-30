@@ -40,6 +40,11 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "run", "build"],
   },
   {
+    id: "package",
+    cwd: "collab-electron",
+    command: ["bun", "run", "package:verify"],
+  },
+  {
     id: "qa",
     cwd: ".",
     command: ["bun", "qa/run.ts", "--all"],
@@ -66,7 +71,7 @@ export function checkReleaseVerifier(
     stages.some((stage, index) => !sameStage(stage, EXPECTED_STAGES[index]!))
   ) {
     reasons.push(
-      "canonical release stages must be install -> unit -> production build -> all QA",
+      "canonical release stages must be install -> unit -> production build -> package -> all QA",
     );
   }
 
@@ -128,6 +133,7 @@ async function checkRunnerBehavior(
       return 0;
     },
     SILENT_REPORTER,
+    "test-run-id",
   );
   const expectedIds = stages.map((stage) => stage.id);
   if (
@@ -143,17 +149,18 @@ async function checkRunnerBehavior(
     stages,
     async (stage) => {
       beforeFailure.push(stage.id);
-      return stage.id === "build" ? 23 : 0;
+      return stage.id === "package" ? 47 : 0;
     },
     SILENT_REPORTER,
+    "test-run-id",
   );
   if (
-    failureCode !== 23 ||
+    failureCode !== 47 ||
     beforeFailure.includes("qa") ||
-    beforeFailure.at(-1) !== "build"
+    beforeFailure.at(-1) !== "package"
   ) {
     reasons.push(
-      "release runner must propagate a build failure and stop before QA",
+      "release runner must propagate a package failure and stop before QA",
     );
   }
 
@@ -167,7 +174,7 @@ export async function runReleaseVerifierGate(): Promise<{ ok: boolean }> {
 
   switch (falsify) {
     case "stage":
-      stages = stages.filter((stage) => stage.id !== "build");
+      stages = stages.filter((stage) => stage.id !== "package");
       break;
     case "workflow":
       sources.workflow = sources.workflow.replace(
