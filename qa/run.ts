@@ -403,6 +403,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "dock-definition-launch",
+    description:
+      "WO-D2: packaged Dock defaults, definition-driven argv, peer ownership, and native-TUI compensation",
+    run: async () => {
+      const { runDockDefinitionLaunchGate } = await import(
+        "./gates/dock-definition-launch.ts"
+      );
+      const { ok } = await runDockDefinitionLaunchGate();
+      return ok;
+    },
+  },
+  {
     name: "dock-registry",
     description:
       "WO-007: agent_definition registry list/resolve, species-literal scan, linkSoftware admission",
