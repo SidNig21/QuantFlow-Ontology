@@ -1,6 +1,6 @@
 # WO-CI2 — The shipped app contains its required runtime files
 
-status: open — adversarial pre-build read PASS; current after WO-K3 merge
+status: rewrite required — two verification rounds failed; rebuild in progress
 assignee: builder
 depends: WO-K3 — independently verified at `b0b7bc5`; merged 2026-07-29
 blocks: WO-N1 · Dock profile/runtime unification
@@ -292,6 +292,138 @@ install → unit → build → package → qa → PASS release-verification
 
 The verifier independently reruns one missing-runtime bait against a temporary copy of the submitted
 package, then reruns green against the untouched real package.
+
+---
+
+## BINDING REWRITE — 2026-07-29
+
+This section supersedes any earlier sentence that permits a different behavior. The first candidate
+`a5779a5` and its rework through `a11565b` are rejected and must not merge. Protocol stopped patching
+after two failed verification rounds; this rebuild starts from merged `main` on a fresh branch.
+
+### Why the rewrite is necessary
+
+The package bytes can be present while the proof remains dishonest. In the rejected implementation,
+all three planted failures printed a red-looking message but returned exit `0`; direct cold QA still
+needed a manually prebuilt `out/`; and a bad same-run receipt could be replaced by a second package
+instead of failing. Those are gate-definition defects, not ordinary missing assertions.
+
+### RW1 — command modes are explicit and mutually exclusive
+
+There are exactly three modes:
+
+1. **Canonical release mode:** `qa/verify-release.ts` creates one unpredictable run id. Its package
+   stage builds exactly once and writes that run's receipt. Its QA stage must reuse that exact
+   package with zero install, build, or package calls. A missing, stale, malformed, hash-mismatched,
+   or out-of-root receipt is a named non-zero failure; QA must never repair it by packaging again.
+2. **Standalone QA mode:** no release run id is supplied. The `package-closure` gate creates a new
+   unpredictable run id on every ordinary green invocation, performs the frozen
+   `collab-electron` install, production build, and `package:verify` exactly once, then validates and
+   inspects that new output. It never reuses a receipt from an earlier ordinary invocation.
+3. **Bait inspection mode:** `missing-hermes` and `dev-root` may reuse the existing validated package
+   only to avoid an unrelated rebuild. They must not rewrite it. `preflight-missing` mutates only the
+   in-memory active Linux configuration and must stop before Builder.
+
+Implement the mode decision through an exported pure function or injected executor so unit tests can
+prove call counts. Production tests must show:
+
+- canonical valid receipt: build `0`, package `0`, inspect `1`;
+- canonical missing/invalid/stale/out-of-root receipt: non-zero named failure, build `0`, package `0`;
+- standalone ordinary run: fresh run id, build `1`, package `1`, inspect `1`, even when an old receipt
+  is already present;
+- no path derived from receipt content is used before exact path validation.
+
+`package:verify` accepts the canonical run id when supplied. When invoked directly without one, it
+creates and prints its own unpredictable run id so the literal builder command below is valid. It
+does not read an operator-supplied environment value as proof of a prior run.
+
+### RW2 — bait red means process failure
+
+The real gate command must exit non-zero for each planted defect. Catching the expected exception and
+returning `0` is forbidden. The bait may add/remove/copy the real artifact and may improve the error
+message, but the failure must escape to `qa/run.ts` as `FAIL package-closure`.
+
+Required transcripts, including shell exit status:
+
+```text
+QF_PACKAGE_CLOSURE_BAIT=missing-hermes bun qa/run.ts package-closure  # non-zero
+QF_PACKAGE_CLOSURE_BAIT=dev-root bun qa/run.ts package-closure        # non-zero
+QF_PACKAGE_CLOSURE_BAIT=preflight-missing bun qa/run.ts package-closure # non-zero
+bun qa/run.ts package-closure                                         # zero, PASS
+```
+
+The missing-Hermes bait must enter the same full inspector as green, against a temporary copy of the
+finished package. The dev-root bait must enter that inspector with the development root. The
+preflight bait must enter the same preflight function used immediately before Builder. Unknown bait
+values fail non-zero by name.
+
+### RW3 — one shared production path law
+
+The gate may not reimplement Hermes metadata, launch, or allowlist path derivation. Extract the pure
+path helpers used by the packaged host into one shared main-process module (or export the existing
+pure helpers without importing Electron/Kernel state), then make both production resolution and the
+gate call those same helpers. Required shared rules are:
+
+- packed sibling metadata from a `.aospkg` reference;
+- committed `species|tools/<name>/launch.json`;
+- committed `species|tools/<name>/tools-allowlist.json`.
+
+A unit bait changes one shared rule input and proves production and package inspection derive the
+same path. Parallel local copies or a hardcoded allowlist path are rejected.
+
+### RW4 — configuration parsing fails closed
+
+`build.extraResources` and `build.linux.extraResources` may be absent or arrays. If present with any
+other type, parsing fails. Each active entry must be an object with exactly two own keys, `from` and
+`to`, both non-empty strings. Strings, arrays-as-entries, macros, filters, and every additional or
+unknown key fail. Focused tests cover top-level and Linux-specific non-array values plus `filter`,
+`macro`, and an arbitrary third key.
+
+### RW5 — exact builder and verifier commands
+
+Builder evidence runs, in this order:
+
+```bash
+cd collab-electron
+bun install --frozen-lockfile
+./scripts/test-unit.sh
+bun run build
+bun run package:verify
+```
+
+The direct `package:verify` command above must succeed without the builder inventing an environment
+variable. The verifier, not the builder, then creates a pristine detached worktree and runs:
+
+```bash
+bun qa/run.ts package-closure
+bun qa/verify-release.ts
+```
+
+Both commands must reach their final `PASS` from that pristine worktree without a prior manual build,
+ambient `node_modules`, copied `out/`, or copied receipt. The verifier then runs one non-zero bait
+against a temporary package copy and restores green.
+
+### Verification round 1 — REJECTED (`a5779a5`)
+
+- cold standalone gate could not resolve the pinned `electron-builder` package;
+- receipt-selected package and log paths were not bound to canonical output;
+- `package:verify` did not check required emitted files before writing a receipt;
+- release-stage deletion coverage tested a local array rather than the oracle;
+- all three bait commands converted the planted failure to exit `0`;
+- the literal ordered `bun run package:verify` failed without an undocumented environment variable;
+- Hermes auxiliary paths were duplicated instead of using production rules;
+- FileSet parsing accepted unsupported shapes.
+
+### Verification round 2 — REJECTED (`4eae3e7`, evidence-only follow-up `a11565b`)
+
+- direct cold QA still required a manual `bun run build` before it could pass;
+- an ordinary no-run-id invocation reused an old receipt instead of creating a new run;
+- canonical invalid receipts were treated as cache misses and silently repackaged, masking tampering
+  and violating the single-package rule;
+- bait commands still exited `0` after observing the intended failure;
+- exact FileSet shape rejection and shared production auxiliary path rules remained incomplete.
+
+No verification PASS exists for either candidate.
 
 ---
 
