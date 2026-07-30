@@ -8,26 +8,6 @@
  */
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
-import { checkDocActionSurface } from "./gates/doc-action-surface.ts";
-import { checkObserveDoor } from "./gates/observe-door.ts";
-import { checkKernelSoleWriter } from "./gates/kernel-sole-writer.ts";
-import { checkKernelSoleWriterApp } from "./gates/kernel-sole-writer-app.ts";
-import { checkNoCanvasDomainWrites } from "./gates/no-canvas-domain-writes.ts";
-import { checkOneSkin } from "./gates/one-skin.ts";
-// agent-path / dock-registry: cold-safe launchers only (no heavy top-level imports)
-import { runAgentPathGate } from "./gates/agent-path.ts";
-import { runDockRegistryGate } from "./gates/dock-registry.ts";
-import { runActionTransportGate } from "./gates/action-transport.ts";
-import { runBootReconcileGate } from "./gates/boot-reconcile.ts";
-import { runKernelDriftGate } from "./gates/kernel-drift.ts";
-import { runArtifactRootGate } from "./gates/artifact-root.ts";
-import { checkVerbRetirement } from "./gates/verb-retirement.ts";
-import { runPublishArtifactRootGate } from "./gates/publish-artifact-root.ts";
-import { runToolDiscoveryGate } from "./gates/tool-discovery.ts";
-import { runKernelOnePathGate } from "./gates/kernel-one-path.ts";
-import { runVaultProjectionGate } from "./gates/vault-projection.ts";
-import { runSchemaBundleAliasesGate } from "./gates/schema-bundle-aliases.ts";
-import { runReleaseVerifierGate } from "./gates/release-verifier.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -215,7 +195,10 @@ const gates: Gate[] = [
     name: "schema-bundle-aliases",
     description:
       "WO-CI1: forbid private qf-kernel aliases; require bundle excludes and live package exports",
-    run: () => {
+    run: async () => {
+      const { runSchemaBundleAliasesGate } = await import(
+        "./gates/schema-bundle-aliases.ts"
+      );
       const { ok } = runSchemaBundleAliasesGate();
       return ok;
     },
@@ -225,7 +208,20 @@ const gates: Gate[] = [
     description:
       "WO-CI1: CI and verifier docs use the canonical install -> unit -> build -> QA command",
     run: async () => {
+      const { runReleaseVerifierGate } = await import(
+        "./gates/release-verifier.ts"
+      );
       const { ok } = await runReleaseVerifierGate();
+      return ok;
+    },
+  },
+  {
+    name: "package-closure",
+    description:
+      "WO-CI2: packaged Linux app closes over qf-toolloop and Hermes runtime bytes",
+    run: async () => {
+      const { runPackageClosureGate } = await import("./gates/package-closure.ts");
+      const { ok } = await runPackageClosureGate();
       return ok;
     },
   },
@@ -316,7 +312,8 @@ const gates: Gate[] = [
     name: "kernel-sole-writer",
     description:
       "Law E: no SQLite/DDL/DML for domain types outside packages/qf-kernel (+ schema allowlist)",
-    run: () => {
+    run: async () => {
+      const { checkKernelSoleWriter } = await import("./gates/kernel-sole-writer.ts");
       const { ok } = checkKernelSoleWriter();
       return ok;
     },
@@ -325,7 +322,10 @@ const gates: Gate[] = [
     name: "kernel-sole-writer-app",
     description:
       "WO-006b: only collab-electron/src/main/kernel.ts may import qf-kernel/sqlite or reference the Kernel db file",
-    run: () => {
+    run: async () => {
+      const { checkKernelSoleWriterApp } = await import(
+        "./gates/kernel-sole-writer-app.ts"
+      );
       const { ok } = checkKernelSoleWriterApp();
       return ok;
     },
@@ -335,6 +335,7 @@ const gates: Gate[] = [
     description:
       "WO-K1: one Kernel resolver; WAL/busy_timeout; MCP seat shares the default world",
     run: async () => {
+      const { runKernelOnePathGate } = await import("./gates/kernel-one-path.ts");
       const { ok } = await runKernelOnePathGate();
       return ok;
     },
@@ -343,7 +344,10 @@ const gates: Gate[] = [
     name: "no-canvas-domain-writes",
     description:
       "Law E: no QuantFlow domain type persisted via canvas-state / canvas-persistence",
-    run: () => {
+    run: async () => {
+      const { checkNoCanvasDomainWrites } = await import(
+        "./gates/no-canvas-domain-writes.ts"
+      );
       const { ok } = checkNoCanvasDomainWrites();
       return ok;
     },
@@ -352,7 +356,8 @@ const gates: Gate[] = [
     name: "doc-action-surface",
     description:
       "Debt #0: ONTOLOGY_SCHEMA.md §Actions equals schema.ts actions (names both directions)",
-    run: () => {
+    run: async () => {
+      const { checkDocActionSurface } = await import("./gates/doc-action-surface.ts");
       const { ok } = checkDocActionSurface();
       return ok;
     },
@@ -361,7 +366,8 @@ const gates: Gate[] = [
     name: "observe-door",
     description:
       "Debt #22: observe_ticket strings only on allowlist; no tools.json reads or generateMcp calls outside qf-kernel-schema/",
-    run: () => {
+    run: async () => {
+      const { checkObserveDoor } = await import("./gates/observe-door.ts");
       const { ok } = checkObserveDoor();
       return ok;
     },
@@ -371,6 +377,7 @@ const gates: Gate[] = [
     description:
       "WO-006c: headless spawn→stream→tool→artifact, concurrency, cancel, orphans, reconcile",
     run: async () => {
+      const { runAgentPathGate } = await import("./gates/agent-path.ts");
       const { ok } = await runAgentPathGate();
       return ok;
     },
@@ -379,7 +386,8 @@ const gates: Gate[] = [
     name: "one-skin",
     description:
       "WO-006d/007: no raw hex/rgb/hsl or non-token font-family outside windows/shared/qf-tokens.css",
-    run: () => {
+    run: async () => {
+      const { checkOneSkin } = await import("./gates/one-skin.ts");
       const { ok } = checkOneSkin();
       return ok;
     },
@@ -389,6 +397,7 @@ const gates: Gate[] = [
     description:
       "WO-007: agent_definition registry list/resolve, species-literal scan, linkSoftware admission",
     run: async () => {
+      const { runDockRegistryGate } = await import("./gates/dock-registry.ts");
       const { ok } = await runDockRegistryGate();
       return ok;
     },
@@ -407,6 +416,7 @@ const gates: Gate[] = [
     description:
       "WO-106 D4/G1/G3: tools/list sufficiency, schema equality, operator door set relations",
     run: async () => {
+      const { runToolDiscoveryGate } = await import("./gates/tool-discovery.ts");
       const { ok } = await runToolDiscoveryGate();
       return ok;
     },
@@ -416,6 +426,7 @@ const gates: Gate[] = [
     description:
       "WO-106 G2: action tools stay permissive at MCP transport; Kernel rejects unknown keys",
     run: async () => {
+      const { runActionTransportGate } = await import("./gates/action-transport.ts");
       const { ok } = await runActionTransportGate();
       return ok;
     },
@@ -425,6 +436,9 @@ const gates: Gate[] = [
     description:
       "WO-106b G1/G2/G3: publish_artifact path confined to QF_ARTIFACT_ROOT; fail closed without root",
     run: async () => {
+      const { runPublishArtifactRootGate } = await import(
+        "./gates/publish-artifact-root.ts"
+      );
       const { ok } = await runPublishArtifactRootGate();
       return ok;
     },
@@ -433,7 +447,8 @@ const gates: Gate[] = [
     name: "verb-retirement",
     description:
       "WO-106 G4: retired read verbs and renamed hand-written SQL stay deleted",
-    run: () => {
+    run: async () => {
+      const { checkVerbRetirement } = await import("./gates/verb-retirement.ts");
       const { ok } = checkVerbRetirement();
       return ok;
     },
@@ -443,6 +458,7 @@ const gates: Gate[] = [
     description:
       "WO-106 G5: boot reconciliation closes every acted-on session above 100 rows",
     run: async () => {
+      const { runBootReconcileGate } = await import("./gates/boot-reconcile.ts");
       const { ok } = await runBootReconcileGate();
       return ok;
     },
@@ -452,6 +468,7 @@ const gates: Gate[] = [
     description:
       "WO-K3 G1–G3/G6: object-type registry drift detector, attachKernel enforcement, canary incomplete DB",
     run: async () => {
+      const { runKernelDriftGate } = await import("./gates/kernel-drift.ts");
       const { ok } = await runKernelDriftGate();
       return ok;
     },
@@ -461,6 +478,7 @@ const gates: Gate[] = [
     description:
       "WO-K3 G4/D5: resolveArtifactRoot default, publish under root, agent-host path grep",
     run: async () => {
+      const { runArtifactRootGate } = await import("./gates/artifact-root.ts");
       const { ok } = await runArtifactRootGate();
       return ok;
     },
@@ -470,6 +488,7 @@ const gates: Gate[] = [
     description:
       "WO-V1: Kernel→Obsidian projection (one-direction, hash-verify, schema-driven, idempotent)",
     run: async () => {
+      const { runVaultProjectionGate } = await import("./gates/vault-projection.ts");
       const { ok } = await runVaultProjectionGate();
       return ok;
     },

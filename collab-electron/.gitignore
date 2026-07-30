@@ -2,6 +2,9 @@ node_modules/
 vendor/
 dist/
 out/
+.package-staging/
+.package-verify/
+.tmp/
 target/
 .env
 .env.*

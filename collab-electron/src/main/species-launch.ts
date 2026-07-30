@@ -10,9 +10,19 @@
  * Values: "agentos" (default) | "host_acp"
  */
 import { existsSync, readFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
 import { loadHostMountsFile } from "./host-mounts";
 import { kernelGetObject } from "./kernel";
+import {
+  committedLaunchPathForPackageRef,
+  packedMetaPathForPackageRef,
+  sourceManifestPathForPackageRef,
+} from "./package-resource-paths";
+
+export {
+  committedLaunchPathForPackageRef,
+  packedMetaPathForPackageRef,
+  sourceManifestPathForPackageRef,
+} from "./package-resource-paths";
 
 export type SpeciesLaunch = "agentos" | "host_acp";
 
@@ -35,43 +45,6 @@ function readLaunchDoc(path: string): SpeciesLaunch | null {
   } catch {
     return null;
   }
-}
-
-/** package_ref → packed sibling meta: species/hermes/packed/hermes.aospkg → …/hermes.meta.json */
-export function packedMetaPathForPackageRef(
-  packageRef: string,
-  appRoot: string,
-): string | null {
-  if (!packageRef.endsWith(".aospkg")) return null;
-  const abs = join(appRoot, packageRef);
-  const base = basename(packageRef, ".aospkg");
-  return join(dirname(abs), `${base}.meta.json`);
-}
-
-/** package_ref → committed launch.json under species|tools/<name>/ */
-export function committedLaunchPathForPackageRef(
-  packageRef: string,
-  appRoot: string,
-): string | null {
-  const parts = packageRef.split("/");
-  if (parts.length < 3) return null;
-  const root = parts[0];
-  const name = parts[1];
-  if (root !== "species" && root !== "tools") return null;
-  return join(appRoot, root, name, "launch.json");
-}
-
-/** Dev-only fallback — must not be required for packed deploys. */
-export function sourceManifestPathForPackageRef(
-  packageRef: string,
-  appRoot: string,
-): string | null {
-  const parts = packageRef.split("/");
-  if (parts.length < 3) return null;
-  const root = parts[0];
-  const name = parts[1];
-  if (root !== "species" && root !== "tools") return null;
-  return join(appRoot, root, name, "agent-package", "agentos-package.json");
 }
 
 /**

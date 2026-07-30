@@ -7,8 +7,9 @@
  */
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+import { app } from "electron";
+import { defaultRepoRoot, selectAppRoot } from "./app-root";
 import {
   AgentOs,
   createHostDirBackend,
@@ -55,13 +56,12 @@ import { writeAgentReportArtifact } from "./agent-artifact-writer";
 /** Boot-seed species name — main-process only (never a renderer literal). */
 export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
 
-function repoRoot(): string {
-  const here = dirname(fileURLToPath(import.meta.url));
-  return join(here, "../../..");
-}
-
 export function appRoot(): string {
-  return repoRoot();
+  return selectAppRoot({
+    isPackaged: app.isPackaged,
+    resourcesPath: process.resourcesPath ?? null,
+    repoRoot: defaultRepoRoot(import.meta.url),
+  });
 }
 
 type ChunkListener = (sessionId: string, text: string) => void;

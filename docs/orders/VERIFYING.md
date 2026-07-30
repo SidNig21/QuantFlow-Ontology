@@ -2,9 +2,9 @@
 
 > **You are the architect/verifier.** This file is your complete cold start. Read it, then `PROTOCOL.md`, then the order you are verifying. You need no chat history — if something matters and isn't in the repo, it doesn't exist (`PROTOCOL.md`, shared-truth rule).
 
-**Door check 2026-07-29 (WO-K3):** the authority list below is current; its branch-diff,
-worktree, and canonical `bun qa/verify-release.ts` commands still resolve against live repository
-surfaces. WO-CI2 will deliberately extend that canonical command with a package stage.
+**Door check 2026-07-30 (WO-CI2):** the authority list below is current; its branch-diff,
+fresh-worktree, and canonical `bun qa/verify-release.ts` commands resolve against live repository
+surfaces. The canonical command now includes the real unsigned Linux package stage.
 
 ## Read in this order
 
@@ -31,13 +31,14 @@ surfaces. WO-CI2 will deliberately extend that canonical command with a package 
 ```bash
 git fetch origin wo-NNN
 git diff --stat origin/main...origin/wo-NNN             # scope: anything outside the order is a defect
-git worktree add /tmp/verify-NNN origin/wo-NNN          # clean room, never the working tree
+test ! -e /tmp/verify-NNN
+git worktree add --detach /tmp/verify-NNN origin/wo-NNN # clean room, never the working tree
 ```
 
-Then, **cold** — with no `node_modules` anywhere, because a warm machine passes gates a fresh CI checkout fails:
+Then, **cold** — the new detached worktree has no inherited `node_modules`, build, staging, receipt,
+or package output:
 
 ```bash
-rm -rf /tmp/verify-NNN/**/node_modules
 cd /tmp/verify-NNN && bun qa/verify-release.ts
 ```
 

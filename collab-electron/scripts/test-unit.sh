@@ -34,3 +34,13 @@ SRC_FILES=$(find src -name '*.test.ts' "${EXCLUDES[@]}" 2>/dev/null)
 bun test $PKG_FILES
 bun test $SRC_FILES
 for f in "${MOCKY[@]}"; do bun test "$f"; done
+
+# WO-CI2: dependency-free package-closure ordering tests and package-lib wiring proofs.
+bun test ../qa/gates/package-closure/lazy-loader.test.ts
+bun test ../qa/verify-release.test.ts
+bun test scripts/package-lib/extra-resources.test.ts \
+  scripts/package-lib/package-cleanup.test.ts \
+  scripts/package-lib/package-receipt.test.ts \
+  scripts/package-lib/shared-paths.test.ts \
+  scripts/package-lib/package-inspect.test.ts \
+  scripts/package-lib/unit-wiring.test.ts

@@ -43,15 +43,13 @@ Gate: one real agent path streaming into a tile · cancel/fail/retry/close · on
 
 Tracked so it is not rediscovered. None blocks the ladder; each lands by order when it starts costing more than it saves.
 
-> **Status rotation — 2026-07-29, WO-K3 merge:** debt **#27 is CLOSED** by the writable-fail/
+> **Status rotation — 2026-07-30, WO-CI2 merge:** debt **#27 is CLOSED** by the writable-fail/
 > readonly-warn object-registry drift detector, and debt **#29 is CLOSED** by the canonical
 > `~/.quantflow/artifacts/` resolver plus production-writer coupling. The original measurement rows
-> below remain as the incident record; this rotation is their current status. Debt **#30's trigger
-> has fired**, but WO-N1 stays parked until package closure and Dock profile/runtime identity stop a
-> cosmetic milestone from hiding a broken shipped path. New debt **#32 is OPEN**: the canonical
-> verifier builds but does not package, and the actual Linux directory package omits qf-toolloop and
-> Hermes runtime resources while Builder only warns about missing tmux inputs. It lands in
-> [`WO-CI2`](orders/WO-CI2.md), now the current order.
+> below remain as the incident record; this rotation is their current status. Debt **#32 is CLOSED**:
+> the canonical verifier packages the unsigned Linux app, and the artifact contains and resolves the
+> qf-toolloop plus Hermes runtime files. Debt **#30's trigger has fired**, but WO-N1 stays parked until
+> WO-D1/D2 replace the split Kernel/hardcoded Dock identity with one definition-driven profile path.
 
 | # | Debt | Lands in |
 |---|---|---|

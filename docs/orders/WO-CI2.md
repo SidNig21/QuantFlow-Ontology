@@ -1,6 +1,6 @@
 # WO-CI2 — The shipped app contains its required runtime files
 
-status: open — adversarial pre-build read PASS; current after WO-K3 merge
+status: done — independently verified and merged 2026-07-30
 assignee: builder
 depends: WO-K3 — independently verified at `b0b7bc5`; merged 2026-07-29
 blocks: WO-N1 · Dock profile/runtime unification
@@ -295,6 +295,270 @@ package, then reruns green against the untouched real package.
 
 ---
 
+## BINDING REWRITE — 2026-07-29
+
+This section supersedes any earlier sentence that permits a different behavior. The first candidate
+`a5779a5` and its rework through `a11565b` are rejected and must not merge. Protocol stopped patching
+after two failed verification rounds; this rebuild starts from merged `main` on a fresh branch.
+
+### Why the rewrite is necessary
+
+The package bytes can be present while the proof remains dishonest. In the rejected implementation,
+all three planted failures printed a red-looking message but returned exit `0`; direct cold QA still
+needed a manually prebuilt `out/`; and a bad same-run receipt could be replaced by a second package
+instead of failing. Those are gate-definition defects, not ordinary missing assertions.
+
+### RW1 — command modes are explicit and mutually exclusive
+
+There are exactly three modes:
+
+1. **Canonical release mode:** `qa/verify-release.ts` creates one unpredictable run id. Its package
+   stage builds exactly once and writes that run's receipt. Its QA stage must reuse that exact
+   package with zero install, build, or package calls. A missing, stale, malformed, hash-mismatched,
+   or out-of-root receipt is a named non-zero failure; QA must never repair it by packaging again.
+2. **Standalone QA mode:** no release run id is supplied. The `package-closure` gate creates a new
+   unpredictable run id on every ordinary green invocation, performs the frozen
+   `collab-electron` install, production build, and `package:verify` exactly once, then validates and
+   inspects that new output. It never reuses a receipt from an earlier ordinary invocation.
+3. **Bait inspection mode:** `missing-hermes` and `dev-root` may reuse the existing validated package
+   only to avoid an unrelated rebuild. They must not rewrite it. `preflight-missing` mutates only the
+   in-memory active Linux configuration and must stop before Builder.
+
+Implement the mode decision through an exported pure function or injected executor so unit tests can
+prove call counts. Production tests must show:
+
+- canonical valid receipt: install `0`, build `0`, package `0`, inspect `1`;
+- canonical missing/invalid/stale/out-of-root receipt: non-zero named failure and install `0`, build
+  `0`, package `0`, inspect `0`;
+- standalone ordinary run: fresh run id and install `1`, build `1`, package `1`, inspect `1`, even
+  when an old receipt is already present;
+- `missing-hermes` and `dev-root` bait modes: install `0`, build `0`, package `0`, inspect `1`;
+- `preflight-missing` bait mode: collab install `0`, production build `0`, Builder/package `0`,
+  inspect `0`, preflight `1`;
+- no path derived from receipt content is used before exact path validation.
+
+`package:verify` accepts the canonical run id when supplied. When invoked directly without one, it
+creates and prints its own unpredictable run id so the literal builder command below is valid. It
+does not read an operator-supplied environment value as proof of a prior run.
+
+### RW2 — bait red means process failure
+
+The real gate command must exit non-zero for each planted defect. Catching the expected exception and
+returning `0` is forbidden. The bait may add/remove/copy the real artifact and may improve the error
+message, but the failure must escape to `qa/run.ts` as `FAIL package-closure`.
+
+Required transcripts, including shell exit status:
+
+```text
+QF_PACKAGE_CLOSURE_BAIT=missing-hermes bun qa/run.ts package-closure  # non-zero
+QF_PACKAGE_CLOSURE_BAIT=dev-root bun qa/run.ts package-closure        # non-zero
+QF_PACKAGE_CLOSURE_BAIT=preflight-missing bun qa/run.ts package-closure # non-zero
+bun qa/run.ts package-closure                                         # zero, PASS
+```
+
+The missing-Hermes bait must enter the same full inspector as green, against a temporary copy of the
+finished package. The dev-root bait must enter that inspector with the development root. The
+preflight bait must enter the same preflight function used immediately before Builder. Unknown bait
+values fail non-zero by name.
+
+### RW3 — one shared production path law
+
+The gate may not reimplement Hermes metadata, launch, or allowlist path derivation. Extract the pure
+path helpers used by the packaged host into one shared main-process module (or export the existing
+pure helpers without importing Electron/Kernel state), then make both production resolution and the
+gate call those same helpers. Required shared rules are:
+
+- packed sibling metadata from a `.aospkg` reference;
+- committed `species|tools/<name>/launch.json`;
+- committed `species|tools/<name>/tools-allowlist.json`.
+
+A unit bait changes one shared rule input and proves production and package inspection derive the
+same path. Add a static dependency assertion proving both production and the gate import that one
+shared module, then inject/substitute the shared helper in a unit test and prove both consumers move
+together. Parallel local copies, textually-identical duplicate functions, and a hardcoded allowlist
+path are rejected.
+
+### RW4 — configuration parsing fails closed
+
+`build.extraResources` and `build.linux.extraResources` may be absent or arrays. If present with any
+other type, parsing fails. Each active entry must be an object with exactly two own keys, `from` and
+`to`, both non-empty strings. Strings, arrays-as-entries, macros, filters, and every additional or
+unknown key fail. A macro means a Builder expansion token inside either value, including `${arch}`;
+reject any `${...}` token in both `from` and `to`. Focused tests cover top-level and Linux-specific
+non-array values, empty values, `filter`, an arbitrary third key, and `${arch}` in each field.
+
+### RW5 — exact builder and verifier commands
+
+Builder evidence runs, in this order:
+
+```bash
+cd collab-electron
+bun install --frozen-lockfile
+./scripts/test-unit.sh
+bun run build
+bun run package:verify
+```
+
+The direct `package:verify` command above must succeed without the builder inventing an environment
+variable. The verifier, not the builder, creates **two different pristine detached worktrees**. In
+the first, with no prior install/build/package command, it runs:
+
+```bash
+bun qa/run.ts package-closure
+```
+
+Only after that worktree reaches `PASS`, the verifier creates a second pristine detached worktree
+from the same submitted commit and runs:
+
+```bash
+bun qa/verify-release.ts
+```
+
+Both commands must reach their final `PASS` without inheriting a prior command's `node_modules`,
+`out/`, package, receipt, or staging tree. The verifier then runs one non-zero bait against a
+temporary copy of the first worktree's submitted package and restores green there.
+
+### Verification round 1 — REJECTED (`a5779a5`)
+
+- cold standalone gate could not resolve the pinned `electron-builder` package;
+- receipt-selected package and log paths were not bound to canonical output;
+- `package:verify` did not check required emitted files before writing a receipt;
+- release-stage deletion coverage tested a local array rather than the oracle;
+- all three bait commands converted the planted failure to exit `0`;
+- the literal ordered `bun run package:verify` failed without an undocumented environment variable;
+- Hermes auxiliary paths were duplicated instead of using production rules;
+- FileSet parsing accepted unsupported shapes.
+
+### Verification round 2 — REJECTED (`4eae3e7`, evidence-only follow-up `a11565b`)
+
+- direct cold QA still required a manual `bun run build` before it could pass;
+- an ordinary no-run-id invocation reused an old receipt instead of creating a new run;
+- canonical invalid receipts were treated as cache misses and silently repackaged, masking tampering
+  and violating the single-package rule;
+- bait commands still exited `0` after observing the intended failure;
+- exact FileSet shape rejection and shared production auxiliary path rules remained incomplete.
+
+No verification PASS exists for either candidate.
+
+---
+
+## SECOND BINDING REWRITE — 2026-07-29
+
+This section supersedes the first clean-rebuild implementation at `599a7b1` and its rework at
+`5c49f6a`. Neither commit may merge. The implementation branch is closed after two failed
+verification rounds; the next builder starts again from merged `main` with this complete order and
+must not cherry-pick implementation code from either rejected candidate.
+
+### In plain terms
+
+The new checker still crashes before it can install what it needs, so it cannot prove that a fresh
+checkout produces a working shipped app.
+
+### Clean rebuild verification round 1 — REJECTED (`599a7b1`)
+
+In a pristine detached worktree, the literal first verifier command:
+
+```bash
+bun qa/run.ts package-closure
+```
+
+exited `1` before the standalone install and printed:
+
+```text
+Cannot find module 'qf-kernel/portable'
+```
+
+Inspection also found that the gate mutated process-global run-id state, derived its supposed
+independent release oracle from production construction, allowed receipt validation and inspection
+to collapse into one call, and did not bind every inspected path and FileSet output to the packaged
+resource root. The candidate therefore did not establish the rewritten contract.
+
+### Clean rebuild verification round 2 — REJECTED (`5c49f6a`)
+
+The rework moved the heavy import behind the top-level gate launcher but still executed
+`loadInspectModules()` before `executePackageClosureMode()` could call the standalone install.
+From a second pristine detached worktree at the submitted commit:
+
+```bash
+bun qa/run.ts package-closure
+```
+
+again exited `1` before any install, build, or package process and printed:
+
+```text
+error: Cannot find module 'qf-kernel/portable' from
+'.../collab-electron/scripts/package-lib/package-inspect.ts'
+```
+
+The added `qa/cold-import.test.ts` did not run the package-closure gate; it ran only
+`qa/run.ts --list`. It also renamed the shared `collab-electron/node_modules` directory during
+the test. That is not cold package proof and violates the protocol boundary against disturbing
+shared dependencies.
+
+### RW6 — the standalone installer must precede every collab dependency import
+
+The cold boundary is behavioral, not merely a dynamic-import style rule:
+
+1. Resolving the mode and constructing the standalone executor must load only Bun/Node built-ins and
+   dependency-free QA modules.
+2. In standalone ordinary mode, the first operation in the parent gate that can touch
+   `collab-electron/node_modules` is `bun install --frozen-lockfile`.
+3. Only after that install exits `0` may the parent gate import `package-inspect.ts`,
+   `package-receipt.ts`, `preflight.ts`, `extra-resources.ts`, or any module that imports
+   `qf-kernel/portable` or another dependency resolved from `collab-electron/node_modules`.
+4. The production sequence is exactly:
+   `install → build → package subprocess → parent loads inspection modules → validate receipt →
+   parent inspects`.
+5. An injected install exit `73` returns `73` from `executePackageClosureMode()`. The public
+   `bun qa/run.ts package-closure` command may normalize any failed gate to process exit `1`, but
+   no later import, build, package, validation, or inspection occurs.
+
+The `package:verify` child is explicitly allowed to statically import and use those package-library
+modules: it launches only after the standalone install and must retain its own post-Builder output
+inspection before writing the receipt. The ruled lazy-loader boundary applies to the parent
+`package-closure` gate, whose premature import caused both pristine failures. It does not remove
+the package child's defense-in-depth inspection.
+
+Construct the production executors around a lazy, memoized inspection-module loader. Creating the
+executors must not invoke that loader. Receipt validation, inspection, and the preflight bait may
+request it only at their ruled point in the selected mode. Canonical release mode remains valid
+because the earlier canonical `install` stage has already completed; it still performs zero second
+installs, builds, or packages.
+
+Add a dependency-free unit test with an injected loader and process executors. It must prove the
+exact standalone trace above, prove the loader is uncalled when install fails, and prove no heavy
+module path is resolved during mode selection or executor construction. A static source search by
+itself is not sufficient.
+
+This test is acceptance, not an orphan file. Put it under
+`qa/gates/package-closure/` and extend `collab-electron/scripts/test-unit.sh` to execute the root
+`qa/**/*.test.ts` suite after its existing collab suites. Add an automatically-discovered test
+under `collab-electron/scripts/package-lib/` that removes the root-QA invocation from an in-memory
+copy of the unit script and proves the coverage assertion red, then restores it green. Therefore the
+literal builder and canonical `unit` command in RW5 execute the lazy-loader test in CI.
+
+### RW7 — cold evidence may not disturb or borrow shared dependencies
+
+Delete `qa/cold-import.test.ts` and do not replace it with another simulated-cold test. The
+automatically-discovered package-library wiring test must assert that this exact rejected path is
+absent; falsify that assertion with an in-memory tracked-path fixture containing it, then restore
+green. A `qa/run.ts --list` subprocess proves only registry loading and must never be reported as
+a cold package-closure pass.
+
+The protocol already forbids a builder from renaming, moving, deleting, hiding, or borrowing an
+installed `node_modules` directory. RW7 adds no test that simulates a cold checkout and therefore
+creates no sanctioned dependency-mutation mechanism to police. The only accepted full cold proof is
+the pristine-worktree command below; the behavioral injected-loader test proves ordering but is not
+a substitute for that run.
+
+The only acceptance evidence for the full cold boundary remains RW5: the verifier creates a new
+detached worktree containing no `node_modules`, `out`, staging tree, receipt, or package and runs
+`bun qa/run.ts package-closure` as its first build-related command. The transcript must show the
+frozen install beginning before any package-inspection module is loaded and must end
+`PASS package-closure`.
+
+---
+
 ## Out of scope
 
 - Universal Dock/profile schema or removal of `hermes-seats.ts`
@@ -318,3 +582,47 @@ package, then reruns green against the untouched real package.
 6. Package command exit and stage-order unit evidence.
 7. Static-gate results.
 8. Judgment paragraph: every place the order was silent and what was chosen.
+
+---
+
+## Final verification — PASS (b1dd8f7, 2026-07-30)
+
+**Plain terms:** a completely fresh checkout now builds a real Linux app containing the Hermes and
+qf-toolloop runtimes, and deleting Hermes from a copy makes the same package checker fail.
+
+Two rejected implementation lines (a5779a5…a11565b and 599a7b1…5c49f6a) never merged. Both claimed
+cold safety while the standalone package-closure command failed before install on
+qf-kernel/portable. The accepted rebuild started from merged WO-K3 without cherry-picking their
+implementation.
+
+Independent pristine verifier A ran the standalone package-closure gate first and exited 0. The
+finished package contained:
+
+```text
+tools/runtime-proof/packed/qf-toolloop.aospkg  22600560 bytes
+species/hermes/packed/hermes.aospkg               20031 bytes
+species/hermes/packed/hermes.meta.json               347 bytes
+species/hermes/launch.json                            49 bytes
+species/hermes/tools-allowlist.json                  243 bytes
+```
+
+The real missing-Hermes bait exited 1 naming `unresolved hermes reference`; the untouched
+receipt-bound package then passed canonical inspection with zero install, build, or package calls.
+
+Pristine verifier B at d7f5820 ran `bun qa/verify-release.ts` and exited 0 after:
+
+```text
+install → unit → build → package → qa → PASS release-verification
+```
+
+A decorrelated merge-risk review then found two boundary defects the pristine worktree could not
+expose: cleanup removed all of `dist/`, and receipt log confinement used a prefix-unsafe
+`startsWith`. Commit b1dd8f7 restricts cleanup to `dist/linux-unpacked` plus owned staging
+evidence and binds the receipt to the exact canonical Builder log. Restoring the old behaviors
+produced three focused failures; restored code produced 19 passes. Independent inspection found no
+remaining blocker/high, and canonical inspection at b1dd8f7 reused the preserved full-release
+artifact successfully.
+
+Accepted limit: this proves shipped runtime byte closure, not a live Hermes turn or founder-defined
+Dock profiles. WO-D1 now owns profile identity; WO-D2 will own the single definition-driven launch
+path and deletion of the hardcoded Peer Seats catalogue.

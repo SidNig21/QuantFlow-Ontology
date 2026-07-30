@@ -16,6 +16,7 @@
     "clean": "bun ./scripts/clean.mjs",
     "clean:deep": "bun ./scripts/clean.mjs --deep",
     "package": "bun ./scripts/package.mjs",
+    "package:verify": "bun ./scripts/package-verify.ts",
     "package:unsigned": "bun ./scripts/package.mjs --no-sign",
     "release": "bun ./scripts/package.mjs --publish",
     "test": "bun test",
@@ -54,14 +55,6 @@
     "afterAllArtifactBuild": "scripts/fix-artifacts.cjs",
     "extraResources": [
       {
-        "from": "vendor/tmux/tmux",
-        "to": "tmux"
-      },
-      {
-        "from": "vendor/tmux/lib",
-        "to": "lib"
-      },
-      {
         "from": "resources/tmux.conf",
         "to": "tmux.conf"
       },
@@ -89,6 +82,16 @@
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Collaborator needs microphone access to enable voice input for CLI tools like Claude Code."
       },
+      "extraResources": [
+        {
+          "from": "vendor/tmux/tmux",
+          "to": "tmux"
+        },
+        {
+          "from": "vendor/tmux/lib",
+          "to": "lib"
+        }
+      ],
       "target": [
         {
           "target": "zip",
@@ -118,6 +121,12 @@
     },
     "linux": {
       "category": "Development",
+      "extraResources": [
+        {
+          "from": ".package-staging",
+          "to": "."
+        }
+      ],
       "target": [
         {
           "target": "AppImage",

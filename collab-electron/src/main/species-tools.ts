@@ -7,8 +7,11 @@
  * Empty / missing → deny all tools that request permission.
  */
 import { existsSync, readFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
 import { kernelGetObject } from "./kernel";
+import {
+  committedAllowlistPathForPackageRef,
+  packedMetaPathForPackageRef,
+} from "./package-resource-paths";
 
 type AllowlistDoc = {
   tools?: unknown;
@@ -31,25 +34,6 @@ function readAllowlistFile(path: string): string[] | null {
   }
 }
 
-function committedAllowlistPath(
-  packageRef: string,
-  appRoot: string,
-): string | null {
-  const parts = packageRef.split("/");
-  if (parts.length < 3) return null;
-  const root = parts[0];
-  const name = parts[1];
-  if (root !== "species" && root !== "tools") return null;
-  return join(appRoot, root, name, "tools-allowlist.json");
-}
-
-function packedMetaPath(packageRef: string, appRoot: string): string | null {
-  if (!packageRef.endsWith(".aospkg")) return null;
-  const abs = join(appRoot, packageRef);
-  const base = basename(packageRef, ".aospkg");
-  return join(dirname(abs), `${base}.meta.json`);
-}
-
 /** Resolve tool allowlist for a registered species. Missing → []. */
 export function resolveSpeciesToolAllowlist(
   species: string,
@@ -60,7 +44,7 @@ export function resolveSpeciesToolAllowlist(
   const packageRef = String(row.package_ref ?? "");
   if (!packageRef) return [];
 
-  const committed = committedAllowlistPath(packageRef, appRoot);
+  const committed = committedAllowlistPathForPackageRef(packageRef, appRoot);
   if (committed) {
     const tools = readAllowlistFile(committed);
     if (tools) {
@@ -71,7 +55,7 @@ export function resolveSpeciesToolAllowlist(
     }
   }
 
-  const meta = packedMetaPath(packageRef, appRoot);
+  const meta = packedMetaPathForPackageRef(packageRef, appRoot);
   if (meta) {
     const tools = readAllowlistFile(meta);
     if (tools && tools.length > 0) {
