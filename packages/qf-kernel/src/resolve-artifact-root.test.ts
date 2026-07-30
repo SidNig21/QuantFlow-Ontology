@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { existsSync, mkdtempSync, mkdirSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
@@ -56,6 +63,21 @@ describe("resolveArtifactRoot", () => {
     } finally {
       process.chdir(prev);
     }
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  test("env path that is a regular file throws and leaves the file unchanged", () => {
+    const dir = mkdtempSync(join(tmpdir(), "qf-art-file-"));
+    const filePath = join(dir, "not-a-directory");
+    const bytes = Buffer.from("k3-art-root-canary-bytes");
+    writeFileSync(filePath, bytes);
+    process.env.QF_ARTIFACT_ROOT = filePath;
+
+    expect(() => resolveArtifactRoot()).toThrow(
+      /QF_ARTIFACT_ROOT is not a directory/,
+    );
+    expect(readFileSync(filePath)).toEqual(bytes);
+
     rmSync(dir, { recursive: true, force: true });
   });
 

@@ -11,6 +11,7 @@ import {
   readFileSync,
   realpathSync,
   rmSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, sep } from "node:path";
@@ -62,6 +63,39 @@ function gateDefaultResolver(): string | null {
   }
 }
 
+function gateEnvNotDirectory(): string | null {
+  const savedRoot = process.env.QF_ARTIFACT_ROOT;
+  const dir = mkdtempSync(join(tmpdir(), "qf-k3-art-notdir-"));
+  const filePath = join(dir, "not-a-directory");
+  const bytes = Buffer.from("k3-art-root-gate-canary");
+  writeFileSync(filePath, bytes);
+
+  process.env.QF_ARTIFACT_ROOT = filePath;
+
+  try {
+    try {
+      const r = resolveArtifactRoot();
+      return `artifact-root: accepted non-directory QF_ARTIFACT_ROOT: ${r.path}`;
+    } catch (error) {
+      const message = String(error);
+      if (!message.includes("QF_ARTIFACT_ROOT is not a directory")) {
+        return `artifact-root: expected non-directory rejection, got: ${message}`;
+      }
+    }
+
+    if (!readFileSync(filePath).equals(bytes)) {
+      return "artifact-root: non-directory canary file bytes changed";
+    }
+
+    console.log("artifact-root G4 env not-directory: PASS");
+    return null;
+  } finally {
+    if (savedRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
+    else process.env.QF_ARTIFACT_ROOT = savedRoot;
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 function gatePublishUnderRoot(): string | null {
   const savedHome = process.env.HOME;
   const savedRoot = process.env.QF_ARTIFACT_ROOT;
@@ -81,7 +115,11 @@ function gatePublishUnderRoot(): string | null {
     }
 
     const falsify = process.env.QF_ARTIFACT_ROOT_FALSIFY;
-    if (falsify !== undefined && falsify !== "writer") {
+    if (
+      falsify !== undefined &&
+      falsify !== "writer" &&
+      falsify !== "skip-directory"
+    ) {
       return `artifact-root: unknown QF_ARTIFACT_ROOT_FALSIFY=${falsify}`;
     }
 
@@ -197,6 +235,7 @@ function gateAgentHostCoupling(): string | null {
 async function main(): Promise<number> {
   for (const fn of [
     gateDefaultResolver,
+    gateEnvNotDirectory,
     gatePublishUnderRoot,
     gateAgentHostCoupling,
   ]) {

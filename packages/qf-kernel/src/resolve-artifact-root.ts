@@ -2,7 +2,7 @@
  * Sole reader of QF_ARTIFACT_ROOT and sole constructor of the default artifact
  * store path. Production publish paths call this — nowhere else invents the root.
  */
-import { existsSync, mkdirSync, realpathSync } from "node:fs";
+import { existsSync, mkdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
 
@@ -32,6 +32,13 @@ export function resolveArtifactRoot(): ResolvedArtifactRoot {
       );
     }
     const path = realpathSync(absolute);
+    const skipDirectoryCheck =
+      process.env.QF_ARTIFACT_ROOT_FALSIFY === "skip-directory";
+    if (!skipDirectoryCheck && !statSync(path).isDirectory()) {
+      throw new Error(
+        `resolveArtifactRoot: QF_ARTIFACT_ROOT is not a directory: ${path}`,
+      );
+    }
     return { path, provenance: "env" };
   }
 
