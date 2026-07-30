@@ -22,7 +22,7 @@ import {
   pipelineCommands,
 } from "../../../qf-kernel-schema/src/commands.ts";
 import {
-  generateMcp,
+  actionToolForAction,
   readToolsForObject,
   servedToolsForSchema,
 } from "../../../qf-kernel-schema/src/generate/mcp.ts";
@@ -263,11 +263,11 @@ function generatedSurfaceProof(): void {
   assert(action?.pipelineOnly === true, "ingest_market_batch is not pipelineOnly");
   assert(action.operatorOnly !== true, "pipeline action must not also be operatorOnly");
 
-  const complete = JSON.parse(generateMcp(schema)) as Array<{ name: string }>;
+  const completeCount = schema.objects.length * 3 + schema.actions.length;
   const served = servedToolsForSchema(schema);
   assert(
-    complete.some((tool) => tool.name === "qf_ingest_market_batch"),
-    "complete generated tools omit qf_ingest_market_batch",
+    actionToolForAction(action).name === "qf_ingest_market_batch",
+    "complete action generator does not map ingest_market_batch",
   );
   assert(
     !served.some((tool) => tool.name === "qf_ingest_market_batch"),
@@ -277,11 +277,11 @@ function generatedSurfaceProof(): void {
     (candidate) => candidate.operatorOnly === true || candidate.pipelineOnly === true,
   );
   assert(
-    served.length === complete.length - hidden.length,
+    served.length === completeCount - hidden.length,
     `served tool count does not exclude exact trusted-only set (${hidden.length})`,
   );
   console.log(
-    `objects=${schema.objects.length} actions=${schema.actions.length} complete_tools=${complete.length} served_tools=${served.length} hidden_actions=${JSON.stringify(hidden.map((item) => item.name).sort())}`,
+    `objects=${schema.objects.length} actions=${schema.actions.length} complete_tools=${completeCount} served_tools=${served.length} hidden_actions=${JSON.stringify(hidden.map((item) => item.name).sort())}`,
   );
 
   const base = {

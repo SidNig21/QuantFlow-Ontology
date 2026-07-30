@@ -83,3 +83,26 @@ PASS market-ingest
 ## Judgment
 
 An exact replay requires the original trace as well as identical row state, source Artifact, observation time, and derived edge. Accepting a new trace as a no-op would return a receipt for a trace that has no event, so a different trace is an explicit conflict rather than a dishonest success. `instrument_id` is not included in the quote row digest because it is not stored in the quote table; the separately governed `quotes` edge is checked exactly. `params` and `coverage` remain declared open JSON objects as ordered, while every surrounding envelope is strict.
+
+## Cold integration repair after verification round 1
+
+Exact candidate `20a7e28` reached a real production build and package verification, including byte-identical `0002` inside `app.asar`, but two existing gates correctly rejected its integration. The repair is deliberately narrow:
+
+- The market gate no longer calls the complete MCP generator. It proves the action's generated mapping with `actionToolForAction` and derives the complete cardinality from schema-owned object/action counts, leaving the serving-authority allowlist closed.
+- `dock-profile-identity` now requires the exact literal production upgrade set (`0001`, `0002`) under `!readonly`, rejects dynamic upgrade filenames, and expects both required upgrade names on a readonly pre-D1 handle.
+
+Focused repair receipts:
+
+```text
+$ bun qa/run.ts observe-door
+PASS observe-door
+
+$ bun qa/run.ts dock-profile-identity
+dock-profile-identity OK
+PASS dock-profile-identity
+
+$ bun qa/gates/market-ingest/run.ts
+PASS market-ingest
+```
+
+Round 1 red receipts and package hashes are committed in `VERIFICATION-ROUND-1.md`. This repair is not a release verdict; a new exact candidate still requires one independent cold run and the four baits.

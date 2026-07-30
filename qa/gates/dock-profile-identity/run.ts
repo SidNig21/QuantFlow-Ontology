@@ -32,7 +32,6 @@ import {
   getLinks,
   KernelUpgradeShapeError,
   openKernel,
-  PROFILE_IDENTITY_UPGRADE,
   SpawnedFromLinkRejectedError,
   UnknownAgentDefinitionError,
   type KernelDb,
@@ -51,6 +50,11 @@ const D1_UPGRADE = join(
   REPO,
   "qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql",
 );
+const PRODUCTION_UPGRADE_FILES = [
+  "0001-agent-profile-identity.sql",
+  "0002-market-ingest.sql",
+] as const;
+const PRE_D1_REQUIRED_UPGRADES = "agent-profile-identity,market-ingest";
 const QF_TOOLLOOP_PACKAGE = join(REPO, "tools/runtime-proof/agent-package");
 const ELECTRON_MAIN = join(REPO, "collab-electron/src/main");
 const KERNEL_ATTACH_SOURCE = join(REPO, "packages/qf-kernel/src/db.ts");
@@ -333,7 +337,8 @@ function assertUpgradeLoadIsWritableOnly(): string | null {
     true,
     ts.ScriptKind.TS,
   );
-  let calls = 0;
+  const resolvedFiles: string[] = [];
+  let dynamicPath = false;
   let unguarded = false;
   const visit = (node: ts.Node): void => {
     if (
@@ -341,7 +346,12 @@ function assertUpgradeLoadIsWritableOnly(): string | null {
       ts.isIdentifier(node.expression) &&
       node.expression.text === "upgradeSqlPath"
     ) {
-      calls += 1;
+      const argument = node.arguments[0];
+      if (!argument || !ts.isStringLiteral(argument)) {
+        dynamicPath = true;
+        return;
+      }
+      resolvedFiles.push(argument.text);
       let parent: ts.Node | undefined = node.parent;
       let guarded = false;
       while (parent && !ts.isFunctionDeclaration(parent)) {
@@ -359,7 +369,13 @@ function assertUpgradeLoadIsWritableOnly(): string | null {
     ts.forEachChild(node, visit);
   };
   visit(sf);
-  if (calls !== 1) return `expected one production upgradeSqlPath call, found ${calls}`;
+  if (dynamicPath) return "production upgradeSqlPath call must use a literal governed filename";
+  if (
+    JSON.stringify(resolvedFiles.sort()) !==
+    JSON.stringify([...PRODUCTION_UPGRADE_FILES].sort())
+  ) {
+    return `production upgradeSqlPath files mismatch: ${JSON.stringify(resolvedFiles.sort())}`;
+  }
   if (unguarded) return "production upgrade SQL load is not guarded by !readonly";
   return null;
 }
@@ -406,7 +422,7 @@ const { attachKernel, getKernelDrift } = await import("./node_modules/qf-kernel/
 const raw = new Database(${JSON.stringify(readonlyDbPath)}, { readonly: true });
 const db = attachKernel(raw, { readonly: true });
 const drift = getKernelDrift(db);
-if (!drift || !("upgrade_required" in drift) || drift.upgrade_required !== "agent-profile-identity") {
+if (!drift || !("upgrade_required" in drift) || drift.upgrade_required !== ${JSON.stringify(PRE_D1_REQUIRED_UPGRADES)}) {
   console.error(JSON.stringify(drift));
   process.exitCode = 2;
 } else {
@@ -1133,7 +1149,7 @@ async function main(): Promise<number> {
   const roWrapped = wrapBunDatabase(roRaw);
   attachKernel(roWrapped, { readonly: true });
   const drift = getKernelDrift(roWrapped);
-  if (!drift || !("upgrade_required" in drift) || drift.upgrade_required !== PROFILE_IDENTITY_UPGRADE) {
+  if (!drift || !("upgrade_required" in drift) || drift.upgrade_required !== PRE_D1_REQUIRED_UPGRADES) {
     console.error("dock-profile-identity FAIL: readonly drift missing upgrade_required", drift);
     return 1;
   }
