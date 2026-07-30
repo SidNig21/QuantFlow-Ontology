@@ -428,7 +428,7 @@ async function admitHostAcpSpecies(
   const trace = newTrace();
   kernelExecute(
     "create_agent_session",
-    { session_id: sessionId, label: species },
+    { session_id: sessionId, agent_definition_id: species, label: species },
     trace,
   );
   if (sessionId !== guestId && !opts?.corruptId) {
@@ -490,7 +490,7 @@ async function admitAgentOsSpecies(
   const trace = newTrace();
   kernelExecute(
     "create_agent_session",
-    { session_id: sessionId, label: species },
+    { session_id: sessionId, agent_definition_id: species, label: species },
     trace,
   );
   if (sessionId !== guestId && !opts?.corruptId) {

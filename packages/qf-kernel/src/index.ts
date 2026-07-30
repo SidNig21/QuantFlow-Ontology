@@ -4,6 +4,7 @@ export {
   getKernelDrift,
   logKernelBoot,
   migrationSqlPath,
+  upgradeSqlPath,
   type AttachKernelOptions,
   type KernelDb,
   type KernelStatement,
@@ -50,18 +51,24 @@ export {
   KernelError,
   KernelIncompleteInitializationError,
   KernelRegistryDriftError,
-  MissingSessionIdError,
+  KernelUpgradeShapeError,
   MissingTraceError,
   PackageRefUnresolvedError,
+  UnknownAgentDefinitionError,
   UnknownSpeciesError,
+  SpawnedFromLinkRejectedError,
 } from "./errors.ts";
 export { appendEvent } from "./events.ts";
 export { eventCount, execute, type ExecuteResult } from "./execute.ts";
 export { contentHash } from "./hash.ts";
-export { insertAgentSession, insertRun } from "./insert.ts";
+export { insertRun } from "./insert.ts";
 export { replayArtifactAndAssert, replayRunAndAssert } from "./replay.ts";
 export {
   resolvePackageRef,
   resolveSpeciesPackage,
 } from "./species.ts";
+export {
+  classifyKernelShape,
+  PROFILE_IDENTITY_UPGRADE,
+} from "./upgrade.ts";
 export { seedExperimentalFixtureTable } from "./fixtures.ts";

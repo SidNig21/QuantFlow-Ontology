@@ -5,7 +5,7 @@
  * agentos-toolchain (installed here, not free-riding on runtime-proof).
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, symlinkSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,29 +33,34 @@ rmSync(distDir, { recursive: true, force: true });
 mkdirSync(distDir, { recursive: true });
 mkdirSync(outDir, { recursive: true });
 
-// Resolve guest deps from this package's node_modules (cold-safe).
-const bundle = spawnSync(
-  "bun",
-  [
-    "build",
-    join(agentDir, "src/acp-main.ts"),
-    "--outfile",
-    join(distDir, "acp-main.js"),
-    "--target",
-    "node",
-    "--format",
-    "esm",
-  ],
-  {
-    cwd: here,
-    stdio: "inherit",
-    env: {
-      ...process.env,
-      // Prefer this package's install over a missing agent-package/node_modules.
-      NODE_PATH: join(here, "node_modules"),
-    },
-  },
-);
+// Bun's bundler resolves from the entry file's ancestors and does not honor
+// NODE_PATH. Link the gate-owned cold install for the duration of bundling,
+// then remove the link so the source fixture remains dependency-free.
+const guestNodeModules = join(agentDir, "node_modules");
+let linkedGuestDependencies = false;
+if (!existsSync(guestNodeModules)) {
+  symlinkSync(join(here, "node_modules"), guestNodeModules, "dir");
+  linkedGuestDependencies = true;
+}
+let bundle;
+try {
+  bundle = spawnSync(
+    "bun",
+    [
+      "build",
+      join(agentDir, "src/acp-main.ts"),
+      "--outfile",
+      join(distDir, "acp-main.js"),
+      "--target",
+      "node",
+      "--format",
+      "esm",
+    ],
+    { cwd: here, stdio: "inherit", env: process.env },
+  );
+} finally {
+  if (linkedGuestDependencies) rmSync(guestNodeModules, { force: true });
+}
 if (bundle.status !== 0) process.exit(bundle.status ?? 1);
 
 const pack = spawnSync(

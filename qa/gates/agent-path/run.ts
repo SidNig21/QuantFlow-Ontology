@@ -112,7 +112,7 @@ async function admitAndStartSession(
   execute(
     db,
     "create_agent_session",
-    { session_id: sessionId, label: SPECIES },
+    { session_id: sessionId, agent_definition_id: SPECIES, label: SPECIES },
     trace(),
   );
   execute(db, "start_agent_session", { session_id: sessionId }, trace());
@@ -281,6 +281,12 @@ async function main(): Promise<number> {
   }
 
   const db = openKernel(":memory:");
+  execute(
+    db,
+    "register_agent_definition",
+    { name: SPECIES, role: "agent-path-proof", package_ref: AOSPKG },
+    trace(),
+  );
   const before = await snapshotAgentProcesses();
   const os = await AgentOs.create({
     defaultSoftware: false,
@@ -459,10 +465,12 @@ async function main(): Promise<number> {
 
     execute(db, "create_agent_session", {
       session_id: "stale-starting",
+      agent_definition_id: SPECIES,
       label: SPECIES,
     }, trace());
     execute(db, "create_agent_session", {
       session_id: "stale-running",
+      agent_definition_id: SPECIES,
       label: SPECIES,
     }, trace());
     execute(

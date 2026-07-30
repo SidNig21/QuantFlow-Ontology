@@ -25,13 +25,13 @@ export const workspace = defineObject({
 export const agent_definition = defineObject({
   name: "agent_definition",
   description:
-    "An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.",
+    "An agent_definition is one founder-visible Dock profile. It governs spawn admission through package_ref while runtime_profile selects the adapter profile without encoding per-session state.",
   lifecycle: "experimental",
   properties: z.object({
     name: z
       .string()
       .describe(
-        "Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.",
+        "Canonical profile identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.",
       ),
     role: z
       .string()
@@ -41,12 +41,20 @@ export const agent_definition = defineObject({
     package_ref: z
       .string()
       .describe(
-        "Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.",
+        "Reusable runtime package reference that resolves to executable code. Several profiles may share one package_ref without sharing identity.",
       ),
     system_prompt_ref: z
       .string()
       .describe(
-        "Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.",
+        "Artifact or prompt identifier containing this profile's operating instructions. Point to immutable prompt bytes so behavior drift can be audited.",
+      )
+      .nullable(),
+    // Appended after the pre-D1 columns so ALTER TABLE and fresh migration
+    // produce one canonical SQLite column order.
+    runtime_profile: z
+      .string()
+      .describe(
+        "Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.",
       )
       .nullable(),
   }),
@@ -169,22 +177,39 @@ export const delegates_to = defineLink({
   to: agent_session,
 });
 
+export const spawned_from = defineLink({
+  name: "spawned_from",
+  description:
+    "Session identity: which agent_definition profile created this agent_session.",
+  lifecycle: "experimental",
+  from: agent_session,
+  to: agent_definition,
+});
+
 export const register_agent_definition = defineAction({
   name: "register_agent_definition",
   description:
-    "Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.",
+    "Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.",
   lifecycle: "experimental",
+  operatorOnly: true,
   input: z.object({
-    name: z.string().describe("Unique species name; becomes the row id."),
+    name: z.string().describe("Unique profile name; becomes the row id."),
     role: z
       .string()
       .describe("Role summary (researcher, critic, backtester, ingestion) for routing and prompts."),
     package_ref: z
       .string()
-      .describe("AgentOS package this species launches — the plug half of the row."),
+      .describe("Runtime package this profile launches — the reusable executable half of the row."),
+    runtime_profile: z
+      .string()
+      .describe(
+        "Optional runtime adapter profile selector. Omission stores null; empty or whitespace-only input is rejected.",
+      )
+      .nullable()
+      .optional(),
     system_prompt_ref: z
       .string()
-      .describe("Artifact or prompt id that defines this species' instructions.")
+      .describe("Artifact or prompt id that defines this profile's instructions.")
       .nullable()
       .optional(),
   }),
@@ -193,15 +218,20 @@ export const register_agent_definition = defineAction({
 export const create_agent_session = defineAction({
   name: "create_agent_session",
   description:
-    "Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.",
+    "Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.",
   lifecycle: "experimental",
   input: z.object({
     session_id: z
       .string()
       .describe("Guest-minted ACP session id — adopted as the Kernel row id, never re-minted."),
+    agent_definition_id: z
+      .string()
+      .describe(
+        "Existing agent_definition row id for the profile that admitted this session. Identity lives in spawned_from, not label.",
+      ),
     label: z
       .string()
-      .describe("Operator-facing label; v0.1 stores the species name here.")
+      .describe("Optional operator-facing label for readability only; never the profile identity.")
       .nullable()
       .optional(),
   }),
@@ -267,4 +297,3 @@ export const close_agent_session = defineAction({
     session_id: z.string().describe("Agent session to close."),
   }),
 });
-

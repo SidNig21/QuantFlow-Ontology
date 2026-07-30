@@ -6,11 +6,12 @@ import {
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
   KernelError,
+  SpawnedFromLinkRejectedError,
+  UnknownAgentDefinitionError,
 } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import type { ExecuteResult } from "./execute.ts";
 import { contentHash } from "./hash.ts";
-import { insertAgentSession } from "./insert.ts";
 import {
   lineageFieldsToLinks,
   type LinkSpec,
@@ -183,6 +184,21 @@ function registerAgentDefinition(
   if (typeof package_ref !== "string" || package_ref.length === 0) {
     throw new KernelError('register_agent_definition requires non-empty "package_ref"');
   }
+  let runtime_profile: string | null = null;
+  if (input.runtime_profile !== undefined && input.runtime_profile !== null) {
+    if (typeof input.runtime_profile !== "string") {
+      throw new KernelError(
+        'register_agent_definition "runtime_profile" must be a string or null',
+      );
+    }
+    const trimmed = input.runtime_profile.trim();
+    if (trimmed.length === 0) {
+      throw new KernelError(
+        'register_agent_definition "runtime_profile" must be non-empty when supplied',
+      );
+    }
+    runtime_profile = trimmed;
+  }
   let system_prompt_ref: string | null = null;
   if (input.system_prompt_ref !== undefined && input.system_prompt_ref !== null) {
     if (typeof input.system_prompt_ref !== "string") {
@@ -212,14 +228,15 @@ function registerAgentDefinition(
       name,
       role,
       package_ref,
+      runtime_profile,
       system_prompt_ref,
     },
     insert: () => {
       const created_at = new Date().toISOString();
       db.query(
-        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, system_prompt_ref)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-      ).run(id, created_at, name, role, package_ref, system_prompt_ref);
+        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      ).run(id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref);
     },
   });
   return creationResult(cmd, id, cmd.event, state);
@@ -238,6 +255,10 @@ function createAgentSession(
       'create_agent_session requires non-empty "session_id" (guest-minted, adopted)',
     );
   }
+  const agent_definition_id = input.agent_definition_id;
+  if (typeof agent_definition_id !== "string" || agent_definition_id.length === 0) {
+    throw new KernelError('create_agent_session requires non-empty "agent_definition_id"');
+  }
   let label: string | null = null;
   if (input.label !== undefined && input.label !== null) {
     if (typeof input.label !== "string") {
@@ -246,13 +267,45 @@ function createAgentSession(
     label = input.label;
   }
 
-  const tx = db.transaction(() => {
-    const state = insertAgentSession(db, { id: session_id, label }, trace);
-    writeLinks(db, cmd.object_type, session_id, links);
-    return state;
+  for (const spec of links) {
+    if (spec.kind === "spawned_from") {
+      throw new SpawnedFromLinkRejectedError();
+    }
+  }
+
+  const definition = db
+    .query(`SELECT id FROM agent_definition WHERE id = ?`)
+    .get(agent_definition_id) as { id: string } | null;
+  if (!definition) {
+    throw new UnknownAgentDefinitionError(agent_definition_id);
+  }
+
+  const identityLinks: LinkSpec[] = [
+    ...links,
+    { kind: "spawned_from", to_id: agent_definition_id },
+  ];
+
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: session_id,
+    event: cmd.event,
+    trace,
+    links: identityLinks,
+    payload: {
+      command: cmd.action,
+      status: "starting",
+      label,
+      agent_definition_id,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO agent_session (id, created_at, status, label)
+         VALUES (?, ?, ?, ?)`,
+      ).run(session_id, created_at, "starting", label);
+    },
   });
-  const state = tx();
-  return creationResult(cmd, session_id, cmd.event, state, String(state.status ?? "starting"));
+  return creationResult(cmd, session_id, cmd.event, state, "starting");
 }
 
 function createHypothesis(

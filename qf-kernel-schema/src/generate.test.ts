@@ -5,6 +5,7 @@ import { countConformanceTests, generateConformance } from "./generate/conforman
 import { generateDocs } from "./generate/docs.ts";
 import { generateMcp } from "./generate/mcp.ts";
 import { generateSql } from "./generate/sql.ts";
+import { generateUpgradeAgentProfileIdentity } from "./generate/upgrade-agent-profile-identity.ts";
 import { schema } from "./schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -31,6 +32,15 @@ describe("golden outputs", () => {
   test("conformance.test.ts matches golden byte-for-byte", () => {
     const actual = generateConformance();
     const expected = readFileSync(join(goldenDir, "conformance.test.ts"), "utf8");
+    expect(actual).toBe(expected);
+  });
+
+  test("agent-profile-identity upgrade matches golden byte-for-byte", () => {
+    const actual = generateUpgradeAgentProfileIdentity();
+    const expected = readFileSync(
+      join(goldenDir, "upgrades", "0001-agent-profile-identity.sql"),
+      "utf8",
+    );
     expect(actual).toBe(expected);
   });
 });

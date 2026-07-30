@@ -58,11 +58,16 @@ export function openKernel(
   }
 
   const db = new Database(path, opts.readonly ? { readonly: true } : undefined);
-  return attachKernel(db as unknown as KernelDb, {
-    readonly: opts.readonly,
-    path,
-    provenance: opts.provenance ?? "explicit",
-  });
+  try {
+    return attachKernel(db as unknown as KernelDb, {
+      readonly: opts.readonly,
+      path,
+      provenance: opts.provenance ?? "explicit",
+    });
+  } catch (error) {
+    db.close();
+    throw error;
+  }
 }
 
 export function closeKernel(db: KernelDb): void {

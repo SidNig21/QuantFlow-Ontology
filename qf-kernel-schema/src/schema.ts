@@ -68,6 +68,7 @@ import {
   connection,
   assigned_to,
   delegates_to,
+  spawned_from,
   register_agent_definition,
   create_agent_session,
   start_agent_session,
@@ -126,6 +127,7 @@ export const schema: Schema = {
     gates,
     assigned_to,
     delegates_to,
+    spawned_from,
   ],
   actions: [
     create_hypothesis,

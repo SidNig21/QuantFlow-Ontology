@@ -242,7 +242,7 @@ async function main(): Promise<number> {
     execute(
       db,
       "create_agent_session",
-      { session_id: sessionId, label: `hermes:${role}` },
+      { session_id: sessionId, agent_definition_id: "hermes", label: `hermes:${role}` },
       trace(),
     );
     execute(db, "start_agent_session", { session_id: sessionId }, trace());

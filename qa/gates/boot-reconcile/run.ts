@@ -22,6 +22,7 @@ import {
 } from "qf-kernel";
 
 const SEED_COUNT = 105;
+const BOOT_DEFINITION_ID = "g5-boot-reconcile";
 const ACTED_ON = new Set([
   "starting",
   "running",
@@ -141,7 +142,11 @@ function seedActedOnSessions(db: KernelDb): string[] {
     execute(
       db,
       "create_agent_session",
-      { session_id: id, label: "g5-boot-reconcile" },
+      {
+        session_id: id,
+        agent_definition_id: BOOT_DEFINITION_ID,
+        label: "g5-boot-reconcile",
+      },
       t,
     );
 
@@ -190,6 +195,16 @@ async function main(): Promise<number> {
   const listLimit: number | null = useDefaultLimit ? 100 : null;
 
   const db = openKernel(":memory:");
+  execute(
+    db,
+    "register_agent_definition",
+    {
+      name: BOOT_DEFINITION_ID,
+      role: "boot-reconcile-proof",
+      package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+    },
+    trace(),
+  );
   const seededIds = new Set(seedActedOnSessions(db));
 
   const before = countActedOnOpen(db, seededIds);

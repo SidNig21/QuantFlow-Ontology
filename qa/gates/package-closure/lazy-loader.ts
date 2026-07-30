@@ -13,6 +13,8 @@ export type InspectionModules = {
   preflightLinuxExtraResources: typeof import("../../../collab-electron/scripts/package-lib/preflight.ts").preflightLinuxExtraResources;
   copyPackageForBait: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").copyPackageForBait;
   removeHermesPackage: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").removeHermesPackage;
+  removeD1UpgradeFromAsar: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").removeD1UpgradeFromAsar;
+  qfKernelSchemaUpgradePath: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").QF_KERNEL_SCHEMA_UPGRADE;
   createPackageRunId: typeof import("../../../collab-electron/scripts/package-lib/run-id.ts").createPackageRunId;
 };
 
@@ -43,6 +45,8 @@ export function createInspectionModuleLoader(): InspectionModuleLoader {
           preflightLinuxExtraResources: preflight.preflightLinuxExtraResources,
           copyPackageForBait: packageInspect.copyPackageForBait,
           removeHermesPackage: packageInspect.removeHermesPackage,
+          removeD1UpgradeFromAsar: packageInspect.removeD1UpgradeFromAsar,
+          qfKernelSchemaUpgradePath: packageInspect.QF_KERNEL_SCHEMA_UPGRADE,
           createPackageRunId: runId.createPackageRunId,
         };
       })();

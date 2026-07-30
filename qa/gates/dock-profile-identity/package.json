@@ -1,0 +1,10 @@
+{
+  "name": "qf-dock-profile-identity-gate",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "qf-kernel": "file:../../../packages/qf-kernel",
+    "qf-kernel-schema": "file:../../../qf-kernel-schema",
+    "typescript": "5.9.3"
+  }
+}

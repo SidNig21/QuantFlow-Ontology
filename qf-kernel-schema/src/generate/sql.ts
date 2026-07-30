@@ -129,7 +129,7 @@ function emitObjectTable(object: DefinedObject): string {
   return lines.join("\n");
 }
 
-function sqlString(value: string): string {
+export function sqlString(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }
 
@@ -183,22 +183,28 @@ export function generateSql(schema: Schema): string {
     parts.push(emitObjectTable(object));
   }
 
-  const linkKinds = schema.links.map((l) => `'${l.name.replaceAll("'", "''")}'`).join(", ");
-
-  parts.push("-- Typed directed edges between ontology objects.");
-  parts.push("CREATE TABLE links (");
-  parts.push("  -- Primary key for this link instance.");
-  parts.push("  id TEXT PRIMARY KEY NOT NULL,");
-  parts.push("  -- Link kind (schema link name), e.g. offered_on.");
-  parts.push(`  kind TEXT NOT NULL CHECK (kind IN (${linkKinds})),`);
-  parts.push("  -- Source object id.");
-  parts.push("  from_id TEXT NOT NULL,");
-  parts.push("  -- Target object id.");
-  parts.push("  to_id TEXT NOT NULL,");
-  parts.push("  -- ISO-8601 UTC timestamp when the link was created.");
-  parts.push("  created_at TEXT NOT NULL");
-  parts.push(");");
-  parts.push("");
+  parts.push(emitLinksTable(schema).trimEnd());
 
   return parts.join("\n");
+}
+
+/** Emit the links table DDL from the current schema link declarations. */
+export function emitLinksTable(schema: Schema): string {
+  const linkKinds = schema.links.map((l) => `'${l.name.replaceAll("'", "''")}'`).join(", ");
+  const lines: string[] = [];
+  lines.push("-- Typed directed edges between ontology objects.");
+  lines.push("CREATE TABLE links (");
+  lines.push("  -- Primary key for this link instance.");
+  lines.push("  id TEXT PRIMARY KEY NOT NULL,");
+  lines.push("  -- Link kind (schema link name), e.g. offered_on.");
+  lines.push(`  kind TEXT NOT NULL CHECK (kind IN (${linkKinds})),`);
+  lines.push("  -- Source object id.");
+  lines.push("  from_id TEXT NOT NULL,");
+  lines.push("  -- Target object id.");
+  lines.push("  to_id TEXT NOT NULL,");
+  lines.push("  -- ISO-8601 UTC timestamp when the link was created.");
+  lines.push("  created_at TEXT NOT NULL");
+  lines.push(");");
+  lines.push("");
+  return lines.join("\n");
 }

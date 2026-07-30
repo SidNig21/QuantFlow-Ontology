@@ -30,7 +30,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('run',
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('artifact', 'object', 'experimental', 'An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluation', 'object', 'experimental', 'An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('workspace', 'object', 'experimental', 'A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_definition', 'object', 'experimental', 'An agent_definition is one founder-visible Dock profile. It governs spawn admission through package_ref while runtime_profile selects the adapter profile without encoding per-session state.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_definition', 'object', 'experimental', 'An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('agent_session', 'object', 'experimental', 'An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('task', 'object', 'experimental', 'A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('tool', 'object', 'experimental', 'A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.');
@@ -51,7 +51,6 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evalu
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assigned_to', 'link', 'experimental', 'Work routing: which agent session owns a task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Session-to-session delegation on the canvas.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('spawned_from', 'link', 'experimental', 'Session identity: which agent_definition profile created this agent_session.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_hypothesis', 'action', 'experimental', 'Open a new research hypothesis with claim, success criteria, and optional sources.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_dataset_version', 'action', 'experimental', 'Register a new content-hashed, point-in-time dataset version in the Kernel.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_run', 'action', 'experimental', 'Enqueue a new run in queued status with full invocation params. Rejectable when params are invalid.');
@@ -66,8 +65,8 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grade
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_event', 'action', 'experimental', 'Move a scheduled event to live (scheduled → live).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('settle_event', 'action', 'experimental', 'Settle a live event (live → settled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('void_event', 'action', 'experimental', 'Void a scheduled event that will not be contested (scheduled → void).');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_agent_definition', 'action', 'experimental', 'Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_agent_definition', 'action', 'experimental', 'Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_agent_session', 'action', 'experimental', 'Bring a starting agent session into running (starting → running).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('block_agent_session', 'action', 'experimental', 'Block a running agent session (running → blocked).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('unblock_agent_session', 'action', 'experimental', 'Return a blocked agent session to running (blocked → running).');
@@ -350,22 +349,20 @@ CREATE TABLE workspace (
   title TEXT NOT NULL
 );
 
--- An agent_definition is one founder-visible Dock profile. It governs spawn admission through package_ref while runtime_profile selects the adapter profile without encoding per-session state.
+-- An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.
 CREATE TABLE agent_definition (
   -- Primary key for this ontology object instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- ISO-8601 UTC timestamp when the row was created.
   created_at TEXT NOT NULL,
-  -- Canonical profile identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.
+  -- Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.
   name TEXT NOT NULL,
   -- Role summary used for planner routing and prompt selection. Keep role labels aligned with actual task boundaries, not model branding.
   role TEXT NOT NULL,
-  -- Reusable runtime package reference that resolves to executable code. Several profiles may share one package_ref without sharing identity.
+  -- Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.
   package_ref TEXT NOT NULL,
-  -- Artifact or prompt identifier containing this profile's operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
-  system_prompt_ref TEXT,
-  -- Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.
-  runtime_profile TEXT
+  -- Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
+  system_prompt_ref TEXT
 );
 
 -- An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.
@@ -437,7 +434,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'gates', 'assigned_to', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'gates', 'assigned_to', 'delegates_to')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.

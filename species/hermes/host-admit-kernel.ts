@@ -69,7 +69,7 @@ async function main(): Promise<number> {
     execute(
       db,
       "create_agent_session",
-      { session_id: sessionId, label: "hermes" },
+      { session_id: sessionId, agent_definition_id: "hermes", label: "hermes" },
       trace(),
     );
     execute(db, "start_agent_session", { session_id: sessionId }, trace());

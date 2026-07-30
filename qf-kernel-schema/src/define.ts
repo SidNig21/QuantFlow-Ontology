@@ -550,8 +550,9 @@ function isObservationEvent(event: string): boolean {
 }
 
 /**
- * operatorOnly must match observation coupling over all command events, both directions.
- * A flagged action's every command event must end `.observed` — no half-observation.
+ * Observation-coupled actions must be operatorOnly. When an action is both
+ * operatorOnly and observation-coupled, every command event must end ".observed".
+ * Non-observation operatorOnly governance actions (for example profile registration) are allowed.
  */
 function assertOperatorOnlyCoupling(
   schema: Schema,
@@ -576,18 +577,13 @@ function assertOperatorOnlyCoupling(
     const observationCoupled = events.some((event) => isObservationEvent(event));
     const operatorOnly = action.operatorOnly === true;
 
-    if (operatorOnly !== observationCoupled) {
-      if (observationCoupled) {
-        throw new Error(
-          `Action "${action.name}" is observation-coupled (command event ends ".observed") but operatorOnly is not true`,
-        );
-      }
+    if (observationCoupled && !operatorOnly) {
       throw new Error(
-        `Action "${action.name}" has operatorOnly but is not observation-coupled (no command event ends ".observed")`,
+        `Action "${action.name}" is observation-coupled (command event ends ".observed") but operatorOnly is not true`,
       );
     }
 
-    if (operatorOnly) {
+    if (operatorOnly && observationCoupled) {
       for (const event of events) {
         if (!isObservationEvent(event)) {
           throw new Error(

@@ -10,9 +10,7 @@ import {
   execute,
   IllegalLinkError,
   IllegalTransitionError,
-  insertAgentSession,
   insertRun,
-  MissingSessionIdError,
   MissingTraceError,
   openKernel,
   replayArtifactAndAssert,
@@ -110,14 +108,34 @@ describe("qf-kernel", () => {
     ).toThrow(MissingTraceError);
   });
 
-  test("agent_session adopts supplied id and rejects missing id", () => {
+  test("create_agent_session requires agent_definition_id and links spawned_from", () => {
     db = openKernel(":memory:");
+    execute(
+      db,
+      "register_agent_definition",
+      { name: "proof-profile", role: "test", package_ref: "/tmp/proof.aospkg" },
+      ctx,
+    );
     const guestId = "acp-session-guest-minted-abc";
-    const row = insertAgentSession(db, { id: guestId, label: "proof" }, ctx);
-    expect(row.id).toBe(guestId);
+    const result = execute(
+      db,
+      "create_agent_session",
+      { session_id: guestId, agent_definition_id: "proof-profile", label: "proof" },
+      ctx,
+    );
+    expect(result.object_id).toBe(guestId);
+    const links = getLinks(db, guestId);
+    expect(links.filter((l) => l.kind === "spawned_from")).toHaveLength(1);
+    expect(links.find((l) => l.kind === "spawned_from")?.to_id).toBe("proof-profile");
 
-    expect(() => insertAgentSession(db, { label: "nope" }, ctx)).toThrow(MissingSessionIdError);
-    expect(() => insertAgentSession(db, { id: "" }, ctx)).toThrow(MissingSessionIdError);
+    expect(() =>
+      execute(
+        db,
+        "create_agent_session",
+        { session_id: "missing-def", label: "nope" },
+        { ...ctx, span_id: "span-2" },
+      ),
+    ).toThrow(/agent_definition_id/);
   });
 
   test("replay rebuilds run status from events and equals live table", () => {

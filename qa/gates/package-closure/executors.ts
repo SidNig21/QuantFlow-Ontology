@@ -1,11 +1,13 @@
 /**
  * Package-closure gate executors with injectable process boundaries (RW1/RW6).
  */
+import { rmSync } from "node:fs";
 import { join } from "node:path";
 import type { PackageClosureMode } from "./modes.ts";
 import {
   COLLAB_ELECTRON_ROOT,
   createInspectionModuleLoader,
+  type InspectionModules,
   type InspectionModuleLoader,
 } from "./lazy-loader.ts";
 
@@ -61,6 +63,70 @@ export type ExecuteOptions = {
   loadInspectionModules?: InspectionModuleLoader;
   repoRoot?: string;
 };
+
+type MissingUpgradeControlResult =
+  | { ok: true; observedReason: string }
+  | { ok: false; reason: string };
+
+async function runMissingUpgradeControl(
+  mods: InspectionModules,
+  packageRoot: string,
+  fileSets: Parameters<InspectionModules["inspectPackagedResources"]>[2],
+): Promise<MissingUpgradeControlResult> {
+  const baitRoot = mods.copyPackageForBait(packageRoot);
+  try {
+    let inventory;
+    try {
+      inventory = await mods.removeD1UpgradeFromAsar(baitRoot);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        ok: false,
+        reason: `missing-upgrade bait mutation failed: ${message}`,
+      };
+    }
+
+    const exactRemoval =
+      inventory.removed.length === 1 &&
+      inventory.removed[0] === mods.qfKernelSchemaUpgradePath &&
+      inventory.added.length === 0;
+    if (!exactRemoval) {
+      return {
+        ok: false,
+        reason:
+          "missing-upgrade bait expected exactly one removed upgrade path and no additions" +
+          `; removed=[${inventory.removed.join(",")}] added=[${inventory.added.join(",")}]`,
+      };
+    }
+
+    const baitResourcesRoot = join(baitRoot, "resources");
+    const inspect = mods.inspectPackagedResources(
+      baitResourcesRoot,
+      COLLAB_ELECTRON_ROOT,
+      fileSets,
+      { expectedResourcesRoot: baitResourcesRoot },
+    );
+    if (inspect.ok) {
+      return {
+        ok: false,
+        reason: "missing-upgrade bait expected missing upgrade SQL failure",
+      };
+    }
+
+    const expectedReason =
+      `missing packaged SQL artifact: ${mods.qfKernelSchemaUpgradePath}`;
+    if (inspect.reason !== expectedReason) {
+      return {
+        ok: false,
+        reason:
+          `missing-upgrade bait expected ${expectedReason}, got: ${inspect.reason}`,
+      };
+    }
+    return { ok: true, observedReason: inspect.reason };
+  } finally {
+    rmSync(baitRoot, { recursive: true, force: true });
+  }
+}
 
 export async function executePackageClosureMode(
   options: ExecuteOptions,
@@ -133,6 +199,14 @@ export async function executePackageClosureMode(
         return { code: 1, trace, reason: inspect.reason };
       }
 
+      if (options.mode.bait === "missing-upgrade") {
+        trace.inspect += 1;
+        const control = await runMissingUpgradeControl(mods, packageRoot, fileSets);
+        if (!control.ok) return fail(control.reason);
+        console.error(`package-closure: ${control.observedReason}`);
+        return { code: 1, trace, reason: control.observedReason };
+      }
+
       trace.inspect += 1;
       const inspect = mods.inspectPackagedResources(
         join(packageRoot, "resources"),
@@ -171,6 +245,17 @@ export async function executePackageClosureMode(
           `package-closure: checked ${entry.path} (${entry.bytes} bytes)`,
         );
       }
+
+      trace.inspect += 1;
+      const control = await runMissingUpgradeControl(
+        mods,
+        validation.receipt.packageRoot,
+        fileSets,
+      );
+      if (!control.ok) return fail(control.reason);
+      console.log(
+        `package-closure: missing-upgrade control observed ${control.observedReason}`,
+      );
       return { code: 0, trace };
     }
 
@@ -217,6 +302,17 @@ export async function executePackageClosureMode(
           `package-closure: checked ${entry.path} (${entry.bytes} bytes)`,
         );
       }
+
+      trace.inspect += 1;
+      const control = await runMissingUpgradeControl(
+        mods,
+        validation.receipt.packageRoot,
+        fileSets,
+      );
+      if (!control.ok) return fail(control.reason);
+      console.log(
+        `package-closure: missing-upgrade control observed ${control.observedReason}`,
+      );
       return { code: 0, trace };
     }
   }

@@ -61,6 +61,11 @@ const DRIVER_SQL_ALLOW = [
   "tools/qf-peer-bus/src/bus.ts",
   "collab-electron/",
   "qa/gates/dock-registry/run.ts",
+  // WO-D1: gate-only temporary Kernels exercise partial-schema rejection,
+  // transactional rollback, and the one-time profile-identity upgrade.
+  "qa/gates/dock-profile-identity/run.ts",
+  // WO-D1: frozen pre-upgrade fixture seeding that execute() cannot express.
+  "qa/fixtures/pre-d1-profile-identity/seed.sql",
   // WO-V1: fixture Kernel seeding that execute() cannot express —
   // forcing identical created_at (G4 tied-timestamp fixture; execute() always
   // stamps new Date().toISOString()) and reshuffling physical row order via
@@ -97,6 +102,8 @@ const OPEN_ALLOW = [
   "species/hermes/a2a-4tile-smoke.ts",
   "species/critic-mock/register.ts",
   "qa/gates/dock-registry/run.ts",
+  // WO-D1: gate-only profile identity and frozen-upgrade proof.
+  "qa/gates/dock-profile-identity/run.ts",
   "qa/gates/boot-reconcile/run.ts",
   "qa/gates/agent-path/run.ts",
   "qa/gates/kernel-drift/run.ts",
@@ -123,6 +130,8 @@ const WRITE_ALLOW = [
   "species/hermes/a2a-4tile-smoke.ts",
   "species/critic-mock/register.ts",
   "qa/gates/dock-registry/run.ts",
+  // WO-D1: gate-only setup and assertions use the sanctioned write boundary.
+  "qa/gates/dock-profile-identity/run.ts",
   "qa/gates/boot-reconcile/run.ts",
   "qa/gates/agent-path/run.ts",
   "qa/gates/kernel-drift/run.ts",

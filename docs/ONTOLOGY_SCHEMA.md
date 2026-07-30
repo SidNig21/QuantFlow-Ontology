@@ -107,7 +107,7 @@ A structured verdict on an Artifact/Run against a Hypothesis. Kills "it worked o
 
 ## Objects — Operations plane (quant-agnostic)
 
-`workspace` (one canvas of work) · `agent_definition` (a spawnable species: Researcher, Ingestion-Collector, Backtester, Critic) · `agent_session` (one durable live instance; L1 ledger identity) · `task` (a unit of assigned work) · `tool` (a capability exposed via MCP; generated from this schema) · `execution_environment` (`local_process | local_python | cloudflare_sandbox`) · `connection` (a typed cable between tiles).
+`workspace` (one canvas of work) · `agent_definition` (one founder-visible Dock profile; many profiles may share a runtime package, while nullable `runtime_profile` selects that package's adapter profile) · `agent_session` (one durable live instance; L1 ledger identity) · `task` (a unit of assigned work) · `tool` (a capability exposed via MCP; generated from this schema) · `execution_environment` (`local_process | local_python | cloudflare_sandbox`) · `connection` (a typed cable between tiles).
 
 Properties drafted at codegen time under the same laws (see ROADMAP WO-003/WO-005).
 
@@ -129,6 +129,7 @@ Properties drafted at codegen time under the same laws (see ROADMAP WO-003/WO-00
 | `derived_from` | dataset/artifact/strategy → same | version & transformation lineage |
 | `evaluated_by` | artifact/run → evaluation | verdict attachment |
 | `assigned_to` / `delegates_to` | task → agent_session / session → session | work routing on canvas |
+| `spawned_from` | agent_session → agent_definition | exact Dock profile identity for every post-D1 session |
 
 ## Actions (initial command surface — MCP tools generate from these)
 

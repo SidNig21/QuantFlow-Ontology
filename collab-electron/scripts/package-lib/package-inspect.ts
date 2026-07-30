@@ -1,16 +1,27 @@
 /**
  * Inspect the finished Linux directory package through production resolution rules.
  */
+import { createHash } from "node:crypto";
 import {
   copyFileSync,
   existsSync,
   mkdirSync,
   readdirSync,
+  readFileSync,
+  renameSync,
   rmSync,
   statSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { finished } from "node:stream/promises";
+import {
+  createPackage,
+  extractAll,
+  extractFile,
+  listPackage,
+  uncache,
+} from "@electron/asar";
 import { resolvePackageRef } from "qf-kernel/portable";
 import {
   committedAllowlistPathForPackageRef,
@@ -21,7 +32,19 @@ import { expandFileSetOutputs } from "./fileset-expand.ts";
 import type { FileSet } from "./extra-resources.ts";
 
 export const QF_TOOLLOOP_REF = "tools/runtime-proof/packed/qf-toolloop.aospkg";
+export const QF_KERNEL_SCHEMA_MIGRATION =
+  "node_modules/qf-kernel-schema/golden/migration.sql";
+export const QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY =
+  "node_modules/qf-kernel-schema/compat/pre-d1-profile-identity.sql";
+export const QF_KERNEL_SCHEMA_UPGRADE =
+  "node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
 export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
+
+const REPO_SCHEMA_MIGRATION = "qf-kernel-schema/golden/migration.sql";
+const REPO_SCHEMA_PRE_D1_AUTHORITY =
+  "qf-kernel-schema/compat/pre-d1-profile-identity.sql";
+const REPO_SCHEMA_UPGRADE =
+  "qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
 
 export type InspectFailure = {
   ok: false;
@@ -183,6 +206,14 @@ export function inspectPackagedResources(
     }
   }
 
+  const sqlInspect = inspectAsarSqlArtifacts(root, join(collabRoot, ".."));
+  if ("ok" in sqlInspect && sqlInspect.ok === false) {
+    return sqlInspect;
+  }
+  if ("entries" in sqlInspect) {
+    checked.push(...sqlInspect.entries);
+  }
+
   return { ok: true, checkedPaths: checked };
 }
 
@@ -213,4 +244,119 @@ export function copyPackageForBait(packageRoot: string): string {
 export function removeHermesPackage(baitPackageRoot: string): void {
   const target = join(baitPackageRoot, "resources", HERMES_REF);
   rmSync(target, { force: true });
+}
+
+function sha256Buffer(buf: Buffer): string {
+  return createHash("sha256").update(buf).digest("hex");
+}
+
+function inspectAsarSqlArtifacts(
+  resourcesRoot: string,
+  repoRoot: string,
+): InspectFailure | { entries: { path: string; bytes: number }[] } {
+  const asarPath = join(resourcesRoot, "app.asar");
+  if (!existsSync(asarPath)) {
+    return { ok: false, reason: "app.asar missing from packaged resources" };
+  }
+
+  const checked: { path: string; bytes: number }[] = [];
+  const pairs: Array<{ packaged: string; golden: string }> = [
+    {
+      packaged: QF_KERNEL_SCHEMA_MIGRATION,
+      golden: REPO_SCHEMA_MIGRATION,
+    },
+    {
+      packaged: QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY,
+      golden: REPO_SCHEMA_PRE_D1_AUTHORITY,
+    },
+    {
+      packaged: QF_KERNEL_SCHEMA_UPGRADE,
+      golden: REPO_SCHEMA_UPGRADE,
+    },
+  ];
+
+  for (const pair of pairs) {
+    let packagedBytes: Buffer;
+    try {
+      packagedBytes = extractFile(asarPath, pair.packaged);
+    } catch {
+      return {
+        ok: false,
+        reason: `missing packaged SQL artifact: ${pair.packaged}`,
+      };
+    }
+
+    const goldenPath = join(repoRoot, pair.golden);
+    if (!existsSync(goldenPath)) {
+      return { ok: false, reason: `missing golden SQL artifact: ${goldenPath}` };
+    }
+    const goldenBytes = readFileSync(goldenPath);
+    if (packagedBytes.compare(goldenBytes) !== 0) {
+      return {
+        ok: false,
+        reason: `SQL artifact byte mismatch: ${pair.packaged} packaged=${sha256Buffer(packagedBytes)} golden=${sha256Buffer(goldenBytes)}`,
+      };
+    }
+    checked.push({ path: pair.packaged, bytes: packagedBytes.length });
+  }
+
+  return { entries: checked };
+}
+
+export type AsarInventoryDiff = {
+  removed: string[];
+  added: string[];
+};
+
+function normalizedAsarInventory(asarPath: string): string[] {
+  return listPackage(asarPath, { isPack: false })
+    .map((entry) => entry.replace(/^[/\\]+/, "").replaceAll("\\", "/"))
+    .sort();
+}
+
+export async function removeD1UpgradeFromAsar(
+  baitPackageRoot: string,
+): Promise<AsarInventoryDiff> {
+  const asarPath = join(baitPackageRoot, "resources", "app.asar");
+  if (!existsSync(asarPath)) {
+    throw new Error(`missing bait app.asar: ${asarPath}`);
+  }
+
+  const inventoryBefore = normalizedAsarInventory(asarPath);
+  const extractRoot = join(tmpdir(), `qf-asar-bait-${process.pid}-${Date.now()}`);
+  const replacementPath = `${asarPath}.qf-bait-${process.pid}-${Date.now()}`;
+  rmSync(extractRoot, { recursive: true, force: true });
+  rmSync(replacementPath, { force: true });
+
+  try {
+    mkdirSync(extractRoot, { recursive: true });
+    extractAll(asarPath, extractRoot);
+
+    const upgradePath = join(extractRoot, QF_KERNEL_SCHEMA_UPGRADE);
+    if (!existsSync(upgradePath)) {
+      throw new Error(
+        `missing packaged SQL artifact before bait removal: ${QF_KERNEL_SCHEMA_UPGRADE}`,
+      );
+    }
+    rmSync(upgradePath);
+
+    const stream = await createPackage(extractRoot, replacementPath);
+    await finished(stream);
+    renameSync(replacementPath, asarPath);
+
+    // @electron/asar caches archive headers by path. The copied archive now has
+    // new bytes at the same path, so force the after-inventory to reread disk.
+    uncache(asarPath);
+    const inventoryAfter = normalizedAsarInventory(asarPath);
+    const beforeSet = new Set(inventoryBefore);
+    const afterSet = new Set(inventoryAfter);
+    return {
+      removed: [...beforeSet].filter((entry) => !afterSet.has(entry)).sort(),
+      added: [...afterSet].filter((entry) => !beforeSet.has(entry)).sort(),
+    };
+  } finally {
+    uncache(asarPath);
+    rmSync(extractRoot, { recursive: true, force: true });
+    rmSync(replacementPath, { force: true });
+  }
 }

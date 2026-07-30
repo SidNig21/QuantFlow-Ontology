@@ -21,14 +21,6 @@ export class MissingTraceError extends Error {
   }
 }
 
-/** agent_session insert rejected: guest must supply the id (never mint). */
-export class MissingSessionIdError extends Error {
-  constructor() {
-    super("agent_session insert rejected: id must be supplied (adopted, never minted)");
-    this.name = "MissingSessionIdError";
-  }
-}
-
 /** Unknown command / object / row. */
 export class KernelError extends Error {
   constructor(message: string) {
@@ -164,6 +156,39 @@ export class KernelRegistryDriftError extends Error {
     this.missing = drift.missing;
     this.retired = drift.retired;
     this.inconsistent = drift.inconsistent;
+  }
+}
+
+/**
+ * Database shape is not the exact pre-D1 profile-identity baseline nor current D1 —
+ * upgrade refuses before mutation (WO-D1 R4).
+ */
+export class KernelUpgradeShapeError extends Error {
+  readonly upgrade: string;
+
+  constructor(upgrade: string, detail: string) {
+    super(`Kernel upgrade shape error (${upgrade}): ${detail}`);
+    this.name = "KernelUpgradeShapeError";
+    this.upgrade = upgrade;
+  }
+}
+
+/** create_agent_session rejected unknown agent_definition_id — nothing written. */
+export class UnknownAgentDefinitionError extends Error {
+  readonly definitionId: string;
+
+  constructor(definitionId: string) {
+    super(`unknown agent_definition_id: ${definitionId}`);
+    this.name = "UnknownAgentDefinitionError";
+    this.definitionId = definitionId;
+  }
+}
+
+/** Caller supplied a system-owned spawned_from link — nothing written. */
+export class SpawnedFromLinkRejectedError extends Error {
+  constructor() {
+    super("create_agent_session rejects caller-supplied spawned_from link");
+    this.name = "SpawnedFromLinkRejectedError";
   }
 }
 

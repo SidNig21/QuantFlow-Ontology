@@ -186,11 +186,35 @@ function publishArtifactFile(
   return hash;
 }
 
+const FIXTURE_DEFINITION_ID = "vault-projection-fixture";
+
+function ensureFixtureDefinition(db: KernelDb): void {
+  const existing = db
+    .query(`SELECT id FROM agent_definition WHERE id = ?`)
+    .get(FIXTURE_DEFINITION_ID) as { id: string } | null;
+  if (existing) return;
+  execute(
+    db,
+    "register_agent_definition",
+    {
+      name: FIXTURE_DEFINITION_ID,
+      role: "vault-projection-proof",
+      package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+    },
+    trace(),
+  );
+}
+
 function seedSession(db: KernelDb, id: string, createdAt?: string): void {
+  ensureFixtureDefinition(db);
   execute(
     db,
     "create_agent_session",
-    { session_id: id, label: "fixture" },
+    {
+      session_id: id,
+      agent_definition_id: FIXTURE_DEFINITION_ID,
+      label: "fixture",
+    },
     trace(),
   );
   if (createdAt) {
@@ -348,6 +372,7 @@ async function assertG1(): Promise<void> {
   const { path: kernelPath, dir: kernelDir } = makeKernelDb();
   const artifactStore = fixtureTemp("art-");
   const db = openKernel(kernelPath);
+  ensureFixtureDefinition(db);
   const body = "# Synthetic report\n\nfixture body\n";
   const artPath = join(artifactStore, "report.md");
   const artId = publishArtifactFile(db, "report", body, artPath);
@@ -357,6 +382,7 @@ async function assertG1(): Promise<void> {
     "create_agent_session",
     {
       session_id: "session-g1",
+      agent_definition_id: FIXTURE_DEFINITION_ID,
       label: "fixture",
       links: [{ kind: "produces", to_id: artId }],
     },

@@ -184,14 +184,15 @@ A workspace is the operator-visible canvas container for one research effort. It
 
 ### `agent_definition`
 
-An agent_definition is the template for a spawnable agent species. It governs what can be launched without encoding per-session runtime state.
+An agent_definition is one founder-visible Dock profile. It governs spawn admission through package_ref while runtime_profile selects the adapter profile without encoding per-session state.
 
 - **lifecycle:** `experimental`
 - **properties:**
-- `name` — Canonical species identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.
+- `name` — Canonical profile identifier used when requesting a spawn. Treat this as stable API surface for orchestration and routing rules.
 - `role` — Role summary used for planner routing and prompt selection. Keep role labels aligned with actual task boundaries, not model branding.
-- `package_ref` — Package or harness reference used to instantiate this species. This should resolve to executable code, not a descriptive label.
-- `system_prompt_ref` — Artifact or prompt identifier containing this species' operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
+- `package_ref` — Reusable runtime package reference that resolves to executable code. Several profiles may share one package_ref without sharing identity.
+- `system_prompt_ref` — Artifact or prompt identifier containing this profile's operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
+- `runtime_profile` — Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.
 
 ### `agent_session`
 
@@ -361,6 +362,14 @@ Session-to-session delegation on the canvas.
 - **from:** `agent_session`
 - **to:** `agent_session`
 
+### `spawned_from`
+
+Session identity: which agent_definition profile created this agent_session.
+
+- **lifecycle:** `experimental`
+- **from:** `agent_session`
+- **to:** `agent_definition`
+
 ## Actions
 
 ### `create_hypothesis`
@@ -503,23 +512,25 @@ Void a scheduled event that will not be contested (scheduled → void).
 
 ### `register_agent_definition`
 
-Register a spawnable agent species in the Kernel registry (id = name). Duplicate names are rejected.
+Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.
 
 - **lifecycle:** `experimental`
 - **input:**
-- `name` — Unique species name; becomes the row id.
+- `name` — Unique profile name; becomes the row id.
 - `role` — Role summary (researcher, critic, backtester, ingestion) for routing and prompts.
-- `package_ref` — AgentOS package this species launches — the plug half of the row.
-- `system_prompt_ref` — Artifact or prompt id that defines this species' instructions.
+- `package_ref` — Runtime package this profile launches — the reusable executable half of the row.
+- `runtime_profile` — Optional runtime adapter profile selector. Omission stores null; empty or whitespace-only input is rejected.
+- `system_prompt_ref` — Artifact or prompt id that defines this profile's instructions.
 
 ### `create_agent_session`
 
-Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Sets status=starting; put the species name in label until agent_definition arrives.
+Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.
 
 - **lifecycle:** `experimental`
 - **input:**
 - `session_id` — Guest-minted ACP session id — adopted as the Kernel row id, never re-minted.
-- `label` — Operator-facing label; v0.1 stores the species name here.
+- `agent_definition_id` — Existing agent_definition row id for the profile that admitted this session. Identity lives in spawned_from, not label.
+- `label` — Optional operator-facing label for readability only; never the profile identity.
 
 ### `start_agent_session`
 

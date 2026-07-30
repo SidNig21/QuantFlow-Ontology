@@ -393,6 +393,16 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "dock-profile-identity",
+    description:
+      "WO-D1: Dock profile identity, upgrade, spawned_from, operator-only surface, callsite coupling",
+    run: async () => {
+      const { runDockProfileIdentityGate } = await import("./gates/dock-profile-identity.ts");
+      const { ok } = await runDockProfileIdentityGate();
+      return ok;
+    },
+  },
+  {
     name: "dock-registry",
     description:
       "WO-007: agent_definition registry list/resolve, species-literal scan, linkSoftware admission",

@@ -2,7 +2,7 @@
 
 **An AI-native quantitative research platform: heterogeneous AI agents collaborating on a spatial canvas, over a governed ontology.**
 
-QuantFlow doesn't compete with agent frameworks — it's the surface they land on. Claude Code, Codex, Hermes, a scraper, an RL worker: anything with a CLI is a *candidate species* that spawns as a seat on the canvas, collaborates with its peers over an MCP bus, and acts on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
+QuantFlow doesn't compete with agent frameworks — it's the surface they land on. Claude Code, Codex, Hermes, a scraper, an RL worker: any controllable CLI can become a Dock runtime through an adapter package, then appear as one or more founder-visible profiles on the canvas. Profiles keep their own identity while sharing reusable runtime code, collaborate over an MCP bus, and act on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
 
 > **It plugs into your world; it doesn't become your world.**
 
@@ -15,8 +15,8 @@ Built solo, in the open, on Linux first. Early-stage and honest about it — see
 Every claim below is backed by a falsified `qa/` gate or a recorded proof in the Kernel. If it's not on this list, it doesn't exist yet.
 
 - **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel commands; a gate (`qa/gates/kernel-sole-writer*`) fails the build if any other code path writes to it — and the gate has been bait-tested red before being trusted green.
-- **The canvas + dock** — an infinite pan/zoom surface (Electron) where agent seats spawn as terminal tiles. The dock renders one spawn button per registered seat, driven by the seat registry, not hardcoded.
-- **Agent seats** — named Hermes seats (`orchestrator`, `worker`, `worker2`), each a real TUI process in its own PTY session with its own profile and tool grants.
+- **The canvas + dock** — an infinite pan/zoom surface (Electron) where agent seats spawn as terminal tiles. Kernel-registered Dock profiles now carry distinct session identity; removal of the legacy hardcoded Peer Seats path is the next contracted rung (WO-D2).
+- **Agent seats** — named Hermes seats (`orchestrator`, `worker`, `worker2`), each a real TUI process in its own PTY session with its own profile and tool grants. The profile is Kernel identity; its package reference is the reusable runtime/adapter.
 - **The peer bus** (`tools/qf-peer-bus`) — a stdio MCP server exposing `send_to_peer` / `read_inbox` / `list_peers`. Every peer message is recorded to the Kernel as a content-addressed `trajectory` artifact (which doubles as a finetuning trace store). Transport routing lives in its own SQLite db, separate from the Kernel.
 - **Live delivery** — a host-side watcher pushes incoming peer messages into the recipient's *live TUI* as a real conversation turn. Proven end-to-end: an orchestrator message injected into a worker's native TUI was auto-processed and answered via `send_to_peer`, with both legs recorded as Kernel artifacts.
 - **Verification culture** — changes land through work orders verified in cold git worktrees; gates are falsified (bait → red → restore → green) before they count; artifact hashes are recomputed, not trusted.
@@ -33,7 +33,7 @@ The ontology has three planes:
 
 - **Research plane** (invariant, market-agnostic): `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`. Identical whether the instrument is a game line, a perp contract, or an equity.
 - **Market plane** (pluggable, pipeline-fed): `Venue / Instrument / Quote / MarketEvent`. A new market adds *rows*, never new object types.
-- **Agent plane** (largely live already): `AgentDefinition / AgentSession` + trajectory artifacts.
+- **Agent plane** (largely live already): `AgentDefinition` (Dock profile) → `AgentSession` through `spawned_from`, plus trajectory artifacts. Several definitions may share one runtime package without collapsing identity.
 
 **The proof standard** — the day this repo gets to call itself an ontology: an orchestrator seat answers *"What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?"* in one pass, using only tools generated from the schema, with every step recorded to the Kernel.
 
@@ -91,7 +91,7 @@ Runtime split worth knowing: the Electron main process is Node (`node:sqlite`); 
 | `collab-electron/` | The desktop app — canvas, dock, seat spawning, peer delivery watcher |
 | `qf-kernel-schema/` | Schema → generated Kernel code (the codegen seam the ontology charter will extend) |
 | `tools/qf-peer-bus/` | The MCP peer bus: server, transport db, Kernel recording, cold-harness proofs |
-| `species/` | Agent definitions |
+| `species/` | Runtime/adapter packages and agent fixtures; durable Dock profile identity lives in the Kernel |
 | `qa/` | Gates. Falsifiable by construction — if a gate can't go red, it isn't a gate |
 | `docs/orders/` | Work orders + verification records (the build's audit trail) |
 

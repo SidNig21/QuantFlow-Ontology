@@ -335,30 +335,6 @@ describe("schema lint", () => {
     );
   });
 
-  test("lintCommands rejects operatorOnly on action with no observation event", () => {
-    const blob = defineObject({
-      name: "blob",
-      description: "A blob.",
-      lifecycle: "experimental",
-      properties: z.object({ label: z.string().describe("Label.") }),
-    });
-    const publish_blob = defineAction({
-      name: "publish_blob",
-      description: "Publish a blob.",
-      lifecycle: "experimental",
-      operatorOnly: true,
-      input: z.object({ label: z.string().describe("Label.") }),
-    });
-    const schema: Schema = { objects: [blob], links: [], actions: [publish_blob] };
-    expect(() =>
-      lintCommands(schema, {}, [], [
-        { action: "publish_blob", object_type: "blob", event: "blob.published" },
-      ]),
-    ).toThrow(
-      'Action "publish_blob" has operatorOnly but is not observation-coupled (no command event ends ".observed")',
-    );
-  });
-
   test("lintCommands rejects operatorOnly action with a non-observation command event", () => {
     const ticket = defineObject({
       name: "ticket",
@@ -399,6 +375,28 @@ describe("schema lint", () => {
     ).toThrow(
       'Action "observe_and_grade" is operatorOnly but command event "ticket.graded" does not end ".observed"',
     );
+  });
+
+  test("lintCommands accepts non-observation operatorOnly action", () => {
+    const profile = defineObject({
+      name: "profile",
+      description: "A profile.",
+      lifecycle: "experimental",
+      properties: z.object({ name: z.string().describe("Name.") }),
+    });
+    const register_profile = defineAction({
+      name: "register_profile",
+      description: "Register a profile.",
+      lifecycle: "experimental",
+      operatorOnly: true,
+      input: z.object({ name: z.string().describe("Name.") }),
+    });
+    const schema: Schema = { objects: [profile], links: [], actions: [register_profile] };
+    expect(() =>
+      lintCommands(schema, {}, [], [
+        { action: "register_profile", object_type: "profile", event: "profile.registered" },
+      ]),
+    ).not.toThrow();
   });
 
   test("lintActionSurface rejects a schema action with no command wiring", () => {
