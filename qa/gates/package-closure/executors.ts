@@ -113,14 +113,21 @@ export async function executePackageClosureMode(
       if (options.mode.bait === "missing-hermes") {
         const baitRoot = mods.copyPackageForBait(packageRoot);
         mods.removeHermesPackage(baitRoot);
+        const baitResourcesRoot = join(baitRoot, "resources");
         trace.inspect += 1;
         const inspect = mods.inspectPackagedResources(
-          join(baitRoot, "resources"),
+          baitResourcesRoot,
           COLLAB_ELECTRON_ROOT,
           fileSets,
+          { expectedResourcesRoot: baitResourcesRoot },
         );
         if (inspect.ok) {
           return fail("missing-hermes bait expected unresolved hermes reference");
+        }
+        if (!inspect.reason.startsWith("unresolved hermes reference:")) {
+          return fail(
+            `missing-hermes bait expected unresolved hermes reference, got: ${inspect.reason}`,
+          );
         }
         console.error(`package-closure: ${inspect.reason}`);
         return { code: 1, trace, reason: inspect.reason };

@@ -38,6 +38,8 @@ export type InspectResult = InspectFailure | InspectSuccess;
 export type InspectOptions = {
   /** When set, proves the inspector rejects a development repo root. */
   probeDevRoot?: string;
+  /** Exact resources root trusted for this inspection (the temporary bait copy in D7). */
+  expectedResourcesRoot?: string;
 };
 
 function fileSize(path: string): number {
@@ -90,9 +92,12 @@ function inspectAuxiliaryPaths(
   return null;
 }
 
-function assertPackagedResourcesRoot(resourcesRoot: string): InspectFailure | null {
+function assertPackagedResourcesRoot(
+  resourcesRoot: string,
+  expectedResourcesRoot: string,
+): InspectFailure | null {
   const normalized = resolve(resourcesRoot);
-  if (!normalized.includes(`${join("dist", "linux-unpacked", "resources")}`)) {
+  if (normalized !== resolve(expectedResourcesRoot)) {
     return {
       ok: false,
       reason: "root escape: inspection must target packaged resources root",
@@ -107,9 +112,15 @@ export function inspectPackagedResources(
   fileSets: FileSet[],
   options: InspectOptions = {},
 ): InspectResult {
+  const productionResourcesRoot = join(
+    collabRoot,
+    "dist",
+    "linux-unpacked",
+    "resources",
+  );
   if (options.probeDevRoot) {
     const probe = resolve(options.probeDevRoot);
-    const escape = assertPackagedResourcesRoot(probe);
+    const escape = assertPackagedResourcesRoot(probe, productionResourcesRoot);
     if (!escape) {
       return {
         ok: false,
@@ -131,7 +142,10 @@ export function inspectPackagedResources(
   }
 
   const root = resolve(resourcesRoot);
-  const packagedCheck = assertPackagedResourcesRoot(root);
+  const packagedCheck = assertPackagedResourcesRoot(
+    root,
+    options.expectedResourcesRoot ?? productionResourcesRoot,
+  );
   if (packagedCheck) return packagedCheck;
 
   const checked: { path: string; bytes: number }[] = [];

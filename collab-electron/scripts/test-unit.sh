@@ -40,4 +40,5 @@ bun test ../qa/gates/package-closure/lazy-loader.test.ts
 bun test ../qa/verify-release.test.ts
 bun test scripts/package-lib/extra-resources.test.ts \
   scripts/package-lib/shared-paths.test.ts \
+  scripts/package-lib/package-inspect.test.ts \
   scripts/package-lib/unit-wiring.test.ts

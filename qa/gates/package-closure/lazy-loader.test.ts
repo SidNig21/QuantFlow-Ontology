@@ -96,4 +96,46 @@ describe("executePackageClosureMode standalone ordering", () => {
     expect(result.trace.install).toBe(0);
     expect(result.trace.inspect).toBe(0);
   });
+
+  test("missing-hermes bait rejects generic root escape", async () => {
+    const result = await executePackageClosureMode({
+      mode: { kind: "bait", bait: "missing-hermes" },
+      loadInspectionModules: () =>
+        Promise.resolve({
+          ...fakeModules(),
+          inspectPackagedResources: () => ({
+            ok: false,
+            reason:
+              "root escape: inspection must target packaged resources root",
+          }),
+        }),
+    });
+
+    expect(result.code).toBe(1);
+    expect(result.reason).toBe(
+      "missing-hermes bait expected unresolved hermes reference, got: root escape: inspection must target packaged resources root",
+    );
+    expect(result.trace.inspect).toBe(1);
+    expect(result.trace.install).toBe(0);
+    expect(result.trace.build).toBe(0);
+    expect(result.trace.packageVerify).toBe(0);
+  });
+
+  test("missing-hermes bait accepts unresolved hermes reference", async () => {
+    const result = await executePackageClosureMode({
+      mode: { kind: "bait", bait: "missing-hermes" },
+      loadInspectionModules: () =>
+        Promise.resolve({
+          ...fakeModules(),
+          inspectPackagedResources: () => ({
+            ok: false,
+            reason: "unresolved hermes reference: missing file",
+          }),
+        }),
+    });
+
+    expect(result.code).toBe(1);
+    expect(result.reason).toBe("unresolved hermes reference: missing file");
+    expect(result.trace.inspect).toBe(1);
+  });
 });
