@@ -534,7 +534,7 @@ rejected against the relocated root.
 
 ---
 
-## Product identity — parked until after WO-K3 (inserted 2026-07-27)
+## Product identity — queued after WO-K3b (inserted 2026-07-27; remeasured 2026-07-30)
 
 **Why this exists.** The app still ships, publishes, and stores state as Collaborator while the
 mission is QuantFlow Ontology. Measured: `productName: Collaborator`, `appId: com.collaborator.desktop`,
@@ -542,23 +542,26 @@ mission is QuantFlow Ontology. Measured: `productName: Collaborator`, `appId: co
 product identity, not the fork seam.
 
 **Why not now.** Relocating `~/.collaborator/` while WO-K3 relocates artifact bytes is two migrations
-with no runner. Kernel is already at `~/.quantflow/kernel.db` (K1). Order: **K1 → K2 → K3 → WO-N1**.
+with no runner. Kernel is already at `~/.quantflow/kernel.db` (K1). Pre-build measurement found the
+A2A publisher still writing beneath `COLLAB_DIR/a2a`, outside K3's canonical shelf and gate. Order:
+**K1 → K2 → K3 → K3b → WO-N1**.
 
 ### WO-N1 · Product identity: QuantFlow, not Collaborator
 
 **Objective.** Every product-facing surface says QuantFlow; app-local data lives under
 `~/.quantflow/app/`; release target is this repo.
 
-**Depends on.** WO-K3 — hard.
+**Depends on.** WO-K3b — hard.
 
-**In.** Packaging fields · `paths.ts` BASE + `COLLAB_DIR`→`QF_APP_DIR` · copy-on-first-boot from
-`~/.collaborator` · `install.sh` / CLI user-visible strings · static gate `product-identity` with bait.
+**In.** Packaging fields · explicit global `QF_APP_ROOT` plus worktree-isolated `QF_APP_DIR` · atomic
+copy-on-first-boot from `~/.collaborator` · Electron browser/userData and workspace metadata
+migration · `install.sh` / CLI user-visible strings · source and shipped-package identity gates.
 
 **Out (ruled, do not "helpfully" include).** Renaming directory `collab-electron/` · changing the
 `upstream` remote URL · erasing LICENSE / NOTICE / START_HERE lineage · Kernel or artifact paths
 (already owned by K1/K3) · historical evidence prose.
 
-**Full draft:** [`WO-N1.md`](WO-N1.md) — parked until K3 verifies; then cut with a pre-build read.
+**Full draft:** [`WO-N1.md`](WO-N1.md) — pre-build read incorporated; queued behind K3b.
 
 ---
 

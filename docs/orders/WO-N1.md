@@ -1,9 +1,9 @@
 # WO-N1 — Product identity: QuantFlow, not Collaborator
 
-status: **parked — contract + draft order; do not cut until WO-K3 is done.**
+status: **unblocked, queued behind WO-K3b — adversarial pre-build read incorporated.**
 Born 2026-07-27 from founder direction + a Claude diagnosis (accepted after measurement).
 assignee: — (not cuttable)
-depends: **WO-K3** (hard) — artifact bytes must already live under `~/.quantflow/` before this
+depends: **WO-K3b** (hard) — every production artifact writer must live under `~/.quantflow/` before this
   order renames the remaining `~/.collaborator/` app-local root; doing both at once is two
   migrations with no runner.
 closes: ROADMAP debt #30
@@ -37,6 +37,7 @@ and docs. They are not one job.
 | **A · Product identity** | `productName`, `appId`, `publish.owner/repo`, `~/.collaborator` app data, window/About strings, `install.sh` release fetch, npm package `@collaborator/electron` | **IN — change** |
 | **B · Fork seam** | directory `collab-electron/`, git remote `upstream` → `collaborator-ai/collab-public`, package path imports that assume that folder | **OUT — keep forever** |
 | **C · Lineage / law** | `START_HERE.md` "fork of collaborator-ai/collab-public", FSL license text, NOTICE, historical evidence under `docs/orders/evidence/` | **OUT — keep** (attribution and history are not branding) |
+| **D · Input-only compatibility** | old paths/names read only by migration or cleanup | **IN — exact allowlist; never emitted as a default or product string** |
 
 **Ruled: do not rename `collab-electron/`.** `upstream` is a live remote (`START_HERE` rule 7).
 Renaming the directory turns every future upstream pull into a whole-tree rename conflict. The
@@ -58,7 +59,7 @@ collab-electron/src/main/paths.ts:5
 plus several direct `join(homedir(), ".collaborator", …)` callsites (agent-artifacts until K3,
 host-mounts, socket-path breadcrumb, ACP cache, canvas-plugin-offered).
 
-**Ruled after K3:**
+**Ruled after K3b:**
 
 ```
 ~/.quantflow/
@@ -69,17 +70,37 @@ host-mounts, socket-path breadcrumb, ACP cache, canvas-plugin-offered).
     …                       # prod app state
 ```
 
-`paths.ts` `BASE` becomes `join(homedir(), ".quantflow", "app")`. Export rename:
-`COLLAB_DIR` → **`QF_APP_DIR`** (every importer updated in the same commit). Env
+`paths.ts` exposes two deliberate authorities:
+
+```text
+QF_APP_ROOT = ~/.quantflow/app
+QF_APP_DIR  = production ? QF_APP_ROOT : QF_APP_ROOT/dev/worktree-<id>
+```
+
+Global breadcrumbs, host-mount configuration, integration markers, and legacy-input discovery use
+`QF_APP_ROOT`. Canvas, config, PTY, logs, sockets, terminals, and other launch-local state use
+`QF_APP_DIR`, preserving development worktree isolation. Export rename: `COLLAB_DIR` →
+**`QF_APP_DIR`** (every importer updated in the same commit). Env
 `COLLAB_DEV_WORKTREE_ROOT` → **`QF_DEV_WORKTREE_ROOT`** (document the rename; accept old env as
 one-release alias only if cheap — prefer hard cut with a boot log line naming the new var).
 
-**Migration ritual (no migration runner exists):** on first boot after this lands, if
-`~/.collaborator` exists and `~/.quantflow/app` does not, **copy** (not move) the tree into
-`~/.quantflow/app`, log the action, then prefer the new root. Do not delete `~/.collaborator` in
-this order — leave a dated note in the report; founder deletes after confirming. Workspace-local
-`.collaborator/` directories (`ipc-workspace.ts`) become `.quantflow/` (same copy-on-first-seen
-rule for the workspace folder name).
+**Migration ritual (no migration runner exists):** before logger/config/sidecar consumers create the
+new destination, copy persistent legacy state into a sibling staging directory and atomically rename
+that staging directory to `QF_APP_ROOT` only after complete success. Never follow symlinks; never
+copy `kernel.db*`, `agent-artifacts/`, sockets, PID files, or generated endpoint breadcrumbs. If both
+roots exist, leave the new root byte-unchanged, prefer it, and log the conflict. A failed copy leaves
+the final destination absent so the next boot retries. Never move or delete the source.
+
+Electron's Linux `userData` currently lives beneath `~/.config/@collaborator/electron/...` and holds
+browser partitions, cookies, local/session storage, and preferences. Include it in the staged
+migration and set the new production/development `userData` to `QF_APP_DIR/electron` before browser
+consumers open. Workspace-local `.collaborator/` directories become `.quantflow/` through one shared
+copy-on-first-seen helper invoked before configured-workspace boot, workspace add, thumbnail-cache
+selection, and replay-cache use. Preserve the legacy ignore entry and add `.quantflow/`.
+
+Before the founder ever removes `~/.collaborator`, report the read-only count of Kernel
+`storage_ref` values beneath that root. Deletion advice is forbidden unless the count is zero; this
+order itself never deletes the old root.
 
 ## RULING 3 — release target is this repo (architect, final)
 
@@ -93,8 +114,15 @@ Measured `collab-electron/package.json`:
 | `build.publish` | `collabs-inc` / `collab-public` | `SidNig21` / `QuantFlow-Ontology` |
 
 `install.sh` currently fetches `collaborator-ai/collab-public` releases — retarget to
-`SidNig21/QuantFlow-Ontology`, or delete the script if this repo does not yet ship GitHub Releases
-(report which; do not leave a script that installs upstream's binary under QuantFlow's name).
+`SidNig21/QuantFlow-Ontology`; the AppImage/release path exists, so do not delete it. Do not run the
+release command in acceptance because it reads credentials; inspect its production configuration and
+the unsigned package instead.
+
+**Identity matrix (pinned):** OS/product name `QuantFlow`; long human-facing name
+`QuantFlow Ontology`; app id `com.quantflow.ontology`; private package `@quantflow/electron`; Linux
+executable/install name `quantflow`; canvas control command `qf-canvas`; release repository
+`SidNig21/QuantFlow-Ontology`. Keep internal upstream seams such as `collab-electron/`, `@collab/*`,
+`collab-file`, and tmux compatibility names where they are not product-facing.
 
 ---
 
@@ -115,29 +143,57 @@ Measured `collab-electron/package.json`:
 
 ### D1 — packaging identity
 `collab-electron/package.json` fields per RULING 3. Any About / window title / tray string that
-still says Collaborator → QuantFlow (or "QuantFlow Ontology" where a long name fits).
+still says Collaborator → QuantFlow (or "QuantFlow Ontology" where a long name fits). Update
+`bun.lock`, `upload-to-github.cjs`, packaged update metadata, the upstream issue link shown in the
+shell, `install.sh` Linux/macOS names, and every production release target named by the pinned matrix.
+Do not run release or read a credential.
 
 ### D2 — app data root
-`paths.ts` + every direct `~/.collaborator` join for **app-local** state → `~/.quantflow/app`.
-`COLLAB_DIR` → `QF_APP_DIR`. Copy-on-first-boot migration per RULING 2. Artifact paths must
-already be under the K3 root — if any `agent-artifacts` join remains under `.collaborator`, that is
-a **K3 defect**, report and stop; do not re-home artifacts here.
+Implement `QF_APP_ROOT` / `QF_APP_DIR` and the staged global, Electron `userData`, and workspace
+migrations exactly as RULING 2 specifies. One migration helper must run before every existing and new
+workspace consumer, not only `workspace:add`. Artifact paths must already be under the K3b root; if
+any production artifact writer still derives from app state, report and stop rather than re-home it.
 
 ### D3 — CLI / installer / skills chrome
-`cli/collab-cli.mjs` user-visible strings and default paths; `install.sh`; canvas skill package
-display names. Binary/command rename (`collab` → `quantflow` or `qf`) only if it does not fight
-upstream package layout — if blocked by the seam, change strings and defaults, leave filename,
-and report.
+`cli/collab-cli.mjs` user-visible strings/default paths; `install.sh`; canvas skill display names.
+Install `quantflow` and retain `qf-canvas` for canvas control. Remove the app-owned old installed
+wrapper during installation, but keep source filenames/folders whose rename would only increase
+upstream conflicts.
 
 ### D4 — gate `product-identity`
-New static gate: fails if `collab-electron/package.json` still contains `com.collaborator`,
-`productName": "Collaborator"`, `collabs-inc`, or `@collaborator/electron`; fails if `paths.ts`
-BASE still joins `".collaborator"`. Allowlist bucket C paths (LICENSE, NOTICE, START_HERE lineage
-sentence, `docs/orders/evidence/**`). **Does not** fail on the string `collab-electron/` or the
-`upstream` remote URL.
+New gate with two coupled surfaces:
 
-### D5 — bait
-Neuter `productName` back to Collaborator → gate red → restore → green.
+1. Source identity fails on stale package/app/product/publish fields, emitted `.collaborator`
+   defaults, and user-facing Collaborator chrome. Bucket C plus exact bucket-D migration readers are
+   allowlisted; `collab-electron/`, `upstream`, `@collab/*`, and historical evidence remain legal.
+2. Extend package inspection to assert the unsigned Linux executable name, packaged `app.asar`
+   manifest identity, `app-update.yml` owner/repo, and absence of a production
+   `collabs-inc/collab-public` update target.
+3. Run the migration matrix through the exact production helper: old-only copies persistent canaries
+   byte-for-byte; both-exist preserves new bytes; injected failure leaves no final root and retry
+   succeeds; Kernel/artifact/PID/socket canaries are excluded; source hashes never change. Prove an
+   existing configured workspace migrates before boot consumers, not only on add.
+
+### D5 — required falsification
+
+Three independent production baits, each red → restore → green:
+
+1. Revert `productName` to Collaborator.
+2. Remove/no-op the production migration call so the helper's unit proof remains green but real boot
+   no longer delegates.
+3. Revert the packaged update owner/repository to the old target.
+
+### D6 — current documentation
+
+Update the official root README and current runtime/demo docs with the final layout:
+
+```text
+~/.quantflow/kernel.db
+~/.quantflow/artifacts/
+~/.quantflow/app/
+```
+
+Do not rewrite historical work orders/evidence or attribution.
 
 ---
 
@@ -149,23 +205,39 @@ historical evidence · Kernel path (K1) · artifact root (K3) · Hermes profile 
 
 ## Acceptance (when cut)
 
-G1: cold suite green including `product-identity`.
-G2: D5 bait transcript.
-G3: fresh boot with a planted `~/.collaborator` stub copies into `~/.quantflow/app` and logs it;
-    Kernel still opens at `~/.quantflow/kernel.db`.
-G4: `rg` over `collab-electron/package.json` and `paths.ts` shows no Collaborator product strings.
-G5: report lists every remaining `collaborator` match in the repo and which bucket (A/B/C) it is —
-    bucket A count must be **zero**.
+Builder, once after the complete implementation batch:
+
+```bash
+cd collab-electron && ./scripts/test-unit.sh && bun run build
+cd ..
+bun qa/run.ts product-identity
+bun qa/run.ts artifact-root
+bun qa/run.ts kernel-sole-writer-app
+```
+
+A separate verifier runs `bun qa/verify-release.ts` once from a fresh detached worktree, including
+the real unsigned Linux package, then independently repeats the three production baits.
+
+G1: builder runs unit/build and focused `product-identity` + migration gates once after the whole
+    batch; independent verifier runs canonical cold release once.
+G2: all three D5 bait transcripts.
+G3: full staged migration matrix, existing-workspace boot proof, Electron `userData` proof, and
+    Kernel still opening at `~/.quantflow/kernel.db`.
+G4: shipped Linux identity/update receipts plus source scan.
+G5: report lists every remaining `collaborator` match by bucket A/B/C/D; bucket A count is zero and
+    every bucket-D match is input-only compatibility.
+G6: read-only old-root artifact-reference count; never advise deletion unless zero.
 
 ## Report-back
 
-Plain-language open · D1–D5 evidence · migration log line · bucket A/B/C residual table ·
-judgment where the order was silent (especially CLI binary rename).
+Plain-language open · D1–D6 evidence · migration/failure/retry receipts · shipped identity · bucket
+A/B/C/D residual table · old-root artifact-reference count · judgment where the order was silent.
 
 ---
 
-## Why after K3 (do not pull forward)
+## Why after K3b (do not pull forward)
 
-K3 relocates artifact bytes into `~/.quantflow/`. This order relocates app-local state out of
+K3/K3b relocate every production artifact writer into `~/.quantflow/`. This order relocates app-local state out of
 `~/.collaborator/`. Running them together (or N1 first) creates two partial moves and no runner to
-reconcile `storage_ref` rows — the exact orphan class debt #29 names. **Sequence: K1 → K2 → K3 → N1.**
+reconcile `storage_ref` rows — the exact orphan class debt #29 names.
+**Sequence: K1 → K2 → K3 → K3b → N1.**

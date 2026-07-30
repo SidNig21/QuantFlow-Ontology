@@ -1,6 +1,6 @@
 # WO-D2b — compensate the remaining ACP launch paths
 
-**Status:** open — current after WO-D2 PASS; adversarial pre-build read incorporated
+**Status:** done — independently verified at `3970ea1` and merged 2026-07-30
 **Depends on:** WO-D2 PASS  
 **Size:** one Cursor-sized runtime repair; no new product surface
 
@@ -83,3 +83,13 @@ transcripts. A separate verifier runs `bun qa/verify-release.ts` from a clean de
 
 Native-TUI changes; peer-bus behavior; profile homes; grants/caller identity; schema/golden changes;
 new dependencies; model calls; credentials; packages/marketplaces; bets or trades.
+
+## Verification record
+
+Independent cold verification passed at `3970ea1e65c00f40b96ddf1c3b8fff48a456ae7b` on
+2026-07-30. The canonical verifier built and inspected the real unsigned Linux package and every QA
+gate passed. AgentOS teardown was independently observed against an exact guest id; all four
+production cleanup baits plus the corrected definition-provenance bait went red and restored green.
+The initial candidate was honestly rejected because the inherited D1 scanner still recognized only
+the pre-refactor callsite; rework made that gate cover exactly the two production admission
+transactions. Full receipts: [`evidence/wo-d2b/VERIFICATION.md`](evidence/wo-d2b/VERIFICATION.md).
