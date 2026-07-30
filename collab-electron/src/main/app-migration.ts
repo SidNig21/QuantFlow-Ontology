@@ -226,7 +226,7 @@ export function migrateLegacyAppState(
         electron.source,
         electronDestination,
         electron.source,
-        null,
+        isExcludedGlobalEntry,
       );
     }
     fs.rename(stage, destination);

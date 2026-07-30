@@ -344,6 +344,10 @@ async function migrationMatrix(): Promise<Result> {
     put(join(oldRoot, "server.pid"), "pid-excluded\n");
     put(join(oldRoot, "agent.sock"), "socket-excluded\n");
     put(join(oldElectron, "Partitions", "persist", "Cookies"), "cookie-bytes\n");
+    put(join(oldElectron, "kernel.db"), "electron-kernel-excluded\n");
+    put(join(oldElectron, "server.pid"), "electron-pid-excluded\n");
+    put(join(oldElectron, "agent-artifacts", "artifact.md"), "electron-artifact-excluded\n");
+    put(join(oldElectron, "socket-path"), "electron-breadcrumb-excluded\n");
     const outside = join(root, "outside-canary.txt");
     put(outside, "do-not-follow\n");
     symlinkSync(outside, join(oldRoot, "outside-link"));
@@ -373,6 +377,17 @@ async function migrationMatrix(): Promise<Result> {
       "outside-link",
     ]) {
       expect(!existsSync(join(target, excluded)), `excluded entry migrated: ${excluded}`);
+    }
+    for (const excluded of [
+      "kernel.db",
+      "server.pid",
+      "agent-artifacts",
+      "socket-path",
+    ]) {
+      expect(
+        !existsSync(join(target, "electron", excluded)),
+        `excluded Electron entry migrated: ${excluded}`,
+      );
     }
     expect(hashTree(oldRoot) === oldHashBefore, "old app source changed during migration");
     expect(hashTree(oldElectron) === electronHashBefore, "old Electron source changed during migration");
