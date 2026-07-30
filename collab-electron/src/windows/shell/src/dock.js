@@ -48,7 +48,8 @@ export function initDock(panelEl) {
 					speciesList.appendChild(el("div", "qf-empty", "No species registered"));
 				}
 				for (const row of defs) {
-					const name = String(row.name ?? row.id ?? "");
+					const definitionId = String(row.id ?? "");
+					const name = String(row.name ?? definitionId);
 					const role = String(row.role ?? "");
 					const card = el("div", "dock-species-row");
 					const meta = el("div", "dock-species-meta");
@@ -57,7 +58,7 @@ export function initDock(panelEl) {
 					const spawnBtn = el("button", "qf-btn qf-btn-primary", "Spawn");
 					spawnBtn.type = "button";
 					spawnBtn.addEventListener("click", () => {
-						void window.shellApi.qf.spawnSession({ species: name });
+						void window.shellApi.qf.spawnSession({ definitionId });
 					});
 					card.appendChild(meta);
 					card.appendChild(spawnBtn);
@@ -115,54 +116,8 @@ export function initDock(panelEl) {
 		}
 	}
 
-	const seatsStatus = panelEl.querySelector("#dock-seats-status");
-	const seatsList = panelEl.querySelector("#dock-seats-list");
-
-	async function spawnSeat(seatId, btn) {
-		if (!seatsStatus) return;
-		if (btn) btn.disabled = true;
-		seatsStatus.textContent = `spawning ${seatId}…`;
-		try {
-			const res = await window.shellApi.qf.spawnSeat({ seatId });
-			if (res?.ok) {
-				const title = res.result?.displayName ?? seatId;
-				seatsStatus.textContent = `${title} ready`;
-			} else {
-				const msg = res?.error?.message ?? "seat spawn failed";
-				seatsStatus.textContent = msg.includes("profile") || msg.includes("Hermes")
-					? `${msg} — run: cd tools/qf-peer-bus && bun run setup-seats`
-					: msg;
-			}
-		} catch (err) {
-			seatsStatus.textContent = String((err && err.message) || err);
-		} finally {
-			if (btn) btn.disabled = false;
-		}
-	}
-
-	// One spawn button per seat, generated from the seat registry — adding a
-	// species is a data change (hermes-seats.ts), never UI surgery here.
-	async function renderSeatButtons() {
-		if (!seatsList) return;
-		const res = await window.shellApi.qf.listSeats();
-		seatsList.replaceChildren();
-		if (!res?.ok) {
-			seatsList.appendChild(el("div", "qf-empty", res?.error?.message ?? "Failed to list seats"));
-			return;
-		}
-		for (const seat of res.seats ?? []) {
-			const btn = el("button", "qf-btn qf-btn-primary", `Spawn ${seat.displayName}`);
-			btn.type = "button";
-			btn.addEventListener("click", () => {
-				void spawnSeat(seat.seatId, btn);
-			});
-			seatsList.appendChild(btn);
-		}
-	}
-
 	window.shellApi.qf.onDockInvalidate(() => {
 		void refresh();
 	});
-	void renderSeatButtons();
 	void refresh();
 }

@@ -6,7 +6,6 @@ import {
 } from "electron";
 import {
   admitAndStartSession,
-  appRoot,
   cancelAgentSession,
   closeAgentSessionRow,
   onSessionChunk,
@@ -19,17 +18,7 @@ import {
   type PublishAndDeliverOpts,
 } from "./a2a-bus";
 import { spawnA2aFourSeats } from "./a2a-orchestra";
-import { listHermesSeats, resolveHermesSeat } from "./hermes-seats";
-import { registerSeatPty, startPeerDelivery } from "./peer-delivery";
-import { homedir } from "node:os";
-import { join } from "node:path";
-
-/** Transport db the qf-peer-bus seats write to (setup-founder-seats.ts). */
-function peerBusDbPath(): string {
-  return join(homedir(), ".qf-peer-bus", "peer-bus.db");
-}
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
-import { resolveSpeciesSurface } from "./species-surface";
 import {
   kernelExecute,
   kernelListAgentDefinitions,
@@ -148,32 +137,44 @@ export function registerKernelHandlers(): void {
   /** Dock / UI spawn: admit + start only — never prompts. */
   ipcMain.handle(
     "qf:sessions:spawn",
-    async (event, args?: { species?: string; prompt?: string; env?: unknown }) => {
+    async (event, args?: unknown) => {
       try {
         assertTrustedSender(event);
-        if (args && "env" in args && args.env !== undefined) {
+        if (!args || typeof args !== "object" || Array.isArray(args)) {
           return {
             ok: false as const,
             error: {
-              name: "RendererEnvRejected",
-              message:
-                "qf:sessions:spawn rejects renderer-supplied env (species data / host only)",
+              name: "InvalidArgs",
+              message: "qf:sessions:spawn requires { definitionId:string }",
             },
           };
         }
-        const species = args?.species;
-        if (!species || typeof species !== "string") {
+        const record = args as Record<string, unknown>;
+        const overrideKeys = Object.keys(record).filter(
+          (key) => key !== "definitionId",
+        );
+        if (overrideKeys.length > 0) {
           return {
             ok: false as const,
             error: {
-              name: "MissingSpecies",
-              message: "qf:sessions:spawn requires args.species",
+              name: "RendererLaunchOverrideRejected",
+              message: `qf:sessions:spawn rejects renderer fields: ${overrideKeys.sort().join(", ")}`,
             },
           };
         }
-        // prompt ignored — connecting and speaking are different acts (WO-007b)
-        void args?.prompt;
-        const result = await admitAndStartSession(species, {
+        const definitionId = record.definitionId;
+        if (
+          typeof definitionId !== "string" || definitionId.trim().length === 0
+        ) {
+          return {
+            ok: false as const,
+            error: {
+              name: "MissingDefinitionId",
+              message: "qf:sessions:spawn requires args.definitionId",
+            },
+          };
+        }
+        const result = await admitAndStartSession(definitionId, {
           onStarted: (sessionId, sp, info) => {
             invalidateDock();
             if (info?.surface === "native_tui" && info.ptySessionId) {
@@ -198,102 +199,6 @@ export function registerKernelHandlers(): void {
         });
         invalidateDock();
         return { ok: true as const, result };
-      } catch (err) {
-        return { ok: false as const, error: serializeError(err) };
-      }
-    },
-  );
-
-  /** The dock renders one spawn button per seat from this list (data, not hardcoded UI). */
-  ipcMain.handle("qf:seats:list", (event) => {
-    try {
-      assertTrustedSender(event);
-      const seats = listHermesSeats().map((s) => ({
-        seatId: s.seatId,
-        displayName: s.displayName,
-      }));
-      return { ok: true as const, seats };
-    } catch (err) {
-      return { ok: false as const, error: serializeError(err) };
-    }
-  });
-
-  /**
-   * Peer-bus canvas PASS: spawn one profiled Hermes native_tui seat.
-   * seatId only — host allowlist supplies argv (never renderer free-text).
-   */
-  ipcMain.handle(
-    "qf:seats:spawn",
-    async (event, args?: { seatId?: string }) => {
-      try {
-        assertTrustedSender(event);
-        if (!args?.seatId || typeof args.seatId !== "string") {
-          return {
-            ok: false as const,
-            error: {
-              name: "InvalidArgs",
-              message: "qf:seats:spawn requires seatId:string",
-            },
-          };
-        }
-        let seat;
-        try {
-          seat = resolveHermesSeat(args.seatId);
-        } catch (err) {
-          return { ok: false as const, error: serializeError(err) };
-        }
-        const surface = resolveSpeciesSurface("hermes", appRoot());
-        if (surface.surface !== "native_tui") {
-          return {
-            ok: false as const,
-            error: {
-              name: "NativeTuiRequired",
-              message:
-                "qf:seats:spawn requires hermes surface=native_tui (check launch.json route/surface + packed hermes.meta.json). Do not open ACP.",
-            },
-          };
-        }
-        const result = await admitAndStartSession("hermes", {
-          sessionLabel: seat.sessionLabel,
-          argvOverride: seat.argv,
-          displayName: seat.displayName,
-          onStarted: (sessionId, sp, info) => {
-            invalidateDock();
-            if (info?.surface === "native_tui" && info.ptySessionId) {
-              sendToShell(
-                "shell:forward",
-                "canvas",
-                "create-term-tile",
-                info.ptySessionId,
-                sessionId,
-                sp,
-              );
-            }
-          },
-        });
-        if (result.surface !== "native_tui" || !result.ptySessionId) {
-          return {
-            ok: false as const,
-            error: {
-              name: "NativeTuiRequired",
-              message: `qf:seats:spawn expected native_tui, got ${result.surface}`,
-            },
-          };
-        }
-        // Visible collaboration: register this seat's live PTY under its peer
-        // role and start the push-delivery watcher, so a peer message from the
-        // other seat lands directly in this seat's TUI instead of an inbox.
-        registerSeatPty(seat.seatId, result.ptySessionId);
-        startPeerDelivery(peerBusDbPath());
-        invalidateDock();
-        return {
-          ok: true as const,
-          result: {
-            ...result,
-            seatId: seat.seatId,
-            displayName: seat.displayName,
-          },
-        };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };
       }

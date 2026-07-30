@@ -337,14 +337,7 @@ export interface CollabApi {
       | { ok: false; error: { name: string; message: string } }
     >;
     spawnSession: (args?: {
-      species?: string;
-      prompt?: string;
-    }) => Promise<
-      | { ok: true; result: Record<string, unknown> }
-      | { ok: false; error: { name: string; message: string } }
-    >;
-    spawnSeat: (args: {
-      seatId: "orchestrator" | "worker";
+      definitionId?: string;
     }) => Promise<
       | { ok: true; result: Record<string, unknown> }
       | { ok: false; error: { name: string; message: string } }

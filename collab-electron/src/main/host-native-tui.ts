@@ -12,17 +12,20 @@ import {
   killSession,
   onPtySessionExit,
 } from "./pty";
+import {
+  assertSeatRoleAvailable,
+  registerSeatPty,
+  startPeerDelivery,
+  unregisterSeatPty,
+} from "./peer-delivery";
+import {
+  orchestrateNativeTuiAdmission,
+  type NativeTuiLive,
+  type NativeTuiOrchestrationDependencies,
+} from "./native-tui-orchestration";
 import type { SpeciesSurfaceSpec } from "./species-surface";
 
-export type NativeTuiLive = {
-  cancelled: boolean;
-  species: string;
-  guestId: string;
-  kind: "native_tui";
-  ptySessionId: string;
-  unsub?: () => void;
-  turnInFlight: boolean;
-};
+export type { NativeTuiLive } from "./native-tui-orchestration";
 
 let exitHookInstalled = false;
 const ptyToKernel = new Map<string, string>();
@@ -63,6 +66,12 @@ export async function admitNativeTuiSpecies(opts: {
   displayName?: string;
   newTrace: () => TraceContext;
   liveSet: (sessionId: string, entry: NativeTuiLive) => void;
+  /** Root admission owner supplies this when wiring the D2 live map. */
+  liveDelete?: (sessionId: string) => void;
+  /** Present only when package metadata authorizes pty_role delivery. */
+  peerDelivery?: { role: string; dbPath: string };
+  /** Narrow fault/capture seam; omitted in the shipped path. */
+  dependencies?: Partial<NativeTuiOrchestrationDependencies>;
   onStarted?: (
     sessionId: string,
     species: string,
@@ -96,65 +105,63 @@ export async function admitNativeTuiSpecies(opts: {
         : ["--tui"];
   const displayName = opts.displayName ?? `${species}-tui`;
 
-  const pty = await createHostCommandSession({
-    command,
-    args: argv,
-    cwd: home,
-    env: {
-      HERMES_BIN: command,
-      HOST_ACP_BIN: command,
-      HOME: home,
-      TERM: "xterm-256color",
-      ...(process.env.QF_KERNEL_DB
-        ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
-        : {}),
-      ...(process.env.QF_ARTIFACT_ROOT
-        ? { QF_ARTIFACT_ROOT: process.env.QF_ARTIFACT_ROOT }
-        : {}),
+  const defaults: NativeTuiOrchestrationDependencies = {
+    createPty: () => createHostCommandSession({
+      command,
+      args: argv,
+      cwd: home,
+      env: {
+        HERMES_BIN: command,
+        HOST_ACP_BIN: command,
+        HOME: home,
+        TERM: "xterm-256color",
+        ...(process.env.QF_KERNEL_DB
+          ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
+          : {}),
+        ...(process.env.QF_ARTIFACT_ROOT
+          ? { QF_ARTIFACT_ROOT: process.env.QF_ARTIFACT_ROOT }
+          : {}),
+      },
+      displayName,
+    }),
+    terminatePty: (ptySessionId) => killSession(ptySessionId),
+    execute: kernelExecute,
+    newTrace: opts.newTrace,
+    newSessionId: () => crypto.randomUUID(),
+    liveSet: opts.liveSet,
+    liveDelete: opts.liveDelete ?? (() => {
+      throw new Error(
+        "native-TUI cleanup requires liveDelete; D2 agent-host integration is missing",
+      );
+    }),
+    ptyMapSet: (ptySessionId, sessionId) => {
+      ptyToKernel.set(ptySessionId, sessionId);
     },
-    displayName,
-  });
-
-  const sessionId = opts.corruptId ?? crypto.randomUUID();
-  const guestId = pty.sessionId;
-
-  opts.liveSet(sessionId, {
-    cancelled: false,
-    species,
-    guestId,
-    kind: "native_tui",
-    ptySessionId: pty.sessionId,
-    turnInFlight: false,
-  });
-  ptyToKernel.set(pty.sessionId, sessionId);
-
-  const trace = opts.newTrace();
-  kernelExecute(
-    "create_agent_session",
-    { session_id: sessionId, agent_definition_id: species, label },
-    trace,
-  );
-  kernelExecute(
-    "start_agent_session",
-    { session_id: sessionId },
-    { ...trace, span_id: crypto.randomUUID() },
-  );
-
-  opts.onStarted?.(sessionId, species, {
-    surface: "native_tui",
-    ptySessionId: pty.sessionId,
-  });
-  console.log(
-    `agent-host: admitted native_tui session=${sessionId} species=${species}`
-    + ` cmd=${command} argv=${JSON.stringify(argv)} pty=${pty.sessionId}`,
-  );
-  return {
-    sessionId,
-    guestId,
-    species,
-    surface: "native_tui",
-    ptySessionId: pty.sessionId,
+    ptyMapDelete: (ptySessionId) => {
+      ptyToKernel.delete(ptySessionId);
+    },
+    peerAssertAvailable: assertSeatRoleAvailable,
+    peerRegister: registerSeatPty,
+    peerUnregister: (role, ptySessionId) => {
+      unregisterSeatPty(role, ptySessionId);
+    },
+    peerStart: startPeerDelivery,
   };
+  const result = await orchestrateNativeTuiAdmission(
+    {
+      definitionId: species,
+      label,
+      corruptId: opts.corruptId,
+      peerDelivery: opts.peerDelivery,
+      onStarted: opts.onStarted,
+    },
+    { ...defaults, ...opts.dependencies },
+  );
+  console.log(
+    `agent-host: admitted native_tui session=${result.sessionId} species=${species}`
+    + ` cmd=${command} argv=${JSON.stringify(argv)} pty=${result.ptySessionId}`,
+  );
+  return result;
 }
 
 export async function cancelNativeTuiSession(

@@ -30,23 +30,31 @@ import { DatabaseSync } from "node:sqlite";
 import { existsSync } from "node:fs";
 import { writeToSession } from "./pty";
 import { onPtySessionExit } from "./pty";
+import { PeerRoleRegistry } from "./peer-role-registry";
 
 /** Peer role ("orchestrator" | "worker" | "worker2" | …) → live ptySessionId. */
-const seatPtyByRole = new Map<string, string>();
+const seatPtyByRole = new PeerRoleRegistry();
 
 /** Messages mid-injection this tick — guards against a second write landing
  *  between a message's text and its Enter on the same PTY. */
 const inFlight = new Set<string>();
 
+export function assertSeatRoleAvailable(role: string): void {
+  seatPtyByRole.assertAvailable(role);
+}
+
 export function registerSeatPty(role: string, ptySessionId: string): void {
-  seatPtyByRole.set(role, ptySessionId);
+  seatPtyByRole.register(role, ptySessionId);
   console.log(`peer-delivery: seat role=${role} → pty=${ptySessionId}`);
 }
 
+/** Remove only the role binding owned by this exact PTY. */
+export function unregisterSeatPty(role: string, ptySessionId: string): boolean {
+  return seatPtyByRole.unregister(role, ptySessionId);
+}
+
 function unregisterSeatPtyBySession(ptySessionId: string): void {
-  for (const [role, id] of seatPtyByRole) {
-    if (id === ptySessionId) seatPtyByRole.delete(role);
-  }
+  seatPtyByRole.unregisterPty(ptySessionId);
 }
 
 type PendingRow = {
