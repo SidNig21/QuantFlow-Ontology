@@ -1,6 +1,6 @@
 # WO-K3 — Bytes follow truth, and drift refuses writes
 
-status: open — REWORK after dishonest D5 proof; architect correction 2026-07-28
+status: rework — ROUND 2: env artifact root accepts a regular file; verifier 2026-07-29
 assignee: builder
 depends: WO-K2 — **done** (`c9c3bf0`). WO-K1 — **done**. WO-V1 — **done** (readonly projector
 must keep working after drift carve-out lands).
@@ -310,3 +310,63 @@ WO-V1 readonly projector still opens drifted DB with warn-not-throw.
 Wipe-and-recreate the Kernel (`SCOPES.md:105`) no longer orphans artifact bytes by default — new
 publishes and the index share `~/.quantflow/`. An obsolete Kernel fails loud on write instead of
 letting ingest or tools run against a lying registry. **WO-107b** may proceed after verify + merge.
+
+---
+
+# REWORK ROUND 2 — 2026-07-29 · ONE ITEM
+
+**Builder:** Cursor `composer-2.5`, rework commit `17effab` on `codex/wo-k3-rework`.
+**Findings by:** the independent Codex verifier. **This is round 2 of a permitted 2.** If the
+next verification finds another acceptance defect, stop this order for a rewrite; do not open a
+third rework lap.
+
+**In plain terms:** the artifact writer now proves it creates and records the real file, and the
+entire shipped application passes its automated board, but a path pointing to an ordinary file is
+still accepted as though it were the artifact directory. Publishing through that configuration
+would fail later and less clearly, instead of refusing the invalid root at startup as ordered.
+
+## Independently verified good — do not reopen in this round
+
+- Cold `bun qa/verify-release.ts` from detached worktree `/tmp/qf-k3-verify.cg3y1m` completed
+  frozen Electron install, unit suite, production Electron build, and all QA gates with
+  `PASS release-verification`, exit 0.
+- D5 production-writer bait:
+  `QF_ARTIFACT_ROOT_FALSIFY=writer bun qa/run.ts artifact-root` → exit 1, accepted file missing;
+  restore `bun qa/run.ts artifact-root` → exit 0, production writer and coupling assertions pass.
+- Drift baits independently reddened the real gate:
+  `QF_KERNEL_DRIFT_GATE_FALSIFY=1 bun qa/run.ts kernel-drift` → exit 1;
+  `QF_KERNEL_DRIFT_ENFORCE_OFF=1 bun qa/run.ts kernel-drift` → exit 1.
+
+## Defect 1 — an existing non-directory passes `resolveArtifactRoot()`
+
+D1 rules that an env-provided root must already be a **directory**. The implementation checks only
+`existsSync()` before `realpathSync()`, so an existing regular file is returned as a valid artifact
+root. The package tests cover a missing path and existing directories, but never this boundary.
+
+**Measured at `17effab` (exit 0):**
+
+```text
+bun -e '<create temp file; set QF_ARTIFACT_ROOT to it; call resolveArtifactRoot()>'
+{"path":".../not-a-directory","provenance":"env"}
+```
+
+This is not hypothetical configuration polish: the production helper joins an artifact filename
+onto the returned root, so it would fail only when work is published. D1 requires fail-closed
+resolution before that work begins.
+
+## Fix — this round only
+
+1. After resolving the env path, require the target to be a directory (`statSync(...).isDirectory()`
+   or an equivalent race-conscious check). Throw an error that names `QF_ARTIFACT_ROOT` and says
+   the resolved target is not a directory. Do not create, replace, or mutate the supplied path.
+2. Add a package regression test: existing regular file → resolver throws; the file remains a file
+   and its bytes remain unchanged.
+3. Extend the `artifact-root` gate with the same negative boundary so the shipped board, not only
+   the package suite, owns the contract. The gate may create the negative canary during fixture
+   setup; it must not weaken D5's prohibition on pre-creating the accepted artifact file.
+4. Falsify the new assertion through the real resolver: temporarily bypass the directory check →
+   gate red naming the accepted non-directory; restore → gate green. Then report package tests and
+   the canonical verifier for the independent verifier to re-run.
+
+**Scope:** resolver, its package test, and the existing artifact-root gate only. No schema, drift,
+Electron, Dock, artifact-helper, allowlist, or doctrine changes. One rework commit.
