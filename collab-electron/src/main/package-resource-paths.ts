@@ -2,7 +2,7 @@
  * Shared species/tools resource path rules for packaged and development roots.
  * Production host and package-closure inspection must derive paths from here only.
  */
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, isAbsolute, join } from "node:path";
 
 /** package_ref → packed sibling meta: species/hermes/packed/hermes.aospkg → …/hermes.meta.json */
 export function packedMetaPathForPackageRef(
@@ -10,7 +10,7 @@ export function packedMetaPathForPackageRef(
   appRoot: string,
 ): string | null {
   if (!packageRef.endsWith(".aospkg")) return null;
-  const abs = join(appRoot, packageRef);
+  const abs = isAbsolute(packageRef) ? packageRef : join(appRoot, packageRef);
   const base = basename(packageRef, ".aospkg");
   return join(dirname(abs), `${base}.meta.json`);
 }

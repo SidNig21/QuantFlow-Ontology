@@ -99,12 +99,12 @@ export function resolveHostMountSpecs(
   return out;
 }
 
-/** Species session env from founder config (paths only). */
-export function resolveSpeciesSessionEnv(
-  species: string,
+/** Adapter session env from founder config (paths only). */
+export function resolveAdapterSessionEnv(
+  adapterId: string,
   file: HostMountsFile | null = loadHostMountsFile(),
 ): Record<string, string> | undefined {
-  const env = file?.speciesEnv?.[species];
+  const env = file?.speciesEnv?.[adapterId];
   if (!env || typeof env !== "object") return undefined;
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(env)) {
@@ -112,3 +112,6 @@ export function resolveSpeciesSessionEnv(
   }
   return Object.keys(out).length > 0 ? out : undefined;
 }
+
+/** Compatibility alias for untouched historical callers. */
+export const resolveSpeciesSessionEnv = resolveAdapterSessionEnv;

@@ -80,7 +80,7 @@ describe("orchestrateNativeTuiAdmission", () => {
     expect(h.commands).toEqual(["create_agent_session"]);
 
     await expect(orchestrateNativeTuiAdmission(admission, h.deps)).resolves.toMatchObject({
-      species: "hermes-worker",
+      definitionId: "hermes-worker",
       ptySessionId: "pty-2",
     });
   });

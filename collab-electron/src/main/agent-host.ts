@@ -29,7 +29,7 @@ import {
 } from "./host-acp-permission";
 import { runHostAcpTurn } from "./host-acp-turn";
 import {
-  admitNativeTuiSpecies,
+  admitNativeTuiDefinition,
   cancelNativeTuiSession,
   installNativeTuiPtyExitHook,
   tearDownNativeTui,
@@ -37,7 +37,7 @@ import {
 } from "./host-native-tui";
 import {
   resolveHostMountSpecs,
-  resolveSpeciesSessionEnv,
+  resolveAdapterSessionEnv,
 } from "./host-mounts";
 import {
   getArtifactRoot,
@@ -45,16 +45,19 @@ import {
   kernelGetObject,
   kernelListAgentSessions,
   kernelListAgentDefinitions,
-  resolveSpeciesPackage,
   type TraceContext,
 } from "./kernel";
-import { resolveSpeciesLaunch } from "./species-launch";
-import { resolveSpeciesSurface } from "./species-surface";
-import { resolveSpeciesToolAllowlist } from "./species-tools";
 import { writeAgentReportArtifact } from "./agent-artifact-writer";
+import { bootstrapDockProfiles } from "./dock-profiles";
+import {
+  collectUniqueRuntimeSoftware,
+  resolveDefinitionRuntime,
+  type DefinitionRuntime,
+} from "./definition-runtime";
+import { allowsPtyRoleDelivery } from "./runtime-adapter";
 
-/** Boot-seed species name — main-process only (never a renderer literal). */
-export const BOOT_SEED_SPECIES = "qf-toolloop" as const;
+/** Credential-free AgentOS adapter used by the startup identity smoke. */
+export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
 
 export function appRoot(): string {
   return selectAppRoot({
@@ -79,7 +82,7 @@ let os: AgentOs | null = null;
 const linkedPackages = new Set<string>();
 type LiveSession = {
   cancelled: boolean;
-  species: string;
+  definitionId: string;
   /** AgentOS guest id, ACP session id, or PTY session id for native_tui. */
   guestId: string;
   kind: "agentos" | "host_acp" | "native_tui";
@@ -123,36 +126,29 @@ function chunkTextFromNotification(
   return typeof text === "string" ? text : null;
 }
 
-/** Resolve species name → absolute package path from Kernel rows. */
-export function getSpeciesPackagePath(name: string): string {
-  return resolveSpeciesPackage(name, appRoot()).packagePath;
+function getDefinition(definitionId: string): Record<string, unknown> | null {
+  return kernelGetObject("agent_definition", definitionId);
 }
 
-/**
- * Idempotent boot seed: register BOOT_SEED_SPECIES via execute if missing.
- * Never a direct INSERT.
- */
-export function seedBootSpecies(): void {
-  const before = kernelListAgentDefinitions().length;
-  if (kernelGetObject("agent_definition", BOOT_SEED_SPECIES)) {
-    console.log(
-      `agent-host: boot-seed skip (already present) definitions=${before}`,
-    );
-    return;
-  }
-  const package_ref = "tools/runtime-proof/packed/qf-toolloop.aospkg";
-  kernelExecute(
-    "register_agent_definition",
-    {
-      name: BOOT_SEED_SPECIES,
-      role: "toolloop-proof",
-      package_ref,
+export function getDefinitionRuntime(definitionId: string): DefinitionRuntime {
+  return resolveDefinitionRuntime(definitionId, appRoot(), getDefinition);
+}
+
+/** Initialize missing package-owned Dock definitions through execute() only. */
+export function bootstrapPackagedDockProfiles(): void {
+  const result = bootstrapDockProfiles(appRoot(), {
+    getAgentDefinition: getDefinition,
+    executeRegisterAgentDefinition: (input) =>
+      kernelExecute("register_agent_definition", input, newTrace()),
+    reportConflict: (conflict) => {
+      console.error(
+        `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
+      );
     },
-    newTrace(),
-  );
-  const after = kernelListAgentDefinitions().length;
+  });
   console.log(
-    `agent-host: boot-seed registered definitions=${after}`,
+    `agent-host: Dock bootstrap registered=${result.registered.length}`
+    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`,
   );
 }
 
@@ -170,37 +166,30 @@ export function onSessionDone(listener: DoneListener): () => void {
   };
 }
 
-/** Admit a package into the live host (create-time list or linkSoftware). */
-export async function admitPackage(packagePath: string): Promise<void> {
+/** Admit one adapter package into the live AgentOS host. */
+export async function admitPackage(runtime: DefinitionRuntime): Promise<void> {
   const host = await ensureAgentOs();
-  if (linkedPackages.has(packagePath)) return;
-  if (!existsSync(packagePath)) {
-    throw new Error(`agent-host: missing species package at ${packagePath}`);
+  const key = `${runtime.metadata.adapterId}\0${runtime.packagePath}`;
+  if (linkedPackages.has(key)) return;
+  if (!existsSync(runtime.packagePath)) {
+    throw new Error(`agent-host: missing adapter package at ${runtime.packagePath}`);
   }
-  await host.linkSoftware({ packagePath });
-  linkedPackages.add(packagePath);
-  console.log(`agent-host: linkSoftware ${packagePath}`);
-}
-
-export async function admitSpecies(species: string): Promise<string> {
-  const { packagePath } = resolveSpeciesPackage(species, appRoot());
-  await admitPackage(packagePath);
-  return packagePath;
+  await host.linkSoftware({ packagePath: runtime.packagePath });
+  linkedPackages.add(key);
+  console.log(
+    `agent-host: linkSoftware adapter=${runtime.metadata.adapterId} ${runtime.packagePath}`,
+  );
 }
 
 export async function ensureAgentOs(): Promise<AgentOs> {
   if (os) return os;
   const defs = kernelListAgentDefinitions();
-  const software: { packagePath: string }[] = [];
-  for (const row of defs) {
-    const name = String(row.name);
-    try {
-      const { packagePath } = resolveSpeciesPackage(name, appRoot());
-      software.push({ packagePath });
-    } catch (err) {
-      console.error(`agent-host: skip unresolved definition ${name}`, err);
-    }
-  }
+  const resolvedSoftware = collectUniqueRuntimeSoftware(
+    defs,
+    appRoot(),
+    getDefinition,
+  );
+  const software = resolvedSoftware.map(({ packagePath }) => ({ packagePath }));
   if (software.length === 0) {
     throw new Error(
       "agent-host: no resolvable agent_definition rows — boot-seed failed?",
@@ -219,14 +208,17 @@ export async function ensureAgentOs(): Promise<AgentOs> {
     software,
     ...(mounts.length > 0 ? { mounts } : {}),
   });
-  for (const s of software) linkedPackages.add(s.packagePath);
+  for (const runtime of resolvedSoftware) {
+    linkedPackages.add(`${runtime.adapterId}\0${runtime.packagePath}`);
+  }
   return os;
 }
 
 export async function runAgentHostSmoke(): Promise<void> {
   const host = await ensureAgentOs();
-  await admitSpecies(BOOT_SEED_SPECIES);
-  const created = await host.createSession(BOOT_SEED_SPECIES);
+  const runtime = getDefinitionRuntime(BOOT_SMOKE_DEFINITION);
+  await admitPackage(runtime);
+  const created = await host.createSession(runtime.metadata.adapterId);
   const session = created.sessionId;
 
   let guestMinted: string | null = null;
@@ -291,7 +283,7 @@ export function reconcileStaleSessions(): void {
 export type AdmitResult = {
   sessionId: string;
   guestId: string;
-  species: string;
+  definitionId: string;
   surface: "acp_session" | "native_tui";
   ptySessionId?: string;
 };
@@ -304,83 +296,75 @@ export type TurnResult = {
 };
 
 /**
- * Admit species + create/start Kernel row.
- * Surface (WO-008d) first:
- *   - native_tui → host PTY term tile (e.g. hermes --tui)
- * Launch (WO-008c) for ACP/AgentOS paths:
- *   - host_acp → host stdio ACP
- *   - agentos (default) → AgentOS createSession
+ * Resolve one Kernel definition, then launch only its package-owned adapter.
  */
 export async function admitAndStartSession(
-  species: string,
+  definitionId: string,
   opts?: {
-    /** Host/species-sourced env. Never from renderer. */
+    /** Host/adapter-sourced env. Never from renderer. */
     env?: Record<string, string>;
     /** When set, host mints its own id (gate falsify — must go red). */
     corruptId?: string;
-    /** Kernel session label override (WO-008e roles). */
-    sessionLabel?: string;
-    /** Host-only argv override (seat registry). Never from renderer free-text. */
-    argvOverride?: string[];
-    /** Term-tile chrome title for native_tui. */
-    displayName?: string;
     onStarted?: (
       sessionId: string,
-      species: string,
+      definitionId: string,
       info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
     ) => void;
   },
 ): Promise<AdmitResult> {
-  if (!species || typeof species !== "string") {
-    throw new Error("agent-host: admit requires a species name");
-  }
-  const surface = resolveSpeciesSurface(species, appRoot());
-  if (surface.surface === "native_tui") {
-    return admitNativeTuiSpecies({
-      species,
-      surface,
-      appRoot: appRoot(),
+  const runtime = getDefinitionRuntime(definitionId);
+  if (runtime.metadata.route === "native_tui") {
+    const peerDelivery = allowsPtyRoleDelivery(
+      runtime.metadata,
+      runtime.runtimeProfile,
+    )
+      ? { role: runtime.role, dbPath: peerBusDbPath() }
+      : undefined;
+    return admitNativeTuiDefinition({
+      definitionId: runtime.definitionId,
+      adapterId: runtime.metadata.adapterId,
+      argv: runtime.argv,
       env: opts?.env,
       corruptId: opts?.corruptId,
-      sessionLabel: opts?.sessionLabel,
-      argvOverride: opts?.argvOverride,
-      displayName: opts?.displayName,
       newTrace,
       liveSet: (sessionId, entry) => {
         live.set(sessionId, entry);
       },
+      liveDelete: (sessionId) => {
+        live.delete(sessionId);
+      },
+      peerDelivery,
       onStarted: opts?.onStarted
         ? (sessionId, sp, info) => opts.onStarted?.(sessionId, sp, info)
         : undefined,
     });
   }
-  if (opts?.argvOverride || opts?.displayName) {
-    throw new Error(
-      `agent-host: seat/native_tui overrides require surface=native_tui (got ${surface.surface})`,
-    );
+  if (runtime.metadata.route === "host_acp") {
+    return admitHostAcpDefinition(runtime, opts);
   }
-  const launch = resolveSpeciesLaunch(species, appRoot());
-  if (launch === "host_acp") {
-    return admitHostAcpSpecies(species, opts);
-  }
-  return admitAgentOsSpecies(species, opts);
+  return admitAgentOsDefinition(runtime, opts);
 }
 
-async function admitHostAcpSpecies(
-  species: string,
+function peerBusDbPath(): string {
+  return join(homedir(), ".qf-peer-bus", "peer-bus.db");
+}
+
+async function admitHostAcpDefinition(
+  runtime: DefinitionRuntime,
   opts?: {
     env?: Record<string, string>;
     corruptId?: string;
     onStarted?: (
       sessionId: string,
-      species: string,
+      definitionId: string,
       info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
     ) => void;
   },
 ): Promise<AdmitResult> {
-  const fromConfig = resolveSpeciesSessionEnv(species);
+  const { definitionId } = runtime;
+  const adapterId = runtime.metadata.adapterId;
+  const fromConfig = resolveAdapterSessionEnv(adapterId);
   const env = { ...fromConfig, ...opts?.env };
-  // Generic host ACP binary: HOST_ACP_BIN, or speciesEnv HERMES_BIN for Hermes.
   const command = resolveHostAcpCommand(
     env.HOST_ACP_BIN ?? env.HERMES_BIN ?? process.env.HOST_ACP_BIN ??
       process.env.HERMES_BIN,
@@ -390,7 +374,7 @@ async function admitHostAcpSpecies(
     ],
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
-  const toolAllowlist = resolveSpeciesToolAllowlist(species, appRoot());
+  const toolAllowlist = runtime.metadata.tools;
   const hostAcpEnv: Record<string, string> = {
     HERMES_BIN: command,
     HOME: home,
@@ -404,7 +388,7 @@ async function admitHostAcpSpecies(
   }
   const handle = await admitHostAcp({
     command,
-    args: ["acp"],
+    args: runtime.argv.length > 0 ? runtime.argv : ["acp"],
     env: hostAcpEnv,
     cwd: home,
     clientName: "quantflow-host-acp",
@@ -418,7 +402,7 @@ async function admitHostAcpSpecies(
 
   live.set(sessionId, {
     cancelled: false,
-    species,
+    definitionId,
     guestId,
     kind: "host_acp",
     hostAcp: handle,
@@ -428,7 +412,11 @@ async function admitHostAcpSpecies(
   const trace = newTrace();
   kernelExecute(
     "create_agent_session",
-    { session_id: sessionId, agent_definition_id: species, label: species },
+    {
+      session_id: sessionId,
+      agent_definition_id: definitionId,
+      label: definitionId,
+    },
     trace,
   );
   if (sessionId !== guestId && !opts?.corruptId) {
@@ -441,28 +429,31 @@ async function admitHostAcpSpecies(
     { session_id: sessionId },
     { ...trace, span_id: crypto.randomUUID() },
   );
-  opts?.onStarted?.(sessionId, species, { surface: "acp_session" });
+  opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
   console.log(
-    `agent-host: admitted host_acp session=${sessionId} species=${species} cmd=${command} (no prompt)`,
+    `agent-host: admitted host_acp session=${sessionId}`
+    + ` definition=${definitionId} adapter=${adapterId} cmd=${command} (no prompt)`,
   );
-  return { sessionId, guestId, species, surface: "acp_session" };
+  return { sessionId, guestId, definitionId, surface: "acp_session" };
 }
 
-async function admitAgentOsSpecies(
-  species: string,
+async function admitAgentOsDefinition(
+  runtime: DefinitionRuntime,
   opts?: {
     env?: Record<string, string>;
     corruptId?: string;
     onStarted?: (
       sessionId: string,
-      species: string,
+      definitionId: string,
       info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
     ) => void;
   },
 ): Promise<AdmitResult> {
+  const { definitionId } = runtime;
+  const adapterId = runtime.metadata.adapterId;
   const host = await ensureAgentOs();
-  await admitSpecies(species);
-  const fromConfig = resolveSpeciesSessionEnv(species);
+  await admitPackage(runtime);
+  const fromConfig = resolveAdapterSessionEnv(adapterId);
   const merged: Record<string, string> = { ...fromConfig, ...opts?.env };
   if (process.env.QF_KERNEL_DB && !merged.QF_KERNEL_DB) {
     merged.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
@@ -473,7 +464,7 @@ async function admitAgentOsSpecies(
   const env =
     Object.keys(merged).length > 0 ? merged : undefined;
   const created = await host.createSession(
-    species,
+    adapterId,
     env ? { env } : undefined,
   );
   const guestId = created.sessionId;
@@ -481,7 +472,7 @@ async function admitAgentOsSpecies(
 
   live.set(sessionId, {
     cancelled: false,
-    species,
+    definitionId,
     guestId,
     kind: "agentos",
     turnInFlight: false,
@@ -490,7 +481,11 @@ async function admitAgentOsSpecies(
   const trace = newTrace();
   kernelExecute(
     "create_agent_session",
-    { session_id: sessionId, agent_definition_id: species, label: species },
+    {
+      session_id: sessionId,
+      agent_definition_id: definitionId,
+      label: definitionId,
+    },
     trace,
   );
   if (sessionId !== guestId && !opts?.corruptId) {
@@ -501,11 +496,12 @@ async function admitAgentOsSpecies(
     { session_id: sessionId },
     { ...trace, span_id: crypto.randomUUID() },
   );
-  opts?.onStarted?.(sessionId, species, { surface: "acp_session" });
+  opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
   console.log(
-    `agent-host: admitted agentos session=${sessionId} species=${species} (no prompt)`,
+    `agent-host: admitted agentos session=${sessionId}`
+    + ` definition=${definitionId} adapter=${adapterId} (no prompt)`,
   );
-  return { sessionId, guestId, species, surface: "acp_session" };
+  return { sessionId, guestId, definitionId, surface: "acp_session" };
 }
 
 /**

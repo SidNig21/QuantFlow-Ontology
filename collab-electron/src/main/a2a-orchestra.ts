@@ -36,7 +36,7 @@ export async function spawnA2aFourSeats(
   opts?: {
     onTile?: (
       sessionId: string,
-      species: string,
+      definitionId: string,
       ptySessionId: string,
       role: A2aRole,
     ) => void;
@@ -46,10 +46,9 @@ export async function spawnA2aFourSeats(
   const out: ElectronA2aSeat[] = [];
   for (const role of ROLES) {
     const result = await admitAndStartSession("hermes", {
-      sessionLabel: `hermes:${role}`,
-      onStarted: (sessionId, species, info) => {
+      onStarted: (sessionId, definitionId, info) => {
         if (info?.surface === "native_tui" && info.ptySessionId) {
-          opts?.onTile?.(sessionId, species, info.ptySessionId, role);
+          opts?.onTile?.(sessionId, definitionId, info.ptySessionId, role);
         }
       },
     });

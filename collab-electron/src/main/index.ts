@@ -53,9 +53,9 @@ import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
 import { registerAgentIpc } from "./acp-agent";
 import {
+  bootstrapPackagedDockProfiles,
   reconcileStaleSessions,
   runAgentHostSmoke,
-  seedBootSpecies,
 } from "./agent-host";
 
 // macOS apps launched from Finder don't inherit the user's shell
@@ -845,10 +845,10 @@ app.whenReady().then(async () => {
     onBeforeQuit: () => shutdownBackgroundServices(),
   });
 
-  // WO-007: seed registry via execute, reconcile phantoms, AgentOS smoke.
+  // Package defaults enter through execute; runtime truth remains in the Kernel.
   try {
-    seedBootSpecies();
-    seedBootSpecies(); // idempotence: second call must not add a row
+    bootstrapPackagedDockProfiles();
+    bootstrapPackagedDockProfiles(); // explicit startup idempotence control
     reconcileStaleSessions();
     await runAgentHostSmoke();
   } catch (err) {

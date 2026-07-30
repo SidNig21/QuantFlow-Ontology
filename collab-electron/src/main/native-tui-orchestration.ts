@@ -2,7 +2,7 @@ export type NativeTuiTrace = { trace_id: string; span_id: string };
 
 export type NativeTuiLive = {
   cancelled: boolean;
-  species: string;
+  definitionId: string;
   guestId: string;
   kind: "native_tui";
   ptySessionId: string;
@@ -47,7 +47,7 @@ export type NativeTuiOrchestrationOptions = {
 export type NativeTuiOrchestrationResult = {
   sessionId: string;
   guestId: string;
-  species: string;
+  definitionId: string;
   surface: "native_tui";
   ptySessionId: string;
 };
@@ -80,7 +80,7 @@ export async function orchestrateNativeTuiAdmission(
 
     deps.liveSet(sessionId, {
       cancelled: false,
-      species: opts.definitionId,
+      definitionId: opts.definitionId,
       guestId: pty.sessionId,
       kind: "native_tui",
       ptySessionId: pty.sessionId,
@@ -120,7 +120,7 @@ export async function orchestrateNativeTuiAdmission(
     return {
       sessionId,
       guestId: pty.sessionId,
-      species: opts.definitionId,
+      definitionId: opts.definitionId,
       surface: "native_tui",
       ptySessionId: pty.sessionId,
     };

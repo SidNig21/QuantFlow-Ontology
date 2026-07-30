@@ -27,6 +27,7 @@ import {
 } from "./kernel";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
+import { parseDefinitionLaunchRequest } from "./definition-runtime";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -140,40 +141,7 @@ export function registerKernelHandlers(): void {
     async (event, args?: unknown) => {
       try {
         assertTrustedSender(event);
-        if (!args || typeof args !== "object" || Array.isArray(args)) {
-          return {
-            ok: false as const,
-            error: {
-              name: "InvalidArgs",
-              message: "qf:sessions:spawn requires { definitionId:string }",
-            },
-          };
-        }
-        const record = args as Record<string, unknown>;
-        const overrideKeys = Object.keys(record).filter(
-          (key) => key !== "definitionId",
-        );
-        if (overrideKeys.length > 0) {
-          return {
-            ok: false as const,
-            error: {
-              name: "RendererLaunchOverrideRejected",
-              message: `qf:sessions:spawn rejects renderer fields: ${overrideKeys.sort().join(", ")}`,
-            },
-          };
-        }
-        const definitionId = record.definitionId;
-        if (
-          typeof definitionId !== "string" || definitionId.trim().length === 0
-        ) {
-          return {
-            ok: false as const,
-            error: {
-              name: "MissingDefinitionId",
-              message: "qf:sessions:spawn requires args.definitionId",
-            },
-          };
-        }
+        const definitionId = parseDefinitionLaunchRequest(args);
         const result = await admitAndStartSession(definitionId, {
           onStarted: (sessionId, sp, info) => {
             invalidateDock();

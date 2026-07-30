@@ -5,7 +5,7 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { resolveHostAcpCommand } from "./host-acp-bridge";
-import { resolveSpeciesSessionEnv } from "./host-mounts";
+import { resolveAdapterSessionEnv } from "./host-mounts";
 import { kernelExecute, type TraceContext } from "./kernel";
 import {
   createHostCommandSession,
@@ -23,7 +23,6 @@ import {
   type NativeTuiLive,
   type NativeTuiOrchestrationDependencies,
 } from "./native-tui-orchestration";
-import type { SpeciesSurfaceSpec } from "./species-surface";
 
 export type { NativeTuiLive } from "./native-tui-orchestration";
 
@@ -49,21 +48,12 @@ export function installNativeTuiPtyExitHook(
   });
 }
 
-export async function admitNativeTuiSpecies(opts: {
-  species: string;
-  surface: SpeciesSurfaceSpec;
-  appRoot: string;
+export async function admitNativeTuiDefinition(opts: {
+  definitionId: string;
+  adapterId: string;
+  argv: string[];
   env?: Record<string, string>;
   corruptId?: string;
-  /** Kernel agent_session.label (e.g. hermes:orchestrator). Default: species. */
-  sessionLabel?: string;
-  /**
-   * Host-only argv override (seat registry). Never from renderer free-text.
-   * When set, replaces surface.argv entirely.
-   */
-  argvOverride?: string[];
-  /** Term-tile chrome title. Default: `${species}-tui`. */
-  displayName?: string;
   newTrace: () => TraceContext;
   liveSet: (sessionId: string, entry: NativeTuiLive) => void;
   /** Root admission owner supplies this when wiring the D2 live map. */
@@ -74,36 +64,31 @@ export async function admitNativeTuiSpecies(opts: {
   dependencies?: Partial<NativeTuiOrchestrationDependencies>;
   onStarted?: (
     sessionId: string,
-    species: string,
+    definitionId: string,
     info: { surface: "native_tui"; ptySessionId: string },
   ) => void;
 }): Promise<{
   sessionId: string;
   guestId: string;
-  species: string;
+  definitionId: string;
   surface: "native_tui";
   ptySessionId: string;
 }> {
-  const { species, surface } = opts;
-  const label = opts.sessionLabel ?? species;
-  const fromConfig = resolveSpeciesSessionEnv(species);
+  const { definitionId, adapterId, argv } = opts;
+  const fromConfig = resolveAdapterSessionEnv(adapterId);
   const env = { ...fromConfig, ...opts.env };
   const command = resolveHostAcpCommand(
     env.HOST_ACP_BIN ?? env.HERMES_BIN ?? process.env.HOST_ACP_BIN ??
       process.env.HERMES_BIN,
-    [
-      join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
-      join(homedir(), ".local/bin/hermes"),
-    ],
+    adapterId === "hermes"
+      ? [
+          join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
+          join(homedir(), ".local/bin/hermes"),
+        ]
+      : [],
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
-  const argv =
-    opts.argvOverride && opts.argvOverride.length > 0
-      ? opts.argvOverride
-      : surface.argv.length > 0
-        ? surface.argv
-        : ["--tui"];
-  const displayName = opts.displayName ?? `${species}-tui`;
+  const displayName = `${definitionId}-tui`;
 
   const defaults: NativeTuiOrchestrationDependencies = {
     createPty: () => createHostCommandSession({
@@ -149,8 +134,8 @@ export async function admitNativeTuiSpecies(opts: {
   };
   const result = await orchestrateNativeTuiAdmission(
     {
-      definitionId: species,
-      label,
+      definitionId,
+      label: definitionId,
       corruptId: opts.corruptId,
       peerDelivery: opts.peerDelivery,
       onStarted: opts.onStarted,
@@ -158,7 +143,7 @@ export async function admitNativeTuiSpecies(opts: {
     { ...defaults, ...opts.dependencies },
   );
   console.log(
-    `agent-host: admitted native_tui session=${result.sessionId} species=${species}`
+    `agent-host: admitted native_tui session=${result.sessionId} definition=${definitionId}`
     + ` cmd=${command} argv=${JSON.stringify(argv)} pty=${result.ptySessionId}`,
   );
   return result;

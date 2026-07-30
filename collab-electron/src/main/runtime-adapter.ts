@@ -6,7 +6,7 @@
  * it never reads or writes Kernel state.
  */
 import { existsSync, lstatSync, readFileSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, isAbsolute, join } from "node:path";
 import { packedMetaPathForPackageRef } from "./package-resource-paths";
 
 export const RUNTIME_PROFILE_TOKEN = "{runtime_profile}" as const;
@@ -226,7 +226,7 @@ export function resolveRuntimeAdapterMetadata(
   packageRef: string,
   appRoot: string,
 ): ResolvedRuntimeAdapter {
-  const packagePath = join(appRoot, packageRef);
+  const packagePath = isAbsolute(packageRef) ? packageRef : join(appRoot, packageRef);
   requireRegularFile(packagePath, "runtime package");
   const metadataPath = packedMetaPathForPackageRef(packageRef, appRoot);
   if (!metadataPath) {
