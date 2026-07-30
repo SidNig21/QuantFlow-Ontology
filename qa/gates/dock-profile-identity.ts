@@ -4,18 +4,27 @@
 import { join } from "node:path";
 
 const CWD = join(import.meta.dir, "dock-profile-identity");
+const KERNEL_PKG = join(import.meta.dir, "../../packages/qf-kernel");
 
-async function run(): Promise<number> {
-  const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-    cwd: CWD,
+async function install(name: string, cwd: string): Promise<number> {
+  const child = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+    cwd,
     stdout: "inherit",
     stderr: "inherit",
   });
-  const installCode = await install.exited;
-  if (installCode !== 0) {
-    console.error(`dock-profile-identity: bun install exited ${installCode}`);
-    return 1;
+  const code = await child.exited;
+  if (code !== 0) {
+    console.error(`dock-profile-identity: ${name} bun install exited ${code}`);
   }
+  return code;
+}
+
+async function run(): Promise<number> {
+  // qf-kernel is file-linked into the gate package. Bun resolves imports from
+  // the linked source directory, so its own declared dependencies must be
+  // materialized there before the gate-owned install can execute it cold.
+  if ((await install("qf-kernel", KERNEL_PKG)) !== 0) return 1;
+  if ((await install("gate", CWD)) !== 0) return 1;
 
   const gate = Bun.spawn(["bun", "./run.ts"], {
     cwd: CWD,
