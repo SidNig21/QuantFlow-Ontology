@@ -44,8 +44,12 @@ separate immediate order before unscripted WO-109 collaboration.
 - Do not edit the Dock UI or `hermes-seats.ts`. Runtime launch files may change only to propagate
   the already-resolved definition ID into `create_agent_session`; argv/env/routing behavior is
   frozen.
+- Non-production Hermes/QA/vault-projection session fixtures may change only to register and pass
+  the now-required real definition ID.
 - Generated schema artifacts come only from `bun run generate`; all writes remain behind
   `execute()`.
+- No exported session-insert helper may survive D1, and production node:sqlite—not only Bun—must
+  prove the session/link/event transaction does not nest or leak residue.
 - Do not delete, reset, relabel, or invent identity for historical sessions. The generated D1
   compatibility step preserves existing Kernel data and begins mandatory identity for new sessions.
 

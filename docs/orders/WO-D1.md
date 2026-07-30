@@ -79,6 +79,15 @@ resolved for admission. This order may make only that input-propagation edit in 
 `host-native-tui.ts`; it must not change argv, environment, runtime routing, seat selection, or
 launch behavior.
 
+Update the non-production session-creation fixtures in `species/hermes/`, `qa/`, and
+`tools/qf-vault-projection/` only as required to register/pass a real definition ID. They remain
+fixtures and must not become another identity or launch implementation.
+
+Delete the exported `insertAgentSession` bypass (and its now-obsolete missing-ID-only tests/error).
+After D1, no production or exported API may create an `agent_session` except
+`execute("create_agent_session", ...)`; otherwise a caller could still create a post-upgrade row
+and event without definition identity.
+
 This invariant begins at the successful D1 upgrade. Preserve all pre-D1 session rows and events,
 but do not fabricate profile identity from their presentation labels. The pre-D1 schema did not
 store a governed definition ID, so this upgrade performs no historical identity backfill; those
@@ -111,6 +120,10 @@ pre-D1 schema shipped at the verified WO-CI2 merge.
   definition into Kernel code.
 - A writable `attachKernel()` detects the exact pre-D1 structure, applies the upgrade atomically,
   and then runs the existing registry-drift enforcement. A current D1 database is a no-op.
+- Structural classification must occur before `attachKernel()` executes any persistent pragma or
+  other write. In particular, `PRAGMA journal_mode = WAL` changes the database file and must not run
+  before an unknown/partial shape is rejected; the unchanged-file proof compares bytes from before
+  attach, not merely row counts after it throws.
 - The upgrade adds nullable `agent_definition.runtime_profile`, rebuilds the `links` constraint to
   include `spawned_from`, and synchronizes the affected `schema_meta` rows from generated schema
   authority. It preserves every definition, session, link, event, ID, timestamp, and payload.
@@ -119,6 +132,16 @@ pre-D1 schema shipped at the verified WO-CI2 merge.
   readonly attach never attempts the upgrade; it warns and makes
   `getKernelDrift()` return `{ ok: false, upgrade_required: "agent-profile-identity" }` without
   writing.
+- Classification must compare exact expected structure, not feature substrings: the full governed
+  table/column constraints, the complete ordered link-kind set, and the complete `schema_meta`
+  rows must match either the frozen WO-CI2 baseline or generated D1 authority. Missing/extra
+  columns or constraints, a lost old link kind, stale/missing metadata, a fake `spawned_from`
+  substring, or any old/new mixture is `partial`. A missing `agent_definition` or `links` table is
+  never `pre_d1`.
+- Preserve the existing fresh-initialization path as a separate `uninitialized` state: no
+  `schema_meta` and no ontology tables may proceed to the generated full migration. A canary or
+  incomplete initialization is not fresh and retains WO-K3's fail/warn behavior without being
+  misclassified as an upgrade candidate.
 - Historical sessions lacking exact durable definition evidence remain unlinked and are reported
   as legacy unknowns. Do not guess from a presentation label, create a fake definition, delete the
   rows, or rewrite their events.
@@ -126,23 +149,29 @@ pre-D1 schema shipped at the verified WO-CI2 merge.
   shipped `qf-kernel-schema` package. Extend the existing package inspector with the already locked
   `@electron/asar@3.4.1`, promoted to a direct dev dependency so the import is declared; do not
   change its version, add another package, or add a second package command.
+- Apply the generated upgrade through exactly one explicit `KernelDb.transaction()` enclosing its
+  DDL and metadata synchronization. Do not rely on transaction text embedded in the SQL artifact,
+  and do not open a second Kernel transaction inside that callback.
 
 This is a single compatibility step, not a general migration framework. Do not add a service,
-dependency, schema-version truth store, or destructive recreate path.
+another dependency, schema-version truth store, or destructive recreate path.
 
 ## Deliverables
 
 ### D1 — schema and generated authority
 
 Update the Agent Plane schema, action input, link, descriptions, tests, and regenerated `golden/`
-artifacts. Generated output is produced only by `bun run generate`.
+artifacts. Generated output is produced only by `bun run generate`. Update
+`docs/ONTOLOGY_SCHEMA.md` in the same commit so its current-authority description says profile,
+names `runtime_profile`, and includes `spawned_from`; do not edit doctrine.
 
 ### D2 — atomic Kernel creation
 
 Update the creation handler behind `execute()` to validate the definition and commit the session,
 `spawned_from` link, and event in one transaction. Remove the label-as-species workaround from
-live insert helpers and tests. Propagate `agent_definition_id` through every production session
-creation caller without changing how that caller launches the runtime.
+live insert helpers and tests; delete/unexport `insertAgentSession` so no identity-free creation
+surface remains. Propagate `agent_definition_id` through every production session creation caller
+without changing how that caller launches the runtime.
 
 ### D3 — existing-Kernel compatibility
 
@@ -151,9 +180,17 @@ Build a frozen pre-D1 fixture from the verified WO-CI2 schema shape, seed it wit
 sessions, every existing link kind, events, and one deliberately unresolvable legacy session, then
 prove writable upgrade preserves those rows byte-for-byte except for the ruled schema/meta
 additions. Prove a second attach is a no-op, readonly detection performs no writes, and an unknown
-partial shape fails closed with the database file unchanged. Extend `package-closure` to require
-both generated SQL artifacts in the finished app; its copied-package control removes only the D1
-upgrade and must fail naming that missing artifact.
+partial shape fails closed with the database bytes unchanged, including no early WAL/header change.
+Extend `package-closure` to require both generated SQL artifacts in the finished app; its
+copied-package control removes only the D1 upgrade and must fail naming that missing artifact.
+
+The partial-shape matrix must cover: new column with old links; new links with old column; both new
+with stale/missing metadata; fake substring without the allowed kind; missing or altered governed
+tables/columns; and loss of one old link kind. For each case compare SHA-256, mtime, row snapshots,
+and absence/presence of `-wal`/`-shm` before and after rejection. Inject a failure in the middle of
+the generated upgrade and prove the single transaction restores the complete pre-run schema and
+rows. Readonly pre-D1 attach must stay byte/mtime identical, set the exact upgrade-required drift,
+and succeed in that detection even when the upgrade SQL file is unavailable.
 
 ### D4 — `dock-profile-identity` gate
 
@@ -173,10 +210,23 @@ Add one root QA gate and wire it into `qa/run.ts`. In a temporary Kernel it must
 - report the preserved unlinked legacy-session count rather than silently claiming it was mapped;
 - derive its definition/session/link expectations from the schema rather than duplicating SQL table
   names in a second oracle;
-- prove `qf_register_agent_definition` is generated but absent from the served agent action list.
+- prove `qf_register_agent_definition` is generated but absent from the served agent action list;
 - statically enumerate every production `create_agent_session` callsite and require the
   `agent_definition_id` field; then run the existing `agent-path` gate, updated to supply a real
-  definition ID, as the Kernel lifecycle proof that a session still starts and closes.
+  definition ID, as the Kernel lifecycle proof that a session still starts and closes;
+- statically reject any exported/production `insertAgentSession` symbol or other session-row writer
+  outside the `execute()` creation path;
+- run the successful creation and forced link-writer rollback through a non-reentrant transaction
+  depth decorator around production `execute()`, not only Bun's nested transaction helper. Also
+  run a Node `node:sqlite` control proving Electron's literal `BEGIN IMMEDIATE` rejects nesting.
+  Valid creation must stay at depth one; baiting an inner transaction into the real handler must
+  fail with a unique nested-transaction error. Do not copy the creation handler into the test;
+- AST-scan the actual Electron main-process callsites with the already locked TypeScript compiler;
+  discover calls rather than trusting a fixed count, require `agent_definition_id` to use the same
+  `species` symbol that drives admission, and name the file/line on failure;
+- prove both operator-only sides: full generated tools still contain
+  `qf_register_agent_definition`, while the actual registered/advertised agent tool surfaces omit
+  it and founder/bootstrap `execute()` can still register a definition.
 
 Falsify the gate by suppressing the `spawned_from` write in the production creation path, observe a
 non-zero gate exit naming the missing relationship, restore it, then observe green.
@@ -190,6 +240,9 @@ Falsify upgrade coupling by disabling the D1 upgrade call inside writable `attac
 the frozen pre-D1 compatibility control red, restore it, then observe upgrade plus second-attach
 idempotence green.
 
+Falsify the sole-creation boundary by restoring an exported `insertAgentSession`-style bypass,
+observe `dock-profile-identity` red, restore its removal, then observe green.
+
 ## Acceptance
 
 ### Builder
@@ -199,6 +252,7 @@ cd qf-kernel-schema && bun test && bun run generate
 cd ../packages/qf-kernel && bun test
 cd ../.. && bun qa/run.ts dock-profile-identity
 bun qa/run.ts agent-path
+bun qa/run.ts tool-plane
 bun qa/run.ts repo-shape
 bun qa/run.ts lockfile-committed
 bun qa/run.ts kernel-sole-writer
@@ -208,7 +262,7 @@ bun qa/run.ts doc-action-surface
 bun qa/run.ts one-skin
 ```
 
-The builder supplies all three ruled red→green bait transcripts and the forced link-writer rollback
+The builder supplies all four ruled red→green bait transcripts and the forced link-writer rollback
 control, then stops. It does not run the cold release verifier or merge.
 
 ### Verifier
@@ -221,8 +275,11 @@ bun qa/verify-release.ts
 
 The verifier independently repeats the unknown-definition and caller-supplied-link no-residue
 controls, the forced link-writer rollback control, the frozen pre-D1 upgrade/idempotence proof, and
-all three baits before deciding PASS or REWORK. It also runs the missing-upgrade copied-package
+all four baits before deciding PASS or REWORK. It also runs the missing-upgrade copied-package
 control against the real unsigned Linux artifact before accepting the release proof.
+The package proof extracts and byte-compares both SQL files with committed goldens. Its bait must
+prove the copied ASAR inventory changed by exactly the one removed upgrade path before inspection
+fails.
 
 ## Out of scope
 
@@ -245,7 +302,7 @@ control against the real unsigned Linux artifact before accepting the release pr
 4. Unknown-definition counts before/after.
 5. Operator-only served-surface evidence.
 6. Existing-Kernel upgrade row counts/hashes, readonly/partial-shape results, and second-attach proof.
-7. Missing-link, real link-writer rollback, production-callsite, and upgrade-coupling transcripts
-   with exit statuses.
+7. Missing-link, real link-writer rollback, production-callsite, sole-creation-boundary, and
+   upgrade-coupling transcripts with exit statuses, including the real node:sqlite adapter result.
 8. Static-gate results.
 9. Judgment: every place the order was silent and what was chosen.
