@@ -50,6 +50,7 @@ import {
   type NativeTuiOrchestrationDependencies,
 } from "../../../collab-electron/src/main/native-tui-orchestration.ts";
 import { PeerRoleRegistry } from "../../../collab-electron/src/main/peer-role-registry.ts";
+import { completeRuntimeKernelAdmission } from "../../../collab-electron/src/main/runtime-kernel-admission.ts";
 
 const GATE = import.meta.dir;
 const REPO = join(GATE, "../../..");
@@ -388,6 +389,199 @@ function assertSpawnedFrom(db: KernelDb, sessionId: string, definitionId: string
   assert(links[0]!.from_id === sessionId && links[0]!.to_id === definitionId, `${sessionId} linked to wrong definition`, links);
 }
 
+type AcpSurface = "host_acp" | "agentos";
+
+type AcpLive = {
+  definitionId: string;
+  guestId: string;
+  surface: AcpSurface;
+};
+
+function sessionEventTypes(db: KernelDb, sessionId: string): string[] {
+  return (
+    db.query(
+      `SELECT type FROM events
+       WHERE object_type = 'agent_session' AND object_id = ?
+       ORDER BY rowid ASC`,
+    ).all(sessionId) as Array<{ type: string }>
+  ).map((row) => row.type);
+}
+
+function errorMessages(error: unknown): string[] {
+  assert(error instanceof AggregateError, "cleanup faults must return AggregateError", error);
+  return error.errors.map((cause) => cause instanceof Error ? cause.message : String(cause));
+}
+
+async function exerciseAcpFailure(input: {
+  db: KernelDb;
+  surface: AcpSurface;
+  definitionId: string;
+  fault: "create" | "start";
+  cleanupFaults?: boolean;
+}): Promise<{ surface: AcpSurface; fault: "create" | "start" }> {
+  const kernelSessionId = `${input.surface}-kernel-${input.fault}${input.cleanupFaults ? "-cleanup" : ""}`;
+  const runtimeId = `${input.surface}-runtime-${input.fault}${input.cleanupFaults ? "-cleanup" : ""}`;
+  assert(kernelSessionId !== runtimeId, `${input.surface} fixture collapsed Kernel and runtime ids`);
+  const hostHandle = { sessionId: runtimeId, owner: "host-handle" };
+  const live = new Map<string, AcpLive>();
+  const commands: string[] = [];
+  const teardownOwners: unknown[] = [];
+  const liveDeletes: string[] = [];
+  const beforeEvents = eventCount(input.db);
+  let thrown: unknown;
+
+  const tearDownRuntime = async (): Promise<void> => {
+    teardownOwners.push(input.surface === "host_acp" ? hostHandle : runtimeId);
+    if (input.cleanupFaults) throw new Error(`${input.surface} teardown fault`);
+  };
+
+  try {
+    await completeRuntimeKernelAdmission(
+      {
+        definitionId: input.definitionId,
+        sessionId: kernelSessionId,
+        liveEntry: { definitionId: input.definitionId, guestId: runtimeId, surface: input.surface },
+      },
+      {
+        execute: (command, body, ctx) => {
+          commands.push(command);
+          if (command === `${input.fault}_agent_session`) {
+            throw new Error(`${input.surface} injected ${input.fault} failure`);
+          }
+          return execute(input.db, command, body, ctx);
+        },
+        newTrace: trace,
+        liveSet: (id, entry) => live.set(id, entry),
+        liveDelete: (id) => {
+          liveDeletes.push(id);
+          live.delete(id);
+          if (input.cleanupFaults) throw new Error(`${input.surface} live-delete fault`);
+        },
+        tearDownRuntime,
+      },
+    );
+    fail(`${input.surface} ${input.fault} failure was accepted`);
+  } catch (error) {
+    thrown = error;
+  }
+
+  const expectedOwner = input.surface === "host_acp" ? hostHandle : runtimeId;
+  assert(
+    teardownOwners.length === 1 && teardownOwners[0] === expectedOwner,
+    `${input.surface} ${input.fault} tore down the wrong runtime owner`,
+    teardownOwners,
+  );
+  assert(
+    liveDeletes.length === 1 && liveDeletes[0] === kernelSessionId && live.size === 0,
+    `${input.surface} ${input.fault} did not remove its exact live entry`,
+    { liveDeletes, live: [...live.keys()] },
+  );
+
+  if (input.fault === "create") {
+    assert(getObject(input.db, "agent_session", kernelSessionId) === null, `${input.surface} create failure left a session`);
+    assert(getLinks(input.db, kernelSessionId).length === 0, `${input.surface} create failure left a link`);
+    assert(eventCount(input.db) === beforeEvents, `${input.surface} create failure left an event`);
+  } else {
+    const session = getObject(input.db, "agent_session", kernelSessionId);
+    assert(session?.status === "closed", `${input.surface} start failure did not end closed`, session);
+    assertSpawnedFrom(input.db, kernelSessionId, input.definitionId);
+    const events = sessionEventTypes(input.db, kernelSessionId);
+    assert(
+      JSON.stringify(events) === JSON.stringify([
+        "agent_session.created",
+        "agent_session.failed",
+        "agent_session.closed",
+      ]),
+      `${input.surface} start failure receipt order is wrong`,
+      events,
+    );
+    assert(
+      JSON.stringify(commands) === JSON.stringify([
+        "create_agent_session",
+        "start_agent_session",
+        "fail_agent_session",
+        "close_agent_session",
+      ]),
+      `${input.surface} start failure skipped durable cleanup`,
+      commands,
+    );
+  }
+
+  const messages = errorMessages(thrown);
+  assert(
+    messages.includes(`${input.surface} injected ${input.fault} failure`),
+    `${input.surface} AggregateError lost the original failure`,
+    messages,
+  );
+  if (input.cleanupFaults) {
+    for (const expected of [
+      `${input.surface} teardown fault`,
+      `${input.surface} live-delete fault`,
+    ]) {
+      assert(messages.includes(expected), `${input.surface} AggregateError lost ${expected}`, messages);
+    }
+  }
+
+  const relaunchSessionId = `${kernelSessionId}-relaunch`;
+  const relaunchRuntimeId = `${runtimeId}-relaunch`;
+  await completeRuntimeKernelAdmission(
+    {
+      definitionId: input.definitionId,
+      sessionId: relaunchSessionId,
+      liveEntry: {
+        definitionId: input.definitionId,
+        guestId: relaunchRuntimeId,
+        surface: input.surface,
+      },
+    },
+    {
+      execute: (command, body, ctx) => execute(input.db, command, body, ctx),
+      newTrace: trace,
+      liveSet: (id, entry) => live.set(id, entry),
+      liveDelete: (id) => void live.delete(id),
+      tearDownRuntime: async () => {},
+    },
+  );
+  assert(
+    getObject(input.db, "agent_session", relaunchSessionId)?.status === "running",
+    `${input.surface} ${input.fault} blocked immediate same-definition relaunch`,
+  );
+  live.delete(relaunchSessionId);
+  execute(input.db, "close_agent_session", { session_id: relaunchSessionId }, trace());
+
+  return { surface: input.surface, fault: input.fault };
+}
+
+function functionSource(source: string, name: string, nextName: string): string {
+  const start = source.indexOf(`async function ${name}(`);
+  const end = source.indexOf(`async function ${nextName}(`, start + 1);
+  assert(start >= 0 && end > start, `cannot isolate production caller ${name}`);
+  return source.slice(start, end);
+}
+
+function assertAcpProductionDelegation(host: string): void {
+  const hostAcp = functionSource(host, "admitHostAcpDefinition", "admitAgentOsDefinition");
+  const agentOs = functionSource(host, "admitAgentOsDefinition", "runTurn");
+  for (const [label, body] of [["host ACP", hostAcp], ["AgentOS", agentOs]] as const) {
+    assert(
+      /await\s+completeRuntimeKernelAdmission(?:<[^>]+>)?\s*\(/.test(body),
+      `${label} production caller does not delegate to completeRuntimeKernelAdmission`,
+    );
+  }
+  assert(
+    /tearDownRuntime:\s*(?:async\s*)?\(\)\s*=>\s*(?:await\s+)?tearDownHostAcp\(handle\)/.test(hostAcp),
+    "host ACP compensation does not own its exact handle",
+  );
+  assert(
+    /tearDownRuntime:\s*(?:async\s*)?\(\)\s*=>\s*(?:await\s+)?host\.destroySession\(guestId\)/.test(agentOs),
+    "AgentOS compensation does not destroy its exact guest id",
+  );
+  assert(
+    !/tearDownRuntime:[\s\S]{0,120}host\.destroySession\(sessionId\)/.test(agentOs),
+    "AgentOS compensation incorrectly destroys the Kernel session id",
+  );
+}
+
 function assertStaticLaunchSurface(): void {
   const dockPath = join(REPO, "collab-electron/src/windows/shell/src/dock.js");
   const dock = readFileSync(dockPath, "utf8");
@@ -425,6 +619,7 @@ function assertStaticLaunchSurface(): void {
 
   const hostPath = join(REPO, "collab-electron/src/main/agent-host.ts");
   const host = readFileSync(hostPath, "utf8");
+  assertAcpProductionDelegation(host);
   assert(
     /resolveDefinitionRuntime\(definitionId,\s*appRoot\(\),\s*getDefinition\)/.test(host),
     "production admission must resolve the exact Kernel definition through the shared helper",
@@ -679,6 +874,25 @@ async function main(): Promise<number> {
     const startRelaunch = await launch(db, appRoot, home, "hermes-worker", peer, "start-relaunch");
     await cleanupSuccess(startRelaunch.harness, startRelaunch.result, "worker");
 
+    const acpFailures = [];
+    for (const surface of ["host_acp", "agentos"] as const) {
+      for (const fault of ["create", "start"] as const) {
+        acpFailures.push(await exerciseAcpFailure({
+          db,
+          surface,
+          definitionId: surface === "host_acp" ? "hermes-worker" : "qf-toolloop",
+          fault,
+        }));
+      }
+      await exerciseAcpFailure({
+        db,
+        surface,
+        definitionId: surface === "host_acp" ? "hermes-worker" : "qf-toolloop",
+        fault: "start",
+        cleanupFaults: true,
+      });
+    }
+
     console.log("dock-definition-launch OK");
     console.log(JSON.stringify({
       bootstrap: { registered: first.registered.length, secondBootSkipped: second.skipped.length, conflicts: conflict.conflicts.length },
@@ -694,6 +908,12 @@ async function main(): Promise<number> {
       uniqueSoftware: uniqueSoftware.map((entry) => ({ adapterId: entry.adapterId, packagePath: relative(work, entry.packagePath) })),
       peer: { role: "orchestrator", transportOpened: false },
       cleanup: { createFailure: "no residue", startFailure: "closed receipt", sameRoleRelaunch: "ok" },
+      acpCleanup: {
+        matrix: acpFailures.map(({ surface, fault }) => `${surface}:${fault}`),
+        exactOwners: true,
+        cleanupFaultAggregation: ["host_acp:start", "agentos:start"],
+        sameDefinitionRelaunch: true,
+      },
       legacyDockSurfaces: 0,
     }));
     return 0;

@@ -56,6 +56,7 @@ import {
   type DefinitionRuntime,
 } from "./definition-runtime";
 import { allowsPtyRoleDelivery } from "./runtime-adapter";
+import { completeRuntimeKernelAdmission } from "./runtime-kernel-admission";
 
 /** Credential-free AgentOS adapter used by the startup identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
@@ -406,34 +407,27 @@ async function admitHostAcpDefinition(
   handle.hooks.onPermission = (params) =>
     requestFounderPermission(sessionId, params, handle.hooks.permissionTimeoutMs);
 
-  live.set(sessionId, {
+  const liveEntry: LiveSession = {
     cancelled: false,
     definitionId,
     guestId,
     kind: "host_acp",
     hostAcp: handle,
     turnInFlight: false,
-  });
-
-  const trace = newTrace();
-  kernelExecute(
-    "create_agent_session",
+  };
+  await completeRuntimeKernelAdmission(
+    { definitionId, sessionId, liveEntry },
     {
-      session_id: sessionId,
-      agent_definition_id: definitionId,
-      label: definitionId,
+      execute: kernelExecute,
+      newTrace,
+      liveSet: (id, entry) => {
+        live.set(id, entry);
+      },
+      liveDelete: (id) => {
+        live.delete(id);
+      },
+      tearDownRuntime: () => tearDownHostAcp(handle),
     },
-    trace,
-  );
-  if (sessionId !== guestId && !opts?.corruptId) {
-    await tearDownHostAcp(handle).catch(() => {});
-    live.delete(sessionId);
-    throw new Error("agent-host: session id adoption failed");
-  }
-  kernelExecute(
-    "start_agent_session",
-    { session_id: sessionId },
-    { ...trace, span_id: crypto.randomUUID() },
   );
   opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
   console.log(
@@ -476,31 +470,26 @@ async function admitAgentOsDefinition(
   const guestId = created.sessionId;
   const sessionId = opts?.corruptId ?? guestId;
 
-  live.set(sessionId, {
+  const liveEntry: LiveSession = {
     cancelled: false,
     definitionId,
     guestId,
     kind: "agentos",
     turnInFlight: false,
-  });
-
-  const trace = newTrace();
-  kernelExecute(
-    "create_agent_session",
+  };
+  await completeRuntimeKernelAdmission(
+    { definitionId, sessionId, liveEntry },
     {
-      session_id: sessionId,
-      agent_definition_id: definitionId,
-      label: definitionId,
+      execute: kernelExecute,
+      newTrace,
+      liveSet: (id, entry) => {
+        live.set(id, entry);
+      },
+      liveDelete: (id) => {
+        live.delete(id);
+      },
+      tearDownRuntime: () => host.destroySession(guestId),
     },
-    trace,
-  );
-  if (sessionId !== guestId && !opts?.corruptId) {
-    throw new Error("agent-host: session id adoption failed");
-  }
-  kernelExecute(
-    "start_agent_session",
-    { session_id: sessionId },
-    { ...trace, span_id: crypto.randomUUID() },
   );
   opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
   console.log(
