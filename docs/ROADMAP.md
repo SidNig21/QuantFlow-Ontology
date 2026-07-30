@@ -55,6 +55,12 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 > links to its exact founder-visible profile and the shipped app carries the one-time compatibility
 > upgrade. Debt #30 remains triggered but parked until WO-D2 removes the hardcoded Peer Seats launch
 > path and makes `runtime_profile` operational.
+>
+> **Status rotation — 2026-07-30, WO-D2 merge:** WO-D2 is CLOSED. One Kernel-backed Dock now
+> bootstraps qf-toolloop plus three Hermes profiles, expands package-owned runtime selectors, and
+> preserves exact session identity and authorized live delivery; the hidden Peer Seats catalogue is
+> gone. Debt #30 is unblocked for WO-N1, queued behind immediate WO-D2b cleanup of the measured
+> host-ACP and AgentOS orphan seams.
 
 | # | Debt | Lands in |
 |---|---|---|

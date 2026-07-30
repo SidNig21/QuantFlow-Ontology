@@ -2,10 +2,10 @@
 
 > **You are the architect/verifier.** This file is your complete cold start. Read it, then `PROTOCOL.md`, then the order you are verifying. You need no chat history — if something matters and isn't in the repo, it doesn't exist (`PROTOCOL.md`, shared-truth rule).
 
-**Door check 2026-07-30 (WO-D1):** the authority list below is current; its branch-diff,
+**Door check 2026-07-30 (WO-D2):** the authority list below is current; its branch-diff,
 fresh-worktree, and canonical `bun qa/verify-release.ts` commands resolve against live repository
-surfaces. The canonical command includes the real unsigned Linux package stage; WO-D1 independently
-proved the shipped migration, frozen pre-D1 authority, and profile-identity upgrade bytes.
+surfaces. The canonical command includes the real unsigned Linux package stage; WO-D2 independently
+proved the shipped Dock manifests, adapter metadata, exact profile launch, and native cleanup.
 
 ## Read in this order
 

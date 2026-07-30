@@ -1,6 +1,6 @@
 # WO-D2 — one Dock Catalog, one definition-driven launch path
 
-**Status:** open — current after WO-D1 PASS  
+**Status:** done — independently verified at `457446a` and merged 2026-07-30
 **Depends on:** WO-D1 independently verified at `4617e06`  
 **Builder:** Cursor CLI Composer 2.5, isolated worktree  
 **Verifier:** independent cold worktree; never the builder
@@ -341,3 +341,11 @@ links before deciding PASS or REWORK.
 8. Real package manifest/metadata inventory and copied-package bait.
 9. Focused/static gate outputs and four red→green transcripts.
 10. Judgment: every silent choice, especially config fallback and untouched ACP/AgentOS cleanup.
+
+## Verification record
+
+Independent cold verification passed on 2026-07-30 at `457446a`. The canonical release verifier
+built and inspected the real unsigned Linux package; both manifests and both adapter metadata files
+matched source bytes. All four required production baits went red and restored green. Exact receipts,
+hashes, cleanup/relaunch results, and the routed ACP/AgentOS seam are recorded in
+[`evidence/wo-d2/VERIFICATION.md`](evidence/wo-d2/VERIFICATION.md).

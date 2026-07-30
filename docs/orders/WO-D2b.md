@@ -1,7 +1,6 @@
 # WO-D2b — compensate the remaining ACP launch paths
 
-**Status:** queued draft — promote only after WO-D2 independently passes and this order receives an
-adversarial pre-build read  
+**Status:** open — current after WO-D2 PASS; adversarial pre-build read incorporated
 **Depends on:** WO-D2 PASS  
 **Size:** one Cursor-sized runtime repair; no new product surface
 
@@ -21,24 +20,51 @@ opened instead of leaving an invisible process behind.
 
 ## Contract
 
-1. Factor the smallest shared post-runtime Kernel-admission transaction used by host ACP and
-   AgentOS. Do not alter their handshake, prompt, permission, environment, or surface semantics.
-2. Inject runtime teardown and live-map deletion into that production transaction so a gate faults
-   the real code, not a QA copy.
-3. On Kernel create failure: destroy the exact runtime, delete its live entry, and leave no session,
-   link, or event. On Kernel start failure: destroy it, delete live state, then record
-   `fail_agent_session` and `close_agent_session`; report cleanup failures with the original error.
-4. Prove immediate relaunch of the same definition succeeds after each failure. Never scan or kill
-   by process name, PID range, or global AgentOS state.
-5. Extend one focused gate with credential-free fake host-ACP and AgentOS handles. Run no model,
-   prompt, network, credential, or founder database.
+### D0 — measure the AgentOS destruction surface before editing
+
+Use the packed credential-free qf-toolloop adapter to call the installed SDK's real
+`createSession(adapterId)` then `destroySession(guestId)`. Record the SDK version, the exact returned
+guest id, and one independent after-observable (for example a rejected prompt/event subscription or
+an SDK session listing) proving that guest is no longer live. Do not infer deletion from a resolved
+Promise. If the installed API exposes no independent observable, stop and amend this order with the
+strongest measurement the SDK actually permits before implementing compensation.
+
+### D1 — one transaction, four failure cases
+
+1. Factor the smallest shared post-runtime Kernel-admission transaction used by both production
+   host-ACP and AgentOS callers. Do not alter handshake, prompt, permission, environment, or surface
+   semantics. `dock-definition-launch` must prove both callers delegate to this exact transaction;
+   a QA-only helper is a failure.
+2. Give every fake distinct identifiers: Kernel `sessionId`, host-ACP `handle.sessionId`, and AgentOS
+   `guestId`. Teardown must receive the exact host handle or exact guest id, never the Kernel id.
+3. Exercise the full four-case matrix: host-ACP create failure, host-ACP start failure, AgentOS
+   create failure, and AgentOS start failure. Prove immediate relaunch of the same definition after
+   every case.
+4. On create failure, attempt exact runtime teardown and live-map deletion; require zero session,
+   `spawned_from` link, or event. On start failure, preserve the creation event and exact
+   `spawned_from` link, then require `fail_agent_session` before `close_agent_session` and final
+   status `closed`.
+5. Every owned cleanup is attempted independently. Runtime teardown failure or live-delete failure
+   must not skip later cleanup or durable fail→close receipts. Throw one `AggregateError` retaining
+   the original failure plus every cleanup failure; never replace the cause with the last error.
+6. Never scan or kill by process name, PID range, or global AgentOS state. Run no model, prompt,
+   network, credential, or founder database.
 
 ## Required falsification
 
-- Remove host-ACP teardown after an injected Kernel failure: gate red on the surviving handle;
-  restore green.
-- Remove AgentOS `destroySession()` after an injected Kernel failure: gate red on the surviving
-  guest; restore green.
+All baits edit production and run `dock-definition-launch` red → restore → green:
+
+1. Remove the host-ACP caller's delegation to the shared transaction: red even if the helper's unit
+   test remains green.
+2. Remove the AgentOS caller's delegation: red under the same control.
+3. Break exact owner teardown by passing Kernel `sessionId` to AgentOS `destroySession()` instead of
+   the distinct `guestId`: red on the surviving guest.
+4. Inject runtime teardown failure and live-delete failure in each start-failure path; the gate must
+   observe that all later cleanup steps and fail→close receipts were still attempted, while the
+   returned `AggregateError` retains every cause.
+
+The ordinary green gate prints all four create/start cases separately. Two create-only baits are not
+the required matrix.
 
 ## Acceptance
 
