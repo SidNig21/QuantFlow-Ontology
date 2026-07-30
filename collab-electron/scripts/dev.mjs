@@ -29,7 +29,7 @@ const child = process.platform === "win32"
         cwd: repoDir,
         env: {
           ...process.env,
-          COLLAB_DEV_WORKTREE_ROOT: repoDir,
+          QF_DEV_WORKTREE_ROOT: repoDir,
         },
       },
     )
@@ -38,7 +38,7 @@ const child = process.platform === "win32"
       cwd: repoDir,
       env: {
         ...process.env,
-        COLLAB_DEV_WORKTREE_ROOT: repoDir,
+        QF_DEV_WORKTREE_ROOT: repoDir,
       },
     });
 

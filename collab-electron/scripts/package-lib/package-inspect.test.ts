@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  chmodSync,
   copyFileSync,
   mkdirSync,
   readFileSync,
@@ -17,6 +18,10 @@ import {
   QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY,
   QF_KERNEL_SCHEMA_UPGRADE,
   QF_TOOLLOOP_REF,
+  QF_LINUX_EXECUTABLE,
+  QF_PACKAGE_NAME,
+  QF_UPDATE_OWNER,
+  QF_UPDATE_REPOSITORY,
   RUNTIME_CONTROL_FILES,
   removeD1UpgradeFromAsar,
   removeDockProfilesManifest,
@@ -48,6 +53,12 @@ function seedMinimalPackage(root: string): void {
     join(resources, "species/hermes/tools-allowlist.json"),
     "[]",
   );
+  writeFileSync(join(root, QF_LINUX_EXECUTABLE), "#!/bin/sh\nexit 0\n");
+  chmodSync(join(root, QF_LINUX_EXECUTABLE), 0o755);
+  writeFileSync(
+    join(resources, "app-update.yml"),
+    `provider: github\nowner: ${QF_UPDATE_OWNER}\nrepo: ${QF_UPDATE_REPOSITORY}\n`,
+  );
 }
 
 async function seedSqlAsar(
@@ -62,6 +73,10 @@ async function seedSqlAsar(
   mkdirSync(join(source, "node_modules/qf-kernel-schema/compat"), {
     recursive: true,
   });
+  writeFileSync(
+    join(source, "package.json"),
+    JSON.stringify({ name: QF_PACKAGE_NAME, version: "0.0.0-test" }),
+  );
   writeFileSync(
     join(source, QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY),
     readFileSync(
@@ -324,6 +339,80 @@ describe("inspectPackagedResources ASAR SQL closure", () => {
           `missing packaged SQL artifact: ${QF_KERNEL_SCHEMA_UPGRADE}`,
         );
       }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("inspectPackagedResources product identity", () => {
+  test("accepts exact Linux executable, ASAR package name, and update target", async () => {
+    const root = testTmpPath("product-pass");
+    rmSync(root, { recursive: true, force: true });
+    seedMinimalPackage(root);
+    await seedSqlAsar(root);
+
+    try {
+      const result = inspectPackagedResources(
+        join(root, "resources"),
+        collabRoot,
+        [],
+        { expectedResourcesRoot: join(root, "resources") },
+      );
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.checkedPaths.map((entry) => entry.path)).toContain(
+          join(root, QF_LINUX_EXECUTABLE),
+        );
+        expect(result.checkedPaths.map((entry) => entry.path)).toContain(
+          "app.asar:package.json",
+        );
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("rejects a non-executable QuantFlow binary", async () => {
+    const root = testTmpPath("product-non-executable");
+    rmSync(root, { recursive: true, force: true });
+    seedMinimalPackage(root);
+    await seedSqlAsar(root);
+    chmodSync(join(root, QF_LINUX_EXECUTABLE), 0o644);
+
+    try {
+      const result = inspectPackagedResources(
+        join(root, "resources"),
+        collabRoot,
+        [],
+        { expectedResourcesRoot: join(root, "resources") },
+      );
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.reason).toContain("is not executable");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("rejects the old packaged update target", async () => {
+    const root = testTmpPath("product-old-update");
+    rmSync(root, { recursive: true, force: true });
+    seedMinimalPackage(root);
+    await seedSqlAsar(root);
+    writeFileSync(
+      join(root, "resources/app-update.yml"),
+      "provider: github\nowner: collabs-inc\nrepo: collab-public\n",
+    );
+
+    try {
+      const result = inspectPackagedResources(
+        join(root, "resources"),
+        collabRoot,
+        [],
+        { expectedResourcesRoot: join(root, "resources") },
+      );
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.reason).toContain("update target mismatch");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

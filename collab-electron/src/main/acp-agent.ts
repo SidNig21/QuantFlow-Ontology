@@ -20,6 +20,7 @@ import {
 import {
   getPref, setPref, type AppConfig,
 } from "./config";
+import { QF_APP_DIR } from "./paths";
 
 type AgentSession = {
   sessionId: string;
@@ -36,8 +37,7 @@ let appConfig: AppConfig | null = null;
 
 function getMessageCachePath(): string {
   return resolve(
-    app.getPath("home"),
-    ".collaborator",
+    QF_APP_DIR,
     "agent-messages.json",
   );
 }
@@ -205,8 +205,8 @@ async function spawnAndInitialize(
       fs: { readTextFile: true, writeTextFile: true },
     },
     clientInfo: {
-      name: "collaborator",
-      title: "Collaborator",
+      name: "quantflow",
+      title: "QuantFlow Ontology",
       version: "1.0.0",
     },
   });

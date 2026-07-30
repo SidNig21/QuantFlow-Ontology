@@ -8,12 +8,12 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 
-// Directory is passed from main via env so it matches the app's COLLAB_DIR
+// Directory is passed from main via env so it matches the app's QF_APP_DIR
 // in both dev (per-worktree) and packaged builds. Falls back to the
 // production default if spawned without it.
 const LOG_DIR =
-  process.env.COLLAB_SIDECAR_LOG_DIR
-  || path.join(os.homedir(), ".collaborator", "logs");
+  process.env.QF_SIDECAR_LOG_DIR
+  || path.join(os.homedir(), ".quantflow", "app", "logs");
 
 const sessionTimestamp = new Date()
   .toISOString()

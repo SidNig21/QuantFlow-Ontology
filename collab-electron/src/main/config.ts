@@ -1,6 +1,6 @@
 import { readFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { COLLAB_DIR } from "./paths";
+import { QF_APP_DIR } from "./paths";
 import { atomicWriteFileSync } from "./files";
 
 export interface WindowState {
@@ -32,7 +32,7 @@ const DEFAULT_CONFIG: AppConfig = {
 };
 
 function configPath(): string {
-  return join(COLLAB_DIR, "config.json");
+  return join(QF_APP_DIR, "config.json");
 }
 
 export function loadConfig(): AppConfig {

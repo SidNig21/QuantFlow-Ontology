@@ -2,7 +2,7 @@
  * Founder-controlled AgentOS host mounts (WO-008b).
  *
  * Specs come from a JSON file the founder owns — never from the renderer.
- * Default path: ~/.collaborator/agentos-host-mounts.json
+ * Default path: ~/.quantflow/app/agentos-host-mounts.json
  * Override: QF_AGENTOS_HOST_MOUNTS=<absolute path to json>
  *
  * Shape:
@@ -18,8 +18,8 @@
  * This module is data-only — agent-host builds typed mounts via createHostDirBackend.
  */
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
+import { QF_APP_ROOT } from "./paths";
 
 export type HostMountSpec = {
   hostPath: string;
@@ -39,7 +39,7 @@ export type HostMountsFile = {
 function configPath(): string {
   const override = process.env.QF_AGENTOS_HOST_MOUNTS;
   if (override && override.length > 0) return override;
-  return join(homedir(), ".collaborator", "agentos-host-mounts.json");
+  return join(QF_APP_ROOT, "agentos-host-mounts.json");
 }
 
 export function hostMountsConfigPath(): string {

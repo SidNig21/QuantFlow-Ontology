@@ -2,6 +2,7 @@ import { utilityProcess, type UtilityProcess } from "electron";
 import { accessSync } from "node:fs";
 import { join } from "node:path";
 import type { ReplayMessage } from "@collab/shared/replay-types";
+import { migrateWorkspaceMetadata } from "./app-migration";
 
 type NotifyFn = (msg: ReplayMessage) => void;
 
@@ -50,6 +51,7 @@ export function setNotifyFn(fn: NotifyFn): void {
 }
 
 export function startReplay(workspacePath: string): boolean {
+  migrateWorkspaceMetadata({ workspacePath });
   try {
     accessSync(join(workspacePath, ".git"));
   } catch {
@@ -59,7 +61,7 @@ export function startReplay(workspacePath: string): boolean {
   if (!worker) startWorker();
   const cachePath = join(
     workspacePath,
-    ".collaborator",
+    ".quantflow",
     "replay-cache.json",
   );
   worker?.postMessage({ cmd: "start", workspacePath, cachePath });

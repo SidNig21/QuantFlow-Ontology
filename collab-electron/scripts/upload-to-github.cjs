@@ -297,7 +297,7 @@ async function main() {
         owner,
         repo,
         tag_name: tag,
-        name: `Collaborator ${version}`,
+        name: `QuantFlow Ontology ${version}`,
         draft: true,
         prerelease: false,
       });

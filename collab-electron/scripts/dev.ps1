@@ -50,7 +50,7 @@ Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyC
     Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
   }
 
-$env:COLLAB_DEV_WORKTREE_ROOT = $repoDir
+$env:QF_DEV_WORKTREE_ROOT = $repoDir
 
 Start-Sleep -Milliseconds 500
 

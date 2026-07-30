@@ -1,11 +1,11 @@
 import * as crypto from "node:crypto";
 import { existsSync, mkdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { COLLAB_DIR } from "./paths";
+import { QF_APP_DIR } from "./paths";
 
 const NAMESPACE = `collaborator-${crypto
   .createHash("sha1")
-  .update(COLLAB_DIR)
+  .update(QF_APP_DIR)
   .digest("hex")
   .slice(0, 8)}`;
 
@@ -17,11 +17,11 @@ export function makeEndpointPath(name: string): string {
   if (process.platform === "win32") {
     return pipePath(name);
   }
-  return join(COLLAB_DIR, `${name}.sock`);
+  return join(QF_APP_DIR, `${name}.sock`);
 }
 
 export function prepareEndpoint(endpoint: string): void {
-  mkdirSync(COLLAB_DIR, { recursive: true });
+  mkdirSync(QF_APP_DIR, { recursive: true });
   if (process.platform === "win32") return;
   if (existsSync(endpoint)) {
     try {
@@ -43,5 +43,5 @@ export function cleanupEndpoint(endpoint: string): void {
 }
 
 export function ensureEndpointDir(): void {
-  mkdirSync(COLLAB_DIR, { recursive: true });
+  mkdirSync(QF_APP_DIR, { recursive: true });
 }

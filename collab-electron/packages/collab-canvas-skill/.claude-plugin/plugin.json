@@ -1,8 +1,8 @@
 {
-  "name": "collab-canvas",
+  "name": "qf-canvas",
   "version": "0.2.0",
-  "description": "Control the Collaborator spatial canvas from your terminal. Open, arrange, and manage tiles.",
+  "description": "Control the QuantFlow spatial canvas from your terminal. Open, arrange, and manage tiles.",
   "author": {
-    "name": "Collaborator"
+    "name": "QuantFlow"
   }
 }

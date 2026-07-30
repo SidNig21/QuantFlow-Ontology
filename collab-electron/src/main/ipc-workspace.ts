@@ -27,6 +27,7 @@ import * as watcher from "./watcher";
 import * as wikilinkIndex from "./wikilink-index";
 import { trackEvent } from "./analytics";
 import type { TreeNode } from "@collab/shared/types";
+import { migrateWorkspaceMetadata } from "./app-migration";
 
 export interface IpcWorkspaceContext {
   mainWindow: () => BrowserWindow | null;
@@ -54,22 +55,23 @@ function ensureGitignoreEntry(workspacePath: string): void {
 
   const content = readFileSync(gitignorePath, "utf-8");
   const lines = content.split("\n");
-  const alreadyIgnored = lines.some(
-    (l) => l.trim() === ".collaborator" || l.trim() === ".collaborator/",
+  const quantFlowIgnored = lines.some(
+    (l) => l.trim() === ".quantflow" || l.trim() === ".quantflow/",
   );
-  if (alreadyIgnored) return;
+  if (quantFlowIgnored) return;
 
   const suffix = content.endsWith("\n") ? "" : "\n";
   appendFileSync(
     gitignorePath,
-    `${suffix}.collaborator\n`,
+    `${suffix}.quantflow\n`,
     "utf-8",
   );
 }
 
 function initWorkspaceFiles(workspacePath: string): void {
-  const collabDir = join(workspacePath, ".collaborator");
-  mkdirSync(collabDir, { recursive: true });
+  migrateWorkspaceMetadata({ workspacePath });
+  const quantFlowDir = join(workspacePath, ".quantflow");
+  mkdirSync(quantFlowDir, { recursive: true });
   ensureGitignoreEntry(workspacePath);
 }
 
@@ -95,6 +97,8 @@ export function startAllWorkspaceServices(
   fileFilterSetter: (f: FileFilter) => void,
 ): void {
   for (const ws of workspaces) {
+    migrateWorkspaceMetadata({ workspacePath: ws });
+    ensureGitignoreEntry(ws);
     wsConfigMap.set(ws, loadWorkspaceConfig(ws));
     setThumbnailCacheDir(ws);
     watcher.watchWorkspace(ws);
@@ -110,6 +114,8 @@ export function startSingleWorkspaceServices(
   path: string,
   fileFilterSetter: (f: FileFilter) => void,
 ): void {
+  migrateWorkspaceMetadata({ workspacePath: path });
+  ensureGitignoreEntry(path);
   wsConfigMap.set(path, loadWorkspaceConfig(path));
   setThumbnailCacheDir(path);
   watcher.watchWorkspace(path);
@@ -288,10 +294,12 @@ export function registerWorkspaceHandlers(
       return { workspaces: appConfig.workspaces };
     }
 
-    const collabDir = join(chosen, ".collaborator");
-    const isNew = !existsSync(collabDir);
+    const migration = migrateWorkspaceMetadata({ workspacePath: chosen });
+    const isNew = migration.status === "source-absent";
     if (isNew) {
       initWorkspaceFiles(chosen);
+    } else {
+      ensureGitignoreEntry(chosen);
     }
 
     appConfig.workspaces.push(chosen);

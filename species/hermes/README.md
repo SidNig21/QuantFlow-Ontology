@@ -11,7 +11,8 @@ as substrate / secondary path. It is **not** the founder Hermes desk UX.
 Launch + surface (deploy-true): committed `launch.json`, `dock-profiles.json`, and packed
 `hermes.meta.json` (written by `pack-agent`). The manifest initializes missing Kernel definitions;
 after boot, the Kernel is the only Dock catalogue. Optional adapter-scoped founder env remains
-`speciesEnv.hermes` (`HERMES_BIN`, `HOME`) in `~/.collaborator/agentos-host-mounts.json`.
+`speciesEnv.hermes` (`HERMES_BIN`, `HOME`) in
+`~/.quantflow/app/agentos-host-mounts.json`.
 
 ## Smokes
 

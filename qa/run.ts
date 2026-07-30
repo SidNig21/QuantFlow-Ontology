@@ -506,6 +506,16 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "product-identity",
+    description:
+      "WO-N1: pinned QuantFlow identity, staged legacy migration, production delegation, and shipped Linux metadata",
+    run: async () => {
+      const { runProductIdentityGate } = await import("./gates/product-identity.ts");
+      const { ok } = await runProductIdentityGate();
+      return ok;
+    },
+  },
+  {
     name: "vault-projection",
     description:
       "WO-V1: Kernel→Obsidian projection (one-direction, hash-verify, schema-driven, idempotent)",

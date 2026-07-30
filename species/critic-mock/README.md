@@ -5,7 +5,7 @@ Mock-model ACP guest (cloned from the ToolLoop proof). Safe to prompt from the d
 ```bash
 bun install
 bun run pack-agent
-bun ./register.ts --db "$(ls ~/.collaborator/dev/worktree-*/kernel.db | head -1)"
+bun ./register.ts --db "$HOME/.quantflow/kernel.db"
 ```
 
 Then in the app: Spawn → chip walks → Cancel. Corrupt the packed `.aospkg` to falsify typed spawn failure; restore → green.

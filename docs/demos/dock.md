@@ -33,15 +33,15 @@ the renderer, and there is no second Peer Seats catalogue.
 6. Cancel a live session from the dock; chip reaches a terminal state; **Close** appears on
    `cancelled`/`failed` and removes the actionable edge.
 7. Spawn again, then **force-kill** mid-run (`kill -9` the Electron PID — not Quit).
-8. Relaunch. Confirm the Dock rebuilds definitions and sessions from `kernel.db` alone;
+8. Relaunch. Confirm the Dock rebuilds definitions and sessions from `~/.quantflow/kernel.db` alone;
    the interrupted session is terminal (`failed`/`cancelled` per policy), never phantom `running`.
 
 ## Receipt
 
-From the repo root (replace `KERNEL_DB` with the boot-line path):
+From the repo root:
 
 ```bash
-KERNEL_DB="$HOME/.collaborator/dev/worktree-XXXXXXXXXXXX/kernel.db" bun -e '
+KERNEL_DB="$HOME/.quantflow/kernel.db" bun -e '
 import { Database } from "bun:sqlite";
 const db = new Database(process.env.KERNEL_DB);
 const definitions = db.query(

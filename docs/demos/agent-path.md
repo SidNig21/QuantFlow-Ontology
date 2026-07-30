@@ -27,10 +27,10 @@ in `kernel.db`. Chunk streams are ephemeral (Law C).
 
 ## Receipt
 
-From the repo root (replace `KERNEL_DB` with the boot-line path):
+From the repo root (the default Kernel path is stable across production and development launches):
 
 ```bash
-KERNEL_DB="$HOME/.collaborator/dev/worktree-XXXXXXXXXXXX/kernel.db" bun -e '
+KERNEL_DB="$HOME/.quantflow/kernel.db" bun -e '
 import { Database } from "bun:sqlite";
 const db = new Database(process.env.KERNEL_DB);
 const rows = db.query(

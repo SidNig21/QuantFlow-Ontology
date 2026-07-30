@@ -8,6 +8,7 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { QF_APP_ROOT } from "./paths";
 import { execSync } from "node:child_process";
 
 export type AgentId = "claude" | "codex" | "gemini";
@@ -78,11 +79,11 @@ function skillInstallPath(id: AgentId): string {
   const home = homedir();
   switch (id) {
     case "claude":
-      return join(home, ".claude", "skills", "collab-canvas");
+      return join(home, ".claude", "skills", "qf-canvas");
     case "codex":
-      return join(home, ".codex", "instructions", "collab-canvas.md");
+      return join(home, ".codex", "instructions", "qf-canvas.md");
     case "gemini":
-      return join(home, ".gemini", "instructions", "collab-canvas.md");
+      return join(home, ".gemini", "instructions", "qf-canvas.md");
   }
 }
 
@@ -135,7 +136,7 @@ export function uninstallSkill(id: AgentId): void {
 // -- plugin offered marker --
 
 function markerPath(): string {
-  return join(homedir(), ".collaborator", "canvas-plugin-offered");
+  return join(QF_APP_ROOT, "canvas-plugin-offered");
 }
 
 export function hasOfferedPlugin(): boolean {
@@ -143,7 +144,7 @@ export function hasOfferedPlugin(): boolean {
 }
 
 export function markPluginOffered(): void {
-  const dir = join(homedir(), ".collaborator");
+  const dir = QF_APP_ROOT;
   mkdirSync(dir, { recursive: true });
   writeFileSync(markerPath(), new Date().toISOString(), "utf-8");
 }

@@ -1,7 +1,8 @@
 # Law D demo — Artifact survives kill + relaunch
 
-This is the founder’s hands-on script for WO-006b. Domain truth lives in
-`kernel.db`; the canvas JSON only stores layout + an `artifactId` reference.
+This is the founder’s hands-on script for WO-006b. Domain truth lives
+at `~/.quantflow/kernel.db`; artifact bytes live under `~/.quantflow/artifacts/`, and the canvas
+state under `~/.quantflow/app/` only stores layout + an `artifactId` reference.
 
 ## Steps
 
@@ -27,16 +28,12 @@ This is the founder’s hands-on script for WO-006b. Domain truth lives in
 
 ## Receipt (event row)
 
-From the **repo root**, after at least one publish (replace `KERNEL_DB` with the
-path from the `kernel: opened` log — in dev it is under
-`~/.collaborator/dev/worktree-<hash>/kernel.db`):
+From the **repo root**, after at least one publish:
 
 ```bash
-bun -e '
+KERNEL_DB="$HOME/.quantflow/kernel.db" bun -e '
 import { Database } from "bun:sqlite";
-const db = new Database(process.env.KERNEL_DB ?? `${process.env.HOME}/.collaborator/dev/` +
-  require("fs").readdirSync(`${process.env.HOME}/.collaborator/dev`).find(d => d.startsWith("worktree-")) +
-  "/kernel.db");
+const db = new Database(process.env.KERNEL_DB);
 const row = db.query(`SELECT * FROM events WHERE type = ? ORDER BY created_at DESC LIMIT 1`)
   .get("artifact.published");
 console.log(JSON.stringify(row, null, 2));
@@ -46,7 +43,7 @@ console.log(JSON.stringify(row, null, 2));
 Or, if you already know the path:
 
 ```bash
-KERNEL_DB="$HOME/.collaborator/dev/worktree-XXXXXXXXXXXX/kernel.db" bun -e '
+KERNEL_DB="$HOME/.quantflow/kernel.db" bun -e '
 import { Database } from "bun:sqlite";
 const db = new Database(process.env.KERNEL_DB);
 console.log(JSON.stringify(

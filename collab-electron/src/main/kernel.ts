@@ -16,7 +16,7 @@ import {
   type KernelDb,
   type TraceContext,
 } from "qf-kernel/portable";
-import { COLLAB_DIR } from "./paths";
+import { QF_APP_DIR } from "./paths";
 
 function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
   return {
@@ -52,9 +52,9 @@ let kernelPath: string | null = null;
 
 export function openAppKernel(): KernelDb {
   if (kernelDb) return kernelDb;
-  // App-local state (canvas, PTY, sockets) still lives under COLLAB_DIR.
+  // App-local state (canvas, PTY, sockets) lives under QF_APP_DIR.
   // Kernel truth does not — see WO-K1 RULING 1.
-  mkdirSync(COLLAB_DIR, { recursive: true });
+  mkdirSync(QF_APP_DIR, { recursive: true });
   const resolved = resolveKernelPath();
   kernelPath = resolved.path;
   // D6: every agent spawn inherits this once the parent process carries it.

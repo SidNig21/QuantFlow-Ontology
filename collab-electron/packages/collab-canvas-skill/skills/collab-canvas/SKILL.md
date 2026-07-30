@@ -1,6 +1,6 @@
-# Collaborator Canvas
+# QuantFlow Canvas
 
-Control Collaborator's spatial canvas from the terminal using the `collab-canvas` CLI.
+Control QuantFlow's spatial canvas from the terminal using the `qf-canvas` CLI.
 The canvas is a pannable, zoomable surface where tiles display terminals, files, images, and graphs.
 
 ## Coordinate System
@@ -27,20 +27,20 @@ Type is inferred from the file when `--file` is used:
 
 ## Commands
 
-### collab-canvas tile list
+### qf-canvas tile list
 
 List all tiles on the canvas. Returns JSON array with id, type, position, size, and file path for each tile.
 
 ```bash
-collab-canvas tile list
+qf-canvas tile list
 ```
 
-### collab-canvas tile create
+### qf-canvas tile create
 
 Create a new tile on the canvas.
 
 ```bash
-collab-canvas tile create <type> [--file <path>] [--pos x,y] [--size w,h]
+qf-canvas tile create <type> [--file <path>] [--pos x,y] [--size w,h]
 ```
 
 - `<type>`: term, note, code, image, or graph
@@ -53,79 +53,79 @@ Returns the new tile's ID on stdout.
 **Examples:**
 ```bash
 # Open a terminal at position (5, 5)
-collab-canvas tile create term --pos 5,5
+qf-canvas tile create term --pos 5,5
 
 # Open a markdown file with default placement
-collab-canvas tile create note --file ./README.md
+qf-canvas tile create note --file ./README.md
 
 # Open a graph file at a specific position and size
-collab-canvas tile create graph --file ./entities.graph.json --pos 25,0 --size 35,30
+qf-canvas tile create graph --file ./entities.graph.json --pos 25,0 --size 35,30
 ```
 
-### collab-canvas tile rm
+### qf-canvas tile rm
 
 Remove a tile from the canvas.
 
 ```bash
-collab-canvas tile rm <id>
+qf-canvas tile rm <id>
 ```
 
-### collab-canvas tile move
+### qf-canvas tile move
 
 Reposition a tile.
 
 ```bash
-collab-canvas tile move <id> --pos x,y
+qf-canvas tile move <id> --pos x,y
 ```
 
-### collab-canvas tile resize
+### qf-canvas tile resize
 
 Resize a tile.
 
 ```bash
-collab-canvas tile resize <id> --size w,h
+qf-canvas tile resize <id> --size w,h
 ```
 
-### collab-canvas tile focus
+### qf-canvas tile focus
 
 Pan and zoom the viewport to bring one or more tiles into view, then flash their focus rings.
 
 ```bash
-collab-canvas tile focus <id> [<id>...]
+qf-canvas tile focus <id> [<id>...]
 ```
 
 **Examples:**
 ```bash
 # Focus a single tile
-collab-canvas tile focus tile-abc123
+qf-canvas tile focus tile-abc123
 
 # Focus multiple tiles (viewport zooms to fit all)
-collab-canvas tile focus tile-abc123 tile-def456
+qf-canvas tile focus tile-abc123 tile-def456
 ```
 
-### collab-canvas terminal write
+### qf-canvas terminal write
 
 Send input to a terminal tile. The tile must be of type `term` with an active PTY session.
 
 ```bash
-collab-canvas terminal write <id> <input>
+qf-canvas terminal write <id> <input>
 ```
 
 **Examples:**
 ```bash
 # Run a command in a terminal tile
-collab-canvas terminal write tile-abc123 $'ls -la\n'
+qf-canvas terminal write tile-abc123 $'ls -la\n'
 
 # Launch Claude Code in headless JSON mode
-collab-canvas terminal write tile-abc123 $'claude -p "fix the bug" --output-format json\n'
+qf-canvas terminal write tile-abc123 $'claude -p "fix the bug" --output-format json\n'
 ```
 
-### collab-canvas terminal read
+### qf-canvas terminal read
 
 Read recent output from a terminal tile. Returns raw terminal output from the PTY session's ring buffer.
 
 ```bash
-collab-canvas terminal read <id> [--lines N]
+qf-canvas terminal read <id> [--lines N]
 ```
 
 - `--lines N`: number of lines to capture (default: 50)
@@ -137,8 +137,8 @@ collab-canvas terminal read <id> [--lines N]
 Two files next to each other for comparison.
 
 ```bash
-collab-canvas tile create code --file ./old.ts --pos 0,0
-collab-canvas tile create code --file ./new.ts --pos 23,0
+qf-canvas tile create code --file ./old.ts --pos 0,0
+qf-canvas tile create code --file ./new.ts --pos 23,0
 ```
 
 ### Research workspace
@@ -146,9 +146,9 @@ collab-canvas tile create code --file ./new.ts --pos 23,0
 Knowledge graph on the left, notes on the right, terminal below.
 
 ```bash
-collab-canvas tile create graph --file ./research.graph.json --pos 0,0 --size 30,25
-collab-canvas tile create note --file ./notes.md --pos 31,0
-collab-canvas tile create term --pos 0,26
+qf-canvas tile create graph --file ./research.graph.json --pos 0,0 --size 30,25
+qf-canvas tile create note --file ./notes.md --pos 31,0
+qf-canvas tile create term --pos 0,26
 ```
 
 ### Dashboard layout
@@ -156,10 +156,10 @@ collab-canvas tile create term --pos 0,26
 Multiple views arranged in a grid.
 
 ```bash
-collab-canvas tile create graph --file ./entities.graph.json --pos 0,0 --size 30,25
-collab-canvas tile create note --file ./log.md --pos 31,0
-collab-canvas tile create note --file ./report.md --pos 31,14
-collab-canvas tile create term --pos 0,26
+qf-canvas tile create graph --file ./entities.graph.json --pos 0,0 --size 30,25
+qf-canvas tile create note --file ./log.md --pos 31,0
+qf-canvas tile create note --file ./report.md --pos 31,14
+qf-canvas tile create term --pos 0,26
 ```
 
 ### Focus view
@@ -167,7 +167,7 @@ collab-canvas tile create term --pos 0,26
 Single tile centered with generous size.
 
 ```bash
-collab-canvas tile create code --file ./main.ts --pos 5,2 --size 40,35
+qf-canvas tile create code --file ./main.ts --pos 5,2 --size 40,35
 ```
 
 ### Agent in a terminal
@@ -176,11 +176,11 @@ Launch a Claude Code instance in a terminal tile for the human to observe.
 
 ```bash
 # Create terminal, wait for PTY, then launch agent
-collab-canvas tile create term --pos 0,0
+qf-canvas tile create term --pos 0,0
 # (use tile list to get the tile ID, then)
-collab-canvas terminal write <id> $'claude -p "summarize this project" --output-format json\n'
+qf-canvas terminal write <id> $'claude -p "summarize this project" --output-format json\n'
 # Read the result when done
-collab-canvas terminal read <id> --lines 100
+qf-canvas terminal read <id> --lines 100
 ```
 
 ## Conventions
@@ -195,7 +195,7 @@ collab-canvas terminal read <id> --lines 100
 
 ## Setup
 
-The `collab-canvas` CLI is installed to `~/.local/bin/`. If the command is not found, the user needs to add it to their PATH:
+The `qf-canvas` CLI is installed to `~/.local/bin/`. If the command is not found, the user needs to add it to their PATH:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
@@ -209,4 +209,4 @@ Add this to `~/.zshrc` (macOS) or `~/.bashrc` (Linux) to persist across sessions
 |------|--------------------------------------------|
 | 0    | Success                                    |
 | 1    | RPC error (tile not found, invalid params) |
-| 2    | Connection failure (Collaborator not running) |
+| 2    | Connection failure (QuantFlow not running) |

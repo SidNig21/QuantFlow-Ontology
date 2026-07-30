@@ -107,7 +107,7 @@ describe("installSkill / uninstallSkill", () => {
       FAKE_HOME,
       ".claude",
       "skills",
-      "collab-canvas",
+      "qf-canvas",
       "SKILL.md",
     );
     expect(existsSync(installed)).toBe(true);
@@ -119,7 +119,7 @@ describe("installSkill / uninstallSkill", () => {
       FAKE_HOME,
       ".codex",
       "instructions",
-      "collab-canvas.md",
+      "qf-canvas.md",
     );
     expect(existsSync(installed)).toBe(true);
   });
@@ -130,14 +130,14 @@ describe("installSkill / uninstallSkill", () => {
       FAKE_HOME,
       ".gemini",
       "instructions",
-      "collab-canvas.md",
+      "qf-canvas.md",
     );
     expect(existsSync(installed)).toBe(true);
   });
 
   test("uninstallSkill removes Claude skill directory", () => {
     installSkill("claude");
-    const dir = join(FAKE_HOME, ".claude", "skills", "collab-canvas");
+    const dir = join(FAKE_HOME, ".claude", "skills", "qf-canvas");
     expect(existsSync(dir)).toBe(true);
 
     uninstallSkill("claude");
@@ -150,7 +150,7 @@ describe("installSkill / uninstallSkill", () => {
       FAKE_HOME,
       ".codex",
       "instructions",
-      "collab-canvas.md",
+      "qf-canvas.md",
     );
     expect(existsSync(file)).toBe(true);
 

@@ -1,6 +1,7 @@
 import { readFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { atomicWriteFileSync } from "./files";
+import { migrateWorkspaceMetadata } from "./app-migration";
 
 export interface WorkspaceConfig {
   expanded_dirs: string[];
@@ -13,7 +14,8 @@ const DEFAULT_CONFIG: WorkspaceConfig = {
 };
 
 export function workspaceConfigPath(workspacePath: string): string {
-  return join(workspacePath, ".collaborator", "config.json");
+  migrateWorkspaceMetadata({ workspacePath });
+  return join(workspacePath, ".quantflow", "config.json");
 }
 
 export function loadWorkspaceConfig(

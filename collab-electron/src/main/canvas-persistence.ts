@@ -3,9 +3,9 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import * as crypto from "node:crypto";
-import { COLLAB_DIR } from "./paths";
+import { QF_APP_DIR } from "./paths";
 
-const STATE_DIR = COLLAB_DIR;
+const STATE_DIR = QF_APP_DIR;
 const STATE_FILE = join(STATE_DIR, "canvas-state.json");
 
 interface TileState {

@@ -15,11 +15,18 @@ const IS_WIN = process.platform === "win32";
 const INSTALL_DIR = IS_WIN
   ? join(
     process.env["LOCALAPPDATA"] || join(homedir(), "AppData", "Local"),
-    "Collaborator",
+    "QuantFlow",
     "bin",
   )
   : join(homedir(), ".local", "bin");
-const WRAPPER_PATH = join(INSTALL_DIR, IS_WIN ? "collab-canvas.cmd" : "collab-canvas");
+const LEGACY_INSTALL_DIR = IS_WIN
+  ? join(
+    process.env["LOCALAPPDATA"] || join(homedir(), "AppData", "Local"),
+    "Collaborator",
+    "bin",
+  )
+  : INSTALL_DIR;
+const WRAPPER_PATH = join(INSTALL_DIR, IS_WIN ? "qf-canvas.cmd" : "qf-canvas");
 const MJS_PATH = join(INSTALL_DIR, "collab-cli.mjs");
 
 function getMjsSource(): string {
@@ -32,9 +39,9 @@ function getMjsSource(): string {
 function generateUnixWrapper(): string {
   return `#!/usr/bin/env bash
 set -euo pipefail
-NODE_BIN="$(cat "$HOME/.collaborator/node-path" 2>/dev/null)" || true
+NODE_BIN="$(cat "$HOME/.quantflow/app/node-path" 2>/dev/null)" || true
 if [[ -z "$NODE_BIN" || ! -x "$NODE_BIN" ]]; then
-  echo "error: collaborator is not running (no node-path file)" >&2
+  echo "error: QuantFlow is not running (no node-path file)" >&2
   exit 2
 fi
 ELECTRON_RUN_AS_NODE=1 exec "$NODE_BIN" "$(dirname "$0")/collab-cli.mjs" "$@"
@@ -44,9 +51,9 @@ ELECTRON_RUN_AS_NODE=1 exec "$NODE_BIN" "$(dirname "$0")/collab-cli.mjs" "$@"
 function generateWindowsWrapper(): string {
   return `@echo off
 setlocal
-set "NP_FILE=%USERPROFILE%\\.collaborator\\node-path"
+set "NP_FILE=%USERPROFILE%\\.quantflow\\app\\node-path"
 if not exist "%NP_FILE%" (
-  echo error: collaborator is not running ^(no node-path file^) >&2
+  echo error: QuantFlow is not running ^(no node-path file^) >&2
   exit /b 2
 )
 set /p NODE_BIN=<"%NP_FILE%"
@@ -63,13 +70,15 @@ export function installCli(): void {
   }
 
   const legacyNames = IS_WIN
-    ? ["collab.cmd", "collab.ps1", "collab-canvas.ps1"]
-    : ["collab"];
-  for (const name of legacyNames) {
-    const legacy = join(INSTALL_DIR, name);
-    if (existsSync(legacy)) {
-      unlinkSync(legacy);
-      console.log("[cli-installer] removed legacy CLI:", legacy);
+    ? ["collab.cmd", "collab.ps1", "collab-canvas.cmd", "collab-canvas.ps1"]
+    : ["collab", "collab-canvas"];
+  for (const dir of new Set([INSTALL_DIR, LEGACY_INSTALL_DIR])) {
+    for (const name of legacyNames) {
+      const legacy = join(dir, name);
+      if (existsSync(legacy)) {
+        unlinkSync(legacy);
+        console.log("[cli-installer] removed legacy CLI:", legacy);
+      }
     }
   }
 

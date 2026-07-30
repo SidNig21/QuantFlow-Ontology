@@ -1,4 +1,4 @@
-# QuantFlow
+# QuantFlow Ontology
 
 **An AI-native quantitative research platform: heterogeneous AI agents collaborating on a spatial canvas, over a governed ontology.**
 
@@ -107,6 +107,26 @@ bun run dev     # Electron app with hot reload
 bun test        # tests
 bun run build   # production build
 ```
+
+The packaged Linux executable is `quantflow`. While the app is running, `qf-canvas` is the
+command-line control surface for arranging and inspecting canvas tiles.
+
+### Local data layout
+
+QuantFlow keeps domain truth, durable artifact bytes, and app-local projection state in three
+deliberately separate locations:
+
+```text
+~/.quantflow/kernel.db
+~/.quantflow/artifacts/
+~/.quantflow/app/
+```
+
+The Kernel is the sole source of domain truth. Artifact bytes live beside it under the canonical
+artifact root, while canvas, browser, configuration, logs, sockets, and other app-local state live
+under `app/` (development launches are isolated below `app/dev/worktree-<id>/`). On first launch,
+QuantFlow copies eligible state from the legacy Collaborator locations without deleting the source;
+if both roots exist, the QuantFlow root wins unchanged.
 
 Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap automatically from packaged manifests, but real Hermes turns still require the founder's local [Hermes](https://github.com/NousResearch/hermes-agent) install and matching `qf-orchestrator`, `qf-worker`, and `qf-worker-2` runtime profiles. The founder-only peer-bus helper is `tools/qf-peer-bus/scripts/setup-founder-seats.ts`.
 

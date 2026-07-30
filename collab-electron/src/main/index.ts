@@ -1,4 +1,3 @@
-import "./logger";
 import {
   app,
   BrowserWindow,
@@ -39,7 +38,12 @@ import * as gitReplay from "./git-replay";
 import { DISABLE_GIT_REPLAY } from "@collab/shared/replay-types";
 import * as pty from "./pty";
 import { updateManager, setupUpdateIPC } from "./updater";
-import { DEV_WORKTREE_ID } from "./paths";
+import { DEV_WORKTREE_ID, QF_APP_DIR } from "./paths";
+import {
+  legacyElectronUserDataPath,
+  runAppMigrationBeforeBoot,
+} from "./app-migration";
+import { initializeLogger } from "./logger";
 import {
   initMainAnalytics,
   trackEvent,
@@ -57,6 +61,18 @@ import {
   reconcileStaleSessions,
   runAgentHostSmoke,
 } from "./agent-host";
+
+// Capture Electron's legacy default before replacing it. The migration must
+// publish app state before logger/config/sidecar consumers create destinations.
+runAppMigrationBeforeBoot({
+  legacyElectronUserData: legacyElectronUserDataPath({
+    appData: app.getPath("appData"),
+    devWorktreeId: DEV_WORKTREE_ID,
+  }),
+  log: (message) => console.warn(message),
+});
+app.setPath("userData", join(QF_APP_DIR, "electron"));
+initializeLogger();
 
 // macOS apps launched from Finder don't inherit the user's shell
 // LANG, so child processes (tmux, shells) default to ASCII.
@@ -83,13 +99,6 @@ process.on("unhandledRejection", (reason) => {
   });
   console.error("[crash] Unhandled rejection:", error);
 });
-
-if (import.meta.env.DEV) {
-  app.setPath(
-    "userData",
-    join(app.getPath("userData"), "dev", DEV_WORKTREE_ID ?? "worktree-unknown"),
-  );
-}
 
 let mainWindow: BrowserWindow | null = null;
 let pendingFilePath: string | null = null;

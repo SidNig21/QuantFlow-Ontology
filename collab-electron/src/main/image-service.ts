@@ -4,6 +4,7 @@ import { basename, dirname, join } from "node:path";
 import { toCollabFileUrl } from "@collab/shared/collab-file-url";
 import { isSubpath } from "@collab/shared/path-utils";
 import { IMAGE_EXTENSIONS, isImageFile } from "./file-filter";
+import { migrateWorkspaceMetadata } from "./app-migration";
 
 const NATIVE_EXTENSIONS = new Set([
   ".png", ".jpg", ".jpeg", ".gif", ".webp",
@@ -20,7 +21,8 @@ const cacheDirs = new Set<string>();
 const pending = new Map<number, Pending>();
 
 export function setThumbnailCacheDir(workspacePath: string): void {
-  cacheDirs.add(join(workspacePath, ".collaborator", "thumbnails"));
+  migrateWorkspaceMetadata({ workspacePath });
+  cacheDirs.add(join(workspacePath, ".quantflow", "thumbnails"));
 }
 
 function ensureWorker(): Worker {

@@ -32,7 +32,7 @@ import {
   SIDECAR_PID_PATH,
   type SessionCreateParams,
 } from "./sidecar/protocol";
-import { COLLAB_DIR } from "./paths";
+import { QF_APP_DIR } from "./paths";
 import {
   bindPtyDisplay,
   clearAllPtyViewers,
@@ -358,7 +358,7 @@ async function spawnSidecar(): Promise<void> {
       env: {
         ...process.env,
         ELECTRON_RUN_AS_NODE: "1",
-        COLLAB_SIDECAR_LOG_DIR: path.join(COLLAB_DIR, "logs"),
+        QF_SIDECAR_LOG_DIR: path.join(QF_APP_DIR, "logs"),
       },
     },
   );
@@ -453,7 +453,7 @@ function attachClient(
   return ptyProcess;
 }
 
-const ZSH_INTEGRATION_DIR = path.join(COLLAB_DIR, "shell-integration", "zsh");
+const ZSH_INTEGRATION_DIR = path.join(QF_APP_DIR, "shell-integration", "zsh");
 
 function ensureZshIntegrationDir(): string | null {
   try {

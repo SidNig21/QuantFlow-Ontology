@@ -48,6 +48,10 @@ export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
 export const HERMES_META = "species/hermes/packed/hermes.meta.json";
 export const HERMES_LAUNCH = "species/hermes/launch.json";
 export const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
+export const QF_LINUX_EXECUTABLE = "quantflow";
+export const QF_PACKAGE_NAME = "@quantflow/electron";
+export const QF_UPDATE_OWNER = "SidNig21";
+export const QF_UPDATE_REPOSITORY = "QuantFlow-Ontology";
 
 export const RUNTIME_CONTROL_FILES = [
   QF_TOOLLOOP_META,
@@ -283,6 +287,14 @@ export function inspectPackagedResources(
     checked.push(...sqlInspect.entries);
   }
 
+  const productIdentity = inspectPackagedProductIdentity(root);
+  if ("ok" in productIdentity && productIdentity.ok === false) {
+    return productIdentity;
+  }
+  if ("entries" in productIdentity) {
+    checked.push(...productIdentity.entries);
+  }
+
   return { ok: true, checkedPaths: checked };
 }
 
@@ -370,6 +382,91 @@ function inspectAsarSqlArtifacts(
   }
 
   return { entries: checked };
+}
+
+function yamlScalar(source: string, key: string): string | null {
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = new RegExp(`^\\s*${escaped}\\s*:\\s*["']?([^"'\\s#]+)["']?\\s*(?:#.*)?$`, "m")
+    .exec(source);
+  return match?.[1] ?? null;
+}
+
+function inspectPackagedProductIdentity(
+  resourcesRoot: string,
+): InspectFailure | { entries: { path: string; bytes: number }[] } {
+  const packageRoot = resolve(resourcesRoot, "..");
+  const executablePath = join(packageRoot, QF_LINUX_EXECUTABLE);
+  const executableFail = requireNonEmpty(executablePath, "QuantFlow executable");
+  if (executableFail) return executableFail;
+  if ((statSync(executablePath).mode & 0o111) === 0) {
+    return {
+      ok: false,
+      reason: `QuantFlow executable is not executable: ${executablePath}`,
+    };
+  }
+
+  const legacyExecutable = join(packageRoot, "collaborator");
+  if (existsSync(legacyExecutable)) {
+    return {
+      ok: false,
+      reason: `legacy production executable still emitted: ${legacyExecutable}`,
+    };
+  }
+
+  const asarPath = join(resourcesRoot, "app.asar");
+  let manifestBytes: Buffer;
+  try {
+    manifestBytes = extractFile(asarPath, "package.json");
+  } catch {
+    return { ok: false, reason: "packaged app.asar manifest missing: package.json" };
+  }
+
+  let manifest: { name?: unknown };
+  try {
+    manifest = JSON.parse(manifestBytes.toString("utf8")) as { name?: unknown };
+  } catch {
+    return { ok: false, reason: "packaged app.asar manifest is not valid JSON" };
+  }
+  if (manifest.name !== QF_PACKAGE_NAME) {
+    return {
+      ok: false,
+      reason: `packaged app.asar manifest name must be ${QF_PACKAGE_NAME}, got ${String(manifest.name)}`,
+    };
+  }
+
+  const updatePath = join(resourcesRoot, "app-update.yml");
+  const updateFail = requireNonEmpty(updatePath, "packaged update metadata");
+  if (updateFail) return updateFail;
+  const updateSource = readFileSync(updatePath, "utf8");
+  const provider = yamlScalar(updateSource, "provider");
+  const owner = yamlScalar(updateSource, "owner");
+  const repo = yamlScalar(updateSource, "repo");
+  if (
+    provider !== "github" ||
+    owner !== QF_UPDATE_OWNER ||
+    repo !== QF_UPDATE_REPOSITORY
+  ) {
+    return {
+      ok: false,
+      reason:
+        "packaged update target mismatch:" +
+        ` provider=${String(provider)} owner=${String(owner)} repo=${String(repo)}`,
+    };
+  }
+  if (/collabs-inc|collab-public/i.test(updateSource)) {
+    return {
+      ok: false,
+      reason: "legacy production update target still emitted in app-update.yml",
+    };
+  }
+
+  return {
+    entries: [
+      { path: executablePath, bytes: fileSize(executablePath) },
+      { path: "app.asar:package.json", bytes: manifestBytes.length },
+      { path: updatePath, bytes: fileSize(updatePath) },
+    ],
+  };
 }
 
 export type AsarInventoryDiff = {
