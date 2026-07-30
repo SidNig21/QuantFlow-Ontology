@@ -140,7 +140,7 @@ research collaboration; those remain later rungs.
 - **Stop building engines.** The substrate is done. New effort goes into the world model and the loop that runs over it.
 - **Kernel is the sole writer.** Everything else asks.
 - **One canonical type per real-world entity.** `Run` with a `kind` property — never `BacktestRun`/`ScreenerRun` clones. Extension via new linked types, not mutation of shipped ones.
-- **Pipeline-shaped data gets pipelines, not actions.** Quotes and events flow in through ingest scripts with provenance; no manual write verbs for them.
+- **Pipeline-shaped data has no per-type or manual agent write verbs.** Trusted bulk-ingest commands still pass through the Kernel's single `execute()` door, carrying provenance and atomic retry rules, while Dock agents receive read access rather than a second write surface.
 - **Descriptions are enforced, not encouraged.** The schema is agent context.
 - **Measurements beat prose.** Nothing is "done" by narrative — gates go red or the claim doesn't exist.
 

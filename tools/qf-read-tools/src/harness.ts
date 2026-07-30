@@ -18,6 +18,7 @@ import {
 } from "qf-kernel";
 import { schema as productionSchema } from "qf-kernel-schema";
 import type { Schema } from "qf-kernel-schema/define";
+import { isActionServedToAgents } from "qf-kernel-schema/mcp";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-tool-plane-harness-"));
 const kernelDbPath = join(workDir, "kernel.db");
@@ -60,7 +61,7 @@ function expectedServedToolNames(schema: Schema): Set<string> {
     names.add(`qf_${object.name}_links`);
   }
   for (const action of schema.actions) {
-    if (action.operatorOnly !== true) {
+    if (isActionServedToAgents(action)) {
       names.add(`qf_${action.name}`);
     }
   }
@@ -107,7 +108,7 @@ async function assertServedSet(client: Client, schema: Schema): Promise<void> {
   const served = new Set(listed.tools.map((t) => t.name));
   const expected = expectedServedToolNames(schema);
   console.log(
-    `tool_plane_expected_count=${expected.size} served_count=${served.size} read=${schema.objects.length * 3} actions=${schema.actions.filter((a) => a.operatorOnly !== true).length}`,
+    `tool_plane_expected_count=${expected.size} served_count=${served.size} read=${schema.objects.length * 3} actions=${schema.actions.filter(isActionServedToAgents).length}`,
   );
   if (served.size !== expected.size) {
     throw new Error(`set-equality: expected ${expected.size} tools, got ${served.size}`);
@@ -118,13 +119,13 @@ async function assertServedSet(client: Client, schema: Schema): Promise<void> {
   for (const name of served) {
     if (!expected.has(name)) throw new Error(`set-equality: unexpected ${name}`);
   }
-  const operatorOnlyLeaks = schema.actions
-    .filter((a) => a.operatorOnly === true)
+  const restrictedActionLeaks = schema.actions
+    .filter((a) => !isActionServedToAgents(a))
     .map((a) => `qf_${a.name}`)
     .filter((name) => served.has(name));
-  console.log("tool_plane_operator_only_leaks=" + JSON.stringify(operatorOnlyLeaks));
-  if (operatorOnlyLeaks.length > 0) {
-    throw new Error(`operatorOnly actions served: ${operatorOnlyLeaks.join(", ")}`);
+  console.log("tool_plane_restricted_action_leaks=" + JSON.stringify(restrictedActionLeaks));
+  if (restrictedActionLeaks.length > 0) {
+    throw new Error(`restricted actions served: ${restrictedActionLeaks.join(", ")}`);
   }
 }
 

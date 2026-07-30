@@ -2475,6 +2475,134 @@
     }
   },
   {
+    "name": "qf_ingest_market_batch",
+    "description": "Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "source_artifact_id": {
+          "type": "string",
+          "description": "This field identifies the existing Artifact that preserves the captured source. The Kernel rejects a batch whose source evidence does not exist."
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "This field records the ISO-8601 observation timestamp shared by the batch. Preserve it as provenance rather than substituting ingest time."
+        },
+        "instruments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "This field is the stable Kernel identity for the instrument row. Retries must reuse it only for byte-equivalent market state and provenance."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "moneyline",
+                  "spread",
+                  "total",
+                  "prop"
+                ],
+                "description": "This field identifies the instrument family needed to interpret pricing semantics. Extend the enum by order rather than cloning new object types per category."
+              },
+              "params": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {},
+                "description": "This field stores kind-specific parameters such as lines, methods, rounds, or handicaps. Keep it machine-readable and deterministic so equivalent instruments compare cleanly."
+              },
+              "sides": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "This field lists the named outcomes offered for the instrument, such as [\"Jones\",\"Miocic\"] or [\"over\",\"under\"]. Preserve provider wording so grading and reconciliation can be traced exactly."
+              },
+              "correlation_group": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "description": "This field groups instruments with known dependent outcomes. Leave it null only when no declared dependence key is available."
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "params",
+              "sides",
+              "correlation_group"
+            ],
+            "additionalProperties": false
+          },
+          "description": "This field carries strict instrument rows for atomic ingestion. Supply an empty array only when the batch contains at least one quote row."
+        },
+        "quotes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "This field is the stable Kernel identity for the quote row. Retries must reuse it only for byte-equivalent quote state and provenance."
+              },
+              "instrument_id": {
+                "type": "string",
+                "description": "This field identifies the instrument priced by the quote. The Kernel derives exactly one quotes link from this identity."
+              },
+              "book": {
+                "type": "string",
+                "enum": [
+                  "bovada",
+                  "pinnacle"
+                ],
+                "description": "This field identifies the source venue or book that published the prices. Use stable lowercase identifiers so cross-source joins remain deterministic."
+              },
+              "data_ref": {
+                "type": "string",
+                "description": "This field points to the content-addressed segment containing timestamped quotes. Treat it as immutable evidence for replay and audit."
+              },
+              "coverage": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {},
+                "description": "This field summarizes temporal and count coverage for the referenced quote data. Use it as a sufficiency hint, not as a replacement for inspecting underlying rows."
+              }
+            },
+            "required": [
+              "id",
+              "instrument_id",
+              "book",
+              "data_ref",
+              "coverage"
+            ],
+            "additionalProperties": false
+          },
+          "description": "This field carries strict quote rows and their instrument identities for derived links. Supply an empty array only when the batch contains at least one instrument row."
+        }
+      },
+      "required": [
+        "source_artifact_id",
+        "observed_at",
+        "instruments",
+        "quotes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
     "name": "qf_register_agent_definition",
     "description": "Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.",
     "inputSchema": {

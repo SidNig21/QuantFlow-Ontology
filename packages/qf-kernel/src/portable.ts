@@ -36,8 +36,8 @@ export {
 } from "./read.ts";
 export {
   assertCreationHandlersComplete,
-  creationHandlers,
 } from "./create.ts";
+export { assertPipelineHandlersComplete } from "./pipeline.ts";
 export {
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
@@ -47,19 +47,32 @@ export {
   KernelIncompleteInitializationError,
   KernelRegistryDriftError,
   KernelUpgradeShapeError,
+  MarketIngestConflictError,
+  MarketIngestValidationError,
   MissingTraceError,
   PackageRefUnresolvedError,
   UnknownAgentDefinitionError,
   UnknownSpeciesError,
   SpawnedFromLinkRejectedError,
 } from "./errors.ts";
-export { appendEvent } from "./events.ts";
-export { eventCount, execute, type ExecuteResult } from "./execute.ts";
+export { eventCount, execute } from "./execute.ts";
+export type {
+  ExecuteResult,
+  ExecuteResultFor,
+  MarketIngestLinkResult,
+  MarketIngestRowResult,
+  ObjectExecuteResult,
+  PipelineExecuteResult,
+} from "./results.ts";
 export { contentHash } from "./hash.ts";
-export { insertRun } from "./insert.ts";
 export { replayArtifactAndAssert, replayRunAndAssert } from "./replay.ts";
 export {
   resolvePackageRef,
   resolveSpeciesPackage,
 } from "./species.ts";
 export { requireTrace, type TraceContext } from "./trace.ts";
+export {
+  classifyKernelShape,
+  MARKET_INGEST_UPGRADE,
+  PROFILE_IDENTITY_UPGRADE,
+} from "./upgrade.ts";

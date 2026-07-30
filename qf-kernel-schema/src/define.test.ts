@@ -10,7 +10,13 @@ import {
   lintSchema,
   type Schema,
 } from "./define.ts";
-import { instrument, market_event, quote, venue } from "./ontology/market.ts";
+import {
+  ingest_market_batch,
+  instrument,
+  market_event,
+  quote,
+  venue,
+} from "./ontology/market.ts";
 import { ticket } from "./ontology/research.ts";
 import { schema } from "./schema.ts";
 
@@ -399,6 +405,117 @@ describe("schema lint", () => {
     ).not.toThrow();
   });
 
+  test("pipeline commands require pipeline-only actions and pipeline-fed object types", () => {
+    const feedSnapshot = defineObject({
+      name: "feed_snapshot",
+      description: "A pipeline-owned snapshot.",
+      lifecycle: "experimental",
+      pipelineFed: true,
+      properties: z.object({ ref: z.string().describe("External reference.") }),
+    });
+    const note = defineObject({
+      name: "note",
+      description: "An operator-owned note.",
+      lifecycle: "experimental",
+      properties: z.object({ text: z.string().describe("Note text.") }),
+    });
+    const ingest = defineAction({
+      name: "ingest_snapshot",
+      description: "Ingest one snapshot.",
+      lifecycle: "experimental",
+      pipelineOnly: true,
+      input: z.object({ ref: z.string().describe("External reference.") }),
+    });
+    const plain = defineAction({
+      name: "plain_ingest",
+      description: "A non-pipeline action.",
+      lifecycle: "experimental",
+      input: z.object({ ref: z.string().describe("External reference.") }),
+    });
+    const fixture: Schema = {
+      objects: [feedSnapshot, note],
+      links: [],
+      actions: [ingest, plain],
+    };
+
+    expect(() =>
+      lintCommands(fixture, {}, [], [], [
+        {
+          action: "plain_ingest",
+          rows: [{ object_type: "feed_snapshot", event: "feed_snapshot.ingested" }],
+        },
+      ]),
+    ).toThrow('Pipeline command action "plain_ingest" must declare pipelineOnly: true');
+    expect(() =>
+      lintCommands(fixture, {}, [], [], [
+        {
+          action: "ingest_snapshot",
+          rows: [{ object_type: "note", event: "note.ingested" }],
+        },
+      ]),
+    ).toThrow('Pipeline command "ingest_snapshot" object_type "note" is not pipeline-fed');
+    expect(() =>
+      lintActionSurface(
+        { objects: [feedSnapshot], links: [], actions: [ingest] },
+        [],
+        [],
+        [
+          {
+            action: "ingest_snapshot",
+            rows: [{ object_type: "feed_snapshot", event: "feed_snapshot.ingested" }],
+          },
+        ],
+      ),
+    ).not.toThrow();
+  });
+
+  test("pipeline command lint rejects dual trust modes, duplicate entries, and mixed families", () => {
+    const feedSnapshot = defineObject({
+      name: "feed_snapshot",
+      description: "A pipeline-owned snapshot.",
+      lifecycle: "experimental",
+      pipelineFed: true,
+      properties: z.object({ ref: z.string().describe("External reference.") }),
+    });
+    const note = defineObject({
+      name: "note",
+      description: "An operator-owned note.",
+      lifecycle: "experimental",
+      properties: z.object({ text: z.string().describe("Note text.") }),
+    });
+    const dual = defineAction({
+      name: "ingest_snapshot",
+      description: "Ingest one snapshot.",
+      lifecycle: "experimental",
+      operatorOnly: true,
+      pipelineOnly: true,
+      input: z.object({ ref: z.string().describe("External reference.") }),
+    });
+    const fixture: Schema = { objects: [feedSnapshot], links: [], actions: [dual] };
+    const pipeline = {
+      action: "ingest_snapshot",
+      rows: [{ object_type: "feed_snapshot", event: "feed_snapshot.ingested" }],
+    } as const;
+
+    expect(() => lintCommands(fixture, {}, [], [], [pipeline])).toThrow(
+      'Action "ingest_snapshot" cannot be both operatorOnly and pipelineOnly',
+    );
+    expect(() => lintCommands(fixture, {}, [], [], [pipeline, pipeline])).toThrow(
+      "Pipeline command catalog contains duplicate action entries",
+    );
+    expect(() =>
+      lintCommands(
+        { objects: [feedSnapshot, note], links: [], actions: [{ ...dual, operatorOnly: false }] },
+        {},
+        [],
+        [{ action: "ingest_snapshot", object_type: "note", event: "note.created" }],
+        [pipeline],
+      ),
+    ).toThrow(
+      'Action "ingest_snapshot" is wired through multiple command families: creation, pipeline',
+    );
+  });
+
   test("lintActionSurface rejects a schema action with no command wiring", () => {
     const widget = defineObject({
       name: "widget",
@@ -783,5 +900,34 @@ describe("schema lint", () => {
     expect(quote.pipelineFed).toBe(true);
     expect(venue.pipelineFed).toBeUndefined();
     expect(market_event.pipelineFed).toBeUndefined();
+  });
+
+  test("market ingest batch is strict at the envelope and row boundaries", () => {
+    const valid = {
+      source_artifact_id: "artifact-source-1",
+      observed_at: "2026-07-30T12:00:00.000Z",
+      instruments: [
+        {
+          id: "instrument-1",
+          kind: "moneyline",
+          params: { period: "match", vendor_extension: { retained: true } },
+          sides: ["home", "away"],
+          correlation_group: null,
+        },
+      ],
+      quotes: [],
+    };
+
+    expect(ingest_market_batch.input.safeParse(valid).success).toBe(true);
+    expect(ingest_market_batch.input.safeParse({ ...valid, extra: true }).success).toBe(false);
+    expect(
+      ingest_market_batch.input.safeParse({
+        ...valid,
+        instruments: [{ ...valid.instruments[0], extra: true }],
+      }).success,
+    ).toBe(false);
+    expect(
+      ingest_market_batch.input.safeParse({ ...valid, instruments: [], quotes: [] }).success,
+    ).toBe(false);
   });
 });

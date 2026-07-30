@@ -30,6 +30,7 @@ export type DefinedAction<T extends z.ZodRawShape = z.ZodRawShape> = {
   description: string;
   lifecycle: Lifecycle;
   operatorOnly?: boolean;
+  pipelineOnly?: boolean;
   input: z.ZodObject<T>;
 };
 
@@ -212,6 +213,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
   description: string;
   lifecycle: Lifecycle;
   operatorOnly?: boolean;
+  pipelineOnly?: boolean;
   input: z.ZodObject<T>;
 }): DefinedAction<T> {
   assertSnakeCase(opts.name, "Action name");
@@ -224,6 +226,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
     description: opts.description,
     lifecycle: opts.lifecycle,
     operatorOnly: opts.operatorOnly,
+    pipelineOnly: opts.pipelineOnly,
     input: opts.input,
   };
 }
@@ -463,6 +466,15 @@ export type CreationCommandEdge = {
   event: string;
 };
 
+/** Pipeline command: atomically ingests rows for one or more pipeline-fed object types. */
+export type PipelineCommandEdge = {
+  action: string;
+  rows: readonly {
+    object_type: string;
+    event: string;
+  }[];
+};
+
 /**
  * Join lint: every transition command names a real schema action and a legal
  * transition; every legal transition has a command; every creation command
@@ -474,6 +486,7 @@ export function lintCommands(
   tables: TransitionTables,
   commandList: readonly CommandEdge[],
   creationList: readonly CreationCommandEdge[] = [],
+  pipelineList: readonly PipelineCommandEdge[] = [],
 ): void {
   const actionNames = new Set(schema.actions.map((a) => a.name));
   const objectNames = new Set(schema.objects.map((o) => o.name));
@@ -542,7 +555,105 @@ export function lintCommands(
     }
   }
 
+  for (const cmd of pipelineList) {
+    const action = schema.actions.find((candidate) => candidate.name === cmd.action);
+    if (!action) {
+      throw new Error(`Pipeline command action "${cmd.action}" is not a schema action`);
+    }
+    if (action.pipelineOnly !== true) {
+      throw new Error(
+        `Pipeline command action "${cmd.action}" must declare pipelineOnly: true`,
+      );
+    }
+    if (cmd.rows.length === 0) {
+      throw new Error(`Pipeline command "${cmd.action}" must name at least one object type`);
+    }
+    const seenObjectTypes = new Set<string>();
+    for (const row of cmd.rows) {
+      if (!objectNames.has(row.object_type)) {
+        throw new Error(
+          `Pipeline command "${cmd.action}" object_type "${row.object_type}" is not a schema object`,
+        );
+      }
+      if (!pipelineFedTypes.has(row.object_type)) {
+        throw new Error(
+          `Pipeline command "${cmd.action}" object_type "${row.object_type}" is not pipeline-fed`,
+        );
+      }
+      if (seenObjectTypes.has(row.object_type)) {
+        throw new Error(
+          `Pipeline command "${cmd.action}" names object_type "${row.object_type}" more than once`,
+        );
+      }
+      seenObjectTypes.add(row.object_type);
+      if (typeof row.event !== "string" || row.event.trim().length === 0) {
+        throw new Error(
+          `Pipeline command "${cmd.action}" object_type "${row.object_type}" is missing event type`,
+        );
+      }
+      if (!row.event.startsWith(`${row.object_type}.`)) {
+        throw new Error(
+          `Pipeline command "${cmd.action}" event "${row.event}" must be namespaced to object_type "${row.object_type}"`,
+        );
+      }
+    }
+  }
+
   assertOperatorOnlyCoupling(schema, commandList, creationList);
+  assertPipelineOnlyCoupling(schema, commandList, creationList, pipelineList);
+}
+
+function assertPipelineOnlyCoupling(
+  schema: Schema,
+  commandList: readonly CommandEdge[],
+  creationList: readonly CreationCommandEdge[],
+  pipelineList: readonly PipelineCommandEdge[],
+): void {
+  const transitionActions = new Set(commandList.map((command) => command.action));
+  const creationActions = new Set(creationList.map((command) => command.action));
+  const pipelineActions = new Set(pipelineList.map((command) => command.action));
+
+  if (pipelineActions.size !== pipelineList.length) {
+    throw new Error("Pipeline command catalog contains duplicate action entries");
+  }
+
+  const familiesByAction = new Map<string, Set<string>>();
+  const addFamily = (actionName: string, family: string) => {
+    const families = familiesByAction.get(actionName) ?? new Set<string>();
+    families.add(family);
+    familiesByAction.set(actionName, families);
+  };
+  for (const command of commandList) addFamily(command.action, "transition");
+  for (const command of creationList) addFamily(command.action, "creation");
+  for (const command of pipelineList) addFamily(command.action, "pipeline");
+  for (const [actionName, families] of familiesByAction) {
+    if (families.size > 1) {
+      throw new Error(
+        `Action "${actionName}" is wired through multiple command families: ${[...families].sort().join(", ")}`,
+      );
+    }
+  }
+
+  for (const action of schema.actions) {
+    if (action.operatorOnly === true && action.pipelineOnly === true) {
+      throw new Error(
+        `Action "${action.name}" cannot be both operatorOnly and pipelineOnly`,
+      );
+    }
+    if (
+      action.pipelineOnly === true &&
+      (transitionActions.has(action.name) || creationActions.has(action.name))
+    ) {
+      throw new Error(
+        `Pipeline-only action "${action.name}" must not use transition or creation commands`,
+      );
+    }
+    if (action.pipelineOnly !== true && pipelineActions.has(action.name)) {
+      throw new Error(
+        `Pipeline command action "${action.name}" must declare pipelineOnly: true`,
+      );
+    }
+  }
 }
 
 function isObservationEvent(event: string): boolean {
@@ -604,11 +715,13 @@ export function lintActionSurface(
   schema: Schema,
   commandList: readonly CommandEdge[],
   creationList: readonly CreationCommandEdge[] = [],
+  pipelineList: readonly PipelineCommandEdge[] = [],
 ): void {
   const actionNames = new Set(schema.actions.map((a) => a.name));
   const wired = new Set<string>();
   for (const cmd of commandList) wired.add(cmd.action);
   for (const cmd of creationList) wired.add(cmd.action);
+  for (const cmd of pipelineList) wired.add(cmd.action);
 
   const unwired = [...actionNames].filter((n) => !wired.has(n)).sort();
   if (unwired.length > 0) {

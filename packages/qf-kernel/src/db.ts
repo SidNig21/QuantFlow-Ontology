@@ -9,11 +9,12 @@ import {
   KernelUpgradeShapeError,
 } from "./errors.ts";
 import {
-  applyProfileIdentityUpgrade,
+  applyKernelUpgradeChain,
   classifyKernelShape,
   isD1CompatibilityCandidate,
   isCompletedKernelInitialization,
   PROFILE_IDENTITY_UPGRADE,
+  MARKET_INGEST_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -298,7 +299,7 @@ export function attachKernel(
   if (shape === "partial") {
     const detail = !tableExists(db, "schema_meta")
       ? "ontology tables present without schema_meta"
-      : "database shape is not the exact pre-D1 baseline nor current D1 authority";
+      : "database shape is not an exact supported predecessor or current authority";
     // Preserve WO-K3's diagnosis for unrelated, much older registry shapes.
     // Near-WO-CI2 files are D1 compatibility candidates and must receive the
     // typed upgrade-shape error before registry drift can mask it.
@@ -334,15 +335,18 @@ export function attachKernel(
     return db;
   }
 
-  if (readonly && shape === "pre_d1") {
+  if (readonly && (shape === "pre_d1" || shape === "d1")) {
+    const required = shape === "pre_d1"
+      ? `${PROFILE_IDENTITY_UPGRADE},${MARKET_INGEST_UPGRADE}`
+      : MARKET_INGEST_UPGRADE;
     process.stderr.write(
-      `kernel: upgrade required (readonly warn): ${PROFILE_IDENTITY_UPGRADE}\n`,
+      `kernel: upgrade required (readonly warn): ${required}\n`,
     );
-    driftByDb.set(db, { ok: false, upgrade_required: PROFILE_IDENTITY_UPGRADE });
+    driftByDb.set(db, { ok: false, upgrade_required: required });
   }
 
 
-  // Registry enforcement follows successful D1 classification. This prevents
+  // Registry enforcement follows successful upgrade-shape classification. This prevents
   // a missing governed table in a near-baseline file from being mislabeled as
   // ordinary registry drift before the compatibility step can fail closed.
   if (hasMeta && shape !== "partial") {
@@ -358,7 +362,7 @@ export function attachKernel(
   }
 
   // journal_mode and synchronous may persist. Run them only after the file is
-  // classified as a safe fresh/current/pre-D1 shape, but before DDL so a fresh
+  // classified as a safe fresh/current/predecessor shape, but before DDL so a fresh
   // migration does not fsync every statement in DELETE/FULL mode.
   if (!readonly) {
     db.exec("PRAGMA journal_mode = WAL;");
@@ -369,12 +373,14 @@ export function attachKernel(
     if (shape === "uninitialized") {
       const migration = readFileSync(migrationSqlPath(), "utf8");
       db.exec(migration);
-    } else if (shape === "pre_d1") {
-      const upgradeSql = readFileSync(
-        upgradeSqlPath("0001-agent-profile-identity.sql"),
-        "utf8",
+    } else if (shape === "pre_d1" || shape === "d1") {
+      const profileIdentitySql = readFileSync(
+        upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
       );
-      applyProfileIdentityUpgrade(db, upgradeSql);
+      const marketIngestSql = readFileSync(
+        upgradeSqlPath("0002-market-ingest.sql"), "utf8",
+      );
+      applyKernelUpgradeChain(db, { profileIdentitySql, marketIngestSql });
     }
   }
 

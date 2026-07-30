@@ -220,6 +220,31 @@ export const creationCommands: readonly CreationCommand[] = [
   },
 ] as const;
 
+/**
+ * Pipeline commands — atomically ingest one batch spanning declared pipeline-fed types.
+ * `rows` is the schema-owned object/event map; the Kernel dispatches by `action` and
+ * derives row events from this catalog rather than inventing a parallel runtime map.
+ */
+export type PipelineCommand = {
+  action: string;
+  rows: readonly {
+    /** Pipeline-fed ontology object table populated by this command. */
+    object_type: string;
+    /** Domain event emitted once for each newly ingested row. */
+    event: string;
+  }[];
+};
+
+export const pipelineCommands: readonly PipelineCommand[] = [
+  {
+    action: "ingest_market_batch",
+    rows: [
+      { object_type: "instrument", event: "instrument.ingested" },
+      { object_type: "quote", event: "quote.ingested" },
+    ],
+  },
+] as const;
+
 /** All legal (type, from, to) edges from the transition tables. */
 export function allTransitionEdges(): Array<{ type: StatefulType; from: string; to: string }> {
   const edges: Array<{ type: StatefulType; from: string; to: string }> = [];

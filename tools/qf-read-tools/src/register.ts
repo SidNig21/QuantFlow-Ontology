@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execute, getLinks, getObject, queryObjects, type KernelDb } from "qf-kernel";
 import {
   actionToolForAction,
+  isActionServedToAgents,
   linksToolInput,
   queryToolInputForObject,
   readToolsForObject,
@@ -113,7 +114,7 @@ export function registerReadTools(
 }
 
 /**
- * Register action tools for every schema action where operatorOnly !== true.
+ * Register action tools only across the schema-owned agent-serving boundary.
  * Transport validation is permissive; execute() applies GATE 1.
  */
 export function registerActionTools(
@@ -125,7 +126,7 @@ export function registerActionTools(
   const registered: McpToolDefinition[] = [];
 
   for (const action of schema.actions) {
-    if (action.operatorOnly === true) continue;
+    if (!isActionServedToAgents(action)) continue;
     if (action.name === "publish_artifact" && !shouldServePublishArtifact(artifactRoot)) {
       continue;
     }

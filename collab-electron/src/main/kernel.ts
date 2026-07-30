@@ -12,7 +12,7 @@ import {
   resolveArtifactRoot,
   resolveKernelPath,
   resolveSpeciesPackage as resolveSpeciesPackageRow,
-  type ExecuteResult,
+  type ExecuteResultFor,
   type KernelDb,
   type TraceContext,
 } from "qf-kernel/portable";
@@ -84,11 +84,11 @@ export function getKernelPath(): string {
   return kernelPath;
 }
 
-export function kernelExecute(
-  command: string,
+export function kernelExecute<C extends string>(
+  command: C,
   input: Record<string, unknown>,
   trace: TraceContext,
-): ExecuteResult {
+): ExecuteResultFor<C> {
   return execute(getKernelDb(), command, input, trace);
 }
 

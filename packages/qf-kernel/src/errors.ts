@@ -29,6 +29,36 @@ export class KernelError extends Error {
   }
 }
 
+/** Market batch input cannot be represented as deterministic Kernel state — nothing written. */
+export class MarketIngestValidationError extends KernelError {
+  readonly reason: string;
+
+  constructor(reason: string) {
+    super(`Market ingest rejected: ${reason}`);
+    this.name = "MarketIngestValidationError";
+    this.reason = reason;
+  }
+}
+
+/** Existing market identity disagrees with the requested row, provenance, or derived edge. */
+export class MarketIngestConflictError extends KernelError {
+  readonly object_type: "instrument" | "quote";
+  readonly object_id: string;
+  readonly reason: string;
+
+  constructor(
+    object_type: "instrument" | "quote",
+    object_id: string,
+    reason: string,
+  ) {
+    super(`Market ingest conflict for ${object_type} "${object_id}": ${reason}`);
+    this.name = "MarketIngestConflictError";
+    this.object_type = object_type;
+    this.object_id = object_id;
+    this.reason = reason;
+  }
+}
+
 /** Caller-supplied content_hash disagrees with Kernel-computed hash — nothing written. */
 export class ContentHashMismatchError extends Error {
   readonly supplied: string;
@@ -160,8 +190,8 @@ export class KernelRegistryDriftError extends Error {
 }
 
 /**
- * Database shape is not the exact pre-D1 profile-identity baseline nor current D1 —
- * upgrade refuses before mutation (WO-D1 R4).
+ * Database shape is not an exact supported upgrade predecessor or current authority —
+ * upgrade refuses before mutation.
  */
 export class KernelUpgradeShapeError extends Error {
   readonly upgrade: string;

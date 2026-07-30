@@ -3,9 +3,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { countConformanceTests, generateConformance } from "./generate/conformance.ts";
 import { generateDocs } from "./generate/docs.ts";
-import { generateMcp } from "./generate/mcp.ts";
+import { generateMcp, servedToolsForSchema } from "./generate/mcp.ts";
 import { generateSql } from "./generate/sql.ts";
 import { generateUpgradeAgentProfileIdentity } from "./generate/upgrade-agent-profile-identity.ts";
+import { generateUpgradeMarketIngest } from "./generate/upgrade-market-ingest.ts";
 import { schema } from "./schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -39,6 +40,15 @@ describe("golden outputs", () => {
     const actual = generateUpgradeAgentProfileIdentity();
     const expected = readFileSync(
       join(goldenDir, "upgrades", "0001-agent-profile-identity.sql"),
+      "utf8",
+    );
+    expect(actual).toBe(expected);
+  });
+
+  test("market-ingest upgrade matches golden byte-for-byte", () => {
+    const actual = generateUpgradeMarketIngest();
+    const expected = readFileSync(
+      join(goldenDir, "upgrades", "0002-market-ingest.sql"),
       "utf8",
     );
     expect(actual).toBe(expected);
@@ -95,6 +105,17 @@ describe("mcp tool descriptions", () => {
         expect(tools.some((t) => t.name === `qf_${object.name}${suffix}`)).toBe(true);
       }
     }
+  });
+
+  test("pipeline-only action is complete generated authority but is not served to agents", () => {
+    const complete = JSON.parse(generateMcp(schema)) as Array<{ name: string }>;
+    const served = servedToolsForSchema(schema);
+    expect(complete.some((tool) => tool.name === "qf_ingest_market_batch")).toBe(true);
+    expect(served.some((tool) => tool.name === "qf_ingest_market_batch")).toBe(false);
+    const restrictedActions = schema.actions.filter(
+      (action) => action.operatorOnly === true || action.pipelineOnly === true,
+    );
+    expect(served).toHaveLength(complete.length - restrictedActions.length);
   });
 });
 

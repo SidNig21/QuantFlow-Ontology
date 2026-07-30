@@ -3,7 +3,7 @@
  * qf-read-tools MCP stdio server.
  *
  * Serves schema-generated read tools (_get, _query, _links) for every object type
- * and action tools for every non-operatorOnly action. Writes go through execute().
+ * and action tools allowed by the schema's agent-serving policy. Writes go through execute().
  *
  * Kernel path: resolveKernelPath() — QF_KERNEL_DB if set, else platform default.
  * Absence of the env var is no longer fatal (WO-K1); the resolver is the answer.

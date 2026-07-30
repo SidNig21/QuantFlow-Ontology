@@ -22,6 +22,7 @@ import {
 } from "qf-kernel";
 import { schema as productionSchema } from "qf-kernel-schema";
 import type { Schema } from "qf-kernel-schema/define";
+import { isActionServedToAgents } from "qf-kernel-schema/mcp";
 
 const workDir = mkdtempSync(join(tmpdir(), "qf-publish-artifact-root-"));
 /** WO-K3: shape like production — Kernel + artifacts under ~/.quantflow/. */
@@ -36,7 +37,7 @@ const serverEntry = join(import.meta.dir, "..", "server.ts");
 function expectedActionToolNames(schema: Schema, includePublishArtifact: boolean): Set<string> {
   return new Set(
     schema.actions
-      .filter((a) => a.operatorOnly !== true)
+      .filter(isActionServedToAgents)
       .filter((a) => includePublishArtifact || a.name !== "publish_artifact")
       .map((a) => `qf_${a.name}`),
   );
@@ -46,7 +47,7 @@ function expectedActionToolNames(schema: Schema, includePublishArtifact: boolean
 function actionToolsFromListed(names: Iterable<string>, schema: Schema): Set<string> {
   const allActions = new Set(
     schema.actions
-      .filter((a) => a.operatorOnly !== true)
+      .filter(isActionServedToAgents)
       .map((a) => `qf_${a.name}`),
   );
   return new Set([...names].filter((n) => allActions.has(n)));

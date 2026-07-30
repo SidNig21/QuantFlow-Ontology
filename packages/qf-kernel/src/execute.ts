@@ -2,6 +2,7 @@ import { schema } from "qf-kernel-schema";
 import {
   commands,
   creationCommands,
+  pipelineCommands,
   type TransitionCommand,
 } from "qf-kernel-schema/commands";
 import {
@@ -14,6 +15,8 @@ import type { KernelDb } from "./db.ts";
 import { IllegalTransitionError, KernelError } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import { extractCreationEnvelope, type LinkSpec } from "./links.ts";
+import { executePipeline } from "./pipeline.ts";
+import type { ExecuteResultFor } from "./results.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
 
 const actionByName = new Map(schema.actions.map((action) => [action.name, action]));
@@ -79,30 +82,26 @@ function readState(
   return { field, value: row.state };
 }
 
-export type ExecuteResult = {
-  object_type: string;
-  object_id: string;
-  from: string;
-  to: string;
-  event: string;
-  state: Record<string, unknown>;
-};
-
 /**
- * Execute a Kernel command: creation (insert + event) or transition (assert + update + event).
+ * Execute a Kernel command: creation, transition, or trusted pipeline batch.
  * On rejection: typed error — and write nothing.
  */
-export function execute(
+export function execute<C extends string>(
   db: KernelDb,
-  command: string,
+  command: C,
   input: Record<string, unknown>,
   ctx: Partial<TraceContext>,
-): ExecuteResult {
+): ExecuteResultFor<C> {
   const trace = requireTrace(ctx);
 
   const creation = creationCommands.find((c) => c.action === command);
-  const transitionSample = creation ? undefined : commands.find((c) => c.action === command);
-  if (!creation && !transitionSample) {
+  const pipeline = creation
+    ? undefined
+    : pipelineCommands.find((candidate) => candidate.action === command);
+  const transitionSample = creation || pipeline
+    ? undefined
+    : commands.find((candidate) => candidate.action === command);
+  if (!creation && !pipeline && !transitionSample) {
     throw new KernelError(`Unknown command "${command}"`);
   }
 
@@ -125,7 +124,10 @@ export function execute(
   }
 
   if (creation) {
-    return executeCreation(db, creation, validatedInput, trace, linkSpecs);
+    return executeCreation(db, creation, validatedInput, trace, linkSpecs) as ExecuteResultFor<C>;
+  }
+  if (pipeline) {
+    return executePipeline(db, pipeline, validatedInput, trace) as ExecuteResultFor<C>;
   }
 
   const id = objectId(transitionSample!, validatedInput);
@@ -157,13 +159,14 @@ export function execute(
 
   const state = tx();
   return {
+    kind: "object",
     object_type: cmd.type,
     object_id: id,
     from,
     to: cmd.to,
     event: cmd.event,
     state,
-  };
+  } as ExecuteResultFor<C>;
 }
 
 /** Count events currently in the log (test helper). */

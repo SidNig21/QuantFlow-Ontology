@@ -10,7 +10,6 @@ import {
   execute,
   IllegalLinkError,
   IllegalTransitionError,
-  insertRun,
   MissingTraceError,
   openKernel,
   replayArtifactAndAssert,
@@ -20,6 +19,7 @@ import {
   queryObjects,
   type KernelDb,
 } from "./index.ts";
+import { insertRun } from "./insert.ts";
 
 const ctx = { trace_id: "trace-root-1", span_id: "span-1" };
 

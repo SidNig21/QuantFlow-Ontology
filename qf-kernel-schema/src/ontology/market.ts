@@ -210,3 +210,70 @@ export const void_event = defineAction({
     event_id: z.string().describe("Event to void."),
   }),
 });
+
+const ingestInstrumentRow = z
+  .object({
+    id: z
+      .string()
+      .describe(
+        "This field is the stable Kernel identity for the instrument row. Retries must reuse it only for byte-equivalent market state and provenance.",
+      ),
+    kind: instrument.properties.shape.kind,
+    params: instrument.properties.shape.params,
+    sides: instrument.properties.shape.sides,
+    correlation_group: instrument.properties.shape.correlation_group,
+  })
+  .strict();
+
+const ingestQuoteRow = z
+  .object({
+    id: z
+      .string()
+      .describe(
+        "This field is the stable Kernel identity for the quote row. Retries must reuse it only for byte-equivalent quote state and provenance.",
+      ),
+    instrument_id: z
+      .string()
+      .describe(
+        "This field identifies the instrument priced by the quote. The Kernel derives exactly one quotes link from this identity.",
+      ),
+    book: quote.properties.shape.book,
+    data_ref: quote.properties.shape.data_ref,
+    coverage: quote.properties.shape.coverage,
+  })
+  .strict();
+
+export const ingest_market_batch = defineAction({
+  name: "ingest_market_batch",
+  description:
+    "Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.",
+  lifecycle: "experimental",
+  pipelineOnly: true,
+  input: z
+    .object({
+      source_artifact_id: z
+        .string()
+        .describe(
+          "This field identifies the existing Artifact that preserves the captured source. The Kernel rejects a batch whose source evidence does not exist.",
+        ),
+      observed_at: z.iso
+        .datetime()
+        .describe(
+          "This field records the ISO-8601 observation timestamp shared by the batch. Preserve it as provenance rather than substituting ingest time.",
+        ),
+      instruments: z
+        .array(ingestInstrumentRow)
+        .describe(
+          "This field carries strict instrument rows for atomic ingestion. Supply an empty array only when the batch contains at least one quote row.",
+        ),
+      quotes: z
+        .array(ingestQuoteRow)
+        .describe(
+          "This field carries strict quote rows and their instrument identities for derived links. Supply an empty array only when the batch contains at least one instrument row.",
+        ),
+    })
+    .strict()
+    .refine((batch) => batch.instruments.length + batch.quotes.length > 0, {
+      message: "Market ingest batch must contain at least one instrument or quote row",
+    }),
+});

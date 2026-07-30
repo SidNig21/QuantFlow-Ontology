@@ -76,6 +76,8 @@ const DRIVER_SQL_ALLOW = [
   "qa/fixtures/kernel-drift/",
   "qa/gates/kernel-drift/run.ts",
   "qa/gates/artifact-root/run.ts",
+  // WO-107b: gate-only historical fixtures, raw count oracle, and injected driver fault.
+  "qa/gates/market-ingest/run.ts",
 ];
 
 /**
@@ -109,6 +111,7 @@ const OPEN_ALLOW = [
   "qa/gates/agent-path/run.ts",
   "qa/gates/kernel-drift/run.ts",
   "qa/gates/artifact-root/run.ts",
+  "qa/gates/market-ingest/run.ts",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
 ];
@@ -139,6 +142,7 @@ const WRITE_ALLOW = [
   "qa/gates/agent-path/run.ts",
   "qa/gates/kernel-drift/run.ts",
   "qa/gates/artifact-root/run.ts",
+  "qa/gates/market-ingest/run.ts",
   "collab-electron/",
 ];
 

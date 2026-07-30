@@ -13,6 +13,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import { closeKernel, openKernel } from "qf-kernel";
 import { schema as productionSchema } from "qf-kernel-schema";
 import {
+  isActionServedToAgents,
   servedToolsForSchema,
 } from "qf-kernel-schema/mcp";
 import type { Schema } from "qf-kernel-schema/define";
@@ -67,9 +68,9 @@ function generatedToolNames(schema: Schema): Set<string> {
   return names;
 }
 
-function operatorOnlyActionNames(schema: Schema): Set<string> {
+function restrictedActionNames(schema: Schema): Set<string> {
   return new Set(
-    schema.actions.filter((a) => a.operatorOnly === true).map((a) => `qf_${a.name}`),
+    schema.actions.filter((a) => !isActionServedToAgents(a)).map((a) => `qf_${a.name}`),
   );
 }
 
@@ -113,33 +114,33 @@ function assertSchemaEquality(advertised: ListedTool[], schema: Schema): void {
 function assertSetRelations(advertised: Set<string>, schema: Schema): void {
   const served = servedToolNames(schema);
   const generated = generatedToolNames(schema);
-  // Operator-only set is anchored to production schema so G3 bait cannot move both sides together.
-  const operatorOnly = operatorOnlyActionNames(productionSchema);
+  // Restricted set is anchored to production schema so a fixture cannot move both sides together.
+  const restricted = restrictedActionNames(productionSchema);
 
   console.log(`G3_advertised_count=${advertised.size}`);
   console.log(`G3_served_count=${served.size}`);
   console.log(`G3_generated_count=${generated.size}`);
 
-  for (const name of operatorOnly) {
-    console.log(`G3_operator_only_${name}_in_generated=${generated.has(name)}`);
-    console.log(`G3_operator_only_${name}_in_advertised=${advertised.has(name)}`);
-    console.log(`G3_operator_only_${name}_in_served=${served.has(name)}`);
+  for (const name of restricted) {
+    console.log(`G3_restricted_${name}_in_generated=${generated.has(name)}`);
+    console.log(`G3_restricted_${name}_in_advertised=${advertised.has(name)}`);
+    console.log(`G3_restricted_${name}_in_served=${served.has(name)}`);
   }
 
   if (!setsEqual(advertised, served)) {
     throw new Error("G3: advertised set !== served set");
   }
-  for (const name of operatorOnly) {
+  for (const name of restricted) {
     if (!generated.has(name)) {
-      throw new Error(`G3: operatorOnly tool ${name} missing from generated set`);
+      throw new Error(`G3: restricted tool ${name} missing from generated set`);
     }
     if (advertised.has(name) || served.has(name)) {
-      throw new Error(`G3: operatorOnly tool ${name} leaked into advertised or served set`);
+      throw new Error(`G3: restricted tool ${name} leaked into advertised or served set`);
     }
   }
-  const expectedServed = new Set([...generated].filter((n) => !operatorOnly.has(n)));
+  const expectedServed = new Set([...generated].filter((n) => !restricted.has(n)));
   if (!setsEqual(served, expectedServed)) {
-    throw new Error("G3: served set !== generated minus operatorOnly");
+    throw new Error("G3: served set !== generated minus restricted actions");
   }
 }
 

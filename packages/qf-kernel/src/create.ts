@@ -10,7 +10,7 @@ import {
   UnknownAgentDefinitionError,
 } from "./errors.ts";
 import { appendEvent } from "./events.ts";
-import type { ExecuteResult } from "./execute.ts";
+import type { ObjectExecuteResult } from "./results.ts";
 import { contentHash } from "./hash.ts";
 import {
   lineageFieldsToLinks,
@@ -49,7 +49,7 @@ type CreationHandler = (
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-) => ExecuteResult;
+) => ObjectExecuteResult;
 
 function creationResult(
   cmd: CreationCommand,
@@ -57,8 +57,9 @@ function creationResult(
   event: string,
   state: Record<string, unknown>,
   to = "exists",
-): ExecuteResult {
+): ObjectExecuteResult {
   return {
+    kind: "object",
     object_type: cmd.object_type,
     object_id: id,
     from: "(none)",
@@ -104,7 +105,7 @@ function publishArtifact(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const kind = input.kind;
   if (typeof kind !== "string" || !ARTIFACT_KINDS.has(kind)) {
     throw new KernelError(
@@ -171,7 +172,7 @@ function registerAgentDefinition(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const name = input.name;
   if (typeof name !== "string" || name.length === 0) {
     throw new KernelError('register_agent_definition requires non-empty "name"');
@@ -248,7 +249,7 @@ function createAgentSession(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const session_id = input.session_id;
   if (typeof session_id !== "string" || session_id.length === 0) {
     throw new KernelError(
@@ -314,7 +315,7 @@ function createHypothesis(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const claim = input.claim;
   if (typeof claim !== "string" || claim.length === 0) {
     throw new KernelError('create_hypothesis requires non-empty "claim"');
@@ -357,7 +358,7 @@ function registerDatasetVersion(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const kind = input.kind;
   if (
     kind !== "odds_history" &&
@@ -414,7 +415,7 @@ function createRun(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const run_id = input.run_id;
   if (typeof run_id !== "string" || run_id.length === 0) {
     throw new KernelError('create_run requires non-empty "run_id"');
@@ -477,7 +478,7 @@ function recordEvaluation(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const metrics = input.metrics;
   if (!metrics || typeof metrics !== "object" || Array.isArray(metrics)) {
     throw new KernelError('record_evaluation requires object "metrics"');
@@ -546,7 +547,7 @@ function createMission(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const name = input.name;
   if (typeof name !== "string" || name.length === 0) {
     throw new KernelError('create_mission requires non-empty "name"');
@@ -689,7 +690,7 @@ function createTicket(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   rejectSuppliedInitialState(input, "grade", cmd.action);
   const fields = parseTicketFields(input, cmd.action);
   const grade = "pending";
@@ -721,7 +722,7 @@ function observeTicket(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-): ExecuteResult {
+): ObjectExecuteResult {
   const fields = parseTicketFields(input, cmd.action);
   const grade = requireObservedGrade(input, cmd.action, TICKET_GRADES);
   const origin = TICKET_ORIGIN.observed;
@@ -781,7 +782,7 @@ export function executeCreation(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[] = [],
-): ExecuteResult {
+): ObjectExecuteResult {
   const handler = creationHandlers[cmd.action];
   if (!handler) {
     throw new KernelError(`No creation handler for action "${cmd.action}"`);

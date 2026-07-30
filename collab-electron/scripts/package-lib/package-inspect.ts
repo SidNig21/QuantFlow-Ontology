@@ -44,6 +44,8 @@ export const QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY =
   "node_modules/qf-kernel-schema/compat/pre-d1-profile-identity.sql";
 export const QF_KERNEL_SCHEMA_UPGRADE =
   "node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
+export const QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE =
+  "node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql";
 export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
 export const HERMES_META = "species/hermes/packed/hermes.meta.json";
 export const HERMES_LAUNCH = "species/hermes/launch.json";
@@ -67,6 +69,8 @@ const REPO_SCHEMA_PRE_D1_AUTHORITY =
   "qf-kernel-schema/compat/pre-d1-profile-identity.sql";
 const REPO_SCHEMA_UPGRADE =
   "qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
+const REPO_SCHEMA_MARKET_INGEST_UPGRADE =
+  "qf-kernel-schema/golden/upgrades/0002-market-ingest.sql";
 
 export type InspectFailure = {
   ok: false;
@@ -354,6 +358,10 @@ function inspectAsarSqlArtifacts(
       packaged: QF_KERNEL_SCHEMA_UPGRADE,
       golden: REPO_SCHEMA_UPGRADE,
     },
+    {
+      packaged: QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
+      golden: REPO_SCHEMA_MARKET_INGEST_UPGRADE,
+    },
   ];
 
   for (const pair of pairs) {
@@ -516,6 +524,22 @@ function normalizedAsarInventory(asarPath: string): string[] {
 export async function removeD1UpgradeFromAsar(
   baitPackageRoot: string,
 ): Promise<AsarInventoryDiff> {
+  return removeUpgradeFromAsar(baitPackageRoot, QF_KERNEL_SCHEMA_UPGRADE);
+}
+
+export async function removeMarketIngestUpgradeFromAsar(
+  baitPackageRoot: string,
+): Promise<AsarInventoryDiff> {
+  return removeUpgradeFromAsar(
+    baitPackageRoot,
+    QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
+  );
+}
+
+async function removeUpgradeFromAsar(
+  baitPackageRoot: string,
+  packagedUpgradePath: string,
+): Promise<AsarInventoryDiff> {
   const asarPath = join(baitPackageRoot, "resources", "app.asar");
   if (!existsSync(asarPath)) {
     throw new Error(`missing bait app.asar: ${asarPath}`);
@@ -531,10 +555,10 @@ export async function removeD1UpgradeFromAsar(
     mkdirSync(extractRoot, { recursive: true });
     extractAll(asarPath, extractRoot);
 
-    const upgradePath = join(extractRoot, QF_KERNEL_SCHEMA_UPGRADE);
+    const upgradePath = join(extractRoot, packagedUpgradePath);
     if (!existsSync(upgradePath)) {
       throw new Error(
-        `missing packaged SQL artifact before bait removal: ${QF_KERNEL_SCHEMA_UPGRADE}`,
+        `missing packaged SQL artifact before bait removal: ${packagedUpgradePath}`,
       );
     }
     rmSync(upgradePath);

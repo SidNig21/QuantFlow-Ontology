@@ -434,6 +434,16 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "market-ingest",
+    description:
+      "WO-107b: governed pipeline catalog, upgrade chain, atomic/replay-safe market ingest, and generated reads",
+    run: async () => {
+      const { runMarketIngestGate } = await import("./gates/market-ingest.ts");
+      const { ok } = await runMarketIngestGate();
+      return ok;
+    },
+  },
+  {
     name: "tool-discovery",
     description:
       "WO-106 D4/G1/G3: tools/list sufficiency, schema equality, operator door set relations",

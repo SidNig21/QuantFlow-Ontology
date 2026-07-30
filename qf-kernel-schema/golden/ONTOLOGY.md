@@ -434,6 +434,7 @@ Record a strategy-proposed ticket starting pending. Does not accept a grade; use
 Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.
 
 - **lifecycle:** `experimental`
+- **operator-only:** `true`
 - **input:**
 - `kind` — Single or parlay wager.
 - `external_ref` — Venue-issued idempotency key.
@@ -510,11 +511,24 @@ Void a scheduled event that will not be contested (scheduled → void).
 - **input:**
 - `event_id` — Event to void.
 
+### `ingest_market_batch`
+
+Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.
+
+- **lifecycle:** `experimental`
+- **pipeline-only:** `true`
+- **input:**
+- `source_artifact_id` — This field identifies the existing Artifact that preserves the captured source. The Kernel rejects a batch whose source evidence does not exist.
+- `observed_at` — This field records the ISO-8601 observation timestamp shared by the batch. Preserve it as provenance rather than substituting ingest time.
+- `instruments` — This field carries strict instrument rows for atomic ingestion. Supply an empty array only when the batch contains at least one quote row.
+- `quotes` — This field carries strict quote rows and their instrument identities for derived links. Supply an empty array only when the batch contains at least one instrument row.
+
 ### `register_agent_definition`
 
 Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.
 
 - **lifecycle:** `experimental`
+- **operator-only:** `true`
 - **input:**
 - `name` — Unique profile name; becomes the row id.
 - `role` — Role summary (researcher, critic, backtester, ingestion) for routing and prompts.

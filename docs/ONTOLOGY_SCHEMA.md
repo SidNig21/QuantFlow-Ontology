@@ -133,7 +133,7 @@ Properties drafted at codegen time under the same laws (see ROADMAP WO-003/WO-00
 
 ## Actions (initial command surface — MCP tools generate from these)
 
-`create_hypothesis` · `register_dataset_version` · `create_run` · `create_mission` · `create_ticket` · `observe_ticket` · `start_run` / `complete_run` / `fail_run` / `cancel_run` · `start_event` / `settle_event` / `void_event` · `grade_ticket` · `register_agent_definition` · `create_agent_session` / `start_agent_session` / `block_agent_session` / `unblock_agent_session` / `cancel_agent_session` / `fail_agent_session` / `close_agent_session` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated)
+`create_hypothesis` · `register_dataset_version` · `create_run` · `create_mission` · `create_ticket` · `observe_ticket` · `start_run` / `complete_run` / `fail_run` / `cancel_run` · `start_event` / `settle_event` / `void_event` · `grade_ticket` · `register_agent_definition` · `create_agent_session` / `start_agent_session` / `block_agent_session` / `unblock_agent_session` / `cancel_agent_session` / `fail_agent_session` / `close_agent_session` · `publish_artifact` · `record_evaluation` · `resolve_hypothesis` (Evaluation-gated) · `ingest_market_batch` (trusted pipeline-only bulk command; generated but not served to agents)
 
 > **Reconciled with code 2026-07-26 (WO-103b).** Six dead actions removed (`retry_run`, `close_run`, `request_approval`, `approve`, `deny`, `promote_type`) — see WO-103b deliverable 1. Prior reconciliation note (WO-005) retained below.
 

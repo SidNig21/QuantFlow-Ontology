@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { propertyDescription, unwrapZodType, type DefinedObject, type Schema } from "../define.ts";
+import {
+  propertyDescription,
+  unwrapZodType,
+  type DefinedAction,
+  type DefinedObject,
+  type Schema,
+} from "../define.ts";
 
 export type McpToolDefinition = {
   name: string;
@@ -95,14 +101,21 @@ type ActionLike = {
   input: z.ZodType;
 };
 
-/** Build MCP tool definitions for the served set (read tools + non-operatorOnly actions). */
+/** Central schema policy for whether an action may be registered on the agent MCP surface. */
+export function isActionServedToAgents(
+  action: Pick<DefinedAction, "operatorOnly" | "pipelineOnly">,
+): boolean {
+  return action.operatorOnly !== true && action.pipelineOnly !== true;
+}
+
+/** Build MCP tools served to agents (reads + actions outside trusted-only boundaries). */
 export function servedToolsForSchema(schema: Schema): McpToolDefinition[] {
   const tools: McpToolDefinition[] = [];
   for (const object of schema.objects) {
     tools.push(...readToolsForObject(object));
   }
   for (const action of schema.actions) {
-    if (action.operatorOnly === true) continue;
+    if (!isActionServedToAgents(action)) continue;
     tools.push(actionToolForAction(action));
   }
   return tools;

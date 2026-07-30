@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { commands, creationCommands } from "./commands.ts";
+import { commands, creationCommands, pipelineCommands } from "./commands.ts";
 import {
   type ActiveSchemaBaseline,
   lintCommands,
@@ -23,6 +23,7 @@ import {
   start_event,
   settle_event,
   void_event,
+  ingest_market_batch,
 } from "./ontology/market.ts";
 import {
   mission,
@@ -144,6 +145,7 @@ export const schema: Schema = {
     start_event,
     settle_event,
     void_event,
+    ingest_market_batch,
     register_agent_definition,
     create_agent_session,
     start_agent_session,
@@ -164,5 +166,5 @@ const activeSchemaBaseline = JSON.parse(baselineJson) as ActiveSchemaBaseline;
 const skipActiveFreeze = process.env.QF_SCHEMA_SKIP_ACTIVE_FREEZE === "1";
 
 lintSchema(schema, transitions, activeSchemaBaseline, { skipActiveFreeze });
-lintCommands(schema, transitions, commands, creationCommands);
-lintActionSurface(schema, commands, creationCommands);
+lintCommands(schema, transitions, commands, creationCommands, pipelineCommands);
+lintActionSurface(schema, commands, creationCommands, pipelineCommands);

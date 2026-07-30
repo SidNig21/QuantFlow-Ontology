@@ -7,10 +7,12 @@ import type { KernelDb } from "./db.ts";
 import { KernelUpgradeShapeError } from "./errors.ts";
 
 export const PROFILE_IDENTITY_UPGRADE = "agent-profile-identity" as const;
+export const MARKET_INGEST_UPGRADE = "market-ingest" as const;
 
 export type KernelShapeState =
   | "uninitialized"
   | "pre_d1"
+  | "d1"
   | "current"
   | "partial";
 
@@ -146,6 +148,7 @@ function resolveCurrentMigrationPath(): string {
 }
 
 let preD1Snapshot: StructureSnapshot | null = null;
+let d1Snapshot: StructureSnapshot | null = null;
 let currentSnapshot: StructureSnapshot | null = null;
 
 function snapshotFromMigrationFile(path: string): StructureSnapshot {
@@ -193,6 +196,24 @@ function expectedCurrent(): StructureSnapshot {
   return currentSnapshot;
 }
 
+/**
+ * 0002 changes exactly one schema_meta action row. Deriving the D1 predecessor
+ * from current authority avoids introducing a second frozen full-migration truth.
+ */
+function expectedD1(): StructureSnapshot {
+  if (!d1Snapshot) {
+    const current = expectedCurrent();
+    d1Snapshot = {
+      tables: new Map(current.tables),
+      linkKinds: [...current.linkKinds],
+      schemaMeta: current.schemaMeta.filter(
+        ([typeName, kind]) => !(typeName === "ingest_market_batch" && kind === "action"),
+      ),
+    };
+  }
+  return d1Snapshot;
+}
+
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
   for (const name of [...ONTOLOGY_TABLES, "links", "schema_meta"]) {
     if (a.tables.get(name) !== b.tables.get(name)) return false;
@@ -235,7 +256,8 @@ export function isCompletedKernelInitialization(db: KernelDb): boolean {
 /**
  * Exact structural classification before any persistent pragma (WO-D1 R4).
  * Compares governed tables, link-kind set, and schema_meta rows against the
- * frozen pre-D1 baseline or generated D1 authority — not feature substrings.
+ * frozen pre-D1 baseline, derived exact D1 predecessor, or generated current
+ * authority — not feature substrings.
  */
 export function classifyKernelShape(db: KernelDb): KernelShapeState {
   const hasMeta = tableExists(db, "schema_meta");
@@ -250,6 +272,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
 
   const live = snapshotDbStructure(db);
   if (snapshotsEqual(live, expectedPreD1())) return "pre_d1";
+  if (snapshotsEqual(live, expectedD1())) return "d1";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -262,8 +285,9 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
 export function isD1CompatibilityCandidate(db: KernelDb): boolean {
   const live = readSchemaMetaRows(db);
   const pre = expectedPreD1().schemaMeta;
+  const d1 = expectedD1().schemaMeta;
   const current = expectedCurrent().schemaMeta;
-  const knownNames = new Set([...pre, ...current].map((row) => row[0]));
+  const knownNames = new Set([...pre, ...d1, ...current].map((row) => row[0]));
   return (
     live.length >= pre.length - 1 &&
     live.every((row) => knownNames.has(row[0]))
@@ -275,20 +299,58 @@ export function assertWritableUpgradeShape(db: KernelDb): KernelShapeState {
   if (state === "partial") {
     throw new KernelUpgradeShapeError(
       PROFILE_IDENTITY_UPGRADE,
-      "database shape is not the exact pre-D1 baseline nor current D1 authority",
+      "database shape is not an exact supported predecessor or current authority",
     );
   }
   return state;
 }
 
-/** Apply the generated D1 upgrade inside exactly one KernelDb.transaction(). */
-export function applyProfileIdentityUpgrade(db: KernelDb, upgradeSql: string): void {
+/** Apply every required generated upgrade inside exactly one KernelDb.transaction(). */
+export function applyKernelUpgradeChain(
+  db: KernelDb,
+  upgrades: { profileIdentitySql: string; marketIngestSql: string },
+): void {
   const state = assertWritableUpgradeShape(db);
   if (state === "current") return;
-  if (state !== "pre_d1") return;
+  if (state === "uninitialized") return;
 
   const tx = db.transaction(() => {
+    if (state === "pre_d1") {
+      db.exec(upgrades.profileIdentitySql);
+      if (classifyKernelShape(db) !== "d1") {
+        throw new KernelUpgradeShapeError(
+          PROFILE_IDENTITY_UPGRADE,
+          "0001 did not produce the exact D1 predecessor shape",
+        );
+      }
+    }
+    db.exec(upgrades.marketIngestSql);
+    if (classifyKernelShape(db) !== "current") {
+      throw new KernelUpgradeShapeError(
+        MARKET_INGEST_UPGRADE,
+        "0002 did not produce the exact current shape",
+      );
+    }
+  });
+  tx();
+}
+
+/**
+ * D1 gate compatibility: apply only generated 0001 and prove the exact D1
+ * predecessor. New production attach flows use applyKernelUpgradeChain.
+ */
+export function applyProfileIdentityUpgrade(db: KernelDb, upgradeSql: string): void {
+  const state = assertWritableUpgradeShape(db);
+  if (state === "d1" || state === "current" || state === "uninitialized") return;
+  if (state !== "pre_d1") return;
+  const tx = db.transaction(() => {
     db.exec(upgradeSql);
+    if (classifyKernelShape(db) !== "d1") {
+      throw new KernelUpgradeShapeError(
+        PROFILE_IDENTITY_UPGRADE,
+        "0001 did not produce the exact D1 predecessor shape",
+      );
+    }
   });
   tx();
 }
