@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "cd ../../packages/qf-kernel && bun install",
     "harness": "bun src/harness.ts",
     "gate:tool-discovery": "bun src/gates/tool-discovery.ts",
     "gate:action-transport": "bun src/gates/action-transport.ts",

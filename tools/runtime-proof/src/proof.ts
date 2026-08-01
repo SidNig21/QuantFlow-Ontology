@@ -1,7 +1,14 @@
 import { AgentOs, type JsonRpcNotification } from "@rivet-dev/agentos-core";
 import { join } from "node:path";
 import { listenerDelta, snapshotListeners, type ListenSnapshot } from "./listeners.ts";
-import { processDelta, snapshotAgentProcesses, type ProcessSnap } from "./processes.ts";
+import {
+  processDelta,
+  selectAgentProcesses,
+  snapshotAgentProcesses,
+  snapshotProcessTable,
+  survivingPids,
+  type ProcessSnap,
+} from "./processes.ts";
 
 export const AGENT_PACKAGE_PATH = join(import.meta.dir, "..", "packed", "qf-toolloop.aospkg");
 
@@ -70,17 +77,101 @@ export type SharedOs = {
   os: AgentOs;
   listenersBefore: ListenSnapshot;
   listenersAfterStart: ListenSnapshot;
+  agentProcessesBaseline: ProcessSnap;
 };
+
+export type SocketDenialProof = {
+  sessionCountBefore: number;
+  sessionIdsBefore: string[];
+  sessionCountAfter: number;
+  sessionIdsAfter: string[];
+  rejectionMessage: string;
+};
+
+function ownedPidsForAgentDelta(baseline: ProcessSnap, current: ProcessSnap): Set<number> {
+  return new Set([process.pid, ...processDelta(baseline, current)]);
+}
+
+function openEphemeralListener(): Bun.TCPSocketListener<undefined> {
+  return Bun.listen({
+    hostname: "127.0.0.1",
+    port: 0,
+    socket: { data() {}, open() {}, close() {} },
+  });
+}
 
 /** Create the shared AgentOS fixture (pack must already have run). */
 export async function createSharedOs(): Promise<SharedOs> {
-  const listenersBefore = await snapshotListeners();
+  const agentProcessesBaseline = await snapshotAgentProcesses();
+  const listenersBefore = await snapshotListeners(new Set([process.pid]));
   const os = await AgentOs.create({
     defaultSoftware: false,
     software: [{ packagePath: AGENT_PACKAGE_PATH }],
+    limits: { resources: { maxSockets: 0 } },
   });
-  const listenersAfterStart = await snapshotListeners();
-  return { os, listenersBefore, listenersAfterStart };
+  const agentProcessesAfterStart = await snapshotAgentProcesses();
+  const listenersAfterStart = await snapshotListeners(
+    ownedPidsForAgentDelta(agentProcessesBaseline, agentProcessesAfterStart),
+  );
+  return { os, listenersBefore, listenersAfterStart, agentProcessesBaseline };
+}
+
+function registeredSessionIds(os: AgentOs): string[] {
+  return os
+    .listSessions()
+    .map((session) => session.sessionId)
+    .sort();
+}
+
+/** Prove the packed guest cannot register a session that opens a socket. */
+export async function runSocketDenialProof(shared: SharedOs): Promise<SocketDenialProof> {
+  const sessionIdsBefore = registeredSessionIds(shared.os);
+  const sessionCountBefore = sessionIdsBefore.length;
+  let rejection: unknown;
+  let createdSessionId: string | undefined;
+
+  try {
+    const created = await shared.os.createSession("qf-toolloop", {
+      env: { QF_PROOF_OPEN_LISTENER: "1" },
+    });
+    createdSessionId = created.sessionId;
+  } catch (error) {
+    rejection = error;
+  }
+
+  if (createdSessionId) {
+    await shared.os.destroySession(createdSessionId);
+  }
+
+  const sessionIdsAfter = registeredSessionIds(shared.os);
+  const sessionCountAfter = sessionIdsAfter.length;
+  if (
+    sessionCountAfter !== sessionCountBefore ||
+    sessionIdsAfter.length !== sessionIdsBefore.length ||
+    sessionIdsAfter.some((id, index) => id !== sessionIdsBefore[index])
+  ) {
+    throw new Error(
+      `P2 socket denial left registered sessions: before=${sessionIdsBefore.join(",")} after=${sessionIdsAfter.join(",")}`,
+    );
+  }
+
+  const rejectionMessage = createdSessionId
+    ? `P2 socket denial unexpectedly succeeded: before=${JSON.stringify(sessionIdsBefore)} after=${JSON.stringify(sessionIdsAfter)}`
+    : rejection instanceof Error
+      ? rejection.message
+      : String(rejection);
+
+  if (!rejectionMessage.includes("maximum socket count reached")) {
+    throw new Error(`P2 socket denial rejected for the wrong reason: ${rejectionMessage}`);
+  }
+
+  return {
+    sessionCountBefore,
+    sessionIdsBefore,
+    sessionCountAfter,
+    sessionIdsAfter,
+    rejectionMessage,
+  };
 }
 
 /**
@@ -88,7 +179,7 @@ export async function createSharedOs(): Promise<SharedOs> {
  * createSession / listSessions and from received ACP notifications — not a receipt file.
  */
 export async function runProofTurn(shared: SharedOs): Promise<ProofRun> {
-  const { os, listenersBefore, listenersAfterStart } = shared;
+  const { os, listenersBefore, listenersAfterStart, agentProcessesBaseline } = shared;
 
   const created = await os.createSession("qf-toolloop");
   const agentOsSessionId = created.sessionId;
@@ -101,7 +192,10 @@ export async function runProofTurn(shared: SharedOs): Promise<ProofRun> {
     throw new Error("AgentOS listSessions did not report the created session id");
   }
 
-  const listenersAfterSession = await snapshotListeners();
+  const agentProcessesAfterSession = await snapshotAgentProcesses();
+  const listenersAfterSession = await snapshotListeners(
+    ownedPidsForAgentDelta(agentProcessesBaseline, agentProcessesAfterSession),
+  );
 
   const sessionEvents: SessionEventRecord[] = [];
   const chunkEventTimestamps: number[] = [];
@@ -210,30 +304,39 @@ export async function runCancelProof(shared: SharedOs): Promise<CancelRun> {
 
   // Brief settle so the stdio child can exit.
   await Bun.sleep(200);
-  const agentProcessesAfter = await snapshotAgentProcesses();
+  const processTableAfter = await snapshotProcessTable();
+  const agentProcessesAfter = selectAgentProcesses(processTableAfter, process.pid);
   const spawned = processDelta(agentProcessesBaseline, agentProcessesDuring);
-  const orphanSurvivors = spawned.filter((pid) => agentProcessesAfter.pids.includes(pid));
+  const orphanSurvivors = survivingPids(spawned, processTableAfter);
 
-  const listenersAfter = await snapshotListeners();
+  let ownedTestListener: Bun.TCPSocketListener<undefined> | undefined;
+  try {
+    if (process.env.QF_PROOF_P4_OPEN_OWNED_LISTENER === "1") {
+      ownedTestListener = openEphemeralListener();
+    }
+    const listenersAfter = await snapshotListeners(new Set([process.pid, ...orphanSurvivors]));
 
-  return {
-    agentOsSessionId,
-    stopReason,
-    chunkEventTimestamps,
-    chunksBeforeCancel,
-    chunksAfterCancel,
-    cancelAt,
-    listenersAfter,
-    newListeners: listenerDelta(listenersBefore, listenersAfter),
-    agentProcessesBaseline,
-    agentProcessesDuring,
-    agentProcessesAfter,
-    orphanSurvivors,
-    orphanCheck: {
-      sessionGone,
-      disposeCompleted: true, // shared fixture owns dispose; session destroy completed above
-      listenerCountFinal: listenersAfter.count,
-      zeroOrphanDescendants: orphanSurvivors.length === 0,
-    },
-  };
+    return {
+      agentOsSessionId,
+      stopReason,
+      chunkEventTimestamps,
+      chunksBeforeCancel,
+      chunksAfterCancel,
+      cancelAt,
+      listenersAfter,
+      newListeners: listenerDelta(listenersBefore, listenersAfter),
+      agentProcessesBaseline,
+      agentProcessesDuring,
+      agentProcessesAfter,
+      orphanSurvivors,
+      orphanCheck: {
+        sessionGone,
+        disposeCompleted: true, // shared fixture owns dispose; session destroy completed above
+        listenerCountFinal: listenersAfter.count,
+        zeroOrphanDescendants: orphanSurvivors.length === 0,
+      },
+    };
+  } finally {
+    ownedTestListener?.stop();
+  }
 }

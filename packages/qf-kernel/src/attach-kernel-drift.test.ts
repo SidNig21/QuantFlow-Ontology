@@ -42,13 +42,19 @@ function tempDir(): string {
 
 function seedPriorSnapshot(path: string): void {
   const db = new Database(path);
-  db.exec(readFileSync(PRIOR_MIGRATION, "utf8"));
+  const tx = db.transaction(() => {
+    db.exec(readFileSync(PRIOR_MIGRATION, "utf8"));
+  });
+  tx();
   db.close();
 }
 
 function seedCanaryOnly(path: string): void {
   const db = new Database(path);
-  db.exec(readFileSync(CANARY_SQL, "utf8"));
+  const tx = db.transaction(() => {
+    db.exec(readFileSync(CANARY_SQL, "utf8"));
+  });
+  tx();
   db.close();
 }
 

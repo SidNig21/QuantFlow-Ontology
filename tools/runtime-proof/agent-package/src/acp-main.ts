@@ -18,14 +18,29 @@ import {
 } from "@agentclientprotocol/sdk";
 import { stepCountIs, tool, ToolLoopAgent } from "ai";
 import { MockLanguageModelV3, simulateReadableStream } from "ai/test";
+import { createServer, type Server } from "node:net";
 import { z } from "zod";
 
 type SessionState = {
   sessionId: string;
   pending: AbortController | null;
+  proofListener?: Server;
 };
 
 const sessions = new Map<string, SessionState>();
+
+async function openProofListener(): Promise<Server> {
+  const server = createServer();
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen({ host: "127.0.0.1", port: 0 }, resolve);
+  });
+  return server;
+}
+
+function closeProofListeners(): void {
+  for (const session of sessions.values()) session.proofListener?.close();
+}
 
 function buildMockModel(slowChunkMs: number) {
   let call = 0;
@@ -102,7 +117,9 @@ class ToolLoopAcpAgent implements Agent {
 
   async newSession(_params: NewSessionRequest) {
     const sessionId = crypto.randomUUID();
-    sessions.set(sessionId, { sessionId, pending: null });
+    const proofListener =
+      process.env.QF_PROOF_OPEN_LISTENER === "1" ? await openProofListener() : undefined;
+    sessions.set(sessionId, { sessionId, pending: null, proofListener });
     return { sessionId };
   }
 
@@ -202,4 +219,7 @@ const input = new ReadableStream<Uint8Array>({
 const stream = ndJsonStream(output, input);
 new AgentSideConnection((conn) => new ToolLoopAcpAgent(conn), stream);
 process.stdin.resume();
-process.stdin.on("end", () => process.exit(0));
+process.stdin.on("end", () => {
+  closeProofListeners();
+  process.exit(0);
+});

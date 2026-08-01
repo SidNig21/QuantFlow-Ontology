@@ -1,41 +1,37 @@
-# NEXT — the current order (rotated 2026-07-31 after WO-107b PASS)
+# NEXT — the current order (rotated 2026-08-01 after WO-CI3 target verification)
 
 > **Builder: this file is your complete entry point.** It always points at the single unblocked
 > order. Do not choose another order or proceed past it.
 > **Founder:** give a fresh builder this file: *“Follow `docs/orders/NEXT.md`.”*
 
-## Current order: **[WO-107c](WO-107c.md) — market context completes the ingest graph**
+## Current order: **[WO-CI4](WO-CI4.md) — runtime ownership ignores foreign listeners, not owned ones**
 
-Read `START_HERE.md`, this file, WO-107c, and `PROTOCOL.md` in the required order. Branch from the
-verified WO-107b merge on `main`, use an isolated worktree, build the full context/link/upgrade
-slice as one batch, run its focused acceptance once, and stop for independent verification.
+Read `START_HERE.md`, this file, WO-CI4, and `PROTOCOL.md` in the required order. Use an isolated
+worktree, scope the runtime listener proof to the test-owned PID set, run focused acceptance once,
+and stop for independent verification.
 
-**In plain terms:** QuantFlow can now load prices safely; connect each price to Bovada and its real
-football event before live network data is allowed into the app.
+**In plain terms:** the fixture repair worked, but QuantFlow's agent test falsely blames itself when
+another program opens a port; watch only QuantFlow's own test and agent processes.
 
 ## Build priority
 
-1. Add trusted-only, replay-safe `register_venue` and `schedule_market_event` commands through
-   `execute()`, with forced scheduled state and source provenance.
-2. Extend the existing market batch with one venue identity and optional per-instrument event
-   identity; derive `lists`, `offered_on`, and `quotes` under the same transaction.
-3. Generate `0003`, preserve all three predecessor shapes, and require it in the real package.
-4. Keep the agent-served MCP set byte-identical at 92 and close the slice with `market-context`.
-5. Build the complete chunk before focused acceptance; then run the four named baits.
+1. Prove same-user `ss -H -ltnp` exposes the exact PID of a controlled listener.
+2. Filter listener evidence to the test PID and newly spawned qf-toolloop/acp-main children.
+3. Keep the existing orphan-process assertion unchanged.
+4. Prove a foreign listener stays green and a real owned child listener turns P2 red.
+5. Stop for a separate verifier's one canonical cold release run.
 
 ## Hard boundaries
 
 - Never place, execute, or automate a bet or trade; never handle credentials.
-- No real Bovada football/network fetch, parser fixture, timer/cron, live model, or Dock demo yet.
-- Context actions are trusted-only and must not enter the agent MCP surface.
-- No second ingest command, no writes outside `execute()`, and no silent event/venue updates.
-- Do not add dependencies or weaken an existing gate.
+- No port allowlist or special case for 8180.
+- No production networking, schema, Kernel, Electron, Dock, package, or QA-order change.
+- No timeout increase, retry, skipped test, or new dependency.
 
-## Behind WO-107c
+## Behind WO-CI4
 
-WO-107 connects one public unauthenticated Bovada football capture to this now-complete graph, adds the
-bounded schedule, and proves a real seat can answer a cross-object question. WO-109 then runs the
-collaborative lower loop over real Kernel evidence.
+The verifier rotates this door back to WO-107c after the release verifier passes. The two bounded CI
+repairs are then applied to the WO-107c candidate for its final clean canonical release proof.
 
 ---
 
