@@ -46,15 +46,27 @@ before `tools/qf-peer-bus`; the postinstall is obsolete, not load-bearing.
 1. Delete only the `postinstall` script from `tools/qf-peer-bus/package.json`. Preserve its harness,
    typecheck, and founder-seat scripts.
 2. Before any typecheck install begins, inspect `preinstall`, `install`, and `postinstall` for every
-   package in the typecheck install closure. Reject a lifecycle command that invokes:
-   `bun install`, `npm install`, `npm ci`, `pnpm install`, or `yarn install`, including after `cd`,
-   shell chaining, or surrounding arguments.
-3. The rejection names the package path, lifecycle key, and matched command. Native rebuild or
-   non-package-manager lifecycle scripts outside this exact rule are not changed by this order.
-4. Add an install-free `QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=1` path that injects the removed
-   peer-bus command into the manifest value in memory. It must fail before the first `Bun.spawn`.
-   Without the selector, no fake manifest or behavior exists.
-5. Do not retry failed installs, change temp paths, add dependencies, or weaken frozen installs.
+   package in the typecheck install closure. Apply this exact lexical policy, not a shell parser:
+   reject a lifecycle string when one shell segment (bounded by start/end or `;`, `&&`, `||`, `|`)
+   contains a bare package-manager token `bun`, `npm`, `pnpm`, or `yarn`, followed later in that same
+   segment by the forbidden operation token (`install` for all four; `ci` additionally for `npm`).
+   Whitespace and intervening flags/arguments do not matter, so both `bun install` and
+   `bun --cwd ../../packages/qf-kernel install --frozen-lockfile` reject.
+3. This is deliberately conservative lifecycle authority, not inferred shell execution. A quoted or
+   echoed package-manager/install instruction in one lifecycle segment also rejects; lifecycle hooks
+   must not carry install instructions as prose. Commands without that ordered pair remain allowed,
+   including `node scripts/postinstall.mjs`, `electron-builder install-app-deps`, `bun run build`,
+   `npm run build`, and `echo install complete`.
+4. The rejection names the package path, lifecycle key, package manager, operation, and full command.
+   Before reading live manifests, the gate runs install-free matcher controls proving all five allowed
+   examples above remain allowed and the following three shapes reject:
+   literal `cd x && bun install`; flagged `bun --cwd x install --frozen-lockfile`; chained
+   `echo preparing; npm --prefix x ci`.
+5. Add install-free selector modes
+   `QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=literal|flagged|chained`. Each injects its named command
+   into the peer-bus manifest value in memory and must fail before the first `Bun.spawn`. Unknown
+   selector values fail closed. Without a selector, no fake manifest or behavior exists.
+6. Do not retry failed installs, change temp paths, add dependencies, or weaken frozen installs.
    The fix is one install owner, not a retry or environment workaround.
 
 ## Deliverables
@@ -72,14 +84,17 @@ before `tools/qf-peer-bus`; the postinstall is obsolete, not load-bearing.
 From the isolated candidate:
 
 ```bash
-QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=1 bun qa/run.ts typecheck
+QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=literal bun qa/run.ts typecheck
+QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=flagged bun qa/run.ts typecheck
+QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=chained bun qa/run.ts typecheck
 bun qa/run.ts typecheck
 bun qa/run.ts kernel
 ```
 
-The selector exits nonzero before any install and names the injected peer-bus postinstall. Exact
-restore (selector absent) passes typecheck in one run. Kernel remains green. Run the standing static
-gates and `git diff --check`; do not run the canonical release verifier.
+Each selector exits nonzero before any install and names the injected peer-bus postinstall, manager,
+operation, and command. The five allowed controls stay green. Exact restore (selector absent) passes
+typecheck in one run. Kernel remains green. Run the standing static gates and `git diff --check`; do
+not run the canonical release verifier.
 
 ### Independent verifier
 
