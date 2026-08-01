@@ -115,6 +115,8 @@ const OPEN_ALLOW = [
   "qa/gates/kernel-drift/run.ts",
   "qa/gates/artifact-root/run.ts",
   "qa/gates/market-ingest/run.ts",
+  // WO-107: permanent deterministic gate opens only its temporary in-memory Kernel.
+  "qa/gates/bovada-football/run.ts",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
 ];
@@ -148,6 +150,8 @@ const WRITE_ALLOW = [
   "qa/gates/kernel-drift/run.ts",
   "qa/gates/artifact-root/run.ts",
   "qa/gates/market-ingest/run.ts",
+  // WO-107: permanent gate seeds its isolated fixture through execute() only.
+  "qa/gates/bovada-football/run.ts",
   "collab-electron/",
 ];
 

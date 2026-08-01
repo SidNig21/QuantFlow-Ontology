@@ -658,6 +658,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "bovada-football",
+    description:
+      "WO-107: fixed public capture, Kernel graph/replay, 92-tool surface, and shipped CLI/app closure",
+    run: async () => {
+      const { runBovadaFootballGate } = await import(
+        "./gates/bovada-football/run.ts"
+      );
+      const { ok } = await runBovadaFootballGate();
+      return ok;
+    },
+  },
+  {
     name: "product-identity",
     description:
       "WO-N1: pinned QuantFlow identity, staged legacy migration, production delegation, and shipped Linux metadata",
