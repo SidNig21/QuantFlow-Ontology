@@ -1,6 +1,6 @@
 # WO-CI4 — Runtime ownership ignores foreign listeners, not owned ones
 
-status: **binding rewrite after two rejected P2 falsifiers**
+status: **second binding rewrite — enforce zero guest sockets after PID attribution proved impossible**
 assignee: builder
 depends: WO-CI3 candidate `196b0ec`
 blocks: WO-CI3 verification · WO-107c verification
@@ -194,3 +194,62 @@ the Node-targeted bundle plus existing no-bind type/parser checks, and commit. T
 verifier then runs the real packed P2 selector first. It must print an owned listener line and fail
 the P2 assertion; any child exception is REWORK. Only after exact restore-green and the unchanged P4
 control may the verifier spend the one canonical release run.
+
+---
+
+## BINDING REWRITE 2 — 2026-08-01 after `8f0af1f` REWORK
+
+This section supersedes Ruling 1 and RW1 only for the AgentOS guest's P2 listener invariant. Host
+foreign-listener filtering, the exact spawned-PID orphan assertion, and the independent P4
+test-process listener remain unchanged.
+
+### Measured contradiction
+
+Candidate `8f0af1f` proved that the minimal packed `node:net` surface works: the guest no longer
+crashed. Its real listener nevertheless appeared outside the host PID-attribution surface, so P2
+reported owned listener counts `0/0/0` and passed. The packed AgentOS guest is isolated from the
+ordinary same-user host process/listener model; requiring an attributed host `ss` line for it is not
+an achievable contract.
+
+The replacement seam was measured reversibly on the exact candidate:
+
+```text
+AgentOs.create({ limits: { resources: { maxSockets: 0 } } })
+ordinary P2: 1 pass · 0 fail
+packed QF_PROOF_OPEN_LISTENER session/new:
+EAGAIN: maximum socket count reached · 0 pass · 1 fail
+```
+
+### RW2 — enforce the invariant at the guest boundary
+
+The runtime-proof AgentOS fixture sets exactly `limits.resources.maxSockets: 0`. This fixture uses
+ACP over stdio and needs no guest network socket. The limit is test-fixture policy only; it changes
+no production Electron, Kernel, Dock, schema, or packaged-app runtime.
+
+Add one permanent P2 socket-denial control that asks the real packed `qf-toolloop` child to open its
+test listener through `QF_PROOF_OPEN_LISTENER=1`. The control passes only when:
+
+1. `session/new` rejects with the exact AgentOS capacity mechanism (`maximum socket count reached`);
+2. no session remains registered after the rejection; and
+3. the ordinary P2 turn still completes normally in the same zero-socket fixture.
+
+If the denial unexpectedly succeeds, destroy that session before failing the test. Do not identify
+the guest by host PID, global listener count, port number, command substring, or ownerless `ss`
+line. The VM limit is the enforcement; the real packed denial test is its receipt.
+
+### Bound implementation and falsification
+
+From `8f0af1f`, the builder may change only:
+
+- `tools/runtime-proof/src/proof.ts` — configure the zero-socket limit and expose the smallest
+  denial helper/result needed by the test;
+- `tools/runtime-proof/src/proof.test.ts` — add the permanent packed denial control.
+
+No dependency, timeout, retry, production surface, listener parser, process parser, or packed-agent
+change is allowed. Run ordinary P2, the new denial control, P4, and the existing pure parser tests.
+
+The required P2 falsifier changes only `maxSockets: 0` to `maxSockets: 1`. The permanent denial
+control must go red because the packed listener opens; its cleanup must leave no registered session.
+Restore `0` and rerun green. The independent verifier repeats this bait, repeats the unchanged P4
+owned-listener bait, confirms ordinary P2/P4 ignore a managed foreign host listener, and only then
+spends the one canonical release run.
