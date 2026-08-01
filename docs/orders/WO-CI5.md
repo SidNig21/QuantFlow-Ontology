@@ -8,13 +8,13 @@ kind: off-ladder cold-verifier correction
 
 ## Objective
 
-Remove the peer-bus package's redundant nested installer and make the typecheck gate reject package
-manager installs hidden inside lifecycle scripts before a cold verifier can execute them.
+Remove the two redundant nested Kernel installers and make the typecheck gate reject package-manager
+installs hidden inside lifecycle scripts before a cold verifier can execute them.
 
 ## In plain terms
 
-QuantFlow's release check installs the Kernel correctly, then an old peer-bus setup hook tries to
-install it again and crashes; remove the duplicate work and prevent it from returning.
+QuantFlow's release check installs the Kernel correctly, then old peer-bus and read-tools setup hooks
+try to install it again; remove the duplicate work and prevent it from returning.
 
 ## Measured failure
 
@@ -41,10 +41,17 @@ The live typecheck gate already computes and installs the transitive closure of 
 dependencies before typechecking. `packages/qf-kernel` and `qf-kernel-schema` are therefore installed
 before `tools/qf-peer-bus`; the postinstall is obsolete, not load-bearing.
 
+The first scanner implementation then exposed the same literal hook in `tools/qf-read-tools` before
+any install began. That package is itself a typecheck target and declares both Kernel packages as
+local `file:` dependencies, so the same closure proves its hook is equally obsolete. A repository-wide
+manifest search found no third package-manager lifecycle install; Electron's unrelated
+`node scripts/postinstall.mjs` is an explicit allowed control.
+
 ## Ruling
 
-1. Delete only the `postinstall` script from `tools/qf-peer-bus/package.json`. Preserve its harness,
-   typecheck, and founder-seat scripts.
+1. Delete only the identical Kernel-installing `postinstall` scripts from
+   `tools/qf-peer-bus/package.json` and `tools/qf-read-tools/package.json`. Preserve every other
+   script in both packages.
 2. Before any typecheck install begins, inspect `preinstall`, `install`, and `postinstall` for every
    package in the typecheck install closure. Apply this exact lexical policy, not a shell parser:
    reject a lifecycle string when one shell segment (bounded by start/end or `;`, `&&`, `||`, `|`)
@@ -72,6 +79,8 @@ before `tools/qf-peer-bus`; the postinstall is obsolete, not load-bearing.
 ## Deliverables
 
 - `tools/qf-peer-bus/package.json` — remove the redundant postinstall.
+- `tools/qf-read-tools/package.json` — remove the second, identical redundant postinstall exposed by
+  the pre-spawn scanner.
 - `qa/run.ts` — lifecycle scanner wired before the typecheck install loop plus its install-free
   falsification selector.
 - Regenerate `tools/qf-peer-bus/bun.lock` only if frozen Bun reports real manifest drift; do not edit
@@ -102,7 +111,8 @@ From a fresh detached clone with no `node_modules`:
 
 1. Repeat the selector red before install.
 2. Run `bun qa/run.ts typecheck` exactly once; it must pass from the genuinely cold clone.
-3. Confirm `tools/qf-peer-bus` has no lifecycle package-manager install and Kernel still passes.
+3. Confirm neither `tools/qf-peer-bus` nor `tools/qf-read-tools` has a lifecycle package-manager
+   install and Kernel still passes.
 4. Run `bun qa/verify-release.ts` exactly once on the successor candidate. It must print
    `PASS release-verification`, retain CI3's five sub-five-second fixtures, and retain every CI4 P2/P4
    control.
