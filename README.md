@@ -42,29 +42,26 @@ The ontology has three planes:
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Substrate: Kernel, canvas/dock, seats, peer bus, live TUI delivery | ✅ Done, verified |
-| 1 | Ontology charter as code (~14 described object types, lint-enforced governance) | 🔜 Next |
-| 2 | Tool plane generated from the charter (MCP read + action tools via codegen) | Planned |
-| 3 | First market pipeline (`Instrument`/`Quote`/`MarketEvent` via Kernel commands) | Planned |
+| 1 | Ontology charter as code (23 described object types, lint-enforced governance) | ✅ Done, verified |
+| 2 | Generated MCP read + action plane with governed hidden actions | ✅ Done, verified |
+| 3 | First market pipeline: trusted context and atomic ingest, then real Bovada football | In progress — live capture is next |
 | 4 | Defining research loop run end-to-end by agents — the one-shot proof | Planned |
 | 5 | Recall layer (FTS5 + sqlite-vec hybrid retrieval) + trust boundaries | Later |
 | 6 | Evaluation-history-driven optimization | Later |
 
 No claim in this README runs ahead of this table.
 
-**Measured 2026-07-25 — what "Phase 0 done" does and does not mean.** The Kernel is real: one
-write path, content-addressed artifacts, generated migrations, trace on every command, twelve
-green QA gates. It is *not* yet able to record the defining workflow. Of 19 declared object
-types **3 can be created**; of 27 declared actions **9 throw `Unknown command`**; of 13 declared
-link types **none are writable** — the `links` table is generated and constrained, with zero
-reads and zero writes anywhere in the repo. So `Hypothesis → Dataset → Run → Artifact →
-Evaluation → Report` has one creatable stage and no connective tissue.
+**Measured 2026-08-01.** The generated authority now contains 23 objects, 28 actions, and 97
+complete tools. Agents receive exactly 92: observation, registration, and market-ingest actions stay
+on trusted/operator or pipeline boundaries. The research graph has governed creation/link paths, and
+the market plane can atomically store replay-safe Venue, MarketEvent, Instrument, and Quote rows with
+source provenance and `lists` / `offered_on` / `quotes` links. The production Linux package contains
+the Kernel's complete three-step upgrade history plus qf-toolloop and the three Hermes-backed Dock
+profiles.
 
-This is a *sequencing* fact, not a broken foundation — nothing above was built on sand, and
-Phase 0's own gates all still pass. But it means the write path is the next real rung, and it
-is why the build ladder is eleven orders rather than ten. **Declaration is not capability:**
-anywhere in this repo, `schema.ts` states what is *declared* — `commands.ts` and
-`transitions.ts` state what is *wired*, and the second is a strict subset. See
-[`docs/orders/SCOPES.md`](docs/orders/SCOPES.md) and `docs/DOCTRINE.md` amendment A5.
+The remaining Phase 3 gap is concrete rather than architectural: no production adapter yet captures
+real public Bovada football data. That adapter, its bounded schedule, and a real seat question are the
+next order; the defining multi-agent research loop remains later work.
 
 ## Architecture
 

@@ -1,4 +1,4 @@
-# NEXT — the current order (WO-107c combined verification)
+# NEXT — WO-107c verified; founder merge decision pending
 
 > **Builder: this file is your complete entry point.** It always points at the single unblocked
 > order. Do not choose another order or proceed past it.
@@ -6,28 +6,27 @@
 
 ## Current order: **[WO-107c](WO-107c.md) — market context completes the ingest graph**
 
-WO-107c's feature implementation and the bounded CI3–CI5 repairs are combined on the isolated
-candidate. No further product implementation is authorized until one cold canonical verifier proves
-the combined shipped Linux application.
+WO-107c's feature implementation and the bounded CI3–CI5 repairs passed the cold canonical shipped-
+Linux verifier and independent falsifiers. The verified branch is ready for the founder's explicit
+merge decision; do not start product implementation from unmerged history.
 
-**In plain terms:** QuantFlow can load prices safely and connect them to Bovada football context; the
-remaining job on this rung is proving those changes and the repaired release checks work together in
-the packaged app.
+**In plain terms:** QuantFlow can load prices safely and connect them to Bovada football context, and
+that foundation has passed the packaged-app proof. The only remaining step on this rung is the
+founder's merge decision; the next build is the narrow live Bovada football adapter.
 
-## Verification priority
+## Closeout priority
 
-1. Start from a fresh detached clone of the combined candidate with no `node_modules` or build output.
-2. Run `bun qa/verify-release.ts` exactly once in an environment that permits Bun's Electron install.
-3. Require production package inspection, cold typecheck, Kernel fixtures, runtime P2/P4, and
-   `market-context` to pass in that same run.
-4. Recheck the four WO-107c baits against the combined tree only if the canonical run is green.
-5. Rotate authority to WO-107 only after independent PASS and explicit founder approval to merge.
+1. Preserve candidate `0924f50` and canonical run ID `304169e3-4e27-4c06-8fdd-cbc11d202673`.
+2. Keep the R2 verification receipt and public README synchronized with the exact verified state.
+3. Merge only after explicit founder approval.
+4. In the same landed state, rotate authority to the measured WO-107 order: real public Bovada
+   football capture, bounded scheduling, and one generated-tools seat question.
 
 ## Hard boundaries
 
 - Never place, execute, or automate a bet or trade; never handle credentials.
 - No real Bovada football/network fetch, parser fixture, timer/cron, live model, or Dock demo yet.
-- No new CI repair, retry, timeout increase, temp-directory workaround, or pre-warmed canonical run.
+- No new CI repair, canonical retry, timeout increase, or temp-directory workaround.
 - Do not merge or touch `main` without explicit founder approval.
 
 ## Behind WO-107c

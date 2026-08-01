@@ -1,6 +1,6 @@
 # WO-CI3 — Keep the prior-schema release fixture inside its deadline
 
-status: **target verified — combined WO-107c canonical pending**
+status: **independently verified on combined candidate — pending merge**
 assignee: builder
 depends: WO-107b
 blocks: WO-107c verification

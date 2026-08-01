@@ -1,6 +1,6 @@
 # WO-CI5 — Typecheck installs each dependency once
 
-status: **target verified — combined WO-107c canonical pending**
+status: **independently verified on combined candidate — pending merge**
 assignee: builder
 depends: WO-CI4 candidate `8ef6d20`
 blocks: CI3/CI4 canonical PASS · WO-107c verification
