@@ -1,6 +1,6 @@
 # WO-CI3 — Keep the prior-schema release fixture inside its deadline
 
-status: **open — blocks WO-107c verification**
+status: **target verified; canonical release blocked by WO-CI4**
 assignee: builder
 depends: WO-107b
 blocks: WO-107c verification
@@ -93,3 +93,13 @@ credentials, bets, or trades.
 
 One plain-language sentence · exact one-file implementation diff · focused green output · deadline
 bait red→restore→green · static gates · judgment where the order was silent.
+
+---
+
+## Verification round 1 — target PASS, canonical REWORK (`4a7b2d3`)
+
+The transaction-only diff was exact. In the single canonical run, the formerly failing tests passed
+at 296.69 ms and 462.23 ms; the complete Kernel suite passed 67/67. The canonical release still
+exited `1` solely because the previously documented machine-wide `runtime-proof` listener trap saw a
+foreign port 8180 after its baseline. No CI3 defect was found. WO-CI4 owns that independent gate
+correction; the canonical command was not rerun and the conditional verifier bait was not started.
