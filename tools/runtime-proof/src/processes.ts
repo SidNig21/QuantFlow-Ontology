@@ -1,18 +1,80 @@
-/**
- * Enumerate OS processes that look like the packed ACP agent (stdio child).
- * Used for P4 orphan assertion — leaked children are the real risk, not listeners.
- */
+/** Read one process table and derive only descendant AgentOS/tool-loop PIDs. */
 
 const AGENT_CMDLINE = /acp-main|qf-toolloop/;
+
+export type ProcessRecord = {
+  pid: number;
+  ppid: number;
+  args: string;
+  line: string;
+};
 
 export type ProcessSnap = {
   pids: number[];
   lines: string[];
+  records: ProcessRecord[];
 };
 
-/** Snapshot PIDs whose command line matches the packed ACP agent. */
-export async function snapshotAgentProcesses(): Promise<ProcessSnap> {
-  const proc = Bun.spawn(["ps", "-eo", "pid=,args="], {
+export function parseProcessTable(output: string): ProcessRecord[] {
+  const records: ProcessRecord[] = [];
+  for (const raw of output.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const match = /^(\d+)\s+(\d+)(?:\s+(.*))?$/.exec(line);
+    if (!match) continue;
+    const pid = Number(match[1]);
+    const ppid = Number(match[2]);
+    if (!Number.isInteger(pid) || !Number.isInteger(ppid)) continue;
+    records.push({ pid, ppid, args: match[3] ?? "", line });
+  }
+  return records;
+}
+
+/** Return every recursive descendant, including grandchildren and deeper nodes. */
+export function descendantPids(rootPid: number, records: readonly ProcessRecord[]): number[] {
+  const children = new Map<number, number[]>();
+  for (const record of records) {
+    const siblings = children.get(record.ppid) ?? [];
+    siblings.push(record.pid);
+    children.set(record.ppid, siblings);
+  }
+  for (const siblings of children.values()) siblings.sort((a, b) => a - b);
+
+  const visited = new Set<number>([rootPid]);
+  const queue = [...(children.get(rootPid) ?? [])];
+  const descendants: number[] = [];
+  while (queue.length > 0) {
+    const pid = queue.shift()!;
+    if (visited.has(pid)) continue;
+    visited.add(pid);
+    descendants.push(pid);
+    queue.push(...(children.get(pid) ?? []));
+  }
+  return descendants.sort((a, b) => a - b);
+}
+
+function toSnapshot(records: readonly ProcessRecord[]): ProcessSnap {
+  const sorted = [...records].sort((a, b) => a.pid - b.pid);
+  return {
+    pids: sorted.map((record) => record.pid),
+    lines: sorted.map((record) => record.line),
+    records: sorted,
+  };
+}
+
+/** Select only matching AgentOS/tool-loop descendants of the supplied root PID. */
+export function selectAgentProcesses(
+  records: readonly ProcessRecord[],
+  rootPid: number,
+): ProcessSnap {
+  const descendants = new Set(descendantPids(rootPid, records));
+  return toSnapshot(
+    records.filter((record) => descendants.has(record.pid) && AGENT_CMDLINE.test(record.args)),
+  );
+}
+
+export async function snapshotProcessTable(): Promise<ProcessRecord[]> {
+  const proc = Bun.spawn(["ps", "-eo", "pid=,ppid=,args="], {
     stdout: "pipe",
     stderr: "pipe",
   });
@@ -22,27 +84,24 @@ export async function snapshotAgentProcesses(): Promise<ProcessSnap> {
     const err = await new Response(proc.stderr).text();
     throw new Error(`ps failed (${code}): ${err}`);
   }
-
-  const lines: string[] = [];
-  const pids: number[] = [];
-  for (const raw of out.split("\n")) {
-    const line = raw.trim();
-    if (!line || !AGENT_CMDLINE.test(line)) continue;
-    // Skip the pack/build helpers if any; keep runtime agent entrypoints.
-    if (line.includes("pack-agent") || line.includes("agentos-toolchain")) continue;
-    const m = /^(\d+)\s+(.*)$/.exec(line);
-    if (!m) continue;
-    const pid = Number(m[1]);
-    if (!Number.isFinite(pid)) continue;
-    pids.push(pid);
-    lines.push(line);
-  }
-  pids.sort((a, b) => a - b);
-  return { pids, lines };
+  return parseProcessTable(out);
 }
 
-/** PIDs present in `after` that were not in `before`. */
+export async function snapshotAgentProcesses(rootPid = process.pid): Promise<ProcessSnap> {
+  return selectAgentProcesses(await snapshotProcessTable(), rootPid);
+}
+
+/** PIDs present after the baseline that were not present in the baseline. */
 export function processDelta(before: ProcessSnap, after: ProcessSnap): number[] {
   const prior = new Set(before.pids);
-  return after.pids.filter((p) => !prior.has(p));
+  return after.pids.filter((pid) => !prior.has(pid));
+}
+
+/** Keep exact tracked PIDs that still exist, independent of their current parentage. */
+export function survivingPids(
+  trackedPids: readonly number[],
+  current: readonly ProcessRecord[],
+): number[] {
+  const live = new Set(current.map((record) => record.pid));
+  return trackedPids.filter((pid) => live.has(pid));
 }

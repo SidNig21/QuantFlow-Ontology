@@ -23,9 +23,22 @@ import { z } from "zod";
 type SessionState = {
   sessionId: string;
   pending: AbortController | null;
+  proofListener?: Bun.TCPSocketListener<undefined>;
 };
 
 const sessions = new Map<string, SessionState>();
+
+function openProofListener(): Bun.TCPSocketListener<undefined> {
+  return Bun.listen({
+    hostname: "127.0.0.1",
+    port: 0,
+    socket: { data() {}, open() {}, close() {} },
+  });
+}
+
+function closeProofListeners(): void {
+  for (const session of sessions.values()) session.proofListener?.stop();
+}
 
 function buildMockModel(slowChunkMs: number) {
   let call = 0;
@@ -102,7 +115,9 @@ class ToolLoopAcpAgent implements Agent {
 
   async newSession(_params: NewSessionRequest) {
     const sessionId = crypto.randomUUID();
-    sessions.set(sessionId, { sessionId, pending: null });
+    const proofListener =
+      process.env.QF_PROOF_OPEN_LISTENER === "1" ? openProofListener() : undefined;
+    sessions.set(sessionId, { sessionId, pending: null, proofListener });
     return { sessionId };
   }
 
@@ -202,4 +217,7 @@ const input = new ReadableStream<Uint8Array>({
 const stream = ndJsonStream(output, input);
 new AgentSideConnection((conn) => new ToolLoopAcpAgent(conn), stream);
 process.stdin.resume();
-process.stdin.on("end", () => process.exit(0));
+process.stdin.on("end", () => {
+  closeProofListeners();
+  process.exit(0);
+});
