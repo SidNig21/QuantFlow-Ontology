@@ -1,6 +1,6 @@
 # WO-CI4 — Runtime ownership ignores foreign listeners, not owned ones
 
-status: **open — current release blocker**
+status: **binding rewrite after two rejected P2 falsifiers**
 assignee: builder
 depends: WO-CI3 candidate `196b0ec`
 blocks: WO-CI3 verification · WO-107c verification
@@ -153,3 +153,44 @@ increases · retries · new dependencies · network access · credentials · bet
 One plain-language sentence · exact owner model · live PID probe · foreign-listener green control ·
 P2/P4 owned-listener red→restore→green · unchanged independent orphan assertion · focused outputs · static gates ·
 judgment where the order was silent.
+
+---
+
+## BINDING REWRITE — 2026-08-01 after two rejected candidates
+
+This section supersedes Ruling 3 only where it specifies the P2 child-listener implementation. The
+PID ownership design and P4 falsifier remain unchanged.
+
+### Rejected candidate 1 — `3147913`
+
+Ordinary P2/P4 passed with a verifier-owned foreign listener alive, and P4's independent owned
+listener bait went red while `orphanSurvivors=[]`. P2's child bait was invalid: the packed ACP agent
+runs under Node and crashed on `Bun.listen` before opening a socket.
+
+### Rejected candidate 2 — `9d9d430`
+
+The one-file Node rewrite reached its listening handler but called `server.off()`, which the packed
+runtime's Server surface does not provide. It again crashed before listener attribution. Neither
+candidate may be approved, and no canonical release run was spent on either after the focused
+falsifier proved REWORK.
+
+### RW1 — the packed P2 hook uses only the measured Server surface
+
+The `QF_PROOF_OPEN_LISTENER` hook uses `node:net.createServer()` and exactly these lifecycle APIs:
+
+```text
+server.once("error", reject)
+server.listen({ host: "127.0.0.1", port: 0 }, resolve)
+server.close()
+```
+
+Do not call `Bun`, `off`, `removeListener`, `on`, `address`, or any other Server convenience method
+inside the hook. The unresolved one-time error listener after successful bind is acceptable for this
+short-lived test child; `close()` on stdin end remains mandatory. Listen errors reject `newSession`
+instead of hanging or being swallowed.
+
+The builder may change only `tools/runtime-proof/agent-package/src/acp-main.ts` from `9d9d430`, run
+the Node-targeted bundle plus existing no-bind type/parser checks, and commit. The independent
+verifier then runs the real packed P2 selector first. It must print an owned listener line and fail
+the P2 assertion; any child exception is REWORK. Only after exact restore-green and the unchanged P4
+control may the verifier spend the one canonical release run.
