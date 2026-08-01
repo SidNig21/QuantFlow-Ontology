@@ -1,41 +1,36 @@
-# NEXT — the current order (rotated 2026-07-31 after WO-107b PASS)
+# NEXT — the current order (temporarily rotated 2026-08-01 after WO-107c release verification)
 
 > **Builder: this file is your complete entry point.** It always points at the single unblocked
 > order. Do not choose another order or proceed past it.
 > **Founder:** give a fresh builder this file: *“Follow `docs/orders/NEXT.md`.”*
 
-## Current order: **[WO-107c](WO-107c.md) — market context completes the ingest graph**
+## Current order: **[WO-CI3](WO-CI3.md) — keep the prior-schema release fixture inside its deadline**
 
-Read `START_HERE.md`, this file, WO-107c, and `PROTOCOL.md` in the required order. Branch from the
-verified WO-107b merge on `main`, use an isolated worktree, build the full context/link/upgrade
-slice as one batch, run its focused acceptance once, and stop for independent verification.
+Read `START_HERE.md`, this file, WO-CI3, and `PROTOCOL.md` in the required order. Use an isolated
+worktree, change only the ruled fixture setup, run the focused acceptance once, and stop for
+independent verification.
 
-**In plain terms:** QuantFlow can now load prices safely; connect each price to Bovada and its real
-football event before live network data is allowed into the app.
+**In plain terms:** WO-107c's product behavior passed, but an older test database sometimes takes too
+long to prepare; make that setup deterministic without weakening the five-second deadline.
 
 ## Build priority
 
-1. Add trusted-only, replay-safe `register_venue` and `schedule_market_event` commands through
-   `execute()`, with forced scheduled state and source provenance.
-2. Extend the existing market batch with one venue identity and optional per-instrument event
-   identity; derive `lists`, `offered_on`, and `quotes` under the same transaction.
-3. Generate `0003`, preserve all three predecessor shapes, and require it in the real package.
-4. Keep the agent-served MCP set byte-identical at 92 and close the slice with `market-context`.
-5. Build the complete chunk before focused acceptance; then run the four named baits.
+1. Wrap both file-backed drift-fixture seed helpers in explicit SQLite transactions.
+2. Preserve every SQL fixture byte, assertion, test name, and the default 5,000 ms deadline.
+3. Run the focused test once and falsify the unchanged deadline red→restore→green.
+4. Stop for a separate verifier's one canonical cold release run.
 
 ## Hard boundaries
 
 - Never place, execute, or automate a bet or trade; never handle credentials.
-- No real Bovada football/network fetch, parser fixture, timer/cron, live model, or Dock demo yet.
-- Context actions are trusted-only and must not enter the agent MCP surface.
-- No second ingest command, no writes outside `execute()`, and no silent event/venue updates.
-- Do not add dependencies or weaken an existing gate.
+- No WO-107c feature, schema, migration, runtime, QA-order, or package change.
+- No timeout increase, retry, skipped test, renamed test, or global test configuration.
+- Do not add dependencies or weaken any assertion.
 
-## Behind WO-107c
+## Behind WO-CI3
 
-WO-107 connects one public unauthenticated Bovada football capture to this now-complete graph, adds the
-bounded schedule, and proves a real seat can answer a cross-object question. WO-109 then runs the
-collaborative lower loop over real Kernel evidence.
+The verifier rotates this door back to WO-107c after the repair passes. The accepted repair is then
+applied to the WO-107c candidate and that complete candidate gets one clean canonical release proof.
 
 ---
 
