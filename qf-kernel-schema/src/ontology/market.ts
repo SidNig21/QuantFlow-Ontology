@@ -127,6 +127,35 @@ export const venue = defineObject({
   }),
 });
 
+export const register_venue = defineAction({
+  name: "register_venue",
+  description:
+    "Register one trusted venue identity from an existing source Artifact. Operator-only provenance is required and retries must preserve the original venue rather than silently updating it.",
+  lifecycle: "experimental",
+  operatorOnly: true,
+  input: z
+    .object({
+      venue_id: z
+        .string()
+        .describe(
+          "This field is the stable Kernel identity for the venue. Reuse it only when all stored venue fields and provenance are an exact replay.",
+        ),
+      kind: venue.properties.shape.kind,
+      name: venue.properties.shape.name,
+      source_artifact_id: z
+        .string()
+        .describe(
+          "This field identifies the existing Artifact that preserves the observed venue source. The Kernel rejects a reference that is not already present.",
+        ),
+      observed_at: z.iso
+        .datetime()
+        .describe(
+          "This field records when the venue was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time.",
+        ),
+    })
+    .strict(),
+});
+
 export const result = defineObject({
   name: "result",
   description:
@@ -142,6 +171,36 @@ export const result = defineObject({
         "This field records when settled truth became known in ISO-8601 UTC. Do not allow grading decisions to cite truth timestamps after this boundary.",
       ),
   }),
+});
+
+export const schedule_market_event = defineAction({
+  name: "schedule_market_event",
+  description:
+    "Schedule one trusted market event from an existing source Artifact. Operator-only provenance is required and creation always writes scheduled state without accepting a caller-supplied status.",
+  lifecycle: "experimental",
+  operatorOnly: true,
+  input: z
+    .object({
+      market_event_id: z
+        .string()
+        .describe(
+          "This field is the stable Kernel identity for the market event. Reuse it only when all stored event fields and provenance are an exact replay.",
+        ),
+      sport: market_event.properties.shape.sport,
+      starts_at: market_event.properties.shape.starts_at,
+      competition: market_event.properties.shape.competition,
+      source_artifact_id: z
+        .string()
+        .describe(
+          "This field identifies the existing Artifact that preserves the observed event source. The Kernel rejects a reference that is not already present.",
+        ),
+      observed_at: z.iso
+        .datetime()
+        .describe(
+          "This field records when the event was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time.",
+        ),
+    })
+    .strict(),
 });
 
 export const participates_in = defineLink({

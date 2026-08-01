@@ -169,6 +169,16 @@ export type CreationCommand = {
 
 export const creationCommands: readonly CreationCommand[] = [
   {
+    action: "register_venue",
+    object_type: "venue",
+    event: "venue.registered",
+  },
+  {
+    action: "schedule_market_event",
+    object_type: "market_event",
+    event: "market_event.scheduled",
+  },
+  {
     action: "publish_artifact",
     object_type: "artifact",
     event: "artifact.published",

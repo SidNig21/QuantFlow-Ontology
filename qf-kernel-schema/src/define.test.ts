@@ -15,12 +15,47 @@ import {
   instrument,
   market_event,
   quote,
+  register_venue,
+  schedule_market_event,
   venue,
 } from "./ontology/market.ts";
 import { ticket } from "./ontology/research.ts";
 import { schema } from "./schema.ts";
 
 describe("schema lint", () => {
+  test("trusted market context actions are operator-only and reject creation envelopes", () => {
+    expect(register_venue.operatorOnly).toBe(true);
+    expect(schedule_market_event.operatorOnly).toBe(true);
+
+    const venueInput = {
+      venue_id: "venue-bovada",
+      kind: "sportsbook" as const,
+      name: "Bovada",
+      source_artifact_id: "artifact-source",
+      observed_at: "2026-08-01T12:00:00.000Z",
+    };
+    const eventInput = {
+      market_event_id: "event-1",
+      sport: "football" as const,
+      starts_at: "2026-08-02T18:00:00.000Z",
+      competition: "NFL",
+      source_artifact_id: "artifact-source",
+      observed_at: "2026-08-01T12:00:00.000Z",
+    };
+
+    expect(register_venue.input.safeParse(venueInput).success).toBe(true);
+    expect(schedule_market_event.input.safeParse(eventInput).success).toBe(true);
+    expect(
+      register_venue.input.safeParse({ ...venueInput, links: [] }).success,
+    ).toBe(false);
+    expect(
+      schedule_market_event.input.safeParse({ ...eventInput, bytes: "ignored" }).success,
+    ).toBe(false);
+    expect(
+      schedule_market_event.input.safeParse({ ...eventInput, status: "live" }).success,
+    ).toBe(false);
+  });
+
   test("object missing description fails naming the offender", () => {
     expect(() =>
       defineObject({
