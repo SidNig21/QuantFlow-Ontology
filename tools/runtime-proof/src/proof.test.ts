@@ -6,6 +6,7 @@ import {
   promptUnknownSession,
   runCancelProof,
   runProofTurn,
+  runSocketDenialProof,
   type SharedOs,
 } from "./proof.ts";
 
@@ -73,6 +74,18 @@ describe("WO-004a runtime ownership proof", () => {
     expect(run.newListenersAfterSession).toEqual([]);
     expect(run.listenersAfterStart.count).toBe(run.listenersBefore.count);
     expect(run.listenersAfterSession.count).toBe(run.listenersBefore.count);
+  }, 60_000);
+
+  test("P2 · guest socket denial leaves no registered session", async () => {
+    const denial = await runSocketDenialProof(shared);
+
+    console.log("P2 socket denial:", denial.rejectionMessage);
+    console.log("P2 sessions before:", denial.sessionIdsBefore);
+    console.log("P2 sessions after:", denial.sessionIdsAfter);
+
+    expect(denial.rejectionMessage).toContain("maximum socket count reached");
+    expect(denial.sessionCountAfter).toBe(denial.sessionCountBefore);
+    expect(denial.sessionIdsAfter).toEqual(denial.sessionIdsBefore);
   }, 60_000);
 
   test("P3 · tool call inside the session reaches the assistant message", async () => {

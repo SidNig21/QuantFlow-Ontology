@@ -80,6 +80,14 @@ export type SharedOs = {
   agentProcessesBaseline: ProcessSnap;
 };
 
+export type SocketDenialProof = {
+  sessionCountBefore: number;
+  sessionIdsBefore: string[];
+  sessionCountAfter: number;
+  sessionIdsAfter: string[];
+  rejectionMessage: string;
+};
+
 function ownedPidsForAgentDelta(baseline: ProcessSnap, current: ProcessSnap): Set<number> {
   return new Set([process.pid, ...processDelta(baseline, current)]);
 }
@@ -99,12 +107,67 @@ export async function createSharedOs(): Promise<SharedOs> {
   const os = await AgentOs.create({
     defaultSoftware: false,
     software: [{ packagePath: AGENT_PACKAGE_PATH }],
+    limits: { resources: { maxSockets: 0 } },
   });
   const agentProcessesAfterStart = await snapshotAgentProcesses();
   const listenersAfterStart = await snapshotListeners(
     ownedPidsForAgentDelta(agentProcessesBaseline, agentProcessesAfterStart),
   );
   return { os, listenersBefore, listenersAfterStart, agentProcessesBaseline };
+}
+
+function registeredSessionIds(os: AgentOs): string[] {
+  return os
+    .listSessions()
+    .map((session) => session.sessionId)
+    .sort();
+}
+
+/** Prove the packed guest cannot register a session that opens a socket. */
+export async function runSocketDenialProof(shared: SharedOs): Promise<SocketDenialProof> {
+  const sessionIdsBefore = registeredSessionIds(shared.os);
+  const sessionCountBefore = sessionIdsBefore.length;
+  let rejection: unknown;
+  let createdSessionId: string | undefined;
+
+  try {
+    const created = await shared.os.createSession("qf-toolloop", {
+      env: { QF_PROOF_OPEN_LISTENER: "1" },
+    });
+    createdSessionId = created.sessionId;
+  } catch (error) {
+    rejection = error;
+  }
+
+  if (createdSessionId) {
+    await shared.os.destroySession(createdSessionId);
+    rejection = new Error("P2 socket denial unexpectedly succeeded");
+  }
+
+  const sessionIdsAfter = registeredSessionIds(shared.os);
+  const sessionCountAfter = sessionIdsAfter.length;
+  const rejectionMessage = rejection instanceof Error ? rejection.message : String(rejection);
+
+  if (!rejectionMessage.includes("maximum socket count reached")) {
+    throw new Error(`P2 socket denial rejected for the wrong reason: ${rejectionMessage}`);
+  }
+  if (
+    sessionCountAfter !== sessionCountBefore ||
+    sessionIdsAfter.length !== sessionIdsBefore.length ||
+    sessionIdsAfter.some((id, index) => id !== sessionIdsBefore[index])
+  ) {
+    throw new Error(
+      `P2 socket denial left registered sessions: before=${sessionIdsBefore.join(",")} after=${sessionIdsAfter.join(",")}`,
+    );
+  }
+
+  return {
+    sessionCountBefore,
+    sessionIdsBefore,
+    sessionCountAfter,
+    sessionIdsAfter,
+    rejectionMessage,
+  };
 }
 
 /**
@@ -114,10 +177,7 @@ export async function createSharedOs(): Promise<SharedOs> {
 export async function runProofTurn(shared: SharedOs): Promise<ProofRun> {
   const { os, listenersBefore, listenersAfterStart, agentProcessesBaseline } = shared;
 
-  const created =
-    process.env.QF_PROOF_OPEN_LISTENER === "1"
-      ? await os.createSession("qf-toolloop", { env: { QF_PROOF_OPEN_LISTENER: "1" } })
-      : await os.createSession("qf-toolloop");
+  const created = await os.createSession("qf-toolloop");
   const agentOsSessionId = created.sessionId;
   let listedSessionIds = os.listSessions().map((s) => s.sessionId);
   // Set QF_PROOF_CORRUPT_LIST_SESSIONS=1 to prove P1 fails when the table is wrong.
