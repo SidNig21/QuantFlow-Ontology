@@ -1,6 +1,6 @@
 # WO-CI3 — Keep the prior-schema release fixture inside its deadline
 
-status: **target verified; canonical release blocked by WO-CI4**
+status: **target verified — combined WO-107c canonical pending**
 assignee: builder
 depends: WO-107b
 blocks: WO-107c verification
