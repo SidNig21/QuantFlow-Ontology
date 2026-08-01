@@ -339,11 +339,6 @@ function sha256Buffer(buf: Buffer): string {
   return createHash("sha256").update(buf).digest("hex");
 }
 
-export type BovadaPackageInspectOptions = {
-  /** Gate-only falsifier: require one additional marker from the bundled main process. */
-  requiredBundleNeedle?: string;
-};
-
 /**
  * Prove the finished package contains the fixed Bovada boundary and the exact
  * shipped qf-canvas resource. This reads package bytes only; it never starts a
@@ -352,7 +347,6 @@ export type BovadaPackageInspectOptions = {
 export function inspectBovadaPackagedSurface(
   resourcesRoot: string,
   repoRoot: string,
-  options: BovadaPackageInspectOptions = {},
 ): InspectResult {
   const asarPath = join(resourcesRoot, "app.asar");
   if (!existsSync(asarPath)) {
@@ -374,8 +368,7 @@ export function inspectBovadaPackagedSurface(
     "QuantFlow-Bovada-Football/0.1",
     'credentials: "omit"',
     "market.bovadaFootballCapture",
-    options.requiredBundleNeedle,
-  ].filter((needle): needle is string => typeof needle === "string");
+  ];
   for (const needle of requiredNeedles) {
     if (!bundleText.includes(needle)) {
       return {

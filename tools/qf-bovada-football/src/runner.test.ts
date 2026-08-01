@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -13,6 +13,7 @@ import {
 import {
   BOVADA_FOOTBALL_URL,
   BovadaCancelledError,
+  BovadaTimeoutError,
   KernelClassificationError,
   BovadaSchemaError,
   runBovadaFootballCapture,
@@ -302,6 +303,47 @@ describe("Bovada source-first Kernel runner", () => {
     await expect(pending).rejects.toBeInstanceOf(BovadaCancelledError);
     expect(bodyAborted).toBe(true);
     expect(readdirSync(root)).toEqual([]);
+  });
+
+  test("classifies the owned request timeout and leaves no file or Kernel residue", async () => {
+    const { db, root } = setup();
+    const timeout = new AbortController();
+    const timeoutSpy = spyOn(AbortSignal, "timeout").mockReturnValue(timeout.signal);
+    let receivedSignal: AbortSignal | undefined;
+    const transport: BovadaTransport = (signal) => {
+      receivedSignal = signal;
+      return new Promise((_resolve, reject) => {
+        signal.addEventListener(
+          "abort",
+          () => reject(new DOMException("timed out", "TimeoutError")),
+          { once: true },
+        );
+      });
+    };
+    try {
+      const pending = runBovadaFootballCapture({
+        db,
+        artifactRoot: root,
+        transport,
+        kernel: { execute: kernelExecute, getObject, getLinks },
+      });
+      await Promise.resolve();
+      timeout.abort();
+      await expect(pending).rejects.toBeInstanceOf(BovadaTimeoutError);
+      expect(receivedSignal?.aborted).toBe(true);
+      expect(readdirSync(root)).toEqual([]);
+      expect(counts(db)).toEqual({
+        artifact: 0,
+        venue: 0,
+        market_event: 0,
+        instrument: 0,
+        quote: 0,
+        links: 0,
+        events: 0,
+      });
+    } finally {
+      timeoutSpy.mockRestore();
+    }
   });
 
   test("fails closed when a missing instrument still has touching links", async () => {

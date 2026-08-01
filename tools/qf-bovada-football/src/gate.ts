@@ -1,258 +1,149 @@
 #!/usr/bin/env bun
+/**
+ * WO-107 five-bait mutation gate. Each bait copies the production source,
+ * changes one guarded behavior, proves the focused tests go red, then runs
+ * those same tests against the restored source and proves green.
+ */
 import {
-  closeKernel,
-  contentHash,
-  execute as kernelExecute,
-  getLinks,
-  getObject,
-  openKernel,
-  MarketContextConflictError,
-  type KernelDb,
-} from "qf-kernel";
-import { readFileSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
+  cpSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  BOVADA_FOOTBALL_URL,
-  BovadaBodyTooLargeError,
-  BovadaRedirectError,
-  BovadaSelectionError,
-  MAX_RESPONSE_BYTES,
-  artifactPathForHash,
-  ensureArtifactFile,
-  parseBovadaFootballResponse,
-  runBovadaFootballCapture,
-  type BovadaFootballCaptureOptions,
-  type BovadaKernelAccess,
-  type BovadaTransport,
-  type BovadaTransportResponse,
-} from "./index.ts";
 
-const fixture = new Uint8Array(
-  readFileSync(join(import.meta.dir, "fixtures", "nfl-snapshot.json")),
-);
-const observedAt = "2026-08-01T12:00:00.000Z";
-const liveBody = () => {
-  const value = JSON.parse(new TextDecoder().decode(fixture)) as Record<string, unknown>[];
-  const event = (value[0]!.events as Record<string, unknown>[])[1]!;
-  event.live = true;
-  return new TextEncoder().encode(JSON.stringify(value));
+const SOURCE_ROOT = import.meta.dir;
+const PACKAGE_ROOT = join(SOURCE_ROOT, "..");
+
+type Bait = {
+  number: number;
+  label: string;
+  sourceFile: string;
+  testFile: string;
+  needle: string;
+  replacement: string;
 };
 
-function responseFor(
-  bytes: Uint8Array,
-  url: string = BOVADA_FOOTBALL_URL,
-): BovadaTransportResponse {
-  return {
-    status: 200,
-    url,
-    headers: new Headers({
-      "content-type": "application/json",
-      "set-cookie": "gate-response-cookie-canary",
-      authorization: "gate-response-authorization-canary",
-    }),
-    body: new ReadableStream<Uint8Array>({
-      start(controller) {
-        controller.enqueue(bytes);
-        controller.close();
-      },
-    }),
-  };
+const BAITS: readonly Bait[] = [
+  {
+    number: 1,
+    label: "caller credentials escape",
+    sourceFile: "transport.ts",
+    testFile: "parser.test.ts",
+    needle: 'credentials: "omit",',
+    replacement: 'credentials: "include",',
+  },
+  {
+    number: 2,
+    label: "Kernel publish before durable source",
+    sourceFile: "runner.ts",
+    testFile: "runner.test.ts",
+    needle:
+      "const durableFile = ensureArtifactFile(options.artifactRoot, artifactId, bytes);",
+    replacement:
+      "const durableFile = { path: finalPath, createdFinal: false };",
+  },
+  {
+    number: 3,
+    label: "removed pre-game selector predicate",
+    sourceFile: "parser.ts",
+    testFile: "parser.test.ts",
+    needle: "event.live !== false ||",
+    replacement: "false ||",
+  },
+  {
+    number: 4,
+    label: "reissued stable venue instead of read classification",
+    sourceFile: "runner.ts",
+    testFile: "runner.test.ts",
+    needle:
+      'const existing = access.getObject(options.db, "venue", VENUE_ID);\n  if (!existing) {',
+    replacement:
+      'const existing = access.getObject(options.db, "venue", VENUE_ID);\n  if (true) {',
+  },
+  {
+    number: 5,
+    label: "removed staging cleanup",
+    sourceFile: "artifact-store.ts",
+    testFile: "artifact-store.test.ts",
+    needle: "removeFile(stagingPath);",
+    replacement: "void stagingPath;",
+  },
+];
+
+async function runTest(testPath: string, cwd: string): Promise<{
+  code: number;
+  output: string;
+}> {
+  const child = Bun.spawn(["bun", "test", testPath], {
+    cwd,
+    stdout: "pipe",
+    stderr: "pipe",
+    env: { ...process.env, NO_COLOR: "1" },
+  });
+  const [stdout, stderr, code] = await Promise.all([
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+    child.exited,
+  ]);
+  return { code, output: stdout + stderr };
 }
 
-function transportFor(bytes: Uint8Array, url: string = BOVADA_FOOTBALL_URL): BovadaTransport {
-  return async () => responseFor(bytes, url);
+function mutateExactlyOnce(path: string, needle: string, replacement: string): void {
+  const source = readFileSync(path, "utf8");
+  const matches = source.split(needle).length - 1;
+  if (matches !== 1) {
+    throw new Error(`mutation needle count for ${path} was ${matches}, expected 1`);
+  }
+  writeFileSync(path, source.replace(needle, replacement));
 }
 
-function setup(): { db: KernelDb; root: string } {
-  return {
-    db: openKernel(":memory:"),
-    root: mkdtempSync(join("/tmp", "qf-bovada-football-gate-")),
-  };
-}
-
-function dispose(db: KernelDb, root: string): void {
-  closeKernel(db);
-  rmSync(root, { recursive: true, force: true });
-}
-
-function options(
-  db: KernelDb,
-  root: string,
-  bytes: Uint8Array,
-  kernel?: Partial<BovadaKernelAccess>,
-  url: string = BOVADA_FOOTBALL_URL,
-): BovadaFootballCaptureOptions {
-  return {
-    db,
-    artifactRoot: root,
-    transport: transportFor(bytes, url),
-    kernel: {
-      execute: kernelExecute,
-      getObject,
-      getLinks,
-      ...kernel,
-    },
-  };
-}
-
-async function rejected<T>(
-  work: () => Promise<T> | T,
-  error: new (...args: never[]) => Error,
-): Promise<void> {
-  let caught: unknown;
+async function runBait(bait: Bait): Promise<void> {
+  const mutantRoot = mkdtempSync(join(tmpdir(), `qf-bovada-bait-${bait.number}-`));
+  const mutantSource = join(mutantRoot, "src");
   try {
-    await work();
-  } catch (value) {
-    caught = value;
-  }
-  if (!(caught instanceof error)) {
-    throw new Error("expected " + error.name + " rejection");
-  }
-}
+    cpSync(SOURCE_ROOT, mutantSource, { recursive: true });
+    symlinkSync(join(PACKAGE_ROOT, "node_modules"), join(mutantRoot, "node_modules"));
+    mutateExactlyOnce(
+      join(mutantSource, bait.sourceFile),
+      bait.needle,
+      bait.replacement,
+    );
 
-function assert(condition: boolean, message: string): void {
-  if (!condition) throw new Error(message);
+    const red = await runTest(join(mutantSource, bait.testFile), mutantRoot);
+    if (red.code === 0) {
+      throw new Error(
+        `BAIT ${bait.number} stayed green after mutation: ${bait.label}`,
+      );
+    }
+    console.log(`BAIT ${bait.number} RED: ${bait.label} was detected`);
+
+    const green = await runTest(join(SOURCE_ROOT, bait.testFile), PACKAGE_ROOT);
+    if (green.code !== 0) {
+      process.stdout.write(green.output);
+      throw new Error(
+        `BAIT ${bait.number} restore did not return green: ${bait.label}`,
+      );
+    }
+    console.log(`BAIT ${bait.number} GREEN: exact production source restored`);
+  } finally {
+    rmSync(mutantRoot, { recursive: true, force: true });
+  }
 }
 
 async function main(): Promise<void> {
-  console.log("qf-bovada-football core gate: fixture-only, no network");
-
-  // Bait 1: a caller/final-origin escape is red; the fixed origin is green.
-  {
-    const bad = setup();
-    await rejected(
-      () => runBovadaFootballCapture(options(bad.db, bad.root, fixture, undefined, "https://evil.example")),
-      BovadaRedirectError,
-    );
-    assert(readdirSync(bad.root).length === 0, "redirect rejection created an artifact file");
-    dispose(bad.db, bad.root);
-    console.log("BAIT 1 RED: non-Bovada final origin rejected");
-    const good = setup();
-    const receipt = await runBovadaFootballCapture(options(good.db, good.root, fixture));
-    assert(receipt.selected.event_id === "25568702", "fixed origin did not reach the fixture selector");
-    dispose(good.db, good.root);
-    console.log("BAIT 1 GREEN: fixed URL/origin accepted");
-  }
-
-  // Bait 2: context-before-source is red; the actual call order and header exclusion are green.
-  {
-    const badOrder = ["register_venue", "publish_artifact"];
-    try {
-      if (badOrder[0] === "publish_artifact") throw new Error("unexpected");
-      throw new Error("source-first assertion rejected context-before-source");
-    } catch {
-      console.log("BAIT 2 RED: context-before-durable-source rejected");
-    }
-    const state = setup();
-    const calls: string[] = [];
-    const access: Partial<BovadaKernelAccess> = {
-      execute: (db, command, input, trace) => {
-        calls.push(command);
-        if (command === "register_venue") {
-          assert(getObject(db, "artifact", contentHash(fixture)) !== null, "source Artifact was not durable first");
-        }
-        return kernelExecute(db, command, input, trace);
-      },
-    };
-    const receipt = await runBovadaFootballCapture(options(state.db, state.root, fixture, access));
-    assert(calls[0] === "publish_artifact", "publish_artifact was not the first Kernel command");
-    const stored = JSON.stringify({
-      bytes: new TextDecoder().decode(readFileSync(receipt.artifact.storage_ref)),
-      artifact: getObject(state.db, "artifact", receipt.artifact.id),
-      events: state.db.query("SELECT payload FROM events").all(),
-    });
-    assert(!stored.includes("gate-response-cookie-canary"), "response cookie entered stored truth");
-    assert(!stored.includes("gate-response-authorization-canary"), "authorization header entered stored truth");
-    dispose(state.db, state.root);
-    console.log("BAIT 2 GREEN: exact body durable before context; headers excluded");
-  }
-
-  // Bait 3: remove a selector predicate (live=true) and it goes red; restore fixture and green.
-  {
-    await rejected(() => parseBovadaFootballResponse(liveBody(), observedAt), BovadaSelectionError);
-    console.log("BAIT 3 RED: in-play event rejected by strict selector");
-    const selected = parseBovadaFootballResponse(fixture, observedAt);
-    assert(selected.event.id === "25568702", "restored selector fixture did not select the event");
-    console.log("BAIT 3 GREEN: restored strict selector accepts only the qualifying event");
-  }
-
-  // Bait 4: a changed source cannot replay context provenance; restored runner uses quote-only ingest.
-  {
-    const state = setup();
-    await runBovadaFootballCapture(options(state.db, state.root, fixture));
-    const changed = new TextEncoder().encode(
-      new TextDecoder().decode(fixture).replace('"+105"', '"+110"'),
-    );
-    const changedHash = contentHash(changed);
-    const changedPath = artifactPathForHash(state.root, changedHash);
-    ensureArtifactFile(state.root, changedHash, changed);
-    const published = kernelExecute(
-      state.db,
-      "publish_artifact",
-      {
-        kind: "result_set",
-        content_hash: changedHash,
-        storage_ref: changedPath,
-        bytes: changed,
-      },
-      { trace_id: "bovada:nfl:" + changedHash, span_id: "bovada:nfl:" + changedHash + ":publish_artifact" },
-    ) as { state: Record<string, unknown> };
-    const observed = String(published.state.created_at);
-    await rejected(
-      () =>
-        kernelExecute(
-          state.db,
-          "register_venue",
-          {
-            venue_id: "venue-bovada",
-            kind: "sportsbook",
-            name: "Bovada",
-            source_artifact_id: changedHash,
-            observed_at: observed,
-          },
-          { trace_id: "bovada:nfl:" + changedHash, span_id: "bovada:nfl:" + changedHash + ":register_venue" },
-        ),
-      MarketContextConflictError,
-    );
-    console.log("BAIT 4 RED: changed provenance cannot reissue trusted context");
-    const calls: Array<{ command: string; input: Record<string, unknown> }> = [];
-    const access: Partial<BovadaKernelAccess> = {
-      execute: (db, command, input, trace) => {
-        calls.push({ command, input });
-        assert(command !== "register_venue" && command !== "schedule_market_event", "runner reissued stable context");
-        return kernelExecute(db, command, input, trace);
-      },
-    };
-    const receipt = await runBovadaFootballCapture(options(state.db, state.root, changed, access));
-    const ingest = calls.find((call) => call.command === "ingest_market_batch");
-    assert(receipt.outcomes.instrument === "reused", "changed body recreated the instrument");
-    assert(ingest?.input.instruments instanceof Array && ingest.input.instruments.length === 0, "changed body was not quote-only");
-    dispose(state.db, state.root);
-    console.log("BAIT 4 GREEN: read classification reused context and ingested one quote");
-  }
-
-  // Bait 5: oversize input is red and cleans request/staging state; restored fixture is green.
-  {
-    const state = setup();
-    const oversized = new Uint8Array(MAX_RESPONSE_BYTES + 1);
-    await rejected(
-      () => runBovadaFootballCapture(options(state.db, state.root, oversized)),
-      BovadaBodyTooLargeError,
-    );
-    assert(readdirSync(state.root).length === 0, "oversize rejection left a file or staging name");
-    dispose(state.db, state.root);
-    console.log("BAIT 5 RED: over-limit body aborted and cleaned");
-    const good = setup();
-    await runBovadaFootballCapture(options(good.db, good.root, fixture));
-    assert(!readdirSync(good.root).some((name) => name.endsWith(".stage")), "successful capture leaked staging");
-    dispose(good.db, good.root);
-    console.log("BAIT 5 GREEN: restored bounded capture leaves no staging file");
-  }
-
-  console.log("PASS bovada-football core gate");
+  console.log("qf-bovada-football mutation gate: fixture-only, no network");
+  for (const bait of BAITS) await runBait(bait);
+  console.log("PASS bovada-football five-bait mutation gate");
 }
 
 main().catch((error: unknown) => {
-  console.error("FAIL bovada-football core gate:", error instanceof Error ? error.message : error);
+  console.error(
+    "FAIL bovada-football mutation gate:",
+    error instanceof Error ? error.message : error,
+  );
   process.exitCode = 1;
 });

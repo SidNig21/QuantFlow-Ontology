@@ -4,7 +4,15 @@
  * fixed shipped operator path, and unchanged generated agent surface.
  */
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import {
+  copyFileSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -41,6 +49,9 @@ const CANARIES = {
   authorization: "qf-wo107-authorization-canary",
   proxy: "qf-wo107-proxy-canary",
 } as const;
+const CLI_RPC_METHOD = "market.bovadaFootballCapture";
+const CLI_RECEIPT_HASH =
+  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -151,7 +162,81 @@ function generatedSurfaceProof(): void {
   console.log(`generated agent surface: PASS served_tools=${served.length}`);
 }
 
-function packagedSurfaceProof(): void {
+async function exercisePackagedCli(cliPath: string): Promise<{
+  request: Record<string, unknown>;
+  stdout: string;
+}> {
+  const root = mkdtempSync(join(tmpdir(), "qf-bovada-packaged-cli-"));
+  const home = join(root, "home");
+  const appRoot = join(home, ".quantflow", "app");
+  const socketPath = join(root, "rpc.sock");
+  mkdirSync(appRoot, { recursive: true });
+  writeFileSync(join(appRoot, "socket-path"), socketPath + "\n");
+
+  let request: Record<string, unknown> | null = null;
+  const server = createServer((socket) => {
+    let buffer = "";
+    socket.on("data", (chunk) => {
+      buffer += chunk.toString("utf8");
+      const newline = buffer.indexOf("\n");
+      if (newline === -1) return;
+      request = JSON.parse(buffer.slice(0, newline)) as Record<string, unknown>;
+      socket.end(JSON.stringify({
+        jsonrpc: "2.0",
+        id: request.id,
+        result: {
+          status: "captured",
+          artifactId: CLI_RECEIPT_HASH,
+          contentHash: CLI_RECEIPT_HASH,
+          bytes: 128,
+          eventId: "event-gate",
+          marketId: "market-gate",
+        },
+      }) + "\n");
+    });
+  });
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once("error", reject);
+      server.listen(socketPath, resolve);
+    });
+    const child = Bun.spawn(
+      ["node", cliPath, "market", "bovada-football", "--once"],
+      {
+        cwd: root,
+        env: { ...process.env, HOME: home },
+        stdout: "pipe",
+        stderr: "pipe",
+      },
+    );
+    const [stdout, stderr, code] = await Promise.all([
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+      child.exited,
+    ]);
+    assert(code === 0, `packaged qf-canvas exited ${code}: ${stderr.trim()}`);
+    assert(request !== null, "packaged qf-canvas sent no JSON-RPC request");
+    return { request, stdout };
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+function assertFixedCliDispatch(result: {
+  request: Record<string, unknown>;
+  stdout: string;
+}): void {
+  assert(result.request.method === CLI_RPC_METHOD, "packaged qf-canvas dispatched the wrong RPC method");
+  assert(
+    JSON.stringify(result.request.params) === JSON.stringify({ mode: "once" }),
+    "packaged qf-canvas dispatched an unexpected RPC envelope",
+  );
+  assert(result.stdout.includes(CLI_RECEIPT_HASH), "packaged qf-canvas did not print the bounded receipt");
+}
+
+async function packagedSurfaceProof(): Promise<void> {
   const runId = process.env.QF_RELEASE_RUN_ID?.trim();
   assert(runId, "Bovada packaged proof requires the canonical QF_RELEASE_RUN_ID");
   const receipt = validatePackageReceipt(runId, COLLAB);
@@ -159,19 +244,39 @@ function packagedSurfaceProof(): void {
     throw new Error(`Bovada package receipt invalid: ${receipt.reason}`);
   }
 
-  const red = inspectBovadaPackagedSurface(receipt.resourcesRoot, REPO, {
-    requiredBundleNeedle: "qf-wo107-deliberately-missing-package-marker",
-  });
-  assert(!red.ok, "Bovada package inspector falsifier unexpectedly stayed green");
-  assert(red.reason.includes("missing required marker"), "Bovada package falsifier failed ambiguously");
-  console.log("package marker bait: RED");
-
   const green = inspectBovadaPackagedSurface(receipt.resourcesRoot, REPO);
   if (!green.ok) throw new Error(green.reason);
   console.log(
     "package marker restore: GREEN " +
       green.checkedPaths.map((entry) => `${entry.path}=${entry.bytes}`).join(" "),
   );
+
+  const packagedCli = join(receipt.resourcesRoot, "collab-cli.mjs");
+  const mutantRoot = mkdtempSync(join(tmpdir(), "qf-bovada-cli-mutant-"));
+  const mutantCli = join(mutantRoot, "collab-cli.mjs");
+  try {
+    copyFileSync(packagedCli, mutantCli);
+    const source = readFileSync(mutantCli, "utf8");
+    assert(
+      source.split(CLI_RPC_METHOD).length - 1 === 1,
+      "packaged CLI mutation target was not unique",
+    );
+    writeFileSync(mutantCli, source.replace(CLI_RPC_METHOD, CLI_RPC_METHOD + "_BROKEN"));
+    const mutant = await exercisePackagedCli(mutantCli);
+    let stayedGreen = true;
+    try {
+      assertFixedCliDispatch(mutant);
+    } catch {
+      stayedGreen = false;
+    }
+    assert(!stayedGreen, "packaged CLI dispatch mutation stayed green");
+    console.log("packaged CLI dispatch bait: RED wrong method observed");
+  } finally {
+    rmSync(mutantRoot, { recursive: true, force: true });
+  }
+
+  assertFixedCliDispatch(await exercisePackagedCli(packagedCli));
+  console.log("packaged CLI dispatch restore: GREEN fixed method and once envelope observed");
 }
 
 export async function runBovadaFootballGate(): Promise<{ ok: boolean }> {
@@ -190,7 +295,7 @@ export async function runBovadaFootballGate(): Promise<{ ok: boolean }> {
     );
     await canaryProof();
     generatedSurfaceProof();
-    packagedSurfaceProof();
+    await packagedSurfaceProof();
     console.log("bovada-football gate OK");
     return { ok: true };
   } catch (error) {
