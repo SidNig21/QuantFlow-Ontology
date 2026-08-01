@@ -277,6 +277,12 @@ const ingestInstrumentRow = z
       .describe(
         "This field is the stable Kernel identity for the instrument row. Retries must reuse it only for byte-equivalent market state and provenance.",
       ),
+    market_event_id: z
+      .string()
+      .nullable()
+      .describe(
+        "This field names the existing market event for the instrument, or null when no bounded event dependency is declared. The Kernel derives offered_on only from this identity.",
+      ),
     kind: instrument.properties.shape.kind,
     params: instrument.properties.shape.params,
     sides: instrument.properties.shape.sides,
@@ -319,6 +325,11 @@ export const ingest_market_batch = defineAction({
         .datetime()
         .describe(
           "This field records the ISO-8601 observation timestamp shared by the batch. Preserve it as provenance rather than substituting ingest time.",
+        ),
+      venue_id: z
+        .string()
+        .describe(
+          "This field identifies the existing venue for every instrument in the batch. The Kernel derives one lists edge from this identity and never infers venue from free-form market fields.",
         ),
       instruments: z
         .array(ingestInstrumentRow)

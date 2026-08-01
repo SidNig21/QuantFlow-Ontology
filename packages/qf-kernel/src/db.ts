@@ -15,6 +15,7 @@ import {
   isCompletedKernelInitialization,
   PROFILE_IDENTITY_UPGRADE,
   MARKET_INGEST_UPGRADE,
+  MARKET_CONTEXT_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -335,10 +336,15 @@ export function attachKernel(
     return db;
   }
 
-  if (readonly && (shape === "pre_d1" || shape === "d1")) {
+  if (
+    readonly &&
+    (shape === "pre_d1" || shape === "d1" || shape === "market_ingest")
+  ) {
     const required = shape === "pre_d1"
-      ? `${PROFILE_IDENTITY_UPGRADE},${MARKET_INGEST_UPGRADE}`
-      : MARKET_INGEST_UPGRADE;
+      ? `${PROFILE_IDENTITY_UPGRADE},${MARKET_INGEST_UPGRADE},${MARKET_CONTEXT_UPGRADE}`
+      : shape === "d1"
+        ? `${MARKET_INGEST_UPGRADE},${MARKET_CONTEXT_UPGRADE}`
+        : MARKET_CONTEXT_UPGRADE;
     process.stderr.write(
       `kernel: upgrade required (readonly warn): ${required}\n`,
     );
@@ -373,14 +379,25 @@ export function attachKernel(
     if (shape === "uninitialized") {
       const migration = readFileSync(migrationSqlPath(), "utf8");
       db.exec(migration);
-    } else if (shape === "pre_d1" || shape === "d1") {
+    } else if (
+      shape === "pre_d1" ||
+      shape === "d1" ||
+      shape === "market_ingest"
+    ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
       );
       const marketIngestSql = readFileSync(
         upgradeSqlPath("0002-market-ingest.sql"), "utf8",
       );
-      applyKernelUpgradeChain(db, { profileIdentitySql, marketIngestSql });
+      const marketContextSql = readFileSync(
+        upgradeSqlPath("0003-market-context.sql"), "utf8",
+      );
+      applyKernelUpgradeChain(db, {
+        profileIdentitySql,
+        marketIngestSql,
+        marketContextSql,
+      });
     }
   }
 

@@ -43,13 +43,43 @@ function publishSource(db: KernelDb, label: string): string {
   return contentHash(bytes);
 }
 
+function registerMarketContext(db: KernelDb, source: string): void {
+  execute(
+    db,
+    "register_venue",
+    {
+      venue_id: "venue-bovada",
+      kind: "sportsbook",
+      name: "Bovada",
+      source_artifact_id: source,
+      observed_at: "2026-07-30T11:00:00.000Z",
+    },
+    TRACE,
+  );
+  execute(
+    db,
+    "schedule_market_event",
+    {
+      market_event_id: "event-football-1",
+      sport: "football",
+      starts_at: "2026-07-30T18:00:00.000Z",
+      competition: "NFL",
+      source_artifact_id: source,
+      observed_at: "2026-07-30T11:00:00.000Z",
+    },
+    TRACE,
+  );
+}
+
 function batch(source_artifact_id: string) {
   return {
     source_artifact_id,
     observed_at: "2026-07-30T12:00:00.000Z",
+    venue_id: "venue-bovada",
     instruments: [
       {
         id: "instrument-1",
+        market_event_id: "event-football-1",
         kind: "moneyline",
         params: { bout: "main", nested: { round: 3 } },
         sides: ["red", "blue"],
@@ -76,6 +106,7 @@ describe("WO-107b market batch runtime", () => {
   test("commits one event per row and one derived edge, then exact retry is a no-op", () => {
     const db = fresh();
     const source = publishSource(db, "market-source-success");
+    registerMarketContext(db, source);
     const before = { events: count(db, "events"), links: count(db, "links") };
 
     const created = execute(db, "ingest_market_batch", batch(source), TRACE);
@@ -87,7 +118,7 @@ describe("WO-107b market batch runtime", () => {
     expect(count(db, "instrument")).toBe(1);
     expect(count(db, "quote")).toBe(1);
     expect(count(db, "events")).toBe(before.events + 2);
-    expect(count(db, "links")).toBe(before.links + 1);
+    expect(count(db, "links")).toBe(before.links + 3);
 
     const edge = db
       .query(`SELECT kind, from_id, to_id FROM links WHERE kind = 'quotes'`)
@@ -136,6 +167,7 @@ describe("WO-107b market batch runtime", () => {
   test("conflicting row state or provenance rejects the entire batch", () => {
     const db = fresh();
     const source = publishSource(db, "market-source-conflict");
+    registerMarketContext(db, source);
     execute(db, "ingest_market_batch", batch(source), TRACE);
     const counts = [count(db, "instrument"), count(db, "quote"), count(db, "events"), count(db, "links")];
 
@@ -161,6 +193,7 @@ describe("WO-107b market batch runtime", () => {
       MarketIngestValidationError,
     );
     const source = publishSource(db, "market-source-invalid");
+    registerMarketContext(db, source);
     const duplicate = batch(source);
     duplicate.quotes[0]!.id = duplicate.instruments[0]!.id;
     expect(() => execute(db, "ingest_market_batch", duplicate, TRACE)).toThrow(
@@ -179,6 +212,7 @@ describe("WO-107b market batch runtime", () => {
   test("a commit-time failure on the final row rolls back prior rows and events", () => {
     const db = fresh();
     const source = publishSource(db, "market-source-poison");
+    registerMarketContext(db, source);
     const poisoned = batch(source);
     poisoned.instruments[0]!.id = "instrument-poison";
     poisoned.quotes[0]!.id = "quote-poison";

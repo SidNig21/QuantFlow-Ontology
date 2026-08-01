@@ -128,29 +128,38 @@ async function runMissingUpgradeControl(
   mods: InspectionModules,
   packageRoot: string,
   fileSets: Parameters<InspectionModules["inspectPackagedResources"]>[2],
+  options: {
+    remove: (baitRoot: string) => Promise<{ removed: string[]; added: string[] }>;
+    path: string;
+    label: string;
+  } = {
+    remove: (baitRoot) => mods.removeD1UpgradeFromAsar(baitRoot),
+    path: mods.qfKernelSchemaUpgradePath,
+    label: "missing-upgrade",
+  },
 ): Promise<MissingUpgradeControlResult> {
   const baitRoot = mods.copyPackageForBait(packageRoot);
   try {
     let inventory;
     try {
-      inventory = await mods.removeD1UpgradeFromAsar(baitRoot);
+      inventory = await options.remove(baitRoot);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return {
         ok: false,
-        reason: `missing-upgrade bait mutation failed: ${message}`,
+        reason: `${options.label} bait mutation failed: ${message}`,
       };
     }
 
     const exactRemoval =
       inventory.removed.length === 1 &&
-      inventory.removed[0] === mods.qfKernelSchemaUpgradePath &&
+      inventory.removed[0] === options.path &&
       inventory.added.length === 0;
     if (!exactRemoval) {
       return {
         ok: false,
         reason:
-          "missing-upgrade bait expected exactly one removed upgrade path and no additions" +
+          `${options.label} bait expected exactly one removed upgrade path and no additions` +
           `; removed=[${inventory.removed.join(",")}] added=[${inventory.added.join(",")}]`,
       };
     }
@@ -165,17 +174,17 @@ async function runMissingUpgradeControl(
     if (inspect.ok) {
       return {
         ok: false,
-        reason: "missing-upgrade bait expected missing upgrade SQL failure",
+        reason: `${options.label} bait expected missing upgrade SQL failure`,
       };
     }
 
     const expectedReason =
-      `missing packaged SQL artifact: ${mods.qfKernelSchemaUpgradePath}`;
+      `missing packaged SQL artifact: ${options.path}`;
     if (inspect.reason !== expectedReason) {
       return {
         ok: false,
         reason:
-          `missing-upgrade bait expected ${expectedReason}, got: ${inspect.reason}`,
+          `${options.label} bait expected ${expectedReason}, got: ${inspect.reason}`,
       };
     }
     return { ok: true, observedReason: inspect.reason };
@@ -263,6 +272,18 @@ export async function executePackageClosureMode(
         return { code: 1, trace, reason: control.observedReason };
       }
 
+      if (options.mode.bait === "missing-market-context-upgrade") {
+        trace.inspect += 1;
+        const control = await runMissingUpgradeControl(mods, packageRoot, fileSets, {
+          remove: mods.removeMarketContextUpgradeFromAsar,
+          path: mods.qfKernelSchemaMarketContextUpgradePath,
+          label: "missing-market-context-upgrade",
+        });
+        if (!control.ok) return fail(control.reason);
+        console.error(`package-closure: ${control.observedReason}`);
+        return { code: 1, trace, reason: control.observedReason };
+      }
+
       trace.inspect += 1;
       const inspect = mods.inspectPackagedResources(
         join(packageRoot, "resources"),
@@ -311,6 +332,21 @@ export async function executePackageClosureMode(
       if (!control.ok) return fail(control.reason);
       console.log(
         `package-closure: missing-upgrade control observed ${control.observedReason}`,
+      );
+      trace.inspect += 1;
+      const marketContextControl = await runMissingUpgradeControl(
+        mods,
+        validation.receipt.packageRoot,
+        fileSets,
+        {
+          remove: mods.removeMarketContextUpgradeFromAsar,
+          path: mods.qfKernelSchemaMarketContextUpgradePath,
+          label: "missing-market-context-upgrade",
+        },
+      );
+      if (!marketContextControl.ok) return fail(marketContextControl.reason);
+      console.log(
+        `package-closure: missing-market-context-upgrade control observed ${marketContextControl.observedReason}`,
       );
       trace.inspect += 1;
       const bootstrapControl = runMissingBootstrapControl(
@@ -378,6 +414,21 @@ export async function executePackageClosureMode(
       if (!control.ok) return fail(control.reason);
       console.log(
         `package-closure: missing-upgrade control observed ${control.observedReason}`,
+      );
+      trace.inspect += 1;
+      const marketContextControl = await runMissingUpgradeControl(
+        mods,
+        validation.receipt.packageRoot,
+        fileSets,
+        {
+          remove: mods.removeMarketContextUpgradeFromAsar,
+          path: mods.qfKernelSchemaMarketContextUpgradePath,
+          label: "missing-market-context-upgrade",
+        },
+      );
+      if (!marketContextControl.ok) return fail(marketContextControl.reason);
+      console.log(
+        `package-closure: missing-market-context-upgrade control observed ${marketContextControl.observedReason}`,
       );
       trace.inspect += 1;
       const bootstrapControl = runMissingBootstrapControl(

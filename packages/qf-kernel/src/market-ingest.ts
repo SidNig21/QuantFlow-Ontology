@@ -19,6 +19,7 @@ type JsonObject = Record<string, unknown>;
 
 type InstrumentInput = {
   id: string;
+  market_event_id: string | null;
   kind: "moneyline" | "spread" | "total" | "prop";
   params: JsonObject;
   sides: string[];
@@ -36,6 +37,7 @@ type QuoteInput = {
 type MarketBatchInput = {
   source_artifact_id: string;
   observed_at: string;
+  venue_id: string;
   instruments: InstrumentInput[];
   quotes: QuoteInput[];
 };
@@ -51,6 +53,11 @@ type PreparedQuote = QuoteInput & {
   coverage_json: string;
   row_digest: string;
   outcome: "created" | "replayed";
+};
+
+type ContextLinkRow = {
+  from_id: string;
+  to_id: string;
 };
 
 function stableCanonical(value: unknown): string {
@@ -215,12 +222,71 @@ function digestStoredQuote(row: Record<string, unknown>): string {
   });
 }
 
+function derivedContextLinks(
+  db: KernelDb,
+  kind: "lists" | "offered_on",
+  instrumentId: string,
+): ContextLinkRow[] {
+  const endpoint = kind === "lists" ? "to_id" : "from_id";
+  return db
+    .query(
+      `SELECT from_id, to_id FROM links WHERE kind = ? AND ${endpoint} = ? ORDER BY id`,
+    )
+    .all(kind, instrumentId) as ContextLinkRow[];
+}
+
+function assertStoredInstrumentContext(
+  db: KernelDb,
+  row: InstrumentInput,
+  venueId: string,
+): void {
+  const listsLinks = derivedContextLinks(db, "lists", row.id);
+  if (listsLinks.length !== 1 || listsLinks[0]!.from_id !== venueId) {
+    throw new MarketIngestConflictError(
+      "instrument",
+      row.id,
+      "stored lists edge differs from this retry or is duplicated",
+    );
+  }
+  const offeredLinks = derivedContextLinks(db, "offered_on", row.id);
+  if (row.market_event_id === null) {
+    if (offeredLinks.length !== 0) {
+      throw new MarketIngestConflictError(
+        "instrument",
+        row.id,
+        "stored offered_on edge exists but this retry declares null market_event_id",
+      );
+    }
+    return;
+  }
+  if (offeredLinks.length !== 1 || offeredLinks[0]!.to_id !== row.market_event_id) {
+    throw new MarketIngestConflictError(
+      "instrument",
+      row.id,
+      "stored offered_on edge differs from this retry or is duplicated",
+    );
+  }
+}
+
+function assertNoStoredInstrumentContext(db: KernelDb, row: InstrumentInput): void {
+  const listsLinks = derivedContextLinks(db, "lists", row.id);
+  const offeredLinks = derivedContextLinks(db, "offered_on", row.id);
+  if (listsLinks.length !== 0 || offeredLinks.length !== 0) {
+    throw new MarketIngestConflictError(
+      "instrument",
+      row.id,
+      "derived context edge exists without its instrument row",
+    );
+  }
+}
+
 function prepareInstrument(
   db: KernelDb,
   row: InstrumentInput,
   provenance: { source_artifact_id: string; observed_at: string },
   event: string,
   traceId: string,
+  venueId: string,
 ): PreparedInstrument {
   assertNonEmpty(row.id, "instrument.id");
   const params = normalizeJsonObject(row.params, `instrument ${row.id} params`);
@@ -247,6 +313,7 @@ function prepareInstrument(
         `found ${orphanEvents.length} ingest event(s) without a row`,
       );
     }
+    assertNoStoredInstrumentContext(db, row);
     return { ...row, params: params.value, params_json: params.json, sides_json, row_digest, outcome: "created" };
   }
   if (digestStoredInstrument(existing) !== row_digest) {
@@ -260,6 +327,7 @@ function prepareInstrument(
     row_digest,
     trace_id: traceId,
   });
+  assertStoredInstrumentContext(db, row, venueId);
   return { ...row, params: params.value, params_json: params.json, sides_json, row_digest, outcome: "replayed" };
 }
 
@@ -348,6 +416,7 @@ export function ingestMarketBatch(
 ): PipelineExecuteResult {
   const input = validatedInput as MarketBatchInput;
   assertNonEmpty(input.source_artifact_id, "source_artifact_id");
+  assertNonEmpty(input.venue_id, "venue_id");
   assertUniqueBatchIds(input);
 
   const instrumentEvent = requiredEvent(cmd, "instrument");
@@ -366,8 +435,30 @@ export function ingestMarketBatch(
         `source Artifact "${input.source_artifact_id}" does not exist`,
       );
     }
+    if (!db.query(`SELECT 1 AS ok FROM venue WHERE id = ?`).get(input.venue_id)) {
+      throw new MarketIngestValidationError(
+        `venue "${input.venue_id}" does not exist`,
+      );
+    }
+    for (const row of input.instruments) {
+      if (
+        row.market_event_id !== null &&
+        !db.query(`SELECT 1 AS ok FROM market_event WHERE id = ?`).get(row.market_event_id)
+      ) {
+        throw new MarketIngestValidationError(
+          `market event "${row.market_event_id}" does not exist for instrument "${row.id}"`,
+        );
+      }
+    }
     const instruments = input.instruments.map((row) =>
-      prepareInstrument(db, row, provenance, instrumentEvent, trace.trace_id),
+      prepareInstrument(
+        db,
+        row,
+        provenance,
+        instrumentEvent,
+        trace.trace_id,
+        input.venue_id,
+      ),
     );
     const quotes = input.quotes.map((row) =>
       prepareQuote(db, row, provenance, quoteEvent, trace.trace_id),
@@ -398,6 +489,14 @@ export function ingestMarketBatch(
         payload: { command: cmd.action, ...provenance, row_digest: row.row_digest, span_id: trace.span_id },
         trace_id: trace.trace_id,
       });
+      writeLinks(db, "instrument", row.id, [
+        { kind: "lists", from_id: input.venue_id },
+      ]);
+      if (row.market_event_id !== null) {
+        writeLinks(db, "instrument", row.id, [
+          { kind: "offered_on", to_id: row.market_event_id },
+        ]);
+      }
     }
     for (const row of quotes) {
       if (row.outcome === "replayed") continue;
@@ -436,12 +535,31 @@ export function ingestMarketBatch(
       outcome: row.outcome,
     })),
   ];
-  const links: MarketIngestLinkResult[] = quotes.map((row) => ({
-    kind: "quotes",
-    from_id: row.id,
-    to_id: row.instrument_id,
-    outcome: row.outcome,
-  }));
+  const links: MarketIngestLinkResult[] = [];
+  for (const row of instruments) {
+    links.push({
+      kind: "lists",
+      from_id: input.venue_id,
+      to_id: row.id,
+      outcome: row.outcome,
+    });
+    if (row.market_event_id !== null) {
+      links.push({
+        kind: "offered_on",
+        from_id: row.id,
+        to_id: row.market_event_id,
+        outcome: row.outcome,
+      });
+    }
+  }
+  for (const row of quotes) {
+    links.push({
+      kind: "quotes",
+      from_id: row.id,
+      to_id: row.instrument_id,
+      outcome: row.outcome,
+    });
+  }
   return {
     kind: "pipeline_batch",
     command: "ingest_market_batch",

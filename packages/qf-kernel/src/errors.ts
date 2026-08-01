@@ -59,6 +59,25 @@ export class MarketIngestConflictError extends KernelError {
   }
 }
 
+/** Existing trusted market context disagrees with the requested identity, state, or provenance. */
+export class MarketContextConflictError extends KernelError {
+  readonly object_type: "venue" | "market_event";
+  readonly object_id: string;
+  readonly reason: string;
+
+  constructor(
+    object_type: "venue" | "market_event",
+    object_id: string,
+    reason: string,
+  ) {
+    super(`Market context conflict for ${object_type} "${object_id}": ${reason}`);
+    this.name = "MarketContextConflictError";
+    this.object_type = object_type;
+    this.object_id = object_id;
+    this.reason = reason;
+  }
+}
+
 /** Caller-supplied content_hash disagrees with Kernel-computed hash — nothing written. */
 export class ContentHashMismatchError extends Error {
   readonly supplied: string;

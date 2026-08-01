@@ -15,6 +15,7 @@ import {
   HERMES_DOCK_PROFILES,
   inspectPackagedResources,
   QF_KERNEL_SCHEMA_MIGRATION,
+  QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE,
   QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
   QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY,
   QF_KERNEL_SCHEMA_UPGRADE,
@@ -25,6 +26,7 @@ import {
   QF_UPDATE_REPOSITORY,
   RUNTIME_CONTROL_FILES,
   removeD1UpgradeFromAsar,
+  removeMarketContextUpgradeFromAsar,
   removeMarketIngestUpgradeFromAsar,
   removeDockProfilesManifest,
   removeHermesPackage,
@@ -65,7 +67,12 @@ function seedMinimalPackage(root: string): void {
 
 async function seedSqlAsar(
   root: string,
-  overrides: { migration?: Buffer; upgrade?: Buffer; marketUpgrade?: Buffer } = {},
+  overrides: {
+    migration?: Buffer;
+    upgrade?: Buffer;
+    marketUpgrade?: Buffer;
+    contextUpgrade?: Buffer;
+  } = {},
 ): Promise<void> {
   const source = join(root, "asar-source");
   rmSync(source, { recursive: true, force: true });
@@ -107,6 +114,16 @@ async function seedSqlAsar(
         join(
           repoRoot,
           "qf-kernel-schema/golden/upgrades/0002-market-ingest.sql",
+        ),
+      ),
+  );
+  writeFileSync(
+    join(source, QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE),
+    overrides.contextUpgrade ??
+      readFileSync(
+        join(
+          repoRoot,
+          "qf-kernel-schema/golden/upgrades/0003-market-context.sql",
         ),
       ),
   );
@@ -290,6 +307,7 @@ describe("inspectPackagedResources ASAR SQL closure", () => {
         expect(paths).toContain(QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY);
         expect(paths).toContain(QF_KERNEL_SCHEMA_UPGRADE);
         expect(paths).toContain(QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE);
+        expect(paths).toContain(QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE);
       }
     } finally {
       rmSync(root, { recursive: true, force: true });
@@ -380,6 +398,36 @@ describe("inspectPackagedResources ASAR SQL closure", () => {
       if (!result.ok) {
         expect(result.reason).toBe(
           `missing packaged SQL artifact: ${QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE}`,
+        );
+      }
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("copied-ASAR control removes exactly the market-context upgrade and names it missing", async () => {
+    const root = testTmpPath("sql-remove-market-context");
+    rmSync(root, { recursive: true, force: true });
+    seedMinimalPackage(root);
+    await seedSqlAsar(root);
+
+    try {
+      const inventory = await removeMarketContextUpgradeFromAsar(root);
+      expect(inventory).toEqual({
+        removed: [QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE],
+        added: [],
+      });
+
+      const result = inspectPackagedResources(
+        join(root, "resources"),
+        collabRoot,
+        [],
+        { expectedResourcesRoot: join(root, "resources") },
+      );
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.reason).toBe(
+          `missing packaged SQL artifact: ${QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE}`,
         );
       }
     } finally {

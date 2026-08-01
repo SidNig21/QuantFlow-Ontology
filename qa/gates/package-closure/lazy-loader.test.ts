@@ -7,6 +7,8 @@ import { resolvePackageClosureMode } from "./modes.ts";
 
 const UPGRADE_PATH =
   "node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
+const MARKET_CONTEXT_UPGRADE_PATH =
+  "node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql";
 const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
 const FAKE_BAIT_ROOT = join(
   tmpdir(),
@@ -14,7 +16,7 @@ const FAKE_BAIT_ROOT = join(
 );
 
 function fakeModules(): InspectionModules {
-  let removed: "upgrade" | "bootstrap" | null = null;
+  let removed: "upgrade" | "market-context-upgrade" | "bootstrap" | null = null;
   return {
     loadLinuxFileSets: () => [],
     validatePackageReceipt: () => ({
@@ -31,15 +33,18 @@ function fakeModules(): InspectionModules {
       if (resourcesRoot !== join(FAKE_BAIT_ROOT, "resources")) {
         return { ok: true, checkedPaths: [] };
       }
-      return removed === "bootstrap"
-        ? {
-            ok: false,
-            reason: `runtime control file missing: ${HERMES_DOCK_PROFILES}`,
-          }
-        : {
-            ok: false,
-            reason: `missing packaged SQL artifact: ${UPGRADE_PATH}`,
-          };
+      if (removed === "bootstrap") {
+        return {
+          ok: false,
+          reason: `runtime control file missing: ${HERMES_DOCK_PROFILES}`,
+        };
+      }
+      return {
+        ok: false,
+        reason: `missing packaged SQL artifact: ${
+          removed === "market-context-upgrade" ? MARKET_CONTEXT_UPGRADE_PATH : UPGRADE_PATH
+        }`,
+      };
     },
     preflightLinuxExtraResources: () => ({ ok: true, fileSets: [] }),
     copyPackageForBait: () => FAKE_BAIT_ROOT,
@@ -48,11 +53,16 @@ function fakeModules(): InspectionModules {
       removed = "upgrade";
       return { removed: [UPGRADE_PATH], added: [] };
     },
+    removeMarketContextUpgradeFromAsar: async () => {
+      removed = "market-context-upgrade";
+      return { removed: [MARKET_CONTEXT_UPGRADE_PATH], added: [] };
+    },
     removeDockProfilesManifest: () => {
       removed = "bootstrap";
       return { removed: [HERMES_DOCK_PROFILES], added: [] };
     },
     qfKernelSchemaUpgradePath: UPGRADE_PATH,
+    qfKernelSchemaMarketContextUpgradePath: MARKET_CONTEXT_UPGRADE_PATH,
     hermesDockProfilesPath: HERMES_DOCK_PROFILES,
     createPackageRunId: () => "fresh-run",
   };
@@ -66,6 +76,15 @@ describe("resolvePackageClosureMode", () => {
         bait: "missing-upgrade",
       }),
     ).toEqual({ kind: "bait", bait: "missing-upgrade" });
+  });
+
+  test("recognizes the missing-market-context-upgrade copied-package bait", () => {
+    expect(
+      resolvePackageClosureMode({
+        releaseRunId: undefined,
+        bait: "missing-market-context-upgrade",
+      }),
+    ).toEqual({ kind: "bait", bait: "missing-market-context-upgrade" });
   });
 
   test("rejects unknown bait", () => {
@@ -100,7 +119,7 @@ describe("executePackageClosureMode standalone ordering", () => {
     expect(loaderCalled).toBe(false);
   });
 
-  test("standalone success runs build, package, and both copied-package controls", async () => {
+  test("standalone success runs build, package, and all copied-package controls", async () => {
     const result = await executePackageClosureMode({
       mode: { kind: "standalone" },
       executors: {
@@ -116,7 +135,7 @@ describe("executePackageClosureMode standalone ordering", () => {
       install: 1,
       build: 1,
       packageVerify: 1,
-      inspect: 3,
+      inspect: 4,
       preflight: 0,
       loaderCalls: 1,
     });
@@ -129,7 +148,7 @@ describe("executePackageClosureMode standalone ordering", () => {
     });
 
     expect(result.code).toBe(0);
-    expect(result.trace.inspect).toBe(3);
+    expect(result.trace.inspect).toBe(4);
   });
 
   test("canonical invalid receipt never installs or inspects", async () => {
@@ -220,5 +239,18 @@ describe("executePackageClosureMode standalone ordering", () => {
 
     expect(result.code).toBe(1);
     expect(result.reason).toContain("added=[unexpected.txt]");
+  });
+
+  test("missing-market-context-upgrade bait observes the exact missing artifact", async () => {
+    const result = await executePackageClosureMode({
+      mode: { kind: "bait", bait: "missing-market-context-upgrade" },
+      loadInspectionModules: () => Promise.resolve(fakeModules()),
+    });
+
+    expect(result.code).toBe(1);
+    expect(result.reason).toBe(
+      `missing packaged SQL artifact: ${MARKET_CONTEXT_UPGRADE_PATH}`,
+    );
+    expect(result.trace.inspect).toBe(1);
   });
 });

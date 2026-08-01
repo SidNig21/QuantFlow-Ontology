@@ -23,6 +23,7 @@ const kernelDbPath = join(workDir, "kernel.db");
 const artifactRootPath = join(workDir, "artifact-root");
 mkdirSync(artifactRootPath, { recursive: true });
 const serverEntry = join(import.meta.dir, "..", "server.ts");
+const MCP_LIFECYCLE_TIMEOUT_MS = 10_000;
 
 function envFor(overrides: Record<string, string>): Record<string, string> {
   const base: Record<string, string> = {};
@@ -43,8 +44,32 @@ async function makeClient(extraEnv: Record<string, string> = {}): Promise<Client
     }),
   });
   const client = new Client({ name: "qf-tool-discovery-gate", version: "0.1.0" });
-  await client.connect(transport);
-  return client;
+  console.log("mcp_connect=begin");
+  try {
+    await withTimeout(client.connect(transport), "mcp_connect");
+    console.log("mcp_connect=end");
+    return client;
+  } catch (error) {
+    await withTimeout(transport.close(), "mcp_transport_close").catch(() => {});
+    await withTimeout(client.close(), "mcp_close").catch(() => {});
+    throw error;
+  }
+}
+
+async function withTimeout<T>(operation: Promise<T>, marker: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`${marker} timed out after ${MCP_LIFECYCLE_TIMEOUT_MS}ms`));
+        }, MCP_LIFECYCLE_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 function deepEqual(a: unknown, b: unknown): boolean {
@@ -198,7 +223,9 @@ export async function runToolDiscoveryGate(): Promise<void> {
   const client = await makeClient(
     schemaModule ? { QF_READ_SCHEMA_MODULE: schemaModule } : {},
   );
-  const listed = await client.listTools();
+  console.log("mcp_tools_list=begin");
+  const listed = await withTimeout(client.listTools(), "mcp_tools_list");
+  console.log("mcp_tools_list=end");
   const advertised = listed.tools as ListedTool[];
   const advertisedNames = new Set(advertised.map((t) => t.name));
 
@@ -218,12 +245,70 @@ export async function runToolDiscoveryGate(): Promise<void> {
     }
   }
 
-  await client.close();
+  await withTimeout(client.close(), "mcp_close");
   console.log("tool-discovery PASS");
 }
 
+function textFrom(result: unknown): string {
+  if (!result || typeof result !== "object") return "";
+  const content = (result as { content?: unknown }).content;
+  if (!Array.isArray(content)) return "";
+  return content
+    .filter(
+      (block): block is { type: "text"; text?: string } =>
+        Boolean(block) &&
+        typeof block === "object" &&
+        (block as { type?: unknown }).type === "text",
+    )
+    .map((block) => block.text ?? "")
+    .join("\n");
+}
+
+export async function runMarketContextMcpBoundary(): Promise<void> {
+  const db = openKernel(kernelDbPath, { create: true });
+  closeKernel(db);
+
+  const client = await makeClient();
+  try {
+    console.log("mcp_tools_list=begin");
+    const listed = await withTimeout(client.listTools(), "mcp_tools_list");
+    console.log("mcp_tools_list=end");
+    const names = new Set(listed.tools.map((tool) => tool.name));
+    for (const name of ["qf_register_venue", "qf_schedule_market_event"]) {
+      if (names.has(name)) throw new Error(`tools/list advertised hidden context action ${name}`);
+    }
+    console.log("context_tools_list_absent=true");
+
+    for (const name of ["qf_register_venue", "qf_schedule_market_event"]) {
+      try {
+        const result = await withTimeout(
+          client.callTool({ name, arguments: {} }),
+          `${name}_direct_call`,
+        );
+        if (!result.isError) throw new Error(`${name} direct MCP call unexpectedly succeeded`);
+        const message = textFrom(result).toLowerCase();
+        if (!message.includes("not found") && !message.includes("unknown tool")) {
+          throw new Error(`${name} direct MCP call returned non-tool-not-found error: ${message}`);
+        }
+        console.log(`${name}_direct_tool_not_found=true`);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (!message.toLowerCase().includes("not found") && !message.toLowerCase().includes("unknown tool")) {
+          throw error;
+        }
+        console.log(`${name}_direct_tool_not_found=true`);
+      }
+    }
+  } finally {
+    await withTimeout(client.close(), "mcp_close").catch(() => {});
+  }
+}
+
 if (import.meta.main) {
-  runToolDiscoveryGate().catch((err) => {
+  const run = process.env.QF_CONTEXT_MCP_BOUNDARY_ONLY === "1"
+    ? runMarketContextMcpBoundary
+    : runToolDiscoveryGate;
+  run().catch((err) => {
     console.error(err);
     process.exit(1);
   });

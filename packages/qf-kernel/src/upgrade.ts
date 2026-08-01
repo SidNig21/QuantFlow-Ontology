@@ -8,11 +8,13 @@ import { KernelUpgradeShapeError } from "./errors.ts";
 
 export const PROFILE_IDENTITY_UPGRADE = "agent-profile-identity" as const;
 export const MARKET_INGEST_UPGRADE = "market-ingest" as const;
+export const MARKET_CONTEXT_UPGRADE = "market-context" as const;
 
 export type KernelShapeState =
   | "uninitialized"
   | "pre_d1"
   | "d1"
+  | "market_ingest"
   | "current"
   | "partial";
 
@@ -196,10 +198,7 @@ function expectedCurrent(): StructureSnapshot {
   return currentSnapshot;
 }
 
-/**
- * 0002 changes exactly one schema_meta action row. Deriving the D1 predecessor
- * from current authority avoids introducing a second frozen full-migration truth.
- */
+/** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
 function expectedD1(): StructureSnapshot {
   if (!d1Snapshot) {
     const current = expectedCurrent();
@@ -207,11 +206,36 @@ function expectedD1(): StructureSnapshot {
       tables: new Map(current.tables),
       linkKinds: [...current.linkKinds],
       schemaMeta: current.schemaMeta.filter(
-        ([typeName, kind]) => !(typeName === "ingest_market_batch" && kind === "action"),
+        ([typeName, kind]) =>
+          kind !== "action" ||
+          ![
+            "ingest_market_batch",
+            "register_venue",
+            "schedule_market_event",
+          ].includes(typeName),
       ),
     };
   }
   return d1Snapshot;
+}
+
+let marketIngestSnapshot: StructureSnapshot | null = null;
+
+/** 0002 adds ingest_market_batch; 0003 adds the two trusted context actions. */
+function expectedMarketIngest(): StructureSnapshot {
+  if (!marketIngestSnapshot) {
+    const current = expectedCurrent();
+    marketIngestSnapshot = {
+      tables: new Map(current.tables),
+      linkKinds: [...current.linkKinds],
+      schemaMeta: current.schemaMeta.filter(
+        ([typeName, kind]) =>
+          kind !== "action" ||
+          !["register_venue", "schedule_market_event"].includes(typeName),
+      ),
+    };
+  }
+  return marketIngestSnapshot;
 }
 
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
@@ -273,6 +297,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   const live = snapshotDbStructure(db);
   if (snapshotsEqual(live, expectedPreD1())) return "pre_d1";
   if (snapshotsEqual(live, expectedD1())) return "d1";
+  if (snapshotsEqual(live, expectedMarketIngest())) return "market_ingest";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -308,7 +333,11 @@ export function assertWritableUpgradeShape(db: KernelDb): KernelShapeState {
 /** Apply every required generated upgrade inside exactly one KernelDb.transaction(). */
 export function applyKernelUpgradeChain(
   db: KernelDb,
-  upgrades: { profileIdentitySql: string; marketIngestSql: string },
+  upgrades: {
+    profileIdentitySql: string;
+    marketIngestSql: string;
+    marketContextSql: string;
+  },
 ): void {
   const state = assertWritableUpgradeShape(db);
   if (state === "current") return;
@@ -324,11 +353,20 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    db.exec(upgrades.marketIngestSql);
+    if (state === "pre_d1" || state === "d1") {
+      db.exec(upgrades.marketIngestSql);
+      if (classifyKernelShape(db) !== "market_ingest") {
+        throw new KernelUpgradeShapeError(
+          MARKET_INGEST_UPGRADE,
+          "0002 did not produce the exact WO-107b shape",
+        );
+      }
+    }
+    db.exec(upgrades.marketContextSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
-        MARKET_INGEST_UPGRADE,
-        "0002 did not produce the exact current shape",
+        MARKET_CONTEXT_UPGRADE,
+        "0003 did not produce the exact current shape",
       );
     }
   });

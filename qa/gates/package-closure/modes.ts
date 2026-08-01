@@ -6,7 +6,12 @@ export type PackageClosureMode =
   | { kind: "standalone" }
   | {
       kind: "bait";
-      bait: "missing-hermes" | "missing-upgrade" | "dev-root" | "preflight-missing";
+      bait:
+        | "missing-hermes"
+        | "missing-upgrade"
+        | "missing-market-context-upgrade"
+        | "dev-root"
+        | "preflight-missing";
     };
 
 export type ModeInputs = {
@@ -17,7 +22,13 @@ export type ModeInputs = {
 export function resolvePackageClosureMode(inputs: ModeInputs): PackageClosureMode {
   const bait = inputs.bait?.trim();
   if (bait) {
-    if (bait === "missing-hermes" || bait === "missing-upgrade" || bait === "dev-root" || bait === "preflight-missing") {
+    if (
+      bait === "missing-hermes" ||
+      bait === "missing-upgrade" ||
+      bait === "missing-market-context-upgrade" ||
+      bait === "dev-root" ||
+      bait === "preflight-missing"
+    ) {
       return { kind: "bait", bait };
     }
     throw new Error(`unknown package-closure bait: ${bait}`);

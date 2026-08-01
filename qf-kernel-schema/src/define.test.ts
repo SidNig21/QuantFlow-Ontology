@@ -941,9 +941,11 @@ describe("schema lint", () => {
     const valid = {
       source_artifact_id: "artifact-source-1",
       observed_at: "2026-07-30T12:00:00.000Z",
+      venue_id: "venue-bovada",
       instruments: [
         {
           id: "instrument-1",
+          market_event_id: null,
           kind: "moneyline",
           params: { period: "match", vendor_extension: { retained: true } },
           sides: ["home", "away"],

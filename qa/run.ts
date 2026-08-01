@@ -434,6 +434,16 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "market-context",
+    description:
+      "WO-107c: trusted venue/event context, atomic market links, exact replay, upgrade/package closure, and hidden context actions",
+    run: async () => {
+      const { runMarketContextGate } = await import("./gates/market-context.ts");
+      const { ok } = await runMarketContextGate();
+      return ok;
+    },
+  },
+  {
     name: "market-ingest",
     description:
       "WO-107b: governed pipeline catalog, upgrade chain, atomic/replay-safe market ingest, and generated reads",

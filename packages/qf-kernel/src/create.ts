@@ -10,13 +10,15 @@ import {
   UnknownAgentDefinitionError,
 } from "./errors.ts";
 import { appendEvent } from "./events.ts";
-import type { ObjectExecuteResult } from "./results.ts";
+import type { ContextExecuteResult, ObjectExecuteResult } from "./results.ts";
 import { contentHash } from "./hash.ts";
 import {
   lineageFieldsToLinks,
+  type CreationEnvelopePresence,
   type LinkSpec,
   writeLinks,
 } from "./links.ts";
+import { registerVenue, scheduleMarketEvent } from "./market-context.ts";
 import type { TraceContext } from "./trace.ts";
 import {
   observationEvent,
@@ -49,7 +51,8 @@ type CreationHandler = (
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[],
-) => ObjectExecuteResult;
+  envelope?: CreationEnvelopePresence,
+) => ObjectExecuteResult | ContextExecuteResult;
 
 function creationResult(
   cmd: CreationCommand,
@@ -761,6 +764,8 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   create_mission: createMission,
   create_ticket: createTicket,
   observe_ticket: observeTicket,
+  register_venue: registerVenue,
+  schedule_market_event: scheduleMarketEvent,
 };
 
 /** Every creationCommands entry must have a handler (D3 join). */
@@ -782,10 +787,11 @@ export function executeCreation(
   input: Record<string, unknown>,
   trace: TraceContext,
   links: LinkSpec[] = [],
-): ObjectExecuteResult {
+  envelope: CreationEnvelopePresence = { links: links.length > 0, bytes: false },
+): ObjectExecuteResult | ContextExecuteResult {
   const handler = creationHandlers[cmd.action];
   if (!handler) {
     throw new KernelError(`No creation handler for action "${cmd.action}"`);
   }
-  return handler(db, cmd, input, trace, links);
+  return handler(db, cmd, input, trace, links, envelope);
 }

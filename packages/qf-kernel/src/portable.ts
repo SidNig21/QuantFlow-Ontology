@@ -47,6 +47,7 @@ export {
   KernelIncompleteInitializationError,
   KernelRegistryDriftError,
   KernelUpgradeShapeError,
+  MarketContextConflictError,
   MarketIngestConflictError,
   MarketIngestValidationError,
   MissingTraceError,
@@ -59,6 +60,7 @@ export { eventCount, execute } from "./execute.ts";
 export type {
   ExecuteResult,
   ExecuteResultFor,
+  ContextExecuteResult,
   MarketIngestLinkResult,
   MarketIngestRowResult,
   ObjectExecuteResult,
@@ -74,5 +76,6 @@ export { requireTrace, type TraceContext } from "./trace.ts";
 export {
   classifyKernelShape,
   MARKET_INGEST_UPGRADE,
+  MARKET_CONTEXT_UPGRADE,
   PROFILE_IDENTITY_UPGRADE,
 } from "./upgrade.ts";

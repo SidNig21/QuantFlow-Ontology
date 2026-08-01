@@ -14,8 +14,10 @@ export type InspectionModules = {
   copyPackageForBait: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").copyPackageForBait;
   removeHermesPackage: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").removeHermesPackage;
   removeD1UpgradeFromAsar: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").removeD1UpgradeFromAsar;
+  removeMarketContextUpgradeFromAsar: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").removeMarketContextUpgradeFromAsar;
   removeDockProfilesManifest: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").removeDockProfilesManifest;
   qfKernelSchemaUpgradePath: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").QF_KERNEL_SCHEMA_UPGRADE;
+  qfKernelSchemaMarketContextUpgradePath: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE;
   hermesDockProfilesPath: typeof import("../../../collab-electron/scripts/package-lib/package-inspect.ts").HERMES_DOCK_PROFILES;
   createPackageRunId: typeof import("../../../collab-electron/scripts/package-lib/run-id.ts").createPackageRunId;
 };
@@ -48,8 +50,11 @@ export function createInspectionModuleLoader(): InspectionModuleLoader {
           copyPackageForBait: packageInspect.copyPackageForBait,
           removeHermesPackage: packageInspect.removeHermesPackage,
           removeD1UpgradeFromAsar: packageInspect.removeD1UpgradeFromAsar,
+          removeMarketContextUpgradeFromAsar: packageInspect.removeMarketContextUpgradeFromAsar,
           removeDockProfilesManifest: packageInspect.removeDockProfilesManifest,
           qfKernelSchemaUpgradePath: packageInspect.QF_KERNEL_SCHEMA_UPGRADE,
+          qfKernelSchemaMarketContextUpgradePath:
+            packageInspect.QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE,
           hermesDockProfilesPath: packageInspect.HERMES_DOCK_PROFILES,
           createPackageRunId: runId.createPackageRunId,
         };

@@ -14,7 +14,11 @@ import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
 import { IllegalTransitionError, KernelError } from "./errors.ts";
 import { appendEvent } from "./events.ts";
-import { extractCreationEnvelope, type LinkSpec } from "./links.ts";
+import {
+  extractCreationEnvelope,
+  type CreationEnvelopePresence,
+  type LinkSpec,
+} from "./links.ts";
 import { executePipeline } from "./pipeline.ts";
 import type { ExecuteResultFor } from "./results.ts";
 import { requireTrace, type TraceContext } from "./trace.ts";
@@ -113,8 +117,14 @@ export function execute<C extends string>(
   let bodyForParse = input;
   let linkSpecs: LinkSpec[] = [];
   let envelopeBytes: Uint8Array | undefined;
+  let envelopePresence: CreationEnvelopePresence = { links: false, bytes: false };
   if (creation) {
-    ({ body: bodyForParse, links: linkSpecs, bytes: envelopeBytes } =
+    ({
+      body: bodyForParse,
+      links: linkSpecs,
+      bytes: envelopeBytes,
+      present: envelopePresence,
+    } =
       extractCreationEnvelope(input));
   }
 
@@ -124,7 +134,14 @@ export function execute<C extends string>(
   }
 
   if (creation) {
-    return executeCreation(db, creation, validatedInput, trace, linkSpecs) as ExecuteResultFor<C>;
+    return executeCreation(
+      db,
+      creation,
+      validatedInput,
+      trace,
+      linkSpecs,
+      envelopePresence,
+    ) as ExecuteResultFor<C>;
   }
   if (pipeline) {
     return executePipeline(db, pipeline, validatedInput, trace) as ExecuteResultFor<C>;

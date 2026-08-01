@@ -2475,6 +2475,100 @@
     }
   },
   {
+    "name": "qf_register_venue",
+    "description": "Register one trusted venue identity from an existing source Artifact. Operator-only provenance is required and retries must preserve the original venue rather than silently updating it.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "venue_id": {
+          "type": "string",
+          "description": "This field is the stable Kernel identity for the venue. Reuse it only when all stored venue fields and provenance are an exact replay."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "sportsbook",
+            "exchange"
+          ],
+          "description": "This field identifies the venue class that governs listing and settlement behavior. Add new classes by order so downstream assumptions remain explicit."
+        },
+        "name": {
+          "type": "string",
+          "description": "This field stores the operator-visible venue name, such as Bovada. Keep names stable so external references can be re-imported idempotently."
+        },
+        "source_artifact_id": {
+          "type": "string",
+          "description": "This field identifies the existing Artifact that preserves the observed venue source. The Kernel rejects a reference that is not already present."
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "This field records when the venue was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time."
+        }
+      },
+      "required": [
+        "venue_id",
+        "kind",
+        "name",
+        "source_artifact_id",
+        "observed_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "qf_schedule_market_event",
+    "description": "Schedule one trusted market event from an existing source Artifact. Operator-only provenance is required and creation always writes scheduled state without accepting a caller-supplied status.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "market_event_id": {
+          "type": "string",
+          "description": "This field is the stable Kernel identity for the market event. Reuse it only when all stored event fields and provenance are an exact replay."
+        },
+        "sport": {
+          "type": "string",
+          "enum": [
+            "ufc",
+            "tennis",
+            "football"
+          ],
+          "description": "This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type."
+        },
+        "starts_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "This field records the scheduled start timestamp in ISO-8601 UTC. Do not use data timestamped after this moment for pre-event decisions."
+        },
+        "competition": {
+          "type": "string",
+          "description": "This field stores the competition context such as league, card, or tournament round. Keep the value operator-legible so slips and reports can be reconciled without external decoding."
+        },
+        "source_artifact_id": {
+          "type": "string",
+          "description": "This field identifies the existing Artifact that preserves the observed event source. The Kernel rejects a reference that is not already present."
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "description": "This field records when the event was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time."
+        }
+      },
+      "required": [
+        "market_event_id",
+        "sport",
+        "starts_at",
+        "competition",
+        "source_artifact_id",
+        "observed_at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
     "name": "qf_ingest_market_batch",
     "description": "Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.",
     "inputSchema": {
@@ -2490,6 +2584,10 @@
           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
           "description": "This field records the ISO-8601 observation timestamp shared by the batch. Preserve it as provenance rather than substituting ingest time."
         },
+        "venue_id": {
+          "type": "string",
+          "description": "This field identifies the existing venue for every instrument in the batch. The Kernel derives one lists edge from this identity and never infers venue from free-form market fields."
+        },
         "instruments": {
           "type": "array",
           "items": {
@@ -2498,6 +2596,17 @@
               "id": {
                 "type": "string",
                 "description": "This field is the stable Kernel identity for the instrument row. Retries must reuse it only for byte-equivalent market state and provenance."
+              },
+              "market_event_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "This field names the existing market event for the instrument, or null when no bounded event dependency is declared. The Kernel derives offered_on only from this identity."
               },
               "kind": {
                 "type": "string",
@@ -2538,6 +2647,7 @@
             },
             "required": [
               "id",
+              "market_event_id",
               "kind",
               "params",
               "sides",
@@ -2596,6 +2706,7 @@
       "required": [
         "source_artifact_id",
         "observed_at",
+        "venue_id",
         "instruments",
         "quotes"
       ],

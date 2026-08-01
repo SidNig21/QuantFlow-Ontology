@@ -46,6 +46,8 @@ export const QF_KERNEL_SCHEMA_UPGRADE =
   "node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
 export const QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE =
   "node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql";
+export const QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE =
+  "node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql";
 export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
 export const HERMES_META = "species/hermes/packed/hermes.meta.json";
 export const HERMES_LAUNCH = "species/hermes/launch.json";
@@ -71,6 +73,8 @@ const REPO_SCHEMA_UPGRADE =
   "qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql";
 const REPO_SCHEMA_MARKET_INGEST_UPGRADE =
   "qf-kernel-schema/golden/upgrades/0002-market-ingest.sql";
+const REPO_SCHEMA_MARKET_CONTEXT_UPGRADE =
+  "qf-kernel-schema/golden/upgrades/0003-market-context.sql";
 
 export type InspectFailure = {
   ok: false;
@@ -362,6 +366,10 @@ function inspectAsarSqlArtifacts(
       packaged: QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
       golden: REPO_SCHEMA_MARKET_INGEST_UPGRADE,
     },
+    {
+      packaged: QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE,
+      golden: REPO_SCHEMA_MARKET_CONTEXT_UPGRADE,
+    },
   ];
 
   for (const pair of pairs) {
@@ -533,6 +541,15 @@ export async function removeMarketIngestUpgradeFromAsar(
   return removeUpgradeFromAsar(
     baitPackageRoot,
     QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
+  );
+}
+
+export async function removeMarketContextUpgradeFromAsar(
+  baitPackageRoot: string,
+): Promise<AsarInventoryDiff> {
+  return removeUpgradeFromAsar(
+    baitPackageRoot,
+    QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE,
   );
 }
 

@@ -11,6 +11,7 @@ const REPO = join(import.meta.dir, "../..");
 const INSTALL_PLAN = [
   { name: "qf-kernel-schema", cwd: join(REPO, "qf-kernel-schema") },
   { name: "qf-kernel", cwd: join(REPO, "packages/qf-kernel") },
+  { name: "qf-read-tools", cwd: join(REPO, "tools/qf-read-tools") },
   { name: "market-ingest gate", cwd: join(import.meta.dir, "market-ingest") },
 ] as const;
 

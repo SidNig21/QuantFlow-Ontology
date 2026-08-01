@@ -511,6 +511,33 @@ Void a scheduled event that will not be contested (scheduled → void).
 - **input:**
 - `event_id` — Event to void.
 
+### `register_venue`
+
+Register one trusted venue identity from an existing source Artifact. Operator-only provenance is required and retries must preserve the original venue rather than silently updating it.
+
+- **lifecycle:** `experimental`
+- **operator-only:** `true`
+- **input:**
+- `venue_id` — This field is the stable Kernel identity for the venue. Reuse it only when all stored venue fields and provenance are an exact replay.
+- `kind` — This field identifies the venue class that governs listing and settlement behavior. Add new classes by order so downstream assumptions remain explicit.
+- `name` — This field stores the operator-visible venue name, such as Bovada. Keep names stable so external references can be re-imported idempotently.
+- `source_artifact_id` — This field identifies the existing Artifact that preserves the observed venue source. The Kernel rejects a reference that is not already present.
+- `observed_at` — This field records when the venue was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time.
+
+### `schedule_market_event`
+
+Schedule one trusted market event from an existing source Artifact. Operator-only provenance is required and creation always writes scheduled state without accepting a caller-supplied status.
+
+- **lifecycle:** `experimental`
+- **operator-only:** `true`
+- **input:**
+- `market_event_id` — This field is the stable Kernel identity for the market event. Reuse it only when all stored event fields and provenance are an exact replay.
+- `sport` — This field names the sport domain for the occurrence. Use it to interpret market vocabularies while keeping shared instrument structure in one type.
+- `starts_at` — This field records the scheduled start timestamp in ISO-8601 UTC. Do not use data timestamped after this moment for pre-event decisions.
+- `competition` — This field stores the competition context such as league, card, or tournament round. Keep the value operator-legible so slips and reports can be reconciled without external decoding.
+- `source_artifact_id` — This field identifies the existing Artifact that preserves the observed event source. The Kernel rejects a reference that is not already present.
+- `observed_at` — This field records when the event was observed in ISO-8601 UTC. Preserve it as provenance and never substitute ingest time.
+
 ### `ingest_market_batch`
 
 Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.
@@ -520,6 +547,7 @@ Ingest one provenance-bound batch of instrument and quote rows through the trust
 - **input:**
 - `source_artifact_id` — This field identifies the existing Artifact that preserves the captured source. The Kernel rejects a batch whose source evidence does not exist.
 - `observed_at` — This field records the ISO-8601 observation timestamp shared by the batch. Preserve it as provenance rather than substituting ingest time.
+- `venue_id` — This field identifies the existing venue for every instrument in the batch. The Kernel derives one lists edge from this identity and never infers venue from free-form market fields.
 - `instruments` — This field carries strict instrument rows for atomic ingestion. Supply an empty array only when the batch contains at least one quote row.
 - `quotes` — This field carries strict quote rows and their instrument identities for derived links. Supply an empty array only when the batch contains at least one instrument row.
 

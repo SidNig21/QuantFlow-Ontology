@@ -7,6 +7,7 @@ import { generateMcp, servedToolsForSchema } from "./generate/mcp.ts";
 import { generateSql } from "./generate/sql.ts";
 import { generateUpgradeAgentProfileIdentity } from "./generate/upgrade-agent-profile-identity.ts";
 import { generateUpgradeMarketIngest } from "./generate/upgrade-market-ingest.ts";
+import { generateUpgradeMarketContext } from "./generate/upgrade-market-context.ts";
 import { schema } from "./schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -49,6 +50,15 @@ describe("golden outputs", () => {
     const actual = generateUpgradeMarketIngest();
     const expected = readFileSync(
       join(goldenDir, "upgrades", "0002-market-ingest.sql"),
+      "utf8",
+    );
+    expect(actual).toBe(expected);
+  });
+
+  test("market-context upgrade matches golden byte-for-byte", () => {
+    const actual = generateUpgradeMarketContext();
+    const expected = readFileSync(
+      join(goldenDir, "upgrades", "0003-market-context.sql"),
       "utf8",
     );
     expect(actual).toBe(expected);

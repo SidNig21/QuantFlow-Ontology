@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 /**
- * WO-107b permanent gate: the market pipeline is governed, atomic, replay-safe,
- * upgrade-safe, readable through generated paths, and absent from agent tools.
+ * WO-107c permanent gate: trusted context and the market pipeline are governed,
+ * atomic, replay-safe, upgrade-safe, readable through generated paths, and
+ * absent from agent tools.
  */
 import { createHash } from "node:crypto";
 import {
@@ -41,6 +42,10 @@ const UPGRADE_0002 = join(
   REPO,
   "qf-kernel-schema/golden/upgrades/0002-market-ingest.sql",
 );
+const UPGRADE_0003 = join(
+  REPO,
+  "qf-kernel-schema/golden/upgrades/0003-market-context.sql",
+);
 const INDEX_SOURCE = join(REPO, "packages/qf-kernel/src/index.ts");
 const PORTABLE_SOURCE = join(REPO, "packages/qf-kernel/src/portable.ts");
 const EXECUTE_SOURCE = join(REPO, "packages/qf-kernel/src/execute.ts");
@@ -49,6 +54,9 @@ const PACKAGE_INSPECTOR = join(
   "collab-electron/scripts/package-lib/package-inspect.ts",
 );
 const INGEST_ACTION = "ingest_market_batch";
+const CONTEXT_ACTIONS = ["register_venue", "schedule_market_event"] as const;
+const SERVED_TOOLS_SHA256 =
+  "f42d36773e4b4d726769442f4196ca7ce18c03384b78b8d55446150ff4c72021";
 const INGEST_EVENTS = ["instrument.ingested", "quote.ingested"] as const;
 const TRACE = { trace_id: "market-gate-trace", span_id: "market-gate-span" };
 
@@ -195,6 +203,203 @@ function publishSource(db: KernelDb, label: string): string {
   );
 }
 
+function registerMarketContext(db: KernelDb, sourceArtifactId: string): void {
+  execute(
+    db,
+    "register_venue",
+    {
+      venue_id: "venue-bovada",
+      kind: "sportsbook",
+      name: "Bovada",
+      source_artifact_id: sourceArtifactId,
+      observed_at: "2026-07-30T11:00:00.000Z",
+    },
+    { ...TRACE, span_id: "context-venue" },
+  );
+  execute(
+    db,
+    "schedule_market_event",
+    {
+      market_event_id: "event-football-1",
+      sport: "football",
+      starts_at: "2026-07-30T18:00:00.000Z",
+      competition: "NFL",
+      source_artifact_id: sourceArtifactId,
+      observed_at: "2026-07-30T11:00:00.000Z",
+    },
+    { ...TRACE, span_id: "context-event" },
+  );
+}
+
+function contextProof(): void {
+  console.log("\n=== D1 trusted context creation, replay, conflict, envelopes, and status ===");
+  const db = openKernel(":memory:");
+  try {
+    const source = publishSource(db, "context-proof");
+    const venueInput = {
+      venue_id: "venue-proof",
+      kind: "sportsbook",
+      name: "Bovada",
+      source_artifact_id: source,
+      observed_at: "2026-07-30T11:00:00.000Z",
+    };
+    const eventInput = {
+      market_event_id: "event-proof",
+      sport: "football",
+      starts_at: "2026-07-30T18:00:00.000Z",
+      competition: "NFL",
+      source_artifact_id: source,
+      observed_at: "2026-07-30T11:00:00.000Z",
+    };
+    const before = marketCounts(db);
+    const venue = execute(db, "register_venue", venueInput, TRACE) as unknown as JsonRecord;
+    const event = execute(db, "schedule_market_event", eventInput, TRACE) as unknown as JsonRecord;
+    for (const [result, command, objectType, objectId, expectedDigest] of [
+      [venue, "register_venue", "venue", "venue-proof", digest({ id: "venue-proof", kind: "sportsbook", name: "Bovada" })],
+      [
+        event,
+        "schedule_market_event",
+        "market_event",
+        "event-proof",
+        digest({
+          id: "event-proof",
+          sport: "football",
+          starts_at: "2026-07-30T18:00:00.000Z",
+          status: "scheduled",
+          competition: "NFL",
+        }),
+      ],
+    ] as const) {
+      assertSetEqual(
+        Object.keys(result),
+        [
+          "command",
+          "kind",
+          "object_id",
+          "object_type",
+          "outcome",
+          "row_digest",
+          "source_artifact_id",
+          "state",
+          "trace_id",
+        ],
+        `${command} result fields`,
+      );
+      assert(result.kind === "context", `${command} result kind mismatch`);
+      assert(result.command === command, `${command} result command mismatch`);
+      assert(result.object_type === objectType, `${command} result object_type mismatch`);
+      assert(result.object_id === objectId, `${command} result object_id mismatch`);
+      assert(result.source_artifact_id === source, `${command} source mismatch`);
+      assert(result.trace_id === TRACE.trace_id, `${command} trace mismatch`);
+      assert(result.row_digest === expectedDigest, `${command} digest mismatch`);
+      assert(result.outcome === "created", `${command} create outcome mismatch`);
+    }
+    assert(
+      (event.state as JsonRecord).status === "scheduled",
+      "schedule_market_event did not force scheduled status",
+    );
+    assertCounts(
+      marketCounts(db),
+      {
+        ...before,
+        ingestEvents: before.ingestEvents,
+      },
+      "context rows are not market ingest rows",
+    );
+    assert(count(db, "venue") === 1, "venue create count mismatch");
+    assert(count(db, "market_event") === 1, "market event create count mismatch");
+    assert(
+      count(db, "events", " WHERE object_type = ?", ["venue"]) === 1 &&
+        count(db, "events", " WHERE object_type = ?", ["market_event"]) === 1,
+      "context provenance event count mismatch",
+    );
+    const contextEvents = db
+      .query(
+        `SELECT type, object_type, object_id, payload, trace_id, created_at
+         FROM events WHERE object_type IN ('venue','market_event') ORDER BY object_type`,
+      )
+      .all() as Array<JsonRecord>;
+    assert(contextEvents.length === 2, "context provenance event total mismatch");
+    for (const row of contextEvents) {
+      assert(typeof row.created_at === "string" && row.created_at.length > 0, "context event created_at missing");
+      assert(row.trace_id === TRACE.trace_id, "context event trace mismatch");
+      const payload = JSON.parse(String(row.payload)) as JsonRecord;
+      assertSetEqual(
+        Object.keys(payload),
+        ["command", "source_artifact_id", "observed_at", "row_digest", "span_id"],
+        `${String(row.object_type)} provenance payload`,
+      );
+    }
+
+    const countsBeforeReplay = marketCounts(db);
+    const venueReplay = execute(db, "register_venue", venueInput, {
+      trace_id: TRACE.trace_id,
+      span_id: "different-replay-span",
+    }) as unknown as JsonRecord;
+    const eventReplay = execute(db, "schedule_market_event", eventInput, {
+      trace_id: TRACE.trace_id,
+      span_id: "different-replay-span-2",
+    }) as unknown as JsonRecord;
+    assert(venueReplay.outcome === "replayed" && eventReplay.outcome === "replayed", "context replay outcome mismatch");
+    assertCounts(marketCounts(db), countsBeforeReplay, "context exact replay");
+    assert(
+      count(db, "events", " WHERE object_type = ?", ["venue"]) === 1 &&
+        count(db, "events", " WHERE object_type = ?", ["market_event"]) === 1,
+      "context exact replay appended a provenance event",
+    );
+
+    const conflictCounts = marketCounts(db);
+    const venueConflict = expectThrow(
+      () => execute(db, "register_venue", { ...venueInput, name: "Renamed Bovada" }, TRACE),
+      "venue context conflict",
+      "MarketContextConflictError",
+    );
+    const venueConflictFields = venueConflict as {
+      object_type?: unknown;
+      object_id?: unknown;
+      reason?: unknown;
+    };
+    assert(venueConflictFields.object_type === "venue", "context conflict object_type mismatch");
+    assert(venueConflictFields.object_id === "venue-proof", "context conflict object_id mismatch");
+    assert(
+      typeof venueConflictFields.reason === "string" && venueConflictFields.reason.length > 0,
+      "context conflict reason is missing",
+    );
+    expectThrow(
+      () => execute(db, "schedule_market_event", eventInput, { trace_id: "different-trace", span_id: TRACE.span_id }),
+      "event trace conflict",
+      "MarketContextConflictError",
+    );
+    assertCounts(marketCounts(db), conflictCounts, "context conflict no-op");
+
+    const envelopeCounts = marketCounts(db);
+    for (const [command, input] of [
+      ["register_venue", venueInput],
+      ["schedule_market_event", eventInput],
+    ] as const) {
+      for (const [label, envelope] of [
+        ["empty links", { links: [] }],
+        ["nonempty links", { links: [{ kind: "lists" }] }],
+        ["bytes", { bytes: new Uint8Array([1, 2, 3]) }],
+      ] as const) {
+        expectThrow(
+          () => execute(db, command, { ...input, ...envelope }, TRACE),
+          `${command} ${label} envelope`,
+        );
+        assertCounts(marketCounts(db), envelopeCounts, `${command} ${label} envelope residue`);
+      }
+    }
+    expectThrow(
+      () => execute(db, "register_venue", { ...venueInput, source_artifact_id: "missing-source" }, TRACE),
+      "missing context source artifact",
+    );
+    assertCounts(marketCounts(db), envelopeCounts, "missing context source residue");
+    console.log(`context_counts=${JSON.stringify(marketCounts(db))}`);
+  } finally {
+    closeKernel(db);
+  }
+}
+
 function commandInventoryProof(): void {
   console.log("\n=== D0/D1 public write and dispatch inventory ===");
   const forbidden = [
@@ -203,6 +408,8 @@ function commandInventoryProof(): void {
     "insertRun",
     "executeCreation",
     "writeLinks",
+    "registerVenue",
+    "scheduleMarketEvent",
   ];
   for (const [entry, exports] of [
     [".", kernel],
@@ -217,7 +424,13 @@ function commandInventoryProof(): void {
 
   for (const path of [INDEX_SOURCE, PORTABLE_SOURCE]) {
     const source = readFileSync(path, "utf8");
-    for (const symbol of ["creationHandlers", "appendEvent", "insertRun"]) {
+    for (const symbol of [
+      "creationHandlers",
+      "appendEvent",
+      "insertRun",
+      "registerVenue",
+      "scheduleMarketEvent",
+    ]) {
       assert(
         !new RegExp(`\\b${symbol}\\b`).test(source),
         `${path} re-exports ${symbol}`,
@@ -244,6 +457,7 @@ function commandInventoryProof(): void {
     "pipeline row/event inventory",
   );
   kernel.assertPipelineHandlersComplete(pipelineCommands);
+  kernel.assertCreationHandlersComplete(creationCommands);
   const executeSource = readFileSync(EXECUTE_SOURCE, "utf8");
   assert(executeSource.includes("pipelineCommands"), "execute() does not import the pipeline catalog");
   assert(
@@ -256,15 +470,19 @@ function commandInventoryProof(): void {
 }
 
 function generatedSurfaceProof(): void {
-  console.log("\n=== D1 generated authority and unserved pipeline action ===");
+  console.log("\n=== D0/D1 generated authority, served hash, and hidden context actions ===");
   assert(schema.objects.length === 23, `expected 23 objects, got ${schema.objects.length}`);
-  assert(schema.actions.length === 26, `expected 26 actions, got ${schema.actions.length}`);
+  assert(schema.actions.length === 28, `expected 28 actions, got ${schema.actions.length}`);
   const action = schema.actions.find((candidate) => candidate.name === INGEST_ACTION);
   assert(action?.pipelineOnly === true, "ingest_market_batch is not pipelineOnly");
   assert(action.operatorOnly !== true, "pipeline action must not also be operatorOnly");
 
   const completeCount = schema.objects.length * 3 + schema.actions.length;
   const served = servedToolsForSchema(schema);
+  const servedHash = createHash("sha256")
+    .update(JSON.stringify(served), "utf8")
+    .digest("hex");
+  assert(servedHash === SERVED_TOOLS_SHA256, `served tool serialization hash changed: ${servedHash}`);
   assert(
     actionToolForAction(action).name === "qf_ingest_market_batch",
     "complete action generator does not map ingest_market_batch",
@@ -273,6 +491,18 @@ function generatedSurfaceProof(): void {
     !served.some((tool) => tool.name === "qf_ingest_market_batch"),
     "served tools expose qf_ingest_market_batch",
   );
+  for (const actionName of CONTEXT_ACTIONS) {
+    const contextAction = schema.actions.find((candidate) => candidate.name === actionName);
+    assert(contextAction?.operatorOnly === true, `${actionName} is not operatorOnly`);
+    assert(
+      actionToolForAction(contextAction).name === `qf_${actionName}`,
+      `${actionName} is absent from complete generated authority`,
+    );
+    assert(
+      !served.some((tool) => tool.name === `qf_${actionName}`),
+      `${actionName} is served to agents`,
+    );
+  }
   const hidden = schema.actions.filter(
     (candidate) => candidate.operatorOnly === true || candidate.pipelineOnly === true,
   );
@@ -287,9 +517,11 @@ function generatedSurfaceProof(): void {
   const base = {
     source_artifact_id: "artifact-id",
     observed_at: "2026-07-30T12:00:00.000Z",
+    venue_id: "venue-bovada",
     instruments: [
       {
         id: "strict-instrument",
+        market_event_id: null,
         kind: "moneyline",
         params: { provider: { market: "ml", extra: 1 } },
         sides: ["a", "b"],
@@ -349,14 +581,17 @@ CREATE TABLE events (
   created_at TEXT NOT NULL
 );`;
 
-function seedHistorical(path: string, shape: "pre_d1" | "d1"): void {
+function seedHistorical(path: string, shape: "pre_d1" | "d1" | "wo_107b"): void {
   const raw = new Database(path);
   raw.transaction(() => {
     // Fixture construction is one transaction so dozens of historical DDL
     // statements do not each pay a durable fsync before the gate even starts.
     raw.exec(readFileSync(PRE_D1, "utf8"));
-    if (shape === "d1") raw.exec(readFileSync(UPGRADE_0001, "utf8"));
+    if (shape === "d1" || shape === "wo_107b") {
+      raw.exec(readFileSync(UPGRADE_0001, "utf8"));
+    }
     raw.exec(EVENTS_DDL);
+    if (shape === "wo_107b") raw.exec(readFileSync(UPGRADE_0002, "utf8"));
     raw.query(
       `INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
        VALUES (?, ?, ?, ?, ?), (?, ?, ?, ?, ?)`,
@@ -411,31 +646,40 @@ function historicalRows(path: string): string {
 }
 
 function assertCurrentMeta(db: KernelDb, label: string): void {
-  const rows = db
-    .query(
-      "SELECT type_name, kind FROM schema_meta WHERE type_name = ? ORDER BY type_name",
-    )
-    .all(INGEST_ACTION) as Array<{ type_name: string; kind: string }>;
-  assert(
-    rows.length === 1 && rows[0]?.kind === "action",
-    `${label} did not land exactly one market-ingest action authority`,
-  );
+  for (const actionName of [INGEST_ACTION, ...CONTEXT_ACTIONS]) {
+    const rows = db
+      .query(
+        "SELECT type_name, kind FROM schema_meta WHERE type_name = ? ORDER BY type_name",
+      )
+      .all(actionName) as Array<{ type_name: string; kind: string }>;
+    assert(
+      rows.length === 1 && rows[0]?.kind === "action",
+      `${label} did not land exactly one ${actionName} action authority`,
+    );
+  }
   const actionCount = count(db, "schema_meta", " WHERE kind = ?", ["action"]);
-  assert(actionCount === 26, `${label} action meta count expected 26, got ${actionCount}`);
+  assert(actionCount === 28, `${label} action meta count expected 28, got ${actionCount}`);
   assert(kernel.classifyKernelShape(db) === "current", `${label} did not classify current`);
 }
 
 function upgradeProof(): void {
-  console.log("\n=== D2 fresh / pre-D1 / D1 upgrade matrix ===");
+  console.log("\n=== D3 fresh / pre-D1 / D1 / WO-107b upgrade matrix ===");
   assert(existsSync(UPGRADE_0002), "generated 0002-market-ingest.sql is missing");
   const upgrade = readFileSync(UPGRADE_0002, "utf8");
   assert(upgrade.length > 0, "generated 0002-market-ingest.sql is empty");
   assert(upgrade.includes(INGEST_ACTION), "0002 omits ingest_market_batch authority");
   assert(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(upgrade), "0002 mutates object-table shape");
+  assert(existsSync(UPGRADE_0003), "generated 0003-market-context.sql is missing");
+  const contextUpgrade = readFileSync(UPGRADE_0003, "utf8");
+  assert(contextUpgrade.length > 0, "generated 0003-market-context.sql is empty");
+  for (const actionName of CONTEXT_ACTIONS) {
+    assert(contextUpgrade.includes(actionName), `0003 omits ${actionName} authority`);
+  }
+  assert(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(contextUpgrade), "0003 mutates object-table shape");
 
   const root = mkdtempSync(join(tmpdir(), "qf-market-upgrades-"));
   try {
-    for (const predecessor of ["pre_d1", "d1"] as const) {
+    for (const predecessor of ["pre_d1", "d1", "wo_107b"] as const) {
       const path = join(root, `${predecessor}.db`);
       seedHistorical(path, predecessor);
       const before = historicalRows(path);
@@ -486,9 +730,11 @@ function strictRuntimeRejections(db: KernelDb, sourceArtifactId: string): void {
   const base = {
     source_artifact_id: sourceArtifactId,
     observed_at: "2026-07-30T12:00:00.000Z",
+    venue_id: "venue-bovada",
     instruments: [
       {
         id: "strict-runtime-instrument",
+        market_event_id: null,
         kind: "moneyline",
         params: {},
         sides: ["a", "b"],
@@ -536,8 +782,10 @@ function strictRuntimeRejections(db: KernelDb, sourceArtifactId: string): void {
 type HappyBatch = {
   source_artifact_id: string;
   observed_at: string;
+  venue_id: string;
   instruments: Array<{
     id: string;
+    market_event_id: string | null;
     kind: "moneyline" | "prop";
     params: JsonRecord;
     sides: string[];
@@ -556,9 +804,11 @@ function happyBatch(sourceArtifactId: string): HappyBatch {
   return {
     source_artifact_id: sourceArtifactId,
     observed_at: "2026-07-30T12:34:56.000Z",
+    venue_id: "venue-bovada",
     instruments: [
       {
         id: "instrument-main",
+        market_event_id: "event-football-1",
         kind: "moneyline",
         params: { provider: { competition: "UFC", market_id: 17 }, period: "full" },
         sides: ["red", "blue"],
@@ -566,6 +816,7 @@ function happyBatch(sourceArtifactId: string): HappyBatch {
       },
       {
         id: "instrument-prop",
+        market_event_id: "event-football-1",
         kind: "prop",
         params: { method: "submission", nested_open_field: { model: "v1" } },
         sides: ["yes", "no"],
@@ -657,6 +908,12 @@ function assertBatchReceipt(
     created: number;
     replayed: number;
     outcome: "created" | "replayed";
+    rowCount?: number;
+    links?: ReadonlyArray<{
+      kind: "lists" | "offered_on" | "quotes";
+      from_id: string;
+      to_id: string;
+    }>;
   },
 ): void {
   assert(result !== null && typeof result === "object", "pipeline command returned no receipt");
@@ -667,14 +924,98 @@ function assertBatchReceipt(
   assert(receipt.trace_id === expected.trace, "pipeline receipt trace mismatch");
   assert(receipt.created === expected.created, "pipeline receipt created count mismatch");
   assert(receipt.replayed === expected.replayed, "pipeline receipt replayed count mismatch");
-  assert(Array.isArray(receipt.rows) && receipt.rows.length === 4, "pipeline receipt row inventory mismatch");
-  assert(Array.isArray(receipt.links) && receipt.links.length === 2, "pipeline receipt link inventory mismatch");
+  assert(
+    Array.isArray(receipt.rows) && receipt.rows.length === (expected.rowCount ?? 4),
+    "pipeline receipt row inventory mismatch",
+  );
+  const expectedLinkRows = expected.links ?? [
+    { kind: "lists", from_id: "venue-bovada", to_id: "instrument-main" },
+    { kind: "offered_on", from_id: "instrument-main", to_id: "event-football-1" },
+    { kind: "lists", from_id: "venue-bovada", to_id: "instrument-prop" },
+    { kind: "offered_on", from_id: "instrument-prop", to_id: "event-football-1" },
+    { kind: "quotes", from_id: "quote-main", to_id: "instrument-main" },
+    { kind: "quotes", from_id: "quote-prop", to_id: "instrument-prop" },
+  ];
+  assert(
+    Array.isArray(receipt.links) && receipt.links.length === expectedLinkRows.length,
+    "pipeline receipt link inventory mismatch",
+  );
   for (const row of receipt.rows as JsonRecord[]) {
     assert(row.outcome === expected.outcome, `pipeline row receipt outcome is not ${expected.outcome}`);
   }
-  for (const link of receipt.links as JsonRecord[]) {
-    assert(link.kind === "quotes", "pipeline link receipt exposes a non-quotes edge");
-    assert(link.outcome === expected.outcome, `pipeline link receipt outcome is not ${expected.outcome}`);
+  const expectedLinks = expectedLinkRows.map((link) => ({
+    ...link,
+    outcome: expected.outcome,
+  }));
+  assert(
+    JSON.stringify(receipt.links) === JSON.stringify(expectedLinks),
+    `pipeline link receipt order/endpoints mismatch actual=${JSON.stringify(receipt.links)}`,
+  );
+}
+
+function nullEventReceiptProof(): void {
+  console.log("\n=== D2 null market-event receipt ordering ===");
+  const db = openKernel(":memory:");
+  try {
+    const source = publishSource(db, "null-event-receipt");
+    registerMarketContext(db, source);
+    const result = execute(
+      db,
+      INGEST_ACTION,
+      {
+        source_artifact_id: source,
+        observed_at: "2026-07-30T12:05:00.000Z",
+        venue_id: "venue-bovada",
+        instruments: [
+          {
+            id: "instrument-no-event",
+            market_event_id: null,
+            kind: "moneyline",
+            params: {},
+            sides: ["home", "away"],
+            correlation_group: null,
+          },
+        ],
+        quotes: [
+          {
+            id: "quote-no-event",
+            instrument_id: "instrument-no-event",
+            book: "bovada",
+            data_ref: "sha256:null-event",
+            coverage: {},
+          },
+        ],
+      },
+      TRACE,
+    );
+    assertBatchReceipt(result, {
+      source,
+      trace: TRACE.trace_id,
+      created: 2,
+      replayed: 0,
+      outcome: "created",
+      rowCount: 2,
+      links: [
+        { kind: "lists", from_id: "venue-bovada", to_id: "instrument-no-event" },
+        { kind: "quotes", from_id: "quote-no-event", to_id: "instrument-no-event" },
+      ],
+    });
+    assertCounts(
+      marketCounts(db),
+      {
+        instruments: 1,
+        quotes: 1,
+        quoteLinks: 1,
+        hasLegLinks: 0,
+        offeredOnLinks: 0,
+        listsLinks: 1,
+        ingestEvents: 2,
+      },
+      "null market-event graph",
+    );
+    console.log("null_event_receipt_lists_then_quotes=true");
+  } finally {
+    closeKernel(db);
   }
 }
 
@@ -709,6 +1050,25 @@ function readAndLinkProof(db: KernelDb, batch: HappyBatch): void {
     );
   }
 
+  for (const instrument of batch.instruments) {
+    const lists = kernel.getLinks(db, instrument.id, { kind: "lists" });
+    assert(lists.length === 1, `${instrument.id} must have exactly one lists link`);
+    assert(
+      lists[0]?.from_id === batch.venue_id && lists[0]?.to_id === instrument.id,
+      `${instrument.id} lists link endpoints are wrong`,
+    );
+    const offered = kernel.getLinks(db, instrument.id, { kind: "offered_on" });
+    if (instrument.market_event_id === null) {
+      assert(offered.length === 0, `${instrument.id} must not have an offered_on link`);
+    } else {
+      assert(offered.length === 1, `${instrument.id} must have exactly one offered_on link`);
+      assert(
+        offered[0]?.from_id === instrument.id && offered[0]?.to_id === instrument.market_event_id,
+        `${instrument.id} offered_on link endpoints are wrong`,
+      );
+    }
+  }
+
   execute(
     db,
     "create_ticket",
@@ -731,13 +1091,20 @@ function readAndLinkProof(db: KernelDb, batch: HappyBatch): void {
     hasLeg[0]?.from_id === "ticket-has-leg-proof" && hasLeg[0]?.to_id === "instrument-main",
     "has_leg endpoints are wrong",
   );
-  assert(count(db, "links", " WHERE kind = ?", ["offered_on"]) === 0, "offered_on was manufactured");
-  assert(count(db, "links", " WHERE kind = ?", ["lists"]) === 0, "lists was manufactured");
+  assert(
+    count(db, "links", " WHERE kind = ?", ["lists"]) === batch.instruments.length,
+    "lists link count does not match instruments",
+  );
+  assert(
+    count(db, "links", " WHERE kind = ?", ["offered_on"]) ===
+      batch.instruments.filter((row) => row.market_event_id !== null).length,
+    "offered_on link count does not match declared events",
+  );
 }
 
 class InjectedFinalRowError extends Error {
   constructor() {
-    super("market-ingest gate injected failure on final quote insert");
+    super("market-ingest gate injected failure on final offered_on link insert");
     this.name = "InjectedFinalRowError";
   }
 }
@@ -747,7 +1114,10 @@ class InjectedFinalRowError extends Error {
  * If execute() ever loses its one outer transaction, this leaves the first
  * instrument behind and the count assertion below turns red.
  */
-function failOnQuoteInsert(base: KernelDb, quoteId: string): KernelDb {
+function failOnFinalOfferedOnInsert(
+  base: KernelDb,
+  probe: { instrumentRow: boolean; instrumentEvent: boolean; listsLink: boolean; reached: boolean },
+): KernelDb {
   return {
     exec: (sql) => base.exec(sql),
     transaction<T>(fn: () => T): () => T {
@@ -759,7 +1129,23 @@ function failOnQuoteInsert(base: KernelDb, quoteId: string): KernelDb {
         get: (...params: unknown[]) => statement.get(...params),
         all: (...params: unknown[]) => statement.all(...params),
         run: (...params: unknown[]) => {
-          if (/INSERT\s+INTO\s+quote\b/i.test(sql) && params[0] === quoteId) {
+          if (/INSERT\s+INTO\s+instrument\b/i.test(sql)) {
+            probe.instrumentRow = true;
+          }
+          if (/INSERT\s+INTO\s+events\b/i.test(sql) && params[1] === "instrument.ingested") {
+            probe.instrumentEvent = true;
+          }
+          if (/INSERT\s+INTO\s+links\b/i.test(sql) && params[1] === "lists") {
+            probe.listsLink = true;
+          }
+          if (
+            /INSERT\s+INTO\s+links\b/i.test(sql) &&
+            params[1] === "offered_on" &&
+            probe.instrumentRow &&
+            probe.instrumentEvent &&
+            probe.listsLink
+          ) {
+            probe.reached = true;
             throw new InjectedFinalRowError();
           }
           return statement.run(...params);
@@ -774,6 +1160,7 @@ function atomicIngestProof(): void {
   const db = openKernel(":memory:");
   try {
     const source = publishSource(db, "primary");
+    registerMarketContext(db, source);
     strictRuntimeRejections(db, source);
 
     const empty = marketCounts(db);
@@ -785,9 +1172,11 @@ function atomicIngestProof(): void {
           {
             source_artifact_id: source,
             observed_at: "2026-07-30T12:00:00.000Z",
+            venue_id: "venue-bovada",
             instruments: [
               {
                 id: "duplicate-id",
+                market_event_id: "event-football-1",
                 kind: "moneyline",
                 params: {},
                 sides: ["a", "b"],
@@ -819,9 +1208,11 @@ function atomicIngestProof(): void {
           {
             source_artifact_id: "missing-source-artifact",
             observed_at: "2026-07-30T12:00:00.000Z",
+            venue_id: "venue-bovada",
             instruments: [
               {
                 id: "missing-source-row",
+                market_event_id: "event-football-1",
                 kind: "moneyline",
                 params: {},
                 sides: ["a", "b"],
@@ -851,16 +1242,65 @@ function atomicIngestProof(): void {
       quotes: 2,
       quoteLinks: 2,
       hasLegLinks: 0,
-      offeredOnLinks: 0,
-      listsLinks: 0,
+      offeredOnLinks: 2,
+      listsLinks: 2,
       ingestEvents: 4,
     };
     assertCounts(marketCounts(db), afterHappy, "happy batch");
     assertIngestEvents(db, batch);
 
+    for (const [label, mutate] of [
+      [
+        "duplicate lists edge",
+        () =>
+          db
+            .query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, ?, ?, ?, ?)")
+            .run("duplicate-lists", "lists", "venue-bovada", "instrument-main", "2026-07-30T12:00:00.000Z"),
+      ],
+      [
+        "missing lists edge",
+        () => db.query("DELETE FROM links WHERE kind = 'lists' AND from_id = 'venue-bovada' AND to_id = 'instrument-main'").run(),
+      ],
+      [
+        "wrong lists edge",
+        () => db.query("UPDATE links SET from_id = 'wrong-venue' WHERE kind = 'lists' AND to_id = 'instrument-main'").run(),
+      ],
+      [
+        "duplicate offered_on edge",
+        () =>
+          db
+            .query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, ?, ?, ?, ?)")
+            .run("duplicate-offered", "offered_on", "instrument-main", "event-football-1", "2026-07-30T12:00:00.000Z"),
+      ],
+      [
+        "missing offered_on edge",
+        () => db.query("DELETE FROM links WHERE kind = 'offered_on' AND from_id = 'instrument-main' AND to_id = 'event-football-1'").run(),
+      ],
+      [
+        "wrong offered_on edge",
+        () => db.query("UPDATE links SET to_id = 'wrong-event' WHERE kind = 'offered_on' AND from_id = 'instrument-main'").run(),
+      ],
+    ] as const) {
+      db.exec("SAVEPOINT market_context_edge_bait;");
+      try {
+        mutate();
+        expectThrow(
+          () => execute(db, INGEST_ACTION, batch as unknown as JsonRecord, TRACE),
+          label,
+          "MarketIngestConflictError",
+        );
+      } finally {
+        db.exec("ROLLBACK TO market_context_edge_bait;");
+        db.exec("RELEASE market_context_edge_bait;");
+      }
+      assertCounts(marketCounts(db), afterHappy, `${label} restore`);
+    }
+
     const reordered: HappyBatch = {
       ...batch,
       instruments: batch.instruments.map((row) => ({
+        id: row.id,
+        market_event_id: row.market_event_id,
         correlation_group: row.correlation_group,
         sides: row.sides,
         params:
@@ -868,7 +1308,6 @@ function atomicIngestProof(): void {
             ? { period: "full", provider: { market_id: 17, competition: "UFC" } }
             : { nested_open_field: { model: "v1" }, method: "submission" },
         kind: row.kind,
-        id: row.id,
       })),
       quotes: batch.quotes.map((row) => ({
         coverage:
@@ -984,9 +1423,11 @@ function atomicIngestProof(): void {
           {
             source_artifact_id: source,
             observed_at: "2026-07-30T13:00:00.000Z",
+            venue_id: "venue-bovada",
             instruments: [
               {
                 id: "poison-first-valid",
+                market_event_id: "event-football-1",
                 kind: "moneyline",
                 params: {},
                 sides: ["left", "right"],
@@ -1015,7 +1456,8 @@ function atomicIngestProof(): void {
     );
 
     const injectedBefore = marketCounts(db);
-    const injectedDb = failOnQuoteInsert(db, "fault-last-quote");
+    const probe = { instrumentRow: false, instrumentEvent: false, listsLink: false, reached: false };
+    const injectedDb = failOnFinalOfferedOnInsert(db, probe);
     expectThrow(
       () =>
         execute(
@@ -1024,9 +1466,11 @@ function atomicIngestProof(): void {
           {
             source_artifact_id: source,
             observed_at: "2026-07-30T13:10:00.000Z",
+            venue_id: "venue-bovada",
             instruments: [
               {
                 id: "fault-first-instrument",
+                market_event_id: "event-football-1",
                 kind: "moneyline",
                 params: {},
                 sides: ["left", "right"],
@@ -1045,8 +1489,16 @@ function atomicIngestProof(): void {
           },
           { ...TRACE, span_id: "fault-span" },
         ),
-      "injected final-row storage fault",
+      "injected final offered_on storage fault",
       "InjectedFinalRowError",
+    );
+    assert(
+      probe.reached,
+      "injected final offered_on failure was not reached after instrument row/event/lists",
+    );
+    assert(
+      probe.instrumentRow && probe.instrumentEvent && probe.listsLink,
+      "injected offered_on preconditions were not executed",
     );
     assertCounts(marketCounts(db), injectedBefore, "outer transaction storage-fault rollback");
     assert(
@@ -1064,23 +1516,42 @@ function atomicIngestProof(): void {
 }
 
 async function packagedAuthorityProof(): Promise<void> {
-  console.log("\n=== D2 packaged 0002 authority hook ===");
+  console.log("\n=== D3 packaged 0002 + 0003 authority hooks ===");
   const inspectorSource = readFileSync(PACKAGE_INSPECTOR, "utf8");
-  const packagedPath =
+  const packagedIngestPath =
     "node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql";
+  const packagedContextPath =
+    "node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql";
   assert(
     inspectorSource.includes("QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE"),
     "package inspector lacks the named 0002 authority",
   );
-  assert(inspectorSource.includes(packagedPath), "package inspector lacks exact 0002 ASAR path");
+  assert(
+    inspectorSource.includes(packagedIngestPath),
+    "package inspector lacks exact 0002 ASAR path",
+  );
   assert(
     inspectorSource.includes("removeMarketIngestUpgradeFromAsar"),
     "package inspector lacks the 0002 removal control hook",
   );
+  assert(
+    inspectorSource.includes("QF_KERNEL_SCHEMA_MARKET_CONTEXT_UPGRADE"),
+    "package inspector lacks the named 0003 authority",
+  );
+  assert(
+    inspectorSource.includes(packagedContextPath),
+    "package inspector lacks exact 0003 ASAR path",
+  );
+  assert(
+    inspectorSource.includes("removeMarketContextUpgradeFromAsar"),
+    "package inspector lacks the 0003 removal control hook",
+  );
 
   const releaseRunId = process.env.QF_RELEASE_RUN_ID?.trim();
   if (!releaseRunId) {
-    console.log(`packaged_0002_hook=${packagedPath} real_package=deferred_to_release_verifier`);
+    console.log(
+      `packaged_0002_hook=${packagedIngestPath} packaged_0003_hook=${packagedContextPath} real_package=deferred_to_release_verifier`,
+    );
     return;
   }
 
@@ -1099,16 +1570,34 @@ async function packagedAuthorityProof(): Promise<void> {
     loadLinuxFileSets(collabRoot),
   );
   assert(inspected.ok, `release package inspection failed: ${inspected.ok ? "" : inspected.reason}`);
-  console.log(`real_packaged_0002=${packagedPath} checked=true`);
+  console.log(
+    `real_packaged_0002=${packagedIngestPath} real_packaged_0003=${packagedContextPath} checked=true`,
+  );
+}
+
+async function mcpBoundaryProof(): Promise<void> {
+  console.log("\n=== D4 MCP hidden context action boundary ===");
+  const child = Bun.spawn(["bun", "src/gates/tool-discovery.ts"], {
+    cwd: join(REPO, "tools/qf-read-tools"),
+    stdout: "inherit",
+    stderr: "inherit",
+    env: { ...process.env, QF_CONTEXT_MCP_BOUNDARY_ONLY: "1" },
+  });
+  const code = await child.exited;
+  assert(code === 0, `direct MCP hidden context action proof exited ${code}`);
+  console.log("mcp_context_actions_unlisted_and_not_found=true");
 }
 
 async function main(): Promise<void> {
   commandInventoryProof();
   generatedSurfaceProof();
+  contextProof();
   upgradeProof();
+  nullEventReceiptProof();
   atomicIngestProof();
   await packagedAuthorityProof();
-  console.log("\nPASS market-ingest");
+  await mcpBoundaryProof();
+  console.log("\nPASS market-context");
 }
 
 await main();

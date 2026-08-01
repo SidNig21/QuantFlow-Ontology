@@ -8,13 +8,23 @@ export type LinkSpec = {
   to_id?: string;
 };
 
+export type CreationEnvelopePresence = {
+  links: boolean;
+  bytes: boolean;
+};
+
 /** Strip kernel-only envelope fields (`links`, `bytes`) before action-field validation. */
 export function extractCreationEnvelope(input: Record<string, unknown>): {
   body: Record<string, unknown>;
   links: LinkSpec[];
   bytes?: Uint8Array;
+  present: CreationEnvelopePresence;
 } {
   const { links, bytes, ...body } = input;
+  const present: CreationEnvelopePresence = {
+    links: Object.prototype.hasOwnProperty.call(input, "links"),
+    bytes: Object.prototype.hasOwnProperty.call(input, "bytes"),
+  };
   let extractedBytes: Uint8Array | undefined;
   if (bytes !== undefined) {
     if (!(bytes instanceof Uint8Array)) {
@@ -23,7 +33,7 @@ export function extractCreationEnvelope(input: Record<string, unknown>): {
     extractedBytes = bytes;
   }
   if (links === undefined) {
-    return { body, links: [], bytes: extractedBytes };
+    return { body, links: [], bytes: extractedBytes, present };
   }
   if (!Array.isArray(links)) {
     throw new KernelError('Optional "links" must be an array of { kind, from_id?, to_id? }');
@@ -43,7 +53,7 @@ export function extractCreationEnvelope(input: Record<string, unknown>): {
       to_id: typeof row.to_id === "string" ? row.to_id : undefined,
     });
   }
-  return { body, links: specs, bytes: extractedBytes };
+  return { body, links: specs, bytes: extractedBytes, present };
 }
 
 /** @deprecated Use extractCreationEnvelope — kept for callers that only need links. */
