@@ -2,11 +2,12 @@
 
 > **You are the architect/verifier.** This file is your complete cold start. Read it, then `PROTOCOL.md`, then the order you are verifying. You need no chat history — if something matters and isn't in the repo, it doesn't exist (`PROTOCOL.md`, shared-truth rule).
 
-**Door check 2026-07-30 (WO-N1):** the authority list below is current; its branch-diff,
+**Door check 2026-07-31 (WO-107b):** the authority list below is current; its branch-diff,
 fresh-worktree, and canonical `bun qa/verify-release.ts` commands resolve against live repository
-surfaces. The canonical command includes the real unsigned Linux package stage; WO-N1 independently
-proved shipped QuantFlow identity and retry-safe app/browser/workspace migration. The current order
-is WO-107b, the atomic market-ingest mechanism that precedes real Bovada data.
+surfaces. The canonical command includes the real unsigned Linux package stage; WO-107b independently
+proved atomic market ingest, exact historical upgrades, byte-identical `0002` in `app.asar`, and an
+unchanged 92-tool agent surface. The current order is WO-107c, trusted market context and complete
+market links before real Bovada football data.
 
 ## Read in this order
 

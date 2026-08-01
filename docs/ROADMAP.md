@@ -78,6 +78,12 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 > QuantFlow, targets `SidNig21/QuantFlow-Ontology`, and migrates legacy app, Electron, and workspace
 > state through one retry-safe boundary without copying Kernel/artifact/process state. Debt #30 is
 > closed. The doctrine ladder resumes at WO-107b.
+>
+> **Status rotation — 2026-07-31, WO-107b merge:** WO-107b is CLOSED. One hidden, atomic,
+> replay-safe Kernel command now owns instrument/quote ingestion and `quotes`; generated `0002`
+> preserves every supported founder database and ships in the real Linux ASAR. The served Dock
+> tool set remains byte-identical at 92. WO-107c is current to establish trusted venue/event
+> context and finish `lists`/`offered_on` before live Bovada football data is allowed.
 
 | # | Debt | Lands in |
 |---|---|---|
@@ -180,7 +186,7 @@ tests. D3/D4 were confirmed by other measurements instead.*
 
 ### P3 · The first market plane — week ~4 · **= SCOPES P4 ("Real data")**
 
-**One pipeline, one market.** Founder picks the market on the day (odds or perps — the ontology doesn't care). One Bun cron script ingests `Instrument / Quote / MarketEvent` rows **through Kernel commands** with an ingest trace. Codegen emits no write-actions for `pipelineFed` types (gate carried from the market-plane reframe rung above). **WO-103b ruling:** ingest is a bulk command on `execute()` (`SCOPES.md` WO-107b contract); it unblocks link kinds `quotes`, `has_leg`, `offered_on`, and `lists` from the `pipelineFed` blocker — `offered_on` and `lists` still need `market_event` / `venue` creation verbs after ingest lands.
+**One pipeline, one market.** Bovada football is fixed by doctrine A7 and the founder's 2026-07-31 narrowing. One bounded scheduled runner captures source evidence, then loads market truth **through Kernel commands** with an ingest trace. Codegen emits no per-type/manual agent write actions for `pipelineFed` types. **WO-107b shipped:** one hidden bulk command owns `Instrument / Quote` plus `quotes`. **WO-107c precedes the network adapter:** trusted replay-safe `Venue / MarketEvent` context plus atomic `lists / offered_on` completes the graph without opening a second agent write door.
 → **Gate:** every market row's provenance recomputes to an ingest event; a seat answers a cross-object question about **real** data through generated tools only.
 
 **The second market, structurally different.** A game line *and* a perp (or equivalent pair) load into the same four types.

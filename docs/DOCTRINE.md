@@ -339,10 +339,11 @@ Same machinery both directions (`Hypothesis → Dataset → Run → Artifact →
 
 Like A6, this is founder-stated and needs no ratification; it *is* the ratification.
 
-**1 · Bovada sports betting is the first and only market through the loop.** Crypto/HyperLiquid is
-explicitly a later market, not a parallel one. In the founder's words: *prove the ontology system
-works, then pivot to other markets.* The market pick that `ROADMAP.md` and `SCOPES WO-107` left
-"to the founder on the day" is hereby made.
+**1 · Bovada football is the first and only market slice through the loop.** Other Bovada sports
+remain later slices; Crypto/HyperLiquid is explicitly a later market, not a parallel one. In the
+founder's words: *prove the ontology system works, then pivot to other markets.* The market pick
+that `ROADMAP.md` and `SCOPES WO-107` left "to the founder on the day" is hereby narrowed by the
+founder on 2026-07-31 to football first.
 
 **This is a sequencing decision and nothing more.** It does not touch Part IV's market-agnostic
 ontology shape, which is a claim about *types* — markets are rows, never types — and was never a

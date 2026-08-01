@@ -715,18 +715,35 @@ Two tools for one job is the second-truth-store rule wearing a different hat.
 
 ### WO-107 · One pipeline, one market
 
-**Objective.** Real instruments, quotes and market events land in the Kernel through commands,
-carrying an ingest trace. The canvas stops being an empty engine.
+**Objective.** Real Bovada football instruments, quotes and market events land in the Kernel
+through commands, carrying an ingest trace. The canvas stops being an empty engine.
 
-**Depends on.** WO-102 (vocabulary), WO-103 (writes).
+**Depends on.** WO-102 (vocabulary), WO-103 (writes), WO-107b (instrument/quote ingest), and
+WO-107c (venue/event context plus complete market links).
 
-**In.** One venue, one market, one scheduled ingest, every row traceable to an ingest event.
+**In.** Bovada, football, one scheduled ingest, every row traceable to an ingest event.
 
 **Out.** A second market (WO-108) · strategies or signals over the data · anything that resembles
 placing a stake, at any rung, ever.
 
 **Gate.** Every row traces back to an ingest event, and a seat answers a question about **real**
 data through generated tools.
+
+### WO-107c · Market context completes the ingest graph
+
+**Objective.** Establish replay-safe venue and scheduled-event context through trusted Kernel
+commands, then derive `lists` and optional `offered_on` inside the existing atomic market batch.
+
+**Depends on.** WO-107b.
+
+**In.** Trusted-only context actions · exact replay/conflict · forced scheduled event creation ·
+`venue → instrument` and `instrument → market_event` edges · generated `0003` and full predecessor
+chain · real package closure.
+
+**Out.** Network/vendor parsing, scheduling, live seats, reconciliation, and any bet execution.
+
+**Gate.** The complete context/market graph is readable through generated tools; exact retries add
+nothing; a poisoned final context edge rolls back every row/link/event; served MCP tools stay 92.
 
 ### WO-108 · The second market
 
@@ -791,6 +808,14 @@ happened is not evidence; Kernel rows and edges are.
 > proof's own code records `"Kernel: no create_task/assigned_to/delegates_to; bus=a2a-core +
 > publish_artifact + inject adapter"` (`species/hermes/a2a-4tile-smoke.ts:388`). WO-103 makes the
 > edges writable; this rung makes them the recorded loop.
+>
+> **Meaning of plug-and-play, founder-sharpened 2026-07-31:** the second species may add its own
+> package manifest, executable/argv adapter metadata, prompt/profile, and grants under `species/**`;
+> it may not add a CLI-name branch to Dock, PTY host, admission, cleanup, Kernel identity, MCP, or
+> peer-bus core. Once installed, its Kernel definition appears in the Dock Catalog without a
+> renderer rebuild. The acceptance uses an operator-installed second CLI without inspecting or
+> copying its credentials. A fake executable remains the deterministic failure/control specimen;
+> the live acceptance proves the actual heterogeneous seat.
 >
 > **Cable principle — founder leaning, 2026-07-25 (exploratory, ratify at the visual pass):**
 > cables are **strictly cosmetic in storage, semantic only as gesture**. *Seeing* a cable =
