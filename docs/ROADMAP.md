@@ -84,6 +84,12 @@ Tracked so it is not rediscovered. None blocks the ladder; each lands by order w
 > preserves every supported founder database and ships in the real Linux ASAR. The served Dock
 > tool set remains byte-identical at 92. WO-107c is current to establish trusted venue/event
 > context and finish `lists`/`offered_on` before live Bovada football data is allowed.
+>
+> **Status rotation — 2026-08-01, WO-107c merge:** WO-107c is CLOSED with the bounded CI3–CI5
+> release repairs. Trusted venue/event commands, complete atomic market links, generated/packaged
+> `0003`, and the unchanged 92-tool served plane passed the cold Linux verifier and independent
+> falsifiers. WO-107 is current: one fixed-origin Bovada NFL capture through the shipped app, one
+> bounded schedule, and one real Hermes seat following Kernel lineage to immutable price bytes.
 
 | # | Debt | Lands in |
 |---|---|---|

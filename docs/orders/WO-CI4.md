@@ -1,6 +1,6 @@
 # WO-CI4 — Runtime ownership ignores foreign listeners, not owned ones
 
-status: **independently verified on combined candidate — pending merge**
+status: **done — independently verified + merged 2026-08-01**
 assignee: builder
 depends: WO-CI3 candidate `196b0ec`
 blocks: WO-CI3 verification · WO-107c verification

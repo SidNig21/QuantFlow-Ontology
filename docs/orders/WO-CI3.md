@@ -1,6 +1,6 @@
 # WO-CI3 — Keep the prior-schema release fixture inside its deadline
 
-status: **independently verified on combined candidate — pending merge**
+status: **done — independently verified + merged 2026-08-01**
 assignee: builder
 depends: WO-107b
 blocks: WO-107c verification

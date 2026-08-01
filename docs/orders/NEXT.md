@@ -1,41 +1,40 @@
-# NEXT — WO-107c verified; founder merge decision pending
+# NEXT — WO-107: one real Bovada football capture
 
 > **Builder: this file is your complete entry point.** It always points at the single unblocked
 > order. Do not choose another order or proceed past it.
 > **Founder:** give a fresh builder this file: *“Follow `docs/orders/NEXT.md`.”*
 
-## Current order: **[WO-107c](WO-107c.md) — market context completes the ingest graph**
+## Current order: **[WO-107](WO-107.md) — one real Bovada football capture**
 
-WO-107c's feature implementation and the bounded CI3–CI5 repairs passed the cold canonical shipped-
-Linux verifier and independent falsifiers. The verified branch is ready for the founder's explicit
-merge decision; do not start product implementation from unmerged history.
+WO-107c and its bounded CI3–CI5 repairs are independently verified and landed. The Kernel now has
+the trusted, replay-safe venue/event context and atomic market links required before vendor data.
 
-**In plain terms:** QuantFlow can load prices safely and connect them to Bovada football context, and
-that foundation has passed the packaged-app proof. The only remaining step on this rung is the
-founder's merge decision; the next build is the narrow live Bovada football adapter.
+**In plain terms:** connect the shipped Linux app to one public Bovada NFL snapshot, preserve the
+source, and prove a real Hermes seat can follow the graph to the current prices.
 
-## Closeout priority
+## Build priority
 
-1. Preserve candidate `0924f50` and canonical run ID `304169e3-4e27-4c06-8fdd-cbc11d202673`.
-2. Keep the R2 verification receipt and public README synchronized with the exact verified state.
-3. Merge only after explicit founder approval.
-4. In the same landed state, rotate authority to the measured WO-107 order: real public Bovada
-   football capture, bounded scheduling, and one generated-tools seat question.
+1. Implement the strict fixed-origin parser and source-first Artifact capture.
+2. Classify existing Kernel truth before choosing context, instrument, or quote-only commands.
+3. Wire the fixed operator trigger through packaged `qf-canvas` into the existing Electron main
+   process—no new runtime, socket, or sidecar.
+4. Prove the deterministic gate, one finished-package live capture, and the real Hermes seat question.
 
 ## Hard boundaries
 
 - Never place, execute, or automate a bet or trade; never handle credentials.
-- No real Bovada football/network fetch, parser fixture, timer/cron, live model, or Dock demo yet.
-- No new CI repair, canonical retry, timeout increase, or temp-directory workaround.
-- Do not merge or touch `main` without explicit founder approval.
+- No caller-controlled URL/header, cookie, login, browser profile, proxy, CAPTCHA bypass, or third-
+  party odds service.
+- No second market/event/venue, recurring poller, scheduler sidecar, schema change, or new dependency.
+- No agent-facing ingest/context action and no price smuggling into `quote.coverage`.
+- Work in an order branch/worktree; the builder does not verify or merge itself.
 
-## Behind WO-107c
+## Behind WO-107
 
-WO-107 connects one public unauthenticated Bovada football capture to this now-complete graph, adds the
-bounded schedule, and proves a real seat can answer a cross-object question. WO-109 then runs the
-collaborative lower loop over real Kernel evidence.
+WO-109 runs the collaborative lower loop over this real evidence. WO-110 adds the Critic and
+mechanical report gate. WO-111 proves the founder's one-shot daily-driver workflow.
 
 ---
 
-*The order log in [README.md](README.md) wins on status. The verifier rotates both this builder door
-and [VERIFYING.md](VERIFYING.md) in the same passing merge.*
+*The order log in [README.md](README.md) wins on status. A verifier rotates both this builder door
+and [VERIFYING.md](VERIFYING.md) only after the order passes.*
