@@ -60,6 +60,14 @@ function rowDigest(value: JsonRecord): string {
   return contentHash(new TextEncoder().encode(stableCanonical(value)));
 }
 
+function isValidCreatedAt(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.trim().length > 0 &&
+    Number.isFinite(Date.parse(value))
+  );
+}
+
 function requiredString(input: JsonRecord, field: string): string {
   const value = input[field];
   if (typeof value !== "string" || value.length === 0) {
@@ -118,6 +126,13 @@ function parsePayload(
 function assertReplay(
   opts: ContextCreation & { eventType: string; existing: JsonRecord },
 ): void {
+  if (!isValidCreatedAt(opts.existing.created_at)) {
+    throw new MarketContextConflictError(
+      opts.object_type,
+      opts.object_id,
+      "stored context row created_at is missing or invalid",
+    );
+  }
   const events = contextEvents(opts.db, opts.object_type, opts.object_id);
   if (events.length !== 1) {
     throw new MarketContextConflictError(
@@ -127,7 +142,7 @@ function assertReplay(
     );
   }
   const event = events[0]!;
-  if (event.type !== opts.eventType || event.created_at.length === 0) {
+  if (event.type !== opts.eventType || !isValidCreatedAt(event.created_at)) {
     throw new MarketContextConflictError(
       opts.object_type,
       opts.object_id,

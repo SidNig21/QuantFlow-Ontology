@@ -348,6 +348,41 @@ function contextProof(): void {
       "context exact replay appended a provenance event",
     );
 
+    for (const [table, command, input, objectType, objectId] of [
+      ["venue", "register_venue", venueInput, "venue", "venue-proof"],
+      ["market_event", "schedule_market_event", eventInput, "market_event", "event-proof"],
+    ] as const) {
+      const originalCreatedAt = (
+        db.query(`SELECT created_at FROM ${table} WHERE id = ?`).get(objectId) as { created_at: string }
+      ).created_at;
+      assert(
+        typeof originalCreatedAt === "string" && Number.isFinite(Date.parse(originalCreatedAt)),
+        `${objectType} healthy created_at is not valid before corruption control`,
+      );
+      db.query(`UPDATE ${table} SET created_at = '' WHERE id = ?`).run(objectId);
+      const beforeCorruptReplay = {
+        rows: count(db, table),
+        events: count(db, "events"),
+      };
+      const corruptError = expectThrow(
+        () => execute(db, command, input, TRACE),
+        `${objectType} blank created_at replay`,
+        "MarketContextConflictError",
+      ) as { object_type?: unknown; object_id?: unknown; reason?: unknown };
+      assert(corruptError.object_type === objectType, `${objectType} created_at conflict object_type mismatch`);
+      assert(corruptError.object_id === objectId, `${objectType} created_at conflict object_id mismatch`);
+      assert(
+        corruptError.reason === "stored context row created_at is missing or invalid",
+        `${objectType} created_at conflict reason mismatch`,
+      );
+      assert(
+        count(db, table) === beforeCorruptReplay.rows && count(db, "events") === beforeCorruptReplay.events,
+        `${objectType} blank created_at replay wrote rows or events`,
+      );
+      db.query(`UPDATE ${table} SET created_at = ? WHERE id = ?`).run(originalCreatedAt, objectId);
+    }
+    console.log("context_created_at_replay_controls=true");
+
     const conflictCounts = marketCounts(db);
     const venueConflict = expectThrow(
       () => execute(db, "register_venue", { ...venueInput, name: "Renamed Bovada" }, TRACE),

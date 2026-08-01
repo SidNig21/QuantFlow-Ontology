@@ -102,6 +102,49 @@ describe("WO-107c trusted market context", () => {
     }).toEqual(before);
   });
 
+  test("rejects blank context row created_at on replay without writes", () => {
+    db = openKernel(":memory:");
+    const source = publishSource("context-created-at-source");
+    execute(db, "register_venue", venueInput(source), TRACE);
+    execute(db, "schedule_market_event", eventInput(source), TRACE);
+
+    for (const [table, command, input, object_type, object_id] of [
+      ["venue", "register_venue", venueInput(source), "venue", "venue-bovada"],
+      ["market_event", "schedule_market_event", eventInput(source), "market_event", "event-football-1"],
+    ] as const) {
+      const originalCreatedAt = (
+        db.query(`SELECT created_at FROM ${table} WHERE id = ?`).get(object_id) as { created_at: string }
+      ).created_at;
+      db.query(`UPDATE ${table} SET created_at = '' WHERE id = ?`).run(object_id);
+      const before = {
+        rows: (db.query(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n,
+        events: (db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n,
+        created_at: (db.query(`SELECT created_at FROM ${table} WHERE id = ?`).get(object_id) as { created_at: string }).created_at,
+      };
+      let caught: unknown;
+      try {
+        execute(db, command, input, TRACE);
+      } catch (error) {
+        caught = error;
+      }
+      expect(caught).toBeInstanceOf(MarketContextConflictError);
+      expect(caught).toMatchObject({
+        object_type,
+        object_id,
+        reason: "stored context row created_at is missing or invalid",
+      });
+      expect({
+        rows: (db.query(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n,
+        events: (db.query("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n,
+        created_at: (db.query(`SELECT created_at FROM ${table} WHERE id = ?`).get(object_id) as { created_at: string }).created_at,
+      }).toEqual(before);
+      db.query(`UPDATE ${table} SET created_at = ? WHERE id = ?`).run(
+        originalCreatedAt,
+        object_id,
+      );
+    }
+  });
+
   test("conflicts are typed and context envelopes reject before any write", () => {
     db = openKernel(":memory:");
     const source = publishSource("context-conflict-source");
