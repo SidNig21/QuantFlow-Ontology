@@ -18,26 +18,37 @@ import {
 } from "@agentclientprotocol/sdk";
 import { stepCountIs, tool, ToolLoopAgent } from "ai";
 import { MockLanguageModelV3, simulateReadableStream } from "ai/test";
+import { createServer, type Server } from "node:net";
 import { z } from "zod";
 
 type SessionState = {
   sessionId: string;
   pending: AbortController | null;
-  proofListener?: Bun.TCPSocketListener<undefined>;
+  proofListener?: Server;
 };
 
 const sessions = new Map<string, SessionState>();
 
-function openProofListener(): Bun.TCPSocketListener<undefined> {
-  return Bun.listen({
-    hostname: "127.0.0.1",
-    port: 0,
-    socket: { data() {}, open() {}, close() {} },
+async function openProofListener(): Promise<Server> {
+  const server = createServer();
+  await new Promise<void>((resolve, reject) => {
+    const onError = (error: Error) => {
+      server.off("listening", onListening);
+      reject(error);
+    };
+    const onListening = () => {
+      server.off("error", onError);
+      resolve();
+    };
+    server.once("error", onError);
+    server.once("listening", onListening);
+    server.listen({ host: "127.0.0.1", port: 0 });
   });
+  return server;
 }
 
 function closeProofListeners(): void {
-  for (const session of sessions.values()) session.proofListener?.stop();
+  for (const session of sessions.values()) session.proofListener?.close();
 }
 
 function buildMockModel(slowChunkMs: number) {
@@ -116,7 +127,7 @@ class ToolLoopAcpAgent implements Agent {
   async newSession(_params: NewSessionRequest) {
     const sessionId = crypto.randomUUID();
     const proofListener =
-      process.env.QF_PROOF_OPEN_LISTENER === "1" ? openProofListener() : undefined;
+      process.env.QF_PROOF_OPEN_LISTENER === "1" ? await openProofListener() : undefined;
     sessions.set(sessionId, { sessionId, pending: null, proofListener });
     return { sessionId };
   }
