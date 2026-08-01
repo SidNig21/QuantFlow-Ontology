@@ -141,16 +141,10 @@ export async function runSocketDenialProof(shared: SharedOs): Promise<SocketDeni
 
   if (createdSessionId) {
     await shared.os.destroySession(createdSessionId);
-    rejection = new Error("P2 socket denial unexpectedly succeeded");
   }
 
   const sessionIdsAfter = registeredSessionIds(shared.os);
   const sessionCountAfter = sessionIdsAfter.length;
-  const rejectionMessage = rejection instanceof Error ? rejection.message : String(rejection);
-
-  if (!rejectionMessage.includes("maximum socket count reached")) {
-    throw new Error(`P2 socket denial rejected for the wrong reason: ${rejectionMessage}`);
-  }
   if (
     sessionCountAfter !== sessionCountBefore ||
     sessionIdsAfter.length !== sessionIdsBefore.length ||
@@ -159,6 +153,16 @@ export async function runSocketDenialProof(shared: SharedOs): Promise<SocketDeni
     throw new Error(
       `P2 socket denial left registered sessions: before=${sessionIdsBefore.join(",")} after=${sessionIdsAfter.join(",")}`,
     );
+  }
+
+  const rejectionMessage = createdSessionId
+    ? `P2 socket denial unexpectedly succeeded: before=${JSON.stringify(sessionIdsBefore)} after=${JSON.stringify(sessionIdsAfter)}`
+    : rejection instanceof Error
+      ? rejection.message
+      : String(rejection);
+
+  if (!rejectionMessage.includes("maximum socket count reached")) {
+    throw new Error(`P2 socket denial rejected for the wrong reason: ${rejectionMessage}`);
   }
 
   return {
