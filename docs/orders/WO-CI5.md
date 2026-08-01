@@ -1,6 +1,6 @@
 # WO-CI5 — Typecheck installs each dependency once
 
-status: **open — current release blocker**
+status: **target verified — canonical successor pending**
 assignee: builder
 depends: WO-CI4 candidate `8ef6d20`
 blocks: CI3/CI4 canonical PASS · WO-107c verification
