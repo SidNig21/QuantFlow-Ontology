@@ -27,6 +27,21 @@ import {
 } from "./config";
 import { registerIpcHandlers, setMainWindow } from "./ipc";
 import { registerCanvasRpc } from "./canvas-rpc";
+import {
+  runBovadaFootballCapture,
+  type BovadaKernelAccess,
+} from "qf-bovada-football";
+import {
+  registerBovadaCaptureRpc,
+  type BovadaCaptureRpcBinding,
+} from "./bovada-capture-rpc";
+import {
+  getArtifactRoot,
+  getKernelDb,
+  kernelExecute,
+  kernelGetLinks,
+  kernelGetObject,
+} from "./kernel";
 import { registerIntegrationsIpc } from "./integrations";
 import {
   registerMethod,
@@ -104,6 +119,7 @@ let mainWindow: BrowserWindow | null = null;
 let pendingFilePath: string | null = null;
 let config = loadConfig();
 let shuttingDown = false;
+let bovadaCaptureBinding: BovadaCaptureRpcBinding | null = null;
 
 // Apply saved theme preference (light/dark/system)
 const savedTheme = config.ui.theme;
@@ -755,6 +771,8 @@ function sendLoadingDone(): void {
 async function shutdownBackgroundServices(): Promise<void> {
   if (shuttingDown) return;
   shuttingDown = true;
+  bovadaCaptureBinding?.cancelOnAppShutdown();
+  bovadaCaptureBinding = null;
   pty.setShuttingDown(true);
   await pty.killAllAndWait();
   await pty.shutdownSidecarIfIdle();
@@ -894,6 +912,35 @@ app.whenReady().then(async () => {
   });
   registerMethod("workspace.getConfig", () => config, {
     description: "Return the current app configuration",
+  });
+  const bovadaKernel: BovadaKernelAccess = {
+    execute: (_db, command, input, trace) =>
+      kernelExecute(command, input, trace),
+    getObject: (_db, type, id) => kernelGetObject(type, id),
+    getLinks: (_db, id, options) => kernelGetLinks(id, options),
+  };
+  bovadaCaptureBinding = registerBovadaCaptureRpc(registerMethod, {
+    service: {
+      capture: async ({ signal }) => {
+        const receipt = await runBovadaFootballCapture({
+          db: getKernelDb(),
+          artifactRoot: getArtifactRoot(),
+          signal,
+          kernel: bovadaKernel,
+        });
+        const deduped = Object.values(receipt.outcomes).every(
+          (outcome) => outcome === "reused",
+        );
+        return {
+          status: deduped ? "deduped" : "captured",
+          artifactId: receipt.artifact.id,
+          contentHash: receipt.artifact.content_hash,
+          bytes: receipt.bytes,
+          eventId: receipt.selected.event_id,
+          marketId: receipt.selected.market_id,
+        };
+      },
+    },
   });
 
   try {

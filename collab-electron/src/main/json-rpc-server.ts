@@ -20,8 +20,14 @@ const BASE_DIR = QF_APP_ROOT;
 const SOCKET_PATH_FILE = join(BASE_DIR, "socket-path");
 const NODE_PATH_FILE = join(BASE_DIR, "node-path");
 
+export interface JsonRpcContext {
+  /** Aborts when the requesting socket closes or the RPC server shuts down. */
+  signal: AbortSignal;
+}
+
 type MethodHandler = (
   params: unknown,
+  context: JsonRpcContext,
 ) => unknown | Promise<unknown>;
 
 interface MethodEntry {
@@ -80,6 +86,7 @@ function makeErrorResponse(
 
 async function handleMessage(
   raw: string,
+  context: JsonRpcContext,
 ): Promise<JsonRpcResponse | null> {
   let parsed: unknown;
   try {
@@ -103,7 +110,7 @@ async function handleMessage(
   }
 
   try {
-    const result = await handler(parsed.params);
+    const result = await handler(parsed.params, context);
     return { jsonrpc: "2.0", id: parsed.id, result };
   } catch (err) {
     const message =
@@ -114,6 +121,8 @@ async function handleMessage(
 
 function handleConnection(socket: Socket): void {
   connections.add(socket);
+  const connectionAbort = new AbortController();
+  const context: JsonRpcContext = { signal: connectionAbort.signal };
   let buffer = "";
 
   socket.on("data", (chunk) => {
@@ -125,7 +134,7 @@ function handleConnection(socket: Socket): void {
       buffer = buffer.slice(newlineIdx + 1);
 
       if (line.length > 0) {
-        void handleMessage(line).then((response) => {
+        void handleMessage(line, context).then((response) => {
           if (response && !socket.destroyed) {
             socket.write(JSON.stringify(response) + "\n");
           }
@@ -137,10 +146,12 @@ function handleConnection(socket: Socket): void {
   });
 
   socket.on("close", () => {
+    connectionAbort.abort(new Error("JSON-RPC client disconnected"));
     connections.delete(socket);
   });
 
   socket.on("error", (err) => {
+    connectionAbort.abort(err);
     console.error("[json-rpc] Socket error:", err.message);
     connections.delete(socket);
   });

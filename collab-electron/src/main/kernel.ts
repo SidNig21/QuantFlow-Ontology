@@ -7,6 +7,7 @@ import { DatabaseSync } from "node:sqlite";
 import {
   attachKernel,
   execute,
+  getLinks,
   getObject,
   queryObjects,
   resolveArtifactRoot,
@@ -14,6 +15,8 @@ import {
   resolveSpeciesPackage as resolveSpeciesPackageRow,
   type ExecuteResultFor,
   type KernelDb,
+  type GetLinksOptions,
+  type LinkRow,
   type TraceContext,
 } from "qf-kernel/portable";
 import { QF_APP_DIR } from "./paths";
@@ -121,6 +124,14 @@ export function kernelGetObject(
   id: string,
 ): Record<string, unknown> | null {
   return getObject(getKernelDb(), type, id);
+}
+
+/** Read links touching one ontology object through the shared Kernel handle. */
+export function kernelGetLinks(
+  id: string,
+  options?: GetLinksOptions,
+): LinkRow[] {
+  return getLinks(getKernelDb(), id, options);
 }
 
 /** Resolve species name → package path against the open Kernel. */

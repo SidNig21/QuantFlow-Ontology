@@ -3,9 +3,14 @@ import { createConnection } from "node:net";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 
 const VERSION = "0.1.0";
 const GRID = 20;
+const BOVADA_CAPTURE_RPC_METHOD = "market.bovadaFootballCapture";
+const DEFAULT_RPC_TIMEOUT_MS = 10_000;
+const BOVADA_CAPTURE_ALLOWANCE_MS = 30_000;
+const MAX_BOVADA_SCHEDULE_AHEAD_MS = 24 * 60 * 60 * 1000;
 const QF_APP_ROOT = join(homedir(), ".quantflow", "app");
 const SOCKET_FILE = join(QF_APP_ROOT, "socket-path");
 
@@ -26,7 +31,7 @@ function readSocketPath() {
   return raw;
 }
 
-function rpcCall(method, params = {}) {
+function rpcCall(method, params = {}, timeoutMs = DEFAULT_RPC_TIMEOUT_MS) {
   return new Promise((res, rej) => {
     const socketPath = readSocketPath();
     const payload =
@@ -34,11 +39,20 @@ function rpcCall(method, params = {}) {
 
     const sock = createConnection(socketPath);
     let buf = "";
+    let settled = false;
+
+    const fail = (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      rej(error);
+    };
 
     const timer = setTimeout(() => {
+      settled = true;
       sock.destroy();
       rej(new Error("timeout"));
-    }, 10_000);
+    }, timeoutMs);
 
     sock.on("connect", () => sock.write(payload));
 
@@ -46,6 +60,7 @@ function rpcCall(method, params = {}) {
       buf += chunk.toString();
       const nl = buf.indexOf("\n");
       if (nl === -1) return;
+      settled = true;
       clearTimeout(timer);
       sock.destroy();
       let resp;
@@ -62,10 +77,8 @@ function rpcCall(method, params = {}) {
       }
     });
 
-    sock.on("error", (err) => {
-      clearTimeout(timer);
-      rej(err);
-    });
+    sock.on("error", fail);
+    sock.on("close", () => fail(new Error("QuantFlow RPC connection closed")));
   });
 }
 
@@ -250,6 +263,62 @@ async function cmdTerminalRead(args) {
   console.log(pretty(result));
 }
 
+// --- fixed Bovada operator command ---------------------------------------
+
+function isUtcTimestamp(value) {
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?Z$/.test(value)
+    && Number.isFinite(Date.parse(value));
+}
+
+function bovadaRpcTimeoutMs(at) {
+  const delay = Math.max(0, Date.parse(at) - Date.now());
+  return delay + BOVADA_CAPTURE_ALLOWANCE_MS;
+}
+
+async function cmdMarketBovadaFootball(args) {
+  const { params, timeoutMs } = parseMarketBovadaFootballArgs(args);
+
+  const result = await rpcCall(
+    BOVADA_CAPTURE_RPC_METHOD,
+    params,
+    timeoutMs,
+  );
+  console.log(pretty(result));
+}
+
+function parseMarketBovadaFootballArgs(args) {
+  if (args.length === 0) {
+    throw new Error("market bovada-football requires --once or --at <UTC timestamp>");
+  }
+
+  const mode = args.shift();
+  let params;
+  let timeoutMs = BOVADA_CAPTURE_ALLOWANCE_MS;
+  if (mode === "--once") {
+    if (args.length !== 0) {
+      throw new Error("market bovada-football --once takes no options");
+    }
+    params = { mode: "once" };
+  } else if (mode === "--at") {
+    if (args.length !== 1) {
+      throw new Error("market bovada-football --at requires one UTC timestamp");
+    }
+    const at = args[0];
+    if (typeof at !== "string" || !isUtcTimestamp(at)) {
+      throw new Error("market bovada-football --at must be an ISO-8601 UTC timestamp ending in Z");
+    }
+    if (Date.parse(at) - Date.now() > MAX_BOVADA_SCHEDULE_AHEAD_MS) {
+      throw new Error("market bovada-football --at may be no more than 24 hours ahead");
+    }
+    params = { mode: "at", at };
+    timeoutMs = bovadaRpcTimeoutMs(at);
+  } else {
+    throw new Error(`unknown market option: ${mode}`);
+  }
+
+  return { params, timeoutMs };
+}
+
 // --- browser subcommands --------------------------------------------------
 
 async function cmdBrowserNavigate(args) {
@@ -380,6 +449,8 @@ COMMANDS
   tile focus <id> [<id>...]          Bring tiles into view
   terminal write <id> <input>        Send input to a terminal tile
   terminal read <id> [--lines N]     Read output from a terminal tile
+  market bovada-football --once      Run one Bovada football capture
+  market bovada-football --at <UTC>  Schedule one capture within 24 hours
   browser navigate <id> <url>        Navigate browser tile to URL
   browser screenshot <id> [--out f]  Capture screenshot (base64 or file)
   browser snapshot <id>              Get DOM tree of browser tile
@@ -426,12 +497,16 @@ VERSION
 
 // --- main dispatch --------------------------------------------------------
 
-const argv = process.argv.slice(2);
-if (argv.length === 0) usage();
+const IS_MAIN = typeof process.argv[1] === "string" &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
-try {
-  const cmd = argv[0];
-  switch (cmd) {
+if (IS_MAIN) {
+  const argv = process.argv.slice(2);
+  if (argv.length === 0) usage();
+
+  try {
+    const cmd = argv[0];
+    switch (cmd) {
     case "help":
     case "--help":
     case "-h":
@@ -471,6 +546,18 @@ try {
       }
       break;
     }
+    case "market": {
+      if (argv.length < 2) {
+        die("market requires the bovada-football subcommand");
+      }
+      const sub = argv[1];
+      const rest = argv.slice(2);
+      if (sub !== "bovada-football") {
+        die(`unknown market subcommand: ${sub}`);
+      }
+      await cmdMarketBovadaFootball(rest);
+      break;
+    }
     case "browser": {
       if (argv.length < 2) {
         die("browser requires a subcommand (navigate, screenshot, snapshot, click, type, scroll, eval, wait, info)");
@@ -491,9 +578,12 @@ try {
       }
       break;
     }
-    default:
-      die(`unknown command: ${cmd} (try: qf-canvas --help)`);
+      default:
+        die(`unknown command: ${cmd} (try: qf-canvas --help)`);
+    }
+  } catch (err) {
+    die(err.message);
   }
-} catch (err) {
-  die(err.message);
 }
+
+export { BOVADA_CAPTURE_RPC_METHOD, parseMarketBovadaFootballArgs };

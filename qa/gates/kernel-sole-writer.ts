@@ -99,6 +99,9 @@ const OPEN_ALLOW = [
   "tools/qf-peer-bus/src/bus.ts",
   "tools/qf-peer-bus/src/harness.ts",
   "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
+  // WO-107: deterministic fixture suite/gate open only temporary Kernels.
+  "tools/qf-bovada-football/src/runner.test.ts",
+  "tools/qf-bovada-football/src/gate.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
   "species/hermes/a2a-4tile-smoke.ts",
@@ -129,6 +132,8 @@ const WRITE_ALLOW = [
   // CLI itself never writes.
   "tools/qf-vault-projection/src/gate.ts",
   "tools/qf-peer-bus/src/bus.ts",
+  // WO-107: the finite runner writes only through its injected execute boundary.
+  "tools/qf-bovada-football/src/runner.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
   "species/hermes/a2a-4tile-smoke.ts",
