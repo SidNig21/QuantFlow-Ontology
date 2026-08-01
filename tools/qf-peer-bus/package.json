@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "cd ../../packages/qf-kernel && bun install",
     "harness": "bun src/harness.ts",
     "typecheck": "tsc --noEmit",
     "setup-seats": "bun scripts/setup-founder-seats.ts",

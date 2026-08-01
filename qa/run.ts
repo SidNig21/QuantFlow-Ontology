@@ -7,19 +7,87 @@
  *   bun qa/run.ts --all
  */
 import { existsSync, readdirSync, readFileSync } from "fs";
-import { join } from "path";
+import { join, relative } from "path";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
 const SKIP_DIRS = new Set(["node_modules", ".git"]);
 
 type PackageManifest = {
-  scripts?: { typecheck?: string };
+  scripts?: Record<string, string>;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
 };
+
+type PackageManager = "bun" | "npm" | "pnpm" | "yarn";
+type LifecycleOperation = "install" | "ci";
+
+const PEER_BUS_DIR = join(REPO_ROOT, "tools/qf-peer-bus");
+const LIFECYCLE_KEYS = ["preinstall", "install", "postinstall"] as const;
+const LIFECYCLE_SEGMENT_BREAK = /;|&&|\|\||\|/;
+const BARE_PACKAGE_MANAGER =
+  /(?<![A-Za-z0-9_./-])(bun|npm|pnpm|yarn)(?![A-Za-z0-9_./-])/g;
+const BARE_INSTALL_OPERATION = /(?<![A-Za-z0-9_./-])(install)(?![A-Za-z0-9_./-])/;
+const BARE_NPM_OPERATION = /(?<![A-Za-z0-9_./-])(install|ci)(?![A-Za-z0-9_./-])/;
+
+const LIFECYCLE_MATCHER_ALLOWED_CONTROLS = [
+  "node scripts/postinstall.mjs",
+  "electron-builder install-app-deps",
+  "bun run build",
+  "npm run build",
+  "echo install complete",
+] as const;
+
+const LIFECYCLE_MATCHER_REJECTED_CONTROLS = [
+  "cd x && bun install",
+  "bun --cwd x install --frozen-lockfile",
+  "echo preparing; npm --prefix x ci",
+] as const;
+
+const TYPECHECK_FALSIFIER_COMMANDS = {
+  literal: "cd x && bun install",
+  flagged: "bun --cwd x install --frozen-lockfile",
+  chained: "echo preparing; npm --prefix x ci",
+} as const;
+
+type LifecycleMatch = {
+  manager: PackageManager;
+  operation: LifecycleOperation;
+};
+
+function findLifecycleMatch(command: string): LifecycleMatch | null {
+  for (const segment of command.split(LIFECYCLE_SEGMENT_BREAK)) {
+    for (const managerMatch of segment.matchAll(BARE_PACKAGE_MANAGER)) {
+      const manager = managerMatch[1] as PackageManager;
+      const managerEnd = (managerMatch.index ?? 0) + manager.length;
+      const operationPattern =
+        manager === "npm" ? BARE_NPM_OPERATION : BARE_INSTALL_OPERATION;
+      const operationMatch = operationPattern.exec(segment.slice(managerEnd));
+      if (operationMatch) {
+        return { manager, operation: operationMatch[1] as LifecycleOperation };
+      }
+    }
+  }
+  return null;
+}
+
+function runLifecycleMatcherControls(): boolean {
+  for (const command of LIFECYCLE_MATCHER_ALLOWED_CONTROLS) {
+    if (findLifecycleMatch(command)) {
+      console.error(`typecheck: lifecycle matcher rejected allowed control: ${command}`);
+      return false;
+    }
+  }
+  for (const command of LIFECYCLE_MATCHER_REJECTED_CONTROLS) {
+    if (!findLifecycleMatch(command)) {
+      console.error(`typecheck: lifecycle matcher allowed rejected control: ${command}`);
+      return false;
+    }
+  }
+  return true;
+}
 
 function readPackageManifest(dir: string): PackageManifest | null {
   const pkgPath = join(dir, "package.json");
@@ -92,6 +160,50 @@ function discoverTypecheckPackages(root: string): string[] {
   }
   walk(root);
   return found.sort();
+}
+
+function lifecycleManifest(
+  dir: string,
+  pkg: PackageManifest,
+  falsifierCommand: string | undefined,
+): PackageManifest {
+  if (falsifierCommand === undefined || dir !== PEER_BUS_DIR) return pkg;
+  return {
+    ...pkg,
+    scripts: { ...pkg.scripts, postinstall: falsifierCommand },
+  };
+}
+
+function checkLifecycleScripts(
+  installDirs: string[],
+  falsifierCommand: string | undefined,
+): boolean {
+  let falsifierApplied = falsifierCommand === undefined;
+  for (const dir of installDirs) {
+    const pkg = readPackageManifest(dir);
+    if (!pkg) continue;
+    const manifest = lifecycleManifest(dir, pkg, falsifierCommand);
+    if (falsifierCommand !== undefined && dir === PEER_BUS_DIR) {
+      falsifierApplied = true;
+    }
+    for (const lifecycleKey of LIFECYCLE_KEYS) {
+      const command = manifest.scripts?.[lifecycleKey];
+      if (typeof command !== "string") continue;
+      const match = findLifecycleMatch(command);
+      if (!match) continue;
+      console.error(
+        `typecheck: forbidden lifecycle install package=${relative(REPO_ROOT, dir)} lifecycle=${lifecycleKey} manager=${match.manager} operation=${match.operation} command=${command}`,
+      );
+      return false;
+    }
+  }
+  if (!falsifierApplied) {
+    console.error(
+      `typecheck: falsifier target is not in the install closure: ${relative(REPO_ROOT, PEER_BUS_DIR)}`,
+    );
+    return false;
+  }
+  return true;
 }
 
 type Gate = {
@@ -276,12 +388,32 @@ const gates: Gate[] = [
     description:
       "TypeScript strict check for every package that declares a typecheck script",
     run: async () => {
+      if (!runLifecycleMatcherControls()) return false;
+
+      const selector = process.env.QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL;
+      let falsifierCommand: string | undefined;
+      if (selector !== undefined) {
+        if (!Object.prototype.hasOwnProperty.call(TYPECHECK_FALSIFIER_COMMANDS, selector)) {
+          console.error(
+            `typecheck: unknown QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL value=${JSON.stringify(selector)}; expected literal, flagged, or chained`,
+          );
+          return false;
+        }
+        falsifierCommand =
+          TYPECHECK_FALSIFIER_COMMANDS[
+            selector as keyof typeof TYPECHECK_FALSIFIER_COMMANDS
+          ];
+      }
+
       const typecheckPackages = discoverTypecheckPackages(REPO_ROOT);
       if (typecheckPackages.length === 0) {
         console.error("typecheck: no packages with a typecheck script found");
         return false;
       }
-      for (const cwd of discoverTypecheckInstallPackages(REPO_ROOT)) {
+      const installPackages = discoverTypecheckInstallPackages(REPO_ROOT);
+      if (!checkLifecycleScripts(installPackages, falsifierCommand)) return false;
+
+      for (const cwd of installPackages) {
         const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
           cwd,
           stdout: "inherit",
