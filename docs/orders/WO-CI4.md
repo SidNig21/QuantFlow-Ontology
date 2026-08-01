@@ -1,6 +1,6 @@
 # WO-CI4 — Runtime ownership ignores foreign listeners, not owned ones
 
-status: **second binding rewrite — enforce zero guest sockets after PID attribution proved impossible**
+status: **target verified — canonical reached unrelated WO-CI5 recursive-install failure**
 assignee: builder
 depends: WO-CI3 candidate `196b0ec`
 blocks: WO-CI3 verification · WO-107c verification
