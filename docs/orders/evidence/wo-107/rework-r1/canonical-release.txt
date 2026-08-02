@@ -1,0 +1,1954 @@
+release: runId=7c13c231-f4dd-4cb9-9aa0-abe3cb6627a1
+
+== release:install (collab-electron) :: bun install --frozen-lockfile ==
+bun install v1.3.14 (0d9b296a)
+
+$ node scripts/postinstall.mjs
+Searching dependency tree
+Building modules: node-pty
+✔ Rebuild Complete
+
++ @assistant-ui/react@0.12.28
++ @assistant-ui/react-markdown@0.12.11
++ @blocknote/core@0.47.0
++ @blocknote/mantine@0.47.0
++ @blocknote/react@0.47.0
++ @electron/asar@3.4.1
++ @electron/notarize@2.5.0
++ @electron/rebuild@4.2.0
++ @octokit/rest@22.0.1
++ @phosphor-icons/react@2.1.7
++ @posthog/react@1.10.3
++ @tailwindcss/vite@4.2.0
++ @tiptap/core@3.20.0
++ @tiptap/extension-typography@3.20.0
++ @types/d3@7.4.3
++ @types/react@19.2.14
++ @types/react-dom@19.2.3
++ @vitejs/plugin-react@5.1.4
++ @xterm/addon-fit@0.11.0
++ @xterm/addon-unicode11@0.9.0
++ @xterm/addon-webgl@0.19.0
++ @xterm/xterm@6.0.0
++ app-builder-bin@4.2.0
++ class-variance-authority@0.7.1
++ clsx@2.1.1
++ d3@7.9.0
++ electron@40.6.0
++ electron-builder@26.8.1
++ electron-vite@5.0.0
++ katex@0.16.33
++ lucide-react@0.576.0
++ monaco-editor@0.55.1
++ posthog-js@1.404.1
++ react@19.2.4
++ react-dom@19.2.4
++ react-markdown@10.1.0
++ rehype-katex@7.0.1
++ rehype-raw@7.0.0
++ remark-breaks@4.0.0
++ remark-gfm@4.0.1
++ remark-math@6.0.0
++ streamdown@2.3.0
++ tailwind-merge@3.5.0
++ tailwindcss@4.2.0
++ tsx@4.23.1
++ use-stick-to-bottom@1.1.3
++ @img/sharp-libvips-linux-x64@1.2.4
++ @img/sharp-linux-x64@0.34.5
++ @agentclientprotocol/claude-agent-acp@0.26.0
++ @agentclientprotocol/sdk@0.18.2
++ @lezer/common@1.5.2
++ @lezer/python@1.1.19
++ @parcel/watcher@2.5.6
++ @postlight/parser@2.2.3
++ @rivet-dev/agentos-core@0.2.7
++ dependency-cruiser@17.4.3
++ electron-log@5.4.3
++ electron-updater@6.8.3
++ front-matter@4.0.2
++ ignore@7.0.5
++ node-pty@1.1.0
++ posthog-node@5.45.2
++ qf-bovada-football@../tools/qf-bovada-football
++ qf-kernel@../packages/qf-kernel
++ qf-kernel-schema@../qf-kernel-schema
++ sharp@0.34.5
++ typescript@5.9.3
+
+2343 packages installed [71.28s]
+
+== release:unit (collab-electron) :: ./scripts/test-unit.sh ==
+bun test v1.3.14 (0d9b296a)
+
+cli/bovada-market-cli.test.ts:
+(pass) qf-canvas Bovada market command > parses --once into the fixed RPC method shape [1.62ms]
+(pass) qf-canvas Bovada market command > parses UTC --at and gives the schedule-aware RPC call a long bound [0.17ms]
+(pass) qf-canvas Bovada market command > rejects non-UTC, extra, and generic envelope fields [0.12ms]
+
+packages/shared/src/path-utils.test.ts:
+(pass) path-utils > detects path kinds [0.11ms]
+(pass) path-utils > matches subpaths across separators [0.20ms]
+(pass) path-utils > converts Windows paths to WSL mount paths [0.16ms]
+(pass) path-utils > parses WSL UNC paths [0.08ms]
+(pass) path-utils > joins and trims platform paths [0.31ms]
+(pass) path-utils > normalizes executable command names for comparison [0.14ms]
+
+packages/shared/src/viewer-item.test.ts:
+(pass) parseFileToViewerItem > parses plain markdown without frontmatter [0.34ms]
+(pass) parseFileToViewerItem > parses frontmatter attributes [2.22ms]
+(pass) parseFileToViewerItem > extracts title from filename, not frontmatter [0.08ms]
+(pass) parseFileToViewerItem > detects skill paths [0.03ms]
+(pass) parseFileToViewerItem > detects plugin skill paths [0.03ms]
+(pass) parseFileToViewerItem > skill type overrides frontmatter type [0.05ms]
+(pass) parseFileToViewerItem > parses string quotes [0.18ms]
+(pass) parseFileToViewerItem > parses object quotes [0.23ms]
+(pass) parseFileToViewerItem > uses provided stats for timestamps [0.07ms]
+(pass) serializeViewerItem > returns plain body when type is md [0.11ms]
+(pass) serializeViewerItem > does not inject frontmatter for extension-derived type [0.03ms]
+(pass) serializeViewerItem > preserves explicit frontmatter type on save [0.70ms]
+(pass) serializeViewerItem > includes frontmatter for article type [0.23ms]
+(pass) serializeViewerItem > omits type when no explicit frontmatter type existed [0.05ms]
+(pass) serializeViewerItem > strips legacy fields [0.11ms]
+
+packages/shared/src/image.test.ts:
+(pass) isImageFile > recognizes common image extensions [0.06ms]
+(pass) isImageFile > is case-insensitive [0.02ms]
+(pass) isImageFile > rejects non-image files [0.02ms]
+(pass) isImageFile > rejects files without extension [0.01ms]
+(pass) isImageFile > handles paths with directories [0.01ms]
+(pass) isImageFile > recognizes modern formats [0.02ms]
+(pass) IMAGE_EXTENSIONS > is a Set [0.01ms]
+(pass) IMAGE_EXTENSIONS > contains lowercase dot-prefixed extensions [0.02ms]
+
+packages/shared/src/pdf.test.ts:
+(pass) isPdfFile > recognizes .pdf extension [0.04ms]
+(pass) isPdfFile > is case-insensitive [0.02ms]
+(pass) isPdfFile > rejects non-pdf files [0.02ms]
+(pass) isPdfFile > rejects files without extension [0.01ms]
+(pass) isPdfFile > handles paths with directories [0.02ms]
+(pass) isPdfFile > handles paths with spaces [0.01ms]
+
+packages/shared/src/collab-file-url.test.ts:
+(pass) collab-file-url > encodes posix absolute paths [0.08ms]
+(pass) collab-file-url > encodes Windows absolute paths with a leading slash [0.03ms]
+(pass) collab-file-url > decodes canonical Windows collab-file URLs [0.07ms]
+(pass) collab-file-url > decodes legacy encoded-host Windows URLs [0.02ms]
+(pass) collab-file-url > decodes legacy drive-host Windows URLs [0.02ms]
+(pass) collab-file-url > encodes # and ? in filenames [0.02ms]
+(pass) collab-file-url > round-trips filenames with # and ? [0.02ms]
+
+packages/shared/src/extract-cover-image.test.ts:
+(pass) extractCoverImageUrl > returns null for plain text with no images [0.09ms]
+(pass) extractCoverImageUrl > extracts from cover_image frontmatter [0.06ms]
+(pass) extractCoverImageUrl > extracts from coverImage frontmatter [0.02ms]
+(pass) extractCoverImageUrl > resolves relative frontmatter image with notePath [0.16ms]
+(pass) extractCoverImageUrl > resolves absolute local path in frontmatter [0.03ms]
+(pass) extractCoverImageUrl > resolves Windows absolute local path in frontmatter [0.02ms]
+(pass) extractCoverImageUrl > returns null for relative image without notePath [0.02ms]
+(pass) extractCoverImageUrl > extracts from markdown image syntax [0.02ms]
+(pass) extractCoverImageUrl > extracts from HTML img tag [0.01ms]
+(pass) extractCoverImageUrl > prefers frontmatter over markdown image [0.02ms]
+(pass) extractCoverImageUrl > resolves relative markdown image with notePath [0.07ms]
+(pass) extractCoverImageUrl > passes through data: URLs [0.03ms]
+(pass) extractCoverImageUrl > passes through collab-file:// URLs [0.01ms]
+
+packages/components/src/WorkspaceGraph/hueMap.test.ts:
+(pass) buildHueMap > assigns hues to files in different folders [0.33ms]
+(pass) buildHueMap > assigns same hue to files in same folder [0.04ms]
+(pass) buildHueMap > handles root-level files [0.03ms]
+(pass) buildHueMap > returns empty map for empty input [0.02ms]
+(pass) buildHueMap > distributes hues across 0-360 range [0.08ms]
+(pass) buildHueMap > handles nested folders [0.03ms]
+(pass) hueToColor > returns gray for negative hue (dark mode) [0.04ms]
+(pass) hueToColor > returns gray for negative hue (light mode) [0.01ms]
+(pass) hueToColor > returns HSL for valid hue (dark mode) [0.02ms]
+(pass) hueToColor > returns HSL for valid hue (light mode) [0.02ms]
+(pass) hueToColor > rounds hue to integer [0.01ms]
+
+packages/components/src/TreeView/Helpers.test.ts:
+(pass) displayFileName > splits name into stem and extension [0.04ms]
+(pass) displayFileName > handles multiple dots [0.02ms]
+(pass) displayFileName > returns empty ext for no extension [0.01ms]
+(pass) displayFileName > returns full name as stem for dotfile [0.01ms]
+(pass) displayFileName > handles empty string [0.01ms]
+(pass) getDateKey > converts ISO timestamp to YYYY-MM-DD [0.12ms]
+(pass) getDateKey > returns empty string for undefined [0.02ms]
+(pass) getDateKey > returns empty string for invalid date [0.01ms]
+(pass) formatDateLabel > returns 'Today' for today's date [0.06ms]
+(pass) formatDateLabel > returns 'Yesterday' for yesterday [0.03ms]
+(pass) formatDateLabel > returns empty string for undefined [0.01ms]
+(pass) formatDateLabel > returns empty string for invalid date
+(pass) formatDateLabel > returns formatted date for older dates [1.39ms]
+
+packages/components/src/TreeView/useFileTree.test.ts:
+(pass) flattenTree > files at expected level [0.40ms]
+(pass) flattenTree > expanded folder shows children [0.09ms]
+(pass) flattenTree > collapsed folder hides children [0.04ms]
+(pass) flattenTree > folders sorted before files [0.03ms]
+(pass) flattenTree > empty node list returns empty [0.02ms]
+
+ 87 pass
+ 0 fail
+ 157 expect() calls
+Ran 87 tests across 10 files. [84.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/main/runtime-adapter.test.ts:
+(pass) runtime adapter metadata > expands one complete runtime-profile token and keeps null on base argv [0.61ms]
+(pass) runtime adapter metadata > rejects missing, repeated, partial, and unknown placeholders [0.27ms]
+(pass) runtime adapter metadata > rejects unknown keys and duplicate peer selectors [0.37ms]
+(pass) runtime adapter metadata > resolves sibling metadata and binds it to the package filename [1.21ms]
+
+src/main/native-tui-orchestration.test.ts:
+(pass) orchestrateNativeTuiAdmission > create failure leaves no process-local or Kernel compensation residue [0.95ms]
+(pass) orchestrateNativeTuiAdmission > start failure records fail and close, cleans maps, then permits same role [0.16ms]
+(pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds [0.13ms]
+(pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start [0.10ms]
+
+src/main/trusted-sender.test.ts:
+(pass) isTrustedSender > allows known webContents id [0.03ms]
+(pass) isTrustedSender > rejects unknown webContents id [0.02ms]
+
+src/main/dock-profiles.test.ts:
+(pass) Dock profile manifests > discovers the exact four definitions with derived package refs [2.56ms]
+(pass) Dock profile manifests > registers once, skips identical rows, and preserves conflicts [2.12ms]
+(pass) Dock profile manifests > validates every manifest before making a Kernel call [1.57ms]
+(pass) Dock profile manifests > rejects traversal and duplicate ids [1.71ms]
+
+src/main/file-filter.test.ts:
+(pass) hasTextBom > detects UTF-8 BOM [0.07ms]
+(pass) hasTextBom > detects UTF-16 LE BOM [0.02ms]
+(pass) hasTextBom > detects UTF-16 BE BOM [0.02ms]
+(pass) hasTextBom > returns false for plain ASCII [0.01ms]
+(pass) hasTextBom > returns false for empty buffer [0.01ms]
+(pass) hasTextBom > returns false for single byte [0.01ms]
+(pass) isBinarySample > returns false for empty buffer [0.04ms]
+(pass) isBinarySample > returns false for plain text [0.12ms]
+(pass) isBinarySample > returns true when null byte present [0.02ms]
+(pass) isBinarySample > returns false for UTF-8 BOM file [0.02ms]
+(pass) isBinarySample > returns true for high ratio of control characters [0.14ms]
+(pass) isBinarySample > returns false for low ratio of control characters [0.11ms]
+(pass) getDefaultPatterns > returns a copy (not the original array) [0.05ms]
+(pass) getDefaultPatterns > includes common ignore patterns [0.02ms]
+
+src/main/bovada-capture-rpc.test.ts:
+(pass) WO-107 fixed Bovada capture RPC boundary > registers exactly one fixed method with no generic request envelope [0.14ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > runs --once through the injected service and returns only the bounded receipt [0.66ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > rejects caller-controlled fields and malformed receipt data [0.23ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > validates strict UTC timestamps and the 24-hour horizon [0.19ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > owns one timer for --at and starts only when it fires [0.36ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > aborts a running service when the CLI request disconnects [0.27ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > rejects immediately for an already-aborted CLI signal [0.11ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > cancels the owned timer and rejects on app shutdown [0.20ms]
+(pass) WO-107 fixed Bovada capture RPC boundary > rejects a second request while one is active and cleans up service failure [0.18ms]
+
+src/main/peer-role-registry.test.ts:
+(pass) PeerRoleRegistry > rejects duplicate live roles without rerouting [0.13ms]
+(pass) PeerRoleRegistry > unregister is owner-specific [0.08ms]
+
+src/main/cwd-fallback.test.ts:
+(pass) nearestExistingDir > returns the directory itself when it exists [0.09ms]
+(pass) nearestExistingDir > returns the nearest existing ancestor when the leaf is missing [0.08ms]
+(pass) nearestExistingDir > walks up multiple missing levels [0.04ms]
+(pass) nearestExistingDir > returns the parent directory when the path is a file [0.02ms]
+(pass) nearestExistingDir > prefers an existing ancestor over the provided fallback [0.03ms]
+(pass) nearestExistingDir > defaults the fallback to the home directory [0.02ms]
+
+src/main/app-root.test.ts:
+(pass) selectAppRoot > development uses repository root [0.04ms]
+(pass) selectAppRoot > packaged uses resourcesPath [0.02ms]
+(pass) selectAppRoot > packaged without resourcesPath fails closed [0.05ms]
+
+src/main/import-service.test.ts:
+(pass) validateUrl > accepts http URLs [1.63ms]
+(pass) validateUrl > accepts https URLs [0.06ms]
+(pass) validateUrl > rejects ftp URLs [0.32ms]
+(pass) validateUrl > rejects javascript: URLs [0.33ms]
+(pass) validateUrl > rejects invalid URLs [4.14ms]
+(pass) validateUrl > rejects empty string [0.06ms]
+(pass) validateWorkspaceBoundary > accepts exact workspace root [0.29ms]
+(pass) validateWorkspaceBoundary > accepts subdirectory of workspace [0.08ms]
+(pass) validateWorkspaceBoundary > rejects path outside workspace [0.07ms]
+(pass) validateWorkspaceBoundary > rejects partial prefix match [0.04ms]
+(pass) sanitizeFilename > removes path separators [0.05ms]
+(pass) sanitizeFilename > removes special characters [0.02ms]
+(pass) sanitizeFilename > collapses whitespace [0.02ms]
+(pass) sanitizeFilename > trims whitespace [0.01ms]
+(pass) sanitizeFilename > handles empty string [0.02ms]
+(pass) fixMalformedLinkedImages > fixes multiline linked image [0.05ms]
+(pass) fixMalformedLinkedImages > leaves well-formed markdown alone [0.02ms]
+(pass) fixMalformedLinkedImages > leaves plain images alone [0.01ms]
+(pass) buildFrontmatter > builds YAML frontmatter with JSON-encoded values [0.11ms]
+(pass) buildFrontmatter > omits undefined values [0.03ms]
+(pass) buildFrontmatter > produces empty frontmatter when all values are undefined [0.02ms]
+
+src/windows/shell/src/canvas-rpc.test.ts:
+(pass) findAutoPlacement > places first tile at origin with no existing tiles [0.09ms]
+(pass) findAutoPlacement > avoids overlapping an existing tile [0.06ms]
+(pass) findAutoPlacement > places tile adjacent to existing tile [0.17ms]
+(pass) findAutoPlacement > result snaps to 20px grid [0.04ms]
+(pass) findAutoPlacement > handles many tiles without overlapping any [0.10ms]
+(pass) findAutoPlacement > falls back to offset from last tile when canvas is full [0.96ms]
+(pass) findAutoPlacement > fallback with no tiles returns {40, 40} [0.74ms]
+
+src/windows/shell/src/webview-factory.test.ts:
+(pass) normalizeShortcutKey > lowercases single character keys [0.07ms]
+(pass) normalizeShortcutKey > preserves already lowercase single characters [0.02ms]
+(pass) normalizeShortcutKey > does not lowercase multi-character keys [0.02ms]
+(pass) normalizeShortcutKey > returns null for null/undefined/empty [0.02ms]
+(pass) isFocusSearchShortcut > returns true for Cmd+K (keyDown) [0.05ms]
+(pass) isFocusSearchShortcut > returns true for Ctrl+K (keydown) [0.02ms]
+(pass) isFocusSearchShortcut > returns true for Cmd+K with uppercase key [0.02ms]
+(pass) isFocusSearchShortcut > returns false without command modifier [0.03ms]
+(pass) isFocusSearchShortcut > returns false for wrong key [0.02ms]
+(pass) isFocusSearchShortcut > returns false for keyUp events [0.02ms]
+(pass) isFocusSearchShortcut > returns false for auto-repeat [0.03ms]
+(pass) isFocusSearchShortcut > returns false for repeat [0.02ms]
+(pass) isFocusSearchShortcut > returns false for null input [0.01ms]
+(pass) isFocusSearchShortcut > returns false for undefined input [0.01ms]
+(pass) isFocusSearchShortcut > matches by code even if key differs [0.01ms]
+(pass) isFocusSearchShortcut > matches by key even if code differs [0.02ms]
+
+src/windows/shell/src/canvas-state.test.ts:
+(pass) defaultSize > returns correct size for each tile type [0.09ms]
+(pass) defaultSize > returns a copy, not the original object [0.03ms]
+(pass) generateId > returns a string starting with 'tile-' [0.06ms]
+(pass) generateId > generates unique ids [0.20ms]
+(pass) tile CRUD > addTile appends to tiles array and returns the tile [0.06ms]
+(pass) tile CRUD > addTile assigns zIndex when not provided [0.03ms]
+(pass) tile CRUD > addTile preserves existing zIndex [0.02ms]
+(pass) tile CRUD > getTile returns the tile by id [0.19ms]
+(pass) tile CRUD > getTile returns null for unknown id [0.02ms]
+(pass) tile CRUD > removeTile removes the tile by id [0.21ms]
+(pass) tile CRUD > removeTile is a no-op for unknown id [0.03ms]
+(pass) tile CRUD > multiple tiles are stored in insertion order [0.06ms]
+(pass) bringToFront > assigns a higher zIndex than previous tiles [0.06ms]
+(pass) bringToFront > successive calls produce increasing zIndex [0.03ms]
+(pass) snapToGrid > snaps position to 20px grid [0.06ms]
+(pass) snapToGrid > snaps size to 20px grid [0.03ms]
+(pass) snapToGrid > values exactly on grid remain unchanged [0.02ms]
+(pass) snapToGrid > rounds to nearest grid line (not always down) [0.03ms]
+(pass) snapToGrid > handles zero position [0.02ms]
+(pass) snapToGrid > handles negative coordinates [0.02ms]
+(pass) inferTileType > returns 'note' for .md files [0.06ms]
+(pass) inferTileType > returns 'image' for image extensions [0.05ms]
+(pass) inferTileType > returns 'code' for other extensions [0.03ms]
+(pass) inferTileType > handles uppercase extensions [0.02ms]
+(pass) inferTileType > handles paths with dots in directories [0.01ms]
+(pass) tileAtPoint > returns tile when point is inside [0.06ms]
+(pass) tileAtPoint > returns null when point is outside all tiles [0.03ms]
+(pass) tileAtPoint > returns topmost tile when overlapping [0.06ms]
+(pass) tileAtPoint > returns null for empty tiles array [0.01ms]
+(pass) tileAtPoint > point on left/top boundary is inside [0.02ms]
+(pass) tileAtPoint > point on right/bottom boundary is outside [0.02ms]
+(pass) selection > selectTile marks a tile as selected [0.05ms]
+(pass) selection > deselectTile unmarks a tile [0.43ms]
+(pass) selection > deselectTile is a no-op for unselected tile [0.09ms]
+(pass) selection > toggleTileSelection toggles selection state [0.06ms]
+(pass) selection > clearSelection deselects all [0.04ms]
+(pass) selection > getSelectedTiles returns only selected tiles [0.15ms]
+(pass) selection > getSelectedTiles returns empty array when none selected [0.03ms]
+(pass) selection > selecting a removed tile does not appear in getSelectedTiles [0.02ms]
+
+src/windows/shell/src/edge-indicators.test.ts:
+(pass) isFullyOffScreen > tile fully visible is not off screen [0.07ms]
+(pass) isFullyOffScreen > tile partially visible is not off screen [0.02ms]
+(pass) isFullyOffScreen > tile fully off right edge [0.02ms]
+(pass) isFullyOffScreen > tile fully off left edge [0.02ms]
+(pass) isFullyOffScreen > tile fully off top edge [0.01ms]
+(pass) isFullyOffScreen > tile fully off bottom edge [0.01ms]
+(pass) isFullyOffScreen > pan offset brings tile into view [0.03ms]
+(pass) isFullyOffScreen > zoom affects off-screen calculation [0.02ms]
+(pass) isFullyOffScreen > tile exactly touching edge is off screen [0.02ms]
+(pass) isFullyOffScreen > 1px overlap means not off screen [0.01ms]
+(pass) rayRectIntersect > target to the right hits right edge [0.07ms]
+(pass) rayRectIntersect > target to the left hits left edge [0.02ms]
+(pass) rayRectIntersect > target above hits top edge [0.01ms]
+(pass) rayRectIntersect > target below hits bottom edge [0.02ms]
+(pass) rayRectIntersect > diagonal target hits the closer edge [0.02ms]
+(pass) rayRectIntersect > returns center when target equals center (no movement) [0.02ms]
+(pass) rayRectIntersect > corner target hits one of the two adjacent edges [0.02ms]
+
+ 148 pass
+ 0 fail
+ 287 expect() calls
+Ran 148 tests across 14 files. [561.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/main/files.test.ts:
+(pass) fsWriteFile > writes file and returns ok with mtime [1.18ms]
+(pass) fsWriteFile > writes without guard when expectedMtime is omitted [0.80ms]
+(pass) fsWriteFile > succeeds when expectedMtime matches [12.70ms]
+(pass) fsWriteFile > returns conflict when expectedMtime is stale [11.18ms]
+(pass) fsWriteFile > skips guard for new file even with expectedMtime [0.81ms]
+(pass) fsWriteFile > returns updated mtime after successful guarded write [23.12ms]
+(pass) fsWriteFile > conflict breaks the mtime chain [23.18ms]
+(pass) atomicWriteFileSync > writes file content [0.52ms]
+(pass) atomicWriteFileSync > overwrites existing file atomically [0.99ms]
+(pass) atomicWriteFileSync > leaves no temp files behind [1.53ms]
+(pass) atomicWriteFileSync > preserves content through multiple writes [1.73ms]
+
+ 11 pass
+ 0 fail
+ 25 expect() calls
+Ran 11 tests across 1 file. [102.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/main/integrations.test.ts:
+(pass) VALID_AGENT_IDS > contains exactly claude, codex, gemini [0.71ms]
+(pass) skillSourceDir > finds skill via app.getAppPath()/packages/collab-canvas-skill [1.26ms]
+(pass) skillSourceDir > falls back to __dirname-relative paths in dev mode [0.47ms]
+(pass) installSkill / uninstallSkill > installs Claude skill (copies SKILL.md) [1.73ms]
+(pass) installSkill / uninstallSkill > installs Codex skill (copies collab-canvas-codex.md) [1.39ms]
+(pass) installSkill / uninstallSkill > installs Gemini skill (copies collab-canvas-gemini.md) [1.32ms]
+(pass) installSkill / uninstallSkill > uninstallSkill removes Claude skill directory [1.56ms]
+(pass) installSkill / uninstallSkill > uninstallSkill removes Codex instruction file [1.37ms]
+(pass) installSkill / uninstallSkill > uninstallSkill is safe when target does not exist [1.06ms]
+(pass) getAgentStatuses > returns entries for all three agents [114.68ms]
+(pass) getAgentStatuses > reports installed=false when skills are not present [103.07ms]
+(pass) getAgentStatuses > reports installed=true after installSkill [108.90ms]
+
+ 12 pass
+ 0 fail
+ 25 expect() calls
+Ran 12 tests across 1 file. [361.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/main/updater/update-manager.test.ts:
+(pass) UpdateManager > starts in idle state [0.29ms]
+(pass) UpdateManager > transitions to checking on checkForUpdates [0.28ms]
+(pass) UpdateManager > transitions to available on update-available event [0.41ms]
+(pass) UpdateManager > transitions to idle on update-not-available [0.08ms]
+(pass) UpdateManager > tracks update_available analytics [0.15ms]
+(pass) UpdateManager > skips check when already checking [0.23ms]
+(pass) UpdateManager > skips check when already available [0.08ms]
+(pass) UpdateManager > downloadAvailableUpdate is no-op when not available [0.12ms]
+(pass) UpdateManager > transitions to downloading on download-progress [0.17ms]
+(pass) UpdateManager > transitions to ready on update-downloaded [0.11ms]
+(pass) UpdateManager > tracks update_downloaded analytics [0.09ms]
+(pass) UpdateManager > transitions to error on error event [0.23ms]
+(pass) UpdateManager > ignores missing release metadata errors [0.09ms]
+(pass) UpdateManager > does not ignore non-linux release metadata errors [0.06ms]
+(pass) UpdateManager > install transitions to installing in dev mode [0.14ms]
+(pass) UpdateManager > install is no-op when not ready [0.06ms]
+(pass) UpdateManager > allows re-check from error state [0.10ms]
+[updater] Ignoring 0.6.1 — not newer than 0.7.0-beta.1
+(pass) UpdateManager > ignores update when offered version is lower than pre-release current [0.52ms]
+(pass) UpdateManager > accepts update when offered version is higher than pre-release current [0.12ms]
+(pass) UpdateManager > accepts stable release of same base version over pre-release [0.09ms]
+(pass) isNewer > higher major version is newer [0.02ms]
+(pass) isNewer > lower major version is not newer [0.01ms]
+(pass) isNewer > higher minor version is newer [0.01ms]
+(pass) isNewer > lower minor version is not newer [0.04ms]
+(pass) isNewer > higher patch version is newer [0.02ms]
+(pass) isNewer > same version is not newer [0.04ms]
+(pass) isNewer > stable is newer than pre-release of same base version [0.07ms]
+(pass) isNewer > pre-release is not newer than same pre-release [0.03ms]
+(pass) isNewer > pre-release of higher base is newer than lower stable [0.02ms]
+
+ 29 pass
+ 0 fail
+ 44 expect() calls
+Ran 29 tests across 1 file. [17.00ms]
+bun test v1.3.14 (0d9b296a)
+
+../qa/gates/package-closure/lazy-loader.test.ts:
+(pass) resolvePackageClosureMode > recognizes the missing-upgrade copied-package bait [0.15ms]
+(pass) resolvePackageClosureMode > recognizes the missing-market-context-upgrade copied-package bait [0.03ms]
+(pass) resolvePackageClosureMode > rejects unknown bait [0.10ms]
+(pass) executePackageClosureMode standalone ordering > install precedes loader; install failure returns without loader [0.78ms]
+package-closure: missing-upgrade control observed missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql
+package-closure: missing-market-context-upgrade control observed missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql
+package-closure: missing-bootstrap control observed runtime control file missing: species/hermes/dock-profiles.json
+(pass) executePackageClosureMode standalone ordering > standalone success runs build, package, and all copied-package controls [0.91ms]
+package-closure: missing-upgrade control observed missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql
+package-closure: missing-market-context-upgrade control observed missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql
+package-closure: missing-bootstrap control observed runtime control file missing: species/hermes/dock-profiles.json
+(pass) executePackageClosureMode standalone ordering > canonical success requires both copied-package controls [0.25ms]
+(pass) executePackageClosureMode standalone ordering > canonical invalid receipt never installs or inspects [0.15ms]
+(pass) executePackageClosureMode standalone ordering > missing-hermes bait rejects generic root escape [0.17ms]
+package-closure: unresolved hermes reference: missing file
+(pass) executePackageClosureMode standalone ordering > missing-hermes bait accepts unresolved hermes reference [0.15ms]
+package-closure: missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql
+(pass) executePackageClosureMode standalone ordering > missing-upgrade bait observes the exact missing artifact [0.15ms]
+(pass) executePackageClosureMode standalone ordering > missing-upgrade control rejects any added ASAR inventory path [0.18ms]
+package-closure: missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql
+(pass) executePackageClosureMode standalone ordering > missing-market-context-upgrade bait observes the exact missing artifact [0.14ms]
+
+ 12 pass
+ 0 fail
+ 34 expect() calls
+Ran 12 tests across 1 file. [27.00ms]
+bun test v1.3.14 (0d9b296a)
+
+../qa/verify-release.test.ts:
+(pass) verify-release stages > requires install unit build package qa order [1.51ms]
+(pass) verify-release stages > deleting package stage is detectable [0.17ms]
+
+ 2 pass
+ 0 fail
+ 3 expect() calls
+Ran 2 tests across 1 file. [18.00ms]
+bun test v1.3.14 (0d9b296a)
+
+scripts/package-lib/package-inspect.test.ts:
+(pass) inspectPackagedResources root rules > rejects inspection outside packaged resources root [0.36ms]
+(pass) inspectPackagedResources root rules > rejects bait copy without its exact expected resources root before Hermes [7.62ms]
+(pass) inspectPackagedResources root rules > accepts the exact bait resources root and reaches missing Hermes [2.25ms]
+(pass) inspectPackagedResources root rules > rejects a bait root that differs from the expected resources root [1.50ms]
+(pass) inspectPackagedResources root rules > dev-root probe still fails root escape [0.08ms]
+(pass) inspectPackagedResources runtime controls > copied-package control removes exactly one manifest and names it missing [31.14ms]
+(pass) inspectPackagedResources runtime controls > rejects a runtime control byte mismatch with both hashes [17.54ms]
+(pass) inspectPackagedResources ASAR SQL closure > byte-compares every shipped SQL artifact at its node_modules path [20.02ms]
+(pass) inspectPackagedResources ASAR SQL closure > rejects a packaged SQL byte mismatch with both hashes [16.33ms]
+(pass) inspectPackagedResources ASAR SQL closure > copied-ASAR control removes exactly the upgrade and then names it missing [30.94ms]
+(pass) inspectPackagedResources ASAR SQL closure > copied-ASAR control removes exactly the market-ingest upgrade and names it missing [28.35ms]
+(pass) inspectPackagedResources ASAR SQL closure > copied-ASAR control removes exactly the market-context upgrade and names it missing [25.39ms]
+(pass) inspectPackagedResources product identity > accepts exact Linux executable, ASAR package name, and update target [14.61ms]
+(pass) inspectPackagedResources product identity > rejects a non-executable QuantFlow binary [14.36ms]
+(pass) inspectPackagedResources product identity > rejects the old packaged update target [14.53ms]
+
+scripts/package-lib/unit-wiring.test.ts:
+(pass) package-closure unit wiring > test-unit.sh executes root qa package-closure tests [0.06ms]
+(pass) package-closure unit wiring > rejects restored cold-import.test.ts path [0.05ms]
+(pass) package-closure unit wiring > falsify removing root qa invocation from in-memory script copy [0.09ms]
+
+scripts/package-lib/package-receipt.test.ts:
+(pass) package receipt log path binding > accepts the canonical package verification log [1.62ms]
+(pass) package receipt log path binding > rejects a prefix-sibling root [1.14ms]
+(pass) package receipt log path binding > rejects an alternative log inside the collab root [0.94ms]
+
+scripts/package-lib/shared-paths.test.ts:
+(pass) shared production path rules > changing shared input moves both production and inspection consumers [0.12ms]
+(pass) static shared-module dependency > gate and production import package-resource-paths [0.52ms]
+
+scripts/package-lib/package-cleanup.test.ts:
+(pass) package verification cleanup > preserves sibling distribution artifacts [1.07ms]
+
+scripts/package-lib/extra-resources.test.ts:
+(pass) extra-resources parsing > rejects non-array extraResources [0.17ms]
+(pass) extra-resources parsing > rejects linux extraResources non-array [0.09ms]
+(pass) extra-resources parsing > rejects empty from/to and extra keys [0.19ms]
+(pass) extra-resources parsing > rejects macros in from and to [0.06ms]
+(pass) extra-resources parsing > merges top-level and linux file sets [0.06ms]
+
+ 29 pass
+ 0 fail
+ 69 expect() calls
+Ran 29 tests across 6 files. [332.00ms]
+
+== release:build (collab-electron) :: bun run build ==
+$ node ./scripts/run-local-bin.mjs electron-vite build
+vite v7.3.6 building ssr environment for production...
+transforming...
+✓ 197 modules transformed.
+rendering chunks...
+out/main/chunks/collab-file-url-DRDP9cMM.js    1.05 kB
+out/main/watcher-worker.js                     2.74 kB
+out/main/chunks/file-filter-B5Zqfp2V.js        3.45 kB
+out/main/image-worker.js                       4.06 kB
+out/main/chunks/protocol-nZI4ITYS.js           6.82 kB
+out/main/git-replay-worker.js                 12.40 kB
+out/main/pty-sidecar.js                       20.10 kB
+out/main/index.js                            604.68 kB
+✓ built in 1.00s
+vite v7.3.6 building ssr environment for production...
+transforming...
+✓ 2 modules transformed.
+rendering chunks...
+out/preload/shell.js      10.66 kB
+out/preload/universal.js  18.82 kB
+✓ built in 33ms
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 10031 modules transformed.
+rendering chunks...
+../../out/renderer/session-tile/index.html                               0.55 kB
+../../out/renderer/artifact-tile/index.html                              0.70 kB
+../../out/renderer/terminal-tile/index.html                              0.71 kB
+../../out/renderer/agent-chat/index.html                                 0.77 kB
+../../out/renderer/tile-list/index.html                                  0.85 kB
+../../out/renderer/settings/index.html                                   0.89 kB
+../../out/renderer/graph-tile/index.html                                 0.94 kB
+../../out/renderer/terminal/index.html                                   1.02 kB
+../../out/renderer/viewer/index.html                                     1.09 kB
+../../out/renderer/nav/index.html                                        1.27 kB
+../../out/renderer/assets/KaTeX_Size3-Regular-CTq5MqoE.woff              4.42 kB
+../../out/renderer/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2             4.93 kB
+../../out/renderer/shell/index.html                                      5.15 kB
+../../out/renderer/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2             5.21 kB
+../../out/renderer/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2             5.47 kB
+../../out/renderer/assets/KaTeX_Size4-Regular-BF-4gkZK.woff              5.98 kB
+../../out/renderer/assets/KaTeX_Size2-Regular-oD1tc_U0.woff              6.19 kB
+../../out/renderer/assets/KaTeX_Size1-Regular-C195tn64.woff              6.50 kB
+../../out/renderer/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2       6.91 kB
+../../out/renderer/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2          6.91 kB
+../../out/renderer/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf               7.59 kB
+../../out/renderer/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff        7.66 kB
+../../out/renderer/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff           7.72 kB
+../../out/renderer/assets/KaTeX_Script-Regular-D3wIWfF6.woff2            9.64 kB
+../../out/renderer/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2        10.34 kB
+../../out/renderer/assets/KaTeX_Size4-Regular-DWFBv043.ttf              10.36 kB
+../../out/renderer/assets/KaTeX_Script-Regular-D5yQViql.woff            10.59 kB
+../../out/renderer/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2          11.32 kB
+../../out/renderer/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2             11.35 kB
+../../out/renderer/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf              11.51 kB
+../../out/renderer/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2         12.03 kB
+../../out/renderer/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2           12.22 kB
+../../out/renderer/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf              12.23 kB
+../../out/renderer/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff         12.32 kB
+../../out/renderer/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf        12.34 kB
+../../out/renderer/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf           12.37 kB
+../../out/renderer/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff           13.21 kB
+../../out/renderer/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff              13.30 kB
+../../out/renderer/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2       13.57 kB
+../../out/renderer/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff          14.11 kB
+../../out/renderer/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff            14.41 kB
+../../out/renderer/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff        16.03 kB
+../../out/renderer/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2          16.40 kB
+../../out/renderer/assets/KaTeX_Math-Italic-t53AETM-.woff2              16.44 kB
+../../out/renderer/assets/inter-v12-latin-100-BQDzDElq.woff2            16.55 kB
+../../out/renderer/assets/KaTeX_Script-Regular-C5JkGWo-.ttf             16.65 kB
+../../out/renderer/assets/inter-v12-latin-regular-YtgfLPRn.woff2        16.71 kB
+../../out/renderer/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2          16.78 kB
+../../out/renderer/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2              16.99 kB
+../../out/renderer/assets/inter-v12-latin-900-CMga-52B.woff2            17.18 kB
+../../out/renderer/assets/inter-v12-latin-300-DEbyFmpd.woff2            17.33 kB
+../../out/renderer/assets/inter-v12-latin-200-BxfrU12A.woff2            17.34 kB
+../../out/renderer/assets/inter-v12-latin-500-DfX5FI9E.woff2            17.55 kB
+../../out/renderer/assets/inter-v12-latin-600-BvOeHRLc.woff2            17.66 kB
+../../out/renderer/assets/inter-v12-latin-800-Bdy4lAMa.woff2            17.76 kB
+../../out/renderer/assets/inter-v12-latin-700-Bj1B9WKG.woff2            17.78 kB
+../../out/renderer/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff           18.67 kB
+../../out/renderer/assets/KaTeX_Math-Italic-DA0__PXp.woff               18.75 kB
+../../out/renderer/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff           19.41 kB
+../../out/renderer/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf          19.44 kB
+../../out/renderer/assets/KaTeX_Fraktur-Regular-CB_wures.ttf            19.57 kB
+../../out/renderer/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf               19.58 kB
+../../out/renderer/assets/KaTeX_Main-Italic-BMLOBm91.woff               19.68 kB
+../../out/renderer/assets/inter-v12-latin-100-46Mq0mOp.woff             21.24 kB
+../../out/renderer/assets/inter-v12-latin-regular-CahmJf_6.woff         21.42 kB
+../../out/renderer/assets/inter-v12-latin-900-ORHAl5ZU.woff             21.98 kB
+../../out/renderer/assets/inter-v12-latin-300-f7r92Nkj.woff             22.16 kB
+../../out/renderer/assets/inter-v12-latin-200-DXfqWPZg.woff             22.24 kB
+../../out/renderer/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf           22.36 kB
+../../out/renderer/assets/inter-v12-latin-500-BQ2gQN_M.woff             22.52 kB
+../../out/renderer/assets/inter-v12-latin-600-D01NXWOK.woff             22.64 kB
+../../out/renderer/assets/inter-v12-latin-700-B5TOIllR.woff             22.68 kB
+../../out/renderer/assets/inter-v12-latin-800-DFVvDWwT.woff             22.71 kB
+../../out/renderer/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf             24.50 kB
+../../out/renderer/assets/KaTeX_Main-Bold-Cx986IdX.woff2                25.32 kB
+../../out/renderer/assets/KaTeX_Main-Regular-B22Nviop.woff2             26.27 kB
+../../out/renderer/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf         27.56 kB
+../../out/renderer/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2              28.08 kB
+../../out/renderer/assets/KaTeX_Main-Bold-Jm3AIy58.woff                 29.91 kB
+../../out/renderer/assets/KaTeX_Main-Regular-Dr94JaBh.woff              30.77 kB
+../../out/renderer/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf            31.20 kB
+../../out/renderer/assets/KaTeX_Math-Italic-flOr_0UB.ttf                31.31 kB
+../../out/renderer/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf            32.97 kB
+../../out/renderer/assets/KaTeX_AMS-Regular-DMm9YOAa.woff               33.52 kB
+../../out/renderer/assets/KaTeX_Main-Italic-3WenGoN9.ttf                33.58 kB
+../../out/renderer/assets/KaTeX_Main-Bold-waoOVXN0.ttf                  51.34 kB
+../../out/renderer/assets/KaTeX_Main-Regular-ypZvNtVU.ttf               53.58 kB
+../../out/renderer/assets/KaTeX_AMS-Regular-DRggAlZN.ttf                63.63 kB
+../../out/renderer/assets/codicon-ngg6Pgfi.ttf                         121.97 kB
+../../out/renderer/assets/editor.worker-BKBmkYkj.js                    540.94 kB
+../../out/renderer/assets/json.worker-r5IVm0zS.js                      840.03 kB
+../../out/renderer/assets/html.worker-5fBvJVFp.js                    1,241.56 kB
+../../out/renderer/assets/css.worker-CsqbzYvt.js                     1,865.96 kB
+../../out/renderer/assets/ts.worker-CL8L56yC.js                     13,264.04 kB
+../../out/renderer/assets/graph-tile-C5ui-h-O.css                        0.13 kB
+../../out/renderer/assets/terminal-tile-MhA4r1O7.css                     0.38 kB
+../../out/renderer/assets/artifact-tile-CDbDrbBE.css                     0.79 kB
+../../out/renderer/assets/session-tile-B_HluM2a.css                      1.32 kB
+../../out/renderer/assets/Theme-C6NCeU_6.css                             1.66 kB
+../../out/renderer/assets/tile-list-BOe-SLSC.css                         1.77 kB
+../../out/renderer/assets/terminal-D1J3upVO.css                          2.53 kB
+../../out/renderer/assets/agent-chat-DeS3Dmvj.css                        2.57 kB
+../../out/renderer/assets/index-W34_rHGk.css                             3.88 kB
+../../out/renderer/assets/WorkspaceGraph-DpA0DDeH.css                    6.24 kB
+../../out/renderer/assets/nav-gmZ8Ad60.css                               6.75 kB
+../../out/renderer/assets/TerminalTab-BSKhviPV.css                       7.83 kB
+../../out/renderer/assets/FileImage-B0y6Veqt.css                        10.83 kB
+../../out/renderer/assets/styles-8RBQTpB7.css                           26.96 kB
+../../out/renderer/assets/shell-BE2_DWgH.css                            31.46 kB
+../../out/renderer/assets/viewer-jacwYX5b.css                           35.98 kB
+../../out/renderer/assets/App-rl0Hxu-2.css                             552.08 kB
+../../out/renderer/assets/dark-mode-LJlL8nTc.js                          0.31 kB
+../../out/renderer/assets/collab-file-url-BmhQoLrA.js                    0.36 kB
+../../out/renderer/assets/image-D9HZFqAz.js                              0.38 kB
+../../out/renderer/assets/azcli-BEAhqcuE.js                              1.30 kB
+../../out/renderer/assets/ini-BcQysCTb.js                                1.67 kB
+../../out/renderer/assets/javascript-uq1lqsGc.js                         1.68 kB
+../../out/renderer/assets/csp-D_3BK2Wp.js                                1.70 kB
+../../out/renderer/assets/IconBase-C0q8mqYL.js                           1.84 kB
+../../out/renderer/assets/scheme-D7PxodDG.js                             2.36 kB
+../../out/renderer/assets/bat-Bqkp9Cfu.js                                2.66 kB
+../../out/renderer/assets/Terminal-Zlybyqd0.js                           2.67 kB
+../../out/renderer/assets/flow9-ZSTChSMd.js                              2.76 kB
+../../out/renderer/assets/sb-Chfc_wZF.js                                 2.81 kB
+../../out/renderer/assets/pla-DEV89yYj.js                                2.87 kB
+../../out/renderer/assets/dockerfile--oxj0cAH.js                         3.02 kB
+../../out/renderer/assets/xml-DIVk8I9q.js                                3.12 kB
+../../out/renderer/assets/pascaligo-VA_LQ1oU.js                          3.25 kB
+../../out/renderer/assets/lua-hNsuGJkO.js                                3.43 kB
+../../out/renderer/assets/bicep-DIlfshcM.js                              3.44 kB
+../../out/renderer/assets/objective-c-B1L1C5EC.js                        3.48 kB
+../../out/renderer/assets/cameligo-CLaaYNMV.js                           3.51 kB
+../../out/renderer/assets/artifact-tile-BcXcLsK-.js                      3.67 kB
+../../out/renderer/assets/graphql-BeiGgjIU.js                            3.77 kB
+../../out/renderer/assets/lexon-C1U0m2n9.js                              3.81 kB
+../../out/renderer/assets/typespec-R77Ln7Jb.js                           3.90 kB
+../../out/renderer/assets/sparql-DxuVdnRl.js                             3.94 kB
+../../out/renderer/assets/terminal-tile-w8HlcfoM.js                      4.07 kB
+../../out/renderer/assets/FileImage-BptNCwZi.js                          4.09 kB
+../../out/renderer/assets/path-utils-VDUsFwSX.js                         4.13 kB
+../../out/renderer/assets/viewer-Lpgalxey.js                             4.13 kB
+../../out/renderer/assets/mips-CJm71dS3.js                               4.14 kB
+../../out/renderer/assets/m3-6ko6q9-_.js                                 4.15 kB
+../../out/renderer/assets/sophia-D7pU0Y1d.js                             4.27 kB
+../../out/renderer/assets/shell-vZEubQ82.js                              4.48 kB
+../../out/renderer/assets/go-brnMpFrj.js                                 4.49 kB
+../../out/renderer/assets/fsharp-D2uoxuLH.js                             4.51 kB
+../../out/renderer/assets/pascal-DMQyD4Xk.js                             4.71 kB
+../../out/renderer/assets/r-CtqYUQ6l.js                                  4.80 kB
+../../out/renderer/assets/less-B7Qaxw-O.js                               5.00 kB
+../../out/renderer/assets/tcl-Bb4GCwBr.js                                5.05 kB
+../../out/renderer/assets/qsharp-BWK6YLKm.js                             5.14 kB
+../../out/renderer/assets/cypher-D0--_GAN.js                             5.15 kB
+../../out/renderer/assets/java-Dt3iMn2o.js                               5.16 kB
+../../out/renderer/assets/kotlin-Ddo1SjA5.js                             5.20 kB
+../../out/renderer/assets/hcl-CrX1Es2W.js                                5.21 kB
+../../out/renderer/assets/redis-O7gSt3oh.js                              5.25 kB
+../../out/renderer/assets/restructuredtext-B-KQCVu_.js                   5.33 kB
+../../out/renderer/assets/powershell-BXiKvz7Z.js                         5.39 kB
+../../out/renderer/assets/liquid-DKjmMWNm.js                             5.45 kB
+../../out/renderer/assets/coffee-CzJ5oEdj.js                             5.51 kB
+../../out/renderer/assets/session-tile--iFJVsmG.js                       6.00 kB
+../../out/renderer/assets/css-i3rI3_64.js                                6.10 kB
+../../out/renderer/assets/mdx-CcRYt66y.js                                6.13 kB
+../../out/renderer/assets/yaml-Dly1Ggt7.js                               6.19 kB
+../../out/renderer/assets/rust-B1c0VCeq.js                               6.27 kB
+../../out/renderer/assets/apex-DVGUZ64i.js                               6.39 kB
+../../out/renderer/assets/dart-vLMHv35g.js                               6.48 kB
+../../out/renderer/assets/cssMode-DENOxsHJ.js                            6.52 kB
+../../out/renderer/assets/markdown-B0YTnTxW.js                           6.65 kB
+../../out/renderer/assets/python-D3lke8B5.js                             6.81 kB
+../../out/renderer/assets/swift-CbF6f74o.js                              6.92 kB
+../../out/renderer/assets/msdax-BBeIktCY.js                              6.95 kB
+../../out/renderer/assets/csharp-BJeIuvde.js                             6.98 kB
+../../out/renderer/assets/htmlMode-DJD8D_Lu.js                           7.26 kB
+../../out/renderer/assets/html-Bk2Dxvya.js                               7.93 kB
+../../out/renderer/assets/ecl-CeuUgzaZ.js                                7.94 kB
+../../out/renderer/assets/typescript-DRKRCcV2.js                         8.21 kB
+../../out/renderer/assets/cpp-CcN6f0ik.js                                8.22 kB
+../../out/renderer/assets/pug-BxCXwerb.js                                8.26 kB
+../../out/renderer/assets/vb-Bm6ESA0Q.js                                 8.33 kB
+../../out/renderer/assets/terminal-BW5IeX67.js                           8.83 kB
+../../out/renderer/assets/scss-B42qMyAu.js                               9.07 kB
+../../out/renderer/assets/wgsl-_KPae5vw.js                               9.78 kB
+../../out/renderer/assets/st-C-b0Dh53.js                                10.15 kB
+../../out/renderer/assets/twig-DvgEGWAV.js                              10.26 kB
+../../out/renderer/assets/julia-Cm3ItYL_.js                             10.54 kB
+../../out/renderer/assets/scala-DbVzH-3O.js                             10.70 kB
+../../out/renderer/assets/handlebars-CY-vrScy.js                        10.71 kB
+../../out/renderer/assets/systemverilog-BOC0OOdC.js                     11.63 kB
+../../out/renderer/assets/php-Bkx1qpkQ.js                               12.48 kB
+../../out/renderer/assets/protobuf-CndvAUGu.js                          12.68 kB
+../../out/renderer/assets/perl-DC0Z0tlO.js                              12.82 kB
+../../out/renderer/assets/razor-D6FizS_m.js                             13.64 kB
+../../out/renderer/assets/clojure-fcgFaMHx.js                           13.94 kB
+../../out/renderer/assets/ruby-DCd4DmAr.js                              15.31 kB
+../../out/renderer/assets/sql-BAGepFCR.js                               15.56 kB
+../../out/renderer/assets/mysql-BWiizXSn.js                             16.16 kB
+../../out/renderer/assets/redshift-CvYMMYZY.js                          16.33 kB
+../../out/renderer/assets/pgsql-DaSGFTLp.js                             18.25 kB
+../../out/renderer/assets/elixir-eLfY1jWH.js                            18.74 kB
+../../out/renderer/assets/postiats-CVVurEnu.js                          19.30 kB
+../../out/renderer/assets/powerquery-BQ_t1ZiQ.js                        21.65 kB
+../../out/renderer/assets/abap-D5KwWAsZ.js                              22.97 kB
+../../out/renderer/assets/tile-list-yPBplMge.js                         23.91 kB
+../../out/renderer/assets/solidity-yHOxYChb.js                          26.03 kB
+../../out/renderer/assets/jsonMode-50yjlewj.js                          29.49 kB
+../../out/renderer/assets/tsMode-Boc07eae.js                            40.69 kB
+../../out/renderer/assets/freemarker2-BFS3ONJU.js                       42.47 kB
+../../out/renderer/assets/graph-tile-B-iHPeev.js                        44.61 kB
+../../out/renderer/assets/settings-fS0QllY7.js                          60.19 kB
+../../out/renderer/assets/lspLanguageFeatures-CKSSP-Z9.js               61.69 kB
+../../out/renderer/assets/module-C_DZUNyP.js                           133.00 kB
+../../out/renderer/assets/WorkspaceGraph-CyBV4Z3x.js                   142.67 kB
+../../out/renderer/assets/shell-IEWlhxkN.js                            161.39 kB
+../../out/renderer/assets/nav-BS2gF4qS.js                              270.98 kB
+../../out/renderer/assets/index-CrtObaRT.js                            285.03 kB
+../../out/renderer/assets/PostHogProvider-4DctsfX9.js                  316.74 kB
+../../out/renderer/assets/agent-chat-CRrSXFY-.js                       383.39 kB
+../../out/renderer/assets/native-4xGXbtDn.js                           433.09 kB
+../../out/renderer/assets/index-Cd67-gFv.js                            555.52 kB
+../../out/renderer/assets/TerminalTab-D660awaO.js                      605.79 kB
+../../out/renderer/assets/App-BMo2XTHU.js                           10,565.70 kB
+✓ built in 48.45s
+
+== release:package (collab-electron) :: bun run package:verify ==
+$ bun ./scripts/package-verify.ts
+package:verify: runId=7c13c231-f4dd-4cb9-9aa0-abe3cb6627a1
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos@0.2.7
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ zod@4.4.3
+
+418 packages installed [13.42s]
+$ node ./scripts/pack-agent.mjs
+Bundled 119 modules in 28ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /home/rybowen21/qf-verify-wo107/tools/runtime-proof/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack-agent: wrote /home/rybowen21/qf-verify-wo107/tools/runtime-proof/packed/qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready /home/rybowen21/qf-verify-wo107/tools/runtime-proof/packed/qf-toolloop.aospkg
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@0.18.2
++ @rivet-dev/agentos-core@0.2.7
++ qf-kernel@../../packages/qf-kernel
+
+358 packages installed [852.00ms]
+$ node ./scripts/pack-agent.mjs
+Bundled 1 module in 5ms
+
+  acp-shim.js  2.15 KB  (entry point)
+
+packed hermes@0.1.0 → /home/rybowen21/qf-verify-wo107/species/hermes/packed/hermes.tar
+  commands: hermes-acp-shim
+pack-agent: wrote /home/rybowen21/qf-verify-wo107/species/hermes/packed/hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"profile_argv":["-p","{runtime_profile}","--tui"],"peer_delivery":{"mode":"pty_role","runtime_profiles":["qf-orchestrator","qf-worker","qf-worker-2"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready /home/rybowen21/qf-verify-wo107/species/hermes/packed/hermes.aospkg
+  • electron-builder  version=26.8.1 os=6.18.33.2-microsoft-standard-WSL2
+  • loaded configuration  file=package.json ("build" field)
+  • description is missed in the package.json  appPackageFile=/home/rybowen21/qf-verify-wo107/collab-electron/package.json
+  • author is missed in the package.json  appPackageFile=/home/rybowen21/qf-verify-wo107/collab-electron/package.json
+  • @electron/rebuild already used by electron-builder, please consider to remove excess dependency from devDependencies
+
+To ensure your native dependencies are always matched electron version, simply add script `"postinstall": "electron-builder install-app-deps" to your `package.json`
+  • skipped dependencies rebuild  reason=npmRebuild is set to false
+  • packaging       platform=linux arch=x64 electron=40.6.0 appOutDir=dist/linux-unpacked
+  • detected workspace root for project using lock file  pm=bun config=undefined resolved=/home/rybowen21/qf-verify-wo107/collab-electron projectDir=/home/rybowen21/qf-verify-wo107/collab-electron
+  • searching for node modules  pm=bun searchDir=/home/rybowen21/qf-verify-wo107/collab-electron
+  • note: bun does not support any CLI for dependency tree extraction, utilizing file traversal collector instead
+  • using manual traversal of node_modules to build dependency tree
+  • missing optional dependencies  dependencies=["@img/sharp-darwin-arm64@^0.34.2","@img/sharp-darwin-x64@^0.34.2","@img/sharp-linux-arm@^0.34.2","@img/sharp-linux-arm64@^0.34.2","@img/sharp-linuxmusl-arm64@^0.34.2","@img/sharp-win32-arm64@^0.34.2","@img/sharp-win32-x64@^0.34.2","@parcel/watcher-darwin-x64@2.5.6","@parcel/watcher-darwin-arm64@2.5.6","@parcel/watcher-win32-x64@2.5.6","@parcel/watcher-win32-arm64@2.5.6","@parcel/watcher-win32-ia32@2.5.6","@parcel/watcher-linux-arm64-glibc@2.5.6","@parcel/watcher-linux-arm64-musl@2.5.6","@parcel/watcher-linux-arm-glibc@2.5.6","@parcel/watcher-linux-arm-musl@2.5.6","@parcel/watcher-android-arm64@2.5.6","@parcel/watcher-freebsd-x64@2.5.6","@img/sharp-darwin-arm64@^0.34.2","@img/sharp-darwin-x64@^0.34.2","@img/sharp-linux-arm@^0.34.2","@img/sharp-linux-arm64@^0.34.2","@img/sharp-linuxmusl-arm64@^0.34.2","@img/sharp-win32-arm64@^0.34.2","@img/sharp-win32-x64@^0.34.2","@mariozechner/clipboard-darwin-arm64@0.3.9","@mariozechner/clipboard-darwin-universal@0.3.9","@mariozechner/clipboard-darwin-x64@0.3.9","@mariozechner/clipboard-linux-arm64-gnu@0.3.9","@mariozechner/clipboard-linux-arm64-musl@0.3.9","@mariozechner/clipboard-linux-riscv64-gnu@0.3.9","@mariozechner/clipboard-win32-arm64-msvc@0.3.9","@mariozechner/clipboard-win32-x64-msvc@0.3.9","@rivet-dev/agentos-sidecar-darwin-arm64@0.2.7","@rivet-dev/agentos-sidecar-darwin-x64@0.2.7","@rivet-dev/agentos-sidecar-linux-arm64-gnu@0.2.7","@rivet-dev/agentos-runtime-sidecar-darwin-arm64@0.2.7","@rivet-dev/agentos-runtime-sidecar-darwin-x64@0.2.7","@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu@0.2.7","@img/sharp-darwin-arm64@0.34.5","@img/sharp-darwin-x64@0.34.5","@img/sharp-libvips-darwin-arm64@1.2.4","@img/sharp-libvips-darwin-x64@1.2.4","@img/sharp-libvips-linux-arm@1.2.4","@img/sharp-libvips-linux-arm64@1.2.4","@img/sharp-libvips-linux-ppc64@1.2.4","@img/sharp-libvips-linux-riscv64@1.2.4","@img/sharp-libvips-linux-s390x@1.2.4","@img/sharp-libvips-linuxmusl-arm64@1.2.4","@img/sharp-linux-arm@0.34.5","@img/sharp-linux-arm64@0.34.5","@img/sharp-linux-ppc64@0.34.5","@img/sharp-linux-riscv64@0.34.5","@img/sharp-linux-s390x@0.34.5","@img/sharp-linuxmusl-arm64@0.34.5","@img/sharp-wasm32@0.34.5","@img/sharp-win32-arm64@0.34.5","@img/sharp-win32-ia32@0.34.5","@img/sharp-win32-x64@0.34.5","@img/sharp-darwin-arm64@0.34.5","@img/sharp-darwin-x64@0.34.5","@img/sharp-libvips-darwin-arm64@1.2.4","@img/sharp-libvips-darwin-x64@1.2.4","@parcel/watcher-darwin-arm64@2.5.6","@parcel/watcher-darwin-x64@2.5.6"]
+  • skipping "afterSign" hook as no signing occurred, perhaps you intended "afterPack"?
+package:verify: PASS
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.meta.json (85 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/launch.json (50 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/dock-profiles.json (269 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.meta.json (565 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/launch.json (247 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/dock-profiles.json (555 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.aospkg (22658527 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.meta.json (85 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/launch.json (50 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.aospkg (20031 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.meta.json (565 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/launch.json (247 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/tools-allowlist.json (243 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tmux.conf (344 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/terminfo/78/xterm-256color (3462 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-cli.mjs (18028 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/skills/collab-canvas/SKILL.md (5998 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/.claude-plugin/plugin.json (201 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/collab-canvas-gemini.md (2474 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/collab-canvas-codex.md (2473 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.meta.json (565 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.aospkg (20031 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/launch.json (247 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/tools-allowlist.json (243 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/dock-profiles.json (555 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.aospkg (22658527 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.meta.json (85 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/launch.json (50 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/dock-profiles.json (269 bytes)
+package:verify: checked node_modules/qf-kernel-schema/golden/migration.sql (38956 bytes)
+package:verify: checked node_modules/qf-kernel-schema/compat/pre-d1-profile-identity.sql (37432 bytes)
+package:verify: checked node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql (1974 bytes)
+package:verify: checked node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql (451 bytes)
+package:verify: checked node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql (739 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/quantflow (202792152 bytes)
+package:verify: checked app.asar:package.json (1343 bytes)
+package:verify: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/app-update.yml (108 bytes)
+
+== release:qa (.) :: bun qa/run.ts --all ==
+PASS  repo-shape
+PASS  lockfile-committed
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ zod@4.4.3
+
+6 packages installed [21.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/define.test.ts:
+(pass) schema lint > trusted market context actions are operator-only and reject creation envelopes [8.39ms]
+(pass) schema lint > object missing description fails naming the offender [0.19ms]
+(pass) schema lint > object missing lifecycle fails naming the offender [0.11ms]
+(pass) schema lint > property missing description fails naming the offender [0.13ms]
+(pass) schema lint > link missing description fails naming the offender [0.23ms]
+(pass) schema lint > action missing description fails naming the offender [0.15ms]
+(pass) schema lint > multi-endpoint link preserves declaration order [0.27ms]
+(pass) schema lint > lintSchema rejects duplicate names [0.24ms]
+(pass) schema lint > lintSchema rejects unknown link endpoints [0.24ms]
+(pass) schema lint > lintSchema rejects status enum missing from transition table [0.35ms]
+(pass) schema lint > lintCommands rejects a command that is not a schema action [0.54ms]
+(pass) schema lint > lintCommands rejects a legal transition with no command [0.22ms]
+(pass) schema lint > lintCommands rejects a creation command that is not a schema action [0.18ms]
+(pass) schema lint > lintCommands rejects transition command edges for pipeline-fed types [0.22ms]
+(pass) schema lint > lintCommands rejects creation command coverage for pipeline-fed types [0.20ms]
+(pass) schema lint > lintCommands rejects observation-coupled action without operatorOnly (generic rule) [0.31ms]
+(pass) schema lint > lintCommands rejects operatorOnly action with a non-observation command event [0.28ms]
+(pass) schema lint > lintCommands accepts non-observation operatorOnly action [0.21ms]
+(pass) schema lint > pipeline commands require pipeline-only actions and pipeline-fed object types [0.62ms]
+(pass) schema lint > pipeline command lint rejects dual trust modes, duplicate entries, and mixed families [0.52ms]
+(pass) schema lint > lintActionSurface rejects a schema action with no command wiring [0.32ms]
+(pass) schema lint > lintSchema rejects silo clone object names that embed another kind enum value [0.30ms]
+(pass) schema lint > lintSchema active-freeze rejects removed baseline property [1.78ms]
+(pass) schema lint > lintSchema active-freeze rejects retyped baseline property [0.33ms]
+(pass) schema lint > real-slip representability fixture builds a single and a five-leg parlay with a void leg [3.09ms]
+(pass) schema lint > market-plane pipeline-fed flags are set only on instrument and quote [0.04ms]
+(pass) schema lint > market ingest batch is strict at the envelope and row boundaries [1.34ms]
+
+src/generate.test.ts:
+(pass) golden outputs > SQL migration matches golden byte-for-byte [2.05ms]
+(pass) golden outputs > MCP tools match golden byte-for-byte [20.68ms]
+(pass) golden outputs > ONTOLOGY.md matches golden byte-for-byte [0.97ms]
+(pass) golden outputs > conformance.test.ts matches golden byte-for-byte [0.31ms]
+(pass) golden outputs > agent-profile-identity upgrade matches golden byte-for-byte [0.15ms]
+(pass) golden outputs > market-ingest upgrade matches golden byte-for-byte [0.07ms]
+(pass) golden outputs > market-context upgrade matches golden byte-for-byte [0.07ms]
+(pass) determinism > two consecutive SQL generations are identical [1.54ms]
+(pass) determinism > two consecutive MCP generations are identical [21.71ms]
+(pass) determinism > two consecutive docs generations are identical [1.25ms]
+(pass) determinism > two consecutive conformance generations are identical [0.65ms]
+(pass) mcp tool descriptions > get, query, and links descriptions are distinct per object [10.71ms]
+(pass) mcp tool descriptions > read tool count is three per object plus one action per action [10.86ms]
+(pass) mcp tool descriptions > pipeline-only action is complete generated authority but is not served to agents [17.14ms]
+(pass) conformance counts > generated file meta matches counted accept/reject totals [0.35ms]
+
+golden/conformance.test.ts:
+(pass) run transitions > accepts queued → running [0.10ms]
+(pass) run transitions > rejects queued → queued [0.10ms]
+(pass) run transitions > rejects queued → succeeded [0.08ms]
+(pass) run transitions > rejects queued → failed [0.04ms]
+(pass) run transitions > rejects queued → cancelled [0.04ms]
+(pass) run transitions > accepts running → succeeded [0.03ms]
+(pass) run transitions > accepts running → failed [0.02ms]
+(pass) run transitions > accepts running → cancelled [0.03ms]
+(pass) run transitions > rejects running → queued [0.04ms]
+(pass) run transitions > rejects running → running [0.04ms]
+(pass) run transitions > rejects succeeded → queued [0.04ms]
+(pass) run transitions > rejects succeeded → running [0.04ms]
+(pass) run transitions > rejects succeeded → succeeded [0.04ms]
+(pass) run transitions > rejects succeeded → failed [0.04ms]
+(pass) run transitions > rejects succeeded → cancelled [0.07ms]
+(pass) run transitions > rejects failed → queued [0.04ms]
+(pass) run transitions > rejects failed → running [0.07ms]
+(pass) run transitions > rejects failed → succeeded [0.07ms]
+(pass) run transitions > rejects failed → failed [0.06ms]
+(pass) run transitions > rejects failed → cancelled [0.07ms]
+(pass) run transitions > rejects cancelled → queued [0.04ms]
+(pass) run transitions > rejects cancelled → running [0.04ms]
+(pass) run transitions > rejects cancelled → succeeded [0.04ms]
+(pass) run transitions > rejects cancelled → failed [0.04ms]
+(pass) run transitions > rejects cancelled → cancelled [0.04ms]
+(pass) hypothesis transitions > accepts open → supported [0.04ms]
+(pass) hypothesis transitions > accepts open → rejected [0.02ms]
+(pass) hypothesis transitions > accepts open → inconclusive [0.02ms]
+(pass) hypothesis transitions > rejects open → open [0.04ms]
+(pass) hypothesis transitions > rejects supported → open [0.05ms]
+(pass) hypothesis transitions > rejects supported → supported [0.04ms]
+(pass) hypothesis transitions > rejects supported → rejected [0.04ms]
+(pass) hypothesis transitions > rejects supported → inconclusive [0.04ms]
+(pass) hypothesis transitions > rejects rejected → open [0.04ms]
+(pass) hypothesis transitions > rejects rejected → supported [0.04ms]
+(pass) hypothesis transitions > rejects rejected → rejected [0.04ms]
+(pass) hypothesis transitions > rejects rejected → inconclusive [0.04ms]
+(pass) hypothesis transitions > rejects inconclusive → open [0.04ms]
+(pass) hypothesis transitions > rejects inconclusive → supported [0.04ms]
+(pass) hypothesis transitions > rejects inconclusive → rejected [0.04ms]
+(pass) hypothesis transitions > rejects inconclusive → inconclusive [0.05ms]
+(pass) ticket transitions > accepts pending → win [0.03ms]
+(pass) ticket transitions > accepts pending → loss [0.03ms]
+(pass) ticket transitions > accepts pending → push [0.03ms]
+(pass) ticket transitions > accepts pending → void [0.02ms]
+(pass) ticket transitions > rejects pending → pending [0.04ms]
+(pass) ticket transitions > rejects win → pending [0.05ms]
+(pass) ticket transitions > rejects win → win [0.04ms]
+(pass) ticket transitions > rejects win → loss [0.03ms]
+(pass) ticket transitions > rejects win → push [0.03ms]
+(pass) ticket transitions > rejects win → void [0.08ms]
+(pass) ticket transitions > rejects loss → pending [0.05ms]
+(pass) ticket transitions > rejects loss → win [0.06ms]
+(pass) ticket transitions > rejects loss → loss [0.06ms]
+(pass) ticket transitions > rejects loss → push [0.06ms]
+(pass) ticket transitions > rejects loss → void [0.06ms]
+(pass) ticket transitions > rejects push → pending [0.06ms]
+(pass) ticket transitions > rejects push → win [0.05ms]
+(pass) ticket transitions > rejects push → loss [0.04ms]
+(pass) ticket transitions > rejects push → push [0.05ms]
+(pass) ticket transitions > rejects push → void [0.04ms]
+(pass) ticket transitions > rejects void → pending [0.04ms]
+(pass) ticket transitions > rejects void → win [0.04ms]
+(pass) ticket transitions > rejects void → loss [0.04ms]
+(pass) ticket transitions > rejects void → push [0.03ms]
+(pass) ticket transitions > rejects void → void [0.03ms]
+(pass) market_event transitions > accepts scheduled → live [0.03ms]
+(pass) market_event transitions > accepts scheduled → void [0.02ms]
+(pass) market_event transitions > rejects scheduled → scheduled [0.04ms]
+(pass) market_event transitions > rejects scheduled → settled [0.06ms]
+(pass) market_event transitions > accepts live → settled [0.08ms]
+(pass) market_event transitions > rejects live → scheduled [0.08ms]
+(pass) market_event transitions > rejects live → live [0.06ms]
+(pass) market_event transitions > rejects live → void [0.04ms]
+(pass) market_event transitions > rejects settled → scheduled [0.05ms]
+(pass) market_event transitions > rejects settled → live [0.04ms]
+(pass) market_event transitions > rejects settled → settled [0.05ms]
+(pass) market_event transitions > rejects settled → void [0.07ms]
+(pass) market_event transitions > rejects void → scheduled [0.05ms]
+(pass) market_event transitions > rejects void → live [0.04ms]
+(pass) market_event transitions > rejects void → settled [0.04ms]
+(pass) market_event transitions > rejects void → void [0.05ms]
+(pass) agent_session transitions > accepts starting → running [0.03ms]
+(pass) agent_session transitions > accepts starting → failed [0.02ms]
+(pass) agent_session transitions > rejects starting → starting [0.04ms]
+(pass) agent_session transitions > rejects starting → blocked [0.04ms]
+(pass) agent_session transitions > rejects starting → cancelled [0.04ms]
+(pass) agent_session transitions > rejects starting → closed [0.07ms]
+(pass) agent_session transitions > accepts running → blocked [0.04ms]
+(pass) agent_session transitions > accepts running → cancelled [0.03ms]
+(pass) agent_session transitions > accepts running → failed [0.03ms]
+(pass) agent_session transitions > accepts running → closed [0.04ms]
+(pass) agent_session transitions > rejects running → starting [0.06ms]
+(pass) agent_session transitions > rejects running → running [0.07ms]
+(pass) agent_session transitions > accepts blocked → running [0.03ms]
+(pass) agent_session transitions > accepts blocked → cancelled [0.02ms]
+(pass) agent_session transitions > accepts blocked → failed [0.02ms]
+(pass) agent_session transitions > rejects blocked → starting [0.04ms]
+(pass) agent_session transitions > rejects blocked → blocked [0.04ms]
+(pass) agent_session transitions > rejects blocked → closed [0.06ms]
+(pass) agent_session transitions > accepts cancelled → closed [0.03ms]
+(pass) agent_session transitions > rejects cancelled → starting [0.06ms]
+(pass) agent_session transitions > rejects cancelled → running [0.06ms]
+(pass) agent_session transitions > rejects cancelled → blocked [0.06ms]
+(pass) agent_session transitions > rejects cancelled → cancelled [0.05ms]
+(pass) agent_session transitions > rejects cancelled → failed [0.04ms]
+(pass) agent_session transitions > accepts failed → closed [0.03ms]
+(pass) agent_session transitions > rejects failed → starting [0.04ms]
+(pass) agent_session transitions > rejects failed → running [0.04ms]
+(pass) agent_session transitions > rejects failed → blocked [0.04ms]
+(pass) agent_session transitions > rejects failed → cancelled [0.04ms]
+(pass) agent_session transitions > rejects failed → failed [0.04ms]
+(pass) agent_session transitions > rejects closed → starting [0.04ms]
+(pass) agent_session transitions > rejects closed → running [0.04ms]
+(pass) agent_session transitions > rejects closed → blocked [0.04ms]
+(pass) agent_session transitions > rejects closed → cancelled [0.03ms]
+(pass) agent_session transitions > rejects closed → failed [0.04ms]
+(pass) agent_session transitions > rejects closed → closed [0.04ms]
+
+ 160 pass
+ 0 fail
+ 584 expect() calls
+Ran 160 tests across 3 files. [196.00ms]
+PASS  schema
+PASS  schema-bundle-aliases
+PASS  release-verifier
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.meta.json (85 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/launch.json (50 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/dock-profiles.json (269 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.meta.json (565 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/launch.json (247 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/dock-profiles.json (555 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.aospkg (22658527 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.meta.json (85 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/launch.json (50 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.aospkg (20031 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.meta.json (565 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/launch.json (247 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/tools-allowlist.json (243 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tmux.conf (344 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/terminfo/78/xterm-256color (3462 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-cli.mjs (18028 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/skills/collab-canvas/SKILL.md (5998 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/.claude-plugin/plugin.json (201 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/collab-canvas-gemini.md (2474 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/collab-canvas-skill/collab-canvas-codex.md (2473 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.meta.json (565 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/packed/hermes.aospkg (20031 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/launch.json (247 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/tools-allowlist.json (243 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/species/hermes/dock-profiles.json (555 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.aospkg (22658527 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/packed/qf-toolloop.meta.json (85 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/launch.json (50 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/tools/runtime-proof/dock-profiles.json (269 bytes)
+package-closure: checked node_modules/qf-kernel-schema/golden/migration.sql (38956 bytes)
+package-closure: checked node_modules/qf-kernel-schema/compat/pre-d1-profile-identity.sql (37432 bytes)
+package-closure: checked node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql (1974 bytes)
+package-closure: checked node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql (451 bytes)
+package-closure: checked node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql (739 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/quantflow (202792152 bytes)
+package-closure: checked app.asar:package.json (1343 bytes)
+package-closure: checked /home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/app-update.yml (108 bytes)
+package-closure: missing-upgrade control observed missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0001-agent-profile-identity.sql
+package-closure: missing-market-context-upgrade control observed missing packaged SQL artifact: node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql
+package-closure: missing-bootstrap control observed runtime control file missing: species/hermes/dock-profiles.json
+PASS  package-closure
+bun install v1.3.14 (0d9b296a)
+
+Checked 426 installs across 460 packages (no changes) [10.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/processes.test.ts:
+(pass) PID-scoped process ownership > recursively derives descendants and excludes an unrelated same-command process [0.69ms]
+(pass) PID-scoped process ownership > process delta identifies only newly observed owned agents [0.16ms]
+(pass) PID-scoped process ownership > exact tracked PID survives after reparenting [0.07ms]
+(pass) PID-scoped process ownership > malformed process rows are ignored without inventing ownership [0.12ms]
+
+src/listeners.test.ts:
+(pass) PID-scoped listener ownership > parses IPv4, IPv6, multiple owners, malformed, ownerless, foreign 8180, and owned lines [0.72ms]
+(pass) PID-scoped listener ownership > live same-user probe reports this test PID for an ephemeral listener [6.43ms]
+(pass) PID-scoped listener ownership > managed foreign listener stays outside this test's owned snapshot [17.49ms]
+
+src/proof.test.ts:
+Bundled 119 modules in 32ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /home/rybowen21/qf-verify-wo107/tools/runtime-proof/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack-agent: wrote /home/rybowen21/qf-verify-wo107/tools/runtime-proof/packed/qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready /home/rybowen21/qf-verify-wo107/tools/runtime-proof/packed/qf-toolloop.aospkg
+P1 createSession / AgentOS: 328ec3e6-15ea-45bb-b59e-b6c26e5df61d
+P1 listSessions table:     [ "328ec3e6-15ea-45bb-b59e-b6c26e5df61d" ]
+P1 notification sessionIds: [ "328ec3e6-15ea-45bb-b59e-b6c26e5df61d", "328ec3e6-15ea-45bb-b59e-b6c26e5df61d",
+  "328ec3e6-15ea-45bb-b59e-b6c26e5df61d"
+]
+(pass) WO-004a runtime ownership proof > P1 · host-reported ID equals guest-minted ID across the process boundary [1010.45ms]
+P1b unknown-session error: Session not found: unknown-session-1a41e7da-631a-4ded-8727-e91f79a90a74
+(pass) WO-004a runtime ownership proof > P1b · loop is session-scoped (notifications + unknown ID rejected) [718.39ms]
+P2 listeners before: 0
+P2 listeners after start: 0
+P2 listeners after session: 0
+P2 new after start: []
+P2 new after session: []
+(pass) WO-004a runtime ownership proof > P2 · no second listening server [730.67ms]
+P2 socket denial: ACP session/new failed: Internal error (data: {"details":"EAGAIN: EAGAIN: maximum socket count reached"})
+P2 sessions before: []
+P2 sessions after: []
+(pass) WO-004a runtime ownership proof > P2 · guest socket denial leaves no registered session [264.49ms]
+P3 prompt text: Calling echo_upper. Tool said QUANTFLOW.
+P3 chunk events: 3
+(pass) WO-004a runtime ownership proof > P3 · tool call inside the session reaches the assistant message [815.05ms]
+P4 stopReason: cancelled
+P4 chunksBeforeCancel: 1
+P4 chunksAfterCancel: 0
+P4 orphanSurvivors: []
+P4 orphanCheck: {
+  sessionGone: true,
+  disposeCompleted: true,
+  listenerCountFinal: 0,
+  zeroOrphanDescendants: true,
+}
+P4 new listeners after cancel: []
+(pass) WO-004a runtime ownership proof > P4 · cancel mid-turn is clean (exactly cancelled, no orphan children) [1315.07ms]
+
+ 13 pass
+ 0 fail
+ 52 expect() calls
+Ran 13 tests across 3 files. [7.76s]
+PASS  runtime-proof
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+7 packages installed [255.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default [0.99ms]
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env [0.25ms]
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork) [0.31ms]
+(pass) resolveKernelPath > :memory: stays verbatim [0.04ms]
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing [0.31ms]
+(pass) resolveKernelPath > G3 control: default creates parent when missing [0.36ms]
+
+src/open-kernel-create.test.ts:
+(pass) WO-K2 openKernel create / readonly > G3: missing file without create throws and creates nothing [6.98ms]
+kernel: path=/tmp/qf-k2-open-3IfM8z/created.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+(pass) WO-K2 openKernel create / readonly > G3: { create: true } creates the file [112.69ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-K2 openKernel create / readonly > G3: :memory: opens without create [3.92ms]
+(pass) WO-K2 openKernel create / readonly > G3: create + readonly together throws [0.63ms]
+(pass) WO-K2 openKernel create / readonly > G3: missing file with readonly throws (cannot create) [0.31ms]
+kernel: path=/tmp/qf-k2-open-BHavGI/ro-write.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+kernel: path=/tmp/qf-k2-open-BHavGI/ro-write.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-k2-open-BHavGI/ro-write.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+(pass) WO-K2 openKernel create / readonly > G4: readonly handle cannot write; writable control succeeds [132.32ms]
+
+src/kernel.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > applies generated migration (run + agent_session + events exist) [2.64ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > execute start_run; illegal retry writes nothing [4.16ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+illegal_transitions_rejected=7
+(pass) qf-kernel > counts illegal transition rejections under test [4.33ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > command without trace context is rejected [2.50ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > create_agent_session requires agent_definition_id and links spawned_from [5.06ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+replay_assertion=equal live.status=failed rebuilt.status=failed
+(pass) qf-kernel > replay rebuilds run status from events and equals live table [2.90ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > events carry trace_id from ctx [2.55ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > publish_artifact creates content-addressed row via event log [3.39ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > publish_artifact rejects hash mismatch and writes nothing [2.54ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+artifact_row_count_after_double_publish=1
+artifact_event_count_after_double_publish=1
+(pass) qf-kernel > publish_artifact identical bytes twice is idempotent (one row, no second event) [2.62ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+artifact_replay_assertion=equal id=229eb2b779d77cfcd8460c1c04c8641f6c43ae35f14a121be52fafadff29de0e kind=result_set
+(pass) qf-kernel > replay rebuilds artifact from events and equals live table [2.64ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > publish_artifact requires trace context [1.88ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > D1 · republish same bytes with different metadata rejects [2.58ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > D2 · replay fails when event content_hash disagrees with identity [2.39ms]
+(pass) qf-kernel > D3 · every creationCommands entry has a handler [0.15ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > register_agent_definition inserts row with id=name [2.66ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > register_agent_definition rejects duplicate name [3.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > market_event start_event transition end to end (WO-103 D0) [2.45ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+G2_objects=[{"t":"artifact","id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"t":"artifact","id":"c0859dc18ea5362b301848a42221a47f42ef15a0af85c498d8da1945e37f503a"},{"t":"dataset","id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{"t":"evaluation","id":"f910d95c-c6e9-43f5-9ef0-cbf2cafb5c7b"},{"t":"hypothesis","id":"53c5f901-fe20-4a08-a78e-e3075db0638c"},{"t":"run","id":"run-chain-1"}]
+G2_links=[{"kind":"evaluated_by","from_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689","to_id":"f910d95c-c6e9-43f5-9ef0-cbf2cafb5c7b"},{"kind":"gates","from_id":"f910d95c-c6e9-43f5-9ef0-cbf2cafb5c7b","to_id":"c0859dc18ea5362b301848a42221a47f42ef15a0af85c498d8da1945e37f503a"},{"kind":"produces","from_id":"run-chain-1","to_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"kind":"tests","from_id":"run-chain-1","to_id":"53c5f901-fe20-4a08-a78e-e3075db0638c"},{"kind":"uses","from_id":"run-chain-1","to_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}]
+(pass) qf-kernel > G2 · six-stage chain created and linked through execute() only [8.33ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > G3 · illegal link kind rejected by endpoint validator before commit [3.09ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > G3 · wrong endpoint type rejected by validator not sqlite [3.24ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+G4_events=[{"type":"ticket.observed","payload":"{\"command\":\"observe_ticket\",\"origin\":\"operator_supplied\",\"kind\":\"single\",\"external_ref\":\"slip-real\",\"placed_at\":\"2026-07-25T12:00:00.000Z\",\"legs\":[{\"selection\":\"A\",\"price\":1.9}],\"combined_price\":1.9,\"stake\":100,\"payout\":190,\"correlation_note\":\"\",\"grade\":\"win\",\"observation\":true,\"span_id\":\"span-slip\"}"}]
+(pass) qf-kernel > G4 · create_ticket rejects grade; observe_ticket records observation [4.36ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) qf-kernel > G4b · creation-policy rejects supplied run status; mechanism is reusable [3.11ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > getObject returns row by id [2.23ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > queryObjects filters by declared property equality [2.51ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > queryObjects limit null returns all rows without cap [5.18ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > queryObjects order asc reverses created_at sort [2.43ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > getLinks returns edges in either direction [3.02ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > unknown type name errors before SQL [2.39ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) read layer > unknown filter key errors before SQL [2.40ms]
+
+src/registry-drift.test.ts:
+(pass) detectObjectTypeRegistryDrift > clean: declared, meta, and tables agree → ok [3.45ms]
+(pass) detectObjectTypeRegistryDrift > missing: declared absent from meta [0.17ms]
+(pass) detectObjectTypeRegistryDrift > retired: meta object no longer declared [0.06ms]
+(pass) detectObjectTypeRegistryDrift > inconsistent: meta claims type with no table [0.04ms]
+(pass) detectObjectTypeRegistryDrift > inconsistent: orphan non-infra table with no meta claim [0.10ms]
+(pass) detectObjectTypeRegistryDrift > infra tables alone never mark inconsistent [0.05ms]
+
+src/attach-kernel-drift.test.ts:
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable → KernelIncompleteInitializationError [39.76ms]
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly → warn + getKernelDrift, no artifact table [38.02ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+(pass) attachKernel WO-K3 drift / incomplete init > clean :memory: writable publish succeeds [3.14ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture writable → KernelRegistryDriftError [47.28ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture readonly → warn + getKernelDrift [57.22ms]
+
+src/busy-timeout.test.ts:
+kernel: path=/tmp/qf-g2-ok-GCNwye/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [718.07ms]
+kernel: path=/tmp/qf-g2-ctrl-SaQmJK/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [627.10ms]
+
+src/market-ingest.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107b market batch runtime > commits one event per row and one derived edge, then exact retry is a no-op [9.83ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107b market batch runtime > conflicting row state or provenance rejects the entire batch [5.06ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107b market batch runtime > missing source, duplicate IDs, and missing quote foreign key reject before writing [4.80ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107b market batch runtime > a commit-time failure on the final row rolls back prior rows and events [4.28ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107b upgrade chain > pre_d1 reaches current in place and preserves rows, links, and events [7.25ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107b upgrade chain > d1 reaches current in place and preserves rows, links, and events [5.84ms]
+
+src/market-context.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107c trusted market context > creates scheduled context with one provenance event and replays by trace identity [4.51ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107c trusted market context > rejects blank context row created_at on replay without writes [3.90ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+(pass) WO-107c trusted market context > conflicts are typed and context envelopes reject before any write [4.76ms]
+
+src/resolve-artifact-root.test.ts:
+(pass) resolveArtifactRoot > default creates ~/.quantflow/artifacts and returns provenance=default [0.99ms]
+(pass) resolveArtifactRoot > env absolute path resolves with provenance=env [0.26ms]
+(pass) resolveArtifactRoot > relative env path becomes absolute [0.40ms]
+(pass) resolveArtifactRoot > env path that is a regular file throws and leaves the file unchanged [0.48ms]
+(pass) resolveArtifactRoot > env path missing throws and creates nothing [0.26ms]
+(pass) resolveArtifactRoot > default creates parent ~/.quantflow when missing [0.53ms]
+
+ 70 pass
+ 0 fail
+ 242 expect() calls
+Ran 70 tests across 9 files. [2.03s]
+PASS  kernel
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [215.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-bovada-football@../../../tools/qf-bovada-football
++ qf-kernel@../../../packages/qf-kernel
++ qf-kernel-schema@../../../qf-kernel-schema
+
+9 packages installed [814.00ms]
+bun install v1.3.14 (0d9b296a)
+
+Checked 6 installs across 7 packages (no changes) [1.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel@../../packages/qf-kernel
+
+8 packages installed [258.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @modelcontextprotocol/sdk@1.29.0
++ qf-kernel@../../packages/qf-kernel
++ zod@4.4.3
+
+99 packages installed [436.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @modelcontextprotocol/sdk@1.29.0
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+99 packages installed [2.46s]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ typescript@5.9.3
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
++ zod@4.4.3
+
+8 packages installed [665.00ms]
+PASS  typecheck
+PASS  kernel-sole-writer
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+kernel-one-path G1: PASS (no illicit env reads or kernel.db literals)
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [266.00ms]
+bun test v1.3.14 (0d9b296a)
+
+src/resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default [2.73ms]
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env [0.97ms]
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork) [0.59ms]
+(pass) resolveKernelPath > :memory: stays verbatim [0.07ms]
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing [0.63ms]
+(pass) resolveKernelPath > G3 control: default creates parent when missing [0.49ms]
+
+src/busy-timeout.test.ts:
+kernel: path=/tmp/qf-g2-ok-qiDgvM/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [793.62ms]
+kernel: path=/tmp/qf-g2-ctrl-0gaPSB/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [630.30ms]
+
+ 8 pass
+ 0 fail
+ 21 expect() calls
+Ran 8 tests across 2 files. [1.51s]
+kernel-one-path G2/G3: PASS
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [635.00ms]
+kernel: path=/tmp/qf-g4-home-9xUHU4/.quantflow/kernel.db provenance=explicit journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+kernel-one-world G4 PASS
+  child D4 boot line: kernel: path=/tmp/qf-g4-home-9xUHU4/.quantflow/kernel.db provenance=default journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+  row round-trip id: 83e5674a-8e12-4745-b8d7-91431c2906c3
+PASS  kernel-one-path
+no-canvas-domain-writes OK
+PASS  no-canvas-domain-writes
+PASS  doc-action-surface
+PASS  observe-door
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ qf-kernel@../../../packages/qf-kernel
++ zod@4.4.3
+
+366 packages installed [1298.00ms]
+$ node ./pack.mjs
+Bundled 119 modules in 41ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /home/rybowen21/qf-verify-wo107/qa/gates/agent-path/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack: ready /home/rybowen21/qf-verify-wo107/qa/gates/agent-path/packed/qf-toolloop.aospkg
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+agent-path: spawn-only/turn pair OK {"admitEvents":["agent_session.created","agent_session.started"],"turnChunks":3}
+agent-path OK
+{"cancelled":"2769d1e9-d7f4-4908-9008-eebdba8dcca5","completed":"4a5c2a8f-748f-4beb-8b69-480d78018257","artifactId":"2964065d5232f6b41512538a1ed123cebb410b30bba442358c15628392ed6ce7","chunksA":1,"chunksB":3}
+PASS  agent-path
+one-skin OK
+totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
+PASS  one-skin
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [296.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../../packages/qf-kernel
++ qf-kernel-schema@../../../qf-kernel-schema
++ typescript@5.9.3
+
+8 packages installed [518.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=67
+kernel: path=/tmp/qf-d1-upgrade-QJtz4d/pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-d1-upgrade-QJtz4d/pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=67
+dock-profile-identity: partial new-column-old-links setup
+dock-profile-identity: partial new-column-old-links rejected cleanly
+dock-profile-identity: partial new-links-old-column setup
+dock-profile-identity: partial new-links-old-column rejected cleanly
+dock-profile-identity: partial both-new-stale-metadata setup
+dock-profile-identity: partial both-new-stale-metadata rejected cleanly
+dock-profile-identity: partial both-new-missing-metadata setup
+dock-profile-identity: partial both-new-missing-metadata rejected cleanly
+dock-profile-identity: partial fake-spawned-from-substring setup
+dock-profile-identity: partial fake-spawned-from-substring rejected cleanly
+dock-profile-identity: partial altered-governed-table setup
+dock-profile-identity: partial altered-governed-table rejected cleanly
+dock-profile-identity: partial missing-agent-definition-table setup
+dock-profile-identity: partial missing-agent-definition-table rejected cleanly
+dock-profile-identity: partial missing-links-table setup
+dock-profile-identity: partial missing-links-table rejected cleanly
+dock-profile-identity: partial lost-old-link-kind setup
+dock-profile-identity: partial lost-old-link-kind rejected cleanly
+dock-profile-identity: partial infrastructure-without-schema-meta setup
+dock-profile-identity: partial infrastructure-without-schema-meta rejected cleanly
+kernel: upgrade required (readonly warn): agent-profile-identity,market-ingest,market-context
+kernel: path=(unspecified) provenance=explicit journal=delete sync=2 schema_meta=63 drift=yes
+dock-profile-identity OK
+{"profileA":"dock-profile-a","profileB":"dock-profile-b","sessionLinks":{"a":"dock-profile-a","b":"dock-profile-b"},"unknownDefinitionResidue":"none","legacyUnlinkedSessions":2,"upgradeRowCounts":{"before":{"definitions":2,"sessions":2,"links":15,"events":3},"after":{"definitions":2,"sessions":2,"links":15,"events":3}}}
+PASS  dock-profile-identity
+bun install v1.3.14 (0d9b296a)
+
+Checked 6 installs across 7 packages (no changes) [1.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [246.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../../packages/qf-kernel
+
+8 packages installed [345.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+dock-definition-launch OK
+{"bootstrap":{"registered":4,"secondBootSkipped":4,"conflicts":1},"sharedHermes":{"packagePath":"app/species/hermes/packed/hermes.aospkg","orchestratorArgv":["-p","qf-orchestrator","--tui"],"workerArgv":["-p","qf-worker","--tui"]},"links":{"orchestrator":"hermes-orchestrator","worker":"hermes-worker"},"uniqueSoftware":[{"adapterId":"hermes","packagePath":"app/species/hermes/packed/hermes.aospkg"},{"adapterId":"qf-toolloop","packagePath":"app/tools/runtime-proof/packed/qf-toolloop.aospkg"}],"peer":{"role":"orchestrator","transportOpened":false},"cleanup":{"createFailure":"no residue","startFailure":"closed receipt","sameRoleRelaunch":"ok"},"acpCleanup":{"matrix":["host_acp:create","host_acp:start","agentos:create","agentos:start"],"exactOwners":true,"cleanupFaultAggregation":["host_acp:start","agentos:start"],"sameDefinitionRelaunch":true},"legacyDockSurfaces":0}
+PASS  dock-definition-launch
+bun install v1.3.14 (0d9b296a)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ qf-kernel@../../../packages/qf-kernel
++ zod@4.4.3
+
+366 packages installed [1.93s]
+$ node ./pack.mjs
+Bundled 119 modules in 41ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → /home/rybowen21/qf-verify-wo107/qa/gates/dock-registry/packed/qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack: ready /home/rybowen21/qf-verify-wo107/qa/gates/dock-registry/packed/qf-toolloop.aospkg
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+dock-registry OK
+{"baitA":"dock-registry-bait-a","baitB":"qf-toolloop","packagePath":"/home/rybowen21/qf-verify-wo107/qa/gates/dock-registry/packed/qf-toolloop.aospkg","literalHits":0}
+PASS  dock-registry
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [616.00ms]
+$ bun src/harness.ts
+[harness] work dir: /tmp/qf-tool-plane-harness-rjL26v
+[harness] kernel db: /tmp/qf-tool-plane-harness-rjL26v/kernel.db
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+
+=== G2 doctrine phase-exit gate ===
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/experimental-kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/experimental-kernel.db provenance=env journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/experimental-kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+tool_plane_expected_count=96 served_count=96 read=72 actions=24
+tool_plane_restricted_action_leaks=[]
+G2_experimental_tools=["qf_experimental_get","qf_experimental_links","qf_experimental_query"]
+G2_experimental_get_response={"content":[{"type":"text","text":"{\n  \"id\": \"exp-probe-1\",\n  \"created_at\": \"2026-07-26T12:00:00.000Z\",\n  \"label\": \"gate-fixture\"\n}"}]}
+
+=== G3 links traversal ===
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+tool_plane_expected_count=92 served_count=92 read=69 actions=23
+tool_plane_restricted_action_leaks=[]
+G3_tool_response={"content":[{"type":"text","text":"[\n  {\n    \"id\": \"29f953ba-7d91-4f3f-9995-a19684168145\",\n    \"kind\": \"tests\",\n    \"from_id\": \"harness-run-1\",\n    \"to_id\": \"885221f4-fb96-404d-8876-d1e9138291ab\",\n    \"created_at\": \"2026-08-02T00:20:47.302Z\"\n  }\n]"}]}
+G3_sql_rows=[{"kind":"tests","from_id":"harness-run-1","to_id":"885221f4-fb96-404d-8876-d1e9138291ab"}]
+
+=== tool-plane action surface ===
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+tool_plane_expected_count=92 served_count=92 read=69 actions=23
+tool_plane_restricted_action_leaks=[]
+tool_plane_action_bad={"content":[{"type":"text","text":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"bogus_gate1_field\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"bogus_gate1_field\\\"\"\n  }\n]"}],"isError":true}
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+tool_plane_events_before_after_bad=4 4
+tool_plane_run_status_after_bad=queued
+tool_plane_action_ok={"content":[{"type":"text","text":"{\n  \"kind\": \"object\",\n  \"object_type\": \"run\",\n  \"object_id\": \"harness-run-action-ok\",\n  \"from\": \"queued\",\n  \"to\": \"running\",\n  \"event\": \"run.started\",\n  \"state\": {\n    \"id\": \"harness-run-action-ok\",\n    \"created_at\": \"2026-08-02T00:20:47.670Z\",\n    \"kind\": \"backtest\",\n    \"status\": \"running\",\n    \"params\": \"{}\",\n    \"trace_id\": \"harness-trace\"\n  }\n}"}]}
+
+=== GATE 2 via action tool ===
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+tool_plane_illegal_transition={"content":[{"type":"text","text":"IllegalTransitionError: Illegal transition for run: queued → succeeded"}],"isError":true}
+kernel: path=/tmp/qf-tool-plane-harness-rjL26v/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+tool_plane_illegal_events_before_after=6 6
+tool_plane_illegal_status=queued
+
+[harness] tool-plane PASS
+PASS  tool-plane
+bun install v1.3.14 (0d9b296a)
+
+Checked 6 installs across 7 packages (no changes) [1.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [258.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [513.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ qf-kernel@../../../packages/qf-kernel
+
+8 packages installed [252.00ms]
+
+=== D0/D1 public write and dispatch inventory ===
+public_exports_root=["AgentDefinitionExistsError","ArtifactMetadataConflictError","ContentHashMismatchError","FabricatedStateError","IllegalLinkError","IllegalTransitionError","KernelError","KernelIncompleteInitializationError","KernelMissingFileError","KernelRegistryDriftError","KernelUpgradeShapeError","MARKET_CONTEXT_UPGRADE","MARKET_INGEST_UPGRADE","MarketContextConflictError","MarketIngestConflictError","MarketIngestValidationError","MissingTraceError","OpenKernelOptionsError","PROFILE_IDENTITY_UPGRADE","PackageRefUnresolvedError","SpawnedFromLinkRejectedError","UnknownAgentDefinitionError","UnknownSpeciesError","assertCreationHandlersComplete","assertPipelineHandlersComplete","attachKernel","classifyKernelShape","closeKernel","contentHash","detectObjectTypeRegistryDrift","enforceObjectTypeRegistryDrift","eventCount","execute","getKernelDrift","getLinks","getObject","logKernelBoot","migrationSqlPath","openKernel","queryObjects","replayArtifactAndAssert","replayRunAndAssert","resolveArtifactRoot","resolveKernelPath","resolvePackageRef","resolveSpeciesPackage","seedExperimentalFixtureTable","upgradeSqlPath"]
+public_exports_portable=["AgentDefinitionExistsError","ArtifactMetadataConflictError","ContentHashMismatchError","IllegalTransitionError","KernelError","KernelIncompleteInitializationError","KernelRegistryDriftError","KernelUpgradeShapeError","MARKET_CONTEXT_UPGRADE","MARKET_INGEST_UPGRADE","MarketContextConflictError","MarketIngestConflictError","MarketIngestValidationError","MissingTraceError","PROFILE_IDENTITY_UPGRADE","PackageRefUnresolvedError","SpawnedFromLinkRejectedError","UnknownAgentDefinitionError","UnknownSpeciesError","assertCreationHandlersComplete","assertPipelineHandlersComplete","attachKernel","classifyKernelShape","contentHash","detectObjectTypeRegistryDrift","enforceObjectTypeRegistryDrift","eventCount","execute","getKernelDrift","getLinks","getObject","logKernelBoot","migrationSqlPath","queryObjects","replayArtifactAndAssert","replayRunAndAssert","requireTrace","resolveArtifactRoot","resolveKernelPath","resolvePackageRef","resolveSpeciesPackage","upgradeSqlPath"]
+dispatch_actions=28 pipeline_rows=2
+
+=== D0/D1 generated authority, served hash, and hidden context actions ===
+objects=23 actions=28 complete_tools=97 served_tools=92 hidden_actions=["ingest_market_batch","observe_ticket","register_agent_definition","register_venue","schedule_market_event"]
+
+=== D1 trusted context creation, replay, conflict, envelopes, and status ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+context_created_at_replay_controls=true
+context_counts={"instruments":0,"quotes":0,"quoteLinks":0,"hasLegLinks":0,"offeredOnLinks":0,"listsLinks":0,"ingestEvents":0}
+
+=== D3 fresh / pre-D1 / D1 / WO-107b upgrade matrix ===
+pre_d1_upgrade_open=begin
+kernel: path=/tmp/qf-market-upgrades-D8ydW9/pre_d1.db provenance=explicit journal=wal sync=2 schema_meta=67
+pre_d1_upgrade_open=end
+pre_d1_upgrade_preserved=true
+d1_upgrade_open=begin
+kernel: path=/tmp/qf-market-upgrades-D8ydW9/d1.db provenance=explicit journal=wal sync=2 schema_meta=67
+d1_upgrade_open=end
+d1_upgrade_preserved=true
+wo_107b_upgrade_open=begin
+kernel: path=/tmp/qf-market-upgrades-D8ydW9/wo_107b.db provenance=explicit journal=wal sync=2 schema_meta=67
+wo_107b_upgrade_open=end
+wo_107b_upgrade_preserved=true
+kernel: path=/tmp/qf-market-upgrades-D8ydW9/fresh.db provenance=explicit journal=wal sync=2 schema_meta=67
+fresh_current=true
+damaged_predecessor_fail_closed=true
+
+=== D2 null market-event receipt ordering ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+null_event_receipt_lists_then_quotes=true
+
+=== D3/D4 atomic ingest, replay, conflict, poison, reads, links ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+market_counts={"instruments":2,"quotes":2,"quoteLinks":2,"hasLegLinks":1,"offeredOnLinks":2,"listsLinks":2,"ingestEvents":4}
+
+=== D3 packaged 0002 + 0003 authority hooks ===
+real_packaged_0002=node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql real_packaged_0003=node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql checked=true
+
+=== D4 MCP hidden context action boundary ===
+kernel: path=/tmp/qf-tool-discovery-1PHns9/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+mcp_connect=begin
+kernel: path=/tmp/qf-tool-discovery-1PHns9/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+mcp_connect=end
+mcp_tools_list=begin
+mcp_tools_list=end
+context_tools_list_absent=true
+qf_register_venue_direct_tool_not_found=true
+qf_schedule_market_event_direct_tool_not_found=true
+mcp_context_actions_unlisted_and_not_found=true
+
+PASS market-context
+PASS  market-context
+bun install v1.3.14 (0d9b296a)
+
+Checked 6 installs across 7 packages (no changes) [2.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [310.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [643.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../../packages/qf-kernel
+
+1 package installed [299.00ms]
+
+=== D0/D1 public write and dispatch inventory ===
+public_exports_root=["AgentDefinitionExistsError","ArtifactMetadataConflictError","ContentHashMismatchError","FabricatedStateError","IllegalLinkError","IllegalTransitionError","KernelError","KernelIncompleteInitializationError","KernelMissingFileError","KernelRegistryDriftError","KernelUpgradeShapeError","MARKET_CONTEXT_UPGRADE","MARKET_INGEST_UPGRADE","MarketContextConflictError","MarketIngestConflictError","MarketIngestValidationError","MissingTraceError","OpenKernelOptionsError","PROFILE_IDENTITY_UPGRADE","PackageRefUnresolvedError","SpawnedFromLinkRejectedError","UnknownAgentDefinitionError","UnknownSpeciesError","assertCreationHandlersComplete","assertPipelineHandlersComplete","attachKernel","classifyKernelShape","closeKernel","contentHash","detectObjectTypeRegistryDrift","enforceObjectTypeRegistryDrift","eventCount","execute","getKernelDrift","getLinks","getObject","logKernelBoot","migrationSqlPath","openKernel","queryObjects","replayArtifactAndAssert","replayRunAndAssert","resolveArtifactRoot","resolveKernelPath","resolvePackageRef","resolveSpeciesPackage","seedExperimentalFixtureTable","upgradeSqlPath"]
+public_exports_portable=["AgentDefinitionExistsError","ArtifactMetadataConflictError","ContentHashMismatchError","IllegalTransitionError","KernelError","KernelIncompleteInitializationError","KernelRegistryDriftError","KernelUpgradeShapeError","MARKET_CONTEXT_UPGRADE","MARKET_INGEST_UPGRADE","MarketContextConflictError","MarketIngestConflictError","MarketIngestValidationError","MissingTraceError","PROFILE_IDENTITY_UPGRADE","PackageRefUnresolvedError","SpawnedFromLinkRejectedError","UnknownAgentDefinitionError","UnknownSpeciesError","assertCreationHandlersComplete","assertPipelineHandlersComplete","attachKernel","classifyKernelShape","contentHash","detectObjectTypeRegistryDrift","enforceObjectTypeRegistryDrift","eventCount","execute","getKernelDrift","getLinks","getObject","logKernelBoot","migrationSqlPath","queryObjects","replayArtifactAndAssert","replayRunAndAssert","requireTrace","resolveArtifactRoot","resolveKernelPath","resolvePackageRef","resolveSpeciesPackage","upgradeSqlPath"]
+dispatch_actions=28 pipeline_rows=2
+
+=== D0/D1 generated authority, served hash, and hidden context actions ===
+objects=23 actions=28 complete_tools=97 served_tools=92 hidden_actions=["ingest_market_batch","observe_ticket","register_agent_definition","register_venue","schedule_market_event"]
+
+=== D1 trusted context creation, replay, conflict, envelopes, and status ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+context_created_at_replay_controls=true
+context_counts={"instruments":0,"quotes":0,"quoteLinks":0,"hasLegLinks":0,"offeredOnLinks":0,"listsLinks":0,"ingestEvents":0}
+
+=== D3 fresh / pre-D1 / D1 / WO-107b upgrade matrix ===
+pre_d1_upgrade_open=begin
+kernel: path=/tmp/qf-market-upgrades-288gso/pre_d1.db provenance=explicit journal=wal sync=2 schema_meta=67
+pre_d1_upgrade_open=end
+pre_d1_upgrade_preserved=true
+d1_upgrade_open=begin
+kernel: path=/tmp/qf-market-upgrades-288gso/d1.db provenance=explicit journal=wal sync=2 schema_meta=67
+d1_upgrade_open=end
+d1_upgrade_preserved=true
+wo_107b_upgrade_open=begin
+kernel: path=/tmp/qf-market-upgrades-288gso/wo_107b.db provenance=explicit journal=wal sync=2 schema_meta=67
+wo_107b_upgrade_open=end
+wo_107b_upgrade_preserved=true
+kernel: path=/tmp/qf-market-upgrades-288gso/fresh.db provenance=explicit journal=wal sync=2 schema_meta=67
+fresh_current=true
+damaged_predecessor_fail_closed=true
+
+=== D2 null market-event receipt ordering ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+null_event_receipt_lists_then_quotes=true
+
+=== D3/D4 atomic ingest, replay, conflict, poison, reads, links ===
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+market_counts={"instruments":2,"quotes":2,"quoteLinks":2,"hasLegLinks":1,"offeredOnLinks":2,"listsLinks":2,"ingestEvents":4}
+
+=== D3 packaged 0002 + 0003 authority hooks ===
+real_packaged_0002=node_modules/qf-kernel-schema/golden/upgrades/0002-market-ingest.sql real_packaged_0003=node_modules/qf-kernel-schema/golden/upgrades/0003-market-context.sql checked=true
+
+=== D4 MCP hidden context action boundary ===
+kernel: path=/tmp/qf-tool-discovery-ZQVvMO/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+mcp_connect=begin
+kernel: path=/tmp/qf-tool-discovery-ZQVvMO/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+mcp_connect=end
+mcp_tools_list=begin
+mcp_tools_list=end
+context_tools_list_absent=true
+qf_register_venue_direct_tool_not_found=true
+qf_schedule_market_event_direct_tool_not_found=true
+mcp_context_actions_unlisted_and_not_found=true
+
+PASS market-context
+PASS  market-ingest
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [492.00ms]
+kernel: path=/tmp/qf-tool-discovery-D1mGaR/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+mcp_connect=begin
+kernel: path=/tmp/qf-tool-discovery-D1mGaR/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+mcp_connect=end
+mcp_tools_list=begin
+mcp_tools_list=end
+G3_advertised_count=92
+G3_served_count=92
+G3_generated_count=97
+G3_restricted_qf_observe_ticket_in_generated=true
+G3_restricted_qf_observe_ticket_in_advertised=false
+G3_restricted_qf_observe_ticket_in_served=false
+G3_restricted_qf_register_venue_in_generated=true
+G3_restricted_qf_register_venue_in_advertised=false
+G3_restricted_qf_register_venue_in_served=false
+G3_restricted_qf_schedule_market_event_in_generated=true
+G3_restricted_qf_schedule_market_event_in_advertised=false
+G3_restricted_qf_schedule_market_event_in_served=false
+G3_restricted_qf_ingest_market_batch_in_generated=true
+G3_restricted_qf_ingest_market_batch_in_advertised=false
+G3_restricted_qf_ingest_market_batch_in_served=false
+G3_restricted_qf_register_agent_definition_in_generated=true
+G3_restricted_qf_register_agent_definition_in_advertised=false
+G3_restricted_qf_register_agent_definition_in_served=false
+named_task_fields_reachable=true
+tool-discovery PASS
+PASS  tool-discovery
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [25200.86s]
+kernel: path=/tmp/qf-action-transport-vXBSez/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-action-transport-vXBSez/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+G2_call_result={"content":[{"type":"text","text":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"bogus_unknown_key\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"bogus_unknown_key\\\"\"\n  }\n]"}],"isError":true}
+kernel: path=/tmp/qf-action-transport-vXBSez/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G2_events_before_after=1 1
+G2_rows_before_after=1 1
+G2_run_status=queued
+action-transport PASS
+PASS  action-transport
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [537.00ms]
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+
+=== G1 hole closed ===
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_absolute_outside_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-rhiH0Q/canary-outside.txt\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_absolute_outside_events_before_after=0 0
+G1_absolute_outside_rows_before_after=0 0
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_dotdot_traversal_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/traversal-target.txt\" does not exist or is not accessible"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_dotdot_traversal_events_before_after=0 0
+G1_dotdot_traversal_rows_before_after=0 0
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_symlink_escape_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/artifacts/escape-link\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_symlink_escape_events_before_after=0 0
+G1_symlink_escape_rows_before_after=0 0
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_prefix_sibling_result={"content":[{"type":"text","text":"KernelError: publish_artifact path rejected: \"/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/artifacts-evil/x\" is outside QF_ARTIFACT_ROOT"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G1_prefix_sibling_events_before_after=0 0
+G1_prefix_sibling_rows_before_after=0 0
+
+=== G2 inside-root publish ===
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+G2_publish_result={"content":[{"type":"text","text":"{\n  \"kind\": \"object\",\n  \"object_type\": \"artifact\",\n  \"object_id\": \"63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750\",\n  \"from\": \"(none)\",\n  \"to\": \"exists\",\n  \"event\": \"artifact.published\",\n  \"state\": {\n    \"id\": \"63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750\",\n    \"created_at\": \"2026-08-02T00:21:02.479Z\",\n    \"kind\": \"report\",\n    \"content_hash\": \"63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750\",\n    \"storage_ref\": \"gate-inside-root\"\n  }\n}"}]}
+G2_content_hash=63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750
+G2_expected_hash=63204421ce88f5725150d05872daaed6477ac3bba36bd2abea754f7f81253750
+
+=== G3 fail closed ===
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+qf-read-tools server: QF_ARTIFACT_ROOT absent — publish_artifact will not be served
+G3_total_tools=91
+G3_action_tools=22
+G3_action_tool_names=["qf_block_agent_session","qf_cancel_agent_session","qf_cancel_run","qf_close_agent_session","qf_complete_run","qf_create_agent_session","qf_create_hypothesis","qf_create_mission","qf_create_run","qf_create_ticket","qf_fail_agent_session","qf_fail_run","qf_grade_ticket","qf_record_evaluation","qf_register_dataset_version","qf_resolve_hypothesis","qf_settle_event","qf_start_agent_session","qf_start_event","qf_start_run","qf_unblock_agent_session","qf_void_event"]
+G3_publish_present=false
+G3_call_result={"content":[{"type":"text","text":"MCP error -32602: Tool qf_publish_artifact not found"}],"isError":true}
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+G3_events_before_after=1 1
+G3_rows_before_after=1 1
+G3_canary_hash_present=false
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+G3_with_root_action_tools=23
+
+=== served action counts ===
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+kernel: path=/tmp/qf-publish-artifact-root-rhiH0Q/home/.quantflow/kernel.db provenance=env journal=wal sync=2 schema_meta=67
+qf-read-tools server: QF_ARTIFACT_ROOT absent — publish_artifact will not be served
+served_action_count_with_root=23
+served_action_count_without_root=22
+publish-artifact-root PASS
+PASS  publish-artifact-root
+PASS  verb-retirement
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ qf-kernel@../../../packages/qf-kernel
+
+8 packages installed [371.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+boot-reconcile OK
+{"seeded":105,"actedOnBefore":105,"actedOnAfter":0,"listLimit":null}
+PASS  boot-reconcile
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [301.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ qf-kernel@../../../packages/qf-kernel
+
+8 packages installed [309.00ms]
+kernel-drift G6 coupling: PASS
+kernel-drift G1: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+kernel-drift G2: PASS
+kernel-drift G3: PASS
+kernel-drift OK
+PASS  kernel-drift
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+1 package installed [236.00ms]
+bun install v1.3.14 (0d9b296a)
+
++ @types/bun@1.3.14
++ qf-kernel@../../../packages/qf-kernel
+
+8 packages installed [256.00ms]
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+artifact-root D5 production writer: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=67
+artifact-root K3b A2A production writer: PASS
+artifact-root G4 production coupling: PASS
+artifact-root K3b A2A production coupling: PASS
+artifact-root K3b governed publishers: PASS (a2a-bus.ts, agent-host.ts)
+artifact-root OK
+PASS  artifact-root
+core tests: PASS
+core five-bait gate: PASS
+qf-canvas/RPC tests: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=67
+request/header canary exclusion: PASS
+generated agent surface: PASS served_tools=92
+package marker restore: GREEN app.asar:out/main/index.js=604679 resources/collab-cli.mjs=18028
+packaged CLI dispatch bait: RED wrong method observed
+packaged CLI dispatch restore: GREEN fixed method and once envelope observed
+bovada-football gate OK
+PASS  bovada-football
+product-identity: bucket B residuals=1
+product-identity: bucket C residuals=138
+product-identity: bucket D residuals=6
+product-identity: migration old-only=7 both=preserved failure=absent retry=published workspace=before-consumers
+product-identity: source, delegation, migration, and package identity coupled
+PASS  product-identity
+bun install v1.3.14 (0d9b296a)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [623.00ms]
+$ bun src/gate.ts
+vault-projection: D1 env refusal…
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-gGLy1M/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+vault-projection: G1…
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-93Wgc7/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-93Wgc7/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+vault-projection: G2…
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-DcIfv4/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-DcIfv4/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+vault-projection: G3…
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-ck20dZ/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-ck20dZ/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+vault-projection: G4…
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-mldNsw/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-mldNsw/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-mldNsw/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+vault-projection: G5…
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-mn2c2d/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/kernel-mn2c2d/kernel.db provenance=explicit journal=wal sync=2 schema_meta=67
+vault-projection: missing-type skip…
+kernel: object-type registry drift (readonly warn): missing=[agent_definition,competitor,connection,dataset,environment,evaluation,execution_environment,hypothesis,instrument,market_event,mission,policy,quote,result,run,strategy,task,ticket,tool,venue,workspace] retired=[] inconsistent=[]
+kernel: path=/home/rybowen21/qf-verify-wo107/tools/qf-vault-projection/.gate-fixtures/incomplete-5A7k5Q/kernel.db provenance=explicit journal=delete sync=2 schema_meta=2 drift=yes
+vault-projection OK
+PASS  vault-projection
+
+PASS  release-verification

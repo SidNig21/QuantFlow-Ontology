@@ -1,0 +1,13 @@
+$ bun src/gate.ts
+qf-bovada-football mutation gate: fixture-only, no network
+BAIT 1 RED: caller credentials escape was detected
+BAIT 1 GREEN: exact production source restored
+BAIT 2 RED: Kernel publish before durable source was detected
+BAIT 2 GREEN: exact production source restored
+BAIT 3 RED: removed pre-game selector predicate was detected
+BAIT 3 GREEN: exact production source restored
+BAIT 4 RED: reissued stable venue instead of read classification was detected
+BAIT 4 GREEN: exact production source restored
+BAIT 5 RED: removed staging cleanup was detected
+BAIT 5 GREEN: exact production source restored
+PASS bovada-football five-bait mutation gate
