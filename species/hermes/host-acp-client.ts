@@ -8,6 +8,8 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
+import { isAbsolute } from "node:path";
+import { execFileSync } from "node:child_process";
 import { Readable, Writable } from "node:stream";
 import {
   ClientSideConnection,
@@ -128,7 +130,18 @@ export function resolveHostAcpCommand(
     (p): p is string => typeof p === "string" && p.length > 0,
   );
   for (const c of candidates) {
-    if (c.startsWith("/") && existsSync(c)) return c;
+    if (isAbsolute(c) && existsSync(c)) return c;
+    if (!isAbsolute(c) && process.platform === "win32") {
+      try {
+        const resolved = execFileSync("where.exe", [c], {
+          encoding: "utf8",
+          windowsHide: true,
+        }).split(/\r?\n/).find((line) => line.trim().length > 0)?.trim();
+        if (resolved && existsSync(resolved)) return resolved;
+      } catch {
+        /* try the next candidate */
+      }
+    }
   }
   throw new Error(
     `host-acp: no executable found among ${JSON.stringify(candidates)}`,

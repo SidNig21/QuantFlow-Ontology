@@ -1,0 +1,276 @@
+[
+  {
+    "path": [
+      {
+        "type": "SPORT",
+        "id": "FOOT",
+        "description": "Football"
+      },
+      {
+        "type": "LEAGUE",
+        "id": "241",
+        "description": "NFL"
+      }
+    ],
+    "events": [
+      {
+        "id": "decoy-live",
+        "startTime": 1788900000000,
+        "live": true,
+        "status": "U",
+        "competitionId": "241",
+        "competitors": [
+          {
+            "id": "decoy-away",
+            "name": "Decoy Away",
+            "home": false
+          },
+          {
+            "id": "decoy-home",
+            "name": "Decoy Home",
+            "home": true
+          }
+        ],
+        "displayGroups": [
+          {
+            "description": "Game Lines",
+            "markets": [
+              {
+                "id": "decoy-live-market",
+                "description": "Moneyline",
+                "status": "O",
+                "period": {
+                  "id": "119",
+                  "description": "Game",
+                  "live": false,
+                  "main": true
+                },
+                "outcomes": [
+                  {
+                    "id": "decoy-live-away-outcome",
+                    "description": "Decoy Away",
+                    "status": "O",
+                    "type": "A",
+                    "price": {
+                      "american": "+120",
+                      "decimal": 2.2,
+                      "fractional": "6/5"
+                    }
+                  },
+                  {
+                    "id": "decoy-live-home-outcome",
+                    "description": "Decoy Home",
+                    "status": "O",
+                    "type": "H",
+                    "price": {
+                      "american": "-140",
+                      "decimal": 1.71,
+                      "fractional": "5/7"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "25568702",
+        "startTime": 1788999600000,
+        "live": false,
+        "status": "U",
+        "competitionId": "241",
+        "competitors": [
+          {
+            "id": "team-away-25568702",
+            "name": "Fixture Away",
+            "home": false
+          },
+          {
+            "id": "team-home-25568702",
+            "name": "Fixture Home",
+            "home": true
+          }
+        ],
+        "displayGroups": [
+          {
+            "description": "Game Lines",
+            "markets": [
+              {
+                "id": "496075087",
+                "description": "Moneyline",
+                "status": "O",
+                "period": {
+                  "id": "119",
+                  "description": "Game",
+                  "live": false,
+                  "main": true
+                },
+                "outcomes": [
+                  {
+                    "id": "outcome-away-496075087",
+                    "description": "Fixture Away",
+                    "status": "O",
+                    "type": "A",
+                    "price": {
+                      "american": "+105",
+                      "decimal": 2.05,
+                      "fractional": "21/20"
+                    }
+                  },
+                  {
+                    "id": "outcome-home-496075087",
+                    "description": "Fixture Home",
+                    "status": "O",
+                    "type": "H",
+                    "price": {
+                      "american": "-125",
+                      "decimal": 1.8,
+                      "fractional": "4/5"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "closed-moneyline",
+                "description": "Moneyline",
+                "status": "C",
+                "period": {
+                  "id": "119",
+                  "description": "Game",
+                  "live": false,
+                  "main": true
+                },
+                "outcomes": [
+                  {
+                    "id": "closed-away",
+                    "description": "Fixture Away",
+                    "status": "O",
+                    "type": "A",
+                    "price": {
+                      "american": "+100",
+                      "decimal": 2,
+                      "fractional": "1/1"
+                    }
+                  },
+                  {
+                    "id": "closed-home",
+                    "description": "Fixture Home",
+                    "status": "O",
+                    "type": "H",
+                    "price": {
+                      "american": "-120",
+                      "decimal": 1.83,
+                      "fractional": "5/6"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Props",
+            "markets": [
+              {
+                "id": "prop-market",
+                "description": "Total",
+                "status": "O",
+                "period": {
+                  "id": "119",
+                  "description": "Game",
+                  "live": false,
+                  "main": true
+                },
+                "outcomes": [
+                  {
+                    "id": "prop-over",
+                    "description": "Over",
+                    "status": "O",
+                    "type": "O",
+                    "price": {
+                      "american": "-110",
+                      "decimal": 1.91,
+                      "fractional": "10/11"
+                    }
+                  },
+                  {
+                    "id": "prop-under",
+                    "description": "Under",
+                    "status": "O",
+                    "type": "U",
+                    "price": {
+                      "american": "-110",
+                      "decimal": 1.91,
+                      "fractional": "10/11"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "decoy-nonmain",
+        "startTime": 1789003200000,
+        "live": false,
+        "status": "U",
+        "competitionId": "241",
+        "competitors": [
+          {
+            "id": "decoy-nonmain-away",
+            "name": "Nonmain Away",
+            "home": false
+          },
+          {
+            "id": "decoy-nonmain-home",
+            "name": "Nonmain Home",
+            "home": true
+          }
+        ],
+        "displayGroups": [
+          {
+            "description": "Game Lines",
+            "markets": [
+              {
+                "id": "decoy-nonmain-market",
+                "description": "Moneyline",
+                "status": "O",
+                "period": {
+                  "id": "119",
+                  "description": "Game",
+                  "live": false,
+                  "main": false
+                },
+                "outcomes": [
+                  {
+                    "id": "decoy-nonmain-away-outcome",
+                    "description": "Nonmain Away",
+                    "status": "O",
+                    "type": "A",
+                    "price": {
+                      "american": "+110",
+                      "decimal": 2.1,
+                      "fractional": "11/10"
+                    }
+                  },
+                  {
+                    "id": "decoy-nonmain-home-outcome",
+                    "description": "Nonmain Home",
+                    "status": "O",
+                    "type": "H",
+                    "price": {
+                      "american": "-130",
+                      "decimal": 1.77,
+                      "fractional": "10/13"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -405,6 +405,19 @@ primary use case is the strongest argument on the board for link properties, and
 
 ---
 
+### A8 · Native Windows is the product floor (founder-stated 2026-08-02)
+
+QuantFlow is Windows-first again. Native Windows 11 is where the founder develops, runs, sees, and
+accepts the product; WSL and Linux are secondary compatibility targets and cannot satisfy a release
+or founder-visible proof gate. This reverses every earlier Linux-first or WSL-continuation statement
+without changing the ontology, Kernel sole-writer rule, canvas projection laws, or research-only
+mission. WO-WIN1 and WO-WIN2 verified the packaged Windows floor and one normal-Dock collaboration
+primitive on 2026-08-02. No later feature order is implicitly reactivated by that proof; `NEXT.md`
+names the only authorized rung, or closes the builder door when none is authorized. See
+`docs/adr/0001-windows-first-product.md`.
+
+---
+
 ## Sources
 - [[00 - The Integration Question]] — verdict: borrow doctrine, don't build on platform
 - [[05 - DevX SuperRepo & Agent Development]] — local embedded ontology, ontology-as-code, schema-drift-as-lint, worktrees

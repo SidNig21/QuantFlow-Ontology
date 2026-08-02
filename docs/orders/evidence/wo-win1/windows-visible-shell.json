@@ -1,0 +1,50 @@
+{
+  "platform": "win32",
+  "packageExecutable": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-win1-visual-proof-20260802\\final-dist\\win-unpacked\\QuantFlow.exe",
+  "packageExecutableSha256": "815E67927FA32618736BEA2D53F8FE1D58035BE915D832FC4A982F6ED533D336",
+  "isolatedRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-win1-visual-proof-20260802\\isolated-final-visible",
+  "processIdAtCapture": 8936,
+  "computerScreenshot": "docs/orders/evidence/wo-win1/windows-visible-shell.png",
+  "computerScreenshotSha256": "F5B839FFA92C78E2CCE5FF04E85856B424903DEDE87128F982FD2A190FC92898",
+  "visible": {
+    "windowTitle": "QuantFlow",
+    "navigator": true,
+    "canvas": true,
+    "minimap": true,
+    "dockProfileIds": [
+      "hermes-orchestrator",
+      "hermes-worker",
+      "hermes-worker-2",
+      "qf-toolloop"
+    ]
+  },
+  "rpc": {
+    "ping": {
+      "pong": true
+    },
+    "readiness": {
+      "canvas": true,
+      "windowUrl": "file:///C:/Users/rybow/AppData/Local/Temp/qf-win1-visual-proof-20260802/final-dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html",
+      "dockProfileIds": [
+        "hermes-orchestrator",
+        "hermes-worker",
+        "hermes-worker-2",
+        "qf-toolloop"
+      ]
+    }
+  },
+  "log": {
+    "path": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-win1-visual-proof-20260802\\isolated-final-visible\\home\\.quantflow\\app\\logs\\main-2026-08-02T10-11-25.log",
+    "epipeCount": 0,
+    "crashCount": 0
+  },
+  "shutdown": {
+    "method": "app.shutdown",
+    "receipt": {
+      "shuttingDown": true
+    },
+    "ownedProcessesRemaining": 0
+  },
+  "claimBoundary": "This proves the native Windows shell, canvas projection, Kernel/RPC readiness, and Dock inventory. It does not prove a live agent turn or multi-agent collaboration.",
+  "recordedAt": "2026-08-02T03:13:26.8573855-07:00"
+}

@@ -25,6 +25,30 @@ this file is the sequence, `docs/orders/` is the work. `START_HERE.md` beats all
 
 ---
 
+## Platform recovery rung — WO-WIN1 · native Windows product floor
+
+**Objective.** Restore native Windows 11 as QuantFlow's canonical product target and prove the
+packaged application reaches a visible, usable canvas and Kernel-backed Dock without touching the
+founder's live state.
+
+**Depends.** Preserved `codex/wo-107` product work; no feature order is allowed to advance first.
+
+**In.** Authority reset · Windows packaging resources · Node/Electron-compatible schema loading ·
+isolated Windows data roots · packaged `.exe` boot · JSON-RPC readiness · visible canvas and Dock
+profile inventory · clean shutdown with no owned process leak · a falsifiable native-Windows gate.
+
+**Out.** Bovada capture · ontology expansion · canvas redesign · Dock redesign · live Hermes turn ·
+AgentOS/Rivet redesign · WSL as an acceptance substitute · migration or mutation of founder state.
+
+**Gate.** From a clean native-Windows checkout, build the unpacked package, launch `QuantFlow.exe`
+against isolated temporary stores, obtain Kernel/RPC readiness, capture the visible app with the
+canvas and expected Dock profiles, request clean shutdown, and prove the package-owned process tree
+is gone. Bait one packaged resource or boot invariant red, restore it, and observe green.
+
+Full order: [`WO-WIN1.md`](WO-WIN1.md).
+
+---
+
 ## Why this ladder is eleven rungs, not ten
 
 The ten-order ladder was drawn on 2026-07-24 against a schema that was measured and a Kernel

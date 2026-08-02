@@ -2,12 +2,11 @@
 
 > **You are the architect/verifier.** This file is your complete cold start. Read it, then `PROTOCOL.md`, then the order you are verifying. You need no chat history — if something matters and isn't in the repo, it doesn't exist (`PROTOCOL.md`, shared-truth rule).
 
-**Door check 2026-08-01 (WO-107c):** the authority list below is current; its branch-diff,
-fresh-worktree, and canonical `bun qa/verify-release.ts` commands resolve against live repository
-surfaces. The canonical command includes the real unsigned Linux package stage; WO-107c independently
-proved trusted market context, complete atomic links, exact historical upgrades, byte-identical
-`0003` in `app.asar`, and an unchanged 92-tool agent surface. The current order is WO-107, one real
-fixed-origin Bovada NFL capture through the shipped app and one real Hermes seat proof.
+**Door check 2026-08-02 (WO-WIN1 + WO-WIN2):** the authority list below is current; its
+branch-diff, fresh-worktree, and native-Windows commands resolve against live repository surfaces.
+The packaged Windows floor and one normal-Dock collaboration primitive are verified. No builder
+order is currently unblocked; WO-107 and its Linux/WSL continuation remain parked until the founder
+authorizes the next bounded rung.
 
 ## Read in this order
 
@@ -31,23 +30,30 @@ fixed-origin Bovada NFL capture through the shipped app and one real Hermes seat
 
 ## How to verify (do not skip steps)
 
-```bash
+```powershell
 git fetch origin wo-NNN
 git diff --stat origin/main...origin/wo-NNN             # scope: anything outside the order is a defect
-test ! -e /tmp/verify-NNN
-git worktree add --detach /tmp/verify-NNN origin/wo-NNN # clean room, never the working tree
+if (Test-Path C:\verify-NNN) { throw 'verification worktree already exists' }
+git worktree add --detach C:\verify-NNN origin/wo-NNN # clean room, never the working tree
 ```
 
 Then, **cold** — the new detached worktree has no inherited `node_modules`, build, staging, receipt,
 or package output:
 
-```bash
-cd /tmp/verify-NNN && bun qa/verify-release.ts
+```powershell
+Set-Location C:\verify-NNN; bun qa/verify-release.ts
 ```
 
-That canonical command is the same one CI runs. It owns the frozen Electron install, bare-environment
-unit suites, production main/preload/renderer build, and every QA gate, in that order. Running only
-`bun qa/run.ts --all` is useful for gate development but is not release verification.
+This native Windows command owns the frozen install, shell-free focused tests (including
+logger-policy), the existing `windows-cold-boot` package gate, and the WO-WIN1 static gates. The
+Linux compatibility command is `bun qa/verify-release-linux.ts`; it is not Windows proof. The
+Windows gate owns the Electron bundle, unpacked `QuantFlow.exe`, isolated-store boot, Kernel/RPC
+and Dock receipt, clean shutdown, and package-owned process-leak check. The founder-visible
+Computer screenshot remains a local evidence input; CI does not claim to produce that screenshot.
+
+For focused gate development, `bun qa/run.ts windows-cold-boot` remains valid on native Windows,
+but it is not the complete release door by itself. The separately verified WO-WIN2 collaboration
+primitive is rerun with `bun qa/run.ts windows-dock-collaboration`.
 
 Then the part that earns the role — **seam inspection**, i.e. what the gates *cannot* prove:
 

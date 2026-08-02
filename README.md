@@ -6,7 +6,7 @@ QuantFlow doesn't compete with agent frameworks — it's the surface they land o
 
 > **It plugs into your world; it doesn't become your world.**
 
-Built solo, in the open, on Linux first. Early-stage and honest about it — see [Status](#status).
+Built solo, in the open, for native Windows first. Early-stage and honest about it — see [Status](#status).
 
 ---
 
@@ -16,9 +16,9 @@ Every claim below is backed by a falsified `qa/` gate or a recorded proof in the
 
 - **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel commands; a gate (`qa/gates/kernel-sole-writer*`) fails the build if any other code path writes to it — and the gate has been bait-tested red before being trusted green.
 - **The canvas + dock** — an infinite pan/zoom surface (Electron) where every agent card launches by exact Kernel definition id. The old hardcoded Peer Seats catalogue and its separate spawn IPC are gone: qf-toolloop and three Hermes profiles all use the same Dock path, and each session links back to the definition the founder clicked.
-- **Agent seats** — the packaged defaults are `qf-toolloop`, `hermes-orchestrator`, `hermes-worker`, and `hermes-worker-2`. The three Hermes definitions share one runtime package while package metadata expands their distinct `-p <profile> --tui` arguments; their Kernel identities do not collapse into a generic Hermes row.
+- **Agent seats** — the packaged Dock contains `qf-toolloop`, three distinct Hermes profiles, and two clearly labeled deterministic proof profiles. The proof orchestrator/worker are verified end to end on Windows; the model-backed ToolLoop/Hermes profiles are present with distinct Kernel identities but are not yet certified as everyday Windows workflows.
 - **The peer bus** (`tools/qf-peer-bus`) — a stdio MCP server exposing `send_to_peer` / `read_inbox` / `list_peers`. Every peer message is recorded to the Kernel as a content-addressed `trajectory` artifact (which doubles as a finetuning trace store). Transport routing lives in its own SQLite db, separate from the Kernel.
-- **Live delivery** — package metadata opts the three ruled Hermes profiles into the existing host-side watcher, which binds the selected Kernel role to that profile's live PTY and pushes incoming peer messages into the TUI. D2 proves the binding and duplicate-role rejection without opening the founder's transport database; a prior founder-run proof observed a real orchestrator/worker round trip with both legs recorded as Kernel artifacts.
+- **Live delivery** — package metadata binds a selected Kernel role to its live PTY and pushes peer messages into the TUI. WO-WIN2 proves the current Windows path with two normal-Dock-launched deterministic seats, distinct sessions, visible task/ACK output, and both legs recorded as Kernel trajectory artifacts. This is a collaboration-transport proof, not a claim that a live model completed research.
 - **Verification culture** — changes land through work orders verified in cold git worktrees; gates are falsified (bait → red → restore → green) before they count; artifact hashes are recomputed, not trusted.
 
 ## The end goal: a real ontology
@@ -41,10 +41,11 @@ The ontology has three planes:
 
 | Phase | Scope | Status |
 |---|---|---|
-| 0 | Substrate: Kernel, canvas/dock, seats, peer bus, live TUI delivery | ✅ Done, verified |
+| WIN | Native Windows package: boot, Kernel, canvas, Dock, clean shutdown | ✅ Verified — WO-WIN1 |
+| 0 | Substrate components: Kernel, canvas/dock, seats, peer bus, collaboration transport | ✅ Windows floor and deterministic two-seat proof verified — WO-WIN2 |
 | 1 | Ontology charter as code (23 described object types, lint-enforced governance) | ✅ Done, verified |
 | 2 | Generated MCP read + action plane with governed hidden actions | ✅ Done, verified |
-| 3 | First market pipeline: trusted context and atomic ingest, then real Bovada football | In progress — live capture is next |
+| 3 | First market pipeline: trusted context and atomic ingest, then real Bovada football | Parked — requires a new founder-authorized Windows order |
 | 4 | Defining research loop run end-to-end by agents — the one-shot proof | Planned |
 | 5 | Recall layer (FTS5 + sqlite-vec hybrid retrieval) + trust boundaries | Later |
 | 6 | Evaluation-history-driven optimization | Later |
@@ -59,9 +60,11 @@ source provenance and `lists` / `offered_on` / `quotes` links. The production Li
 the Kernel's complete three-step upgrade history plus qf-toolloop and the three Hermes-backed Dock
 profiles.
 
-The remaining Phase 3 gap is concrete rather than architectural: no production adapter yet captures
-real public Bovada football data. That adapter, its bounded schedule, and a real seat question are the
-next order; the defining multi-agent research loop remains later work.
+The Windows product floor is now real and founder-visible. The honest boundary is narrower than a
+finished product: deterministic collaboration is proven, while live model-backed seats, the parked
+Bovada workflow, and the defining multi-agent research loop still require later orders. For the
+single current status page, including what is usable and what is not, read
+[`docs/orders/NEXT.md`](docs/orders/NEXT.md).
 
 ## Architecture
 
@@ -94,7 +97,7 @@ Runtime split worth knowing: the Electron main process is Node (`node:sqlite`); 
 
 ## Development
 
-Prerequisites: **Node.js 24+**, **Bun**, **tmux** (Linux-first; macOS/Windows carried by upstream but untested here).
+Prerequisites: **Windows 11**, **Node.js 24+**, and **Bun**. Native Windows packaging and runtime are the release floor; WSL/Linux are secondary compatibility targets.
 
 ```sh
 git clone <this repo>
@@ -105,8 +108,10 @@ bun test        # tests
 bun run build   # production build
 ```
 
-The packaged Linux executable is `quantflow`. While the app is running, `qf-canvas` is the
-command-line control surface for arranging and inspecting canvas tiles.
+On Windows, `bun run package:unsigned` creates the unsigned package under `collab-electron/dist/`.
+The canonical readiness check is run from the repository root with `bun qa/verify-release.ts`.
+While the app is running, `qf-canvas` is the command-line control surface for arranging and
+inspecting canvas tiles.
 
 ### Local data layout
 

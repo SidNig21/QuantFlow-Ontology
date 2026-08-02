@@ -1,4 +1,4 @@
-> **Active track (2026-07-24):** the Ontology Doctrine ladder — `docs/DOCTRINE.md` is the plan of record, `docs/ROADMAP.md` carries the forward build ladder, and [`docs/orders/NEXT.md`](docs/orders/NEXT.md) points at the one unblocked order. Work happens on `main` via short-lived order branches. The old `origin/QuantFlow` park record and the peer-bus PASS notes are history, not routes.
+> **Active track (2026-08-02):** the native-Windows product floor is verified through WO-WIN1 and WO-WIN2: packaged boot, the founder-visible canvas and Dock, and one real two-seat collaboration primitive. [`docs/orders/NEXT.md`](docs/orders/NEXT.md) is intentionally closed until the founder authorizes the next bounded order; the ontology ladder remains preserved.
 
 # START_HERE.md
 
@@ -10,7 +10,9 @@
 
 ## 0. Mission (fixed)
 
-**QuantFlow is a Linux-first, single-user spatial operating console for AI-assisted quantitative research** — v1 domain: sports betting markets (Bovada; UFC, tennis, football). Agent sessions, execution environments, datasets, tickets, artifacts, and evaluations are **typed objects on an infinite canvas**. Agents stream visible work into tiles, delegate through validated relationships, and publish durable versioned artifacts. Every action carries an end-to-end trace.
+**QuantFlow is a Windows-first, single-user spatial operating console for AI-assisted quantitative research** — v1 domain: sports betting markets (Bovada; UFC, tennis, football). Agent sessions, execution environments, datasets, tickets, artifacts, and evaluations are **typed objects on an infinite canvas**. Agents stream visible work into tiles, delegate through validated relationships, and publish durable versioned artifacts. Every action carries an end-to-end trace.
+
+Native Windows 11 is the canonical development, packaging, runtime, and founder-proof environment. WSL and Linux are secondary compatibility targets; they never substitute for a Windows acceptance proof.
 
 Research-only: QuantFlow **never places bets or executes trades**. It proposes, backtests, criticizes, evaluates, and reports — the operator acts in the world.
 
@@ -48,7 +50,7 @@ Bun + TypeScript strict (orchestration) · Electron shell inherited from Collabo
 3. Every change ships with a runnable `qa/` gate; the founder verifies outcomes, not diffs.
 4. **No self-approval** — the agent that built a change is never its verifier.
 5. Lockfiles are committed. Descriptions on every schema entity. LF line endings (.gitattributes enforces).
-6. Windows-era thinking is dead: this repo is Linux-first from birth; platform-dependent code takes an injectable `platform` parameter.
+6. Windows is the primary product target. Platform-dependent code still takes an injectable `platform` parameter, but every release floor must pass natively on Windows before secondary-platform work counts.
 7. Upstream (`collaborator-ai/collab-public`) stays a configured remote for future pulls. QuantFlow work lives on `main`.
 8. **Substrate triage — three buckets, five minutes, no reconciliation weeks.** Every new tool the ecosystem ships gets classified on sight, never "evaluated":
    - **Dock item** — has a CLI, spawns as a seat, acts on the Kernel. *It depends on QuantFlow.* **Adopt freely; it is inventory.**

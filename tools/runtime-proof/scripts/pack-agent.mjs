@@ -41,10 +41,14 @@ const bundle = spawnSync(
 );
 if (bundle.status !== 0) process.exit(bundle.status ?? 1);
 
+const toolchain = process.env.QF_AGENTOS_TOOLCHAIN_BIN ?? join(
+  root,
+  "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs",
+);
 const pack = spawnSync(
   "node",
   [
-    join(root, "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs"),
+    toolchain,
     "pack",
     agentDir,
     "--agent",

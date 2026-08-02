@@ -53,12 +53,37 @@ export function initDock(panelEl) {
 					const role = String(row.role ?? "");
 					const card = el("div", "dock-species-row");
 					const meta = el("div", "dock-species-meta");
-					meta.appendChild(el("div", "dock-species-name", name));
+					meta.appendChild(el(
+						"div",
+						"dock-species-name",
+						definitionId.startsWith("qf-proof-")
+							? "DETERMINISTIC PROOF AGENT"
+							: name,
+					));
 					if (role) meta.appendChild(el("div", "qf-label", role));
 					const spawnBtn = el("button", "qf-btn qf-btn-primary", "Spawn");
 					spawnBtn.type = "button";
-					spawnBtn.addEventListener("click", () => {
-						void window.shellApi.qf.spawnSession({ definitionId });
+					spawnBtn.addEventListener("click", async () => {
+						card.classList.remove("dock-spawn-failed");
+						spawnBtn.disabled = true;
+						spawnBtn.textContent = "Starting…";
+						card.classList.add("dock-spawning");
+						try {
+							const result = await window.shellApi.qf.spawnSession({ definitionId });
+							if (!result?.ok) {
+								throw new Error(result?.error?.message ?? "Spawn failed");
+							}
+						} catch (error) {
+							spawnBtn.textContent = "Failed — retry";
+							spawnBtn.title = error?.message ?? String(error);
+							card.classList.add("dock-spawn-failed");
+						} finally {
+							if (!card.classList.contains("dock-spawn-failed")) {
+								spawnBtn.textContent = "Spawn";
+							}
+							spawnBtn.disabled = false;
+							card.classList.remove("dock-spawning");
+						}
 					});
 					card.appendChild(meta);
 					card.appendChild(spawnBtn);

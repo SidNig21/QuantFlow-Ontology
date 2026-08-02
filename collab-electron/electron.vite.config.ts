@@ -27,7 +27,7 @@ export default defineConfig({
       outDir: resolve(__dirname, outDir, "main"),
       // file: TS packages must be bundled — Node cannot import their .ts sources.
       externalizeDeps: {
-        exclude: ["qf-kernel", "qf-kernel-schema"],
+        exclude: ["qf-bovada-football", "qf-kernel", "qf-kernel-schema"],
       },
       rollupOptions: {
         external: ["node-pty", "@parcel/watcher", "typescript", "sharp"],

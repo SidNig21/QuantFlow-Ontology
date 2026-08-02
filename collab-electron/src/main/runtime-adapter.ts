@@ -22,6 +22,8 @@ export type RuntimeAdapterMetadata = {
   adapterId: string;
   route: RuntimeAdapterRoute;
   packageName: string;
+  command: string | null;
+  entrypoint: string | null;
   argv: string[];
   profileArgv: string[] | null;
   tools: string[];
@@ -156,6 +158,8 @@ export function parseRuntimeAdapterMetadata(
       "name",
       "route",
       "package",
+      "command",
+      "entrypoint",
       "argv",
       "profile_argv",
       "tools",
@@ -167,6 +171,12 @@ export function parseRuntimeAdapterMetadata(
   const adapterId = trimmedString(doc.name, `${source}.name`);
   const route = parseRoute(doc.route, `${source}.route`);
   const packageName = trimmedString(doc.package, `${source}.package`);
+  const command = doc.command === undefined || doc.command === null
+    ? null
+    : trimmedString(doc.command, `${source}.command`);
+  const entrypoint = doc.entrypoint === undefined || doc.entrypoint === null
+    ? null
+    : trimmedString(doc.entrypoint, `${source}.entrypoint`);
   if (basename(packageName) !== packageName || packageName.includes("\\")) {
     throw new RuntimeAdapterContractError(
       `${source}.package must name the sibling package file`,
@@ -177,17 +187,17 @@ export function parseRuntimeAdapterMetadata(
     doc.argv === undefined
       ? []
       : stringArray(doc.argv, `${source}.argv`, { nonEmpty: route === "native_tui" });
-  if (route === "native_tui" && argv.length === 0) {
+  const profileArgv =
+    doc.profile_argv === undefined
+      ? null
+      : stringArray(doc.profile_argv, `${source}.profile_argv`, { nonEmpty: true });
+  if (route === "native_tui" && argv.length === 0 && !profileArgv) {
     throw new RuntimeAdapterContractError(
       `${source}.argv must be non-empty for native_tui`,
     );
   }
   validateBaseArgv(argv, `${source}.argv`);
 
-  const profileArgv =
-    doc.profile_argv === undefined
-      ? null
-      : stringArray(doc.profile_argv, `${source}.profile_argv`, { nonEmpty: true });
   if (profileArgv) validateProfileArgv(profileArgv, `${source}.profile_argv`);
 
   const tools =
@@ -209,6 +219,8 @@ export function parseRuntimeAdapterMetadata(
     adapterId,
     route,
     packageName,
+    command,
+    entrypoint,
     argv,
     profileArgv,
     tools,

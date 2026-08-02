@@ -29,6 +29,19 @@ if (!env.NODE_OPTIONS?.includes("--max-old-space-size")) {
 
 const shouldPublish = args.includes("--publish");
 
+// Windows packages need the same deploy-true Dock runtime resources as the
+// Linux verification package. Stage them before electron-builder reads the
+// platform-specific extraResources list.
+if (process.platform === "win32") {
+  const { prepareRuntimeStaging } = await import(
+    "./package-lib/runtime-staging.ts",
+  );
+  prepareRuntimeStaging({
+    stagingRoot: join(cwd, ".package-staging"),
+    repoRoot: join(cwd, ".."),
+  });
+}
+
 // Never use electron-builder's publisher — it fails when the release type
 // (draft vs pre-release) doesn't match.  We upload via upload-to-github.cjs
 // on all platforms instead.

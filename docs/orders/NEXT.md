@@ -1,40 +1,61 @@
-# NEXT — WO-107: one real Bovada football capture
+# NEXT — Windows product floor verified; no unblocked build order
 
-> **Builder: this file is your complete entry point.** It always points at the single unblocked
-> order. Do not choose another order or proceed past it.
-> **Founder:** give a fresh builder this file: *“Follow `docs/orders/NEXT.md`.”*
+> **Builder: stop here.** WO-WIN1 and WO-WIN2 are verified. Do not select a roadmap item or resume
+> parked work without a founder-authorized work order.
 
-## Current order: **[WO-107](WO-107.md) — one real Bovada football capture**
+## Current state
 
-WO-107c and its bounded CI3–CI5 repairs are independently verified and landed. The Kernel now has
-the trusted, replay-safe venue/event context and atomic market links required before vendor data.
+Native Windows is now the canonical QuantFlow release door. The real packaged application boots
+against isolated state, reaches Kernel/RPC/canvas/Dock readiness, and closes without owned-process
+leaks. Two deterministic package-owned agents can also be launched from the normal Dock as distinct
+Kernel sessions and exchange one nonce task and ACK through the product-owned collaboration path.
 
-**In plain terms:** connect the shipped Linux app to one public Bovada NFL snapshot, preserve the
-source, and prove a real Hermes seat can follow the graph to the current prices.
+## What you can use now
 
-## Build priority
+- The native Windows desktop shell and infinite canvas.
+- The Kernel-backed Dock and distinct agent-session tiles.
+- Isolated local Kernel and artifact state.
+- The deterministic orchestrator/worker profiles to exercise and demonstrate the collaboration path.
+- The Windows release verifier and permanent collaboration gate.
 
-1. Implement the strict fixed-origin parser and source-first Artifact capture.
-2. Classify existing Kernel truth before choosing context, instrument, or quote-only commands.
-3. Wire the fixed operator trigger through packaged `qf-canvas` into the existing Electron main
-   process—no new runtime, socket, or sidecar.
-4. Prove the deterministic gate, one finished-package live capture, and the real Hermes seat question.
+## What is not ready yet
 
-## Hard boundaries
+- Live model-backed Hermes or ToolLoop seats are not certified as everyday Windows workflows.
+- The preserved Bovada capture path is parked and has not been reactivated as a supported Windows feature.
+- The full Hypothesis → Dataset → Run → Artifact → Evaluation → Report loop is not complete.
+- This checkpoint is an unsigned development build, not a signed public installer/release.
 
-- Never place, execute, or automate a bet or trade; never handle credentials.
-- No caller-controlled URL/header, cookie, login, browser profile, proxy, CAPTCHA bypass, or third-
-  party odds service.
-- No second market/event/venue, recurring poller, scheduler sidecar, schema change, or new dependency.
-- No agent-facing ingest/context action and no price smuggling into `quote.coverage`.
-- Work in an order branch/worktree; the builder does not verify or merge itself.
+## Doctrine roadmap position
 
-## Behind WO-107
+| Layer | State |
+|---|---|
+| Kernel, ontology charter, generated read/action tools | Verified |
+| Native Windows shell, canvas, Dock, shutdown | Verified — WO-WIN1 |
+| Two-seat collaboration primitive | Verified — WO-WIN2 |
+| Real market-data workflow | Parked pending a new order |
+| Self-running research/critic/report loop | Not built yet |
+| Recall and optimization layers | Later |
 
-WO-109 runs the collaborative lower loop over this real evidence. WO-110 adds the Critic and
-mechanical report gate. WO-111 proves the founder's one-shot daily-driver workflow.
+Evidence:
 
----
+- [`WO-WIN1`](WO-WIN1.md) — packaged Windows product floor and release verifier;
+- [`WO-WIN2`](WO-WIN2.md) — normal-Dock collaboration proof;
+- [`evidence/wo-win1/windows-visible-shell.png`](evidence/wo-win1/windows-visible-shell.png) — visible shell;
+- [`evidence/wo-win2/COMPUTER-USE-2026-08-02.md`](evidence/wo-win2/COMPUTER-USE-2026-08-02.md) — visible collaboration and Kernel/peer-bus receipt.
 
-*The order log in [README.md](README.md) wins on status. A verifier rotates both this builder door
-and [VERIFYING.md](VERIFYING.md) only after the order passes.*
+## Next decision belongs to the founder
+
+The next bounded order has not been authored. The recorded sequence is:
+
+1. a focused Dock/catalog/canvas quality pass using the now-real Windows sessions;
+2. then one explicitly selected vertical slice from the parked market/research ladder.
+
+Until that order exists, the repository is usable for the verified Windows product floor, but no
+builder has authority to add product scope.
+
+## Standing boundaries
+
+- Windows remains primary; Linux/WSL are compatibility targets only.
+- Kernel remains authority; canvas is projection.
+- AgentOS remains optional and capability-bound.
+- No credentials, betting execution, founder-state mutation, or host-painted collaboration proof.

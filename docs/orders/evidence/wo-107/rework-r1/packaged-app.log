@@ -1,0 +1,9 @@
+(node:845) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `quantflow --trace-warnings ...` to show where the warning was created)
+[1m[47m[31mA JavaScript error occurred in the main process
+[30mUncaught Exception:
+TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received undefined
+    at join (node:path:1339:7)
+    at file:///home/rybowen21/qf-verify-wo107/collab-electron/dist/linux-unpacked/resources/app.asar/out/main/index.js:9509:28
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[0m(node:845) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.

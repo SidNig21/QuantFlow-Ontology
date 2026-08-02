@@ -14,7 +14,7 @@ export type NativeTuiLive = {
 export type NativeTuiPty = { sessionId: string };
 
 export type NativeTuiOrchestrationDependencies = {
-  createPty: () => Promise<NativeTuiPty>;
+  createPty: (input: { sessionId: string }) => Promise<NativeTuiPty>;
   terminatePty: (ptySessionId: string) => Promise<void>;
   execute: (
     command: string,
@@ -38,10 +38,11 @@ export type NativeTuiOrchestrationOptions = {
   label: string;
   corruptId?: string;
   peerDelivery?: { role: string; dbPath: string };
+  role?: string;
   onStarted?: (
     sessionId: string,
     definitionId: string,
-    info: { surface: "native_tui"; ptySessionId: string },
+    info: { surface: "native_tui"; ptySessionId: string; role?: string },
   ) => void;
 };
 
@@ -76,8 +77,8 @@ export async function orchestrateNativeTuiAdmission(
   let kernelCreated = false;
 
   try {
-    pty = await deps.createPty();
     sessionId = opts.corruptId ?? deps.newSessionId();
+    pty = await deps.createPty({ sessionId });
 
     deps.liveSet(sessionId, {
       cancelled: false,
@@ -120,6 +121,7 @@ export async function orchestrateNativeTuiAdmission(
     opts.onStarted?.(sessionId, opts.definitionId, {
       surface: "native_tui",
       ptySessionId: pty.sessionId,
+      role: opts.role,
     });
     return {
       sessionId,

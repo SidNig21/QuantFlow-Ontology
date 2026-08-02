@@ -12,7 +12,7 @@ import { createEdgeIndicators } from "./edge-indicators.js";
 import { createMinimap } from "./canvas-minimap.js";
 import { createPanel } from "./panel-manager.js";
 import { createWorkspaceManager } from "./workspace-manager.js";
-import { createCanvasRpc } from "./canvas-rpc.js";
+import { createCanvasRpc, findAutoPlacement } from "./canvas-rpc.js";
 import { createTileManager } from "./tile-manager.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
 import { initDock } from "./dock.js";
@@ -1214,12 +1214,22 @@ async function init() {
 				}
 				if (channel === "create-term-tile") {
 					const ptySessionId = args[0];
+					const sessionId = args[1];
+					const definitionId = args[2];
+					const role = args[3];
+					const agentLabel = args[4];
 					const size = defaultSize("term");
-					const { cx, cy } = centerCanvasCoords(
-						canvasEl, viewportState, size,
+					const pos = findAutoPlacement(
+						tiles, size.width, size.height,
 					);
 					const tile = tileManager.createCanvasTile(
-						"term", cx, cy, { ptySessionId },
+						"term", pos.x, pos.y, {
+							ptySessionId,
+							sessionId,
+							definitionId,
+							role,
+							agentLabel,
+						},
 					);
 					tileManager.spawnTerminalWebview(tile, true);
 					minimap.update();

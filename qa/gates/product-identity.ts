@@ -15,7 +15,7 @@ import {
 } from "node:fs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, posix, relative, win32 } from "node:path";
 
 const REPO = join(import.meta.dir, "../..");
 const COLLAB = join(REPO, "collab-electron");
@@ -323,12 +323,27 @@ async function migrationMatrix(): Promise<Result> {
       worktreeRoot: join(root, "repo-worktree"),
     });
     expect(
-      resolved.appRoot === join(root, "linux-home", ".quantflow", "app"),
+      resolved.appRoot === posix.join(join(root, "linux-home"), ".quantflow", "app"),
       "Linux QF_APP_ROOT is not ~/.quantflow/app",
     );
     expect(
-      resolved.appDir.startsWith(join(resolved.appRoot, "dev", "worktree-")),
+      resolved.appDir.startsWith(posix.join(resolved.appRoot, "dev", "worktree-")),
       "Linux development QF_APP_DIR is not worktree-isolated beneath QF_APP_ROOT",
+    );
+
+    const windowsResolved = pathsModule.resolveQuantFlowPaths({
+      home: join(root, "windows-home"),
+      platform: "win32",
+      isDev: true,
+      worktreeRoot: join(root, "windows-repo-worktree"),
+    });
+    expect(
+      windowsResolved.appRoot === win32.join(root, "windows-home", ".quantflow", "app"),
+      "Windows QF_APP_ROOT is not beneath the injected USERPROFILE home",
+    );
+    expect(
+      windowsResolved.appDir.startsWith(win32.join(windowsResolved.appRoot, "dev", "worktree-")),
+      "Windows development QF_APP_DIR is not worktree-isolated beneath QF_APP_ROOT",
     );
 
     // old-only: persistent app + Electron bytes migrate together, unsafe state
@@ -350,7 +365,8 @@ async function migrationMatrix(): Promise<Result> {
     put(join(oldElectron, "socket-path"), "electron-breadcrumb-excluded\n");
     const outside = join(root, "outside-canary.txt");
     put(outside, "do-not-follow\n");
-    symlinkSync(outside, join(oldRoot, "outside-link"));
+    const outsideLinkSupported = process.platform !== "win32";
+    if (outsideLinkSupported) symlinkSync(outside, join(oldRoot, "outside-link"));
     const oldHashBefore = hashTree(oldRoot);
     const electronHashBefore = hashTree(oldElectron);
     const oldOnly = migrateLegacyAppState({
@@ -374,7 +390,7 @@ async function migrationMatrix(): Promise<Result> {
       "agent-artifacts",
       "server.pid",
       "agent.sock",
-      "outside-link",
+      ...(outsideLinkSupported ? ["outside-link"] : []),
     ]) {
       expect(!existsSync(join(target, excluded)), `excluded entry migrated: ${excluded}`);
     }

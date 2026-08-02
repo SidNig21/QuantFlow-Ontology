@@ -1,5 +1,4 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import baselineJson from "../schema-baseline.json" with { type: "json" };
 import { commands, creationCommands, pipelineCommands } from "./commands.ts";
 import {
   type ActiveSchemaBaseline,
@@ -164,9 +163,7 @@ export const schema: Schema = {
   ],
 };
 
-const schemaBaselinePath = join(import.meta.dir, "..", "schema-baseline.json");
-const baselineJson = readFileSync(schemaBaselinePath, "utf8");
-const activeSchemaBaseline = JSON.parse(baselineJson) as ActiveSchemaBaseline;
+const activeSchemaBaseline = baselineJson as ActiveSchemaBaseline;
 const skipActiveFreeze = process.env.QF_SCHEMA_SKIP_ACTIVE_FREEZE === "1";
 
 lintSchema(schema, transitions, activeSchemaBaseline, { skipActiveFreeze });

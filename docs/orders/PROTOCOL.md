@@ -13,6 +13,27 @@ Solves the real constraint: **founder usage limits**. The architect (Fable, prem
 
 **Founder = PM.** Verifies outcomes (demos, gate boards, the order log) — never diffs. Trust flows from receipts.
 
+## Tangible progress, anti-ceremony, and honest credit
+
+The purpose of the project is working, deployable software delivered quickly without trading away
+correctness, reliability, performance, or invention. This section binds human-directed sessions,
+main agents, sub-agents, and automated swarms, and every work order carries it into acceptance.
+
+1. **No process work without a named product gate.** Certificates, ledgers, dashboards,
+   meta-reports, governance documents, and planning artifacts are not progress by themselves. A
+   process artifact exists only when it gates a named capability or is required release evidence.
+2. **Feature-first ratio.** At least 95% of open items deliver or directly repair runnable behavior
+   that a user or consuming agent can exercise. Every process-only item names the feature and gate it
+   unblocks; otherwise it is deleted from the plan.
+3. **Honesty is absolute.** Fixtures, mocks, scripted movies, weakened assertions, hard-coded success
+   paths, and host-painted output never count as live proof. Any false close is reopened, documented
+   as an incident, and assigned the smallest real implementation step.
+4. **Refusal is not shipped capability.** A correct refusal proves only the refusal path. The feature
+   remains open with an explicit follow-up until the positive capability is implemented, tested, and
+   verified for real.
+5. **Reports stay short.** Lead with the runnable outcome, the command or user action that proves it,
+   and the next product rung. Do not manufacture ceremony to make incomplete work look substantial.
+
 ## The reviewer role (added 2026-07-18, after the fourth incident)
 
 **Decorrelation is the active ingredient — not extra scrutiny.** The reviewer must be a *different agent* from both the builder and the verifier of the work in question. This is the same lesson as the cold-install bug, applied one level up: correlated environments mask defects, and **correlated cognition masks them the same way**. A second pass by the same mind re-runs the same blind spot. "Whichever builder didn't write it" is not sufficient — if the verifier wrote the order or passed the work, the verifier's eyes are also spent on it.

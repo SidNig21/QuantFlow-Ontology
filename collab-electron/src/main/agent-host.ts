@@ -61,6 +61,24 @@ import { completeRuntimeKernelAdmission } from "./runtime-kernel-admission";
 /** Credential-free AgentOS adapter used by the startup identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
 
+/**
+ * AgentOS/Rivet's packaged sidecar support is not available on native Windows
+ * in the current pinned runtime. The base shell and Kernel-backed Dock remain
+ * usable; profiles that require AgentOS are admitted only when this boundary
+ * says the capability exists.
+ */
+export function isAgentOsBootSupported(): boolean {
+  return process.platform !== "win32";
+}
+
+function assertAgentOsSupported(): void {
+  if (!isAgentOsBootSupported()) {
+    throw new Error(
+      "AgentOS/Rivet is unsupported on native Windows in this package; use a native-TUI or host-ACP Dock profile",
+    );
+  }
+}
+
 export function appRoot(): string {
   return selectAppRoot({
     isPackaged: app.isPackaged,
@@ -170,6 +188,7 @@ export function onSessionDone(listener: DoneListener): () => void {
 
 /** Admit one adapter package into the live AgentOS host. */
 export async function admitPackage(runtime: DefinitionRuntime): Promise<void> {
+  assertAgentOsSupported();
   const host = await ensureAgentOs();
   const identity = runtimeSoftwareIdentity(
     runtime.metadata.adapterId,
@@ -187,6 +206,7 @@ export async function admitPackage(runtime: DefinitionRuntime): Promise<void> {
 }
 
 export async function ensureAgentOs(): Promise<AgentOs> {
+  assertAgentOsSupported();
   if (os) return os;
   const defs = kernelListAgentDefinitions();
   const resolvedSoftware = collectUniqueRuntimeSoftware(
@@ -291,6 +311,7 @@ export type AdmitResult = {
   definitionId: string;
   surface: "acp_session" | "native_tui";
   ptySessionId?: string;
+  role?: string;
 };
 
 export type TurnResult = {
@@ -313,7 +334,11 @@ export async function admitAndStartSession(
     onStarted?: (
       sessionId: string,
       definitionId: string,
-      info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
+      info?: {
+        surface: "acp_session" | "native_tui";
+        ptySessionId?: string;
+        role?: string;
+      },
     ) => void;
   },
 ): Promise<AdmitResult> {
@@ -329,6 +354,9 @@ export async function admitAndStartSession(
       definitionId: runtime.definitionId,
       adapterId: runtime.metadata.adapterId,
       argv: runtime.argv,
+      command: runtime.metadata.command,
+      entrypointPath: runtime.entrypointPath,
+      role: runtime.role,
       env: opts?.env,
       corruptId: opts?.corruptId,
       newTrace,
@@ -351,7 +379,7 @@ export async function admitAndStartSession(
 }
 
 function peerBusDbPath(): string {
-  return join(homedir(), ".qf-peer-bus", "peer-bus.db");
+  return process.env.QF_PEER_BUS_DB ?? join(homedir(), ".qf-peer-bus", "peer-bus.db");
 }
 
 async function admitHostAcpDefinition(
@@ -362,7 +390,11 @@ async function admitHostAcpDefinition(
     onStarted?: (
       sessionId: string,
       definitionId: string,
-      info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
+      info?: {
+        surface: "acp_session" | "native_tui";
+        ptySessionId?: string;
+        role?: string;
+      },
     ) => void;
   },
 ): Promise<AdmitResult> {
@@ -445,10 +477,15 @@ async function admitAgentOsDefinition(
     onStarted?: (
       sessionId: string,
       definitionId: string,
-      info?: { surface: "acp_session" | "native_tui"; ptySessionId?: string },
+      info?: {
+        surface: "acp_session" | "native_tui";
+        ptySessionId?: string;
+        role?: string;
+      },
     ) => void;
   },
 ): Promise<AdmitResult> {
+  assertAgentOsSupported();
   const { definitionId } = runtime;
   const adapterId = runtime.metadata.adapterId;
   const host = await ensureAgentOs();

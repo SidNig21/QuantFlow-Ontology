@@ -1,0 +1,19 @@
+{
+  "name": "qa-bovada-football",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gate": "bun ./run.ts",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "qf-bovada-football": "file:../../../tools/qf-bovada-football",
+    "qf-kernel": "file:../../../packages/qf-kernel",
+    "qf-kernel-schema": "file:../../../qf-kernel-schema"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "typescript": "^5.9.3"
+  }
+}

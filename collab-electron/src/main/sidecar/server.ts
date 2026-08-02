@@ -340,7 +340,6 @@ export class SidecarServer {
     // cause any `electron` invocation to behave as Node instead of
     // the Electron runtime (e.g. `bun run dev` failing with
     // "module 'electron' does not provide an export named 'BrowserWindow'").
-    delete env.ELECTRON_RUN_AS_NODE;
     if (!env.LANG || !env.LANG.includes("UTF-8")) {
       env.LANG = "en_US.UTF-8";
     }
@@ -350,6 +349,9 @@ export class SidecarServer {
 
     // Backward compat: old clients send `shell` instead of `command`/`args`.
     const command = params.command || params.shell || "/bin/sh";
+    // ELECTRON_RUN_AS_NODE belongs only to the sidecar process itself; never
+    // leak it into an ordinary host command or user shell.
+    delete env.ELECTRON_RUN_AS_NODE;
     const args = params.args || [];
     const displayName = params.displayName || displayCommandName(command);
     const cwdHostPath = params.cwdHostPath || params.cwd;

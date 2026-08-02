@@ -92,7 +92,7 @@ export function installCli(): void {
     chmodSync(WRAPPER_PATH, 0o755);
   }
 
-  if (IS_WIN) {
+  if (IS_WIN && process.env["QF_SKIP_WINDOWS_PATH_UPDATE"] !== "1") {
     addToWindowsPath(INSTALL_DIR);
   }
 }

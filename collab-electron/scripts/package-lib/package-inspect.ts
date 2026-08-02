@@ -339,6 +339,80 @@ function sha256Buffer(buf: Buffer): string {
   return createHash("sha256").update(buf).digest("hex");
 }
 
+/**
+ * Prove the finished package contains the fixed Bovada boundary and the exact
+ * shipped qf-canvas resource. This reads package bytes only; it never starts a
+ * vendor request or mutates the package.
+ */
+export function inspectBovadaPackagedSurface(
+  resourcesRoot: string,
+  repoRoot: string,
+): InspectResult {
+  const asarPath = join(resourcesRoot, "app.asar");
+  if (!existsSync(asarPath)) {
+    return { ok: false, reason: "Bovada package proof missing app.asar" };
+  }
+
+  let mainBundle: Buffer;
+  try {
+    mainBundle = extractFile(asarPath, "out/main/index.js");
+  } catch {
+    return {
+      ok: false,
+      reason: "Bovada package proof missing out/main/index.js",
+    };
+  }
+  const bundleText = mainBundle.toString("utf8");
+  const requiredNeedles = [
+    "https://www.bovada.lv/services/sports/event/v2/events/A/description/football/nfl",
+    "QuantFlow-Bovada-Football/0.1",
+    'credentials: "omit"',
+    "market.bovadaFootballCapture",
+  ];
+  for (const needle of requiredNeedles) {
+    if (!bundleText.includes(needle)) {
+      return {
+        ok: false,
+        reason: `Bovada main bundle missing required marker: ${needle}`,
+      };
+    }
+  }
+
+  const sourceCliPath = join(repoRoot, "collab-electron", "cli", "collab-cli.mjs");
+  const packagedCliPath = join(resourcesRoot, "collab-cli.mjs");
+  if (!existsSync(sourceCliPath) || !existsSync(packagedCliPath)) {
+    return { ok: false, reason: "Bovada package proof missing qf-canvas CLI bytes" };
+  }
+  const sourceCli = readFileSync(sourceCliPath);
+  const packagedCli = readFileSync(packagedCliPath);
+  if (sourceCli.compare(packagedCli) !== 0) {
+    return {
+      ok: false,
+      reason:
+        "packaged qf-canvas byte mismatch" +
+        ` packaged=${sha256Buffer(packagedCli)} source=${sha256Buffer(sourceCli)}`,
+    };
+  }
+  const cliText = packagedCli.toString("utf8");
+  for (const marker of [
+    "market bovada-football --once",
+    "market bovada-football --at <UTC>",
+    "market.bovadaFootballCapture",
+  ]) {
+    if (!cliText.includes(marker)) {
+      return { ok: false, reason: `packaged qf-canvas missing marker: ${marker}` };
+    }
+  }
+
+  return {
+    ok: true,
+    checkedPaths: [
+      { path: "app.asar:out/main/index.js", bytes: mainBundle.length },
+      { path: "resources/collab-cli.mjs", bytes: packagedCli.length },
+    ],
+  };
+}
+
 function inspectAsarSqlArtifacts(
   resourcesRoot: string,
   repoRoot: string,

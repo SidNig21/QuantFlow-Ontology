@@ -6,11 +6,11 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: Release verification (install + unit + production build + QA)
+      - name: Native Windows release verification
         run: bun qa/verify-release.ts
