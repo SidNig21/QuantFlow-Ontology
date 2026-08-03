@@ -56,6 +56,7 @@ contextBridge.exposeInMainWorld("shellApi", {
       trace: { trace_id: string; span_id: string },
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+    listHandoffs: () => ipcRenderer.invoke("qf:handoffs:list"),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
     spawnSession: (args: { definitionId: string }) =>

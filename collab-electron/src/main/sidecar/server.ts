@@ -108,18 +108,38 @@ export class SidecarServer {
 
   private sanitizeWindowsWslEnv(env: Record<string, string>): void {
     const pathKey = this.windowsPathKey(env);
-    if (!pathKey) return;
+    if (pathKey) {
+      const filtered = env[pathKey]
+        .split(";")
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+        .filter((entry) => !this.isMalformedNodeModulesBinEntry(entry));
 
-    const filtered = env[pathKey]
-      .split(";")
-      .map((entry) => entry.trim())
-      .filter(Boolean)
-      .filter((entry) => !this.isMalformedNodeModulesBinEntry(entry));
-
-    env[pathKey] = filtered.join(";");
-    if (pathKey !== "PATH" && env.PATH == null) {
-      env.PATH = env[pathKey];
+      env[pathKey] = filtered.join(";");
+      if (pathKey !== "PATH" && env.PATH == null) {
+        env.PATH = env[pathKey];
+      }
     }
+
+    // wsl.exe only imports explicitly named Windows variables. Keep this
+    // allowlist narrow: these values belong to the one QuantFlow launch and
+    // let the guest wrapper reach the app-owned collaboration bridge.
+    const quantFlowKeys = [
+      "QF_AGENT_SESSION_ID",
+      "QF_PEER_ROLE",
+      "QF_PEER_BUS_DB",
+      "QF_APP_RPC_ENDPOINT",
+      "QF_KERNEL_DB",
+      "QF_ARTIFACT_ROOT",
+    ].filter((key) => env[key] != null);
+    const inherited = (env.WSLENV ?? "").split(":").filter(Boolean);
+    const inheritedNames = new Set(
+      inherited.map((entry) => entry.split("/")[0]),
+    );
+    for (const key of quantFlowKeys) {
+      if (!inheritedNames.has(key)) inherited.push(key);
+    }
+    env.WSLENV = inherited.join(":");
   }
 
   private killWindowsProcessTree(
@@ -533,11 +553,23 @@ export class SidecarServer {
       return;
     }
 
+    if (session.exited) {
+      sock.write(makeError(id, -32000, `Session already exited: ${params.sessionId}`));
+      return;
+    }
+
     // Start queuing PTY output
     session.reconnectQueue = [];
 
     // Resize to match new client
-    session.pty.resize(params.cols, params.rows);
+    try {
+      session.pty.resize(params.cols, params.rows);
+    } catch (err) {
+      session.reconnectQueue = null;
+      const message = err instanceof Error ? err.message : String(err);
+      sock.write(makeError(id, -32000, `Session reconnect failed: ${message}`));
+      return;
+    }
 
     // Close old data client if present
     if (session.dataClient && !session.dataClient.destroyed) {
@@ -562,10 +594,20 @@ export class SidecarServer {
       sock.write(makeError(id, -32000, "Session not found"));
       return;
     }
-    session.pty.resize(
-      params.cols as number,
-      params.rows as number,
-    );
+    if (session.exited) {
+      sock.write(makeError(id, -32000, "Session already exited"));
+      return;
+    }
+    try {
+      session.pty.resize(
+        params.cols as number,
+        params.rows as number,
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      sock.write(makeError(id, -32000, `Session resize failed: ${message}`));
+      return;
+    }
     sock.write(makeResponse(id, { ok: true }));
   }
 

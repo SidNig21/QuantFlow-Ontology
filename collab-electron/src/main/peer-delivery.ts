@@ -61,13 +61,22 @@ type PendingRow = {
   id: string;
   from_role: string;
   to_role: string;
+  artifact_id: string;
   body: string;
+  message_kind: "task" | "result";
+  reply_to_artifact_id: string | null;
 };
 
 /** The message text that appears in the recipient's TUI (no Enter — see below). */
-function formatIncoming(fromRole: string, body: string): string {
-  const oneLine = body.replace(/\s*\n\s*/g, " ").trim();
-  return `[peer message from ${fromRole}] ${oneLine}`;
+function formatIncoming(row: PendingRow): string {
+  const oneLine = row.body.replace(/\s*\n\s*/g, " ").trim();
+  if (row.message_kind === "task") {
+    return `[QuantFlow TASK ${row.artifact_id} from ${row.from_role}] ${oneLine} `
+      + `Complete it, then call the QuantFlow collaboration send_result tool `
+      + `with task_artifact_id=${row.artifact_id}.`;
+  }
+  return `[QuantFlow RESULT for ${row.reply_to_artifact_id ?? "unknown task"} `
+    + `from ${row.from_role}] ${oneLine}`;
 }
 
 /**
@@ -93,7 +102,8 @@ function poll(): void {
       // Not-yet-pushed only. `delivered` (the pull path) is never read here.
       rows = db
         .prepare(
-          `SELECT id, from_role, to_role, body FROM messages
+          `SELECT id, from_role, to_role, artifact_id, body, message_kind,
+                  reply_to_artifact_id FROM messages
            WHERE pushed_at IS NULL ORDER BY created_at ASC`,
         )
         .all() as PendingRow[];
@@ -109,7 +119,7 @@ function poll(): void {
       // paste-detection). Mark pushed_at ONLY after the Enter is written — a
       // seat that dies mid-inject is never falsely marked, so it retries.
       inFlight.add(row.id);
-      writeToSession(pty, formatIncoming(row.from_role, row.body));
+      writeToSession(pty, formatIncoming(row));
       const { id, from_role, to_role } = row;
       setTimeout(() => {
         try {

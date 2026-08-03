@@ -806,6 +806,7 @@ export function createTileManager({
 						height: saved.height,
 						zIndex: saved.zIndex,
 						ptySessionId: saved.ptySessionId,
+						sessionId: saved.sessionId,
 						definitionId: saved.definitionId,
 						role: saved.role,
 						agentLabel: saved.agentLabel,
@@ -813,7 +814,15 @@ export function createTileManager({
 						autoTitle: saved.autoTitle,
 					},
 				);
-				spawnTerminalWebview(tile);
+				if (tile.ptySessionId || !tile.sessionId) {
+					spawnTerminalWebview(tile);
+				} else {
+					const dom = tileDOMs.get(tile.id);
+					const stopped = document.createElement("div");
+					stopped.className = "agent-session-stopped";
+					stopped.textContent = "Session stopped";
+					dom?.contentArea.appendChild(stopped);
+				}
 			} else if (saved.type === "graph" && saved.folderPath) {
 				const tile = createCanvasTile(
 					"graph", cx, cy, {

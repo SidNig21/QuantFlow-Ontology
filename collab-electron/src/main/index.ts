@@ -42,6 +42,7 @@ import {
   kernelGetLinks,
   kernelGetObject,
   kernelListAgentDefinitions,
+  kernelListAgentSessions,
   peerBusReadInbox,
   peerBusSend,
 } from "./kernel";
@@ -108,6 +109,24 @@ function requirePeerSessionRole(
     throw new Error(`peer-bus role/session mismatch for ${sessionId}`);
   }
   return { sessionId, role: claimedRole };
+}
+
+function requireLivePeerSession(role: unknown): { sessionId: string; role: string } {
+  if (typeof role !== "string" || role.length === 0) {
+    throw new Error("peer-bus requires to_role");
+  }
+  for (const session of kernelListAgentSessions()) {
+    if (String(session.status ?? "") !== "running") continue;
+    const sessionId = String(session.id ?? "");
+    if (!sessionId) continue;
+    try {
+      const identity = requirePeerSessionRole(sessionId, role);
+      return identity;
+    } catch {
+      // This running session belongs to another Dock role.
+    }
+  }
+  throw new Error(`peer-bus requires a live recipient for role ${role}`);
 }
 
 // Capture Electron's legacy default before replacing it. The migration must
@@ -1016,11 +1035,35 @@ app.whenReady().then(async () => {
       const identity = requirePeerSessionRole(input.session_id, input.from_role);
       const toRole = input.to_role;
       const body = input.message;
+      const kind = input.kind;
+      const replyToArtifactId = input.reply_to_artifact_id;
       const busDb = input.bus_db;
       if (typeof toRole !== "string" || toRole.length === 0) throw new Error("peer-bus send requires to_role");
       if (typeof body !== "string" || body.length === 0) throw new Error("peer-bus send requires message");
+      if (kind !== "task" && kind !== "result") throw new Error("peer-bus send requires kind=task|result");
+      if (kind === "result") {
+        if (typeof replyToArtifactId !== "string" || replyToArtifactId.length === 0) {
+          throw new Error("peer-bus result requires reply_to_artifact_id");
+        }
+        const task = kernelGetObject("artifact", replyToArtifactId);
+        if (!task || task.kind !== "trajectory") {
+          throw new Error("peer-bus result reply target must be a trajectory artifact");
+        }
+      }
       if (typeof busDb !== "string" || busDb !== process.env.QF_PEER_BUS_DB) throw new Error("peer-bus db is not app-owned");
-      return peerBusSend(busDb, identity.role, toRole, body);
+      const recipient = requireLivePeerSession(toRole);
+      const result = peerBusSend(busDb, {
+        fromSessionId: identity.sessionId,
+        fromRole: identity.role,
+        toSessionId: recipient.sessionId,
+        toRole: recipient.role,
+        body,
+        kind,
+        ...(typeof replyToArtifactId === "string" ? { replyToArtifactId } : {}),
+      });
+      mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
+      mainWindow?.webContents.send("qf:dock:invalidate");
+      return result;
     },
     { description: "Product-owned peer-bus send; records a Kernel trajectory before routing." },
   );

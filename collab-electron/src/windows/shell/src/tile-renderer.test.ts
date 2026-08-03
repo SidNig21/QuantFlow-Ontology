@@ -175,6 +175,15 @@ describe("native TUI agent tile model", () => {
   test("does not label an ordinary terminal as an agent", () => {
     expect(getAgentTileModel({ type: "term", id: "terminal" })).toBeNull();
   });
+
+  test("marks a durable agent tile without a live PTY as stopped", () => {
+    expect(getAgentTileModel({
+      type: "term",
+      id: "tile-stopped-agent",
+      definitionId: "hermes-worker",
+      sessionId: "session-worker-stopped",
+    })?.status).toBe("stopped");
+  });
 });
 
 // -- positionTile --

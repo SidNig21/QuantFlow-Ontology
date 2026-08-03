@@ -3,7 +3,9 @@
  * Extracted so agent-host.ts stays under 1k.
  */
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { hostPathToGuestPath } from "@collab/shared/path-utils";
 import { resolveHostAcpCommand } from "./host-acp-bridge";
 import { makeEndpointPath } from "./ipc-endpoint";
 import { resolveAdapterSessionEnv } from "./host-mounts";
@@ -90,13 +92,41 @@ export async function admitNativeTuiDefinition(opts: {
   const home = env.HOME ?? process.env.HOME ?? homedir();
   const hostHome = homedir();
   const displayName = `${definitionId}-tui`;
+  const collaborationBridge = resolve(
+    __dirname,
+    "../../cli/qf-collaboration-mcp.mjs",
+  );
+  const hermesLaunchWrapper = resolve(
+    __dirname,
+    "../../cli/qf-hermes-launch.sh",
+  );
+  const useQuantFlowHermesLaunch =
+    opts.adapterId === "hermes" &&
+    opts.terminalTarget?.startsWith("wsl:") === true &&
+    Boolean(opts.role) &&
+    existsSync(collaborationBridge) &&
+    existsSync(hermesLaunchWrapper);
+  const wrapperGuestPath = useQuantFlowHermesLaunch
+    ? hostPathToGuestPath(hermesLaunchWrapper, opts.terminalTarget!)
+    : null;
+  if (useQuantFlowHermesLaunch && !wrapperGuestPath) {
+    throw new Error("QuantFlow could not map its Hermes launch bridge into WSL");
+  }
+  const guestCommand = opts.command ?? adapterId;
   const wslLaunch = opts.terminalTarget?.startsWith("wsl:")
     ? resolveWslNativeTuiLaunch({
         terminalTarget: opts.terminalTarget,
         homeDir: hostHome,
         cwdHostPath: hostHome,
-        guestCommand: opts.command ?? adapterId,
-        argv,
+        guestCommand: useQuantFlowHermesLaunch ? "/bin/bash" : guestCommand,
+        argv: useQuantFlowHermesLaunch
+          ? [
+              wrapperGuestPath!,
+              collaborationBridge.replace(/\\/g, "/"),
+              guestCommand,
+              ...argv,
+            ]
+          : argv,
         platform: process.platform,
         getDefaultWslDistro,
         resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
@@ -115,8 +145,6 @@ export async function admitNativeTuiDefinition(opts: {
   const commandTarget = wslLaunch?.target ?? "host_command";
   const commandCwd = wslLaunch?.cwd ?? home;
   const commandCwdGuest = wslLaunch?.cwdGuestPath;
-  const guestCommand = opts.command ?? adapterId;
-
   const defaults: NativeTuiOrchestrationDependencies = {
     createPty: ({ sessionId }) => createHostCommandSession({
       command,

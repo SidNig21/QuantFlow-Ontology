@@ -24,6 +24,7 @@ import {
   kernelListAgentDefinitions,
   kernelListAgentSessions,
   kernelListArtifacts,
+  peerBusListHandoffs,
 } from "./kernel";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
@@ -121,6 +122,17 @@ export function registerKernelHandlers(): void {
     try {
       assertTrustedSender(event);
       return { ok: true as const, artifacts: kernelListArtifacts() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:handoffs:list", (event) => {
+    try {
+      assertTrustedSender(event);
+      const busDb = process.env.QF_PEER_BUS_DB;
+      if (!busDb) throw new Error("peer-bus is not initialized");
+      return { ok: true as const, handoffs: peerBusListHandoffs(busDb) };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

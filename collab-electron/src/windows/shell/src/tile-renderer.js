@@ -38,7 +38,9 @@ export function getAgentTileModel(tile) {
   return {
     identity: tile.definitionId || tile.userTitle || "Agent CLI",
     runtime: "Native TUI",
-    status: tile.ptySessionId ? "TUI attached" : "starting",
+    status: tile.ptySessionId
+      ? "TUI attached"
+      : (tile.sessionId ? "stopped" : "starting"),
     sessionId: tile.sessionId || null,
     dominantSurface: "tui",
     actions: ["fullscreen", "close"],
