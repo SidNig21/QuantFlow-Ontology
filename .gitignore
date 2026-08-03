@@ -3,6 +3,8 @@
 *.swo
 *~
 docs/*
+!docs/adr/
+!docs/adr/**
 !docs/orders/
 !docs/orders/**
 !docs/demos/
