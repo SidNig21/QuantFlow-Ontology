@@ -3,7 +3,7 @@
 > **ADOPTED 2026-07-18 (WO-002a).** Governing contract for the canvas seam. **Same weight as the One
 > Rule** (`START_HERE.md` §1). Collaborator stays; ownership inverts. **A tile that remembers is a bug.**
 >
-> Cut out of `docs/BLUEPRINT.md` on 2026-08-03 under DOCTRINE A9, unchanged. The blueprint's stack
+> Cut out of `docs/BLUEPRINT.md` (now `docs/history/BLUEPRINT-2026-07-18.md`) on 2026-08-03 under DOCTRINE A9, unchanged. The blueprint's stack
 > table and organ-harvest notes went to `docs/history/`; these laws did not, because `START_HERE.md`
 > gives them One-Rule weight and they are enforced by runnable gates.
 

@@ -20,7 +20,7 @@ Research-only: QuantFlow **never places bets or executes trades**. It proposes, 
 
 **The Kernel owns truth. Everything else is a projection or a cache.** The Kernel is a typed ontology (objects · links · actions) in local SQLite. Any change that makes something remember state outside the Kernel is rejected on sight.
 
-At the canvas seam this rule is spelled out as **Canvas-seam Laws A–F** (`docs/BLUEPRINT.md`), which carry the same weight as this section. Short form: **a tile that remembers is a bug**; `Tile = render(projection) + dispatch(action)`; commands are rejectable, events are replayable, and the event log is the receipt log.
+At the canvas seam this rule is spelled out as **Canvas-seam Laws A–F** (`docs/LAWS.md`), which carry the same weight as this section. Short form: **a tile that remembers is a bug**; `Tile = render(projection) + dispatch(action)`; commands are rejectable, events are replayable, and the event log is the receipt log.
 
 ## 2. The defining v1 workflow (everything else is scope creep until this runs)
 
@@ -32,10 +32,19 @@ Hypothesis → Dataset (versioned, point-in-time fenced) → Backtest Run (local
 
 ## 3. Authority documents
 
+There are seven, and nothing else binds. If a document is not on this list, it cannot authorize work.
+
 1. **This file** — mission and rules.
-2. **`DOC_AUTHORITY_MAP.md`** — is any doc CURRENT / REFERENCE / ARCHIVE.
-3. **`docs/BLUEPRINT.md`** — the seven-layer architecture and decided stack. **`docs/ONTOLOGY_SCHEMA.md`** — the typed schema, frozen v0.1. **`docs/ROADMAP.md`** — the work-order ladder and phase gates.
-4. **`docs/orders/`** — active work orders (`PROTOCOL.md` = rules of engagement). Work happens **only** through a work order.
+2. **`docs/orders/NEXT.md`** — the build authority (DOCTRINE A9). It names exactly one active rung, or closes the builder door. No agent selects work it does not name.
+3. **`docs/DOCTRINE.md`** — the plan of record: why the ontology, the phases, the founder amendments. Where it and an older doc disagree on *direction*, it wins.
+4. **`docs/LAWS.md`** — the Canvas-seam Laws A–F. Same weight as §1 of this file.
+5. **`docs/orders/PROTOCOL.md`** — rules of engagement, roles, evidence standard.
+6. **`docs/DEBT.md`** — the debt register. Binding, but blocks nothing.
+7. **`docs/adr/`** — accepted decisions with their reasons. A later ADR explicitly supersedes an earlier one.
+
+Two surfaces are **generated and cannot go stale** — prefer them over any prose: `qf-kernel-schema/golden/ONTOLOGY.md` for the live schema (byte-checked against the generator), and `bun qa/run.ts --list` for the live gates.
+
+`docs/history/` is superseded material, kept for reasoning. **Nothing in it is authority and nothing in it reactivates by being read.**
 
 The predecessor repo (`SidNig21/QuantFlow`) is the **parts shop**: read-only reference, organ harvest by explicit order only. Never copy code from it without an order saying so.
 

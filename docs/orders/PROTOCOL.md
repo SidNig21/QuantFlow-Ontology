@@ -51,7 +51,7 @@ Nothing else. The read is deliberately narrow so it stays cheap enough to actual
 
 **Reviews are testimony, not verdicts.** A review is a claim like any other and gets verified before it is acted on — the same standard applied to a builder's report. This is not ceremony: the review that produced this role was itself partly wrong (it proposed binding a real session ID into `ToolLoopAgent`, which has no session concept — the `sessionId` it found belongs to React hooks). Two blockers were confirmed by measurement; one proposed remedy was not achievable. **Precedence, always: measurements beat prose — the reviewer's, the builder's, the verifier's, and the architect's alike.**
 
-**Entry points.** Builders start at [`NEXT.md`](NEXT.md); verifiers start at [`VERIFYING.md`](VERIFYING.md). Both are cold starts — no chat history required, by design.
+**Entry points.** Builders and verifiers both start at [`NEXT.md`](NEXT.md) — it is the build authority (DOCTRINE A9) and it names the one active rung plus its acceptance. Cold start, no chat history required, by design. The separate `VERIFYING.md` door was archived on 2026-08-03: it was a second reading-order doc that drifted from this one, which is the exact rot the paragraph below describes.
 
 ## The loop
 
