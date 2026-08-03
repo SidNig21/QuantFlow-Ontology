@@ -20,6 +20,7 @@ import {
 import {
   getPref, setPref, type AppConfig,
 } from "./config";
+import { denyPermissionResponse } from "./host-acp-bridge";
 import { QF_APP_DIR } from "./paths";
 
 type AgentSession = {
@@ -77,7 +78,7 @@ function sendToRenderer(
   }
 }
 
-function createClient(): Client {
+export function createClient(): Client {
   return {
     async sessionUpdate(
       params: SessionNotification,
@@ -88,16 +89,12 @@ function createClient(): Client {
     async requestPermission(
       params: RequestPermissionRequest,
     ): Promise<RequestPermissionResponse> {
-      const allow = params.options.find(
-        (o) => o.kind === "allow_once",
-      );
-      return {
-        outcome: {
-          outcome: "selected",
-          optionId:
-            allow?.optionId ?? params.options[0].optionId,
-        },
-      };
+      sendToRenderer("agent:prompt-error", {
+        sessionId: params.sessionId,
+        error:
+          "Legacy ACP permission denied: no founder decision UI is available.",
+      });
+      return denyPermissionResponse(params);
     },
 
     async readTextFile(
@@ -178,7 +175,6 @@ async function spawnAndInitialize(
     env: {
       ...process.env,
       ...extraEnv,
-      ACP_PERMISSION_MODE: "acceptEdits",
     },
   });
   console.log(

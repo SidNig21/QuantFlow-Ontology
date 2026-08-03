@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   mergeFileSetsForPlatform,
   parseExtraResourcesFromBuildConfig,
@@ -63,5 +65,16 @@ describe("extra-resources parsing", () => {
       { from: "a", to: "A" },
       { from: "b", to: "B" },
     ]);
+  });
+
+  test("Windows packaging declares both collaboration bridge resources", () => {
+    const packageJson = JSON.parse(
+      readFileSync(join(import.meta.dir, "../../package.json"), "utf8"),
+    ) as { build: unknown };
+    const sets = mergeFileSetsForPlatform(packageJson.build, "win");
+    expect(sets).toEqual(expect.arrayContaining([
+      { from: "cli/qf-collaboration-mcp.mjs", to: "qf-collaboration-mcp.mjs" },
+      { from: "cli/qf-hermes-launch.sh", to: "qf-hermes-launch.sh" },
+    ]));
   });
 });

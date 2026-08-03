@@ -24,7 +24,12 @@ import {
   kernelListAgentDefinitions,
   kernelListAgentSessions,
   kernelListArtifacts,
+  peerBusListHandoffs,
 } from "./kernel";
+import {
+  getDockDefinitionAvailability,
+  getHermesDockDiagnostic,
+} from "./agent-host";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
@@ -126,10 +131,34 @@ export function registerKernelHandlers(): void {
     }
   });
 
+  ipcMain.handle("qf:handoffs:list", (event) => {
+    try {
+      assertTrustedSender(event);
+      const busDb = process.env.QF_PEER_BUS_DB;
+      if (!busDb) throw new Error("peer-bus is not initialized");
+      return { ok: true as const, handoffs: peerBusListHandoffs(busDb) };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
   ipcMain.handle("qf:definitions:list", (event) => {
     try {
       assertTrustedSender(event);
-      return { ok: true as const, definitions: kernelListAgentDefinitions() };
+      const diagnostics = [];
+      const hermesDiagnostic = getHermesDockDiagnostic();
+      if (hermesDiagnostic) diagnostics.push(hermesDiagnostic);
+      const definitions = kernelListAgentDefinitions().map((definition) => {
+        if (
+          hermesDiagnostic &&
+          String(definition.package_ref ?? "").startsWith("species/hermes/")
+        ) {
+          return definition;
+        }
+        const availability = getDockDefinitionAvailability(definition);
+        return availability ? { ...definition, availability } : definition;
+      });
+      return { ok: true as const, definitions, diagnostics };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

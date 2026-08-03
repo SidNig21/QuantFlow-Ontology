@@ -64,22 +64,34 @@ const DEFAULTS = [
     runtimeProfile: null,
   },
   {
+    id: "qf-proof-orchestrator",
+    role: "orchestrator",
+    packageRef: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+    runtimeProfile: "qf-proof-orchestrator",
+  },
+  {
+    id: "qf-proof-worker",
+    role: "worker",
+    packageRef: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+    runtimeProfile: "qf-proof-worker",
+  },
+  {
     id: "hermes-orchestrator",
     role: "orchestrator",
     packageRef: "species/hermes/packed/hermes.aospkg",
-    runtimeProfile: "qf-orchestrator",
+    runtimeProfile: "default",
   },
   {
     id: "hermes-worker",
     role: "worker",
     packageRef: "species/hermes/packed/hermes.aospkg",
-    runtimeProfile: "qf-worker",
+    runtimeProfile: "default",
   },
   {
     id: "hermes-worker-2",
     role: "worker2",
     packageRef: "species/hermes/packed/hermes.aospkg",
-    runtimeProfile: "qf-worker-2",
+    runtimeProfile: "default",
   },
 ] as const;
 
@@ -111,6 +123,9 @@ function copyFixtureRoot(target: string): void {
     "tools/runtime-proof/dock-profiles.json",
     "tools/runtime-proof/launch.json",
     "tools/runtime-proof/packed/qf-toolloop.meta.json",
+    "tools/qf-proof-agent/dock-profiles.json",
+    "tools/qf-proof-agent/launch.json",
+    "tools/qf-proof-agent/packed/qf-proof-agent.meta.json",
   ];
   for (const ref of files) {
     const destination = join(target, ref);
@@ -120,6 +135,7 @@ function copyFixtureRoot(target: string): void {
   for (const ref of [
     "species/hermes/packed/hermes.aospkg",
     "tools/runtime-proof/packed/qf-toolloop.aospkg",
+    "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
   ]) {
     const destination = join(target, ref);
     mkdirSync(join(destination, ".."), { recursive: true });
@@ -136,12 +152,12 @@ function bootstrap(db: KernelDb, appRoot: string) {
     getAgentDefinition: (id) => definition(db, id),
     executeRegisterAgentDefinition: (input: DockProfileRegistration) =>
       execute(db, "register_agent_definition", input, trace()),
-  });
+  }, { qaMode: true });
 }
 
 function assertExactDefaults(db: KernelDb): Record<string, unknown>[] {
   const rows = queryObjects(db, "agent_definition", undefined, null, 0, undefined, "asc");
-  assert(rows.length === 4, "bootstrap row count must be exactly four", rows);
+  assert(rows.length === 6, "bootstrap row count must be exactly six", rows);
   for (const expected of DEFAULTS) {
     const row = rows.find((candidate) => candidate.id === expected.id);
     assert(row, `missing default ${expected.id}`);
@@ -162,6 +178,7 @@ function assertSourceMetadataAgreement(): void {
   for (const adapter of [
     { root: "species/hermes", packageName: "hermes.aospkg" },
     { root: "tools/runtime-proof", packageName: "qf-toolloop.aospkg" },
+    { root: "tools/qf-proof-agent", packageName: "qf-proof-agent.aospkg" },
   ]) {
     const launch = JSON.parse(readFileSync(join(REPO, adapter.root, "launch.json"), "utf8")) as Record<string, unknown>;
     const packed = JSON.parse(
@@ -200,7 +217,7 @@ function assertStrictManifests(work: string): void {
   unknown.extra = true;
   writeFileSync(unknownPath, `${JSON.stringify(unknown, null, 2)}\n`);
   expectContractRejection(
-    () => discoverDockProfileManifests(unknownRoot),
+    () => discoverDockProfileManifests(unknownRoot, { qaMode: true }),
     /keys must be exactly/,
     "manifest unknown key",
   );
@@ -214,7 +231,7 @@ function assertStrictManifests(work: string): void {
   traversal.adapter.package = "../packed/hermes.aospkg";
   writeFileSync(traversalPath, `${JSON.stringify(traversal, null, 2)}\n`);
   expectContractRejection(
-    () => discoverDockProfileManifests(traversalRoot),
+    () => discoverDockProfileManifests(traversalRoot, { qaMode: true }),
     /normalized relative POSIX path/,
     "manifest traversal",
   );
@@ -228,7 +245,7 @@ function assertStrictManifests(work: string): void {
   absolute.adapter.package = "/tmp/qf-toolloop.aospkg";
   writeFileSync(absolutePath, `${JSON.stringify(absolute, null, 2)}\n`);
   expectContractRejection(
-    () => discoverDockProfileManifests(absoluteRoot),
+    () => discoverDockProfileManifests(absoluteRoot, { qaMode: true }),
     /normalized relative POSIX path/,
     "manifest absolute path",
   );
@@ -676,12 +693,12 @@ async function main(): Promise<number> {
 
     db = openKernel(":memory:");
     const first = bootstrap(db, appRoot);
-    assert(first.registered.length === 4 && first.skipped.length === 0 && first.conflicts.length === 0, "first bootstrap counts wrong", first);
+    assert(first.registered.length === 6 && first.skipped.length === 0 && first.conflicts.length === 0, "first bootstrap counts wrong", first);
     const rows = assertExactDefaults(db);
     const eventsAfterFirst = eventCount(db);
     const second = bootstrap(db, appRoot);
-    assert(second.registered.length === 0 && second.skipped.length === 4 && second.conflicts.length === 0, "second bootstrap counts wrong", second);
-    assert(queryObjects(db, "agent_definition", undefined, null).length === 4, "second bootstrap changed row count");
+    assert(second.registered.length === 0 && second.skipped.length === 6 && second.conflicts.length === 0, "second bootstrap counts wrong", second);
+    assert(queryObjects(db, "agent_definition", undefined, null).length === 6, "second bootstrap changed row count");
     assert(eventCount(db) === eventsAfterFirst, "second bootstrap changed event count");
 
     conflictDb = openKernel(":memory:");
@@ -698,19 +715,19 @@ async function main(): Promise<number> {
     );
     const conflictBeforeEvents = eventCount(conflictDb);
     const conflict = bootstrap(conflictDb, appRoot);
-    assert(conflict.registered.length === 3 && conflict.skipped.length === 0 && conflict.conflicts.length === 1, "conflict bootstrap counts wrong", conflict);
+    assert(conflict.registered.length === 5 && conflict.skipped.length === 0 && conflict.conflicts.length === 1, "conflict bootstrap counts wrong", conflict);
     const preserved = definition(conflictDb, "qf-toolloop");
     assert(preserved?.role === "operator-preserved-conflict" && preserved?.package_ref === "operator/custom.aospkg", "bootstrap overwrote conflicting operator row", preserved);
-    assert(eventCount(conflictDb) === conflictBeforeEvents + 3, "conflict bootstrap event count wrong");
+    assert(eventCount(conflictDb) === conflictBeforeEvents + 5, "conflict bootstrap event count wrong");
 
     const orchestrator = resolvedRow(db, appRoot, "hermes-orchestrator");
     const worker = resolvedRow(db, appRoot, "hermes-worker");
     assert(orchestrator.resolved.metadata.adapterId === "hermes" && worker.resolved.metadata.adapterId === "hermes", "shared Hermes adapter id mismatch");
     assert(orchestrator.resolved.packagePath === worker.resolved.packagePath, "Hermes profiles do not share package path");
-    const orchestratorArgv = expandRuntimeAdapterArgv(orchestrator.adapter.metadata, "qf-orchestrator");
-    const workerArgv = expandRuntimeAdapterArgv(worker.adapter.metadata, "qf-worker");
-    assert(JSON.stringify(orchestratorArgv) === JSON.stringify(["-p", "qf-orchestrator", "--tui"]), "orchestrator argv wrong", orchestratorArgv);
-    assert(JSON.stringify(workerArgv) === JSON.stringify(["-p", "qf-worker", "--tui"]), "worker argv wrong", workerArgv);
+    const orchestratorArgv = expandRuntimeAdapterArgv(orchestrator.adapter.metadata, "default");
+    const workerArgv = expandRuntimeAdapterArgv(worker.adapter.metadata, "default");
+    assert(JSON.stringify(orchestratorArgv) === JSON.stringify(["--tui"]), "orchestrator argv wrong", orchestratorArgv);
+    assert(JSON.stringify(workerArgv) === JSON.stringify(["--tui"]), "worker argv wrong", workerArgv);
 
     const uniqueSoftware = collectUniqueRuntimeSoftware(
       rows,
@@ -782,7 +799,7 @@ async function main(): Promise<number> {
 
     const hermesMetadata = orchestrator.adapter.metadata;
     const noPeerMetadata: RuntimeAdapterMetadata = { ...hermesMetadata, peerDelivery: null };
-    assert(!allowsPtyRoleDelivery(noPeerMetadata, "qf-orchestrator"), "unflagged adapter became peer eligible");
+    assert(!allowsPtyRoleDelivery(noPeerMetadata, "default"), "unflagged adapter became peer eligible");
     assert(!allowsPtyRoleDelivery(hermesMetadata, null), "null selector became peer eligible");
     assert(!allowsPtyRoleDelivery(hermesMetadata, "unlisted"), "unlisted selector became peer eligible");
     const toolloop = resolvedRow(db, appRoot, "qf-toolloop");

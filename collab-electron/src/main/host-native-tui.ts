@@ -4,9 +4,11 @@
  */
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { hostPathToGuestPath } from "@collab/shared/path-utils";
 import { resolveHostAcpCommand } from "./host-acp-bridge";
 import { makeEndpointPath } from "./ipc-endpoint";
 import { resolveAdapterSessionEnv } from "./host-mounts";
+import { QF_APP_DIR } from "./paths";
 import { kernelExecute, type TraceContext } from "./kernel";
 import {
   createHostCommandSession,
@@ -20,6 +22,16 @@ import {
   unregisterSeatPty,
 } from "./peer-delivery";
 import {
+  getDefaultWslDistro,
+  classifyWslNativeTuiPrerequisites,
+  resolveWslNativeTuiLaunch,
+} from "./terminal-target";
+import type { TerminalTarget } from "./config";
+import {
+  resolveCollaborationResourcePath,
+  resolveHermesProfileRoot,
+} from "./package-resource-paths";
+import {
   orchestrateNativeTuiAdmission,
   type NativeTuiLive,
   type NativeTuiOrchestrationDependencies,
@@ -30,6 +42,15 @@ export type { NativeTuiLive } from "./native-tui-orchestration";
 let exitHookInstalled = false;
 const ptyToKernel = new Map<string, string>();
 let closeKernelRow: ((sessionId: string) => void) | null = null;
+
+function resolveHermesProfileGuestRoot(
+  terminalTarget: string,
+  appDir: string,
+): string | null {
+  const profileRoot = resolveHermesProfileRoot(appDir);
+  if (profileRoot.startsWith("/")) return profileRoot;
+  return hostPathToGuestPath(profileRoot, terminalTarget);
+}
 
 /** Wire once from agent-host so PTY exit closes the Kernel row. */
 export function installNativeTuiPtyExitHook(
@@ -55,6 +76,7 @@ export async function admitNativeTuiDefinition(opts: {
   argv: string[];
   command?: string | null;
   entrypointPath?: string | null;
+  terminalTarget?: TerminalTarget | null;
   role?: string;
   env?: Record<string, string>;
   corruptId?: string;
@@ -81,32 +103,110 @@ export async function admitNativeTuiDefinition(opts: {
   const { definitionId, adapterId, argv } = opts;
   const fromConfig = resolveAdapterSessionEnv(adapterId);
   const env = { ...fromConfig, ...opts.env };
-  const command = resolveHostAcpCommand(
+  const home = env.HOME ?? process.env.HOME ?? homedir();
+  const hostHome = homedir();
+  const displayName = `${definitionId}-tui`;
+  const hermesWslAdapter =
+    opts.adapterId === "hermes" &&
+    opts.terminalTarget?.startsWith("wsl:") === true &&
+    Boolean(opts.role);
+  const collaborationBridge = hermesWslAdapter
+    ? resolveCollaborationResourcePath("qf-collaboration-mcp.mjs", {
+        resourcesPath: process.resourcesPath,
+        moduleDir: __dirname,
+      })
+    : null;
+  const hermesLaunchWrapper = hermesWslAdapter
+    ? resolveCollaborationResourcePath("qf-hermes-launch.sh", {
+        resourcesPath: process.resourcesPath,
+        moduleDir: __dirname,
+      })
+    : null;
+  if (hermesWslAdapter && (!collaborationBridge || !hermesLaunchWrapper)) {
+    throw new Error(
+      "Hermes unavailable: QuantFlow collaboration resources are missing. " +
+      "Reinstall QuantFlow or run the development app.",
+    );
+  }
+  const guestCommand = opts.command ?? adapterId;
+  const wslPrerequisite = hermesWslAdapter
+    ? classifyWslNativeTuiPrerequisites({
+        platform: process.platform,
+        homeDir: hostHome,
+        terminalTarget: opts.terminalTarget!,
+        cwdHostPath: hostHome,
+        getDefaultWslDistro,
+        resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+        guestCommand,
+      })
+    : null;
+  if (wslPrerequisite) throw new Error(wslPrerequisite.message);
+  const useQuantFlowHermesLaunch = hermesWslAdapter;
+  const wrapperGuestPath = useQuantFlowHermesLaunch
+    ? hostPathToGuestPath(hermesLaunchWrapper!, opts.terminalTarget!)
+    : null;
+  if (useQuantFlowHermesLaunch && !wrapperGuestPath) {
+    throw new Error("QuantFlow could not map its Hermes launch bridge into WSL");
+  }
+  const hermesProfileRootGuest = hermesWslAdapter
+    ? resolveHermesProfileGuestRoot(
+        opts.terminalTarget!,
+        QF_APP_DIR,
+      )
+    : null;
+  if (hermesWslAdapter && !hermesProfileRootGuest) {
+    throw new Error(
+      "Hermes unavailable: QuantFlow's isolated Hermes profile path could not be mapped into WSL",
+    );
+  }
+  const wslLaunch = opts.terminalTarget?.startsWith("wsl:")
+    ? resolveWslNativeTuiLaunch({
+        terminalTarget: opts.terminalTarget,
+        homeDir: hostHome,
+        cwdHostPath: hostHome,
+        guestCommand: useQuantFlowHermesLaunch ? "/bin/bash" : guestCommand,
+        argv: useQuantFlowHermesLaunch
+          ? [
+              wrapperGuestPath!,
+              collaborationBridge!.replace(/\\/g, "/"),
+              guestCommand,
+              ...argv,
+            ]
+          : argv,
+        platform: process.platform,
+        getDefaultWslDistro,
+        resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+      })
+    : null;
+  const command = wslLaunch?.command ?? resolveHostAcpCommand(
     opts.command === "electron-node" ? process.execPath :
       opts.command ?? env.HOST_ACP_BIN ?? env.HERMES_BIN ??
       process.env.HOST_ACP_BIN ?? process.env.HERMES_BIN,
-    adapterId === "hermes"
-      ? [
-          join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
-          join(homedir(), ".local/bin/hermes"),
-        ]
-      : [],
   );
-  const home = env.HOME ?? process.env.HOME ?? homedir();
-  const displayName = `${definitionId}-tui`;
-  const commandArgs = opts.entrypointPath
-    ? [opts.entrypointPath, ...argv]
-    : argv;
-
+  const commandArgs = wslLaunch
+    ? wslLaunch.args
+    : opts.entrypointPath
+      ? [opts.entrypointPath, ...argv]
+      : argv;
+  const commandTarget = wslLaunch?.target ?? "host_command";
+  const commandCwd = wslLaunch?.cwd ?? home;
+  const commandCwdGuest = wslLaunch?.cwdGuestPath;
   const defaults: NativeTuiOrchestrationDependencies = {
     createPty: ({ sessionId }) => createHostCommandSession({
       command,
       args: commandArgs,
-      cwd: home,
+      cwd: commandCwd,
+      target: commandTarget,
+      cwdGuestPath: commandCwdGuest,
       env: {
-        HERMES_BIN: command,
-        HOST_ACP_BIN: command,
-        HOME: home,
+        HERMES_BIN: wslLaunch ? guestCommand : command,
+        HOST_ACP_BIN: wslLaunch ? guestCommand : command,
+        ...(wslLaunch
+          ? (env.HOME?.startsWith("/") ? { HOME: env.HOME } : {})
+          : { HOME: home }),
+        ...(hermesProfileRootGuest
+          ? { QF_QUANTFLOW_HERMES_PROFILE_ROOT: hermesProfileRootGuest }
+          : {}),
         TERM: "xterm-256color",
         ...(process.env.QF_KERNEL_DB
           ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
@@ -162,7 +262,8 @@ export async function admitNativeTuiDefinition(opts: {
   );
   console.log(
     `agent-host: admitted native_tui session=${result.sessionId} definition=${definitionId}`
-    + ` cmd=${command} argv=${JSON.stringify(argv)} pty=${result.ptySessionId}`,
+    + ` cmd=${command} argv=${JSON.stringify(commandArgs)}`
+    + ` target=${commandTarget} pty=${result.ptySessionId}`,
   );
   return result;
 }

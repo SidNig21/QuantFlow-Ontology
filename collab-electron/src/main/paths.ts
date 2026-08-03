@@ -7,6 +7,8 @@ export interface QuantFlowPathOptions {
   platform: NodeJS.Platform;
   isDev: boolean;
   worktreeRoot: string;
+  appRootOverride?: string;
+  appDirOverride?: string;
 }
 
 function normalizeWindowsPath(
@@ -39,6 +41,38 @@ export function resolveQuantFlowPaths(
   devWorktreeId: string | null;
 } {
   const pathApi = options.platform === "win32" ? win32 : posix;
+  const appRootOverride = options.appRootOverride?.trim();
+  const appDirOverride = options.appDirOverride?.trim();
+  if (Boolean(appRootOverride) !== Boolean(appDirOverride)) {
+    throw new Error("QF_APP_ROOT and QF_APP_DIR must be configured together");
+  }
+  if (appRootOverride && appDirOverride) {
+    if (
+      !pathApi.isAbsolute(
+        normalizeWindowsPath(appRootOverride, options.platform),
+      ) ||
+      !pathApi.isAbsolute(
+        normalizeWindowsPath(appDirOverride, options.platform),
+      )
+    ) {
+      throw new Error("QF_APP_ROOT and QF_APP_DIR must be absolute paths");
+    }
+    const appRoot = pathApi.resolve(
+      normalizeWindowsPath(appRootOverride, options.platform),
+    );
+    const appDir = pathApi.resolve(
+      normalizeWindowsPath(appDirOverride, options.platform),
+    );
+    const relativeDir = pathApi.relative(appRoot, appDir);
+    if (
+      relativeDir === ".." ||
+      relativeDir.startsWith(`..${pathApi.sep}`) ||
+      pathApi.isAbsolute(relativeDir)
+    ) {
+      throw new Error("QF_APP_DIR must be contained beneath QF_APP_ROOT");
+    }
+    return { appRoot, appDir, devWorktreeId: null };
+  }
   const appRoot = pathApi.join(options.home, ".quantflow", "app");
   if (!options.isDev) {
     return { appRoot, appDir: appRoot, devWorktreeId: null };
@@ -55,12 +89,35 @@ export function resolveQuantFlowPaths(
   };
 }
 
+export function shouldRunLegacyAppMigration(options: {
+  appRootOverride?: string;
+  appDirOverride?: string;
+}): boolean {
+  const appRootOverride = options.appRootOverride?.trim();
+  const appDirOverride = options.appDirOverride?.trim();
+  if (Boolean(appRootOverride) !== Boolean(appDirOverride)) {
+    throw new Error("QF_APP_ROOT and QF_APP_DIR must be configured together");
+  }
+  return !appRootOverride;
+}
+
+const appRootOverride = process.env["QF_APP_ROOT"];
+const appDirOverride = process.env["QF_APP_DIR"];
+
 const resolvedPaths = resolveQuantFlowPaths({
   home: homedir(),
   platform: process.platform,
   isDev: import.meta.env?.DEV === true,
   worktreeRoot:
     process.env["QF_DEV_WORKTREE_ROOT"] || process.cwd(),
+  appRootOverride,
+  appDirOverride,
+});
+
+/** Explicit app-owned isolation disables compatibility import from founder state. */
+export const QF_APP_PATHS_EXPLICIT = !shouldRunLegacyAppMigration({
+  appRootOverride,
+  appDirOverride,
 });
 
 /** Global app state shared by packaged and worktree-isolated launches. */

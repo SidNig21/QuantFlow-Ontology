@@ -50,7 +50,11 @@ export function createDefaultExecutors(): ProcessExecutors {
         cwd: collabRoot,
         stdout: "inherit",
         stderr: "inherit",
-        env: { ...process.env, QF_RELEASE_RUN_ID: runId },
+        env: {
+          ...process.env,
+          QF_RELEASE_RUN_ID: runId,
+          QF_DOCK_QA_MODE: "1",
+        },
       });
       return child.exited;
     },
@@ -104,7 +108,7 @@ function runMissingBootstrapControl(
       baitResourcesRoot,
       COLLAB_ELECTRON_ROOT,
       fileSets,
-      { expectedResourcesRoot: baitResourcesRoot },
+      { expectedResourcesRoot: baitResourcesRoot, qaMode: true },
     );
     if (inspect.ok) {
       return { ok: false, reason: "missing-bootstrap bait expected manifest failure" };
@@ -169,7 +173,7 @@ async function runMissingUpgradeControl(
       baitResourcesRoot,
       COLLAB_ELECTRON_ROOT,
       fileSets,
-      { expectedResourcesRoot: baitResourcesRoot },
+      { expectedResourcesRoot: baitResourcesRoot, qaMode: true },
     );
     if (inspect.ok) {
       return {
@@ -250,7 +254,7 @@ export async function executePackageClosureMode(
           baitResourcesRoot,
           COLLAB_ELECTRON_ROOT,
           fileSets,
-          { expectedResourcesRoot: baitResourcesRoot },
+          { expectedResourcesRoot: baitResourcesRoot, qaMode: true },
         );
         if (inspect.ok) {
           return fail("missing-hermes bait expected unresolved hermes reference");
@@ -289,7 +293,7 @@ export async function executePackageClosureMode(
         join(packageRoot, "resources"),
         COLLAB_ELECTRON_ROOT,
         fileSets,
-        { probeDevRoot: repoRoot },
+        { probeDevRoot: repoRoot, qaMode: true },
       );
       if (inspect.ok) {
         return fail("dev-root bait expected root escape failure");
@@ -313,6 +317,7 @@ export async function executePackageClosureMode(
         validation.resourcesRoot,
         COLLAB_ELECTRON_ROOT,
         fileSets,
+        { qaMode: true },
       );
       if (!inspect.ok) {
         return fail(inspect.reason);
@@ -394,6 +399,7 @@ export async function executePackageClosureMode(
         validation.resourcesRoot,
         COLLAB_ELECTRON_ROOT,
         fileSets,
+        { qaMode: true },
       );
       if (!inspect.ok) {
         return fail(inspect.reason);

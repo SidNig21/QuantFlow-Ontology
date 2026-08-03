@@ -29,6 +29,21 @@ function hermesMetadata(): Record<string, unknown> {
   };
 }
 
+function defaultProfileHermesMetadata(): Record<string, unknown> {
+  return {
+    name: "hermes",
+    route: "native_tui",
+    package: "hermes.aospkg",
+    command: "hermes",
+    terminal_target: "wsl:auto",
+    argv: ["--tui"],
+    peer_delivery: {
+      mode: "pty_role",
+      runtime_profiles: ["default"],
+    },
+  };
+}
+
 describe("runtime adapter metadata", () => {
   test("expands one complete runtime-profile token and keeps null on base argv", () => {
     const metadata = parseRuntimeAdapterMetadata(hermesMetadata());
@@ -69,6 +84,13 @@ describe("runtime adapter metadata", () => {
         },
       })
     ).toThrow(/must be unique/);
+  });
+
+  test("uses base argv for a real default-only profile", () => {
+    const metadata = parseRuntimeAdapterMetadata(defaultProfileHermesMetadata());
+    expect(metadata.terminalTarget).toBe("wsl:auto");
+    expect(expandRuntimeAdapterArgv(metadata, "default")).toEqual(["--tui"]);
+    expect(allowsPtyRoleDelivery(metadata, "default")).toBe(true);
   });
 
   test("resolves sibling metadata and binds it to the package filename", () => {

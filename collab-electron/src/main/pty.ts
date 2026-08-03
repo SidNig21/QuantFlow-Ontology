@@ -745,6 +745,8 @@ export async function createHostCommandSession(opts: {
   cols?: number;
   rows?: number;
   displayName?: string;
+  target?: string;
+  cwdGuestPath?: string;
   senderWebContentsId?: number;
 }): Promise<{
   sessionId: string;
@@ -780,9 +782,10 @@ export async function createHostCommandSession(opts: {
     args,
     shell: command,
     displayName,
-    target: "host_command",
+    target: opts.target ?? "host_command",
     cwd: resolvedCwd,
     cwdHostPath: resolvedCwd,
+    cwdGuestPath: opts.cwdGuestPath,
     cols: c,
     rows: r,
     env: sidecarEnv,
@@ -811,11 +814,12 @@ export async function createHostCommandSession(opts: {
     shell: command,
     cwd: resolvedCwd,
     createdAt: new Date().toISOString(),
-    target: "host_command",
+    target: opts.target ?? "host_command",
     displayName,
     command,
     args,
     cwdHostPath: resolvedCwd,
+    cwdGuestPath: opts.cwdGuestPath,
     backend: "sidecar",
   });
 

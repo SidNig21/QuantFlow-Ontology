@@ -57,14 +57,21 @@ export const QF_PACKAGE_NAME = "@quantflow/electron";
 export const QF_UPDATE_OWNER = "SidNig21";
 export const QF_UPDATE_REPOSITORY = "QuantFlow-Ontology";
 
-export const RUNTIME_CONTROL_FILES = [
-  QF_TOOLLOOP_META,
-  QF_TOOLLOOP_LAUNCH,
-  QF_TOOLLOOP_DOCK_PROFILES,
+export const PRODUCTION_RUNTIME_CONTROL_FILES = [
   HERMES_META,
   HERMES_LAUNCH,
   HERMES_DOCK_PROFILES,
 ] as const;
+
+export const QA_RUNTIME_CONTROL_FILES = [
+  QF_TOOLLOOP_META,
+  QF_TOOLLOOP_LAUNCH,
+  QF_TOOLLOOP_DOCK_PROFILES,
+  ...PRODUCTION_RUNTIME_CONTROL_FILES,
+] as const;
+
+/** Normal package inspection. QA gates opt into QA_RUNTIME_CONTROL_FILES. */
+export const RUNTIME_CONTROL_FILES = PRODUCTION_RUNTIME_CONTROL_FILES;
 
 const REPO_SCHEMA_MIGRATION = "qf-kernel-schema/golden/migration.sql";
 const REPO_SCHEMA_PRE_D1_AUTHORITY =
@@ -93,6 +100,8 @@ export type InspectOptions = {
   probeDevRoot?: string;
   /** Exact resources root trusted for this inspection (the temporary bait copy in D7). */
   expectedResourcesRoot?: string;
+  /** QA-only package closure includes deterministic proof runtime fixtures. */
+  qaMode?: boolean;
 };
 
 function fileSize(path: string): number {
@@ -152,8 +161,9 @@ function inspectRuntimeControlFiles(
   resourcesRoot: string,
   repoRoot: string,
   checked: { path: string; bytes: number }[],
+  files: readonly string[],
 ): InspectFailure | null {
-  for (const rel of RUNTIME_CONTROL_FILES) {
+  for (const rel of files) {
     const packagedPath = join(resourcesRoot, rel);
     if (!existsSync(packagedPath)) {
       return { ok: false, reason: `runtime control file missing: ${rel}` };
@@ -236,23 +246,34 @@ export function inspectPackagedResources(
 
   const checked: { path: string; bytes: number }[] = [];
   const repoRoot = join(collabRoot, "..");
+  const qaMode = options.qaMode ?? process.env.QF_DOCK_QA_MODE === "1";
+  const runtimeControlFiles = qaMode
+    ? QA_RUNTIME_CONTROL_FILES
+    : PRODUCTION_RUNTIME_CONTROL_FILES;
 
-  const controlFail = inspectRuntimeControlFiles(root, repoRoot, checked);
+  const controlFail = inspectRuntimeControlFiles(
+    root,
+    repoRoot,
+    checked,
+    runtimeControlFiles,
+  );
   if (controlFail) return controlFail;
 
-  try {
-    const toolloopPath = resolvePackageRef(QF_TOOLLOOP_REF, root, "qf-toolloop");
-    checked.push({ path: toolloopPath, bytes: fileSize(toolloopPath) });
-    const auxFail = inspectAuxiliaryPaths(
-      QF_TOOLLOOP_REF,
-      root,
-      checked,
-      false,
-    );
-    if (auxFail) return auxFail;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { ok: false, reason: `unresolved qf-toolloop reference: ${message}` };
+  if (qaMode) {
+    try {
+      const toolloopPath = resolvePackageRef(QF_TOOLLOOP_REF, root, "qf-toolloop");
+      checked.push({ path: toolloopPath, bytes: fileSize(toolloopPath) });
+      const auxFail = inspectAuxiliaryPaths(
+        QF_TOOLLOOP_REF,
+        root,
+        checked,
+        false,
+      );
+      if (auxFail) return auxFail;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ok: false, reason: `unresolved qf-toolloop reference: ${message}` };
+    }
   }
 
   try {
@@ -266,7 +287,7 @@ export function inspectPackagedResources(
   }
 
   try {
-    discoverDockProfileManifests(root);
+    discoverDockProfileManifests(root, { qaMode });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return { ok: false, reason: `runtime control validation failed: ${message}` };

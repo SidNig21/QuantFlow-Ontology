@@ -2,8 +2,8 @@
  * Sole app module that imports @rivet-dev/agentos* (mirror of kernel.ts).
  * Species come from agent_definition rows (package_ref); no in-code registry map.
  *
- * Pack: `cd tools/runtime-proof && bun run pack-agent`
- * (collab-electron script `pack-agent` forwards there).
+ * Production packaging stages the genuine Hermes species. Deterministic
+ * AgentOS proof fixtures are packed only by explicit QA gates.
  */
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
@@ -48,7 +48,11 @@ import {
   type TraceContext,
 } from "./kernel";
 import { writeAgentReportArtifact } from "./agent-artifact-writer";
-import { bootstrapDockProfiles } from "./dock-profiles";
+import {
+  bootstrapDockProfiles,
+  getMissingHermesDockDiagnostic,
+  type DockAdapterDiagnostic,
+} from "./dock-profiles";
 import {
   collectUniqueRuntimeSoftware,
   resolveDefinitionRuntime,
@@ -57,8 +61,13 @@ import {
 } from "./definition-runtime";
 import { allowsPtyRoleDelivery } from "./runtime-adapter";
 import { completeRuntimeKernelAdmission } from "./runtime-kernel-admission";
+import {
+  classifyWslNativeTuiPrerequisites,
+  getDefaultWslDistro,
+} from "./terminal-target";
+import { resolveCollaborationResourcePath } from "./package-resource-paths";
 
-/** Credential-free AgentOS adapter used by the startup identity smoke. */
+/** Credential-free QA-only adapter used by the AgentOS identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
 
 /**
@@ -154,8 +163,82 @@ export function getDefinitionRuntime(definitionId: string): DefinitionRuntime {
   return resolveDefinitionRuntime(definitionId, appRoot(), getDefinition);
 }
 
+export type DockDefinitionAvailability = {
+  available: boolean;
+  message: string;
+};
+
+export function getHermesDockDiagnostic(): DockAdapterDiagnostic | null {
+  return getMissingHermesDockDiagnostic(appRoot());
+}
+
+/**
+ * Project adapter readiness beside a Kernel definition without changing the
+ * definition row. This never reads auth material; Hermes reports sign-in
+ * state only after its normal launch.
+ */
+export function getDockDefinitionAvailability(
+  definition: Record<string, unknown>,
+): DockDefinitionAvailability | null {
+  const packageRef = String(definition.package_ref ?? "");
+  if (!packageRef.startsWith("species/hermes/")) return null;
+  const collaborationBridge = resolveCollaborationResourcePath(
+    "qf-collaboration-mcp.mjs",
+    { resourcesPath: process.resourcesPath, moduleDir: __dirname },
+  );
+  const hermesLaunchWrapper = resolveCollaborationResourcePath(
+    "qf-hermes-launch.sh",
+    { resourcesPath: process.resourcesPath, moduleDir: __dirname },
+  );
+  if (!collaborationBridge || !hermesLaunchWrapper) {
+    return {
+      available: false,
+      message:
+        "Hermes unavailable: QuantFlow collaboration resources are missing. " +
+        "Reinstall QuantFlow or run the development app.",
+    };
+  }
+
+  if (process.platform !== "win32") {
+    return {
+      available: false,
+      message: "Hermes unavailable: native Windows with WSL2 is required for this seat.",
+    };
+  }
+
+  const runtime = resolveDefinitionRuntime(
+    String(definition.id ?? ""),
+    appRoot(),
+    getDefinition,
+  );
+  const diagnostic = classifyWslNativeTuiPrerequisites({
+    platform: process.platform,
+    homeDir: homedir(),
+    terminalTarget: runtime.metadata.terminalTarget ?? "wsl:auto",
+    cwdHostPath: homedir(),
+    getDefaultWslDistro,
+    resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+    guestCommand: runtime.metadata.command ?? "hermes",
+  });
+  if (diagnostic) return { available: false, message: diagnostic.message };
+
+  return {
+    available: true,
+    message:
+      "Hermes authentication is checked at launch; if sign-in is required, authenticate in Ubuntu and retry.",
+  };
+}
+
 /** Initialize missing package-owned Dock definitions through execute() only. */
 export function bootstrapPackagedDockProfiles(): void {
+  const qaMode = process.env.QF_DOCK_QA_MODE === "1";
+  const missing = getHermesDockDiagnostic();
+  if (missing) {
+    console.error(
+      `agent-host: ${missing.message}`,
+    );
+    return;
+  }
   const result = bootstrapDockProfiles(appRoot(), {
     getAgentDefinition: getDefinition,
     executeRegisterAgentDefinition: (input) =>
@@ -165,10 +248,11 @@ export function bootstrapPackagedDockProfiles(): void {
         `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
       );
     },
-  });
+  }, { qaMode });
   console.log(
     `agent-host: Dock bootstrap registered=${result.registered.length}`
-    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`,
+    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`
+    + ` qaMode=${qaMode}`,
   );
 }
 
@@ -356,6 +440,7 @@ export async function admitAndStartSession(
       argv: runtime.argv,
       command: runtime.metadata.command,
       entrypointPath: runtime.entrypointPath,
+      terminalTarget: runtime.metadata.terminalTarget,
       role: runtime.role,
       env: opts?.env,
       corruptId: opts?.corruptId,

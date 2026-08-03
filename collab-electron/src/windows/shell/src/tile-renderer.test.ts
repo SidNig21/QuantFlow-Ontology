@@ -1,5 +1,5 @@
 import { describe, test, expect } from "bun:test";
-import { getTileLabel, splitFilepath, positionTile } from "./tile-renderer.js";
+import { getAgentTileModel, getTileLabel, splitFilepath, positionTile } from "./tile-renderer.js";
 
 // -- splitFilepath --
 
@@ -150,6 +150,39 @@ describe("getTileLabel", () => {
     });
     expect(label.name).toBe("cat.png");
     expect(label.parent).toBe("/photos/");
+  });
+});
+
+describe("native TUI agent tile model", () => {
+  test("makes identity, runtime, status, and session binding explicit", () => {
+    expect(getAgentTileModel({
+      type: "term",
+      id: "tile-agent",
+      definitionId: "hermes-worker",
+      role: "worker",
+      sessionId: "session-worker-123456",
+      ptySessionId: "pty-worker",
+    })).toEqual({
+      identity: "hermes-worker",
+      runtime: "Native TUI",
+      status: "TUI attached",
+      sessionId: "session-worker-123456",
+      dominantSurface: "tui",
+      actions: ["fullscreen", "close"],
+    });
+  });
+
+  test("does not label an ordinary terminal as an agent", () => {
+    expect(getAgentTileModel({ type: "term", id: "terminal" })).toBeNull();
+  });
+
+  test("marks a durable agent tile without a live PTY as stopped", () => {
+    expect(getAgentTileModel({
+      type: "term",
+      id: "tile-stopped-agent",
+      definitionId: "hermes-worker",
+      sessionId: "session-worker-stopped",
+    })?.status).toBe("stopped");
   });
 });
 

@@ -2,7 +2,41 @@
  * Shared species/tools resource path rules for packaged and development roots.
  * Production host and package-closure inspection must derive paths from here only.
  */
-import { basename, dirname, isAbsolute, join } from "node:path";
+import { existsSync } from "node:fs";
+import { basename, dirname, isAbsolute, join, resolve } from "node:path";
+
+export type CollaborationResourcePathInputs = {
+  /** Electron's resources root when running from an installed package. */
+  resourcesPath?: string | null;
+  /** Bundled main-module directory, injected by tests and defaulted by the host. */
+  moduleDir: string;
+  exists?: (path: string) => boolean;
+};
+
+/**
+ * Resolve a package-owned collaboration resource without consulting founder
+ * state. Packaged resources live under process.resourcesPath; development
+ * resources live beside the repository's main bundle under collab-electron/cli.
+ */
+export function resolveCollaborationResourcePath(
+  fileName: string,
+  inputs: CollaborationResourcePathInputs,
+): string | null {
+  if (!fileName || fileName.includes("/") || fileName.includes("\\")) {
+    throw new Error("collaboration resource name must be a single file name");
+  }
+  const exists = inputs.exists ?? existsSync;
+  const candidates = [
+    inputs.resourcesPath ? join(inputs.resourcesPath, fileName) : null,
+    resolve(inputs.moduleDir, "../../cli", fileName),
+  ].filter((path): path is string => path !== null);
+  return candidates.find(exists) ?? null;
+}
+
+/** QuantFlow-owned Hermes state root; callers must supply the authoritative QF_APP_DIR. */
+export function resolveHermesProfileRoot(appDir: string): string {
+  return join(appDir, "hermes-profiles");
+}
 
 /** package_ref → packed sibling meta: species/hermes/packed/hermes.aospkg → …/hermes.meta.json */
 export function packedMetaPathForPackageRef(

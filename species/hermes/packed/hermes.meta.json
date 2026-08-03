@@ -1,20 +1,15 @@
 {
   "route": "native_tui",
   "name": "hermes",
+  "command": "hermes",
+  "terminal_target": "wsl:auto",
   "argv": [
-    "--tui"
-  ],
-  "profile_argv": [
-    "-p",
-    "{runtime_profile}",
     "--tui"
   ],
   "peer_delivery": {
     "mode": "pty_role",
     "runtime_profiles": [
-      "qf-orchestrator",
-      "qf-worker",
-      "qf-worker-2"
+      "default"
     ]
   },
   "package": "hermes.aospkg",

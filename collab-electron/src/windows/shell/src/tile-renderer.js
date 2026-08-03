@@ -31,11 +31,33 @@ function resolveInput(raw) {
  * @param {((id: string) => void)|null} [callbacks.onDuplicate]
  * @param {((id: string) => void)|null} [callbacks.onToggleFullscreen]
  */
+export function getAgentTileModel(tile) {
+  if (tile?.type !== "term" || (!tile.definitionId && !tile.sessionId)) {
+    return null;
+  }
+  return {
+    identity: tile.definitionId || tile.userTitle || "Agent CLI",
+    runtime: "Native TUI",
+    status: tile.ptySessionId
+      ? "TUI attached"
+      : (tile.sessionId ? "stopped" : "starting"),
+    sessionId: tile.sessionId || null,
+    dominantSurface: "tui",
+    actions: ["fullscreen", "close"],
+  };
+}
+
 export function createTileDOM(tile, callbacks) {
   const container = document.createElement("div");
   container.className = "canvas-tile";
   container.dataset.tileId = tile.id;
   container.dataset.tileType = tile.type;
+  const agentModel = getAgentTileModel(tile);
+  if (agentModel) {
+    container.classList.add("agent-cli-tile");
+    container.dataset.agentRuntime = "native-tui";
+    container.dataset.agentStatus = agentModel.status;
+  }
 
   const titleBar = document.createElement("div");
   titleBar.className = "tile-title-bar";
@@ -61,6 +83,10 @@ export function createTileDOM(tile, callbacks) {
 		badges.className = "tile-agent-badges";
 		if (tile.agentLabel) badges.appendChild(badge("tile-agent-label", tile.agentLabel));
 		if (tile.role) badges.appendChild(badge("tile-agent-role", tile.role));
+		if (agentModel) {
+			badges.appendChild(badge("tile-agent-runtime", "TUI"));
+			badges.appendChild(badge("tile-agent-status", agentModel.status));
+		}
 		if (tile.sessionId) badges.appendChild(badge("tile-agent-session", shortId(tile.sessionId)));
 		titleGroup.appendChild(badges);
 	}
@@ -241,6 +267,9 @@ function shortId(id) {
 export function getTileLabel(tile) {
   if (tile.type === "term") {
     if (tile.userTitle) return { parent: "", name: tile.userTitle };
+    if (tile.definitionId) {
+      return { parent: tile.role ? `${tile.role} / ` : "", name: tile.definitionId };
+    }
     if (tile.autoTitle) return splitFilepath(tile.autoTitle);
     if (tile.cwd) return splitFilepath(tile.cwd);
     return { parent: "", name: "Terminal" };
@@ -344,7 +373,7 @@ export function startInlineRename(dom, tile, onCommit) {
  * @param {number} zoom
  */
 export function positionTile(container, tile, panX, panY, zoom) {
-  if (container.classList.contains("tile-fullscreen")) return;
+  if (container.classList?.contains?.("tile-fullscreen")) return;
 
   const sx = tile.x * zoom + panX;
   const sy = tile.y * zoom + panY;

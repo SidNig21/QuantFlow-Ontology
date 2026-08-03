@@ -39,7 +39,7 @@ if (process.platform === "win32") {
   prepareRuntimeStaging({
     stagingRoot: join(cwd, ".package-staging"),
     repoRoot: join(cwd, ".."),
-  });
+  }, { qaMode: env.QF_DOCK_QA_MODE === "1" });
 }
 
 // Never use electron-builder's publisher — it fails when the release type

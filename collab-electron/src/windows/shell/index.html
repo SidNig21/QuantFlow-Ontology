@@ -45,17 +45,28 @@
 			<canvas id="grid-canvas"></canvas>
 			<div id="canvas-watermark"></div>
 			<div id="tile-layer"></div>
+			<div id="handoff-layer" aria-live="polite"></div>
 			<div id="edge-indicators"></div>
 			<div id="zoom-indicator">100%</div>
 			<div id="minimap-wrapper">
 				<canvas id="minimap-canvas"></canvas>
 			</div>
+			<div id="canvas-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 		</div>
 		<div id="agent-resize" class="resize-handle" data-panel="agent"></div>
 		<div id="panel-agent">
 			<div id="dock">
+			<header class="dock-header">
+				<div class="dock-heading">
+					<span class="dock-kicker">QuantFlow / Dock</span>
+					<strong>Agent workspace</strong>
+				</div>
+				<button id="dock-tidy" class="qf-btn qf-btn-quiet dock-tidy" type="button" title="Arrange eligible canvas tiles into a readable grid">
+					Tidy
+				</button>
+			</header>
 				<section class="dock-section" id="dock-species">
-					<div class="qf-label dock-section-label">Species</div>
+					<div class="qf-label dock-section-label">Launchable CLIs</div>
 					<div id="dock-species-list"></div>
 				</section>
 				<section class="dock-section" id="dock-sessions">

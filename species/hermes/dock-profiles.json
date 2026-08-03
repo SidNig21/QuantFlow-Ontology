@@ -8,19 +8,19 @@
     {
       "id": "hermes-orchestrator",
       "role": "orchestrator",
-      "runtime_profile": "qf-orchestrator",
+      "runtime_profile": "default",
       "system_prompt_ref": null
     },
     {
       "id": "hermes-worker",
       "role": "worker",
-      "runtime_profile": "qf-worker",
+      "runtime_profile": "default",
       "system_prompt_ref": null
     },
     {
       "id": "hermes-worker-2",
       "role": "worker2",
-      "runtime_profile": "qf-worker-2",
+      "runtime_profile": "default",
       "system_prompt_ref": null
     }
   ]

@@ -2,7 +2,8 @@
  * Sole app module that imports qf-kernel / opens SQLite.
  * All other main-process code goes through getKernelDb() / helpers here.
  */
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { dirname, join } from "node:path";
 import {
@@ -94,8 +95,12 @@ CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,
   from_role TEXT,
   to_role TEXT,
+  from_session_id TEXT,
+  to_session_id TEXT,
   artifact_id TEXT,
   body TEXT,
+  message_kind TEXT DEFAULT 'task',
+  reply_to_artifact_id TEXT,
   created_at TEXT,
   delivered INTEGER DEFAULT 0,
   pushed_at TEXT
@@ -105,10 +110,27 @@ export type PeerBusMessage = {
   id: string;
   from_role: string;
   to_role: string;
+  from_session_id: string | null;
+  to_session_id: string | null;
   artifact_id: string;
   body: string;
+  message_kind: "task" | "result";
+  reply_to_artifact_id: string | null;
   created_at: string;
   delivered: number;
+};
+
+export type PeerHandoff = {
+  taskArtifactId: string;
+  fromRole: string;
+  toRole: string;
+  fromSessionId: string;
+  toSessionId: string;
+  task: string;
+  resultArtifactId: string | null;
+  result: string | null;
+  status: "requested" | "completed";
+  createdAt: string;
 };
 
 function openPeerBus(path: string): DatabaseSync {
@@ -116,22 +138,66 @@ function openPeerBus(path: string): DatabaseSync {
   const db = new DatabaseSync(path);
   db.exec("PRAGMA journal_mode = WAL;");
   db.exec(PEER_BUS_DDL);
+  for (const ddl of [
+    "ALTER TABLE messages ADD COLUMN from_session_id TEXT",
+    "ALTER TABLE messages ADD COLUMN to_session_id TEXT",
+    "ALTER TABLE messages ADD COLUMN message_kind TEXT DEFAULT 'task'",
+    "ALTER TABLE messages ADD COLUMN reply_to_artifact_id TEXT",
+  ]) {
+    try {
+      db.exec(ddl);
+    } catch {
+      // Existing column. SQLite has no ADD COLUMN IF NOT EXISTS.
+    }
+  }
   return db;
 }
 
 /** Product-owned peer transport: Kernel trajectory first, then optional routing. */
 export function peerBusSend(
   path: string,
-  fromRole: string,
-  toRole: string,
-  body: string,
+  input: {
+    fromSessionId: string;
+    fromRole: string;
+    toSessionId: string;
+    toRole: string;
+    body: string;
+    kind: "task" | "result";
+    replyToArtifactId?: string;
+  },
 ): { artifactId: string; messageId: string; delivered: boolean } {
+  const createdAt = new Date().toISOString();
+  const payload = JSON.stringify({
+    contract: "qf.collaboration.v1",
+    kind: input.kind,
+    from_role: input.fromRole,
+    to_role: input.toRole,
+    from_session_id: input.fromSessionId,
+    to_session_id: input.toSessionId,
+    body: input.body,
+    reply_to_artifact_id: input.replyToArtifactId ?? null,
+    created_at: createdAt,
+    nonce: crypto.randomUUID(),
+  }, null, 2);
+  const contentHash = createHash("sha256").update(payload).digest("hex");
+  const artifactDir = join(getArtifactRoot(), "peer-handoffs");
+  mkdirSync(artifactDir, { recursive: true });
+  const storagePath = join(artifactDir, `${contentHash}.json`);
+  writeFileSync(storagePath, payload, "utf8");
+  const links: Array<{ kind: string; from_id?: string; to_id?: string }> = [
+    { kind: "produces", from_id: input.fromSessionId },
+  ];
+  if (input.kind === "result" && input.replyToArtifactId) {
+    links.push({ kind: "derived_from", to_id: input.replyToArtifactId });
+  }
   const artifact = kernelExecute(
     "publish_artifact",
     {
       kind: "trajectory",
-      storage_ref: `peer://${fromRole}->${toRole}`,
-      bytes: new TextEncoder().encode(body),
+      storage_ref: storagePath,
+      path: storagePath,
+      content_hash: contentHash,
+      links,
     },
     { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
   ) as { object_id: string };
@@ -142,15 +208,20 @@ export function peerBusSend(
     if (delivered) {
       db.prepare(
         `INSERT INTO messages
-          (id, from_role, to_role, artifact_id, body, created_at, delivered)
-         VALUES (?, ?, ?, ?, ?, ?, 0)`,
+          (id, from_role, to_role, from_session_id, to_session_id, artifact_id,
+           body, message_kind, reply_to_artifact_id, created_at, delivered)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
       ).run(
         messageId,
-        fromRole,
-        toRole,
+        input.fromRole,
+        input.toRole,
+        input.fromSessionId,
+        input.toSessionId,
         artifact.object_id,
-        body,
-        new Date().toISOString(),
+        input.body,
+        input.kind,
+        input.replyToArtifactId ?? null,
+        createdAt,
       );
     }
   } finally {
@@ -166,13 +237,56 @@ export function peerBusReadInbox(
   const db = openPeerBus(path);
   try {
     const rows = db.prepare(
-      `SELECT id, from_role, to_role, artifact_id, body, created_at, delivered
+      `SELECT id, from_role, to_role, from_session_id, to_session_id, artifact_id,
+              body, message_kind, reply_to_artifact_id, created_at, delivered
        FROM messages WHERE to_role = ? AND delivered = 0 ORDER BY created_at ASC`,
     ).all(role) as PeerBusMessage[];
     for (const row of rows) {
       db.prepare(`UPDATE messages SET delivered = 1 WHERE id = ?`).run(row.id);
     }
     return rows;
+  } finally {
+    db.close();
+  }
+}
+
+/** Read-only canvas projection. Transport rows supply copy; Kernel links authorize status. */
+export function peerBusListHandoffs(path: string): PeerHandoff[] {
+  const db = openPeerBus(path);
+  try {
+    const rows = db.prepare(
+      `SELECT id, from_role, to_role, from_session_id, to_session_id, artifact_id,
+              body, message_kind, reply_to_artifact_id, created_at, delivered
+       FROM messages ORDER BY created_at ASC`,
+    ).all() as PeerBusMessage[];
+    const results = rows.filter((row) => row.message_kind === "result");
+    return rows
+      .filter((row) => row.message_kind === "task")
+      .filter((row) => row.from_session_id && row.to_session_id)
+      .filter((row) => kernelGetLinks(row.artifact_id, { kind: "produces" })
+        .some((link) => link.from_id === row.from_session_id && link.to_id === row.artifact_id))
+      .map((task) => {
+        const result = results.find((row) => {
+          if (row.reply_to_artifact_id !== task.artifact_id) return false;
+          const produced = kernelGetLinks(row.artifact_id, { kind: "produces" })
+            .some((link) => link.from_id === row.from_session_id && link.to_id === row.artifact_id);
+          const derived = kernelGetLinks(row.artifact_id, { kind: "derived_from" })
+            .some((link) => link.from_id === row.artifact_id && link.to_id === task.artifact_id);
+          return produced && derived;
+        });
+        return {
+          taskArtifactId: task.artifact_id,
+          fromRole: task.from_role,
+          toRole: task.to_role,
+          fromSessionId: task.from_session_id!,
+          toSessionId: task.to_session_id!,
+          task: task.body,
+          resultArtifactId: result?.artifact_id ?? null,
+          result: result?.body ?? null,
+          status: result ? "completed" : "requested",
+          createdAt: task.created_at,
+        };
+      });
   } finally {
     db.close();
   }

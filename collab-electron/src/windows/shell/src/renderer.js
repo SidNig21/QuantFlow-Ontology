@@ -16,8 +16,10 @@ import { createCanvasRpc, findAutoPlacement } from "./canvas-rpc.js";
 import { createTileManager } from "./tile-manager.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
 import { initDock } from "./dock.js";
+import { formatTidyToast, repackTilesToGrid } from "./canvas-layout.js";
 import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 import { centerCanvasCoords } from "./canvas-place.js";
+import { createHandoffLayer } from "./handoff-layer.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -151,6 +153,15 @@ async function init() {
 	const panelAgent = document.getElementById("panel-agent");
 	const agentResizeHandle = document.getElementById("agent-resize");
 	const agentToggle = document.getElementById("agent-toggle");
+	const handoffLayer = createHandoffLayer({
+		layerEl: document.getElementById("handoff-layer"),
+		viewportState,
+		getTiles: () => tiles,
+	});
+	async function refreshHandoffs() {
+		const response = await window.shellApi.qf.listHandoffs();
+		if (response?.ok) handoffLayer.setHandoffs(response.handoffs);
+	}
 
 	// -- State --
 
@@ -245,8 +256,21 @@ async function init() {
 	panelManager.initPrefs(prefNavWidth, prefSidebarMode);
 
 	let agentWebview = null;
+	let canvasToastTimer = null;
+	function showCanvasToast(message) {
+		const toast = document.getElementById("canvas-toast");
+		if (!toast) return;
+		window.clearTimeout(canvasToastTimer);
+		toast.textContent = message;
+		toast.classList.add("visible");
+		canvasToastTimer = window.setTimeout(() => {
+			toast.classList.remove("visible");
+		}, 2400);
+	}
 
-	initDock(panelAgent);
+	initDock(panelAgent, {
+		onTidy: () => tidyTilesToGrid(),
+	});
 
 	const agentPanel = createPanel("agent", {
 		panel: panelAgent,
@@ -506,6 +530,25 @@ async function init() {
 	});
 	minimapRef = minimap;
 
+	function tidyTilesToGrid() {
+		const projected = tiles.map((tile) => ({ ...tile }));
+		const tidyMargin = 40;
+		const zoom = Math.max(viewportState.zoom, 0.01);
+		const result = repackTilesToGrid(projected, {
+			viewportWidth: panelViewer.clientWidth,
+			zoom,
+			screenSpace: true,
+			tokens: { gutter: 120 },
+			originX: (tidyMargin - viewportState.panX) / zoom,
+			originY: (tidyMargin - viewportState.panY) / zoom,
+		});
+		tileManager.applyTileLayout(projected);
+		edgeIndicators.update();
+		minimap.update();
+		showCanvasToast(formatTidyToast(result));
+		return result;
+	}
+
 	// -- Canvas RPC --
 
 	const handleCanvasRpc = createCanvasRpc({
@@ -516,6 +559,7 @@ async function init() {
 
 	viewport.init(viewportState, () => {
 		tileManager.repositionAllTiles();
+		handoffLayer.update();
 		edgeIndicators.update();
 		minimap.wake();
 		tileManager.saveCanvasDebounced();
@@ -523,12 +567,14 @@ async function init() {
 
 	viewport.setOnResize(() => {
 		tileManager.repositionAllTiles();
+		handoffLayer.update();
 		edgeIndicators.update();
 		minimap.update();
 	});
 
 	edgeIndicators.update();
 	minimap.update();
+	void refreshHandoffs();
 
 	// -- Agent panel init (after tileManager, since getAllWebviews references it) --
 
@@ -1134,6 +1180,9 @@ async function init() {
 					);
 				}
 			} else if (target === "canvas") {
+				if (channel === "handoffs-changed") {
+					void refreshHandoffs();
+				}
 				if (channel === "open-terminal") {
 					const cwd = args[0];
 					setLastTerminalCwd(cwd);
@@ -1606,6 +1655,14 @@ async function init() {
 
 	const savedState = await window.shellApi.canvasLoadState();
 	if (savedState) {
+		const discovered = await window.shellApi.ptyDiscover?.() ?? [];
+		const livePtyIds = new Set(discovered.map((entry) => entry.sessionId));
+		const savedTiles = savedState.tiles.map((tile) => (
+			tile.type === "term" && tile.sessionId &&
+			tile.ptySessionId && !livePtyIds.has(tile.ptySessionId)
+				? { ...tile, ptySessionId: undefined }
+				: tile
+		));
 		const { centerX, centerY, zoom } = savedState.viewport;
 		const w = canvasEl.clientWidth;
 		const h = canvasEl.clientHeight;
@@ -1617,7 +1674,7 @@ async function init() {
 			? h / 2 - centerY * viewportState.zoom
 			: 0;
 		viewport.updateCanvas();
-		tileManager.restoreCanvasState(savedState.tiles);
+		tileManager.restoreCanvasState(savedTiles);
 		viewport.redrawGrid();
 		minimap.update();
 
@@ -1626,8 +1683,6 @@ async function init() {
 			(t) => t.type === "term" && t.ptySessionId,
 		);
 		if (restoredTermTiles.length > 0) {
-			const discovered =
-				await window.shellApi.ptyDiscover?.() ?? [];
 			for (const tile of restoredTermTiles) {
 				const session = discovered.find(
 					(entry) => entry.sessionId === tile.ptySessionId,
