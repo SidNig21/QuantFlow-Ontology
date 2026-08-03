@@ -41,6 +41,13 @@ const ALLOW_PREFIXES = [
   "tools/qf-vault-projection/src/gate.ts",
   // WO-N1: migration fixture proves legacy Kernel files are excluded, never opened.
   "qa/gates/product-identity.ts",
+  // WO-WIN1/WIN2: both gates build an isolated temp fixture and *set* QF_KERNEL_DB
+  // in the launched child's env so the packaged app boots against throwaway state.
+  // Setting it for a subprocess is the opposite of a second resolver — but G1 is a
+  // grep, not a parser, and cannot tell a write from a read. These landed 2026-08-02
+  // without this entry, leaving the gate red on main until 2026-08-03.
+  "qa/gates/windows-cold-boot.ts",
+  "qa/gates/windows-dock-collaboration.ts",
   "collab-electron/",
   "qa/gates/kernel-one-path.ts",
   "species/hermes/agent-package/src/acp-shim.ts",

@@ -17,7 +17,7 @@ const CANONICAL_COMMAND = "bun qa/verify-release.ts";
 type CheckResult = { ok: boolean; reasons: string[] };
 type AuthoritySources = {
   workflow: string;
-  verifierHandbook: string;
+  verifierProtocol: string;
   agentBriefing: string;
   runner: string;
 };
@@ -140,8 +140,8 @@ export function checkReleaseVerifier(
 function loadSources(): AuthoritySources {
   return {
     workflow: readFileSync(join(REPO_ROOT, ".github/workflows/ci.yml"), "utf8"),
-    verifierHandbook: readFileSync(
-      join(REPO_ROOT, "docs/orders/VERIFYING.md"),
+    verifierProtocol: readFileSync(
+      join(REPO_ROOT, "docs/orders/PROTOCOL.md"),
       "utf8",
     ),
     agentBriefing: readFileSync(join(REPO_ROOT, "AGENTS.md"), "utf8"),
@@ -208,14 +208,17 @@ export async function runReleaseVerifierGate(): Promise<{ ok: boolean }> {
     case "stage":
       stages = stages.filter((stage) => stage.id !== "windows-cold-boot");
       break;
+    // replaceAll, not replace: an authority document may name the canonical
+    // command more than once, and leaving one behind makes the bait unable to
+    // go red — a dead bait reads exactly like a passing gate.
     case "workflow":
-      sources.workflow = sources.workflow.replace(
+      sources.workflow = sources.workflow.replaceAll(
         CANONICAL_COMMAND,
         "bun qa/run.ts --all",
       );
       break;
     case "handbook":
-      sources.verifierHandbook = sources.verifierHandbook.replace(
+      sources.verifierProtocol = sources.verifierProtocol.replaceAll(
         CANONICAL_COMMAND,
         "bun qa/run.ts --all",
       );
