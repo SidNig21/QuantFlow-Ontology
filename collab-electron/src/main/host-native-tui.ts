@@ -20,6 +20,11 @@ import {
   unregisterSeatPty,
 } from "./peer-delivery";
 import {
+  getDefaultWslDistro,
+  resolveWslNativeTuiLaunch,
+} from "./terminal-target";
+import type { TerminalTarget } from "./config";
+import {
   orchestrateNativeTuiAdmission,
   type NativeTuiLive,
   type NativeTuiOrchestrationDependencies,
@@ -55,6 +60,7 @@ export async function admitNativeTuiDefinition(opts: {
   argv: string[];
   command?: string | null;
   entrypointPath?: string | null;
+  terminalTarget?: TerminalTarget | null;
   role?: string;
   env?: Record<string, string>;
   corruptId?: string;
@@ -81,32 +87,49 @@ export async function admitNativeTuiDefinition(opts: {
   const { definitionId, adapterId, argv } = opts;
   const fromConfig = resolveAdapterSessionEnv(adapterId);
   const env = { ...fromConfig, ...opts.env };
-  const command = resolveHostAcpCommand(
+  const home = env.HOME ?? process.env.HOME ?? homedir();
+  const hostHome = homedir();
+  const displayName = `${definitionId}-tui`;
+  const wslLaunch = opts.terminalTarget?.startsWith("wsl:")
+    ? resolveWslNativeTuiLaunch({
+        terminalTarget: opts.terminalTarget,
+        homeDir: hostHome,
+        cwdHostPath: hostHome,
+        guestCommand: opts.command ?? adapterId,
+        argv,
+        platform: process.platform,
+        getDefaultWslDistro,
+        resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+      })
+    : null;
+  const command = wslLaunch?.command ?? resolveHostAcpCommand(
     opts.command === "electron-node" ? process.execPath :
       opts.command ?? env.HOST_ACP_BIN ?? env.HERMES_BIN ??
       process.env.HOST_ACP_BIN ?? process.env.HERMES_BIN,
-    adapterId === "hermes"
-      ? [
-          join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
-          join(homedir(), ".local/bin/hermes"),
-        ]
-      : [],
   );
-  const home = env.HOME ?? process.env.HOME ?? homedir();
-  const displayName = `${definitionId}-tui`;
-  const commandArgs = opts.entrypointPath
-    ? [opts.entrypointPath, ...argv]
-    : argv;
+  const commandArgs = wslLaunch
+    ? wslLaunch.args
+    : opts.entrypointPath
+      ? [opts.entrypointPath, ...argv]
+      : argv;
+  const commandTarget = wslLaunch?.target ?? "host_command";
+  const commandCwd = wslLaunch?.cwd ?? home;
+  const commandCwdGuest = wslLaunch?.cwdGuestPath;
+  const guestCommand = opts.command ?? adapterId;
 
   const defaults: NativeTuiOrchestrationDependencies = {
     createPty: ({ sessionId }) => createHostCommandSession({
       command,
       args: commandArgs,
-      cwd: home,
+      cwd: commandCwd,
+      target: commandTarget,
+      cwdGuestPath: commandCwdGuest,
       env: {
-        HERMES_BIN: command,
-        HOST_ACP_BIN: command,
-        HOME: home,
+        HERMES_BIN: wslLaunch ? guestCommand : command,
+        HOST_ACP_BIN: wslLaunch ? guestCommand : command,
+        ...(wslLaunch
+          ? (env.HOME?.startsWith("/") ? { HOME: env.HOME } : {})
+          : { HOME: home }),
         TERM: "xterm-256color",
         ...(process.env.QF_KERNEL_DB
           ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
@@ -162,7 +185,8 @@ export async function admitNativeTuiDefinition(opts: {
   );
   console.log(
     `agent-host: admitted native_tui session=${result.sessionId} definition=${definitionId}`
-    + ` cmd=${command} argv=${JSON.stringify(argv)} pty=${result.ptySessionId}`,
+    + ` cmd=${command} argv=${JSON.stringify(commandArgs)}`
+    + ` target=${commandTarget} pty=${result.ptySessionId}`,
   );
   return result;
 }

@@ -76,6 +76,10 @@ let route = "native_tui";
 let argv = ["--tui"];
 /** @type {string[] | undefined} */
 let profileArgv;
+/** @type {string | undefined} */
+let command;
+/** @type {string | undefined} */
+let terminalTarget;
 /** @type {{mode: string, runtime_profiles: string[]} | undefined} */
 let peerDelivery;
 try {
@@ -101,6 +105,12 @@ try {
     }
     if (Array.isArray(doc.profile_argv)) {
       profileArgv = doc.profile_argv;
+    }
+    if (typeof doc.command === "string" && doc.command.length > 0) {
+      command = doc.command;
+    }
+    if (typeof doc.terminal_target === "string" && doc.terminal_target.length > 0) {
+      terminalTarget = doc.terminal_target;
     }
     if (doc.peer_delivery && typeof doc.peer_delivery === "object") {
       peerDelivery = doc.peer_delivery;
@@ -131,6 +141,8 @@ const meta = {
   name: "hermes",
   ...(route === "native_tui" ? { argv } : {}),
   ...(profileArgv ? { profile_argv: profileArgv } : {}),
+  ...(command ? { command } : {}),
+  ...(terminalTarget ? { terminal_target: terminalTarget } : {}),
   ...(peerDelivery ? { peer_delivery: peerDelivery } : {}),
   package: "hermes.aospkg",
   tools,

@@ -8,6 +8,7 @@
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { basename, isAbsolute, join } from "node:path";
 import { packedMetaPathForPackageRef } from "./package-resource-paths";
+import { isTerminalTarget, type TerminalTarget } from "./config";
 
 export const RUNTIME_PROFILE_TOKEN = "{runtime_profile}" as const;
 
@@ -24,6 +25,7 @@ export type RuntimeAdapterMetadata = {
   packageName: string;
   command: string | null;
   entrypoint: string | null;
+  terminalTarget: TerminalTarget | null;
   argv: string[];
   profileArgv: string[] | null;
   tools: string[];
@@ -160,6 +162,7 @@ export function parseRuntimeAdapterMetadata(
       "package",
       "command",
       "entrypoint",
+      "terminal_target",
       "argv",
       "profile_argv",
       "tools",
@@ -176,7 +179,16 @@ export function parseRuntimeAdapterMetadata(
     : trimmedString(doc.command, `${source}.command`);
   const entrypoint = doc.entrypoint === undefined || doc.entrypoint === null
     ? null
-    : trimmedString(doc.entrypoint, `${source}.entrypoint`);
+      : trimmedString(doc.entrypoint, `${source}.entrypoint`);
+  const terminalTarget = doc.terminal_target === undefined || doc.terminal_target === null
+    ? null
+    : isTerminalTarget(doc.terminal_target)
+      ? doc.terminal_target
+      : (() => {
+          throw new RuntimeAdapterContractError(
+            `${source}.terminal_target must be auto, powershell, shell, or wsl:<distro>`,
+          );
+        })();
   if (basename(packageName) !== packageName || packageName.includes("\\")) {
     throw new RuntimeAdapterContractError(
       `${source}.package must name the sibling package file`,
@@ -221,6 +233,7 @@ export function parseRuntimeAdapterMetadata(
     packageName,
     command,
     entrypoint,
+    terminalTarget,
     argv,
     profileArgv,
     tools,
@@ -277,11 +290,9 @@ export function expandRuntimeAdapterArgv(
       "runtime profile must be non-empty when supplied",
     );
   }
-  if (!metadata.profileArgv) {
-    throw new RuntimeAdapterContractError(
-      `adapter ${metadata.adapterId} does not declare profile_argv`,
-    );
-  }
+  // A runtime with one real profile may use its base argv for every
+  // definition. profile_argv is only needed when selectors change argv.
+  if (!metadata.profileArgv) return [...metadata.argv];
   return metadata.profileArgv.map((token) =>
     token === RUNTIME_PROFILE_TOKEN ? selector : token
   );

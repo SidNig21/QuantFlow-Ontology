@@ -18,7 +18,15 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { discoverDockProfileManifests } from "../../src/main/dock-profiles.ts";
 
-export const RUNTIME_FILES = [
+export const PRODUCTION_RUNTIME_FILES = [
+  "species/hermes/packed/hermes.aospkg",
+  "species/hermes/packed/hermes.meta.json",
+  "species/hermes/launch.json",
+  "species/hermes/dock-profiles.json",
+  "species/hermes/tools-allowlist.json",
+] as const;
+
+export const QA_RUNTIME_FILES = [
   "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
   "tools/qf-proof-agent/packed/qf-proof-agent.meta.json",
   "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
@@ -28,16 +36,19 @@ export const RUNTIME_FILES = [
   "tools/runtime-proof/packed/qf-toolloop.meta.json",
   "tools/runtime-proof/launch.json",
   "tools/runtime-proof/dock-profiles.json",
-  "species/hermes/packed/hermes.aospkg",
-  "species/hermes/packed/hermes.meta.json",
-  "species/hermes/launch.json",
-  "species/hermes/dock-profiles.json",
-  "species/hermes/tools-allowlist.json",
+  ...PRODUCTION_RUNTIME_FILES,
 ] as const;
+
+/** Normal packaging inventory. QA must opt into QA_RUNTIME_FILES explicitly. */
+export const RUNTIME_FILES = PRODUCTION_RUNTIME_FILES;
 
 export type RuntimeStagingPaths = {
   stagingRoot: string;
   repoRoot: string;
+};
+
+export type RuntimeStagingOptions = {
+  qaMode?: boolean;
 };
 
 function runOrThrow(
@@ -124,30 +135,60 @@ function assertNonEmptyFile(path: string): void {
   }
 }
 
-export function prepareRuntimeStaging(paths: RuntimeStagingPaths): void {
+export function prepareRuntimeStaging(
+  paths: RuntimeStagingPaths,
+  options: RuntimeStagingOptions = {},
+): void {
   const { stagingRoot, repoRoot } = paths;
+  const qaMode = options.qaMode === true;
+  const runtimeFiles = qaMode ? QA_RUNTIME_FILES : PRODUCTION_RUNTIME_FILES;
   rmSync(stagingRoot, { recursive: true, force: true });
   mkdirSync(stagingRoot, { recursive: true });
 
   const stagingWorkspace = mkdtempSync(join(tmpdir(), "qf-runtime-staging-"));
   const stagingRepo = join(stagingWorkspace, "repo");
+  const hermesDir = join(stagingRepo, "species/hermes");
   const runtimeProofDir = join(stagingRepo, "tools/runtime-proof");
   const proofAgentDir = join(stagingRepo, "tools/qf-proof-agent");
-  const hermesDir = join(stagingRepo, "species/hermes");
   try {
-    copySourceTree(join(repoRoot, "tools/qf-proof-agent"), proofAgentDir);
-    copySourceTree(join(repoRoot, "tools/runtime-proof"), runtimeProofDir);
     copySourceTree(join(repoRoot, "species/hermes"), hermesDir);
-    copySourceTree(join(repoRoot, "packages/qf-kernel"), join(stagingRepo, "packages/qf-kernel"));
+    if (qaMode) {
+      copySourceTree(join(repoRoot, "tools/qf-proof-agent"), proofAgentDir);
+      copySourceTree(join(repoRoot, "tools/runtime-proof"), runtimeProofDir);
+    }
 
-    runOrThrow("bun", ["install", "--frozen-lockfile"], runtimeProofDir);
-    // The Hermes package entrypoint is Node built-ins only; its harness-level
-    // qf-kernel dependency is not part of the deploy-true package closure.
-    // Avoid installing the harness root so local file-package handling cannot
-    // contaminate or lock the shared checkout.
+    // Each copied species is its own frozen workspace. Install Hermes in the
+    // production path so packing never depends on a checkout's node_modules or
+    // on the QA runtime-proof fixture. QA installs its fixture workspace
+    // separately and gets a separate Windows adapter copy.
+    // qf-kernel is used by the Hermes harness smoke scripts, not by the
+    // deploy-true ACP shim that pack-agent builds. Its nested local
+    // qf-kernel-schema dependency is not portable when this workspace is
+    // copied into a clean temporary root, so remove that harness-only edge in
+    // the copy and regenerate its lockfile before the frozen install.
+    const hermesPackagePath = join(hermesDir, "package.json");
+    const hermesPackage = JSON.parse(readFileSync(hermesPackagePath, "utf8")) as {
+      dependencies?: Record<string, unknown>;
+    };
+    if (!hermesPackage.dependencies?.["qf-kernel"]) {
+      throw new Error("Hermes staging package must declare its harness qf-kernel dependency");
+    }
+    delete hermesPackage.dependencies["qf-kernel"];
+    writeFileSync(hermesPackagePath, `${JSON.stringify(hermesPackage, null, 2)}\n`, "utf8");
+    rmSync(join(hermesDir, "bun.lock"), { force: true });
+    runOrThrow("bun", ["install", "--lockfile-only"], hermesDir);
 
-    const adapter = prepareWindowsToolchainAdapter(runtimeProofDir);
-    const packEnv = adapter
+    const installArgs = ["install", "--frozen-lockfile", "--backend", "copyfile"];
+    runOrThrow("bun", installArgs, hermesDir);
+    if (qaMode) {
+      runOrThrow("bun", installArgs, runtimeProofDir);
+    }
+
+    const hermesAdapter = prepareWindowsToolchainAdapter(hermesDir);
+    const proofAdapter = qaMode
+      ? prepareWindowsToolchainAdapter(runtimeProofDir)
+      : null;
+    const packEnv = (adapter: { bin: string } | null) => adapter
       ? {
           ...process.env,
           QF_AGENTOS_TOOLCHAIN_BIN: adapter.bin,
@@ -155,16 +196,19 @@ export function prepareRuntimeStaging(paths: RuntimeStagingPaths): void {
         }
       : undefined;
     try {
-      runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir, packEnv);
-      runOrThrow("bun", ["run", "pack-agent"], runtimeProofDir, packEnv);
-      runOrThrow("bun", ["run", "pack-agent"], hermesDir, packEnv);
+      if (qaMode) {
+        runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir);
+        runOrThrow("bun", ["run", "pack-agent"], runtimeProofDir, packEnv(proofAdapter));
+      }
+      runOrThrow("bun", ["run", "pack-agent"], hermesDir, packEnv(hermesAdapter));
     } finally {
-      adapter?.cleanup();
+      proofAdapter?.cleanup();
+      hermesAdapter?.cleanup();
     }
 
     const stagedRepo = stagingRepo;
-    discoverDockProfileManifests(stagedRepo);
-    for (const rel of RUNTIME_FILES) {
+    discoverDockProfileManifests(stagedRepo, { qaMode });
+    for (const rel of runtimeFiles) {
       const source = join(stagedRepo, rel);
       assertNonEmptyFile(source);
       const dest = join(stagingRoot, rel);
@@ -173,7 +217,7 @@ export function prepareRuntimeStaging(paths: RuntimeStagingPaths): void {
       assertNonEmptyFile(dest);
     }
 
-    discoverDockProfileManifests(stagingRoot);
+    discoverDockProfileManifests(stagingRoot, { qaMode });
   } finally {
     rmSync(stagingWorkspace, { recursive: true, force: true });
   }

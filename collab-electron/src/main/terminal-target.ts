@@ -19,6 +19,60 @@ export interface ResolvedTerminalTarget {
   cwdGuestPath?: string;
 }
 
+export type WslNativeTuiLaunch = {
+  command: string;
+  args: string[];
+  target: `wsl:${string}`;
+  cwd: string;
+  cwdHostPath: string;
+  cwdGuestPath?: string;
+};
+
+/** Resolve a package-owned guest command through the existing Windows WSL PTY target. */
+export function resolveWslNativeTuiLaunch(options: {
+  terminalTarget: TerminalTarget;
+  cwdHostPath: string;
+  guestCommand: string;
+  argv: string[];
+  resolveWslCommand: (command: string) => string;
+} & TerminalTargetResolutionDependencies): WslNativeTuiLaunch {
+  const platform = options.platform ?? process.platform;
+  if (platform !== "win32") {
+    throw new Error("WSL native-TUI launch requires Windows");
+  }
+  if (!options.terminalTarget.startsWith("wsl:")) {
+    throw new Error("WSL native-TUI launch requires terminal_target=wsl:<distro>");
+  }
+  const target = resolveTerminalTarget(
+    options.terminalTarget,
+    options.cwdHostPath,
+    options,
+  );
+  if (!target.target.startsWith("wsl:")) {
+    throw new Error("WSL native-TUI target did not resolve to WSL");
+  }
+  return {
+    command: options.resolveWslCommand(target.command),
+    // A direct `wsl.exe ... hermes` launch does not load the distro user's
+    // login PATH, so user-installed CLIs such as ~/.local/bin/hermes vanish.
+    // Pass argv positionally through a login shell; never interpolate it into
+    // shell source.
+    args: [
+      ...target.args,
+      "--exec",
+      "/bin/bash",
+      "-lc",
+      'exec "$0" "$@"',
+      options.guestCommand,
+      ...options.argv,
+    ],
+    target: target.target,
+    cwd: target.cwd,
+    cwdHostPath: target.cwdHostPath,
+    cwdGuestPath: target.cwdGuestPath,
+  };
+}
+
 function withGuestPath(
   base: Omit<ResolvedTerminalTarget, "cwdGuestPath">,
   cwdGuestPath: string | null,
@@ -32,6 +86,13 @@ interface WslDistro {
   name: string;
   isDefault: boolean;
 }
+
+export type TerminalTargetResolutionDependencies = {
+  platform?: NodeJS.Platform;
+  homeDir?: string;
+  getDefaultWslDistro?: () => string | null;
+  resolvePowerShellCommand?: () => string;
+};
 
 function commandExists(command: string): boolean {
   try {
@@ -109,6 +170,7 @@ export function listTerminalTargets(): TerminalTargetOption[] {
 function resolveWindowsAutoTarget(
   preferred: TerminalTarget,
   cwdHostPath: string,
+  getDefaultDistro: () => string | null,
 ): TerminalTarget {
   const unc = parseWslUncPath(cwdHostPath);
   if (unc) {
@@ -117,7 +179,7 @@ function resolveWindowsAutoTarget(
   if (preferred !== "auto") {
     return preferred;
   }
-  const defaultDistro = getDefaultWslDistro();
+  const defaultDistro = getDefaultDistro();
   return defaultDistro ? `wsl:${defaultDistro}` : "powershell";
 }
 
@@ -135,17 +197,23 @@ function resolvePowerShellCommand(): string {
 export function resolveTerminalTarget(
   preferredTarget: TerminalTarget,
   cwdHostPath?: string,
+  dependencies: TerminalTargetResolutionDependencies = {},
 ): ResolvedTerminalTarget {
-  const initialCwd = cwdHostPath || os.homedir();
+  const platform = dependencies.platform ?? process.platform;
+  const homeDir = dependencies.homeDir ?? os.homedir();
+  const initialCwd = cwdHostPath || homeDir;
+  const getDefaultDistro = dependencies.getDefaultWslDistro ?? getDefaultWslDistro;
+  const powerShellCommand = dependencies.resolvePowerShellCommand ?? resolvePowerShellCommand;
 
-  if (process.platform === "win32") {
+  if (platform === "win32") {
     const target = resolveWindowsAutoTarget(
       preferredTarget,
       initialCwd,
+      getDefaultDistro,
     );
 
     if (target === "powershell") {
-      const command = resolvePowerShellCommand();
+      const command = powerShellCommand();
       return {
         target,
         command,
@@ -157,23 +225,30 @@ export function resolveTerminalTarget(
     }
 
     if (target.startsWith("wsl:")) {
-      const distro = target.slice(4);
-      const guestPath = hostPathToGuestPath(initialCwd, target);
+      const requestedDistro = target.slice(4);
+      const distro = requestedDistro === "auto"
+        ? getDefaultDistro()
+        : requestedDistro;
+      if (!distro) {
+        throw new Error("WSL terminal target requires an installed distro");
+      }
+      const resolvedTarget = `wsl:${distro}` as const;
+      const guestPath = hostPathToGuestPath(initialCwd, resolvedTarget);
       const args = ["-d", distro];
       if (guestPath) {
         args.push("--cd", guestPath);
       }
       return withGuestPath({
-        target,
+        target: resolvedTarget,
         command: "wsl.exe",
         args,
         displayName: distro || "WSL",
-        cwd: os.homedir(),
+        cwd: homeDir,
         cwdHostPath: initialCwd,
       }, guestPath);
     }
 
-    const command = resolvePowerShellCommand();
+    const command = powerShellCommand();
     return {
       target: "powershell",
       command,

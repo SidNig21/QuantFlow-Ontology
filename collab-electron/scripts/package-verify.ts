@@ -15,7 +15,11 @@ import {
   writePackageReceipt,
 } from "./package-lib/package-receipt.ts";
 import { cleanPackageVerificationOutputs } from "./package-lib/package-cleanup.ts";
-import { prepareRuntimeStaging, RUNTIME_FILES } from "./package-lib/runtime-staging.ts";
+import {
+  prepareRuntimeStaging,
+  PRODUCTION_RUNTIME_FILES,
+  QA_RUNTIME_FILES,
+} from "./package-lib/runtime-staging.ts";
 import { inspectPackagedResources } from "./package-lib/package-inspect.ts";
 import { createPackageRunId } from "./package-lib/run-id.ts";
 
@@ -27,6 +31,8 @@ const distDir = join(collabRoot, "dist");
 const packageRoot = join(distDir, "linux-unpacked");
 const resourcesRoot = join(packageRoot, "resources");
 const logPath = canonicalPackageVerifyLogPath(collabRoot);
+const qaMode = process.env.QF_DOCK_QA_MODE === "1";
+const runtimeFiles = qaMode ? QA_RUNTIME_FILES : PRODUCTION_RUNTIME_FILES;
 
 function fail(message: string): never {
   console.error(`package:verify: ${message}`);
@@ -39,11 +45,12 @@ if (process.platform !== "linux") {
 
 const runId = process.env.QF_RELEASE_RUN_ID?.trim() || createPackageRunId();
 console.log(`package:verify: runId=${runId}`);
+console.log(`package:verify: dockQaMode=${qaMode}`);
 
 cleanPackageVerificationOutputs({ packageRoot, stagingRoot, verifyDir });
 mkdirSync(verifyDir, { recursive: true });
 
-prepareRuntimeStaging({ stagingRoot, repoRoot });
+prepareRuntimeStaging({ stagingRoot, repoRoot }, { qaMode });
 
 const fileSets = loadLinuxFileSets(collabRoot);
 const preflight = preflightLinuxExtraResources(collabRoot, fileSets);
@@ -97,12 +104,17 @@ if (!statSync(logPath).size) {
   fail("electron-builder log is empty");
 }
 
-const inspect = inspectPackagedResources(resourcesRoot, collabRoot, fileSets);
+const inspect = inspectPackagedResources(
+  resourcesRoot,
+  collabRoot,
+  fileSets,
+  { qaMode },
+);
 if (!inspect.ok) {
   fail(inspect.reason);
 }
 
-for (const rel of RUNTIME_FILES) {
+for (const rel of runtimeFiles) {
   const abs = join(resourcesRoot, rel);
   if (!statSync(abs).size) {
     fail(`required runtime file empty after package: ${abs}`);

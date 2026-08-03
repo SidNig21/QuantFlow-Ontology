@@ -911,11 +911,11 @@ app.whenReady().then(async () => {
     bootstrapPackagedDockProfiles();
     bootstrapPackagedDockProfiles(); // explicit startup idempotence control
     reconcileStaleSessions();
-    if (isAgentOsBootSupported()) {
+    if (isAgentOsBootSupported() && process.env.QF_DOCK_QA_MODE === "1") {
       await runAgentHostSmoke();
     } else {
       console.warn(
-        "agent-host: AgentOS/Rivet boot smoke disabled on Windows; base shell remains available",
+        "agent-host: AgentOS/Rivet proof boot smoke is QA-only; base shell remains available",
       );
     }
   } catch (err) {

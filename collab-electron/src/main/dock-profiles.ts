@@ -9,15 +9,28 @@ import {
   existsSync,
   lstatSync,
   readFileSync,
-  readdirSync,
 } from "node:fs";
 import { join, posix } from "node:path";
 import { resolveRuntimeAdapterMetadata } from "./runtime-adapter";
 
-export const REQUIRED_DOCK_PROFILE_MANIFESTS = [
+/** Product inventory: only real, launchable species are bootstrapped by default. */
+export const PRODUCTION_DOCK_PROFILE_MANIFESTS = [
   "species/hermes/dock-profiles.json",
+] as const;
+
+/** QA-only inventory used by deterministic collaboration/runtime gates. */
+export const QA_DOCK_PROFILE_MANIFESTS = [
+  ...PRODUCTION_DOCK_PROFILE_MANIFESTS,
+  "tools/qf-proof-agent/dock-profiles.json",
   "tools/runtime-proof/dock-profiles.json",
 ] as const;
+
+/** Backward-compatible name for the normal product contract. */
+export const REQUIRED_DOCK_PROFILE_MANIFESTS = PRODUCTION_DOCK_PROFILE_MANIFESTS;
+
+export type DockProfileDiscoveryOptions = {
+  qaMode?: boolean;
+};
 
 export type DockProfileRegistration = {
   name: string;
@@ -193,26 +206,24 @@ function readManifest(
   return { manifestPath, manifestRef, adapterId, packageRef, profiles };
 }
 
-export function discoverDockProfileManifests(appRoot: string): DockProfileManifest[] {
-  const manifests: DockProfileManifest[] = [];
-  for (const rootName of ["species", "tools"] as const) {
-    const rootPath = join(appRoot, rootName);
-    if (!existsSync(rootPath) || !lstatSync(rootPath).isDirectory()) continue;
-    for (const entry of readdirSync(rootPath, { withFileTypes: true })
-      .filter((candidate) => candidate.isDirectory() && !candidate.isSymbolicLink())
-      .sort((a, b) => a.name.localeCompare(b.name))) {
-      const manifestPath = join(rootPath, entry.name, "dock-profiles.json");
-      if (!existsSync(manifestPath)) continue;
-      manifests.push(readManifest(appRoot, rootName, entry.name));
+export function discoverDockProfileManifests(
+  appRoot: string,
+  options: DockProfileDiscoveryOptions = {},
+): DockProfileManifest[] {
+  const required = options.qaMode === true
+    ? QA_DOCK_PROFILE_MANIFESTS
+    : PRODUCTION_DOCK_PROFILE_MANIFESTS;
+  const manifests = required.map((manifestRef) => {
+    const [rootName, adapterDirectory, fileName] = manifestRef.split("/");
+    if (
+      (rootName !== "species" && rootName !== "tools") ||
+      !adapterDirectory ||
+      fileName !== "dock-profiles.json"
+    ) {
+      throw new DockProfilesContractError(`invalid Dock profile manifest ref: ${manifestRef}`);
     }
-  }
-
-  const refs = new Set(manifests.map((manifest) => manifest.manifestRef));
-  for (const required of REQUIRED_DOCK_PROFILE_MANIFESTS) {
-    if (!refs.has(required)) {
-      throw new DockProfilesContractError(`required Dock profile manifest missing: ${required}`);
-    }
-  }
+    return readManifest(appRoot, rootName, adapterDirectory);
+  });
   const definitionIds = new Set<string>();
   for (const manifest of manifests) {
     for (const profile of manifest.profiles) {
@@ -242,9 +253,10 @@ function sameDefinition(
 export function bootstrapDockProfiles(
   appRoot: string,
   dependencies: BootstrapDockProfilesDependencies,
+  options: DockProfileDiscoveryOptions = {},
 ): BootstrapDockProfilesResult {
   // Load and validate the complete package-owned input set before any Kernel call.
-  const manifests = discoverDockProfileManifests(appRoot);
+  const manifests = discoverDockProfileManifests(appRoot, options);
   const registered: string[] = [];
   const skipped: string[] = [];
   const conflicts: BootstrapConflict[] = [];

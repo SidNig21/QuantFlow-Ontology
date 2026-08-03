@@ -21,7 +21,7 @@ import { join, parse, resolve } from "node:path";
 import { createConnection } from "node:net";
 import {
   prepareRuntimeStaging,
-  RUNTIME_FILES,
+  QA_RUNTIME_FILES,
 } from "../../collab-electron/scripts/package-lib/runtime-staging.ts";
 import { discoverDockProfileManifests } from
   "../../collab-electron/src/main/dock-profiles.ts";
@@ -52,6 +52,7 @@ type RpcResponse = {
   error?: { message?: unknown };
 };
 
+// Cold boot is an explicit QA fixture path; normal product boot is Hermes-only.
 const REQUIRED_DOCK_IDS = [
   "qf-toolloop",
   "hermes-orchestrator",
@@ -468,7 +469,7 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
   prepareRuntimeStaging({
     stagingRoot: join(COLLAB_ROOT, ".package-staging"),
     repoRoot: REPO_ROOT,
-  });
+  }, { qaMode: true });
 
   const electronVite = packageBin("electron-vite", "electron-vite");
   const electronBuilder = packageBin("electron-builder", "electron-builder");
@@ -509,14 +510,17 @@ export async function buildWindowsPackage(tempRoot: string): Promise<string> {
   assert(existsSync(executable), `unpacked Windows executable missing: ${executable}`);
   const resourcesRoot = join(packageRoot, "resources");
   assert(existsSync(join(resourcesRoot, "app.asar")), "unpacked Windows app.asar missing");
-  for (const relativePath of RUNTIME_FILES) {
+  for (const relativePath of QA_RUNTIME_FILES) {
     const path = join(resourcesRoot, relativePath);
     assert(existsSync(path) && statSync(path).size > 0, `Windows runtime resource missing or empty: ${relativePath}`);
   }
   const expectedManifests = discoverDockProfileManifests(
     join(COLLAB_ROOT, ".package-staging"),
+    { qaMode: true },
   );
-  const packagedManifests = discoverDockProfileManifests(resourcesRoot);
+  const packagedManifests = discoverDockProfileManifests(resourcesRoot, {
+    qaMode: true,
+  });
   const expectedClosure = expectedManifests.map((manifest) => ({
     ref: manifest.manifestRef,
     adapterId: manifest.adapterId,
@@ -541,6 +545,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
   mkdirSync(storeRoot, { recursive: true });
   mkdirSync(artifactRoot, { recursive: true });
   const childEnv = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
+  childEnv.QF_DOCK_QA_MODE = "1";
   const endpointFile = join(childEnv.USERPROFILE!, ".quantflow", "app", "socket-path");
   const defaultStateRoot = join(homedir(), ".quantflow");
   const defaultBefore = snapshotTree(defaultStateRoot);

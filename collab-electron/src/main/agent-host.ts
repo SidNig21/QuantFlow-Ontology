@@ -2,8 +2,8 @@
  * Sole app module that imports @rivet-dev/agentos* (mirror of kernel.ts).
  * Species come from agent_definition rows (package_ref); no in-code registry map.
  *
- * Pack: `cd tools/runtime-proof && bun run pack-agent`
- * (collab-electron script `pack-agent` forwards there).
+ * Production packaging stages the genuine Hermes species. Deterministic
+ * AgentOS proof fixtures are packed only by explicit QA gates.
  */
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
@@ -58,7 +58,7 @@ import {
 import { allowsPtyRoleDelivery } from "./runtime-adapter";
 import { completeRuntimeKernelAdmission } from "./runtime-kernel-admission";
 
-/** Credential-free AgentOS adapter used by the startup identity smoke. */
+/** Credential-free QA-only adapter used by the AgentOS identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
 
 /**
@@ -156,6 +156,7 @@ export function getDefinitionRuntime(definitionId: string): DefinitionRuntime {
 
 /** Initialize missing package-owned Dock definitions through execute() only. */
 export function bootstrapPackagedDockProfiles(): void {
+  const qaMode = process.env.QF_DOCK_QA_MODE === "1";
   const result = bootstrapDockProfiles(appRoot(), {
     getAgentDefinition: getDefinition,
     executeRegisterAgentDefinition: (input) =>
@@ -165,10 +166,11 @@ export function bootstrapPackagedDockProfiles(): void {
         `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
       );
     },
-  });
+  }, { qaMode });
   console.log(
     `agent-host: Dock bootstrap registered=${result.registered.length}`
-    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`,
+    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`
+    + ` qaMode=${qaMode}`,
   );
 }
 
@@ -356,6 +358,7 @@ export async function admitAndStartSession(
       argv: runtime.argv,
       command: runtime.metadata.command,
       entrypointPath: runtime.entrypointPath,
+      terminalTarget: runtime.metadata.terminalTarget,
       role: runtime.role,
       env: opts?.env,
       corruptId: opts?.corruptId,
