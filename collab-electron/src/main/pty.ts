@@ -305,6 +305,7 @@ async function doEnsureSidecar(): Promise<void> {
         clearPendingPtyData(sessionId);
         dataSockets.get(sessionId)?.destroy();
         dataSockets.delete(sessionId);
+        sidecarSessionIds.delete(sessionId);
         sidecarPowerShellSessionIds.delete(sessionId);
         deleteSessionMeta(sessionId);
         emitPtySessionExit(sessionId, exitCode);
@@ -753,7 +754,7 @@ export async function createHostCommandSession(opts: {
   displayName: string;
 }> {
   const command = opts.command;
-  if (!command.startsWith("/") || !fs.existsSync(command)) {
+  if (!path.isAbsolute(command) || !fs.existsSync(command)) {
     throw new Error(
       `pty: createHostCommandSession requires absolute existing command (got ${command})`,
     );
@@ -1030,6 +1031,7 @@ export async function killSession(
     try {
       const client = getSidecarClient();
       await client.killSession(sessionId);
+      emitPtySessionExit(sessionId, -1);
     } catch {
       // Session may already be dead
     }
@@ -1087,7 +1089,8 @@ const KILL_ALL_TIMEOUT_MS = 2000;
 export function killAllAndWait(): Promise<void> {
   shuttingDown = true;
   clearAllPtyViewers();
-  if (sessions.size === 0) return Promise.resolve();
+  const sidecarIds = [...sidecarSessionIds];
+  if (sessions.size === 0 && sidecarIds.length === 0) return Promise.resolve();
 
   const pending: Promise<void>[] = [];
   for (const [id, session] of sessions) {
@@ -1100,6 +1103,7 @@ export function killAllAndWait(): Promise<void> {
     session.pty.kill();
     sessions.delete(id);
   }
+  pending.push(...sidecarIds.map((id) => killSession(id)));
 
   const timeout = new Promise<void>((resolve) =>
     setTimeout(resolve, KILL_ALL_TIMEOUT_MS),

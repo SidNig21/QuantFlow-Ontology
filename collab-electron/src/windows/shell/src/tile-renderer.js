@@ -53,10 +53,18 @@ export function createTileDOM(tile, callbacks) {
   titleText.appendChild(nameSpan);
   if (tile.filePath) titleText.title = tile.filePath;
   if (tile.folderPath) titleText.title = tile.folderPath;
-  const titleGroup = document.createElement("div");
-  titleGroup.className = "tile-title-group";
-  titleGroup.appendChild(titleText);
-  titleBar.appendChild(titleGroup);
+	const titleGroup = document.createElement("div");
+	titleGroup.className = "tile-title-group";
+	titleGroup.appendChild(titleText);
+	if (tile.type === "term" && (tile.role || tile.sessionId || tile.definitionId)) {
+		const badges = document.createElement("div");
+		badges.className = "tile-agent-badges";
+		if (tile.agentLabel) badges.appendChild(badge("tile-agent-label", tile.agentLabel));
+		if (tile.role) badges.appendChild(badge("tile-agent-role", tile.role));
+		if (tile.sessionId) badges.appendChild(badge("tile-agent-session", shortId(tile.sessionId)));
+		titleGroup.appendChild(badges);
+	}
+	titleBar.appendChild(titleGroup);
 
   // For browser tiles, add nav controls and a URL input to the title bar
   let urlInput;
@@ -216,6 +224,18 @@ export function createTileDOM(tile, callbacks) {
   contentArea.appendChild(contentOverlay);
 
   return { container, titleBar, titleText, contentArea, contentOverlay, closeBtn, urlInput, navBack, navForward, navReload };
+}
+
+function badge(className, text) {
+	const node = document.createElement("span");
+	node.className = className;
+	node.textContent = text;
+	node.title = text;
+	return node;
+}
+
+function shortId(id) {
+	return id.length <= 12 ? id : `${id.slice(0, 8)}…${id.slice(-4)}`;
 }
 
 export function getTileLabel(tile) {

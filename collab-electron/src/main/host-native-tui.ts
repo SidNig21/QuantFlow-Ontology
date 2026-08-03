@@ -5,6 +5,7 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { resolveHostAcpCommand } from "./host-acp-bridge";
+import { makeEndpointPath } from "./ipc-endpoint";
 import { resolveAdapterSessionEnv } from "./host-mounts";
 import { kernelExecute, type TraceContext } from "./kernel";
 import {
@@ -52,6 +53,9 @@ export async function admitNativeTuiDefinition(opts: {
   definitionId: string;
   adapterId: string;
   argv: string[];
+  command?: string | null;
+  entrypointPath?: string | null;
+  role?: string;
   env?: Record<string, string>;
   corruptId?: string;
   newTrace: () => TraceContext;
@@ -65,7 +69,7 @@ export async function admitNativeTuiDefinition(opts: {
   onStarted?: (
     sessionId: string,
     definitionId: string,
-    info: { surface: "native_tui"; ptySessionId: string },
+    info: { surface: "native_tui"; ptySessionId: string; role?: string },
   ) => void;
 }): Promise<{
   sessionId: string;
@@ -78,8 +82,9 @@ export async function admitNativeTuiDefinition(opts: {
   const fromConfig = resolveAdapterSessionEnv(adapterId);
   const env = { ...fromConfig, ...opts.env };
   const command = resolveHostAcpCommand(
-    env.HOST_ACP_BIN ?? env.HERMES_BIN ?? process.env.HOST_ACP_BIN ??
-      process.env.HERMES_BIN,
+    opts.command === "electron-node" ? process.execPath :
+      opts.command ?? env.HOST_ACP_BIN ?? env.HERMES_BIN ??
+      process.env.HOST_ACP_BIN ?? process.env.HERMES_BIN,
     adapterId === "hermes"
       ? [
           join(homedir(), ".hermes/hermes-agent/venv/bin/hermes"),
@@ -89,11 +94,14 @@ export async function admitNativeTuiDefinition(opts: {
   );
   const home = env.HOME ?? process.env.HOME ?? homedir();
   const displayName = `${definitionId}-tui`;
+  const commandArgs = opts.entrypointPath
+    ? [opts.entrypointPath, ...argv]
+    : argv;
 
   const defaults: NativeTuiOrchestrationDependencies = {
-    createPty: () => createHostCommandSession({
+    createPty: ({ sessionId }) => createHostCommandSession({
       command,
-      args: argv,
+      args: commandArgs,
       cwd: home,
       env: {
         HERMES_BIN: command,
@@ -106,6 +114,13 @@ export async function admitNativeTuiDefinition(opts: {
         ...(process.env.QF_ARTIFACT_ROOT
           ? { QF_ARTIFACT_ROOT: process.env.QF_ARTIFACT_ROOT }
           : {}),
+        ...(process.env.QF_PEER_BUS_DB
+          ? { QF_PEER_BUS_DB: process.env.QF_PEER_BUS_DB }
+          : { QF_PEER_BUS_DB: join(home, ".qf-peer-bus", "peer-bus.db") }),
+        QF_AGENT_SESSION_ID: sessionId,
+        QF_PEER_ROLE: opts.role ?? "",
+        QF_APP_RPC_ENDPOINT:
+          process.env.QF_APP_RPC_ENDPOINT ?? makeEndpointPath("ipc"),
       },
       displayName,
     }),
@@ -135,9 +150,12 @@ export async function admitNativeTuiDefinition(opts: {
   const result = await orchestrateNativeTuiAdmission(
     {
       definitionId,
-      label: definitionId,
+      label: definitionId.startsWith("qf-proof-")
+        ? "DETERMINISTIC PROOF AGENT"
+        : definitionId,
       corruptId: opts.corruptId,
       peerDelivery: opts.peerDelivery,
+      role: opts.role,
       onStarted: opts.onStarted,
     },
     { ...defaults, ...opts.dependencies },

@@ -41,6 +41,9 @@ import {
   kernelExecute,
   kernelGetLinks,
   kernelGetObject,
+  kernelListAgentDefinitions,
+  peerBusReadInbox,
+  peerBusSend,
 } from "./kernel";
 import { registerIntegrationsIpc } from "./integrations";
 import {
@@ -73,9 +76,39 @@ import { registerBrowserIpc } from "./ipc-browser";
 import { registerAgentIpc } from "./acp-agent";
 import {
   bootstrapPackagedDockProfiles,
+  disposeAgentOs,
+  admitAndStartSession,
+  isAgentOsBootSupported,
   reconcileStaleSessions,
   runAgentHostSmoke,
 } from "./agent-host";
+
+function getKernelAgentDefinitionIds(): string[] {
+  return kernelListAgentDefinitions()
+    .map((row) => row.id)
+    .filter((id): id is string => typeof id === "string");
+}
+
+function requirePeerSessionRole(
+  sessionId: unknown,
+  claimedRole: unknown,
+): { sessionId: string; role: string } {
+  if (typeof sessionId !== "string" || sessionId.length === 0) {
+    throw new Error("peer-bus requires session_id");
+  }
+  if (typeof claimedRole !== "string" || claimedRole.length === 0) {
+    throw new Error("peer-bus requires role");
+  }
+  const link = kernelGetLinks(sessionId, { kind: "spawned_from" })[0];
+  const definitionId = link?.to_id;
+  const definition = definitionId
+    ? kernelGetObject("agent_definition", definitionId)
+    : null;
+  if (!definition || String(definition.role ?? "") !== claimedRole) {
+    throw new Error(`peer-bus role/session mismatch for ${sessionId}`);
+  }
+  return { sessionId, role: claimedRole };
+}
 
 // Capture Electron's legacy default before replacing it. The migration must
 // publish app state before logger/config/sidecar consumers create destinations.
@@ -776,6 +809,7 @@ async function shutdownBackgroundServices(): Promise<void> {
   pty.setShuttingDown(true);
   await pty.killAllAndWait();
   await pty.shutdownSidecarIfIdle();
+  await disposeAgentOs();
   watcher.stopWorker();
   if (!DISABLE_GIT_REPLAY) gitReplay.stopWorker();
   stopJsonRpcServer();
@@ -877,7 +911,13 @@ app.whenReady().then(async () => {
     bootstrapPackagedDockProfiles();
     bootstrapPackagedDockProfiles(); // explicit startup idempotence control
     reconcileStaleSessions();
-    await runAgentHostSmoke();
+    if (isAgentOsBootSupported()) {
+      await runAgentHostSmoke();
+    } else {
+      console.warn(
+        "agent-host: AgentOS/Rivet boot smoke disabled on Windows; base shell remains available",
+      );
+    }
   } catch (err) {
     console.error("agent-host: smoke FAILED", err);
     throw err;
@@ -910,9 +950,92 @@ app.whenReady().then(async () => {
   registerMethod("ping", () => ({ pong: true }), {
     description: "Health check — returns {pong: true}",
   });
+  registerMethod("app.shutdown", () => {
+    setImmediate(() => app.quit());
+    return { shuttingDown: true };
+  }, {
+    description: "Request a clean application shutdown",
+  });
+  registerMethod("app.readiness", () => ({
+    canvas: Boolean(
+      mainWindow &&
+        !mainWindow.isDestroyed() &&
+        mainWindow.webContents.getURL().includes("/shell") &&
+        !mainWindow.webContents.isLoading(),
+    ),
+    windowUrl: mainWindow?.webContents.getURL() ?? "",
+    dockProfileIds: getKernelAgentDefinitionIds(),
+  }), {
+    description: "Return founder-visible shell and Kernel-backed Dock readiness",
+  });
+  registerMethod(
+    "qf.dock.spawn",
+    async (params) => {
+      if (!params || typeof params !== "object") throw new Error("dock spawn requires params");
+      const definitionId = (params as Record<string, unknown>).definitionId;
+      if (typeof definitionId !== "string" || definitionId.length === 0) {
+        throw new Error("dock spawn requires definitionId");
+      }
+      return await admitAndStartSession(definitionId, {
+        onStarted: (sessionId, sp, info) => {
+          if (info?.surface === "native_tui" && info.ptySessionId) {
+            mainWindow?.webContents.send(
+              "shell:forward",
+              "canvas",
+              "create-term-tile",
+              info.ptySessionId,
+              sessionId,
+              sp,
+              info.role,
+              sp.startsWith("qf-proof-") ? "DETERMINISTIC PROOF AGENT" : undefined,
+            );
+          }
+        },
+      });
+    },
+    { description: "Drive the same definition-backed Dock spawn admission used by the shell." },
+  );
+  registerMethod(
+    "qf.pty.capture",
+    (params) => {
+      if (!params || typeof params !== "object") throw new Error("pty capture requires params");
+      const sessionId = (params as Record<string, unknown>).sessionId;
+      if (typeof sessionId !== "string" || sessionId.length === 0) throw new Error("pty capture requires sessionId");
+      return { output: pty.captureSession(sessionId, 200) };
+    },
+    { description: "Capture a spawned proof tile's terminal output for the Windows gate." },
+  );
   registerMethod("workspace.getConfig", () => config, {
     description: "Return the current app configuration",
   });
+  registerMethod(
+    "qf.peer-bus.send_to_peer",
+    (params) => {
+      if (!params || typeof params !== "object") throw new Error("peer-bus send requires params");
+      const input = params as Record<string, unknown>;
+      const identity = requirePeerSessionRole(input.session_id, input.from_role);
+      const toRole = input.to_role;
+      const body = input.message;
+      const busDb = input.bus_db;
+      if (typeof toRole !== "string" || toRole.length === 0) throw new Error("peer-bus send requires to_role");
+      if (typeof body !== "string" || body.length === 0) throw new Error("peer-bus send requires message");
+      if (typeof busDb !== "string" || busDb !== process.env.QF_PEER_BUS_DB) throw new Error("peer-bus db is not app-owned");
+      return peerBusSend(busDb, identity.role, toRole, body);
+    },
+    { description: "Product-owned peer-bus send; records a Kernel trajectory before routing." },
+  );
+  registerMethod(
+    "qf.peer-bus.read_inbox",
+    (params) => {
+      if (!params || typeof params !== "object") throw new Error("peer-bus read requires params");
+      const input = params as Record<string, unknown>;
+      const identity = requirePeerSessionRole(input.session_id, input.role);
+      const busDb = input.bus_db;
+      if (typeof busDb !== "string" || busDb !== process.env.QF_PEER_BUS_DB) throw new Error("peer-bus db is not app-owned");
+      return peerBusReadInbox(busDb, identity.role);
+    },
+    { description: "Product-owned peer-bus inbox pull for one admitted session role." },
+  );
   const bovadaKernel: BovadaKernelAccess = {
     execute: (_db, command, input, trace) =>
       kernelExecute(command, input, trace),

@@ -318,7 +318,7 @@ const gates: Gate[] = [
   {
     name: "release-verifier",
     description:
-      "WO-CI1: CI and verifier docs use the canonical install -> unit -> build -> QA command",
+      "WO-WIN1: CI and verifier docs use the native Windows release door and its independent stage contract",
     run: async () => {
       const { runReleaseVerifierGate } = await import(
         "./gates/release-verifier.ts"
@@ -334,6 +334,30 @@ const gates: Gate[] = [
     run: async () => {
       const { runPackageClosureGate } = await import("./gates/package-closure.ts");
       const { ok } = await runPackageClosureGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-cold-boot",
+    description:
+      "WO-WIN1: unpacked Windows package boots on isolated stores, answers ping, and shuts down cleanly",
+    run: async () => {
+      const { runWindowsColdBootGate } = await import(
+        "./gates/windows-cold-boot.ts"
+      );
+      const { ok } = await runWindowsColdBootGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-dock-collaboration",
+    description:
+      "WO-WIN2: packaged normal-Dock deterministic task/ACK round trip with Kernel lineage and clean shutdown",
+    run: async () => {
+      const { runWindowsDockCollaborationGate } = await import(
+        "./gates/windows-dock-collaboration.ts"
+      );
+      const { ok } = await runWindowsDockCollaborationGate();
       return ok;
     },
   },

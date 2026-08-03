@@ -8,6 +8,8 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 
 | Order | Title | Status | Assignee |
 |---|---|---|---|
+| [WO-WIN1](WO-WIN1.md) | Native Windows product floor | **done — independently verified 2026-08-02**; packaged boot, canvas/Dock readiness, canonical Windows release door, and clean shutdown | Codex lead + independent verifier |
+| [WO-WIN2](WO-WIN2.md) | Normal-Dock collaboration proof | **done — independently verified 2026-08-02**; two distinct Dock-launched sessions exchanged a nonce task/ACK with Kernel and peer-bus receipts | Codex lead + independent verifier |
 | WO-000 | Cut the fork (vault) | done — this repo is the result | fable |
 | [WO-001](WO-001.md) | Codegen spike `qf-kernel-schema` | **done** — verified + merged 2026-07-18 | builder (Cursor) |
 | [WO-002](WO-002.md) | Docs graduation + roadmap | done | fable |
@@ -28,7 +30,7 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-008d](WO-008d.md) | Hermes tile = real TUI (standing: native TUI for all future interactive agents) | **done** — verified + merged 2026-07-20; Spawn → term tile `hermes --tui` | builder |
 | [WO-008e](WO-008e.md) | A2A proof: 4 Hermes tiles (orchestrate → fan-out → review → talk-back) | **done** — verified + merged 2026-07-20 (rework D1–D5); `a2a-core` + spawn/dispatch IPC | builder |
 | [WO-PEER-BUS](WO-PEER-BUS.md) | MCP peer plane beside the TUI (cold harness) | **done** — verified cold 2026-07-20 | builder |
-| [WO-PEER-BUS-CANVAS](WO-PEER-BUS-CANVAS.md) | Peer-bus visual PASS — dock seat spawn + founder live turns | **open** — current (park ignored for this PASS); plan `docs/plans/2026-07-20-001-req-peer-bus-canvas-pass-plan.md` | builder |
+| [WO-PEER-BUS-CANVAS](WO-PEER-BUS-CANVAS.md) | Peer-bus visual PASS — dock seat spawn + founder live turns | **parked** — superseded by Windows product recovery and a later honest collaboration proof | builder |
 | [WO-009](WO-009.md) | Datasets I: bootstrap ingestion (Parquet + Kernel pointer) | **parked** until canvas PASS holds | builder |
 
 ## Doctrine ladder (P1→P5, eleven rungs — `SCOPES.md`)
@@ -61,5 +63,5 @@ Work happens **only** through a work order. Builders: read `/START_HERE.md`, the
 | [WO-CI4](WO-CI4.md) | Runtime ownership ignores foreign listeners, not owned ones (off-ladder repair) | **done — independently verified + merged 2026-08-01** — packaged guest socket denial, foreign-listener filtering, exact cancellation, and zero-orphan cleanup passed in canonical run `304169e3-4e27-4c06-8fdd-cbc11d202673` | builder + independent verifier |
 | [WO-CI5](WO-CI5.md) | Typecheck installs each dependency once (off-ladder repair) | **done — independently verified + merged 2026-08-01** — both obsolete nested installers are gone; pre-spawn falsifiers and the genuinely cold canonical typecheck passed. Record: [`evidence/wo-ci5/VERIFICATION.md`](evidence/wo-ci5/VERIFICATION.md) | builder + independent verifier |
 | [WO-107c](WO-107c.md) | Market context completes the ingest graph | **done — independently verified + merged 2026-08-01** — trusted replay-safe venue/event context, atomic `lists`/`offered_on`, generated/packaged `0003`, hidden context actions, and four falsifiers passed. Record: [`evidence/wo-107c/VERIFICATION-R2.md`](evidence/wo-107c/VERIFICATION-R2.md) | builder + independent verifier |
-| [WO-107](WO-107.md) | One real Bovada football capture | **open — current** | builder |
+| [WO-107](WO-107.md) | One real Bovada football capture | **parked — Windows floor restored; requires explicit founder reactivation** | builder |
 | WO-109…WO-111 | Heterogeneous Dock loop · mechanical review · the one-shot proof | contracts only, promoted one verified rung ahead | — |

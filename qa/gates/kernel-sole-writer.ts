@@ -78,6 +78,8 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/artifact-root/run.ts",
   // WO-107b: gate-only historical fixtures, raw count oracle, and injected driver fault.
   "qa/gates/market-ingest/run.ts",
+  // WO-WIN2: read-only oracle over isolated proof Kernel/transport receipts.
+  "qa/gates/windows-dock-collaboration.ts",
 ];
 
 /**

@@ -29,6 +29,12 @@ Hypothesis → Dataset (versioned, point-in-time fenced) → Backtest Run (local
 
 **Supporting cast:** Python sidecar (uv-managed: polars + backtest engine) as an `ExecutionEnvironment` — TypeScript orchestrates, Python computes. Parquet + DuckDB hold bulk odds series; the Kernel holds only hashed pointers. Cloudflare sandboxes for disposable CPU work only (GPU stays local). Bun + strict TypeScript; GitHub Actions gates on every push.
 
+**Primary platform — founder decision 2026-08-02.** Native Windows 11 is the development,
+packaging, runtime, and acceptance floor. Electron/Node owns the packaged application; Bun owns
+tools, tests, and build orchestration. Windows paths, named-pipe IPC, PTY/process ownership, and
+packaged runtime resources must be proven in the real `.exe`. WSL/Linux are secondary compatibility
+targets and cannot substitute for a Windows product proof. See `docs/adr/0001-windows-first-product.md`.
+
 **Runtime proof gate (the L2 bet) — PROVEN 2026-07-18 by WO-004.** AgentOS owns the public session lifecycle → custom ACP agent → Vercel `ToolLoopAgent` owns the model/tool loop. One session ID, no second Eve server. Mastra was the named fallback; **it is not needed and is now off the table** unless a later order reopens the question.
 
 **Session identity flows guest → host, corrected 2026-07-18.** This paragraph previously said AgentOS is the *source* of the session ID. It is not: ACP's `session/new` returns the ID by protocol, so the **ACP agent mints it and AgentOS adopts it**. AgentOS still owns the lifecycle (create · cancel · destroy). Anything that records session identity (the Kernel's `agent_session`, WO-005) must **adopt** the guest-minted ID, never mint its own.

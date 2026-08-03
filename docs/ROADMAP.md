@@ -3,6 +3,13 @@
 > Established 2026-07-18 (WO-002). The phase gates are **fixed**. Order details are planned **one phase ahead only** — numbering every order to v1.0 today would be fiction; later phases are gates plus named placeholders, detailed when the prior phase ships.
 > Work happens only through `docs/orders/`. This file and the order log must agree; the log wins on status.
 
+> **Platform reset closed — 2026-08-02:** native Windows 11 is the canonical product, development,
+> packaging, and proof target. WO-WIN1 verified packaged boot, Kernel, canvas, Dock, and clean
+> shutdown; WO-WIN2 verified one normal-Dock two-seat collaboration primitive. The ontology/market
+> ladder is preserved, but no later feature work is active until `docs/orders/NEXT.md` names a
+> founder-authorized order. Linux/WSL remain secondary compatibility targets and cannot substitute
+> for Windows acceptance.
+
 ## Definition of done (one sentence)
 
 **QuantFlow v1 is done when it is the founder's daily driver for making predictions in a market of his choosing** — a console he opens each week to run Hypothesis → Report on real markets and trusts enough to act on. Market-agnostic core; sports betting (Bovada) is domain pack #1, not the identity. The demo bar (v1.0 gates below) is the proof, not the point.
@@ -276,7 +283,7 @@ The dock is QuantFlow's access point — the surface where **species become sess
 
 > **Direction lock (founder, 2026-07-20): after WO-008e merges, the next rung is "Run Workflow v1" — Hermes commands the desk.** One task typed at the dock → an orchestrator Hermes decomposes it, spawns/staffs worker tiles through Kernel-mediated levers, collects and reviews results, and reports back. WO-008e's fan-out/review/talk-back is the scripted rehearsal; Run Workflow generalizes it to founder-driven tasks. The order gets drafted only after 008e's merged shape is measured, with a doc-attached pre-build read (how Hermes best receives levers — MCP server vs ACP bridge — is an external-surface question, cite-or-probe). Datasets (WO-009) follow, feeding the commander real research work.
 
-**WO-009 · Datasets I — bootstrap ingestion.** ***Current rung*** (unparked after WO-008e).*
+**WO-009 · Datasets I — bootstrap ingestion.** *Historical rung at the time of this superseded section; not a current route.*
 - `ingestion` Runs → `dataset` objects + content-hashed Parquet; identical source bytes → identical `content_hash` (falsify by mutating one byte).
 - `as_of` + `coverage` populated; DuckDB reads Parquet via the pointer; **no bulk rows in SQLite** — gated, not assumed.
 - Failure honesty: truncated/malformed source → run `failed`, **zero partial Kernel writes**.

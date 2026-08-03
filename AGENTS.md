@@ -5,14 +5,14 @@
 is not the authority — it tells you where the authority lives and which rules you will break
 if you skip it.
 
-QuantFlow is a Linux-first, single-user spatial console for AI-assisted quantitative research.
+QuantFlow is a Windows-first, single-user spatial console for AI-assisted quantitative research.
 It is **research and advisor only** — it never places a bet or executes a trade. It proposes,
 backtests, criticizes, evaluates, and reports; the operator acts in the world.
 
 ## Read in this order, in full, before your first edit
 
 1. **`START_HERE.md`** — mission and the hard rules. If anything below contradicts it, it wins.
-2. **`docs/orders/NEXT.md`** — points at the one unblocked order. That order is your job.
+2. **`docs/orders/NEXT.md`** — points at the one unblocked order, or tells you to stop when none is authorized. Never choose work around it.
 3. **Your order in `docs/orders/`** — deliverables, gates, and out-of-scope. End to end.
 4. **`docs/orders/PROTOCOL.md`** — rules of engagement, roles, evidence standards.
 
@@ -67,15 +67,17 @@ step." That is the bar.
 
 ## Commands (as CI runs them — `.github/workflows/ci.yml`)
 
-From a clean worktree, run the one canonical release verifier from repo root:
+From a clean native-Windows worktree, run the one canonical release verifier from repo root:
 
 ```bash
 bun qa/verify-release.ts
 ```
 
-It runs the frozen `collab-electron` install, bare-environment unit suite, production build, and
-`bun qa/run.ts --all`, in that order. The last command alone checks ontology gates but does not
-prove the shipped Electron bundle. Use `bun qa/run.ts --list` to inspect the available gates.
+It fails closed off Windows and runs the frozen `collab-electron` install, shell-free focused unit
+tests (including the packaged Windows logger policy), the real Windows cold-boot package gate, and
+the WO-WIN1 static acceptance gates. The compatibility-only Linux route is
+`bun qa/verify-release-linux.ts`; it is not Windows acceptance proof. Use `bun qa/run.ts --list` to
+inspect the available gates.
 
 Schema work specifically:
 

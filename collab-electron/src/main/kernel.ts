@@ -4,6 +4,7 @@
  */
 import { mkdirSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
+import { dirname, join } from "node:path";
 import {
   attachKernel,
   execute,
@@ -64,6 +65,7 @@ export function openAppKernel(): KernelDb {
   process.env.QF_KERNEL_DB = resolved.path;
   // WO-K3: artifact bytes share the platform root; inject for MCP/child seats.
   process.env.QF_ARTIFACT_ROOT = resolveArtifactRoot().path;
+  process.env.QF_PEER_BUS_DB ??= join(QF_APP_DIR, "peer-bus.db");
   const raw = new DatabaseSync(kernelPath);
   kernelDb = attachKernel(wrapDatabaseSync(raw), {
     path: resolved.path,
@@ -85,6 +87,95 @@ export function getKernelDb(): KernelDb {
 export function getKernelPath(): string {
   if (!kernelPath) throw new Error("kernel not opened");
   return kernelPath;
+}
+
+const PEER_BUS_DDL = `
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  from_role TEXT,
+  to_role TEXT,
+  artifact_id TEXT,
+  body TEXT,
+  created_at TEXT,
+  delivered INTEGER DEFAULT 0,
+  pushed_at TEXT
+);`;
+
+export type PeerBusMessage = {
+  id: string;
+  from_role: string;
+  to_role: string;
+  artifact_id: string;
+  body: string;
+  created_at: string;
+  delivered: number;
+};
+
+function openPeerBus(path: string): DatabaseSync {
+  mkdirSync(dirname(path), { recursive: true });
+  const db = new DatabaseSync(path);
+  db.exec("PRAGMA journal_mode = WAL;");
+  db.exec(PEER_BUS_DDL);
+  return db;
+}
+
+/** Product-owned peer transport: Kernel trajectory first, then optional routing. */
+export function peerBusSend(
+  path: string,
+  fromRole: string,
+  toRole: string,
+  body: string,
+): { artifactId: string; messageId: string; delivered: boolean } {
+  const artifact = kernelExecute(
+    "publish_artifact",
+    {
+      kind: "trajectory",
+      storage_ref: `peer://${fromRole}->${toRole}`,
+      bytes: new TextEncoder().encode(body),
+    },
+    { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+  ) as { object_id: string };
+  const messageId = crypto.randomUUID();
+  const delivered = process.env.QF_PEER_DELIVERY !== "off";
+  const db = openPeerBus(path);
+  try {
+    if (delivered) {
+      db.prepare(
+        `INSERT INTO messages
+          (id, from_role, to_role, artifact_id, body, created_at, delivered)
+         VALUES (?, ?, ?, ?, ?, ?, 0)`,
+      ).run(
+        messageId,
+        fromRole,
+        toRole,
+        artifact.object_id,
+        body,
+        new Date().toISOString(),
+      );
+    }
+  } finally {
+    db.close();
+  }
+  return { artifactId: artifact.object_id, messageId, delivered };
+}
+
+export function peerBusReadInbox(
+  path: string,
+  role: string,
+): PeerBusMessage[] {
+  const db = openPeerBus(path);
+  try {
+    const rows = db.prepare(
+      `SELECT id, from_role, to_role, artifact_id, body, created_at, delivered
+       FROM messages WHERE to_role = ? AND delivered = 0 ORDER BY created_at ASC`,
+    ).all(role) as PeerBusMessage[];
+    for (const row of rows) {
+      db.prepare(`UPDATE messages SET delivered = 1 WHERE id = ?`).run(row.id);
+    }
+    return rows;
+  } finally {
+    db.close();
+  }
 }
 
 export function kernelExecute<C extends string>(

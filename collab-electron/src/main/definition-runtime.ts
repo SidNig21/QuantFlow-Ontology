@@ -11,6 +11,7 @@ export type DefinitionRuntime = ResolvedRuntimeAdapter & {
   runtimeProfile: string | null;
   systemPromptRef: string | null;
   argv: string[];
+  entrypointPath: string | null;
 };
 
 export type DefinitionReader = (
@@ -83,6 +84,9 @@ export function resolveDefinitionRuntime(
     runtimeProfile,
     systemPromptRef,
     argv: expandRuntimeAdapterArgv(resolved.metadata, runtimeProfile),
+    entrypointPath: resolved.metadata.entrypoint
+      ? resolve(resolved.metadataPath, "..", resolved.metadata.entrypoint)
+      : null,
   };
 }
 

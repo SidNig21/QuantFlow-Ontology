@@ -153,6 +153,10 @@ export function registerKernelHandlers(): void {
                 info.ptySessionId,
                 sessionId,
                 sp,
+                info.role,
+                sp.startsWith("qf-proof-")
+                  ? "DETERMINISTIC PROOF AGENT"
+                  : undefined,
               );
               return;
             }

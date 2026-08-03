@@ -1,8 +1,10 @@
 /**
- * Canonical cold release verifier.
+ * Canonical native-Windows release verifier.
  *
  * CI, builders, and independent verifiers call this one command so a green
- * ontology board can never stand in for a production Electron build.
+ * ontology board can never stand in for the packaged Windows application.
+ * The old Linux route remains available through verify-release-linux.ts, but
+ * it is compatibility evidence and never the Windows acceptance door.
  */
 import { randomUUID } from "node:crypto";
 import { delimiter, dirname, join } from "node:path";
@@ -10,12 +12,66 @@ import { delimiter, dirname, join } from "node:path";
 const REPO_ROOT = join(import.meta.dir, "..");
 
 export type ReleaseStage = {
-  id: "install" | "unit" | "build" | "package" | "qa";
+  id: string;
   cwd: "." | "collab-electron";
   command: readonly [string, ...string[]];
 };
 
-export const RELEASE_STAGES: readonly ReleaseStage[] = [
+export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
+  {
+    id: "install",
+    cwd: "collab-electron",
+    command: ["bun", "install", "--frozen-lockfile"],
+  },
+  {
+    id: "unit",
+    cwd: ".",
+    command: ["bun", "qa/windows-unit.ts"],
+  },
+  {
+    id: "windows-cold-boot",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "windows-cold-boot"],
+  },
+  {
+    id: "repo-shape",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "repo-shape"],
+  },
+  {
+    id: "lockfile-committed",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "lockfile-committed"],
+  },
+  {
+    id: "kernel-sole-writer",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "kernel-sole-writer"],
+  },
+  {
+    id: "no-canvas-domain-writes",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "no-canvas-domain-writes"],
+  },
+  {
+    id: "kernel-sole-writer-app",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "kernel-sole-writer-app"],
+  },
+  {
+    id: "doc-action-surface",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "doc-action-surface"],
+  },
+  {
+    id: "one-skin",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "one-skin"],
+  },
+];
+
+/** Compatibility-only Linux release route; it is not Windows proof. */
+export const LINUX_RELEASE_STAGES: readonly ReleaseStage[] = [
   {
     id: "install",
     cwd: "collab-electron",
@@ -42,6 +98,21 @@ export const RELEASE_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/run.ts", "--all"],
   },
 ];
+
+export function releaseStagesForPlatform(
+  platform: NodeJS.Platform = process.platform,
+): readonly ReleaseStage[] {
+  return platform === "win32" ? WINDOWS_RELEASE_STAGES : LINUX_RELEASE_STAGES;
+}
+
+export function nativeWindowsReleaseAllowed(
+  platform: NodeJS.Platform = process.platform,
+): boolean {
+  return platform === "win32";
+}
+
+/** The canonical command dispatches to the native route on Windows. */
+export const RELEASE_STAGES = releaseStagesForPlatform();
 
 export type ReleaseStageExecutor = (
   stage: ReleaseStage,
@@ -102,5 +173,11 @@ export async function runReleaseVerification(
 }
 
 if (import.meta.main) {
+  if (!nativeWindowsReleaseAllowed()) {
+    console.error(
+      "release-verification: FAIL (native Windows 11 is required; use qa/verify-release-linux.ts only for compatibility evidence)",
+    );
+    process.exit(1);
+  }
   process.exit(await runReleaseVerification());
 }

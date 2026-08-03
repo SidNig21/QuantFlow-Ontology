@@ -1,20 +1,43 @@
 import { describe, expect, test } from "bun:test";
-import { RELEASE_STAGES } from "./verify-release.ts";
+import {
+  LINUX_RELEASE_STAGES,
+  WINDOWS_RELEASE_STAGES,
+  nativeWindowsReleaseAllowed,
+  releaseStagesForPlatform,
+} from "./verify-release.ts";
 
 describe("verify-release stages", () => {
-  test("requires install unit build package qa order", () => {
-    expect(RELEASE_STAGES.map((stage) => stage.id)).toEqual([
+  test("requires the native Windows install, unit, package, and static-gate order", () => {
+    expect(WINDOWS_RELEASE_STAGES.map((stage) => stage.id)).toEqual([
       "install",
       "unit",
-      "build",
-      "package",
-      "qa",
+      "windows-cold-boot",
+      "repo-shape",
+      "lockfile-committed",
+      "kernel-sole-writer",
+      "no-canvas-domain-writes",
+      "kernel-sole-writer-app",
+      "doc-action-surface",
+      "one-skin",
     ]);
   });
 
-  test("deleting package stage is detectable", () => {
-    const withoutPackage = RELEASE_STAGES.filter((stage) => stage.id !== "package");
-    expect(withoutPackage.some((stage) => stage.id === "package")).toBe(false);
-    expect(RELEASE_STAGES.some((stage) => stage.id === "package")).toBe(true);
+  test("deleting Windows cold boot is detectable", () => {
+    const withoutColdBoot = WINDOWS_RELEASE_STAGES.filter(
+      (stage) => stage.id !== "windows-cold-boot",
+    );
+    expect(withoutColdBoot.some((stage) => stage.id === "windows-cold-boot")).toBe(false);
+    expect(WINDOWS_RELEASE_STAGES.some((stage) => stage.id === "windows-cold-boot")).toBe(true);
+  });
+
+  test("keeps Linux as an explicit compatibility route", () => {
+    expect(releaseStagesForPlatform("win32")).toBe(WINDOWS_RELEASE_STAGES);
+    expect(releaseStagesForPlatform("linux")).toBe(LINUX_RELEASE_STAGES);
+  });
+
+  test("fails the canonical door closed off Windows", () => {
+    expect(nativeWindowsReleaseAllowed("win32")).toBe(true);
+    expect(nativeWindowsReleaseAllowed("linux")).toBe(false);
+    expect(nativeWindowsReleaseAllowed("darwin")).toBe(false);
   });
 });

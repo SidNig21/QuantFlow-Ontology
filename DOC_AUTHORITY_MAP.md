@@ -1,7 +1,7 @@
 # DOC_AUTHORITY_MAP.md
 
 > The "is this doc current?" answer key. If this map and another doc disagree about a doc's status, this map wins.
-> Last updated: 2026-07-26 (WO-103b: ONTOLOGY_SCHEMA.md demoted to REFERENCE) · Branch: `main`
+> Last updated: 2026-08-02 (native Windows restored as the primary platform) · Branch: `main`
 
 ## CURRENT — binding
 
@@ -13,9 +13,10 @@
 | `docs/DOCTRINE.md` | **Plan of record.** The ontology doctrine — charter, six phases, anti-pattern lint. Graduated verbatim from the vault 2026-07-24; `QuantFlow-Ontology-Doctrine.pdf` at repo root is an export of it, not a source. Where it and an older doc disagree on *direction*, this wins |
 | `docs/BLUEPRINT.md` | Architecture + decided stack + laws |
 | `docs/ROADMAP.md` | Phase gates + work-order ladder; carries the **definition of done** and the **debt register** |
+| `docs/adr/**` | Accepted architectural decisions and their reasons; a later ADR explicitly supersedes an earlier one |
 | `docs/RESEARCH.md` | The keystone: borrowed principles + the phase-correlated tool shelf. Reference, not direction — but binding on *how to shop* |
 | `docs/orders/SCOPES.md` | **The build sequence.** All eleven rungs as scope contracts (objective · depends · in · out · gate). Where it and `docs/ROADMAP.md` disagree on *rung numbering*, SCOPES wins; where they disagree on a *gate*, the stricter wins. Orders are written at most one rung ahead of the build front |
-| `docs/orders/**` (status: open/building/verifying) | The only source of active work; `PROTOCOL.md` = process; `NEXT.md` points at the single unblocked order |
+| `docs/orders/**` (status: open/building/verifying) | The only source of active work; `PROTOCOL.md` = process; `NEXT.md` points at the single unblocked order or explicitly closes the builder door when no order is authorized |
 
 ## REFERENCE — informs, not authority
 

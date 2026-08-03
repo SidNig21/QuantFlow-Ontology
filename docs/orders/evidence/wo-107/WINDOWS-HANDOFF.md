@@ -1,4 +1,4 @@
-# WO-107 Windows / WSL continuation handoff
+# WO-107 Windows / WSL continuation handoff — superseded
 
 ## Plain-language status
 
@@ -6,7 +6,10 @@ The QuantFlow source and the complete WO-107 implementation are preserved on Git
 not approved or merged yet because the final packaged live Bovada capture and real Hermes reading
 proof were not completed before the Linux-to-Windows move.
 
-This file is a continuation handoff, not verification evidence and not a PASS record.
+This file is a continuation handoff, not verification evidence and not a PASS record. The founder's
+2026-08-02 platform decision supersedes its Linux-first/WSL route: WO-WIN1 is now the sole active
+order and native Windows 11 is the acceptance environment. Preserve this file as historical context;
+do not follow its restart prompt or launch instructions.
 
 ## Preserved Git state
 
@@ -24,8 +27,7 @@ output, or incomplete D5 harness files only.
 
 ## Start on Windows
 
-QuantFlow is Linux-first. Use WSL2 with Ubuntu rather than treating native Windows as a supported
-runtime.
+WO-WIN1 replaces this route. Do not use WSL2 or Linux as a substitute for native Windows acceptance.
 
 ```bash
 git clone https://github.com/SidNig21/QuantFlow-Ontology.git

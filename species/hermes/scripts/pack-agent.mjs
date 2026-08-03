@@ -25,7 +25,7 @@ const aospkg = join(outDir, "hermes.aospkg");
 const metaOut = join(outDir, "hermes.meta.json");
 const launchJson = join(root, "launch.json");
 const toolsJson = join(root, "tools-allowlist.json");
-const toolchain = join(
+const toolchain = process.env.QF_AGENTOS_TOOLCHAIN_BIN ?? join(
   root,
   "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs",
 );

@@ -1,11 +1,12 @@
 /**
- * WO-CI1 rework: keep the shipped-app verifier identical in CI and operator docs.
- * Static and install-free; falsification mutates in-memory inputs through the real checker.
+ * WO-WIN1: keep the native Windows shipped-app verifier identical in CI and
+ * operator docs. Static and install-free; falsification mutates in-memory
+ * inputs through the real checker.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
-  RELEASE_STAGES,
+  WINDOWS_RELEASE_STAGES,
   runReleaseVerification,
   type ReleaseStage,
 } from "../verify-release.ts";
@@ -22,7 +23,7 @@ type AuthoritySources = {
 };
 
 // Deliberately independent from RELEASE_STAGES: this is the contract oracle
-// that makes removing or reordering a live stage fail the gate.
+// that makes removing or reordering a live Windows stage fail the gate.
 const EXPECTED_STAGES: readonly ReleaseStage[] = [
   {
     id: "install",
@@ -31,23 +32,48 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
   },
   {
     id: "unit",
-    cwd: "collab-electron",
-    command: ["./scripts/test-unit.sh"],
-  },
-  {
-    id: "build",
-    cwd: "collab-electron",
-    command: ["bun", "run", "build"],
-  },
-  {
-    id: "package",
-    cwd: "collab-electron",
-    command: ["bun", "run", "package:verify"],
-  },
-  {
-    id: "qa",
     cwd: ".",
-    command: ["bun", "qa/run.ts", "--all"],
+    command: ["bun", "qa/windows-unit.ts"],
+  },
+  {
+    id: "windows-cold-boot",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "windows-cold-boot"],
+  },
+  {
+    id: "repo-shape",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "repo-shape"],
+  },
+  {
+    id: "lockfile-committed",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "lockfile-committed"],
+  },
+  {
+    id: "kernel-sole-writer",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "kernel-sole-writer"],
+  },
+  {
+    id: "no-canvas-domain-writes",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "no-canvas-domain-writes"],
+  },
+  {
+    id: "kernel-sole-writer-app",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "kernel-sole-writer-app"],
+  },
+  {
+    id: "doc-action-surface",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "doc-action-surface"],
+  },
+  {
+    id: "one-skin",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "one-skin"],
   },
 ];
 
@@ -71,7 +97,7 @@ export function checkReleaseVerifier(
     stages.some((stage, index) => !sameStage(stage, EXPECTED_STAGES[index]!))
   ) {
     reasons.push(
-      "canonical release stages must be install -> unit -> production build -> package -> all QA",
+      "canonical Windows release stages must be install -> focused unit -> cold boot -> static acceptance gates",
     );
   }
 
@@ -82,13 +108,17 @@ export function checkReleaseVerifier(
     }
   }
 
+  if (!/runs-on:\s*windows-latest/.test(sources.workflow)) {
+    reasons.push("workflow must run the canonical verifier on windows-latest");
+  }
+
   if (
-    !/if\s*\(import\.meta\.main\)\s*\{\s*process\.exit\(await runReleaseVerification\(\)\);\s*\}/s.test(
+    !/if\s*\(import\.meta\.main\)[\s\S]*if\s*\(!nativeWindowsReleaseAllowed\(\)\)[\s\S]*process\.exit\(1\)[\s\S]*process\.exit\(await runReleaseVerification\(\)\)/.test(
       sources.runner,
     )
   ) {
     reasons.push(
-      "qa/verify-release.ts main entrypoint must exit with runReleaseVerification()",
+      "qa/verify-release.ts must fail closed off Windows and exit with runReleaseVerification()",
     );
   }
 
@@ -145,22 +175,24 @@ async function checkRunnerBehavior(
   }
 
   const beforeFailure: string[] = [];
+  const failureIndex = stages.findIndex((stage) => stage.id === "windows-cold-boot");
   const failureCode = await runReleaseVerification(
     stages,
     async (stage) => {
       beforeFailure.push(stage.id);
-      return stage.id === "package" ? 47 : 0;
+      return stage.id === "windows-cold-boot" ? 47 : 0;
     },
     SILENT_REPORTER,
     "test-run-id",
   );
   if (
     failureCode !== 47 ||
-    beforeFailure.includes("qa") ||
-    beforeFailure.at(-1) !== "package"
+    failureIndex < 0 ||
+    beforeFailure.length !== failureIndex + 1 ||
+    beforeFailure.at(-1) !== "windows-cold-boot"
   ) {
     reasons.push(
-      "release runner must propagate a package failure and stop before QA",
+      "release runner must propagate the Windows cold-boot failure and stop before later gates",
     );
   }
 
@@ -168,13 +200,13 @@ async function checkRunnerBehavior(
 }
 
 export async function runReleaseVerifierGate(): Promise<{ ok: boolean }> {
-  let stages = [...RELEASE_STAGES];
+  let stages = [...WINDOWS_RELEASE_STAGES];
   const sources = loadSources();
   const falsify = process.env.QF_RELEASE_VERIFIER_FALSIFY;
 
   switch (falsify) {
     case "stage":
-      stages = stages.filter((stage) => stage.id !== "package");
+      stages = stages.filter((stage) => stage.id !== "windows-cold-boot");
       break;
     case "workflow":
       sources.workflow = sources.workflow.replace(

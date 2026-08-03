@@ -58,7 +58,7 @@ describe("runtime adapter metadata", () => {
 
   test("rejects unknown keys and duplicate peer selectors", () => {
     expect(() =>
-      parseRuntimeAdapterMetadata({ ...hermesMetadata(), command: "hermes" })
+        parseRuntimeAdapterMetadata({ ...hermesMetadata(), unknown: "hermes" })
     ).toThrow(/unknown key/);
     expect(() =>
       parseRuntimeAdapterMetadata({

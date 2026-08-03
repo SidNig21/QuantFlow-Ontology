@@ -103,6 +103,12 @@
       ]
     },
     "win": {
+      "extraResources": [
+        {
+          "from": ".package-staging",
+          "to": "."
+        }
+      ],
       "target": [
         {
           "target": "nsis",
