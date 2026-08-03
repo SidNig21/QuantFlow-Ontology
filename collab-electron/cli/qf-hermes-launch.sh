@@ -16,7 +16,7 @@ case "$bridge_path" in
   *"'"*) echo "QuantFlow bridge path cannot contain an apostrophe" >&2; exit 2 ;;
 esac
 
-profile_root="${QF_HERMES_PROFILE_ROOT:-}"
+profile_root="${QF_QUANTFLOW_HERMES_PROFILE_ROOT:-}"
 if [[ -z "$profile_root" ]]; then
   echo "QuantFlow Hermes unavailable: an isolated Hermes profile root is not configured." >&2
   exit 2

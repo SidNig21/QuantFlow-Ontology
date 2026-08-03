@@ -68,6 +68,19 @@ export function initDock(panelEl, options = {}) {
 					el("div", "qf-empty", defsRes?.error?.message ?? "Failed to list species"),
 				);
 			} else {
+				for (const diagnostic of (Array.isArray(defsRes.diagnostics) ? defsRes.diagnostics : [])) {
+					const card = el("div", "dock-species-row dock-species-unavailable");
+					const meta = el("div", "dock-species-meta");
+					meta.appendChild(el("div", "dock-species-name", String(diagnostic.name ?? "Adapter")));
+					meta.appendChild(el("div", "qf-label", String(diagnostic.message ?? "Unavailable")));
+					const unavailableBtn = el("button", "qf-btn qf-btn-primary", "Unavailable");
+					unavailableBtn.type = "button";
+					unavailableBtn.disabled = true;
+					unavailableBtn.title = String(diagnostic.message ?? "Unavailable");
+					card.appendChild(meta);
+					card.appendChild(unavailableBtn);
+					speciesList.appendChild(card);
+				}
 				const defs = visibleDockDefinitions(defsRes.definitions, {
 					qaMode: options.qaMode === true || window.__QF_QA_MODE__ === true,
 				});

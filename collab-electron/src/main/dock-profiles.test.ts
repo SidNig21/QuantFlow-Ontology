@@ -11,6 +11,7 @@ import { join } from "node:path";
 import {
   bootstrapDockProfiles,
   discoverDockProfileManifests,
+  getMissingHermesDockDiagnostic,
   type DockProfileRegistration,
 } from "./dock-profiles";
 
@@ -166,6 +167,23 @@ describe("Dock profile manifests", () => {
     );
   });
 
+  test("projects only exact missing Hermes Dock state as an adapter diagnostic", () => {
+    const root = freshRoot();
+    rmSync(join(root, "species/hermes/dock-profiles.json"));
+    expect(getMissingHermesDockDiagnostic(root)).toMatchObject({
+      id: "hermes-dock-manifest-missing",
+    });
+
+    seedRequired(root);
+    rmSync(join(root, "species/hermes/packed/hermes.aospkg"));
+    expect(getMissingHermesDockDiagnostic(root)).toMatchObject({
+      id: "hermes-dock-package-missing",
+    });
+
+    seedRequired(root);
+    expect(getMissingHermesDockDiagnostic(root)).toBeNull();
+  });
+
   test("registers once, skips identical rows, and preserves conflicts", () => {
     const rows = new Map<string, Record<string, unknown>>();
     const writes: DockProfileRegistration[] = [];
@@ -229,6 +247,15 @@ describe("Dock profile manifests", () => {
       })
     ).toThrow(/keys must be exactly/);
     expect(writes).toBe(0);
+  });
+
+  test("propagates Kernel registration failures", () => {
+    expect(() => bootstrapDockProfiles(freshRoot(), {
+      getAgentDefinition: () => null,
+      executeRegisterAgentDefinition: () => {
+        throw new Error("Kernel registration failed");
+      },
+    })).toThrow("Kernel registration failed");
   });
 
   test("rejects traversal and duplicate ids", () => {

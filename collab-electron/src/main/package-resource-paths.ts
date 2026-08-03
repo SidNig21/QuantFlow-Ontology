@@ -33,6 +33,11 @@ export function resolveCollaborationResourcePath(
   return candidates.find(exists) ?? null;
 }
 
+/** QuantFlow-owned Hermes state root; callers must supply the authoritative QF_APP_DIR. */
+export function resolveHermesProfileRoot(appDir: string): string {
+  return join(appDir, "hermes-profiles");
+}
+
 /** package_ref → packed sibling meta: species/hermes/packed/hermes.aospkg → …/hermes.meta.json */
 export function packedMetaPathForPackageRef(
   packageRef: string,

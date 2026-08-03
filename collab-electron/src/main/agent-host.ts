@@ -48,7 +48,11 @@ import {
   type TraceContext,
 } from "./kernel";
 import { writeAgentReportArtifact } from "./agent-artifact-writer";
-import { bootstrapDockProfiles } from "./dock-profiles";
+import {
+  bootstrapDockProfiles,
+  getMissingHermesDockDiagnostic,
+  type DockAdapterDiagnostic,
+} from "./dock-profiles";
 import {
   collectUniqueRuntimeSoftware,
   resolveDefinitionRuntime,
@@ -164,6 +168,10 @@ export type DockDefinitionAvailability = {
   message: string;
 };
 
+export function getHermesDockDiagnostic(): DockAdapterDiagnostic | null {
+  return getMissingHermesDockDiagnostic(appRoot());
+}
+
 /**
  * Project adapter readiness beside a Kernel definition without changing the
  * definition row. This never reads auth material; Hermes reports sign-in
@@ -174,15 +182,6 @@ export function getDockDefinitionAvailability(
 ): DockDefinitionAvailability | null {
   const packageRef = String(definition.package_ref ?? "");
   if (!packageRef.startsWith("species/hermes/")) return null;
-  if (String(definition.id ?? "") === "hermes-unavailable") {
-    return {
-      available: false,
-      message:
-        "Hermes unavailable: the packaged Hermes adapter manifest is missing. " +
-        "Reinstall QuantFlow or run the development app.",
-    };
-  }
-
   const collaborationBridge = resolveCollaborationResourcePath(
     "qf-collaboration-mcp.mjs",
     { resourcesPath: process.resourcesPath, moduleDir: __dirname },
@@ -207,27 +206,21 @@ export function getDockDefinitionAvailability(
     };
   }
 
-  try {
-    const runtime = resolveDefinitionRuntime(
-      String(definition.id ?? ""),
-      appRoot(),
-      getDefinition,
-    );
-    const diagnostic = classifyWslNativeTuiPrerequisites({
-      platform: process.platform,
-      homeDir: homedir(),
-      terminalTarget: runtime.metadata.terminalTarget ?? "wsl:auto",
-      cwdHostPath: homedir(),
-      getDefaultWslDistro,
-      resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
-    });
-    if (diagnostic) return { available: false, message: diagnostic.message };
-  } catch (error) {
-    return {
-      available: false,
-      message: `Hermes unavailable: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
+  const runtime = resolveDefinitionRuntime(
+    String(definition.id ?? ""),
+    appRoot(),
+    getDefinition,
+  );
+  const diagnostic = classifyWslNativeTuiPrerequisites({
+    platform: process.platform,
+    homeDir: homedir(),
+    terminalTarget: runtime.metadata.terminalTarget ?? "wsl:auto",
+    cwdHostPath: homedir(),
+    getDefaultWslDistro,
+    resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+    guestCommand: runtime.metadata.command ?? "hermes",
+  });
+  if (diagnostic) return { available: false, message: diagnostic.message };
 
   return {
     available: true,
@@ -239,28 +232,28 @@ export function getDockDefinitionAvailability(
 /** Initialize missing package-owned Dock definitions through execute() only. */
 export function bootstrapPackagedDockProfiles(): void {
   const qaMode = process.env.QF_DOCK_QA_MODE === "1";
-  try {
-    const result = bootstrapDockProfiles(appRoot(), {
-      getAgentDefinition: getDefinition,
-      executeRegisterAgentDefinition: (input) =>
-        kernelExecute("register_agent_definition", input, newTrace()),
-      reportConflict: (conflict) => {
-        console.error(
-          `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
-        );
-      },
-    }, { qaMode });
-    console.log(
-      `agent-host: Dock bootstrap registered=${result.registered.length}`
-      + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`
-      + ` qaMode=${qaMode}`,
-    );
-  } catch (error) {
+  const missing = getHermesDockDiagnostic();
+  if (missing) {
     console.error(
-      "agent-host: Hermes Dock adapter unavailable; base shell remains available",
-      error,
+      `agent-host: ${missing.message}`,
     );
+    return;
   }
+  const result = bootstrapDockProfiles(appRoot(), {
+    getAgentDefinition: getDefinition,
+    executeRegisterAgentDefinition: (input) =>
+      kernelExecute("register_agent_definition", input, newTrace()),
+    reportConflict: (conflict) => {
+      console.error(
+        `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
+      );
+    },
+  }, { qaMode });
+  console.log(
+    `agent-host: Dock bootstrap registered=${result.registered.length}`
+    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`
+    + ` qaMode=${qaMode}`,
+  );
 }
 
 export function onSessionChunk(listener: ChunkListener): () => void {

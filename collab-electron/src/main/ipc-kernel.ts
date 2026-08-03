@@ -26,7 +26,10 @@ import {
   kernelListArtifacts,
   peerBusListHandoffs,
 } from "./kernel";
-import { getDockDefinitionAvailability } from "./agent-host";
+import {
+  getDockDefinitionAvailability,
+  getHermesDockDiagnostic,
+} from "./agent-host";
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
@@ -142,29 +145,20 @@ export function registerKernelHandlers(): void {
   ipcMain.handle("qf:definitions:list", (event) => {
     try {
       assertTrustedSender(event);
+      const diagnostics = [];
+      const hermesDiagnostic = getHermesDockDiagnostic();
+      if (hermesDiagnostic) diagnostics.push(hermesDiagnostic);
       const definitions = kernelListAgentDefinitions().map((definition) => {
+        if (
+          hermesDiagnostic &&
+          String(definition.package_ref ?? "").startsWith("species/hermes/")
+        ) {
+          return definition;
+        }
         const availability = getDockDefinitionAvailability(definition);
         return availability ? { ...definition, availability } : definition;
       });
-      if (!definitions.some((definition) =>
-        String(definition.package_ref ?? "").startsWith("species/hermes/"),
-      )) {
-        definitions.push({
-          id: "hermes-unavailable",
-          name: "Hermes",
-          role: "collaboration adapter",
-          package_ref: "species/hermes/packed/hermes.aospkg",
-          runtime_profile: "default",
-          system_prompt_ref: null,
-          availability: {
-            available: false,
-            message:
-              "Hermes unavailable: the packaged Hermes adapter manifest is missing. " +
-              "Reinstall QuantFlow or run the development app.",
-          },
-        });
-      }
-      return { ok: true as const, definitions };
+      return { ok: true as const, definitions, diagnostics };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

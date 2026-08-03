@@ -23,7 +23,8 @@ function wslPath(path: string): string {
 
 describe("Hermes packaged launch wrapper", () => {
   test("requires and uses an isolated profile root", () => {
-    expect(wrapper).toContain("QF_HERMES_PROFILE_ROOT");
+    expect(wrapper).toContain("QF_QUANTFLOW_HERMES_PROFILE_ROOT");
+    expect(wrapper).not.toContain("QF_HERMES_PROFILE_ROOT");
     expect(wrapper).toContain('profile_home="$profile_root/profiles/quantflow-runtime-$seat_id"');
     expect(wrapper).toContain('"$HOME/.hermes/config.yaml"');
     expect(wrapper).toContain('ln -s "$auth_source" "$auth_link"');
@@ -58,7 +59,8 @@ describe("Hermes packaged launch wrapper", () => {
             "-d", "Ubuntu", "--", "env",
             `HOME=${wslPath(founderHome)}`,
             "QF_AGENT_SESSION_ID=seat/test",
-            `QF_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
+            `QF_HERMES_PROFILE_ROOT=${wslPath(join(founderHome, ".hermes", "redirect"))}`,
+            `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
             "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "sh", "-c", "exit 0",
           ]
         : [wrapperPath, "/tmp/qf-bridge.mjs", "sh", "-c", "exit 0"];
@@ -73,7 +75,8 @@ describe("Hermes packaged launch wrapper", () => {
                 ...process.env,
                 HOME: founderHome,
                 QF_AGENT_SESSION_ID: "seat/test",
-                QF_HERMES_PROFILE_ROOT: isolatedRoot,
+                QF_HERMES_PROFILE_ROOT: join(founderHome, ".hermes", "redirect"),
+                QF_QUANTFLOW_HERMES_PROFILE_ROOT: isolatedRoot,
               },
               encoding: "utf8",
             },
@@ -105,6 +108,7 @@ describe("Hermes packaged launch wrapper", () => {
         expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-collaboration");
       }
       expect(() => lstatSync(join(founderHome, ".hermes", "profiles"))).toThrow();
+      expect(() => lstatSync(join(founderHome, ".hermes", "redirect"))).toThrow();
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

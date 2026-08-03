@@ -2,7 +2,10 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveCollaborationResourcePath } from "./package-resource-paths";
+import {
+  resolveCollaborationResourcePath,
+  resolveHermesProfileRoot,
+} from "./package-resource-paths";
 
 const roots: string[] = [];
 
@@ -47,5 +50,10 @@ describe("packaged collaboration resource resolution", () => {
       resourcesPath: null,
       moduleDir: join(tmpdir(), "qf-no-such-main-module"),
     })).toBeNull();
+  });
+
+  test("derives Hermes state only from the authoritative app directory", () => {
+    const authoritative = "C:\\QuantFlow\\app-dev-worktree";
+    expect(resolveHermesProfileRoot(authoritative)).toBe(join(authoritative, "hermes-profiles"));
   });
 });

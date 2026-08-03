@@ -13,9 +13,18 @@ import {
 import { join, posix } from "node:path";
 import { resolveRuntimeAdapterMetadata } from "./runtime-adapter";
 
+export const HERMES_DOCK_MANIFEST_REF = "species/hermes/dock-profiles.json";
+export const HERMES_DOCK_PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
+
+export type DockAdapterDiagnostic = {
+  id: string;
+  name: string;
+  message: string;
+};
+
 /** Product inventory: only real, launchable species are bootstrapped by default. */
 export const PRODUCTION_DOCK_PROFILE_MANIFESTS = [
-  "species/hermes/dock-profiles.json",
+  HERMES_DOCK_MANIFEST_REF,
 ] as const;
 
 /** QA-only inventory used by deterministic collaboration/runtime gates. */
@@ -73,6 +82,34 @@ export class DockProfilesContractError extends Error {
   constructor(message: string) {
     super(message);
   }
+}
+
+/** Missing-only check for the optional Hermes adapter surface. */
+export function getMissingHermesDockDiagnostic(
+  appRoot: string,
+  exists: (path: string) => boolean = existsSync,
+): DockAdapterDiagnostic | null {
+  const manifestPath = join(appRoot, HERMES_DOCK_MANIFEST_REF);
+  if (!exists(manifestPath)) {
+    return {
+      id: "hermes-dock-manifest-missing",
+      name: "Hermes",
+      message:
+        "Hermes unavailable: the packaged Hermes Dock manifest is missing. " +
+        "Reinstall QuantFlow or run the development app.",
+    };
+  }
+  const packagePath = join(appRoot, HERMES_DOCK_PACKAGE_REF);
+  if (!exists(packagePath)) {
+    return {
+      id: "hermes-dock-package-missing",
+      name: "Hermes",
+      message:
+        "Hermes unavailable: the packaged Hermes adapter package is missing. " +
+        "Reinstall QuantFlow or run the development app.",
+    };
+  }
+  return null;
 }
 
 function record(value: unknown, label: string): Record<string, unknown> {

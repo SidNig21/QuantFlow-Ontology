@@ -29,7 +29,12 @@ export type WslNativeTuiLaunch = {
 };
 
 export type WslPrerequisiteDiagnostic = {
-  code: "windows-required" | "wsl-unavailable" | "distro-unavailable";
+  code:
+    | "windows-required"
+    | "wsl-unavailable"
+    | "distro-unavailable"
+    | "wsl1-distro"
+    | "hermes-unavailable";
   message: string;
 };
 
@@ -90,6 +95,7 @@ function withGuestPath(
 interface WslDistro {
   name: string;
   isDefault: boolean;
+  version: number | null;
 }
 
 export type TerminalTargetResolutionDependencies = {
@@ -98,6 +104,39 @@ export type TerminalTargetResolutionDependencies = {
   getDefaultWslDistro?: () => string | null;
   resolvePowerShellCommand?: () => string;
 };
+
+type WslGuestCommandProbe = (
+  target: ResolvedTerminalTarget,
+  guestCommand: string,
+) => void;
+
+function probeWslGuestCommand(
+  target: ResolvedTerminalTarget,
+  guestCommand: string,
+): void {
+  execFileSync(
+    target.command,
+    [
+      ...target.args,
+      "--exec",
+      "/bin/bash",
+      "-lc",
+      'command -v "$0" >/dev/null',
+      guestCommand,
+    ],
+    {
+      encoding: "utf8",
+      stdio: "ignore",
+      timeout: 5000,
+      windowsHide: true,
+    },
+  );
+}
+
+function getWslDistroVersion(distro: string): number | null {
+  const entry = listWslDistributions().find((candidate) => candidate.name === distro);
+  return entry?.version ?? null;
+}
 
 /**
  * Read-only pre-spawn classification for the Hermes WSL adapter. It checks
@@ -111,6 +150,9 @@ export function classifyWslNativeTuiPrerequisites(options: {
   cwdHostPath: string;
   getDefaultWslDistro?: () => string | null;
   resolveWslCommand?: (command: string) => string;
+  getWslDistroVersion?: (distro: string) => number | null;
+  guestCommand?: string;
+  probeGuestCommand?: WslGuestCommandProbe;
 }): WslPrerequisiteDiagnostic | null {
   const platform = options.platform ?? process.platform;
   if (platform !== "win32") {
@@ -119,6 +161,7 @@ export function classifyWslNativeTuiPrerequisites(options: {
       message: "Hermes unavailable: native Windows with WSL2 is required for this seat.",
     };
   }
+  let probeStage: "wsl" | "distro" | "guest" = "wsl";
   try {
     const target = resolveTerminalTarget(options.terminalTarget, options.cwdHostPath, {
       platform,
@@ -126,7 +169,34 @@ export function classifyWslNativeTuiPrerequisites(options: {
       getDefaultWslDistro: options.getDefaultWslDistro,
     });
     if (!target.target.startsWith("wsl:")) return null;
-    options.resolveWslCommand?.(target.command);
+    const resolvedCommand = options.resolveWslCommand
+      ? options.resolveWslCommand(target.command)
+      : target.command;
+    const resolvedTarget = { ...target, command: resolvedCommand };
+    probeStage = "distro";
+    const distro = target.target.slice("wsl:".length);
+    const version = (options.getWslDistroVersion ?? getWslDistroVersion)(distro);
+    if (version === null) {
+      return {
+        code: "distro-unavailable",
+        message:
+          `Hermes unavailable: selected WSL distro "${distro}" is not installed. ` +
+          "Install it or select an installed WSL2 distro, then retry.",
+      };
+    }
+    if (version !== 2) {
+      return {
+        code: "wsl1-distro",
+        message:
+          `Hermes unavailable: selected distro "${distro}" is WSL1. ` +
+          "Convert it to WSL2 and retry.",
+      };
+    }
+    probeStage = "guest";
+    (options.probeGuestCommand ?? probeWslGuestCommand)(
+      resolvedTarget,
+      options.guestCommand ?? "hermes",
+    );
     return null;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -136,6 +206,14 @@ export function classifyWslNativeTuiPrerequisites(options: {
         message:
           "Hermes unavailable: no WSL2/Ubuntu distro is installed or available. " +
           "Install Ubuntu in WSL2, make it the default distro, and retry.",
+      };
+    }
+    if (probeStage === "guest") {
+      return {
+        code: "hermes-unavailable",
+        message:
+          `Hermes unavailable: "${options.guestCommand ?? "hermes"}" is not installed ` +
+          "in the selected WSL2 distro. Install Hermes in Ubuntu/WSL2, then retry.",
       };
     }
     return {
@@ -181,8 +259,12 @@ function listWslDistributions(): WslDistro[] {
       .map((line) => {
         const isDefault = line.trimStart().startsWith("*");
         const clean = line.replace(/^\*\s*/, "").trim();
-        const [name] = clean.split(/\s{2,}/);
-        return name ? { name, isDefault } : null;
+        const columns = clean.split(/\s{2,}/);
+        const name = columns[0];
+        const version = Number(columns.at(-1));
+        return name
+          ? { name, isDefault, version: Number.isInteger(version) ? version : null }
+          : null;
       })
       .filter((value): value is WslDistro => value !== null);
   } catch {

@@ -73,4 +73,67 @@ describe("WSL terminal targets", () => {
       },
     })?.code).toBe("wsl-unavailable");
   });
+
+  test("classifies an explicitly selected but missing distro", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      getWslDistroVersion: () => null,
+      resolveWslCommand: () => "wsl.exe",
+    })).toEqual({
+      code: "distro-unavailable",
+      message:
+        'Hermes unavailable: selected WSL distro "Ubuntu" is not installed. ' +
+        "Install it or select an installed WSL2 distro, then retry.",
+    });
+  });
+
+  test("classifies WSL1 before Hermes launch", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      getWslDistroVersion: () => 1,
+      resolveWslCommand: () => "wsl.exe",
+    })?.code).toBe("wsl1-distro");
+  });
+
+  test("classifies missing Hermes inside the selected WSL2 distro", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      getWslDistroVersion: () => 2,
+      resolveWslCommand: () => "wsl.exe",
+      guestCommand: "hermes",
+      probeGuestCommand: () => {
+        throw new Error("command not found");
+      },
+    })?.code).toBe("hermes-unavailable");
+  });
+
+  test("keeps missing wsl.exe distinct when Hermes is the guest command", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      getWslDistroVersion: () => 2,
+      guestCommand: "hermes",
+      resolveWslCommand: () => {
+        throw new Error("wsl.exe not found");
+      },
+      probeGuestCommand: () => {
+        throw new Error("must not probe guest");
+      },
+    })?.code).toBe("wsl-unavailable");
+  });
 });

@@ -27,7 +27,10 @@ import {
   resolveWslNativeTuiLaunch,
 } from "./terminal-target";
 import type { TerminalTarget } from "./config";
-import { resolveCollaborationResourcePath } from "./package-resource-paths";
+import {
+  resolveCollaborationResourcePath,
+  resolveHermesProfileRoot,
+} from "./package-resource-paths";
 import {
   orchestrateNativeTuiAdmission,
   type NativeTuiLive,
@@ -42,12 +45,9 @@ let closeKernelRow: ((sessionId: string) => void) | null = null;
 
 function resolveHermesProfileGuestRoot(
   terminalTarget: string,
-  configuredRoot: string | undefined,
-  appDir: string | undefined,
-  hostHome: string,
+  appDir: string,
 ): string | null {
-  const profileRoot = configuredRoot?.trim() ||
-    join(appDir || join(hostHome, ".quantflow", "app"), "hermes-profiles");
+  const profileRoot = resolveHermesProfileRoot(appDir);
   if (profileRoot.startsWith("/")) return profileRoot;
   return hostPathToGuestPath(profileRoot, terminalTarget);
 }
@@ -128,6 +128,7 @@ export async function admitNativeTuiDefinition(opts: {
       "Reinstall QuantFlow or run the development app.",
     );
   }
+  const guestCommand = opts.command ?? adapterId;
   const wslPrerequisite = hermesWslAdapter
     ? classifyWslNativeTuiPrerequisites({
         platform: process.platform,
@@ -136,6 +137,7 @@ export async function admitNativeTuiDefinition(opts: {
         cwdHostPath: hostHome,
         getDefaultWslDistro,
         resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+        guestCommand,
       })
     : null;
   if (wslPrerequisite) throw new Error(wslPrerequisite.message);
@@ -149,9 +151,7 @@ export async function admitNativeTuiDefinition(opts: {
   const hermesProfileRootGuest = hermesWslAdapter
     ? resolveHermesProfileGuestRoot(
         opts.terminalTarget!,
-        env.QF_HERMES_PROFILE_ROOT,
-        env.QF_APP_DIR ?? process.env.QF_APP_DIR ?? QF_APP_DIR,
-        hostHome,
+        QF_APP_DIR,
       )
     : null;
   if (hermesWslAdapter && !hermesProfileRootGuest) {
@@ -159,7 +159,6 @@ export async function admitNativeTuiDefinition(opts: {
       "Hermes unavailable: QuantFlow's isolated Hermes profile path could not be mapped into WSL",
     );
   }
-  const guestCommand = opts.command ?? adapterId;
   const wslLaunch = opts.terminalTarget?.startsWith("wsl:")
     ? resolveWslNativeTuiLaunch({
         terminalTarget: opts.terminalTarget,
@@ -206,7 +205,7 @@ export async function admitNativeTuiDefinition(opts: {
           ? (env.HOME?.startsWith("/") ? { HOME: env.HOME } : {})
           : { HOME: home }),
         ...(hermesProfileRootGuest
-          ? { QF_HERMES_PROFILE_ROOT: hermesProfileRootGuest }
+          ? { QF_QUANTFLOW_HERMES_PROFILE_ROOT: hermesProfileRootGuest }
           : {}),
         TERM: "xterm-256color",
         ...(process.env.QF_KERNEL_DB
