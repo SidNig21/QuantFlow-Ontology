@@ -248,15 +248,35 @@ async function bunPackageGate(
 const gates: Gate[] = [
   {
     name: "repo-shape",
-    description: "Front door + authority map + orders dir exist; CLA machinery stays gone",
+    description: "The authority set named by START_HERE exists; CLA machinery stays gone",
     run: () => {
+      // Mirrors START_HERE.md section 3. A file listed there and absent here is a
+      // gate that stopped guarding the thing it names; a file here and absent there
+      // is a document claiming authority nobody granted. Update both together.
       const mustExist = [
         "START_HERE.md",
-        "DOC_AUTHORITY_MAP.md",
-        "docs/orders/README.md",
+        "AGENTS.md",
+        "docs/DOCTRINE.md",
+        "docs/LAWS.md",
+        "docs/DEBT.md",
+        "docs/orders/NEXT.md",
+        "docs/orders/PROTOCOL.md",
+        "docs/adr/0001-windows-first-product.md",
+        "qf-kernel-schema/golden/ONTOLOGY.md",
         ".gitattributes",
       ];
-      const mustNotExist = [".clabot", "CLA.md", ".github/workflows/cla.yml"];
+      // DOC_AUTHORITY_MAP.md and docs/orders/README.md were hand-maintained caches
+      // about other documents. Archived to docs/history/ on 2026-08-03 under
+      // DOCTRINE A9. Their return would mean the doc-about-docs layer grew back.
+      const mustNotExist = [
+        ".clabot",
+        "CLA.md",
+        ".github/workflows/cla.yml",
+        "DOC_AUTHORITY_MAP.md",
+        "docs/orders/README.md",
+        "docs/orders/SCOPES.md",
+        "docs/ROADMAP.md",
+      ];
       let ok = true;
       for (const f of mustExist) {
         if (!existsSync(join(REPO_ROOT, f))) {
