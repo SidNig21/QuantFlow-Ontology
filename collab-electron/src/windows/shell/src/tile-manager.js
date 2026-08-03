@@ -939,6 +939,24 @@ export function createTileManager({
 		saveCanvasImmediate();
 	}
 
+	/**
+	 * Apply a projected layout to the live canvas projection only. The ontology
+	 * has no tile-layout Kernel action yet, so Tidy is intentionally ephemeral.
+	 * Agent/session identity stays attached to the existing tile object and no
+	 * second state store is introduced.
+	 */
+	function applyTileLayout(nextLayout) {
+		if (!Array.isArray(nextLayout)) return;
+		const nextById = new Map(nextLayout.map((tile) => [tile?.id, tile]));
+		for (const tile of tiles) {
+			const next = nextById.get(tile.id);
+			if (!next || tile.locked === true) continue;
+			if (Number.isFinite(next.x)) tile.x = next.x;
+			if (Number.isFinite(next.y)) tile.y = next.y;
+		}
+		repositionAllTiles();
+	}
+
 	return {
 		createCanvasTile,
 		closeCanvasTile,
@@ -964,6 +982,7 @@ export function createTileManager({
 		getFocusedTile: () => getTile(focusedTileId),
 		setFocusedTileId: (id) => { focusedTileId = id; },
 		renameTile,
+		applyTileLayout,
 		toggleTileFullscreen,
 		getFullscreenTileId: () => fullscreenTileId,
 		updateTileForRename,

@@ -15,10 +15,35 @@ function el(tag, className, text) {
 	return node;
 }
 
+export function isQaDockDefinition(definitionId) {
+	return String(definitionId ?? "").startsWith("qf-proof-");
+}
+
+export function isProductionDockDefinition(row) {
+	const packageRef = String(row?.package_ref ?? "");
+	if (
+		packageRef.startsWith("tools/qf-proof-agent/") ||
+		packageRef.startsWith("tools/runtime-proof/")
+	) {
+		return false;
+	}
+	return !isQaDockDefinition(row?.id);
+}
+
+/**
+ * Production Dock projection. QA may opt in explicitly, but proof fixtures
+ * never become product inventory merely because they are Kernel-registered.
+ */
+export function visibleDockDefinitions(definitions, { qaMode = false } = {}) {
+	const rows = Array.isArray(definitions) ? definitions : [];
+	return rows.filter((row) => qaMode || isProductionDockDefinition(row));
+}
+
 /**
  * @param {HTMLElement} panelEl
+ * @param {{ onTidy?: () => void, qaMode?: boolean }} [options]
  */
-export function initDock(panelEl) {
+export function initDock(panelEl, options = {}) {
 	const speciesList = panelEl.querySelector("#dock-species-list");
 	const sessionsList = panelEl.querySelector("#dock-sessions-list");
 	if (!speciesList || !sessionsList) {
@@ -43,7 +68,9 @@ export function initDock(panelEl) {
 					el("div", "qf-empty", defsRes?.error?.message ?? "Failed to list species"),
 				);
 			} else {
-				const defs = defsRes.definitions ?? [];
+				const defs = visibleDockDefinitions(defsRes.definitions, {
+					qaMode: options.qaMode === true || window.__QF_QA_MODE__ === true,
+				});
 				if (defs.length === 0) {
 					speciesList.appendChild(el("div", "qf-empty", "No species registered"));
 				}
@@ -56,9 +83,7 @@ export function initDock(panelEl) {
 					meta.appendChild(el(
 						"div",
 						"dock-species-name",
-						definitionId.startsWith("qf-proof-")
-							? "DETERMINISTIC PROOF AGENT"
-							: name,
+						name,
 					));
 					if (role) meta.appendChild(el("div", "qf-label", role));
 					const spawnBtn = el("button", "qf-btn qf-btn-primary", "Spawn");
@@ -140,6 +165,10 @@ export function initDock(panelEl) {
 			refreshing = false;
 		}
 	}
+
+	panelEl.querySelector("#dock-tidy")?.addEventListener("click", () => {
+		options.onTidy?.();
+	});
 
 	window.shellApi.qf.onDockInvalidate(() => {
 		void refresh();

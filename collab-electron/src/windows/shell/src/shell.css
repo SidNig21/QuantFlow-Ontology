@@ -217,10 +217,47 @@ body.platform-win {
 	flex-direction: column;
 	flex: 1;
 	min-height: 0;
-	gap: calc(var(--qf-u) * 2);
+	gap: calc(var(--qf-u) * 1.5);
 	padding: calc(var(--qf-u) * 1.5);
 	padding-top: calc(var(--toolbar-height) + var(--qf-u));
 	overflow: auto;
+}
+
+.dock-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--qf-u);
+	padding: calc(var(--qf-u) * 0.5) calc(var(--qf-u) * 0.25) calc(var(--qf-u) * 1.25);
+	border-bottom: 1px solid var(--qf-line);
+}
+
+.dock-heading {
+	display: grid;
+	gap: 3px;
+	min-width: 0;
+}
+
+.dock-heading strong {
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.dock-kicker {
+	font-family: var(--qf-mono);
+	font-size: 9px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--qf-accent);
+}
+
+.dock-tidy {
+	padding: 5px 10px;
+	font-family: var(--qf-mono);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 }
 
 .dock-section {
@@ -302,6 +339,31 @@ body.platform-win {
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
+}
+
+#canvas-toast {
+	position: absolute;
+	top: 16px;
+	left: 50%;
+	transform: translate(-50%, -8px);
+	max-width: min(360px, calc(100% - 32px));
+	padding: 7px 11px;
+	border: 1px solid color-mix(in srgb, var(--qf-accent) 45%, var(--qf-line));
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--qf-surface) 94%, transparent);
+	box-shadow: 0 8px 28px color-mix(in srgb, var(--qf-ink) 45%, transparent);
+	color: var(--qf-text);
+	font-family: var(--qf-mono);
+	font-size: 10px;
+	letter-spacing: 0.04em;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 160ms ease-out, transform 160ms ease-out;
+}
+
+#canvas-toast.visible {
+	opacity: 1;
+	transform: translate(-50%, 0);
 }
 
 #grid-canvas {
@@ -1142,6 +1204,74 @@ body.platform-win {
 
 .canvas-tile[data-tile-type="term"] .tile-content {
 	padding: 0 2px 0 12px;
+}
+
+.canvas-tile.agent-cli-tile {
+	min-width: 320px;
+	min-height: 220px;
+	border-color: color-mix(in srgb, var(--qf-teal) 38%, var(--qf-line));
+	background: var(--qf-ink);
+	box-shadow: 0 14px 34px color-mix(in srgb, var(--qf-ink) 36%, transparent);
+}
+
+.canvas-tile.agent-cli-tile::before,
+.canvas-tile.agent-cli-tile::after {
+	border-color: color-mix(in srgb, var(--qf-teal) 24%, var(--qf-line));
+}
+
+.agent-cli-tile .tile-title-bar {
+	min-height: 42px;
+	padding: 8px 10px;
+	background: color-mix(in srgb, var(--qf-raised) 88%, var(--qf-ink));
+	border-bottom: 1px solid var(--qf-line);
+}
+
+.agent-cli-tile .tile-title-text {
+	font-family: var(--qf-sans);
+	font-size: 13px;
+	font-weight: 600;
+	opacity: 1;
+	color: var(--qf-text);
+}
+
+.agent-cli-tile .tile-title-parent {
+	color: var(--qf-muted);
+	font-size: 10px;
+	font-family: var(--qf-mono);
+	font-weight: 500;
+}
+
+.agent-cli-tile .tile-agent-badges span {
+	background: color-mix(in srgb, var(--qf-ink) 80%, transparent);
+	border-color: var(--qf-line);
+}
+
+.agent-cli-tile .tile-agent-runtime {
+	color: var(--qf-teal);
+}
+
+.agent-cli-tile .tile-agent-status {
+	color: var(--qf-ok);
+}
+
+.agent-cli-tile .tile-agent-status::before {
+	content: "";
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	margin-right: 4px;
+	border-radius: 50%;
+	background: currentColor;
+}
+
+.agent-cli-tile .tile-content {
+	min-height: 0;
+	padding: 0 4px 4px 10px;
+	background: var(--qf-ink);
+}
+
+.agent-cli-tile .tile-content webview {
+	background: var(--qf-ink);
 }
 
 /* Fullscreen tile fills the entire canvas viewport */

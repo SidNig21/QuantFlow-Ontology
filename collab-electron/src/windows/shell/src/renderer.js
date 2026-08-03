@@ -16,6 +16,7 @@ import { createCanvasRpc, findAutoPlacement } from "./canvas-rpc.js";
 import { createTileManager } from "./tile-manager.js";
 import { updateTileTitle, getTileLabel } from "./tile-renderer.js";
 import { initDock } from "./dock.js";
+import { formatTidyToast, repackTilesToGrid } from "./canvas-layout.js";
 import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 import { centerCanvasCoords } from "./canvas-place.js";
 
@@ -245,8 +246,21 @@ async function init() {
 	panelManager.initPrefs(prefNavWidth, prefSidebarMode);
 
 	let agentWebview = null;
+	let canvasToastTimer = null;
+	function showCanvasToast(message) {
+		const toast = document.getElementById("canvas-toast");
+		if (!toast) return;
+		window.clearTimeout(canvasToastTimer);
+		toast.textContent = message;
+		toast.classList.add("visible");
+		canvasToastTimer = window.setTimeout(() => {
+			toast.classList.remove("visible");
+		}, 2400);
+	}
 
-	initDock(panelAgent);
+	initDock(panelAgent, {
+		onTidy: () => tidyTilesToGrid(),
+	});
 
 	const agentPanel = createPanel("agent", {
 		panel: panelAgent,
@@ -505,6 +519,24 @@ async function init() {
 		viewport,
 	});
 	minimapRef = minimap;
+
+	function tidyTilesToGrid() {
+		const projected = tiles.map((tile) => ({ ...tile }));
+		const tidyMargin = 40;
+		const zoom = Math.max(viewportState.zoom, 0.01);
+		const result = repackTilesToGrid(projected, {
+			viewportWidth: panelViewer.clientWidth,
+			zoom,
+			screenSpace: true,
+			originX: (tidyMargin - viewportState.panX) / zoom,
+			originY: (tidyMargin - viewportState.panY) / zoom,
+		});
+		tileManager.applyTileLayout(projected);
+		edgeIndicators.update();
+		minimap.update();
+		showCanvasToast(formatTidyToast(result));
+		return result;
+	}
 
 	// -- Canvas RPC --
 
