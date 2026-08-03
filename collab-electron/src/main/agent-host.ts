@@ -57,6 +57,11 @@ import {
 } from "./definition-runtime";
 import { allowsPtyRoleDelivery } from "./runtime-adapter";
 import { completeRuntimeKernelAdmission } from "./runtime-kernel-admission";
+import {
+  classifyWslNativeTuiPrerequisites,
+  getDefaultWslDistro,
+} from "./terminal-target";
+import { resolveCollaborationResourcePath } from "./package-resource-paths";
 
 /** Credential-free QA-only adapter used by the AgentOS identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
@@ -154,24 +159,108 @@ export function getDefinitionRuntime(definitionId: string): DefinitionRuntime {
   return resolveDefinitionRuntime(definitionId, appRoot(), getDefinition);
 }
 
+export type DockDefinitionAvailability = {
+  available: boolean;
+  message: string;
+};
+
+/**
+ * Project adapter readiness beside a Kernel definition without changing the
+ * definition row. This never reads auth material; Hermes reports sign-in
+ * state only after its normal launch.
+ */
+export function getDockDefinitionAvailability(
+  definition: Record<string, unknown>,
+): DockDefinitionAvailability | null {
+  const packageRef = String(definition.package_ref ?? "");
+  if (!packageRef.startsWith("species/hermes/")) return null;
+  if (String(definition.id ?? "") === "hermes-unavailable") {
+    return {
+      available: false,
+      message:
+        "Hermes unavailable: the packaged Hermes adapter manifest is missing. " +
+        "Reinstall QuantFlow or run the development app.",
+    };
+  }
+
+  const collaborationBridge = resolveCollaborationResourcePath(
+    "qf-collaboration-mcp.mjs",
+    { resourcesPath: process.resourcesPath, moduleDir: __dirname },
+  );
+  const hermesLaunchWrapper = resolveCollaborationResourcePath(
+    "qf-hermes-launch.sh",
+    { resourcesPath: process.resourcesPath, moduleDir: __dirname },
+  );
+  if (!collaborationBridge || !hermesLaunchWrapper) {
+    return {
+      available: false,
+      message:
+        "Hermes unavailable: QuantFlow collaboration resources are missing. " +
+        "Reinstall QuantFlow or run the development app.",
+    };
+  }
+
+  if (process.platform !== "win32") {
+    return {
+      available: false,
+      message: "Hermes unavailable: native Windows with WSL2 is required for this seat.",
+    };
+  }
+
+  try {
+    const runtime = resolveDefinitionRuntime(
+      String(definition.id ?? ""),
+      appRoot(),
+      getDefinition,
+    );
+    const diagnostic = classifyWslNativeTuiPrerequisites({
+      platform: process.platform,
+      homeDir: homedir(),
+      terminalTarget: runtime.metadata.terminalTarget ?? "wsl:auto",
+      cwdHostPath: homedir(),
+      getDefaultWslDistro,
+      resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
+    });
+    if (diagnostic) return { available: false, message: diagnostic.message };
+  } catch (error) {
+    return {
+      available: false,
+      message: `Hermes unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+
+  return {
+    available: true,
+    message:
+      "Hermes authentication is checked at launch; if sign-in is required, authenticate in Ubuntu and retry.",
+  };
+}
+
 /** Initialize missing package-owned Dock definitions through execute() only. */
 export function bootstrapPackagedDockProfiles(): void {
   const qaMode = process.env.QF_DOCK_QA_MODE === "1";
-  const result = bootstrapDockProfiles(appRoot(), {
-    getAgentDefinition: getDefinition,
-    executeRegisterAgentDefinition: (input) =>
-      kernelExecute("register_agent_definition", input, newTrace()),
-    reportConflict: (conflict) => {
-      console.error(
-        `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
-      );
-    },
-  }, { qaMode });
-  console.log(
-    `agent-host: Dock bootstrap registered=${result.registered.length}`
-    + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`
-    + ` qaMode=${qaMode}`,
-  );
+  try {
+    const result = bootstrapDockProfiles(appRoot(), {
+      getAgentDefinition: getDefinition,
+      executeRegisterAgentDefinition: (input) =>
+        kernelExecute("register_agent_definition", input, newTrace()),
+      reportConflict: (conflict) => {
+        console.error(
+          `agent-host: Dock bootstrap conflict definition=${conflict.definitionId}`,
+        );
+      },
+    }, { qaMode });
+    console.log(
+      `agent-host: Dock bootstrap registered=${result.registered.length}`
+      + ` skipped=${result.skipped.length} conflicts=${result.conflicts.length}`
+      + ` qaMode=${qaMode}`,
+    );
+  } catch (error) {
+    console.error(
+      "agent-host: Hermes Dock adapter unavailable; base shell remains available",
+      error,
+    );
+  }
 }
 
 export function onSessionChunk(listener: ChunkListener): () => void {

@@ -78,6 +78,7 @@ export function initDock(panelEl, options = {}) {
 					const definitionId = String(row.id ?? "");
 					const name = String(row.name ?? definitionId);
 					const role = String(row.role ?? "");
+					const availability = row.availability;
 					const card = el("div", "dock-species-row");
 					const meta = el("div", "dock-species-meta");
 					meta.appendChild(el(
@@ -86,8 +87,20 @@ export function initDock(panelEl, options = {}) {
 						name,
 					));
 					if (role) meta.appendChild(el("div", "qf-label", role));
+					if (availability?.message) {
+						meta.appendChild(el(
+							"div",
+							availability.available === false ? "qf-label dock-species-unavailable" : "qf-label",
+							availability.message,
+						));
+					}
 					const spawnBtn = el("button", "qf-btn qf-btn-primary", "Spawn");
 					spawnBtn.type = "button";
+					if (availability?.available === false) {
+						spawnBtn.disabled = true;
+						spawnBtn.textContent = "Unavailable";
+						spawnBtn.title = availability.message;
+					}
 					spawnBtn.addEventListener("click", async () => {
 						card.classList.remove("dock-spawn-failed");
 						spawnBtn.disabled = true;

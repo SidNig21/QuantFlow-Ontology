@@ -1,0 +1,112 @@
+import { createHash } from "node:crypto";
+import {
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readlinkSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { describe, expect, test } from "bun:test";
+
+const wrapper = readFileSync(resolve(import.meta.dir, "qf-hermes-launch.sh"), "utf8");
+
+function wslPath(path: string): string {
+  return path.replace(/^([A-Za-z]):[\\/]/, (_, drive: string) => `/mnt/${drive.toLowerCase()}/`).replaceAll("\\", "/");
+}
+
+describe("Hermes packaged launch wrapper", () => {
+  test("requires and uses an isolated profile root", () => {
+    expect(wrapper).toContain("QF_HERMES_PROFILE_ROOT");
+    expect(wrapper).toContain('profile_home="$profile_root/profiles/quantflow-runtime-$seat_id"');
+    expect(wrapper).toContain('"$HOME/.hermes/config.yaml"');
+    expect(wrapper).toContain('ln -s "$auth_source" "$auth_link"');
+    expect(wrapper).toContain('auth_source="$HOME/.hermes/auth.json"');
+  });
+
+  test("reports missing Hermes prerequisites without writing a profile", () => {
+    expect(wrapper).toContain("QuantFlow Hermes unavailable: install Hermes");
+    expect(wrapper).toContain("an isolated Hermes profile root is not configured");
+    expect(wrapper).toContain("isolated auth.json path is not a symlink");
+    expect(wrapper).not.toContain('cp "$HOME/.hermes/auth.json"');
+  });
+
+  test("keeps founder config/auth untouched while using isolated profile shape", () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-hermes-launch-"));
+    try {
+      const founderHome = join(root, "founder-home");
+      const hermesHome = join(founderHome, ".hermes");
+      const isolatedRoot = join(root, "isolated-hermes");
+      mkdirSync(hermesHome, { recursive: true });
+      const founderConfig = join(hermesHome, "config.yaml");
+      const founderAuth = join(hermesHome, "auth.json");
+      writeFileSync(founderConfig, "model:\n  name: test-only\n");
+      writeFileSync(founderAuth, "opaque-test-auth\n");
+      const configHash = createHash("sha256")
+        .update(readFileSync(founderConfig))
+        .digest("hex");
+      const authBefore = statSync(founderAuth);
+      const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
+      const hermesArgs = process.platform === "win32"
+        ? [
+            "-d", "Ubuntu", "--", "env",
+            `HOME=${wslPath(founderHome)}`,
+            "QF_AGENT_SESSION_ID=seat/test",
+            `QF_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
+            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "sh", "-c", "exit 0",
+          ]
+        : [wrapperPath, "/tmp/qf-bridge.mjs", "sh", "-c", "exit 0"];
+      const result = spawnSync(
+        process.platform === "win32" ? "wsl.exe" : "bash",
+        hermesArgs,
+        process.platform === "win32"
+          ? { encoding: "utf8" }
+          : {
+              cwd: resolve(import.meta.dir, ".."),
+              env: {
+                ...process.env,
+                HOME: founderHome,
+                QF_AGENT_SESSION_ID: "seat/test",
+                QF_HERMES_PROFILE_ROOT: isolatedRoot,
+              },
+              encoding: "utf8",
+            },
+      );
+      expect(result.status).toBe(0);
+      const profileHome = join(isolatedRoot, "profiles", "quantflow-runtime-seat_test");
+      if (process.platform === "win32") {
+        const linkPath = wslPath(join(isolatedRoot, "auth.json"));
+        const linkCheck = spawnSync("wsl.exe", ["-d", "Ubuntu", "--", "test", "-L", linkPath]);
+        expect(linkCheck.status).toBe(0);
+        const linkTarget = spawnSync("wsl.exe", ["-d", "Ubuntu", "--", "readlink", linkPath], { encoding: "utf8" });
+        expect(linkTarget.status).toBe(0);
+        expect(linkTarget.stdout.trim()).toContain("founder-home/.hermes/auth.json");
+      } else {
+        expect(lstatSync(join(isolatedRoot, "auth.json")).isSymbolicLink()).toBe(true);
+        expect(readlinkSync(join(isolatedRoot, "auth.json"))).toContain("founder-home/.hermes/auth.json");
+      }
+      expect(createHash("sha256").update(readFileSync(founderConfig)).digest("hex")).toBe(configHash);
+      const authAfter = statSync(founderAuth);
+      expect(authAfter.size).toBe(authBefore.size);
+      expect(authAfter.mtimeMs).toBe(authBefore.mtimeMs);
+      if (process.platform === "win32") {
+        const profileCheck = spawnSync(
+          "wsl.exe",
+          ["-d", "Ubuntu", "--", "test", "-f", `${wslPath(join(profileHome, "config.yaml"))}`],
+        );
+        expect(profileCheck.status).toBe(0);
+      } else {
+        expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-collaboration");
+      }
+      expect(() => lstatSync(join(founderHome, ".hermes", "profiles"))).toThrow();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});

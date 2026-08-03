@@ -67,6 +67,14 @@
         "to": "collab-cli.mjs"
       },
       {
+        "from": "cli/qf-collaboration-mcp.mjs",
+        "to": "qf-collaboration-mcp.mjs"
+      },
+      {
+        "from": "cli/qf-hermes-launch.sh",
+        "to": "qf-hermes-launch.sh"
+      },
+      {
         "from": "packages/collab-canvas-skill",
         "to": "collab-canvas-skill"
       }

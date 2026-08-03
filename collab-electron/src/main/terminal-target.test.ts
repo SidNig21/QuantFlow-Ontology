@@ -1,5 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { resolveTerminalTarget, resolveWslNativeTuiLaunch } from "./terminal-target";
+import {
+  classifyWslNativeTuiPrerequisites,
+  resolveTerminalTarget,
+  resolveWslNativeTuiLaunch,
+} from "./terminal-target";
 
 describe("WSL terminal targets", () => {
   test("resolves an injected default distro without consulting the host Hermes path", () => {
@@ -39,5 +43,34 @@ describe("WSL terminal targets", () => {
       getDefaultWslDistro: () => null,
       resolvePowerShellCommand: () => "powershell.exe",
     })).toThrow("WSL terminal target requires an installed distro");
+  });
+
+  test("classifies missing WSL distro without probing Hermes or credentials", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:auto",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => null,
+      resolveWslCommand: () => "wsl.exe",
+    })).toEqual({
+      code: "distro-unavailable",
+      message:
+        "Hermes unavailable: no WSL2/Ubuntu distro is installed or available. " +
+        "Install Ubuntu in WSL2, make it the default distro, and retry.",
+    });
+  });
+
+  test("classifies missing wsl.exe separately from a missing distro", () => {
+    expect(classifyWslNativeTuiPrerequisites({
+      platform: "win32",
+      homeDir: "C:\\Users\\tester",
+      terminalTarget: "wsl:Ubuntu",
+      cwdHostPath: "C:\\Users\\tester",
+      getDefaultWslDistro: () => "Ubuntu",
+      resolveWslCommand: () => {
+        throw new Error('host-acp: no executable found among ["wsl.exe"]');
+      },
+    })?.code).toBe("wsl-unavailable");
   });
 });

@@ -28,6 +28,11 @@ export type WslNativeTuiLaunch = {
   cwdGuestPath?: string;
 };
 
+export type WslPrerequisiteDiagnostic = {
+  code: "windows-required" | "wsl-unavailable" | "distro-unavailable";
+  message: string;
+};
+
 /** Resolve a package-owned guest command through the existing Windows WSL PTY target. */
 export function resolveWslNativeTuiLaunch(options: {
   terminalTarget: TerminalTarget;
@@ -93,6 +98,54 @@ export type TerminalTargetResolutionDependencies = {
   getDefaultWslDistro?: () => string | null;
   resolvePowerShellCommand?: () => string;
 };
+
+/**
+ * Read-only pre-spawn classification for the Hermes WSL adapter. It checks
+ * only Windows/WSL/distro availability; Hermes authentication is deliberately
+ * left to the adapter launch so credentials are never inspected by QuantFlow.
+ */
+export function classifyWslNativeTuiPrerequisites(options: {
+  platform?: NodeJS.Platform;
+  homeDir: string;
+  terminalTarget: TerminalTarget;
+  cwdHostPath: string;
+  getDefaultWslDistro?: () => string | null;
+  resolveWslCommand?: (command: string) => string;
+}): WslPrerequisiteDiagnostic | null {
+  const platform = options.platform ?? process.platform;
+  if (platform !== "win32") {
+    return {
+      code: "windows-required",
+      message: "Hermes unavailable: native Windows with WSL2 is required for this seat.",
+    };
+  }
+  try {
+    const target = resolveTerminalTarget(options.terminalTarget, options.cwdHostPath, {
+      platform,
+      homeDir: options.homeDir,
+      getDefaultWslDistro: options.getDefaultWslDistro,
+    });
+    if (!target.target.startsWith("wsl:")) return null;
+    options.resolveWslCommand?.(target.command);
+    return null;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("installed distro")) {
+      return {
+        code: "distro-unavailable",
+        message:
+          "Hermes unavailable: no WSL2/Ubuntu distro is installed or available. " +
+          "Install Ubuntu in WSL2, make it the default distro, and retry.",
+      };
+    }
+    return {
+      code: "wsl-unavailable",
+      message:
+        "Hermes unavailable: WSL2 is not available on this Windows install. " +
+        "Enable WSL2 and install Ubuntu, then retry.",
+    };
+  }
+}
 
 function commandExists(command: string): boolean {
   try {
