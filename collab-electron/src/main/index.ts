@@ -14,6 +14,7 @@ import {
   type WebContents,
 } from "electron";
 import { execFileSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { fromCollabFileUrl } from "@collab/shared/collab-file-url";
@@ -57,7 +58,11 @@ import * as gitReplay from "./git-replay";
 import { DISABLE_GIT_REPLAY } from "@collab/shared/replay-types";
 import * as pty from "./pty";
 import { updateManager, setupUpdateIPC } from "./updater";
-import { DEV_WORKTREE_ID, QF_APP_DIR } from "./paths";
+import {
+  DEV_WORKTREE_ID,
+  QF_APP_DIR,
+  QF_APP_PATHS_EXPLICIT,
+} from "./paths";
 import {
   legacyElectronUserDataPath,
   runAppMigrationBeforeBoot,
@@ -131,14 +136,18 @@ function requireLivePeerSession(role: unknown): { sessionId: string; role: strin
 
 // Capture Electron's legacy default before replacing it. The migration must
 // publish app state before logger/config/sidecar consumers create destinations.
-runAppMigrationBeforeBoot({
-  legacyElectronUserData: legacyElectronUserDataPath({
-    appData: app.getPath("appData"),
-    devWorktreeId: DEV_WORKTREE_ID,
-  }),
-  log: (message) => console.warn(message),
-});
-app.setPath("userData", join(QF_APP_DIR, "electron"));
+if (!QF_APP_PATHS_EXPLICIT) {
+  runAppMigrationBeforeBoot({
+    legacyElectronUserData: legacyElectronUserDataPath({
+      appData: app.getPath("appData"),
+      devWorktreeId: DEV_WORKTREE_ID,
+    }),
+    log: (message) => console.warn(message),
+  });
+}
+const electronUserData = join(QF_APP_DIR, "electron");
+mkdirSync(electronUserData, { recursive: true });
+app.setPath("userData", electronUserData);
 initializeLogger();
 
 // macOS apps launched from Finder don't inherit the user's shell
