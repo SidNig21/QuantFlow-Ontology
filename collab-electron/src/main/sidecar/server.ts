@@ -24,6 +24,16 @@ import {
   type PidFileData,
 } from "./protocol";
 
+export const WINDOWS_WSL_LAUNCH_ENV_KEYS = [
+  "QF_AGENT_SESSION_ID",
+  "QF_PEER_ROLE",
+  "QF_PEER_BUS_DB",
+  "QF_APP_RPC_ENDPOINT",
+  "QF_KERNEL_DB",
+  "QF_ARTIFACT_ROOT",
+  "QF_QUANTFLOW_HERMES_PROFILE_ROOT",
+] as const;
+
 interface ServerOptions {
   controlSocketPath: string;
   sessionSocketDir: string;
@@ -124,14 +134,9 @@ export class SidecarServer {
     // wsl.exe only imports explicitly named Windows variables. Keep this
     // allowlist narrow: these values belong to the one QuantFlow launch and
     // let the guest wrapper reach the app-owned collaboration bridge.
-    const quantFlowKeys = [
-      "QF_AGENT_SESSION_ID",
-      "QF_PEER_ROLE",
-      "QF_PEER_BUS_DB",
-      "QF_APP_RPC_ENDPOINT",
-      "QF_KERNEL_DB",
-      "QF_ARTIFACT_ROOT",
-    ].filter((key) => env[key] != null);
+    const quantFlowKeys = WINDOWS_WSL_LAUNCH_ENV_KEYS.filter(
+      (key) => env[key] != null,
+    );
     const inherited = (env.WSLENV ?? "").split(":").filter(Boolean);
     const inheritedNames = new Set(
       inherited.map((entry) => entry.split("/")[0]),
