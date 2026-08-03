@@ -110,6 +110,11 @@ type WslGuestCommandProbe = (
   guestCommand: string,
 ) => void;
 
+// A stopped WSL2 distro can take longer than five seconds to cold-start even
+// when the requested CLI is installed. Keep this bounded, but leave enough
+// room for the first Dock readiness probe to report the real state.
+export const WSL_GUEST_PROBE_TIMEOUT_MS = 15_000;
+
 function probeWslGuestCommand(
   target: ResolvedTerminalTarget,
   guestCommand: string,
@@ -127,7 +132,7 @@ function probeWslGuestCommand(
     {
       encoding: "utf8",
       stdio: "ignore",
-      timeout: 5000,
+      timeout: WSL_GUEST_PROBE_TIMEOUT_MS,
       windowsHide: true,
     },
   );

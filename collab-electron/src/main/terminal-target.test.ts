@@ -3,7 +3,12 @@ import {
   classifyWslNativeTuiPrerequisites,
   resolveTerminalTarget,
   resolveWslNativeTuiLaunch,
+  WSL_GUEST_PROBE_TIMEOUT_MS,
 } from "./terminal-target";
+
+test("WSL guest probe allows a bounded cold-start window", () => {
+  expect(WSL_GUEST_PROBE_TIMEOUT_MS).toBe(15_000);
+});
 
 describe("WSL terminal targets", () => {
   test("resolves an injected default distro without consulting the host Hermes path", () => {
