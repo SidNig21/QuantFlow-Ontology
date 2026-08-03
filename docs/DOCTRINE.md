@@ -286,16 +286,14 @@ RL is **in scope** as the doctrine's continuation, not a rival direction. Standi
 
 Phase numbering unchanged (P1–P6; P7 = RL per A3). The forward WO ladder implementing these phases lives in `docs/ROADMAP.md` and is the build authority; this document stays the *why*.
 
-### A5 · Report is not a type — and the write path does not exist yet (2026-07-25)
+### A5 · Report is an Artifact; founder experience ratified (2026-08-03)
 
-> **RATIFICATION STATUS, 2026-07-25.** Ruling 2 (no confidence floor) is **founder-ratified**.
-> Ruling 1 (report is `artifact.kind`, not an object type) is **held open at the founder's
-> request** — not rejected. The founder's stated reservation is not about storage shape but
-> about the artifact system as a whole and how it serves *"the collaboration and culmination of
-> agent ideas and data."* Nothing is blocked: no `Report` type exists or is being built, and the
-> rung that depends on the ruling is several out. **Do not treat ruling 1 as settled, and do not
-> re-argue it — it resolves when the founder can picture the system it belongs to.** The
-> write-path findings recorded below are measurements, not rulings, and stand regardless.
+> **RATIFICATION STATUS, 2026-08-03.** Both rulings are **founder-ratified**. A Report is
+> `artifact.kind: "report"`, not an object type, and there is no confidence floor in the Kernel.
+> The founder-visible experience is now fixed: completed Reports persist in a Research Ledger in
+> the Navigator and open in the existing Viewer. Active report generation is a working Run or
+> agent tile; a completed Report is not a canvas tile. The canvas retains only its completion
+> receipt and Kernel lineage.
 
 Two corrections, both forced by measurement rather than argument. Part IV above has been patched in place to match; this amendment records *why*, so the reasoning survives the next reader who wonders whether the charter table was simply wrong.
 
@@ -321,7 +319,10 @@ Recorded verbatim in substance because it was stated directly by the founder. Un
 
 **1 · Tiles are for active things only.** A tile is a CLI agent, a script, an RL training run — something *doing* work. **Tiles are not document viewers.** This makes the canvas a *process* workspace, not a document workspace, and it contradicts the shipped `collab-electron/src/windows/artifact-tile/` (built for WO-006b's Law D demo, before this rule existed). That tile is now legacy pending a decision, not a pattern to copy.
 
-**Open question this creates, deliberately unanswered:** if reports do not live on tiles, **where does the founder read them?** No document specifies this. Do not invent an answer; it needs the founder.
+**Founder ruling, 2026-08-03:** completed Reports live in a persistent Research Ledger collection
+in the Navigator and open in the existing Viewer. Active report generation remains visible as a
+working Run or agent tile. Completed Reports are not canvas tiles; the canvas keeps a completion
+receipt and lineage projection only.
 
 **2 · The two primary use cases are one loop, reversed.**
 - **Backward — post-mortem:** the founder supplies a real, already-settled betting slip; the loop analyses why it cashed or bricked.
