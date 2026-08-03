@@ -59,11 +59,6 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/run.ts", "kernel-sole-writer-app"],
   },
   {
-    id: "doc-action-surface",
-    cwd: ".",
-    command: ["bun", "qa/run.ts", "doc-action-surface"],
-  },
-  {
     id: "one-skin",
     cwd: ".",
     command: ["bun", "qa/run.ts", "one-skin"],

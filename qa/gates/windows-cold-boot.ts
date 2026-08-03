@@ -167,6 +167,17 @@ export function snapshotTree(root: string): TreeSnapshot {
     // The concrete case: a WSL symlink (IO_REPARSE_TAG_LX_SYMLINK) created by a
     // seat launcher makes lstat throw EACCES here, which crashed the gate
     // outright — no verdict, and every later release stage skipped.
+    // Stated limit: an unreadable entry yields a CONSTANT row, so one mutation
+    // is invisible here -- the entry stays unreadable but its contents change.
+    // Measured 2026-08-03 on the LX symlink: lstat EACCES, readlink EINVAL,
+    // open EACCES. Windows can learn nothing about it without a reparse-point
+    // ioctl, so the row cannot carry a target digest.
+    // Still detected, because the row text changes: deletion (row vanishes),
+    // replacement by a real file or a Windows symlink (lstat then succeeds),
+    // and any new entry appearing. Undetected: an LX symlink retargeted while
+    // remaining an LX symlink -- which the actor under test cannot do, since a
+    // Windows process cannot write an LX reparse tag. Narrow, but not zero:
+    // do not read a green digest as proof that unreadable entries are pristine.
     let stats;
     try {
       stats = lstatSync(path);

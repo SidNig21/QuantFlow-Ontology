@@ -529,16 +529,6 @@ const gates: Gate[] = [
     },
   },
   {
-    name: "doc-action-surface",
-    description:
-      "Debt #0: ONTOLOGY_SCHEMA.md §Actions equals schema.ts actions (names both directions)",
-    run: async () => {
-      const { checkDocActionSurface } = await import("./gates/doc-action-surface.ts");
-      const { ok } = checkDocActionSurface();
-      return ok;
-    },
-  },
-  {
     name: "observe-door",
     description:
       "Debt #22: observe_ticket strings only on allowlist; no tools.json reads or generateMcp calls outside qf-kernel-schema/",

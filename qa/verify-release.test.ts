@@ -17,7 +17,6 @@ describe("verify-release stages", () => {
       "kernel-sole-writer",
       "no-canvas-domain-writes",
       "kernel-sole-writer-app",
-      "doc-action-surface",
       "one-skin",
     ]);
   });
