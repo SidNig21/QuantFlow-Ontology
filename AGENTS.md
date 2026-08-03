@@ -29,6 +29,24 @@ makes something remember state outside the Kernel is rejected on sight. There is
 write path — `execute()` in `packages/qf-kernel/src/execute.ts`. If your change writes SQL
 anywhere else, it is wrong no matter how well it works.
 
+## Delivery standard: tangible progress, anti-ceremony, honest credit
+
+This binds every main agent, sub-agent, verifier, and automated swarm working in this repository.
+
+- **Ship runnable capability.** Optimize for the shortest correct path to software an operator or
+  downstream agent can actually exercise. Process serves delivery; it never becomes the product.
+- **No process for its own sake.** A certificate, ledger, dashboard, meta-report, or governance file
+  counts only when it is a hard gate or required release evidence for a named feature. Otherwise do
+  not create it.
+- **Feature work dominates.** At least 95% of open work must deliver or directly repair runnable
+  behavior. Any process-only item must name the feature and gate it unblocks.
+- **Proof must be real.** Never present a fixture, mock, scripted movie, weakened assertion, or
+  hard-coded success path as live capability. A false close is reopened and recorded as an incident.
+- **Refusal is not delivery.** A correct refusal earns credit only for the refusal path; it does not
+  close the feature. Keep the capability open and name the smallest follow-up that implements it.
+- **Acceptance criteria carry these rules.** Every order must say what a user or consuming agent can
+  run when it is done, and every builder prompt inherits this section without restatement.
+
 ## The five you are most likely to break
 
 1. **No work without an order.** If you find a bug outside your order, log it — don't fix it.
