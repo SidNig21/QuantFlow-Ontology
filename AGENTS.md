@@ -17,8 +17,12 @@ backtests, criticizes, evaluates, and reports; the operator acts in the world.
 4. **`docs/orders/PROTOCOL.md`** — rules of engagement, roles, evidence standards.
 
 Background, only as needed: `docs/DOCTRINE.md` (plan of record, the *why*),
-`docs/ROADMAP.md` (build authority, the ladder and the debt register),
-`docs/orders/SCOPES.md` (what every rung ahead of you is contracted to do).
+`docs/LAWS.md` (canvas-seam laws, same weight as the One Rule), `docs/DEBT.md`
+(known debt — binding, blocks nothing).
+
+**`NEXT.md` is the build authority** (DOCTRINE A9). There is no ladder file to consult and no
+roadmap to select from. The old ones are in `docs/history/` and are not authority — if one names a
+rung, that is history, not permission. If `NEXT.md` closes the door, stop and say so.
 
 ## The one rule
 
@@ -101,7 +105,7 @@ Schema work specifically:
 
 ```bash
 cd qf-kernel-schema
-bun test                           # 140 tests as of 2026-07-25
+bun test                           # the suite reports its own count; do not cache it here
 bun run generate                   # regenerates golden/ — see below
 ```
 

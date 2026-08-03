@@ -5,6 +5,10 @@
 docs/*
 !docs/adr/
 !docs/adr/**
+!docs/history/
+!docs/history/**
+!docs/LAWS.md
+!docs/DEBT.md
 !docs/orders/
 !docs/orders/**
 !docs/demos/

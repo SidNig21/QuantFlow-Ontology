@@ -51,7 +51,7 @@ Nothing else. The read is deliberately narrow so it stays cheap enough to actual
 
 **Reviews are testimony, not verdicts.** A review is a claim like any other and gets verified before it is acted on — the same standard applied to a builder's report. This is not ceremony: the review that produced this role was itself partly wrong (it proposed binding a real session ID into `ToolLoopAgent`, which has no session concept — the `sessionId` it found belongs to React hooks). Two blockers were confirmed by measurement; one proposed remedy was not achievable. **Precedence, always: measurements beat prose — the reviewer's, the builder's, the verifier's, and the architect's alike.**
 
-**Entry points.** Builders start at [`NEXT.md`](NEXT.md); verifiers start at [`VERIFYING.md`](VERIFYING.md). Both are cold starts — no chat history required, by design.
+**Entry points.** Builders and verifiers both start at [`NEXT.md`](NEXT.md) — it is the build authority (DOCTRINE A9) and it names the one active rung plus its acceptance. Cold start, no chat history required, by design. The separate `VERIFYING.md` door was archived on 2026-08-03: it was a second reading-order doc that drifted from this one, which is the exact rot the paragraph below describes.
 
 ## The loop
 
@@ -93,7 +93,7 @@ The reason is that builders share the founder's single working tree. WO-005 and 
 So the split is now fixed:
 
 - **Builder** runs package-level gates only (`bun install && bun test`, `bunx tsc --noEmit`) plus the gate-falsification proof, then reports. A builder that cannot run the cold gate says so; that is compliance, not a gap.
-- **Verifier** runs `bun qa/run.ts --all` in a fresh worktree. Use `git worktree add --detach <path> origin/wo-NNN` so the builder's branch can stay checked out in the founder's tree. **A fresh worktree has no `node_modules` by construction — there is nothing to delete, and the `rm` was always a no-op there anyway.**
+- **Verifier** runs `bun qa/verify-release.ts` in a fresh worktree — that is the canonical door, the one CI runs. (`bun qa/run.ts --all` is the gate-level runner; use `--list` to inspect what exists.) Use `git worktree add --detach <path> origin/wo-NNN` so the builder's branch can stay checked out in the founder's tree. **A fresh worktree has no `node_modules` by construction — there is nothing to delete, and the `rm` was always a no-op there anyway.**
 
 The general lesson, and the reason this is a rule rather than a fix: an instruction that is safe in the environment the author imagined can be destructive in the environment the builder occupies. Orders state *what* must be true, not *where* someone must stand to check it.
 
@@ -112,7 +112,7 @@ depends: WO-MMM
 ## Contract — constraints that may not be violated (types, naming, laws).
 ## Acceptance gates — exact runnable commands + expected results.
 ##   Builder-run: package-level only (install, test, typecheck) + the gate-falsification proof.
-##   Verifier-run: the cold `bun qa/run.ts --all`. Never ask a builder to delete node_modules.
+##   Verifier-run: the cold `bun qa/verify-release.ts`. Never ask a builder to delete node_modules.
 ## Out of scope — explicit, to stop helpful drift.
 ## Report back — the exact format the builder must return.
 ```
