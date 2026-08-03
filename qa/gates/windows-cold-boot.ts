@@ -161,7 +161,20 @@ export function snapshotTree(root: string): TreeSnapshot {
   }
   const rows: string[] = [];
   function visit(path: string, relativePath: string): void {
-    const stats = lstatSync(path);
+    // An entry Windows cannot stat must still be *recorded*, not skipped, or a
+    // file appearing or vanishing under an unreadable name would leave the
+    // digest unchanged and the assertion would silently stop detecting change.
+    // The concrete case: a WSL symlink (IO_REPARSE_TAG_LX_SYMLINK) created by a
+    // seat launcher makes lstat throw EACCES here, which crashed the gate
+    // outright — no verdict, and every later release stage skipped.
+    let stats;
+    try {
+      stats = lstatSync(path);
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code ?? "UNKNOWN";
+      rows.push(`${relativePath}|unreadable:${code}|0|0`);
+      return;
+    }
     const kind = stats.isDirectory()
       ? "dir"
       : stats.isSymbolicLink()
@@ -173,7 +186,15 @@ export function snapshotTree(root: string): TreeSnapshot {
       `${relativePath}|${kind}|${stats.size}|${Math.trunc(stats.mtimeMs)}`,
     );
     if (!stats.isDirectory()) return;
-    for (const name of readdirSync(path).sort()) {
+    let names: string[];
+    try {
+      names = readdirSync(path).sort();
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code ?? "UNKNOWN";
+      rows.push(`${relativePath}|unlistable:${code}|0|0`);
+      return;
+    }
+    for (const name of names) {
       visit(join(path, name), join(relativePath, name));
     }
   }
