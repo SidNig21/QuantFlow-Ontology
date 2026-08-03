@@ -93,7 +93,7 @@ The reason is that builders share the founder's single working tree. WO-005 and 
 So the split is now fixed:
 
 - **Builder** runs package-level gates only (`bun install && bun test`, `bunx tsc --noEmit`) plus the gate-falsification proof, then reports. A builder that cannot run the cold gate says so; that is compliance, not a gap.
-- **Verifier** runs `bun qa/run.ts --all` in a fresh worktree. Use `git worktree add --detach <path> origin/wo-NNN` so the builder's branch can stay checked out in the founder's tree. **A fresh worktree has no `node_modules` by construction — there is nothing to delete, and the `rm` was always a no-op there anyway.**
+- **Verifier** runs `bun qa/verify-release.ts` in a fresh worktree — that is the canonical door, the one CI runs. (`bun qa/run.ts --all` is the gate-level runner; use `--list` to inspect what exists.) Use `git worktree add --detach <path> origin/wo-NNN` so the builder's branch can stay checked out in the founder's tree. **A fresh worktree has no `node_modules` by construction — there is nothing to delete, and the `rm` was always a no-op there anyway.**
 
 The general lesson, and the reason this is a rule rather than a fix: an instruction that is safe in the environment the author imagined can be destructive in the environment the builder occupies. Orders state *what* must be true, not *where* someone must stand to check it.
 
@@ -112,7 +112,7 @@ depends: WO-MMM
 ## Contract — constraints that may not be violated (types, naming, laws).
 ## Acceptance gates — exact runnable commands + expected results.
 ##   Builder-run: package-level only (install, test, typecheck) + the gate-falsification proof.
-##   Verifier-run: the cold `bun qa/run.ts --all`. Never ask a builder to delete node_modules.
+##   Verifier-run: the cold `bun qa/verify-release.ts`. Never ask a builder to delete node_modules.
 ## Out of scope — explicit, to stop helpful drift.
 ## Report back — the exact format the builder must return.
 ```
