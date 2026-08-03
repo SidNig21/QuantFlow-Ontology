@@ -1460,7 +1460,7 @@ body.platform-win {
 	border: 1px solid color-mix(in srgb, var(--qf-accent) 52%, var(--qf-line));
 	border-radius: 10px;
 	background: var(--qf-surface);
-	box-shadow: 0 12px 32px rgb(0 0 0 / 28%);
+	box-shadow: 0 12px 32px color-mix(in srgb, var(--qf-ink) 28%, transparent);
 	backdrop-filter: blur(10px);
 	color: var(--qf-text);
 }
