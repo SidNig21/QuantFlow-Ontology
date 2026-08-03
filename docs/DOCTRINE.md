@@ -2,7 +2,7 @@
 tags: [quantflow, ontology, doctrine, roadmap, palantir]
 created: 2026-07-22
 author: Claude (architect/verifier seat)
-status: v1.4 — PLAN OF RECORD (graduated into the repo 2026-07-24, `3b20c0d`). A1–A4 founder-ratified; A5 split (ruling 2 ratified, ruling 1 held open); A6–A7 founder-stated.
+status: PLAN OF RECORD (graduated into the repo 2026-07-24, `3b20c0d`). Ratification state is recorded on each amendment in the Amendments section below — this line does not restate it, because a cached range rots the moment an amendment lands.
 artifact: https://claude.ai/code/artifact/ec99620c-b327-4fae-be9e-3e9a97128542
 sources: [DevCon6 00-09, Cerebras KB, INSPIRE-USECASES, repo audit]
 ---
@@ -256,7 +256,11 @@ Pivoting marketing to "ontology" means backing it up. Never claim ahead of what 
 
 ---
 
-## Amendments — v1.4 (A1–A4 2026-07-24 founder-ratified · A5 **split** 2026-07-25 · A6–A7 2026-07-25 founder-stated)
+## Amendments
+
+Each amendment carries its own date and ratification state in its heading. Append new ones at the
+end; never renumber. Do not summarize this list anywhere — a summary is a cache with no mechanism
+to stay true, and this heading previously stopped at A7 while A8 sat forty lines below it.
 
 The v1 text above is preserved untouched. These amendments record decisions made after it, and win where they conflict.
 
@@ -415,6 +419,18 @@ mission. WO-WIN1 and WO-WIN2 verified the packaged Windows floor and one normal-
 primitive on 2026-08-02. No later feature order is implicitly reactivated by that proof; `NEXT.md`
 names the only authorized rung, or closes the builder door when none is authorized. See
 `docs/adr/0001-windows-first-product.md`.
+
+---
+
+### A9 · The active rung is the build authority (founder-stated 2026-08-03)
+
+A4 named `docs/ROADMAP.md` as the build authority. That ladder is superseded. Build authority now
+lives in `docs/orders/NEXT.md`, which names exactly one active rung at a time, or closes the builder
+door when none is authorized. `docs/ROADMAP.md` and `docs/orders/SCOPES.md` are archived to
+`docs/history/ladders/` as reasoning, not direction — six competing numbering systems collapse to
+none. The debt register moves to `docs/DEBT.md` and remains binding. The Canvas-seam laws move to
+`docs/LAWS.md` and keep the weight `START_HERE.md` gives them. No agent may select work that
+`NEXT.md` does not name, and no archived ladder reactivates by being read.
 
 ---
 
