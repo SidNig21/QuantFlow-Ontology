@@ -18,6 +18,8 @@ docs/*
 !docs/BLUEPRINT.md
 !docs/ONTOLOGY_SCHEMA.md
 !docs/ROADMAP.md
+!docs/readme-assets/
+!docs/readme-assets/**
 .collaborator
 .superpowers
 .claude/
