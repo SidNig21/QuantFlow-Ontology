@@ -264,6 +264,18 @@ to stay true, and this heading previously stopped at A7 while A8 sat forty lines
 
 The v1 text above is preserved untouched. These amendments record decisions made after it, and win where they conflict.
 
+> **Amendments are dated records, not standing instructions.** A later amendment supersedes an
+> earlier one silently — the earlier text is left intact so the reasoning survives, which means an
+> earlier amendment can still *read* like a live instruction after it has been overturned.
+>
+> **The case that matters today:** A4 (and passing mentions in A2, A3, and A6) name `docs/ROADMAP.md`
+> and `docs/orders/SCOPES.md` as the build ladder and build authority. **A9 overturned that.** Both
+> files are archived under `docs/history/`, the build authority is
+> [`docs/orders/NEXT.md`](orders/NEXT.md), and the route is
+> [`docs/orders/GOLDEN-RUN.md`](orders/GOLDEN-RUN.md), which carries the only rung status table.
+> Anything in this section naming a build authority is superseded by A9 — check A9 before acting on
+> it.
+
 ### A1 · Decision log (settled, do not re-litigate)
 
 - **Research and advisor only.** QuantFlow never places bets or executes trades — the operator acts in the world. `Position` remains in the charter as a *record* (`record_position`, the operator reporting their own fill — required for CLV against the close), never an execution. Duplicate-order risk is out of scope by construction.
