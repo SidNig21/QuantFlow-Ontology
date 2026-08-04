@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLACIER — QuantFlow Ontology full visual swap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLACIER — QuantFlow Ontology
+   Full-application visual swap. Shell chrome · file rail · canvas · dock · tiles.
+   Every colour is a token; every token is measured against the surface it sits on.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* surfaces — a five-step ramp, elevation by lightness */
+  --gl-void:#060a12;      /* app ground / canvas */
+  --gl-screen:#050a12;    /* PTY well */
+  --gl-panel:#0f1727;     /* tiles, cards */
+  --gl-panel-2:#152034;   /* rails, spines, chrome */
+  --gl-panel-3:#1d2b45;   /* hover, raised */
+  --gl-rule:#22314b;
+  --gl-rule-hi:#33466a;
+
+  /* text — measured */
+  --gl-text:#eaf1fb;      /* 15.4:1 on panel */
+  --gl-muted:#8fa3c0;     /*  6.97:1 · AA */
+  --gl-dim:#7288ab;       /*  4.52:1 on panel-2 · AA */
+  --gl-faint:#3b4b68;     /* rules + ticks ONLY, never text */
+
+  /* signal */
+  --gl-ice:#5cc8ff;       /* 9.52:1 · live · focus · connected */
+  --gl-ice-ink:#08111c;   /* text on ice · 10.08:1 */
+  --gl-idle:#6b7f9e;
+  --gl-warn:#f2c260;
+  --gl-alert:#ff8a75;
+  --gl-ok:#6fe3a8;
+
+  --gl-spine:44px;
+  --gl-r:2px;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --sans:"Geist",-apple-system,"Segoe UI",system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#03050a;color:var(--gl-text);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;overflow-x:clip}
+.page{padding:26px}
+.hdr{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.hdr h1{margin:0;font-size:19px;font-weight:600;letter-spacing:.16em}
+.hdr span{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--gl-dim);
+  text-transform:uppercase}
+.hdr-note{font-size:12px;color:var(--gl-muted);margin:0 0 22px;line-height:1.65;max-width:88ch}
+.hdr-note b{color:var(--gl-text);font-weight:500}
+
+/* ── app frame ─────────────────────────────────────────────────── */
+.app{border:1px solid var(--gl-rule);border-radius:5px;overflow:hidden;background:var(--gl-void);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.95)}
+.titlebar{height:32px;display:flex;align-items:center;gap:9px;padding:0 4px 0 11px;
+  background:var(--gl-panel-2);border-bottom:1px solid var(--gl-rule)}
+.titlebar .mark{width:13px;height:13px;flex:none;position:relative}
+.titlebar .mark::before{content:'';position:absolute;inset:0;border:1px solid var(--gl-ice);
+  transform:rotate(45deg);border-radius:1px}
+.titlebar b{font-size:11.5px;font-weight:500;letter-spacing:.01em}
+.menus{display:flex;gap:2px;margin-left:14px}
+.menus span{font-size:11.5px;color:var(--gl-muted);padding:3px 8px;border-radius:3px}
+.menus span:hover{background:var(--gl-panel-3);color:var(--gl-text)}
+.wctl{margin-left:auto;display:flex}
+.wctl i{width:38px;height:32px;display:grid;place-items:center;color:var(--gl-dim);
+  font-family:var(--mono);font-size:11px;font-style:normal}
+.wctl i:hover{background:var(--gl-panel-3);color:var(--gl-text)}
+.wctl i.q:hover{background:var(--gl-alert);color:var(--gl-ice-ink)}
+
+.shell{display:flex;height:742px}
+
+/* ═══ LEFT · FILE RAIL ═══════════════════════════════════════════
+   Deliberately conservative — re-themed, not re-thought. Same tabs,
+   same search, same tree, same counts. It just stops fighting the
+   rest of the app.                                                  */
+.files{width:252px;flex:none;display:flex;flex-direction:column;background:var(--gl-panel-2);
+  border-right:1px solid var(--gl-rule)}
+.files__top{display:flex;align-items:center;padding:8px 8px 0;justify-content:flex-end}
+.icobtn{width:24px;height:24px;display:grid;place-items:center;border-radius:3px;color:var(--gl-dim);
+  cursor:default}
+.icobtn:hover{background:var(--gl-panel-3);color:var(--gl-text)}
+.icobtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.tabs{display:flex;padding:0 10px;gap:2px;border-bottom:1px solid var(--gl-rule);margin-top:2px}
+.tabs b{font-size:12px;font-weight:500;padding:8px 11px 9px;color:var(--gl-dim);position:relative;
+  cursor:default}
+.tabs b.on{color:var(--gl-text)}
+.tabs b.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gl-ice)}
+.srch{display:flex;align-items:center;gap:7px;margin:10px;padding:0 8px;height:28px;
+  background:var(--gl-void);border:1px solid var(--gl-rule);border-radius:3px}
+.srch svg{width:12px;height:12px;stroke:var(--gl-faint);fill:none;stroke-width:1.6}
+.srch input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--gl-text);
+  font-family:var(--sans);font-size:11.5px}
+.srch input::placeholder{color:var(--gl-faint)}
+.srch kbd{font-family:var(--mono);font-size:8.5px;color:var(--gl-faint);border:1px solid var(--gl-rule);
+  border-radius:2px;padding:2px 4px}
+.addws{margin:0 10px 8px;height:28px;display:flex;align-items:center;justify-content:center;gap:8px;
+  border:1px dashed var(--gl-rule-hi);border-radius:3px;font-size:11px;color:var(--gl-muted);cursor:default}
+.addws:hover{border-color:var(--gl-ice);color:var(--gl-ice)}
+.addws kbd{font-family:var(--mono);font-size:8.5px;color:var(--gl-faint)}
+.tree{flex:1;overflow:auto;padding:2px 6px 10px;scrollbar-width:thin;
+  scrollbar-color:var(--gl-rule-hi) transparent}
+.tree::-webkit-scrollbar{width:8px}
+.tree::-webkit-scrollbar-thumb{background:var(--gl-rule-hi);border-radius:99px}
+.root{display:flex;align-items:center;gap:6px;padding:6px 6px;font-size:11px;color:var(--gl-dim)}
+.root b{color:var(--gl-text);font-weight:600;font-size:11.5px}
+.rw{display:flex;align-items:center;gap:7px;padding:4px 6px 4px 16px;border-radius:3px;font-size:11.5px;
+  color:var(--gl-muted);cursor:default}
+.rw:hover{background:var(--gl-panel-3);color:var(--gl-text)}
+.rw.sel{background:color-mix(in srgb,var(--gl-ice) 13%,transparent);color:var(--gl-text);
+  box-shadow:inset 2px 0 0 var(--gl-ice)}
+.rw .cv{width:9px;flex:none;color:var(--gl-faint);font-family:var(--mono);font-size:8px}
+.rw .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rw .ct{font-family:var(--mono);font-size:9px;color:var(--gl-faint);font-variant-numeric:tabular-nums}
+.rw .dot{width:11px;flex:none;color:var(--gl-faint)}
+.rw .dot svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.4}
+.rw .md{color:var(--gl-dim)}
+
+/* ═══ CENTER · CANVAS ════════════════════════════════════════════ */
+.canvas{flex:1;min-width:0;position:relative;overflow:hidden;background:var(--gl-void)}
+.canvas::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,#152034 1px,transparent 1px);background-size:24px 24px}
+.wm{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;pointer-events:none;opacity:.42}
+.wm .word{font-size:22px;font-weight:600;letter-spacing:.42em;color:#2c3b57;padding-left:.42em}
+.wm .bar{width:172px;height:2px;background:var(--gl-ice);opacity:.5}
+.newtile{position:absolute;top:14px;right:14px;width:28px;height:28px;display:grid;place-items:center;
+  border:1px solid var(--gl-rule-hi);border-radius:3px;background:var(--gl-panel-2);color:var(--gl-muted);
+  z-index:8;cursor:default}
+.newtile:hover{border-color:var(--gl-ice);color:var(--gl-ice)}
+.newtile svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
+.alpha{position:absolute;left:0;right:0;bottom:0;height:26px;display:flex;align-items:center;
+  justify-content:center;gap:9px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gl-warn);background:color-mix(in srgb,var(--gl-warn) 8%,transparent);
+  border-top:1px solid color-mix(in srgb,var(--gl-warn) 24%,transparent);z-index:9}
+.alpha u{text-decoration:none;color:var(--gl-dim);cursor:default}
+.alpha u:hover{color:var(--gl-text)}
+
+/* cable layer sits UNDER tiles, over the grid */
+.cables{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:visible}
+
+/* ── the tile ── */
+.gl-tile{position:absolute;display:flex;border:1px solid var(--gl-rule);border-radius:var(--gl-r);
+  background:var(--gl-panel);z-index:6;
+  box-shadow:0 20px 46px -18px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.045)}
+.gl-tile{--tone:var(--gl-ice)}
+.gl-tile[data-state="idle"]{--tone:var(--gl-idle)}
+.gl-tile[data-state="blocked"]{--tone:var(--gl-warn);
+  border-color:color-mix(in srgb,var(--gl-warn) 38%,var(--gl-rule))}
+.gl-tile.is-focus{outline:2px solid var(--gl-ice);outline-offset:2px;border-color:var(--gl-rule-hi)}
+.sp{width:var(--gl-spine);flex:none;display:flex;flex-direction:column;background:var(--gl-panel-2);
+  border-right:1px solid var(--gl-rule);border-radius:1px 0 0 1px;cursor:grab}
+.sp__head{height:var(--gl-spine);flex:none;display:grid;place-items:center;position:relative;
+  border-bottom:1px solid var(--gl-rule);border:0;border-bottom:1px solid var(--gl-rule);
+  background:transparent;padding:0;cursor:default}
+.sp__light{width:10px;height:10px;border-radius:50%;background:var(--tone);
+  box-shadow:0 0 13px color-mix(in srgb,var(--tone) 62%,transparent);transition:opacity .11s var(--ease)}
+.sp__plate{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);
+  font-size:7.5px;font-weight:600;letter-spacing:.14em;opacity:0;transition:opacity .11s var(--ease);
+  background:var(--gl-ice);color:var(--gl-ice-ink)}
+.sp__head:hover .sp__light{opacity:0}
+.sp__head:hover .sp__plate{opacity:1}
+.sp__id{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sp__id span{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:9px;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--gl-dim);white-space:nowrap}
+.sp__grip{height:var(--gl-spine);flex:none;border-top:1px solid var(--gl-rule);display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.sp__grip i{width:16px;height:1px;background:var(--gl-rule-hi);display:block}
+.bd{flex:1;min-width:0;display:flex;flex-direction:column}
+.bd__t{flex:none;display:flex;align-items:baseline;gap:11px;padding:12px 14px 11px;min-width:0}
+.bd__t b{font-size:13.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.bd__t u{text-decoration:none;font-family:var(--mono);font-size:9.5px;color:var(--gl-dim);
+  margin-left:auto;flex:none;font-variant-numeric:tabular-nums}
+.bd__s{flex:1;min-height:0;overflow:hidden;margin:0 11px 11px;border-radius:var(--gl-r);
+  background:var(--gl-screen);box-shadow:inset 0 0 0 1px #0d1626;font-family:var(--mono);
+  font-size:11px;line-height:1.6;padding:10px 11px;white-space:pre-wrap;color:#c9d8ea}
+.a-d{color:#7288ab}.a-i{color:#5cc8ff}.a-o{color:#6fe3a8}.a-w{color:#f2c260}.a-s{color:#c49bff}
+.cur{display:inline-block;width:6px;height:1em;vertical-align:text-bottom;background:var(--gl-ice)}
+.nd{position:absolute;width:11px;height:11px;border-radius:50%;background:var(--gl-panel-2);
+  border:1px solid var(--gl-rule-hi);transform:translate(-50%,-50%);z-index:7}
+.nd[data-on]{background:var(--gl-ice);border-color:var(--gl-ice);
+  box-shadow:0 0 12px color-mix(in srgb,var(--gl-ice) 60%,transparent)}
+
+/* ═══ RIGHT · DOCK ═══════════════════════════════════════════════
+   The rework. Old dock problems, each addressed:
+     · four identical lime Spawn pills dominating the panel
+     · the same 3-line auth boilerplate repeated on every CLI card
+     · 14 closed sessions at equal weight, no grouping, no collapse
+     · CLOSED chips coloured green — a dead session reading as healthy
+     · the CLI list and the session list overlapping (z-index bug)      */
+/* No cards. Zero boxes. The dock is three zones separated by space and
+   scale — a loose hero, a typographic launcher, a dense ledger. Nothing
+   is bordered; hierarchy comes from size, weight, and density instead. */
+.dock{width:376px;flex:none;display:flex;flex-direction:column;background:var(--gl-panel-2);
+  border-left:1px solid var(--gl-rule);min-height:0}
+
+/* ── masthead ── */
+.dk-hd{padding:20px 18px 0;flex:none}
+.dk-hd .eye{font-family:var(--mono);font-size:8px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gl-faint)}
+.dk-hd h2{margin:9px 0 0;font-size:21px;font-weight:600;letter-spacing:-.025em;line-height:1}
+.dk-hd .tally{display:flex;align-items:baseline;gap:7px;margin-top:9px;font-family:var(--mono);
+  font-size:10px;color:var(--gl-dim);font-variant-numeric:tabular-nums}
+.dk-hd .tally b{color:var(--gl-ice);font-weight:500}
+.dk-hd .tally s{text-decoration:none;color:var(--gl-faint)}
+
+/* ── zone 1 · ask. The primary action, so it gets the most air. ── */
+.ask{margin:18px 18px 0;flex:none;background:var(--gl-void);border-radius:4px;padding:13px 14px 9px;
+  box-shadow:inset 0 0 0 1px var(--gl-rule);transition:box-shadow .12s var(--ease)}
+.ask:focus-within{box-shadow:inset 0 0 0 1px var(--gl-ice)}
+.ask textarea{width:100%;height:58px;border:0;background:none;resize:none;outline:none;
+  color:var(--gl-text);font-family:var(--sans);font-size:13px;line-height:1.5;padding:0;display:block}
+.ask textarea::placeholder{color:var(--gl-faint)}
+.ask .hint{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:6px;
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gl-faint)}
+.ask .hint kbd{font-family:var(--mono);border:1px solid var(--gl-rule-hi);border-radius:2px;
+  padding:2px 5px;color:var(--gl-dim)}
+.ask:focus-within .hint kbd{border-color:var(--gl-ice);color:var(--gl-ice)}
+
+/* ── section heads — a label and a rule. No container. ── */
+.sh{display:flex;align-items:center;gap:11px;padding:0 18px;margin:26px 0 4px;flex:none}
+.sh b{font-family:var(--mono);font-size:8px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gl-faint);font-weight:500}
+.sh .r{flex:1;height:1px;background:var(--gl-rule)}
+.sh u{text-decoration:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gl-dim);cursor:default}
+.sh u:hover{color:var(--gl-ice)}
+
+/* ── zone 2 · launcher. Whole row is the target; no button at all. ── */
+.launch{flex:none}
+.lrow{display:flex;align-items:baseline;gap:9px;padding:9px 18px;cursor:default;
+  border-left:2px solid transparent}
+.lrow:hover{background:color-mix(in srgb,var(--gl-ice) 8%,transparent);border-left-color:var(--gl-ice)}
+.lrow b{font-size:13px;font-weight:500;letter-spacing:-.01em;color:var(--gl-text);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lrow span{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gl-faint);flex:none}
+.lrow em{margin-left:auto;flex:none;font-style:normal;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gl-faint)}
+.lrow:hover em{color:var(--gl-ice)}
+.authnote{padding:8px 18px 0;font-size:10.5px;line-height:1.55;color:var(--gl-faint)}
+
+/* ── zone 3 · ledger. Tightest thing in the app. ── */
+.ledger{flex:1;min-height:0;display:flex;flex-direction:column;margin-top:4px}
+.lg-hd{display:flex;gap:9px;padding:5px 18px 6px;flex:none;font-family:var(--mono);font-size:7.5px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gl-faint);
+  border-bottom:1px solid var(--gl-rule)}
+.lg-hd .c1{width:8px;flex:none}
+.lg-hd .c2{width:104px;flex:none}
+.lg-hd .c3{flex:1;min-width:0}
+.lg-body{flex:1;min-height:0;overflow:auto;padding-bottom:14px;scrollbar-width:thin;
+  scrollbar-color:var(--gl-rule-hi) transparent}
+.lg-body::-webkit-scrollbar{width:8px}
+.lg-body::-webkit-scrollbar-thumb{background:var(--gl-rule-hi);border-radius:99px}
+.srow{display:flex;align-items:center;gap:9px;padding:0 18px;height:26px;cursor:default;
+  border-left:2px solid transparent}
+.srow:hover{background:color-mix(in srgb,var(--gl-ice) 7%,transparent);border-left-color:var(--gl-rule-hi)}
+.srow i{width:8px;flex:none;display:grid;place-items:center}
+.srow i::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--gl-faint)}
+.srow.live i::after{background:var(--gl-ice);box-shadow:0 0 7px color-mix(in srgb,var(--gl-ice) 60%,transparent)}
+.srow.blk i::after{background:var(--gl-warn);box-shadow:0 0 7px color-mix(in srgb,var(--gl-warn) 55%,transparent)}
+.srow .id{width:104px;flex:none;font-family:var(--mono);font-size:10.5px;color:var(--gl-dim);
+  font-variant-numeric:tabular-nums}
+.srow.live .id,.srow.blk .id{color:var(--gl-text)}
+.srow .who{flex:1;min-width:0;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gl-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srow .st{flex:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gl-faint)}
+.srow.live .st{color:var(--gl-ice)}
+.srow.blk .st{color:var(--gl-warn)}
+.lg-grp{display:flex;align-items:center;gap:9px;padding:0 18px;height:26px;margin-top:6px;
+  font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gl-faint);cursor:default}
+.lg-grp .r{flex:1;height:1px;background:var(--gl-rule)}
+.lg-grp:hover{color:var(--gl-muted)}
+
+.legend{margin-top:26px;display:flex;gap:34px;flex-wrap:wrap;font-size:11.5px;color:var(--gl-muted);
+  line-height:1.65}
+.legend div{flex:1;min-width:250px}
+.legend h3{margin:0 0 6px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gl-ice)}
+.legend b{color:var(--gl-text);font-weight:500}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr"><h1>GLACIER</h1><span>QuantFlow Ontology · full visual swap</span></div>
+<p class="hdr-note">Shell chrome, file rail, canvas, dock, and tiles in one system. <b>The file rail is
+re-themed, not re-thought</b> — same tabs, search, tree, counts. <b>The dock is reworked</b>. The canvas
+shows two live tiles with a declared cable between them.</p>
+
+<div class="app">
+
+  <div class="titlebar">
+    <span class="mark"></span><b>QuantFlow</b>
+    <span class="menus"><span>File</span><span>Edit</span><span>View</span><span>Window</span></span>
+    <span class="wctl"><i>—</i><i>▢</i><i class="q">✕</i></span>
+  </div>
+
+  <div class="shell">
+
+    <!-- ═══ FILE RAIL ═══ -->
+    <div class="files">
+      <div class="files__top"><span class="icobtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg></span></div>
+      <div class="tabs"><b class="on">Files</b><b>Tiles</b></div>
+      <div class="srch">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input placeholder="Search" readonly><kbd>Ctrl+K</kbd>
+      </div>
+      <div class="addws">+ Add workspace <kbd>Shift+Ctrl+O</kbd></div>
+      <div class="tree">
+        <div class="root"><span class="cv">▾</span>C:\Users\rybow\O… <b>Cursor Collab</b></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">_meta</span><span class="ct">4</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.claude</span><span class="ct">1</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.codex</span><span class="ct">1</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.collaborator</span><span class="ct">1</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.cursor</span><span class="ct">3</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.obsidian</span><span class="ct">22</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.quantflow</span><span class="ct">3</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">.tmp</span><span class="ct">16</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Agents</span><span class="ct">1394</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Expertise</span><span class="ct">920</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Projects</span><span class="ct">202</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">QuantFlow Audit 7.14</span><span class="ct">2</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Reference</span><span class="ct">37</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Specs</span><span class="ct">23</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Tools</span><span class="ct">159</span></div>
+        <div class="rw"><span class="cv">▸</span><span class="nm">Trading</span><span class="ct">2</span></div>
+        <div class="rw sel"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">Vault Home<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">V7_FIRST_PROOF<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">V3 Official<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">RUNTIME_BINDING_CONTRACT<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">QuantMeta<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">QuantFlow Map<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">QuantFlow Dock 7.8<span class="md">.md</span></span></div>
+        <div class="rw"><span class="cv"></span><span class="dot"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="nm">QuantFlow Centaur<span class="md">.md</span></span></div>
+      </div>
+    </div>
+
+    <!-- ═══ CANVAS ═══ -->
+    <div class="canvas">
+      <div class="wm">
+        <svg width="240" height="220" viewBox="0 0 240 220" fill="none" stroke="#2c3b57" stroke-width="1" stroke-dasharray="4 5">
+          <path d="M120 34 L198 80 L198 164 L120 210 L42 164 L42 80 Z"/>
+          <path d="M120 34 L120 122 M120 122 L198 164 M120 122 L42 164"/>
+          <circle cx="120" cy="122" r="5" fill="#5cc8ff" stroke="none" opacity=".85"/>
+          <circle cx="42" cy="164" r="4" fill="#6fe3a8" stroke="none" opacity=".7"/>
+          <circle cx="198" cy="164" r="4" fill="#c49bff" stroke="none" opacity=".7"/>
+        </svg>
+        <div class="word">QUANTFLOW</div>
+        <div class="bar"></div>
+      </div>
+
+      <span class="newtile"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+
+      <!-- declared cable: hermes.E → codex.W -->
+      <svg class="cables">
+        <defs>
+          <linearGradient id="cbl" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#5cc8ff" stop-opacity=".95"/>
+            <stop offset="1" stop-color="#5cc8ff" stop-opacity=".38"/>
+          </linearGradient>
+        </defs>
+        <path d="M 386 178 C 440 178, 424 384, 478 384" stroke="url(#cbl)" stroke-width="1.75" fill="none"/>
+        <circle cx="424" cy="272" r="2.4" fill="#5cc8ff"/>
+      </svg>
+
+      <div class="gl-tile is-focus" data-state="running" style="left:36px;top:74px;width:350px;height:208px">
+        <span class="nd" style="left:50%;top:0"></span>
+        <span class="nd" style="left:100%;top:50%" data-on></span>
+        <span class="nd" style="left:50%;top:100%"></span>
+        <span class="nd" style="left:0;top:50%"></span>
+        <div class="sp">
+          <button class="sp__head"><span class="sp__light"></span><span class="sp__plate">CLOSE</span></button>
+          <div class="sp__id"><span>2cb2ca99</span></div>
+          <div class="sp__grip"><i></i><i></i><i></i></div>
+        </div>
+        <div class="bd">
+          <div class="bd__t"><b>hermes-worker</b><u>03:14:22</u></div>
+          <div class="bd__s"><span class="a-d">$</span> hermes
+<span class="a-o">⌗ Nous Research</span>
+<span class="a-i">▾ tools</span> <span class="a-d">31 · skills 82 · mcp 1</span>
+<span class="a-w">! 4192 commits behind</span>
+<span class="a-d">❯</span> <span class="a-s">dispatch → codex</span><i class="cur"></i></div>
+        </div>
+      </div>
+
+      <div class="gl-tile" data-state="running" style="left:478px;top:280px;width:340px;height:208px">
+        <span class="nd" style="left:50%;top:0"></span>
+        <span class="nd" style="left:100%;top:50%"></span>
+        <span class="nd" style="left:50%;top:100%"></span>
+        <span class="nd" style="left:0;top:50%" data-on></span>
+        <div class="sp">
+          <button class="sp__head"><span class="sp__light"></span><span class="sp__plate">CLOSE</span></button>
+          <div class="sp__id"><span>7fa1e004</span></div>
+          <div class="sp__grip"><i></i><i></i><i></i></div>
+        </div>
+        <div class="bd">
+          <div class="bd__t"><b>codex</b><u>00:41:09</u></div>
+          <div class="bd__s"><span class="a-d">←</span> <span class="a-i">inbound · hermes-worker</span>
+<span class="a-d">$</span> codex exec --stdin
+<span class="a-d">reading task envelope…</span>
+<span class="a-d">❯</span> <i class="cur"></i></div>
+        </div>
+      </div>
+
+      <div class="alpha">quantflow ontology alpha · beware bugs <u>[create issue]</u> <u>[dismiss]</u></div>
+    </div>
+
+    <!-- ═══ DOCK ═══ -->
+    <div class="dock">
+      <div class="dk-hd">
+        <div class="eye">quantflow / dock</div>
+        <h2>Agent workspace</h2>
+        <div class="tally"><b>2 live</b><s>·</s>14 closed<s>·</s>4 launchable</div>
+      </div>
+
+      <div class="ask">
+        <textarea placeholder="Ask QuantFlow, or spawn a CLI below…" readonly></textarea>
+        <div class="hint">submit <kbd>⌘ ⏎</kbd></div>
+      </div>
+
+      <div class="sh"><b>launch</b><span class="r"></span><u>manage</u></div>
+      <div class="launch">
+        <div class="lrow"><b>hermes-orchestrator</b><span>orchestrator</span><em>spawn ⏎</em></div>
+        <div class="lrow"><b>hermes-worker</b><span>worker</span><em>spawn ⏎</em></div>
+        <div class="lrow"><b>hermes-worker-2</b><span>worker</span><em>spawn ⏎</em></div>
+        <div class="lrow"><b>claude-code-orchestrator</b><span>orchestrator</span><em>spawn ⏎</em></div>
+        <div class="authnote">Auth is checked at launch — if sign-in is required, authenticate in Ubuntu and retry.</div>
+      </div>
+
+      <div class="sh"><b>sessions</b><span class="r"></span><u>clear closed</u></div>
+      <div class="ledger">
+        <div class="lg-hd"><span class="c1"></span><span class="c2">session</span><span class="c3">species</span><span>state</span></div>
+        <div class="lg-body">
+          <div class="srow live"><i></i><span class="id">2cb2ca99…44da</span><span class="who">hermes-worker</span><span class="st">running</span></div>
+          <div class="srow blk"><i></i><span class="id">7fa1e004…91c7</span><span class="who">codex</span><span class="st">blocked</span></div>
+
+          <div class="lg-grp">closed · 14 <span class="r"></span>collapse</div>
+
+          <div class="srow"><i></i><span class="id">3e51cbd3…896a</span><span class="who">hermes-worker</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">033b6e67…1072</span><span class="who">hermes-worker</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">16a2f8df…0378</span><span class="who">hermes-worker</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">224bb45a…3c24</span><span class="who">hermes-orchestrator</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">cf86c0bc…ab96</span><span class="who">hermes-worker</span><span class="st">exit 130</span></div>
+          <div class="srow"><i></i><span class="id">a2218250…a751</span><span class="who">hermes-worker</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">597ce211…1934</span><span class="who">hermes-orchestrator</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">dc28d634…91a7</span><span class="who">hermes-worker</span><span class="st">exit 0</span></div>
+          <div class="srow"><i></i><span class="id">99f98466…1fd0</span><span class="who">hermes-orchestrator</span><span class="st">exit 1</span></div>
+          <div class="srow"><i></i><span class="id">08f833c8…7547</span><span class="who">hermes-worker</span><span class="st">exit 0</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="legend">
+  <div>
+    <h3>Dock — what changed</h3>
+    <b>Every box is gone.</b> No cards, no chips, no segmented control, no bordered rows. The old dock
+    was eight bordered rectangles stacked in a bordered panel — that nesting is what made it read as
+    an admin template. Hierarchy is now scale and density: a 21 px masthead, a loose ask, a
+    typographic launcher, a 26 px-row ledger.<br><br>
+    <b>The spawn buttons are gone too.</b> The row <i>is</i> the button — full-bleed hover, ice edge
+    on the left. Four filled pills competing with four names is a fight the names should never have
+    been in.<br><br>
+    <b>Sessions became a ledger.</b> Fixed columns, tabular figures, real exit codes instead of a
+    uniform CLOSED chip — <code style="font-family:var(--mono);color:var(--gl-warn)">exit 130</code>
+    and <code style="font-family:var(--mono);color:var(--gl-alert)">exit 1</code> are information a
+    green pill was actively hiding.
+  </div>
+  <div>
+    <h3>File rail — what did not</h3>
+    Tabs, search, add-workspace, tree, counts: unchanged in structure. Only the palette, the row
+    hover, and the selection marker moved. Selection is a 2 px ice edge plus a tint rather than a
+    full-bleed highlight, so long filenames stay readable.
+  </div>
+  <div>
+    <h3>Canvas</h3>
+    The watermark stays on the canvas and no longer bleeds through tiles — tiles are opaque, so they
+    read as objects on the surface. <b>The cable is drawn beneath tiles and above the grid</b>, exits
+    a lit E node and enters a lit W node. Unlit nodes are free ports.
+  </div>
+</div>
+
+</div>
+</body>
+</html>

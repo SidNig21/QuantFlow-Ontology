@@ -1,0 +1,275 @@
+/* GLACIER — QuantFlow Ontology tile.
+ * ─────────────────────────────────────────────────────────────────────────
+ * A tile is an operational record mounted on the canvas. It hosts a WSL PTY
+ * stream; agents are launched into it by CLI. It never renders content of
+ * its own and it never varies by dock catalog item.
+ *
+ * ANATOMY — the spine has exactly three zones and there are no floating icons:
+ *   head   44px  status light · click to arm · click again to close
+ *   id     flex  session id, set vertically
+ *   grip   44px  three rules marking the spine as the drag handle
+ * Double-click anywhere on the spine toggles fullscreen.
+ *
+ * Cable nodes sit at the four cardinals, half outside the border.
+ *
+ * Every colour below is measured against the surface it actually sits on.
+ */
+
+:root {
+  /* ── surfaces ──────────────────────────────────────────────── */
+  --gl-void:    #060a12;   /* canvas */
+  --gl-screen:  #050a12;   /* the PTY well */
+  --gl-panel:   #0f1727;   /* tile body */
+  --gl-panel-2: #152034;   /* spine */
+  --gl-panel-3: #1d2b45;   /* raised / hover */
+  --gl-rule:    #22314b;
+  --gl-rule-hi: #33466a;
+
+  /* ── text ──────────────────────────────────────────────────── */
+  --gl-text:  #eaf1fb;   /* 15.4:1 on panel */
+  --gl-muted: #8fa3c0;   /*  6.97:1 on panel · AA */
+  --gl-dim:   #7288ab;   /*  4.52:1 on spine · AA  (was #5A6D8C, 3.41:1 — failed) */
+  --gl-faint: #3b4b68;   /* rules and ticks only — never text */
+
+  /* ── signal ────────────────────────────────────────────────── */
+  --gl-ice:      #5cc8ff;   /* 9.52:1 · live, focus, connected */
+  --gl-ice-ink:  #08111c;   /* text ON ice · 10.08:1 */
+  --gl-idle:     #6b7f9e;
+  --gl-warn:     #f2c260;
+  --gl-alert:    #ff8a75;
+
+  /* ── rhythm ────────────────────────────────────────────────── */
+  --gl-spine: 44px;
+  --gl-r:     2px;
+  --gl-rule-w: 1px;
+
+  --gl-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gl-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --gl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --gl-fast: 110ms;
+  --gl-slow: 180ms;
+}
+
+/* ══ TILE ════════════════════════════════════════════════════════ */
+.gl-tile {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  border: var(--gl-rule-w) solid var(--gl-rule);
+  border-radius: var(--gl-r);
+  background: var(--gl-panel);
+  font-family: var(--gl-sans);
+  box-shadow:
+    0 20px 46px -18px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .045);
+  outline: 2px solid transparent;   /* reserved — no shift when focus lands */
+  outline-offset: 2px;
+  transition: border-color var(--gl-fast) var(--gl-ease);
+}
+
+.gl-tile:focus-visible,
+.gl-tile.is-focus { outline-color: var(--gl-ice); border-color: var(--gl-rule-hi); }
+
+.gl-tile.is-drag {
+  background: var(--gl-panel-3);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 1);
+}
+.gl-tile.is-drag .gl-tile__spine { cursor: grabbing; }
+
+/* state → tone. Drives the head light and the id colour together. */
+.gl-tile                        { --gl-tone: var(--gl-ice);  }
+.gl-tile[data-state="idle"]     { --gl-tone: var(--gl-idle); }
+.gl-tile[data-state="blocked"]  { --gl-tone: var(--gl-warn); }
+.gl-tile[data-state="error"]    { --gl-tone: var(--gl-alert); }
+.gl-tile[data-state="blocked"],
+.gl-tile[data-state="error"]    { border-color: color-mix(in srgb, var(--gl-tone) 38%, var(--gl-rule)); }
+
+/* ══ SPINE ═══════════════════════════════════════════════════════ */
+.gl-tile__spine {
+  width: var(--gl-spine);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--gl-panel-2);
+  border-right: var(--gl-rule-w) solid var(--gl-rule);
+  border-radius: calc(var(--gl-r) - 1px) 0 0 calc(var(--gl-r) - 1px);
+  cursor: grab;
+  user-select: none;
+}
+
+/* ── head: status → armed → close ──────────────────────────────
+   One object, three states. The first click ARMS; it does not close.
+   That is what makes it safe to put the kill switch on the status light. */
+.gl-tile__head {
+  position: relative;
+  height: var(--gl-spine);
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-bottom: var(--gl-rule-w) solid var(--gl-rule);
+  background: transparent;
+  padding: 0;
+  cursor: default;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+.gl-tile__head:focus-visible { outline-color: var(--gl-ice); }
+
+.gl-tile__light {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gl-tone);
+  box-shadow: 0 0 13px color-mix(in srgb, var(--gl-tone) 62%, transparent);
+  transition: opacity var(--gl-fast) var(--gl-ease);
+}
+.gl-tile[data-state="running"] .gl-tile__light { animation: gl-breathe 2.4s var(--gl-ease) infinite; }
+
+/* the plate that replaces the light */
+.gl-tile__plate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--gl-mono);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  opacity: 0;
+  transition: opacity var(--gl-fast) var(--gl-ease);
+  background: var(--gl-ice);
+  color: var(--gl-ice-ink);
+}
+@media (hover: hover) {
+  .gl-tile__head:hover .gl-tile__light { opacity: 0; }
+  .gl-tile__head:hover .gl-tile__plate { opacity: 1; }
+}
+.gl-tile__head:focus-visible .gl-tile__light { opacity: 0; }
+.gl-tile__head:focus-visible .gl-tile__plate { opacity: 1; }
+
+/* armed — click one has landed. Red, and it says what happens next. */
+.gl-tile__head[data-armed="true"] .gl-tile__light { opacity: 0; }
+.gl-tile__head[data-armed="true"] .gl-tile__plate {
+  opacity: 1;
+  background: var(--gl-alert);
+  color: var(--gl-ice-ink);
+  animation: gl-arm 1.1s steps(2) infinite;
+}
+.gl-tile__head[data-armed="true"] .gl-tile__plate::after { content: "SURE?"; }
+.gl-tile__head[data-armed="true"] .gl-tile__plate span { display: none; }
+
+/* ── id ────────────────────────────────────────────────────────── */
+.gl-tile__id {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gl-tile__id span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--gl-mono);
+  font-size: 9px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--gl-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── grip: the only thing that says "drag me" ──────────────────── */
+.gl-tile__grip {
+  height: var(--gl-spine);
+  flex: none;
+  border-top: var(--gl-rule-w) solid var(--gl-rule);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+}
+.gl-tile__grip i { width: 16px; height: 1px; background: var(--gl-rule-hi); display: block; }
+@media (hover: hover) {
+  .gl-tile__spine:hover .gl-tile__grip i { background: var(--gl-muted); }
+}
+
+/* ══ BODY ════════════════════════════════════════════════════════ */
+.gl-tile__body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.gl-tile__title {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  padding: 13px 15px 12px;
+  min-width: 0;
+}
+.gl-tile__name {
+  font-size: 14px; font-weight: 600; letter-spacing: -.01em; color: var(--gl-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.gl-tile__meta {
+  font-family: var(--gl-mono); font-size: 9.5px; color: var(--gl-dim);
+  margin-left: auto; white-space: nowrap; flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the PTY well */
+.gl-tile__screen {
+  flex: 1; min-height: 0; overflow: auto;
+  margin: 0 12px 12px;
+  border-radius: var(--gl-r);
+  background: var(--gl-screen);
+  box-shadow: inset 0 0 0 1px #0d1626;
+  font-family: var(--gl-mono);
+  font-size: 11.5px;
+  line-height: 1.62;
+  white-space: pre-wrap;
+  padding: 11px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gl-rule-hi) transparent;
+}
+.gl-tile__screen::-webkit-scrollbar { width: 8px; }
+.gl-tile__screen::-webkit-scrollbar-thumb { background: var(--gl-rule-hi); border-radius: 99px; }
+
+/* ══ CABLE NODES ═════════════════════════════════════════════════ */
+.gl-node {
+  position: absolute;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--gl-panel-2);
+  border: 1px solid var(--gl-rule-hi);
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  transition: background-color var(--gl-fast) var(--gl-ease),
+              border-color var(--gl-fast) var(--gl-ease);
+}
+.gl-node--n { left: 50%;  top: 0;    }
+.gl-node--e { left: 100%; top: 50%;  }
+.gl-node--s { left: 50%;  top: 100%; }
+.gl-node--w { left: 0;    top: 50%;  }
+.gl-node[data-on="true"] {
+  background: var(--gl-ice);
+  border-color: var(--gl-ice);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gl-ice) 60%, transparent);
+}
+@media (hover: hover) {
+  .gl-tile:hover .gl-node { border-color: var(--gl-muted); }
+}
+
+/* ══ MOTION ══════════════════════════════════════════════════════ */
+@keyframes gl-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@keyframes gl-arm     { 0% { opacity: 1; } 50% { opacity: .55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-tile, .gl-node, .gl-tile__light, .gl-tile__plate { transition-duration: .01ms; }
+  .gl-tile__light, .gl-tile__plate { animation: none; }
+}
+
+/* ══ NARROW ══════════════════════════════════════════════════════
+   Tiles get dragged small. Meta goes first, then the spine id — the
+   stream is the job, and the spine keeps its head and grip. */
+.gl-tile { container-type: inline-size; container-name: gltile; }
+@container gltile (max-width: 300px) { .gl-tile__meta { display: none; } }
+@container gltile (max-width: 220px) { .gl-tile__id   { display: none; } }

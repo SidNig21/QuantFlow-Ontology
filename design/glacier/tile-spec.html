@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLACIER — QuantFlow tile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* GLACIER — QuantFlow Ontology tile.
+ * ─────────────────────────────────────────────────────────────────────────
+ * A tile is an operational record mounted on the canvas. It hosts a WSL PTY
+ * stream; agents are launched into it by CLI. It never renders content of
+ * its own and it never varies by dock catalog item.
+ *
+ * ANATOMY — the spine has exactly three zones and there are no floating icons:
+ *   head   44px  status light · click to arm · click again to close
+ *   id     flex  session id, set vertically
+ *   grip   44px  three rules marking the spine as the drag handle
+ * Double-click anywhere on the spine toggles fullscreen.
+ *
+ * Cable nodes sit at the four cardinals, half outside the border.
+ *
+ * Every colour below is measured against the surface it actually sits on.
+ */
+
+:root {
+  /* ── surfaces ──────────────────────────────────────────────── */
+  --gl-void:    #060a12;   /* canvas */
+  --gl-screen:  #050a12;   /* the PTY well */
+  --gl-panel:   #0f1727;   /* tile body */
+  --gl-panel-2: #152034;   /* spine */
+  --gl-panel-3: #1d2b45;   /* raised / hover */
+  --gl-rule:    #22314b;
+  --gl-rule-hi: #33466a;
+
+  /* ── text ──────────────────────────────────────────────────── */
+  --gl-text:  #eaf1fb;   /* 15.4:1 on panel */
+  --gl-muted: #8fa3c0;   /*  6.97:1 on panel · AA */
+  --gl-dim:   #7288ab;   /*  4.52:1 on spine · AA  (was #5A6D8C, 3.41:1 — failed) */
+  --gl-faint: #3b4b68;   /* rules and ticks only — never text */
+
+  /* ── signal ────────────────────────────────────────────────── */
+  --gl-ice:      #5cc8ff;   /* 9.52:1 · live, focus, connected */
+  --gl-ice-ink:  #08111c;   /* text ON ice · 10.08:1 */
+  --gl-idle:     #6b7f9e;
+  --gl-warn:     #f2c260;
+  --gl-alert:    #ff8a75;
+
+  /* ── rhythm ────────────────────────────────────────────────── */
+  --gl-spine: 44px;
+  --gl-r:     2px;
+  --gl-rule-w: 1px;
+
+  --gl-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gl-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --gl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --gl-fast: 110ms;
+  --gl-slow: 180ms;
+}
+
+/* ══ TILE ════════════════════════════════════════════════════════ */
+.gl-tile {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  border: var(--gl-rule-w) solid var(--gl-rule);
+  border-radius: var(--gl-r);
+  background: var(--gl-panel);
+  font-family: var(--gl-sans);
+  box-shadow:
+    0 20px 46px -18px rgba(0, 0, 0, .95),
+    inset 0 1px 0 rgba(255, 255, 255, .045);
+  outline: 2px solid transparent;   /* reserved — no shift when focus lands */
+  outline-offset: 2px;
+  transition: border-color var(--gl-fast) var(--gl-ease);
+}
+
+.gl-tile:focus-visible,
+.gl-tile.is-focus { outline-color: var(--gl-ice); border-color: var(--gl-rule-hi); }
+
+.gl-tile.is-drag {
+  background: var(--gl-panel-3);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 1);
+}
+.gl-tile.is-drag .gl-tile__spine { cursor: grabbing; }
+
+/* state → tone. Drives the head light and the id colour together. */
+.gl-tile                        { --gl-tone: var(--gl-ice);  }
+.gl-tile[data-state="idle"]     { --gl-tone: var(--gl-idle); }
+.gl-tile[data-state="blocked"]  { --gl-tone: var(--gl-warn); }
+.gl-tile[data-state="error"]    { --gl-tone: var(--gl-alert); }
+.gl-tile[data-state="blocked"],
+.gl-tile[data-state="error"]    { border-color: color-mix(in srgb, var(--gl-tone) 38%, var(--gl-rule)); }
+
+/* ══ SPINE ═══════════════════════════════════════════════════════ */
+.gl-tile__spine {
+  width: var(--gl-spine);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--gl-panel-2);
+  border-right: var(--gl-rule-w) solid var(--gl-rule);
+  border-radius: calc(var(--gl-r) - 1px) 0 0 calc(var(--gl-r) - 1px);
+  cursor: grab;
+  user-select: none;
+}
+
+/* ── head: status → armed → close ──────────────────────────────
+   One object, three states. The first click ARMS; it does not close.
+   That is what makes it safe to put the kill switch on the status light. */
+.gl-tile__head {
+  position: relative;
+  height: var(--gl-spine);
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-bottom: var(--gl-rule-w) solid var(--gl-rule);
+  background: transparent;
+  padding: 0;
+  cursor: default;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+.gl-tile__head:focus-visible { outline-color: var(--gl-ice); }
+
+.gl-tile__light {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gl-tone);
+  box-shadow: 0 0 13px color-mix(in srgb, var(--gl-tone) 62%, transparent);
+  transition: opacity var(--gl-fast) var(--gl-ease);
+}
+.gl-tile[data-state="running"] .gl-tile__light { animation: gl-breathe 2.4s var(--gl-ease) infinite; }
+
+/* the plate that replaces the light */
+.gl-tile__plate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--gl-mono);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  opacity: 0;
+  transition: opacity var(--gl-fast) var(--gl-ease);
+  background: var(--gl-ice);
+  color: var(--gl-ice-ink);
+}
+@media (hover: hover) {
+  .gl-tile__head:hover .gl-tile__light { opacity: 0; }
+  .gl-tile__head:hover .gl-tile__plate { opacity: 1; }
+}
+.gl-tile__head:focus-visible .gl-tile__light { opacity: 0; }
+.gl-tile__head:focus-visible .gl-tile__plate { opacity: 1; }
+
+/* armed — click one has landed. Red, and it says what happens next. */
+.gl-tile__head[data-armed="true"] .gl-tile__light { opacity: 0; }
+.gl-tile__head[data-armed="true"] .gl-tile__plate {
+  opacity: 1;
+  background: var(--gl-alert);
+  color: var(--gl-ice-ink);
+  animation: gl-arm 1.1s steps(2) infinite;
+}
+.gl-tile__head[data-armed="true"] .gl-tile__plate::after { content: "SURE?"; }
+.gl-tile__head[data-armed="true"] .gl-tile__plate span { display: none; }
+
+/* ── id ────────────────────────────────────────────────────────── */
+.gl-tile__id {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gl-tile__id span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--gl-mono);
+  font-size: 9px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--gl-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── grip: the only thing that says "drag me" ──────────────────── */
+.gl-tile__grip {
+  height: var(--gl-spine);
+  flex: none;
+  border-top: var(--gl-rule-w) solid var(--gl-rule);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+}
+.gl-tile__grip i { width: 16px; height: 1px; background: var(--gl-rule-hi); display: block; }
+@media (hover: hover) {
+  .gl-tile__spine:hover .gl-tile__grip i { background: var(--gl-muted); }
+}
+
+/* ══ BODY ════════════════════════════════════════════════════════ */
+.gl-tile__body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.gl-tile__title {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  padding: 13px 15px 12px;
+  min-width: 0;
+}
+.gl-tile__name {
+  font-size: 14px; font-weight: 600; letter-spacing: -.01em; color: var(--gl-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.gl-tile__meta {
+  font-family: var(--gl-mono); font-size: 9.5px; color: var(--gl-dim);
+  margin-left: auto; white-space: nowrap; flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the PTY well */
+.gl-tile__screen {
+  flex: 1; min-height: 0; overflow: auto;
+  margin: 0 12px 12px;
+  border-radius: var(--gl-r);
+  background: var(--gl-screen);
+  box-shadow: inset 0 0 0 1px #0d1626;
+  font-family: var(--gl-mono);
+  font-size: 11.5px;
+  line-height: 1.62;
+  white-space: pre-wrap;
+  padding: 11px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gl-rule-hi) transparent;
+}
+.gl-tile__screen::-webkit-scrollbar { width: 8px; }
+.gl-tile__screen::-webkit-scrollbar-thumb { background: var(--gl-rule-hi); border-radius: 99px; }
+
+/* ══ CABLE NODES ═════════════════════════════════════════════════ */
+.gl-node {
+  position: absolute;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--gl-panel-2);
+  border: 1px solid var(--gl-rule-hi);
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  transition: background-color var(--gl-fast) var(--gl-ease),
+              border-color var(--gl-fast) var(--gl-ease);
+}
+.gl-node--n { left: 50%;  top: 0;    }
+.gl-node--e { left: 100%; top: 50%;  }
+.gl-node--s { left: 50%;  top: 100%; }
+.gl-node--w { left: 0;    top: 50%;  }
+.gl-node[data-on="true"] {
+  background: var(--gl-ice);
+  border-color: var(--gl-ice);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gl-ice) 60%, transparent);
+}
+@media (hover: hover) {
+  .gl-tile:hover .gl-node { border-color: var(--gl-muted); }
+}
+
+/* ══ MOTION ══════════════════════════════════════════════════════ */
+@keyframes gl-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@keyframes gl-arm     { 0% { opacity: 1; } 50% { opacity: .55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-tile, .gl-node, .gl-tile__light, .gl-tile__plate { transition-duration: .01ms; }
+  .gl-tile__light, .gl-tile__plate { animation: none; }
+}
+
+/* ══ NARROW ══════════════════════════════════════════════════════
+   Tiles get dragged small. Meta goes first, then the spine id — the
+   stream is the job, and the spine keeps its head and grip. */
+.gl-tile { container-type: inline-size; container-name: gltile; }
+@container gltile (max-width: 300px) { .gl-tile__meta { display: none; } }
+@container gltile (max-width: 220px) { .gl-tile__id   { display: none; } }
+
+</style>
+<style>
+  html,body{margin:0;background:var(--gl-void);color:var(--gl-text);font-family:var(--gl-sans);
+    overflow-x:clip;-webkit-font-smoothing:antialiased}
+  .page{padding:44px 38px 100px}
+  .mast{display:flex;align-items:baseline;gap:14px;margin-bottom:9px}
+  .mast h1{margin:0;font-size:20px;font-weight:600;letter-spacing:.16em}
+  .mast span{font-family:var(--gl-mono);font-size:10px;letter-spacing:.22em;color:var(--gl-dim);
+    text-transform:uppercase}
+  .lede{font-size:12.5px;color:var(--gl-muted);line-height:1.7;margin:0 0 40px;max-width:80ch}
+  .lede b{color:var(--gl-text);font-weight:500}
+  h2{font-family:var(--gl-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--gl-dim);margin:52px 0 20px;padding-bottom:9px;border-bottom:1px solid var(--gl-rule)}
+  .row{display:flex;gap:44px;flex-wrap:wrap;align-items:flex-start}
+  .cell{display:flex;flex-direction:column;gap:11px;min-width:0}
+  .cap{font-family:var(--gl-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gl-faint)}
+  .cap b{color:var(--gl-muted);font-weight:600}
+  .deck{padding:44px 40px;border-radius:3px;background:#080e1a;
+    background-image:radial-gradient(circle,#14203a 1px,transparent 1px);background-size:24px 24px;
+    box-shadow:inset 0 0 0 1px var(--gl-rule)}
+  .w400 .gl-tile{width:400px;height:250px}
+  .w300 .gl-tile{width:300px;height:230px}
+  .w200 .gl-tile{width:200px;height:230px}
+  /* ANSI tuned to the Glacier well */
+  .a-dim{color:#7288ab}.a-ice{color:#5cc8ff}.a-ok{color:#6fe3a8}
+  .a-warn{color:#f2c260}.a-str{color:#c49bff}
+  .cur{display:inline-block;width:6.5px;height:1.02em;vertical-align:text-bottom;background:var(--gl-ice)}
+  /* anatomy callouts */
+  .anat{position:relative;display:inline-block}
+  .pin{position:absolute;font-family:var(--gl-mono);font-size:9px;letter-spacing:.1em;
+    color:var(--gl-dim);white-space:nowrap}
+  .pin::before{content:'';position:absolute;left:-26px;top:50%;width:20px;height:1px;
+    background:var(--gl-rule-hi)}
+  .note{font-size:12px;line-height:1.7;color:var(--gl-muted);max-width:78ch;margin:18px 0 0}
+  .note b{color:var(--gl-text);font-weight:500}
+  .note code{font-family:var(--gl-mono);font-size:11px;color:var(--gl-ice)}
+  .pair{position:relative;display:flex;gap:100px;align-items:center}
+  .cable{position:absolute;left:400px;width:100px;top:50%;height:2px;z-index:1;
+    background:linear-gradient(90deg,var(--gl-ice),rgba(92,200,255,.3))}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="mast"><h1>GLACIER</h1><span>QuantFlow Ontology · tile</span></div>
+<p class="lede">A tile is an operational record mounted on the canvas. It hosts a <b>WSL PTY stream</b>;
+agents are launched into it by CLI. It renders nothing of its own and never varies by dock catalog
+item. <b>The spine has three zones and there are no floating icons.</b> Double-click the spine for
+fullscreen.</p>
+
+<h2>Anatomy</h2>
+<div class="deck">
+  <div class="row w400">
+    <div class="anat">
+      <div class="gl-tile" data-state="running" tabindex="0">
+        <span class="gl-node gl-node--n" data-on="true"></span>
+        <span class="gl-node gl-node--e"></span>
+        <span class="gl-node gl-node--s"></span>
+        <span class="gl-node gl-node--w" data-on="true"></span>
+        <div class="gl-tile__spine">
+          <button class="gl-tile__head"><span class="gl-tile__light"></span>
+            <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div>
+        </div>
+        <div class="gl-tile__body">
+          <div class="gl-tile__title"><span class="gl-tile__name">hermes-worker</span>
+            <span class="gl-tile__meta">kimi-k3 · 03:14:22</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">$</span> hermes
+<span class="a-ok">⌗ Nous Research</span>
+<span class="a-ice">▾ tools</span> <span class="a-dim">31 · skills 82</span>
+<span class="a-warn">! 4192 commits behind</span>
+<span class="a-dim">❯</span> <span class="a-str">try "explain this"</span><i class="cur"></i></div>
+        </div>
+      </div>
+      <span class="pin" style="left:466px;top:22px">head — status · arm · close</span>
+      <span class="pin" style="left:466px;top:125px">id — session, vertical</span>
+      <span class="pin" style="left:466px;top:228px">grip — drag handle</span>
+      <span class="pin" style="left:466px;top:0">node N</span>
+    </div>
+  </div>
+  <p class="note"><b>Hover the head</b> to see it flip to CLOSE. <b>Tab to the tile</b> to see the focus
+  ring, then tab again to reach the head — the plate shows on keyboard focus too, so the control is
+  not hover-only.</p>
+</div>
+
+<h2>Close — arm, then confirm</h2>
+<div class="deck">
+  <div class="row w300">
+    <div class="cell"><span class="cap"><b>1 · rest</b> status light</span>
+      <div class="gl-tile" data-state="running">
+        <div class="gl-tile__spine">
+          <button class="gl-tile__head"><span class="gl-tile__light"></span>
+            <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div>
+        </div>
+        <div class="gl-tile__body">
+          <div class="gl-tile__title"><span class="gl-tile__name">hermes-worker</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">❯</span> <i class="cur"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="cell"><span class="cap"><b>2 · hover</b> plate revealed</span>
+      <div class="gl-tile" data-state="running">
+        <div class="gl-tile__spine">
+          <button class="gl-tile__head" style="--f:1"><span class="gl-tile__light" style="opacity:0"></span>
+            <span class="gl-tile__plate" style="opacity:1"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div>
+        </div>
+        <div class="gl-tile__body">
+          <div class="gl-tile__title"><span class="gl-tile__name">hermes-worker</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">❯</span> <i class="cur"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="cell"><span class="cap"><b>3 · armed</b> second click kills</span>
+      <div class="gl-tile" data-state="running">
+        <div class="gl-tile__spine">
+          <button class="gl-tile__head" data-armed="true"><span class="gl-tile__light"></span>
+            <span class="gl-tile__plate"></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div>
+        </div>
+        <div class="gl-tile__body">
+          <div class="gl-tile__title"><span class="gl-tile__name">hermes-worker</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">❯</span> <i class="cur"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">The first click <b>arms</b>; it does not close. That is what makes it safe to put the
+  kill switch on the status light — the elegance survives and a stray click can't end a running agent.
+  Arming lapses after two seconds.</p>
+</div>
+
+<h2>Session states</h2>
+<div class="deck">
+  <div class="row w300">
+    <div class="cell"><span class="cap"><b>running</b> ice, breathing</span>
+      <div class="gl-tile" data-state="running">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">hermes-worker</span></div>
+          <div class="gl-tile__screen"><span class="a-ok">⌗ ready</span>
+<span class="a-dim">❯</span> <i class="cur"></i></div></div>
+      </div>
+    </div>
+    <div class="cell"><span class="cap"><b>idle</b> steel, no glow</span>
+      <div class="gl-tile" data-state="idle">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>7fa1e004</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">codex</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">exit 0 · no session</span></div></div>
+      </div>
+    </div>
+    <div class="cell"><span class="cap"><b>blocked</b> amber edge</span>
+      <div class="gl-tile" data-state="blocked">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>44da91c7</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">pi-policy</span></div>
+          <div class="gl-tile__screen"><span class="a-warn">awaiting permission</span>
+<span class="a-dim">bash · write ~/train</span></div></div>
+      </div>
+    </div>
+    <div class="cell"><span class="cap"><b>error</b> coral edge</span>
+      <div class="gl-tile" data-state="error">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>0b3ce55f</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">pi-exec</span></div>
+          <div class="gl-tile__screen"><span style="color:#ff8a75">handshake refused</span>
+<span class="a-dim">venue-2 · 3 tries</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>Focus · drag · narrow</h2>
+<div class="deck">
+  <div class="row">
+    <div class="cell w300"><span class="cap"><b>focused</b> ice ring, instant</span>
+      <div class="gl-tile is-focus" data-state="running">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">hermes-worker</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">❯</span> <i class="cur"></i></div></div>
+      </div>
+    </div>
+    <div class="cell w300"><span class="cap"><b>dragging</b> lifts by lightness</span>
+      <div class="gl-tile is-drag" data-state="running">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">hermes-worker</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">❯</span> <i class="cur"></i></div></div>
+      </div>
+    </div>
+    <div class="cell w200"><span class="cap"><b>200px</b> id drops, spine holds</span>
+      <div class="gl-tile" data-state="running">
+        <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+          <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+          <div class="gl-tile__id"><span>2cb2ca99</span></div>
+          <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+        <div class="gl-tile__body"><div class="gl-tile__title">
+          <span class="gl-tile__name">hermes</span>
+          <span class="gl-tile__meta">kimi-k3</span></div>
+          <div class="gl-tile__screen"><span class="a-dim">❯</span> <i class="cur"></i></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>Cabled</h2>
+<div class="deck">
+  <div class="pair w400">
+    <span class="cable"></span>
+    <div class="gl-tile" data-state="running">
+      <span class="gl-node gl-node--e" data-on="true"></span>
+      <span class="gl-node gl-node--w"></span>
+      <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+        <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+        <div class="gl-tile__id"><span>2cb2ca99</span></div>
+        <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+      <div class="gl-tile__body"><div class="gl-tile__title">
+        <span class="gl-tile__name">hermes-worker</span></div>
+        <div class="gl-tile__screen"><span class="a-ok">⌗ dispatch → codex</span>
+<span class="a-dim">❯</span> <i class="cur"></i></div></div>
+    </div>
+    <div class="gl-tile" data-state="running">
+      <span class="gl-node gl-node--w" data-on="true"></span>
+      <span class="gl-node gl-node--e"></span>
+      <div class="gl-tile__spine"><button class="gl-tile__head"><span class="gl-tile__light"></span>
+        <span class="gl-tile__plate"><span>CLOSE</span></span></button>
+        <div class="gl-tile__id"><span>7fa1e004</span></div>
+        <div class="gl-tile__grip"><i></i><i></i><i></i></div></div>
+      <div class="gl-tile__body"><div class="gl-tile__title">
+        <span class="gl-tile__name">codex</span></div>
+        <div class="gl-tile__screen"><span class="a-dim">← inbound from hermes</span>
+<span class="a-dim">❯</span> <i class="cur"></i></div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
