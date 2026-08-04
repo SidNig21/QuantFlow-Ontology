@@ -576,6 +576,37 @@ async function init() {
 	minimap.update();
 	void refreshHandoffs();
 
+	/**
+	 * Project Kernel agent_session rows onto the canvas. Tiles hold sessionId
+	 * refs only — appearance follows Kernel truth, not Dock click callbacks.
+	 */
+	async function reconcileKernelSessionTiles() {
+		const response = await window.shellApi.qf.listSessions();
+		if (!response?.ok || !Array.isArray(response.sessions)) return;
+		let added = false;
+		for (const session of response.sessions) {
+			const sessionId =
+				typeof session.id === "string" ? session.id : null;
+			if (!sessionId) continue;
+			const status =
+				typeof session.status === "string" ? session.status : "";
+			if (status === "closed" || status === "failed" || status === "cancelled") {
+				continue;
+			}
+			const existing = tiles.find((t) => t.sessionId === sessionId);
+			if (existing) continue;
+			const size = defaultSize("session");
+			const pos = findAutoPlacement(tiles, size.width, size.height);
+			tileManager.createSessionTile(pos.x, pos.y, sessionId);
+			added = true;
+		}
+		if (added) minimap.update();
+	}
+	void reconcileKernelSessionTiles();
+	setInterval(() => {
+		void reconcileKernelSessionTiles();
+	}, 1500);
+
 	// -- Agent panel init (after tileManager, since getAllWebviews references it) --
 
 	agentPanel.initPrefs(prefAgentWidth, prefAgentMode);
@@ -1182,6 +1213,9 @@ async function init() {
 			} else if (target === "canvas") {
 				if (channel === "handoffs-changed") {
 					void refreshHandoffs();
+				}
+				if (channel === "sessions-changed") {
+					void reconcileKernelSessionTiles();
 				}
 				if (channel === "open-terminal") {
 					const cwd = args[0];

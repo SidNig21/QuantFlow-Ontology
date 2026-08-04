@@ -8,6 +8,7 @@ export const workspace = defineObject({
   description:
     "A workspace is the operator-visible canvas container for one research effort. It governs spatial context and should not be overloaded with mission semantics.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     name: z
       .string()
@@ -27,6 +28,7 @@ export const agent_definition = defineObject({
   description:
     "An agent_definition is one founder-visible Dock profile. It governs spawn admission through package_ref while runtime_profile selects the adapter profile without encoding per-session state.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     name: z
       .string()
@@ -57,6 +59,11 @@ export const agent_definition = defineObject({
         "Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.",
       )
       .nullable(),
+    capability_groups: z
+      .array(z.enum(["market.read", "desk.orchestrate"]))
+      .describe(
+        "Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.",
+      ),
   }),
 });
 
@@ -65,6 +72,7 @@ export const agent_session = defineObject({
   description:
     "An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     status: z
       .enum(["starting", "running", "blocked", "cancelled", "failed", "closed"])
@@ -85,6 +93,7 @@ export const task = defineObject({
   description:
     "A task is a discrete unit of requested work tracked on the canvas. It governs delegation by linking intent to the session that owns execution.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     title: z
       .string()
@@ -96,6 +105,11 @@ export const task = defineObject({
       .describe(
         "Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.",
       ),
+    status: z
+      .enum(["open", "done"])
+      .describe(
+        "Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.",
+      ),
   }),
 });
 
@@ -104,6 +118,7 @@ export const tool = defineObject({
   description:
     "A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     name: z
       .string()
@@ -123,6 +138,7 @@ export const execution_environment = defineObject({
   description:
     "An execution_environment identifies where a run actually executes. It governs reproducibility by separating runtime substrate from run intent.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     kind: z
       .enum(["local_process", "local_python", "cloudflare_sandbox"])
@@ -142,6 +158,7 @@ export const connection = defineObject({
   description:
     "A connection is a typed edge between canvas tiles. It governs projection wiring only and must never become an independent truth store.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   properties: z.object({
     kind: z
       .string()
@@ -212,6 +229,12 @@ export const register_agent_definition = defineAction({
       .describe("Artifact or prompt id that defines this profile's instructions.")
       .nullable()
       .optional(),
+    capability_groups: z
+      .array(z.enum(["market.read", "desk.orchestrate"]))
+      .describe(
+        "Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names.",
+      )
+      .optional(),
   }),
 });
 
@@ -220,6 +243,7 @@ export const create_agent_session = defineAction({
   description:
     "Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   input: z.object({
     session_id: z
       .string()
@@ -241,6 +265,7 @@ export const start_agent_session = defineAction({
   name: "start_agent_session",
   description: "Bring a starting agent session into running (starting → running).",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   input: z.object({
     session_id: z.string().describe("Agent session id (guest-minted; adopted, never minted)."),
   }),
@@ -295,5 +320,35 @@ export const close_agent_session = defineAction({
   lifecycle: "experimental",
   input: z.object({
     session_id: z.string().describe("Agent session to close."),
+  }),
+});
+
+export const create_task = defineAction({
+  name: "create_task",
+  description:
+    "Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    task_id: z
+      .string()
+      .describe("Guest-minted task id — adopted as the Kernel row id, never re-minted."),
+    title: z.string().describe("Short outcome-oriented title for the task."),
+    description: z
+      .string()
+      .describe("Completion contract a verifier can judge from observable evidence."),
+    assignee_session_id: z
+      .string()
+      .describe("Existing agent_session id that owns execution; written as assigned_to."),
+  }),
+});
+
+export const complete_task = defineAction({
+  name: "complete_task",
+  description: "Mark an open task done (open → done) through the transition table.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    task_id: z.string().describe("Task id to complete."),
   }),
 });

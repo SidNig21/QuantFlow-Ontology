@@ -122,6 +122,62 @@ export function registerKernelHandlers(): void {
     },
   );
 
+  ipcMain.handle(
+    "qf:research:submitQuestion",
+    async (event, args?: { question?: string; definitionId?: string }) => {
+      try {
+        assertTrustedSender(event);
+        const question = args?.question;
+        if (typeof question !== "string" || question.trim().length === 0) {
+          throw new Error("submitQuestion requires non-empty question");
+        }
+        const text = question.trim();
+        const missionId = `mission-${crypto.randomUUID()}`;
+        kernelExecute(
+          "create_mission",
+          {
+            mission_id: missionId,
+            name: "Founder question",
+            objective: text,
+          },
+          { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+        );
+        const definitionId =
+          typeof args?.definitionId === "string" && args.definitionId.length > 0
+            ? args.definitionId
+            : process.env.QF_DOCK_QA_MODE === "1"
+              ? "qf-proof-orchestrator"
+              : "hermes-orchestrator";
+        const result = await admitAndStartSession(definitionId, {
+          onStarted: (sessionId, sp, info) => {
+            invalidateDock();
+            sendToShell("shell:forward", "canvas", "sessions-changed");
+            if (info?.surface === "native_tui" && info.ptySessionId) {
+              sendToShell(
+                "shell:forward",
+                "canvas",
+                "create-term-tile",
+                info.ptySessionId,
+                sessionId,
+                sp,
+                info.role,
+              );
+            }
+          },
+        });
+        invalidateDock();
+        return {
+          ok: true as const,
+          missionId,
+          sessionId: result.sessionId,
+          objective: text,
+        };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
   ipcMain.handle("qf:artifacts:list", (event) => {
     try {
       assertTrustedSender(event);

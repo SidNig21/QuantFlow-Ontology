@@ -65,24 +65,18 @@ These are unsafe or irreversible, not matters of taste:
 
 Everything else: keep building.
 
-## R0 close-out — do this first
+## R0 close-out — complete
 
-R0 is `active`, not complete. Three lines remain.
+R0 is `complete`. The three lines that remained:
 
-1. **Build the missing gate (R0 deliverable 10).** `NEXT.md` acceptance claims the founder's global
-   Hermes config and authentication are untouched. That claim is currently checked *by hand*.
-   `windows-cold-boot` photographs `~/.quantflow` on the Windows side only; no gate reads `~/.hermes`
-   inside WSL, which is where the real config and token live. Build a gate that captures a SHA-256 of
-   `~/.hermes/config.yaml` and `~/.hermes/auth.json` before and after a seat launch and fails if
-   either changes. **Never read, print, copy, or log the contents of those files — hashes only.**
-   Falsify it by touching a scratch copy, not the founder's real file.
-2. ~~Boot with Hermes unavailable.~~ **Closed 2026-08-04** — app opens, Dock stays visible, spawn is
-   refused with an actionable message, app survives the failure. See
+1. **Founder-Hermes-state gate (deliverable 10).** Closed — `hermes-founder-state` photographs
+   SHA-256 of WSL `~/.hermes/config.yaml` and `auth.json` before/after a seat launch (hashes only).
+   Evidence: `docs/orders/evidence/r0/VERIFICATION.md`.
+2. ~~Boot with Hermes unavailable.~~ **Closed 2026-08-04** — see
    `docs/orders/evidence/r0/CHECKS-2026-08-04.md`.
-3. ~~Cancel a running seat.~~ **Closed 2026-08-04** — cancelled mid-work in under 3 seconds, tile
-   removed, Kernel honestly `closed`, zero orphaned processes. Same evidence file.
+3. ~~Cancel a running seat.~~ **Closed 2026-08-04** — same evidence file.
 
-**Item 1 is the only thing left in R0.** Build that gate, then close R0 and move to R1.
+Continue at R1.
 
 ## What is already true, so you do not rebuild it
 

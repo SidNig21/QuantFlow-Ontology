@@ -9,12 +9,16 @@ import { KernelUpgradeShapeError } from "./errors.ts";
 export const PROFILE_IDENTITY_UPGRADE = "agent-profile-identity" as const;
 export const MARKET_INGEST_UPGRADE = "market-ingest" as const;
 export const MARKET_CONTEXT_UPGRADE = "market-context" as const;
+export const CAPABILITY_GRANTS_UPGRADE = "capability-grants" as const;
+export const TASK_STATUS_UPGRADE = "task-status" as const;
 
 export type KernelShapeState =
   | "uninitialized"
   | "pre_d1"
   | "d1"
   | "market_ingest"
+  | "market_context"
+  | "capability_grants"
   | "current"
   | "partial";
 
@@ -198,14 +202,64 @@ function expectedCurrent(): StructureSnapshot {
   return currentSnapshot;
 }
 
+/** Strip R2 capability_groups from agent_definition DDL for historical snapshots. */
+function withoutCapabilityGroupsColumn(sql: string | undefined): string | undefined {
+  if (!sql) return sql;
+  return sql
+    .replace(/,capability_groups TEXT NOT NULL DEFAULT '\[\]'/gi, "")
+    .replace(/,capability_groups TEXT NOT NULL/gi, "")
+    .replace(/,capability_groups TEXT/gi, "");
+}
+
+/** Strip R5 task.status from task DDL for historical snapshots. */
+function withoutTaskStatusColumn(sql: string | undefined): string | undefined {
+  if (!sql) return sql;
+  return sql
+    .replace(/,status TEXT NOT NULL DEFAULT 'open'/gi, "")
+    .replace(/,status TEXT NOT NULL/gi, "")
+    .replace(/,CHECK \(status IN \('open','done'\)\)/gi, "")
+    .replace(/CHECK \(status IN \('open','done'\)\)/gi, "");
+}
+
+function tablesWithoutCapabilityGroups(
+  tables: Map<string, string>,
+): Map<string, string> {
+  const next = new Map(tables);
+  const agentDef = withoutCapabilityGroupsColumn(next.get("agent_definition"));
+  if (agentDef) next.set("agent_definition", agentDef);
+  return next;
+}
+
+function tablesWithoutTaskStatus(
+  tables: Map<string, string>,
+): Map<string, string> {
+  const next = new Map(tables);
+  const taskSql = withoutTaskStatusColumn(next.get("task"));
+  if (taskSql) next.set("task", taskSql);
+  return next;
+}
+
+function schemaMetaWithoutTaskActions(
+  rows: Array<[string, string, string, string]>,
+): Array<[string, string, string, string]> {
+  return rows.filter(
+    ([typeName, kind]) =>
+      kind !== "action" || !["create_task", "complete_task"].includes(typeName),
+  );
+}
+
+function predecessorTables(tables: Map<string, string>): Map<string, string> {
+  return tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables));
+}
+
 /** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
 function expectedD1(): StructureSnapshot {
   if (!d1Snapshot) {
     const current = expectedCurrent();
     d1Snapshot = {
-      tables: new Map(current.tables),
+      tables: predecessorTables(current.tables),
       linkKinds: [...current.linkKinds],
-      schemaMeta: current.schemaMeta.filter(
+      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta).filter(
         ([typeName, kind]) =>
           kind !== "action" ||
           ![
@@ -226,9 +280,9 @@ function expectedMarketIngest(): StructureSnapshot {
   if (!marketIngestSnapshot) {
     const current = expectedCurrent();
     marketIngestSnapshot = {
-      tables: new Map(current.tables),
+      tables: predecessorTables(current.tables),
       linkKinds: [...current.linkKinds],
-      schemaMeta: current.schemaMeta.filter(
+      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta).filter(
         ([typeName, kind]) =>
           kind !== "action" ||
           !["register_venue", "schedule_market_event"].includes(typeName),
@@ -236,6 +290,36 @@ function expectedMarketIngest(): StructureSnapshot {
     };
   }
   return marketIngestSnapshot;
+}
+
+let marketContextSnapshot: StructureSnapshot | null = null;
+
+/** Post-0003 / pre-0004 — no capability_groups, no task.status, no R5 actions. */
+function expectedMarketContext(): StructureSnapshot {
+  if (!marketContextSnapshot) {
+    const current = expectedCurrent();
+    marketContextSnapshot = {
+      tables: predecessorTables(current.tables),
+      linkKinds: [...current.linkKinds],
+      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
+    };
+  }
+  return marketContextSnapshot;
+}
+
+let capabilityGrantsSnapshot: StructureSnapshot | null = null;
+
+/** Post-0004 / pre-0005 — capability_groups present; task.status and R5 actions absent. */
+function expectedCapabilityGrants(): StructureSnapshot {
+  if (!capabilityGrantsSnapshot) {
+    const current = expectedCurrent();
+    capabilityGrantsSnapshot = {
+      tables: tablesWithoutTaskStatus(current.tables),
+      linkKinds: [...current.linkKinds],
+      schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
+    };
+  }
+  return capabilityGrantsSnapshot;
 }
 
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
@@ -298,6 +382,8 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedPreD1())) return "pre_d1";
   if (snapshotsEqual(live, expectedD1())) return "d1";
   if (snapshotsEqual(live, expectedMarketIngest())) return "market_ingest";
+  if (snapshotsEqual(live, expectedMarketContext())) return "market_context";
+  if (snapshotsEqual(live, expectedCapabilityGrants())) return "capability_grants";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -337,6 +423,8 @@ export function applyKernelUpgradeChain(
     profileIdentitySql: string;
     marketIngestSql: string;
     marketContextSql: string;
+    capabilityGrantsSql: string;
+    taskStatusSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -362,11 +450,34 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    db.exec(upgrades.marketContextSql);
+    if (state === "pre_d1" || state === "d1" || state === "market_ingest") {
+      db.exec(upgrades.marketContextSql);
+      if (classifyKernelShape(db) !== "market_context") {
+        throw new KernelUpgradeShapeError(
+          MARKET_CONTEXT_UPGRADE,
+          "0003 did not produce the exact market-context shape",
+        );
+      }
+    }
+    if (
+      state === "pre_d1" ||
+      state === "d1" ||
+      state === "market_ingest" ||
+      state === "market_context"
+    ) {
+      db.exec(upgrades.capabilityGrantsSql);
+      if (classifyKernelShape(db) !== "capability_grants") {
+        throw new KernelUpgradeShapeError(
+          CAPABILITY_GRANTS_UPGRADE,
+          "0004 did not produce the exact capability-grants shape",
+        );
+      }
+    }
+    db.exec(upgrades.taskStatusSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
-        MARKET_CONTEXT_UPGRADE,
-        "0003 did not produce the exact current shape",
+        TASK_STATUS_UPGRADE,
+        "0005 did not produce the exact current shape",
       );
     }
   });
@@ -379,7 +490,14 @@ export function applyKernelUpgradeChain(
  */
 export function applyProfileIdentityUpgrade(db: KernelDb, upgradeSql: string): void {
   const state = assertWritableUpgradeShape(db);
-  if (state === "d1" || state === "current" || state === "uninitialized") return;
+  if (
+    state === "d1" ||
+    state === "capability_grants" ||
+    state === "current" ||
+    state === "uninitialized"
+  ) {
+    return;
+  }
   if (state !== "pre_d1") return;
   const tx = db.transaction(() => {
     db.exec(upgradeSql);

@@ -152,6 +152,14 @@ export const commands: readonly TransitionCommand[] = [
     to: "closed",
     event: "agent_session.closed",
   },
+  // task
+  {
+    action: "complete_task",
+    type: "task",
+    from: "open",
+    to: "done",
+    event: "task.completed",
+  },
 ] as const;
 
 /**
@@ -187,6 +195,11 @@ export const creationCommands: readonly CreationCommand[] = [
     action: "create_agent_session",
     object_type: "agent_session",
     event: "agent_session.created",
+  },
+  {
+    action: "create_task",
+    object_type: "task",
+    event: "task.created",
   },
   {
     action: "register_agent_definition",

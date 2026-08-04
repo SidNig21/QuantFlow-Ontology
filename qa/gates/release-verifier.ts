@@ -40,6 +40,8 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
     cwd: ".",
     command: ["bun", "qa/run.ts", "windows-cold-boot"],
   },
+  // hermes-founder-state is intentionally absent: it requires a WSL distro and
+  // fails closed without one, and CI's windows-latest runner has none.
   {
     id: "repo-shape",
     cwd: ".",

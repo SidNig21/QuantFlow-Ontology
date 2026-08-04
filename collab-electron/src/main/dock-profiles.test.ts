@@ -23,17 +23,20 @@ afterEach(() => {
 
 function seedAdapter(
   root: string,
-  base: "species/hermes" | "tools/runtime-proof" | "tools/qf-proof-agent",
-  adapterId: "hermes" | "qf-toolloop" | "qf-proof-agent",
+  base: "species/hermes" | "species/claude-code" | "tools/runtime-proof" | "tools/qf-proof-agent",
+  adapterId: "hermes" | "claude-code" | "qf-toolloop" | "qf-proof-agent",
   profiles: Array<{
     id: string;
     role: string;
     runtime_profile: string | null;
     system_prompt_ref: string | null;
+    capability_groups: Array<"market.read" | "desk.orchestrate">;
   }>,
 ): void {
   const packageName = adapterId === "hermes"
     ? "hermes.aospkg"
+    : adapterId === "claude-code"
+      ? "claude-code.aospkg"
     : adapterId === "qf-toolloop"
       ? "qf-toolloop.aospkg"
       : "qf-proof-agent.aospkg";
@@ -51,6 +54,13 @@ function seedAdapter(
             argv: ["--tui"],
             profile_argv: ["-p", "{runtime_profile}", "--tui"],
           }
+        : adapterId === "claude-code"
+          ? {
+              command: "node",
+              entrypoint: "claude-code.mjs",
+              profile_argv: ["--profile", "{runtime_profile}"],
+              argv: ["--profile", "default"],
+            }
         : adapterId === "qf-proof-agent"
           ? {
               command: "node",
@@ -76,19 +86,45 @@ function seedRequired(root: string): void {
       id: "hermes-orchestrator",
       role: "orchestrator",
       runtime_profile: "qf-orchestrator",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/orchestrator.md",
+      capability_groups: ["desk.orchestrate"],
     },
     {
       id: "hermes-worker",
       role: "worker",
       runtime_profile: "qf-worker",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
     },
     {
       id: "hermes-worker-2",
       role: "worker2",
       runtime_profile: "qf-worker-2",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
+    },
+  ]);
+  seedAdapter(root, "species/claude-code", "claude-code", [
+    {
+      id: "claude-code-orchestrator",
+      role: "claude-orchestrator",
+      runtime_profile: "claude-code-orchestrator",
+      system_prompt_ref: "prompts/orchestrator.md",
+      capability_groups: ["desk.orchestrate"],
+    },
+    {
+      id: "claude-code-worker",
+      role: "claude-worker",
+      runtime_profile: "claude-code-worker",
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
+    },
+    {
+      id: "claude-code-ungranted",
+      role: "claude-ungranted",
+      runtime_profile: "claude-code-ungranted",
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: [],
     },
   ]);
 }
@@ -99,13 +135,15 @@ function seedQaFixtures(root: string): void {
       id: "qf-proof-orchestrator",
       role: "orchestrator",
       runtime_profile: "qf-proof-orchestrator",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/orchestrator.md",
+      capability_groups: ["desk.orchestrate"],
     },
     {
       id: "qf-proof-worker",
       role: "worker",
       runtime_profile: "qf-proof-worker",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
     },
   ]);
   seedAdapter(root, "tools/runtime-proof", "qf-toolloop", [
@@ -114,6 +152,7 @@ function seedQaFixtures(root: string): void {
       role: "toolloop-proof",
       runtime_profile: null,
       system_prompt_ref: null,
+      capability_groups: [],
     },
   ]);
 }
@@ -136,6 +175,9 @@ describe("Dock profile manifests", () => {
     const manifests = discoverDockProfileManifests(freshRoot());
     const profiles = manifests.flatMap((manifest) => manifest.profiles);
     expect(profiles.map((profile) => profile.name).sort()).toEqual([
+      "claude-code-orchestrator",
+      "claude-code-ungranted",
+      "claude-code-worker",
       "hermes-orchestrator",
       "hermes-worker",
       "hermes-worker-2",
@@ -150,6 +192,9 @@ describe("Dock profile manifests", () => {
   test("QA discovery explicitly includes proof fixtures", () => {
     const manifests = discoverDockProfileManifests(freshQaRoot(), { qaMode: true });
     expect(manifests.flatMap((manifest) => manifest.profiles).map((profile) => profile.name).sort()).toEqual([
+      "claude-code-orchestrator",
+      "claude-code-ungranted",
+      "claude-code-worker",
       "hermes-orchestrator",
       "hermes-worker",
       "hermes-worker-2",
@@ -196,14 +241,14 @@ describe("Dock profile manifests", () => {
     };
     const root = freshRoot();
     const first = bootstrapDockProfiles(root, deps);
-    expect(first.registered).toHaveLength(3);
+    expect(first.registered).toHaveLength(6);
     expect(first.conflicts).toHaveLength(0);
-    expect(writes).toHaveLength(3);
+    expect(writes).toHaveLength(6);
 
     const second = bootstrapDockProfiles(root, deps);
     expect(second.registered).toHaveLength(0);
-    expect(second.skipped).toHaveLength(3);
-    expect(writes).toHaveLength(3);
+    expect(second.skipped).toHaveLength(6);
+    expect(writes).toHaveLength(6);
 
     rows.set("hermes-worker", {
       ...rows.get("hermes-worker"),
@@ -214,7 +259,7 @@ describe("Dock profile manifests", () => {
       "hermes-worker",
     ]);
     expect(rows.get("hermes-worker")?.role).toBe("operator-custom-role");
-    expect(writes).toHaveLength(3);
+    expect(writes).toHaveLength(6);
 
     const qaRows = new Map<string, Record<string, unknown>>();
     const qaWrites: DockProfileRegistration[] = [];
@@ -225,8 +270,8 @@ describe("Dock profile manifests", () => {
         qaRows.set(input.name, { id: input.name, ...input });
       },
     }, { qaMode: true });
-    expect(qa.registered).toHaveLength(6);
-    expect(qaWrites).toHaveLength(6);
+    expect(qa.registered).toHaveLength(9);
+    expect(qaWrites).toHaveLength(9);
   });
 
   test("validates every manifest before making a Kernel call", () => {
@@ -270,6 +315,7 @@ describe("Dock profile manifests", () => {
           role: "worker",
           runtime_profile: "one",
           system_prompt_ref: null,
+          capability_groups: ["market.read"],
         },
       ],
     };

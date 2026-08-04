@@ -129,16 +129,16 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 
 | Rung | State | Evidence |
 |---|---|---|
-| R0 | active | `docs/orders/evidence/r0` |
-| R1 | pending | — |
-| R2 | pending | — |
-| R3 | pending | — |
-| R4 | pending | — |
-| R5 | pending | — |
-| R6 | pending | — |
-| R7 | pending | — |
-| R8 | pending | — |
-| R9 | pending | — |
+| R0 | complete | `docs/orders/evidence/r0` |
+| R1 | complete | `docs/orders/evidence/r1` |
+| R2 | complete | `docs/orders/evidence/r2` |
+| R3 | complete | `docs/orders/evidence/r3` |
+| R4 | complete | `docs/orders/evidence/r4` |
+| R5 | complete | `docs/orders/evidence/r5` |
+| R6 | complete | `docs/orders/evidence/r6` |
+| R7 | complete | `docs/orders/evidence/r7` |
+| R8 | complete | `docs/orders/evidence/r8` |
+| R9 | active | — |
 | R10 | pending | — |
 | R11a | pending | — |
 | R11b | pending | — |
@@ -168,13 +168,13 @@ falsifiable test, not the builder's opinion, so this does not violate the no-sel
 
 Written one rung ahead of the build front. A rung with no contract here is not ready to be selected.
 
-### R0 — installable collaboration floor · ACTIVE
+### R0 — installable collaboration floor · COMPLETE
 
 **Proves.** The Windows app you install — not `bun run dev` — spawns real Hermes seats that exchange
 a real task and result, and the work is backed up on GitHub.
 
-**Remaining.** Two blockers, both external to the code: the Hermes provider rate limit, and the
-founder's manual keyboard-input check. Everything else has commits.
+**Closed.** Founder-Hermes-state is gated by `hermes-founder-state` (hashes only). Hermes-unavailable
+boot and mid-work cancel closed 2026-08-04 (`docs/orders/evidence/r0/`).
 
 **Acceptance.** From the installed application: app opens even with no Hermes available; Dock shows
 accurate availability; two real seats spawn; both receive only launch-scoped config; one task and one
@@ -185,9 +185,11 @@ config and authentication are provably untouched; branch pushed.
 **Carried risk.** Acceptance runs through automated TUI input, which is known to enter partial text.
 A red result must be diagnosed as product-or-harness before it counts as a failure.
 
-### R1 — the ontology gateway
+### R1 — the ontology gateway · COMPLETE
 
 **Proves.** A Dock-spawned seat can call a generated `qf_*` tool and get real Kernel data back.
+
+**Closed.** App-owned gateway + `windows-dock-ontology` gate. Evidence: `docs/orders/evidence/r1/`.
 
 **Deliverables.** An app-owned MCP server exposing the generated tool surface. Calls resolve inside
 the app; a seat never holds a database handle. Designed **stateless** — no session state on the

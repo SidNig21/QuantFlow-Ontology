@@ -21,6 +21,8 @@ import {
   type LinkRow,
   type TraceContext,
 } from "qf-kernel/portable";
+import { schema } from "qf-kernel-schema";
+import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp";
 import { QF_APP_DIR } from "./paths";
 
 function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
@@ -323,12 +325,114 @@ export function kernelListAgentDefinitions(): Record<string, unknown>[] {
   );
 }
 
+/** Generated ontology read-tool surface (names + schemas) from the live schema. */
+export function kernelListOntologyReadTools(): McpToolDefinition[] {
+  const tools: McpToolDefinition[] = [];
+  for (const object of schema.objects) {
+    tools.push(...readToolsForObject(object));
+  }
+  for (const action of schema.actions) {
+    if (action.capabilityGroup) {
+      tools.push({
+        name: `qf_${action.name}`,
+        description: action.description,
+        inputSchema: { type: "object", properties: {}, additionalProperties: true },
+      });
+    }
+  }
+  return tools;
+}
+
+/** Capability group for a generated tool name, or null if untagged/unknown. */
+export function kernelCapabilityGroupForTool(
+  name: string,
+): "market.read" | "desk.orchestrate" | null {
+  const read = kernelParseOntologyReadTool(name);
+  if (read) {
+    const object = schema.objects.find((entry) => entry.name === read.objectName);
+    return object?.capabilityGroup ?? null;
+  }
+  const actionMatch = /^qf_(.+)$/.exec(name);
+  if (!actionMatch) return null;
+  const action = schema.actions.find((entry) => entry.name === actionMatch[1]);
+  return action?.capabilityGroup ?? null;
+}
+
+/** Filter generated tools to those whose group is in the granted set. */
+export function kernelListOntologyToolsForGroups(
+  groups: ReadonlyArray<"market.read" | "desk.orchestrate">,
+): McpToolDefinition[] {
+  const allowed = new Set(groups);
+  return kernelListOntologyReadTools().filter((tool) => {
+    const group = kernelCapabilityGroupForTool(tool.name);
+    return group !== null && allowed.has(group);
+  });
+}
+
+/** Resolve capability_groups JSON from the session's spawned_from definition. */
+export function kernelCapabilityGroupsForSession(
+  sessionId: string,
+): Array<"market.read" | "desk.orchestrate"> {
+  const link = kernelGetLinks(sessionId, { kind: "spawned_from" })[0];
+  if (!link?.to_id) return [];
+  const definition = kernelGetObject("agent_definition", link.to_id);
+  if (!definition) return [];
+  const raw = definition.capability_groups;
+  let parsed: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(parsed)) return [];
+  const out: Array<"market.read" | "desk.orchestrate"> = [];
+  for (const group of parsed) {
+    if (group === "market.read" || group === "desk.orchestrate") out.push(group);
+  }
+  return out;
+}
+
+/** True when name is a generated read tool for a known schema object. */
+export function kernelParseOntologyReadTool(
+  name: string,
+): { objectName: string; op: "get" | "query" | "links" } | null {
+  const match = /^qf_(.+)_(get|query|links)$/.exec(name);
+  if (!match) return null;
+  const objectName = match[1]!;
+  const op = match[2] as "get" | "query" | "links";
+  if (!schema.objects.some((object) => object.name === objectName)) return null;
+  return { objectName, op };
+}
+
+/** True when name is a generated action tool (`qf_<action>`). */
+export function kernelParseOntologyActionTool(name: string): string | null {
+  const match = /^qf_(.+)$/.exec(name);
+  if (!match) return null;
+  const actionName = match[1]!;
+  if (kernelParseOntologyReadTool(name)) return null;
+  if (!schema.actions.some((action) => action.name === actionName)) return null;
+  return actionName;
+}
+
 /** Fetch one ontology row by type and id. */
 export function kernelGetObject(
   type: string,
   id: string,
 ): Record<string, unknown> | null {
   return getObject(getKernelDb(), type, id);
+}
+
+/** List ontology rows with optional filters through the shared Kernel handle. */
+export function kernelQueryObjects(
+  type: string,
+  filters?: Record<string, unknown>,
+  limit: number | null | undefined = 100,
+  offset = 0,
+  order: "asc" | "desc" = "desc",
+): Record<string, unknown>[] {
+  return queryObjects(getKernelDb(), type, filters, limit, offset, undefined, order);
 }
 
 /** Read links touching one ontology object through the shared Kernel handle. */

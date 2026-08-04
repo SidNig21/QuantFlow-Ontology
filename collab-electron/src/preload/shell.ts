@@ -59,6 +59,8 @@ contextBridge.exposeInMainWorld("shellApi", {
     listHandoffs: () => ipcRenderer.invoke("qf:handoffs:list"),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
+    submitResearchQuestion: (question: string) =>
+      ipcRenderer.invoke("qf:research:submitQuestion", { question }),
     spawnSession: (args: { definitionId: string }) =>
       ipcRenderer.invoke("qf:sessions:spawn", args),
     runTurn: (args: { sessionId: string; prompt?: string }) =>

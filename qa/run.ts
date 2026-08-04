@@ -426,6 +426,112 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "hermes-founder-state",
+    description:
+      "R0: SHA-256 of WSL ~/.hermes/config.yaml and auth.json unchanged across a seat launch (hashes only)",
+    run: async () => {
+      const { runHermesFounderStateGate } = await import(
+        "./gates/hermes-founder-state.ts"
+      );
+      const { ok } = await runHermesFounderStateGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-dock-ontology",
+    description:
+      "R1: Dock seat calls generated ontology read tools through the app-owned gateway; foreign kernel_db refused",
+    run: async () => {
+      const { runWindowsDockOntologyGate } = await import(
+        "./gates/windows-dock-ontology.ts"
+      );
+      const { ok } = await runWindowsDockOntologyGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-dock-capability",
+    description:
+      "R2: capability groups grant desk tools to orchestrator and refuse them for worker",
+    run: async () => {
+      const { runWindowsDockCapabilityGate } = await import(
+        "./gates/windows-dock-capability.ts"
+      );
+      const { ok } = await runWindowsDockCapabilityGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-dock-hire",
+    description:
+      "R3: orchestrator catalogs/hires via ontology gateway; canvas projects Kernel sessions",
+    run: async () => {
+      const { runWindowsDockHireGate } = await import(
+        "./gates/windows-dock-hire.ts"
+      );
+      const { ok } = await runWindowsDockHireGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-dock-species",
+    description:
+      "R4: Claude Code and Hermes-contract seats share ontology gateway; no hermes MCP hardcode",
+    run: async () => {
+      const { runWindowsDockSpeciesGate } = await import(
+        "./gates/windows-dock-species.ts"
+      );
+      const { ok } = await runWindowsDockSpeciesGate();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-task-delegation",
+    description:
+      "R5: create_task + assigned_to + complete_task survive reopen; illegal transition refused",
+    run: async () => {
+      const { runKernelTaskDelegationGate } = await import(
+        "./gates/kernel-task-delegation-launch.ts"
+      );
+      const { ok } = await runKernelTaskDelegationGate();
+      return ok;
+    },
+  },
+  {
+    name: "acp-fs-confine",
+    description:
+      "R7: ACP fs confined to QF_ACP_FS_ROOT; unset root not advertised; escape baits refused",
+    run: async () => {
+      const { runAcpFsConfineGate } = await import("./gates/acp-fs-confine.ts");
+      const { ok } = await runAcpFsConfineGate();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-market-lineage",
+    description:
+      "R6: answer lineage must cite seeded/read ids; empty and fabricated cites fail",
+    run: async () => {
+      const { runKernelMarketLineageGate } = await import(
+        "./gates/kernel-market-lineage-launch.ts"
+      );
+      const { ok } = await runKernelMarketLineageGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-research-question",
+    description:
+      "R8: canvas/RPC submit creates Kernel mission + starts orchestrator",
+    run: async () => {
+      const { runWindowsResearchQuestionGate } = await import(
+        "./gates/windows-research-question.ts"
+      );
+      const { ok } = await runWindowsResearchQuestionGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",

@@ -47,6 +47,7 @@ import {
   peerBusReadInbox,
   peerBusSend,
 } from "./kernel";
+import { registerOntologyGatewayRpc } from "./ontology-gateway";
 import { registerIntegrationsIpc } from "./integrations";
 import {
   registerMethod,
@@ -1087,6 +1088,70 @@ app.whenReady().then(async () => {
       return peerBusReadInbox(busDb, identity.role);
     },
     { description: "Product-owned peer-bus inbox pull for one admitted session role." },
+  );
+  registerOntologyGatewayRpc(registerMethod, requirePeerSessionRole);
+  registerMethod(
+    "qf.research.submit_question",
+    async (params) => {
+      if (!params || typeof params !== "object") {
+        throw new Error("submit_question requires params");
+      }
+      const input = params as Record<string, unknown>;
+      const question = input.question;
+      if (typeof question !== "string" || question.trim().length === 0) {
+        throw new Error("submit_question requires non-empty question");
+      }
+      const text = question.trim();
+      const missionId =
+        typeof input.mission_id === "string" && input.mission_id.length > 0
+          ? input.mission_id
+          : `mission-${crypto.randomUUID()}`;
+      kernelExecute(
+        "create_mission",
+        {
+          mission_id: missionId,
+          name: "Founder question",
+          objective: text,
+        },
+        { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+      );
+      const definitionId =
+        typeof input.definition_id === "string" && input.definition_id.length > 0
+          ? input.definition_id
+          : process.env.QF_DOCK_QA_MODE === "1"
+            ? "qf-proof-orchestrator"
+            : "hermes-orchestrator";
+      const result = await admitAndStartSession(definitionId, {
+        onStarted: (sessionId, sp, info) => {
+          mainWindow?.webContents.send("qf:dock:invalidate");
+          mainWindow?.webContents.send(
+            "shell:forward",
+            "canvas",
+            "sessions-changed",
+          );
+          if (info?.surface === "native_tui" && info.ptySessionId) {
+            mainWindow?.webContents.send(
+              "shell:forward",
+              "canvas",
+              "create-term-tile",
+              info.ptySessionId,
+              sessionId,
+              sp,
+              info.role,
+            );
+          }
+        },
+      });
+      return {
+        missionId,
+        sessionId: result.sessionId,
+        objective: text,
+      };
+    },
+    {
+      description:
+        "Create a Kernel mission from the founder question and start the orchestrator seat.",
+    },
   );
   const bovadaKernel: BovadaKernelAccess = {
     execute: (_db, command, input, trace) =>

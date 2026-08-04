@@ -71,6 +71,8 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('sched
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ingest_market_batch', 'action', 'experimental', 'Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_agent_definition', 'action', 'experimental', 'Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_task', 'action', 'experimental', 'Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_task', 'action', 'experimental', 'Mark an open task done (open → done) through the transition table.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_agent_session', 'action', 'experimental', 'Bring a starting agent session into running (starting → running).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('block_agent_session', 'action', 'experimental', 'Block a running agent session (running → blocked).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('unblock_agent_session', 'action', 'experimental', 'Return a blocked agent session to running (blocked → running).');
@@ -368,7 +370,9 @@ CREATE TABLE agent_definition (
   -- Artifact or prompt identifier containing this profile's operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
   system_prompt_ref TEXT,
   -- Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.
-  runtime_profile TEXT
+  runtime_profile TEXT,
+  -- Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.
+  capability_groups TEXT NOT NULL
 );
 
 -- An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.
@@ -393,7 +397,10 @@ CREATE TABLE task (
   -- Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.
   title TEXT NOT NULL,
   -- Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.
-  description TEXT NOT NULL
+  description TEXT NOT NULL,
+  -- Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.
+  status TEXT NOT NULL,
+  CHECK (status IN ('open', 'done'))
 );
 
 -- A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.

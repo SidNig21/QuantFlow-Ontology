@@ -91,6 +91,8 @@ export function createCanvasRpc({
 							url: t.url,
 							cwd: t.cwd,
 							ptySessionId: t.ptySessionId,
+							sessionId: t.sessionId,
+							artifactId: t.artifactId,
 							userTitle: t.userTitle,
 							autoTitle: t.autoTitle,
 							position: { x: t.x, y: t.y },

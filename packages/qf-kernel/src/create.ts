@@ -4,10 +4,12 @@ import type { KernelDb } from "./db.ts";
 import {
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
+  AssignedToLinkRejectedError,
   ContentHashMismatchError,
   KernelError,
   SpawnedFromLinkRejectedError,
   UnknownAgentDefinitionError,
+  UnknownAssigneeSessionError,
 } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import type { ContextExecuteResult, ObjectExecuteResult } from "./results.ts";
@@ -212,6 +214,23 @@ function registerAgentDefinition(
     }
     system_prompt_ref = input.system_prompt_ref;
   }
+  let capability_groups: string[] = [];
+  if (input.capability_groups !== undefined && input.capability_groups !== null) {
+    if (!Array.isArray(input.capability_groups)) {
+      throw new KernelError(
+        'register_agent_definition "capability_groups" must be an array',
+      );
+    }
+    for (const group of input.capability_groups) {
+      if (group !== "market.read" && group !== "desk.orchestrate") {
+        throw new KernelError(
+          'register_agent_definition "capability_groups" entries must be market.read or desk.orchestrate',
+        );
+      }
+      capability_groups.push(group);
+    }
+  }
+  const capability_groups_json = JSON.stringify(capability_groups);
 
   const id = name;
   const existing = db.query(`SELECT * FROM agent_definition WHERE id = ?`).get(id) as
@@ -234,13 +253,23 @@ function registerAgentDefinition(
       package_ref,
       runtime_profile,
       system_prompt_ref,
+      capability_groups,
     },
     insert: () => {
       const created_at = new Date().toISOString();
       db.query(
-        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ).run(id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref);
+        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref, capability_groups)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        id,
+        created_at,
+        name,
+        role,
+        package_ref,
+        runtime_profile,
+        system_prompt_ref,
+        capability_groups_json,
+      );
     },
   });
   return creationResult(cmd, id, cmd.event, state);
@@ -310,6 +339,74 @@ function createAgentSession(
     },
   });
   return creationResult(cmd, session_id, cmd.event, state, "starting");
+}
+
+function createTask(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ObjectExecuteResult {
+  const task_id = input.task_id;
+  if (typeof task_id !== "string" || task_id.length === 0) {
+    throw new KernelError(
+      'create_task requires non-empty "task_id" (guest-minted, adopted)',
+    );
+  }
+  const title = input.title;
+  if (typeof title !== "string" || title.length === 0) {
+    throw new KernelError('create_task requires non-empty "title"');
+  }
+  const description = input.description;
+  if (typeof description !== "string" || description.length === 0) {
+    throw new KernelError('create_task requires non-empty "description"');
+  }
+  const assignee_session_id = input.assignee_session_id;
+  if (typeof assignee_session_id !== "string" || assignee_session_id.length === 0) {
+    throw new KernelError('create_task requires non-empty "assignee_session_id"');
+  }
+
+  for (const spec of links) {
+    if (spec.kind === "assigned_to") {
+      throw new AssignedToLinkRejectedError();
+    }
+  }
+
+  const session = db
+    .query(`SELECT id FROM agent_session WHERE id = ?`)
+    .get(assignee_session_id) as { id: string } | null;
+  if (!session) {
+    throw new UnknownAssigneeSessionError(assignee_session_id);
+  }
+
+  const identityLinks: LinkSpec[] = [
+    ...links,
+    { kind: "assigned_to", to_id: assignee_session_id },
+  ];
+
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: task_id,
+    event: cmd.event,
+    trace,
+    links: identityLinks,
+    payload: {
+      command: cmd.action,
+      status: "open",
+      title,
+      description,
+      assignee_session_id,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO task (id, created_at, title, description, status)
+         VALUES (?, ?, ?, ?, ?)`,
+      ).run(task_id, created_at, title, description, "open");
+    },
+  });
+  return creationResult(cmd, task_id, cmd.event, state, "open");
 }
 
 function createHypothesis(
@@ -756,6 +853,7 @@ function observeTicket(
 export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   publish_artifact: publishArtifact,
   create_agent_session: createAgentSession,
+  create_task: createTask,
   register_agent_definition: registerAgentDefinition,
   create_hypothesis: createHypothesis,
   register_dataset_version: registerDatasetVersion,

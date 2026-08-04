@@ -10,6 +10,7 @@ export const competitor = defineObject({
   description:
     "A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.",
   lifecycle: "experimental",
+  capabilityGroup: "market.read",
   properties: z.object({
     kind: z
       .enum(["ufc_fighter", "tennis_player", "team"])
@@ -32,6 +33,7 @@ export const market_event = defineObject({
   description:
     "A market_event is the bounded real-world occurrence that instruments resolve against. Treat starts_at and status as the governing fence for legal pre-event decisions and lifecycle transitions.",
   lifecycle: "experimental",
+  capabilityGroup: "market.read",
   properties: z.object({
     sport: z
       .enum(["ufc", "tennis", "football"])
@@ -62,6 +64,7 @@ export const instrument = defineObject({
     "An instrument is one bettable selection under a market category. Encode category variation in kind and params so the type can exist with or without a bounded market_event.",
   lifecycle: "experimental",
   pipelineFed: true,
+  capabilityGroup: "market.read",
   properties: z.object({
     kind: z
       .enum(["moneyline", "spread", "total", "prop"])
@@ -91,6 +94,7 @@ export const quote = defineObject({
     "A quote is a pointer object for timestamped price observations of one instrument from one source. Keep raw tick rows outside the Kernel and store only references and coverage metadata here.",
   lifecycle: "experimental",
   pipelineFed: true,
+  capabilityGroup: "market.read",
   properties: z.object({
     book: z
       .enum(["bovada", "pinnacle"])
@@ -113,6 +117,7 @@ export const venue = defineObject({
   description:
     "A venue is the listing and pricing source where instruments are offered. Represent sportsbooks and exchanges as rows here so tickets can reference a concrete origin.",
   lifecycle: "experimental",
+  capabilityGroup: "market.read",
   properties: z.object({
     kind: z
       .enum(["sportsbook", "exchange"])
@@ -161,6 +166,7 @@ export const result = defineObject({
   description:
     "A result is the settled truth payload for a market_event and its instruments. Treat settled_at as the governing timestamp that closes uncertainty and enables final grading.",
   lifecycle: "experimental",
+  capabilityGroup: "market.read",
   properties: z.object({
     outcome: jsonObject.describe(
       "This field stores structured settlement facts such as winner, method, and per-instrument grading. Keep the structure explicit so grading decisions are reproducible.",

@@ -37,6 +37,10 @@ export const transitions = {
     failed: ["closed"],
     closed: [],
   },
+  task: {
+    open: ["done"],
+    done: [],
+  },
 } as const;
 
 export type StatefulType = keyof typeof transitions;

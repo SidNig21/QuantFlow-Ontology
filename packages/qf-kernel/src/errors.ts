@@ -241,6 +241,24 @@ export class SpawnedFromLinkRejectedError extends Error {
   }
 }
 
+/** Caller supplied a system-owned assigned_to link — nothing written. */
+export class AssignedToLinkRejectedError extends Error {
+  constructor() {
+    super("create_task rejects caller-supplied assigned_to link");
+    this.name = "AssignedToLinkRejectedError";
+  }
+}
+
+/** assignee_session_id does not name an existing agent_session. */
+export class UnknownAssigneeSessionError extends Error {
+  readonly sessionId: string;
+  constructor(sessionId: string) {
+    super(`unknown assignee_session_id: ${sessionId}`);
+    this.name = "UnknownAssigneeSessionError";
+    this.sessionId = sessionId;
+  }
+}
+
 /**
  * Database has a schema_meta table but is not a completed Kernel initialization
  * (WO-K3 RULING 3). Bare migration CREATE TABLE cannot repair it in place.

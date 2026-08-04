@@ -21,6 +21,12 @@ import {
   getPref, setPref, type AppConfig,
 } from "./config";
 import { denyPermissionResponse } from "./host-acp-bridge";
+import {
+  assertPathWithinAcpFsRoot,
+  loadAcpFsRoot,
+  shouldAdvertiseAcpFs,
+  type AcpFsRoot,
+} from "./acp-fs-root";
 import { QF_APP_DIR } from "./paths";
 
 type AgentSession = {
@@ -35,6 +41,7 @@ const PREF_SESSION_CWD = "agent-acp-session-cwd";
 const sessions = new Map<string, AgentSession>();
 let shellWindow: BrowserWindow | null = null;
 let appConfig: AppConfig | null = null;
+let acpFsRoot: AcpFsRoot = null;
 
 function getMessageCachePath(): string {
   return resolve(
@@ -100,6 +107,10 @@ export function createClient(): Client {
     async readTextFile(
       params: ReadTextFileRequest,
     ): Promise<ReadTextFileResponse> {
+      if (!acpFsRoot) {
+        throw new Error("ACP fs read refused: QF_ACP_FS_ROOT is unset");
+      }
+      assertPathWithinAcpFsRoot(acpFsRoot, params.path);
       const content = await readFile(
         params.path, "utf-8",
       );
@@ -109,6 +120,10 @@ export function createClient(): Client {
     async writeTextFile(
       params: WriteTextFileRequest,
     ): Promise<WriteTextFileResponse> {
+      if (!acpFsRoot) {
+        throw new Error("ACP fs write refused: QF_ACP_FS_ROOT is unset");
+      }
+      assertPathWithinAcpFsRoot(acpFsRoot, params.path);
       await writeFile(
         params.path, params.content, "utf-8",
       );
@@ -195,10 +210,13 @@ async function spawnAndInitialize(
   );
 
   const t1 = performance.now();
+  const fsCapability = shouldAdvertiseAcpFs(acpFsRoot)
+    ? { readTextFile: true, writeTextFile: true }
+    : undefined;
   await connection.initialize({
     protocolVersion: 1,
     clientCapabilities: {
-      fs: { readTextFile: true, writeTextFile: true },
+      ...(fsCapability ? { fs: fsCapability } : {}),
     },
     clientInfo: {
       name: "quantflow",
@@ -362,6 +380,7 @@ export function registerAgentIpc(
 ): void {
   shellWindow = win;
   appConfig = cfg;
+  acpFsRoot = loadAcpFsRoot();
 
   ipcMain.handle(
     "agent:spawn",
