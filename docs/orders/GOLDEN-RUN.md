@@ -129,8 +129,8 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 
 | Rung | State | Evidence |
 |---|---|---|
-| R0 | active | `docs/orders/evidence/r0` |
-| R1 | pending | — |
+| R0 | complete | `docs/orders/evidence/r0` |
+| R1 | active | — |
 | R2 | pending | — |
 | R3 | pending | — |
 | R4 | pending | — |
@@ -168,13 +168,13 @@ falsifiable test, not the builder's opinion, so this does not violate the no-sel
 
 Written one rung ahead of the build front. A rung with no contract here is not ready to be selected.
 
-### R0 — installable collaboration floor · ACTIVE
+### R0 — installable collaboration floor · COMPLETE
 
 **Proves.** The Windows app you install — not `bun run dev` — spawns real Hermes seats that exchange
 a real task and result, and the work is backed up on GitHub.
 
-**Remaining.** Two blockers, both external to the code: the Hermes provider rate limit, and the
-founder's manual keyboard-input check. Everything else has commits.
+**Closed.** Founder-Hermes-state is gated by `hermes-founder-state` (hashes only). Hermes-unavailable
+boot and mid-work cancel closed 2026-08-04 (`docs/orders/evidence/r0/`).
 
 **Acceptance.** From the installed application: app opens even with no Hermes available; Dock shows
 accurate availability; two real seats spawn; both receive only launch-scoped config; one task and one

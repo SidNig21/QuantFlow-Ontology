@@ -12,6 +12,7 @@ describe("verify-release stages", () => {
       "install",
       "unit",
       "windows-cold-boot",
+      "hermes-founder-state",
       "repo-shape",
       "lockfile-committed",
       "kernel-sole-writer",

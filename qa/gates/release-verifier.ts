@@ -41,6 +41,11 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/run.ts", "windows-cold-boot"],
   },
   {
+    id: "hermes-founder-state",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "hermes-founder-state"],
+  },
+  {
     id: "repo-shape",
     cwd: ".",
     command: ["bun", "qa/run.ts", "repo-shape"],

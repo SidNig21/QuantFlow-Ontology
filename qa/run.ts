@@ -426,6 +426,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "hermes-founder-state",
+    description:
+      "R0: SHA-256 of WSL ~/.hermes/config.yaml and auth.json unchanged across a seat launch (hashes only)",
+    run: async () => {
+      const { runHermesFounderStateGate } = await import(
+        "./gates/hermes-founder-state.ts"
+      );
+      const { ok } = await runHermesFounderStateGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",
