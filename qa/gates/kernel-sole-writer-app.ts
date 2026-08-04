@@ -24,6 +24,16 @@ const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
 /**
+ * The frozen path's own falsification test (WO-WIN, commit 4b7545a): it proves a
+ * permission request cannot silently select an allow option. Its only SDK
+ * reference is `import type { RequestPermissionRequest }` — a type-only import,
+ * erased at compile time, so it adds no runtime SDK dependency. This scan is a
+ * grep and cannot distinguish `import type` from a value import. Refusing the
+ * exception would mean the frozen legacy surface could not be tested at all,
+ * which is the opposite of what debt #14 wants while it stays frozen.
+ */
+const ACP_FROZEN_TEST = "collab-electron/src/main/acp-agent.test.ts";
+/**
  * WO-008a: sole live host ACP client (outside APP_SRC walk — scanned explicitly).
  * Thin Electron bridge may re-export but must not import the SDK itself.
  */
@@ -94,6 +104,7 @@ function scanAgentPatterns(
     if (
       p.name === "@agentclientprotocol" &&
       (rel === ACP_FROZEN ||
+        rel === ACP_FROZEN_TEST ||
         rel === HOST_ACP_CLIENT ||
         rel === HOST_ACP_POLICY)
     ) {

@@ -1,9 +1,15 @@
-# NEXT — L1 packaged Windows collaboration baseline
+# NEXT — R0 packaged Windows collaboration baseline
 
 status: ACTIVE
 authorized-by: founder
 authorized-at: 2026-08-03
-baseline: `wo-windows-return@e75d110`
+baseline: `wo-windows-return@e75d110`, merged to `main` 2026-08-03
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R0 is the floor of Act I
+
+> **Named R0, not L1 (renamed 2026-08-03).** This order was authored as "L1" against a private ladder
+> that duplicated the route in `GOLDEN-RUN.md` under different letters. Two ladders naming the same
+> rung is the exact rot the 2026-08-03 restructure removed, so the L-names are retired. Evidence
+> files and commits written before the rename still say L1; they mean this order.
 
 > Execute L1 only. Stop when its proof checklist passes or a stop condition fires. Do not select
 > work from later rungs.
@@ -25,8 +31,10 @@ one visible, durable task and result without modifying personal data or leaving 
 - `wo-windows-return@e75d110` adds the locally proven Windows/WSL Hermes launch, visual crossover,
   launch-scoped collaboration MCP, real two-Hermes task/result exchange, durable canvas receipt,
   and honest stopped-seat recovery.
-- The latest collaboration bridge is development-proven but not yet packaged, installed, merged,
-  or pushed.
+- **Merged to `main` on 2026-08-03**, on the founder's instruction, after `bun qa/verify-release.ts`
+  passed end to end on the merged result. The bridge is packaged and the branch is no longer the
+  baseline of record. What remains unproven is the *installed-application* acceptance below, not the
+  code.
 - Founder manual keyboard input remains the authority for terminal-input usability; automated PTY
   injection proves transport only.
 
@@ -51,8 +59,14 @@ one visible, durable task and result without modifying personal data or leaving 
    normal cancellation/close/reopen, honest stopped recovery, and no owned orphan processes.
 8. Label automated PTY prompt injection as transport evidence only. Record the founder's manual
    keyboard-input verdict separately before L1 may pass.
-9. Commit completed L1 work locally. Do not push or merge until the founder reviews the final
-   report.
+9. ~~Commit completed work locally; do not push or merge until the founder reviews the final
+   report.~~ **Discharged 2026-08-03** — the founder instructed the merge after the release verifier
+   passed on the merged result.
+10. **Add an automated gate for deliverable 2.** Deliverable 6 already requires a before/after
+    SHA-256 of the global Hermes configuration, but that is captured *by hand* during acceptance.
+    No gate in `qa/` reads `~/.hermes` — `windows-cold-boot` photographs `~/.quantflow` on the
+    Windows side only. Until a gate covers it, "founder Hermes state untouched" is an acceptance
+    step, not a measurement, and no verification record may describe it as *proven*.
 
 ## Acceptance proof
 
@@ -69,7 +83,10 @@ one visible, durable task and result without modifying personal data or leaving 
 - [ ] Normal shutdown leaves no QuantFlow-owned Electron, sidecar, WSL, or Hermes processes.
 - [ ] Founder Kernel manifests and global Hermes configuration hashes match before versus after.
 - [ ] Typecheck, focused tests, build/package verification, and diff checks pass.
-- [ ] Work remains local and unmerged pending founder review.
+- [x] `bun qa/verify-release.ts` passes on the merged result — **done 2026-08-03, exit 0**, all nine
+      stages green including the packaged cold boot.
+- [ ] A gate covers the founder-Hermes-state claim (deliverable 10), or the claim is downgraded to
+      "checked by hand during acceptance" everywhere it appears.
 
 ## Stop conditions
 
@@ -83,6 +100,17 @@ Stop immediately and report exact evidence if any of these occur:
 - installed acceptance requires copying, exposing, rewriting, or packaging credentials;
 - the isolated runtime cannot be proven distinct from founder state.
 
+## Carried debt this rung knowingly ships with
+
+**Debt #32 — the seat launcher writes a Linux-only symlink into Windows app state.**
+`collab-electron/cli/qf-hermes-launch.sh` runs inside WSL and links the founder's `auth.json` into a
+Windows path, producing an `IO_REPARSE_TAG_LX_SYMLINK` reparse point that no Windows process can
+read. The intent is right — never copy the token — but the placement is wrong, and it crashed
+`windows-cold-boot` until that gate was hardened on 2026-08-03. It does not block boot now. Fix
+shape: move the per-seat profile root into the WSL filesystem, where the link is native and no
+Windows process walks it. Close it on this rung if it is cheap; otherwise it stays recorded in
+[`DEBT.md`](../DEBT.md) and does not gate acceptance.
+
 ## Do not touch
 
 - L2 evidence-integrity guards;
@@ -92,24 +120,17 @@ Stop immediately and report exact evidence if any of these occur:
 - AgentOS architecture;
 - broad UI redesign;
 - schema migration or unrelated Linux porting;
-- CI/GitHub Actions;
-- push or merge.
+- CI/GitHub Actions.
 
-## Directional ladder — not authorized work
+## What comes after — not authorized work
 
-| Rung | State | Directional outcome |
-|---|---|---|
-| L0 | DONE LOCALLY | Real Windows/Hermes collaboration in the development app |
-| L1 | **ACTIVE** | Installed, isolated, founder-reviewed collaboration baseline |
-| L2 | NEXT | Evidence integrity: refuse ungated Reports and unsupported Hypothesis resolution |
-| L3A | DIRECTION ONLY | Kernel authority for Dock-role/generated-tool capabilities |
-| L3B | DIRECTION ONLY | Real agent reads captured market data through generated tools |
-| L4 | DIRECTION ONLY | Immutable point-in-time Dataset builder with leakage protection |
-| L5A–C | DIRECTION ONLY | Correct deterministic execution, production backtest, durable Run artifacts |
-| L6A–C | DIRECTION ONLY | Durable collaborative workflow, governed specialist spawning, second CLI adapter |
-| L7A–B | DIRECTION ONLY | Independent critic, Evaluation, and gated Report production |
-| L8A–C | DIRECTION ONLY | Domain projections, recovery, onboarding, diagnostics, and release |
-| L9 | LATER | Recall and optimization after real Evaluation history exists |
+**The ladder lives in one place: [`GOLDEN-RUN.md`](GOLDEN-RUN.md).** The duplicate L0–L9 table that
+stood here was deleted on 2026-08-03. It named the same rungs as the route document under different
+letters, and a second ladder is how a builder ends up authorized by whichever list it read first.
+
+Next after R0 is **R1 — the ontology gateway**: a Dock seat calling generated ontology tools through
+an app-owned gateway. Every rung in Act I depends on R1 existing. Read the route for the rest; read
+nothing there as authorization.
 
 ## Durable rulings
 
