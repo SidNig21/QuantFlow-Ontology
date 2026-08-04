@@ -2,17 +2,32 @@ import { complete_task, create_task, task } from "../ontology/agent.ts";
 import { sqlString } from "./sql.ts";
 
 /**
- * R5 data-preserving upgrade: add task.status and task action authorities.
- * Fresh migration.sql already emits them; this brings predecessors forward.
+ * R5 data-preserving upgrade: bring predecessors to the exact current `task`
+ * CREATE shape (including CHECK). Plain ALTER ADD COLUMN cannot attach a
+ * table-level CHECK and leaves DEFAULT in sqlite_master, so classifyKernelShape
+ * would never accept the result as `current`. Rebuild + copy instead.
  */
 export function generateUpgradeTaskStatus(): string {
   const lines: string[] = [];
   lines.push("-- qf-kernel-schema generated upgrade: task-status");
   lines.push("-- DO NOT EDIT — regenerate with `bun run generate`.");
   lines.push("");
+  lines.push("CREATE TABLE task__upgrade (");
+  lines.push("  id TEXT PRIMARY KEY NOT NULL,");
+  lines.push("  created_at TEXT NOT NULL,");
+  lines.push("  title TEXT NOT NULL,");
+  lines.push("  description TEXT NOT NULL,");
+  lines.push("  status TEXT NOT NULL,");
+  lines.push("  CHECK (status IN ('open', 'done'))");
+  lines.push(");");
   lines.push(
-    "ALTER TABLE task ADD COLUMN status TEXT NOT NULL DEFAULT 'open';",
+    "INSERT INTO task__upgrade (id, created_at, title, description, status)",
   );
+  lines.push(
+    "  SELECT id, created_at, title, description, 'open' FROM task;",
+  );
+  lines.push("DROP TABLE task;");
+  lines.push("ALTER TABLE task__upgrade RENAME TO task;");
   lines.push("");
   lines.push(
     `UPDATE schema_meta SET description = ${sqlString(task.description)} WHERE type_name = 'task';`,

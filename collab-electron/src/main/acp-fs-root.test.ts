@@ -74,6 +74,21 @@ describe("ACP fs root confinement", () => {
     ).toBeNull();
   });
 
+  test("in-root create is allowed; prefix-sibling create is not", () => {
+    const root = temp();
+    const fresh = join(root, "brand-new.txt");
+    assertPathWithinAcpFsRoot(root, fresh, { allowCreate: true });
+
+    const prefixSibling = `${root}-evil`;
+    mkdirSync(prefixSibling, { recursive: true });
+    roots.push(prefixSibling);
+    expect(() =>
+      assertPathWithinAcpFsRoot(root, join(prefixSibling, "new.txt"), {
+        allowCreate: true,
+      }),
+    ).toThrow(/outside QF_ACP_FS_ROOT/);
+  });
+
   test("cleanup", () => {
     for (const root of roots.splice(0)) {
       rmSync(root, { recursive: true, force: true });

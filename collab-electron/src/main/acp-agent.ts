@@ -123,7 +123,7 @@ export function createClient(): Client {
       if (!acpFsRoot) {
         throw new Error("ACP fs write refused: QF_ACP_FS_ROOT is unset");
       }
-      assertPathWithinAcpFsRoot(acpFsRoot, params.path);
+      assertPathWithinAcpFsRoot(acpFsRoot, params.path, { allowCreate: true });
       await writeFile(
         params.path, params.content, "utf-8",
       );

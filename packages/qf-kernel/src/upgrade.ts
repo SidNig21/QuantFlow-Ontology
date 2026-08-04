@@ -34,14 +34,23 @@ type StructureSnapshot = {
 };
 
 function normalizeSql(sql: string): string {
-  return sql
-    .replace(/--[^\n\r]*/g, "")
-    .replace(/\bCREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\b/gi, "CREATE TABLE")
-    .replace(/([`\"])([a-z_]+)\1/gi, "$2")
-    .replace(/\s+/g, " ")
-    .replace(/\s*([(),])\s*/g, "$1")
-    .trim()
-    .replace(/;$/, "");
+  return (
+    sql
+      .replace(/--[^\n\r]*/g, "")
+      .replace(/\bCREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\b/gi, "CREATE TABLE")
+      .replace(/([`\"])([a-z_]+)\1/gi, "$2")
+      // ALTER ADD COLUMN … DEFAULT '…' leaves DEFAULT in sqlite_master; golden
+      // CREATE does not. Strip DEFAULT literals so upgraded and fresh DBs compare
+      // equal for NOT NULL columns (debt #27 / Act I boot class).
+      .replace(
+        /\s*DEFAULT\s+(?:'(?:[^']|'')*'|[0-9]+(?:\.[0-9]+)?|NULL|TRUE|FALSE)/gi,
+        "",
+      )
+      .replace(/\s+/g, " ")
+      .replace(/\s*([(),])\s*/g, "$1")
+      .trim()
+      .replace(/;$/, "")
+  );
 }
 
 function tableExists(db: KernelDb, name: string): boolean {
