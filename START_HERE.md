@@ -1,4 +1,8 @@
-> **Active track (2026-08-02):** the native-Windows product floor is verified through WO-WIN1 and WO-WIN2: packaged boot, the founder-visible canvas and Dock, and one real two-seat collaboration primitive. [`docs/orders/NEXT.md`](docs/orders/NEXT.md) is intentionally closed until the founder authorizes the next bounded order; the ontology ladder remains preserved.
+> **Active track:** [`docs/orders/NEXT.md`](docs/orders/NEXT.md) names the one active rung, and
+> [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) holds the route and the rung status table.
+> **This line deliberately states no status.** It used to, and it went stale: on 2026-08-03 it still
+> announced the builder door was closed while `NEXT.md` named an active rung. A status copied into a
+> second file has no mechanism to stay true, so this one points instead of asserting.
 
 # START_HERE.md
 
