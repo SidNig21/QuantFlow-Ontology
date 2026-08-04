@@ -76,13 +76,13 @@ R0 is `active`, not complete. Three lines remain.
    `~/.hermes/config.yaml` and `~/.hermes/auth.json` before and after a seat launch and fails if
    either changes. **Never read, print, copy, or log the contents of those files — hashes only.**
    Falsify it by touching a scratch copy, not the founder's real file.
-2. **Founder-only: boot with Hermes genuinely unavailable.** Never tested; Hermes worked throughout
-   acceptance. The Dock must stay visible and the app must still open. *Leave this to the founder.*
-3. **Founder-only: cancel a running seat.** Spawn, receipt, close, reopen, and stopped recovery are
-   proven; cancellation is not. *Leave this to the founder.*
+2. ~~Boot with Hermes unavailable.~~ **Closed 2026-08-04** — app opens, Dock stays visible, spawn is
+   refused with an actionable message, app survives the failure. See
+   `docs/orders/evidence/r0/CHECKS-2026-08-04.md`.
+3. ~~Cancel a running seat.~~ **Closed 2026-08-04** — cancelled mid-work in under 3 seconds, tile
+   removed, Kernel honestly `closed`, zero orphaned processes. Same evidence file.
 
-Do item 1. Items 2 and 3 are the founder's — record them as outstanding and proceed; they do not
-block R1.
+**Item 1 is the only thing left in R0.** Build that gate, then close R0 and move to R1.
 
 ## What is already true, so you do not rebuild it
 
