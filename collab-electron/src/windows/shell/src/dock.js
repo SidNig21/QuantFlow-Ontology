@@ -196,6 +196,23 @@ export function initDock(panelEl, options = {}) {
 		options.onTidy?.();
 	});
 
+	const questionForm = panelEl.querySelector("#dock-question-form");
+	const questionInput = panelEl.querySelector("#dock-question-input");
+	if (questionForm && questionInput) {
+		questionForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			const question = String(questionInput.value ?? "").trim();
+			if (!question) return;
+			questionInput.value = "";
+			void window.shellApi.qf.submitResearchQuestion(question).then((res) => {
+				if (!res?.ok) {
+					console.error("[dock] submit question failed", res?.error);
+				}
+				void refresh();
+			});
+		});
+	}
+
 	window.shellApi.qf.onDockInvalidate(() => {
 		void refresh();
 	});

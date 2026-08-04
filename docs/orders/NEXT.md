@@ -1,37 +1,24 @@
-# NEXT — R5 durable delegation
+# NEXT — R9 (blocked: Act I founder sign-off)
 
-status: ACTIVE
+status: BLOCKED
 authorized-by: founder
 authorized-at: 2026-08-03
-baseline: R4 complete on `act-i-ladder` (Claude Code species)
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R5
+baseline: R0–R8 complete on `act-i-ladder`
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) Part IV · R9
 
-> Execute R5 only as the active rung of the continuous Act I walk (`SPRINT.md`).
+> Act I ladder build (R0–R8) is gated green. **Do not start R9** until the founder
+> reads the FOUNDER-REVIEW queue and signs off Act I. This file names R9 only so
+> `rung-ladder` keeps exactly one active rung.
 
-## Objective
+## Founder gate before R9
 
-Task creation and assignment live as Kernel objects and links — not peer-bus messages — so work
-survives close and reopen.
+1. Read `docs/orders/evidence/r3/FOUNDER-REVIEW.md`
+2. Read `docs/orders/evidence/r6/FOUNDER-REVIEW.md`
+3. Read `docs/orders/evidence/r8/FOUNDER-REVIEW.md`
+4. Watch one end-to-end golden run
+5. Authorize R9 in a fresh NEXT rewrite
 
-## In plain terms
+## Stop
 
-Kill the seats mid-task, reopen, and the assignment is still there.
-
-## Deliverables
-
-1. `create_task` / assign / complete transitions via `execute()`; `assigned_to` link required.
-2. Gateway exposes desk task actions under R2 grants.
-3. Peer-bus may notify only; meaning is Kernel.
-4. Gate with bus-only bait + illegal transition bait; evidence under `docs/orders/evidence/r5/`.
-
-## Acceptance
-
-Create + assign → link exists; worker → done → event log; close/reopen → task/link/state intact.
-
-## Out of scope
-
-Scheduling, retries, priorities, deadlines.
-
-## Stop conditions
-
-Any SPRINT hard stop. Stay experimental — no schema promotion.
+No builder implements R9 under this authorization. No claim that Act I is complete
+without founder sign-off.

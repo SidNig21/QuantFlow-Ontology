@@ -490,4 +490,23 @@ describe("agent_session transitions", () => {
   });
 });
 
-// meta: accept=25 reject=93 total=118
+describe("task transitions", () => {
+  test("accepts open → done", () => {
+    expect(canTransition("task", "open", "done")).toBe(true);
+    expect(() => assertTransition("task", "open", "done")).not.toThrow();
+  });
+  test("rejects open → open", () => {
+    expect(canTransition("task", "open", "open")).toBe(false);
+    expect(() => assertTransition("task", "open", "open")).toThrow(/task.*open.*open/);
+  });
+  test("rejects done → open", () => {
+    expect(canTransition("task", "done", "open")).toBe(false);
+    expect(() => assertTransition("task", "done", "open")).toThrow(/task.*done.*open/);
+  });
+  test("rejects done → done", () => {
+    expect(canTransition("task", "done", "done")).toBe(false);
+    expect(() => assertTransition("task", "done", "done")).toThrow(/task.*done.*done/);
+  });
+});
+
+// meta: accept=26 reject=96 total=122

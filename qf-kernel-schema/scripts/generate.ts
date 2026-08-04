@@ -8,6 +8,7 @@ import { generateUpgradeAgentProfileIdentity } from "../src/generate/upgrade-age
 import { generateUpgradeMarketIngest } from "../src/generate/upgrade-market-ingest.ts";
 import { generateUpgradeMarketContext } from "../src/generate/upgrade-market-context.ts";
 import { generateUpgradeCapabilityGrants } from "../src/generate/upgrade-capability-grants.ts";
+import { generateUpgradeTaskStatus } from "../src/generate/upgrade-task-status.ts";
 import { schema } from "../src/schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -39,7 +40,12 @@ writeFileSync(
   generateUpgradeCapabilityGrants(),
   "utf8",
 );
+writeFileSync(
+  join(upgradesDir, "0005-task-status.sql"),
+  generateUpgradeTaskStatus(),
+  "utf8",
+);
 
 console.log(
-  "Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, golden/upgrades/0001-agent-profile-identity.sql, golden/upgrades/0002-market-ingest.sql, golden/upgrades/0003-market-context.sql, golden/upgrades/0004-capability-grants.sql",
+  "Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, golden/upgrades/0001-agent-profile-identity.sql, golden/upgrades/0002-market-ingest.sql, golden/upgrades/0003-market-context.sql, golden/upgrades/0004-capability-grants.sql, golden/upgrades/0005-task-status.sql",
 );

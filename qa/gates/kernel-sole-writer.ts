@@ -84,6 +84,10 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/windows-dock-capability.ts",
   "qa/gates/windows-dock-hire.ts",
   "qa/gates/windows-dock-species.ts",
+  "qa/gates/windows-research-question.ts",
+  // Act I R5/R6: gate-only Kernel reopen + bus-only bait DB (not Kernel domain tables).
+  "qa/gates/kernel-task-delegation.ts",
+  "qa/gates/kernel-market-lineage.ts",
 ];
 
 /**
@@ -125,6 +129,8 @@ const OPEN_ALLOW = [
   "qa/gates/bovada-football/run.ts",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
+  "qa/gates/kernel-task-delegation.ts",
+  "qa/gates/kernel-market-lineage.ts",
 ];
 
 /**
@@ -158,6 +164,8 @@ const WRITE_ALLOW = [
   "qa/gates/market-ingest/run.ts",
   // WO-107: permanent gate seeds its isolated fixture through execute() only.
   "qa/gates/bovada-football/run.ts",
+  "qa/gates/kernel-task-delegation.ts",
+  "qa/gates/kernel-market-lineage.ts",
   "collab-electron/",
 ];
 

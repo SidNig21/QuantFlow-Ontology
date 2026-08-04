@@ -1774,6 +1774,14 @@
         "description": {
           "description": "Equality filter on description. Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.",
           "type": "string"
+        },
+        "status": {
+          "description": "Equality filter on status. Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.",
+          "type": "string",
+          "enum": [
+            "open",
+            "done"
+          ]
         }
       }
     }
@@ -2801,6 +2809,53 @@
       "required": [
         "session_id",
         "agent_definition_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_create_task",
+    "description": "Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Guest-minted task id — adopted as the Kernel row id, never re-minted."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short outcome-oriented title for the task."
+        },
+        "description": {
+          "type": "string",
+          "description": "Completion contract a verifier can judge from observable evidence."
+        },
+        "assignee_session_id": {
+          "type": "string",
+          "description": "Existing agent_session id that owns execution; written as assigned_to."
+        }
+      },
+      "required": [
+        "task_id",
+        "title",
+        "description",
+        "assignee_session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_complete_task",
+    "description": "Mark an open task done (open → done) through the transition table.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Task id to complete."
+        }
+      },
+      "required": [
+        "task_id"
       ]
     }
   },

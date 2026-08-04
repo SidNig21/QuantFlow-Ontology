@@ -486,6 +486,52 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "kernel-task-delegation",
+    description:
+      "R5: create_task + assigned_to + complete_task survive reopen; illegal transition refused",
+    run: async () => {
+      const { runKernelTaskDelegationGate } = await import(
+        "./gates/kernel-task-delegation-launch.ts"
+      );
+      const { ok } = await runKernelTaskDelegationGate();
+      return ok;
+    },
+  },
+  {
+    name: "acp-fs-confine",
+    description:
+      "R7: ACP fs confined to QF_ACP_FS_ROOT; unset root not advertised; escape baits refused",
+    run: async () => {
+      const { runAcpFsConfineGate } = await import("./gates/acp-fs-confine.ts");
+      const { ok } = await runAcpFsConfineGate();
+      return ok;
+    },
+  },
+  {
+    name: "kernel-market-lineage",
+    description:
+      "R6: answer lineage must cite seeded/read ids; empty and fabricated cites fail",
+    run: async () => {
+      const { runKernelMarketLineageGate } = await import(
+        "./gates/kernel-market-lineage-launch.ts"
+      );
+      const { ok } = await runKernelMarketLineageGate();
+      return ok;
+    },
+  },
+  {
+    name: "windows-research-question",
+    description:
+      "R8: canvas/RPC submit creates Kernel mission + starts orchestrator",
+    run: async () => {
+      const { runWindowsResearchQuestionGate } = await import(
+        "./gates/windows-research-question.ts"
+      );
+      const { ok } = await runWindowsResearchQuestionGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",

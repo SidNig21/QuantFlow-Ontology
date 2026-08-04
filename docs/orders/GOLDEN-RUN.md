@@ -134,11 +134,11 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R2 | complete | `docs/orders/evidence/r2` |
 | R3 | complete | `docs/orders/evidence/r3` |
 | R4 | complete | `docs/orders/evidence/r4` |
-| R5 | active | — |
-| R6 | pending | — |
-| R7 | pending | — |
-| R8 | pending | — |
-| R9 | pending | — |
+| R5 | complete | `docs/orders/evidence/r5` |
+| R6 | complete | `docs/orders/evidence/r6` |
+| R7 | complete | `docs/orders/evidence/r7` |
+| R8 | complete | `docs/orders/evidence/r8` |
+| R9 | active | — |
 | R10 | pending | — |
 | R11a | pending | — |
 | R11b | pending | — |

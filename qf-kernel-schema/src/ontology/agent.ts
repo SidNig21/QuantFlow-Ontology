@@ -105,6 +105,11 @@ export const task = defineObject({
       .describe(
         "Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.",
       ),
+    status: z
+      .enum(["open", "done"])
+      .describe(
+        "Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.",
+      ),
   }),
 });
 
@@ -315,5 +320,35 @@ export const close_agent_session = defineAction({
   lifecycle: "experimental",
   input: z.object({
     session_id: z.string().describe("Agent session to close."),
+  }),
+});
+
+export const create_task = defineAction({
+  name: "create_task",
+  description:
+    "Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    task_id: z
+      .string()
+      .describe("Guest-minted task id — adopted as the Kernel row id, never re-minted."),
+    title: z.string().describe("Short outcome-oriented title for the task."),
+    description: z
+      .string()
+      .describe("Completion contract a verifier can judge from observable evidence."),
+    assignee_session_id: z
+      .string()
+      .describe("Existing agent_session id that owns execution; written as assigned_to."),
+  }),
+});
+
+export const complete_task = defineAction({
+  name: "complete_task",
+  description: "Mark an open task done (open → done) through the transition table.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    task_id: z.string().describe("Task id to complete."),
   }),
 });

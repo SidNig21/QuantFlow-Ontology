@@ -212,6 +212,7 @@ A task is a discrete unit of requested work tracked on the canvas. It governs de
 - **properties:**
 - `title` — Short task title visible to operators and agents. Keep this outcome-oriented so routing can prioritize without opening full context.
 - `description` — Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.
+- `status` — Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.
 
 ### `tool`
 
@@ -575,6 +576,25 @@ Create an agent_session by adopting a guest-minted session_id (Kernel never mint
 - `session_id` — Guest-minted ACP session id — adopted as the Kernel row id, never re-minted.
 - `agent_definition_id` — Existing agent_definition row id for the profile that admitted this session. Identity lives in spawned_from, not label.
 - `label` — Optional operator-facing label for readability only; never the profile identity.
+
+### `create_task`
+
+Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `task_id` — Guest-minted task id — adopted as the Kernel row id, never re-minted.
+- `title` — Short outcome-oriented title for the task.
+- `description` — Completion contract a verifier can judge from observable evidence.
+- `assignee_session_id` — Existing agent_session id that owns execution; written as assigned_to.
+
+### `complete_task`
+
+Mark an open task done (open → done) through the transition table.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `task_id` — Task id to complete.
 
 ### `start_agent_session`
 

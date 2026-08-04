@@ -58,8 +58,10 @@ export {
   MissingTraceError,
   PackageRefUnresolvedError,
   UnknownAgentDefinitionError,
+  UnknownAssigneeSessionError,
   UnknownSpeciesError,
   SpawnedFromLinkRejectedError,
+  AssignedToLinkRejectedError,
 } from "./errors.ts";
 export { eventCount, execute } from "./execute.ts";
 export type {

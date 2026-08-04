@@ -138,7 +138,12 @@ export function callOntologyReadTool(
   return { result, artifactId };
 }
 
-const HIRE_ACTIONS = new Set(["create_agent_session", "start_agent_session"]);
+const HIRE_ACTIONS = new Set([
+  "create_agent_session",
+  "start_agent_session",
+  "create_task",
+  "complete_task",
+]);
 
 /** Granted desk actions (hire path) plus generated reads. */
 export function callOntologyTool(
