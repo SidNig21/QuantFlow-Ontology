@@ -218,6 +218,142 @@ the matching capability group picks it up with no hand edit.
 **Open question for the founder.** Every schema entity is still `experimental`, and no promotion
 authority is defined (`docs/DEBT.md` #19). This rung is when that has to be decided.
 
+### R3 — the orchestrator hires
+
+**Proves.** An orchestrator seat reads the real Dock catalog, creates and starts a session, and a
+tile appears on the canvas **because the Kernel says so** — not because anything told the UI to draw
+it. Golden run steps 1 and 2.
+
+**Deliverables.** `qf_agent_definition_query`, `qf_create_agent_session`, and `qf_start_agent_session`
+reachable from an orchestrator seat through R1's gateway, scoped by R2's capability groups. The
+canvas renders a tile for any `agent_session` row it did not create itself. Each session carries a
+`spawned_from` link to the definition it came from.
+
+**Acceptance.** Runnable end to end. Spawn an orchestrator. It calls the catalog tool and receives
+the real `agent_definition` rows. It creates and starts a session for a named definition. Assert: the
+session row exists, its `spawned_from` link resolves to that definition, and the canvas projection —
+**queried, not screenshotted** — lists a tile bound to that session id. Then write a session row by
+direct Kernel command with the app running and assert the tile still appears; that is the real test
+of "the canvas reads the Kernel."
+
+**Falsify.** Drop the `spawned_from` write — red. Make the tile render from UI state instead of a
+Kernel query — the Law E / `no-canvas-domain-writes` gate goes red.
+
+**Out of scope.** The orchestrator *choosing* which agent to hire by its own judgment — that is
+prompting, not plumbing. Task assignment, which is R5.
+
+**Founder review — queued, does not block.** You should see a tile appear that you did not click.
+
+### R4 — a second species
+
+**Proves.** Claude Code CLI works through the identical contract as Hermes, with no Hermes-shaped
+special case anywhere in the path.
+
+**Deliverables.** An adapter package and `agent_definition` rows for a Claude Code profile. The same
+launch path, the same R1 gateway, the same R2 capability grants. Claude Code speaks MCP natively, so
+the gateway should need no new transport.
+
+**Acceptance.** Spawn a Claude Code seat from the normal Dock. It calls the same generated read tool
+a Hermes seat calls and receives the same result shape. Both sessions appear as distinct Kernel rows
+with correct `spawned_from` links.
+
+**Falsify.** Hardcode a `"hermes"` literal into the shared launch path — the existing species-literal
+scan in `dock-registry` goes red. Point the Claude Code seat at the gateway with no capability grant
+— refused.
+
+**Out of scope.** Claude Code doing research. Tool-for-tool parity between species.
+
+### R5 — delegation is durable objects
+
+**Proves.** Assigned work survives the transcript. Kill both seats mid-task, reopen, and the task is
+still there, still assigned, with its state. Golden run step 3.
+
+**Deliverables.** Task creation and assignment as **Kernel objects and links**, not messages — a
+`task` row plus an assignment link, which is what makes cables render between tiles. Task state moves
+through `execute()` like everything else. The peer bus may still *notify*, but it stops being where
+meaning lives.
+
+**Acceptance.** An orchestrator creates a task and assigns it to a worker; assert the link row
+exists. The worker transitions it to done; assert the event log records the transition. Close the
+app, reopen, and assert the task, the link, and the state are all intact and the cable renders.
+
+**Falsify.** Carry the assignment only as a peer-bus message — reopen loses it, gate red. Attempt an
+illegal state transition — the Kernel refuses and writes nothing.
+
+**Out of scope.** Scheduling, retries, priorities, deadlines.
+
+### R6 — a real answer with real lineage
+
+**Proves.** A live agent answers a market question, and every claim it makes traces to Kernel rows it
+actually read. Golden run step 4.
+
+**Deliverables.** A worker queries the market plane — `venue`, `instrument`, `quote`, `market_event` —
+through generated read tools, then publishes an artifact that **cites the object ids it read**, with
+a lineage link from the artifact back to those rows.
+
+**Acceptance.** The gate seeds known market rows, asks the question, and asserts every cited id
+exists and matches a seeded row. Because the model is non-deterministic, **assert lineage validity,
+never exact text.** An answer citing an id that was never read fails. An answer citing nothing fails.
+
+**Falsify.** Have the agent answer from its own memory without calling a read tool — lineage is empty,
+gate red. Cite a fabricated id — red.
+
+**Out of scope.** Whether the answer is *good trading judgment*. That is Act II's evaluation plane,
+and pretending a gate can judge it is how the last four plans died.
+
+**Founder review — queued, does not block.** Read one real answer and its lineage.
+
+### R7 — nothing approves on your behalf
+
+**Proves.** No path approves a permission for the founder, and the inherited unconfined file surface
+is closed.
+
+**Deliverables.** `collab-electron/src/main/acp-agent.ts` still exposes `readTextFile` and
+`writeTextFile` with no path confinement while advertising both capabilities to the client
+(`docs/DEBT.md` #14). Either confine both to a declared root, exactly as `publish_artifact` was
+confined in WO-106b, or retire the legacy path and delete its gate exception with it.
+
+**Acceptance.** A permission request arriving with no human present is **denied**, not auto-allowed —
+`4b7545a` fixed this, so falsify the fix rather than trusting it. A read or write outside the
+declared root is refused. Confinement uses `relative()` plus `realpathSync.native` on both sides,
+never a bare `startsWith` — the prefix-sibling case (`/tmp/root-evil` against root `/tmp/root`)
+defeats that, and WO-106b already learned it.
+
+**Falsify.** Six escape shapes on disk, mirroring WO-106b: absolute path outside root, `..`
+traversal, symlink out, prefix sibling, UNC path, and root absent entirely. With the root unset the
+surface must be **neither advertised nor callable** — absence never means unconstrained.
+
+**Out of scope.** Rewriting agent-chat onto the species seam.
+
+### R8 — the founder types the question
+
+**Proves.** A research question typed into the canvas starts the run. Golden run step 0 — the last
+plank, deliberately, because there is nothing to start until R3–R6 exist.
+
+**Deliverables.** A canvas input that creates the initiating Kernel object and starts the
+orchestrator against it. The question text lives in the Kernel from the moment it is submitted.
+
+**Acceptance.** Submitting text creates the object, starts a session, and both survive close and
+reopen. Assert by querying the Kernel, not the DOM.
+
+**Falsify.** Hold the question in component state before writing it — Law A says a tile that
+remembers is a bug, and `no-canvas-domain-writes` goes red.
+
+**Out of scope.** Natural-language parsing of the question. Prompt engineering the orchestrator.
+
+**Founder review — queued, does not block.** This is the golden run. Watch it once, end to end.
+
+---
+
+## Act I sign-off
+
+Rungs close on gates. **Act I** closes on the founder.
+
+When R8's gates are green, every queued `FOUNDER-REVIEW.md` gets read in one sitting, and the founder
+watches the golden run happen once. Only then is Act I complete. A builder never marks that; it is
+the one judgment no test can stand in for, and it is the entire reason the golden run was defined as
+something observable rather than something asserted.
+
 ---
 
 ## Standing constraints — no rung relaxes these

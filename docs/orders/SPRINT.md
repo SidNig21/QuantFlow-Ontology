@@ -22,8 +22,7 @@ on the next.
 
 Repeat until the stop conditions fire:
 
-1. **Read the rung's contract** in `GOLDEN-RUN.md` Part IV. If the rung has no contract there, write
-   one first and stop for founder review — a rung with no contract is not ready to be selected.
+1. **Read the rung's contract** in `GOLDEN-RUN.md` Part IV. R0 through R8 all have one.
 2. **Build only what the contract names.** Anything not in its Deliverables is out of scope.
 3. **Add at least one runnable gate**, registered in `qa/run.ts`.
 4. **Falsify every gate you add.** Break what it guards on purpose, watch it go red, restore, watch
@@ -31,28 +30,40 @@ Repeat until the stop conditions fire:
 5. **Run `bun qa/verify-release.ts`.** It must exit 0.
 6. **Write `docs/orders/evidence/<rung>/VERIFICATION.md`** stating what was proven *and what was
    not*. The "what was not" section is mandatory and may not be empty — if you cannot think of a
-   limit, you have not looked hard enough.
+   limit, you have not looked hard enough. If the rung's contract names a **Founder review**, also
+   write `FOUNDER-REVIEW.md` beside it: what to look at, the steps to see it, and what would count as
+   wrong. Then continue; do not wait.
 7. **Close the rung**: flip it to `complete` in `GOLDEN-RUN.md`'s status table, set the next rung
    `active`, and retitle `NEXT.md` to the new rung — **all in one commit**. The `rung-ladder` gate
    fails if these disagree.
 8. **Commit and push.** Then start the next rung.
 
-## Where you must stop and wait for the founder
+## Do not halt for the founder's eyes
 
-Stop, post your evidence, and do not mark the rung complete:
+**No rung stops for a visual check.** R3, R6, and R8 produce things the founder will want to look at,
+but looking is not a precondition for the next rung. Each of those rungs writes
+`docs/orders/evidence/<rung>/FOUNDER-REVIEW.md` — what to look at, the exact steps to see it, and
+what would count as wrong — and then **keeps going**. The founder reads the whole queue in one
+sitting at Act I sign-off.
 
-- **R3, R6, and R8** — these change what the founder sees on the canvas. Their acceptance is not
-  fully expressible as a command, so a human has to look. Build them fully, prove what you can, then
-  stop.
-- **Any rung whose contract is missing from `GOLDEN-RUN.md` Part IV.**
-- **Any schema type promotion.** Only the founder promotes a type from `experimental` to `active`.
-  You may propose; you may never land it. See `docs/adr/0002-schema-promotion-authority.md`.
-- **Any change to `START_HERE.md`, `docs/DOCTRINE.md`, or `docs/LAWS.md`.** Propose in a comment.
-- **Two failed rework cycles on the same rung.** Stop and report; never a third lap.
-- **Anything requiring a credential, a purchase, or a push to a public surface.**
+Every rung in Act I closes on gates. Advancing yourself past one is not self-approval: the check is a
+falsifiable test, not your opinion of your own work. That is why step 4 of the loop is not optional —
+**the falsification transcript is what earns you the right to advance without asking.**
 
-Everything else in Act I closes on gates alone. Advancing yourself past a gate-closable rung is not
-self-approval: the check is a falsifiable test, not your opinion of your own work.
+## Where you must genuinely stop
+
+These are unsafe or irreversible, not matters of taste:
+
+- **Any schema type promotion** (`experimental` → `active`). Only the founder promotes. You may
+  propose; you may never land it. See `docs/adr/0002-schema-promotion-authority.md`.
+- **Any change to `START_HERE.md`, `docs/DOCTRINE.md`, or `docs/LAWS.md`.** Propose in the report.
+- **Two failed rework cycles on the same rung.** Report and stop; never a third lap.
+- **Anything needing a credential, a purchase, or publication to a public surface.**
+- **Any deletion of founder data** — `~/.quantflow`, `~/.hermes`, or a Kernel database.
+- **A rung whose Part IV contract is missing.** R0 through R8 all have contracts as of 2026-08-04, so
+  this should not fire during Act I. If it does, write the contract, put it in the report, and stop.
+
+Everything else: keep building.
 
 ## R0 close-out — do this first
 

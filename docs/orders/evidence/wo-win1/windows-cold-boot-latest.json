@@ -1,11 +1,11 @@
 {
   "platform": "win32",
-  "packageRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uVASFq\\dist\\win-unpacked",
-  "kernelDb": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uVASFq\\stores\\kernel.db",
-  "artifactRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uVASFq\\stores\\artifacts",
+  "packageRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-INS5zk\\dist\\win-unpacked",
+  "kernelDb": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-INS5zk\\stores\\kernel.db",
+  "artifactRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-INS5zk\\stores\\artifacts",
   "readiness": {
     "canvas": true,
-    "windowUrl": "file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-uVASFq/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html",
+    "windowUrl": "file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-INS5zk/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html",
     "dockProfileIds": [
       "hermes-orchestrator",
       "hermes-worker",
@@ -26,5 +26,5 @@
   "screenshot": "external Computer Use capture required",
   "defaultUserStateUnchanged": true,
   "shutdown": "rpc app.shutdown; exit code 0; owned process set empty",
-  "recordedAt": "2026-08-04T00:04:35.519Z"
+  "recordedAt": "2026-08-04T00:52:31.467Z"
 }
