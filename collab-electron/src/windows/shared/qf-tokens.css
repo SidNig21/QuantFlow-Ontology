@@ -30,3 +30,57 @@
   --qf-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
     sans-serif;
 }
+
+/* --- GLACIER (WO-g1) append-only --qf-gl-* tokens. Consumers opt in. --- */
+
+:root {
+  /* ── surfaces · elevation by lightness, never by glow ───────────── */
+  --qf-gl-void:    #060a12;  /* app ground, canvas */
+  --qf-gl-screen:  #050a12;  /* PTY well — recessed one step */
+  --qf-gl-panel:   #0f1727;  /* tile body, cards */
+  --qf-gl-panel-2: #152034;  /* spine, rails, dock */
+  --qf-gl-panel-3: #1d2b45;  /* hover, raised, dragging */
+  --qf-gl-rule:    #22314b;
+  --qf-gl-rule-hi: #33466a;
+
+  /* ── text ───────────────────────────────────────────────────────── */
+  --qf-gl-text:  #eaf1fb;  /* 15.4:1 on panel  · AAA */
+  --qf-gl-muted: #8fa3c0;  /*  6.97:1 on panel · AA  */
+  --qf-gl-dim:   #7288ab;  /*  4.52:1 on panel-2 · AA — lifted from #5A6D8C (3.41:1, failed) */
+  --qf-gl-faint: #3b4b68;  /*  rules, ticks, grid dots ONLY — never text */
+
+  /* ── signal ─────────────────────────────────────────────────────── */
+  --qf-gl-ice:     #5cc8ff;  /* 9.52:1 · live · focus · connected */
+  --qf-gl-ice-ink: #08111c;  /* text ON ice · 10.08:1 — never hardcode white */
+  --qf-gl-idle:    #6b7f9e;
+  --qf-gl-warn:    #f2c260;  /* 11.59:1 */
+  --qf-gl-alert:   #ff8a75;  /*  8.37:1 · armed close, error edge */
+  --qf-gl-ok:      #6fe3a8;  /* 12.11:1 */
+
+  /* ── elevation ──────────────────────────────────────────────────
+     rgba() is legal ONLY in this file. Consumers reference the token. */
+  --qf-gl-shadow:      0 20px 46px -18px rgba(0, 0, 0, 0.95);
+  --qf-gl-shadow-lift: 0 30px 60px -20px rgba(0, 0, 0, 1);
+  --qf-gl-edge-light:  inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  --qf-gl-screen-ring: inset 0 0 0 1px #0d1626;
+
+  /* ── geometry ───────────────────────────────────────────────────── */
+  --qf-gl-spine: 44px;   /* spine width AND head/grip height — one number */
+  --qf-gl-r:     2px;
+  --qf-gl-rule-w: 1px;   /* border width — constant across every state */
+
+  /* ── motion ─────────────────────────────────────────────────────── */
+  --qf-gl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --qf-gl-fast: 110ms;
+  --qf-gl-slow: 180ms;
+}
+
+/* NOTE ON FONTS — do not add --qf-gl-mono / --qf-gl-sans.
+ * one-skin.ts:32 enforces  /^var\(\s*--qf-(?:mono|sans)\s*\)$/
+ * on every font-family declaration. Glacier reuses --qf-mono and --qf-sans
+ * unchanged. Any other value fails the gate.
+ *
+ * NOTE ON color-mix — color-mix(in srgb, var(--qf-gl-ice) 38%, transparent)
+ * is NOT matched by the gate's regexes and is the sanctioned way to derive
+ * a tint without introducing a literal.
+ */
