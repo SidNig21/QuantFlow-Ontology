@@ -33,11 +33,12 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     cwd: ".",
     command: ["bun", "qa/run.ts", "windows-cold-boot"],
   },
-  {
-    id: "hermes-founder-state",
-    cwd: ".",
-    command: ["bun", "qa/run.ts", "hermes-founder-state"],
-  },
+  // hermes-founder-state is deliberately NOT a release stage. It needs a real
+  // WSL distro and fails closed without one, which is the correct posture for a
+  // gate but wrong for this door: CI runs on windows-latest, which ships no WSL
+  // distro, so listing it here turns the canonical door permanently red. Same
+  // reason windows-dock-collaboration is not a stage. Run it on a founder
+  // machine with `bun qa/run.ts hermes-founder-state`.
   {
     id: "repo-shape",
     cwd: ".",
