@@ -2752,6 +2752,17 @@
               "type": "null"
             }
           ]
+        },
+        "capability_groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "market.read",
+              "desk.orchestrate"
+            ]
+          },
+          "description": "Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names."
         }
       },
       "required": [

@@ -368,7 +368,9 @@ CREATE TABLE agent_definition (
   -- Artifact or prompt identifier containing this profile's operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
   system_prompt_ref TEXT,
   -- Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.
-  runtime_profile TEXT
+  runtime_profile TEXT,
+  -- Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.
+  capability_groups TEXT NOT NULL
 );
 
 -- An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.

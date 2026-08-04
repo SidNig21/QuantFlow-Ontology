@@ -14,10 +14,12 @@ import type { registerMethod } from "./json-rpc-server";
 import {
   getArtifactRoot,
   getKernelPath,
+  kernelCapabilityGroupForTool,
+  kernelCapabilityGroupsForSession,
   kernelExecute,
   kernelGetLinks,
   kernelGetObject,
-  kernelListOntologyReadTools,
+  kernelListOntologyToolsForGroups,
   kernelParseOntologyReadTool,
   kernelQueryObjects,
 } from "./kernel";
@@ -84,6 +86,13 @@ export function callOntologyReadTool(
   toolName: string,
   args: Record<string, unknown>,
 ): { result: unknown; artifactId: string } {
+  const grants = kernelCapabilityGroupsForSession(identity.sessionId);
+  const group = kernelCapabilityGroupForTool(toolName);
+  if (!group || !grants.includes(group)) {
+    throw new Error(
+      `ontology capability grant denied: ${group ?? "untagged"} (tool=${toolName})`,
+    );
+  }
   const parsed = kernelParseOntologyReadTool(toolName);
   if (!parsed) {
     throw new Error(`Unknown ontology read tool: ${toolName}`);
@@ -137,7 +146,8 @@ export function registerOntologyGatewayRpc(
       const input = params as Record<string, unknown>;
       requirePeerSessionRole(input.session_id, input.role);
       requireAppOwnedKernelDb(input.kernel_db);
-      return { tools: kernelListOntologyReadTools() };
+      const grants = kernelCapabilityGroupsForSession(String(input.session_id));
+      return { tools: kernelListOntologyToolsForGroups(grants) };
     },
     { description: "List generated ontology read tools for an admitted seat." },
   );

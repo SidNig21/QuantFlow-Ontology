@@ -1,42 +1,41 @@
-# NEXT — R2 capability grants and operating instructions
+# NEXT — R3 the orchestrator hires
 
 status: ACTIVE
 authorized-by: founder
 authorized-at: 2026-08-03
-baseline: R1 complete on `act-i-ladder` (ontology gateway)
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R2
+baseline: R2 complete on `act-i-ladder` (capability grants)
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R3
 
-> Execute R2 only as the active rung of the continuous Act I walk (`SPRINT.md`).
+> Execute R3 only as the active rung of the continuous Act I walk (`SPRINT.md`).
 
 ## Objective
 
-The Kernel decides which tool groups a role receives, and seats get written operating
-instructions. Capability groups only — never hand-listed tool names.
+An orchestrator seat reads the Dock catalog, creates and starts a session through the ontology
+gateway, and a canvas tile appears because the Kernel says so.
 
 ## In plain terms
 
-An orchestrator may use desk tools; a worker may not. Each seat knows what it is for because its
-profile points at written instructions.
+You should see a tile appear that you did not click — the canvas read the Kernel.
 
 ## Deliverables
 
-1. Schema field `capability_groups` on `agent_definition` (experimental; do not promote).
-2. Schema-side `capabilityGroup` tags so tools inherit groups from object/action definitions.
-3. Gateway enforces grants from Kernel definition rows.
-4. Non-null `system_prompt_ref` on Dock profiles with committed prompt files.
-5. Gate with falsification (worker spawn/desk tool refused); evidence under `docs/orders/evidence/r2/`.
+1. `qf_agent_definition_query`, `qf_create_agent_session`, `qf_start_agent_session` callable through
+   R1 gateway, scoped by R2 grants.
+2. Canvas renders a tile for any `agent_session` it did not create itself.
+3. Every hired session carries `spawned_from` to its definition.
+4. Gate with falsification; evidence under `docs/orders/evidence/r3/`; `FOUNDER-REVIEW.md` queued.
 
 ## Acceptance
 
-- Orchestrator receives desk tools; worker does not.
-- Worker attempting a desk/spawn tool is refused.
-- Add a new tagged object type → regenerate → group picks it up with no hand roster edit.
-- Stay experimental; propose promotion only in the report.
+- Orchestrator catalogs real `agent_definition` rows.
+- Create + start via gateway → Kernel row + `spawned_from` + queried canvas tile bound to session id.
+- Direct Kernel insert while app runs still produces a tile.
+- Falsify: drop `spawned_from` → red; UI-state tile → `no-canvas-domain-writes` red.
 
 ## Out of scope
 
-Schema promotion to `active`. Full orchestrator hire/canvas (R3). Second species (R4).
+Orchestrator judgment about whom to hire. Task assignment (R5).
 
 ## Stop conditions
 
-Any SPRINT hard stop, especially schema promotion.
+Any SPRINT hard stop.

@@ -4,12 +4,16 @@ export type Lifecycle = "experimental" | "active";
 
 const SNAKE_CASE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 
+export type CapabilityGroup = "market.read" | "desk.orchestrate";
+
 export type DefinedObject<T extends z.ZodRawShape = z.ZodRawShape> = {
   kind: "object";
   name: string;
   description: string;
   lifecycle: Lifecycle;
   pipelineFed?: boolean;
+  /** Ontology gateway capability group this object's read tools inherit. */
+  capabilityGroup?: CapabilityGroup;
   properties: z.ZodObject<T>;
 };
 
@@ -31,6 +35,8 @@ export type DefinedAction<T extends z.ZodRawShape = z.ZodRawShape> = {
   lifecycle: Lifecycle;
   operatorOnly?: boolean;
   pipelineOnly?: boolean;
+  /** Ontology gateway capability group this action tool inherits. */
+  capabilityGroup?: CapabilityGroup;
   input: z.ZodObject<T>;
 };
 
@@ -160,6 +166,7 @@ export function defineObject<T extends z.ZodRawShape>(opts: {
   description: string;
   lifecycle: Lifecycle;
   pipelineFed?: boolean;
+  capabilityGroup?: CapabilityGroup;
   properties: z.ZodObject<T>;
 }): DefinedObject<T> {
   assertSnakeCase(opts.name, "Object name");
@@ -172,6 +179,7 @@ export function defineObject<T extends z.ZodRawShape>(opts: {
     description: opts.description,
     lifecycle: opts.lifecycle,
     pipelineFed: opts.pipelineFed,
+    capabilityGroup: opts.capabilityGroup,
     properties: opts.properties,
   };
 }
@@ -214,6 +222,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
   lifecycle: Lifecycle;
   operatorOnly?: boolean;
   pipelineOnly?: boolean;
+  capabilityGroup?: CapabilityGroup;
   input: z.ZodObject<T>;
 }): DefinedAction<T> {
   assertSnakeCase(opts.name, "Action name");
@@ -227,6 +236,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
     lifecycle: opts.lifecycle,
     operatorOnly: opts.operatorOnly,
     pipelineOnly: opts.pipelineOnly,
+    capabilityGroup: opts.capabilityGroup,
     input: opts.input,
   };
 }

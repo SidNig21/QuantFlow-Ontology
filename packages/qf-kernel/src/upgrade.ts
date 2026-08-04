@@ -9,12 +9,14 @@ import { KernelUpgradeShapeError } from "./errors.ts";
 export const PROFILE_IDENTITY_UPGRADE = "agent-profile-identity" as const;
 export const MARKET_INGEST_UPGRADE = "market-ingest" as const;
 export const MARKET_CONTEXT_UPGRADE = "market-context" as const;
+export const CAPABILITY_GRANTS_UPGRADE = "capability-grants" as const;
 
 export type KernelShapeState =
   | "uninitialized"
   | "pre_d1"
   | "d1"
   | "market_ingest"
+  | "market_context"
   | "current"
   | "partial";
 
@@ -198,12 +200,30 @@ function expectedCurrent(): StructureSnapshot {
   return currentSnapshot;
 }
 
+/** Strip R2 capability_groups from agent_definition DDL for historical snapshots. */
+function withoutCapabilityGroupsColumn(sql: string | undefined): string | undefined {
+  if (!sql) return sql;
+  return sql
+    .replace(/,capability_groups TEXT NOT NULL DEFAULT '\[\]'/gi, "")
+    .replace(/,capability_groups TEXT NOT NULL/gi, "")
+    .replace(/,capability_groups TEXT/gi, "");
+}
+
+function tablesWithoutCapabilityGroups(
+  tables: Map<string, string>,
+): Map<string, string> {
+  const next = new Map(tables);
+  const agentDef = withoutCapabilityGroupsColumn(next.get("agent_definition"));
+  if (agentDef) next.set("agent_definition", agentDef);
+  return next;
+}
+
 /** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
 function expectedD1(): StructureSnapshot {
   if (!d1Snapshot) {
     const current = expectedCurrent();
     d1Snapshot = {
-      tables: new Map(current.tables),
+      tables: tablesWithoutCapabilityGroups(current.tables),
       linkKinds: [...current.linkKinds],
       schemaMeta: current.schemaMeta.filter(
         ([typeName, kind]) =>
@@ -226,7 +246,7 @@ function expectedMarketIngest(): StructureSnapshot {
   if (!marketIngestSnapshot) {
     const current = expectedCurrent();
     marketIngestSnapshot = {
-      tables: new Map(current.tables),
+      tables: tablesWithoutCapabilityGroups(current.tables),
       linkKinds: [...current.linkKinds],
       schemaMeta: current.schemaMeta.filter(
         ([typeName, kind]) =>
@@ -236,6 +256,21 @@ function expectedMarketIngest(): StructureSnapshot {
     };
   }
   return marketIngestSnapshot;
+}
+
+let marketContextSnapshot: StructureSnapshot | null = null;
+
+/** Post-0003 / pre-0004 — full schema meta, agent_definition without capability_groups. */
+function expectedMarketContext(): StructureSnapshot {
+  if (!marketContextSnapshot) {
+    const current = expectedCurrent();
+    marketContextSnapshot = {
+      tables: tablesWithoutCapabilityGroups(current.tables),
+      linkKinds: [...current.linkKinds],
+      schemaMeta: [...current.schemaMeta],
+    };
+  }
+  return marketContextSnapshot;
 }
 
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
@@ -298,6 +333,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedPreD1())) return "pre_d1";
   if (snapshotsEqual(live, expectedD1())) return "d1";
   if (snapshotsEqual(live, expectedMarketIngest())) return "market_ingest";
+  if (snapshotsEqual(live, expectedMarketContext())) return "market_context";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -337,6 +373,7 @@ export function applyKernelUpgradeChain(
     profileIdentitySql: string;
     marketIngestSql: string;
     marketContextSql: string;
+    capabilityGrantsSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -362,11 +399,20 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    db.exec(upgrades.marketContextSql);
+    if (state === "pre_d1" || state === "d1" || state === "market_ingest") {
+      db.exec(upgrades.marketContextSql);
+      if (classifyKernelShape(db) !== "market_context") {
+        throw new KernelUpgradeShapeError(
+          MARKET_CONTEXT_UPGRADE,
+          "0003 did not produce the exact market-context shape",
+        );
+      }
+    }
+    db.exec(upgrades.capabilityGrantsSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
-        MARKET_CONTEXT_UPGRADE,
-        "0003 did not produce the exact current shape",
+        CAPABILITY_GRANTS_UPGRADE,
+        "0004 did not produce the exact current shape",
       );
     }
   });

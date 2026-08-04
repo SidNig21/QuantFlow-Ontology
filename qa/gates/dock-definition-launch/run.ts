@@ -169,7 +169,11 @@ function assertExactDefaults(db: KernelDb): Record<string, unknown>[] {
       `${expected.id} runtime_profile mismatch`,
       row,
     );
-    assert((row.system_prompt_ref ?? null) === null, `${expected.id} prompt ref must be null`, row);
+    assert(
+      typeof row.capability_groups === "string" || Array.isArray(row.capability_groups),
+      `${expected.id} capability_groups missing`,
+      row,
+    );
   }
   return rows;
 }

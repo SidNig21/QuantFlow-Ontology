@@ -212,6 +212,23 @@ function registerAgentDefinition(
     }
     system_prompt_ref = input.system_prompt_ref;
   }
+  let capability_groups: string[] = [];
+  if (input.capability_groups !== undefined && input.capability_groups !== null) {
+    if (!Array.isArray(input.capability_groups)) {
+      throw new KernelError(
+        'register_agent_definition "capability_groups" must be an array',
+      );
+    }
+    for (const group of input.capability_groups) {
+      if (group !== "market.read" && group !== "desk.orchestrate") {
+        throw new KernelError(
+          'register_agent_definition "capability_groups" entries must be market.read or desk.orchestrate',
+        );
+      }
+      capability_groups.push(group);
+    }
+  }
+  const capability_groups_json = JSON.stringify(capability_groups);
 
   const id = name;
   const existing = db.query(`SELECT * FROM agent_definition WHERE id = ?`).get(id) as
@@ -234,13 +251,23 @@ function registerAgentDefinition(
       package_ref,
       runtime_profile,
       system_prompt_ref,
+      capability_groups,
     },
     insert: () => {
       const created_at = new Date().toISOString();
       db.query(
-        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ).run(id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref);
+        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref, capability_groups)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        id,
+        created_at,
+        name,
+        role,
+        package_ref,
+        runtime_profile,
+        system_prompt_ref,
+        capability_groups_json,
+      );
     },
   });
   return creationResult(cmd, id, cmd.event, state);

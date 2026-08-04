@@ -331,7 +331,67 @@ export function kernelListOntologyReadTools(): McpToolDefinition[] {
   for (const object of schema.objects) {
     tools.push(...readToolsForObject(object));
   }
+  for (const action of schema.actions) {
+    if (action.capabilityGroup) {
+      tools.push({
+        name: `qf_${action.name}`,
+        description: action.description,
+        inputSchema: { type: "object", properties: {}, additionalProperties: true },
+      });
+    }
+  }
   return tools;
+}
+
+/** Capability group for a generated tool name, or null if untagged/unknown. */
+export function kernelCapabilityGroupForTool(
+  name: string,
+): "market.read" | "desk.orchestrate" | null {
+  const read = kernelParseOntologyReadTool(name);
+  if (read) {
+    const object = schema.objects.find((entry) => entry.name === read.objectName);
+    return object?.capabilityGroup ?? null;
+  }
+  const actionMatch = /^qf_(.+)$/.exec(name);
+  if (!actionMatch) return null;
+  const action = schema.actions.find((entry) => entry.name === actionMatch[1]);
+  return action?.capabilityGroup ?? null;
+}
+
+/** Filter generated tools to those whose group is in the granted set. */
+export function kernelListOntologyToolsForGroups(
+  groups: ReadonlyArray<"market.read" | "desk.orchestrate">,
+): McpToolDefinition[] {
+  const allowed = new Set(groups);
+  return kernelListOntologyReadTools().filter((tool) => {
+    const group = kernelCapabilityGroupForTool(tool.name);
+    return group !== null && allowed.has(group);
+  });
+}
+
+/** Resolve capability_groups JSON from the session's spawned_from definition. */
+export function kernelCapabilityGroupsForSession(
+  sessionId: string,
+): Array<"market.read" | "desk.orchestrate"> {
+  const link = kernelGetLinks(sessionId, { kind: "spawned_from" })[0];
+  if (!link?.to_id) return [];
+  const definition = kernelGetObject("agent_definition", link.to_id);
+  if (!definition) return [];
+  const raw = definition.capability_groups;
+  let parsed: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(parsed)) return [];
+  const out: Array<"market.read" | "desk.orchestrate"> = [];
+  for (const group of parsed) {
+    if (group === "market.read" || group === "desk.orchestrate") out.push(group);
+  }
+  return out;
 }
 
 /** True when name is a generated read tool for a known schema object. */

@@ -47,6 +47,7 @@ export type DockProfileRegistration = {
   package_ref: string;
   runtime_profile: string | null;
   system_prompt_ref: string | null;
+  capability_groups: Array<"market.read" | "desk.orchestrate">;
 };
 
 export type DockProfileManifest = {
@@ -217,7 +218,7 @@ function readManifest(
     const profile = record(value, label);
     exactKeys(
       profile,
-      ["id", "role", "runtime_profile", "system_prompt_ref"],
+      ["id", "role", "runtime_profile", "system_prompt_ref", "capability_groups"],
       label,
     );
     const name = trimmedString(profile.id, `${label}.id`);
@@ -225,6 +226,19 @@ function readManifest(
       throw new DockProfilesContractError(`${manifestPath} has duplicate profile id: ${name}`);
     }
     ids.add(name);
+    const rawGroups = profile.capability_groups;
+    if (!Array.isArray(rawGroups)) {
+      throw new DockProfilesContractError(`${label}.capability_groups must be an array`);
+    }
+    const capability_groups: Array<"market.read" | "desk.orchestrate"> = [];
+    for (const group of rawGroups) {
+      if (group !== "market.read" && group !== "desk.orchestrate") {
+        throw new DockProfilesContractError(
+          `${label}.capability_groups entries must be market.read or desk.orchestrate`,
+        );
+      }
+      capability_groups.push(group);
+    }
     return {
       name,
       role: trimmedString(profile.role, `${label}.role`),
@@ -237,6 +251,7 @@ function readManifest(
         profile.system_prompt_ref,
         `${label}.system_prompt_ref`,
       ),
+      capability_groups,
     };
   });
 
@@ -284,7 +299,22 @@ function sameDefinition(
     String(existing.role ?? "") === expected.role &&
     String(existing.package_ref ?? "") === expected.package_ref &&
     (existing.runtime_profile ?? null) === expected.runtime_profile &&
-    (existing.system_prompt_ref ?? null) === expected.system_prompt_ref;
+    (existing.system_prompt_ref ?? null) === expected.system_prompt_ref &&
+    normalizeCapabilityGroupsJson(existing.capability_groups) ===
+      JSON.stringify(expected.capability_groups);
+}
+
+function normalizeCapabilityGroupsJson(value: unknown): string {
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      if (Array.isArray(parsed)) return JSON.stringify(parsed);
+    } catch {
+      return value;
+    }
+  }
+  if (Array.isArray(value)) return JSON.stringify(value);
+  return "[]";
 }
 
 export function bootstrapDockProfiles(

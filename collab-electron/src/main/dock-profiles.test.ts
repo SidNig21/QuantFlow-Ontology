@@ -30,6 +30,7 @@ function seedAdapter(
     role: string;
     runtime_profile: string | null;
     system_prompt_ref: string | null;
+    capability_groups: Array<"market.read" | "desk.orchestrate">;
   }>,
 ): void {
   const packageName = adapterId === "hermes"
@@ -76,19 +77,22 @@ function seedRequired(root: string): void {
       id: "hermes-orchestrator",
       role: "orchestrator",
       runtime_profile: "qf-orchestrator",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/orchestrator.md",
+      capability_groups: ["desk.orchestrate"],
     },
     {
       id: "hermes-worker",
       role: "worker",
       runtime_profile: "qf-worker",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
     },
     {
       id: "hermes-worker-2",
       role: "worker2",
       runtime_profile: "qf-worker-2",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
     },
   ]);
 }
@@ -99,13 +103,15 @@ function seedQaFixtures(root: string): void {
       id: "qf-proof-orchestrator",
       role: "orchestrator",
       runtime_profile: "qf-proof-orchestrator",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/orchestrator.md",
+      capability_groups: ["desk.orchestrate"],
     },
     {
       id: "qf-proof-worker",
       role: "worker",
       runtime_profile: "qf-proof-worker",
-      system_prompt_ref: null,
+      system_prompt_ref: "prompts/worker.md",
+      capability_groups: ["market.read"],
     },
   ]);
   seedAdapter(root, "tools/runtime-proof", "qf-toolloop", [
@@ -114,6 +120,7 @@ function seedQaFixtures(root: string): void {
       role: "toolloop-proof",
       runtime_profile: null,
       system_prompt_ref: null,
+      capability_groups: [],
     },
   ]);
 }
@@ -270,6 +277,7 @@ describe("Dock profile manifests", () => {
           role: "worker",
           runtime_profile: "one",
           system_prompt_ref: null,
+          capability_groups: ["market.read"],
         },
       ],
     };

@@ -9,13 +9,15 @@
       "id": "qf-proof-orchestrator",
       "role": "orchestrator",
       "runtime_profile": "qf-proof-orchestrator",
-      "system_prompt_ref": null
+      "system_prompt_ref": "prompts/orchestrator.md",
+      "capability_groups": ["desk.orchestrate"]
     },
     {
       "id": "qf-proof-worker",
       "role": "worker",
       "runtime_profile": "qf-proof-worker",
-      "system_prompt_ref": null
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": ["market.read"]
     }
   ]
 }

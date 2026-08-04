@@ -450,6 +450,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "windows-dock-capability",
+    description:
+      "R2: capability groups grant desk tools to orchestrator and refuse them for worker",
+    run: async () => {
+      const { runWindowsDockCapabilityGate } = await import(
+        "./gates/windows-dock-capability.ts"
+      );
+      const { ok } = await runWindowsDockCapabilityGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",

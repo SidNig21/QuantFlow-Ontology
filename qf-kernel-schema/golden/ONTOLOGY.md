@@ -193,6 +193,7 @@ An agent_definition is one founder-visible Dock profile. It governs spawn admiss
 - `package_ref` — Reusable runtime package reference that resolves to executable code. Several profiles may share one package_ref without sharing identity.
 - `system_prompt_ref` — Artifact or prompt identifier containing this profile's operating instructions. Point to immutable prompt bytes so behavior drift can be audited.
 - `runtime_profile` — Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.
+- `capability_groups` — Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.
 
 ### `agent_session`
 
@@ -563,6 +564,7 @@ Register a Dock profile in the Kernel registry (id = name). Duplicate names are 
 - `package_ref` — Runtime package this profile launches — the reusable executable half of the row.
 - `runtime_profile` — Optional runtime adapter profile selector. Omission stores null; empty or whitespace-only input is rejected.
 - `system_prompt_ref` — Artifact or prompt id that defines this profile's instructions.
+- `capability_groups` — Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names.
 
 ### `create_agent_session`
 
