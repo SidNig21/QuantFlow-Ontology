@@ -1,0 +1,47 @@
+﻿{
+    "label":  "before",
+    "capturedAtUtc":  "2026-08-04T00:15:47.5007125Z",
+    "note":  "Hermes entries are SHA-256 only; contents were never read into this file.",
+    "entries":  [
+                    {
+                        "scope":  "windows",
+                        "path":  ".quantflow/kernel.db",
+                        "present":  true,
+                        "bytes":  282624,
+                        "mtimeUtc":  "2026-08-03T23:34:50.6341796Z",
+                        "sha256":  "9487242D5B5A45D5F8AEA0336334CF178B08C47E2DFF25317A90761728AB0144"
+                    },
+                    {
+                        "scope":  "windows",
+                        "path":  ".quantflow/kernel.db-wal",
+                        "present":  false,
+                        "bytes":  null,
+                        "mtimeUtc":  null,
+                        "sha256":  null
+                    },
+                    {
+                        "scope":  "windows",
+                        "path":  ".quantflow/kernel.db-shm",
+                        "present":  false,
+                        "bytes":  null,
+                        "mtimeUtc":  null,
+                        "sha256":  null
+                    },
+                    {
+                        "scope":  "wsl",
+                        "path":  "~/.hermes/config.yaml",
+                        "present":  true,
+                        "bytes":  10560,
+                        "mtimeUtc":  null,
+                        "sha256":  "e94b59965d330decd15c9befd99c0dca3ec8ab2674817c3e13a04c2f8c379d2e"
+                    },
+                    {
+                        "scope":  "wsl",
+                        "path":  "~/.hermes/auth.json",
+                        "present":  true,
+                        "bytes":  12141,
+                        "mtimeUtc":  null,
+                        "sha256":  "2924b6a33c67b172b85833cc5f02280f49f8055aa5114aa53642b1623f863bbb"
+                    }
+                ]
+}

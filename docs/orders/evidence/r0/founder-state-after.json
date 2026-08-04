@@ -1,0 +1,47 @@
+﻿{
+    "label":  "after",
+    "capturedAtUtc":  "2026-08-04T00:36:54.2578645Z",
+    "note":  "Hermes entries are SHA-256 only; contents were never read into this file.",
+    "entries":  [
+                    {
+                        "scope":  "windows",
+                        "path":  ".quantflow/kernel.db",
+                        "present":  true,
+                        "bytes":  294912,
+                        "mtimeUtc":  "2026-08-04T00:34:41.5901671Z",
+                        "sha256":  "B6AF9C52C49B5D0F9EA87AF69719A1566C92DAA46BFD82ABA343047A45933972"
+                    },
+                    {
+                        "scope":  "windows",
+                        "path":  ".quantflow/kernel.db-wal",
+                        "present":  false,
+                        "bytes":  null,
+                        "mtimeUtc":  null,
+                        "sha256":  null
+                    },
+                    {
+                        "scope":  "windows",
+                        "path":  ".quantflow/kernel.db-shm",
+                        "present":  false,
+                        "bytes":  null,
+                        "mtimeUtc":  null,
+                        "sha256":  null
+                    },
+                    {
+                        "scope":  "wsl",
+                        "path":  "~/.hermes/config.yaml",
+                        "present":  true,
+                        "bytes":  10560,
+                        "mtimeUtc":  null,
+                        "sha256":  "e94b59965d330decd15c9befd99c0dca3ec8ab2674817c3e13a04c2f8c379d2e"
+                    },
+                    {
+                        "scope":  "wsl",
+                        "path":  "~/.hermes/auth.json",
+                        "present":  true,
+                        "bytes":  12141,
+                        "mtimeUtc":  null,
+                        "sha256":  "2924b6a33c67b172b85833cc5f02280f49f8055aa5114aa53642b1623f863bbb"
+                    }
+                ]
+}
