@@ -202,23 +202,109 @@ function expectedCurrent(): StructureSnapshot {
   return currentSnapshot;
 }
 
+/**
+ * Remove one generated column (and any trailing CHECK that belongs to it) from
+ * a normalized CREATE TABLE, so a current-authority snapshot can stand in for
+ * its predecessor.
+ *
+ * The generator emits a documentation comment between the comma and the column
+ * name, and the CREATE carries no DEFAULT (that lives only in the ALTER). The
+ * first version of these strippers matched literal `,<column> TEXT NOT NULL
+ * DEFAULT '...'`, which therefore never matched anything. The predecessor
+ * snapshots kept the new columns, no existing database could match any
+ * predecessor shape, every real Kernel classified as `partial`, and the app
+ * refused to boot — correctly, but for a reason that did not exist.
+ *
+ * Nothing caught it because every gate builds a FRESH database, which
+ * classifies as `current` and never enters the upgrade path at all. Debt #27:
+ * one source, two sides, and the side with real data is the one no gate reads.
+ */
+/**
+ * Blank every `--` comment, preserving length and newlines so indices still
+ * line up with the original string.
+ */
+function maskSqlComments(sql: string): string {
+  const out = sql.split("");
+  let inComment = false;
+  for (let i = 0; i < out.length; i++) {
+    if (!inComment && out[i] === "-" && out[i + 1] === "-") inComment = true;
+    if (inComment) {
+      if (out[i] === "\n") inComment = false;
+      else out[i] = " ";
+    }
+  }
+  return out.join("");
+}
+
+function withoutGeneratedColumn(
+  sql: string | undefined,
+  column: string,
+): string | undefined {
+  if (!sql) return sql;
+  const open = sql.indexOf("(");
+  const close = sql.lastIndexOf(")");
+  if (open < 0 || close <= open) return sql;
+
+  const head = sql.slice(0, open + 1);
+  const body = sql.slice(open + 1, close);
+  const tail = sql.slice(close);
+
+  // Boundaries are computed on a MASKED copy in which every `--` comment is
+  // blanked out, then applied to the original text so the result reproduces the
+  // database byte for byte.
+  //
+  // This matters because the generator writes English documentation between
+  // columns, and that English contains commas ("...task boundaries, not model
+  // branding."), apostrophes ("this profile's operating instructions") and
+  // parentheses ("(for example a Hermes profile name)"). Parsing the raw text
+  // splits mid-sentence, mistakes an apostrophe for an opening quote, and
+  // swallows whole columns.
+  const masked = maskSqlComments(body);
+
+  const segments: string[] = [];
+  let depth = 0;
+  let quote: string | null = null;
+  let start = 0;
+  for (let i = 0; i < masked.length; i++) {
+    const ch = masked[i]!;
+    if (quote) {
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === "'" || ch === '"') quote = ch;
+    else if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    else if (ch === "," && depth === 0) {
+      segments.push(body.slice(start, i));
+      start = i + 1;
+    }
+  }
+  segments.push(body.slice(start));
+
+  const word = new RegExp(`\\b${column.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`);
+  const kept = segments.filter((segment) => {
+    // A segment carries a leading documentation comment; the definition is what
+    // follows it. Judge on the definition, never on the prose.
+    const definition = maskSqlComments(segment).trim();
+    const isColumn = new RegExp(`^${column}\\b`, "i").test(definition);
+    const isCheckOnIt = /^CHECK\b/i.test(definition) && word.test(definition);
+    return !isColumn && !isCheckOnIt;
+  });
+
+  // Re-insert the newline that separated the last column from the closing
+  // paren: it belonged to the segment just removed, and without it the
+  // normalized text ends `TEXT)` where a real database reads `TEXT )`.
+  return `${head}${kept.join(",")}\n${tail}`.replace(/\s+/g, " ").trim();
+}
+
 /** Strip R2 capability_groups from agent_definition DDL for historical snapshots. */
 function withoutCapabilityGroupsColumn(sql: string | undefined): string | undefined {
-  if (!sql) return sql;
-  return sql
-    .replace(/,capability_groups TEXT NOT NULL DEFAULT '\[\]'/gi, "")
-    .replace(/,capability_groups TEXT NOT NULL/gi, "")
-    .replace(/,capability_groups TEXT/gi, "");
+  return withoutGeneratedColumn(sql, "capability_groups");
 }
 
 /** Strip R5 task.status from task DDL for historical snapshots. */
 function withoutTaskStatusColumn(sql: string | undefined): string | undefined {
-  if (!sql) return sql;
-  return sql
-    .replace(/,status TEXT NOT NULL DEFAULT 'open'/gi, "")
-    .replace(/,status TEXT NOT NULL/gi, "")
-    .replace(/,CHECK \(status IN \('open','done'\)\)/gi, "")
-    .replace(/CHECK \(status IN \('open','done'\)\)/gi, "");
+  return withoutGeneratedColumn(sql, "status");
 }
 
 function tablesWithoutCapabilityGroups(
