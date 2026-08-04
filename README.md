@@ -10,16 +10,46 @@ Built solo, in the open, for native Windows first. Early-stage and honest about 
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/readme-assets/windows-shell.png" alt="QuantFlow Ontology on Windows — canvas, file rail, and Dock species rail" width="900" />
+</p>
+
+<p align="center"><em>Live Windows shell (WO-WIN1 evidence): infinite canvas, file rail, and Dock species with Spawn — the product floor that Act I built on.</em></p>
+
+<p align="center">
+  <img src="docs/readme-assets/dock-session.png" alt="Dock session tile with qf-toolloop running on the canvas" width="720" />
+</p>
+
+<p align="center"><em>A Dock-spawned <code>qf-toolloop</code> session on the canvas with live session ledger (running / closed) — collaboration transport proven on Windows.</em></p>
+
+<p align="center">
+  <img src="docs/readme-assets/glacier-showcase.png" alt="Glacier design showcase — spine tiles, dock, and a declared cable" width="900" />
+</p>
+
+<p align="center"><em>Glacier design reference (<code>design/glacier/showcase.html</code>) — target look for the visual program: spine tiles, reworked dock, and declared cables. Spec, not a claim that every surface is already reskinned in the installed build.</em></p>
+
+<p align="center">
+  <img src="docs/readme-assets/glacier-tile-spec.png" alt="Glacier tile anatomy — spine head, id, grip, and arm-confirm close" width="720" />
+</p>
+
+<p align="center"><em>Tile anatomy from the Glacier tile spec — 44px spine, arm-then-confirm close, vertical session id. WO-g2 landed this structure in source.</em></p>
+
+---
+
 ## What works today (verified, not aspirational)
 
-Every claim below is backed by a falsified `qa/` gate or a recorded proof in the Kernel. If it's not on this list, it doesn't exist yet.
+Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a recorded work-order evidence folder. If it's not on this list, it doesn't exist yet.
 
-- **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel commands; a gate (`qa/gates/kernel-sole-writer*`) fails the build if any other code path writes to it — and the gate has been bait-tested red before being trusted green.
-- **The canvas + dock** — an infinite pan/zoom surface (Electron) where every agent card launches by exact Kernel definition id. The old hardcoded Peer Seats catalogue and its separate spawn IPC are gone: qf-toolloop and three Hermes profiles all use the same Dock path, and each session links back to the definition the founder clicked.
-- **Agent seats** — the packaged Dock contains `qf-toolloop`, three distinct Hermes profiles, and two clearly labeled deterministic proof profiles. The proof orchestrator/worker are verified end to end on Windows; the model-backed ToolLoop/Hermes profiles are present with distinct Kernel identities but are not yet certified as everyday Windows workflows.
-- **The peer bus** (`tools/qf-peer-bus`) — a stdio MCP server exposing `send_to_peer` / `read_inbox` / `list_peers`. Every peer message is recorded to the Kernel as a content-addressed `trajectory` artifact (which doubles as a finetuning trace store). Transport routing lives in its own SQLite db, separate from the Kernel.
-- **Live delivery** — package metadata binds a selected Kernel role to its live PTY and pushes peer messages into the TUI. WO-WIN2 proves the current Windows path with two normal-Dock-launched deterministic seats, distinct sessions, visible task/ACK output, and both legs recorded as Kernel trajectory artifacts. This is a collaboration-transport proof, not a claim that a live model completed research.
-- **Verification culture** — changes land through work orders verified in cold git worktrees; gates are falsified (bait → red → restore → green) before they count; artifact hashes are recomputed, not trusted.
+- **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel `execute()`; gates fail the build if any other path writes domain truth.
+- **The canvas + dock** — an infinite pan/zoom Electron surface. Every agent card launches by exact Kernel definition id. Sessions link back to the definition the founder clicked. Dock **Clear** hides closed sessions from the ledger without deleting Kernel history.
+- **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
+- **The peer bus** (`tools/qf-peer-bus`) — stdio MCP (`send_to_peer` / `read_inbox` / `list_peers`). Peer messages land as content-addressed `trajectory` artifacts. Transport SQLite stays separate from the Kernel.
+- **Act I ladder (R0–R8)** — build gates green on `act-i-ladder` / local `main`. Durable tasks, market lineage, and Windows dock capability proofs are in evidence. **Act I is not “complete” until founder sign-off** on the FOUNDER-REVIEW queue (see Status).
+- **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward. Canvas cables as UI are still in flight (WO-g5).
+- **Glacier foundation (WO-g1 / WO-g2)** — `--qf-gl-*` design tokens in `qf-tokens.css`, QuantFlow terminal ANSI palette, and tile **spine** chrome (arm-confirm close, dblclick fullscreen). Later Glacier orders (dock / shell / cables) continue from reversible tag `glacier-checkpoint-a`.
+- **Verification culture** — work orders, cold worktrees, bait-tested gates. Artifact hashes are recomputed, not trusted.
 
 ## The end goal: a real ontology
 
@@ -39,36 +69,27 @@ The ontology has three planes:
 
 ## Status
 
-The definition of done and the route to it live in
-[`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md). The single authorized rung lives in
-[`docs/orders/NEXT.md`](docs/orders/NEXT.md).
+**As of 2026-08-04 (local `main`, snapshot — not a second authority):**
 
-This README used to carry a phase table here. It was removed on 2026-08-03: it was a hand-maintained
-copy of status that had no mechanism to stay true, and it drifted — asserting a phase complete while
-the plan document it copied from warned readers off that exact conclusion. Status is something you
-run, not something you read:
+| Layer | State |
+| --- | --- |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) — **R9 BLOCKED** pending Act I founder sign-off |
+| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0–R8 complete in the ladder table; R9 named but not started |
+| Product floor | Windows-native Electron console; deterministic Dock collaboration proven |
+| Visual program | **GLACIER** — g5a + g1 + g2 on `main`; checkpoint tag `glacier-checkpoint-a`; g3–g5 still open |
+| Honest boundary | Live model-backed research loop, Bovada workflow, and full cable UI are **not** claimed done |
+
+Authority lives in `NEXT.md` and `GOLDEN-RUN.md`. This table is a human-facing postcard; if it disagrees with those files, **they win**. Status is also something you run:
 
 ```bash
-bun qa/verify-release.ts     # the canonical release gate
+bun qa/verify-release.ts     # the canonical release gate (Windows)
 bun qa/run.ts --list         # every registered gate
+bun qa/run.ts rung-ladder    # active=R9; complete=9 when the ladder agrees
 ```
 
-The ontology is generated, not hand-written: object types, links, actions, the migration, the agent
-tool surface, and the conformance suite all fall out of one schema. Observation, registration, and
-market-ingest actions are withheld from agents and stay on trusted/operator or pipeline boundaries.
-The research graph has governed creation and link paths; the market plane atomically stores
-replay-safe venue, market-event, instrument, and quote rows with source provenance.
+The ontology is generated, not hand-written: object types, links, actions, the migration, the agent tool surface, and the conformance suite all fall out of one schema. The live surface is [`qf-kernel-schema/golden/ONTOLOGY.md`](qf-kernel-schema/golden/ONTOLOGY.md), regenerated by `bun run generate` and compared byte-for-byte on every schema test run.
 
-Exact counts are deliberately not printed here — they change when the schema does, and a number in
-prose has no mechanism to stay true. The live surface is
-[`qf-kernel-schema/golden/ONTOLOGY.md`](qf-kernel-schema/golden/ONTOLOGY.md), which is regenerated by
-`bun run generate` and compared byte-for-byte against the generator on every test run.
-
-The Windows product floor is now real and founder-visible. The honest boundary is narrower than a
-finished product: deterministic collaboration is proven, while live model-backed seats, the parked
-Bovada workflow, and the defining multi-agent research loop still require later orders. For the
-single current status page, including what is usable and what is not, read
-[`docs/orders/NEXT.md`](docs/orders/NEXT.md).
+Research-only: QuantFlow **never places bets or executes trades**. It proposes, backtests, criticizes, evaluates, and reports — the operator acts in the world.
 
 ## Architecture
 
@@ -93,11 +114,13 @@ Runtime split worth knowing: the Electron main process is Node (`node:sqlite`); 
 | Path | What it is |
 |---|---|
 | `collab-electron/` | The desktop app — canvas, dock, seat spawning, peer delivery watcher |
-| `qf-kernel-schema/` | Schema → generated Kernel code (the codegen seam the ontology charter will extend) |
+| `qf-kernel-schema/` | Schema → generated Kernel SQL, tools, ontology docs, upgrades |
 | `tools/qf-peer-bus/` | The MCP peer bus: server, transport db, Kernel recording, cold-harness proofs |
 | `species/` | Runtime/adapter packages and agent fixtures; durable Dock profile identity lives in the Kernel |
+| `design/glacier/` | Glacier visual language — tokens, tile/showcase specs, cable plumbing |
 | `qa/` | Gates. Falsifiable by construction — if a gate can't go red, it isn't a gate |
 | `docs/orders/` | Work orders + verification records (the build's audit trail) |
+| `docs/readme-assets/` | Screenshots linked from this README |
 
 ## Development
 
@@ -116,6 +139,8 @@ On Windows, `bun run package:unsigned` creates the unsigned package under `colla
 The canonical readiness check is run from the repository root with `bun qa/verify-release.ts`.
 While the app is running, `qf-canvas` is the command-line control surface for arranging and
 inspecting canvas tiles.
+
+Cold-start for agents: read [`START_HERE.md`](START_HERE.md), then [`AGENTS.md`](AGENTS.md), then the order named by `docs/orders/NEXT.md`.
 
 ### Local data layout
 
@@ -136,10 +161,7 @@ if both roots exist, the QuantFlow root wins unchanged.
 
 Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap automatically from packaged manifests, but real Hermes turns still require the founder's local [Hermes](https://github.com/NousResearch/hermes-agent) install and matching `qf-orchestrator`, `qf-worker`, and `qf-worker-2` runtime profiles. The founder-only peer-bus helper is `tools/qf-peer-bus/scripts/setup-founder-seats.ts`.
 
-**Current collaboration limit:** D2 proves one catalogue, exact profile selection, session lineage,
-safe native-TUI cleanup, and metadata-authorized PTY delivery. It does not create Hermes profiles,
-handle credentials, enforce caller-bound QuantFlow tool grants, or prove an unscripted real-model
-research collaboration; those remain later rungs.
+**Current collaboration limit:** Windows proofs cover catalogue selection, session lineage, safe native-TUI cleanup, and metadata-authorized PTY delivery for deterministic seats. They do not create Hermes profiles, handle credentials, or prove an unscripted real-model research collaboration; those remain later rungs.
 
 ## Doctrine (the rules this repo is built under)
 
