@@ -1,0 +1,12 @@
+{
+  "route": "native_tui",
+  "name": "qf-proof-agent",
+  "command": "node",
+  "entrypoint": "qf-proof-agent.mjs",
+  "profile_argv": [
+    "--profile",
+    "{runtime_profile}"
+  ],
+  "package": "qf-proof-agent.aospkg",
+  "tools": []
+}

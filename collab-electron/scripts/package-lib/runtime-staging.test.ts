@@ -6,10 +6,14 @@ import {
 } from "./runtime-staging.ts";
 
 describe("runtime staging inventory", () => {
-  test("normal production staging contains Hermes only", () => {
+  test("normal production staging contains packaged species only", () => {
     expect(RUNTIME_FILES).toEqual(PRODUCTION_RUNTIME_FILES);
     expect(RUNTIME_FILES.some((path) => path.startsWith("tools/"))).toBe(false);
-    expect(RUNTIME_FILES.every((path) => path.startsWith("species/hermes/"))).toBe(true);
+    expect(
+      RUNTIME_FILES.every(
+        (path) => path.startsWith("species/hermes/") || path.startsWith("species/claude-code/"),
+      ),
+    ).toBe(true);
   });
 
   test("QA staging explicitly adds deterministic proof fixtures", () => {

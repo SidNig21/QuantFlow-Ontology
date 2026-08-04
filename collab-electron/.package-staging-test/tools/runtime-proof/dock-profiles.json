@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "adapter": {
+    "id": "qf-toolloop",
+    "package": "packed/qf-toolloop.aospkg"
+  },
+  "profiles": [
+    {
+      "id": "qf-toolloop",
+      "role": "toolloop-proof",
+      "runtime_profile": null,
+      "system_prompt_ref": null,
+      "capability_groups": []
+    }
+  ]
+}

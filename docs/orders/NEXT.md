@@ -1,39 +1,37 @@
-# NEXT — R4 a second species
+# NEXT — R5 durable delegation
 
 status: ACTIVE
 authorized-by: founder
 authorized-at: 2026-08-03
-baseline: R3 complete on `act-i-ladder` (orchestrator hire + Kernel canvas projection)
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R4
+baseline: R4 complete on `act-i-ladder` (Claude Code species)
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R5
 
-> Execute R4 only as the active rung of the continuous Act I walk (`SPRINT.md`).
+> Execute R5 only as the active rung of the continuous Act I walk (`SPRINT.md`).
 
 ## Objective
 
-Claude Code works through the identical Dock / gateway / grant contract as Hermes — no Hermes-shaped
-special case in the shared launch path.
+Task creation and assignment live as Kernel objects and links — not peer-bus messages — so work
+survives close and reopen.
 
 ## In plain terms
 
-A second kind of seat can sit next to Hermes and use the same world tools.
+Kill the seats mid-task, reopen, and the assignment is still there.
 
 ## Deliverables
 
-1. Claude Code adapter package + `agent_definition` Dock profiles.
-2. Shared launch path injects ontology/collaboration MCP without `adapterId === "hermes"` literals.
-3. Gate: both species call the same generated read; distinct Kernel rows + `spawned_from`; no-grant
-   refuse; species-literal scan red on `"hermes"` hardcode in shared path.
-4. Evidence under `docs/orders/evidence/r4/`.
+1. `create_task` / assign / complete transitions via `execute()`; `assigned_to` link required.
+2. Gateway exposes desk task actions under R2 grants.
+3. Peer-bus may notify only; meaning is Kernel.
+4. Gate with bus-only bait + illegal transition bait; evidence under `docs/orders/evidence/r5/`.
 
 ## Acceptance
 
-Spawn Claude Code from Dock; same read tool/result shape as Hermes; two Kernel sessions with
-correct `spawned_from`.
+Create + assign → link exists; worker → done → event log; close/reopen → task/link/state intact.
 
 ## Out of scope
 
-Rewriting legacy ACP chat onto the species seam (R7). Task assignment (R5).
+Scheduling, retries, priorities, deadlines.
 
 ## Stop conditions
 
-Any SPRINT hard stop.
+Any SPRINT hard stop. Stay experimental — no schema promotion.

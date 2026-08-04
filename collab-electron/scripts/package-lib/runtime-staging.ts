@@ -24,6 +24,11 @@ export const PRODUCTION_RUNTIME_FILES = [
   "species/hermes/launch.json",
   "species/hermes/dock-profiles.json",
   "species/hermes/tools-allowlist.json",
+  "species/claude-code/packed/claude-code.aospkg",
+  "species/claude-code/packed/claude-code.meta.json",
+  "species/claude-code/packed/claude-code.mjs",
+  "species/claude-code/launch.json",
+  "species/claude-code/dock-profiles.json",
 ] as const;
 
 export const QA_RUNTIME_FILES = [
@@ -148,10 +153,12 @@ export function prepareRuntimeStaging(
   const stagingWorkspace = mkdtempSync(join(tmpdir(), "qf-runtime-staging-"));
   const stagingRepo = join(stagingWorkspace, "repo");
   const hermesDir = join(stagingRepo, "species/hermes");
+  const claudeCodeDir = join(stagingRepo, "species/claude-code");
   const runtimeProofDir = join(stagingRepo, "tools/runtime-proof");
   const proofAgentDir = join(stagingRepo, "tools/qf-proof-agent");
   try {
     copySourceTree(join(repoRoot, "species/hermes"), hermesDir);
+    copySourceTree(join(repoRoot, "species/claude-code"), claudeCodeDir);
     if (qaMode) {
       copySourceTree(join(repoRoot, "tools/qf-proof-agent"), proofAgentDir);
       copySourceTree(join(repoRoot, "tools/runtime-proof"), runtimeProofDir);
@@ -201,6 +208,7 @@ export function prepareRuntimeStaging(
         runOrThrow("bun", ["run", "pack-agent"], runtimeProofDir, packEnv(proofAdapter));
       }
       runOrThrow("bun", ["run", "pack-agent"], hermesDir, packEnv(hermesAdapter));
+      runOrThrow("node", ["./scripts/pack-agent.mjs"], claudeCodeDir);
     } finally {
       proofAdapter?.cleanup();
       hermesAdapter?.cleanup();

@@ -1,0 +1,16 @@
+{
+  "tools": [
+    "kind:think",
+    "kind:read",
+    "kind:search",
+    "kind:fetch",
+    "think",
+    "web_search",
+    "web_extract",
+    "browser_navigate",
+    "browser_snapshot",
+    "read_file",
+    "search_files",
+    "list_dir"
+  ]
+}

@@ -474,6 +474,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "windows-dock-species",
+    description:
+      "R4: Claude Code and Hermes-contract seats share ontology gateway; no hermes MCP hardcode",
+    run: async () => {
+      const { runWindowsDockSpeciesGate } = await import(
+        "./gates/windows-dock-species.ts"
+      );
+      const { ok } = await runWindowsDockSpeciesGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",

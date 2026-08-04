@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "adapter": {
+    "id": "hermes",
+    "package": "packed/hermes.aospkg"
+  },
+  "profiles": [
+    {
+      "id": "hermes-orchestrator",
+      "role": "orchestrator",
+      "runtime_profile": "default",
+      "system_prompt_ref": "prompts/orchestrator.md",
+      "capability_groups": ["desk.orchestrate"]
+    },
+    {
+      "id": "hermes-worker",
+      "role": "worker",
+      "runtime_profile": "default",
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": ["market.read"]
+    },
+    {
+      "id": "hermes-worker-2",
+      "role": "worker2",
+      "runtime_profile": "default",
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": ["market.read"]
+    }
+  ]
+}

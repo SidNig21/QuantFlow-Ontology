@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "adapter": {
+    "id": "claude-code",
+    "package": "packed/claude-code.aospkg"
+  },
+  "profiles": [
+    {
+      "id": "claude-code-orchestrator",
+      "role": "claude-orchestrator",
+      "runtime_profile": "claude-code-orchestrator",
+      "system_prompt_ref": "prompts/orchestrator.md",
+      "capability_groups": ["desk.orchestrate"]
+    },
+    {
+      "id": "claude-code-worker",
+      "role": "claude-worker",
+      "runtime_profile": "claude-code-worker",
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": ["market.read"]
+    },
+    {
+      "id": "claude-code-ungranted",
+      "role": "claude-ungranted",
+      "runtime_profile": "claude-code-ungranted",
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": []
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "route": "native_tui",
+  "name": "hermes",
+  "command": "hermes",
+  "terminal_target": "wsl:auto",
+  "argv": ["--tui"],
+  "peer_delivery": {
+    "mode": "pty_role",
+    "runtime_profiles": ["default"]
+  }
+}

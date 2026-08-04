@@ -1,15 +1,18 @@
 {
   "platform": "win32",
-  "packageRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-INS5zk\\dist\\win-unpacked",
-  "kernelDb": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-INS5zk\\stores\\kernel.db",
-  "artifactRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-INS5zk\\stores\\artifacts",
+  "packageRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ccOQd8\\dist\\win-unpacked",
+  "kernelDb": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ccOQd8\\stores\\kernel.db",
+  "artifactRoot": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ccOQd8\\stores\\artifacts",
   "readiness": {
     "canvas": true,
-    "windowUrl": "file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-INS5zk/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html",
+    "windowUrl": "file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-ccOQd8/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html",
     "dockProfileIds": [
       "hermes-orchestrator",
       "hermes-worker",
       "hermes-worker-2",
+      "claude-code-orchestrator",
+      "claude-code-worker",
+      "claude-code-ungranted",
       "qf-proof-orchestrator",
       "qf-proof-worker",
       "qf-toolloop"
@@ -19,6 +22,9 @@
     "hermes-orchestrator",
     "hermes-worker",
     "hermes-worker-2",
+    "claude-code-orchestrator",
+    "claude-code-worker",
+    "claude-code-ungranted",
     "qf-proof-orchestrator",
     "qf-proof-worker",
     "qf-toolloop"
@@ -26,5 +32,5 @@
   "screenshot": "external Computer Use capture required",
   "defaultUserStateUnchanged": true,
   "shutdown": "rpc app.shutdown; exit code 0; owned process set empty",
-  "recordedAt": "2026-08-04T00:52:31.467Z"
+  "recordedAt": "2026-08-04T03:22:21.300Z"
 }
