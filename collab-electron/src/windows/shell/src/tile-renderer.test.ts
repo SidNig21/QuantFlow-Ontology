@@ -1,5 +1,112 @@
-import { describe, test, expect } from "bun:test";
-import { getAgentTileModel, getTileLabel, splitFilepath, positionTile } from "./tile-renderer.js";
+import { describe, test, expect, beforeAll, afterAll } from "bun:test";
+import {
+  getAgentTileModel,
+  getTileLabel,
+  splitFilepath,
+  positionTile,
+  createTileDOM,
+  armCloseHead,
+} from "./tile-renderer.js";
+
+/** Minimal DOM for bun tests — no new dependency (one-skin / order forbid). */
+function installMinimalDom() {
+  class El {
+    tagName: string;
+    className = "";
+    id = "";
+    title = "";
+    type = "";
+    textContent = "";
+    innerHTML = "";
+    parentNode: El | null = null;
+    children: El[] = [];
+    dataset: Record<string, string> = {};
+    style: Record<string, string> = {};
+    disabled = false;
+    classList = {
+      add: (...tokens: string[]) => {
+        const set = new Set(this.className.split(/\s+/).filter(Boolean));
+        for (const t of tokens) set.add(t);
+        this.className = [...set].join(" ");
+      },
+      contains: (token: string) => this.className.split(/\s+/).includes(token),
+    };
+    private listeners = new Map<string, Array<(e: unknown) => void>>();
+    constructor(tag: string) {
+      this.tagName = tag.toUpperCase();
+    }
+    appendChild(child: El) {
+      this.children.push(child);
+      child.parentNode = this;
+      return child;
+    }
+    addEventListener(type: string, fn: (e: unknown) => void) {
+      const list = this.listeners.get(type) ?? [];
+      list.push(fn);
+      this.listeners.set(type, list);
+    }
+    dispatchEvent(event: { type: string; stopPropagation?: () => void; preventDefault?: () => void }) {
+      const e = {
+        type: event.type,
+        stopPropagation() {},
+        preventDefault() {},
+        ...event,
+      };
+      for (const fn of this.listeners.get(event.type) ?? []) fn(e);
+      return true;
+    }
+    querySelector(sel: string): El | null {
+      return this.querySelectorAll(sel)[0] ?? null;
+    }
+    querySelectorAll(sel: string): El[] {
+      const out: El[] = [];
+      const walk = (node: El) => {
+        if (matches(node, sel)) out.push(node);
+        for (const c of node.children) walk(c);
+      };
+      walk(this);
+      return out;
+    }
+  }
+
+  function matches(node: El, sel: string): boolean {
+    if (sel.startsWith(".")) {
+      const cls = sel.slice(1);
+      return node.className.split(/\s+/).includes(cls);
+    }
+    return false;
+  }
+
+  const doc = {
+    createElement(tag: string) {
+      return new El(tag);
+    },
+    documentElement: new El("html"),
+  };
+  const prevDoc = (globalThis as { document?: unknown }).document;
+  const prevGetComputed = (globalThis as { getComputedStyle?: unknown }).getComputedStyle;
+  (globalThis as { document: typeof doc }).document = doc;
+  (globalThis as { getComputedStyle: (el: unknown) => { getPropertyValue: (p: string) => string } }).getComputedStyle =
+    () => ({ getPropertyValue: () => "" });
+  (globalThis as { MouseEvent: new (type: string, init?: object) => { type: string } }).MouseEvent =
+    class MouseEvent {
+      type: string;
+      constructor(type: string) {
+        this.type = type;
+      }
+    } as never;
+  (globalThis as { Event: new (type: string, init?: object) => { type: string } }).Event =
+    class Event {
+      type: string;
+      constructor(type: string) {
+        this.type = type;
+      }
+    } as never;
+  return () => {
+    (globalThis as { document?: unknown }).document = prevDoc;
+    (globalThis as { getComputedStyle?: unknown }).getComputedStyle = prevGetComputed;
+  };
+}
 
 // -- splitFilepath --
 
@@ -253,5 +360,74 @@ describe("positionTile", () => {
     // screen y = 300 * 0.75 + 20 = 245
     expect(container.style.left).toBe("160px");
     expect(container.style.top).toBe("245px");
+  });
+});
+
+describe("WO-g2 glacier spine DOM", () => {
+  let restore: (() => void) | undefined;
+  beforeAll(() => {
+    restore = installMinimalDom();
+  });
+  afterAll(() => {
+    restore?.();
+  });
+
+  test("createTileDOM builds spine/head/id/grip/body/screen and cable nodes", () => {
+    const closes: string[] = [];
+    const fs: string[] = [];
+    const dom = createTileDOM(
+      { type: "term", id: "t-spine", definitionId: "hermes-worker", sessionId: "sess-abc" },
+      {
+        onClose: (id: string) => closes.push(id),
+        onToggleFullscreen: (id: string) => fs.push(id),
+      },
+    );
+    expect(dom.container.querySelector(".gl-tile__spine")).toBeTruthy();
+    expect(dom.container.querySelector(".gl-tile__head")).toBeTruthy();
+    expect(dom.container.querySelector(".gl-tile__id")).toBeTruthy();
+    expect(dom.container.querySelector(".gl-tile__grip")).toBeTruthy();
+    expect(dom.container.querySelector(".gl-tile__body")).toBeTruthy();
+    expect(dom.container.querySelector(".gl-tile__screen")).toBeTruthy();
+    expect(dom.container.querySelectorAll(".gl-node")).toHaveLength(4);
+    expect(dom.container.querySelector(".tile-title-bar")).toBeNull();
+    expect(dom.container.querySelector(".tile-action-btn")).toBeNull();
+    expect(dom.spine).toBe(dom.titleBar);
+  });
+
+  test("arm/confirm: one click does not close; two within 2s closes", () => {
+    const closes: string[] = [];
+    const head = document.createElement("button");
+    head.dataset.armed = "false";
+    armCloseHead(head, { onConfirm: () => closes.push("ok"), armMs: 2000 });
+    head.dispatchEvent(new Event("click"));
+    expect(closes).toEqual([]);
+    expect(head.dataset.armed).toBe("true");
+    head.dispatchEvent(new Event("click"));
+    expect(closes).toEqual(["ok"]);
+    expect(head.dataset.armed).toBe("false");
+  });
+
+  test("arm/confirm: arm lapses after timer so second click does not close", async () => {
+    const closes: string[] = [];
+    const head = document.createElement("button");
+    head.dataset.armed = "false";
+    armCloseHead(head, { onConfirm: () => closes.push("ok"), armMs: 50 });
+    head.dispatchEvent(new Event("click"));
+    expect(head.dataset.armed).toBe("true");
+    await Bun.sleep(80);
+    expect(head.dataset.armed).toBe("false");
+    head.dispatchEvent(new Event("click"));
+    expect(closes).toEqual([]);
+    expect(head.dataset.armed).toBe("true");
+  });
+
+  test("dblclick spine toggles fullscreen via callback", () => {
+    const fs: string[] = [];
+    const dom = createTileDOM(
+      { type: "term", id: "t-fs" },
+      { onClose: () => {}, onToggleFullscreen: (id: string) => fs.push(id) },
+    );
+    dom.spine.dispatchEvent(new MouseEvent("dblclick"));
+    expect(fs).toEqual(["t-fs"]);
   });
 });

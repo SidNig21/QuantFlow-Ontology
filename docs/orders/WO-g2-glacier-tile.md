@@ -1,6 +1,6 @@
 # WO-g2 — GLACIER tile: spine chrome, states, close, expand
 
-status: DRAFT — needs founder authorization
+status: BUILT — evidence in docs/orders/evidence/wo-g2/ (visual receipts after package sync)
 branch: `wo-g2-glacier-tile`
 program: GLACIER full visual swap · order 2 of 5
 depends on: **WO-g1 merged** (`--qf-gl-*` tokens must exist)

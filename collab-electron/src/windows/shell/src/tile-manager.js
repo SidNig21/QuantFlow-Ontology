@@ -606,13 +606,7 @@ export function createTileManager({
 			},
 		});
 
-		// Double-click title bar → center tile in viewport
-		dom.titleBar.addEventListener("dblclick", (e) => {
-			e.stopPropagation();
-			if (onTileDblClick) onTileDblClick(tile);
-		});
-
-		attachDrag(dom.titleBar, tile, {
+		attachDrag(dom.spine, tile, {
 			viewport,
 			onUpdate: repositionAllTiles,
 			disablePointerEvents: (wvs) => {

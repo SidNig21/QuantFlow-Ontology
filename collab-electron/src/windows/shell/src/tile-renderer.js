@@ -47,11 +47,53 @@ export function getAgentTileModel(tile) {
   };
 }
 
+/**
+ * Arm/confirm close on the spine head. First click arms; second within armMs closes.
+ * Clears armed on mouseleave, blur, and timer expiry.
+ * @returns {{ disarm: () => void }}
+ */
+export function armCloseHead(headEl, { onConfirm, armMs = 2000 } = {}) {
+  let armed = false;
+  let timer = null;
+
+  function disarm() {
+    armed = false;
+    headEl.dataset.armed = "false";
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
+
+  function arm() {
+    armed = true;
+    headEl.dataset.armed = "true";
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(disarm, armMs);
+  }
+
+  headEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (!armed) {
+      arm();
+      return;
+    }
+    disarm();
+    onConfirm?.();
+  });
+  headEl.addEventListener("mousedown", (e) => e.stopPropagation());
+  headEl.addEventListener("mouseleave", () => disarm());
+  headEl.addEventListener("blur", () => disarm());
+
+  return { disarm };
+}
+
 export function createTileDOM(tile, callbacks) {
   const container = document.createElement("div");
   container.className = "canvas-tile";
   container.dataset.tileId = tile.id;
   container.dataset.tileType = tile.type;
+  container.dataset.state = tileState(tile);
   const agentModel = getAgentTileModel(tile);
   if (agentModel) {
     container.classList.add("agent-cli-tile");
@@ -59,11 +101,75 @@ export function createTileDOM(tile, callbacks) {
     container.dataset.agentStatus = agentModel.status;
   }
 
-  const titleBar = document.createElement("div");
-  titleBar.className = "tile-title-bar";
+  const spine = document.createElement("div");
+  spine.className = "gl-tile__spine";
+
+  const head = document.createElement("button");
+  head.type = "button";
+  head.className = "gl-tile__head";
+  head.dataset.armed = "false";
+  head.title = "Close tile";
+  const light = document.createElement("i");
+  light.className = "gl-tile__light";
+  const plate = document.createElement("span");
+  plate.className = "gl-tile__plate";
+  const plateLabel = document.createElement("span");
+  plateLabel.textContent = "CLOSE";
+  plate.appendChild(plateLabel);
+  head.appendChild(light);
+  head.appendChild(plate);
+  armCloseHead(head, {
+    onConfirm: () => callbacks.onClose?.(tile.id),
+  });
+
+  const idZone = document.createElement("div");
+  idZone.className = "gl-tile__id";
+  const idSpan = document.createElement("span");
+  idSpan.textContent = spineIdLabel(tile, agentModel);
+  idZone.appendChild(idSpan);
+
+  const grip = document.createElement("div");
+  grip.className = "gl-tile__grip";
+  for (let i = 0; i < 3; i++) {
+    grip.appendChild(document.createElement("i"));
+  }
+
+  spine.appendChild(head);
+  spine.appendChild(idZone);
+  spine.appendChild(grip);
+
+  if (callbacks.onToggleFullscreen) {
+    spine.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      callbacks.onToggleFullscreen(tile.id);
+    });
+  }
+
+  if (tile.type === "term") {
+    spine.addEventListener("contextmenu", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const selected = await window.shellApi.showContextMenu([
+        { id: "rename", label: "Rename" },
+        { id: "duplicate", label: "Duplicate" },
+      ]);
+      if (selected === "rename" && callbacks.onRename) {
+        callbacks.onRename(tile.id);
+      } else if (selected === "duplicate" && callbacks.onDuplicate) {
+        callbacks.onDuplicate(tile.id);
+      }
+    });
+  }
+
+  const body = document.createElement("div");
+  body.className = "gl-tile__body";
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "gl-tile__title";
 
   const titleText = document.createElement("span");
-  titleText.className = "tile-title-text";
+  titleText.className = "tile-title-text gl-tile__name";
   const label = getTileLabel(tile);
   const parentSpan = document.createElement("span");
   parentSpan.className = "tile-title-parent";
@@ -75,24 +181,47 @@ export function createTileDOM(tile, callbacks) {
   titleText.appendChild(nameSpan);
   if (tile.filePath) titleText.title = tile.filePath;
   if (tile.folderPath) titleText.title = tile.folderPath;
-	const titleGroup = document.createElement("div");
-	titleGroup.className = "tile-title-group";
-	titleGroup.appendChild(titleText);
-	if (tile.type === "term" && (tile.role || tile.sessionId || tile.definitionId)) {
-		const badges = document.createElement("div");
-		badges.className = "tile-agent-badges";
-		if (tile.agentLabel) badges.appendChild(badge("tile-agent-label", tile.agentLabel));
-		if (tile.role) badges.appendChild(badge("tile-agent-role", tile.role));
-		if (agentModel) {
-			badges.appendChild(badge("tile-agent-runtime", "TUI"));
-			badges.appendChild(badge("tile-agent-status", agentModel.status));
-		}
-		if (tile.sessionId) badges.appendChild(badge("tile-agent-session", shortId(tile.sessionId)));
-		titleGroup.appendChild(badges);
-	}
-	titleBar.appendChild(titleGroup);
 
-  // For browser tiles, add nav controls and a URL input to the title bar
+  const titleGroup = document.createElement("div");
+  titleGroup.className = "tile-title-group";
+  titleGroup.appendChild(titleText);
+
+  if (tile.type === "term" && (tile.role || tile.sessionId || tile.definitionId)) {
+    const badges = document.createElement("div");
+    badges.className = "tile-agent-badges";
+    if (tile.agentLabel) badges.appendChild(badge("tile-agent-label", tile.agentLabel));
+    if (tile.role) badges.appendChild(badge("tile-agent-role", tile.role));
+    if (agentModel) {
+      badges.appendChild(badge("tile-agent-runtime", "TUI"));
+      badges.appendChild(badge("tile-agent-status", agentModel.status));
+    }
+    if (tile.sessionId) badges.appendChild(badge("tile-agent-session", shortId(tile.sessionId)));
+    titleGroup.appendChild(badges);
+  }
+
+  const copyablePath = tile.filePath || tile.folderPath;
+  if (copyablePath) {
+    const copySvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 0 1 2 9.5V3.5A1.5 1.5 0 0 1 3.5 2h6A1.5 1.5 0 0 1 11 3.5V5"/></svg>`;
+    const okStroke = getComputedStyle(document.documentElement)
+      .getPropertyValue("--qf-ok")
+      .trim() || "currentColor";
+    const checkSvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="${okStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`;
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "tile-copy-path-btn";
+    copyBtn.innerHTML = copySvg;
+    copyBtn.title = "Copy path";
+    copyBtn.addEventListener("mousedown", (e) => e.stopPropagation());
+    copyBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(copyablePath);
+      copyBtn.innerHTML = checkSvg;
+      setTimeout(() => { copyBtn.innerHTML = copySvg; }, 1000);
+    });
+    titleGroup.appendChild(copyBtn);
+  }
+
+  titleRow.appendChild(titleGroup);
+
   let urlInput;
   let navBack;
   let navForward;
@@ -124,7 +253,8 @@ export function createTileDOM(tile, callbacks) {
     navGroup.appendChild(navBack);
     navGroup.appendChild(navForward);
     navGroup.appendChild(navReload);
-    titleBar.appendChild(navGroup);
+    titleRow.appendChild(navGroup);
+
     urlInput = document.createElement("input");
     urlInput.type = "text";
     urlInput.className = "tile-url-input";
@@ -167,89 +297,58 @@ export function createTileDOM(tile, callbacks) {
       }
       window.getSelection()?.removeAllRanges();
     });
+    titleRow.appendChild(urlInput);
     titleText.style.display = "none";
   }
 
-  const btnGroup = document.createElement("div");
-  btnGroup.className = "tile-btn-group";
-
-  const copyablePath = tile.filePath || tile.folderPath;
-  if (copyablePath) {
-    const copySvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M5 11H3.5A1.5 1.5 0 0 1 2 9.5V3.5A1.5 1.5 0 0 1 3.5 2h6A1.5 1.5 0 0 1 11 3.5V5"/></svg>`;
-    const okStroke = getComputedStyle(document.documentElement)
-      .getPropertyValue("--qf-ok")
-      .trim();
-    const checkSvg = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="${okStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4"/></svg>`;
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "tile-action-btn tile-copy-path-btn";
-    copyBtn.innerHTML = copySvg;
-    copyBtn.title = "Copy path";
-    copyBtn.addEventListener("mousedown", (e) => e.stopPropagation());
-    copyBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      navigator.clipboard.writeText(copyablePath);
-      copyBtn.innerHTML = checkSvg;
-      setTimeout(() => { copyBtn.innerHTML = copySvg; }, 1000);
-    });
-    titleGroup.appendChild(copyBtn);
-  }
-
-  if (callbacks.onToggleFullscreen) {
-    const fsBtn = document.createElement("button");
-    fsBtn.className = "tile-action-btn tile-fullscreen-btn";
-    fsBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 1 1 1 1 4"/><polyline points="12 1 15 1 15 4"/><polyline points="4 15 1 15 1 12"/><polyline points="12 15 15 15 15 12"/></svg>`;
-    fsBtn.title = "Fullscreen";
-    fsBtn.addEventListener("mousedown", (e) => e.stopPropagation());
-    fsBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      callbacks.onToggleFullscreen(tile.id);
-    });
-    btnGroup.appendChild(fsBtn);
-  }
-
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "tile-action-btn tile-close-btn";
-  closeBtn.innerHTML = "&times;";
-  closeBtn.title = "Close tile";
-  closeBtn.addEventListener("mousedown", (e) => {
-    e.stopPropagation();
-  });
-  closeBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    callbacks.onClose(tile.id);
-  });
-  btnGroup.appendChild(closeBtn);
-  titleBar.appendChild(btnGroup);
-
-  if (tile.type === "term") {
-    titleBar.addEventListener("contextmenu", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const selected = await window.shellApi.showContextMenu([
-        { id: "rename", label: "Rename" },
-        { id: "duplicate", label: "Duplicate" },
-      ]);
-      if (selected === "rename" && callbacks.onRename) {
-        callbacks.onRename(tile.id);
-      } else if (selected === "duplicate" && callbacks.onDuplicate) {
-        callbacks.onDuplicate(tile.id);
-      }
-    });
-  }
-
   const contentArea = document.createElement("div");
-  contentArea.className = "tile-content";
+  contentArea.className = "tile-content gl-tile__screen";
 
   const contentOverlay = document.createElement("div");
   contentOverlay.className = "tile-content-overlay";
 
-  if (urlInput) titleBar.insertBefore(urlInput, btnGroup);
-
-  container.appendChild(titleBar);
-  container.appendChild(contentArea);
+  body.appendChild(titleRow);
+  body.appendChild(contentArea);
   contentArea.appendChild(contentOverlay);
 
-  return { container, titleBar, titleText, contentArea, contentOverlay, closeBtn, urlInput, navBack, navForward, navReload };
+  for (const side of ["n", "e", "s", "w"]) {
+    const node = document.createElement("div");
+    node.className = `gl-node gl-node--${side}`;
+    node.dataset.side = side;
+    container.appendChild(node);
+  }
+
+  container.appendChild(spine);
+  container.appendChild(body);
+
+  // titleBar alias = spine so drag/dblclick callers keep working until rebound.
+  return {
+    container,
+    spine,
+    titleBar: spine,
+    titleText,
+    contentArea,
+    contentOverlay,
+    head,
+    urlInput,
+    navBack,
+    navForward,
+    navReload,
+  };
+}
+
+function tileState(tile) {
+  if (tile.type !== "term") return "idle";
+  if (tile.ptySessionId) return "running";
+  if (tile.sessionId) return "idle";
+  return "idle";
+}
+
+function spineIdLabel(tile, agentModel) {
+  if (tile.sessionId) return shortId(tile.sessionId);
+  if (tile.definitionId) return tile.definitionId;
+  if (agentModel?.identity) return agentModel.identity;
+  return tile.id;
 }
 
 function badge(className, text) {
