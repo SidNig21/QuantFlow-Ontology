@@ -596,6 +596,25 @@ Mark an open task done (open → done) through the transition table.
 - **input:**
 - `task_id` — Task id to complete.
 
+### `create_connection`
+
+Create a typed canvas connection edge (kind data|control|view) between two port refs. It persists projection wiring only through the Kernel command path — never a second truth store or a self-loop.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `connection_id` — Guest-minted connection id — adopted as the Kernel row id, never re-minted.
+- `kind` — Connection kind. view is inert UI wiring; data and control grant runtime obligations and must not be implied by the renderer alone.
+- `from_ref` — Source port id as tileId:side (n|e|s|w). Must name a different tile than to_ref.
+- `to_ref` — Target port id as tileId:side (n|e|s|w). Duplicate from/to/kind triples are rejected.
+
+### `delete_connection`
+
+Delete a connection row by id and append connection.deleted. Hard delete only — the ontology has no tombstone field, and canvas persistence must never keep the edge.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `connection_id` — Existing connection id to remove.
+
 ### `start_agent_session`
 
 Bring a starting agent session into running (starting → running).

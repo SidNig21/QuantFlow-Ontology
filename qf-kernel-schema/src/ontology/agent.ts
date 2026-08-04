@@ -352,3 +352,42 @@ export const complete_task = defineAction({
     task_id: z.string().describe("Task id to complete."),
   }),
 });
+
+export const create_connection = defineAction({
+  name: "create_connection",
+  description:
+    "Create a typed canvas connection edge (kind data|control|view) between two port refs. It persists projection wiring only through the Kernel command path — never a second truth store or a self-loop.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    connection_id: z
+      .string()
+      .describe("Guest-minted connection id — adopted as the Kernel row id, never re-minted."),
+    kind: z
+      .enum(["data", "control", "view"])
+      .describe(
+        "Connection kind. view is inert UI wiring; data and control grant runtime obligations and must not be implied by the renderer alone.",
+      ),
+    from_ref: z
+      .string()
+      .describe(
+        "Source port id as tileId:side (n|e|s|w). Must name a different tile than to_ref.",
+      ),
+    to_ref: z
+      .string()
+      .describe(
+        "Target port id as tileId:side (n|e|s|w). Duplicate from/to/kind triples are rejected.",
+      ),
+  }),
+});
+
+export const delete_connection = defineAction({
+  name: "delete_connection",
+  description:
+    "Delete a connection row by id and append connection.deleted. Hard delete only — the ontology has no tombstone field, and canvas persistence must never keep the edge.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    connection_id: z.string().describe("Existing connection id to remove."),
+  }),
+});

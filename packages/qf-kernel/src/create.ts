@@ -409,6 +409,135 @@ function createTask(
   return creationResult(cmd, task_id, cmd.event, state, "open");
 }
 
+const CONNECTION_KINDS = new Set(["data", "control", "view"]);
+const PORT_REF_RE = /^[^:]+:[nesw]$/;
+
+function parseConnectionTile(portRef: string): string {
+  const colon = portRef.lastIndexOf(":");
+  return colon === -1 ? portRef : portRef.slice(0, colon);
+}
+
+function createConnection(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  links: LinkSpec[],
+): ObjectExecuteResult {
+  const connection_id = input.connection_id;
+  if (typeof connection_id !== "string" || connection_id.length === 0) {
+    throw new KernelError(
+      'create_connection requires non-empty "connection_id" (guest-minted, adopted)',
+    );
+  }
+  const kind = input.kind;
+  if (typeof kind !== "string" || !CONNECTION_KINDS.has(kind)) {
+    throw new KernelError(
+      'create_connection requires kind in data|control|view',
+    );
+  }
+  const from_ref = input.from_ref;
+  if (typeof from_ref !== "string" || !PORT_REF_RE.test(from_ref)) {
+    throw new KernelError(
+      'create_connection requires from_ref as tileId:side with side in n|e|s|w',
+    );
+  }
+  const to_ref = input.to_ref;
+  if (typeof to_ref !== "string" || !PORT_REF_RE.test(to_ref)) {
+    throw new KernelError(
+      'create_connection requires to_ref as tileId:side with side in n|e|s|w',
+    );
+  }
+  if (parseConnectionTile(from_ref) === parseConnectionTile(to_ref)) {
+    throw new KernelError(
+      "create_connection rejects self-loops (from and to must name different tiles)",
+    );
+  }
+
+  const existingId = db
+    .query(
+      `SELECT id FROM connection WHERE from_ref = ? AND to_ref = ? AND kind = ?`,
+    )
+    .get(from_ref, to_ref, kind) as { id: string } | null;
+  if (existingId) {
+    throw new KernelError(
+      `create_connection rejects duplicate from/to/kind (existing ${existingId.id})`,
+    );
+  }
+
+  const state = commitCreation(db, {
+    object_type: cmd.object_type,
+    object_id: connection_id,
+    event: cmd.event,
+    trace,
+    links,
+    payload: {
+      command: cmd.action,
+      kind,
+      from_ref,
+      to_ref,
+    },
+    insert: () => {
+      const created_at = new Date().toISOString();
+      db.query(
+        `INSERT INTO connection (id, created_at, kind, from_ref, to_ref)
+         VALUES (?, ?, ?, ?, ?)`,
+      ).run(connection_id, created_at, kind, from_ref, to_ref);
+    },
+  });
+  return creationResult(cmd, connection_id, cmd.event, state, "exists");
+}
+
+function deleteConnection(
+  db: KernelDb,
+  cmd: CreationCommand,
+  input: Record<string, unknown>,
+  trace: TraceContext,
+  _links: LinkSpec[],
+): ObjectExecuteResult {
+  const connection_id = input.connection_id;
+  if (typeof connection_id !== "string" || connection_id.length === 0) {
+    throw new KernelError(
+      'delete_connection requires non-empty "connection_id"',
+    );
+  }
+
+  const prior = db
+    .query(`SELECT * FROM connection WHERE id = ?`)
+    .get(connection_id) as Record<string, unknown> | null;
+  if (!prior) {
+    throw new KernelError(`delete_connection: unknown connection_id ${connection_id}`);
+  }
+
+  const tx = db.transaction(() => {
+    db.query(`DELETE FROM connection WHERE id = ?`).run(connection_id);
+    appendEvent(db, {
+      type: cmd.event,
+      object_type: cmd.object_type,
+      object_id: connection_id,
+      payload: {
+        command: cmd.action,
+        kind: prior.kind,
+        from_ref: prior.from_ref,
+        to_ref: prior.to_ref,
+        span_id: trace.span_id,
+      },
+      trace_id: trace.trace_id,
+    });
+  });
+  tx();
+
+  return {
+    kind: "object",
+    object_type: cmd.object_type,
+    object_id: connection_id,
+    from: "exists",
+    to: "(none)",
+    event: cmd.event,
+    state: {},
+  };
+}
+
 function createHypothesis(
   db: KernelDb,
   cmd: CreationCommand,
@@ -854,6 +983,8 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   publish_artifact: publishArtifact,
   create_agent_session: createAgentSession,
   create_task: createTask,
+  create_connection: createConnection,
+  delete_connection: deleteConnection,
   register_agent_definition: registerAgentDefinition,
   create_hypothesis: createHypothesis,
   register_dataset_version: registerDatasetVersion,

@@ -2860,6 +2860,58 @@
     }
   },
   {
+    "name": "qf_create_connection",
+    "description": "Create a typed canvas connection edge (kind data|control|view) between two port refs. It persists projection wiring only through the Kernel command path — never a second truth store or a self-loop.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "connection_id": {
+          "type": "string",
+          "description": "Guest-minted connection id — adopted as the Kernel row id, never re-minted."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "data",
+            "control",
+            "view"
+          ],
+          "description": "Connection kind. view is inert UI wiring; data and control grant runtime obligations and must not be implied by the renderer alone."
+        },
+        "from_ref": {
+          "type": "string",
+          "description": "Source port id as tileId:side (n|e|s|w). Must name a different tile than to_ref."
+        },
+        "to_ref": {
+          "type": "string",
+          "description": "Target port id as tileId:side (n|e|s|w). Duplicate from/to/kind triples are rejected."
+        }
+      },
+      "required": [
+        "connection_id",
+        "kind",
+        "from_ref",
+        "to_ref"
+      ]
+    }
+  },
+  {
+    "name": "qf_delete_connection",
+    "description": "Delete a connection row by id and append connection.deleted. Hard delete only — the ontology has no tombstone field, and canvas persistence must never keep the edge.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "connection_id": {
+          "type": "string",
+          "description": "Existing connection id to remove."
+        }
+      },
+      "required": [
+        "connection_id"
+      ]
+    }
+  },
+  {
     "name": "qf_start_agent_session",
     "description": "Bring a starting agent session into running (starting → running).",
     "inputSchema": {

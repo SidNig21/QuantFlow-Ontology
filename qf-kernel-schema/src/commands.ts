@@ -241,6 +241,16 @@ export const creationCommands: readonly CreationCommand[] = [
     object_type: "ticket",
     event: "ticket.observed",
   },
+  {
+    action: "create_connection",
+    object_type: "connection",
+    event: "connection.created",
+  },
+  {
+    action: "delete_connection",
+    object_type: "connection",
+    event: "connection.deleted",
+  },
 ] as const;
 
 /**

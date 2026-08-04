@@ -11,6 +11,7 @@ export const MARKET_INGEST_UPGRADE = "market-ingest" as const;
 export const MARKET_CONTEXT_UPGRADE = "market-context" as const;
 export const CAPABILITY_GRANTS_UPGRADE = "capability-grants" as const;
 export const TASK_STATUS_UPGRADE = "task-status" as const;
+export const CONNECTION_ACTIONS_UPGRADE = "connection-actions" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -19,6 +20,7 @@ export type KernelShapeState =
   | "market_ingest"
   | "market_context"
   | "capability_grants"
+  | "task_status"
   | "current"
   | "partial";
 
@@ -266,7 +268,23 @@ function schemaMetaWithoutTaskActions(
 ): Array<[string, string, string, string]> {
   return rows.filter(
     ([typeName, kind]) =>
-      kind !== "action" || !["create_task", "complete_task"].includes(typeName),
+      kind !== "action" ||
+      ![
+        "create_task",
+        "complete_task",
+        "create_connection",
+        "delete_connection",
+      ].includes(typeName),
+  );
+}
+
+function schemaMetaWithoutConnectionActions(
+  rows: Array<[string, string, string, string]>,
+): Array<[string, string, string, string]> {
+  return rows.filter(
+    ([typeName, kind]) =>
+      kind !== "action" ||
+      !["create_connection", "delete_connection"].includes(typeName),
   );
 }
 
@@ -344,6 +362,21 @@ function expectedCapabilityGrants(): StructureSnapshot {
   return capabilityGrantsSnapshot;
 }
 
+let taskStatusSnapshot: StructureSnapshot | null = null;
+
+/** Post-0005 / pre-0006 — task.status present; create_connection/delete_connection absent. */
+function expectedTaskStatus(): StructureSnapshot {
+  if (!taskStatusSnapshot) {
+    const current = expectedCurrent();
+    taskStatusSnapshot = {
+      tables: current.tables,
+      linkKinds: [...current.linkKinds],
+      schemaMeta: schemaMetaWithoutConnectionActions(current.schemaMeta),
+    };
+  }
+  return taskStatusSnapshot;
+}
+
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
   for (const name of [...ONTOLOGY_TABLES, "links", "schema_meta"]) {
     if (a.tables.get(name) !== b.tables.get(name)) return false;
@@ -406,6 +439,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedMarketIngest())) return "market_ingest";
   if (snapshotsEqual(live, expectedMarketContext())) return "market_context";
   if (snapshotsEqual(live, expectedCapabilityGrants())) return "capability_grants";
+  if (snapshotsEqual(live, expectedTaskStatus())) return "task_status";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -447,6 +481,7 @@ export function applyKernelUpgradeChain(
     marketContextSql: string;
     capabilityGrantsSql: string;
     taskStatusSql: string;
+    connectionActionsSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -495,11 +530,26 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    db.exec(upgrades.taskStatusSql);
+    if (
+      state === "pre_d1" ||
+      state === "d1" ||
+      state === "market_ingest" ||
+      state === "market_context" ||
+      state === "capability_grants"
+    ) {
+      db.exec(upgrades.taskStatusSql);
+      if (classifyKernelShape(db) !== "task_status") {
+        throw new KernelUpgradeShapeError(
+          TASK_STATUS_UPGRADE,
+          "0005 did not produce the exact task-status shape",
+        );
+      }
+    }
+    db.exec(upgrades.connectionActionsSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
-        TASK_STATUS_UPGRADE,
-        "0005 did not produce the exact current shape",
+        CONNECTION_ACTIONS_UPGRADE,
+        "0006 did not produce the exact current shape",
       );
     }
   });
@@ -515,6 +565,7 @@ export function applyProfileIdentityUpgrade(db: KernelDb, upgradeSql: string): v
   if (
     state === "d1" ||
     state === "capability_grants" ||
+    state === "task_status" ||
     state === "current" ||
     state === "uninitialized"
   ) {

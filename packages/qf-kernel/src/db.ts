@@ -384,7 +384,8 @@ export function attachKernel(
       shape === "d1" ||
       shape === "market_ingest" ||
       shape === "market_context" ||
-      shape === "capability_grants"
+      shape === "capability_grants" ||
+      shape === "task_status"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -401,12 +402,16 @@ export function attachKernel(
       const taskStatusSql = readFileSync(
         upgradeSqlPath("0005-task-status.sql"), "utf8",
       );
+      const connectionActionsSql = readFileSync(
+        upgradeSqlPath("0006-connection-actions.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
         marketContextSql,
         capabilityGrantsSql,
         taskStatusSql,
+        connectionActionsSql,
       });
     }
   }

@@ -1,0 +1,4 @@
+﻿ qf-kernel-schema/golden/ONTOLOGY.md   | 19 +++++++++++++
+ qf-kernel-schema/golden/migration.sql |  2 ++
+ qf-kernel-schema/golden/tools.json    | 52 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 73 insertions(+)
