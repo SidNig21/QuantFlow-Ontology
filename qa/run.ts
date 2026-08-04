@@ -529,6 +529,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "rung-ladder",
+    description:
+      "GOLDEN-RUN.md rung status and NEXT.md agree; one active rung; complete rungs have evidence; no rung skipped; no second ladder",
+    run: async () => {
+      const { checkRungLadder } = await import("./gates/rung-ladder.ts");
+      return checkRungLadder().ok;
+    },
+  },
+  {
     name: "observe-door",
     description:
       "Debt #22: observe_ticket strings only on allowlist; no tools.json reads or generateMcp calls outside qf-kernel-schema/",

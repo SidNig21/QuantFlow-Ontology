@@ -120,6 +120,50 @@ become a fitness function before evaluation history exists. The schema hooks are
 
 ---
 
+## Rung status — the single source of truth
+
+**Machine-checked.** `bun qa/run.ts rung-ladder` fails if this table and `NEXT.md` disagree, if more
+than one rung is `active`, if a `complete` rung has no evidence directory, or if a rung is marked
+`complete` while an earlier one is not. Edit this table and `NEXT.md` in the same commit or the gate
+goes red. **Do not describe rung state anywhere else** — link here instead.
+
+| Rung | State | Evidence |
+|---|---|---|
+| R0 | active | `docs/orders/evidence/r0` |
+| R1 | pending | — |
+| R2 | pending | — |
+| R3 | pending | — |
+| R4 | pending | — |
+| R5 | pending | — |
+| R6 | pending | — |
+| R7 | pending | — |
+| R8 | pending | — |
+| R9 | pending | — |
+| R10 | pending | — |
+| R11a | pending | — |
+| R11b | pending | — |
+| R12 | pending | — |
+| R13 | pending | — |
+| R14 | pending | — |
+
+### Closing a rung
+
+A rung moves `active` → `complete` only when all of these hold, in this order:
+
+1. Its acceptance commands run green, pasted unedited.
+2. Every gate it added has been falsified — broken on purpose, seen red, restored, seen green — and
+   both outputs are in the record.
+3. An evidence file exists under `docs/orders/evidence/<rung>/` stating what was proven **and what
+   was not**.
+4. `bun qa/verify-release.ts` passes.
+5. This table and `NEXT.md` are updated in the same commit.
+
+**Founder-gated rungs stop for human eyes.** R3, R6, and R8 change what the founder sees on the
+canvas, and their acceptance is not fully expressible as a command. A builder reaching the end of one
+of those posts its evidence and **stops**; it does not mark itself complete. Every other rung in
+Act I closes on gates alone, and a builder may advance itself through them — the check is a
+falsifiable test, not the builder's opinion, so this does not violate the no-self-approval rule.
+
 ## Part IV — Rung contracts
 
 Written one rung ahead of the build front. A rung with no contract here is not ready to be selected.

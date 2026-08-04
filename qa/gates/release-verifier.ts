@@ -72,6 +72,11 @@ const EXPECTED_STAGES: readonly ReleaseStage[] = [
   // the gate would have compared the schema to a file generated from the
   // schema -- true by construction, which PROTOCOL.md defines as not a gate.
   {
+    id: "rung-ladder",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "rung-ladder"],
+  },
+  {
     id: "one-skin",
     cwd: ".",
     command: ["bun", "qa/run.ts", "one-skin"],

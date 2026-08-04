@@ -42,6 +42,11 @@ There are seven, and nothing else binds. If a document is not on this list, it c
 6. **`docs/DEBT.md`** — the debt register. Binding, but blocks nothing.
 7. **`docs/adr/`** — accepted decisions with their reasons. A later ADR explicitly supersedes an earlier one.
 
+The route to the golden run is [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md), and it holds
+the **only** rung status table — the `rung-ladder` gate fails the build if any other authority
+document grows a competing one. [`docs/orders/SPRINT.md`](docs/orders/SPRINT.md) tells a builder how
+to walk that ladder continuously and where it must stop. Neither authorizes work; `NEXT.md` does.
+
 Two surfaces are **generated and cannot go stale** — prefer them over any prose: `qf-kernel-schema/golden/ONTOLOGY.md` for the live schema (byte-checked against the generator), and `bun qa/run.ts --list` for the live gates.
 
 `docs/history/` is superseded material, kept for reasoning. **Nothing in it is authority and nothing in it reactivates by being read.**
