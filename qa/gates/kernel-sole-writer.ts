@@ -82,6 +82,7 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/windows-dock-collaboration.ts",
   "qa/gates/windows-dock-ontology.ts",
   "qa/gates/windows-dock-capability.ts",
+  "qa/gates/windows-dock-hire.ts",
 ];
 
 /**

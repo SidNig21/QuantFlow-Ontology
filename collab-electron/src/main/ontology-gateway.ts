@@ -1,5 +1,5 @@
 /**
- * App-owned ontology gateway — generated read tools via the open Kernel.
+ * App-owned ontology gateway — generated read + granted desk actions via Kernel.
  *
  * Seats never open SQLite. They call through MCP → JSON-RPC → these handlers,
  * which refuse any kernel_db that is not the app-owned path (same shape as
@@ -20,9 +20,11 @@ import {
   kernelGetLinks,
   kernelGetObject,
   kernelListOntologyToolsForGroups,
+  kernelParseOntologyActionTool,
   kernelParseOntologyReadTool,
   kernelQueryObjects,
 } from "./kernel";
+import { notifySessionCanvasProjection } from "./session-canvas-projector";
 
 type RegisterMethod = typeof registerMethod;
 
@@ -81,11 +83,10 @@ function recordTrajectory(
   return { artifactId: artifact.object_id };
 }
 
-export function callOntologyReadTool(
+function assertCapability(
   identity: OntologyCallerIdentity,
   toolName: string,
-  args: Record<string, unknown>,
-): { result: unknown; artifactId: string } {
+): void {
   const grants = kernelCapabilityGroupsForSession(identity.sessionId);
   const group = kernelCapabilityGroupForTool(toolName);
   if (!group || !grants.includes(group)) {
@@ -93,6 +94,14 @@ export function callOntologyReadTool(
       `ontology capability grant denied: ${group ?? "untagged"} (tool=${toolName})`,
     );
   }
+}
+
+export function callOntologyReadTool(
+  identity: OntologyCallerIdentity,
+  toolName: string,
+  args: Record<string, unknown>,
+): { result: unknown; artifactId: string } {
+  assertCapability(identity, toolName);
   const parsed = kernelParseOntologyReadTool(toolName);
   if (!parsed) {
     throw new Error(`Unknown ontology read tool: ${toolName}`);
@@ -126,6 +135,39 @@ export function callOntologyReadTool(
     result = kernelGetLinks(id, { kind, direction });
   }
   const { artifactId } = recordTrajectory(identity, toolName, args, result);
+  return { result, artifactId };
+}
+
+const HIRE_ACTIONS = new Set(["create_agent_session", "start_agent_session"]);
+
+/** Granted desk actions (hire path) plus generated reads. */
+export function callOntologyTool(
+  identity: OntologyCallerIdentity,
+  toolName: string,
+  args: Record<string, unknown>,
+): { result: unknown; artifactId: string } {
+  const action = kernelParseOntologyActionTool(toolName);
+  if (!action) {
+    return callOntologyReadTool(identity, toolName, args);
+  }
+  if (!HIRE_ACTIONS.has(action)) {
+    throw new Error(`ontology action not exposed through gateway: ${toolName}`);
+  }
+  assertCapability(identity, toolName);
+
+  const input: Record<string, unknown> = { ...args };
+  if (action === "create_agent_session") {
+    if (typeof input.session_id !== "string" || input.session_id.length === 0) {
+      input.session_id = `hire-${crypto.randomUUID()}`;
+    }
+  }
+
+  const result = kernelExecute(action, input, {
+    trace_id: crypto.randomUUID(),
+    span_id: crypto.randomUUID(),
+  });
+  notifySessionCanvasProjection();
+  const { artifactId } = recordTrajectory(identity, toolName, input, result);
   return { result, artifactId };
 }
 
@@ -168,11 +210,11 @@ export function registerOntologyGatewayRpc(
         input.arguments && typeof input.arguments === "object" && !Array.isArray(input.arguments)
           ? (input.arguments as Record<string, unknown>)
           : {};
-      return callOntologyReadTool(identity, name, args);
+      return callOntologyTool(identity, name, args);
     },
     {
       description:
-        "Invoke a generated ontology read tool against the app-owned Kernel; records a trajectory artifact.",
+        "Invoke a generated ontology read or granted hire action against the app-owned Kernel; records a trajectory artifact.",
     },
   );
 }

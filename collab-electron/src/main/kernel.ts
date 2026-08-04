@@ -406,6 +406,16 @@ export function kernelParseOntologyReadTool(
   return { objectName, op };
 }
 
+/** True when name is a generated action tool (`qf_<action>`). */
+export function kernelParseOntologyActionTool(name: string): string | null {
+  const match = /^qf_(.+)$/.exec(name);
+  if (!match) return null;
+  const actionName = match[1]!;
+  if (kernelParseOntologyReadTool(name)) return null;
+  if (!schema.actions.some((action) => action.name === actionName)) return null;
+  return actionName;
+}
+
 /** Fetch one ontology row by type and id. */
 export function kernelGetObject(
   type: string,

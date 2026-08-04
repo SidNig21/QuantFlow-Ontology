@@ -1,40 +1,38 @@
-# NEXT — R3 the orchestrator hires
+# NEXT — R4 a second species
 
 status: ACTIVE
 authorized-by: founder
 authorized-at: 2026-08-03
-baseline: R2 complete on `act-i-ladder` (capability grants)
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R3
+baseline: R3 complete on `act-i-ladder` (orchestrator hire + Kernel canvas projection)
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R4
 
-> Execute R3 only as the active rung of the continuous Act I walk (`SPRINT.md`).
+> Execute R4 only as the active rung of the continuous Act I walk (`SPRINT.md`).
 
 ## Objective
 
-An orchestrator seat reads the Dock catalog, creates and starts a session through the ontology
-gateway, and a canvas tile appears because the Kernel says so.
+Claude Code works through the identical Dock / gateway / grant contract as Hermes — no Hermes-shaped
+special case in the shared launch path.
 
 ## In plain terms
 
-You should see a tile appear that you did not click — the canvas read the Kernel.
+A second kind of seat can sit next to Hermes and use the same world tools.
 
 ## Deliverables
 
-1. `qf_agent_definition_query`, `qf_create_agent_session`, `qf_start_agent_session` callable through
-   R1 gateway, scoped by R2 grants.
-2. Canvas renders a tile for any `agent_session` it did not create itself.
-3. Every hired session carries `spawned_from` to its definition.
-4. Gate with falsification; evidence under `docs/orders/evidence/r3/`; `FOUNDER-REVIEW.md` queued.
+1. Claude Code adapter package + `agent_definition` Dock profiles.
+2. Shared launch path injects ontology/collaboration MCP without `adapterId === "hermes"` literals.
+3. Gate: both species call the same generated read; distinct Kernel rows + `spawned_from`; no-grant
+   refuse; species-literal scan red on `"hermes"` hardcode in shared path.
+4. Evidence under `docs/orders/evidence/r4/`.
 
 ## Acceptance
 
-- Orchestrator catalogs real `agent_definition` rows.
-- Create + start via gateway → Kernel row + `spawned_from` + queried canvas tile bound to session id.
-- Direct Kernel insert while app runs still produces a tile.
-- Falsify: drop `spawned_from` → red; UI-state tile → `no-canvas-domain-writes` red.
+Spawn Claude Code from Dock; same read tool/result shape as Hermes; two Kernel sessions with
+correct `spawned_from`.
 
 ## Out of scope
 
-Orchestrator judgment about whom to hire. Task assignment (R5).
+Rewriting legacy ACP chat onto the species seam (R7). Task assignment (R5).
 
 ## Stop conditions
 

@@ -462,6 +462,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "windows-dock-hire",
+    description:
+      "R3: orchestrator catalogs/hires via ontology gateway; canvas projects Kernel sessions",
+    run: async () => {
+      const { runWindowsDockHireGate } = await import(
+        "./gates/windows-dock-hire.ts"
+      );
+      const { ok } = await runWindowsDockHireGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",
