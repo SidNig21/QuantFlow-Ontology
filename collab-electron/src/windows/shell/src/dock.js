@@ -1,6 +1,11 @@
 /**
  * Dock rail — species + sessions from Kernel IPC only.
  * No hardcoded species names; refresh on qf:dock:invalidate only.
+ *
+ * Session Clear is a view filter only: Kernel agent_session rows are never
+ * deleted. Terminal sessions at-or-before the cursor are hidden from the rail;
+ * live sessions and newer rows still appear. The list may grow without bound
+ * in the Kernel.
  */
 
 function shortId(id) {
@@ -39,6 +44,31 @@ export function visibleDockDefinitions(definitions, { qaMode = false } = {}) {
 	return rows.filter((row) => qaMode || isProductionDockDefinition(row));
 }
 
+/** Terminal statuses that Clear may hide from the Dock rail. */
+export function isDockTerminalSessionStatus(status) {
+	return ["closed", "cancelled", "failed"].includes(String(status ?? ""));
+}
+
+/**
+ * View filter for the Dock sessions rail. Does not mutate Kernel rows.
+ * @param {unknown} sessions
+ * @param {string | null | undefined} clearedThroughIso exclusive lower bound for
+ *   terminal sessions (hide when created_at <= cursor). Live sessions always pass.
+ */
+export function visibleDockSessions(sessions, clearedThroughIso) {
+	const rows = Array.isArray(sessions) ? sessions : [];
+	const cursor =
+		typeof clearedThroughIso === "string" && clearedThroughIso.length > 0
+			? clearedThroughIso
+			: null;
+	if (!cursor) return rows;
+	return rows.filter((row) => {
+		if (!isDockTerminalSessionStatus(row?.status)) return true;
+		const created = String(row?.created_at ?? "");
+		return created > cursor;
+	});
+}
+
 /**
  * @param {HTMLElement} panelEl
  * @param {{ onTidy?: () => void, qaMode?: boolean }} [options]
@@ -52,6 +82,8 @@ export function initDock(panelEl, options = {}) {
 	}
 
 	let refreshing = false;
+	/** @type {string | null} ISO watermark — hide terminal sessions at-or-before. */
+	let sessionsClearedThroughIso = null;
 
 	async function refresh() {
 		if (refreshing) return;
@@ -148,9 +180,19 @@ export function initDock(panelEl, options = {}) {
 					el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"),
 				);
 			} else {
-				const sessions = sessRes.sessions ?? [];
+				const allSessions = Array.isArray(sessRes.sessions) ? sessRes.sessions : [];
+				const sessions = visibleDockSessions(allSessions, sessionsClearedThroughIso);
 				if (sessions.length === 0) {
-					sessionsList.appendChild(el("div", "qf-empty", "No sessions"));
+					const hidden = allSessions.length - sessions.length;
+					sessionsList.appendChild(
+						el(
+							"div",
+							"qf-empty",
+							hidden > 0
+								? `No sessions in view (${hidden} kept in Kernel)`
+								: "No sessions",
+						),
+					);
 				}
 				for (const row of sessions) {
 					const id = String(row.id ?? "");
@@ -194,6 +236,11 @@ export function initDock(panelEl, options = {}) {
 
 	panelEl.querySelector("#dock-tidy")?.addEventListener("click", () => {
 		options.onTidy?.();
+	});
+
+	panelEl.querySelector("#dock-sessions-clear")?.addEventListener("click", () => {
+		sessionsClearedThroughIso = new Date().toISOString();
+		void refresh();
 	});
 
 	const questionForm = panelEl.querySelector("#dock-question-form");

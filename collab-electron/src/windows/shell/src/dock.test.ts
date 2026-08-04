@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { visibleDockDefinitions } from "./dock.js";
+import {
+  visibleDockDefinitions,
+  visibleDockSessions,
+} from "./dock.js";
 
 describe("production Dock inventory", () => {
   const definitions = [
@@ -22,5 +25,33 @@ describe("production Dock inventory", () => {
       "qf-proof-orchestrator",
       "qf-proof-worker",
     ]);
+  });
+});
+
+describe("Dock sessions Clear view filter", () => {
+  const sessions = [
+    { id: "old-closed", status: "closed", created_at: "2026-08-01T00:00:00.000Z" },
+    { id: "live", status: "running", created_at: "2026-08-01T00:00:00.000Z" },
+    { id: "new-closed", status: "closed", created_at: "2026-08-04T12:00:00.000Z" },
+  ];
+
+  test("without cursor shows every Kernel row", () => {
+    expect(visibleDockSessions(sessions, null).map((row) => row.id)).toEqual([
+      "old-closed",
+      "live",
+      "new-closed",
+    ]);
+  });
+
+  test("cursor hides terminal rows at-or-before without deleting them", () => {
+    const visible = visibleDockSessions(sessions, "2026-08-03T00:00:00.000Z");
+    expect(visible.map((row) => row.id)).toEqual(["live", "new-closed"]);
+    expect(sessions).toHaveLength(3);
+  });
+
+  test("live sessions stay visible even when older than the cursor", () => {
+    expect(
+      visibleDockSessions(sessions, "2099-01-01T00:00:00.000Z").map((row) => row.id),
+    ).toEqual(["live"]);
   });
 });

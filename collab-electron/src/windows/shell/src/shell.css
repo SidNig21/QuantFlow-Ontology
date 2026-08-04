@@ -271,6 +271,21 @@ body.platform-win {
 	margin: 0;
 }
 
+.dock-section-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--qf-u);
+}
+
+#dock-sessions-clear {
+	padding: 4px 8px;
+	font-family: var(--qf-mono);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
 #dock-species-list,
 #dock-sessions-list {
 	display: flex;
