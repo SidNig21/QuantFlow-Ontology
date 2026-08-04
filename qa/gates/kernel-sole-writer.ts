@@ -80,6 +80,7 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/market-ingest/run.ts",
   // WO-WIN2: read-only oracle over isolated proof Kernel/transport receipts.
   "qa/gates/windows-dock-collaboration.ts",
+  "qa/gates/windows-dock-ontology.ts",
 ];
 
 /**

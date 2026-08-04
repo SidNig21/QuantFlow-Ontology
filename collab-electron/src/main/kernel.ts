@@ -21,6 +21,8 @@ import {
   type LinkRow,
   type TraceContext,
 } from "qf-kernel/portable";
+import { schema } from "qf-kernel-schema";
+import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp";
 import { QF_APP_DIR } from "./paths";
 
 function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
@@ -323,12 +325,44 @@ export function kernelListAgentDefinitions(): Record<string, unknown>[] {
   );
 }
 
+/** Generated ontology read-tool surface (names + schemas) from the live schema. */
+export function kernelListOntologyReadTools(): McpToolDefinition[] {
+  const tools: McpToolDefinition[] = [];
+  for (const object of schema.objects) {
+    tools.push(...readToolsForObject(object));
+  }
+  return tools;
+}
+
+/** True when name is a generated read tool for a known schema object. */
+export function kernelParseOntologyReadTool(
+  name: string,
+): { objectName: string; op: "get" | "query" | "links" } | null {
+  const match = /^qf_(.+)_(get|query|links)$/.exec(name);
+  if (!match) return null;
+  const objectName = match[1]!;
+  const op = match[2] as "get" | "query" | "links";
+  if (!schema.objects.some((object) => object.name === objectName)) return null;
+  return { objectName, op };
+}
+
 /** Fetch one ontology row by type and id. */
 export function kernelGetObject(
   type: string,
   id: string,
 ): Record<string, unknown> | null {
   return getObject(getKernelDb(), type, id);
+}
+
+/** List ontology rows with optional filters through the shared Kernel handle. */
+export function kernelQueryObjects(
+  type: string,
+  filters?: Record<string, unknown>,
+  limit: number | null | undefined = 100,
+  offset = 0,
+  order: "asc" | "desc" = "desc",
+): Record<string, unknown>[] {
+  return queryObjects(getKernelDb(), type, filters, limit, offset, undefined, order);
 }
 
 /** Read links touching one ontology object through the shared Kernel handle. */

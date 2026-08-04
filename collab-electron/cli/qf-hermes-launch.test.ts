@@ -61,9 +61,9 @@ describe("Hermes packaged launch wrapper", () => {
             "QF_AGENT_SESSION_ID=seat/test",
             `QF_HERMES_PROFILE_ROOT=${wslPath(join(founderHome, ".hermes", "redirect"))}`,
             `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
-            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "sh", "-c", "exit 0",
+            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "sh", "-c", "exit 0",
           ]
-        : [wrapperPath, "/tmp/qf-bridge.mjs", "sh", "-c", "exit 0"];
+        : [wrapperPath, "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "sh", "-c", "exit 0"];
       const result = spawnSync(
         process.platform === "win32" ? "wsl.exe" : "bash",
         hermesArgs,
@@ -106,6 +106,7 @@ describe("Hermes packaged launch wrapper", () => {
         expect(profileCheck.status).toBe(0);
       } else {
         expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-collaboration");
+      expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-ontology");
       }
       expect(() => lstatSync(join(founderHome, ".hermes", "profiles"))).toThrow();
       expect(() => lstatSync(join(founderHome, ".hermes", "redirect"))).toThrow();

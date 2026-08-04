@@ -1,54 +1,42 @@
-# NEXT — R1 the ontology gateway
+# NEXT — R2 capability grants and operating instructions
 
 status: ACTIVE
 authorized-by: founder
 authorized-at: 2026-08-03
-baseline: R0 complete on `act-i-ladder` (hermes-founder-state gated)
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R1
+baseline: R1 complete on `act-i-ladder` (ontology gateway)
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) — R2
 
-> Execute R1 only as the active rung of the continuous Act I walk (`SPRINT.md`). Do not select
-> work from later rungs until this one closes.
+> Execute R2 only as the active rung of the continuous Act I walk (`SPRINT.md`).
 
 ## Objective
 
-Ship an app-owned MCP gateway so a Dock-spawned seat can call generated `qf_*` read tools and get
-real Kernel data back — without the seat ever holding a database handle.
+The Kernel decides which tool groups a role receives, and seats get written operating
+instructions. Capability groups only — never hand-listed tool names.
 
 ## In plain terms
 
-Today agents get a mailbox and no world. After this rung, a seat can ask the Kernel a read question
-through the app, and the answer matches what the Kernel itself knows.
+An orchestrator may use desk tools; a worker may not. Each seat knows what it is for because its
+profile points at written instructions.
 
 ## Deliverables
 
-1. An app-owned MCP server exposing the generated tool surface (reads). Calls resolve inside the
-   app; a seat never holds a database handle.
-2. Stateless design — no session state on the server; caller identity carried per request.
-3. Every tool call recorded as a trajectory artifact.
-4. Launch wiring so a Dock Hermes seat receives this gateway (alongside collaboration MCP).
-5. Packaged resource path resolution matching the collaboration bridge pattern.
-6. A runnable gate registered in `qa/run.ts`, falsified (foreign DB refused), with evidence under
-   `docs/orders/evidence/r1/`.
+1. Schema field `capability_groups` on `agent_definition` (experimental; do not promote).
+2. Schema-side `capabilityGroup` tags so tools inherit groups from object/action definitions.
+3. Gateway enforces grants from Kernel definition rows.
+4. Non-null `system_prompt_ref` on Dock profiles with committed prompt files.
+5. Gate with falsification (worker spawn/desk tool refused); evidence under `docs/orders/evidence/r2/`.
 
-## Acceptance proof
+## Acceptance
 
-- [ ] Spawn one seat. It calls a generated read tool.
-- [ ] Returned object ids match a direct Kernel query.
-- [ ] Falsify: point the seat at a database the app does not own — the call is refused, exactly as
-      the peer-bus handler already refuses a foreign `busDb`.
-- [ ] `bun qa/verify-release.ts` exits 0.
-- [ ] Evidence states what was proven and what was not.
+- Orchestrator receives desk tools; worker does not.
+- Worker attempting a desk/spawn tool is refused.
+- Add a new tagged object type → regenerate → group picks it up with no hand roster edit.
+- Stay experimental; propose promotion only in the report.
 
 ## Out of scope
 
-Writes. Role scoping (R2). A second species (R4).
+Schema promotion to `active`. Full orchestrator hire/canvas (R3). Second species (R4).
 
 ## Stop conditions
 
-Stop immediately on any SPRINT hard stop (schema promotion, START_HERE/DOCTRINE/LAWS edit,
-credentials, founder-data deletion, two failed rework cycles).
-
-## Durable rulings
-
-- Windows/Hermes adapter boundary: [`docs/adr/0001-windows-first-product.md`](../adr/0001-windows-first-product.md)
-- Route contract: [`GOLDEN-RUN.md` Part IV R1](GOLDEN-RUN.md)
+Any SPRINT hard stop, especially schema promotion.

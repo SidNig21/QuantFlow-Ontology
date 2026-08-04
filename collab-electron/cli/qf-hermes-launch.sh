@@ -4,6 +4,9 @@ set -euo pipefail
 bridge_path="${1:?QuantFlow MCP bridge path is required}"
 shift
 
+ontology_bridge_path="${1:?QuantFlow ontology MCP bridge path is required}"
+shift
+
 hermes_command="${1:?Hermes command is required}"
 shift
 
@@ -14,6 +17,9 @@ fi
 
 case "$bridge_path" in
   *"'"*) echo "QuantFlow bridge path cannot contain an apostrophe" >&2; exit 2 ;;
+esac
+case "$ontology_bridge_path" in
+  *"'"*) echo "QuantFlow ontology bridge path cannot contain an apostrophe" >&2; exit 2 ;;
 esac
 
 profile_root="${QF_QUANTFLOW_HERMES_PROFILE_ROOT:-}"
@@ -57,6 +63,11 @@ mcp_servers:
     command: node.exe
     args:
       - '$bridge_path'
+    enabled: true
+  quantflow-ontology:
+    command: node.exe
+    args:
+      - '$ontology_bridge_path'
     enabled: true
 EOF
 mv "$config_tmp" "$profile_home/config.yaml"

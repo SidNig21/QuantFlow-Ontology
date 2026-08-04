@@ -47,6 +47,7 @@ import {
   peerBusReadInbox,
   peerBusSend,
 } from "./kernel";
+import { registerOntologyGatewayRpc } from "./ontology-gateway";
 import { registerIntegrationsIpc } from "./integrations";
 import {
   registerMethod,
@@ -1088,6 +1089,7 @@ app.whenReady().then(async () => {
     },
     { description: "Product-owned peer-bus inbox pull for one admitted session role." },
   );
+  registerOntologyGatewayRpc(registerMethod, requirePeerSessionRole);
   const bovadaKernel: BovadaKernelAccess = {
     execute: (_db, command, input, trace) =>
       kernelExecute(command, input, trace),

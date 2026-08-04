@@ -438,6 +438,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "windows-dock-ontology",
+    description:
+      "R1: Dock seat calls generated ontology read tools through the app-owned gateway; foreign kernel_db refused",
+    run: async () => {
+      const { runWindowsDockOntologyGate } = await import(
+        "./gates/windows-dock-ontology.ts"
+      );
+      const { ok } = await runWindowsDockOntologyGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",

@@ -93,6 +93,7 @@ function launchSeat(homeGuest: string, profileRootGuest: string, seatId: string)
     "bash",
     wslPath(WRAPPER),
     "/tmp/qf-bridge-hermes-founder-state.mjs",
+    "/tmp/qf-ontology-hermes-founder-state.mjs",
     "sh",
     "-c",
     "exit 0",

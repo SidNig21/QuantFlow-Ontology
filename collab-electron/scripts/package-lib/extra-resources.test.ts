@@ -67,13 +67,14 @@ describe("extra-resources parsing", () => {
     ]);
   });
 
-  test("Windows packaging declares both collaboration bridge resources", () => {
+  test("Windows packaging declares collaboration and ontology bridge resources", () => {
     const packageJson = JSON.parse(
       readFileSync(join(import.meta.dir, "../../package.json"), "utf8"),
     ) as { build: unknown };
     const sets = mergeFileSetsForPlatform(packageJson.build, "win");
     expect(sets).toEqual(expect.arrayContaining([
       { from: "cli/qf-collaboration-mcp.mjs", to: "qf-collaboration-mcp.mjs" },
+      { from: "cli/qf-ontology-mcp.mjs", to: "qf-ontology-mcp.mjs" },
       { from: "cli/qf-hermes-launch.sh", to: "qf-hermes-launch.sh" },
     ]));
   });

@@ -130,8 +130,8 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | Rung | State | Evidence |
 |---|---|---|
 | R0 | complete | `docs/orders/evidence/r0` |
-| R1 | active | — |
-| R2 | pending | — |
+| R1 | complete | `docs/orders/evidence/r1` |
+| R2 | active | — |
 | R3 | pending | — |
 | R4 | pending | — |
 | R5 | pending | — |
@@ -185,9 +185,11 @@ config and authentication are provably untouched; branch pushed.
 **Carried risk.** Acceptance runs through automated TUI input, which is known to enter partial text.
 A red result must be diagnosed as product-or-harness before it counts as a failure.
 
-### R1 — the ontology gateway
+### R1 — the ontology gateway · COMPLETE
 
 **Proves.** A Dock-spawned seat can call a generated `qf_*` tool and get real Kernel data back.
+
+**Closed.** App-owned gateway + `windows-dock-ontology` gate. Evidence: `docs/orders/evidence/r1/`.
 
 **Deliverables.** An app-owned MCP server exposing the generated tool surface. Calls resolve inside
 the app; a seat never holds a database handle. Designed **stateless** — no session state on the

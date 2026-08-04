@@ -116,13 +116,19 @@ export async function admitNativeTuiDefinition(opts: {
         moduleDir: __dirname,
       })
     : null;
+  const ontologyBridge = hermesWslAdapter
+    ? resolveCollaborationResourcePath("qf-ontology-mcp.mjs", {
+        resourcesPath: process.resourcesPath,
+        moduleDir: __dirname,
+      })
+    : null;
   const hermesLaunchWrapper = hermesWslAdapter
     ? resolveCollaborationResourcePath("qf-hermes-launch.sh", {
         resourcesPath: process.resourcesPath,
         moduleDir: __dirname,
       })
     : null;
-  if (hermesWslAdapter && (!collaborationBridge || !hermesLaunchWrapper)) {
+  if (hermesWslAdapter && (!collaborationBridge || !ontologyBridge || !hermesLaunchWrapper)) {
     throw new Error(
       "Hermes unavailable: QuantFlow collaboration resources are missing. " +
       "Reinstall QuantFlow or run the development app.",
@@ -169,6 +175,7 @@ export async function admitNativeTuiDefinition(opts: {
           ? [
               wrapperGuestPath!,
               collaborationBridge!.replace(/\\/g, "/"),
+              ontologyBridge!.replace(/\\/g, "/"),
               guestCommand,
               ...argv,
             ]

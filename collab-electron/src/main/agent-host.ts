@@ -186,11 +186,15 @@ export function getDockDefinitionAvailability(
     "qf-collaboration-mcp.mjs",
     { resourcesPath: process.resourcesPath, moduleDir: __dirname },
   );
+  const ontologyBridge = resolveCollaborationResourcePath(
+    "qf-ontology-mcp.mjs",
+    { resourcesPath: process.resourcesPath, moduleDir: __dirname },
+  );
   const hermesLaunchWrapper = resolveCollaborationResourcePath(
     "qf-hermes-launch.sh",
     { resourcesPath: process.resourcesPath, moduleDir: __dirname },
   );
-  if (!collaborationBridge || !hermesLaunchWrapper) {
+  if (!collaborationBridge || !ontologyBridge || !hermesLaunchWrapper) {
     return {
       available: false,
       message:
