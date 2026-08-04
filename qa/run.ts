@@ -8,6 +8,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join, relative } from "path";
+import { execFileSync } from "child_process";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -245,6 +246,14 @@ async function bunPackageGate(
   return true;
 }
 
+/** Every path git tracks, repo-relative with forward slashes. */
+function trackedFiles(): string[] {
+  return execFileSync("git", ["ls-files"], { cwd: REPO_ROOT, encoding: "utf8" })
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
 const gates: Gate[] = [
   {
     name: "repo-shape",
@@ -287,6 +296,41 @@ const gates: Gate[] = [
       for (const f of mustNotExist) {
         if (existsSync(join(REPO_ROOT, f))) {
           console.error(`repo-shape: stripped file has returned: ${f}`);
+          ok = false;
+        }
+      }
+      // A rendered export is a copy of a document with no mechanism to stay
+      // true. QuantFlow-Ontology-Doctrine.pdf sat at the root from 2026-07-22
+      // while docs/DOCTRINE.md changed three times underneath it, and the only
+      // note explaining it was an export was itself archived. Exports live in
+      // docs/history/ with a date in the filename, or they do not live here.
+      const EXPORT_EXT = /\.(pdf|docx?|rtf|odt|pptx?|xlsx?|bak|old|orig)$/i;
+      for (const rel of trackedFiles()) {
+        if (EXPORT_EXT.test(rel) && !rel.startsWith("docs/history/")) {
+          console.error(
+            `repo-shape: rendered export tracked outside docs/history/: ${rel}`,
+          );
+          ok = false;
+        }
+      }
+      // The root is the first thing any agent lists. Keep it to the front door
+      // and nothing else, so a stray file cannot read as authority.
+      const ROOT_ALLOWED = new Set([
+        ".gitattributes",
+        ".gitignore",
+        ".mcp.json",
+        "AGENTS.md",
+        "install.sh",
+        "LICENSE.md",
+        "NOTICE.md",
+        "README.md",
+        "START_HERE.md",
+      ]);
+      for (const rel of trackedFiles()) {
+        if (!rel.includes("/") && !ROOT_ALLOWED.has(rel)) {
+          console.error(
+            `repo-shape: unexpected tracked file at repo root: ${rel} — add it to ROOT_ALLOWED deliberately or move it`,
+          );
           ok = false;
         }
       }
@@ -526,6 +570,15 @@ const gates: Gate[] = [
       );
       const { ok } = checkNoCanvasDomainWrites();
       return ok;
+    },
+  },
+  {
+    name: "doc-links",
+    description:
+      "Every relative link in a live document resolves; links into docs/history/ are marked superseded",
+    run: async () => {
+      const { checkDocLinks } = await import("./gates/doc-links.ts");
+      return checkDocLinks().ok;
     },
   },
   {
