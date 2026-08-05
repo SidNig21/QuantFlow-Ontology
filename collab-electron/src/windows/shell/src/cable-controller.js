@@ -81,6 +81,13 @@ export function createCableController({
 			);
 			return row;
 		} catch (err) {
+			// Kernel may have accepted the write even when the IPC read-back
+			// fails — always resync so a live row is not invisible on canvas.
+			try {
+				await refresh();
+			} catch {
+				/* refresh best-effort */
+			}
 			const message = err instanceof Error ? err.message : String(err);
 			showToast?.(message, { tone: "reject" });
 			return null;

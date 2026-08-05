@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import {
   kernelExecute,
+  kernelGetObject,
   kernelQueryObjects,
   type TraceContext,
 } from "./kernel";
@@ -101,9 +102,14 @@ export function createViewConnection(input: {
     newTrace(),
   );
 
-  const row = kernelQueryObjects("connection", { id: connection_id }, 1)[0] as
+  // getObject by primary key — NOT queryObjects({ id }). connection's declared
+  // filter surface is kind/from_ref/to_ref only; filtering on id throws
+  // "Unknown filter key for connection: id" AFTER the row is already written.
+  // That abort meant the renderer never refreshed, so Kernel had the edge and
+  // the overlay showed nothing (or a leftover drag preview).
+  const row = kernelGetObject("connection", connection_id) as
     | ConnectionRow
-    | undefined;
+    | null;
   if (!row) {
     throw new Error("qf:connections:create failed to read back row");
   }
