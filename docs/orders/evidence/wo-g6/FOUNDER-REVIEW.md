@@ -64,3 +64,5 @@ Plain language: The canvas should now tell you what you can grab, when a cable r
 | D5 | **Tested** (`fitViewportToTiles`). **Founder:** Tidy with tiles partly off-screen. |
 
 Gates green on builder machine: `one-skin`, `no-canvas-domain-writes`, `rung-ladder` (`active=R9`), `glacier-feel` (falsified red then restored green).
+
+`bun qa/verify-release.ts` reached `windows-cold-boot: PASS`, then failed on **pre-existing** `kernel-sole-writer` flagging `docs/orders/evidence/wo-g5a/0006-connection-actions.sql` (INSERT) — not introduced by WO-g6. Order static gates listed above are green.
