@@ -303,6 +303,14 @@ export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
 
     for (const full of files) {
       const rel = relative(REPO_ROOT, full).split("\\").join("/");
+      // Law E governs RUNTIME write paths. Nothing under docs/ is imported,
+      // built, or executed — a .sql file there is a record of what a migration
+      // said, not a migration that runs. Scanning it made the gate flag
+      // docs/orders/evidence/wo-g5a/0006-connection-actions.sql for `INSERT
+      // INTO`, which held verify-release red on main from 2026-08-04 for a
+      // documentation artifact. Stated limit: if executable code is ever placed
+      // under docs/ and actually invoked, this gate will not see it.
+      if (rel.startsWith("docs/")) continue;
       let text: string;
       try {
         text = readFileSync(full, "utf8");

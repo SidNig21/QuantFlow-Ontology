@@ -48,6 +48,24 @@ const ALLOW_PREFIXES = [
   // without this entry, leaving the gate red on main until 2026-08-03.
   "qa/gates/windows-cold-boot.ts",
   "qa/gates/windows-dock-collaboration.ts",
+  // R1–R8 (2026-08-05): every rung gate builds an isolated temp fixture and sets
+  // QF_KERNEL_DB for the child it launches — the same shape as WO-WIN1/WIN2
+  // above, and the same omission repeated seven times. Nothing caught it because
+  // kernel-one-path is not a release stage, so the gate had been red on main
+  // since the Act I merge with no run to say so.
+  "qa/gates/windows-dock-ontology.ts",
+  "qa/gates/windows-dock-capability.ts",
+  "qa/gates/windows-dock-hire.ts",
+  "qa/gates/windows-dock-species.ts",
+  "qa/gates/windows-research-question.ts",
+  "qa/gates/kernel-task-delegation.ts",
+  "qa/gates/kernel-market-lineage.ts",
+  // R4 Claude Code adapter: reads QF_KERNEL_DB *only* to assert the app set it,
+  // and never uses the value. Verified 2026-08-05 — the file contains no sqlite
+  // import, no Database construction, and no other reference to the variable.
+  // R1's contract that a seat never holds a database handle is intact; this is a
+  // presence check that the grep cannot distinguish from a resolver.
+  "species/claude-code/src/claude-code.mjs",
   "collab-electron/",
   "qa/gates/kernel-one-path.ts",
   "species/hermes/agent-package/src/acp-shim.ts",
