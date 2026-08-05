@@ -1,6 +1,6 @@
 # WO-g5 — GLACIER cables: ports, overlay, draw, persist
 
-status: DRAFT — needs founder authorization
+status: BUILT — evidence in docs/orders/evidence/wo-g5/
 branch: `wo-g5-glacier-cables`
 program: GLACIER full visual swap · order 5 of 5
 depends on: WO-g2 merged (nodes render), WO-g4 merged (z-layer reserved)

@@ -69,6 +69,19 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:sessions:cancel", { sessionId }),
     closeSession: (sessionId: string) =>
       ipcRenderer.invoke("qf:sessions:close", { sessionId }),
+    listConnections: (args?: { tileIds?: string[] }) =>
+      ipcRenderer.invoke("qf:connections:list", args ?? {}),
+    createConnection: (args: {
+      from: string;
+      to: string;
+      kind?: string;
+      connectionId?: string;
+      canvasTileIds: string[];
+    }) => ipcRenderer.invoke("qf:connections:create", args),
+    deleteConnection: (args: { id: string }) =>
+      ipcRenderer.invoke("qf:connections:delete", args),
+    deleteConnectionsForTile: (args: { tileId: string }) =>
+      ipcRenderer.invoke("qf:connections:deleteForTile", args),
     onDockInvalidate: (cb: () => void) => {
       const handler = () => cb();
       ipcRenderer.on("qf:dock:invalidate", handler);

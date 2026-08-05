@@ -685,6 +685,9 @@ export function createTileManager({
 			}
 		}
 		removeTile(id);
+		void window.shellApi?.qf?.deleteConnectionsForTile?.({ tileId: id })
+			.then(() => onReposition?.())
+			.catch(() => {});
 		onReposition?.();
 		saveCanvasImmediate();
 	}

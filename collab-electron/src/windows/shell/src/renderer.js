@@ -20,6 +20,9 @@ import { formatTidyToast, repackTilesToGrid } from "./canvas-layout.js";
 import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 import { centerCanvasCoords } from "./canvas-place.js";
 import { createHandoffLayer } from "./handoff-layer.js";
+import { createCableOverlay } from "./cable-overlay.js";
+import { createCableController } from "./cable-controller.js";
+import { createCableInspector } from "./cable-inspector.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -458,11 +461,22 @@ async function init() {
 	// -- Tile manager --
 
 	let minimapRef = null;
+	/** @type {ReturnType<typeof createCableOverlay> | null} */
+	let cableOverlay = null;
+	/** @type {ReturnType<typeof createCableController> | null} */
+	let cableController = null;
+	/** @type {Array<{id:string,kind:string,from_ref:string,to_ref:string,created_at?:string}>} */
+	let liveConnections = [];
 	const tileManager = createTileManager({
 		tileLayer, viewportState, configs,
 		getAllWebviews,
 		isSpaceHeld: () => spaceHeld,
-		onReposition: () => { viewport.redrawGrid(); minimapRef?.update(); },
+		onReposition: () => {
+			viewport.redrawGrid();
+			minimapRef?.update();
+			cableOverlay?.redraw();
+			void cableController?.refresh();
+		},
 		onSaveDebounced(state) {
 			window.shellApi.canvasSaveState(
 				toCenterPointState(state),
@@ -561,6 +575,7 @@ async function init() {
 		tileManager.repositionAllTiles();
 		handoffLayer.update();
 		edgeIndicators.update();
+		cableOverlay?.redraw();
 		minimap.wake();
 		tileManager.saveCanvasDebounced();
 	});
@@ -569,8 +584,42 @@ async function init() {
 		tileManager.repositionAllTiles();
 		handoffLayer.update();
 		edgeIndicators.update();
+		cableOverlay?.redraw();
 		minimap.update();
 	});
+
+	const cableInspector = createCableInspector(
+		document.getElementById("cable-inspector"),
+	);
+
+	/** Cable overlay + Kernel-backed draw (WO-g5). */
+	const cableSvg = document.getElementById("cable-overlay");
+	if (cableSvg) {
+		cableOverlay = createCableOverlay(cableSvg, {
+			getTiles: () => tiles,
+			getViewport: () => viewportState,
+			getConnections: () => liveConnections,
+			onSelect: (conn) => cableInspector.show(conn),
+		});
+		cableController = createCableController({
+			canvasEl,
+			overlay: cableOverlay,
+			getTiles: () => tiles,
+			getTileDOMs: () => tileManager.getTileDOMs(),
+			loadConnections: async (tileIds) => {
+				const rows = await window.shellApi.qf.listConnections({ tileIds });
+				return Array.isArray(rows) ? rows : [];
+			},
+			createConnection: (args) => window.shellApi.qf.createConnection(args),
+			deleteConnection: (id) =>
+				window.shellApi.qf.deleteConnection({ id }),
+			onConnectionsChanged: (conns) => {
+				liveConnections = conns;
+			},
+			showToast: showCanvasToast,
+		});
+		void cableController.refresh();
+	}
 
 	edgeIndicators.update();
 	minimap.update();
