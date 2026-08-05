@@ -259,7 +259,11 @@ export function initDock(panelEl, options = {}) {
 					card.appendChild(el("span", "who", sessionSpeciesLabel(row)));
 					card.appendChild(el("span", "st", state.text));
 
-					if (status === "running" || status === "blocked") {
+					if (
+						status === "starting" ||
+						status === "running" ||
+						status === "blocked"
+					) {
 						card.title = "Click to cancel session";
 						card.addEventListener("click", () => {
 							void window.shellApi.qf.cancelSession(id);

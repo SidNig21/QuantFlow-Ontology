@@ -686,6 +686,20 @@ export function createTileManager({
 			}
 		}
 		removeTile(id);
+		// Session tiles are projections of Kernel agent_session rows. Closing the
+		// chrome without cancelling left live rows in the Dock with no canvas tile
+		// (and reconcile would recreate the tile). Tear down the Kernel session.
+		if (tile?.type === "session" && tile.sessionId) {
+			const sid = tile.sessionId;
+			void window.shellApi?.qf?.cancelSession?.(sid)
+				.then((res) => {
+					if (res && res.ok === false) {
+						return window.shellApi?.qf?.closeSession?.(sid);
+					}
+					return res;
+				})
+				.catch(() => window.shellApi?.qf?.closeSession?.(sid));
+		}
 		void window.shellApi?.qf?.deleteConnectionsForTile?.({ tileId: id })
 			.then(() => {
 				onTileClosed?.(id);
