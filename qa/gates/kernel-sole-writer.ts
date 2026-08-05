@@ -299,6 +299,24 @@ export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
   try {
     const files: string[] = [];
     walk(REPO_ROOT, files);
+
+    // Coverage floor. A scanning gate that examines zero files reports PASS,
+    // which makes it unfalsifiable by construction: move its scan root and it
+    // goes quiet instead of red. Proved on 2026-08-05 against verb-retirement
+    // — pointing its whole scope at nonexistent paths still returned PASS.
+    // This gate must always find the Kernel package it exists to protect.
+    const MIN_FILES = 200;
+    const sawKernelPackage = files.some((f) =>
+      relative(REPO_ROOT, f).split("\\").join("/").startsWith("packages/qf-kernel/src/"),
+    );
+    if (files.length < MIN_FILES || !sawKernelPackage) {
+      console.error(
+        `kernel-sole-writer: scan collapsed — ${files.length} files, kernel package seen: ${sawKernelPackage}. ` +
+          `Refusing to report PASS on a scan that inspected nothing.`,
+      );
+      return { ok: false, offenders: ["<scan-coverage-collapsed>"] };
+    }
+
     const offenders: Offender[] = [];
 
     for (const full of files) {

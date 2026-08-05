@@ -64,6 +64,25 @@ export function checkNoCanvasDomainWrites(): { ok: boolean; offenders: string[] 
     files.add(relative(REPO_ROOT, full).split("\\").join("/"));
   }
 
+  // Coverage floor. Law E is enforced by reading canvas files; if none are
+  // found the gate would report PASS while guarding nothing. Every TARGET_FILES
+  // entry is optional by design (two spellings of canvas-state), so the floor
+  // asserts the *outcome* instead: at least one real canvas file was read.
+  const readable = [...files].filter((rel) => {
+    try {
+      return statSync(join(REPO_ROOT, rel)).isFile();
+    } catch {
+      return false;
+    }
+  });
+  if (readable.length === 0) {
+    console.error(
+      "no-canvas-domain-writes: scan collapsed — no canvas file was found to inspect. " +
+        "Refusing to report PASS on a scan that read nothing.",
+    );
+    return { ok: false, offenders: ["<scan-coverage-collapsed>"] };
+  }
+
   for (const rel of files) {
     const full = join(REPO_ROOT, rel);
     let st;
