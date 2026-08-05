@@ -9,12 +9,16 @@ button {
 :root {
 	--top-spacing: 0px;
 	--nav-inset: 12px;
-	--card: var(--qf-raised);
-	--color-primary: var(--primary);
-	--color-text-secondary: color-mix(in srgb, var(--muted-foreground) 75%, var(--foreground) 25%);
-	--color-hover: color-mix(in srgb, var(--foreground) 6%, transparent);
-	--color-active: color-mix(in srgb, var(--foreground) 12%, transparent);
-	--color-background-toggle-active: color-mix(in srgb, var(--card) 80%, var(--border) 20%);
+	--card: var(--qf-gl-panel-2);
+	--color-primary: var(--qf-gl-ice);
+	--color-text-secondary: var(--qf-gl-dim);
+	--color-hover: var(--qf-gl-panel-3);
+	--color-active: color-mix(in srgb, var(--qf-gl-ice) 13%, transparent);
+	--color-background-toggle-active: color-mix(in srgb, var(--qf-gl-panel-2) 80%, var(--qf-gl-rule) 20%);
+	--foreground: var(--qf-gl-text);
+	--muted-foreground: var(--qf-gl-dim);
+	--border: var(--qf-gl-rule);
+	--background: var(--qf-gl-panel-2);
 
 	font-family: var(--qf-sans);
 	font-size: 15px;
@@ -142,10 +146,10 @@ button {
 	gap: 4px;
 	font-size: 0.8rem;
 	font-weight: 400;
-	color: var(--muted-foreground);
-	background: none;
-	border: 1px dashed color-mix(in srgb, var(--foreground) 20%, transparent);
-	border-radius: 999px;
+	color: var(--qf-gl-dim);
+	background: var(--qf-gl-void);
+	border: 1px dashed var(--qf-gl-rule-hi);
+	border-radius: var(--qf-gl-r, 4px);
 	padding: 6px 10px;
 	cursor: pointer;
 	line-height: 1.4;
@@ -164,8 +168,41 @@ button {
 }
 
 .ws-add-btn:hover {
-	color: var(--foreground);
-	border-color: var(--foreground);
+	color: var(--qf-gl-ice);
+	border-color: var(--qf-gl-ice);
+}
+
+/* WO-g4 file-rail selection: ice left edge + 13% tint (not full-bleed) */
+.collection-item-row:hover,
+.workspace-folder-row:hover,
+.collection-folder-row:hover {
+	background: var(--qf-gl-panel-3) !important;
+}
+
+.collection-item-row.isFocused,
+.collection-item-row.isMultiSelected {
+	background: color-mix(in srgb, var(--qf-gl-ice) 13%, transparent) !important;
+	box-shadow: inset 2px 0 0 var(--qf-gl-ice);
+	border-right-color: transparent !important;
+}
+
+.collection-tree-count {
+	color: var(--qf-gl-faint) !important;
+	background: transparent !important;
+	font-variant-numeric: tabular-nums;
+	font-family: var(--qf-mono);
+}
+
+.search-input {
+	background: var(--qf-gl-void) !important;
+	border: 1px solid var(--qf-gl-rule) !important;
+	color: var(--qf-gl-text) !important;
+	border-radius: var(--qf-gl-r, 4px);
+}
+
+.search-input:focus {
+	border-color: var(--qf-gl-ice) !important;
+	box-shadow: 0 0 0 1px var(--qf-gl-ice);
 }
 
 .ws-add-btn:active {
@@ -181,7 +218,7 @@ button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	z-index: 1100;
+	z-index: 30;
 	padding: 32px;
 }
 
@@ -283,7 +320,7 @@ button {
 
 .nav-tooltip {
 	position: fixed;
-	z-index: 10000;
+	z-index: 30;
 	background: var(--qf-faint);
 	border: 1px solid color-mix(in srgb, var(--qf-text) 12%, transparent);
 	border-radius: 6px;

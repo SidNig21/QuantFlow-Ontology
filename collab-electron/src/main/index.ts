@@ -584,6 +584,13 @@ function createWindow(): void {
     Object.assign(windowOptions, {
       backgroundColor: "#00000000",
       backgroundMaterial: "mica",
+      // WO-g4: Glacier chrome strip + custom caption (native frame would double the bar).
+      titleBarStyle: "hidden",
+      titleBarOverlay: {
+        color: "#152034", // --qf-gl-panel-2
+        symbolColor: "#7288ab", // --qf-gl-dim
+        height: 38,
+      },
     } satisfies Partial<Electron.BrowserWindowConstructorOptions>);
   }
 

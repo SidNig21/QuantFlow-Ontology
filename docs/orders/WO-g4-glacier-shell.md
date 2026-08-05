@@ -1,6 +1,6 @@
 # WO-g4 — GLACIER shell: chrome, file rail, canvas
 
-status: DRAFT — needs founder authorization
+status: BUILT — evidence in docs/orders/evidence/wo-g4/
 branch: `wo-g4-glacier-shell`
 program: GLACIER full visual swap · order 4 of 5
 depends on: WO-g1 merged

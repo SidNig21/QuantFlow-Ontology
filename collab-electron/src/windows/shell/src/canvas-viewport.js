@@ -1,8 +1,8 @@
 const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 1;
 const ZOOM_RUBBER_BAND_K = 400;
-const CELL = 20;
-const MAJOR = 80;
+const CELL = 24;
+const MAJOR = 96;
 
 const isMac = window.shellApi.getPlatform() === "darwin";
 
@@ -80,10 +80,10 @@ export function createViewport(canvasEl, gridCanvas, tilesRef) {
 			(state.zoom - 0.5) / (0.75 - 0.5),
 		));
 		if (minorFade > 0) {
-			const minorAlpha = dark ? 0.15 * minorFade : 0.25 * minorFade;
-			gridCtx.fillStyle = dark
+			const minorAlpha = 0.55 * minorFade;
+			gridCtx.fillStyle = cssToken("--qf-gl-panel-2") || (dark
 				? cssToken("--qf-text")
-				: cssToken("--qf-ink");
+				: cssToken("--qf-ink"));
 			gridCtx.globalAlpha = minorAlpha;
 			const halfDot = dotSize / 2;
 			for (let x = dotOffX; x <= w; x += step) {
@@ -103,10 +103,10 @@ export function createViewport(canvasEl, gridCanvas, tilesRef) {
 		if (majorFade > 0) {
 			const majorDotSize = Math.max(1.5, 1.5 * state.zoom);
 			const halfMajor = majorDotSize / 2;
-			const majorAlpha = dark ? 0.25 * majorFade : 0.40 * majorFade;
-			gridCtx.fillStyle = dark
+			const majorAlpha = 0.85 * majorFade;
+			gridCtx.fillStyle = cssToken("--qf-gl-panel-2") || (dark
 				? cssToken("--qf-text")
-				: cssToken("--qf-ink");
+				: cssToken("--qf-ink"));
 			gridCtx.globalAlpha = majorAlpha;
 			for (let x = offX; x <= w; x += majorStep) {
 				for (let y = offY; y <= h; y += majorStep) {

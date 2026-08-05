@@ -16,8 +16,8 @@
 	--muted: var(--qf-muted);
 	--edge-dot: var(--qf-ok);
 	--edge-dot-hover: var(--qf-accent);
-	--new-tile-btn-bg: var(--qf-raised);
-	--new-tile-btn-bg-hover: var(--qf-line);
+	--new-tile-btn-bg: var(--qf-gl-panel-2);
+	--new-tile-btn-bg-hover: var(--qf-gl-panel-3);
 
 	--panel-nav-min: 100;
 	--panel-nav-max: 1000;
@@ -38,8 +38,8 @@
 	--muted: var(--qf-muted);
 	--edge-dot: var(--qf-ok);
 	--edge-dot-hover: var(--qf-accent);
-	--new-tile-btn-bg: var(--qf-raised);
-	--new-tile-btn-bg-hover: var(--qf-line);
+	--new-tile-btn-bg: var(--qf-gl-panel-2);
+	--new-tile-btn-bg-hover: var(--qf-gl-panel-3);
 }
 
 * {
@@ -70,7 +70,9 @@ body.platform-win {
 	background: transparent;
 }
 
-/* ── Titlebar ── */
+/* ── Titlebar (WO-g4 GLACIER chrome) ──
+   z-scale: 0 grid · 4 cables · 6 tiles · 7 nodes · 8 controls · 9 banners · 30 chrome
+*/
 
 #titlebar {
 	position: fixed;
@@ -79,26 +81,34 @@ body.platform-win {
 	right: 0;
 	height: var(--toolbar-height);
 	-webkit-app-region: drag;
-	z-index: 100;
+	z-index: 30;
 	display: flex;
 	align-items: center;
+	justify-content: flex-end;
+	background: var(--qf-gl-panel-2);
+	border-bottom: 1px solid var(--qf-gl-rule);
+	/* Leave hit-target for Electron titleBarOverlay caption buttons (3×38). */
+	padding-right: 120px;
 }
 
 #alpha-label {
 	position: fixed;
-	bottom: 8px;
+	bottom: 0;
 	left: 50%;
 	transform: translateX(-50%);
 	font-family: var(--qf-mono);
 	font-size: 11px;
 	font-weight: 500;
-	color: var(--qf-fail);
+	color: var(--qf-gl-warn);
 	text-transform: uppercase;
 	user-select: none;
 	-webkit-user-select: none;
 	pointer-events: none;
 	white-space: nowrap;
-	z-index: 1000;
+	z-index: 9;
+	padding: 6px 14px 8px;
+	background: color-mix(in srgb, var(--qf-gl-warn) 8%, transparent);
+	border-top: 1px solid color-mix(in srgb, var(--qf-gl-warn) 24%, transparent);
 }
 
 #alpha-label a {
@@ -126,22 +136,23 @@ body.platform-win {
 	flex: 1 1 0;
 	min-width: calc(var(--panel-nav-min) * 1px);
 	max-width: calc(var(--panel-nav-max) * 1px);
-	border-right: 1px solid var(--border);
+	border-right: 1px solid var(--qf-gl-rule);
 	overflow: hidden;
-	background: color-mix(in srgb, var(--bg) calc((1 - (1 - var(--canvas-opacity)) / 2) * 100%), transparent);
+	background: var(--qf-gl-panel-2);
+	z-index: 30;
 }
 
 .platform-win #panel-nav {
-	background: color-mix(in srgb, var(--bg) calc((1 - (1 - var(--canvas-opacity)) / 2) * 100%), transparent);
+	background: var(--qf-gl-panel-2);
 }
 
 #panel-nav::after {
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: color-mix(in srgb, var(--bg) 70%, transparent);
+	background: color-mix(in srgb, var(--qf-gl-panel-2) 70%, transparent);
 	backdrop-filter: blur(6px);
-	z-index: 500;
+	z-index: 1;
 	pointer-events: none;
 	opacity: 0;
 	transition: opacity 120ms ease-out;
@@ -165,8 +176,9 @@ body.platform-win {
 	min-width: 200px;
 	overflow: hidden;
 	position: relative;
-	background: color-mix(in srgb, var(--canvas-bg) calc(var(--canvas-opacity) * 100%), transparent);
+	background: var(--qf-gl-void);
 	outline: none;
+	z-index: 0;
 }
 
 #panel-viewer::after {
@@ -174,7 +186,7 @@ body.platform-win {
 	position: absolute;
 	inset: 0;
 	pointer-events: none;
-	z-index: 104;
+	z-index: 8;
 	box-shadow: none;
 }
 
@@ -193,7 +205,7 @@ body.platform-win {
 }
 
 .platform-win #panel-viewer {
-	background: color-mix(in srgb, var(--canvas-bg) calc(var(--canvas-opacity) * 100%), transparent);
+	background: var(--qf-gl-void);
 }
 
 #panel-agent {
@@ -635,7 +647,7 @@ body.platform-win {
 #canvas-watermark {
 	position: absolute;
 	inset: 0;
-	z-index: 1;
+	z-index: 0;
 	pointer-events: none;
 	display: flex;
 	align-items: center;
@@ -648,13 +660,14 @@ body.platform-win {
 	top: 16px;
 	left: 50%;
 	transform: translate(-50%, -8px);
+	z-index: 9;
 	max-width: min(360px, calc(100% - 32px));
 	padding: 7px 11px;
-	border: 1px solid color-mix(in srgb, var(--qf-accent) 45%, var(--qf-line));
+	border: 1px solid color-mix(in srgb, var(--qf-gl-ice) 45%, var(--qf-gl-rule));
 	border-radius: 999px;
-	background: color-mix(in srgb, var(--qf-surface) 94%, transparent);
-	box-shadow: 0 8px 28px color-mix(in srgb, var(--qf-ink) 45%, transparent);
-	color: var(--qf-text);
+	background: color-mix(in srgb, var(--qf-gl-panel-2) 94%, transparent);
+	box-shadow: 0 8px 28px color-mix(in srgb, var(--qf-gl-void) 45%, transparent);
+	color: var(--qf-gl-text);
 	font-family: var(--qf-mono);
 	font-size: 10px;
 	letter-spacing: 0.04em;
@@ -677,10 +690,19 @@ body.platform-win {
 	pointer-events: none;
 }
 
+/* Reserved for WO-g5 — draw nothing yet */
+#cable-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 4;
+	pointer-events: none;
+	overflow: visible;
+}
+
 #panel-viewer webview {
 	flex: 1;
 	position: relative;
-	z-index: 110;
+	z-index: 6;
 }
 
 /* ── Nav toolbar ── */
@@ -701,7 +723,7 @@ body.platform-win {
 	background: transparent;
 	padding: 0;
 	gap: 0;
-	border-bottom: 1px solid var(--border);
+	border-bottom: 1px solid var(--qf-gl-rule);
 	-webkit-app-region: no-drag;
 }
 
@@ -713,20 +735,21 @@ body.platform-win {
 	border-bottom: 2px solid transparent;
 	margin-bottom: -1px;
 	background: transparent;
+	font-family: var(--qf-sans);
 	font-size: 0.8rem;
 	font-weight: 400;
-	color: var(--muted);
+	color: var(--qf-gl-dim);
 	cursor: pointer;
 	transition: color 0.1s ease, border-color 0.1s ease;
 }
 
 .mode-btn:hover {
-	color: var(--fg);
+	color: var(--qf-gl-text);
 }
 
 .mode-btn.active {
-	border-bottom-color: var(--fg);
-	color: var(--fg);
+	border-bottom-color: var(--qf-gl-ice);
+	color: var(--qf-gl-text);
 	font-weight: 500;
 }
 
@@ -734,7 +757,7 @@ body.platform-win {
 	position: absolute;
 	top: 10px;
 	right: 10px;
-	z-index: 100;
+	z-index: 8;
 	-webkit-app-region: no-drag;
 	display: flex;
 	align-items: center;
@@ -742,16 +765,17 @@ body.platform-win {
 	width: 28px;
 	height: 28px;
 	padding: 0;
-	border: 1px solid var(--border);
-	border-radius: 8px;
+	border: 1px solid var(--qf-gl-rule);
+	border-radius: var(--qf-gl-r);
 	background: var(--new-tile-btn-bg);
-	color: var(--muted);
+	color: var(--qf-gl-dim);
 	cursor: pointer;
-	transition: color 0.15s ease, background 0.15s ease;
+	transition: color var(--qf-gl-fast) var(--qf-gl-ease), background var(--qf-gl-fast) var(--qf-gl-ease), border-color var(--qf-gl-fast) var(--qf-gl-ease);
 }
 
 #new-tile-btn:hover {
-	color: var(--fg);
+	color: var(--qf-gl-ice);
+	border-color: var(--qf-gl-ice);
 	background: var(--new-tile-btn-bg-hover);
 }
 
@@ -763,7 +787,7 @@ body.platform-win {
 	position: absolute;
 	top: 6px;
 	right: 10px;
-	z-index: 601;
+	z-index: 30;
 	-webkit-app-region: no-drag;
 	display: flex;
 	align-items: center;
@@ -793,7 +817,7 @@ body.platform-win {
 	position: absolute;
 	top: 8px;
 	right: 42px;
-	z-index: 101;
+	z-index: 30;
 	-webkit-app-region: no-drag;
 	padding: 2px 9px;
 	border-radius: 9999px;
@@ -839,7 +863,7 @@ body.platform-win {
 	width: 0;
 	position: relative;
 	cursor: col-resize;
-	z-index: 10;
+	z-index: 30;
 	flex-shrink: 0;
 }
 
@@ -860,7 +884,7 @@ body.platform-win {
 	display: none;
 	align-items: center;
 	justify-content: center;
-	z-index: 9500;
+	z-index: 30;
 }
 
 #settings-overlay.visible {
@@ -899,7 +923,7 @@ body.platform-win {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	z-index: 9600;
+	z-index: 30;
 }
 
 #canvas-skill-dialog.hidden {
@@ -1043,7 +1067,7 @@ body.platform-win {
 	opacity: 0.6;
 	transition: opacity 0.1s ease-in-out;
 	padding: 0;
-	z-index: 9000;
+	z-index: 30;
 }
 
 .panel-toggle:hover {
@@ -1054,7 +1078,7 @@ body.platform-win {
 
 #tooltip {
 	position: fixed;
-	z-index: 10000;
+	z-index: 30;
 	background: var(--qf-raised);
 	border: 1px solid color-mix(in srgb, var(--qf-ink) 12%, transparent);
 	border-radius: 6px;
@@ -1103,7 +1127,7 @@ body.platform-win {
 #resize-overlay {
 	position: fixed;
 	inset: 0;
-	z-index: 9999;
+	z-index: 30;
 	display: none;
 }
 
@@ -1118,7 +1142,7 @@ body.platform-win {
 #loading-overlay {
 	position: fixed;
 	inset: 0;
-	z-index: 2000;
+	z-index: 30;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -1153,7 +1177,7 @@ body.platform-win {
 	position: absolute;
 	bottom: var(--zoom-indicator-bottom, 12px);
 	right: 12px;
-	z-index: 104;
+	z-index: 8;
 	font-family: var(--qf-mono);
 	font-size: 11px;
 	font-weight: 500;
@@ -1181,7 +1205,7 @@ body.platform-win {
 	right: 14px;
 	width: 160px;
 	height: 112px;
-	z-index: 105;
+	z-index: 8;
 	background: color-mix(in srgb, var(--qf-muted) 25%, transparent);
 	border: none;
 	border-radius: 4px;
@@ -1219,7 +1243,7 @@ body.platform-win {
 #edge-indicators {
 	position: absolute;
 	inset: 0;
-	z-index: 104;
+	z-index: 8;
 	pointer-events: none;
 	overflow: hidden;
 }
@@ -1258,7 +1282,7 @@ body.platform-win {
 	border: 1px solid var(--border);
 	white-space: nowrap;
 	pointer-events: none;
-	z-index: 101;
+	z-index: 8;
 }
 
 .canvas-tile.edge-indicator-highlight {
@@ -1584,7 +1608,7 @@ body.platform-win {
 	background: var(--qf-gl-panel-2);
 	border: 1px solid var(--qf-gl-rule-hi);
 	transform: translate(-50%, -50%);
-	z-index: 5;
+	z-index: 7;
 	pointer-events: none;
 	transition:
 		background-color var(--qf-gl-fast) var(--qf-gl-ease),
@@ -1669,7 +1693,7 @@ body.platform-win {
 	width: auto !important;
 	height: auto !important;
 	transform: none !important;
-	z-index: 1000 !important;
+	z-index: 30 !important;
 	border-radius: 0;
 }
 
@@ -1805,7 +1829,7 @@ body.platform-win {
 	inset: 0;
 	overflow: hidden;
 	pointer-events: none;
-	z-index: 103;
+	z-index: 6;
 }
 
 #handoff-layer {
@@ -1813,7 +1837,7 @@ body.platform-win {
 	inset: 0;
 	pointer-events: none;
 	overflow: hidden;
-	z-index: 104;
+	z-index: 8;
 }
 
 .handoff-line {
@@ -1946,7 +1970,7 @@ body.platform-win {
 	border: 1.5px solid var(--qf-teal);
 	background: color-mix(in srgb, var(--qf-teal) 8%, transparent);
 	pointer-events: none;
-	z-index: 999999;
+	z-index: 9;
 }
 
 /* ── Browser tile nav controls ── */
