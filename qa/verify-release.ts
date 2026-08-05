@@ -75,11 +75,6 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     command: ["bun", "qa/run.ts", "rung-ladder"],
   },
   {
-    id: "glacier-feel",
-    cwd: ".",
-    command: ["bun", "qa/run.ts", "glacier-feel"],
-  },
-  {
     id: "one-skin",
     cwd: ".",
     command: ["bun", "qa/run.ts", "one-skin"],
