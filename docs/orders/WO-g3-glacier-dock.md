@@ -1,6 +1,6 @@
 # WO-g3 — GLACIER dock: masthead, ask, launcher, ledger
 
-status: DRAFT — needs founder authorization
+status: BUILT — evidence in docs/orders/evidence/wo-g3/
 branch: `wo-g3-glacier-dock`
 program: GLACIER full visual swap · order 3 of 5
 depends on: WO-g1 merged

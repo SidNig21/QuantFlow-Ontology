@@ -56,40 +56,56 @@
 		<div id="agent-resize" class="resize-handle" data-panel="agent"></div>
 		<div id="panel-agent">
 			<div id="dock">
-			<header class="dock-header">
-				<div class="dock-heading">
-					<span class="dock-kicker">QuantFlow / Dock</span>
-					<strong>Agent workspace</strong>
-				</div>
-				<button id="dock-tidy" class="qf-btn qf-btn-quiet dock-tidy" type="button" title="Arrange eligible canvas tiles into a readable grid">
-					Tidy
-				</button>
-			</header>
-				<section class="dock-section" id="dock-question">
-					<div class="qf-label dock-section-label">Research question</div>
-					<form id="dock-question-form" class="dock-question-form">
-						<textarea id="dock-question-input" class="dock-question-input" rows="3" placeholder="Ask QuantFlow…"></textarea>
-						<button id="dock-question-submit" class="qf-btn qf-btn-primary" type="submit">Submit</button>
-					</form>
-				</section>
-				<section class="dock-section" id="dock-species">
-					<div class="qf-label dock-section-label">Launchable CLIs</div>
-					<div id="dock-species-list"></div>
-				</section>
-				<section class="dock-section" id="dock-sessions">
-					<div class="dock-section-head">
-						<div class="qf-label dock-section-label">Sessions</div>
-						<button
-							id="dock-sessions-clear"
-							class="qf-btn qf-btn-quiet"
-							type="button"
-							title="Hide closed sessions from this list. Kernel history is kept."
-						>
-							Clear
-						</button>
+				<header class="dk-hd" id="dock-masthead">
+					<div class="eye">quantflow / dock</div>
+					<div class="dk-hd-row">
+						<h2>Agent workspace</h2>
+						<button id="dock-tidy" class="dk-link" type="button" title="Arrange eligible canvas tiles into a readable grid">Tidy</button>
 					</div>
-					<div id="dock-sessions-list"></div>
-				</section>
+					<div class="tally" id="dock-tally" aria-live="polite"></div>
+				</header>
+
+				<div class="ask" id="dock-question">
+					<form id="dock-question-form" class="dock-question-form">
+						<textarea
+							id="dock-question-input"
+							class="dock-question-input"
+							rows="3"
+							placeholder="Ask QuantFlow, or spawn a CLI below…"
+						></textarea>
+						<div class="hint">submit <kbd>Ctrl ⏎</kbd></div>
+						<button id="dock-question-submit" type="submit" class="sr-only">Submit</button>
+					</form>
+				</div>
+
+				<div class="sh"><b>launch</b><span class="r"></span></div>
+				<div class="launch" id="dock-species">
+					<div id="dock-species-list"></div>
+					<div class="authnote" id="dock-auth-note">
+						Auth is checked at launch — if sign-in is required, authenticate in Ubuntu and retry.
+					</div>
+				</div>
+
+				<div class="sh">
+					<b>sessions</b><span class="r"></span>
+					<button
+						id="dock-sessions-clear"
+						class="dk-link"
+						type="button"
+						title="Hide closed sessions from this list. Kernel history is kept."
+					>
+						clear closed
+					</button>
+				</div>
+				<div class="ledger" id="dock-sessions">
+					<div class="lg-hd">
+						<span class="c1"></span>
+						<span class="c2">session</span>
+						<span class="c3">species</span>
+						<span>state</span>
+					</div>
+					<div class="lg-body" id="dock-sessions-list"></div>
+				</div>
 			</div>
 		</div>
 	</div>

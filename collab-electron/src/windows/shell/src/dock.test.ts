@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  formatDockSessionState,
   visibleDockDefinitions,
   visibleDockSessions,
 } from "./dock.js";
@@ -53,5 +54,29 @@ describe("Dock sessions Clear view filter", () => {
     expect(
       visibleDockSessions(sessions, "2099-01-01T00:00:00.000Z").map((row) => row.id),
     ).toEqual(["live"]);
+  });
+});
+
+describe("Dock session state labels (WO-g3)", () => {
+  test("live and blocked use Kernel status text", () => {
+    expect(formatDockSessionState({ status: "running" })).toEqual({
+      text: "running",
+      kind: "live",
+    });
+    expect(formatDockSessionState({ status: "blocked" })).toEqual({
+      text: "blocked",
+      kind: "blocked",
+    });
+  });
+
+  test("terminal sessions never invent exit 0 when code is missing", () => {
+    expect(formatDockSessionState({ status: "closed" })).toEqual({
+      text: "closed · exit n/a",
+      kind: "terminal",
+    });
+    expect(formatDockSessionState({ status: "failed", exit_code: 130 })).toEqual({
+      text: "exit 130",
+      kind: "terminal",
+    });
   });
 });

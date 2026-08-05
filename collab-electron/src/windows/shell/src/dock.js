@@ -6,6 +6,9 @@
  * deleted. Terminal sessions at-or-before the cursor are hidden from the rail;
  * live sessions and newer rows still appear. The list may grow without bound
  * in the Kernel.
+ *
+ * WO-g3: Glacier zones (masthead / ask / launcher / ledger). Exit codes are
+ * not on agent_session — terminal rows show "exit n/a" rather than a fake 0.
  */
 
 function shortId(id) {
@@ -49,6 +52,32 @@ export function isDockTerminalSessionStatus(status) {
 	return ["closed", "cancelled", "failed"].includes(String(status ?? ""));
 }
 
+export function isDockLiveSessionStatus(status) {
+	return ["starting", "running", "blocked"].includes(String(status ?? ""));
+}
+
+/**
+ * Ledger state label. agent_session has no exit_code property — never invent one.
+ * @returns {{ text: string; kind: "live" | "blocked" | "terminal" }}
+ */
+export function formatDockSessionState(row) {
+	const status = String(row?.status ?? "");
+	if (status === "running" || status === "starting") {
+		return { text: status, kind: "live" };
+	}
+	if (status === "blocked") {
+		return { text: "blocked", kind: "blocked" };
+	}
+	if (isDockTerminalSessionStatus(status)) {
+		const code = row?.exit_code ?? row?.exitCode;
+		if (typeof code === "number" && Number.isFinite(code)) {
+			return { text: `exit ${code}`, kind: "terminal" };
+		}
+		return { text: `${status} · exit n/a`, kind: "terminal" };
+	}
+	return { text: status || "unknown", kind: "terminal" };
+}
+
 /**
  * View filter for the Dock sessions rail. Does not mutate Kernel rows.
  * @param {unknown} sessions
@@ -69,6 +98,10 @@ export function visibleDockSessions(sessions, clearedThroughIso) {
 	});
 }
 
+function sessionSpeciesLabel(row) {
+	return String(row?.label ?? row?.definition_id ?? row?.role ?? "session");
+}
+
 /**
  * @param {HTMLElement} panelEl
  * @param {{ onTidy?: () => void, qaMode?: boolean }} [options]
@@ -76,6 +109,7 @@ export function visibleDockSessions(sessions, clearedThroughIso) {
 export function initDock(panelEl, options = {}) {
 	const speciesList = panelEl.querySelector("#dock-species-list");
 	const sessionsList = panelEl.querySelector("#dock-sessions-list");
+	const tallyEl = panelEl.querySelector("#dock-tally");
 	if (!speciesList || !sessionsList) {
 		console.error("[dock] missing #dock-species-list or #dock-sessions-list");
 		return;
@@ -84,6 +118,19 @@ export function initDock(panelEl, options = {}) {
 	let refreshing = false;
 	/** @type {string | null} ISO watermark — hide terminal sessions at-or-before. */
 	let sessionsClearedThroughIso = null;
+	/** @type {boolean} */
+	let closedCollapsed = true;
+
+	function setTally({ live, closed, launchable }) {
+		if (!tallyEl) return;
+		tallyEl.replaceChildren();
+		const liveEl = el("b", null, `${live} live`);
+		tallyEl.appendChild(liveEl);
+		tallyEl.appendChild(el("s", null, "·"));
+		tallyEl.appendChild(document.createTextNode(`${closed} closed`));
+		tallyEl.appendChild(el("s", null, "·"));
+		tallyEl.appendChild(document.createTextNode(`${launchable} launchable`));
+	}
 
 	async function refresh() {
 		if (refreshing) return;
@@ -95,28 +142,23 @@ export function initDock(panelEl, options = {}) {
 			]);
 
 			speciesList.replaceChildren();
+			let launchable = 0;
 			if (!defsRes?.ok) {
 				speciesList.appendChild(
 					el("div", "qf-empty", defsRes?.error?.message ?? "Failed to list species"),
 				);
 			} else {
 				for (const diagnostic of (Array.isArray(defsRes.diagnostics) ? defsRes.diagnostics : [])) {
-					const card = el("div", "dock-species-row dock-species-unavailable");
-					const meta = el("div", "dock-species-meta");
-					meta.appendChild(el("div", "dock-species-name", String(diagnostic.name ?? "Adapter")));
-					meta.appendChild(el("div", "qf-label", String(diagnostic.message ?? "Unavailable")));
-					const unavailableBtn = el("button", "qf-btn qf-btn-primary", "Unavailable");
-					unavailableBtn.type = "button";
-					unavailableBtn.disabled = true;
-					unavailableBtn.title = String(diagnostic.message ?? "Unavailable");
-					card.appendChild(meta);
-					card.appendChild(unavailableBtn);
-					speciesList.appendChild(card);
+					const row = el("div", "lrow lrow-unavailable");
+					row.appendChild(el("b", null, String(diagnostic.name ?? "Adapter")));
+					row.appendChild(el("span", null, "unavailable"));
+					row.title = String(diagnostic.message ?? "Unavailable");
+					speciesList.appendChild(row);
 				}
 				const defs = visibleDockDefinitions(defsRes.definitions, {
 					qaMode: options.qaMode === true || window.__QF_QA_MODE__ === true,
 				});
-				if (defs.length === 0) {
+				if (defs.length === 0 && speciesList.childNodes.length === 0) {
 					speciesList.appendChild(el("div", "qf-empty", "No species registered"));
 				}
 				for (const row of defs) {
@@ -124,57 +166,53 @@ export function initDock(panelEl, options = {}) {
 					const name = String(row.name ?? definitionId);
 					const role = String(row.role ?? "");
 					const availability = row.availability;
-					const card = el("div", "dock-species-row");
-					const meta = el("div", "dock-species-meta");
-					meta.appendChild(el(
-						"div",
-						"dock-species-name",
-						name,
-					));
-					if (role) meta.appendChild(el("div", "qf-label", role));
-					if (availability?.message) {
-						meta.appendChild(el(
-							"div",
-							availability.available === false ? "qf-label dock-species-unavailable" : "qf-label",
-							availability.message,
-						));
-					}
-					const spawnBtn = el("button", "qf-btn qf-btn-primary", "Spawn");
-					spawnBtn.type = "button";
-					if (availability?.available === false) {
-						spawnBtn.disabled = true;
-						spawnBtn.textContent = "Unavailable";
-						spawnBtn.title = availability.message;
-					}
-					spawnBtn.addEventListener("click", async () => {
-						card.classList.remove("dock-spawn-failed");
-						spawnBtn.disabled = true;
-						spawnBtn.textContent = "Starting…";
-						card.classList.add("dock-spawning");
-						try {
-							const result = await window.shellApi.qf.spawnSession({ definitionId });
-							if (!result?.ok) {
-								throw new Error(result?.error?.message ?? "Spawn failed");
+					const unavailable = availability?.available === false;
+					const card = el("div", unavailable ? "lrow lrow-unavailable" : "lrow");
+					card.tabIndex = unavailable ? -1 : 0;
+					card.setAttribute("role", "button");
+					card.appendChild(el("b", null, name));
+					if (role) card.appendChild(el("span", null, role));
+					const cue = el("em", null, unavailable ? "unavailable" : "spawn ⏎");
+					card.appendChild(cue);
+					if (unavailable) {
+						card.title = String(availability.message ?? "Unavailable");
+					} else {
+						launchable += 1;
+						const spawn = async () => {
+							card.classList.remove("dock-spawn-failed");
+							card.classList.add("dock-spawning");
+							cue.textContent = "starting…";
+							try {
+								const result = await window.shellApi.qf.spawnSession({ definitionId });
+								if (!result?.ok) {
+									throw new Error(result?.error?.message ?? "Spawn failed");
+								}
+								cue.textContent = "spawn ⏎";
+							} catch (error) {
+								cue.textContent = "failed — retry";
+								card.title = error?.message ?? String(error);
+								card.classList.add("dock-spawn-failed");
+							} finally {
+								card.classList.remove("dock-spawning");
 							}
-						} catch (error) {
-							spawnBtn.textContent = "Failed — retry";
-							spawnBtn.title = error?.message ?? String(error);
-							card.classList.add("dock-spawn-failed");
-						} finally {
-							if (!card.classList.contains("dock-spawn-failed")) {
-								spawnBtn.textContent = "Spawn";
+						};
+						card.addEventListener("click", () => {
+							void spawn();
+						});
+						card.addEventListener("keydown", (event) => {
+							if (event.key === "Enter" || event.key === " ") {
+								event.preventDefault();
+								void spawn();
 							}
-							spawnBtn.disabled = false;
-							card.classList.remove("dock-spawning");
-						}
-					});
-					card.appendChild(meta);
-					card.appendChild(spawnBtn);
+						});
+					}
 					speciesList.appendChild(card);
 				}
 			}
 
 			sessionsList.replaceChildren();
+			let liveCount = 0;
+			let closedCount = 0;
 			if (!sessRes?.ok) {
 				sessionsList.appendChild(
 					el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"),
@@ -182,6 +220,15 @@ export function initDock(panelEl, options = {}) {
 			} else {
 				const allSessions = Array.isArray(sessRes.sessions) ? sessRes.sessions : [];
 				const sessions = visibleDockSessions(allSessions, sessionsClearedThroughIso);
+				const live = [];
+				const closed = [];
+				for (const row of sessions) {
+					if (isDockLiveSessionStatus(row?.status)) live.push(row);
+					else closed.push(row);
+				}
+				liveCount = live.length;
+				closedCount = closed.length;
+
 				if (sessions.length === 0) {
 					const hidden = allSessions.length - sessions.length;
 					sessionsList.appendChild(
@@ -194,41 +241,63 @@ export function initDock(panelEl, options = {}) {
 						),
 					);
 				}
-				for (const row of sessions) {
+
+				const appendSessionRow = (row) => {
 					const id = String(row.id ?? "");
 					const status = String(row.status ?? "");
-					const label = row.label != null ? String(row.label) : "";
-					const card = el("div", "dock-session-row");
-					const head = el("div", "dock-session-head");
-					head.appendChild(el("span", "dock-session-id", shortId(id)));
-					if (label) head.appendChild(el("span", "qf-label", label));
-					const chip = el("span", `qf-chip ${status}`, status);
-					head.appendChild(chip);
-					card.appendChild(head);
+					const state = formatDockSessionState(row);
+					const card = el(
+						"div",
+						state.kind === "live"
+							? "srow live"
+							: state.kind === "blocked"
+								? "srow blk"
+								: "srow",
+					);
+					card.appendChild(el("i", null, null));
+					card.appendChild(el("span", "id", shortId(id)));
+					card.appendChild(el("span", "who", sessionSpeciesLabel(row)));
+					card.appendChild(el("span", "st", state.text));
 
-					const actions = el("div", "dock-session-actions");
 					if (status === "running" || status === "blocked") {
-						const cancelBtn = el("button", "qf-btn qf-btn-quiet", "Cancel");
-						cancelBtn.type = "button";
-						cancelBtn.addEventListener("click", () => {
+						card.title = "Click to cancel session";
+						card.addEventListener("click", () => {
 							void window.shellApi.qf.cancelSession(id);
 						});
-						actions.appendChild(cancelBtn);
-					}
-					if (status === "cancelled" || status === "failed") {
-						const closeBtn = el("button", "qf-btn qf-btn-quiet", "Close");
-						closeBtn.type = "button";
-						closeBtn.addEventListener("click", () => {
+					} else if (status === "cancelled" || status === "failed") {
+						card.title = "Click to close session";
+						card.addEventListener("click", () => {
 							void window.shellApi.qf.closeSession(id);
 						});
-						actions.appendChild(closeBtn);
-					}
-					if (actions.childNodes.length > 0) {
-						card.appendChild(actions);
 					}
 					sessionsList.appendChild(card);
+				};
+
+				for (const row of live) appendSessionRow(row);
+
+				if (closed.length > 0) {
+					const grp = el("div", "lg-grp");
+					grp.appendChild(
+						document.createTextNode(
+							`closed · ${closed.length}`,
+						),
+					);
+					grp.appendChild(el("span", "r", null));
+					grp.appendChild(
+						el("span", null, closedCollapsed ? "expand" : "collapse"),
+					);
+					grp.addEventListener("click", () => {
+						closedCollapsed = !closedCollapsed;
+						void refresh();
+					});
+					sessionsList.appendChild(grp);
+					if (!closedCollapsed) {
+						for (const row of closed) appendSessionRow(row);
+					}
 				}
 			}
+
+			setTally({ live: liveCount, closed: closedCount, launchable });
 		} finally {
 			refreshing = false;
 		}
@@ -257,6 +326,12 @@ export function initDock(panelEl, options = {}) {
 				}
 				void refresh();
 			});
+		});
+		questionInput.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+				event.preventDefault();
+				questionForm.requestSubmit();
+			}
 		});
 	}
 
