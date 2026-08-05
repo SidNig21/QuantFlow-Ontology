@@ -16,7 +16,7 @@ Built solo, in the open, for native Windows first. Early-stage and honest about 
   <img src="docs/readme-assets/windows-shell.png" alt="QuantFlow Ontology on Windows — canvas, file rail, and Dock species rail" width="900" />
 </p>
 
-<p align="center"><em>Live Windows shell (WO-WIN1 evidence): infinite canvas, file rail, and Dock species with Spawn — the product floor that Act I built on.</em></p>
+<p align="center"><em>Live Windows shell (WO-WIN1 evidence): infinite canvas, file rail, and Dock — Act I product floor. Glacier (g1–g5) re-skins this surface in source; rebuild the install to see it on the desktop shortcut.</em></p>
 
 <p align="center">
   <img src="docs/readme-assets/dock-session.png" alt="Dock session tile with qf-toolloop running on the canvas" width="720" />
@@ -28,7 +28,7 @@ Built solo, in the open, for native Windows first. Early-stage and honest about 
   <img src="docs/readme-assets/glacier-showcase.png" alt="Glacier design showcase — spine tiles, dock, and a declared cable" width="900" />
 </p>
 
-<p align="center"><em>Glacier design reference (<code>design/glacier/showcase.html</code>) — target look for the visual program: spine tiles, reworked dock, and declared cables. Spec, not a claim that every surface is already reskinned in the installed build.</em></p>
+<p align="center"><em>Glacier design reference (<code>design/glacier/showcase.html</code>) — the look WO-g1–g5 land in source: spine tiles, typographic dock, void canvas, and declared (dashed) cables.</em></p>
 
 <p align="center">
   <img src="docs/readme-assets/glacier-tile-spec.png" alt="Glacier tile anatomy — spine head, id, grip, and arm-confirm close" width="720" />
@@ -47,8 +47,8 @@ Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a reco
 - **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
 - **The peer bus** (`tools/qf-peer-bus`) — stdio MCP (`send_to_peer` / `read_inbox` / `list_peers`). Peer messages land as content-addressed `trajectory` artifacts. Transport SQLite stays separate from the Kernel.
 - **Act I ladder (R0–R8)** — build gates green on `act-i-ladder` / local `main`. Durable tasks, market lineage, and Windows dock capability proofs are in evidence. **Act I is not “complete” until founder sign-off** on the FOUNDER-REVIEW queue (see Status).
-- **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward. Canvas cables as UI are still in flight (WO-g5).
-- **Glacier foundation (WO-g1 / WO-g2)** — `--qf-gl-*` design tokens in `qf-tokens.css`, QuantFlow terminal ANSI palette, and tile **spine** chrome (arm-confirm close, dblclick fullscreen). Later Glacier orders (dock / shell / cables) continue from reversible tag `glacier-checkpoint-a`.
+- **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward.
+- **Glacier visual program (WO-g1 → g5)** — tokens + ANSI (g1), tile spine (g2), dock masthead/ask/launcher/ledger (g3), shell chrome / file-rail / canvas / z-scale (g4), Kernel-backed **view** cables with dashed honesty + orphan cascade (g5). ADR-0003 allows UI on experimental `connection` without promotion. Reversible checkpoint: tag `glacier-checkpoint-a` (after g5a+g1). Installed asar needs rebuild/package-click to match source.
 - **Verification culture** — work orders, cold worktrees, bait-tested gates. Artifact hashes are recomputed, not trusted.
 
 ## The end goal: a real ontology
@@ -76,8 +76,8 @@ The ontology has three planes:
 | Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) — **R9 BLOCKED** pending Act I founder sign-off |
 | Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0–R8 complete in the ladder table; R9 named but not started |
 | Product floor | Windows-native Electron console; deterministic Dock collaboration proven |
-| Visual program | **GLACIER** — g5a + g1 + g2 on `main`; checkpoint tag `glacier-checkpoint-a`; g3–g5 still open |
-| Honest boundary | Live model-backed research loop, Bovada workflow, and full cable UI are **not** claimed done |
+| Visual program | **GLACIER** — g5a + g1–g5 + ADR-0003 on `main`; checkpoint tag `glacier-checkpoint-a` |
+| Honest boundary | Live model-backed research loop and Bovada workflow are **not** claimed done; view cables are declared (dashed) until a runtime honours them |
 
 Authority lives in `NEXT.md` and `GOLDEN-RUN.md`. This table is a human-facing postcard; if it disagrees with those files, **they win**. Status is also something you run:
 
