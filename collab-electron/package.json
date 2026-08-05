@@ -18,6 +18,7 @@
     "package": "bun ./scripts/package.mjs",
     "package:verify": "bun ./scripts/package-verify.ts",
     "package:unsigned": "bun ./scripts/package.mjs --no-sign",
+    "shortcut:refresh": "bun ./scripts/refresh-desktop-shortcut.mjs",
     "release": "bun ./scripts/package.mjs --publish",
     "test": "bun test",
     "test:updater": "bun test src/main/updater/github-release-fetcher.test.ts && bun test src/main/updater/downloader.test.ts && bun test src/main/updater/update-manager.test.ts",

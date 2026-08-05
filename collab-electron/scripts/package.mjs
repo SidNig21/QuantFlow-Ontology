@@ -188,3 +188,22 @@ if (shouldPublish) {
   uploadArgs.push("--arch", builtArches.join(","));
   run(process.execPath, uploadArgs);
 }
+
+// Keep the founder Desktop shortcut aimed at this checkout's win-unpacked exe
+// so a double-click never reopens a stale L1/acceptance install after package.
+if (process.platform === "win32") {
+  const { refreshDesktopShortcut } = await import(
+    "./refresh-desktop-shortcut.mjs"
+  );
+  const refreshed = refreshDesktopShortcut({
+    exePath: join(cwd, "dist", "win-unpacked", "QuantFlow.exe"),
+    workingDirectory: join(cwd, "dist", "win-unpacked"),
+    repoRoot: join(cwd, ".."),
+  });
+  if (refreshed.ok) {
+    console.log(`• Desktop shortcut → ${refreshed.exePath}`);
+    console.log(`  ${refreshed.description}`);
+  } else {
+    console.warn(`• Desktop shortcut not updated: ${refreshed.reason}`);
+  }
+}
