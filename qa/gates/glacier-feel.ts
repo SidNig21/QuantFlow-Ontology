@@ -84,6 +84,15 @@ export function checkGlacierFeel(): { ok: boolean; errors: string[] } {
     errors.push("D4: kernel-ledger.js must project via projectKernelLedger");
   }
 
+  // Coverage floor. Fixed-path reads throw on missing files; still refuse PASS
+  // if any protected source arrived empty (truncated/moved content).
+  if (!canvasState.trim() || !renderer.trim() || !ledgerSrc.trim()) {
+    errors.push(
+      "glacier-feel: scan collapsed — a protected source file was empty. " +
+        "Refusing to report PASS on a scan that read nothing.",
+    );
+  }
+
   if (errors.length) {
     console.error("glacier-feel FAIL:");
     for (const e of errors) console.error(`  - ${e}`);

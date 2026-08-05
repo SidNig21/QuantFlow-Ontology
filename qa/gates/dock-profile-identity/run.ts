@@ -236,6 +236,16 @@ function scanElectronCreateSessionCallsites(): string | null {
   }
   walk(ELECTRON_MAIN);
 
+  // Coverage floor. Missing main/ would throw; empty-but-present tree would
+  // leave discovered===0 which already fails — still require we read files.
+  const MIN_MAIN_FILES = 10;
+  if (files.length < MIN_MAIN_FILES) {
+    return (
+      `dock-profile-identity: scan collapsed — ${files.length} files under ` +
+      `collab-electron/src/main/. Refusing to report PASS on a scan that inspected nothing.`
+    );
+  }
+
   const expectedCreators = new Map([
     ["native-tui-orchestration.ts", "opts.definitionId"],
     ["runtime-kernel-admission.ts", "definitionId"],
@@ -464,6 +474,8 @@ function assertNoInsertAgentSessionBypass(): string | null {
   ];
   const allowedWriter = join(REPO, "packages/qf-kernel/src/create.ts");
   const skip = new Set(["node_modules", "dist", "out", "packed"]);
+  let filesRead = 0;
+  let sawKernelSrc = false;
   const visit = (dir: string): string | null => {
     for (const name of readdirSync(dir)) {
       if (skip.has(name)) continue;
@@ -475,6 +487,9 @@ function assertNoInsertAgentSessionBypass(): string | null {
         continue;
       }
       if (!/\.[cm]?[jt]sx?$/.test(name) || path === allowedWriter) continue;
+      const rel = relative(REPO, path).split("\\").join("/");
+      if (rel.startsWith("packages/qf-kernel/src/")) sawKernelSrc = true;
+      filesRead += 1;
       const source = readFileSync(path, "utf8");
       if (/INSERT\s+(?:OR\s+\w+\s+)?INTO\s+agent_session\b/i.test(source)) {
         return `session-row writer outside execute creation path: ${relative(REPO, path)}`;
@@ -485,6 +500,14 @@ function assertNoInsertAgentSessionBypass(): string | null {
   for (const root of roots) {
     const failure = visit(root);
     if (failure) return failure;
+  }
+  // Coverage floor. Empty trees → no INSERT hits → PASS while guarding nothing.
+  const MIN_INSERT_SCAN = 50;
+  if (filesRead < MIN_INSERT_SCAN || !sawKernelSrc) {
+    return (
+      `dock-profile-identity: INSERT scan collapsed — ${filesRead} files, ` +
+      `kernel src seen: ${sawKernelSrc}. Refusing to report PASS on a scan that inspected nothing.`
+    );
   }
   return null;
 }

@@ -79,6 +79,45 @@ export const WINDOWS_RELEASE_STAGES: readonly ReleaseStage[] = [
     cwd: ".",
     command: ["bun", "qa/run.ts", "one-skin"],
   },
+  // WO-g7: cheap Act I / Law gates that were rung-once and then orphaned.
+  // hermes-founder-state stays out (needs WSL; CI windows-latest has none).
+  // Packaged-app windows-dock-* gates stay out of this door (~100s each) —
+  // see .github/workflows/packaged-app.yml.
+  {
+    id: "glacier-feel",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "glacier-feel"],
+  },
+  {
+    id: "acp-fs-confine",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "acp-fs-confine"],
+  },
+  {
+    id: "schema-bundle-aliases",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "schema-bundle-aliases"],
+  },
+  {
+    id: "verb-retirement",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "verb-retirement"],
+  },
+  {
+    id: "kernel-task-delegation",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "kernel-task-delegation"],
+  },
+  {
+    id: "kernel-market-lineage",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "kernel-market-lineage"],
+  },
+  {
+    id: "observe-door",
+    cwd: ".",
+    command: ["bun", "qa/run.ts", "observe-door"],
+  },
 ];
 
 /** Compatibility-only Linux release route; it is not Windows proof. */

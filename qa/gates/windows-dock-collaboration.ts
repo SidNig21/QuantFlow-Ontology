@@ -4,6 +4,9 @@
  * It launches the unpacked package, drives the same definition-backed Dock
  * admission as the shell, and lets two package-owned proof children perform
  * the task/ACK round trip through the app-owned peer-bus transport.
+ *
+ * CI reach (WO-g7): not part of `bun qa/verify-release.ts` (~100s packaged-app
+ * cost). Exercised by `.github/workflows/packaged-app.yml`.
  */
 import { spawn, type ChildProcess } from "node:child_process";
 import { Database } from "bun:sqlite";

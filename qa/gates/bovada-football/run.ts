@@ -6,6 +6,7 @@
 import { createHash } from "node:crypto";
 import {
   copyFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -281,6 +282,14 @@ async function packagedSurfaceProof(): Promise<void> {
 
 export async function runBovadaFootballGate(): Promise<{ ok: boolean }> {
   try {
+    // Coverage floor. Missing fixture/package roots must not look like PASS.
+    if (!existsSync(FIXTURE) || !existsSync(CORE) || !existsSync(COLLAB)) {
+      throw new Error(
+        `bovada-football: scan collapsed — fixture=${existsSync(FIXTURE)} ` +
+          `core=${existsSync(CORE)} collab=${existsSync(COLLAB)}. ` +
+          `Refusing to report PASS on a scan that inspected nothing.`,
+      );
+    }
     await runProof("core tests", ["bun", "test"], CORE);
     await runProof("core five-bait gate", ["bun", "run", "gate"], CORE);
     await runProof(

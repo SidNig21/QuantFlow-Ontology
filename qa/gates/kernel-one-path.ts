@@ -118,6 +118,21 @@ function walk(dir: string, out: string[]): void {
 export function checkKernelOnePath(): { ok: boolean; offenders: string[] } {
   const files: string[] = [];
   walk(REPO_ROOT, files);
+
+  // Coverage floor. Walk swallows missing roots; empty files → PASS with no
+  // allowlist check. Must always see the Kernel package this gate protects.
+  const MIN_FILES = 200;
+  const sawKernelPackage = files.some((f) =>
+    relative(REPO_ROOT, f).split("\\").join("/").startsWith("packages/qf-kernel/src/"),
+  );
+  if (files.length < MIN_FILES || !sawKernelPackage) {
+    console.error(
+      `kernel-one-path: scan collapsed — ${files.length} files, kernel package seen: ${sawKernelPackage}. ` +
+        `Refusing to report PASS on a scan that inspected nothing.`,
+    );
+    return { ok: false, offenders: ["<scan-coverage-collapsed>"] };
+  }
+
   const offenders: string[] = [];
 
   for (const full of files) {

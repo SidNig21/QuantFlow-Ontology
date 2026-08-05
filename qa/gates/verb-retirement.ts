@@ -87,6 +87,23 @@ export function checkVerbRetirement(): { ok: boolean; offenders: string[] } {
   const files: string[] = [];
   walk(REPO_ROOT, files);
 
+  // Coverage floor. Proved 2026-08-05: pointing SCOPED_PREFIXES at nonexistent
+  // directories still returned PASS. Refuse to report success on an empty scan.
+  const scoped = files
+    .map((f) => relative(REPO_ROOT, f).split("\\").join("/"))
+    .filter(isScoped);
+  const sawKernel = scoped.some((rel) => rel.startsWith("packages/qf-kernel/src/"));
+  const sawMain = scoped.some((rel) => rel.startsWith("collab-electron/src/main/"));
+  const MIN_SCOPED = 20;
+  if (scoped.length < MIN_SCOPED || !sawKernel || !sawMain) {
+    console.error(
+      `verb-retirement: scan collapsed — ${scoped.length} scoped files, ` +
+        `kernel seen: ${sawKernel}, main seen: ${sawMain}. ` +
+        `Refusing to report PASS on a scan that inspected nothing.`,
+    );
+    return { ok: false, offenders: ["<scan-coverage-collapsed>"] };
+  }
+
   for (const full of files) {
     const rel = relative(REPO_ROOT, full).split("\\").join("/");
     if (!isScoped(rel)) continue;

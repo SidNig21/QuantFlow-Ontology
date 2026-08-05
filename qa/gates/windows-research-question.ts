@@ -1,5 +1,8 @@
 /**
  * R8 — founder question creates Kernel mission + starts orchestrator.
+ *
+ * CI reach (WO-g7): not part of `bun qa/verify-release.ts` (~100s packaged-app
+ * cost). Exercised by `.github/workflows/packaged-app.yml`.
  */
 import { spawn, type ChildProcess } from "node:child_process";
 import { Database } from "bun:sqlite";

@@ -20,6 +20,13 @@ describe("verify-release stages", () => {
       "doc-links",
       "rung-ladder",
       "one-skin",
+      "glacier-feel",
+      "acp-fs-confine",
+      "schema-bundle-aliases",
+      "verb-retirement",
+      "kernel-task-delegation",
+      "kernel-market-lineage",
+      "observe-door",
     ]);
   });
 

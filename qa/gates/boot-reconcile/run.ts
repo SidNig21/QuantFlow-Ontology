@@ -71,6 +71,14 @@ function assertProductionBootPathCoupling(): string | null {
     "utf8",
   );
 
+  // Coverage floor. Missing files throw; empty content must not PASS coupling.
+  if (!agentHost.trim() || !kernel.trim()) {
+    return (
+      "boot-reconcile: scan collapsed — agent-host.ts or kernel.ts was empty. " +
+      "Refusing to report PASS on a scan that read nothing."
+    );
+  }
+
   const reconcileBody = extractExportFunctionBody(
     agentHost,
     "reconcileStaleSessions",

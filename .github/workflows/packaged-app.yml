@@ -1,0 +1,31 @@
+# WO-g7: Act I packaged-app proofs (~100s each). Kept off the default release
+# door (`bun qa/verify-release.ts`) so every push stays minutes, not ten.
+# Still runs on every PR and on main so R1–R8 cannot rot unnoticed.
+#
+# hermes-founder-state is NOT listed here: it needs a real WSL distro and
+# fails closed without one; windows-latest has none.
+name: packaged-app
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  packaged-app:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install collab-electron (frozen)
+        working-directory: collab-electron
+        run: bun install --frozen-lockfile
+      - name: Packaged-app Act I gates
+        run: |
+          bun qa/run.ts windows-dock-collaboration
+          bun qa/run.ts windows-dock-ontology
+          bun qa/run.ts windows-dock-capability
+          bun qa/run.ts windows-dock-hire
+          bun qa/run.ts windows-dock-species
+          bun qa/run.ts windows-research-question

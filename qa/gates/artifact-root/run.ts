@@ -399,8 +399,22 @@ function gateProductionPublishers(): string | null {
   const mainRoot = join(REPO_ROOT, "collab-electron/src/main");
   const directPublish = /\bkernelExecute\s*\(\s*["']publish_artifact["']/g;
   const callsites: string[] = [];
+  const files = productionSourceFiles(mainRoot);
 
-  for (const path of productionSourceFiles(mainRoot)) {
+  // Coverage floor. Empty main tree → expected callsites "none" already fails,
+  // but require we actually read the production surface this gate protects.
+  const MIN_MAIN_FILES = 10;
+  const sawA2a = files.some((path) => relative(mainRoot, path).split("\\").join("/") === "a2a-bus.ts");
+  const sawHost = files.some((path) => relative(mainRoot, path).split("\\").join("/") === "agent-host.ts");
+  if (files.length < MIN_MAIN_FILES || !sawA2a || !sawHost) {
+    return (
+      `artifact-root: scan collapsed — ${files.length} main files, ` +
+      `a2a-bus.ts seen: ${sawA2a}, agent-host.ts seen: ${sawHost}. ` +
+      `Refusing to report PASS on a scan that inspected nothing.`
+    );
+  }
+
+  for (const path of files) {
     const relativePath = relative(mainRoot, path);
     const stripped = stripComments(readFileSync(path, "utf8"));
     const matches = stripped.match(directPublish) ?? [];

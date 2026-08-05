@@ -157,7 +157,20 @@ function trackedFiles(): string[] {
 function classifyResiduals(): Result & { residuals?: Residual[] } {
   const forbidden = /\.collaborator|@collaborator\/electron|\bcollaborator\b|collabs-inc|collab-public/ig;
   const residuals: Residual[] = [];
-  for (const file of trackedFiles()) {
+  const files = trackedFiles();
+  // Coverage floor. Empty git listing → zero residuals → PASS while scanning nothing.
+  const MIN_TRACKED = 100;
+  const sawPackageJson = files.includes("collab-electron/package.json");
+  if (files.length < MIN_TRACKED || !sawPackageJson) {
+    return {
+      ok: false,
+      reason:
+        `product-identity: scan collapsed — ${files.length} tracked files, ` +
+        `collab-electron/package.json seen: ${sawPackageJson}. ` +
+        `Refusing to report PASS on a scan that inspected nothing.`,
+    };
+  }
+  for (const file of files) {
     const abs = join(REPO, file);
     if (!existsSync(abs) || !statSync(abs).isFile()) continue;
     let source: string;

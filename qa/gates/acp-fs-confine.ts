@@ -20,6 +20,13 @@ export async function runAcpFsConfineGate(): Promise<{ ok: boolean }> {
       join(import.meta.dir, "../../collab-electron/src/main/acp-agent.ts"),
       "utf8",
     );
+    // Coverage floor. Missing file already throws; empty content must not PASS.
+    if (!source.trim()) {
+      throw new Error(
+        "acp-fs-confine: scan collapsed — acp-agent.ts was empty. " +
+          "Refusing to report PASS on a scan that read nothing.",
+      );
+    }
     assert(source.includes("shouldAdvertiseAcpFs"), "fs advertise helper missing");
     assert(source.includes("assertPathWithinAcpFsRoot"), "fs confine helper missing");
     assert(

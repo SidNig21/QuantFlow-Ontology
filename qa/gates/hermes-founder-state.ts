@@ -7,6 +7,12 @@
  *
  * Falsification uses a scratch HOME under a temp directory, never the
  * founder's real ~/.hermes.
+ *
+ * CI reach (WO-g7): deliberately excluded from `bun qa/verify-release.ts` and
+ * from CI. Requires a real WSL distro and fails closed without one; GitHub's
+ * windows-latest runner ships none. Adding it turns the canonical door
+ * permanently red (attempted 2026-08-04, reverted in 86eac5f). Run on a
+ * founder machine: `bun qa/run.ts hermes-founder-state`.
  */
 import { spawnSync } from "node:child_process";
 import {

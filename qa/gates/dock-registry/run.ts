@@ -44,8 +44,9 @@ function definitionsFromDb(db: KernelDb): Record<string, unknown>[] {
   return queryObjects(db, "agent_definition", undefined, null, 0, undefined, "asc");
 }
 
-function scanWindowsForSpeciesLiteral(): string[] {
+function scanWindowsForSpeciesLiteral(): { hits: string[]; filesRead: number } {
   const hits: string[] = [];
+  let filesRead = 0;
   const skip = new Set(["node_modules", "dist", "out", ".git"]);
 
   function walk(dir: string): void {
@@ -74,6 +75,7 @@ function scanWindowsForSpeciesLiteral(): string[] {
       } catch {
         continue;
       }
+      filesRead += 1;
       if (text.includes(SPECIES_LITERAL)) {
         hits.push(relative(REPO, full).split("\\").join("/"));
       }
@@ -81,7 +83,7 @@ function scanWindowsForSpeciesLiteral(): string[] {
   }
 
   walk(WINDOWS);
-  return hits;
+  return { hits, filesRead };
 }
 
 async function main(): Promise<number> {
@@ -188,7 +190,17 @@ async function main(): Promise<number> {
   }
 
   // ── (d) no species literal under collab-electron/src/windows/ ──
-  const literalHits = scanWindowsForSpeciesLiteral();
+  const { hits: literalHits, filesRead } = scanWindowsForSpeciesLiteral();
+  // Coverage floor. Walk swallows a missing windows/ tree; empty hits would
+  // otherwise PASS while guarding nothing.
+  const MIN_WINDOWS_FILES = 10;
+  if (filesRead < MIN_WINDOWS_FILES) {
+    console.error(
+      `dock-registry FAIL: scan collapsed — ${filesRead} files under collab-electron/src/windows/. ` +
+        `Refusing to report PASS on a scan that inspected nothing.`,
+    );
+    return 1;
+  }
   if (literalHits.length > 0) {
     console.error(
       "dock-registry FAIL: species literal in renderer source:",
