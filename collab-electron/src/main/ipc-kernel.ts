@@ -24,6 +24,8 @@ import {
   kernelListAgentDefinitions,
   kernelListAgentSessions,
   kernelListArtifacts,
+  kernelListEvents,
+  onKernelEvents,
   peerBusListHandoffs,
 } from "./kernel";
 import {
@@ -432,5 +434,24 @@ export function registerKernelHandlers(): void {
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }
+  });
+
+  ipcMain.handle(
+    "qf:events:list",
+    (event, args: { limit?: number } = {}) => {
+      try {
+        assertTrustedSender(event);
+        return {
+          ok: true as const,
+          events: kernelListEvents(args?.limit ?? 40),
+        };
+      } catch (err) {
+        return { ok: false as const, error: serializeError(err) };
+      }
+    },
+  );
+
+  onKernelEvents(() => {
+    broadcast("qf:events:invalidate");
   });
 }

@@ -29,6 +29,7 @@ export function createTileManager({
 	onTileFocused,
 	onTileDblClick,
 	onReposition,
+	onTileClosed,
 }) {
 	/** @type {Map<string, {container: HTMLElement, contentArea: HTMLElement, titleText: HTMLElement, webview?: HTMLElement}>} */
 	const tileDOMs = new Map();
@@ -686,8 +687,14 @@ export function createTileManager({
 		}
 		removeTile(id);
 		void window.shellApi?.qf?.deleteConnectionsForTile?.({ tileId: id })
-			.then(() => onReposition?.())
-			.catch(() => {});
+			.then(() => {
+				onTileClosed?.(id);
+				onReposition?.();
+			})
+			.catch(() => {
+				onTileClosed?.(id);
+				onReposition?.();
+			});
 		onReposition?.();
 		saveCanvasImmediate();
 	}

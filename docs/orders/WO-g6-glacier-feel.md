@@ -1,6 +1,6 @@
 # WO-g6 — Glacier feel: affordances, live ledger, framing
 
-status: open
+status: BUILT — evidence in docs/orders/evidence/wo-g6/
 assignee: builder
 depends: WO-g2 (tile spine), WO-g4 (shell/canvas), WO-g5 (cables) — all landed on `main`
 

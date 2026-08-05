@@ -11,6 +11,7 @@ import {
 	bezierPath,
 	SIDES,
 } from "./cable-math.js";
+import { cableStateLabel } from "./glacier-feel.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -26,9 +27,10 @@ export function runtimeHonoursViewConnections() {
 export function cableStrokeStyle(connection, honoured = runtimeHonoursViewConnections()) {
 	const solid = honoured && connection.kind === "view";
 	return {
-		strokeDasharray: solid ? "none" : "6 5",
+		strokeDasharray: solid ? "none" : "7 5",
 		hollowNodes: !solid,
 		className: solid ? "cable-path cable-path--live" : "cable-path cable-path--declared",
+		label: cableStateLabel(connection, honoured),
 	};
 }
 
@@ -54,6 +56,8 @@ export function createCableOverlay(svgEl, {
 	svgEl.appendChild(preview);
 
 	let selectedId = null;
+	/** @type {Set<string>} */
+	const settlingIds = new Set();
 
 	function tilesById() {
 		const map = new Map();
@@ -94,12 +98,20 @@ export function createCableOverlay(svgEl, {
 			path.setAttribute("d", d);
 			path.setAttribute("fill", "none");
 			path.setAttribute("class", style.className);
+			path.setAttribute("aria-label", style.label);
+			const title = document.createElementNS(SVG_NS, "title");
+			title.textContent = style.label;
+			path.appendChild(title);
 			if (style.strokeDasharray !== "none") {
 				path.setAttribute("stroke-dasharray", style.strokeDasharray);
 			}
 			path.dataset.connectionId = conn.id;
+			path.dataset.cableState = honoured ? "honoured" : "declared";
 			if (conn.id === selectedId) {
 				path.classList.add("cable-path--selected");
+			}
+			if (settlingIds.has(conn.id)) {
+				path.classList.add("cable-path--settle");
 			}
 			path.addEventListener("pointerdown", (e) => {
 				e.stopPropagation();
@@ -108,9 +120,31 @@ export function createCableOverlay(svgEl, {
 				redraw();
 			});
 			content.appendChild(path);
+
+			if (conn.id === selectedId) {
+				const midX = (a.x + b.x) / 2;
+				const midY = (a.y + b.y) / 2 - 10;
+				const label = document.createElementNS(SVG_NS, "text");
+				label.setAttribute("x", String(midX));
+				label.setAttribute("y", String(midY));
+				label.setAttribute("text-anchor", "middle");
+				label.setAttribute("class", "cable-label");
+				label.textContent = style.label;
+				content.appendChild(label);
+			}
 		}
 		syncNodeHonesty(honoured);
 		onRedrawNeeded?.();
+	}
+
+	function playSettle(connectionId) {
+		if (!connectionId) return;
+		settlingIds.add(connectionId);
+		redraw();
+		window.setTimeout(() => {
+			settlingIds.delete(connectionId);
+			redraw();
+		}, 520);
 	}
 
 	function syncNodeHonesty(honoured) {
@@ -187,6 +221,7 @@ export function createCableOverlay(svgEl, {
 
 	return {
 		redraw,
+		playSettle,
 		setPreview,
 		clearPreview,
 		screenToWorld,

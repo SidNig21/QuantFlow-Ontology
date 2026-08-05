@@ -23,6 +23,8 @@ import { createHandoffLayer } from "./handoff-layer.js";
 import { createCableOverlay } from "./cable-overlay.js";
 import { createCableController } from "./cable-controller.js";
 import { createCableInspector } from "./cable-inspector.js";
+import { createKernelLedger } from "./kernel-ledger.js";
+import { fitViewportToTiles } from "./glacier-feel.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -260,15 +262,17 @@ async function init() {
 
 	let agentWebview = null;
 	let canvasToastTimer = null;
-	function showCanvasToast(message) {
+	function showCanvasToast(message, { tone = "neutral" } = {}) {
 		const toast = document.getElementById("canvas-toast");
 		if (!toast) return;
 		window.clearTimeout(canvasToastTimer);
 		toast.textContent = message;
+		toast.dataset.tone = tone;
 		toast.classList.add("visible");
 		canvasToastTimer = window.setTimeout(() => {
 			toast.classList.remove("visible");
-		}, 2400);
+			delete toast.dataset.tone;
+		}, 2800);
 	}
 
 	initDock(panelAgent, {
@@ -474,8 +478,8 @@ async function init() {
 		onReposition: () => {
 			viewport.redrawGrid();
 			minimapRef?.update();
+			// D2: geometry-only redraw while dragging — do not re-fetch Kernel rows per frame.
 			cableOverlay?.redraw();
-			void cableController?.refresh();
 		},
 		onSaveDebounced(state) {
 			window.shellApi.canvasSaveState(
@@ -518,6 +522,9 @@ async function init() {
 		onTileDblClick(tile) {
 			edgeIndicators.panToTile(tile);
 		},
+		onTileClosed() {
+			void cableController?.refresh();
+		},
 	});
 
 	// -- Edge indicators --
@@ -546,6 +553,10 @@ async function init() {
 
 	function tidyTilesToGrid() {
 		const projected = tiles.map((tile) => ({ ...tile }));
+		if (projected.length === 0) {
+			showCanvasToast("Nothing to tidy", { tone: "neutral" });
+			return { placed: 0 };
+		}
 		const tidyMargin = 40;
 		const zoom = Math.max(viewportState.zoom, 0.01);
 		const result = repackTilesToGrid(projected, {
@@ -559,8 +570,40 @@ async function init() {
 		tileManager.applyTileLayout(projected);
 		edgeIndicators.update();
 		minimap.update();
-		showCanvasToast(formatTidyToast(result));
+		cableOverlay?.redraw();
+		void animateViewportFit(tiles);
+		showCanvasToast(formatTidyToast(result), { tone: "ok" });
 		return result;
+	}
+
+	function animateViewportFit(layoutTiles) {
+		const fit = fitViewportToTiles(
+			layoutTiles,
+			panelViewer.clientWidth,
+			panelViewer.clientHeight,
+			48,
+		);
+		if (!fit) return;
+		const start = {
+			panX: viewportState.panX,
+			panY: viewportState.panY,
+			zoom: viewportState.zoom,
+		};
+		const duration = 280;
+		const t0 = performance.now();
+		function ease(t) {
+			return 1 - (1 - t) ** 3;
+		}
+		function frame(now) {
+			const u = Math.min(1, (now - t0) / duration);
+			const e = ease(u);
+			viewportState.zoom = start.zoom + (fit.zoom - start.zoom) * e;
+			viewportState.panX = start.panX + (fit.panX - start.panX) * e;
+			viewportState.panY = start.panY + (fit.panY - start.panY) * e;
+			viewport.updateCanvas();
+			if (u < 1) requestAnimationFrame(frame);
+		}
+		requestAnimationFrame(frame);
 	}
 
 	// -- Canvas RPC --
@@ -620,6 +663,15 @@ async function init() {
 		});
 		void cableController.refresh();
 	}
+
+	createKernelLedger(document.getElementById("kernel-ledger"), {
+		listEvents: async () => {
+			const res = await window.shellApi.qf.listEvents({ limit: 40 });
+			if (!res?.ok) return [];
+			return Array.isArray(res.events) ? res.events : [];
+		},
+		onSubscribe: (cb) => window.shellApi.qf.onEventsInvalidate(cb),
+	});
 
 	edgeIndicators.update();
 	minimap.update();

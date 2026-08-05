@@ -12,7 +12,7 @@ describe("WO-g5 cable honesty", () => {
 
 	test("declared view cables are dashed with hollow nodes", () => {
 		const style = cableStrokeStyle({ kind: "view" }, false);
-		expect(style.strokeDasharray).toBe("6 5");
+		expect(style.strokeDasharray).toBe("7 5");
 		expect(style.hollowNodes).toBe(true);
 		expect(style.className).toContain("declared");
 	});

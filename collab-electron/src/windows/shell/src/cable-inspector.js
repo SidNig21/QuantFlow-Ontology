@@ -2,6 +2,7 @@
  * Minimal connection inspector (WO-g5). Honesty label reflects runtime honour.
  */
 import { runtimeHonoursViewConnections } from "./cable-overlay.js";
+import { cableStateLabel } from "./glacier-feel.js";
 
 /**
  * @param {HTMLElement | null} host
@@ -36,7 +37,7 @@ export function createCableInspector(host) {
 			`from       ${connection.from_ref}`,
 			`to         ${connection.to_ref}`,
 			`created_at ${connection.created_at ?? "n/a"}`,
-			`runtime    ${honoured ? "honours view" : "does not honour (dashed)"}`,
+			`state      ${cableStateLabel(connection, honoured)}`,
 		].join("\n");
 		host.appendChild(title);
 		host.appendChild(body);

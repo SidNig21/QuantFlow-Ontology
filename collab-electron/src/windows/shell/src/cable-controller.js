@@ -73,9 +73,16 @@ export function createCableController({
 				canvasTileIds: getTiles().map((t) => t.id),
 			});
 			await refresh();
+			overlay.playSettle?.(row?.id);
+			overlay.setSelectedId?.(row?.id);
+			showToast?.(
+				"Declared · no runtime honours this yet",
+				{ tone: "ok" },
+			);
 			return row;
 		} catch (err) {
-			showToast?.(err instanceof Error ? err.message : String(err));
+			const message = err instanceof Error ? err.message : String(err);
+			showToast?.(message, { tone: "reject" });
 			return null;
 		}
 	}

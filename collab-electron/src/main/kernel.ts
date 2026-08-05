@@ -299,7 +299,54 @@ export function kernelExecute<C extends string>(
   input: Record<string, unknown>,
   trace: TraceContext,
 ): ExecuteResultFor<C> {
-  return execute(getKernelDb(), command, input, trace);
+  const result = execute(getKernelDb(), command, input, trace);
+  notifyKernelEvents();
+  return result;
+}
+
+/** Newest-first Kernel receipt log for the shell ledger (projection only). */
+export function kernelListEvents(limit = 40): Array<{
+  id: string;
+  type: string;
+  object_type: string;
+  object_id: string;
+  created_at: string;
+}> {
+  const n = Math.max(1, Math.min(200, Math.floor(limit)));
+  return getKernelDb()
+    .query(
+      `SELECT id, type, object_type, object_id, created_at
+       FROM events
+       ORDER BY created_at DESC, id DESC
+       LIMIT ?`,
+    )
+    .all(n) as Array<{
+    id: string;
+    type: string;
+    object_type: string;
+    object_id: string;
+    created_at: string;
+  }>;
+}
+
+type EventsListener = () => void;
+const eventsListeners = new Set<EventsListener>();
+
+export function onKernelEvents(listener: EventsListener): () => void {
+  eventsListeners.add(listener);
+  return () => {
+    eventsListeners.delete(listener);
+  };
+}
+
+function notifyKernelEvents(): void {
+  for (const listener of eventsListeners) {
+    try {
+      listener();
+    } catch {
+      /* projection listeners must not break writes */
+    }
+  }
 }
 
 /** Unbounded artifact listing for IPC / boot logging (created_at DESC). */

@@ -82,6 +82,13 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:connections:delete", args),
     deleteConnectionsForTile: (args: { tileId: string }) =>
       ipcRenderer.invoke("qf:connections:deleteForTile", args),
+    listEvents: (args?: { limit?: number }) =>
+      ipcRenderer.invoke("qf:events:list", args ?? {}),
+    onEventsInvalidate: (cb: () => void) => {
+      const handler = () => cb();
+      ipcRenderer.on("qf:events:invalidate", handler);
+      return () => ipcRenderer.removeListener("qf:events:invalidate", handler);
+    },
     onDockInvalidate: (cb: () => void) => {
       const handler = () => cb();
       ipcRenderer.on("qf:dock:invalidate", handler);

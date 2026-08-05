@@ -717,6 +717,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "glacier-feel",
+    description:
+      "WO-g6: cable endpoints track tile geometry; Kernel ledger projection matches events",
+    run: async () => {
+      const { checkGlacierFeel } = await import("./gates/glacier-feel.ts");
+      return checkGlacierFeel().ok;
+    },
+  },
+  {
     name: "one-skin",
     description:
       "WO-006d/007: no raw hex/rgb/hsl or non-token font-family outside windows/shared/qf-tokens.css",
