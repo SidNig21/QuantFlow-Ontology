@@ -3,5 +3,9 @@
   "name": "qf-proof-agent",
   "command": "node",
   "entrypoint": "qf-proof-agent.mjs",
-  "profile_argv": ["--profile", "{runtime_profile}"]
+  "profile_argv": ["--profile", "{runtime_profile}"],
+  "peer_delivery": {
+    "mode": "pty_role",
+    "runtime_profiles": ["qf-proof-orchestrator", "qf-proof-worker"]
+  }
 }

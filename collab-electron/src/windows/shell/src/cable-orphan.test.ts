@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 
 /**
- * Orphan-cascade selection (WO-g5). Kernel delete is covered by
- * packages/qf-kernel connection-actions tests; this asserts the tile-touch
+ * Orphan-cascade selection (WO-g5). Kernel deletion is covered by the
+ * connection-action tests; this asserts the tile-touch
  * filter that the IPC cascade uses (no FK on connection.from_ref/to_ref).
  */
 function parseTileId(portRef: string): string {
