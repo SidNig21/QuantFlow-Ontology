@@ -132,8 +132,9 @@ export async function admitNativeTuiDefinition(opts: {
   // MCP bridges attach by peer-delivery + WSL contract — never by species id.
   const wantsQuantFlowMcpBridges =
     Boolean(opts.peerDelivery) &&
-    opts.terminalTarget?.startsWith("wsl:") === true &&
     Boolean(opts.role);
+  const usesWslMcpLauncher =
+    wantsQuantFlowMcpBridges && opts.terminalTarget?.startsWith("wsl:") === true;
   const collaborationBridge = wantsQuantFlowMcpBridges
     ? resolveCollaborationResourcePath("qf-collaboration-mcp.mjs", {
         resourcesPath: process.resourcesPath,
@@ -146,20 +147,23 @@ export async function admitNativeTuiDefinition(opts: {
         moduleDir: __dirname,
       })
     : null;
-  const mcpLaunchWrapper = wantsQuantFlowMcpBridges
+  const mcpLaunchWrapper = usesWslMcpLauncher
     ? resolveCollaborationResourcePath("qf-hermes-launch.sh", {
         resourcesPath: process.resourcesPath,
         moduleDir: __dirname,
       })
     : null;
-  if (wantsQuantFlowMcpBridges && (!collaborationBridge || !ontologyBridge || !mcpLaunchWrapper)) {
+  if (
+    wantsQuantFlowMcpBridges &&
+    (!collaborationBridge || !ontologyBridge || (usesWslMcpLauncher && !mcpLaunchWrapper))
+  ) {
     throw new Error(
       "Seat unavailable: QuantFlow collaboration resources are missing. " +
       "Reinstall QuantFlow or run the development app.",
     );
   }
   const guestCommand = opts.command ?? adapterId;
-  const wslPrerequisite = wantsQuantFlowMcpBridges
+  const wslPrerequisite = usesWslMcpLauncher
     ? classifyWslNativeTuiPrerequisites({
         platform: process.platform,
         homeDir: hostHome,
@@ -171,7 +175,7 @@ export async function admitNativeTuiDefinition(opts: {
       })
     : null;
   if (wslPrerequisite) throw new Error(wslPrerequisite.message);
-  const useQuantFlowMcpLaunch = wantsQuantFlowMcpBridges;
+  const useQuantFlowMcpLaunch = usesWslMcpLauncher;
   const wrapperGuestPath = useQuantFlowMcpLaunch
     ? hostPathToGuestPath(mcpLaunchWrapper!, opts.terminalTarget!)
     : null;
@@ -179,13 +183,13 @@ export async function admitNativeTuiDefinition(opts: {
     throw new Error("QuantFlow could not map its MCP launch bridge into WSL");
   }
   // Hermes-only profile isolation (species adapter detail, not shared MCP path).
-  const hermesProfileRootGuest = adapterId === "hermes" && wantsQuantFlowMcpBridges
+  const hermesProfileRootGuest = adapterId === "hermes" && usesWslMcpLauncher
     ? resolveHermesProfileGuestRoot(
         opts.terminalTarget!,
         QF_APP_DIR,
       )
     : null;
-  if (adapterId === "hermes" && wantsQuantFlowMcpBridges && !hermesProfileRootGuest) {
+  if (adapterId === "hermes" && usesWslMcpLauncher && !hermesProfileRootGuest) {
     throw new Error(
       "Hermes unavailable: QuantFlow's isolated Hermes profile path could not be mapped into WSL",
     );
@@ -263,6 +267,12 @@ export async function admitNativeTuiDefinition(opts: {
             QF_PEER_ROLE: opts.role ?? "",
             QF_LAUNCH_READY_NONCE: readinessNonce,
             QF_LIVE_SEAT_CAPABILITY: seatCapability,
+            ...(collaborationBridge
+              ? { QF_COLLABORATION_MCP_PATH: collaborationBridge }
+              : {}),
+            ...(ontologyBridge
+              ? { QF_ONTOLOGY_MCP_PATH: ontologyBridge }
+              : {}),
             QF_APP_RPC_ENDPOINT:
               process.env.QF_APP_RPC_ENDPOINT ?? makeEndpointPath("ipc"),
           },
