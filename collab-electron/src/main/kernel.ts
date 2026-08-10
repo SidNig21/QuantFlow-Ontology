@@ -24,6 +24,10 @@ import {
 import { schema } from "qf-kernel-schema";
 import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp";
 import { QF_APP_DIR } from "./paths";
+import {
+  projectTaskDelegations,
+  type TaskDelegationProjection,
+} from "./task-delegation-projection";
 
 function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
   return {
@@ -120,19 +124,6 @@ export type PeerBusMessage = {
   reply_to_artifact_id: string | null;
   created_at: string;
   delivered: number;
-};
-
-export type PeerHandoff = {
-  taskArtifactId: string;
-  fromRole: string;
-  toRole: string;
-  fromSessionId: string;
-  toSessionId: string;
-  task: string;
-  resultArtifactId: string | null;
-  result: string | null;
-  status: "requested" | "completed";
-  createdAt: string;
 };
 
 function openPeerBus(path: string): DatabaseSync {
@@ -252,46 +243,13 @@ export function peerBusReadInbox(
   }
 }
 
-/** Read-only canvas projection. Transport rows supply copy; Kernel links authorize status. */
-export function peerBusListHandoffs(path: string): PeerHandoff[] {
-  const db = openPeerBus(path);
-  try {
-    const rows = db.prepare(
-      `SELECT id, from_role, to_role, from_session_id, to_session_id, artifact_id,
-              body, message_kind, reply_to_artifact_id, created_at, delivered
-       FROM messages ORDER BY created_at ASC`,
-    ).all() as PeerBusMessage[];
-    const results = rows.filter((row) => row.message_kind === "result");
-    return rows
-      .filter((row) => row.message_kind === "task")
-      .filter((row) => row.from_session_id && row.to_session_id)
-      .filter((row) => kernelGetLinks(row.artifact_id, { kind: "produces" })
-        .some((link) => link.from_id === row.from_session_id && link.to_id === row.artifact_id))
-      .map((task) => {
-        const result = results.find((row) => {
-          if (row.reply_to_artifact_id !== task.artifact_id) return false;
-          const produced = kernelGetLinks(row.artifact_id, { kind: "produces" })
-            .some((link) => link.from_id === row.from_session_id && link.to_id === row.artifact_id);
-          const derived = kernelGetLinks(row.artifact_id, { kind: "derived_from" })
-            .some((link) => link.from_id === row.artifact_id && link.to_id === task.artifact_id);
-          return produced && derived;
-        });
-        return {
-          taskArtifactId: task.artifact_id,
-          fromRole: task.from_role,
-          toRole: task.to_role,
-          fromSessionId: task.from_session_id!,
-          toSessionId: task.to_session_id!,
-          task: task.body,
-          resultArtifactId: result?.artifact_id ?? null,
-          result: result?.body ?? null,
-          status: result ? "completed" : "requested",
-          createdAt: task.created_at,
-        };
-      });
-  } finally {
-    db.close();
-  }
+/** Read-only canvas projection from durable Kernel task and identity links. */
+export function kernelListTaskDelegations(): TaskDelegationProjection[] {
+  return projectTaskDelegations({
+    listTasks: () => kernelQueryObjects("task", {}, null, 0, "asc"),
+    linksFrom: (id, kind) => kernelGetLinks(id, { kind }).filter((link) => link.from_id === id),
+    getObject: kernelGetObject,
+  });
 }
 
 export function kernelExecute<C extends string>(

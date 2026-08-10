@@ -25,8 +25,8 @@ import {
   kernelListAgentSessions,
   kernelListArtifacts,
   kernelListEvents,
+  kernelListTaskDelegations,
   onKernelEvents,
-  peerBusListHandoffs,
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
@@ -198,9 +198,7 @@ export function registerKernelHandlers(): void {
   ipcMain.handle("qf:handoffs:list", (event) => {
     try {
       assertTrustedSender(event);
-      const busDb = process.env.QF_PEER_BUS_DB;
-      if (!busDb) throw new Error("peer-bus is not initialized");
-      return { ok: true as const, handoffs: peerBusListHandoffs(busDb) };
+      return { ok: true as const, handoffs: kernelListTaskDelegations() };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }
@@ -459,5 +457,6 @@ export function registerKernelHandlers(): void {
 
   onKernelEvents(() => {
     broadcast("qf:events:invalidate");
+    sendToShell("shell:forward", "canvas", "handoffs-changed");
   });
 }

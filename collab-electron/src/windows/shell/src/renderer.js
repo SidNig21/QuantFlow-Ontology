@@ -19,7 +19,10 @@ import { initDock } from "./dock.js";
 import { formatTidyToast, repackTilesToGrid } from "./canvas-layout.js";
 import { createFlowCubeWatermark } from "../../shared/flow-cube/flow-cube-watermark.js";
 import { centerCanvasCoords } from "./canvas-place.js";
-import { createHandoffLayer } from "./handoff-layer.js";
+import {
+	createHandoffLayer,
+	refreshTaskDelegationCanvas,
+} from "./handoff-layer.js";
 import { createCableOverlay } from "./cable-overlay.js";
 import { createCableController } from "./cable-controller.js";
 import { createCableInspector } from "./cable-inspector.js";
@@ -163,10 +166,6 @@ async function init() {
 		viewportState,
 		getTiles: () => tiles,
 	});
-	async function refreshHandoffs() {
-		const response = await window.shellApi.qf.listHandoffs();
-		if (response?.ok) handoffLayer.setHandoffs(response.handoffs);
-	}
 
 	// -- State --
 
@@ -675,38 +674,42 @@ async function init() {
 
 	edgeIndicators.update();
 	minimap.update();
-	void refreshHandoffs();
 
 	/**
-	 * Project Kernel agent_session rows onto the canvas. Tiles hold sessionId
-	 * refs only — appearance follows Kernel truth, not Dock click callbacks.
+	 * Project Kernel task endpoints and live sessions onto the canvas. Tiles hold
+	 * sessionId refs only — appearance follows Kernel truth, not click callbacks.
 	 */
-	async function reconcileKernelSessionTiles() {
-		const response = await window.shellApi.qf.listSessions();
-		if (!response?.ok || !Array.isArray(response.sessions)) return;
+	async function reconcileTaskDelegationCanvas() {
 		let added = false;
-		for (const session of response.sessions) {
-			const sessionId =
-				typeof session.id === "string" ? session.id : null;
-			if (!sessionId) continue;
-			const status =
-				typeof session.status === "string" ? session.status : "";
-			if (status === "closed" || status === "failed" || status === "cancelled") {
-				continue;
-			}
-			const existing = tiles.find((t) => t.sessionId === sessionId);
-			if (existing) continue;
-			const size = defaultSize("session");
-			const pos = findAutoPlacement(tiles, size.width, size.height);
-			tileManager.createSessionTile(pos.x, pos.y, sessionId);
-			added = true;
-		}
+		await refreshTaskDelegationCanvas({
+			listHandoffs: () => window.shellApi.qf.listHandoffs(),
+			listSessions: () => window.shellApi.qf.listSessions(),
+			ensureSessionTile(sessionId) {
+				if (tiles.some((tile) => tile.sessionId === sessionId)) return;
+				const size = defaultSize("session");
+				const pos = findAutoPlacement(tiles, size.width, size.height);
+				tileManager.createSessionTile(pos.x, pos.y, sessionId);
+				added = true;
+			},
+			setHandoffs: (handoffs) => handoffLayer.setHandoffs(handoffs),
+		});
 		if (added) minimap.update();
 	}
-	void reconcileKernelSessionTiles();
-	setInterval(() => {
-		void reconcileKernelSessionTiles();
-	}, 1500);
+
+	let taskProjectionReady = false;
+	let taskProjectionRefresh = Promise.resolve();
+	function scheduleTaskProjectionRefresh() {
+		if (!taskProjectionReady) return taskProjectionRefresh;
+		taskProjectionRefresh = taskProjectionRefresh
+			.then(
+				() => reconcileTaskDelegationCanvas(),
+				() => reconcileTaskDelegationCanvas(),
+			)
+			.catch((error) => {
+				console.error("task delegation projection refresh failed", error);
+			});
+		return taskProjectionRefresh;
+	}
 
 	// -- Agent panel init (after tileManager, since getAllWebviews references it) --
 
@@ -1312,11 +1315,11 @@ async function init() {
 					);
 				}
 			} else if (target === "canvas") {
-				if (channel === "handoffs-changed") {
-					void refreshHandoffs();
-				}
-				if (channel === "sessions-changed") {
-					void reconcileKernelSessionTiles();
+				if (
+					channel === "handoffs-changed" ||
+					channel === "sessions-changed"
+				) {
+					void scheduleTaskProjectionRefresh();
 				}
 				if (channel === "open-terminal") {
 					const cwd = args[0];
@@ -1827,6 +1830,12 @@ async function init() {
 			tileManager.saveCanvasDebounced();
 		}
 	}
+
+	taskProjectionReady = true;
+	void scheduleTaskProjectionRefresh();
+	setInterval(() => {
+		void scheduleTaskProjectionRefresh();
+	}, 1500);
 
 	// -- Initialize workspaces --
 
