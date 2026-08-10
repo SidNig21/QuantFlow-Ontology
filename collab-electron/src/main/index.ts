@@ -45,6 +45,7 @@ import {
   kernelGetObject,
   kernelListAgentDefinitions,
   kernelListAgentSessions,
+  kernelListTaskDelegations,
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
   peerBusReadInbox,
@@ -1074,6 +1075,11 @@ app.whenReady().then(async () => {
       return { output: pty.captureSession(sessionId, 200) };
     },
     { description: "Capture a spawned proof tile's terminal output for the Windows gate." },
+  );
+  registerMethod(
+    "qf.task_delegations.list",
+    () => kernelListTaskDelegations(),
+    { description: "Read Kernel-backed task delegation projection." },
   );
   registerMethod("workspace.getConfig", () => config, {
     description: "Return the current app configuration",

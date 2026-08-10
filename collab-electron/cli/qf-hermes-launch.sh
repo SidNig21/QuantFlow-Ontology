@@ -77,7 +77,7 @@ if [[ -z "${QF_LAUNCH_READY_NONCE:-}" ]]; then
   echo "QuantFlow launcher readiness nonce is missing." >&2
   exit 2
 fi
-printf 'QF_LAUNCH_READY %s\nQF_LAUNCH_COMMIT %s\n' \
+printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
   "$QF_LAUNCH_READY_NONCE" "$QF_LAUNCH_READY_NONCE"
 unset QF_LAUNCH_READY_NONCE
 

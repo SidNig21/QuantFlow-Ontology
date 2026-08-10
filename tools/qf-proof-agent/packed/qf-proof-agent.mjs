@@ -375,8 +375,11 @@ async function nextNotification(reader, kind, expectedTaskId) {
 export async function runProof({ env = process.env, input = process.stdin, output = process.stdout, spawnChild } = {}) {
   const config = proofLaunchConfig(env);
   const reader = new PtyLineReader(input);
-  output.write(`QF_LAUNCH_READY ${config.readinessNonce}\n`);
-  output.write(`QF_LAUNCH_COMMIT ${config.readinessNonce}\n`);
+  // ConPTY may inject its own startup/title control sequence immediately
+  // before either write. Start each nonce frame on a fresh terminal line so
+  // the main process can match the exact, unadorned receipt.
+  output.write(`\nQF_LAUNCH_READY ${config.readinessNonce}\n`);
+  output.write(`\nQF_LAUNCH_COMMIT ${config.readinessNonce}\n`);
   // The one founder Submit activation belongs to the orchestrator. A worker is
   // started only after that activation and its one instruction is the bounded
   // app-delivered task notification from collaboration.

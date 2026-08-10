@@ -10,6 +10,20 @@ test("readiness accepts one READY followed by COMMIT across split chunks", async
   await expect(waiter.wait()).resolves.toBeUndefined();
 });
 
+test("readiness accepts exact receipts after ConPTY control frames", async () => {
+  const waiter = createLauncherReadinessWaiter("session", "nonce", 100);
+  waiter.push(Buffer.from("\u001b[?9001h\u001b[2;1HQF_LAUNCH_READY nonce\r\n"));
+  waiter.push(Buffer.from("\u001b]0;node.exe\u0007\u001b[?25h\r\nQF_LAUNCH_COMMIT nonce\r\n"));
+  await waiter.wait();
+});
+
+test("readiness rejects ordinary text before a receipt", async () => {
+  const waiter = createLauncherReadinessWaiter("session", "nonce", 100);
+  waiter.push(Buffer.from("not-terminal-text QF_LAUNCH_READY nonce\n"));
+  waiter.push(Buffer.from("QF_LAUNCH_COMMIT nonce\n"));
+  await expect(waiter.wait()).rejects.toThrow("without exactly one READY");
+});
+
 test("readiness rejects duplicate READY across separate chunks before COMMIT", async () => {
   const waiter = createLauncherReadinessWaiter("session-a", "nonce", 1_000);
   waiter.push(Buffer.from("QF_LAUNCH_READY nonce\n"));

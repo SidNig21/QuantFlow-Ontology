@@ -6,6 +6,34 @@ export type LauncherReadinessWaiter = {
   cancel(): void;
 };
 
+/** Remove only terminal-emulator control frames at the start of a PTY line. */
+function stripTerminalPrefix(line: string): string {
+  let rest = line;
+  while (rest.startsWith("\u001b")) {
+    if (rest.startsWith("\u001b[")) {
+      const end = [...rest].findIndex((char, index) =>
+        index >= 2 && char.charCodeAt(0) >= 0x40 && char.charCodeAt(0) <= 0x7e
+      );
+      if (end < 0) return line;
+      rest = rest.slice(end + 1);
+      continue;
+    }
+    if (rest.startsWith("\u001b]")) {
+      const bell = rest.indexOf("\u0007", 2);
+      const terminator = rest.indexOf("\u001b\\", 2);
+      const end = bell >= 0 && (terminator < 0 || bell < terminator)
+        ? bell + 1
+        : terminator >= 0 ? terminator + 2 : -1;
+      if (end < 0) return line;
+      rest = rest.slice(end);
+      continue;
+    }
+    if (rest.length < 2) return line;
+    rest = rest.slice(2);
+  }
+  return rest.replace(/^\r+/, "");
+}
+
 export function createLauncherReadinessWaiter(
   sessionId: string,
   nonce: string,
@@ -35,6 +63,7 @@ export function createLauncherReadinessWaiter(
   }
 
   function inspectLine(line: string): void {
+    line = stripTerminalPrefix(line);
     if (line === ready) {
       readyCount += 1;
       if (readyCount !== 1) {

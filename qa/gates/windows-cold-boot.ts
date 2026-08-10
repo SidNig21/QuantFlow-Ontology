@@ -319,6 +319,7 @@ export function rpcCall(
   endpoint: string,
   method: string,
   params: Record<string, unknown> = {},
+  timeoutMs = RPC_TIMEOUT_MS,
 ): Promise<unknown> {
   return new Promise((resolveResult, reject) => {
     const socket = createConnection(endpoint);
@@ -330,7 +331,7 @@ export function rpcCall(
       settled = true;
       socket.destroy();
       reject(new Error(`RPC timeout: ${method}`));
-    }, RPC_TIMEOUT_MS);
+    }, timeoutMs);
     const finish = (callback: () => void): void => {
       if (settled) return;
       settled = true;
