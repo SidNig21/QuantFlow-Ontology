@@ -226,6 +226,9 @@ export async function admitNativeTuiDefinition(opts: {
         ...(process.env.QF_PEER_BUS_DB
           ? { QF_PEER_BUS_DB: process.env.QF_PEER_BUS_DB }
           : { QF_PEER_BUS_DB: join(home, ".qf-peer-bus", "peer-bus.db") }),
+        ...(process.env.QF_PROOF_NONCE
+          ? { QF_PROOF_NONCE: process.env.QF_PROOF_NONCE }
+          : {}),
         QF_AGENT_SESSION_ID: sessionId,
         QF_PEER_ROLE: opts.role ?? "",
         QF_APP_RPC_ENDPOINT:

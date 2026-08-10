@@ -7,6 +7,13 @@
     "--profile",
     "{runtime_profile}"
   ],
+  "peer_delivery": {
+    "mode": "pty_role",
+    "runtime_profiles": [
+      "qf-proof-orchestrator",
+      "qf-proof-worker"
+    ]
+  },
   "package": "qf-proof-agent.aospkg",
   "tools": []
 }

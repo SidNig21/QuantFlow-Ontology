@@ -76,6 +76,7 @@ async function send(toRole, message) {
     from_role: role,
     to_role: toRole,
     message,
+    kind: "task",
     bus_db: busDb,
   });
 }
