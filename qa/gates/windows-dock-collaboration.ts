@@ -8,6 +8,7 @@
  * CI reach (WO-g7): not part of `bun qa/verify-release.ts` (~100s packaged-app
  * cost). Exercised by `.github/workflows/packaged-app.yml`.
  */
+import { createHash } from "node:crypto";
 import { spawn, type ChildProcess } from "node:child_process";
 import { Database } from "bun:sqlite";
 import {
@@ -15,10 +16,17 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { join } from "node:path";
+import {
+  basename,
+  isAbsolute,
+  join,
+  relative,
+  resolve as resolvePath,
+} from "node:path";
 import {
   buildWindowsPackage,
   collectOwnedPids,
@@ -247,9 +255,48 @@ function assertReceipts(
     assert(sessions.every((row) => row.status === "closed"), "proof sessions were not closed");
     const links = kernel.prepare("SELECT kind FROM links WHERE kind = 'spawned_from'").all();
     assert(links.length === 2, "Kernel session lineage did not contain two spawned_from links");
-    const trajectories = kernel.prepare("SELECT storage_ref FROM artifact WHERE kind = 'trajectory'").all() as Array<{ storage_ref: string }>;
+    const trajectories = kernel.prepare(
+      "SELECT id, content_hash, storage_ref FROM artifact WHERE kind = 'trajectory'",
+    ).all() as Array<{
+      id: string;
+      content_hash: string;
+      storage_ref: string;
+    }>;
     assert(trajectories.length === 2, "Kernel did not record both peer trajectories");
-    assert(trajectories.every((row) => row.storage_ref.startsWith("peer://")), "trajectory storage refs are not peer-bus receipts");
+    let handoffRoot: string;
+    try {
+      handoffRoot = realpathSync.native(
+        resolvePath(run.artifactRoot, "peer-handoffs"),
+      );
+    } catch {
+      throw new Error("peer receipt root is missing or inaccessible");
+    }
+    for (const row of trajectories) {
+      assert(existsSync(row.storage_ref), `peer receipt missing: ${row.storage_ref}`);
+      let receiptPath: string;
+      try {
+        receiptPath = realpathSync.native(resolvePath(row.storage_ref));
+      } catch {
+        throw new Error(`peer receipt is missing or inaccessible: ${row.storage_ref}`);
+      }
+      const rel = relative(handoffRoot, receiptPath);
+      assert(
+        rel !== "" && !rel.startsWith("..") && !isAbsolute(rel),
+        `peer receipt escaped isolated artifact root: ${row.storage_ref}`,
+      );
+      assert(
+        basename(receiptPath) === `${row.content_hash}.json`,
+        `peer receipt filename does not match content_hash: ${receiptPath}`,
+      );
+      const digest = createHash("sha256")
+        .update(readFileSync(receiptPath))
+        .digest("hex");
+      assert(digest === row.id, `peer receipt bytes do not match artifact id: ${receiptPath}`);
+      assert(
+        digest === row.content_hash,
+        `peer receipt bytes do not match content_hash: ${receiptPath}`,
+      );
+    }
     const messages = bus.prepare("SELECT from_role, to_role FROM messages").all() as Array<{ from_role: string; to_role: string }>;
     assert(messages.some((row) => row.from_role === "orchestrator" && row.to_role === "worker"), "peer-bus task direction missing");
     assert(messages.some((row) => row.from_role === "worker" && row.to_role === "orchestrator"), "peer-bus ACK direction missing");
