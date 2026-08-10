@@ -1,24 +1,24 @@
-# NEXT — R9 (blocked: Act I founder sign-off)
+# NEXT — R9 (pre-R9 golden-path repair authorized)
 
-status: BLOCKED
+status: PRE-R9 REPAIR AUTHORIZED
 authorized-by: founder
-authorized-at: 2026-08-03
+authorized-at: 2026-08-10
 baseline: R0–R8 complete on `act-i-ladder`
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) Part IV · R9
 
-> Act I ladder build (R0–R8) is gated green. **Do not start R9** until the founder
-> reads the FOUNDER-REVIEW queue and signs off Act I. This file names R9 only so
-> `rung-ladder` keeps exactly one active rung.
+> R9 remains the one active rung for `rung-ladder`, but the founder authorizes
+> **only** the pre-R9 repair in [`WO-ACT1-GOLDEN-PATH.md`](WO-ACT1-GOLDEN-PATH.md).
+> It joins the already-built Act I planks into one packaged Windows golden run and
+> produces the founder sign-off evidence. It does not implement R9.
 
-## Founder gate before R9
+## Authorized work
 
-1. Read `docs/orders/evidence/r3/FOUNDER-REVIEW.md`
-2. Read `docs/orders/evidence/r6/FOUNDER-REVIEW.md`
-3. Read `docs/orders/evidence/r8/FOUNDER-REVIEW.md`
-4. Watch one end-to-end golden run
-5. Authorize R9 in a fresh NEXT rewrite
+Build `WO-ACT1-GOLDEN-PATH.md` exactly. The deterministic packaged proof and the
+founder-only normal-mode Hermes proof must remain distinct. Do not claim the
+deterministic proof is live-model behavior.
 
 ## Stop
 
-No builder implements R9 under this authorization. No claim that Act I is complete
-without founder sign-off.
+No builder implements R9, alters R9 semantics, or begins R10–R14 under this
+authorization. After the repaired golden run is accepted by the founder, the
+verifier writes a fresh NEXT authorization for R9.

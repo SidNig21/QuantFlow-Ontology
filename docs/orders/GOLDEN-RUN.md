@@ -11,7 +11,8 @@
 
 ## Part I — The golden run
 
-QuantFlow v1 is done when the founder can sit down at a Windows machine and watch this happen.
+**Act I desk acceptance** is complete when the founder can sit down at a Windows machine and watch
+this happen. It proves the working desk; it is not the complete QuantFlow v1 release.
 
 > **You type a research question into the canvas.**
 >
@@ -28,7 +29,7 @@ QuantFlow v1 is done when the founder can sit down at a Windows machine and watc
 > **You close the app. You reopen it. Everything is still there** — because none of it lived in the
 > UI. The canvas was reading the Kernel the whole time.
 
-### Why this is the goal and not something more ambitious
+### Why this Act I gate matters
 
 Because it is **observable**. You can watch it succeed or watch it fail, without reading code, a
 report, or a status table. Every previous definition of done in this repository was a claim someone
@@ -63,9 +64,10 @@ cd qf-kernel-schema && bun test && bun run generate   # schema + regenerate gold
 boots, a Dock that spawns real Hermes CLI seats through WSL, durable task/result handoffs recorded as
 Kernel artifacts, canvas projection, close/reopen recovery, and clean shutdown.
 
-**The gap that defines the whole plan:** the generated ontology tools are **not connected to any
-seat**. `tools/qf-read-tools` serves them; nothing in the running app consumes it. Agents today get a
-mailbox and no world. Closing that is R1, and every rung after it depends on R1 existing.
+**The remaining Act I gap:** Dock seats already reach generated ontology tools through the app-owned
+gateway, but the question, hire, task, result, and canvas proofs were built as separate slices. The
+pre-R9 golden-path repair makes those existing seams one continuous packaged workflow. It does not
+claim live market data or research judgment.
 
 **Known open items, carried honestly:** the legacy ACP surface denies permissions but still exposes
 unconfined file read/write (R7). `resolve_hypothesis` and `publish_artifact` have no evidence guards
@@ -107,14 +109,23 @@ reopen.
 | **R11b** | Large | The quantitative metrics are *correct*, proven against a hand-calculated fixture |
 | **R12** | Large | An independent critic evaluates, and a Report cannot publish without a passing Evaluation |
 
-### Act III — after there is history to learn from
+R10, R11a, R11b, and R12 create the substrate R14 needs: immutable point-in-time datasets,
+deterministic execution, validated quantitative outcomes, and independent Evaluation history. Recall
+or learning has no honest fitness signal until those facts exist in the Kernel.
+
+### Act III — Windows v1 release
 
 | # | Size | Proves |
 |---|---|---|
-| **R13** | Large | Domain tiles, semantic cables, workflow recovery, onboarding, signed release |
+| **R13** | Large | Windows v1: domain tiles, semantic cables, workflow recovery, onboarding, signed release |
+
+### Act IV — post-v1 learning
+
+| # | Size | Proves |
+|---|---|---|
 | **R14** | Large | Recall over real Evaluation history; RL — Track A playbook first, Track B weights after |
 
-R14 is last because it is *downstream*, not because it is unimportant. Evaluation history cannot
+R14 is post-v1 because it is *downstream*, not because it is unimportant. Evaluation history cannot
 become a fitness function before evaluation history exists. The schema hooks are already seeded —
 `policy`, `environment`, and `run.kind: "training"` all exist today.
 
