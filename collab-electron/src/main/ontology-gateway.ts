@@ -26,6 +26,8 @@ import {
 } from "./kernel";
 import { notifySessionCanvasProjection } from "./session-canvas-projector";
 import { invokePrecreatedStart } from "./precreated-start-ownership";
+import { ontologyTrajectoryContext } from "./ontology-trajectory-context";
+import { ontologyReadReceiptEligible } from "./ontology-read-dispatch";
 
 type RegisterMethod = typeof registerMethod;
 
@@ -49,6 +51,7 @@ function recordTrajectory(
   toolName: string,
   args: Record<string, unknown>,
   result: unknown,
+  issueReadReceipt = false,
 ): { artifactId: string } {
   const createdAt = new Date().toISOString();
   const payload = JSON.stringify(
@@ -79,7 +82,7 @@ function recordTrajectory(
       content_hash: contentHash,
       links: [{ kind: "produces", from_id: identity.sessionId }],
     },
-    { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+    ontologyTrajectoryContext(identity, toolName, issueReadReceipt),
   ) as { object_id: string };
   return { artifactId: artifact.object_id };
 }
@@ -133,17 +136,23 @@ export function callOntologyReadTool(
       args.direction === "from" || args.direction === "to" || args.direction === "both"
         ? args.direction
         : undefined;
-    result = kernelGetLinks(id, { kind, direction });
+    result = kernelGetLinks(id, kind ? { kind } : undefined).filter((link) =>
+      direction === "from" ? link.from_id === id : link.to_id === id
+    );
   }
-  const { artifactId } = recordTrajectory(identity, toolName, args, result);
+  const { artifactId } = recordTrajectory(
+    identity,
+    toolName,
+    args,
+    result,
+    ontologyReadReceiptEligible(toolName, kernelCapabilityGroupForTool(toolName)),
+  );
   return { result, artifactId };
 }
 
 const HIRE_ACTIONS = new Set([
   "create_agent_session",
   "start_agent_session",
-  "create_task",
-  "complete_task",
 ]);
 
 /** Granted desk actions (hire path) plus generated reads. */
@@ -186,6 +195,7 @@ export async function callOntologyTool(
     : kernelExecute(action, input, {
         trace_id: crypto.randomUUID(),
         span_id: crypto.randomUUID(),
+        actor_session_id: identity.sessionId,
       });
   notifySessionCanvasProjection();
   const { artifactId } = recordTrajectory(identity, toolName, input, result);

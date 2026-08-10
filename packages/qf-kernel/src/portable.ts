@@ -71,6 +71,7 @@ export type {
   PipelineExecuteResult,
 } from "./results.ts";
 export { contentHash } from "./hash.ts";
+export { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 export { replayArtifactAndAssert, replayRunAndAssert } from "./replay.ts";
 export {
   resolvePackageRef,

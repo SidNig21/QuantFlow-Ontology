@@ -40,14 +40,22 @@ import {
   getArtifactRoot,
   getKernelDb,
   kernelExecute,
+  kernelCapabilityGroupsForSession,
   kernelGetLinks,
   kernelGetObject,
   kernelListAgentDefinitions,
   kernelListAgentSessions,
+  kernelMarketObjectExists,
+  kernelReadMarketTrajectoryResult,
   peerBusReadInbox,
-  peerBusSend,
+  peerBusNotify,
+  commitCollaborationResult,
 } from "./kernel";
 import { registerOntologyGatewayRpc } from "./ontology-gateway";
+import { registerCollaborationGatewayRpc } from "./collaboration-gateway";
+import { resolveLivePeerRecipient } from "./live-peer-recipient";
+import { livePtyIdsForRole } from "./peer-delivery";
+import { kernelSessionIdForNativePty } from "./host-native-tui";
 import { requireLiveSeatCapability } from "./live-seat-capability";
 import { buildMissionActivationInstruction } from "./mission-activation";
 import { registerIntegrationsIpc } from "./integrations";
@@ -109,8 +117,12 @@ function requirePeerSessionRole(
   if (typeof claimedRole !== "string" || claimedRole.length === 0) {
     throw new Error("peer-bus requires role");
   }
-  const link = kernelGetLinks(sessionId, { kind: "spawned_from" })[0];
-  const definitionId = link?.to_id;
+  const links = kernelGetLinks(sessionId, { kind: "spawned_from" })
+    .filter((link) => link.from_id === sessionId);
+  if (links.length !== 1 || !links[0]!.to_id) {
+    throw new Error(`peer-bus requires exactly one outgoing spawned_from for ${sessionId}`);
+  }
+  const definitionId = links[0]!.to_id;
   const definition = definitionId
     ? kernelGetObject("agent_definition", definitionId)
     : null;
@@ -133,18 +145,28 @@ function requireLivePeerSession(role: unknown): { sessionId: string; role: strin
   if (typeof role !== "string" || role.length === 0) {
     throw new Error("peer-bus requires to_role");
   }
-  for (const session of kernelListAgentSessions()) {
-    if (String(session.status ?? "") !== "running") continue;
-    const sessionId = String(session.id ?? "");
-    if (!sessionId) continue;
-    try {
-      const identity = requirePeerSessionRole(sessionId, role);
-      return identity;
-    } catch {
-      // This running session belongs to another Dock role.
-    }
+  return resolveLivePeerRecipient(role, {
+    ptyIdsForRole: livePtyIdsForRole,
+    kernelSessionForPty: kernelSessionIdForNativePty,
+    getSession: (sessionId) => kernelGetObject("agent_session", sessionId),
+    identityForSession: peerIdentityForSession,
+  });
+}
+
+function peerIdentityForSession(sessionId: string): { sessionId: string; role: string } {
+  const links = kernelGetLinks(sessionId, { kind: "spawned_from" })
+    .filter((link) => link.from_id === sessionId);
+  if (links.length !== 1 || !links[0]!.to_id) {
+    throw new Error(`collaboration session must have exactly one spawned_from: ${sessionId}`);
   }
-  throw new Error(`peer-bus requires a live recipient for role ${role}`);
+  const definition = links[0]!.to_id
+    ? kernelGetObject("agent_definition", links[0]!.to_id)
+    : null;
+  const role = definition?.role;
+  if (typeof role !== "string" || role.length === 0) {
+    throw new Error(`collaboration session identity is missing for ${sessionId}`);
+  }
+  return requirePeerSessionRole(sessionId, role);
 }
 
 // Capture Electron's legacy default before replacing it. The migration must
@@ -1056,49 +1078,29 @@ app.whenReady().then(async () => {
   registerMethod("workspace.getConfig", () => config, {
     description: "Return the current app configuration",
   });
-  registerMethod(
-    "qf.peer-bus.send_to_peer",
-    (params) => {
-      if (!params || typeof params !== "object") throw new Error("peer-bus send requires params");
-      const input = params as Record<string, unknown>;
-      const identity = requireAuthenticatedPeerSessionRole(
-        input.seat_capability,
-        input.session_id,
-        input.from_role,
-      );
-      const toRole = input.to_role;
-      const body = input.message;
-      const kind = input.kind;
-      const replyToArtifactId = input.reply_to_artifact_id;
-      const busDb = input.bus_db;
-      if (typeof toRole !== "string" || toRole.length === 0) throw new Error("peer-bus send requires to_role");
-      if (typeof body !== "string" || body.length === 0) throw new Error("peer-bus send requires message");
-      if (kind !== "task" && kind !== "result") throw new Error("peer-bus send requires kind=task|result");
-      if (kind === "result") {
-        if (typeof replyToArtifactId !== "string" || replyToArtifactId.length === 0) {
-          throw new Error("peer-bus result requires reply_to_artifact_id");
-        }
-        const task = kernelGetObject("artifact", replyToArtifactId);
-        if (!task || task.kind !== "trajectory") {
-          throw new Error("peer-bus result reply target must be a trajectory artifact");
-        }
-      }
-      if (typeof busDb !== "string" || busDb !== process.env.QF_PEER_BUS_DB) throw new Error("peer-bus db is not app-owned");
-      const recipient = requireLivePeerSession(toRole);
-      const result = peerBusSend(busDb, {
-        fromSessionId: identity.sessionId,
-        fromRole: identity.role,
-        toSessionId: recipient.sessionId,
-        toRole: recipient.role,
-        body,
-        kind,
-        ...(typeof replyToArtifactId === "string" ? { replyToArtifactId } : {}),
-      });
+  registerCollaborationGatewayRpc(
+    registerMethod,
+    {
+      authenticate: requireAuthenticatedPeerSessionRole,
+      capabilityGroups: kernelCapabilityGroupsForSession,
+      liveRecipientForRole: requireLivePeerSession,
+      identityForSession: peerIdentityForSession,
+      getObject: kernelGetObject,
+      getLinks: kernelGetLinks,
+      execute: kernelExecute,
+      marketObjectExists: kernelMarketObjectExists,
+      readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
+      commitResult: commitCollaborationResult,
+      notify: (input) => {
+        const busDb = process.env.QF_PEER_BUS_DB;
+        if (!busDb) throw new Error("app-owned peer bus is unavailable");
+        return peerBusNotify(busDb, input);
+      },
+    },
+    () => {
       mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
       mainWindow?.webContents.send("qf:dock:invalidate");
-      return result;
     },
-    { description: "Product-owned peer-bus send; records a Kernel trajectory before routing." },
   );
   registerMethod(
     "qf.peer-bus.read_inbox",
@@ -1110,9 +1112,13 @@ app.whenReady().then(async () => {
         input.session_id,
         input.role,
       );
-      const busDb = input.bus_db;
-      if (typeof busDb !== "string" || busDb !== process.env.QF_PEER_BUS_DB) throw new Error("peer-bus db is not app-owned");
-      return peerBusReadInbox(busDb, identity.role);
+      const extras = Object.keys(input).filter(
+        (key) => !["seat_capability", "session_id", "role"].includes(key),
+      );
+      if (extras.length > 0) throw new Error(`peer-bus read rejects extra field: ${extras[0]}`);
+      const busDb = process.env.QF_PEER_BUS_DB;
+      if (!busDb) throw new Error("app-owned peer bus is unavailable");
+      return peerBusReadInbox(busDb, identity.sessionId);
     },
     { description: "Product-owned peer-bus inbox pull for one admitted session role." },
   );

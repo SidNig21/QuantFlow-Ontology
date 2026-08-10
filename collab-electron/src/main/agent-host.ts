@@ -68,6 +68,7 @@ import {
 } from "./terminal-target";
 import { resolveCollaborationResourcePath } from "./package-resource-paths";
 import { assertPrecreatedNativeTuiRoute } from "./precreated-native-tui";
+import { assertPrecreatedStartOwnership } from "./precreated-start-ownership";
 
 /** Credential-free QA-only adapter used by the AgentOS identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
@@ -491,7 +492,8 @@ export async function startPrecreatedNativeTuiSession(
   if (!row || row.status !== "starting") {
     throw new Error("precreated agent session must still be starting");
   }
-  const links = kernelGetLinks(sessionId, { kind: "spawned_from", direction: "from" });
+  const links = kernelGetLinks(sessionId, { kind: "spawned_from" })
+    .filter((link) => link.from_id === sessionId);
   if (links.length !== 1 || typeof links[0]?.to_id !== "string" || !links[0]!.to_id) {
     throw new Error("precreated agent session must have exactly one spawned_from link");
   }
@@ -499,6 +501,9 @@ export async function startPrecreatedNativeTuiSession(
   if (!kernelGetObject("agent_definition", definitionId)) {
     throw new Error("precreated agent session spawned_from definition is missing");
   }
+  const delegations = kernelGetLinks(sessionId, { kind: "delegates_to" })
+    .filter((link) => link.to_id === sessionId);
+  assertPrecreatedStartOwnership(caller.sessionId, sessionId, delegations);
   const runtime = getDefinitionRuntime(definitionId);
   assertPrecreatedNativeTuiRoute(runtime.metadata.route);
   return await admitAndStartSession(definitionId, { existingSessionId: sessionId });

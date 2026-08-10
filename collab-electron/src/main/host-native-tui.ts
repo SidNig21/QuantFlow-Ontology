@@ -54,6 +54,10 @@ const ptyToKernel = new Map<string, string>();
 const ptyToCapability = new Map<string, string>();
 let closeKernelRow: ((sessionId: string) => void) | null = null;
 
+export function kernelSessionIdForNativePty(ptySessionId: string): string | undefined {
+  return ptyToKernel.get(ptySessionId);
+}
+
 function resolveHermesProfileGuestRoot(
   terminalTarget: string,
   appDir: string,
