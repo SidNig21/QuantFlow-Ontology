@@ -77,6 +77,7 @@ async function launchProof(
   const artifactRoot = join(storeRoot, "artifacts");
   mkdirSync(artifactRoot, { recursive: true });
   const env = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
+  env.QF_DOCK_QA_MODE = "1";
   env.QF_PEER_BUS_DB = busDb;
   env.QF_PROOF_NONCE = nonce;
   if (deliveryOff) env.QF_PEER_DELIVERY = "off";
