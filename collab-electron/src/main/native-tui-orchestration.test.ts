@@ -14,7 +14,10 @@ function harness(opts?: {
   const ptyMap = new Map<string, string>();
   const roles = new PeerRoleRegistry();
   const terminated: string[] = [];
+  const revoked: Array<string | undefined> = [];
+  const capabilities = new Map<string, string>();
   const commands: string[] = [];
+  const events: string[] = [];
   let ptyN = 0;
   let sessionN = 0;
   let peerStartFailures = opts?.failPeerStartOnce ? 1 : 0;
@@ -27,6 +30,7 @@ function harness(opts?: {
     },
     execute: (command) => {
       commands.push(command);
+      events.push(command);
       if (failedCommand === command) {
         failedCommand = undefined;
         throw new Error(`injected ${command}`);
@@ -52,18 +56,24 @@ function harness(opts?: {
       roles.unregister(role, pty);
     },
     peerStart: () => {
+      events.push("peerStart");
       if (peerStartFailures > 0) {
         peerStartFailures -= 1;
         throw new Error("injected peer start");
       }
     },
+    seatCapabilityBind: (capability, sessionId) => {
+      capabilities.set(capability, sessionId);
+    },
+    seatCapabilityRevoke: (capability) => revoked.push(capability),
   };
-  return { deps, live, ptyMap, roles, terminated, commands };
+  return { deps, live, ptyMap, roles, terminated, commands, events, revoked, capabilities };
 }
 
 const admission = {
   definitionId: "hermes-worker",
   label: "hermes-worker",
+  role: "worker",
   peerDelivery: { role: "worker", dbPath: "/tmp/fake-peer.db" },
 };
 
@@ -131,5 +141,61 @@ describe("orchestrateNativeTuiAdmission", () => {
     expect(h.terminated).toEqual([]);
     expect(h.commands).toEqual([]);
     expect(h.roles.get("worker")).toBe("existing-pty");
+  });
+
+  test("duplicate-role preflight revokes a minted capability without starting a process", async () => {
+    const h = harness();
+    h.roles.register("worker", "existing-pty");
+    await expect(
+      orchestrateNativeTuiAdmission(
+        { ...admission, seatCapability: "preflight-capability" },
+        h.deps,
+      ),
+    ).rejects.toThrow(/already bound/);
+    expect(h.revoked).toEqual(["preflight-capability"]);
+    expect(h.terminated).toEqual([]);
+  });
+
+  test("precreated admission preserves the exact id and registers delivery before running", async () => {
+    const h = harness();
+    const result = await orchestrateNativeTuiAdmission(
+      { ...admission, existingSessionId: "kernel-created-worker" },
+      h.deps,
+    );
+    expect(result.sessionId).toBe("kernel-created-worker");
+    expect(h.commands).toEqual(["start_agent_session"]);
+    expect(h.events.indexOf("peerStart")).toBeLessThan(
+      h.events.indexOf("start_agent_session"),
+    );
+  });
+
+  test("failed admission revokes its in-memory seat capability during owned cleanup", async () => {
+    const h = harness({ failCommand: "start_agent_session" });
+    await expect(
+      orchestrateNativeTuiAdmission(
+        { ...admission, seatCapability: "test-capability" },
+        h.deps,
+      ),
+    ).rejects.toThrow(/injected start_agent_session/);
+    expect(h.revoked).toEqual(["test-capability"]);
+  });
+
+  test("readiness rejection writes no start and cleans every owned runtime seam", async () => {
+    const h = harness();
+    h.deps.awaitLauncherReady = async () => {
+      throw new Error("injected readiness rejection");
+    };
+    await expect(orchestrateNativeTuiAdmission(admission, h.deps)).rejects.toThrow(
+      /readiness rejection/,
+    );
+    expect(h.commands).toEqual([
+      "create_agent_session",
+      "fail_agent_session",
+      "close_agent_session",
+    ]);
+    expect(h.terminated).toEqual(["pty-1"]);
+    expect(h.live.size).toBe(0);
+    expect(h.ptyMap.size).toBe(0);
+    expect(h.roles.get("worker")).toBeUndefined();
   });
 });

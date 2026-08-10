@@ -48,6 +48,8 @@ import {
   peerBusSend,
 } from "./kernel";
 import { registerOntologyGatewayRpc } from "./ontology-gateway";
+import { requireLiveSeatCapability } from "./live-seat-capability";
+import { buildMissionActivationInstruction } from "./mission-activation";
 import { registerIntegrationsIpc } from "./integrations";
 import {
   registerMethod,
@@ -85,6 +87,7 @@ import {
   bootstrapPackagedDockProfiles,
   disposeAgentOs,
   admitAndStartSession,
+  startPrecreatedNativeTuiSession,
   isAgentOsBootSupported,
   reconcileStaleSessions,
   runAgentHostSmoke,
@@ -115,6 +118,15 @@ function requirePeerSessionRole(
     throw new Error(`peer-bus role/session mismatch for ${sessionId}`);
   }
   return { sessionId, role: claimedRole };
+}
+
+function requireAuthenticatedPeerSessionRole(
+  capability: unknown,
+  sessionId: unknown,
+  claimedRole: unknown,
+): { sessionId: string; role: string } {
+  const authenticated = requireLiveSeatCapability(capability, sessionId, claimedRole);
+  return requirePeerSessionRole(authenticated.sessionId, authenticated.role);
 }
 
 function requireLivePeerSession(role: unknown): { sessionId: string; role: string } {
@@ -1049,7 +1061,11 @@ app.whenReady().then(async () => {
     (params) => {
       if (!params || typeof params !== "object") throw new Error("peer-bus send requires params");
       const input = params as Record<string, unknown>;
-      const identity = requirePeerSessionRole(input.session_id, input.from_role);
+      const identity = requireAuthenticatedPeerSessionRole(
+        input.seat_capability,
+        input.session_id,
+        input.from_role,
+      );
       const toRole = input.to_role;
       const body = input.message;
       const kind = input.kind;
@@ -1089,14 +1105,22 @@ app.whenReady().then(async () => {
     (params) => {
       if (!params || typeof params !== "object") throw new Error("peer-bus read requires params");
       const input = params as Record<string, unknown>;
-      const identity = requirePeerSessionRole(input.session_id, input.role);
+      const identity = requireAuthenticatedPeerSessionRole(
+        input.seat_capability,
+        input.session_id,
+        input.role,
+      );
       const busDb = input.bus_db;
       if (typeof busDb !== "string" || busDb !== process.env.QF_PEER_BUS_DB) throw new Error("peer-bus db is not app-owned");
       return peerBusReadInbox(busDb, identity.role);
     },
     { description: "Product-owned peer-bus inbox pull for one admitted session role." },
   );
-  registerOntologyGatewayRpc(registerMethod, requirePeerSessionRole);
+  registerOntologyGatewayRpc(
+    registerMethod,
+    requireAuthenticatedPeerSessionRole,
+    startPrecreatedNativeTuiSession,
+  );
   registerMethod(
     "qf.research.submit_question",
     async (params) => {
@@ -1113,6 +1137,10 @@ app.whenReady().then(async () => {
         typeof input.mission_id === "string" && input.mission_id.length > 0
           ? input.mission_id
           : `mission-${crypto.randomUUID()}`;
+      const activationInstruction = buildMissionActivationInstruction(
+        missionId,
+        text,
+      );
       kernelExecute(
         "create_mission",
         {
@@ -1129,6 +1157,7 @@ app.whenReady().then(async () => {
             ? "qf-proof-orchestrator"
             : "hermes-orchestrator";
       const result = await admitAndStartSession(definitionId, {
+        missionActivation: activationInstruction,
         onStarted: (sessionId, sp, info) => {
           mainWindow?.webContents.send("qf:dock:invalidate");
           mainWindow?.webContents.send(

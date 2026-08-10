@@ -8,6 +8,7 @@ const socketFile = join(homedir(), ".quantflow", "app", "socket-path");
 const role = process.env.QF_PEER_ROLE;
 const sessionId = process.env.QF_AGENT_SESSION_ID;
 const busDb = process.env.QF_PEER_BUS_DB;
+const seatCapability = process.env.QF_LIVE_SEAT_CAPABILITY;
 
 function rpcCall(method, params) {
   return new Promise((resolve, reject) => {
@@ -70,13 +71,14 @@ const tools = [
 ];
 
 async function callTool(name, args) {
-  if (!role || !sessionId || !busDb) {
+  if (!role || !sessionId || !busDb || !seatCapability) {
     throw new Error("QuantFlow did not provide this seat's collaboration identity");
   }
   if (name === "send_task") {
     return rpcCall("qf.peer-bus.send_to_peer", {
       session_id: sessionId,
       from_role: role,
+      seat_capability: seatCapability,
       to_role: args.to_role,
       message: args.task,
       kind: "task",
@@ -87,6 +89,7 @@ async function callTool(name, args) {
     return rpcCall("qf.peer-bus.send_to_peer", {
       session_id: sessionId,
       from_role: role,
+      seat_capability: seatCapability,
       to_role: args.to_role,
       message: args.result,
       kind: "result",

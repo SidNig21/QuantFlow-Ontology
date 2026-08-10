@@ -25,6 +25,7 @@ import {
   kernelQueryObjects,
 } from "./kernel";
 import { notifySessionCanvasProjection } from "./session-canvas-projector";
+import { invokePrecreatedStart } from "./precreated-start-ownership";
 
 type RegisterMethod = typeof registerMethod;
 
@@ -146,11 +147,15 @@ const HIRE_ACTIONS = new Set([
 ]);
 
 /** Granted desk actions (hire path) plus generated reads. */
-export function callOntologyTool(
+export async function callOntologyTool(
   identity: OntologyCallerIdentity,
   toolName: string,
   args: Record<string, unknown>,
-): { result: unknown; artifactId: string } {
+  startPrecreatedSession?: (
+    caller: OntologyCallerIdentity,
+    sessionId: string,
+  ) => Promise<unknown>,
+): Promise<{ result: unknown; artifactId: string }> {
   const action = kernelParseOntologyActionTool(toolName);
   if (!action) {
     return callOntologyReadTool(identity, toolName, args);
@@ -167,10 +172,21 @@ export function callOntologyTool(
     }
   }
 
-  const result = kernelExecute(action, input, {
-    trace_id: crypto.randomUUID(),
-    span_id: crypto.randomUUID(),
-  });
+  const result = action === "start_agent_session"
+    ? await (() => {
+        if (!startPrecreatedSession) {
+          throw new Error("ontology gateway precreated admission callback is missing");
+        }
+        return invokePrecreatedStart(
+          identity,
+          input.session_id,
+          startPrecreatedSession,
+        );
+      })()
+    : kernelExecute(action, input, {
+        trace_id: crypto.randomUUID(),
+        span_id: crypto.randomUUID(),
+      });
   notifySessionCanvasProjection();
   const { artifactId } = recordTrajectory(identity, toolName, input, result);
   return { result, artifactId };
@@ -179,10 +195,15 @@ export function callOntologyTool(
 /** Register JSON-RPC methods for the ontology gateway. */
 export function registerOntologyGatewayRpc(
   register: RegisterMethod,
-  requirePeerSessionRole: (
+  requireLiveSeat: (
+    capability: unknown,
     sessionId: unknown,
     claimedRole: unknown,
   ) => OntologyCallerIdentity,
+  startPrecreatedSession: (
+    caller: OntologyCallerIdentity,
+    sessionId: string,
+  ) => Promise<unknown>,
 ): void {
   register(
     "qf.ontology.list_tools",
@@ -191,7 +212,7 @@ export function registerOntologyGatewayRpc(
         throw new Error("ontology list_tools requires params");
       }
       const input = params as Record<string, unknown>;
-      requirePeerSessionRole(input.session_id, input.role);
+      requireLiveSeat(input.seat_capability, input.session_id, input.role);
       requireAppOwnedKernelDb(input.kernel_db);
       const grants = kernelCapabilityGroupsForSession(String(input.session_id));
       return { tools: kernelListOntologyToolsForGroups(grants) };
@@ -200,12 +221,16 @@ export function registerOntologyGatewayRpc(
   );
   register(
     "qf.ontology.call_tool",
-    (params) => {
+    async (params) => {
       if (!params || typeof params !== "object") {
         throw new Error("ontology call_tool requires params");
       }
       const input = params as Record<string, unknown>;
-      const identity = requirePeerSessionRole(input.session_id, input.role);
+      const identity = requireLiveSeat(
+        input.seat_capability,
+        input.session_id,
+        input.role,
+      );
       requireAppOwnedKernelDb(input.kernel_db);
       const name = input.name;
       if (typeof name !== "string" || name.length === 0) {
@@ -215,7 +240,7 @@ export function registerOntologyGatewayRpc(
         input.arguments && typeof input.arguments === "object" && !Array.isArray(input.arguments)
           ? (input.arguments as Record<string, unknown>)
           : {};
-      return callOntologyTool(identity, name, args);
+      return await callOntologyTool(identity, name, args, startPrecreatedSession);
     },
     {
       description:

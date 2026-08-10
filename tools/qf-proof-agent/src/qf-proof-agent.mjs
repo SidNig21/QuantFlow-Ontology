@@ -6,17 +6,25 @@ const sessionId = process.env.QF_AGENT_SESSION_ID;
 const busDb = process.env.QF_PEER_BUS_DB;
 const endpoint = process.env.QF_APP_RPC_ENDPOINT;
 const nonce = process.env.QF_PROOF_NONCE || randomUUID();
+const readinessNonce = process.env.QF_LAUNCH_READY_NONCE;
+const seatCapability = process.env.QF_LIVE_SEAT_CAPABILITY;
 
-if (!role || !sessionId || !busDb || !endpoint) {
+if (!role || !sessionId || !busDb || !endpoint || !seatCapability) {
   throw new Error(
     "qf-proof-agent requires QF_PEER_ROLE, QF_AGENT_SESSION_ID, "
       + "QF_PEER_BUS_DB, and QF_APP_RPC_ENDPOINT",
   );
 }
+if (!readinessNonce) {
+  throw new Error("qf-proof-agent requires QF_LAUNCH_READY_NONCE");
+}
 
 function log(message) {
   process.stdout.write(`${message}\n`);
 }
+
+log(`QF_LAUNCH_READY ${readinessNonce}`);
+log(`QF_LAUNCH_COMMIT ${readinessNonce}`);
 
 function rpc(method, params) {
   return new Promise((resolve, reject) => {
@@ -66,6 +74,7 @@ async function inbox() {
   return await rpc("qf.peer-bus.read_inbox", {
     session_id: sessionId,
     role,
+    seat_capability: seatCapability,
     bus_db: busDb,
   });
 }
@@ -74,6 +83,7 @@ async function send(toRole, message) {
   return await rpc("qf.peer-bus.send_to_peer", {
     session_id: sessionId,
     from_role: role,
+    seat_capability: seatCapability,
     to_role: toRole,
     message,
     kind: "task",

@@ -12,6 +12,7 @@ const socketFile = join(homedir(), ".quantflow", "app", "socket-path");
 const role = process.env.QF_PEER_ROLE;
 const sessionId = process.env.QF_AGENT_SESSION_ID;
 const kernelDb = process.env.QF_KERNEL_DB;
+const seatCapability = process.env.QF_LIVE_SEAT_CAPABILITY;
 
 function rpcCall(method, params) {
   return new Promise((resolve, reject) => {
@@ -44,7 +45,7 @@ function rpcCall(method, params) {
 }
 
 function requireIdentity() {
-  if (!role || !sessionId || !kernelDb) {
+  if (!role || !sessionId || !kernelDb || !seatCapability) {
     throw new Error("QuantFlow did not provide this seat's ontology identity");
   }
 }
@@ -54,6 +55,7 @@ async function listTools() {
   const result = await rpcCall("qf.ontology.list_tools", {
     session_id: sessionId,
     role,
+    seat_capability: seatCapability,
     kernel_db: kernelDb,
   });
   return result.tools ?? [];
@@ -64,6 +66,7 @@ async function callTool(name, args) {
   const result = await rpcCall("qf.ontology.call_tool", {
     session_id: sessionId,
     role,
+    seat_capability: seatCapability,
     kernel_db: kernelDb,
     name,
     arguments: args ?? {},

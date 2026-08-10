@@ -35,6 +35,7 @@ import {
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
+import { buildMissionActivationInstruction } from "./mission-activation";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -135,6 +136,10 @@ export function registerKernelHandlers(): void {
         }
         const text = question.trim();
         const missionId = `mission-${crypto.randomUUID()}`;
+        const activationInstruction = buildMissionActivationInstruction(
+          missionId,
+          text,
+        );
         kernelExecute(
           "create_mission",
           {
@@ -151,6 +156,7 @@ export function registerKernelHandlers(): void {
               ? "qf-proof-orchestrator"
               : "hermes-orchestrator";
         const result = await admitAndStartSession(definitionId, {
+          missionActivation: activationInstruction,
           onStarted: (sessionId, sp, info) => {
             invalidateDock();
             sendToShell("shell:forward", "canvas", "sessions-changed");
