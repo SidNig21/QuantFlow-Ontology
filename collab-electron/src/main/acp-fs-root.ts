@@ -57,6 +57,14 @@ export function assertPathWithinAcpFsRoot(
   candidatePath: string,
   options: AssertAcpFsPathOptions = {},
 ): void {
+  let resolvedRoot: string;
+  try {
+    resolvedRoot = realpathSync.native(resolvePath(root));
+  } catch {
+    throw new Error(
+      `ACP fs path rejected: QF_ACP_FS_ROOT is not accessible`,
+    );
+  }
   const absolute = resolvePath(candidatePath);
 
   if (options.allowCreate && !existsSync(absolute)) {
@@ -68,7 +76,7 @@ export function assertPathWithinAcpFsRoot(
         `ACP fs path rejected: "${candidatePath}" parent does not exist or is not accessible`,
       );
     }
-    assertResolvedInsideRoot(root, parentReal, candidatePath, {
+    assertResolvedInsideRoot(resolvedRoot, parentReal, candidatePath, {
       allowExactRoot: true,
     });
     return;
@@ -82,5 +90,5 @@ export function assertPathWithinAcpFsRoot(
       `ACP fs path rejected: "${candidatePath}" does not exist or is not accessible`,
     );
   }
-  assertResolvedInsideRoot(root, resolved, candidatePath);
+  assertResolvedInsideRoot(resolvedRoot, resolved, candidatePath);
 }
