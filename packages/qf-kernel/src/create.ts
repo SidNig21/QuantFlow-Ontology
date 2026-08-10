@@ -2,12 +2,14 @@ import { readFileSync } from "node:fs";
 import { creationCommands, type CreationCommand } from "qf-kernel-schema/commands";
 import type { KernelDb } from "./db.ts";
 import {
+  AgentSessionIdentityLinkRejectedError,
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
-  AssignedToLinkRejectedError,
   ContentHashMismatchError,
+  DelegatesToLinkRejectedError,
   KernelError,
   SpawnedFromLinkRejectedError,
+  TaskCreationEnvelopeRejectedError,
   UnknownAgentDefinitionError,
   UnknownAssigneeSessionError,
 } from "./errors.ts";
@@ -21,7 +23,11 @@ import {
   writeLinks,
 } from "./links.ts";
 import { registerVenue, scheduleMarketEvent } from "./market-context.ts";
-import type { TraceContext } from "./trace.ts";
+import type { TraceContext, TrustedExecutionContext } from "./trace.ts";
+import {
+  assertDurableOntologyReadReceipt,
+  validateOntologyReadPublication,
+} from "./ontology-read-receipt.ts";
 import {
   observationEvent,
   rejectSuppliedInitialState,
@@ -51,7 +57,7 @@ type CreationHandler = (
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
   envelope?: CreationEnvelopePresence,
 ) => ObjectExecuteResult | ContextExecuteResult;
@@ -108,7 +114,7 @@ function publishArtifact(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
 ): ObjectExecuteResult {
   const kind = input.kind;
@@ -130,6 +136,22 @@ function publishArtifact(
     }
   }
 
+  const ontologyReadReceipt = trace.ontology_read_tool
+    ? validateOntologyReadPublication(bytes, trace.actor_session_id, trace.ontology_read_tool)
+    : undefined;
+  if (ontologyReadReceipt) {
+    const producerLinks = links.filter((link) => link.kind === "produces");
+    if (
+      links.length !== 1 ||
+      producerLinks.length !== 1 ||
+      producerLinks[0]!.from_id !== ontologyReadReceipt.actor_session_id
+    ) {
+      throw new KernelError(
+        "ontology read publication requires exactly one produces link from trusted actor",
+      );
+    }
+  }
+
   const id = computed;
   const existing = db.query(`SELECT * FROM artifact WHERE id = ?`).get(id) as
     | Record<string, unknown>
@@ -145,6 +167,9 @@ function publishArtifact(
         storage_ref,
       );
     }
+    if (ontologyReadReceipt) {
+      assertDurableOntologyReadReceipt(db, id, ontologyReadReceipt.actor_session_id);
+    }
     return creationResult(cmd, id, cmd.event, existing);
   }
 
@@ -159,6 +184,7 @@ function publishArtifact(
       kind,
       content_hash: computed,
       storage_ref,
+      ...(ontologyReadReceipt ? { ontology_read_receipt: ontologyReadReceipt } : {}),
     },
     insert: () => {
       const created_at = new Date().toISOString();
@@ -279,7 +305,7 @@ function createAgentSession(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
 ): ObjectExecuteResult {
   const session_id = input.session_id;
@@ -304,6 +330,12 @@ function createAgentSession(
     if (spec.kind === "spawned_from") {
       throw new SpawnedFromLinkRejectedError();
     }
+    if (spec.kind === "delegates_to") {
+      throw new DelegatesToLinkRejectedError();
+    }
+    if (["assigned_to", "delegated_by", "produces"].includes(spec.kind)) {
+      throw new AgentSessionIdentityLinkRejectedError(spec.kind);
+    }
   }
 
   const definition = db
@@ -313,9 +345,22 @@ function createAgentSession(
     throw new UnknownAgentDefinitionError(agent_definition_id);
   }
 
+  const delegator_session_id = trace.actor_session_id;
+  if (delegator_session_id) {
+    const delegator = db
+      .query(`SELECT id FROM agent_session WHERE id = ?`)
+      .get(delegator_session_id) as { id: string } | null;
+    if (!delegator) {
+      throw new KernelError(`unknown trusted actor_session_id: ${delegator_session_id}`);
+    }
+  }
+
   const identityLinks: LinkSpec[] = [
     ...links,
     { kind: "spawned_from", to_id: agent_definition_id },
+    ...(delegator_session_id
+      ? [{ kind: "delegates_to", from_id: delegator_session_id }]
+      : []),
   ];
 
   const state = commitCreation(db, {
@@ -329,6 +374,7 @@ function createAgentSession(
       status: "starting",
       label,
       agent_definition_id,
+      ...(delegator_session_id ? { delegator_session_id } : {}),
     },
     insert: () => {
       const created_at = new Date().toISOString();
@@ -345,8 +391,9 @@ function createTask(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
+  envelope: CreationEnvelopePresence = { links: links.length > 0, bytes: false },
 ): ObjectExecuteResult {
   const task_id = input.task_id;
   if (typeof task_id !== "string" || task_id.length === 0) {
@@ -367,10 +414,16 @@ function createTask(
     throw new KernelError('create_task requires non-empty "assignee_session_id"');
   }
 
-  for (const spec of links) {
-    if (spec.kind === "assigned_to") {
-      throw new AssignedToLinkRejectedError();
-    }
+  if (links.length > 0) {
+    throw new TaskCreationEnvelopeRejectedError("links");
+  }
+  if (envelope.bytes) {
+    throw new TaskCreationEnvelopeRejectedError("bytes");
+  }
+
+  const delegator_session_id = trace.actor_session_id;
+  if (!delegator_session_id) {
+    throw new KernelError("create_task requires trusted actor_session_id context");
   }
 
   const session = db
@@ -379,9 +432,15 @@ function createTask(
   if (!session) {
     throw new UnknownAssigneeSessionError(assignee_session_id);
   }
+  const delegator = db
+    .query(`SELECT id FROM agent_session WHERE id = ?`)
+    .get(delegator_session_id) as { id: string } | null;
+  if (!delegator) {
+    throw new KernelError(`unknown trusted actor_session_id: ${delegator_session_id}`);
+  }
 
   const identityLinks: LinkSpec[] = [
-    ...links,
+    { kind: "delegated_by", to_id: delegator_session_id },
     { kind: "assigned_to", to_id: assignee_session_id },
   ];
 
@@ -396,6 +455,7 @@ function createTask(
       status: "open",
       title,
       description,
+      delegator_session_id,
       assignee_session_id,
     },
     insert: () => {
@@ -421,7 +481,7 @@ function createConnection(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
 ): ObjectExecuteResult {
   const connection_id = input.connection_id;
@@ -1014,7 +1074,7 @@ export function executeCreation(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[] = [],
   envelope: CreationEnvelopePresence = { links: links.length > 0, bytes: false },
 ): ObjectExecuteResult | ContextExecuteResult {

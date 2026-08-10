@@ -1,5 +1,13 @@
-import { complete_task, create_task, task } from "../ontology/agent.ts";
+import { task } from "../ontology/agent.ts";
 import { sqlString } from "./sql.ts";
+
+const PRE_TASK_DELEGATION_ACTIONS = [
+  [
+    "create_task",
+    "Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.",
+  ],
+  ["complete_task", "Mark an open task done (open → done) through the transition table."],
+] as const;
 
 /**
  * R5 data-preserving upgrade: bring predecessors to the exact current `task`
@@ -32,9 +40,9 @@ export function generateUpgradeTaskStatus(): string {
   lines.push(
     `UPDATE schema_meta SET description = ${sqlString(task.description)} WHERE type_name = 'task';`,
   );
-  for (const action of [create_task, complete_task]) {
+  for (const [name, description] of PRE_TASK_DELEGATION_ACTIONS) {
     lines.push(
-      `INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES (${sqlString(action.name)}, 'action', ${sqlString(action.lifecycle)}, ${sqlString(action.description)});`,
+      `INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES (${sqlString(name)}, 'action', 'experimental', ${sqlString(description)});`,
     );
   }
   lines.push("");

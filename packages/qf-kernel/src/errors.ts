@@ -15,7 +15,9 @@ export class IllegalTransitionError extends Error {
 
 /** Command rejected because trace context is missing. */
 export class MissingTraceError extends Error {
-  constructor(missing: "trace_id" | "span_id") {
+  constructor(
+    missing: "trace_id" | "span_id" | "actor_session_id" | "ontology_read_tool",
+  ) {
     super(`Command rejected: ctx.${missing} is required`);
     this.name = "MissingTraceError";
   }
@@ -241,11 +243,43 @@ export class SpawnedFromLinkRejectedError extends Error {
   }
 }
 
+/** Caller supplied a Kernel-owned hire provenance link â€” nothing written. */
+export class DelegatesToLinkRejectedError extends Error {
+  constructor() {
+    super("create_agent_session rejects caller-supplied delegates_to link");
+    this.name = "DelegatesToLinkRejectedError";
+  }
+}
+
+/** Caller supplied another Kernel-owned session identity/provenance link. */
+export class AgentSessionIdentityLinkRejectedError extends Error {
+  constructor(kind: string) {
+    super(`create_agent_session rejects caller-supplied ${kind} link`);
+    this.name = "AgentSessionIdentityLinkRejectedError";
+  }
+}
+
 /** Caller supplied a system-owned assigned_to link — nothing written. */
 export class AssignedToLinkRejectedError extends Error {
   constructor() {
     super("create_task rejects caller-supplied assigned_to link");
     this.name = "AssignedToLinkRejectedError";
+  }
+}
+
+/** Caller supplied a system-owned delegated_by link â€” nothing written. */
+export class DelegatedByLinkRejectedError extends Error {
+  constructor() {
+    super("create_task rejects caller-supplied delegated_by link");
+    this.name = "DelegatedByLinkRejectedError";
+  }
+}
+
+/** Caller supplied a task creation envelope beyond the declared task fields. */
+export class TaskCreationEnvelopeRejectedError extends Error {
+  constructor(field: "links" | "bytes") {
+    super(`create_task rejects caller-supplied ${field}`);
+    this.name = "TaskCreationEnvelopeRejectedError";
   }
 }
 

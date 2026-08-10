@@ -21,7 +21,8 @@ import {
 } from "./links.ts";
 import { executePipeline } from "./pipeline.ts";
 import type { ExecuteResultFor } from "./results.ts";
-import { requireTrace, type TraceContext } from "./trace.ts";
+import { requireTrace, type TrustedExecutionContext } from "./trace.ts";
+import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 
 const actionByName = new Map(schema.actions.map((action) => [action.name, action]));
 
@@ -94,9 +95,12 @@ export function execute<C extends string>(
   db: KernelDb,
   command: C,
   input: Record<string, unknown>,
-  ctx: Partial<TraceContext>,
+  ctx: Partial<TrustedExecutionContext>,
 ): ExecuteResultFor<C> {
   const trace = requireTrace(ctx);
+  if (trace.ontology_read_tool && command !== "publish_artifact") {
+    throw new KernelError("ontology_read_tool context is valid only for publish_artifact");
+  }
 
   const creation = creationCommands.find((c) => c.action === command);
   const pipeline = creation
@@ -147,6 +151,10 @@ export function execute<C extends string>(
     return executePipeline(db, pipeline, validatedInput, trace) as ExecuteResultFor<C>;
   }
 
+  if (command === "complete_task") {
+    assertTaskCompletionLineage(db, validatedInput, trace);
+  }
+
   const id = objectId(transitionSample!, validatedInput);
   const { field, value: from } = readState(db, transitionSample!.type, id);
   const hint = toHint(command, validatedInput);
@@ -184,6 +192,73 @@ export function execute<C extends string>(
     event: cmd.event,
     state,
   } as ExecuteResultFor<C>;
+}
+
+/**
+ * Completion provenance is Kernel truth, not a collaboration-MCP assertion.
+ * The app supplies actor_session_id in trusted execution context; action input
+ * remains only task/result identifiers and is schema-strict. This checks the
+ * durable worker/result trajectory graph and Kernel-issued read receipt. The
+ * app separately validates cited market ids against the read result.
+ */
+function assertTaskCompletionLineage(
+  db: KernelDb,
+  input: Record<string, unknown>,
+  ctx: TrustedExecutionContext,
+): void {
+  const taskId = input.task_id;
+  const resultArtifactId = input.result_artifact_id;
+  if (typeof taskId !== "string" || typeof resultArtifactId !== "string") {
+    throw new KernelError("complete_task requires task_id and result_artifact_id");
+  }
+  const actorSessionId = ctx.actor_session_id;
+  if (!actorSessionId) {
+    throw new KernelError("complete_task requires trusted actor_session_id context");
+  }
+
+  const assignments = db.query(
+    `SELECT to_id FROM links WHERE from_id = ? AND kind = 'assigned_to'`,
+  ).all(taskId) as Array<{ to_id: string }>;
+  if (assignments.length !== 1 || assignments[0]!.to_id !== actorSessionId) {
+    throw new KernelError("complete_task actor is not the task's assigned worker");
+  }
+
+  const result = db.query(
+    `SELECT kind FROM artifact WHERE id = ?`,
+  ).get(resultArtifactId) as { kind: string } | null;
+  if (result?.kind !== "trajectory") {
+    throw new KernelError("complete_task result_artifact_id must name a trajectory artifact");
+  }
+  const resultProducer = db.query(
+    `SELECT 1 AS ok FROM links WHERE kind = 'produces' AND from_id = ? AND to_id = ?`,
+  ).get(actorSessionId, resultArtifactId) as { ok: number } | null;
+  if (!resultProducer) {
+    throw new KernelError("complete_task result artifact is not produced by the assigned worker");
+  }
+
+  const readTrajectories = db.query(
+    `SELECT artifact.id AS id
+       FROM links
+       JOIN artifact ON artifact.id = links.to_id
+      WHERE links.from_id = ? AND links.kind = 'derived_from' AND artifact.kind = 'trajectory'`,
+  ).all(resultArtifactId) as Array<{ id: string }>;
+  const hasWorkerReadTrajectory = readTrajectories.some((trajectory) => {
+    const producer = db.query(
+      `SELECT 1 AS ok FROM links WHERE kind = 'produces' AND from_id = ? AND to_id = ?`,
+    ).get(actorSessionId, trajectory.id) as { ok: number } | null;
+    if (!producer) return false;
+    try {
+      assertDurableOntologyReadReceipt(db, trajectory.id, actorSessionId);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!hasWorkerReadTrajectory) {
+    throw new KernelError(
+      "complete_task result artifact must derive from a Kernel-receipted worker ontology read",
+    );
+  }
 }
 
 /** Count events currently in the log (test helper). */

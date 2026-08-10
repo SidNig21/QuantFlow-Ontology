@@ -39,9 +39,13 @@ export {
 } from "./create.ts";
 export { assertPipelineHandlersComplete } from "./pipeline.ts";
 export {
+  AgentSessionIdentityLinkRejectedError,
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
+  DelegatesToLinkRejectedError,
+  DelegatedByLinkRejectedError,
+  TaskCreationEnvelopeRejectedError,
   IllegalTransitionError,
   KernelError,
   KernelIncompleteInitializationError,
@@ -72,10 +76,11 @@ export {
   resolvePackageRef,
   resolveSpeciesPackage,
 } from "./species.ts";
-export { requireTrace, type TraceContext } from "./trace.ts";
+export { requireTrace, type TraceContext, type TrustedExecutionContext } from "./trace.ts";
 export {
   classifyKernelShape,
   MARKET_INGEST_UPGRADE,
   MARKET_CONTEXT_UPGRADE,
   PROFILE_IDENTITY_UPGRADE,
+  TASK_DELEGATION_UPGRADE,
 } from "./upgrade.ts";

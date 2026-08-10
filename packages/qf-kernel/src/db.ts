@@ -16,6 +16,10 @@ import {
   PROFILE_IDENTITY_UPGRADE,
   MARKET_INGEST_UPGRADE,
   MARKET_CONTEXT_UPGRADE,
+  CAPABILITY_GRANTS_UPGRADE,
+  TASK_STATUS_UPGRADE,
+  CONNECTION_ACTIONS_UPGRADE,
+  TASK_DELEGATION_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -338,13 +342,33 @@ export function attachKernel(
 
   if (
     readonly &&
-    (shape === "pre_d1" || shape === "d1" || shape === "market_ingest")
+    (shape === "pre_d1" ||
+      shape === "d1" ||
+      shape === "market_ingest" ||
+      shape === "market_context" ||
+      shape === "capability_grants" ||
+      shape === "task_status" ||
+      shape === "connection_actions")
   ) {
-    const required = shape === "pre_d1"
-      ? `${PROFILE_IDENTITY_UPGRADE},${MARKET_INGEST_UPGRADE},${MARKET_CONTEXT_UPGRADE}`
-      : shape === "d1"
-        ? `${MARKET_INGEST_UPGRADE},${MARKET_CONTEXT_UPGRADE}`
-        : MARKET_CONTEXT_UPGRADE;
+    const upgradeOrder = [
+      PROFILE_IDENTITY_UPGRADE,
+      MARKET_INGEST_UPGRADE,
+      MARKET_CONTEXT_UPGRADE,
+      CAPABILITY_GRANTS_UPGRADE,
+      TASK_STATUS_UPGRADE,
+      CONNECTION_ACTIONS_UPGRADE,
+      TASK_DELEGATION_UPGRADE,
+    ];
+    const completedByShape = {
+      pre_d1: 0,
+      d1: 1,
+      market_ingest: 2,
+      market_context: 3,
+      capability_grants: 4,
+      task_status: 5,
+      connection_actions: 6,
+    } as const;
+    const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
       `kernel: upgrade required (readonly warn): ${required}\n`,
     );
@@ -385,7 +409,8 @@ export function attachKernel(
       shape === "market_ingest" ||
       shape === "market_context" ||
       shape === "capability_grants" ||
-      shape === "task_status"
+      shape === "task_status" ||
+      shape === "connection_actions"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -405,6 +430,9 @@ export function attachKernel(
       const connectionActionsSql = readFileSync(
         upgradeSqlPath("0006-connection-actions.sql"), "utf8",
       );
+      const taskDelegationSql = readFileSync(
+        upgradeSqlPath("0007-task-delegation.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -412,6 +440,7 @@ export function attachKernel(
         capabilityGrantsSql,
         taskStatusSql,
         connectionActionsSql,
+        taskDelegationSql,
       });
     }
   }
