@@ -6,13 +6,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  closeKernel,
-  execute,
-  getObject,
-  openKernel,
-  queryObjects,
-} from "qf-kernel";
+import { closeKernel, openKernel } from "./db-bun.ts";
+import { execute } from "./execute.ts";
+import { getObject, queryObjects } from "./read.ts";
 
 const FIXTURE_ENV = "QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY";
 const dirs: string[] = [];
