@@ -25,6 +25,9 @@ import {
 } from "./protocol";
 
 export const WINDOWS_WSL_LAUNCH_ENV_KEYS = [
+  // Hermes' configured provider reads this founder-owned token directly.
+  // Forward it without inspecting, logging, persisting, or rewriting it.
+  "OPENCODE_GO_API_KEY",
   "QF_AGENT_SESSION_ID",
   "QF_PEER_ROLE",
   "QF_PEER_BUS_DB",

@@ -8,6 +8,7 @@ test("forwards the isolated Hermes profile root into WSL launches", () => {
 });
 
 test("forwards only the seat-scoped launch inputs required by the WSL adapter", () => {
+  expect(WINDOWS_WSL_LAUNCH_ENV_KEYS).toContain("OPENCODE_GO_API_KEY");
   expect(WINDOWS_WSL_LAUNCH_ENV_KEYS).toContain("QF_LAUNCH_READY_NONCE");
   expect(WINDOWS_WSL_LAUNCH_ENV_KEYS).toContain("QF_LIVE_SEAT_CAPABILITY");
 });
