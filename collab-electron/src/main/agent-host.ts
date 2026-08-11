@@ -42,6 +42,7 @@ import {
 import {
   getArtifactRoot,
   kernelExecute,
+  kernelGetLinks,
   kernelGetObject,
   kernelListAgentSessions,
   kernelListAgentDefinitions,
@@ -66,6 +67,8 @@ import {
   getDefaultWslDistro,
 } from "./terminal-target";
 import { resolveCollaborationResourcePath } from "./package-resource-paths";
+import { assertPrecreatedNativeTuiRoute } from "./precreated-native-tui";
+import { assertPrecreatedStartOwnership } from "./precreated-start-ownership";
 
 /** Credential-free QA-only adapter used by the AgentOS identity smoke. */
 export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
@@ -419,6 +422,10 @@ export async function admitAndStartSession(
     env?: Record<string, string>;
     /** When set, host mints its own id (gate falsify — must go red). */
     corruptId?: string;
+    /** Launch this already-created `starting` Kernel session exactly once. */
+    existingSessionId?: string;
+    /** Founder Submit's one bounded post-launch instruction. */
+    missionActivation?: string;
     onStarted?: (
       sessionId: string,
       definitionId: string,
@@ -448,6 +455,8 @@ export async function admitAndStartSession(
       role: runtime.role,
       env: opts?.env,
       corruptId: opts?.corruptId,
+      existingSessionId: opts?.existingSessionId,
+      missionActivation: opts?.missionActivation,
       newTrace,
       liveSet: (sessionId, entry) => {
         live.set(sessionId, entry);
@@ -465,6 +474,39 @@ export async function admitAndStartSession(
     return admitHostAcpDefinition(runtime, opts);
   }
   return admitAgentOsDefinition(runtime, opts);
+}
+
+/**
+ * Start one precreated native-TUI session after validating Kernel-owned identity.
+ * The gateway injects this host callback; it never opens SQLite or launches a
+ * runtime itself.
+ */
+export async function startPrecreatedNativeTuiSession(
+  caller: { sessionId: string; role: string },
+  sessionId: string,
+): Promise<AdmitResult> {
+  if (!caller.sessionId || !caller.role) {
+    throw new Error("precreated admission requires authenticated caller identity");
+  }
+  const row = kernelGetObject("agent_session", sessionId);
+  if (!row || row.status !== "starting") {
+    throw new Error("precreated agent session must still be starting");
+  }
+  const links = kernelGetLinks(sessionId, { kind: "spawned_from" })
+    .filter((link) => link.from_id === sessionId);
+  if (links.length !== 1 || typeof links[0]?.to_id !== "string" || !links[0]!.to_id) {
+    throw new Error("precreated agent session must have exactly one spawned_from link");
+  }
+  const definitionId = links[0]!.to_id;
+  if (!kernelGetObject("agent_definition", definitionId)) {
+    throw new Error("precreated agent session spawned_from definition is missing");
+  }
+  const delegations = kernelGetLinks(sessionId, { kind: "delegates_to" })
+    .filter((link) => link.to_id === sessionId);
+  assertPrecreatedStartOwnership(caller.sessionId, sessionId, delegations);
+  const runtime = getDefinitionRuntime(definitionId);
+  assertPrecreatedNativeTuiRoute(runtime.metadata.route);
+  return await admitAndStartSession(definitionId, { existingSessionId: sessionId });
 }
 
 function peerBusDbPath(): string {

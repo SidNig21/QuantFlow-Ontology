@@ -7,6 +7,52 @@ function truncate(text, max = 96) {
 	return clean.length <= max ? clean : `${clean.slice(0, max - 3)}...`;
 }
 
+const TERMINAL_SESSION_STATUSES = new Set([
+	"closed", "failed", "cancelled",
+]);
+
+export function sessionsForTaskDelegationCanvas(sessions, handoffs) {
+	const historicalIds = new Set();
+	for (const handoff of handoffs) {
+		if (typeof handoff?.fromSessionId === "string") {
+			historicalIds.add(handoff.fromSessionId);
+		}
+		if (typeof handoff?.toSessionId === "string") {
+			historicalIds.add(handoff.toSessionId);
+		}
+	}
+	return sessions.filter((session) => {
+		const sessionId = typeof session?.id === "string" ? session.id : null;
+		if (!sessionId) return false;
+		const status = typeof session.status === "string" ? session.status : "";
+		return !TERMINAL_SESSION_STATUSES.has(status) || historicalIds.has(sessionId);
+	});
+}
+
+/**
+ * Fetch one durable projection snapshot, ensure its endpoint tiles exist, then
+ * draw cables. The ordering prevents a cable refresh racing ahead of tiles.
+ */
+export async function refreshTaskDelegationCanvas({
+	listHandoffs,
+	listSessions,
+	ensureSessionTile,
+	setHandoffs,
+}) {
+	const handoffResponse = await listHandoffs();
+	if (!handoffResponse?.ok || !Array.isArray(handoffResponse.handoffs)) return;
+	const sessionResponse = await listSessions();
+	if (!sessionResponse?.ok || !Array.isArray(sessionResponse.sessions)) return;
+	const handoffs = handoffResponse.handoffs;
+	for (const session of sessionsForTaskDelegationCanvas(
+		sessionResponse.sessions,
+		handoffs,
+	)) {
+		ensureSessionTile(session.id);
+	}
+	setHandoffs(handoffs);
+}
+
 export function createHandoffLayer({ layerEl, viewportState, getTiles }) {
 	let handoffs = [];
 
@@ -23,7 +69,7 @@ export function createHandoffLayer({ layerEl, viewportState, getTiles }) {
 			const y2 = (to.y + to.height / 2) * viewportState.zoom + viewportState.panY;
 
 			const item = document.createElement("div");
-			item.className = `handoff-projection ${handoff.status}`;
+			item.className = `handoff-projection ${handoff.status === "done" ? "completed" : "open"}`;
 
 			const line = document.createElement("div");
 			line.className = "handoff-line";
@@ -51,18 +97,12 @@ export function createHandoffLayer({ layerEl, viewportState, getTiles }) {
 
 			const task = document.createElement("div");
 			task.className = "handoff-copy";
-			task.textContent = `TASK - ${truncate(handoff.task)}`;
-			card.title = `Task ${handoff.taskArtifactId}\n${handoff.task}`;
+			task.textContent = `TASK - ${truncate(handoff.title)}`;
+			card.title = `Task ${handoff.taskId}\n${handoff.title}`;
 			card.append(head, task);
-			if (handoff.result) {
-				const result = document.createElement("div");
-				result.className = "handoff-copy handoff-result";
-				result.textContent = `RESULT - ${truncate(handoff.result)}`;
-				card.appendChild(result);
-			}
 			const receipt = document.createElement("div");
 			receipt.className = "handoff-receipt";
-			receipt.textContent = `Kernel ${shortId(handoff.taskArtifactId)}`;
+			receipt.textContent = `Kernel ${shortId(handoff.taskId)}`;
 			card.appendChild(receipt);
 
 			item.append(line, card);

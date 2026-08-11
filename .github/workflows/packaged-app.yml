@@ -22,10 +22,5 @@ jobs:
         working-directory: collab-electron
         run: bun install --frozen-lockfile
       - name: Packaged-app Act I gates
-        run: |
-          bun qa/run.ts windows-dock-collaboration
-          bun qa/run.ts windows-dock-ontology
-          bun qa/run.ts windows-dock-capability
-          bun qa/run.ts windows-dock-hire
-          bun qa/run.ts windows-dock-species
-          bun qa/run.ts windows-research-question
+        # One build, one complete consumer workflow, one restart recovery.
+        run: bun qa/run.ts windows-golden-run

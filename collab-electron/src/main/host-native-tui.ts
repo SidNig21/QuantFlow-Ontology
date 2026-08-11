@@ -14,7 +14,17 @@ import {
   createHostCommandSession,
   killSession,
   onPtySessionExit,
+  writeToSession,
 } from "./pty";
+import {
+  createLauncherReadinessWaiter,
+  type LauncherReadinessWaiter,
+} from "./launcher-readiness";
+import {
+  bindLiveSeatCapability,
+  mintLiveSeatCapability,
+  revokeLiveSeatCapability,
+} from "./live-seat-capability";
 import {
   assertSeatRoleAvailable,
   registerSeatPty,
@@ -41,7 +51,12 @@ export type { NativeTuiLive } from "./native-tui-orchestration";
 
 let exitHookInstalled = false;
 const ptyToKernel = new Map<string, string>();
+const ptyToCapability = new Map<string, string>();
 let closeKernelRow: ((sessionId: string) => void) | null = null;
+
+export function kernelSessionIdForNativePty(ptySessionId: string): string | undefined {
+  return ptyToKernel.get(ptySessionId);
+}
 
 function resolveHermesProfileGuestRoot(
   terminalTarget: string,
@@ -63,6 +78,8 @@ export function installNativeTuiPtyExitHook(
     const kernelId = ptyToKernel.get(ptySessionId);
     if (!kernelId) return;
     ptyToKernel.delete(ptySessionId);
+    revokeLiveSeatCapability(ptyToCapability.get(ptySessionId));
+    ptyToCapability.delete(ptySessionId);
     console.log(
       `agent-host: native_tui pty exited pty=${ptySessionId} → close kernel=${kernelId}`,
     );
@@ -80,6 +97,10 @@ export async function admitNativeTuiDefinition(opts: {
   role?: string;
   env?: Record<string, string>;
   corruptId?: string;
+  /** Start an already-created Kernel session; never creates a second row. */
+  existingSessionId?: string;
+  /** One bounded post-launch instruction for founder Submit only. */
+  missionActivation?: string;
   newTrace: () => TraceContext;
   liveSet: (sessionId: string, entry: NativeTuiLive) => void;
   /** Root admission owner supplies this when wiring the D2 live map. */
@@ -101,6 +122,8 @@ export async function admitNativeTuiDefinition(opts: {
   ptySessionId: string;
 }> {
   const { definitionId, adapterId, argv } = opts;
+  const kernelSessionId = opts.existingSessionId ?? crypto.randomUUID();
+  const readinessNonce = crypto.randomUUID();
   const fromConfig = resolveAdapterSessionEnv(adapterId);
   const env = { ...fromConfig, ...opts.env };
   const home = env.HOME ?? process.env.HOME ?? homedir();
@@ -109,8 +132,9 @@ export async function admitNativeTuiDefinition(opts: {
   // MCP bridges attach by peer-delivery + WSL contract — never by species id.
   const wantsQuantFlowMcpBridges =
     Boolean(opts.peerDelivery) &&
-    opts.terminalTarget?.startsWith("wsl:") === true &&
     Boolean(opts.role);
+  const usesWslMcpLauncher =
+    wantsQuantFlowMcpBridges && opts.terminalTarget?.startsWith("wsl:") === true;
   const collaborationBridge = wantsQuantFlowMcpBridges
     ? resolveCollaborationResourcePath("qf-collaboration-mcp.mjs", {
         resourcesPath: process.resourcesPath,
@@ -123,20 +147,23 @@ export async function admitNativeTuiDefinition(opts: {
         moduleDir: __dirname,
       })
     : null;
-  const mcpLaunchWrapper = wantsQuantFlowMcpBridges
+  const mcpLaunchWrapper = usesWslMcpLauncher
     ? resolveCollaborationResourcePath("qf-hermes-launch.sh", {
         resourcesPath: process.resourcesPath,
         moduleDir: __dirname,
       })
     : null;
-  if (wantsQuantFlowMcpBridges && (!collaborationBridge || !ontologyBridge || !mcpLaunchWrapper)) {
+  if (
+    wantsQuantFlowMcpBridges &&
+    (!collaborationBridge || !ontologyBridge || (usesWslMcpLauncher && !mcpLaunchWrapper))
+  ) {
     throw new Error(
       "Seat unavailable: QuantFlow collaboration resources are missing. " +
       "Reinstall QuantFlow or run the development app.",
     );
   }
   const guestCommand = opts.command ?? adapterId;
-  const wslPrerequisite = wantsQuantFlowMcpBridges
+  const wslPrerequisite = usesWslMcpLauncher
     ? classifyWslNativeTuiPrerequisites({
         platform: process.platform,
         homeDir: hostHome,
@@ -148,7 +175,7 @@ export async function admitNativeTuiDefinition(opts: {
       })
     : null;
   if (wslPrerequisite) throw new Error(wslPrerequisite.message);
-  const useQuantFlowMcpLaunch = wantsQuantFlowMcpBridges;
+  const useQuantFlowMcpLaunch = usesWslMcpLauncher;
   const wrapperGuestPath = useQuantFlowMcpLaunch
     ? hostPathToGuestPath(mcpLaunchWrapper!, opts.terminalTarget!)
     : null;
@@ -156,13 +183,13 @@ export async function admitNativeTuiDefinition(opts: {
     throw new Error("QuantFlow could not map its MCP launch bridge into WSL");
   }
   // Hermes-only profile isolation (species adapter detail, not shared MCP path).
-  const hermesProfileRootGuest = adapterId === "hermes" && wantsQuantFlowMcpBridges
+  const hermesProfileRootGuest = adapterId === "hermes" && usesWslMcpLauncher
     ? resolveHermesProfileGuestRoot(
         opts.terminalTarget!,
         QF_APP_DIR,
       )
     : null;
-  if (adapterId === "hermes" && wantsQuantFlowMcpBridges && !hermesProfileRootGuest) {
+  if (adapterId === "hermes" && usesWslMcpLauncher && !hermesProfileRootGuest) {
     throw new Error(
       "Hermes unavailable: QuantFlow's isolated Hermes profile path could not be mapped into WSL",
     );
@@ -200,42 +227,62 @@ export async function admitNativeTuiDefinition(opts: {
   const commandTarget = wslLaunch?.target ?? "host_command";
   const commandCwd = wslLaunch?.cwd ?? home;
   const commandCwdGuest = wslLaunch?.cwdGuestPath;
+  const seatCapability = mintLiveSeatCapability(kernelSessionId, opts.role ?? "");
+  let readinessWaiter: LauncherReadinessWaiter | null = null;
   const defaults: NativeTuiOrchestrationDependencies = {
-    createPty: ({ sessionId }) => createHostCommandSession({
-      command,
-      args: commandArgs,
-      cwd: commandCwd,
-      target: commandTarget,
-      cwdGuestPath: commandCwdGuest,
-      env: {
-        HERMES_BIN: wslLaunch ? guestCommand : command,
-        HOST_ACP_BIN: wslLaunch ? guestCommand : command,
-        ...(wslLaunch
-          ? (env.HOME?.startsWith("/") ? { HOME: env.HOME } : {})
-          : { HOME: home }),
-        ...(hermesProfileRootGuest
-          ? { QF_QUANTFLOW_HERMES_PROFILE_ROOT: hermesProfileRootGuest }
-          : {}),
-        TERM: "xterm-256color",
-        ...(process.env.QF_KERNEL_DB
-          ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
-          : {}),
-        ...(process.env.QF_ARTIFACT_ROOT
-          ? { QF_ARTIFACT_ROOT: process.env.QF_ARTIFACT_ROOT }
-          : {}),
-        ...(process.env.QF_PEER_BUS_DB
-          ? { QF_PEER_BUS_DB: process.env.QF_PEER_BUS_DB }
-          : { QF_PEER_BUS_DB: join(home, ".qf-peer-bus", "peer-bus.db") }),
-        ...(process.env.QF_PROOF_NONCE
-          ? { QF_PROOF_NONCE: process.env.QF_PROOF_NONCE }
-          : {}),
-        QF_AGENT_SESSION_ID: sessionId,
-        QF_PEER_ROLE: opts.role ?? "",
-        QF_APP_RPC_ENDPOINT:
-          process.env.QF_APP_RPC_ENDPOINT ?? makeEndpointPath("ipc"),
-      },
-      displayName,
-    }),
+    createPty: async ({ sessionId }) => {
+      const waiter = createLauncherReadinessWaiter(sessionId, readinessNonce);
+      readinessWaiter = waiter;
+      try {
+        return await createHostCommandSession({
+          command,
+          args: commandArgs,
+          cwd: commandCwd,
+          target: commandTarget,
+          cwdGuestPath: commandCwdGuest,
+          onData: (data) => waiter.push(data),
+          env: {
+            HERMES_BIN: wslLaunch ? guestCommand : command,
+            HOST_ACP_BIN: wslLaunch ? guestCommand : command,
+            ...(wslLaunch
+              ? (env.HOME?.startsWith("/") ? { HOME: env.HOME } : {})
+              : { HOME: home }),
+            ...(hermesProfileRootGuest
+              ? { QF_QUANTFLOW_HERMES_PROFILE_ROOT: hermesProfileRootGuest }
+              : {}),
+            TERM: "xterm-256color",
+            ...(process.env.QF_KERNEL_DB
+              ? { QF_KERNEL_DB: process.env.QF_KERNEL_DB }
+              : {}),
+            ...(process.env.QF_ARTIFACT_ROOT
+              ? { QF_ARTIFACT_ROOT: process.env.QF_ARTIFACT_ROOT }
+              : {}),
+            ...(process.env.QF_PEER_BUS_DB
+              ? { QF_PEER_BUS_DB: process.env.QF_PEER_BUS_DB }
+              : { QF_PEER_BUS_DB: join(home, ".qf-peer-bus", "peer-bus.db") }),
+            ...(process.env.QF_PROOF_NONCE
+              ? { QF_PROOF_NONCE: process.env.QF_PROOF_NONCE }
+              : {}),
+            QF_AGENT_SESSION_ID: sessionId,
+            QF_PEER_ROLE: opts.role ?? "",
+            QF_LAUNCH_READY_NONCE: readinessNonce,
+            QF_LIVE_SEAT_CAPABILITY: seatCapability,
+            ...(collaborationBridge
+              ? { QF_COLLABORATION_MCP_PATH: collaborationBridge }
+              : {}),
+            ...(ontologyBridge
+              ? { QF_ONTOLOGY_MCP_PATH: ontologyBridge }
+              : {}),
+            QF_APP_RPC_ENDPOINT:
+              process.env.QF_APP_RPC_ENDPOINT ?? makeEndpointPath("ipc"),
+          },
+          displayName,
+        });
+      } catch (error) {
+        waiter.cancel();
+        throw error;
+      }
+    },
     terminatePty: (ptySessionId) => killSession(ptySessionId),
     execute: kernelExecute,
     newTrace: opts.newTrace,
@@ -248,9 +295,11 @@ export async function admitNativeTuiDefinition(opts: {
     }),
     ptyMapSet: (ptySessionId, sessionId) => {
       ptyToKernel.set(ptySessionId, sessionId);
+      ptyToCapability.set(ptySessionId, seatCapability);
     },
     ptyMapDelete: (ptySessionId) => {
       ptyToKernel.delete(ptySessionId);
+      ptyToCapability.delete(ptySessionId);
     },
     peerAssertAvailable: assertSeatRoleAvailable,
     peerRegister: registerSeatPty,
@@ -258,6 +307,20 @@ export async function admitNativeTuiDefinition(opts: {
       unregisterSeatPty(role, ptySessionId);
     },
     peerStart: startPeerDelivery,
+    seatCapabilityBind: bindLiveSeatCapability,
+    seatCapabilityRevoke: revokeLiveSeatCapability,
+    awaitLauncherReady: async () => {
+      if (!readinessWaiter) {
+        throw new Error("native-TUI launcher readiness waiter was not registered");
+      }
+      await readinessWaiter.wait();
+    },
+    cancelLauncherReadiness: () => readinessWaiter?.cancel(),
+    activateMission: opts.missionActivation
+      ? async (ptySessionId) => {
+          writeToSession(ptySessionId, opts.missionActivation!);
+        }
+      : undefined,
   };
   const result = await orchestrateNativeTuiAdmission(
     {
@@ -266,6 +329,9 @@ export async function admitNativeTuiDefinition(opts: {
         ? "DETERMINISTIC PROOF AGENT"
         : definitionId,
       corruptId: opts.corruptId,
+      sessionId: kernelSessionId,
+      existingSessionId: opts.existingSessionId,
+      seatCapability,
       peerDelivery: opts.peerDelivery,
       role: opts.role,
       onStarted: opts.onStarted,
@@ -288,7 +354,9 @@ export async function cancelNativeTuiSession(
   if (entry.peerRole) {
     unregisterSeatPty(entry.peerRole, entry.ptySessionId);
   }
+  revokeLiveSeatCapability(entry.seatCapability);
   ptyToKernel.delete(entry.ptySessionId);
+  ptyToCapability.delete(entry.ptySessionId);
   await killSession(entry.ptySessionId).catch(() => {});
   try {
     kernelExecute(
@@ -315,6 +383,8 @@ export async function tearDownNativeTui(entry: NativeTuiLive): Promise<void> {
   if (entry.peerRole) {
     unregisterSeatPty(entry.peerRole, entry.ptySessionId);
   }
+  revokeLiveSeatCapability(entry.seatCapability);
   ptyToKernel.delete(entry.ptySessionId);
+  ptyToCapability.delete(entry.ptySessionId);
   await killSession(entry.ptySessionId).catch(() => {});
 }

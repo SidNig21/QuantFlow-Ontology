@@ -32,6 +32,8 @@ export const WINDOWS_WSL_LAUNCH_ENV_KEYS = [
   "QF_KERNEL_DB",
   "QF_ARTIFACT_ROOT",
   "QF_QUANTFLOW_HERMES_PROFILE_ROOT",
+  "QF_LAUNCH_READY_NONCE",
+  "QF_LIVE_SEAT_CAPABILITY",
 ] as const;
 
 interface ServerOptions {

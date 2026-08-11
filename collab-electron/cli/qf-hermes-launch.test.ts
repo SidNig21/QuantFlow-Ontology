@@ -29,6 +29,10 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain('"$HOME/.hermes/config.yaml"');
     expect(wrapper).toContain('ln -s "$auth_source" "$auth_link"');
     expect(wrapper).toContain('auth_source="$HOME/.hermes/auth.json"');
+    expect(wrapper).toContain("QF_LAUNCH_READY_NONCE");
+    expect(wrapper).toContain("QF_LAUNCH_READY %s");
+    expect(wrapper).toContain("QF_LAUNCH_COMMIT %s");
+    expect(wrapper).toContain("unset QF_LAUNCH_READY_NONCE");
   });
 
   test("reports missing Hermes prerequisites without writing a profile", () => {
@@ -59,6 +63,7 @@ describe("Hermes packaged launch wrapper", () => {
             "-d", "Ubuntu", "--", "env",
             `HOME=${wslPath(founderHome)}`,
             "QF_AGENT_SESSION_ID=seat/test",
+            "QF_LAUNCH_READY_NONCE=test-ready",
             `QF_HERMES_PROFILE_ROOT=${wslPath(join(founderHome, ".hermes", "redirect"))}`,
             `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
             "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs", "sh", "-c", "exit 0",
@@ -75,6 +80,7 @@ describe("Hermes packaged launch wrapper", () => {
                 ...process.env,
                 HOME: founderHome,
                 QF_AGENT_SESSION_ID: "seat/test",
+                QF_LAUNCH_READY_NONCE: "test-ready",
                 QF_HERMES_PROFILE_ROOT: join(founderHome, ".hermes", "redirect"),
                 QF_QUANTFLOW_HERMES_PROFILE_ROOT: isolatedRoot,
               },

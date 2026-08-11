@@ -42,9 +42,13 @@ export {
 } from "./create.ts";
 export { assertPipelineHandlersComplete } from "./pipeline.ts";
 export {
+  AgentSessionIdentityLinkRejectedError,
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
   ContentHashMismatchError,
+  DelegatesToLinkRejectedError,
+  DelegatedByLinkRejectedError,
+  TaskCreationEnvelopeRejectedError,
   FabricatedStateError,
   IllegalLinkError,
   IllegalTransitionError,
@@ -74,6 +78,7 @@ export type {
   PipelineExecuteResult,
 } from "./results.ts";
 export { contentHash } from "./hash.ts";
+export { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 export { replayArtifactAndAssert, replayRunAndAssert } from "./replay.ts";
 export {
   resolvePackageRef,
@@ -84,5 +89,6 @@ export {
   MARKET_INGEST_UPGRADE,
   MARKET_CONTEXT_UPGRADE,
   PROFILE_IDENTITY_UPGRADE,
+  TASK_DELEGATION_UPGRADE,
 } from "./upgrade.ts";
 export { seedExperimentalFixtureTable } from "./fixtures.ts";

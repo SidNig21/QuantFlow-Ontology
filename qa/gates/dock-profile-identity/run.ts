@@ -54,8 +54,13 @@ const PRODUCTION_UPGRADE_FILES = [
   "0001-agent-profile-identity.sql",
   "0002-market-ingest.sql",
   "0003-market-context.sql",
+  "0004-capability-grants.sql",
+  "0005-task-status.sql",
+  "0006-connection-actions.sql",
+  "0007-task-delegation.sql",
 ] as const;
-const PRE_D1_REQUIRED_UPGRADES = "agent-profile-identity,market-ingest,market-context";
+const PRE_D1_REQUIRED_UPGRADES =
+  "agent-profile-identity,market-ingest,market-context,capability-grants,task-status,connection-actions,task-delegation";
 const QF_TOOLLOOP_PACKAGE = join(REPO, "tools/runtime-proof/agent-package");
 const ELECTRON_MAIN = join(REPO, "collab-electron/src/main");
 const KERNEL_ATTACH_SOURCE = join(REPO, "packages/qf-kernel/src/db.ts");

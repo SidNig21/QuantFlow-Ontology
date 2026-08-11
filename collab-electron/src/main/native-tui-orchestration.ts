@@ -7,6 +7,8 @@ export type NativeTuiLive = {
   kind: "native_tui";
   ptySessionId: string;
   peerRole?: string;
+  /** Process-local app-boundary credential; never projected or persisted. */
+  seatCapability?: string;
   unsub?: () => void;
   turnInFlight: boolean;
 };
@@ -31,12 +33,28 @@ export type NativeTuiOrchestrationDependencies = {
   peerRegister: (role: string, ptySessionId: string) => void;
   peerUnregister: (role: string, ptySessionId: string) => void;
   peerStart: (dbPath: string) => void;
+  seatCapabilityBind?: (
+    capability: string,
+    sessionId: string,
+    role: string,
+    ptySessionId: string,
+  ) => void;
+  seatCapabilityRevoke?: (capability: string | undefined) => void;
+  awaitLauncherReady?: (ptySessionId: string) => Promise<void>;
+  cancelLauncherReadiness?: () => void;
+  activateMission?: (ptySessionId: string) => Promise<void>;
 };
 
 export type NativeTuiOrchestrationOptions = {
   definitionId: string;
   label: string;
   corruptId?: string;
+  /** Runtime-minted id for the normal admission path. */
+  sessionId?: string;
+  /** Existing Kernel row supplied by the gateway; never substitute it. */
+  existingSessionId?: string;
+  /** App-memory credential delivered only to this runtime's environment. */
+  seatCapability?: string;
   peerDelivery?: { role: string; dbPath: string };
   role?: string;
   onStarted?: (
@@ -67,7 +85,6 @@ export async function orchestrateNativeTuiAdmission(
   deps: NativeTuiOrchestrationDependencies,
 ): Promise<NativeTuiOrchestrationResult> {
   const peer = opts.peerDelivery;
-  if (peer) deps.peerAssertAvailable(peer.role);
 
   let pty: NativeTuiPty | null = null;
   let sessionId: string | null = null;
@@ -77,7 +94,8 @@ export async function orchestrateNativeTuiAdmission(
   let kernelCreated = false;
 
   try {
-    sessionId = opts.corruptId ?? deps.newSessionId();
+    if (peer) deps.peerAssertAvailable(peer.role);
+    sessionId = opts.existingSessionId ?? opts.sessionId ?? opts.corruptId ?? deps.newSessionId();
     pty = await deps.createPty({ sessionId });
 
     deps.liveSet(sessionId, {
@@ -87,28 +105,36 @@ export async function orchestrateNativeTuiAdmission(
       kind: "native_tui",
       ptySessionId: pty.sessionId,
       ...(peer ? { peerRole: peer.role } : {}),
+      ...(opts.seatCapability ? { seatCapability: opts.seatCapability } : {}),
       turnInFlight: false,
     });
     liveOwned = true;
     deps.ptyMapSet(pty.sessionId, sessionId);
     ptyMapOwned = true;
 
+    if (opts.seatCapability) {
+      if (!opts.role || !deps.seatCapabilityBind) {
+        throw new Error("native-TUI seat capability requires a role and binder");
+      }
+      deps.seatCapabilityBind(opts.seatCapability, sessionId, opts.role, pty.sessionId);
+    }
+
     const trace = deps.newTrace();
-    deps.execute(
-      "create_agent_session",
-      {
-        session_id: sessionId,
-        agent_definition_id: opts.definitionId,
-        label: opts.label,
-      },
-      trace,
-    );
-    kernelCreated = true;
-    deps.execute(
-      "start_agent_session",
-      { session_id: sessionId },
-      { ...trace, span_id: deps.newTrace().span_id },
-    );
+    if (!opts.existingSessionId) {
+      deps.execute(
+        "create_agent_session",
+        {
+          session_id: sessionId,
+          agent_definition_id: opts.definitionId,
+          label: opts.label,
+        },
+        trace,
+      );
+      kernelCreated = true;
+    } else {
+      // The gateway validated this exact starting row and spawned_from link.
+      kernelCreated = true;
+    }
 
     if (peer) {
       // Install the exit watcher before binding the role so a fast-exiting PTY
@@ -117,6 +143,14 @@ export async function orchestrateNativeTuiAdmission(
       deps.peerRegister(peer.role, pty.sessionId);
       peerOwned = true;
     }
+
+    await deps.awaitLauncherReady?.(pty.sessionId);
+    deps.execute(
+      "start_agent_session",
+      { session_id: sessionId },
+      { ...trace, span_id: deps.newTrace().span_id },
+    );
+    await deps.activateMission?.(pty.sessionId);
 
     opts.onStarted?.(sessionId, opts.definitionId, {
       surface: "native_tui",
@@ -153,6 +187,8 @@ export async function orchestrateNativeTuiAdmission(
         cleanupErrors.push(asError(error));
       }
     }
+    deps.seatCapabilityRevoke?.(opts.seatCapability);
+    deps.cancelLauncherReadiness?.();
     if (pty) {
       try {
         await deps.terminatePty(pty.sessionId);

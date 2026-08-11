@@ -748,6 +748,8 @@ export async function createHostCommandSession(opts: {
   target?: string;
   cwdGuestPath?: string;
   senderWebContentsId?: number;
+  /** Main-process consumer registered before the owned command is spawned. */
+  onData?: (data: Buffer) => void;
 }): Promise<{
   sessionId: string;
   command: string;
@@ -801,6 +803,7 @@ export async function createHostCommandSession(opts: {
   const dataSock = await client.attachDataSocket(
     socketPath,
     (data) => {
+      opts.onData?.(data);
       forwardPtyData(
         sessionId,
         getPtyViewer(sessionId) ?? opts.senderWebContentsId,

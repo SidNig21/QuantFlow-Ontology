@@ -2814,7 +2814,7 @@
   },
   {
     "name": "qf_create_task",
-    "description": "Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.",
+    "description": "Create an open task with one trusted delegator and one assignee. The Kernel writes delegated_by and assigned_to atomically; callers cannot supply either identity link.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -2845,17 +2845,22 @@
   },
   {
     "name": "qf_complete_task",
-    "description": "Mark an open task done (open → done) through the transition table.",
+    "description": "Complete an open task with its durable result artifact. The Kernel accepts it only when trusted worker context owns the assignment and the result derives from that worker's Kernel-receipted generated ontology read.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "task_id": {
           "type": "string",
           "description": "Task id to complete."
+        },
+        "result_artifact_id": {
+          "type": "string",
+          "description": "Canonical result trajectory artifact that proves this task's completion lineage."
         }
       },
       "required": [
-        "task_id"
+        "task_id",
+        "result_artifact_id"
       ]
     }
   },

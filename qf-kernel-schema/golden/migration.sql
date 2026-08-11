@@ -50,7 +50,8 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('deriv
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluated_by', 'link', 'experimental', 'Verdict attachment: which evaluation judged an artifact or run.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assigned_to', 'link', 'experimental', 'Work routing: which agent session owns a task.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Session-to-session delegation on the canvas.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegated_by', 'link', 'experimental', 'Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('spawned_from', 'link', 'experimental', 'Session identity: which agent_definition profile created this agent_session.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_hypothesis', 'action', 'experimental', 'Open a new research hypothesis with claim, success criteria, and optional sources.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_dataset_version', 'action', 'experimental', 'Register a new content-hashed, point-in-time dataset version in the Kernel.');
@@ -71,8 +72,8 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('sched
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('ingest_market_batch', 'action', 'experimental', 'Ingest one provenance-bound batch of instrument and quote rows through the trusted market pipeline. The Kernel must validate the whole batch and commit its rows, derived quote links, and evidence events atomically.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('register_agent_definition', 'action', 'experimental', 'Register a Dock profile in the Kernel registry (id = name). Duplicate names are rejected; operator-only because it controls package_ref and runtime_profile.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_task', 'action', 'experimental', 'Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_task', 'action', 'experimental', 'Mark an open task done (open → done) through the transition table.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_task', 'action', 'experimental', 'Create an open task with one trusted delegator and one assignee. The Kernel writes delegated_by and assigned_to atomically; callers cannot supply either identity link.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_task', 'action', 'experimental', 'Complete an open task with its durable result artifact. The Kernel accepts it only when trusted worker context owns the assignment and the result derives from that worker''s Kernel-receipted generated ontology read.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_connection', 'action', 'experimental', 'Create a typed canvas connection edge (kind data|control|view) between two port refs. It persists projection wiring only through the Kernel command path — never a second truth store or a self-loop.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delete_connection', 'action', 'experimental', 'Delete a connection row by id and append connection.deleted. Hard delete only — the ontology has no tombstone field, and canvas persistence must never keep the edge.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_agent_session', 'action', 'experimental', 'Bring a starting agent session into running (starting → running).');
@@ -449,7 +450,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'gates', 'assigned_to', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'gates', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.

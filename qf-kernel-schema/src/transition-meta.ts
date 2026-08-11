@@ -13,11 +13,9 @@ function objectIdFieldFromAction(actionName: string): string {
   if (idKeys.length === 0) {
     throw new Error(`transition-meta: action "${actionName}" has no *_id input field`);
   }
-  if (idKeys.length > 1) {
-    throw new Error(
-      `transition-meta: action "${actionName}" has multiple *_id fields: ${idKeys.join(", ")}`,
-    );
-  }
+  // The transitioned row id is declared first. Later *_id fields are durable
+  // lineage inputs (for example complete_task.result_artifact_id), not a
+  // second transition target.
   return idKeys[0]!;
 }
 

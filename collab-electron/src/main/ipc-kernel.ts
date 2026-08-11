@@ -25,8 +25,8 @@ import {
   kernelListAgentSessions,
   kernelListArtifacts,
   kernelListEvents,
+  kernelListTaskDelegations,
   onKernelEvents,
-  peerBusListHandoffs,
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
@@ -35,6 +35,7 @@ import {
 import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
+import { buildMissionActivationInstruction } from "./mission-activation";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -135,6 +136,10 @@ export function registerKernelHandlers(): void {
         }
         const text = question.trim();
         const missionId = `mission-${crypto.randomUUID()}`;
+        const activationInstruction = buildMissionActivationInstruction(
+          missionId,
+          text,
+        );
         kernelExecute(
           "create_mission",
           {
@@ -151,6 +156,7 @@ export function registerKernelHandlers(): void {
               ? "qf-proof-orchestrator"
               : "hermes-orchestrator";
         const result = await admitAndStartSession(definitionId, {
+          missionActivation: activationInstruction,
           onStarted: (sessionId, sp, info) => {
             invalidateDock();
             sendToShell("shell:forward", "canvas", "sessions-changed");
@@ -192,9 +198,7 @@ export function registerKernelHandlers(): void {
   ipcMain.handle("qf:handoffs:list", (event) => {
     try {
       assertTrustedSender(event);
-      const busDb = process.env.QF_PEER_BUS_DB;
-      if (!busDb) throw new Error("peer-bus is not initialized");
-      return { ok: true as const, handoffs: peerBusListHandoffs(busDb) };
+      return { ok: true as const, handoffs: kernelListTaskDelegations() };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }
@@ -453,5 +457,6 @@ export function registerKernelHandlers(): void {
 
   onKernelEvents(() => {
     broadcast("qf:events:invalidate");
+    sendToShell("shell:forward", "canvas", "handoffs-changed");
   });
 }

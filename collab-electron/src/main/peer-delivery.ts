@@ -31,6 +31,7 @@ import { existsSync } from "node:fs";
 import { writeToSession } from "./pty";
 import { onPtySessionExit } from "./pty";
 import { PeerRoleRegistry } from "./peer-role-registry";
+import { formatPeerNotification } from "./peer-notification";
 
 /** Peer role ("orchestrator" | "worker" | "worker2" | …) → live ptySessionId. */
 const seatPtyByRole = new PeerRoleRegistry();
@@ -53,6 +54,11 @@ export function unregisterSeatPty(role: string, ptySessionId: string): boolean {
   return seatPtyByRole.unregister(role, ptySessionId);
 }
 
+export function livePtyIdsForRole(role: string): string[] {
+  const pty = seatPtyByRole.get(role);
+  return pty ? [pty] : [];
+}
+
 function unregisterSeatPtyBySession(ptySessionId: string): void {
   seatPtyByRole.unregisterPty(ptySessionId);
 }
@@ -61,7 +67,7 @@ type PendingRow = {
   id: string;
   from_role: string;
   to_role: string;
-  artifact_id: string;
+  artifact_id: string | null;
   body: string;
   message_kind: "task" | "result";
   reply_to_artifact_id: string | null;
@@ -69,14 +75,7 @@ type PendingRow = {
 
 /** The message text that appears in the recipient's TUI (no Enter — see below). */
 function formatIncoming(row: PendingRow): string {
-  const oneLine = row.body.replace(/\s*\n\s*/g, " ").trim();
-  if (row.message_kind === "task") {
-    return `[QuantFlow TASK ${row.artifact_id} from ${row.from_role}] ${oneLine} `
-      + `Complete it, then call the QuantFlow collaboration send_result tool `
-      + `with task_artifact_id=${row.artifact_id}.`;
-  }
-  return `[QuantFlow RESULT for ${row.reply_to_artifact_id ?? "unknown task"} `
-    + `from ${row.from_role}] ${oneLine}`;
+  return formatPeerNotification(row.from_role, row.message_kind, row.body) ?? "";
 }
 
 /**
@@ -118,8 +117,15 @@ function poll(): void {
       // Split write: text now, Enter as a separate keystroke (defeats the TUI's
       // paste-detection). Mark pushed_at ONLY after the Enter is written — a
       // seat that dies mid-inject is never falsely marked, so it retries.
+      const instruction = formatIncoming(row);
+      if (!instruction) {
+        db.prepare(`UPDATE messages SET pushed_at = ? WHERE id = ?`)
+          .run(new Date().toISOString(), row.id);
+        console.warn(`peer-delivery: skipped malformed notification id=${row.id}`);
+        continue;
+      }
       inFlight.add(row.id);
-      writeToSession(pty, formatIncoming(row));
+      writeToSession(pty, instruction);
       const { id, from_role, to_role } = row;
       setTimeout(() => {
         try {

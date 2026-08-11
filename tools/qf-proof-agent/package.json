@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "pack-agent": "node ./scripts/pack-agent.mjs"
+    "pack-agent": "node ./scripts/pack-agent.mjs",
+    "test": "node --test ./src/*.test.mjs"
   }
 }

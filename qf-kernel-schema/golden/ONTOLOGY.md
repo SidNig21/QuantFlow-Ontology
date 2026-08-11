@@ -356,9 +356,17 @@ Work routing: which agent session owns a task.
 - **from:** `task`
 - **to:** `agent_session`
 
+### `delegated_by`
+
+Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.
+
+- **lifecycle:** `experimental`
+- **from:** `task`
+- **to:** `agent_session`
+
 ### `delegates_to`
 
-Session-to-session delegation on the canvas.
+Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.
 
 - **lifecycle:** `experimental`
 - **from:** `agent_session`
@@ -579,7 +587,7 @@ Create an agent_session by adopting a guest-minted session_id (Kernel never mint
 
 ### `create_task`
 
-Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.
+Create an open task with one trusted delegator and one assignee. The Kernel writes delegated_by and assigned_to atomically; callers cannot supply either identity link.
 
 - **lifecycle:** `experimental`
 - **input:**
@@ -590,11 +598,12 @@ Create a task in status open and atomically assign it to an agent_session via as
 
 ### `complete_task`
 
-Mark an open task done (open → done) through the transition table.
+Complete an open task with its durable result artifact. The Kernel accepts it only when trusted worker context owns the assignment and the result derives from that worker's Kernel-receipted generated ontology read.
 
 - **lifecycle:** `experimental`
 - **input:**
 - `task_id` — Task id to complete.
+- `result_artifact_id` — Canonical result trajectory artifact that proves this task's completion lineage.
 
 ### `create_connection`
 

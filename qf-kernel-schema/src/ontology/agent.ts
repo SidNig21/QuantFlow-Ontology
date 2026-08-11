@@ -186,9 +186,19 @@ export const assigned_to = defineLink({
   to: agent_session,
 });
 
+export const delegated_by = defineLink({
+  name: "delegated_by",
+  description:
+    "Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.",
+  lifecycle: "experimental",
+  from: task,
+  to: agent_session,
+});
+
 export const delegates_to = defineLink({
   name: "delegates_to",
-  description: "Session-to-session delegation on the canvas.",
+  description:
+    "Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.",
   lifecycle: "experimental",
   from: agent_session,
   to: agent_session,
@@ -326,7 +336,7 @@ export const close_agent_session = defineAction({
 export const create_task = defineAction({
   name: "create_task",
   description:
-    "Create a task in status open and atomically assign it to an agent_session via assigned_to. Guest-minted task_id is adopted; caller may not supply assigned_to links.",
+    "Create an open task with one trusted delegator and one assignee. The Kernel writes delegated_by and assigned_to atomically; callers cannot supply either identity link.",
   lifecycle: "experimental",
   capabilityGroup: "desk.orchestrate",
   input: z.object({
@@ -345,11 +355,15 @@ export const create_task = defineAction({
 
 export const complete_task = defineAction({
   name: "complete_task",
-  description: "Mark an open task done (open → done) through the transition table.",
+  description:
+    "Complete an open task with its durable result artifact. The Kernel accepts it only when trusted worker context owns the assignment and the result derives from that worker's Kernel-receipted generated ontology read.",
   lifecycle: "experimental",
   capabilityGroup: "desk.orchestrate",
   input: z.object({
     task_id: z.string().describe("Task id to complete."),
+    result_artifact_id: z
+      .string()
+      .describe("Canonical result trajectory artifact that proves this task's completion lineage."),
   }),
 });
 

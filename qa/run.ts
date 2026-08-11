@@ -532,6 +532,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "windows-golden-run",
+    description:
+      "Act I: one packaged Submit delegates a cited market result and recovers it after restart",
+    run: async () => {
+      const { runWindowsGoldenRunGate } = await import(
+        "./gates/windows-golden-run.ts"
+      );
+      const { ok } = await runWindowsGoldenRunGate();
+      return ok;
+    },
+  },
+  {
     name: "runtime-proof",
     description:
       "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",

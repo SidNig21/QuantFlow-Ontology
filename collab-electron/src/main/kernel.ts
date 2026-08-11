@@ -2,12 +2,13 @@
  * Sole app module that imports qf-kernel / opens SQLite.
  * All other main-process code goes through getKernelDb() / helpers here.
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { dirname, join } from "node:path";
 import {
   attachKernel,
+  assertDurableOntologyReadReceipt,
   execute,
   getLinks,
   getObject,
@@ -20,19 +21,27 @@ import {
   type GetLinksOptions,
   type LinkRow,
   type TraceContext,
+  type TrustedExecutionContext,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
 import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp";
 import { QF_APP_DIR } from "./paths";
+import {
+  projectTaskDelegations,
+  type TaskDelegationProjection,
+} from "./task-delegation-projection";
+import { runAtomicResultCommit } from "./atomic-result-commit";
 
-function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
+/** Node DatabaseSync adapter with savepoints for Kernel commands inside app transactions. */
+export function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
+  let transactionDepth = 0;
   return {
     query(sql: string) {
       const stmt = raw.prepare(sql);
       return {
-        run: (...params: unknown[]) => stmt.run(...params),
-        get: (...params: unknown[]) => stmt.get(...params),
-        all: (...params: unknown[]) => stmt.all(...params),
+        run: (...params: unknown[]) => stmt.run(...params as Parameters<typeof stmt.run>),
+        get: (...params: unknown[]) => stmt.get(...params as Parameters<typeof stmt.get>),
+        all: (...params: unknown[]) => stmt.all(...params as Parameters<typeof stmt.all>),
       };
     },
     exec(sql: string) {
@@ -40,14 +49,25 @@ function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
     },
     transaction<T>(fn: () => T): () => T {
       return () => {
-        raw.exec("BEGIN IMMEDIATE");
+        const depth = transactionDepth;
+        const savepoint = `qf_nested_${depth}`;
+        if (depth === 0) raw.exec("BEGIN IMMEDIATE");
+        else raw.exec(`SAVEPOINT ${savepoint}`);
+        transactionDepth += 1;
         try {
           const result = fn();
-          raw.exec("COMMIT");
+          if (depth === 0) raw.exec("COMMIT");
+          else raw.exec(`RELEASE SAVEPOINT ${savepoint}`);
           return result;
-        } catch (err) {
-          raw.exec("ROLLBACK");
-          throw err;
+        } catch (error) {
+          if (depth === 0) raw.exec("ROLLBACK");
+          else {
+            raw.exec(`ROLLBACK TO SAVEPOINT ${savepoint}`);
+            raw.exec(`RELEASE SAVEPOINT ${savepoint}`);
+          }
+          throw error;
+        } finally {
+          transactionDepth = depth;
         }
       };
     },
@@ -114,25 +134,12 @@ export type PeerBusMessage = {
   to_role: string;
   from_session_id: string | null;
   to_session_id: string | null;
-  artifact_id: string;
+  artifact_id: string | null;
   body: string;
   message_kind: "task" | "result";
   reply_to_artifact_id: string | null;
   created_at: string;
   delivered: number;
-};
-
-export type PeerHandoff = {
-  taskArtifactId: string;
-  fromRole: string;
-  toRole: string;
-  fromSessionId: string;
-  toSessionId: string;
-  task: string;
-  resultArtifactId: string | null;
-  result: string | null;
-  status: "requested" | "completed";
-  createdAt: string;
 };
 
 function openPeerBus(path: string): DatabaseSync {
@@ -155,8 +162,8 @@ function openPeerBus(path: string): DatabaseSync {
   return db;
 }
 
-/** Product-owned peer transport: Kernel trajectory first, then optional routing. */
-export function peerBusSend(
+/** Notification-only peer transport. Kernel task/result truth already exists. */
+export function peerBusNotify(
   path: string,
   input: {
     fromSessionId: string;
@@ -165,44 +172,16 @@ export function peerBusSend(
     toRole: string;
     body: string;
     kind: "task" | "result";
-    replyToArtifactId?: string;
+    taskId: string;
+    artifactId?: string;
   },
-): { artifactId: string; messageId: string; delivered: boolean } {
+): { messageId: string; delivered: boolean } {
   const createdAt = new Date().toISOString();
-  const payload = JSON.stringify({
-    contract: "qf.collaboration.v1",
-    kind: input.kind,
-    from_role: input.fromRole,
-    to_role: input.toRole,
-    from_session_id: input.fromSessionId,
-    to_session_id: input.toSessionId,
+  const notificationBody = JSON.stringify({
+    contract: "qf.peer-notification.v1",
+    task_id: input.taskId,
     body: input.body,
-    reply_to_artifact_id: input.replyToArtifactId ?? null,
-    created_at: createdAt,
-    nonce: crypto.randomUUID(),
-  }, null, 2);
-  const contentHash = createHash("sha256").update(payload).digest("hex");
-  const artifactDir = join(getArtifactRoot(), "peer-handoffs");
-  mkdirSync(artifactDir, { recursive: true });
-  const storagePath = join(artifactDir, `${contentHash}.json`);
-  writeFileSync(storagePath, payload, "utf8");
-  const links: Array<{ kind: string; from_id?: string; to_id?: string }> = [
-    { kind: "produces", from_id: input.fromSessionId },
-  ];
-  if (input.kind === "result" && input.replyToArtifactId) {
-    links.push({ kind: "derived_from", to_id: input.replyToArtifactId });
-  }
-  const artifact = kernelExecute(
-    "publish_artifact",
-    {
-      kind: "trajectory",
-      storage_ref: storagePath,
-      path: storagePath,
-      content_hash: contentHash,
-      links,
-    },
-    { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
-  ) as { object_id: string };
+  });
   const messageId = crypto.randomUUID();
   const delivered = process.env.QF_PEER_DELIVERY !== "off";
   const db = openPeerBus(path);
@@ -219,30 +198,30 @@ export function peerBusSend(
         input.toRole,
         input.fromSessionId,
         input.toSessionId,
-        artifact.object_id,
-        input.body,
+        input.artifactId ?? null,
+        notificationBody,
         input.kind,
-        input.replyToArtifactId ?? null,
+        null,
         createdAt,
       );
     }
   } finally {
     db.close();
   }
-  return { artifactId: artifact.object_id, messageId, delivered };
+  return { messageId, delivered };
 }
 
 export function peerBusReadInbox(
   path: string,
-  role: string,
+  sessionId: string,
 ): PeerBusMessage[] {
   const db = openPeerBus(path);
   try {
     const rows = db.prepare(
       `SELECT id, from_role, to_role, from_session_id, to_session_id, artifact_id,
               body, message_kind, reply_to_artifact_id, created_at, delivered
-       FROM messages WHERE to_role = ? AND delivered = 0 ORDER BY created_at ASC`,
-    ).all(role) as PeerBusMessage[];
+       FROM messages WHERE to_session_id = ? AND delivered = 0 ORDER BY created_at ASC`,
+    ).all(sessionId) as PeerBusMessage[];
     for (const row of rows) {
       db.prepare(`UPDATE messages SET delivered = 1 WHERE id = ?`).run(row.id);
     }
@@ -252,52 +231,152 @@ export function peerBusReadInbox(
   }
 }
 
-/** Read-only canvas projection. Transport rows supply copy; Kernel links authorize status. */
-export function peerBusListHandoffs(path: string): PeerHandoff[] {
-  const db = openPeerBus(path);
-  try {
-    const rows = db.prepare(
-      `SELECT id, from_role, to_role, from_session_id, to_session_id, artifact_id,
-              body, message_kind, reply_to_artifact_id, created_at, delivered
-       FROM messages ORDER BY created_at ASC`,
-    ).all() as PeerBusMessage[];
-    const results = rows.filter((row) => row.message_kind === "result");
-    return rows
-      .filter((row) => row.message_kind === "task")
-      .filter((row) => row.from_session_id && row.to_session_id)
-      .filter((row) => kernelGetLinks(row.artifact_id, { kind: "produces" })
-        .some((link) => link.from_id === row.from_session_id && link.to_id === row.artifact_id))
-      .map((task) => {
-        const result = results.find((row) => {
-          if (row.reply_to_artifact_id !== task.artifact_id) return false;
-          const produced = kernelGetLinks(row.artifact_id, { kind: "produces" })
-            .some((link) => link.from_id === row.from_session_id && link.to_id === row.artifact_id);
-          const derived = kernelGetLinks(row.artifact_id, { kind: "derived_from" })
-            .some((link) => link.from_id === row.artifact_id && link.to_id === task.artifact_id);
-          return produced && derived;
-        });
-        return {
-          taskArtifactId: task.artifact_id,
-          fromRole: task.from_role,
-          toRole: task.to_role,
-          fromSessionId: task.from_session_id!,
-          toSessionId: task.to_session_id!,
-          task: task.body,
-          resultArtifactId: result?.artifact_id ?? null,
-          result: result?.body ?? null,
-          status: result ? "completed" : "requested",
-          createdAt: task.created_at,
-        };
-      });
-  } finally {
-    db.close();
+/** Publish the one canonical result trajectory under the root-owned handoff path. */
+function publishCollaborationResult(input: {
+  taskId: string;
+  workerSessionId: string;
+  workerRole: string;
+  delegatorSessionId: string;
+  delegatorRole: string;
+  result: string;
+  citedMarketIds: string[];
+  readTrajectoryArtifactIds: string[];
+}, executeCommand: typeof kernelExecute): { artifactId: string } {
+  const createdAt = new Date().toISOString();
+  const payload = JSON.stringify({
+    contract: "qf.collaboration.v1",
+    kind: "result",
+    task_id: input.taskId,
+    result: input.result,
+    cited_market_ids: input.citedMarketIds,
+    read_trajectory_artifact_ids: input.readTrajectoryArtifactIds,
+    from_session_id: input.workerSessionId,
+    from_role: input.workerRole,
+    to_session_id: input.delegatorSessionId,
+    to_role: input.delegatorRole,
+    created_at: createdAt,
+    nonce: crypto.randomUUID(),
+  }, null, 2);
+  const contentHash = createHash("sha256").update(payload).digest("hex");
+  const artifactDir = join(getArtifactRoot(), "peer-handoffs");
+  mkdirSync(artifactDir, { recursive: true });
+  const storagePath = join(artifactDir, `${contentHash}.json`);
+  writeFileSync(storagePath, payload, "utf8");
+  const artifact = executeCommand(
+    "publish_artifact",
+    {
+      kind: "trajectory",
+      storage_ref: storagePath,
+      path: storagePath,
+      content_hash: contentHash,
+      links: [
+        { kind: "produces", from_id: input.workerSessionId },
+        ...input.readTrajectoryArtifactIds.map((id) => ({
+          kind: "derived_from",
+          to_id: id,
+        })),
+      ],
+    },
+    {
+      trace_id: crypto.randomUUID(),
+      span_id: crypto.randomUUID(),
+      actor_session_id: input.workerSessionId,
+    },
+  ) as { object_id: string };
+  return { artifactId: artifact.object_id };
+}
+
+/** Result publication and task completion are one Kernel transaction. */
+export function commitCollaborationResult(input: {
+  taskId: string;
+  workerSessionId: string;
+  workerRole: string;
+  delegatorSessionId: string;
+  delegatorRole: string;
+  result: string;
+  citedMarketIds: string[];
+  readTrajectoryArtifactIds: string[];
+}): { artifactId: string; completion: unknown } {
+  const context = {
+    trace_id: crypto.randomUUID(),
+    span_id: crypto.randomUUID(),
+    actor_session_id: input.workerSessionId,
+  };
+  const rawExecute = <C extends string>(
+    command: C,
+    commandInput: Record<string, unknown>,
+    trace: TrustedExecutionContext,
+  ) => execute(getKernelDb(), command, commandInput, trace);
+  const committed = runAtomicResultCommit(
+    getKernelDb(),
+    () => publishCollaborationResult(input, rawExecute),
+    (published) => rawExecute(
+      "complete_task",
+      { task_id: input.taskId, result_artifact_id: published.artifactId },
+      context,
+    ),
+  );
+  notifyKernelEvents();
+  return {
+    artifactId: committed.published.artifactId,
+    completion: committed.completion,
+  };
+}
+
+/** App cite validation over a Kernel-issued, worker-owned market.read receipt. */
+export function kernelReadMarketTrajectoryResult(
+  artifactId: string,
+  workerSessionId: string,
+): unknown {
+  assertDurableOntologyReadReceipt(getKernelDb(), artifactId, workerSessionId);
+  const producerLinks = kernelGetLinks(artifactId, {
+    kind: "produces",
+  }).filter((link) => link.to_id === artifactId);
+  if (
+    producerLinks.length !== 1 ||
+    producerLinks[0]!.from_id !== workerSessionId
+  ) {
+    throw new Error("read trajectory is not produced by the assigned worker");
   }
+  const artifact = kernelGetObject("artifact", artifactId);
+  if (!artifact || artifact.kind !== "trajectory") {
+    throw new Error("read trajectory artifact is missing");
+  }
+  const payload = JSON.parse(readFileSync(String(artifact.storage_ref), "utf8")) as {
+    contract?: unknown;
+    tool?: unknown;
+    result?: unknown;
+  };
+  if (
+    payload.contract !== "qf.ontology.v1" ||
+    typeof payload.tool !== "string" ||
+    kernelCapabilityGroupForTool(payload.tool) !== "market.read"
+  ) {
+    throw new Error("read trajectory is not a market.read ontology receipt");
+  }
+  return payload.result;
+}
+
+/** Market ids are object ids from schema objects governed by market.read. */
+export function kernelMarketObjectExists(id: string): boolean {
+  return schema.objects
+    .filter((object) => object.capabilityGroup === "market.read")
+    .some((object) => kernelGetObject(object.name, id) !== null);
+}
+
+/** Read-only canvas projection from durable Kernel task and identity links. */
+export function kernelListTaskDelegations(): TaskDelegationProjection[] {
+  return projectTaskDelegations({
+    listTasks: () => kernelQueryObjects("task", {}, null, 0, "asc"),
+    linksFrom: (id, kind) => kernelGetLinks(id, { kind }).filter((link) => link.from_id === id),
+    getObject: kernelGetObject,
+  });
 }
 
 export function kernelExecute<C extends string>(
   command: C,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
 ): ExecuteResultFor<C> {
   const result = execute(getKernelDb(), command, input, trace);
   notifyKernelEvents();
@@ -498,4 +577,4 @@ export function resolveSpeciesPackage(
   return resolveSpeciesPackageRow(getKernelDb(), species, appRoot);
 }
 
-export type { TraceContext };
+export type { TraceContext, TrustedExecutionContext };
