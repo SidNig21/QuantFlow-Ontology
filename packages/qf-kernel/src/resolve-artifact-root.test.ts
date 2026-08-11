@@ -8,7 +8,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
 
 const saved = {
@@ -59,7 +59,7 @@ describe("resolveArtifactRoot", () => {
       const r = resolveArtifactRoot();
       expect(r.provenance).toBe("env");
       expect(r.path).toBe(join(dir, "store"));
-      expect(r.path.startsWith("/")).toBe(true);
+      expect(isAbsolute(r.path)).toBe(true);
     } finally {
       process.chdir(prev);
     }

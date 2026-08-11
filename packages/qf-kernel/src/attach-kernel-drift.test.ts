@@ -114,7 +114,9 @@ describe("attachKernel WO-K3 drift / incomplete init", () => {
       db,
       "publish_artifact",
       {
-        kind: "report",
+        // Not a report: R12 gates report publication behind a supporting
+        // evaluation, and this test covers clean-init writability only.
+        kind: "result_set",
         bytes,
         storage_ref: "mem://k3-clean",
       },

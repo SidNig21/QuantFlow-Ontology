@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { resolveKernelPath } from "./resolve-path.ts";
 
 const saved = {
@@ -54,7 +54,7 @@ describe("resolveKernelPath", () => {
       const r = resolveKernelPath();
       expect(r.provenance).toBe("env");
       expect(r.path).toBe(join(dir, "kernel.db"));
-      expect(r.path.startsWith("/")).toBe(true);
+      expect(isAbsolute(r.path)).toBe(true);
     } finally {
       process.chdir(prev);
       rmSync(dir, { recursive: true, force: true });
