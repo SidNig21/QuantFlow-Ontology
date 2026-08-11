@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { parseCollaborationResultPayload } from "./result-payload";
+import { parseCollaborationResultPayload, parseResearchReportPayload } from "./result-payload";
 
 test("parses a cited collaboration result", () => {
   expect(parseCollaborationResultPayload(JSON.stringify({
@@ -12,6 +12,21 @@ test("parses a cited collaboration result", () => {
     result: "Venue one is strongest.",
     citedMarketIds: ["venue-1"],
     readTrajectoryArtifactIds: ["read-1"],
+  });
+});
+
+test("parses a Kernel-gated research report", () => {
+  expect(parseResearchReportPayload(JSON.stringify({
+    contract: "qf.research.report.v1",
+    hypothesis: { claim: "Highest edge produced positive ROI", status: "supported" },
+    run: { id: "run-1" },
+    evaluation: {
+      verdict: "supports", confidence: 0.9, rationale: "The metric is positive.",
+      metrics: JSON.stringify({ contract: "qf.metrics.v1", roi: "1.000000" }),
+    },
+  }))).toMatchObject({
+    claim: "Highest edge produced positive ROI", verdict: "supports", confidence: 0.9,
+    metrics: { roi: "1.000000" },
   });
 });
 

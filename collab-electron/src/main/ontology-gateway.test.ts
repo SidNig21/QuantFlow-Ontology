@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { ontologyTrajectoryContext } from "./ontology-trajectory-context";
 import { ontologyReadReceiptEligible } from "./ontology-read-dispatch";
+import { ontologyToolsForRole } from "./ontology-role-tools";
 
 test("only ontology reads receive the Kernel read marker", () => {
   const identity = { sessionId: "session-worker", role: "worker" };
@@ -41,4 +42,30 @@ test("generic ontology actions expose deterministic execution but not task bypas
   expect(block).toContain("record_evaluation");
   expect(block).not.toContain("create_task");
   expect(block).not.toContain("complete_task");
+});
+
+test("native research roles receive a focused generated ontology surface", () => {
+  const tools = [
+    { name: "qf_agent_definition_query" },
+    { name: "qf_create_agent_session" },
+    { name: "qf_start_agent_session" },
+    { name: "qf_task_query" },
+    { name: "qf_hypothesis_get" },
+    { name: "qf_run_get" },
+    { name: "qf_artifact_get" },
+    { name: "qf_record_evaluation" },
+    { name: "qf_market_event_query" },
+  ];
+  expect(ontologyToolsForRole("orchestrator", tools).map((tool) => tool.name)).toEqual([
+    "qf_agent_definition_query",
+    "qf_create_agent_session",
+    "qf_start_agent_session",
+  ]);
+  expect(ontologyToolsForRole("critic", tools).map((tool) => tool.name)).toEqual([
+    "qf_hypothesis_get",
+    "qf_run_get",
+    "qf_artifact_get",
+    "qf_record_evaluation",
+  ]);
+  expect(ontologyToolsForRole("worker", tools)).toEqual(tools);
 });

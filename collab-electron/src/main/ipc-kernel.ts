@@ -25,6 +25,9 @@ import {
   kernelListAgentSessions,
   kernelListArtifacts,
   kernelListEvents,
+  kernelListResearchLedger,
+  kernelEnsureSampleResearchDataset,
+  kernelOpenHypothesisForQuestion,
   kernelListTaskDelegations,
   onKernelEvents,
 } from "./kernel";
@@ -127,7 +130,7 @@ export function registerKernelHandlers(): void {
 
   ipcMain.handle(
     "qf:research:submitQuestion",
-    async (event, args?: { question?: string; definitionId?: string }) => {
+    async (event, args?: { question?: string; definitionId?: string; datasetId?: string }) => {
       try {
         assertTrustedSender(event);
         const question = args?.question;
@@ -149,6 +152,7 @@ export function registerKernelHandlers(): void {
           },
           { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
         );
+        const hypothesisId = kernelOpenHypothesisForQuestion(text, args?.datasetId);
         const definitionId =
           typeof args?.definitionId === "string" && args.definitionId.length > 0
             ? args.definitionId
@@ -177,6 +181,7 @@ export function registerKernelHandlers(): void {
         return {
           ok: true as const,
           missionId,
+          hypothesisId,
           sessionId: result.sessionId,
           objective: text,
         };
@@ -190,6 +195,24 @@ export function registerKernelHandlers(): void {
     try {
       assertTrustedSender(event);
       return { ok: true as const, artifacts: kernelListArtifacts() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:research:ledger", (event) => {
+    try {
+      assertTrustedSender(event);
+      return { ok: true as const, entries: kernelListResearchLedger() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:research:loadSampleDataset", (event) => {
+    try {
+      assertTrustedSender(event);
+      return { ok: true as const, dataset: kernelEnsureSampleResearchDataset() };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

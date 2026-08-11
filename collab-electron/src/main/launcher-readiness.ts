@@ -45,11 +45,14 @@ export function createLauncherReadinessWaiter(
   sessionId: string,
   nonce: string,
   timeoutMs = 10_000,
+  requireTuiScreen = false,
 ): LauncherReadinessWaiter {
   const ready = `QF_LAUNCH_READY ${nonce}`;
   const commit = `QF_LAUNCH_COMMIT ${nonce}`;
   let buffered = "";
   let readyCount = 0;
+  let launcherCommitted = false;
+  let tuiScreenReady = false;
   let settled = false;
   let resolveWait!: () => void;
   let rejectWait!: (error: Error) => void;
@@ -80,7 +83,8 @@ export function createLauncherReadinessWaiter(
         finish(new Error("native-TUI launcher READY receipt was duplicated"));
       } else {
         readyCount = 1;
-        finish();
+        launcherCommitted = true;
+        if (!requireTuiScreen || tuiScreenReady) finish();
       }
       return;
     }
@@ -95,7 +99,8 @@ export function createLauncherReadinessWaiter(
       if (readyCount !== 1) {
         finish(new Error("native-TUI launcher COMMIT arrived without exactly one READY"));
       } else {
-        finish();
+        launcherCommitted = true;
+        if (!requireTuiScreen || tuiScreenReady) finish();
       }
       return;
     }
@@ -108,7 +113,15 @@ export function createLauncherReadinessWaiter(
     sessionId,
     push(data) {
       if (settled) return;
-      buffered += data.toString("utf8");
+      const text = data.toString("utf8");
+      // Hermes's native Ink UI enters DEC alternate-screen mode only after
+      // its real TUI owns the PTY. This is a terminal protocol boundary, not
+      // scraped vendor copy, and prevents founder missions racing startup.
+      if (requireTuiScreen && text.includes("\u001b[?1049h")) {
+        tuiScreenReady = true;
+        if (launcherCommitted) finish();
+      }
+      buffered += text;
       let newline = buffered.indexOf("\n");
       while (!settled && newline >= 0) {
         const line = buffered.slice(0, newline).replace(/\r$/, "");

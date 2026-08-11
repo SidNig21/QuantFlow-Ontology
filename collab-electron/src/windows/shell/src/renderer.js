@@ -665,9 +665,9 @@ async function init() {
 
 	createKernelLedger(document.getElementById("kernel-ledger"), {
 		listEvents: async () => {
-			const res = await window.shellApi.qf.listEvents({ limit: 40 });
+			const res = await window.shellApi.qf.listResearchLedger();
 			if (!res?.ok) return [];
-			return Array.isArray(res.events) ? res.events : [];
+			return Array.isArray(res.entries) ? res.entries : [];
 		},
 		onSubscribe: (cb) => window.shellApi.qf.onEventsInvalidate(cb),
 	});
@@ -676,24 +676,18 @@ async function init() {
 	minimap.update();
 
 	/**
-	 * Project Kernel task endpoints and live sessions onto the canvas. Tiles hold
-	 * sessionId refs only — appearance follows Kernel truth, not click callbacks.
+	 * Project Kernel task handoffs onto real agent surfaces. Native CLI terminals
+	 * already carry their Kernel sessionId, so a second session card would only
+	 * duplicate internal bookkeeping on the founder canvas. Session history and
+	 * controls remain available in the Dock and Research Ledger.
 	 */
 	async function reconcileTaskDelegationCanvas() {
-		let added = false;
 		await refreshTaskDelegationCanvas({
 			listHandoffs: () => window.shellApi.qf.listHandoffs(),
 			listSessions: () => window.shellApi.qf.listSessions(),
-			ensureSessionTile(sessionId) {
-				if (tiles.some((tile) => tile.sessionId === sessionId)) return;
-				const size = defaultSize("session");
-				const pos = findAutoPlacement(tiles, size.width, size.height);
-				tileManager.createSessionTile(pos.x, pos.y, sessionId);
-				added = true;
-			},
+			ensureSessionTile() {},
 			setHandoffs: (handoffs) => handoffLayer.setHandoffs(handoffs),
 		});
-		if (added) minimap.update();
 	}
 
 	let taskProjectionReady = false;

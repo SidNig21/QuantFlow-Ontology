@@ -484,6 +484,19 @@ export async function admitAndStartSession(
 export async function startPrecreatedNativeTuiSession(
   caller: { sessionId: string; role: string },
   sessionId: string,
+  opts?: {
+    /** One bounded app-authored instruction delivered after native-TUI readiness. */
+    missionActivation?: string;
+    onStarted?: (
+      sessionId: string,
+      definitionId: string,
+      info?: {
+        surface: "acp_session" | "native_tui";
+        ptySessionId?: string;
+        role?: string;
+      },
+    ) => void;
+  },
 ): Promise<AdmitResult> {
   if (!caller.sessionId || !caller.role) {
     throw new Error("precreated admission requires authenticated caller identity");
@@ -506,7 +519,11 @@ export async function startPrecreatedNativeTuiSession(
   assertPrecreatedStartOwnership(caller.sessionId, sessionId, delegations);
   const runtime = getDefinitionRuntime(definitionId);
   assertPrecreatedNativeTuiRoute(runtime.metadata.route);
-  return await admitAndStartSession(definitionId, { existingSessionId: sessionId });
+  return await admitAndStartSession(definitionId, {
+    existingSessionId: sessionId,
+    missionActivation: opts?.missionActivation,
+    onStarted: opts?.onStarted,
+  });
 }
 
 function peerBusDbPath(): string {

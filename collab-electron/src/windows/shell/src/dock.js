@@ -318,17 +318,32 @@ export function initDock(panelEl, options = {}) {
 
 	const questionForm = panelEl.querySelector("#dock-question-form");
 	const questionInput = panelEl.querySelector("#dock-question-input");
+	const questionStatus = panelEl.querySelector("#dock-question-status");
+	let selectedResearchDatasetId = null;
+	const setQuestionStatus = (message, tone = "") => {
+		if (!questionStatus) return;
+		questionStatus.textContent = message;
+		questionStatus.dataset.tone = tone;
+	};
 	if (questionForm && questionInput) {
 		questionForm.addEventListener("submit", (event) => {
 			event.preventDefault();
 			const question = String(questionInput.value ?? "").trim();
 			if (!question) return;
 			questionInput.value = "";
-			void window.shellApi.qf.submitResearchQuestion(question).then((res) => {
-				if (!res?.ok) {
-					console.error("[dock] submit question failed", res?.error);
-				}
+			questionInput.disabled = true;
+			setQuestionStatus("Starting durable research…");
+			const datasetId = selectedResearchDatasetId;
+			selectedResearchDatasetId = null;
+			void window.shellApi.qf.submitResearchQuestion(question, datasetId ?? undefined).then((res) => {
+				if (!res?.ok) throw new Error(res?.error?.message ?? "research launch failed");
+				setQuestionStatus("Research started · watch the canvas and ledger", "ok");
 				void refresh();
+			}).catch((error) => {
+				questionInput.value = question;
+				setQuestionStatus(error?.message ?? String(error), "error");
+			}).finally(() => {
+				questionInput.disabled = false;
 			});
 		});
 		questionInput.addEventListener("keydown", (event) => {
@@ -336,6 +351,23 @@ export function initDock(panelEl, options = {}) {
 				event.preventDefault();
 				questionForm.requestSubmit();
 			}
+		});
+		panelEl.querySelector("#dock-guided-research")?.addEventListener("click", (event) => {
+			const button = event.currentTarget;
+			button.disabled = true;
+			button.textContent = "Loading sample…";
+			void window.shellApi.qf.loadSampleResearchDataset().then((res) => {
+				if (!res?.ok) throw new Error(res?.error?.message ?? "sample dataset failed");
+				setQuestionStatus("Guided settled-data sample loaded", "ok");
+				selectedResearchDatasetId = res.dataset?.object_id ?? null;
+				questionInput.value = "Using the guided settled-results sample, test whether the highest recorded edge produced positive ROI and explain the evidence.";
+				questionForm.requestSubmit();
+			}).catch((error) => {
+				setQuestionStatus(error?.message ?? String(error), "error");
+			}).finally(() => {
+				button.disabled = false;
+				button.textContent = "Try guided research";
+			});
 		});
 	}
 

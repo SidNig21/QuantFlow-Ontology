@@ -1,7 +1,6 @@
 /**
  * Kernel events ledger (WO-g6 D4) — projection only.
  */
-import { projectKernelLedger } from "./glacier-feel.js";
 
 /**
  * @param {HTMLElement} rootEl
@@ -18,31 +17,31 @@ export function createKernelLedger(rootEl, { listEvents, onSubscribe }) {
 		return { refresh: async () => {}, dispose() {}, renderedIds: () => [] };
 	}
 
-	/** @type {Array<{id:string,type:string,object_type:string,created_at:string}>} */
+	/** @type {Array<{id:string,stage:string,title:string,status:string,detail:string,created_at:string}>} */
 	let lastRows = [];
 
 	function render(rows) {
 		lastRows = Array.isArray(rows) ? rows : [];
-		const projected = projectKernelLedger(lastRows);
 		listEl.replaceChildren();
-		if (projected.length === 0) {
+		if (lastRows.length === 0) {
 			if (emptyEl) emptyEl.hidden = false;
 			return;
 		}
 		if (emptyEl) emptyEl.hidden = true;
-		for (const entry of projected) {
+		for (const entry of lastRows) {
 			const row = document.createElement("div");
 			row.className = "kl-row";
 			row.dataset.eventId = entry.id;
 			const type = document.createElement("span");
 			type.className = "kl-type";
-			type.textContent = entry.type;
+			type.textContent = `${entry.stage} · ${entry.title}`;
 			const obj = document.createElement("span");
 			obj.className = "kl-obj";
-			obj.textContent = entry.object_type;
+			obj.textContent = entry.detail;
+			obj.title = entry.detail;
 			const when = document.createElement("span");
 			when.className = "kl-when";
-			when.textContent = entry.relative;
+			when.textContent = entry.status;
 			row.appendChild(type);
 			row.appendChild(obj);
 			row.appendChild(when);

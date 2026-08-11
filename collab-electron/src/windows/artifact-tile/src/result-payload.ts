@@ -4,6 +4,44 @@ export type CollaborationResultPayload = {
   readTrajectoryArtifactIds: string[];
 };
 
+export type ResearchReportPayload = {
+  claim: string;
+  status: string;
+  verdict: string;
+  confidence: number;
+  rationale: string;
+  metrics: Record<string, unknown>;
+};
+
+function record(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+export function parseResearchReportPayload(text: string): ResearchReportPayload | null {
+  let value: Record<string, unknown> | null = null;
+  try { value = record(JSON.parse(text)); } catch { return null; }
+  if (value?.contract !== "qf.research.report.v1") return null;
+  const hypothesis = record(value.hypothesis);
+  const evaluation = record(value.evaluation);
+  if (!hypothesis || !evaluation || typeof hypothesis.claim !== "string" ||
+      typeof evaluation.verdict !== "string" || typeof evaluation.confidence !== "number" ||
+      typeof evaluation.rationale !== "string") return null;
+  let metrics = record(evaluation.metrics);
+  if (!metrics && typeof evaluation.metrics === "string") {
+    try { metrics = record(JSON.parse(evaluation.metrics)); } catch { metrics = null; }
+  }
+  return {
+    claim: hypothesis.claim,
+    status: String(hypothesis.status ?? "unknown"),
+    verdict: evaluation.verdict,
+    confidence: evaluation.confidence,
+    rationale: evaluation.rationale,
+    metrics: metrics ?? {},
+  };
+}
+
 export function parseCollaborationResultPayload(
   text: string,
 ): CollaborationResultPayload | null {

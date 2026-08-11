@@ -1,6 +1,6 @@
 # NEXT — R13 Windows v1 release
 
-status: R13 AUTHORIZED
+status: R13 IN PROGRESS — consumer run reaches native Hermes, first tool call blocked
 authorized-by: founder
 authorized-at: 2026-08-10
 baseline: R0–R10 complete on `act-i-ladder`
@@ -19,3 +19,9 @@ path discoverable, and the release artifact must identify its signing state.
 Finish the consumer-facing Windows v1 with domain tiles, semantic cables,
 workflow recovery, onboarding, installer/release output, and one Computer Use
 demonstration in normal mode. Do not start R14/RL and never place bets or trades.
+
+## Current evidence
+
+[`evidence/r13/PROGRESS.md`](evidence/r13/PROGRESS.md) records the implemented
+surface, passing local checks, and the remaining consumer blocker. Do not close
+R13 until the same visible workflow reaches a gated Report and survives reopen.

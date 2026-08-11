@@ -46,6 +46,9 @@ import {
   kernelListAgentDefinitions,
   kernelListAgentSessions,
   kernelListTaskDelegations,
+  kernelOpenHypothesisForQuestion,
+  kernelRunGuidedResearch,
+  kernelFinalizeResearchEvaluation,
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
   peerBusReadInbox,
@@ -53,7 +56,10 @@ import {
   commitCollaborationResult,
 } from "./kernel";
 import { registerOntologyGatewayRpc } from "./ontology-gateway";
-import { registerCollaborationGatewayRpc } from "./collaboration-gateway";
+import {
+  createCollaborationService,
+  registerCollaborationGatewayRpc,
+} from "./collaboration-gateway";
 import { resolveLivePeerRecipient } from "./live-peer-recipient";
 import { livePtyIdsForRole } from "./peer-delivery";
 import { kernelSessionIdForNativePty } from "./host-native-tui";
@@ -1009,6 +1015,40 @@ app.whenReady().then(async () => {
   initMainAnalytics();
   trackEvent("app_launched");
 
+  const projectStartedSession = (
+    sessionId: string,
+    definitionId: string,
+    info?: {
+      surface: "acp_session" | "native_tui";
+      ptySessionId?: string;
+      role?: string;
+    },
+  ) => {
+    mainWindow?.webContents.send("qf:dock:invalidate");
+    mainWindow?.webContents.send("shell:forward", "canvas", "sessions-changed");
+    if (info?.surface !== "native_tui" || !info.ptySessionId) return;
+    mainWindow?.webContents.send(
+      "shell:forward",
+      "canvas",
+      "create-term-tile",
+      info.ptySessionId,
+      sessionId,
+      definitionId,
+      info.role,
+      definitionId.startsWith("qf-proof-")
+        ? "DETERMINISTIC PROOF AGENT"
+        : undefined,
+    );
+  };
+  const startPrecreatedSessionWithTile = (
+    caller: { sessionId: string; role: string },
+    sessionId: string,
+    missionActivation?: string,
+  ) => startPrecreatedNativeTuiSession(caller, sessionId, {
+    missionActivation,
+    onStarted: projectStartedSession,
+  });
+
   mainWindow!.webContents.on("did-finish-load", () => {
     sendLoadingDone();
     if (pendingFilePath) {
@@ -1049,31 +1089,18 @@ app.whenReady().then(async () => {
         throw new Error("dock spawn requires definitionId");
       }
       return await admitAndStartSession(definitionId, {
-        onStarted: (sessionId, sp, info) => {
-          if (info?.surface === "native_tui" && info.ptySessionId) {
-            mainWindow?.webContents.send(
-              "shell:forward",
-              "canvas",
-              "create-term-tile",
-              info.ptySessionId,
-              sessionId,
-              sp,
-              info.role,
-              sp.startsWith("qf-proof-") ? "DETERMINISTIC PROOF AGENT" : undefined,
-            );
-          }
-        },
+        onStarted: projectStartedSession,
       });
     },
     { description: "Drive the same definition-backed Dock spawn admission used by the shell." },
   );
   registerMethod(
     "qf.pty.capture",
-    (params) => {
+    async (params) => {
       if (!params || typeof params !== "object") throw new Error("pty capture requires params");
       const sessionId = (params as Record<string, unknown>).sessionId;
       if (typeof sessionId !== "string" || sessionId.length === 0) throw new Error("pty capture requires sessionId");
-      return { output: pty.captureSession(sessionId, 200) };
+      return { output: await pty.captureSession(sessionId, 200) };
     },
     { description: "Capture a spawned proof tile's terminal output for the Windows gate." },
   );
@@ -1085,9 +1112,7 @@ app.whenReady().then(async () => {
   registerMethod("workspace.getConfig", () => config, {
     description: "Return the current app configuration",
   });
-  registerCollaborationGatewayRpc(
-    registerMethod,
-    {
+  const collaborationDeps = {
       authenticate: requireAuthenticatedPeerSessionRole,
       capabilityGroups: kernelCapabilityGroupsForSession,
       liveRecipientForRole: requireLivePeerSession,
@@ -1103,7 +1128,11 @@ app.whenReady().then(async () => {
         if (!busDb) throw new Error("app-owned peer bus is unavailable");
         return peerBusNotify(busDb, input);
       },
-    },
+    };
+  const collaborationService = createCollaborationService(collaborationDeps);
+  registerCollaborationGatewayRpc(
+    registerMethod,
+    collaborationDeps,
     (change) => {
       mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
       mainWindow?.webContents.send("qf:dock:invalidate");
@@ -1114,12 +1143,58 @@ app.whenReady().then(async () => {
           "create-artifact-tile",
           change.artifactId,
         );
-        // Return the durable result receipt to the bridge before closing the
-        // completed one-shot seats. The Kernel commit has already succeeded,
-        // and the founder-visible result artifact is now the durable answer.
-        setTimeout(() => {
+        // Only evidence workers advance the research pipeline. A critic owns
+        // Evaluation truth, not another worker-result cycle.
+        if (peerIdentityForSession(change.workerSessionId).role !== "worker") {
           closeAgentSessionRow(change.workerSessionId);
           closeAgentSessionRow(change.delegatorSessionId);
+          return;
+        }
+        // When a settled Dataset is available, continue through deterministic
+        // metrics and an independent critic. Otherwise the evidence answer is
+        // the honest terminal product for this question.
+        setTimeout(() => {
+          void (async () => {
+            try {
+              closeAgentSessionRow(change.workerSessionId);
+              const run = kernelRunGuidedResearch(change.delegatorSessionId);
+              if (!run) {
+                closeAgentSessionRow(change.delegatorSessionId);
+                return;
+              }
+              const criticSessionId = `critic-${crypto.randomUUID()}`;
+              kernelExecute("create_agent_session", {
+                session_id: criticSessionId,
+                agent_definition_id: "hermes-critic",
+                label: "Independent research critic",
+              }, {
+                trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(),
+                actor_session_id: change.delegatorSessionId,
+              });
+              const criticInstruction = buildMissionActivationInstruction(
+                `review-${run.runId}`,
+                [
+                  "Independently review this completed deterministic QuantFlow research run.",
+                  `hypothesis_id=${run.hypothesisId}`,
+                  `run_id=${run.runId}`,
+                  `artifact_id=${run.artifactId}`,
+                  `metrics=${JSON.stringify(run.metrics)}`,
+                  "Read exactly those Hypothesis, Run, and Artifact objects with generated QuantFlow ontology tools; do not query unrelated objects.",
+                  "Then call qf_record_evaluation exactly once with those exact ids, a verdict of supports|rejects|inconclusive, numeric confidence from 0 through 1, a non-empty rationale, and non-empty plain-text findings.",
+                ].join("\n"),
+              );
+              await startPrecreatedSessionWithTile(
+                { sessionId: change.delegatorSessionId, role: "orchestrator" },
+                criticSessionId,
+                criticInstruction,
+              );
+              mainWindow?.webContents.send("qf:dock:invalidate");
+              mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
+            } catch (error) {
+              console.error("research continuation failed", error);
+              closeAgentSessionRow(change.delegatorSessionId);
+            }
+          })();
         }, 250);
       }
     },
@@ -1147,7 +1222,29 @@ app.whenReady().then(async () => {
   registerOntologyGatewayRpc(
     registerMethod,
     requireAuthenticatedPeerSessionRole,
-    startPrecreatedNativeTuiSession,
+    startPrecreatedSessionWithTile,
+    (change) => {
+      if (change.action !== "record_evaluation") return;
+      try {
+        const evaluationId = String((change.result as { object_id?: unknown }).object_id ?? "");
+        const final = kernelFinalizeResearchEvaluation(evaluationId);
+        mainWindow?.webContents.send("qf:dock:invalidate");
+        mainWindow?.webContents.send("qf:events:invalidate");
+        if (final.reportArtifactId) {
+          mainWindow?.webContents.send(
+            "shell:forward", "canvas", "create-artifact-tile", final.reportArtifactId,
+          );
+        }
+      } finally {
+        const criticId = change.identity.sessionId;
+        const delegatorId = kernelGetLinks(criticId, { kind: "delegates_to" })
+          .find((link) => link.to_id === criticId)?.from_id;
+        setTimeout(() => {
+          closeAgentSessionRow(criticId);
+          if (delegatorId) closeAgentSessionRow(delegatorId);
+        }, 2_000);
+      }
+    },
   );
   registerMethod(
     "qf.research.submit_question",
@@ -1178,6 +1275,10 @@ app.whenReady().then(async () => {
         },
         { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
       );
+      const hypothesisId = kernelOpenHypothesisForQuestion(
+        text,
+        typeof input.dataset_id === "string" ? input.dataset_id : undefined,
+      );
       const definitionId =
         typeof input.definition_id === "string" && input.definition_id.length > 0
           ? input.definition_id
@@ -1186,28 +1287,11 @@ app.whenReady().then(async () => {
             : "hermes-orchestrator";
       const result = await admitAndStartSession(definitionId, {
         missionActivation: activationInstruction,
-        onStarted: (sessionId, sp, info) => {
-          mainWindow?.webContents.send("qf:dock:invalidate");
-          mainWindow?.webContents.send(
-            "shell:forward",
-            "canvas",
-            "sessions-changed",
-          );
-          if (info?.surface === "native_tui" && info.ptySessionId) {
-            mainWindow?.webContents.send(
-              "shell:forward",
-              "canvas",
-              "create-term-tile",
-              info.ptySessionId,
-              sessionId,
-              sp,
-              info.role,
-            );
-          }
-        },
+        onStarted: projectStartedSession,
       });
       return {
         missionId,
+        hypothesisId,
         sessionId: result.sessionId,
         objective: text,
       };

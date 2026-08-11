@@ -10,6 +10,11 @@ shift
 hermes_command="${1:?Hermes command is required}"
 shift
 
+# Product seats need QuantFlow, not Hermes's broad workstation catalog. The
+# invocation-level allowlist keeps the native TUI while exposing only the two
+# app-owned MCP surfaces configured below.
+quantflow_toolsets="mcp-quantflow-collaboration,mcp-quantflow-ontology"
+
 mission_oneshot=0
 if [[ "${1:-}" == "--quantflow-mission-oneshot" ]]; then
   mission_oneshot=1
@@ -45,7 +50,17 @@ fi
 seat_id="${QF_AGENT_SESSION_ID//[^a-zA-Z0-9_-]/_}"
 profile_home="$profile_root/profiles/quantflow-runtime-$seat_id"
 mkdir -p "$profile_home"
+# These product seats use explicit QuantFlow MCP workflows. Do not seed the
+# unrelated bundled skill catalog into their disposable prompt context.
+: > "$profile_home/.no-bundled-skills"
+empty_bundled_skills="$profile_home/.quantflow-empty-bundled-skills"
+mkdir -p "$empty_bundled_skills"
+export HERMES_BUNDLED_SKILLS="$empty_bundled_skills"
 config_tmp="$profile_home/config.yaml.tmp"
+reasoning_effort="none"
+if [[ "${QF_PEER_ROLE:-}" == "critic" ]]; then
+  reasoning_effort="low"
+fi
 
 # Hermes resolves auth.json from the custom root when HERMES_HOME has the
 # <root>/profiles/<seat> shape. Reference the founder token read-only through
@@ -70,6 +85,8 @@ if [[ -f "$HOME/.hermes/config.yaml" ]]; then
   ' "$HOME/.hermes/config.yaml" >> "$config_tmp"
 fi
 cat >> "$config_tmp" <<EOF
+agent:
+  reasoning_effort: $reasoning_effort
 mcp_servers:
   quantflow-collaboration:
     command: node.exe
@@ -94,46 +111,18 @@ printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
 unset QF_LAUNCH_READY_NONCE
 
 if [[ "$mission_oneshot" == "1" ]]; then
-  if ! IFS= read -r activation; then
-    echo "QuantFlow Hermes mission was not delivered." >&2
-    exit 2
-  fi
-  activation="${activation%$'\r'}"
-  if [[ "$activation" != QUANTFLOW_MISSION\ * ]]; then
-    echo "QuantFlow Hermes received an invalid mission envelope." >&2
-    exit 2
-  fi
-  if (( ${#activation} > 6144 )); then
-    echo "QuantFlow Hermes mission exceeds the supported size." >&2
-    exit 2
-  fi
-
-  exec "$hermes_command" -z \
-    "You are the QuantFlow research orchestrator. Use the available QuantFlow ontology and collaboration tools to inspect Kernel-held evidence before answering. Delegate to a worker when useful. Return a concise research-only answer and never place bets or trades. Founder mission: $activation"
+  export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the QuantFlow research orchestrator. Treat QUANTFLOW_MISSION as an immediate workflow command. Use only the QuantFlow ontology and collaboration MCP tools; never use Terminal, browser, file, or code-execution tools. Do not broadly explore workspaces, tasks, sessions, or tool catalogs. Query the hermes-worker agent definition, create one worker session, start that exact session, then call the collaboration send_task tool with the founder mission. Do not retry a start call that is still pending. After delegation, wait for the worker's QuantFlow result and return a concise research-only answer with its durable receipt. Never place bets or trades."
+  exec "$hermes_command" --tui --toolsets "$quantflow_toolsets" "$@"
 fi
 
 if [[ "$task_oneshot" == "1" ]]; then
-  if ! IFS= read -r task; then
-    echo "QuantFlow Hermes task was not delivered." >&2
-    exit 2
-  fi
-  task="${task%$'\r'}"
-  if [[ "$task" != \[QuantFlow\ TASK\ * ]]; then
-    echo "QuantFlow Hermes received an invalid task envelope." >&2
-    exit 2
-  fi
-  if (( ${#task} > 16384 )); then
-    echo "QuantFlow Hermes task exceeds the supported size." >&2
-    exit 2
-  fi
-
   if [[ "${QF_PEER_ROLE:-}" == "critic" ]]; then
-    exec "$hermes_command" -z \
-      "You are the independent QuantFlow research critic. Review the completed Run, result Artifact, and metrics named in this task. You must call qf_record_evaluation exactly once with concrete findings and a supports, rejects, or inconclusive verdict. Never place bets or trades. Delegated review: $task"
+    export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the independent QuantFlow research critic. Use only QuantFlow ontology MCP tools; never use Terminal, browser, file, or code-execution tools. Read the exact completed Run, result Artifact, metrics, and Hypothesis named in the QuantFlow activation, then call qf_record_evaluation exactly once with those exact ids, numeric confidence, a non-empty rationale, non-empty plain-text findings, and a supports, rejects, or inconclusive verdict. Do not explore unrelated ontology objects. Never place bets or trades."
+    exec "$hermes_command" --tui --toolsets "$quantflow_toolsets" "$@"
   fi
 
-  exec "$hermes_command" -z \
-    "You are the QuantFlow research worker. Complete the following delegated task using only QuantFlow's ontology evidence. You must call the QuantFlow collaboration send_result tool exactly once before finishing. If the market reads are empty, return a truthful no-evidence result with empty cited_market_ids and at least one actual empty read trajectory artifact id. Never place bets or trades. Delegated task: $task"
+  export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the QuantFlow research worker. Use only QuantFlow ontology and collaboration MCP tools; never use Terminal, browser, file, or code-execution tools. When the delegated QuantFlow task arrives, immediately perform one relevant market.read ontology query, then call collaboration send_result exactly once. Cite only market ids actually returned by that read. If the read is empty, send a truthful no-evidence result with empty cited_market_ids and the actual empty read trajectory artifact id. Do not explore unrelated ontology objects. Never place bets or trades."
+  exec "$hermes_command" --tui --toolsets "$quantflow_toolsets" "$@"
 fi
 
 exec "$hermes_command" "$@"

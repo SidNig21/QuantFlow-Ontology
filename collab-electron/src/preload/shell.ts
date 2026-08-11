@@ -56,11 +56,13 @@ contextBridge.exposeInMainWorld("shellApi", {
       trace: { trace_id: string; span_id: string },
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
+    listResearchLedger: () => ipcRenderer.invoke("qf:research:ledger"),
+    loadSampleResearchDataset: () => ipcRenderer.invoke("qf:research:loadSampleDataset"),
     listHandoffs: () => ipcRenderer.invoke("qf:handoffs:list"),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
-    submitResearchQuestion: (question: string) =>
-      ipcRenderer.invoke("qf:research:submitQuestion", { question }),
+    submitResearchQuestion: (question: string, datasetId?: string) =>
+      ipcRenderer.invoke("qf:research:submitQuestion", { question, datasetId }),
     spawnSession: (args: { definitionId: string }) =>
       ipcRenderer.invoke("qf:sessions:spawn", args),
     runTurn: (args: { sessionId: string; prompt?: string }) =>

@@ -27,6 +27,17 @@ test("readiness accepts receipts fused by ConPTY cursor positioning", async () =
   await waiter.wait();
 });
 
+test("Hermes readiness waits for the real native TUI alternate screen", async () => {
+  const waiter = createLauncherReadinessWaiter("session", "nonce", 1_000, true);
+  let resolved = false;
+  void waiter.wait().then(() => { resolved = true; });
+  waiter.push(Buffer.from("QF_LAUNCH_READY nonce\nQF_LAUNCH_COMMIT nonce\n"));
+  await Promise.resolve();
+  expect(resolved).toBe(false);
+  waiter.push(Buffer.from("\u001b[?1049h\u001b[2J\u001b[H"));
+  await expect(waiter.wait()).resolves.toBeUndefined();
+});
+
 test("readiness rejects ordinary text before a receipt", async () => {
   const waiter = createLauncherReadinessWaiter("session", "nonce", 100);
   waiter.push(Buffer.from("not-terminal-text QF_LAUNCH_READY nonce\n"));

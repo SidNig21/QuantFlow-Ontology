@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import {
   parseCollaborationResultPayload,
+  parseResearchReportPayload,
   type CollaborationResultPayload,
+  type ResearchReportPayload,
 } from "./result-payload";
 
 type ArtifactRow = {
@@ -23,6 +25,7 @@ function App() {
   });
   const [row, setRow] = useState<ArtifactRow | null>(null);
   const [result, setResult] = useState<CollaborationResultPayload | null>(null);
+  const [report, setReport] = useState<ResearchReportPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,6 +55,7 @@ function App() {
         const content = await window.api.readFile(found.storage_ref);
         if (cancelled) return;
         setResult(parseCollaborationResultPayload(content));
+        setReport(parseResearchReportPayload(content));
       } catch {
         // Some legacy artifact rows are metadata-only. Keep their existing
         // inspector view instead of turning an optional payload read into an
@@ -89,6 +93,24 @@ function App() {
           {result.readTrajectoryArtifactIds.length} durable read receipt
           {result.readTrajectoryArtifactIds.length === 1 ? "" : "s"}
         </div>
+      </article>
+    );
+  }
+
+  if (report) {
+    return (
+      <article className="artifact-tile artifact-tile--answer">
+        <div className="artifact-tile__eyebrow">INDEPENDENTLY VERIFIED REPORT</div>
+        <div className="artifact-tile__answer">{report.claim}</div>
+        <div className="artifact-tile__metrics">
+          <span>verdict <b>{report.verdict}</b></span>
+          <span>confidence <b>{Math.round(report.confidence * 100)}%</b></span>
+          <span>ROI <b>{String(report.metrics.roi ?? "n/a")}</b></span>
+          <span>hit rate <b>{String(report.metrics.hit_rate ?? "n/a")}</b></span>
+          <span>avg CLV <b>{String(report.metrics.average_clv ?? "n/a")}</b></span>
+        </div>
+        <div className="artifact-tile__evidence">{report.rationale}</div>
+        <div className="artifact-tile__receipts">Kernel status: {report.status}</div>
       </article>
     );
   }

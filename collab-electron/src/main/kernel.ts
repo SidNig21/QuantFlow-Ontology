@@ -2,7 +2,7 @@
  * Sole app module that imports qf-kernel / opens SQLite.
  * All other main-process code goes through getKernelDb() / helpers here.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { dirname, join } from "node:path";
@@ -431,6 +431,195 @@ function notifyKernelEvents(): void {
 /** Unbounded artifact listing for IPC / boot logging (created_at DESC). */
 export function kernelListArtifacts(): Record<string, unknown>[] {
   return queryObjects(getKernelDb(), "artifact", undefined, null);
+}
+
+export type ResearchLedgerEntry = {
+  id: string;
+  stage: "question" | "hypothesis" | "dataset" | "run" | "evaluation" | "report";
+  title: string;
+  status: string;
+  detail: string;
+  created_at: string;
+};
+
+function jsonRecord(value: unknown): Record<string, unknown> {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  if (typeof value !== "string") return {};
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown>
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Consumer projection of the durable research loop. Every row is re-read from Kernel truth. */
+export function kernelListResearchLedger(limit = 30): ResearchLedgerEntry[] {
+  const entries: ResearchLedgerEntry[] = [];
+  for (const row of kernelQueryObjects("mission", {}, limit)) {
+    entries.push({
+      id: String(row.id), stage: "question", title: String(row.name), status: "submitted",
+      detail: String(row.objective), created_at: String(row.created_at),
+    });
+  }
+  for (const row of kernelQueryObjects("hypothesis", {}, limit)) {
+    entries.push({
+      id: String(row.id), stage: "hypothesis", title: String(row.claim), status: String(row.status),
+      detail: String(row.success_criteria), created_at: String(row.created_at),
+    });
+  }
+  for (const row of kernelQueryObjects("dataset", {}, limit)) {
+    const coverage = jsonRecord(row.coverage);
+    entries.push({
+      id: String(row.id), stage: "dataset", title: String(row.kind), status: "sealed",
+      detail: `${coverage.sample === true ? "sample · " : ""}${String(coverage.record_count ?? 0)} rows · as of ${String(row.as_of)}`,
+      created_at: String(row.created_at),
+    });
+  }
+  for (const row of kernelQueryObjects("run", {}, limit)) {
+    const params = jsonRecord(row.params);
+    entries.push({
+      id: String(row.id), stage: "run", title: "Deterministic run", status: String(row.status),
+      detail: String(params.execution_version ?? params.execution_contract ?? row.kind),
+      created_at: String(row.created_at),
+    });
+  }
+  for (const row of kernelQueryObjects("evaluation", {}, limit)) {
+    const metrics = jsonRecord(row.metrics);
+    entries.push({
+      id: String(row.id), stage: "evaluation", title: "Independent critic", status: String(row.verdict),
+      detail: `confidence ${String(row.confidence)} · ROI ${String(metrics.roi ?? "n/a")}`,
+      created_at: String(row.created_at),
+    });
+  }
+  for (const row of kernelQueryObjects("artifact", { kind: "report" }, limit)) {
+    entries.push({
+      id: String(row.id), stage: "report", title: "Gated research report", status: "published",
+      detail: String(row.storage_ref), created_at: String(row.created_at),
+    });
+  }
+  return entries
+    .sort((left, right) => right.created_at.localeCompare(left.created_at))
+    .slice(0, Math.max(1, Math.min(100, Math.floor(limit))));
+}
+
+/** Explicit onboarding sample: immutable, clearly labeled, and never live market truth. */
+export function kernelEnsureSampleResearchDataset(): Record<string, unknown> {
+  const payload = `${JSON.stringify({
+    contract: "qf.dataset.v1",
+    observations: [
+      { observed_at: "2026-08-09T08:00:00.000Z", label: "sample-a", edge: 0.08, settlement: { outcome: "win", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.80" } },
+      { observed_at: "2026-08-09T09:00:00.000Z", label: "sample-b", edge: 0.05, settlement: { outcome: "loss", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.90" } },
+      { observed_at: "2026-08-09T10:00:00.000Z", label: "sample-c", edge: 0.03, settlement: { outcome: "push", stake: "100", decimal_odds: "1.95", closing_decimal_odds: "1.95" } },
+    ],
+  }, null, 2)}\n`;
+  const hash = createHash("sha256").update(payload).digest("hex");
+  const directory = join(getArtifactRoot(), "onboarding");
+  const path = join(directory, `${hash}.json`);
+  mkdirSync(directory, { recursive: true });
+  if (!existsSync(path)) writeFileSync(path, payload, { encoding: "utf8", flag: "wx" });
+  const trace = { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() };
+  const artifact = kernelExecute("publish_artifact", {
+    kind: "result_set", path, storage_ref: path, content_hash: hash,
+  }, trace) as { object_id: string };
+  return kernelExecute("register_dataset_version", {
+    kind: "results",
+    artifact_id: artifact.object_id,
+    content_hash: artifact.object_id,
+    as_of: "2026-08-09T12:00:00.000Z",
+    coverage: {
+      sample: true,
+      label: "QuantFlow guided research sample",
+      deterministic_score_field: "edge",
+    },
+  }, { ...trace, span_id: crypto.randomUUID() }) as unknown as Record<string, unknown>;
+}
+
+export function kernelOpenHypothesisForQuestion(question: string, datasetId?: string): string {
+  const result = kernelExecute("create_hypothesis", {
+    claim: question,
+    success_criteria:
+      "Kernel-held evidence and, when a settled Dataset exists, deterministic metrics independently reviewed by a critic.",
+    sources: datasetId ? [datasetId] : [],
+  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as { object_id: string };
+  return result.object_id;
+}
+
+export function kernelRunGuidedResearch(executorSessionId: string): {
+  hypothesisId: string;
+  runId: string;
+  artifactId: string;
+  metrics: Record<string, unknown>;
+} | null {
+  const hypothesis = kernelQueryObjects("hypothesis", { status: "open" }, 1)[0];
+  let sources: unknown = [];
+  try { sources = JSON.parse(String(hypothesis?.sources ?? "[]")); } catch { sources = []; }
+  const datasetId = Array.isArray(sources)
+    ? sources.find((source): source is string => typeof source === "string" && source.startsWith("dataset:"))
+    : undefined;
+  const dataset = datasetId ? kernelGetObject("dataset", datasetId) : null;
+  if (dataset && typeof jsonRecord(dataset.coverage).deterministic_score_field !== "string") return null;
+  if (!hypothesis || !dataset) return null;
+  const scoreField = String(jsonRecord(dataset.coverage).deterministic_score_field);
+  const run = kernelExecute("execute_deterministic_run", {
+    run_id: `run-${crypto.randomUUID()}`,
+    dataset_id: String(dataset.id),
+    strategy_spec: {
+      contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: scoreField,
+    },
+    params: { limit: 1 },
+  }, {
+    trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId,
+  }) as { object_id: string; state: Record<string, unknown> };
+  return {
+    hypothesisId: String(hypothesis.id),
+    runId: run.object_id,
+    artifactId: String(run.state.result_artifact_id),
+    metrics: jsonRecord(run.state.metrics),
+  };
+}
+
+export function kernelFinalizeResearchEvaluation(evaluationId: string): {
+  reportArtifactId: string | null;
+  hypothesisId: string;
+  status: string;
+} {
+  const evaluation = kernelGetObject("evaluation", evaluationId);
+  if (!evaluation) throw new Error(`Evaluation not found: ${evaluationId}`);
+  const lineage = kernelGetLinks(evaluationId, { kind: "evaluated_by" });
+  const hypothesisId = lineage.find((link) =>
+    link.to_id === evaluationId && kernelGetObject("hypothesis", link.from_id)
+  )?.from_id;
+  const runId = lineage.find((link) =>
+    link.to_id === evaluationId && kernelGetObject("run", link.from_id)
+  )?.from_id;
+  if (!hypothesisId || !runId) throw new Error("Evaluation lacks exact hypothesis and Run lineage");
+  const verdict = String(evaluation.verdict);
+  const status = verdict === "supports" ? "supported" : verdict === "rejects" ? "rejected" : "inconclusive";
+  kernelExecute("resolve_hypothesis", {
+    hypothesis_id: hypothesisId, evaluation_id: evaluationId, status,
+  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  if (verdict !== "supports") return { reportArtifactId: null, hypothesisId, status };
+
+  const payload = `${JSON.stringify({
+    contract: "qf.research.report.v1",
+    hypothesis: kernelGetObject("hypothesis", hypothesisId),
+    run: kernelGetObject("run", runId),
+    evaluation,
+  }, null, 2)}\n`;
+  const hash = createHash("sha256").update(payload).digest("hex");
+  const directory = join(getArtifactRoot(), "reports");
+  const path = join(directory, `${hash}.json`);
+  mkdirSync(directory, { recursive: true });
+  if (!existsSync(path)) writeFileSync(path, payload, { encoding: "utf8", flag: "wx" });
+  const report = kernelExecute("publish_artifact", {
+    kind: "report", path, storage_ref: path, content_hash: hash, evaluation_id: evaluationId,
+  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as { object_id: string };
+  return { reportArtifactId: report.object_id, hypothesisId, status };
 }
 
 /** Unbounded agent_session listing for IPC / reconciliation (created_at DESC). */

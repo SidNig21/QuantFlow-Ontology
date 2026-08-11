@@ -340,6 +340,33 @@ body.platform-win {
 	color: var(--qf-gl-faint);
 }
 
+.research-onboarding {
+	display: grid;
+	gap: 6px;
+	padding: 8px 2px 0;
+	font-family: var(--qf-mono);
+	font-size: 10px;
+	line-height: 1.45;
+	color: var(--qf-gl-dim);
+}
+
+.research-onboarding .dk-link {
+	justify-self: start;
+}
+
+.research-status {
+	min-height: 15px;
+	color: var(--qf-gl-faint);
+}
+
+.research-status[data-tone="ok"] {
+	color: var(--qf-gl-ok);
+}
+
+.research-status[data-tone="error"] {
+	color: var(--qf-gl-alert);
+}
+
 .ask .hint {
 	display: flex;
 	align-items: center;
@@ -1715,7 +1742,7 @@ body.platform-win {
 
 .kernel-ledger {
 	flex: 0 0 auto;
-	max-height: 140px;
+	max-height: 220px;
 	display: flex;
 	flex-direction: column;
 	margin: 0 0 8px;

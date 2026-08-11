@@ -28,12 +28,20 @@ import { notifySessionCanvasProjection } from "./session-canvas-projector";
 import { invokePrecreatedStart } from "./precreated-start-ownership";
 import { ontologyTrajectoryContext } from "./ontology-trajectory-context";
 import { ontologyReadReceiptEligible } from "./ontology-read-dispatch";
+import { ontologyToolsForRole } from "./ontology-role-tools";
 
 type RegisterMethod = typeof registerMethod;
 
 export type OntologyCallerIdentity = {
   sessionId: string;
   role: string;
+};
+
+export type OntologyActionChange = {
+  action: string;
+  identity: OntologyCallerIdentity;
+  input: Record<string, unknown>;
+  result: unknown;
 };
 
 function requireAppOwnedKernelDb(kernelDb: unknown): void {
@@ -167,6 +175,7 @@ export async function callOntologyTool(
     caller: OntologyCallerIdentity,
     sessionId: string,
   ) => Promise<unknown>,
+  onAction?: (change: OntologyActionChange) => void,
 ): Promise<{ result: unknown; artifactId: string }> {
   const action = kernelParseOntologyActionTool(toolName);
   if (!action) {
@@ -202,6 +211,7 @@ export async function callOntologyTool(
       });
   notifySessionCanvasProjection();
   const { artifactId } = recordTrajectory(identity, toolName, input, result);
+  onAction?.({ action, identity, input, result });
   return { result, artifactId };
 }
 
@@ -217,6 +227,7 @@ export function registerOntologyGatewayRpc(
     caller: OntologyCallerIdentity,
     sessionId: string,
   ) => Promise<unknown>,
+  onAction?: (change: OntologyActionChange) => void,
 ): void {
   register(
     "qf.ontology.list_tools",
@@ -225,10 +236,19 @@ export function registerOntologyGatewayRpc(
         throw new Error("ontology list_tools requires params");
       }
       const input = params as Record<string, unknown>;
-      requireLiveSeat(input.seat_capability, input.session_id, input.role);
+      const identity = requireLiveSeat(
+        input.seat_capability,
+        input.session_id,
+        input.role,
+      );
       requireAppOwnedKernelDb(input.kernel_db);
       const grants = kernelCapabilityGroupsForSession(String(input.session_id));
-      return { tools: kernelListOntologyToolsForGroups(grants) };
+      return {
+        tools: ontologyToolsForRole(
+          identity.role,
+          kernelListOntologyToolsForGroups(grants),
+        ),
+      };
     },
     { description: "List generated ontology read tools for an admitted seat." },
   );
@@ -253,7 +273,7 @@ export function registerOntologyGatewayRpc(
         input.arguments && typeof input.arguments === "object" && !Array.isArray(input.arguments)
           ? (input.arguments as Record<string, unknown>)
           : {};
-      return await callOntologyTool(identity, name, args, startPrecreatedSession);
+      return await callOntologyTool(identity, name, args, startPrecreatedSession, onAction);
     },
     {
       description:

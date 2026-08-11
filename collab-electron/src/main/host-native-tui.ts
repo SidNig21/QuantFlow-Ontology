@@ -135,6 +135,7 @@ export async function admitNativeTuiDefinition(opts: {
     Boolean(opts.role);
   const usesWslMcpLauncher =
     wantsQuantFlowMcpBridges && opts.terminalTarget?.startsWith("wsl:") === true;
+  const usesHermesNativeTui = adapterId === "hermes" && usesWslMcpLauncher;
   const collaborationBridge = wantsQuantFlowMcpBridges
     ? resolveCollaborationResourcePath("qf-collaboration-mcp.mjs", {
         resourcesPath: process.resourcesPath,
@@ -238,7 +239,12 @@ export async function admitNativeTuiDefinition(opts: {
   let readinessWaiter: LauncherReadinessWaiter | null = null;
   const defaults: NativeTuiOrchestrationDependencies = {
     createPty: async ({ sessionId }) => {
-      const waiter = createLauncherReadinessWaiter(sessionId, readinessNonce);
+      const waiter = createLauncherReadinessWaiter(
+        sessionId,
+        readinessNonce,
+        usesHermesNativeTui ? 30_000 : 10_000,
+        usesHermesNativeTui,
+      );
       readinessWaiter = waiter;
       try {
         return await createHostCommandSession({
@@ -325,7 +331,16 @@ export async function admitNativeTuiDefinition(opts: {
     cancelLauncherReadiness: () => readinessWaiter?.cancel(),
     activateMission: opts.missionActivation
       ? async (ptySessionId) => {
-          writeToSession(ptySessionId, opts.missionActivation!);
+          if (!usesHermesNativeTui) {
+            writeToSession(ptySessionId, opts.missionActivation!);
+            return;
+          }
+          const instruction = opts.missionActivation!.replace(/\r$/, "");
+          writeToSession(ptySessionId, instruction);
+          // Hermes treats a text+Enter burst as pasted content. Submit Enter
+          // as its own native key after the input has reached the TUI.
+          await new Promise((resolve) => setTimeout(resolve, 400));
+          writeToSession(ptySessionId, "\r");
         }
       : undefined,
   };

@@ -3,6 +3,7 @@ import {
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   readlinkSync,
   rmSync,
@@ -35,8 +36,9 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain("unset QF_LAUNCH_READY_NONCE");
     expect(wrapper).toContain("--quantflow-mission-oneshot");
     expect(wrapper).toContain("--quantflow-task-oneshot");
-    expect(wrapper).toContain('IFS= read -r activation');
-    expect(wrapper).toContain('exec "$hermes_command" -z');
+    expect(wrapper).toContain('exec "$hermes_command" --tui');
+    expect(wrapper).toContain("HERMES_EPHEMERAL_SYSTEM_PROMPT");
+    expect(wrapper).not.toContain('exec "$hermes_command" -z');
   });
 
   test("reports missing Hermes prerequisites without writing a profile", () => {
@@ -46,13 +48,11 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).not.toContain('cp "$HOME/.hermes/auth.json"');
   });
 
-  test("waits for the founder mission and hands it to Hermes as one supported prompt", () => {
+  test("starts the founder mission in Hermes's native TUI", () => {
     const root = mkdtempSync(join(tmpdir(), "qf-hermes-oneshot-"));
     try {
       const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
       const isolatedRoot = join(root, "isolated-hermes");
-      const activation =
-        'QUANTFLOW_MISSION {"contract":"qf.mission.activation.v1","mission_id":"mission-test","question":"What changed?"}\r\n';
       const args = process.platform === "win32"
         ? [
             "-d", "Ubuntu", "--", "env",
@@ -68,7 +68,6 @@ describe("Hermes packaged launch wrapper", () => {
             "echo", "--quantflow-mission-oneshot", "--tui",
           ];
       const result = spawnSync(process.platform === "win32" ? "wsl.exe" : "bash", args, {
-        input: activation,
         encoding: "utf8",
         env: process.platform === "win32"
           ? process.env
@@ -82,21 +81,19 @@ describe("Hermes packaged launch wrapper", () => {
       });
       expect(result.status).toBe(0);
       expect(result.stdout).toContain("QF_LAUNCH_COMMIT test-ready");
-      expect(result.stdout).toContain("-z You are the QuantFlow research orchestrator");
-      expect(result.stdout).toContain("mission-test");
-      expect(result.stdout).not.toContain("-z --tui");
+      expect(result.stdout).toContain("--tui");
+      expect(result.stdout).toContain("--toolsets mcp-quantflow-collaboration,mcp-quantflow-ontology");
+      expect(result.stdout).not.toContain("-z");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
   });
 
-  test("waits for a delegated task before starting a one-shot worker", () => {
+  test("starts a delegated worker in Hermes's native TUI", () => {
     const root = mkdtempSync(join(tmpdir(), "qf-hermes-task-oneshot-"));
     try {
       const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
       const isolatedRoot = join(root, "isolated-hermes");
-      const task =
-        "[QuantFlow TASK task-test from orchestrator] Inspect the available market evidence, then call send_result.\r\n";
       const args = process.platform === "win32"
         ? [
             "-d", "Ubuntu", "--", "env",
@@ -112,7 +109,6 @@ describe("Hermes packaged launch wrapper", () => {
             "echo", "--quantflow-task-oneshot", "--tui",
           ];
       const result = spawnSync(process.platform === "win32" ? "wsl.exe" : "bash", args, {
-        input: task,
         encoding: "utf8",
         env: process.platform === "win32"
           ? process.env
@@ -126,21 +122,19 @@ describe("Hermes packaged launch wrapper", () => {
       });
       expect(result.status).toBe(0);
       expect(result.stdout).toContain("QF_LAUNCH_COMMIT test-ready");
-      expect(result.stdout).toContain("-z You are the QuantFlow research worker");
-      expect(result.stdout).toContain("task-test");
-      expect(result.stdout).not.toContain("-z --tui");
+      expect(result.stdout).toContain("--tui");
+      expect(result.stdout).toContain("--toolsets mcp-quantflow-collaboration,mcp-quantflow-ontology");
+      expect(result.stdout).not.toContain("-z");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
   });
 
-  test("starts a delegated critic with the independent Evaluation contract", () => {
+  test("starts a delegated critic in Hermes's native TUI", () => {
     const root = mkdtempSync(join(tmpdir(), "qf-hermes-critic-oneshot-"));
     try {
       const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
       const isolatedRoot = join(root, "isolated-hermes");
-      const task =
-        "[QuantFlow TASK task-critic from orchestrator] Review run-1 and result-1.\r\n";
       const args = process.platform === "win32"
         ? [
             "-d", "Ubuntu", "--", "env",
@@ -157,7 +151,6 @@ describe("Hermes packaged launch wrapper", () => {
             "echo", "--quantflow-task-oneshot", "--tui",
           ];
       const result = spawnSync(process.platform === "win32" ? "wsl.exe" : "bash", args, {
-        input: task,
         encoding: "utf8",
         env: process.platform === "win32"
           ? process.env
@@ -171,9 +164,9 @@ describe("Hermes packaged launch wrapper", () => {
             },
       });
       expect(result.status).toBe(0);
-      expect(result.stdout).toContain("-z You are the independent QuantFlow research critic");
-      expect(result.stdout).toContain("qf_record_evaluation");
-      expect(result.stdout).toContain("task-critic");
+      expect(result.stdout).toContain("--tui");
+      expect(result.stdout).toContain("--toolsets mcp-quantflow-collaboration,mcp-quantflow-ontology");
+      expect(result.stdout).not.toContain("-z");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
@@ -247,10 +240,18 @@ describe("Hermes packaged launch wrapper", () => {
           ["-d", "Ubuntu", "--", "test", "-f", `${wslPath(join(profileHome, "config.yaml"))}`],
         );
         expect(profileCheck.status).toBe(0);
+        const skillsOptOutCheck = spawnSync(
+          "wsl.exe",
+          ["-d", "Ubuntu", "--", "test", "-f", `${wslPath(join(profileHome, ".no-bundled-skills"))}`],
+        );
+        expect(skillsOptOutCheck.status).toBe(0);
       } else {
-        expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-collaboration");
-      expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-ontology");
+        expect(readFileSync(join(profileHome, ".no-bundled-skills"), "utf8")).toBe("");
       }
+      expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("reasoning_effort: none");
+      expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-collaboration");
+      expect(readFileSync(join(profileHome, "config.yaml"), "utf8")).toContain("quantflow-ontology");
+      expect(readdirSync(join(profileHome, ".quantflow-empty-bundled-skills"))).toEqual([]);
       expect(() => lstatSync(join(founderHome, ".hermes", "profiles"))).toThrow();
       expect(() => lstatSync(join(founderHome, ".hermes", "redirect"))).toThrow();
     } finally {

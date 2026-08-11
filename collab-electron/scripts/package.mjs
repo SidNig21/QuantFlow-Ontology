@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { normalizeWindowsPath, resolvePackageBin } from "./local-bin.mjs";
 
@@ -166,6 +166,42 @@ run(process.execPath, [electronVite, "build"]);
 // electron-builder which architectures to produce, so passing --<arch>
 // per-invocation just causes redundant full builds + notarizations.
 run(process.execPath, [electronBuilder, ...builderArgs]);
+
+if (process.platform === "win32") {
+  const dist = join(cwd, "dist");
+  const candidates = [
+    join(dist, "win-unpacked", "QuantFlow.exe"),
+    ...readdirSync(dist)
+      .filter((name) => name.endsWith(".exe"))
+      .map((name) => join(dist, name)),
+  ].filter((path) => existsSync(path));
+  const artifacts = candidates.map((path) => {
+    const quotedPath = path.replaceAll("'", "''");
+    const check = spawnSync(
+      "powershell.exe",
+      ["-NoProfile", "-NonInteractive", "-Command",
+        `(Get-AuthenticodeSignature -LiteralPath '${quotedPath}').Status.ToString()`],
+      { encoding: "utf8", windowsHide: true },
+    );
+    return {
+      path,
+      authenticode: check.status === 0 ? check.stdout.trim() : "Unknown",
+    };
+  });
+  const releaseStatus = {
+    contract: "qf.windows.release-status.v1",
+    generated_at: new Date().toISOString(),
+    artifacts,
+  };
+  writeFileSync(
+    join(dist, "RELEASE-STATUS.json"),
+    `${JSON.stringify(releaseStatus, null, 2)}\n`,
+    "utf8",
+  );
+  for (const artifact of artifacts) {
+    console.log(`• Windows signing state: ${artifact.authenticode} · ${artifact.path}`);
+  }
+}
 
 // electron-builder's npmRebuild rewrites node-pty's native binary in-place
 // for the last target architecture. On a cross-compile (e.g. x64 pass on an

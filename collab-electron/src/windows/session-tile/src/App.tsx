@@ -164,7 +164,9 @@ function App() {
           </div>
         </div>
       ) : null}
-      <div className="session-tile__stream">{stream || "(streaming…)"}</div>
+      <div className="session-tile__stream">
+        {stream || "Native CLI attached — waiting for runtime activity"}
+      </div>
       <div className="session-tile__actions">
         {canRunTurn ? (
           <button type="button" onClick={() => void runDemoTurn()}>

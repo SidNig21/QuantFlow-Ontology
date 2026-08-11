@@ -78,6 +78,11 @@
 						<div class="hint">submit <kbd>Ctrl ⏎</kbd></div>
 						<button id="dock-question-submit" type="submit" class="sr-only">Submit</button>
 					</form>
+					<div class="research-onboarding">
+						<span>QuantFlow delegates evidence, preserves lineage, and independently reviews settled-data results.</span>
+						<button id="dock-guided-research" class="dk-link" type="button">Try guided research</button>
+						<div id="dock-question-status" class="research-status" role="status" aria-live="polite"></div>
+					</div>
 				</div>
 
 				<div class="sh"><b>launch</b><span class="r"></span></div>
@@ -101,9 +106,9 @@
 				</div>
 				<div class="kernel-ledger" id="kernel-ledger">
 					<div class="kl-hd">
-						<span>kernel activity</span>
+						<span>research ledger</span>
 					</div>
-					<div class="kl-empty" id="kernel-ledger-empty">idle · waiting for Kernel events</div>
+					<div class="kl-empty" id="kernel-ledger-empty">Ask a question to begin durable research.</div>
 					<div class="kl-body" id="kernel-ledger-list"></div>
 				</div>
 				<div class="ledger" id="dock-sessions">

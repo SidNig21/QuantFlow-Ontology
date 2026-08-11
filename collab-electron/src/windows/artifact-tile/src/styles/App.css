@@ -68,3 +68,17 @@ html, body, #root {
   color: var(--muted-foreground, var(--qf-muted));
   line-height: 1.45;
 }
+
+.artifact-tile__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  font-family: var(--qf-mono);
+  font-size: 11px;
+  color: var(--muted-foreground, var(--qf-muted));
+}
+
+.artifact-tile__metrics b {
+  color: var(--foreground, var(--qf-text));
+  font-weight: 600;
+}

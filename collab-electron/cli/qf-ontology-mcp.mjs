@@ -13,6 +13,11 @@ const role = process.env.QF_PEER_ROLE;
 const sessionId = process.env.QF_AGENT_SESSION_ID;
 const kernelDb = process.env.QF_KERNEL_DB;
 const seatCapability = process.env.QF_LIVE_SEAT_CAPABILITY;
+// Native-TUI admission waits for the launched seat to cross its real readiness
+// boundary before the Kernel session becomes running. Hermes startup on WSL can
+// legitimately exceed ten seconds, so the bridge must not turn a successful
+// hire into an apparent timeout that encourages duplicate retries.
+const RPC_TIMEOUT_MS = 30_000;
 
 function rpcCall(method, params) {
   return new Promise((resolve, reject) => {
@@ -23,7 +28,7 @@ function rpcCall(method, params) {
     const timer = setTimeout(() => {
       socket.destroy();
       reject(new Error("QuantFlow RPC timed out"));
-    }, 10_000);
+    }, RPC_TIMEOUT_MS);
     socket.on("connect", () => socket.write(
       JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) + "\n",
     ));
