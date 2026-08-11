@@ -286,6 +286,34 @@ describe("collaboration gateway", () => {
     }
   });
 
+  test("send_result can report no evidence only from empty market reads", () => {
+    const f = fixture();
+    f.deps.readMarketTrajectoryResult = () => [];
+    const result = createCollaborationService(f.deps).sendResult(
+      { sessionId: "worker-1", role: "worker" },
+      {
+        taskId: "task-1",
+        result: "No market evidence is currently available.",
+        citedMarketIds: [],
+        readTrajectoryArtifactIds: ["read-1"],
+      },
+    );
+    expect(result).toMatchObject({ artifactId: "result-artifact-1" });
+    expect(f.published[0]).toMatchObject({ citedMarketIds: [] });
+
+    const withEvidence = fixture();
+    expect(() => createCollaborationService(withEvidence.deps).sendResult(
+      { sessionId: "worker-1", role: "worker" },
+      {
+        taskId: "task-1",
+        result: "I saw evidence but cited none.",
+        citedMarketIds: [],
+        readTrajectoryArtifactIds: ["read-1"],
+      },
+    )).toThrow(/requires citations/);
+    expect(withEvidence.published).toHaveLength(0);
+  });
+
   test("send_result publishes exact lineage, completes Kernel task, and survives bus failure", () => {
     const f = fixture();
     f.setNotifyError(new Error("peer bus unavailable"));

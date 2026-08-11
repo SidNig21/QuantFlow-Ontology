@@ -26,6 +26,12 @@ test("collaboration bridge rejects missing and malicious extra fields", () => {
     read_trajectory_artifact_ids: ["read-1"],
     path: "C:\\forged\\result.json",
   })).toThrow(/extra field: path/);
+  expect(validateToolArguments("send_result", {
+    task_id: "task-1",
+    result: "No market evidence is currently available.",
+    cited_market_ids: [],
+    read_trajectory_artifact_ids: ["read-empty"],
+  })).toBeTruthy();
 });
 
 test("packaged collaboration bridge has no generic peer-send bypass", () => {

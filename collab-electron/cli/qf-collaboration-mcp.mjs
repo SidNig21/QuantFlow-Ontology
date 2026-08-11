@@ -64,9 +64,8 @@ const tools = [
         result: { type: "string", description: "Concrete completed result." },
         cited_market_ids: {
           type: "array",
-          minItems: 1,
           items: { type: "string" },
-          description: "Market object ids cited by the result.",
+          description: "Market object ids cited by the result. May be empty only when the named reads returned no market evidence.",
         },
         read_trajectory_artifact_ids: {
           type: "array",
@@ -103,10 +102,11 @@ export function validateToolArguments(name, args) {
   } else {
     if (typeof args.task_id !== "string" || !args.task_id.trim()) throw new Error("send_result requires task_id");
     if (typeof args.result !== "string" || !args.result.trim()) throw new Error("send_result requires result");
-    for (const key of ["cited_market_ids", "read_trajectory_artifact_ids"]) {
-      if (!Array.isArray(args[key]) || args[key].length === 0 || args[key].some((id) => typeof id !== "string" || !id.trim())) {
-        throw new Error(`send_result requires non-empty ${key}`);
-      }
+    if (!Array.isArray(args.cited_market_ids) || args.cited_market_ids.some((id) => typeof id !== "string" || !id.trim())) {
+      throw new Error("send_result requires cited_market_ids to be a string array");
+    }
+    if (!Array.isArray(args.read_trajectory_artifact_ids) || args.read_trajectory_artifact_ids.length === 0 || args.read_trajectory_artifact_ids.some((id) => typeof id !== "string" || !id.trim())) {
+      throw new Error("send_result requires non-empty read_trajectory_artifact_ids");
     }
   }
   return args;

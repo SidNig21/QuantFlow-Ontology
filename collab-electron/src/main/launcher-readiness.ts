@@ -71,6 +71,19 @@ export function createLauncherReadinessWaiter(
 
   function inspectLine(line: string): void {
     line = stripTerminalControls(line);
+    // Windows ConPTY may render the launcher's blank line as an absolute
+    // cursor-position escape instead of preserving the newline. After those
+    // terminal controls are removed, the two exact receipts are adjacent.
+    // Accept only that exact fused pair; surrounding vendor text still fails.
+    if (line === `${ready}${commit}`) {
+      if (readyCount !== 0) {
+        finish(new Error("native-TUI launcher READY receipt was duplicated"));
+      } else {
+        readyCount = 1;
+        finish();
+      }
+      return;
+    }
     if (line === ready) {
       readyCount += 1;
       if (readyCount !== 1) {

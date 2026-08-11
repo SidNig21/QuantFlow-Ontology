@@ -17,6 +17,16 @@ test("readiness accepts exact receipts after ConPTY control frames", async () =>
   await waiter.wait();
 });
 
+test("readiness accepts receipts fused by ConPTY cursor positioning", async () => {
+  const waiter = createLauncherReadinessWaiter("session", "nonce", 100);
+  waiter.push(Buffer.from(
+    "\u001b[?9001h\u001b[?1004h\u001b[?25l\u001b[2J\u001b[m"
+      + "\u001b[2;1HQF_LAUNCH_READY nonce"
+      + "\u001b[4;1HQF_LAUNCH_COMMIT nonce\r\n",
+  ));
+  await waiter.wait();
+});
+
 test("readiness rejects ordinary text before a receipt", async () => {
   const waiter = createLauncherReadinessWaiter("session", "nonce", 100);
   waiter.push(Buffer.from("not-terminal-text QF_LAUNCH_READY nonce\n"));

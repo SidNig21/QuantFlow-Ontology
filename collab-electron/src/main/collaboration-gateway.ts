@@ -94,9 +94,11 @@ function nonEmptyString(value: unknown, field: string): string {
   return value.trim();
 }
 
-function stringIdArray(value: unknown, field: string): string[] {
-  if (!Array.isArray(value) || value.length === 0) {
-    throw new Error(`${field} must be a non-empty string array`);
+function stringIdArray(value: unknown, field: string, allowEmpty = false): string[] {
+  if (!Array.isArray(value) || (!allowEmpty && value.length === 0)) {
+    throw new Error(
+      allowEmpty ? `${field} must be a string array` : `${field} must be a non-empty string array`,
+    );
   }
   if (value.length > ID_ARRAY_MAX_ITEMS) {
     throw new Error(`${field} exceeds ${ID_ARRAY_MAX_ITEMS} items`);
@@ -110,9 +112,11 @@ function stringIdArray(value: unknown, field: string): string[] {
   return ids;
 }
 
-function boundedIdList(ids: string[], field: string): string[] {
-  if (ids.length === 0 || ids.length > ID_ARRAY_MAX_ITEMS) {
-    throw new Error(`${field} must contain 1-${ID_ARRAY_MAX_ITEMS} items`);
+function boundedIdList(ids: string[], field: string, allowEmpty = false): string[] {
+  if ((!allowEmpty && ids.length === 0) || ids.length > ID_ARRAY_MAX_ITEMS) {
+    throw new Error(
+      `${field} must contain ${allowEmpty ? "0" : "1"}-${ID_ARRAY_MAX_ITEMS} items`,
+    );
   }
   const bounded = ids.map((id) =>
     boundedString(nonEmptyString(id, field), field, ID_MAX_BYTES)
@@ -225,7 +229,11 @@ export function createCollaborationService(deps: CollaborationDependencies) {
       requireCapability(deps, identity, "market.read");
       const resultText = boundedString(input.result, "result", RESULT_MAX_BYTES);
       const taskId = boundedString(input.taskId, "task_id", ID_MAX_BYTES);
-      const citedMarketIds = boundedIdList(input.citedMarketIds, "cited_market_ids");
+      const citedMarketIds = boundedIdList(
+        input.citedMarketIds,
+        "cited_market_ids",
+        true,
+      );
       const readTrajectoryArtifactIds = boundedIdList(
         input.readTrajectoryArtifactIds,
         "read_trajectory_artifact_ids",
@@ -247,6 +255,12 @@ export function createCollaborationService(deps: CollaborationDependencies) {
           deps.readMarketTrajectoryResult(trajectoryId, identity.sessionId),
           observedIds,
         );
+      }
+      if (
+        citedMarketIds.length === 0 &&
+        [...observedIds].some((id) => deps.marketObjectExists(id))
+      ) {
+        throw new Error("send_result requires citations for observed market evidence");
       }
       for (const citedId of citedMarketIds) {
         if (!deps.marketObjectExists(citedId)) {
@@ -337,7 +351,11 @@ export function registerCollaborationGatewayRpc(
       const result = service.sendResult(identity, {
         taskId: nonEmptyString(input.task_id, "task_id"),
         result: nonEmptyString(input.result, "result"),
-        citedMarketIds: stringIdArray(input.cited_market_ids, "cited_market_ids"),
+        citedMarketIds: stringIdArray(
+          input.cited_market_ids,
+          "cited_market_ids",
+          true,
+        ),
         readTrajectoryArtifactIds: stringIdArray(
           input.read_trajectory_artifact_ids,
           "read_trajectory_artifact_ids",
