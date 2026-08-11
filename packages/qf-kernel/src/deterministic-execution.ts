@@ -228,6 +228,134 @@ function compareCanonical(left: JsonRecord, right: JsonRecord): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
+const METRIC_SCALE = 1_000_000n;
+
+function parsePositiveFixed(value: unknown, label: string): bigint {
+  if (typeof value !== "string" || !/^\d+(?:\.\d{1,6})?$/.test(value)) {
+    throw new KernelError(`${label} must be a positive decimal string with at most 6 places`);
+  }
+  const [whole, fraction = ""] = value.split(".");
+  const units = BigInt(whole!) * METRIC_SCALE + BigInt(fraction.padEnd(6, "0"));
+  if (units <= 0n) throw new KernelError(`${label} must be greater than zero`);
+  return units;
+}
+
+function roundDivide(numerator: bigint, denominator: bigint): bigint {
+  if (denominator <= 0n) throw new KernelError("metric denominator must be positive");
+  const negative = numerator < 0n;
+  const absolute = negative ? -numerator : numerator;
+  const rounded = (absolute + denominator / 2n) / denominator;
+  return negative ? -rounded : rounded;
+}
+
+function formatFixed(units: bigint): string {
+  const negative = units < 0n;
+  const absolute = negative ? -units : units;
+  const whole = absolute / METRIC_SCALE;
+  const fraction = (absolute % METRIC_SCALE).toString().padStart(6, "0");
+  return `${negative ? "-" : ""}${whole}.${fraction}`;
+}
+
+function calculateMetrics(selected: readonly JsonRecord[]): JsonRecord {
+  let wins = 0n;
+  let losses = 0n;
+  let pushes = 0n;
+  let voids = 0n;
+  let settledStake = 0n;
+  let netProfit = 0n;
+  let clvTotal = 0n;
+  let clvCount = 0n;
+  let excluded = 0n;
+
+  for (const [index, observation] of selected.entries()) {
+    const raw = observation.settlement;
+    if (raw === undefined) {
+      excluded++;
+      continue;
+    }
+    const settlement = objectValue(raw, `selected observation ${index} settlement`);
+    exactKeys(
+      settlement,
+      ["outcome", "stake", "decimal_odds", "closing_decimal_odds"],
+      `selected observation ${index} settlement`,
+    );
+    if (!["win", "loss", "push", "void"].includes(String(settlement.outcome))) {
+      throw new KernelError(
+        `selected observation ${index} settlement outcome must be win|loss|push|void`,
+      );
+    }
+    const stake = parsePositiveFixed(settlement.stake, `selected observation ${index} stake`);
+    const odds = parsePositiveFixed(
+      settlement.decimal_odds,
+      `selected observation ${index} decimal_odds`,
+    );
+    if (odds <= METRIC_SCALE) {
+      throw new KernelError(`selected observation ${index} decimal_odds must be greater than 1`);
+    }
+    const outcome = settlement.outcome;
+    if (outcome !== "void") settledStake += stake;
+    if (outcome === "win") {
+      wins++;
+      netProfit += roundDivide(stake * (odds - METRIC_SCALE), METRIC_SCALE);
+    } else if (outcome === "loss") {
+      losses++;
+      netProfit -= stake;
+    } else if (outcome === "push") {
+      pushes++;
+    } else {
+      voids++;
+    }
+
+    if (outcome !== "void" && settlement.closing_decimal_odds !== undefined) {
+      const close = parsePositiveFixed(
+        settlement.closing_decimal_odds,
+        `selected observation ${index} closing_decimal_odds`,
+      );
+      if (close <= METRIC_SCALE) {
+        throw new KernelError(
+          `selected observation ${index} closing_decimal_odds must be greater than 1`,
+        );
+      }
+      clvTotal += roundDivide((odds - close) * METRIC_SCALE, close);
+      clvCount++;
+    }
+  }
+
+  const decisive = wins + losses;
+  return {
+    contract: "qf.metrics.v1",
+    version: 1,
+    scale: 6,
+    definitions: {
+      roi: "net profit / stake across win, loss, and push rows; void rows excluded",
+      hit_rate: "wins / (wins + losses); push and void rows excluded",
+      average_clv:
+        "mean of per-row (decimal_odds / closing_decimal_odds - 1), each rounded half-up to 6 decimals; missing close and void rows excluded",
+      missing_settlement: "selected rows without settlement are counted and excluded",
+    },
+    selected_count: selected.length,
+    excluded_count: Number(excluded),
+    settled_count: Number(wins + losses + pushes + voids),
+    clv_count: Number(clvCount),
+    wins: Number(wins),
+    losses: Number(losses),
+    pushes: Number(pushes),
+    voids: Number(voids),
+    total_stake: formatFixed(settledStake),
+    net_profit: formatFixed(netProfit),
+    roi:
+      settledStake === 0n
+        ? null
+        : formatFixed(roundDivide(netProfit * METRIC_SCALE, settledStake)),
+    hit_rate:
+      decisive === 0n
+        ? null
+        : formatFixed(roundDivide(wins * METRIC_SCALE, decisive)),
+    average_clv:
+      clvCount === 0n ? null : formatFixed(roundDivide(clvTotal, clvCount)),
+  };
+}
+
 function buildResult(
   observations: readonly JsonRecord[],
   scoreField: string,
@@ -249,6 +377,7 @@ function buildResult(
     .sort((left, right) =>
       right.score - left.score || compareCanonical(left.observation, right.observation));
   const selected = ranked.slice(0, params.limit).map((row) => row.observation);
+  const metrics = calculateMetrics(selected);
   const payload = {
     contract: "qf.execution.result.v1",
     execution_version: DETERMINISTIC_EXECUTION_VERSION,
@@ -257,6 +386,7 @@ function buildResult(
     params: params.value,
     selected,
     eligible_count: ranked.length,
+    metrics,
   };
   const bytes = new TextEncoder().encode(`${canonicalJson(payload)}\n`);
   return { bytes, hash: contentHash(bytes), selected };
