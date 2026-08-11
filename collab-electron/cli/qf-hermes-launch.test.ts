@@ -33,6 +33,9 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain("QF_LAUNCH_READY %s");
     expect(wrapper).toContain("QF_LAUNCH_COMMIT %s");
     expect(wrapper).toContain("unset QF_LAUNCH_READY_NONCE");
+    expect(wrapper).toContain("--quantflow-mission-oneshot");
+    expect(wrapper).toContain('IFS= read -r activation');
+    expect(wrapper).toContain('exec "$hermes_command" -z');
   });
 
   test("reports missing Hermes prerequisites without writing a profile", () => {
@@ -40,6 +43,50 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain("an isolated Hermes profile root is not configured");
     expect(wrapper).toContain("isolated auth.json path is not a symlink");
     expect(wrapper).not.toContain('cp "$HOME/.hermes/auth.json"');
+  });
+
+  test("waits for the founder mission and hands it to Hermes as one supported prompt", () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-hermes-oneshot-"));
+    try {
+      const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
+      const isolatedRoot = join(root, "isolated-hermes");
+      const activation =
+        'QUANTFLOW_MISSION {"contract":"qf.mission.activation.v1","mission_id":"mission-test","question":"What changed?"}\r\n';
+      const args = process.platform === "win32"
+        ? [
+            "-d", "Ubuntu", "--", "env",
+            `HOME=${wslPath(root)}`,
+            "QF_AGENT_SESSION_ID=seat-test",
+            "QF_LAUNCH_READY_NONCE=test-ready",
+            `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
+            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs",
+            "echo", "--quantflow-mission-oneshot", "--tui",
+          ]
+        : [
+            wrapperPath, "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs",
+            "echo", "--quantflow-mission-oneshot", "--tui",
+          ];
+      const result = spawnSync(process.platform === "win32" ? "wsl.exe" : "bash", args, {
+        input: activation,
+        encoding: "utf8",
+        env: process.platform === "win32"
+          ? process.env
+          : {
+              ...process.env,
+              HOME: root,
+              QF_AGENT_SESSION_ID: "seat-test",
+              QF_LAUNCH_READY_NONCE: "test-ready",
+              QF_QUANTFLOW_HERMES_PROFILE_ROOT: isolatedRoot,
+            },
+      });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain("QF_LAUNCH_COMMIT test-ready");
+      expect(result.stdout).toContain("-z You are the QuantFlow research orchestrator");
+      expect(result.stdout).toContain("mission-test");
+      expect(result.stdout).not.toContain("-z --tui");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 
   test("keeps founder config/auth untouched while using isolated profile shape", () => {

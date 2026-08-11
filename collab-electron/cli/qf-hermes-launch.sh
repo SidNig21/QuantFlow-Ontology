@@ -10,6 +10,12 @@ shift
 hermes_command="${1:?Hermes command is required}"
 shift
 
+mission_oneshot=0
+if [[ "${1:-}" == "--quantflow-mission-oneshot" ]]; then
+  mission_oneshot=1
+  shift
+fi
+
 if ! command -v "$hermes_command" >/dev/null 2>&1; then
   echo "QuantFlow Hermes unavailable: install Hermes in the selected Ubuntu/WSL2 distro, then retry." >&2
   exit 127
@@ -80,5 +86,24 @@ fi
 printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
   "$QF_LAUNCH_READY_NONCE" "$QF_LAUNCH_READY_NONCE"
 unset QF_LAUNCH_READY_NONCE
+
+if [[ "$mission_oneshot" == "1" ]]; then
+  if ! IFS= read -r activation; then
+    echo "QuantFlow Hermes mission was not delivered." >&2
+    exit 2
+  fi
+  activation="${activation%$'\r'}"
+  if [[ "$activation" != QUANTFLOW_MISSION\ * ]]; then
+    echo "QuantFlow Hermes received an invalid mission envelope." >&2
+    exit 2
+  fi
+  if (( ${#activation} > 6144 )); then
+    echo "QuantFlow Hermes mission exceeds the supported size." >&2
+    exit 2
+  fi
+
+  exec "$hermes_command" -z \
+    "You are the QuantFlow research orchestrator. Use the available QuantFlow ontology and collaboration tools to inspect Kernel-held evidence before answering. Delegate to a worker when useful. Return a concise research-only answer and never place bets or trades. Founder mission: $activation"
+fi
 
 exec "$hermes_command" "$@"

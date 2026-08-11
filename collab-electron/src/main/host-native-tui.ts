@@ -206,6 +206,9 @@ export async function admitNativeTuiDefinition(opts: {
               collaborationBridge!.replace(/\\/g, "/"),
               ontologyBridge!.replace(/\\/g, "/"),
               guestCommand,
+              ...(adapterId === "hermes" && opts.missionActivation
+                ? ["--quantflow-mission-oneshot"]
+                : []),
               ...argv,
             ]
           : argv,
