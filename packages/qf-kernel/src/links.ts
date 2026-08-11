@@ -175,6 +175,9 @@ export function writeLinks(
 /** Merge convenience lineage fields into link specs for record_evaluation. */
 export function lineageFieldsToLinks(input: Record<string, unknown>): LinkSpec[] {
   const extra: LinkSpec[] = [];
+  if (typeof input.hypothesis_id === "string" && input.hypothesis_id.length > 0) {
+    extra.push({ kind: "evaluated_by", from_id: input.hypothesis_id });
+  }
   if (typeof input.artifact_id === "string" && input.artifact_id.length > 0) {
     extra.push({ kind: "evaluated_by", from_id: input.artifact_id });
   }

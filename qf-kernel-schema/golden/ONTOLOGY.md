@@ -337,7 +337,7 @@ Version and transformation lineage among datasets, artifacts, and strategies.
 Verdict attachment: which evaluation judged an artifact or run.
 
 - **lifecycle:** `experimental`
-- **from:** `artifact` | `run`
+- **from:** `artifact` | `run` | `hypothesis`
 - **to:** `evaluation`
 
 ### `gates`
@@ -683,6 +683,7 @@ Publish an immutable content-addressed artifact (must land before sandbox death)
 - `content_hash` — Advisory content hash; verified against the computed hash when supplied, and a mismatch is rejected.
 - `storage_ref` — Durable storage location.
 - `path` — Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.
+- `evaluation_id` — Supporting Evaluation that authorizes a report. Required only when kind is report.
 
 ### `record_evaluation`
 
@@ -706,4 +707,5 @@ Resolve an open hypothesis to supported|rejected|inconclusive; evaluation-gated 
 - **lifecycle:** `experimental`
 - **input:**
 - `hypothesis_id` — Hypothesis to resolve.
+- `evaluation_id` — Evaluation whose hypothesis lineage and verdict authorize this resolution.
 - `status` — Resolved status to write.

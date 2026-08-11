@@ -154,6 +154,9 @@ export function execute<C extends string>(
   if (command === "complete_task") {
     assertTaskCompletionLineage(db, validatedInput, trace);
   }
+  if (command === "resolve_hypothesis") {
+    assertHypothesisResolutionEvidence(db, validatedInput);
+  }
 
   const id = objectId(transitionSample!, validatedInput);
   const { field, value: from } = readState(db, transitionSample!.type, id);
@@ -192,6 +195,57 @@ export function execute<C extends string>(
     event: cmd.event,
     state,
   } as ExecuteResultFor<C>;
+}
+
+function assertHypothesisResolutionEvidence(
+  db: KernelDb,
+  input: Record<string, unknown>,
+): void {
+  const hypothesisId = input.hypothesis_id;
+  const evaluationId = input.evaluation_id;
+  const status = input.status;
+  if (
+    typeof hypothesisId !== "string" ||
+    typeof evaluationId !== "string" ||
+    typeof status !== "string"
+  ) {
+    throw new KernelError(
+      "resolve_hypothesis requires hypothesis_id, evaluation_id, and status",
+    );
+  }
+
+  const evaluation = db
+    .query(`SELECT verdict FROM evaluation WHERE id = ?`)
+    .get(evaluationId) as { verdict: string } | null;
+  if (!evaluation) {
+    throw new KernelError(`resolve_hypothesis Evaluation "${evaluationId}" not found`);
+  }
+
+  const hypotheses = db
+    .query(
+      `SELECT links.from_id
+         FROM links
+         JOIN hypothesis ON hypothesis.id = links.from_id
+        WHERE links.kind = 'evaluated_by' AND links.to_id = ?`,
+    )
+    .all(evaluationId) as Array<{ from_id: string }>;
+  if (hypotheses.length !== 1 || hypotheses[0]!.from_id !== hypothesisId) {
+    throw new KernelError(
+      "resolve_hypothesis Evaluation is not tied to exactly the requested hypothesis",
+    );
+  }
+
+  const requiredVerdict =
+    status === "supported"
+      ? "supports"
+      : status === "rejected"
+        ? "rejects"
+        : "inconclusive";
+  if (evaluation.verdict !== requiredVerdict) {
+    throw new KernelError(
+      `resolve_hypothesis status ${status} requires Evaluation verdict ${requiredVerdict}`,
+    );
+  }
 }
 
 /**

@@ -1,24 +1,19 @@
-# NEXT — R9 (pre-R9 golden-path repair authorized)
+# NEXT — R10 point-in-time datasets
 
-status: PRE-R9 REPAIR AUTHORIZED
+status: R10 AUTHORIZED
 authorized-by: founder
 authorized-at: 2026-08-10
-baseline: R0–R8 complete on `act-i-ladder`
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) Part IV · R9
+baseline: R0–R9 complete on `act-i-ladder`
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R10
 
-> R9 remains the one active rung for `rung-ladder`, but the founder authorizes
-> **only** the pre-R9 repair in [`WO-ACT1-GOLDEN-PATH.md`](WO-ACT1-GOLDEN-PATH.md).
-> It joins the already-built Act I planks into one packaged Windows golden run and
-> produces the founder sign-off evidence. It does not implement R9.
+## Active outcome
 
-## Authorized work
+A Dataset must be bound to real immutable bytes and an `as_of` time. QuantFlow
+must reject registration when the declared hash does not match the bytes or when
+the dataset contains observations from after its `as_of` fence.
 
-Build `WO-ACT1-GOLDEN-PATH.md` exactly. The deterministic packaged proof and the
-founder-only normal-mode Hermes proof must remain distinct. Do not claim the
-deterministic proof is live-model behavior.
+## Boundary
 
-## Stop
-
-No builder implements R9, alters R9 semantics, or begins R10–R14 under this
-authorization. After the repaired golden run is accepted by the founder, the
-verifier writes a fresh NEXT authorization for R9.
+Build R10 only. Keep Dataset truth in the Kernel and artifact storage; add no
+second database or manifest store. Do not start backtest execution, metric
+calculation, critic behavior, release packaging, R11–R14, or live betting/trading.

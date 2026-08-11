@@ -128,6 +128,43 @@ function publishArtifact(
     throw new KernelError('publish_artifact requires non-empty "storage_ref"');
   }
 
+  let effectiveLinks = links;
+  if (kind === "report") {
+    if (links.some((link) => link.kind === "gates")) {
+      throw new KernelError(
+        "publish_artifact report gate is Kernel-owned; supply evaluation_id instead of a gates link",
+      );
+    }
+    const evaluationId = input.evaluation_id;
+    if (typeof evaluationId !== "string" || evaluationId.length === 0) {
+      throw new KernelError("publish_artifact report requires evaluation_id");
+    }
+    const evaluation = db
+      .query(`SELECT verdict FROM evaluation WHERE id = ?`)
+      .get(evaluationId) as { verdict: string } | null;
+    if (evaluation?.verdict !== "supports") {
+      throw new KernelError(
+        "publish_artifact report requires an Evaluation with verdict supports",
+      );
+    }
+    const hypotheses = db
+      .query(
+        `SELECT links.from_id
+           FROM links
+           JOIN hypothesis ON hypothesis.id = links.from_id
+          WHERE links.kind = 'evaluated_by' AND links.to_id = ?`,
+      )
+      .all(evaluationId) as Array<{ from_id: string }>;
+    if (hypotheses.length !== 1) {
+      throw new KernelError(
+        "publish_artifact report requires an Evaluation tied to exactly one hypothesis",
+      );
+    }
+    effectiveLinks = [...links, { kind: "gates", from_id: evaluationId }];
+  } else if (input.evaluation_id !== undefined) {
+    throw new KernelError("publish_artifact evaluation_id is valid only for kind report");
+  }
+
   const bytes = resolveBytes(input);
   const computed = contentHash(bytes);
   if (typeof input.content_hash === "string" && input.content_hash.length > 0) {
@@ -140,9 +177,9 @@ function publishArtifact(
     ? validateOntologyReadPublication(bytes, trace.actor_session_id, trace.ontology_read_tool)
     : undefined;
   if (ontologyReadReceipt) {
-    const producerLinks = links.filter((link) => link.kind === "produces");
+    const producerLinks = effectiveLinks.filter((link) => link.kind === "produces");
     if (
-      links.length !== 1 ||
+      effectiveLinks.length !== 1 ||
       producerLinks.length !== 1 ||
       producerLinks[0]!.from_id !== ontologyReadReceipt.actor_session_id
     ) {
@@ -170,6 +207,19 @@ function publishArtifact(
     if (ontologyReadReceipt) {
       assertDurableOntologyReadReceipt(db, id, ontologyReadReceipt.actor_session_id);
     }
+    if (kind === "report") {
+      const existingGates = db
+        .query(`SELECT from_id FROM links WHERE kind = 'gates' AND to_id = ?`)
+        .all(id) as Array<{ from_id: string }>;
+      if (
+        existingGates.length !== 1 ||
+        existingGates[0]!.from_id !== input.evaluation_id
+      ) {
+        throw new KernelError(
+          "publish_artifact report already exists without the requested Evaluation gate",
+        );
+      }
+    }
     return creationResult(cmd, id, cmd.event, existing);
   }
 
@@ -178,7 +228,7 @@ function publishArtifact(
     object_id: id,
     event: cmd.event,
     trace,
-    links,
+    links: effectiveLinks,
     payload: {
       command: cmd.action,
       kind,
@@ -768,6 +818,11 @@ function recordEvaluation(
   trace: TraceContext,
   links: LinkSpec[],
 ): ObjectExecuteResult {
+  if (links.some((link) => link.kind === "evaluated_by")) {
+    throw new KernelError(
+      "record_evaluation lineage is Kernel-owned; use hypothesis_id, run_id, or artifact_id",
+    );
+  }
   const metrics = input.metrics;
   if (!metrics || typeof metrics !== "object" || Array.isArray(metrics)) {
     throw new KernelError('record_evaluation requires object "metrics"');

@@ -216,9 +216,9 @@ describe("qf-kernel", () => {
     db = openKernel(":memory:");
     const bytes = new TextEncoder().encode("same-bytes");
     const input = {
-      kind: "report" as const,
+      kind: "code" as const,
       bytes,
-      storage_ref: "file:///tmp/report.bin",
+      storage_ref: "file:///tmp/code.bin",
     };
     execute(db, "publish_artifact", input, ctx);
     const afterFirst = eventCount(db);
@@ -270,7 +270,7 @@ describe("qf-kernel", () => {
     execute(
       db,
       "publish_artifact",
-      { kind: "report", bytes, storage_ref: "file:///a" },
+      { kind: "result_set", bytes, storage_ref: "file:///a" },
       ctx,
     );
     const before = eventCount(db);
@@ -287,7 +287,7 @@ describe("qf-kernel", () => {
       kind: string;
       storage_ref: string;
     };
-    expect(row.kind).toBe("report");
+    expect(row.kind).toBe("result_set");
     expect(row.storage_ref).toBe("file:///a");
   });
 
@@ -458,7 +458,7 @@ describe("qf-kernel", () => {
         kind: "report",
         bytes: reportBytes,
         storage_ref: "file:///tmp/report-chain.bin",
-        links: [{ kind: "gates", from_id: ev.object_id }],
+        evaluation_id: ev.object_id,
       },
       { ...ctx, span_id: "span-report" },
     );

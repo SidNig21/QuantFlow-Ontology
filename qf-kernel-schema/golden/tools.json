@@ -3044,6 +3044,10 @@
         "path": {
           "description": "Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.",
           "type": "string"
+        },
+        "evaluation_id": {
+          "description": "Supporting Evaluation that authorizes a report. Required only when kind is report.",
+          "type": "string"
         }
       },
       "required": [
@@ -3118,6 +3122,10 @@
           "type": "string",
           "description": "Hypothesis to resolve."
         },
+        "evaluation_id": {
+          "type": "string",
+          "description": "Evaluation whose hypothesis lineage and verdict authorize this resolution."
+        },
         "status": {
           "type": "string",
           "enum": [
@@ -3130,6 +3138,7 @@
       },
       "required": [
         "hypothesis_id",
+        "evaluation_id",
         "status"
       ]
     }

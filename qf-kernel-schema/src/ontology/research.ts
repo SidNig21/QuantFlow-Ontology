@@ -339,7 +339,7 @@ export const evaluated_by = defineLink({
   name: "evaluated_by",
   description: "Verdict attachment: which evaluation judged an artifact or run.",
   lifecycle: "experimental",
-  from: [artifact, run],
+  from: [artifact, run, hypothesis],
   to: evaluation,
 });
 
@@ -518,6 +518,12 @@ export const publish_artifact = defineAction({
         .describe(
           "Filesystem path to read artifact bytes from; MCP callers must supply this because bytes cannot cross JSON.",
         ),
+      evaluation_id: z
+        .string()
+        .optional()
+        .describe(
+          "Supporting Evaluation that authorizes a report. Required only when kind is report.",
+        ),
     }),
 });
 
@@ -558,6 +564,9 @@ export const resolve_hypothesis = defineAction({
   lifecycle: "experimental",
   input: z.object({
     hypothesis_id: z.string().describe("Hypothesis to resolve."),
+    evaluation_id: z
+      .string()
+      .describe("Evaluation whose hypothesis lineage and verdict authorize this resolution."),
     status: z
       .enum(["supported", "rejected", "inconclusive"])
       .describe("Resolved status to write."),
