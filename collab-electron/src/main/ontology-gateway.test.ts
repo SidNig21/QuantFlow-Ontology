@@ -36,7 +36,9 @@ test("generic ontology actions expose deterministic execution but not task bypas
   const block = /const EXPOSED_ACTIONS = new Set\(\[([\s\S]*?)\]\);/.exec(source)?.[1] ?? "";
   expect(block).toContain("create_agent_session");
   expect(block).toContain("start_agent_session");
+  expect(block).toContain("create_hypothesis");
   expect(block).toContain("execute_deterministic_run");
+  expect(block).toContain("record_evaluation");
   expect(block).not.toContain("create_task");
   expect(block).not.toContain("complete_task");
 });

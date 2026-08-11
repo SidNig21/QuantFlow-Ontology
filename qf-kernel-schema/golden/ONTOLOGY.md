@@ -340,6 +340,14 @@ Verdict attachment: which evaluation judged an artifact or run.
 - **from:** `artifact` | `run` | `hypothesis`
 - **to:** `evaluation`
 
+### `performed_by`
+
+Independent review provenance: which admitted critic session authored an Evaluation.
+
+- **lifecycle:** `experimental`
+- **from:** `evaluation`
+- **to:** `agent_session`
+
 ### `gates`
 
 Publication authorization: which evaluation approved an artifact for release. Ends evaluation's sink status so WO-110 can read the gating fact.
@@ -700,18 +708,17 @@ Publish an immutable content-addressed artifact (must land before sandbox death)
 
 ### `record_evaluation`
 
-Record a structured evaluation verdict with metrics against a hypothesis lineage.
+Record an independent critic verdict over a succeeded deterministic Run. The Kernel derives metrics from the Run result, binds the admitted critic identity and durable findings, and refuses self-review.
 
 - **lifecycle:** `experimental`
 - **input:**
-- `metrics` — Metric set for this evaluation.
 - `verdict` — Verdict relative to the hypothesis.
 - `confidence` — Confidence in the verdict (0–1).
 - `rationale` — Rationale text.
-- `critic_findings_ref` — Optional Critic findings artifact id.
-- `hypothesis_id` — Hypothesis this evaluation answers (lineage; also writable as tests link).
-- `run_id` — Run evaluated (lineage; also writable as evaluated_by link).
-- `artifact_id` — Artifact evaluated (lineage; also writable as evaluated_by link).
+- `findings` — Durable critic findings text authored by this seat.
+- `hypothesis_id` — Hypothesis this evaluation answers.
+- `run_id` — Succeeded deterministic Run evaluated.
+- `artifact_id` — Exact result Artifact produced by the Run.
 
 ### `resolve_hypothesis`
 

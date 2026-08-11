@@ -343,6 +343,15 @@ export const evaluated_by = defineLink({
   to: evaluation,
 });
 
+export const performed_by = defineLink({
+  name: "performed_by",
+  description:
+    "Independent review provenance: which admitted critic session authored an Evaluation.",
+  lifecycle: "experimental",
+  from: evaluation,
+  to: agent_session,
+});
+
 export const gates = defineLink({
   name: "gates",
   description:
@@ -357,6 +366,7 @@ export const create_hypothesis = defineAction({
   description:
     "Open a new research hypothesis with claim, success criteria, and optional sources.",
   lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
   input: z.object({
     claim: z.string().describe("The falsifiable claim to register."),
     success_criteria: z.string().describe("How an evaluation would support this claim."),
@@ -560,31 +570,26 @@ export const publish_artifact = defineAction({
 
 export const record_evaluation = defineAction({
   name: "record_evaluation",
-  description: "Record a structured evaluation verdict with metrics against a hypothesis lineage.",
+  description:
+    "Record an independent critic verdict over a succeeded deterministic Run. The Kernel derives metrics from the Run result, binds the admitted critic identity and durable findings, and refuses self-review.",
   lifecycle: "experimental",
+  capabilityGroup: "research.evaluate",
   input: z.object({
-    metrics: jsonObject.describe("Metric set for this evaluation."),
     verdict: z
       .enum(["supports", "rejects", "inconclusive"])
       .describe("Verdict relative to the hypothesis."),
     confidence: z.number().describe("Confidence in the verdict (0–1)."),
     rationale: z.string().describe("Rationale text."),
-    critic_findings_ref: z
-      .string()
-      .describe("Optional Critic findings artifact id.")
-      .optional(),
+    findings: z.string().describe("Durable critic findings text authored by this seat."),
     hypothesis_id: z
       .string()
-      .describe("Hypothesis this evaluation answers (lineage; also writable as tests link).")
-      .optional(),
+      .describe("Hypothesis this evaluation answers."),
     run_id: z
       .string()
-      .describe("Run evaluated (lineage; also writable as evaluated_by link).")
-      .optional(),
+      .describe("Succeeded deterministic Run evaluated."),
     artifact_id: z
       .string()
-      .describe("Artifact evaluated (lineage; also writable as evaluated_by link).")
-      .optional(),
+      .describe("Exact result Artifact produced by the Run."),
   }),
 });
 

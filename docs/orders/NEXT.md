@@ -1,20 +1,21 @@
-# NEXT — R12 independent critic
+# NEXT — R13 Windows v1 release
 
-status: R12 AUTHORIZED
+status: R13 AUTHORIZED
 authorized-by: founder
 authorized-at: 2026-08-10
 baseline: R0–R10 complete on `act-i-ladder`
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R12
+route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13
 
 ## Active outcome
 
-An admitted critic seat, independent from the session that ran the research,
-must evaluate one R11b result and publish durable findings. The Kernel must bind
-the critic identity, target Run/result, findings, and verdict. A Report may
-publish only from a supporting Evaluation with that independent lineage.
+The normal Windows app must deliver one understandable founder workflow from
+question to durable research result: orchestrator, worker evidence, deterministic
+Run and metrics when settled data exists, independent critic, gated Report, and
+Research Ledger recovery after close/reopen. First-run guidance must make the
+path discoverable, and the release artifact must identify its signing state.
 
 ## Boundary
 
-Build one critic workflow and its Kernel enforcement using the existing agent,
-Artifact, Run, Evaluation, and Report objects. Do not add automated model-quality
-claims, release packaging, R13–R14, or live betting/trading.
+Finish the consumer-facing Windows v1 with domain tiles, semantic cables,
+workflow recovery, onboarding, installer/release output, and one Computer Use
+demonstration in normal mode. Do not start R14/RL and never place bets or trades.

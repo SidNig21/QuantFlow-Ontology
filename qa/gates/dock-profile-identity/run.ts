@@ -59,9 +59,10 @@ const PRODUCTION_UPGRADE_FILES = [
   "0006-connection-actions.sql",
   "0007-task-delegation.sql",
   "0008-deterministic-execution.sql",
+  "0009-independent-critic.sql",
 ] as const;
 const PRE_D1_REQUIRED_UPGRADES =
-  "agent-profile-identity,market-ingest,market-context,capability-grants,task-status,connection-actions,task-delegation,deterministic-execution";
+  "agent-profile-identity,market-ingest,market-context,capability-grants,task-status,connection-actions,task-delegation,deterministic-execution,independent-critic";
 const QF_TOOLLOOP_PACKAGE = join(REPO, "tools/runtime-proof/agent-package");
 const ELECTRON_MAIN = join(REPO, "collab-electron/src/main");
 const KERNEL_ATTACH_SOURCE = join(REPO, "packages/qf-kernel/src/db.ts");

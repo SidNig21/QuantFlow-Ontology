@@ -134,6 +134,51 @@ describe("Hermes packaged launch wrapper", () => {
     }
   });
 
+  test("starts a delegated critic with the independent Evaluation contract", () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-hermes-critic-oneshot-"));
+    try {
+      const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
+      const isolatedRoot = join(root, "isolated-hermes");
+      const task =
+        "[QuantFlow TASK task-critic from orchestrator] Review run-1 and result-1.\r\n";
+      const args = process.platform === "win32"
+        ? [
+            "-d", "Ubuntu", "--", "env",
+            `HOME=${wslPath(root)}`,
+            "QF_AGENT_SESSION_ID=critic-test",
+            "QF_PEER_ROLE=critic",
+            "QF_LAUNCH_READY_NONCE=test-ready",
+            `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
+            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs",
+            "echo", "--quantflow-task-oneshot", "--tui",
+          ]
+        : [
+            wrapperPath, "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs",
+            "echo", "--quantflow-task-oneshot", "--tui",
+          ];
+      const result = spawnSync(process.platform === "win32" ? "wsl.exe" : "bash", args, {
+        input: task,
+        encoding: "utf8",
+        env: process.platform === "win32"
+          ? process.env
+          : {
+              ...process.env,
+              HOME: root,
+              QF_AGENT_SESSION_ID: "critic-test",
+              QF_PEER_ROLE: "critic",
+              QF_LAUNCH_READY_NONCE: "test-ready",
+              QF_QUANTFLOW_HERMES_PROFILE_ROOT: isolatedRoot,
+            },
+      });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain("-z You are the independent QuantFlow research critic");
+      expect(result.stdout).toContain("qf_record_evaluation");
+      expect(result.stdout).toContain("task-critic");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   test("keeps founder config/auth untouched while using isolated profile shape", () => {
     const root = mkdtempSync(join(tmpdir(), "qf-hermes-launch-"));
     try {

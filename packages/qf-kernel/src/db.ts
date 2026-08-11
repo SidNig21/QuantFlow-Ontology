@@ -21,6 +21,7 @@ import {
   CONNECTION_ACTIONS_UPGRADE,
   TASK_DELEGATION_UPGRADE,
   DETERMINISTIC_EXECUTION_UPGRADE,
+  INDEPENDENT_CRITIC_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -350,7 +351,8 @@ export function attachKernel(
       shape === "capability_grants" ||
       shape === "task_status" ||
       shape === "connection_actions" ||
-      shape === "task_delegation")
+      shape === "task_delegation" ||
+      shape === "deterministic_execution")
   ) {
     const upgradeOrder = [
       PROFILE_IDENTITY_UPGRADE,
@@ -361,6 +363,7 @@ export function attachKernel(
       CONNECTION_ACTIONS_UPGRADE,
       TASK_DELEGATION_UPGRADE,
       DETERMINISTIC_EXECUTION_UPGRADE,
+      INDEPENDENT_CRITIC_UPGRADE,
     ];
     const completedByShape = {
       pre_d1: 0,
@@ -371,6 +374,7 @@ export function attachKernel(
       task_status: 5,
       connection_actions: 6,
       task_delegation: 7,
+      deterministic_execution: 8,
     } as const;
     const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
@@ -415,7 +419,8 @@ export function attachKernel(
       shape === "capability_grants" ||
       shape === "task_status" ||
       shape === "connection_actions" ||
-      shape === "task_delegation"
+      shape === "task_delegation" ||
+      shape === "deterministic_execution"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -441,6 +446,9 @@ export function attachKernel(
       const deterministicExecutionSql = readFileSync(
         upgradeSqlPath("0008-deterministic-execution.sql"), "utf8",
       );
+      const independentCriticSql = readFileSync(
+        upgradeSqlPath("0009-independent-critic.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -450,6 +458,7 @@ export function attachKernel(
         connectionActionsSql,
         taskDelegationSql,
         deterministicExecutionSql,
+        independentCriticSql,
       });
     }
   }

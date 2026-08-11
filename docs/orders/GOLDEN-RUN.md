@@ -153,8 +153,8 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R10 | complete | `docs/orders/evidence/r10` |
 | R11a | complete | `docs/orders/evidence/r11a` |
 | R11b | complete | `docs/orders/evidence/r11b` |
-| R12 | active | — |
-| R13 | pending | — |
+| R12 | complete | `docs/orders/evidence/r12` |
+| R13 | active | — |
 | R14 | pending | — |
 
 ### Closing a rung

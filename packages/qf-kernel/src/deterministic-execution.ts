@@ -17,7 +17,7 @@ import {
 } from "./links.ts";
 import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
 import type { ObjectExecuteResult } from "./results.ts";
-import type { TraceContext } from "./trace.ts";
+import type { TraceContext, TrustedExecutionContext } from "./trace.ts";
 
 export const DETERMINISTIC_EXECUTION_VERSION = "qf-deterministic-v1";
 const EXECUTION_ENVIRONMENT_ID =
@@ -362,7 +362,7 @@ function buildResult(
   params: { value: JsonRecord; limit: number; minimumScore: number | null },
   strategyHash: string,
   datasetHash: string,
-): { bytes: Uint8Array; hash: string; selected: JsonRecord[] } {
+): { bytes: Uint8Array; hash: string; selected: JsonRecord[]; metrics: JsonRecord } {
   const ranked = observations
     .map((observation) => {
       const score = observation[scoreField];
@@ -389,7 +389,7 @@ function buildResult(
     metrics,
   };
   const bytes = new TextEncoder().encode(`${canonicalJson(payload)}\n`);
-  return { bytes, hash: contentHash(bytes), selected };
+  return { bytes, hash: contentHash(bytes), selected, metrics };
 }
 
 function artifactRow(db: KernelDb, id: string): {
@@ -494,7 +494,7 @@ function insertArtifact(
   id: string,
   kind: "strategy_spec" | "result_set",
   storageRef: string,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
 ): void {
   db.query(
     `INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
@@ -519,7 +519,7 @@ export function executeDeterministicRun(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
   envelope?: CreationEnvelopePresence,
 ): ObjectExecuteResult {
@@ -605,6 +605,9 @@ export function executeDeterministicRun(
     dataset_artifact_id: dataset.artifactId,
     dataset_content_hash: dataset.contentHash,
     result_artifact_id: result.hash,
+    ...(trace.actor_session_id
+      ? { executor_session_id: trace.actor_session_id }
+      : {}),
     ...(repeatOfRunId ? { repeat_of_run_id: repeatOfRunId } : {}),
   };
 
@@ -734,6 +737,7 @@ export function executeDeterministicRun(
       execution_manifest_hash: manifestHash,
       result_artifact_id: result.hash,
       selected_count: result.selected.length,
+      metrics: result.metrics,
     },
   };
 }

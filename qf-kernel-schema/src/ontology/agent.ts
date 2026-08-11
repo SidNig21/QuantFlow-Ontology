@@ -60,7 +60,7 @@ export const agent_definition = defineObject({
       )
       .nullable(),
     capability_groups: z
-      .array(z.enum(["market.read", "desk.orchestrate"]))
+      .array(z.enum(["market.read", "desk.orchestrate", "research.evaluate"]))
       .describe(
         "Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.",
       ),
@@ -240,7 +240,7 @@ export const register_agent_definition = defineAction({
       .nullable()
       .optional(),
     capability_groups: z
-      .array(z.enum(["market.read", "desk.orchestrate"]))
+      .array(z.enum(["market.read", "desk.orchestrate", "research.evaluate"]))
       .describe(
         "Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names.",
       )

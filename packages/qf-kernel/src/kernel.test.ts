@@ -396,7 +396,7 @@ describe("qf-kernel", () => {
     expect(row.status).toBe("live");
   });
 
-  test("G2 · six-stage chain created and linked through execute() only", () => {
+  test("G2 · hypothesis, Dataset, Run, and result link through execute() only", () => {
     db = openKernel(":memory:");
     const hyp = execute(
       db,
@@ -457,39 +457,12 @@ describe("qf-kernel", () => {
       },
       { ...ctx, span_id: "span-art" },
     );
-    const ev = execute(
-      db,
-      "record_evaluation",
-      {
-        metrics: { clv: 0.04 },
-        verdict: "supports",
-        confidence: 0.8,
-        rationale: "positive edge",
-        artifact_id: art.object_id,
-        hypothesis_id: hyp.object_id,
-      },
-      { ...ctx, span_id: "span-ev" },
-    );
-    const reportBytes = new TextEncoder().encode("report-body");
-    execute(
-      db,
-      "publish_artifact",
-      {
-        kind: "report",
-        bytes: reportBytes,
-        storage_ref: "file:///tmp/report-chain.bin",
-        evaluation_id: ev.object_id,
-      },
-      { ...ctx, span_id: "span-report" },
-    );
-
     const objects = db
       .query(
         `SELECT 'hypothesis' AS t, id FROM hypothesis
          UNION ALL SELECT 'dataset', id FROM dataset
          UNION ALL SELECT 'run', id FROM run
          UNION ALL SELECT 'artifact', id FROM artifact
-         UNION ALL SELECT 'evaluation', id FROM evaluation
          ORDER BY t, id`,
       )
       .all() as Array<{ t: string; id: string }>;
@@ -500,12 +473,10 @@ describe("qf-kernel", () => {
       .all() as Array<{ kind: string; from_id: string; to_id: string }>;
     console.log("G2_links=" + JSON.stringify(links));
 
-    expect(objects.length).toBeGreaterThanOrEqual(5);
+    expect(objects.length).toBeGreaterThanOrEqual(3);
     expect(links.some((l) => l.kind === "tests")).toBe(true);
     expect(links.some((l) => l.kind === "uses")).toBe(true);
     expect(links.some((l) => l.kind === "produces")).toBe(true);
-    expect(links.some((l) => l.kind === "evaluated_by")).toBe(true);
-    expect(links.some((l) => l.kind === "gates")).toBe(true);
   });
 
   test("G3 · illegal link kind rejected by endpoint validator before commit", () => {
@@ -542,27 +513,16 @@ describe("qf-kernel", () => {
       { claim: "x", success_criteria: "y" },
       ctx,
     );
-    const mission = execute(
-      db,
-      "create_mission",
-      {
-        mission_id: "mission-wrong-evaluation-endpoint",
-        name: "Wrong endpoint",
-        objective: "Exercise endpoint validation",
-      },
-      { ...ctx, span_id: "span-ds2" },
-    );
     const before = eventCount(db);
     try {
       execute(
         db,
-        "record_evaluation",
+        "create_run",
         {
-          metrics: {},
-          verdict: "inconclusive",
-          confidence: 0.5,
-          rationale: "n/a",
-          artifact_id: mission.object_id,
+          run_id: "run-wrong-endpoint",
+          kind: "backtest",
+          params: {},
+          links: [{ kind: "uses", to_id: hyp.object_id }],
         },
         { ...ctx, span_id: "span-bad-endpoint" },
       );
@@ -571,11 +531,11 @@ describe("qf-kernel", () => {
       expect(e).toBeInstanceOf(IllegalLinkError);
       const err = e as IllegalLinkError;
       expect(err.layer).toBe("endpoint");
-      expect(err.detail).toContain("mission");
+      expect(err.detail).toContain("hypothesis");
     }
     expect(eventCount(db)).toBe(before);
-    const evals = db.query(`SELECT COUNT(*) AS n FROM evaluation`).get() as { n: number };
-    expect(evals.n).toBe(0);
+    const runs = db.query(`SELECT COUNT(*) AS n FROM run`).get() as { n: number };
+    expect(runs.n).toBe(0);
   });
 
   test("G4 · create_ticket rejects grade; observe_ticket records observation", () => {

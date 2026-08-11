@@ -127,6 +127,11 @@ if [[ "$task_oneshot" == "1" ]]; then
     exit 2
   fi
 
+  if [[ "${QF_PEER_ROLE:-}" == "critic" ]]; then
+    exec "$hermes_command" -z \
+      "You are the independent QuantFlow research critic. Review the completed Run, result Artifact, and metrics named in this task. You must call qf_record_evaluation exactly once with concrete findings and a supports, rejects, or inconclusive verdict. Never place bets or trades. Delegated review: $task"
+  fi
+
   exec "$hermes_command" -z \
     "You are the QuantFlow research worker. Complete the following delegated task using only QuantFlow's ontology evidence. You must call the QuantFlow collaboration send_result tool exactly once before finishing. If the market reads are empty, return a truthful no-evidence result with empty cited_market_ids and at least one actual empty read trajectory artifact id. Never place bets or trades. Delegated task: $task"
 fi

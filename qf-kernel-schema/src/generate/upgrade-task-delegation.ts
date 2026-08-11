@@ -12,7 +12,10 @@ import { sqlString } from "./sql.ts";
  * vocabulary and replace the affected schema metadata with current authority.
  */
 export function generateUpgradeTaskDelegation(): string {
-  const linkKinds = schema.links.map((link) => sqlString(link.name)).join(", ");
+  const linkKinds = schema.links
+    .filter((link) => link.name !== "performed_by")
+    .map((link) => sqlString(link.name))
+    .join(", ");
   const lines: string[] = [];
   lines.push("-- qf-kernel-schema generated upgrade: task-delegation");
   lines.push("-- DO NOT EDIT â€” regenerate with `bun run generate`.");

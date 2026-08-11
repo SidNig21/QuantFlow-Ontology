@@ -193,6 +193,24 @@ describe("R11a deterministic local execution", () => {
   test("upgrades an existing R10 database in place", () => {
     const raw = new Database(":memory:");
     raw.exec(readFileSync(migrationSqlPath(), "utf8").toString());
+    raw.query(`DELETE FROM schema_meta WHERE type_name = 'performed_by'`).run();
+    raw.query(
+      `UPDATE schema_meta SET description = ? WHERE type_name = 'record_evaluation'`,
+    ).run("Record a structured evaluation verdict with metrics against a hypothesis lineage.");
+    const linksSql = (raw
+      .query(`SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'links'`)
+      .get() as { sql: string }).sql
+      .replace("CREATE TABLE links", "CREATE TABLE links_previous")
+      .replace(/,\s*'performed_by'/, "");
+    raw.exec(linksSql);
+    raw.exec(
+      `INSERT INTO links_previous SELECT * FROM links;
+       DROP TABLE links;
+       ALTER TABLE links_previous RENAME TO links;`,
+    );
+    expect(classifyKernelShape(raw as unknown as KernelDb)).toBe(
+      "deterministic_execution",
+    );
     raw.query(
       `DELETE FROM schema_meta WHERE type_name = 'execute_deterministic_run'`,
     ).run();
@@ -205,6 +223,9 @@ describe("R11a deterministic local execution", () => {
         .query(`SELECT kind FROM schema_meta WHERE type_name = ?`)
         .get("execute_deterministic_run"),
     ).toEqual({ kind: "action" });
+    expect(
+      upgraded.query(`SELECT kind FROM schema_meta WHERE type_name = ?`).get("performed_by"),
+    ).toEqual({ kind: "link" });
     raw.close();
   });
 });

@@ -14,6 +14,7 @@ import { generateUpgradeTaskStatus } from "./generate/upgrade-task-status.ts";
 import { generateUpgradeConnectionActions } from "./generate/upgrade-connection-actions.ts";
 import { generateUpgradeTaskDelegation } from "./generate/upgrade-task-delegation.ts";
 import { generateUpgradeDeterministicExecution } from "./generate/upgrade-deterministic-execution.ts";
+import { generateUpgradeIndependentCritic } from "./generate/upgrade-independent-critic.ts";
 import { schema } from "./schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -114,6 +115,15 @@ describe("golden outputs", () => {
     const actual = generateUpgradeDeterministicExecution();
     const expected = readFileSync(
       join(goldenDir, "upgrades", "0008-deterministic-execution.sql"),
+      "utf8",
+    );
+    expect(actual).toBe(expected);
+  });
+
+  test("independent-critic upgrade matches golden byte-for-byte", () => {
+    const actual = generateUpgradeIndependentCritic();
+    const expected = readFileSync(
+      join(goldenDir, "upgrades", "0009-independent-critic.sql"),
       "utf8",
     );
     expect(actual).toBe(expected);

@@ -1,4 +1,5 @@
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { creationCommands, type CreationCommand } from "qf-kernel-schema/commands";
 import type { KernelDb } from "./db.ts";
 import {
@@ -16,6 +17,7 @@ import {
 import { appendEvent } from "./events.ts";
 import type { ContextExecuteResult, ObjectExecuteResult } from "./results.ts";
 import { contentHash } from "./hash.ts";
+import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
 import {
   lineageFieldsToLinks,
   type CreationEnvelopePresence,
@@ -111,6 +113,116 @@ function commitCreation(
   return tx();
 }
 
+function readStoredArtifactBytes(row: {
+  id: string;
+  content_hash: string;
+  storage_ref: string;
+}): Uint8Array {
+  let bytes: Uint8Array;
+  try {
+    bytes = new Uint8Array(
+      readFileSync(row.storage_ref.startsWith("file:") ? new URL(row.storage_ref) : row.storage_ref),
+    );
+  } catch {
+    throw new KernelError(`Artifact bytes are unavailable: ${row.id}`);
+  }
+  if (row.id !== row.content_hash || contentHash(bytes) !== row.id) {
+    throw new KernelError(`Artifact bytes changed after publication: ${row.id}`);
+  }
+  return bytes;
+}
+
+function criticProfile(
+  db: KernelDb,
+  sessionId: string,
+  requireRunning: boolean,
+): void {
+  const session = db
+    .query(`SELECT status FROM agent_session WHERE id = ?`)
+    .get(sessionId) as { status: string } | null;
+  if (!session || (requireRunning && session.status !== "running")) {
+    throw new KernelError("record_evaluation requires a running admitted critic session");
+  }
+  const definitions = db
+    .query(
+      `SELECT agent_definition.role, agent_definition.capability_groups
+         FROM links
+         JOIN agent_definition ON agent_definition.id = links.to_id
+        WHERE links.kind = 'spawned_from' AND links.from_id = ?`,
+    )
+    .all(sessionId) as Array<{ role: string; capability_groups: string }>;
+  let groups: unknown = [];
+  try {
+    groups = definitions.length === 1
+      ? JSON.parse(definitions[0]!.capability_groups)
+      : [];
+  } catch {
+    groups = [];
+  }
+  if (
+    definitions.length !== 1 ||
+    definitions[0]!.role !== "critic" ||
+    !Array.isArray(groups) ||
+    !groups.includes("research.evaluate")
+  ) {
+    throw new KernelError(
+      "record_evaluation requires exactly one critic definition with research.evaluate",
+    );
+  }
+}
+
+function assertIndependentEvaluationForReport(db: KernelDb, evaluationId: string): void {
+  const evaluation = db
+    .query(`SELECT critic_findings_ref FROM evaluation WHERE id = ?`)
+    .get(evaluationId) as { critic_findings_ref: string | null } | null;
+  const critics = db
+    .query(`SELECT to_id FROM links WHERE kind = 'performed_by' AND from_id = ?`)
+    .all(evaluationId) as Array<{ to_id: string }>;
+  const runs = db
+    .query(
+      `SELECT run.id, run.params
+         FROM links JOIN run ON run.id = links.from_id
+        WHERE links.kind = 'evaluated_by' AND links.to_id = ?`,
+    )
+    .all(evaluationId) as Array<{ id: string; params: string }>;
+  const results = db
+    .query(
+      `SELECT artifact.id
+         FROM links JOIN artifact ON artifact.id = links.from_id
+        WHERE links.kind = 'evaluated_by' AND links.to_id = ?`,
+    )
+    .all(evaluationId) as Array<{ id: string }>;
+  if (!evaluation?.critic_findings_ref || critics.length !== 1 || runs.length !== 1 || results.length !== 1) {
+    throw new KernelError(
+      "publish_artifact report requires complete independent critic lineage",
+    );
+  }
+  criticProfile(db, critics[0]!.to_id, false);
+  let runParams: Record<string, unknown>;
+  try {
+    runParams = JSON.parse(runs[0]!.params) as Record<string, unknown>;
+  } catch {
+    throw new KernelError("publish_artifact report requires a valid Run manifest");
+  }
+  if (
+    runParams.executor_session_id === critics[0]!.to_id ||
+    typeof runParams.executor_session_id !== "string"
+  ) {
+    throw new KernelError("publish_artifact report refuses self-review");
+  }
+  const output = db
+    .query(`SELECT 1 AS ok FROM links WHERE kind = 'produces' AND from_id = ? AND to_id = ?`)
+    .get(runs[0]!.id, results[0]!.id);
+  const findingsProducer = db
+    .query(`SELECT from_id FROM links WHERE kind = 'produces' AND to_id = ?`)
+    .all(evaluation.critic_findings_ref) as Array<{ from_id: string }>;
+  if (!output || findingsProducer.length !== 1 || findingsProducer[0]!.from_id !== critics[0]!.to_id) {
+    throw new KernelError(
+      "publish_artifact report requires critic-produced findings over the Run result",
+    );
+  }
+}
+
 function publishArtifact(
   db: KernelDb,
   cmd: CreationCommand,
@@ -161,6 +273,7 @@ function publishArtifact(
         "publish_artifact report requires an Evaluation tied to exactly one hypothesis",
       );
     }
+    assertIndependentEvaluationForReport(db, evaluationId);
     effectiveLinks = [...links, { kind: "gates", from_id: evaluationId }];
   } else if (input.evaluation_id !== undefined) {
     throw new KernelError("publish_artifact evaluation_id is valid only for kind report");
@@ -299,9 +412,13 @@ function registerAgentDefinition(
       );
     }
     for (const group of input.capability_groups) {
-      if (group !== "market.read" && group !== "desk.orchestrate") {
+      if (
+        group !== "market.read" &&
+        group !== "desk.orchestrate" &&
+        group !== "research.evaluate"
+      ) {
         throw new KernelError(
-          'register_agent_definition "capability_groups" entries must be market.read or desk.orchestrate',
+          'register_agent_definition "capability_groups" entries must be market.read, desk.orchestrate, or research.evaluate',
         );
       }
       capability_groups.push(group);
@@ -922,58 +1039,183 @@ function recordEvaluation(
   db: KernelDb,
   cmd: CreationCommand,
   input: Record<string, unknown>,
-  trace: TraceContext,
+  trace: TrustedExecutionContext,
   links: LinkSpec[],
+  envelope?: CreationEnvelopePresence,
 ): ObjectExecuteResult {
-  if (links.some((link) => link.kind === "evaluated_by")) {
+  if (links.length > 0 || envelope?.links || envelope?.bytes) {
     throw new KernelError(
-      "record_evaluation lineage is Kernel-owned; use hypothesis_id, run_id, or artifact_id",
+      "record_evaluation lineage and findings bytes are Kernel-owned",
     );
   }
-  const metrics = input.metrics;
-  if (!metrics || typeof metrics !== "object" || Array.isArray(metrics)) {
-    throw new KernelError('record_evaluation requires object "metrics"');
+  const criticSessionId = trace.actor_session_id;
+  if (!criticSessionId) {
+    throw new KernelError("record_evaluation requires trusted critic identity");
   }
+  criticProfile(db, criticSessionId, true);
+
   const verdict = input.verdict;
   if (verdict !== "supports" && verdict !== "rejects" && verdict !== "inconclusive") {
     throw new KernelError('record_evaluation requires verdict supports|rejects|inconclusive');
   }
   const confidence = input.confidence;
-  if (typeof confidence !== "number") {
-    throw new KernelError('record_evaluation requires numeric "confidence"');
+  if (
+    typeof confidence !== "number" ||
+    !Number.isFinite(confidence) ||
+    confidence < 0 ||
+    confidence > 1
+  ) {
+    throw new KernelError('record_evaluation requires confidence from 0 through 1');
   }
   const rationale = input.rationale;
   if (typeof rationale !== "string" || rationale.length === 0) {
     throw new KernelError('record_evaluation requires non-empty "rationale"');
   }
-  let critic_findings_ref: string | null = null;
-  if (input.critic_findings_ref !== undefined && input.critic_findings_ref !== null) {
-    if (typeof input.critic_findings_ref !== "string") {
-      throw new KernelError('record_evaluation "critic_findings_ref" must be string or null');
-    }
-    critic_findings_ref = input.critic_findings_ref;
+  const findings = input.findings;
+  if (
+    typeof findings !== "string" ||
+    findings.trim().length === 0 ||
+    new TextEncoder().encode(findings).length > 64 * 1024
+  ) {
+    throw new KernelError("record_evaluation requires findings from 1 through 65536 UTF-8 bytes");
+  }
+  const hypothesisId = input.hypothesis_id;
+  const runId = input.run_id;
+  const artifactId = input.artifact_id;
+  if (
+    typeof hypothesisId !== "string" ||
+    typeof runId !== "string" ||
+    typeof artifactId !== "string"
+  ) {
+    throw new KernelError(
+      "record_evaluation requires hypothesis_id, run_id, and artifact_id",
+    );
+  }
+  if (!db.query(`SELECT 1 AS ok FROM hypothesis WHERE id = ?`).get(hypothesisId)) {
+    throw new KernelError(`record_evaluation Hypothesis not found: ${hypothesisId}`);
+  }
+  const run = db
+    .query(`SELECT status, params FROM run WHERE id = ?`)
+    .get(runId) as { status: string; params: string } | null;
+  if (!run || run.status !== "succeeded") {
+    throw new KernelError("record_evaluation requires a succeeded Run");
+  }
+  let runParams: Record<string, unknown>;
+  try {
+    runParams = JSON.parse(run.params) as Record<string, unknown>;
+  } catch {
+    throw new KernelError("record_evaluation Run manifest is invalid");
+  }
+  if (
+    typeof runParams.executor_session_id !== "string" ||
+    runParams.executor_session_id === criticSessionId
+  ) {
+    throw new KernelError("record_evaluation refuses a missing executor or self-review");
+  }
+  const outputLinks = db
+    .query(`SELECT to_id FROM links WHERE kind = 'produces' AND from_id = ?`)
+    .all(runId) as Array<{ to_id: string }>;
+  if (outputLinks.length !== 1 || outputLinks[0]!.to_id !== artifactId) {
+    throw new KernelError("record_evaluation artifact_id must be the Run's exact output");
+  }
+  const artifact = db
+    .query(`SELECT id, kind, content_hash, storage_ref FROM artifact WHERE id = ?`)
+    .get(artifactId) as {
+      id: string;
+      kind: string;
+      content_hash: string;
+      storage_ref: string;
+    } | null;
+  if (!artifact || artifact.kind !== "result_set") {
+    throw new KernelError("record_evaluation requires a result_set Artifact");
+  }
+  let resultPayload: Record<string, unknown>;
+  try {
+    resultPayload = JSON.parse(
+      new TextDecoder().decode(readStoredArtifactBytes(artifact)),
+    ) as Record<string, unknown>;
+  } catch (error) {
+    if (error instanceof KernelError) throw error;
+    throw new KernelError("record_evaluation result bytes are invalid JSON");
+  }
+  const metrics = resultPayload.metrics;
+  if (
+    resultPayload.contract !== "qf.execution.result.v1" ||
+    !metrics ||
+    typeof metrics !== "object" ||
+    Array.isArray(metrics) ||
+    (metrics as Record<string, unknown>).contract !== "qf.metrics.v1"
+  ) {
+    throw new KernelError("record_evaluation requires an R11b metric result");
   }
 
-  const mergedLinks = [...lineageFieldsToLinks(input), ...links];
+  const findingsBytes = new TextEncoder().encode(`${JSON.stringify({
+    contract: "qf.critic.findings.v1",
+    critic_session_id: criticSessionId,
+    hypothesis_id: hypothesisId,
+    run_id: runId,
+    artifact_id: artifactId,
+    verdict,
+    findings,
+  })}\n`);
+  const findingsId = contentHash(findingsBytes);
+  const findingsDirectory = join(resolveArtifactRoot().path, "critic-findings");
+  mkdirSync(findingsDirectory, { recursive: true });
+  const findingsPath = join(findingsDirectory, `${findingsId}.json`);
+  if (existsSync(findingsPath)) {
+    const existing = new Uint8Array(readFileSync(findingsPath));
+    if (contentHash(existing) !== findingsId) {
+      throw new KernelError(`critic findings file conflict: ${findingsPath}`);
+    }
+  } else {
+    writeFileSync(findingsPath, findingsBytes, { flag: "wx" });
+  }
+
   const id = crypto.randomUUID();
-  const state = commitCreation(db, {
-    object_type: cmd.object_type,
-    object_id: id,
-    event: cmd.event,
-    trace,
-    links: mergedLinks,
-    payload: {
-      command: cmd.action,
-      metrics,
-      verdict,
-      confidence,
-      rationale,
-      critic_findings_ref,
-      hypothesis_id: input.hypothesis_id ?? null,
-      run_id: input.run_id ?? null,
-      artifact_id: input.artifact_id ?? null,
-    },
-    insert: () => {
+  const tx = db.transaction(() => {
+    const existingFindings = db.query(`SELECT * FROM artifact WHERE id = ?`).get(findingsId) as
+      | { id: string; kind: string; content_hash: string; storage_ref: string }
+      | null;
+    if (!existingFindings) {
+      const createdAt = new Date().toISOString();
+      db.query(
+        `INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
+         VALUES (?, ?, 'trajectory', ?, ?)`,
+      ).run(findingsId, createdAt, findingsId, findingsPath);
+      writeLinks(db, "artifact", findingsId, [
+        { kind: "produces", from_id: criticSessionId },
+      ]);
+      appendEvent(db, {
+        type: "artifact.published",
+        object_type: "artifact",
+        object_id: findingsId,
+        payload: {
+          command: cmd.action,
+          kind: "trajectory",
+          content_hash: findingsId,
+          storage_ref: findingsPath,
+          span_id: trace.span_id,
+        },
+        trace_id: trace.trace_id,
+      });
+    } else {
+      if (
+        existingFindings.kind !== "trajectory" ||
+        existingFindings.content_hash !== findingsId ||
+        existingFindings.storage_ref !== findingsPath
+      ) {
+        throw new KernelError("critic findings Artifact metadata conflict");
+      }
+      readStoredArtifactBytes(existingFindings);
+      const producers = db
+        .query(`SELECT from_id FROM links WHERE kind = 'produces' AND to_id = ?`)
+        .all(findingsId) as Array<{ from_id: string }>;
+      if (producers.length !== 1 || producers[0]!.from_id !== criticSessionId) {
+        throw new KernelError("critic findings Artifact producer conflict");
+      }
+    }
+
+    {
       const created_at = new Date().toISOString();
       db.query(
         `INSERT INTO evaluation (id, created_at, metrics, critic_findings_ref, verdict, confidence, rationale)
@@ -982,13 +1224,38 @@ function recordEvaluation(
         id,
         created_at,
         JSON.stringify(metrics),
-        critic_findings_ref,
+        findingsId,
         verdict,
         confidence,
         rationale,
       );
-    },
+    }
+    writeLinks(db, "evaluation", id, [
+      ...lineageFieldsToLinks(input),
+      { kind: "performed_by", to_id: criticSessionId },
+    ]);
+    appendEvent(db, {
+      type: cmd.event,
+      object_type: "evaluation",
+      object_id: id,
+      payload: {
+        command: cmd.action,
+        metrics,
+        verdict,
+        confidence,
+        rationale,
+        critic_findings_ref: findingsId,
+        critic_session_id: criticSessionId,
+        hypothesis_id: hypothesisId,
+        run_id: runId,
+        artifact_id: artifactId,
+        span_id: trace.span_id,
+      },
+      trace_id: trace.trace_id,
+    });
+    return db.query(`SELECT * FROM evaluation WHERE id = ?`).get(id) as Record<string, unknown>;
   });
+  const state = tx();
   return creationResult(cmd, id, cmd.event, state);
 }
 

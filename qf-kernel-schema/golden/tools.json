@@ -2815,7 +2815,8 @@
             "type": "string",
             "enum": [
               "market.read",
-              "desk.orchestrate"
+              "desk.orchestrate",
+              "research.evaluate"
             ]
           },
           "description": "Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names."
@@ -3106,18 +3107,10 @@
   },
   {
     "name": "qf_record_evaluation",
-    "description": "Record a structured evaluation verdict with metrics against a hypothesis lineage.",
+    "description": "Record an independent critic verdict over a succeeded deterministic Run. The Kernel derives metrics from the Run result, binds the admitted critic identity and durable findings, and refuses self-review.",
     "inputSchema": {
       "type": "object",
       "properties": {
-        "metrics": {
-          "type": "object",
-          "propertyNames": {
-            "type": "string"
-          },
-          "additionalProperties": {},
-          "description": "Metric set for this evaluation."
-        },
         "verdict": {
           "type": "string",
           "enum": [
@@ -3135,28 +3128,31 @@
           "type": "string",
           "description": "Rationale text."
         },
-        "critic_findings_ref": {
+        "findings": {
           "type": "string",
-          "description": "Optional Critic findings artifact id."
+          "description": "Durable critic findings text authored by this seat."
         },
         "hypothesis_id": {
           "type": "string",
-          "description": "Hypothesis this evaluation answers (lineage; also writable as tests link)."
+          "description": "Hypothesis this evaluation answers."
         },
         "run_id": {
           "type": "string",
-          "description": "Run evaluated (lineage; also writable as evaluated_by link)."
+          "description": "Succeeded deterministic Run evaluated."
         },
         "artifact_id": {
           "type": "string",
-          "description": "Artifact evaluated (lineage; also writable as evaluated_by link)."
+          "description": "Exact result Artifact produced by the Run."
         }
       },
       "required": [
-        "metrics",
         "verdict",
         "confidence",
-        "rationale"
+        "rationale",
+        "findings",
+        "hypothesis_id",
+        "run_id",
+        "artifact_id"
       ]
     }
   },

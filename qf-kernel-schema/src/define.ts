@@ -4,7 +4,10 @@ export type Lifecycle = "experimental" | "active";
 
 const SNAKE_CASE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 
-export type CapabilityGroup = "market.read" | "desk.orchestrate";
+export type CapabilityGroup =
+  | "market.read"
+  | "desk.orchestrate"
+  | "research.evaluate";
 
 export type DefinedObject<T extends z.ZodRawShape = z.ZodRawShape> = {
   kind: "object";

@@ -25,6 +25,13 @@
       "runtime_profile": "default",
       "system_prompt_ref": "prompts/worker.md",
       "capability_groups": ["market.read"]
+    },
+    {
+      "id": "hermes-critic",
+      "role": "critic",
+      "runtime_profile": "default",
+      "system_prompt_ref": "prompts/critic.md",
+      "capability_groups": ["research.evaluate"]
     }
   ]
 }

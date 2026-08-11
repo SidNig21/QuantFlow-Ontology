@@ -472,7 +472,7 @@ export function kernelListOntologyReadTools(): McpToolDefinition[] {
 /** Capability group for a generated tool name, or null if untagged/unknown. */
 export function kernelCapabilityGroupForTool(
   name: string,
-): "market.read" | "desk.orchestrate" | null {
+): "market.read" | "desk.orchestrate" | "research.evaluate" | null {
   const read = kernelParseOntologyReadTool(name);
   if (read) {
     const object = schema.objects.find((entry) => entry.name === read.objectName);
@@ -486,7 +486,7 @@ export function kernelCapabilityGroupForTool(
 
 /** Filter generated tools to those whose group is in the granted set. */
 export function kernelListOntologyToolsForGroups(
-  groups: ReadonlyArray<"market.read" | "desk.orchestrate">,
+  groups: ReadonlyArray<"market.read" | "desk.orchestrate" | "research.evaluate">,
 ): McpToolDefinition[] {
   const allowed = new Set(groups);
   return kernelListOntologyReadTools().filter((tool) => {
@@ -498,7 +498,7 @@ export function kernelListOntologyToolsForGroups(
 /** Resolve capability_groups JSON from the session's spawned_from definition. */
 export function kernelCapabilityGroupsForSession(
   sessionId: string,
-): Array<"market.read" | "desk.orchestrate"> {
+): Array<"market.read" | "desk.orchestrate" | "research.evaluate"> {
   const link = kernelGetLinks(sessionId, { kind: "spawned_from" })[0];
   if (!link?.to_id) return [];
   const definition = kernelGetObject("agent_definition", link.to_id);
@@ -513,9 +513,13 @@ export function kernelCapabilityGroupsForSession(
     }
   }
   if (!Array.isArray(parsed)) return [];
-  const out: Array<"market.read" | "desk.orchestrate"> = [];
+  const out: Array<"market.read" | "desk.orchestrate" | "research.evaluate"> = [];
   for (const group of parsed) {
-    if (group === "market.read" || group === "desk.orchestrate") out.push(group);
+    if (
+      group === "market.read" ||
+      group === "desk.orchestrate" ||
+      group === "research.evaluate"
+    ) out.push(group);
   }
   return out;
 }

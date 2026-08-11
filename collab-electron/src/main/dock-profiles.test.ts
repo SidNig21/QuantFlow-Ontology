@@ -30,7 +30,7 @@ function seedAdapter(
     role: string;
     runtime_profile: string | null;
     system_prompt_ref: string | null;
-    capability_groups: Array<"market.read" | "desk.orchestrate">;
+    capability_groups: Array<"market.read" | "desk.orchestrate" | "research.evaluate">;
   }>,
 ): void {
   const packageName = adapterId === "hermes"

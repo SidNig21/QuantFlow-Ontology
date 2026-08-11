@@ -48,7 +48,7 @@ export type DockProfileRegistration = {
   package_ref: string;
   runtime_profile: string | null;
   system_prompt_ref: string | null;
-  capability_groups: Array<"market.read" | "desk.orchestrate">;
+  capability_groups: Array<"market.read" | "desk.orchestrate" | "research.evaluate">;
 };
 
 export type DockProfileManifest = {
@@ -231,11 +231,15 @@ function readManifest(
     if (!Array.isArray(rawGroups)) {
       throw new DockProfilesContractError(`${label}.capability_groups must be an array`);
     }
-    const capability_groups: Array<"market.read" | "desk.orchestrate"> = [];
+    const capability_groups: Array<"market.read" | "desk.orchestrate" | "research.evaluate"> = [];
     for (const group of rawGroups) {
-      if (group !== "market.read" && group !== "desk.orchestrate") {
+      if (
+        group !== "market.read" &&
+        group !== "desk.orchestrate" &&
+        group !== "research.evaluate"
+      ) {
         throw new DockProfilesContractError(
-          `${label}.capability_groups entries must be market.read or desk.orchestrate`,
+          `${label}.capability_groups entries must be market.read, desk.orchestrate, or research.evaluate`,
         );
       }
       capability_groups.push(group);

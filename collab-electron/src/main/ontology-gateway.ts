@@ -151,9 +151,11 @@ export function callOntologyReadTool(
 }
 
 const EXPOSED_ACTIONS = new Set([
+  "create_hypothesis",
   "create_agent_session",
   "start_agent_session",
   "execute_deterministic_run",
+  "record_evaluation",
 ]);
 
 /** Granted desk actions plus generated reads. */

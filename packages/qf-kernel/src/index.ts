@@ -91,5 +91,6 @@ export {
   PROFILE_IDENTITY_UPGRADE,
   TASK_DELEGATION_UPGRADE,
   DETERMINISTIC_EXECUTION_UPGRADE,
+  INDEPENDENT_CRITIC_UPGRADE,
 } from "./upgrade.ts";
 export { seedExperimentalFixtureTable } from "./fixtures.ts";

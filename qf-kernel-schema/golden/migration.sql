@@ -48,6 +48,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execu
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('produces', 'link', 'experimental', 'Output provenance: datasets or artifacts produced by a run or agent session.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('derived_from', 'link', 'experimental', 'Version and transformation lineage among datasets, artifacts, and strategies.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluated_by', 'link', 'experimental', 'Verdict attachment: which evaluation judged an artifact or run.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('performed_by', 'link', 'experimental', 'Independent review provenance: which admitted critic session authored an Evaluation.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assigned_to', 'link', 'experimental', 'Work routing: which agent session owns a task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegated_by', 'link', 'experimental', 'Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.');
@@ -84,7 +85,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cance
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('fail_agent_session', 'action', 'experimental', 'Fail a starting, running, or blocked agent session (→ failed). Used for guest crash and boot reconciliation.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('close_agent_session', 'action', 'experimental', 'Close a running, cancelled, or failed agent session (→ closed).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('publish_artifact', 'action', 'experimental', 'Publish an immutable content-addressed artifact (must land before sandbox death).');
-INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('record_evaluation', 'action', 'experimental', 'Record a structured evaluation verdict with metrics against a hypothesis lineage.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('record_evaluation', 'action', 'experimental', 'Record an independent critic verdict over a succeeded deterministic Run. The Kernel derives metrics from the Run result, binds the admitted critic identity and durable findings, and refuses self-review.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('resolve_hypothesis', 'action', 'experimental', 'Resolve an open hypothesis to supported|rejected|inconclusive; evaluation-gated at the Kernel.');
 
 -- A competitor is a participant that can appear in priced betting instruments. Keep one row per real participant and represent aliases as references rather than duplicate identities.
@@ -451,7 +452,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'gates', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.
