@@ -372,7 +372,12 @@ export const register_dataset_version = defineAction({
     kind: z
       .enum(["odds_history", "results", "features", "mixed"])
       .describe("Dataset kind being registered."),
-    content_hash: z.string().describe("Hash of the underlying Parquet set."),
+    artifact_id: z
+      .string()
+      .describe("Existing immutable result_set Artifact that contains qf.dataset.v1 bytes."),
+    content_hash: z
+      .string()
+      .describe("Hash of the underlying dataset bytes; must equal the Artifact identity."),
     as_of: z.iso.datetime().describe("Point-in-time boundary for this version."),
     coverage: jsonObject.describe("Sufficiency summary for agents."),
   }),

@@ -399,7 +399,8 @@ Register a new content-hashed, point-in-time dataset version in the Kernel.
 - **lifecycle:** `experimental`
 - **input:**
 - `kind` — Dataset kind being registered.
-- `content_hash` — Hash of the underlying Parquet set.
+- `artifact_id` — Existing immutable result_set Artifact that contains qf.dataset.v1 bytes.
+- `content_hash` — Hash of the underlying dataset bytes; must equal the Artifact identity.
 - `as_of` — Point-in-time boundary for this version.
 - `coverage` — Sufficiency summary for agents.
 

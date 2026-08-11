@@ -2099,9 +2099,13 @@
           ],
           "description": "Dataset kind being registered."
         },
+        "artifact_id": {
+          "type": "string",
+          "description": "Existing immutable result_set Artifact that contains qf.dataset.v1 bytes."
+        },
         "content_hash": {
           "type": "string",
-          "description": "Hash of the underlying Parquet set."
+          "description": "Hash of the underlying dataset bytes; must equal the Artifact identity."
         },
         "as_of": {
           "type": "string",
@@ -2120,6 +2124,7 @@
       },
       "required": [
         "kind",
+        "artifact_id",
         "content_hash",
         "as_of",
         "coverage"

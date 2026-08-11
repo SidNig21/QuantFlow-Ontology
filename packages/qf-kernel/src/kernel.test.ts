@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
+import { rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   AgentDefinitionExistsError,
   ArtifactMetadataConflictError,
@@ -24,9 +27,11 @@ import { insertRun } from "./insert.ts";
 const ctx = { trace_id: "trace-root-1", span_id: "span-1" };
 
 let db: KernelDb;
+const tempFiles: string[] = [];
 
 afterEach(() => {
   if (db) closeKernel(db);
+  for (const file of tempFiles.splice(0)) rmSync(file, { force: true });
 });
 
 describe("qf-kernel", () => {
@@ -399,13 +404,28 @@ describe("qf-kernel", () => {
       { claim: "edge exists", success_criteria: "CLV > 0" },
       ctx,
     );
-    const dsHash = "a".repeat(64);
+    const datasetBytes = new TextEncoder().encode(
+      JSON.stringify({
+        contract: "qf.dataset.v1",
+        observations: [{ observed_at: "2026-07-24T23:00:00.000Z" }],
+      }),
+    );
+    const datasetPath = join(tmpdir(), `qf-kernel-dataset-${crypto.randomUUID()}.json`);
+    writeFileSync(datasetPath, datasetBytes);
+    tempFiles.push(datasetPath);
+    const datasetArtifact = execute(
+      db,
+      "publish_artifact",
+      { kind: "result_set", bytes: datasetBytes, storage_ref: datasetPath },
+      { ...ctx, span_id: "span-ds-artifact" },
+    );
     const ds = execute(
       db,
       "register_dataset_version",
       {
         kind: "odds_history",
-        content_hash: dsHash,
+        artifact_id: datasetArtifact.object_id,
+        content_hash: datasetArtifact.object_id,
         as_of: "2026-07-25T00:00:00.000Z",
         coverage: { sports: ["ufc"] },
       },
@@ -522,15 +542,13 @@ describe("qf-kernel", () => {
       { claim: "x", success_criteria: "y" },
       ctx,
     );
-    const dsHash = "b".repeat(64);
-    execute(
+    const mission = execute(
       db,
-      "register_dataset_version",
+      "create_mission",
       {
-        kind: "results",
-        content_hash: dsHash,
-        as_of: "2026-07-25T00:00:00.000Z",
-        coverage: {},
+        mission_id: "mission-wrong-evaluation-endpoint",
+        name: "Wrong endpoint",
+        objective: "Exercise endpoint validation",
       },
       { ...ctx, span_id: "span-ds2" },
     );
@@ -544,7 +562,7 @@ describe("qf-kernel", () => {
           verdict: "inconclusive",
           confidence: 0.5,
           rationale: "n/a",
-          artifact_id: dsHash,
+          artifact_id: mission.object_id,
         },
         { ...ctx, span_id: "span-bad-endpoint" },
       );
@@ -553,7 +571,7 @@ describe("qf-kernel", () => {
       expect(e).toBeInstanceOf(IllegalLinkError);
       const err = e as IllegalLinkError;
       expect(err.layer).toBe("endpoint");
-      expect(err.detail).toContain("dataset");
+      expect(err.detail).toContain("mission");
     }
     expect(eventCount(db)).toBe(before);
     const evals = db.query(`SELECT COUNT(*) AS n FROM evaluation`).get() as { n: number };

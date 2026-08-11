@@ -713,6 +713,10 @@ function registerDatasetVersion(
   if (typeof content_hash !== "string" || content_hash.length === 0) {
     throw new KernelError('register_dataset_version requires non-empty "content_hash"');
   }
+  const artifact_id = input.artifact_id;
+  if (typeof artifact_id !== "string" || artifact_id.length === 0) {
+    throw new KernelError('register_dataset_version requires non-empty "artifact_id"');
+  }
   const as_of = input.as_of;
   if (typeof as_of !== "string" || as_of.length === 0) {
     throw new KernelError('register_dataset_version requires "as_of" ISO datetime');
@@ -721,12 +725,107 @@ function registerDatasetVersion(
   if (!coverage || typeof coverage !== "object" || Array.isArray(coverage)) {
     throw new KernelError('register_dataset_version requires object "coverage"');
   }
+  if (links.some((link) => link.kind === "derived_from")) {
+    throw new KernelError(
+      "register_dataset_version artifact lineage is Kernel-owned; supply artifact_id",
+    );
+  }
 
-  const id = content_hash;
+  const artifact = db
+    .query(`SELECT kind, content_hash, storage_ref FROM artifact WHERE id = ?`)
+    .get(artifact_id) as
+    | { kind: string; content_hash: string; storage_ref: string }
+    | null;
+  if (artifact?.kind !== "result_set") {
+    throw new KernelError(
+      "register_dataset_version artifact_id must name an existing result_set Artifact",
+    );
+  }
+  if (artifact_id !== content_hash || artifact.content_hash !== content_hash) {
+    throw new KernelError(
+      "register_dataset_version content_hash must match the immutable Artifact identity",
+    );
+  }
+
+  let bytes: Uint8Array;
+  try {
+    const storage = artifact.storage_ref.startsWith("file:")
+      ? new URL(artifact.storage_ref)
+      : artifact.storage_ref;
+    bytes = new Uint8Array(readFileSync(storage));
+  } catch {
+    throw new KernelError("register_dataset_version Artifact bytes are unavailable");
+  }
+  if (contentHash(bytes) !== content_hash) {
+    throw new KernelError(
+      "register_dataset_version durable Artifact bytes do not match content_hash",
+    );
+  }
+
+  let payload: Record<string, unknown>;
+  try {
+    const parsed = JSON.parse(new TextDecoder().decode(bytes)) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+    payload = parsed as Record<string, unknown>;
+  } catch {
+    throw new KernelError("register_dataset_version Artifact must contain qf.dataset.v1 JSON");
+  }
+  if (payload.contract !== "qf.dataset.v1" || !Array.isArray(payload.observations)) {
+    throw new KernelError("register_dataset_version Artifact must contain qf.dataset.v1 observations");
+  }
+  const asOfMs = Date.parse(as_of);
+  let maxObservedMs = Number.NEGATIVE_INFINITY;
+  let maxObservedAt: string | null = null;
+  for (const observation of payload.observations) {
+    if (!observation || typeof observation !== "object" || Array.isArray(observation)) {
+      throw new KernelError("register_dataset_version observations must be objects");
+    }
+    const observedAt = (observation as Record<string, unknown>).observed_at;
+    const observedMs = typeof observedAt === "string" ? Date.parse(observedAt) : Number.NaN;
+    if (!Number.isFinite(observedMs)) {
+      throw new KernelError(
+        "register_dataset_version every observation requires ISO observed_at",
+      );
+    }
+    if (observedMs > asOfMs) {
+      throw new KernelError(
+        `register_dataset_version observation ${observedAt} is after as_of ${as_of}`,
+      );
+    }
+    if (observedMs > maxObservedMs) {
+      maxObservedMs = observedMs;
+      maxObservedAt = observedAt as string;
+    }
+  }
+  const verifiedCoverage = {
+    ...(coverage as Record<string, unknown>),
+    record_count: payload.observations.length,
+    max_observed_at: maxObservedAt,
+  };
+  const effectiveLinks = [...links, { kind: "derived_from", to_id: artifact_id }];
+
+  const id = `dataset:${content_hash}`;
   const existing = db.query(`SELECT * FROM dataset WHERE id = ?`).get(id) as
     | Record<string, unknown>
     | null;
   if (existing) {
+    if (
+      existing.kind !== kind ||
+      existing.as_of !== as_of ||
+      existing.coverage !== JSON.stringify(verifiedCoverage)
+    ) {
+      throw new KernelError(
+        "register_dataset_version immutable Dataset already exists with different metadata",
+      );
+    }
+    const lineage = db
+      .query(`SELECT to_id FROM links WHERE kind = 'derived_from' AND from_id = ?`)
+      .all(id) as Array<{ to_id: string }>;
+    if (lineage.length !== 1 || lineage[0]!.to_id !== artifact_id) {
+      throw new KernelError(
+        "register_dataset_version existing Dataset lacks exact Artifact lineage",
+      );
+    }
     return creationResult(cmd, id, cmd.event, existing);
   }
 
@@ -735,14 +834,21 @@ function registerDatasetVersion(
     object_id: id,
     event: cmd.event,
     trace,
-    links,
-    payload: { command: cmd.action, kind, content_hash, as_of, coverage },
+    links: effectiveLinks,
+    payload: {
+      command: cmd.action,
+      kind,
+      content_hash,
+      as_of,
+      coverage: verifiedCoverage,
+      artifact_id,
+    },
     insert: () => {
       const created_at = new Date().toISOString();
       db.query(
         `INSERT INTO dataset (id, created_at, kind, content_hash, as_of, coverage)
          VALUES (?, ?, ?, ?, ?, ?)`,
-      ).run(id, created_at, kind, content_hash, as_of, JSON.stringify(coverage));
+      ).run(id, created_at, kind, content_hash, as_of, JSON.stringify(verifiedCoverage));
     },
   });
   return creationResult(cmd, id, cmd.event, state);
