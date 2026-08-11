@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   createCollaborationService,
   registerCollaborationGatewayRpc,
+  type CollaborationChange,
   type CollaborationDependencies,
 } from "./collaboration-gateway";
 
@@ -114,14 +115,17 @@ function fixture() {
   };
 }
 
-function registerHandlers(f: Fixture) {
+function registerHandlers(
+  f: Fixture,
+  onChanged: (change: CollaborationChange) => void = () => {},
+) {
   const handlers = new Map<string, (params: unknown) => unknown>();
   registerCollaborationGatewayRpc(
     ((name: string, handler: (params: unknown) => unknown) => {
       handlers.set(name, handler);
     }) as never,
     f.deps,
-    () => {},
+    onChanged,
   );
   return handlers;
 }
@@ -348,5 +352,29 @@ describe("collaboration gateway", () => {
       artifactId: "result-artifact-1",
       notification: { delivered: false, error: "peer bus unavailable" },
     });
+  });
+
+  test("registered result route reports the founder-visible artifact and worker", () => {
+    const f = fixture();
+    const changes: CollaborationChange[] = [];
+    const sendResult = registerHandlers(f, (change) => changes.push(change))
+      .get("qf.collaboration.send_result")!;
+    const result = sendResult({
+      seat_capability: "cap:worker-1:worker",
+      session_id: "worker-1",
+      from_role: "worker",
+      task_id: "task-1",
+      result: "Venue one is available",
+      cited_market_ids: ["venue-1"],
+      read_trajectory_artifact_ids: ["read-1"],
+    });
+    expect(result).toMatchObject({ artifactId: "result-artifact-1" });
+    expect(changes).toEqual([{
+      kind: "result",
+      taskId: "task-1",
+      artifactId: "result-artifact-1",
+      workerSessionId: "worker-1",
+      delegatorSessionId: "orch-1",
+    }]);
   });
 });

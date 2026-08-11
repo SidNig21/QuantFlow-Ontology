@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import {
+  parseCollaborationResultPayload,
+  type CollaborationResultPayload,
+} from "./result-payload";
 
 type ArtifactRow = {
   id: string;
@@ -18,6 +22,7 @@ function App() {
     return p.get("artifactId") ?? "";
   });
   const [row, setRow] = useState<ArtifactRow | null>(null);
+  const [result, setResult] = useState<CollaborationResultPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,6 +48,16 @@ function App() {
         return;
       }
       setRow(found);
+      try {
+        const content = await window.api.readFile(found.storage_ref);
+        if (cancelled) return;
+        setResult(parseCollaborationResultPayload(content));
+      } catch {
+        // Some legacy artifact rows are metadata-only. Keep their existing
+        // inspector view instead of turning an optional payload read into an
+        // error state.
+        if (!cancelled) setResult(null);
+      }
     })().catch((e: unknown) => {
       if (!cancelled) setError(e instanceof Error ? e.message : String(e));
     });
@@ -58,6 +73,24 @@ function App() {
   }
   if (!row) {
     return <div className="artifact-tile artifact-tile--muted">Loading…</div>;
+  }
+
+  if (result) {
+    return (
+      <article className="artifact-tile artifact-tile--answer">
+        <div className="artifact-tile__eyebrow">QUANTFLOW RESEARCH ANSWER</div>
+        <div className="artifact-tile__answer">{result.result}</div>
+        <div className="artifact-tile__evidence">
+          {result.citedMarketIds.length > 0
+            ? `Evidence: ${result.citedMarketIds.join(", ")}`
+            : "Evidence status: no market evidence was available in the named reads."}
+        </div>
+        <div className="artifact-tile__receipts">
+          {result.readTrajectoryArtifactIds.length} durable read receipt
+          {result.readTrajectoryArtifactIds.length === 1 ? "" : "s"}
+        </div>
+      </article>
+    );
   }
 
   return (
@@ -91,4 +124,3 @@ function App() {
 }
 
 export default App;
-

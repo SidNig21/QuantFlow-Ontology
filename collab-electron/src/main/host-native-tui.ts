@@ -209,6 +209,10 @@ export async function admitNativeTuiDefinition(opts: {
               ...(adapterId === "hermes" && opts.missionActivation
                 ? ["--quantflow-mission-oneshot"]
                 : []),
+              ...(adapterId === "hermes" && opts.existingSessionId &&
+                  opts.peerDelivery && opts.role !== "orchestrator"
+                ? ["--quantflow-task-oneshot"]
+                : []),
               ...argv,
             ]
           : argv,

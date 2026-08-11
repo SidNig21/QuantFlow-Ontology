@@ -34,6 +34,7 @@ describe("Hermes packaged launch wrapper", () => {
     expect(wrapper).toContain("QF_LAUNCH_COMMIT %s");
     expect(wrapper).toContain("unset QF_LAUNCH_READY_NONCE");
     expect(wrapper).toContain("--quantflow-mission-oneshot");
+    expect(wrapper).toContain("--quantflow-task-oneshot");
     expect(wrapper).toContain('IFS= read -r activation');
     expect(wrapper).toContain('exec "$hermes_command" -z');
   });
@@ -83,6 +84,50 @@ describe("Hermes packaged launch wrapper", () => {
       expect(result.stdout).toContain("QF_LAUNCH_COMMIT test-ready");
       expect(result.stdout).toContain("-z You are the QuantFlow research orchestrator");
       expect(result.stdout).toContain("mission-test");
+      expect(result.stdout).not.toContain("-z --tui");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("waits for a delegated task before starting a one-shot worker", () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-hermes-task-oneshot-"));
+    try {
+      const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
+      const isolatedRoot = join(root, "isolated-hermes");
+      const task =
+        "[QuantFlow TASK task-test from orchestrator] Inspect the available market evidence, then call send_result.\r\n";
+      const args = process.platform === "win32"
+        ? [
+            "-d", "Ubuntu", "--", "env",
+            `HOME=${wslPath(root)}`,
+            "QF_AGENT_SESSION_ID=worker-test",
+            "QF_LAUNCH_READY_NONCE=test-ready",
+            `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${wslPath(isolatedRoot)}`,
+            "bash", wslPath(wrapperPath), "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs",
+            "echo", "--quantflow-task-oneshot", "--tui",
+          ]
+        : [
+            wrapperPath, "/tmp/qf-bridge.mjs", "/tmp/qf-ontology-bridge.mjs",
+            "echo", "--quantflow-task-oneshot", "--tui",
+          ];
+      const result = spawnSync(process.platform === "win32" ? "wsl.exe" : "bash", args, {
+        input: task,
+        encoding: "utf8",
+        env: process.platform === "win32"
+          ? process.env
+          : {
+              ...process.env,
+              HOME: root,
+              QF_AGENT_SESSION_ID: "worker-test",
+              QF_LAUNCH_READY_NONCE: "test-ready",
+              QF_QUANTFLOW_HERMES_PROFILE_ROOT: isolatedRoot,
+            },
+      });
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain("QF_LAUNCH_COMMIT test-ready");
+      expect(result.stdout).toContain("-z You are the QuantFlow research worker");
+      expect(result.stdout).toContain("task-test");
       expect(result.stdout).not.toContain("-z --tui");
     } finally {
       rmSync(root, { recursive: true, force: true });

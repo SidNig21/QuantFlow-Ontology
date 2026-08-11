@@ -2,6 +2,16 @@ import type { registerMethod } from "./json-rpc-server";
 
 export type CollaborationIdentity = { sessionId: string; role: string };
 
+export type CollaborationChange =
+  | { kind: "task"; taskId: string }
+  | {
+    kind: "result";
+    taskId: string;
+    artifactId: string;
+    workerSessionId: string;
+    delegatorSessionId: string;
+  };
+
 type Link = { from_id: string; to_id: string; kind?: string };
 
 export type CollaborationDependencies = {
@@ -304,7 +314,7 @@ export function createCollaborationService(deps: CollaborationDependencies) {
 export function registerCollaborationGatewayRpc(
   register: typeof registerMethod,
   deps: CollaborationDependencies,
-  onChanged: () => void,
+  onChanged: (change: CollaborationChange) => void,
 ): void {
   const service = createCollaborationService(deps);
   register(
@@ -326,7 +336,7 @@ export function registerCollaborationGatewayRpc(
         toRole: nonEmptyString(input.to_role, "to_role"),
         task: nonEmptyString(input.task, "task"),
       });
-      onChanged();
+      onChanged({ kind: "task", taskId: result.taskId });
       return result;
     },
     { description: "Create a Kernel task, then notify its live assigned recipient." },
@@ -361,7 +371,17 @@ export function registerCollaborationGatewayRpc(
           "read_trajectory_artifact_ids",
         ),
       });
-      onChanged();
+      onChanged({
+        kind: "result",
+        taskId: result.taskId,
+        artifactId: result.artifactId,
+        workerSessionId: identity.sessionId,
+        delegatorSessionId: exactOutgoingLink(
+          deps,
+          result.taskId,
+          "delegated_by",
+        ),
+      });
       return result;
     },
     { description: "Publish cited result lineage, complete its Kernel task, then notify." },

@@ -43,3 +43,28 @@ html, body, #root {
 .artifact-tile__value {
   word-break: break-all;
 }
+
+.artifact-tile--answer {
+  gap: 14px;
+  overflow: auto;
+  background: linear-gradient(145deg, rgba(168, 255, 0, 0.08), transparent 55%);
+}
+
+.artifact-tile__eyebrow {
+  color: var(--qf-accent, #b6ff35);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.artifact-tile__answer {
+  font-family: var(--qf-sans, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.artifact-tile__evidence,
+.artifact-tile__receipts {
+  color: var(--muted-foreground, var(--qf-muted));
+  line-height: 1.45;
+}

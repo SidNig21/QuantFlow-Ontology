@@ -94,6 +94,7 @@ import { registerBrowserIpc } from "./ipc-browser";
 import { registerAgentIpc } from "./acp-agent";
 import {
   bootstrapPackagedDockProfiles,
+  closeAgentSessionRow,
   disposeAgentOs,
   admitAndStartSession,
   startPrecreatedNativeTuiSession,
@@ -1103,9 +1104,24 @@ app.whenReady().then(async () => {
         return peerBusNotify(busDb, input);
       },
     },
-    () => {
+    (change) => {
       mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
       mainWindow?.webContents.send("qf:dock:invalidate");
+      if (change.kind === "result") {
+        mainWindow?.webContents.send(
+          "shell:forward",
+          "canvas",
+          "create-artifact-tile",
+          change.artifactId,
+        );
+        // Return the durable result receipt to the bridge before closing the
+        // completed one-shot seats. The Kernel commit has already succeeded,
+        // and the founder-visible result artifact is now the durable answer.
+        setTimeout(() => {
+          closeAgentSessionRow(change.workerSessionId);
+          closeAgentSessionRow(change.delegatorSessionId);
+        }, 250);
+      }
     },
   );
   registerMethod(

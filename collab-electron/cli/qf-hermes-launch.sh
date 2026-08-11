@@ -16,6 +16,12 @@ if [[ "${1:-}" == "--quantflow-mission-oneshot" ]]; then
   shift
 fi
 
+task_oneshot=0
+if [[ "${1:-}" == "--quantflow-task-oneshot" ]]; then
+  task_oneshot=1
+  shift
+fi
+
 if ! command -v "$hermes_command" >/dev/null 2>&1; then
   echo "QuantFlow Hermes unavailable: install Hermes in the selected Ubuntu/WSL2 distro, then retry." >&2
   exit 127
@@ -104,6 +110,25 @@ if [[ "$mission_oneshot" == "1" ]]; then
 
   exec "$hermes_command" -z \
     "You are the QuantFlow research orchestrator. Use the available QuantFlow ontology and collaboration tools to inspect Kernel-held evidence before answering. Delegate to a worker when useful. Return a concise research-only answer and never place bets or trades. Founder mission: $activation"
+fi
+
+if [[ "$task_oneshot" == "1" ]]; then
+  if ! IFS= read -r task; then
+    echo "QuantFlow Hermes task was not delivered." >&2
+    exit 2
+  fi
+  task="${task%$'\r'}"
+  if [[ "$task" != \[QuantFlow\ TASK\ * ]]; then
+    echo "QuantFlow Hermes received an invalid task envelope." >&2
+    exit 2
+  fi
+  if (( ${#task} > 16384 )); then
+    echo "QuantFlow Hermes task exceeds the supported size." >&2
+    exit 2
+  fi
+
+  exec "$hermes_command" -z \
+    "You are the QuantFlow research worker. Complete the following delegated task using only QuantFlow's ontology evidence. You must call the QuantFlow collaboration send_result tool exactly once before finishing. If the market reads are empty, return a truthful no-evidence result with empty cited_market_ids and at least one actual empty read trajectory artifact id. Never place bets or trades. Delegated task: $task"
 fi
 
 exec "$hermes_command" "$@"

@@ -7,7 +7,10 @@ test("only exact peer notification envelopes produce TUI instructions", () => {
     task_id: "task-1",
     body: "Read venue-1",
   });
-  expect(formatPeerNotification("orchestrator", "task", valid)).toContain("task_id=task-1");
+  const instruction = formatPeerNotification("orchestrator", "task", valid);
+  expect(instruction).toContain("task_id=task-1");
+  expect(instruction).toContain("cited_market_ids=[]");
+  expect(instruction).toContain("stop searching");
   expect(formatPeerNotification("worker", "result", valid)).toBe(
     "[QuantFlow RESULT for task-1 from worker] Read venue-1",
   );
