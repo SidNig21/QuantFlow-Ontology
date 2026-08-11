@@ -60,6 +60,11 @@ const ALLOW_PREFIXES = [
   "qa/gates/windows-research-question.ts",
   "qa/gates/kernel-task-delegation.ts",
   "qa/gates/kernel-market-lineage.ts",
+  // Act I golden run (2026-08-10): same shape again — seeds an isolated temp
+  // store and sets QF_KERNEL_DB for the packaged child it launches. Landed with
+  // the WO-ACT1-GOLDEN-PATH merge and left this gate red on main, which is the
+  // ninth repeat of the omission described above.
+  "qa/gates/windows-golden-run.ts",
   // R4 Claude Code adapter: reads QF_KERNEL_DB *only* to assert the app set it,
   // and never uses the value. Verified 2026-08-05 — the file contains no sqlite
   // import, no Database construction, and no other reference to the variable.

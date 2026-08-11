@@ -47,17 +47,21 @@ html, body, #root {
 .artifact-tile--answer {
   gap: 14px;
   overflow: auto;
-  background: linear-gradient(145deg, rgba(168, 255, 0, 0.08), transparent 55%);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--qf-accent) 8%, transparent),
+    transparent 55%
+  );
 }
 
 .artifact-tile__eyebrow {
-  color: var(--qf-accent, #b6ff35);
+  color: var(--qf-accent);
   font-size: 10px;
   letter-spacing: 0.14em;
 }
 
 .artifact-tile__answer {
-  font-family: var(--qf-sans, system-ui, sans-serif);
+  font-family: var(--qf-sans);
   font-size: 14px;
   line-height: 1.55;
   white-space: pre-wrap;
