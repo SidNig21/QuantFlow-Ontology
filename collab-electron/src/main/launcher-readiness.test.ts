@@ -12,8 +12,8 @@ test("readiness accepts one READY followed by COMMIT across split chunks", async
 
 test("readiness accepts exact receipts after ConPTY control frames", async () => {
   const waiter = createLauncherReadinessWaiter("session", "nonce", 100);
-  waiter.push(Buffer.from("\u001b[?9001h\u001b[2;1HQF_LAUNCH_READY nonce\r\n"));
-  waiter.push(Buffer.from("\u001b]0;node.exe\u0007\u001b[?25h\r\nQF_LAUNCH_COMMIT nonce\r\n"));
+  waiter.push(Buffer.from("\u001b[?9001h\u001b[2;1HQF_LAUNCH_READY nonce\u001b[?25h\r\n"));
+  waiter.push(Buffer.from("\u001b]0;node.exe\u0007\rQF_LAUNCH_COMMIT nonce\u001b[m\r\n"));
   await waiter.wait();
 });
 

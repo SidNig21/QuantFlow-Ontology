@@ -6,32 +6,39 @@ export type LauncherReadinessWaiter = {
   cancel(): void;
 };
 
-/** Remove only terminal-emulator control frames at the start of a PTY line. */
-function stripTerminalPrefix(line: string): string {
-  let rest = line;
-  while (rest.startsWith("\u001b")) {
-    if (rest.startsWith("\u001b[")) {
-      const end = [...rest].findIndex((char, index) =>
-        index >= 2 && char.charCodeAt(0) >= 0x40 && char.charCodeAt(0) <= 0x7e
-      );
-      if (end < 0) return line;
-      rest = rest.slice(end + 1);
+/** Remove terminal-emulator control frames without removing ordinary text. */
+function stripTerminalControls(line: string): string {
+  let plain = "";
+  for (let index = 0; index < line.length;) {
+    if (line[index] !== "\u001b") {
+      if (line[index] !== "\r") plain += line[index];
+      index += 1;
       continue;
     }
-    if (rest.startsWith("\u001b]")) {
-      const bell = rest.indexOf("\u0007", 2);
-      const terminator = rest.indexOf("\u001b\\", 2);
+    if (line[index + 1] === "[") {
+      let end = index + 2;
+      while (
+        end < line.length &&
+        !(line.charCodeAt(end) >= 0x40 && line.charCodeAt(end) <= 0x7e)
+      ) end += 1;
+      if (end >= line.length) return line;
+      index = end + 1;
+      continue;
+    }
+    if (line[index + 1] === "]") {
+      const bell = line.indexOf("\u0007", index + 2);
+      const terminator = line.indexOf("\u001b\\", index + 2);
       const end = bell >= 0 && (terminator < 0 || bell < terminator)
         ? bell + 1
         : terminator >= 0 ? terminator + 2 : -1;
       if (end < 0) return line;
-      rest = rest.slice(end);
+      index = end;
       continue;
     }
-    if (rest.length < 2) return line;
-    rest = rest.slice(2);
+    if (index + 1 >= line.length) return line;
+    index += 2;
   }
-  return rest.replace(/^\r+/, "");
+  return plain;
 }
 
 export function createLauncherReadinessWaiter(
@@ -63,7 +70,7 @@ export function createLauncherReadinessWaiter(
   }
 
   function inspectLine(line: string): void {
-    line = stripTerminalPrefix(line);
+    line = stripTerminalControls(line);
     if (line === ready) {
       readyCount += 1;
       if (readyCount !== 1) {
