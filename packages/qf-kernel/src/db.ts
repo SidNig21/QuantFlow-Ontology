@@ -20,6 +20,7 @@ import {
   TASK_STATUS_UPGRADE,
   CONNECTION_ACTIONS_UPGRADE,
   TASK_DELEGATION_UPGRADE,
+  DETERMINISTIC_EXECUTION_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -348,7 +349,8 @@ export function attachKernel(
       shape === "market_context" ||
       shape === "capability_grants" ||
       shape === "task_status" ||
-      shape === "connection_actions")
+      shape === "connection_actions" ||
+      shape === "task_delegation")
   ) {
     const upgradeOrder = [
       PROFILE_IDENTITY_UPGRADE,
@@ -358,6 +360,7 @@ export function attachKernel(
       TASK_STATUS_UPGRADE,
       CONNECTION_ACTIONS_UPGRADE,
       TASK_DELEGATION_UPGRADE,
+      DETERMINISTIC_EXECUTION_UPGRADE,
     ];
     const completedByShape = {
       pre_d1: 0,
@@ -367,6 +370,7 @@ export function attachKernel(
       capability_grants: 4,
       task_status: 5,
       connection_actions: 6,
+      task_delegation: 7,
     } as const;
     const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
@@ -410,7 +414,8 @@ export function attachKernel(
       shape === "market_context" ||
       shape === "capability_grants" ||
       shape === "task_status" ||
-      shape === "connection_actions"
+      shape === "connection_actions" ||
+      shape === "task_delegation"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -433,6 +438,9 @@ export function attachKernel(
       const taskDelegationSql = readFileSync(
         upgradeSqlPath("0007-task-delegation.sql"), "utf8",
       );
+      const deterministicExecutionSql = readFileSync(
+        upgradeSqlPath("0008-deterministic-execution.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -441,6 +449,7 @@ export function attachKernel(
         taskStatusSql,
         connectionActionsSql,
         taskDelegationSql,
+        deterministicExecutionSql,
       });
     }
   }

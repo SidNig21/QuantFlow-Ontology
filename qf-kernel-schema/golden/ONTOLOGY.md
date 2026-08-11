@@ -415,6 +415,18 @@ Enqueue a new run in queued status with full invocation params. Rejectable when 
 - `params` — Full invocation arguments captured at launch.
 - `trace_id` — Root span id; defaults to ctx.trace_id when omitted.
 
+### `execute_deterministic_run`
+
+Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.
+
+- **lifecycle:** `experimental`
+- **input:**
+- `run_id` — Caller-selected id for this execution record.
+- `dataset_id` — Existing immutable Dataset registered through register_dataset_version.
+- `strategy_spec` — Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.
+- `params` — Exact execution parameters. R11a supports limit and optional minimum_score.
+- `repeat_of_run_id` — Optional succeeded run claimed as an identical replay. The Kernel rejects any manifest or result mismatch.
+
 ### `create_mission`
 
 Register a standing research mission with name and objective.

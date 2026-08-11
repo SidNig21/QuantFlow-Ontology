@@ -13,6 +13,7 @@ export const CAPABILITY_GRANTS_UPGRADE = "capability-grants" as const;
 export const TASK_STATUS_UPGRADE = "task-status" as const;
 export const CONNECTION_ACTIONS_UPGRADE = "connection-actions" as const;
 export const TASK_DELEGATION_UPGRADE = "task-delegation" as const;
+export const DETERMINISTIC_EXECUTION_UPGRADE = "deterministic-execution" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -23,6 +24,7 @@ export type KernelShapeState =
   | "capability_grants"
   | "task_status"
   | "connection_actions"
+  | "task_delegation"
   | "current"
   | "partial";
 
@@ -265,6 +267,22 @@ function tablesWithoutTaskStatus(
   return next;
 }
 
+function tablesWithoutTaskDelegation(
+  tables: Map<string, string>,
+): Map<string, string> {
+  const next = new Map(tables);
+  const linksSql = next.get("links");
+  if (linksSql) {
+    next.set(
+      "links",
+      linksSql
+        .replace(/,'delegated_by'/gi, "")
+        .replace(/'delegated_by',/gi, ""),
+    );
+  }
+  return next;
+}
+
 function schemaMetaWithoutTaskActions(
   rows: Array<[string, string, string, string]>,
 ): Array<[string, string, string, string]> {
@@ -294,11 +312,21 @@ function schemaMetaWithoutTaskDelegation(
   rows: Array<[string, string, string, string]>,
 ): Array<[string, string, string, string]> {
   return rows
-    .filter(([typeName]) => typeName !== "delegated_by")
+    .filter(
+      ([typeName]) =>
+        typeName !== "delegated_by" &&
+        typeName !== "execute_deterministic_run",
+    )
     .map((row) => {
       const description = PRE_TASK_DELEGATION_DESCRIPTIONS.get(row[0]);
       return description ? [row[0], row[1], row[2], description] : row;
     });
+}
+
+function schemaMetaWithoutDeterministicExecution(
+  rows: Array<[string, string, string, string]>,
+): Array<[string, string, string, string]> {
+  return rows.filter(([typeName]) => typeName !== "execute_deterministic_run");
 }
 
 function linkKindsWithoutTaskDelegation(linkKinds: readonly string[]): string[] {
@@ -316,7 +344,9 @@ function schemaMetaWithoutConnectionActions(
 }
 
 function predecessorTables(tables: Map<string, string>): Map<string, string> {
-  return tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables));
+  return tablesWithoutTaskDelegation(
+    tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables)),
+  );
 }
 
 /** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
@@ -381,7 +411,7 @@ function expectedCapabilityGrants(): StructureSnapshot {
   if (!capabilityGrantsSnapshot) {
     const current = expectedCurrent();
     capabilityGrantsSnapshot = {
-      tables: tablesWithoutTaskStatus(current.tables),
+      tables: tablesWithoutTaskDelegation(tablesWithoutTaskStatus(current.tables)),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
     };
@@ -396,7 +426,7 @@ function expectedTaskStatus(): StructureSnapshot {
   if (!taskStatusSnapshot) {
     const current = expectedCurrent();
     taskStatusSnapshot = {
-      tables: current.tables,
+      tables: tablesWithoutTaskDelegation(current.tables),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutConnectionActions(
         schemaMetaWithoutTaskDelegation(current.schemaMeta),
@@ -413,12 +443,27 @@ function expectedConnectionActions(): StructureSnapshot {
   if (!connectionActionsSnapshot) {
     const current = expectedCurrent();
     connectionActionsSnapshot = {
-      tables: current.tables,
+      tables: tablesWithoutTaskDelegation(current.tables),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskDelegation(current.schemaMeta),
     };
   }
   return connectionActionsSnapshot;
+}
+
+let taskDelegationSnapshot: StructureSnapshot | null = null;
+
+/** Post-0007 / pre-0008 — durable task delegation exists, execution does not. */
+function expectedTaskDelegation(): StructureSnapshot {
+  if (!taskDelegationSnapshot) {
+    const current = expectedCurrent();
+    taskDelegationSnapshot = {
+      tables: current.tables,
+      linkKinds: current.linkKinds,
+      schemaMeta: schemaMetaWithoutDeterministicExecution(current.schemaMeta),
+    };
+  }
+  return taskDelegationSnapshot;
 }
 
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
@@ -485,6 +530,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedCapabilityGrants())) return "capability_grants";
   if (snapshotsEqual(live, expectedTaskStatus())) return "task_status";
   if (snapshotsEqual(live, expectedConnectionActions())) return "connection_actions";
+  if (snapshotsEqual(live, expectedTaskDelegation())) return "task_delegation";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -528,6 +574,7 @@ export function applyKernelUpgradeChain(
     taskStatusSql: string;
     connectionActionsSql: string;
     taskDelegationSql: string;
+    deterministicExecutionSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -591,20 +638,29 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    if (state !== "connection_actions") {
+    if (state !== "connection_actions" && state !== "task_delegation") {
       db.exec(upgrades.connectionActionsSql);
+      if (classifyKernelShape(db) !== "connection_actions") {
+        throw new KernelUpgradeShapeError(
+          CONNECTION_ACTIONS_UPGRADE,
+          "0006 did not produce the exact connection-actions shape",
+        );
+      }
     }
-    if (classifyKernelShape(db) !== "connection_actions") {
-      throw new KernelUpgradeShapeError(
-        CONNECTION_ACTIONS_UPGRADE,
-        "0006 did not produce the exact connection-actions shape",
-      );
+    if (state !== "task_delegation") {
+      db.exec(upgrades.taskDelegationSql);
+      if (classifyKernelShape(db) !== "task_delegation") {
+        throw new KernelUpgradeShapeError(
+          TASK_DELEGATION_UPGRADE,
+          "0007 did not produce the exact task-delegation shape",
+        );
+      }
     }
-    db.exec(upgrades.taskDelegationSql);
+    db.exec(upgrades.deterministicExecutionSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
-        TASK_DELEGATION_UPGRADE,
-        "0007 did not produce the exact current shape",
+        DETERMINISTIC_EXECUTION_UPGRADE,
+        "0008 did not produce the exact current shape",
       );
     }
   });
@@ -622,6 +678,7 @@ export function applyProfileIdentityUpgrade(db: KernelDb, upgradeSql: string): v
     state === "capability_grants" ||
     state === "task_status" ||
     state === "connection_actions" ||
+    state === "task_delegation" ||
     state === "current" ||
     state === "uninitialized"
   ) {

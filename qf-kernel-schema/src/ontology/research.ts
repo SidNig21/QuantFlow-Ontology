@@ -403,6 +403,32 @@ export const create_run = defineAction({
   }),
 });
 
+export const execute_deterministic_run = defineAction({
+  name: "execute_deterministic_run",
+  description:
+    "Execute one canonical strategy specification against one immutable Dataset. The Kernel owns the execution version, result bytes, content hash, and complete uses/executes_in/produces lineage; a claimed repeat is rejected unless its manifest and result hash match.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    run_id: z.string().describe("Caller-selected id for this execution record."),
+    dataset_id: z
+      .string()
+      .describe("Existing immutable Dataset registered through register_dataset_version."),
+    strategy_spec: jsonObject.describe(
+      "Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.",
+    ),
+    params: jsonObject.describe(
+      "Exact execution parameters. R11a supports limit and optional minimum_score.",
+    ),
+    repeat_of_run_id: z
+      .string()
+      .describe(
+        "Optional succeeded run claimed as an identical replay. The Kernel rejects any manifest or result mismatch.",
+      )
+      .optional(),
+  }),
+});
+
 export const create_mission = defineAction({
   name: "create_mission",
   description: "Register a standing research mission with name and objective.",

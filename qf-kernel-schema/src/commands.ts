@@ -222,6 +222,11 @@ export const creationCommands: readonly CreationCommand[] = [
     event: "run.created",
   },
   {
+    action: "execute_deterministic_run",
+    object_type: "run",
+    event: "run.succeeded",
+  },
+  {
     action: "record_evaluation",
     object_type: "evaluation",
     event: "evaluation.recorded",

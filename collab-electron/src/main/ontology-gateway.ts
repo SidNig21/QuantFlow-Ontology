@@ -150,12 +150,13 @@ export function callOntologyReadTool(
   return { result, artifactId };
 }
 
-const HIRE_ACTIONS = new Set([
+const EXPOSED_ACTIONS = new Set([
   "create_agent_session",
   "start_agent_session",
+  "execute_deterministic_run",
 ]);
 
-/** Granted desk actions (hire path) plus generated reads. */
+/** Granted desk actions plus generated reads. */
 export async function callOntologyTool(
   identity: OntologyCallerIdentity,
   toolName: string,
@@ -169,7 +170,7 @@ export async function callOntologyTool(
   if (!action) {
     return callOntologyReadTool(identity, toolName, args);
   }
-  if (!HIRE_ACTIONS.has(action)) {
+  if (!EXPOSED_ACTIONS.has(action)) {
     throw new Error(`ontology action not exposed through gateway: ${toolName}`);
   }
   assertCapability(identity, toolName);

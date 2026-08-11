@@ -151,8 +151,8 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R8 | complete | `docs/orders/evidence/r8` |
 | R9 | complete | `docs/orders/evidence/r9` |
 | R10 | complete | `docs/orders/evidence/r10` |
-| R11a | active | — |
-| R11b | pending | — |
+| R11a | complete | `docs/orders/evidence/r11a` |
+| R11b | active | — |
 | R12 | pending | — |
 | R13 | pending | — |
 | R14 | pending | — |
@@ -166,7 +166,9 @@ A rung moves `active` → `complete` only when all of these hold, in this order:
    both outputs are in the record.
 3. An evidence file exists under `docs/orders/evidence/<rung>/` stating what was proven **and what
    was not**.
-4. `bun qa/verify-release.ts` passes.
+4. R9–R12 run one focused local product proof plus the relevant invariant checks.
+   R13 runs the complete `bun qa/verify-release.ts`, packaged Windows, and visible
+   consumer proof once, so research rungs do not repeatedly rebuild the same app.
 5. This table and `NEXT.md` are updated in the same commit.
 
 **Founder-gated rungs stop for human eyes.** R3, R6, and R8 change what the founder sees on the

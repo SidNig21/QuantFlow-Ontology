@@ -34,6 +34,7 @@ import {
   requireObservedGrade,
   TICKET_ORIGIN,
 } from "./creation-policy.ts";
+import { executeDeterministicRun } from "./deterministic-execution.ts";
 
 const TICKET_GRADES = ["pending", "win", "loss", "push", "void"] as const;
 
@@ -1210,6 +1211,7 @@ export const creationHandlers: Readonly<Record<string, CreationHandler>> = {
   create_hypothesis: createHypothesis,
   register_dataset_version: registerDatasetVersion,
   create_run: createRun,
+  execute_deterministic_run: executeDeterministicRun,
   record_evaluation: recordEvaluation,
   create_mission: createMission,
   create_ticket: createTicket,

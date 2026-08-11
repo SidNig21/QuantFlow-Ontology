@@ -31,11 +31,12 @@ test("production read dispatch marks market reads but not desk orchestration rea
   )).toMatchObject({ ontology_read_tool: "qf_venue_get" });
 });
 
-test("generic ontology hire actions exclude task creation and completion", () => {
+test("generic ontology actions expose deterministic execution but not task bypasses", () => {
   const source = readFileSync(new URL("./ontology-gateway.ts", import.meta.url), "utf8");
-  const block = /const HIRE_ACTIONS = new Set\(\[([\s\S]*?)\]\);/.exec(source)?.[1] ?? "";
+  const block = /const EXPOSED_ACTIONS = new Set\(\[([\s\S]*?)\]\);/.exec(source)?.[1] ?? "";
   expect(block).toContain("create_agent_session");
   expect(block).toContain("start_agent_session");
+  expect(block).toContain("execute_deterministic_run");
   expect(block).not.toContain("create_task");
   expect(block).not.toContain("complete_task");
 });
