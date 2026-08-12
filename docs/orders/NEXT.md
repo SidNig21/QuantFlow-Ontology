@@ -1,27 +1,31 @@
-# NEXT — R13 Windows v1 release
+# NEXT — R13-S1 Windows gate board
 
-status: R13 IN PROGRESS — consumer run reaches native Hermes, first tool call blocked
+status: R13 IN PROGRESS — WO-R13-S1 ONLY
 authorized-by: founder
-authorized-at: 2026-08-10
-baseline: R0–R10 complete on `act-i-ladder`
+authorized-at: 2026-08-11
+baseline: R0–R12 complete on `wo-r9-research-integrity` at `e20e5d0`
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13
+active-order: [`WO-R13-S1.md`](WO-R13-S1.md)
 
 ## Active outcome
 
-The normal Windows app must deliver one understandable founder workflow from
-question to durable research result: orchestrator, worker evidence, deterministic
-Run and metrics when settled data exists, independent critic, gated Report, and
-Research Ledger recovery after close/reopen. First-run guidance must make the
-path discoverable, and the release artifact must identify its signing state.
+Restore the native-Windows gate board without weakening it: remove the R13 diagnostic from the app sole-writer scan and repair the shared Bun `EPERM` install failure blocking `kernel`, `dock-profile-identity`, and `kernel-one-path`.
+
+## Why this is first
+
+The planned first-turn measurement cannot close while a mandatory static gate is red. This is the only sequencing correction to the five-slice R13 plan: make the measuring instruments trustworthy, then measure Hermes, then scope the repair from that evidence.
 
 ## Boundary
 
-Finish the consumer-facing Windows v1 with domain tiles, semantic cables,
-workflow recovery, onboarding, installer/release output, and one Computer Use
-demonstration in normal mode. Do not start R14/RL and never place bets or trades.
+Only `WO-R13-S1.md` is authorized. Do not diagnose or change Hermes behavior, prompts, native-TUI behavior, consumer UI, installer/signing, R14, or RL. Do not weaken or bypass a gate. Never place bets or trades.
+
+Before a builder edits code, a separate reviewer must answer the two `PROTOCOL.md` questions for S1: can every gate fail, and does every deliverable have exactly one meaning?
 
 ## Current evidence
 
-[`evidence/r13/PROGRESS.md`](evidence/r13/PROGRESS.md) records the implemented
-surface, passing local checks, and the remaining consumer blocker. Do not close
-R13 until the same visible workflow reaches a gated Report and survives reopen.
+- `kernel-sole-writer-app` is red on `collab-electron/src/main/r13-consumer-workflow.check.ts`.
+- `kernel`, `dock-profile-identity`, and `kernel-one-path` reproduce the same Windows Bun `EPERM` copy failure for `qf-kernel-schema`.
+- `schema`, `repo-shape`, `rung-ladder`, and `one-skin` are green at the baseline.
+- [`evidence/r13/PROGRESS.md`](evidence/r13/PROGRESS.md) remains the consumer-workflow progress record.
+
+After independent verification of S1, rewrite this file to authorize `WO-R13-S2.md` only.

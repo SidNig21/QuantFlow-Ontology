@@ -13,6 +13,13 @@
 > mechanized. Do not trust a row's status without checking the code — that habit is the entire
 > reason the surrounding ladder was archived.
 
+> **Debt #22 correction — 2026-08-11.** Caller identity now exists as
+> `TrustedExecutionContext.actor_session_id` and is enforced for durable delegation,
+> ontology-read receipts, task completion, critic evaluation, and gated research flows.
+> This supersedes #22's old sentence that no identity concept exists. It does **not**
+> authorize `observe_ticket` or replace a deliberate per-action role policy. Until such
+> an order is authorized, `observe-door` and `tool-plane` must remain green.
+
 | # | Debt | Lands in |
 |---|---|---|
 | 0 | ~~doc↔code action-surface drift~~ — **killed** by WO-006a's `doc-action-surface` gate, falsified in both directions by the verifier | done |

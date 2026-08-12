@@ -108,3 +108,27 @@ One line of forward relevance, logged not decided: its "browser-sniff gate" (lau
 capture traffic, reverse-engineer the undocumented API) is exactly the shape of the **WO-107
 external-surface probe** — the thing PROTOCOL requires before anyone may write an order asserting
 how Bovada data arrives. Candidate probe instrument. Nothing turns on it until WO-107 is scoped.
+
+## Horizon inventory — recorded, not authorized (2026-08-11)
+
+These are inventory entries, not roadmap rungs, dependencies, or permission to build. Each stays parked until its named product failure is observed and `NEXT.md` authorizes a bounded work order.
+
+| Item | Bucket | Trigger that would justify a work order |
+|---|---|---|
+| Parent-span trace tree | Underlayer | A real multi-seat failure cannot be reconstructed from current Kernel trajectories and mission/task links |
+| Twelve-seat concurrency gate | Product gate | The supported consumer workflow intentionally rises above the current seat count and needs a measured finite bound |
+| Data refinery | Product/data pipeline | A named Dataset or Run is blocked by raw captured data that cannot be normalized with the existing ingest path |
+| Held-out evaluations | R14 / RL | R13 is accepted, R14 is authorized, and enough real Evaluation history exists to define a non-leaking holdout |
+| Cloudflare Workflows | Underlayer candidate | The first long workflow dies mid-flight and cannot resume through existing Kernel state and app recovery |
+| Cloudflare Browser/Computer | Execution-environment candidate | A named data or research task requires a remote browser/computer boundary the native Windows desk cannot safely provide |
+| WebMCP | Dock/tool-surface candidate | A browser data source has a stable structured tool surface that is measurably better than the current generated-tool or capture path |
+| OpenTelemetry | Underlayer candidate | Bounded local receipts cannot diagnose a repeated production failure across app, model, and tool boundaries |
+| Object Timeline | UX/reference concept | The Research Ledger cannot answer a founder's concrete “what changed, when, and why?” question from Kernel history |
+| Prime Agent | Neither yet | A concrete product/repository and one unmet QuantFlow gate are identified |
+| AC2 | Neither yet | A concrete product/repository and one unmet QuantFlow gate are identified |
+| Overeasy | Neither yet | A concrete product/repository and one unmet QuantFlow gate are identified |
+| Modal | Underlayer/compute candidate | A named Run exceeds local Windows capacity or needs isolation that accepted execution environments cannot supply |
+| Voice operator | Dock/UI candidate | The founder requests hands-free operation after the keyboard/mouse R13 consumer workflow is accepted |
+| Model routing | Product-policy candidate | Repeated measurements show a provider-specific latency, quality, availability, or cost failure across supported seats |
+
+RL remains a founder priority and stays on the shelf above, not deleted. It starts only through a fresh R14 authorization after the Windows v1 consumer loop produces trustworthy trajectories, Evaluations, and fenced Datasets.
