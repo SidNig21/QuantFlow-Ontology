@@ -23,8 +23,10 @@ Make the check-engine light trustworthy before diagnosing the stalled Hermes tur
 
 ## Deliverables
 
-1. Move the R13 consumer diagnostic out of `collab-electron/src/main/` and into the QA/diagnostic surface so `kernel-sole-writer-app` evaluates product code only. Do not add an allowlist exception for it.
-2. Reproduce and name the shared Windows Bun `EPERM` failure in exactly these three gates: `kernel`, `dock-profile-identity`, and `kernel-one-path`.
+1. Move the R13 consumer diagnostic from `collab-electron/src/main/r13-consumer-workflow.check.ts` to `collab-electron/qa/r13-consumer-workflow.check.ts` so `kernel-sole-writer-app` evaluates product code only. Do not add an allowlist exception for it, and update every reference to its old path (`docs/orders/evidence/r13/PROGRESS.md` at minimum).
+
+   **Destination is fixed, not a choice.** `kernel-sole-writer-app` scans `collab-electron/src`; `kernel-one-path` scans the repo *outside* `collab-electron/` and already flags `join(…, "kernel.db")` literals there. Moving this file to `qa/` or `qa/diagnostics/` therefore trades one red gate for another, and deliverable 1 forbids the allowlist that would silence it. `collab-electron/qa/` is outside `src` and inside `collab-electron/`, so it satisfies both scans without weakening either.
+2. Reproduce and name the shared Windows Bun `EPERM` failure in exactly these four gates: `kernel`, `typecheck`, `dock-profile-identity`, and `kernel-one-path`. All four fail with the identical `EPERM: failed copying files from cache to destination for package qf-kernel-schema` during the gate's own `bun install`.
 3. Apply the smallest supported install/toolchain repair shared by those gates. Do not delete broad caches, weaken assertions, skip installs, or replace frozen installs with mutable installs.
 4. Record the unedited red and green transcripts in `docs/orders/evidence/r13-s1/VERIFICATION.md`.
 
@@ -43,6 +45,7 @@ The builder runs on native Windows:
 ```powershell
 bun qa/run.ts kernel-sole-writer-app
 bun qa/run.ts kernel
+bun qa/run.ts typecheck
 bun qa/run.ts dock-profile-identity
 bun qa/run.ts kernel-one-path
 bun qa/run.ts schema
@@ -54,7 +57,17 @@ bun qa/run.ts one-skin
 git diff --check
 ```
 
-All must pass. The verifier repeats the same commands from a fresh detached worktree. The existing three `EPERM` failures and the current `kernel-sole-writer-app` offender are the required red side of the falsification transcript; the repair must turn those exact failures green.
+All must pass. The verifier repeats the same commands from a fresh detached worktree. The existing four `EPERM` failures and the current `kernel-sole-writer-app` offender are the required red side of the falsification transcript; the repair must turn those exact failures green.
+
+Measured red baseline, 2026-08-11 on native Windows at `0cfe078` — paste this alongside the post-repair run:
+
+```
+FAIL   kernel                   (EPERM install)
+FAIL   typecheck                (EPERM install)
+FAIL   dock-profile-identity    (EPERM install)
+FAIL   kernel-one-path          (EPERM install)
+FAIL   kernel-sole-writer-app   (scan offender: collab-electron/src/main/r13-consumer-workflow.check.ts)
+```
 
 ## Out of scope
 
