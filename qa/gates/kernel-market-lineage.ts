@@ -23,6 +23,34 @@ function trace() {
   return { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() };
 }
 
+function createSession(
+  db: ReturnType<typeof openKernel>,
+  id: string,
+  role: string,
+  capabilityGroups: string[],
+): void {
+  execute(
+    db,
+    "register_agent_definition",
+    {
+      name: `${id}-definition`,
+      role,
+      package_ref: "species/hermes/packed/hermes.aospkg",
+      runtime_profile: "default",
+      system_prompt_ref: `prompts/${role}.md`,
+      capability_groups: capabilityGroups,
+    },
+    trace(),
+  );
+  execute(
+    db,
+    "create_agent_session",
+    { session_id: id, agent_definition_id: `${id}-definition`, label: id },
+    trace(),
+  );
+  execute(db, "start_agent_session", { session_id: id }, trace());
+}
+
 function assertValidAnswer(
   db: ReturnType<typeof openKernel>,
   artifactId: string,
@@ -56,8 +84,10 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
   const temp = mkdtempSync(join(tmpdir(), "qf-market-lineage-"));
   const dbPath = join(temp, "kernel.db");
   const artifactRoot = join(temp, "artifacts");
+  const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
   try {
     mkdirSync(artifactRoot, { recursive: true });
+    process.env.QF_ARTIFACT_ROOT = artifactRoot;
     const db = openKernel(dbPath, { create: true });
 
     const sourcePath = join(artifactRoot, "seed-source.json");
@@ -107,6 +137,101 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
     const seeded = new Set(["venue-r6"]);
     const readArts = new Set([readArt.object_id]);
 
+    // Build the accepted R12 lineage through Kernel actions: an executor runs a
+    // deterministic result, and a separate running critic records the Evaluation.
+    createSession(db, "executor-r12", "orchestrator", ["desk.orchestrate"]);
+    createSession(db, "critic-r12", "critic", ["research.evaluate"]);
+    const hypothesis = execute(
+      db,
+      "create_hypothesis",
+      {
+        claim: "The seeded market strategy has positive return.",
+        success_criteria:
+          "The deterministic metrics are positive and an independent critic supports them.",
+      },
+      trace(),
+    ) as { object_id: string };
+    const datasetBytes = new TextEncoder().encode(
+      JSON.stringify({
+        contract: "qf.dataset.v1",
+        observations: [
+          {
+            id: "settled-win-r12-market-lineage",
+            observed_at: "2026-08-09T10:00:00.000Z",
+            edge: 1,
+            settlement: {
+              outcome: "win",
+              stake: "100.000000",
+              decimal_odds: "2.000000",
+              closing_decimal_odds: "1.600000",
+            },
+          },
+        ],
+      }),
+    );
+    const datasetPath = join(artifactRoot, "dataset.json");
+    writeFileSync(datasetPath, datasetBytes);
+    const datasetArtifact = execute(
+      db,
+      "publish_artifact",
+      { kind: "result_set", bytes: datasetBytes, storage_ref: datasetPath },
+      trace(),
+    ) as { object_id: string };
+    const dataset = execute(
+      db,
+      "register_dataset_version",
+      {
+        kind: "results",
+        artifact_id: datasetArtifact.object_id,
+        content_hash: datasetArtifact.object_id,
+        as_of: "2026-08-09T11:00:00.000Z",
+        coverage: { fixture: "r12-market-lineage" },
+      },
+      trace(),
+    ) as { object_id: string };
+    const deterministicRun = execute(
+      db,
+      "execute_deterministic_run",
+      {
+        run_id: "run-r12-market-lineage",
+        dataset_id: dataset.object_id,
+        strategy_spec: {
+          contract: "qf.strategy.v1",
+          version: 1,
+          stake_model: "flat",
+          score_field: "edge",
+        },
+        params: { limit: 1 },
+      },
+      { ...trace(), actor_session_id: "executor-r12" },
+    ) as { object_id: string; state: Record<string, unknown> };
+    const resultArtifactId = deterministicRun.state.result_artifact_id;
+    assert(
+      typeof resultArtifactId === "string",
+      "deterministic run did not return a result artifact",
+    );
+    const evaluation = execute(
+      db,
+      "record_evaluation",
+      {
+        hypothesis_id: hypothesis.object_id,
+        run_id: deterministicRun.object_id,
+        artifact_id: resultArtifactId,
+        verdict: "supports",
+        confidence: 0.9,
+        rationale: "The recorded metrics and market lineage support the fixture claim.",
+        findings:
+          "Verified the deterministic result bytes, metric definitions, and positive ROI.",
+      },
+      { ...trace(), actor_session_id: "critic-r12" },
+    ) as { object_id: string };
+    const evaluationId = evaluation.object_id;
+    assert(
+      (getObject(db, "evaluation", evaluationId) as { verdict?: string } | null)?.verdict ===
+        "supports",
+      "record_evaluation did not create a supporting Evaluation",
+    );
+
     // Empty lineage → red
     const emptyPath = join(artifactRoot, "empty.json");
     const emptyBytes = Buffer.from(JSON.stringify({ cites: ["venue-r6"] }));
@@ -119,6 +244,7 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
         storage_ref: emptyPath,
         path: emptyPath,
         content_hash: contentHash(new Uint8Array(emptyBytes)),
+        evaluation_id: evaluationId,
       },
       trace(),
     ) as { object_id: string };
@@ -144,6 +270,7 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
         path: fakePath,
         content_hash: contentHash(new Uint8Array(fakeBytes)),
         links: [{ kind: "derived_from", to_id: readArt.object_id }],
+        evaluation_id: evaluationId,
       },
       trace(),
     ) as { object_id: string };
@@ -171,10 +298,16 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
         path: answerPath,
         content_hash: contentHash(new Uint8Array(answerBytes)),
         links: [{ kind: "derived_from", to_id: readArt.object_id }],
+        evaluation_id: evaluationId,
       },
       trace(),
     ) as { object_id: string };
     assertValidAnswer(db, answer.object_id, seeded, readArts);
+    const gates = getLinks(db, answer.object_id, { kind: "gates" });
+    assert(
+      gates.length === 1 && gates[0]!.from_id === evaluationId,
+      "report gate does not point to the returned Evaluation",
+    );
 
     closeKernel(db);
     console.log("kernel-market-lineage: PASS");
@@ -185,6 +318,8 @@ export async function runKernelMarketLineageGateBody(): Promise<{ ok: boolean }>
     );
     return { ok: false };
   } finally {
+    if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
+    else process.env.QF_ARTIFACT_ROOT = previousArtifactRoot;
     try {
       rmSync(temp, { recursive: true, force: true });
     } catch {

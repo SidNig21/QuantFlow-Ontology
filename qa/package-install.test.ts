@@ -3,6 +3,9 @@ import { describe, expect, test } from "bun:test";
 import { resolve } from "node:path";
 import {
   FROZEN_PACKAGE_INSTALL_ARGS,
+  TYPECHECK_ELECTRON_INSTALL_ARGS,
+  TYPECHECK_ELECTRON_PACKAGE,
+  packageInstallArgsForTypecheck,
   runFrozenPackageInstall,
 } from "./package-install.ts";
 
@@ -31,6 +34,19 @@ describe("shared frozen package install", () => {
       "--linker",
       "isolated",
     ]);
+  });
+
+  test("uses hardlink only for the exact Electron typecheck package", () => {
+    expect(TYPECHECK_ELECTRON_PACKAGE).toBe("collab-electron");
+    expect(
+      packageInstallArgsForTypecheck(REPO_ROOT, resolve(REPO_ROOT, "collab-electron")),
+    ).toEqual(TYPECHECK_ELECTRON_INSTALL_ARGS);
+    expect(
+      packageInstallArgsForTypecheck(REPO_ROOT, resolve(REPO_ROOT, "tools/collab-electron")),
+    ).toEqual(FROZEN_PACKAGE_INSTALL_ARGS);
+    expect(
+      packageInstallArgsForTypecheck(REPO_ROOT, resolve(REPO_ROOT, "packages/qf-kernel")),
+    ).toEqual(FROZEN_PACKAGE_INSTALL_ARGS);
   });
 
   test("permanent copy failures remain red", async () => {

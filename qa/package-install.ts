@@ -21,6 +21,18 @@ export const FROZEN_PACKAGE_INSTALL_ARGS = [
   "isolated",
 ] as const;
 
+export const TYPECHECK_ELECTRON_PACKAGE = "collab-electron" as const;
+
+export const TYPECHECK_ELECTRON_INSTALL_ARGS = [
+  "bun",
+  "install",
+  "--frozen-lockfile",
+  "--backend",
+  "hardlink",
+  "--linker",
+  "isolated",
+] as const;
+
 type InstallChild = { exited: Promise<number> };
 type InstallSpawn = (
   args: readonly string[],
@@ -37,6 +49,16 @@ type PackageManifest = {
   optionalDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 };
+
+export function packageInstallArgsForTypecheck(
+  repoRoot: string,
+  cwd: string,
+): readonly string[] {
+  const repoRelative = relative(resolve(repoRoot), resolve(cwd)).replaceAll("\\", "/");
+  return repoRelative === TYPECHECK_ELECTRON_PACKAGE
+    ? TYPECHECK_ELECTRON_INSTALL_ARGS
+    : FROZEN_PACKAGE_INSTALL_ARGS;
+}
 
 /**
  * Bun can leave an empty local file-dependency directory after a Windows
@@ -101,7 +123,11 @@ export async function runFrozenPackageInstall(
   spawn: InstallSpawn = Bun.spawn as unknown as InstallSpawn,
 ): Promise<boolean> {
   if (!clearStaleLocalFileDependencyDestinations(gateName, cwd)) return false;
-  const child = spawn(FROZEN_PACKAGE_INSTALL_ARGS, {
+  const args =
+    gateName === "typecheck"
+      ? packageInstallArgsForTypecheck(resolve(import.meta.dir, ".."), cwd)
+      : FROZEN_PACKAGE_INSTALL_ARGS;
+  const child = spawn(args, {
     cwd,
     stdout: "inherit",
     stderr: "inherit",
@@ -109,7 +135,7 @@ export async function runFrozenPackageInstall(
   const code = await child.exited;
   if (code !== 0) {
     console.error(
-      `${gateName}: ${FROZEN_PACKAGE_INSTALL_ARGS.join(" ")} exited ${code}; ` +
+      `${gateName}: ${args.join(" ")} exited ${code}; ` +
         "the original Bun install error above is authoritative (no retry was attempted)",
     );
     return false;
