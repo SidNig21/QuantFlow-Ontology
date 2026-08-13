@@ -33,7 +33,13 @@ artifact states its signing status honestly. No R14–R18. Never place bets or t
 
 Before a builder edits code, a reviewer who did not author the order must answer
 the two `PROTOCOL.md` questions: can every gate fail, and does every deliverable
-have exactly one meaning?
+have exactly one meaning? **`WO-V2-1` has not had this read** — it was authored by
+the same session that scoped it, so that seat is spent. This is the lead session's
+first action, per [`AUTONOMY.md`](AUTONOMY.md).
+
+Unattended operation is governed by [`AUTONOMY.md`](AUTONOMY.md). Note that this
+order ends in a founder acceptance step and therefore cannot complete without the
+founder present — that is the intended stopping point, not a defect.
 
 ## Current evidence
 
