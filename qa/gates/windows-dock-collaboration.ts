@@ -322,7 +322,7 @@ async function removeTempRoot(root: string): Promise<void> {
     return;
   }
   let lastError: unknown;
-  for (let attempt = 0; attempt < 20; attempt += 1) {
+  for (let attempt = 0; attempt < 60; attempt += 1) {
     try {
       rmSync(root, { recursive: true, force: true });
       return;
@@ -340,6 +340,12 @@ async function cleanupRun(run: Awaited<ReturnType<typeof launchProof>>): Promise
   if (run.child.pid !== undefined) {
     await terminateOwnedProcessTree(run.child.pid);
     await waitForExit(run.child, 5_000).catch(() => null);
+  }
+  const current = await processSnapshot();
+  for (const row of current) {
+    if (run.ownedPids.has(row.pid)) {
+      await terminateOwnedProcessTree(row.pid);
+    }
   }
   const packageNeedle = run.packageRoot.toLowerCase().replaceAll("/", "\\");
   const deadline = Date.now() + 5_000;
@@ -394,7 +400,17 @@ function assertReceipts(
     } catch {
       throw new Error("peer receipt root is missing or inaccessible");
     }
-    for (const row of trajectories) {
+    const peerTrajectories = trajectories.filter((row) => {
+      try {
+        const receiptPath = realpathSync.native(resolvePath(row.storage_ref));
+        const rel = relative(handoffRoot, receiptPath);
+        return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+      } catch {
+        return false;
+      }
+    });
+    assert(peerTrajectories.length === 1, "Kernel did not record exactly one peer handoff trajectory");
+    for (const row of peerTrajectories) {
       assert(existsSync(row.storage_ref), `peer receipt missing: ${row.storage_ref}`);
       let receiptPath: string;
       try {
