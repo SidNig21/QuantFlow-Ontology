@@ -108,6 +108,7 @@ import {
   reconcileStaleSessions,
   runAgentHostSmoke,
 } from "./agent-host";
+import { createKernelAgentSession } from "./runtime-kernel-admission";
 
 function getKernelAgentDefinitionIds(): string[] {
   return kernelListAgentDefinitions()
@@ -1173,14 +1174,21 @@ app.whenReady().then(async () => {
                 return;
               }
               const criticSessionId = `critic-${crypto.randomUUID()}`;
-              kernelExecute("create_agent_session", {
-                session_id: criticSessionId,
-                agent_definition_id: "hermes-critic",
-                label: "Independent research critic",
-              }, {
-                trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(),
-                actor_session_id: change.delegatorSessionId,
-              });
+              createKernelAgentSession(
+                {
+                  sessionId: criticSessionId,
+                  definitionId: "hermes-critic",
+                  label: "Independent research critic",
+                  actorSessionId: change.delegatorSessionId,
+                },
+                {
+                  execute: kernelExecute,
+                  newTrace: () => ({
+                    trace_id: crypto.randomUUID(),
+                    span_id: crypto.randomUUID(),
+                  }),
+                },
+              );
               const criticInstruction = buildMissionActivationInstruction(
                 `review-${run.runId}`,
                 [

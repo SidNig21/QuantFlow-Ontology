@@ -9,7 +9,16 @@
     "noEmit": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "types": ["bun"]
+    "types": ["bun"],
+    "baseUrl": "../../../",
+    "paths": {
+      "@collab/shared": ["collab-electron/packages/shared/src"],
+      "@collab/shared/*": ["collab-electron/packages/shared/src/*"],
+      "@collab/components": ["collab-electron/packages/components/src"],
+      "@collab/components/*": ["collab-electron/packages/components/src/*"],
+      "@collab/theme": ["collab-electron/packages/theme/src"],
+      "@collab/theme/*": ["collab-electron/packages/theme/src/*"]
+    }
   },
   "include": ["run.ts"]
 }

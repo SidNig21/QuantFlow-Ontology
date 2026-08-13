@@ -15,7 +15,6 @@ import {
   readdirSync,
   rmSync,
   statSync,
-  symlinkSync,
 } from "node:fs";
 import { join, relative } from "node:path";
 import { Database } from "bun:sqlite";
@@ -406,7 +405,7 @@ function assertReadonlyWithoutUpgradeSql(
   const modules = join(isolated, "node_modules");
   const isolatedKernel = join(modules, "qf-kernel");
   const isolatedSchema = join(modules, "qf-kernel-schema");
-  mkdirSync(join(isolatedKernel, "src"), { recursive: true });
+  mkdirSync(isolatedKernel, { recursive: true });
   mkdirSync(join(isolatedSchema, "golden"), { recursive: true });
   cpSync(join(REPO, "packages/qf-kernel/src"), join(isolatedKernel, "src"), {
     recursive: true,
@@ -430,9 +429,13 @@ function assertReadonlyWithoutUpgradeSql(
     join(isolatedSchema, "schema-baseline.json"),
   );
   copyFileSync(CURRENT_MIGRATION, join(isolatedSchema, "golden/migration.sql"));
-  const zodSource = join(PKG, "node_modules/zod");
-  if (!existsSync(zodSource)) return `isolated readonly control missing ${zodSource}`;
-  symlinkSync(zodSource, join(modules, "zod"), "dir");
+  const zodSource = [
+    join(PKG, "node_modules/zod"),
+    join(REPO, "packages/qf-kernel/node_modules/zod"),
+    join(REPO, "collab-electron/node_modules/zod"),
+  ].find((candidate) => existsSync(candidate));
+  if (!zodSource) return "isolated readonly control missing zod runtime";
+  cpSync(zodSource, join(modules, "zod"), { recursive: true });
 
   const script = `
 import { Database } from "bun:sqlite";
@@ -550,6 +553,9 @@ function snapshotCounts(db: KernelDb): Record<string, number> {
 }
 
 function snapshotLegacyData(db: KernelDb): string {
+  // These columns are added by later upgrades in the same attach chain. The
+  // legacy-byte proof compares only columns that existed in the pre-D1 input.
+  const upgradeAddedColumns = new Set(["runtime_profile", "capability_groups", "status"]);
   const tables = (
     db
       .query(
@@ -563,7 +569,7 @@ function snapshotLegacyData(db: KernelDb): string {
         db.query(`PRAGMA table_info("${table}")`).all() as Array<{ name: string }>
       )
         .map((column) => column.name)
-        .filter((name) => name !== "runtime_profile");
+        .filter((name) => !upgradeAddedColumns.has(name));
       const projection = columns.map((name) => `"${name}"`).join(", ");
       return {
         table,
@@ -1205,7 +1211,19 @@ async function main(): Promise<number> {
   }
 
   closeKernel(db);
-  rmSync(workDir, { recursive: true, force: true });
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  try {
+    rmSync(workDir, {
+      recursive: true,
+      force: true,
+      maxRetries: 5,
+      retryDelay: 100,
+    });
+  } catch (error) {
+    // Windows may release a child Bun cwd handle just after spawnSync returns;
+    // the proof is complete even if this best-effort temp cleanup is delayed.
+    console.warn(`dock-profile-identity: temp cleanup deferred: ${String(error)}`);
+  }
 
   console.log("dock-profile-identity OK");
   console.log(

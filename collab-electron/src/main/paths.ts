@@ -107,7 +107,7 @@ const appDirOverride = process.env["QF_APP_DIR"];
 const resolvedPaths = resolveQuantFlowPaths({
   home: homedir(),
   platform: process.platform,
-  isDev: import.meta.env?.DEV === true,
+  isDev: Boolean(import.meta.env?.DEV),
   worktreeRoot:
     process.env["QF_DEV_WORKTREE_ROOT"] || process.cwd(),
   appRootOverride,

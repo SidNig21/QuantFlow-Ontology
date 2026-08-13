@@ -2,9 +2,10 @@
  * Shared cold package-install seam for gates that own a frozen Bun install.
  *
  * Native Windows can fail Bun's default cache-linking backend while copying
- * the local qf-kernel-schema package. The copyfile backend keeps the install
- * frozen while avoiding that cache-copy EPERM. There is intentionally no
- * retry: a permanent install failure must remain a red gate.
+ * the local qf-kernel-schema package. The copyfile backend plus isolated
+ * linker keeps the install frozen while avoiding that cache-copy EPERM. There
+ * is intentionally no retry: a permanent install failure must remain a red
+ * gate.
  */
 
 import { existsSync, readFileSync, rmSync } from "node:fs";
@@ -16,6 +17,8 @@ export const FROZEN_PACKAGE_INSTALL_ARGS = [
   "--frozen-lockfile",
   "--backend",
   "copyfile",
+  "--linker",
+  "isolated",
 ] as const;
 
 type InstallChild = { exited: Promise<number> };

@@ -21,13 +21,15 @@ function isGitIgnored(path: string): boolean {
 }
 
 describe("shared frozen package install", () => {
-  test("keeps the Windows copyfile backend explicit", () => {
+  test("keeps the Windows copyfile and isolated linker contract explicit", () => {
     expect(FROZEN_PACKAGE_INSTALL_ARGS).toEqual([
       "bun",
       "install",
       "--frozen-lockfile",
       "--backend",
       "copyfile",
+      "--linker",
+      "isolated",
     ]);
   });
 

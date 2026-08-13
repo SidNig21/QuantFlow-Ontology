@@ -21,8 +21,40 @@ export type RuntimeKernelAdmissionDependencies<TLive> = {
   tearDownRuntime: () => void | Promise<void>;
 };
 
+export type CreateKernelAgentSessionInput = {
+  definitionId: string;
+  sessionId: string;
+  label: string;
+  actorSessionId?: string;
+};
+
+export type CreateKernelAgentSessionDependencies = Pick<
+  RuntimeKernelAdmissionDependencies<unknown>,
+  "execute" | "newTrace"
+>;
+
 function asError(value: unknown): Error {
   return value instanceof Error ? value : new Error(String(value));
+}
+
+/** Keep every production session creation inside the admitted Kernel seam. */
+export function createKernelAgentSession(
+  input: CreateKernelAgentSessionInput,
+  dependencies: CreateKernelAgentSessionDependencies,
+): RuntimeKernelAdmissionTrace {
+  const { definitionId, sessionId, label, actorSessionId } = input;
+  const trace = dependencies.newTrace();
+  dependencies.execute(
+    "create_agent_session",
+    {
+      session_id: sessionId,
+      agent_definition_id: definitionId,
+      label,
+      ...(actorSessionId ? { actor_session_id: actorSessionId } : {}),
+    },
+    trace,
+  );
+  return trace;
 }
 
 /**
@@ -45,15 +77,9 @@ export async function completeRuntimeKernelAdmission<TLive>(
 
   try {
     liveSet(sessionId, liveEntry);
-    const trace = newTrace();
-    execute(
-      "create_agent_session",
-      {
-        session_id: sessionId,
-        agent_definition_id: definitionId,
-        label: definitionId,
-      },
-      trace,
+    const trace = createKernelAgentSession(
+      { definitionId, sessionId, label: definitionId },
+      { execute, newTrace },
     );
     kernelCreated = true;
     execute(
