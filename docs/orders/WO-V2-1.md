@@ -40,36 +40,50 @@ below are the landed defects; chat guidance is not authority.
 
 ## Deliverables
 
-1. **Repair the shared frozen local-file install contract.** Exactly these four
-   gates use the shared helper and currently fail before their substantive
-   assertions: `kernel`, `typecheck`, `dock-profile-identity`, and
-   `kernel-one-path`.
-
-   Every gate-owned local package install must run exactly:
+1. **Repair the cold install contract without pretending typecheck and package
+   gates have the same dependency graph.** `kernel`, `dock-profile-identity`, and
+   `kernel-one-path` keep the shared exact command:
 
    ```text
    bun install --frozen-lockfile --backend copyfile --linker isolated
    ```
 
-   This is measured, not inferred. Fresh Reader task
-   `019ffb84-7adb-7033-8184-8e9d8d0ef484` ran the contract with an isolated
-   temporary `BUN_INSTALL_CACHE_DIR`: installed Bun 1.3.12 produced 86 passing
-   Kernel tests, zero failures, and `PASS kernel`; Bun 1.3.14 also passed. With
-   the two linker arguments removed, both versions failed with
-   `EPERM: failed copying files from cache to destination for package qf-kernel-schema`.
+   `typecheck` has one additional, explicit rule: when it installs the
+   `collab-electron` closure, it must use:
 
-   The follow-up repair may change only `qa/package-install.ts` to add
-   `"--linker", "isolated"` to `FROZEN_PACKAGE_INSTALL_ARGS`,
-   `qa/package-install.test.ts` to assert the exact argument list, and the
-   evidence file. Retain partial implementation commit `b7a6de1` as the base;
-   do not amend it. No further source file, manifest, ignore file, lockfile,
-   dependency, Bun version, or version pin may change for this repair. No Bun
-   upgrade/downgrade, cache deletion, mutable install, or retry is authorized.
+   ```text
+   bun install --frozen-lockfile --backend hardlink --linker isolated
+   ```
 
-   Stop and report an order defect if the exact contract does not produce exit
-   code 0, `PASS kernel`, 86 passing tests and zero failures in a fresh detached
-   worktree, if `bunx tsc --noEmit` in `packages/qf-kernel` is nonzero, or if any
-   prohibited file changes are required.
+   It must match the exact repo-relative path `collab-electron` (not a suffix)
+   and use the original `copyfile`/`isolated` command for every other
+   typecheck package, run lifecycle scripts, and then run `bunx tsc --noEmit`
+   for every package that declares a typecheck script. This is still a frozen
+   install; no mutable install, retry, ambient package, skipped script, or
+   skipped typecheck target is allowed.
+
+   The distinction is measured, not inferred. On stop candidate `295dcf6`, a
+   fresh short worktree at `C:\tmp\qf-v21-rewrite-reader` ran the current
+   copyfile/isolated typecheck
+   installed 2,323 packages and exited 1 while linking
+   `@agentos-software/opencode@0.2.7` with `ENOENT`. In a fresh short worktree
+   with only the `collab-electron` install changed to hardlink/isolated,
+   `bun qa/run.ts typecheck` installed 2,325 packages, rebuilt `node-pty`, and
+   printed `PASS typecheck`; the other typecheck package installs remained
+   copyfile/isolated.
+
+   The repair may change only `qa/package-install.ts`, its focused tests, and
+   the evidence file. Keep `FROZEN_PACKAGE_INSTALL_ARGS` exact for the three
+   package gates and add a separately asserted typecheck-Electron argument
+   list/routing rule. No source file, manifest, ignore file, lockfile,
+   dependency, Bun version, or version pin may change. Retain partial
+   implementation commit `b7a6de1` as history; do not amend it.
+
+   Stop and report an order defect if a fresh short-path detached worktree does
+   not produce exit code 0 and `PASS typecheck` under this exact split, if the
+   package-level `kernel` command does not produce 86 passing tests and zero
+   failures, if `bunx tsc --noEmit` in `packages/qf-kernel` is nonzero, or if
+   any prohibited file changes are required.
 
 2. **Move the R13 consumer diagnostic** from
    `collab-electron/src/main/r13-consumer-workflow.check.ts` to
@@ -128,11 +142,30 @@ below are the landed defects; chat guidance is not authority.
 
 7. Record the unedited red and green transcripts in
    `docs/orders/evidence/r13/V2-1-VERIFICATION.md`. Use one heading per command
-   with commit SHA, environment, exact command, exit code, complete output, red
-   mutation, restoration, and green rerun. Record the installer path,
-   Authenticode result, installed executable path, build-identity values, and the
-   founder steps separately; file existence without these fields is not
-   acceptance evidence.
+   with the one verified acceptance-candidate SHA, environment, exact command,
+   exit code, complete output, red mutation, restoration, and green rerun.
+   Record the installer path, Authenticode result, installed executable path,
+   build-identity values, and the founder steps separately; file existence
+   without these fields is not acceptance evidence.
+
+8. **Repair the R12 fixture behind `kernel-market-lineage`.** The accepted path
+   must remain a real `kind: "report"` publication. Before it publishes, the
+   gate must create through Kernel actions one hypothesis, one deterministic run
+   and result artifact, one independent critic session, and one
+   `record_evaluation` result with verdict `supports`. The report must pass the
+   exact `evaluation_id` returned by that evaluation, carry its `gates` link as
+   Kernel-derived output, retain the `derived_from` link to the market-read
+   trajectory artifact, and cite the seeded venue id. No raw SQL row insertion,
+   hard-coded evaluation id, conversion of the report to `result_set`, or
+   weakening of `publish_artifact` is allowed.
+
+   The green meaning is singular: a report is accepted only when a real,
+   supporting, independent R12 Evaluation authorizes it. The current red is
+   measured at `bun qa/verify-release.ts`: `kernel-market-lineage` exits 1 with
+   `publish_artifact report requires evaluation_id`. The existing positive R12
+   contract is measured by `bun test src/r12-independent-critic.test.ts` in
+   `packages/qf-kernel` at stop candidate `295dcf6`: `2 pass`, `0 fail`,
+   including a report published with the returned evaluation id.
 
 ## Contract
 
@@ -158,6 +191,7 @@ Builder runs on native Windows, pasting unedited output:
 bun qa/run.ts kernel-sole-writer-app
 bun qa/run.ts kernel
 bun qa/run.ts typecheck
+bun qa/run.ts kernel-market-lineage
 bun qa/run.ts dock-profile-identity
 bun qa/run.ts dock-production-inventory
 bun qa/run.ts kernel-one-path
@@ -174,12 +208,42 @@ canonical release door and the package-specific gates:
 
 ```powershell
 bun qa/verify-release.ts
+bun qa/run.ts kernel-market-lineage
 bun qa/run.ts windows-cold-boot
 bun qa/run.ts windows-dock-collaboration
 bun qa/run.ts windows-installer
 git diff --check origin/wo-r9-research-integrity...HEAD
 git diff --check
 ```
+
+### Verified acceptance candidate and evidence identity
+
+The verifier must capture one full 40-character SHA before running any
+acceptance command:
+
+```powershell
+git fetch origin wo-V2-1
+$candidate = git rev-parse origin/wo-V2-1
+git worktree add --detach "C:\tmp\qf-v21-accept-$($candidate.Substring(0,12))" $candidate
+git -C "C:\tmp\qf-v21-accept-$($candidate.Substring(0,12))" rev-parse HEAD
+git -C "C:\tmp\qf-v21-accept-$($candidate.Substring(0,12))" status --short --branch
+```
+
+The printed `$candidate` is the only acceptance candidate. Every green claim,
+installer identity, and founder-facing build identity in the final evidence
+must come from raw commands run in that exact detached worktree. The evidence
+file must begin with `acceptance_candidate_sha: <full SHA>` and must not name a
+second current product, rework, or final candidate SHA. Older SHAs remain under
+an explicitly labelled `HISTORY ONLY — NOT ACCEPTANCE EVIDENCE` heading and are
+never used to support a current green claim.
+
+If the evidence file is committed after the run, its docs-only commit is
+recorded as `evidence_commit_sha`, not as another acceptance candidate. Each
+final green claim must point to the complete, unedited transcript whose first
+identity line is the same candidate SHA and whose command exited 0 with the
+expected `PASS` line. A transcript from another worktree, a missing raw output,
+two candidate headers, or a green claim contradicted by the candidate's raw
+output is a failed acceptance, not a wording issue.
 
 `windows-cold-boot` proves the unpacked package; it does not substitute for the
 installed-artifact proof in `windows-installer`.
@@ -219,12 +283,31 @@ shown green. Both transcripts go in the evidence file.
   arguments in the same clean state → 86 tests pass, zero fail, and the gate
   prints `PASS kernel` with exit code 0. Then run the other three repaired gates
   green through the same shared helper.
+- In a fresh short detached worktree, change only the `collab-electron`
+  typecheck install from `--backend hardlink` to `--backend copyfile` while
+  keeping `--frozen-lockfile --linker isolated` and scripts enabled â†’
+  `bun qa/run.ts typecheck` must exit nonzero with the
+  `@agentos-software/opencode@0.2.7` `ENOENT` link failure. Restore hardlink in
+  that contract and rerun from a new fresh short worktree â†’ all typecheck
+  targets pass and the gate prints `PASS typecheck`.
+- Delete `evaluation_id` from only the accepted `kind: "report"` publication in
+  `kernel-market-lineage` â†’ the gate must print
+  `publish_artifact report requires evaluation_id` and go red. Restore the
+  real id returned by `record_evaluation` â†’ the gate must print its lineage
+  baits and `PASS`. Change that Evaluation's verdict to `rejects`, or replace
+  its id with an uncreated string â†’ the report must remain refused.
+- Change the final evidence header to a different SHA, leave two current
+  candidate SHA headings, or replace a raw transcript's candidate identity with
+  the wrong SHA â†’ the evidence is invalid and acceptance stops. Restore one
+  full candidate SHA shared by the detached-worktree identity lines and every
+  final transcript â†’ the evidence contract is satisfied.
 
 ## Founder acceptance
 
 The founder installs from the produced NSIS installer on a Windows account that
 has never run this checkout, opens the installed desktop shortcut, and confirms
-the masthead's full commit equals the builder commit and its UTC build timestamp
+the masthead's full commit equals the one `acceptance_candidate_sha` and its UTC
+build timestamp
 equals `RELEASE-STATUS.json`. The founder sees `hermes-critic` in the Dock and no
 profile whose id or role contains `ungranted`. The founder then spawns
 `hermes-critic` directly from the ordinary Dock with no mission or task
