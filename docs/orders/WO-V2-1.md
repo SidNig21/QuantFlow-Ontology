@@ -40,28 +40,36 @@ below are the landed defects; chat guidance is not authority.
 
 ## Deliverables
 
-1. **Repair the gate board.** Reproduce and name the shared Bun `EPERM` failure in
-   exactly these four gates: `kernel`, `typecheck`, `dock-profile-identity`,
-   `kernel-one-path`. All four fail with
-   `EPERM: failed copying files from cache to destination for package qf-kernel-schema`
-   during the gate's own `bun install`. The first builder proved in a clean
-   temporary checkout that `--backend copyfile`, cache isolation, and clearing
-   the exact stale destination all fail identically on Bun 1.3.12: Bun attempts
-   to copy `qf-kernel-schema/.gitignore` into the local `file:` dependency and
-   Windows returns `EPERM`. Therefore the repair seam includes relocating the
-   ignore rules from `qf-kernel-schema/.gitignore` into equivalent root
-   `.gitignore` patterns and deleting only that nested `.gitignore`, so the
-   package tree Bun copies no longer contains the failing file. Preserve every
-   existing ignore behavior, and add a regression check for those scoped root
-   rules. Do not change the pinned Bun version, package dependencies, or
-   lockfiles as a repair.
-   Do not delete any shared/global cache, weaken assertions, skip installs, swap
-   frozen installs for mutable ones, or hide the failure behind an unbounded
-   retry. A retry is permitted only if it is bounded, reports the original
-   Windows error and exhausted attempt count, and has a deterministic test that
-   proves permanent copy failures still fail. If the reproduced cause cannot be
-   repaired inside this seam, stop and report an order defect rather than
-   widening scope.
+1. **Repair the shared frozen local-file install contract.** Exactly these four
+   gates use the shared helper and currently fail before their substantive
+   assertions: `kernel`, `typecheck`, `dock-profile-identity`, and
+   `kernel-one-path`.
+
+   Every gate-owned local package install must run exactly:
+
+   ```text
+   bun install --frozen-lockfile --backend copyfile --linker isolated
+   ```
+
+   This is measured, not inferred. Fresh Reader task
+   `019ffb84-7adb-7033-8184-8e9d8d0ef484` ran the contract with an isolated
+   temporary `BUN_INSTALL_CACHE_DIR`: installed Bun 1.3.12 produced 86 passing
+   Kernel tests, zero failures, and `PASS kernel`; Bun 1.3.14 also passed. With
+   the two linker arguments removed, both versions failed with
+   `EPERM: failed copying files from cache to destination for package qf-kernel-schema`.
+
+   The follow-up repair may change only `qa/package-install.ts` to add
+   `"--linker", "isolated"` to `FROZEN_PACKAGE_INSTALL_ARGS`,
+   `qa/package-install.test.ts` to assert the exact argument list, and the
+   evidence file. Retain partial implementation commit `b7a6de1` as the base;
+   do not amend it. No further source file, manifest, ignore file, lockfile,
+   dependency, Bun version, or version pin may change for this repair. No Bun
+   upgrade/downgrade, cache deletion, mutable install, or retry is authorized.
+
+   Stop and report an order defect if the exact contract does not produce exit
+   code 0, `PASS kernel`, 86 passing tests and zero failures in a fresh detached
+   worktree, if `bunx tsc --noEmit` in `packages/qf-kernel` is nonzero, or if any
+   prohibited file changes are required.
 
 2. **Move the R13 consumer diagnostic** from
    `collab-electron/src/main/r13-consumer-workflow.check.ts` to
@@ -204,12 +212,13 @@ shown green. Both transcripts go in the evidence file.
   `hermes-launch-policy` goes red; restore it → green.
 - Feed `windows-installer` a copied installer whose recorded build SHA differs
   from the expected SHA → red; restore the produced artifact → green.
-- Exercise the shared package-install helper with its deterministic permanent
-  copy-failure bait → each of the four repaired gates reports the copy cause and
-  exits non-zero; restore the real installer → all four green.
-- Restore `qf-kernel-schema/.gitignore` with its former contents while the
-  equivalent root rules remain → the clean Windows `kernel` install reproduces
-  the `EPERM`; remove the nested file again → all four repaired gates green.
+- In a fresh detached worktree with a newly-created temporary
+  `BUN_INSTALL_CACHE_DIR`, remove only `"--linker", "isolated"` from
+  `FROZEN_PACKAGE_INSTALL_ARGS` → `bun qa/run.ts kernel` prints the
+  `qf-kernel-schema` `EPERM`, `FAIL kernel`, and exits nonzero. Restore the two
+  arguments in the same clean state → 86 tests pass, zero fail, and the gate
+  prints `PASS kernel` with exit code 0. Then run the other three repaired gates
+  green through the same shared helper.
 
 ## Founder acceptance
 
@@ -247,15 +256,15 @@ repair, every command result unedited, the falsification transcripts, the
 installer path and its signing status, and any remaining red gate. Stop after
 this order; do not begin `WO-V2-2` automatically.
 
-## REWRITE STOP — 2026-08-13
+## REWRITE RECORD — 2026-08-13
 
 Plain language: the product work exists on the builder branch, but it cannot be
 trusted or installed yet because Bun still cannot perform the cold dependency
 install that every release proof starts with.
 
-The same blocking condition survived the initial builder pass and the one
-permitted continuation. `AUTONOMY.md` therefore forbids a third lap; this order
-must be rewritten before another builder receives it.
+The same blocking condition survived the initial builder pass and its permitted
+continuation. `AUTONOMY.md` forbade a third lap from that builder, so the order
+was sent to a fresh Reader and rewritten before a new builder could receive it.
 
 1. **The first repair hypothesis was false.** Builder task
    `019ffb5e-272e-75b1-a726-772e0c816dfc` reproduced the Windows Bun 1.3.12
@@ -283,15 +292,14 @@ must be rewritten before another builder receives it.
    `qf-kernel-schema/bun.lock`. This proves the failure is not specific to the
    nested ignore file.
 
-3. **Required rewrite boundary.** The next order text must begin with a bounded
-   toolchain probe that selects one measured Windows-safe install contract for
-   local `file:` packages before retaining any implementation: either a Bun
-   release that demonstrably passes this repository's frozen cold install, or a
-   different supported dependency-link contract whose runtime and typecheck
-   semantics are proven. It must explicitly authorize the resulting Bun/version,
-   lockfile, or install-contract change and falsify it in a clean worktree. Do
-   not delete or mutate the shared Bun cache, and do not resume the current
-   builder by chat instruction.
+3. **Rewrite resolved by measurement.** Reader task
+   `019ffb84-7adb-7033-8184-8e9d8d0ef484` proved that changing Bun versions does
+   not repair the failure: unmodified Bun 1.3.12 and 1.3.14 both fail. Adding
+   `--linker isolated` to the existing frozen copyfile command makes both pass.
+   Restoring the nested `.gitignore` still passes under that contract, proving
+   the previous falsifier invalid. Deliverable 1 and Falsification above now
+   carry the exact measured red/green contract. The previous builder task remains
+   stopped; a new builder session is required.
 
 Partial product implementation is preserved at `b7a6de1` on branch `wo-V2-1`.
 It has not passed the order, has not been independently verified, and must not be
