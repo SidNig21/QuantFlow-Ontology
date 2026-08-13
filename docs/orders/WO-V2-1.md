@@ -361,3 +361,43 @@ Rework acceptance is the complete command list above, in order, from one fresh
 detached worktree with no cleanup between commands. Any remaining red command is
 a second failed verification and stops this order for another rewrite; there is
 no third lap.
+
+## VERIFICATION ROUND 2 — STOP FOR REWRITE 2026-08-13
+
+Verifier task `019ffbd9-76bc-7990-877e-f0191b1d014e` checked pushed HEAD
+`a7231624a2085e5873d354fc6b759b839ec7342b` cold in a fresh short-path detached
+worktree and returned REWORK. This is the second failed verification after the
+one permitted rework cycle. The order stops here for rewrite; do not send these
+defects back to the current builder and do not run a third rework lap.
+
+1. **Cold typecheck still cannot install its dependency closure.** Plain
+   language: a fresh Windows checkout still cannot reach the compiler because
+   the shared frozen copyfile install loses a package while linking the full app
+   closure. `bun qa/run.ts typecheck` exited 1 after installing 2,323 packages
+   with `ENOENT: No such file or directory: failed to link package:
+   @agentos-software/opencode@0.2.7 (copyfile)`. The verifier first reproduced a
+   separate `node-pty` MSBuild `MSB3491` failure in an overly deep worktree, then
+   removed that path-length confound by repeating the untouched sequence at a
+   short `C:\tmp` path; the `opencode` link failure remained. The rewrite must
+   give the cold typecheck gate one deterministic, measurable install meaning
+   without relying on ambient packages or weakening the frozen-install failure.
+
+2. **The canonical release door remains red.** Plain language: Ryan still
+   cannot run the one release command and read PASS. `bun qa/verify-release.ts`
+   exited 1 with `kernel-market-lineage: FAIL publish_artifact report requires
+   evaluation_id`, followed by `release:kernel-market-lineage: failed with exit
+   1`. The rewrite must make the accepted R12 fixture/lineage contract explicit
+   and require a real `evaluation_id`; do not bypass or weaken the lineage gate.
+
+3. **The evidence is not truthful for the pushed acceptance candidate.** Plain
+   language: the receipt identifies product commit `fe756d68...` while the
+   verifier was required to accept pushed HEAD `a7231624...`, and it carries
+   green typecheck/release claims contradicted by the cold outputs above. The
+   rewrite must define one unambiguous verified-commit identity and make every
+   green claim derive from that exact candidate's raw transcript while retaining
+   all prior failed rounds.
+
+The successful receipts are preserved: the short-path verifier saw Kernel
+`86 pass, 0 fail`, and the Dock inventory/static gates passed. Those successes
+do not override either red acceptance command. WO-V2-1 has not reached founder
+acceptance, must not be merged, and must not be described as shipped capability.
