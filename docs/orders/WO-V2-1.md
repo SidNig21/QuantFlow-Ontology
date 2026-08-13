@@ -136,6 +136,33 @@ the build identity, sees `hermes-critic` in the Dock, sees no `ungranted` card,
 spawns one seat, reads `5 tools · 0 skills` in the TUI, closes the app, and finds
 no leftover processes.
 
+### Open question the pre-build reader must resolve first
+
+`collab-electron/cli/qf-hermes-launch.sh` has four exec paths. Three restrict the
+tool surface — mission-oneshot (line 115), task-oneshot critic (121), and
+task-oneshot worker (125) all pass
+`--toolsets "mcp-quantflow-collaboration,mcp-quantflow-ontology"`. **The fourth,
+the plain fallback at line 128, does not.** A seat spawned directly from the Dock
+with no mission takes that path, so it inherits skill suppression
+(`HERMES_BUNDLED_SKILLS`, the `.no-bundled-skills` marker, and
+`reasoning_effort`) but **not** the tool allowlist.
+
+The acceptance step above therefore has two meanings, which is a defect under
+`PROTOCOL.md`'s second pre-build question. Resolve before building:
+
+- **If every product seat should be restricted** — the file's own comment at
+  lines 13–15 says "Product seats need QuantFlow, not Hermes's broad workstation
+  catalog" — then line 128 is a bug, the fallback gains `--toolsets`, and a gate
+  asserts every exec path carries it. Note line 128 also omits `--tui`; check
+  whether that is intended.
+- **If a manually-hired seat is deliberately general-purpose**, then the
+  acceptance step must say *which* spawn path it means, and the founder must be
+  told that a hand-spawned seat legitimately shows a wider tool count.
+
+Do not guess. This was measured by reading the launcher on 2026-08-12, not
+observed at runtime — the installed build predates the file. Confirm against the
+packaged launcher before deciding.
+
 ## Out of scope
 
 The first-action stall. Any UI redesign. Task creation or assignment. Cables.
