@@ -50,7 +50,15 @@ Scope expanded 2026-07-24 (founder). The doctrine's own Phase 6 already seeds it
 
 **Standing reference (founder, 2026-07-24):** the vault `Research/` folder is the RL source of record; the founder will hand-pick priorities from it, and this shelf is the distillation until then. Neither track decision blocks Phase 1 — both consume identical substrate (trajectories, Evaluations, fenced Datasets), and the charter seeds `Policy`/`Environment` as `experimental` either way.
 
-**Two tracks, and they share the ontology but almost no other machinery. Which is first-class is an open founder call.**
+**SPLIT 2026-08-12 (founder).** This shelf conflated two unrelated applications, which is why it read as one impossible topic. They share the ontology and almost nothing else.
+
+**A · RL on the market — the priority.** Learning a betting or selection policy. Environment is the market; reward is profit, CLV, and calibration. **This is research, not platform work.** It runs as a `run.kind: "training"` Run executed by an RL worker seat hired from the Dock like any other specialist — a CLI-backed participant, PufferLib if they ship one. The seat is the Dock item; PufferLib, gym environments, and OpenEnv are the *workload* it imports inside its sandbox. This closes the triage gap recorded at `DOCTRINE.md` §351: the library was never the Dock item, the seat is. Shelf for A: environment synthesis (Gym-Anything 2604.06126, RLAnything 2602.02488, Verifiable Environment Synthesis 2605.14392), QTNet 2312.15730 for quant-RL architecture, PufferLib. First environment will be **football**; not yet specified.
+
+**Reward signal, already built.** R11b computes `roi`, `hit_rate`, `net_profit`, and `average_clv` with push, void, and missing-settlement handled, proven against a hand-calculated fixture. Do not rebuild these for training.
+
+**B · RL on the harness — secondary, parked.** Agents learning to use QuantFlow better. A genuine orchestrator use case, deliberately not the priority. The two tracks below belong to B.
+
+**Two tracks within B, sharing the ontology but almost no other machinery. Which is first-class is an open founder call.**
 
 - **Track A · the playbook improves.** Versioned skills, prompts and configs mined from trajectories, selected by Evaluation history. Bandit machinery; no gradients, no GPU. Shelf: `firstbatchxyz/watchmen`, SkillOpt (2605.23904), Neural Cheat Sheets, CEO-Bench (2606.18543). **The improvement lives in the Kernel, so it survives a species swap** — swap the brain, keep the desk's accumulated skill.
 - **Track B · the weights improve.** LoRA/RL finetuning on trajectory data. Shelf: OpenPipe/ART, THUDM/slime, OpenEnv, `rlvrbook`, Unsloth LoRA + advanced-RL guides, NVIDIA ProRL-Agent-Server. **The improvement is locked inside one model** and dies with the species.

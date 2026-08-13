@@ -350,6 +350,8 @@ Same machinery both directions (`Hypothesis → Dataset → Run → Artifact →
 
 *Triage honesty:* PufferLib does **not** fit the three substrate buckets (`START_HERE.md` §5.8). It is not a dock item — no CLI seat, does not act on the Kernel — and not an underlayer, since nothing runs on top of it. It is a **workload library**, like numpy: something a `run.kind: "training"` imports inside a sandbox. The triage rule has a genuine gap here and forcing a bucket would be worse than recording the gap.
 
+**GAP CLOSED 2026-08-12 (founder ruling), and the scheduling call above is now made.** The triage rule was sound; it was being applied to the wrong object. **The Dock item is an RL worker *seat*** — a CLI-backed participant with a training role, hired by the founder or the orchestrator like any other specialist, which acts on the Kernel by creating a `run.kind: "training"` Run, publishing Artifacts, and submitting to independent Evaluation. **PufferLib is that seat's workload**, imported inside its sandbox, and never appears in the Dock. The seat passes the same L0–L5 adapter ladder as Hermes and Claude Code; the library passes nothing, because it is not a participant. Scheduling: the seat is gated on R13 accepted plus R14 (a seat can be hired and given durable work), and does **not** require R17 — the founder hires it by hand. Its purpose is market research, not agents learning the harness. See `RESEARCH.md` "The RL shelf" §A.
+
 **4 · Recall layer stays local.** `FTS5 + sqlite-vec` as already specced. Hosted vector services were considered and dropped 2026-07-25 — data leaving the tower reverses the local-only decision, and price was never the binding constraint.
 
 ### A7 · Sports betting first, crypto later (founder-stated 2026-07-25)
