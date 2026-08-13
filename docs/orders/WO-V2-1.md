@@ -246,3 +246,53 @@ Return the commit SHA, the exact failing cause of each repaired gate, the exact
 repair, every command result unedited, the falsification transcripts, the
 installer path and its signing status, and any remaining red gate. Stop after
 this order; do not begin `WO-V2-2` automatically.
+
+## REWRITE STOP — 2026-08-13
+
+Plain language: the product work exists on the builder branch, but it cannot be
+trusted or installed yet because Bun still cannot perform the cold dependency
+install that every release proof starts with.
+
+The same blocking condition survived the initial builder pass and the one
+permitted continuation. `AUTONOMY.md` therefore forbids a third lap; this order
+must be rewritten before another builder receives it.
+
+1. **The first repair hypothesis was false.** Builder task
+   `019ffb5e-272e-75b1-a726-772e0c816dfc` reproduced the Windows Bun 1.3.12
+   failure in a clean temporary checkout after trying the permitted install
+   backends, cache isolation, and exact stale-destination cleanup. The unedited
+   terminal result from the router's independent reproduction was:
+
+   ```text
+   1.3.12
+   kernel: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology-act1-golden\packages\qf-kernel\node_modules\qf-kernel-schema
+   bun install v1.3.12 (700fc117)
+
+   Failed to install 1 package
+   [12.00ms] done
+   FAIL  kernel
+   EPERM: failed copying files from cache to destination for package qf-kernel-schema
+   kernel: bun install --frozen-lockfile --backend copyfile exited 1; the original Bun install error above is authoritative (no retry was attempted)
+   ```
+
+2. **The amended nested-ignore remedy was also false.** Commit `b7a6de1`
+   preserved the package's ignore behavior at the repository root and removed
+   `qf-kernel-schema/.gitignore`; its regression test printed `3 pass`. A fresh
+   detached worktree at that commit still failed `bun qa/run.ts kernel` with the
+   same `EPERM`, and verbose output identified the next copied file,
+   `qf-kernel-schema/bun.lock`. This proves the failure is not specific to the
+   nested ignore file.
+
+3. **Required rewrite boundary.** The next order text must begin with a bounded
+   toolchain probe that selects one measured Windows-safe install contract for
+   local `file:` packages before retaining any implementation: either a Bun
+   release that demonstrably passes this repository's frozen cold install, or a
+   different supported dependency-link contract whose runtime and typecheck
+   semantics are proven. It must explicitly authorize the resulting Bun/version,
+   lockfile, or install-contract change and falsify it in a clean worktree. Do
+   not delete or mutate the shared Bun cache, and do not resume the current
+   builder by chat instruction.
+
+Partial product implementation is preserved at `b7a6de1` on branch `wo-V2-1`.
+It has not passed the order, has not been independently verified, and must not be
+merged or described as shipped capability.
