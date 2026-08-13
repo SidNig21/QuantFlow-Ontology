@@ -1,6 +1,6 @@
 # WO-V2-1 — the installable product
 
-status: open
+status: rework
 assignee: builder
 depends: R12 complete
 rung: R13
@@ -304,3 +304,60 @@ was sent to a fresh Reader and rewritten before a new builder could receive it.
 Partial product implementation is preserved at `b7a6de1` on branch `wo-V2-1`.
 It has not passed the order, has not been independently verified, and must not be
 merged or described as shipped capability.
+
+## REWORK ROUND 1 — independent verification 2026-08-13
+
+Verifier task `019ffbd9-76bc-7990-877e-f0191b1d014e` checked pushed HEAD
+`d754562e732b16542addb88e1a71d143594cfc10` cold in a fresh detached worktree
+and returned REWORK. This is the one permitted rework cycle for the rewritten
+order. Pull this docs-only record before changing code.
+
+1. **Cold typecheck is red.** Plain language: a fresh machine cannot prove the
+   application compiles because required package imports disappear under the
+   new isolated install layout. `bun qa/run.ts typecheck` exited 1 with missing
+   `@electron/asar`, `qf-kernel/portable`, and `ignore` imports in
+   `collab-electron/scripts/package-lib/package-inspect.ts` and
+   `collab-electron/src/main/file-filter.ts`. Reproduce in the clean worktree and
+   repair the dependency/typecheck closure without reverting the measured
+   `--linker isolated` contract or relying on ambient `node_modules`.
+
+2. **The canonical release door is red.** Plain language: Ryan still cannot run
+   the one release command and read PASS because the ledger projection gate
+   stops it. `bun qa/verify-release.ts` passed install, units, Windows cold boot,
+   and static gates through `one-skin`, then exited 1 with
+   `glacier-feel D4: kernel-ledger.js must project via projectKernelLedger`.
+   Repair the production projection/coupling expected by the existing gate; do
+   not weaken or bypass `glacier-feel`.
+
+3. **Packaged collaboration races its database.** Plain language: the packaged
+   app can boot, but its collaboration proof sometimes asks for the work ledger
+   before the app has created it. `bun qa/run.ts windows-dock-collaboration`
+   exited 1 with `unable to open database file`. Make the harness wait for the
+   app-owned peer-bus database/readiness condition it consumes, with a bounded
+   timeout and named failure. Preserve the existing delivery-off and
+   collapsed-identity red controls.
+
+4. **Earlier gates poison the installer proof.** Plain language: running the
+   acceptance commands in the specified order leaves generated files that make
+   packaging reject its own verifier checkout. After the required cold runs,
+   `bun qa/run.ts windows-installer` exited 1 before packaging because
+   `docs/orders/evidence/wo-win1/windows-cold-boot-latest.json` was modified and
+   `qa/gates/bovada-football/node_modules/` was untracked. Make each earlier gate
+   restore tracked generated receipts and ensure gate-local dependency output is
+   git-ignored; do not relax packaging's refusal of real uncommitted source or
+   order changes. Falsify by leaving one tracked source edit: packaging must
+   still refuse it. Then run the entire acceptance sequence in order and require
+   `windows-installer` green without manual cleanup between commands.
+
+5. **The evidence names the wrong verified commit and contradicts cold output.**
+   Plain language: the receipt currently says a different revision was checked
+   and claims green commands that the verifier saw red. Update
+   `docs/orders/evidence/r13/V2-1-VERIFICATION.md` to distinguish the product
+   commit from the final evidence/rework HEAD, replace the typecheck and installer
+   claims with the new cold transcripts, and retain the prior failed outputs as
+   a `REWORK ROUND 1` record rather than erasing them.
+
+Rework acceptance is the complete command list above, in order, from one fresh
+detached worktree with no cleanup between commands. Any remaining red command is
+a second failed verification and stops this order for another rewrite; there is
+no third lap.
