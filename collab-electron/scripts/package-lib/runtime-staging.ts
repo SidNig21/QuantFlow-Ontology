@@ -42,6 +42,7 @@ export const QA_RUNTIME_FILES = [
   "tools/runtime-proof/launch.json",
   "tools/runtime-proof/dock-profiles.json",
   ...PRODUCTION_RUNTIME_FILES,
+  "species/claude-code/qa-dock-profiles.json",
 ] as const;
 
 /** Normal packaging inventory. QA must opt into QA_RUNTIME_FILES explicitly. */

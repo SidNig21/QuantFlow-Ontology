@@ -67,6 +67,7 @@ export const QA_RUNTIME_CONTROL_FILES = [
   QF_TOOLLOOP_META,
   QF_TOOLLOOP_LAUNCH,
   QF_TOOLLOOP_DOCK_PROFILES,
+  "species/claude-code/qa-dock-profiles.json",
   ...PRODUCTION_RUNTIME_CONTROL_FILES,
 ] as const;
 

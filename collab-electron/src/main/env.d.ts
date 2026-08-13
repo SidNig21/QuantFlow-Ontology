@@ -1,4 +1,5 @@
 declare const __GIT_COMMIT_SHA__: string;
+declare const __QF_BUILD_TIMESTAMP__: string;
 
 interface ImportMetaEnv {
   readonly MAIN_VITE_POSTHOG_KEY: string;

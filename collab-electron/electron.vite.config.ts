@@ -9,11 +9,14 @@ const outDir = "out";
 const gitCommitSha = execSync("git rev-parse HEAD", {
   encoding: "utf8",
 }).trim();
+const buildCommitSha = process.env.QF_BUILD_COMMIT_SHA?.trim() || gitCommitSha;
+const buildTimestamp = process.env.QF_BUILD_TIMESTAMP?.trim() || "development";
 
 export default defineConfig({
   main: {
     define: {
-      __GIT_COMMIT_SHA__: JSON.stringify(gitCommitSha),
+      __GIT_COMMIT_SHA__: JSON.stringify(buildCommitSha),
+      __QF_BUILD_TIMESTAMP__: JSON.stringify(buildTimestamp),
     },
     resolve: {
       alias: [

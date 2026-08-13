@@ -32,6 +32,7 @@ function seedAdapter(
     system_prompt_ref: string | null;
     capability_groups: Array<"market.read" | "desk.orchestrate" | "research.evaluate">;
   }>,
+  manifestFileName = "dock-profiles.json",
 ): void {
   const packageName = adapterId === "hermes"
     ? "hermes.aospkg"
@@ -71,7 +72,7 @@ function seedAdapter(
     })}\n`,
   );
   writeFileSync(
-    join(root, base, "dock-profiles.json"),
+    join(root, base, manifestFileName),
     `${JSON.stringify({
       schema_version: 1,
       adapter: { id: adapterId, package: `packed/${packageName}` },
@@ -104,7 +105,7 @@ function seedRequired(root: string): void {
       capability_groups: ["market.read"],
     },
   ]);
-  seedAdapter(root, "species/claude-code", "claude-code", [
+  const claudeProfiles = [
     {
       id: "claude-code-orchestrator",
       role: "claude-orchestrator",
@@ -119,14 +120,21 @@ function seedRequired(root: string): void {
       system_prompt_ref: "prompts/worker.md",
       capability_groups: ["market.read"],
     },
-    {
+  ];
+  seedAdapter(root, "species/claude-code", "claude-code", claudeProfiles);
+  seedAdapter(
+    root,
+    "species/claude-code",
+    "claude-code",
+    [{
       id: "claude-code-ungranted",
       role: "claude-ungranted",
       runtime_profile: "claude-code-ungranted",
       system_prompt_ref: "prompts/worker.md",
       capability_groups: [],
-    },
-  ]);
+    }],
+    "qa-dock-profiles.json",
+  );
 }
 
 function seedQaFixtures(root: string): void {
@@ -176,7 +184,6 @@ describe("Dock profile manifests", () => {
     const profiles = manifests.flatMap((manifest) => manifest.profiles);
     expect(profiles.map((profile) => profile.name).sort()).toEqual([
       "claude-code-orchestrator",
-      "claude-code-ungranted",
       "claude-code-worker",
       "hermes-orchestrator",
       "hermes-worker",
@@ -202,6 +209,9 @@ describe("Dock profile manifests", () => {
       "qf-proof-worker",
       "qf-toolloop",
     ]);
+    expect(manifests.map((manifest) => manifest.manifestRef)).toContain(
+      "species/claude-code/qa-dock-profiles.json",
+    );
   });
 
   test("QA discovery still fails when a required fixture package is missing", () => {
@@ -241,14 +251,14 @@ describe("Dock profile manifests", () => {
     };
     const root = freshRoot();
     const first = bootstrapDockProfiles(root, deps);
-    expect(first.registered).toHaveLength(6);
+    expect(first.registered).toHaveLength(5);
     expect(first.conflicts).toHaveLength(0);
-    expect(writes).toHaveLength(6);
+    expect(writes).toHaveLength(5);
 
     const second = bootstrapDockProfiles(root, deps);
     expect(second.registered).toHaveLength(0);
-    expect(second.skipped).toHaveLength(6);
-    expect(writes).toHaveLength(6);
+    expect(second.skipped).toHaveLength(5);
+    expect(writes).toHaveLength(5);
 
     rows.set("hermes-worker", {
       ...rows.get("hermes-worker"),
@@ -259,7 +269,7 @@ describe("Dock profile manifests", () => {
       "hermes-worker",
     ]);
     expect(rows.get("hermes-worker")?.role).toBe("operator-custom-role");
-    expect(writes).toHaveLength(6);
+    expect(writes).toHaveLength(5);
 
     const qaRows = new Map<string, Record<string, unknown>>();
     const qaWrites: DockProfileRegistration[] = [];

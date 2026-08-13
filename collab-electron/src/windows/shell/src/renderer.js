@@ -48,6 +48,11 @@ document.getElementById("alpha-dismiss").addEventListener("click", (e) => {
 	document.getElementById("alpha-label").hidden = true;
 });
 
+window.shellApi.getBuildIdentity().then((identity) => {
+	const buildIdentity = document.getElementById("build-identity");
+	buildIdentity.textContent = `build ${identity.commitSha} • packaged ${identity.packagedAt}`;
+});
+
 // -- Dark mode --
 
 initDarkMode(() => viewport.updateCanvas());

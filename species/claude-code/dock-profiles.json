@@ -18,13 +18,6 @@
       "runtime_profile": "claude-code-worker",
       "system_prompt_ref": "prompts/worker.md",
       "capability_groups": ["market.read"]
-    },
-    {
-      "id": "claude-code-ungranted",
-      "role": "claude-ungranted",
-      "runtime_profile": "claude-code-ungranted",
-      "system_prompt_ref": "prompts/worker.md",
-      "capability_groups": []
     }
   ]
 }

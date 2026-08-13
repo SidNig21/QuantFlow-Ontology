@@ -1,12 +1,53 @@
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { normalizeWindowsPath, resolvePackageBin } from "./local-bin.mjs";
 
 const args = process.argv.slice(2);
 const builderArgs = ["--publish", "never"];
 const env = { ...process.env };
 const cwd = normalizeWindowsPath(process.cwd());
+const PACKAGING_DEADLINE_MS = 10 * 60 * 1000;
+const packagingDeadline = Date.now() + PACKAGING_DEADLINE_MS;
+
+function packageBuildInputs() {
+  let commitSha;
+  try {
+    commitSha = execFileSync("git", ["rev-parse", "HEAD"], {
+      cwd,
+      encoding: "utf8",
+    }).trim();
+  } catch (error) {
+    console.error(`package: cannot resolve git rev-parse HEAD: ${String(error)}`);
+    process.exit(1);
+  }
+  if (!/^[0-9a-f]{40}$/.test(commitSha)) {
+    console.error(`package: git rev-parse HEAD was not a full 40-character SHA: ${commitSha}`);
+    process.exit(1);
+  }
+
+  const status = spawnSync(
+    "git",
+    ["status", "--porcelain=v1", "--untracked-files=all"],
+    { cwd, encoding: "utf8", windowsHide: true },
+  );
+  if (status.status !== 0) {
+    console.error(`package: cannot inspect checkout status: ${status.stderr || status.stdout}`);
+    process.exit(1);
+  }
+  if (status.stdout.trim()) {
+    console.error("package: refusing to package a dirty checkout");
+    console.error(status.stdout.trim());
+    process.exit(1);
+  }
+
+  const packagedAt = new Date().toISOString();
+  return { commitSha, packagedAt };
+}
+
+const buildInputs = packageBuildInputs();
+env.QF_BUILD_COMMIT_SHA = buildInputs.commitSha;
+env.QF_BUILD_TIMESTAMP = buildInputs.packagedAt;
 
 // Load .env.local (same approach as notarize.cjs) so GH_TOKEN and other
 // credentials are available without requiring a manual export.
@@ -63,7 +104,18 @@ if (args.includes("--no-sign")) {
   }
 }
 
-function run(command, commandArgs, extraEnv = env) {
+function assertTimeRemaining(phase) {
+  const remaining = packagingDeadline - Date.now();
+  if (remaining <= 0) {
+    console.error(
+      `package: phase=${phase} failed: packaging deadline exhausted after ${PACKAGING_DEADLINE_MS}ms`,
+    );
+    process.exit(1);
+  }
+  return remaining;
+}
+
+function run(phase, command, commandArgs, extraEnv = env) {
   const result = spawnSync(
     command,
     commandArgs,
@@ -71,9 +123,21 @@ function run(command, commandArgs, extraEnv = env) {
       stdio: "inherit",
       cwd,
       env: extraEnv,
+      timeout: assertTimeRemaining(phase),
+      killSignal: "SIGTERM",
+      windowsHide: true,
     },
   );
+  if (result.error) {
+    const timeout = result.error.code === "ETIMEDOUT";
+    console.error(
+      `package: phase=${phase} failed: ${timeout ? "timed out" : result.error.message}; ` +
+        `last active phase=${phase}; cause=${result.error.message}`,
+    );
+    process.exit(1);
+  }
   if (result.status !== 0) {
+    console.error(`package: phase=${phase} failed with exit ${result.status}; last active phase=${phase}`);
     process.exit(result.status ?? 1);
   }
 }
@@ -159,22 +223,34 @@ const electronBuilder = detectMismatchedToolchain("electron-builder");
 const builtArches = targetArchitectures();
 
 // Vite build is arch-independent — run once.
-run(process.execPath, [electronVite, "build"]);
+run("renderer build", process.execPath, [electronVite, "build"]);
 
 // Package all target architectures in a single electron-builder run.
 // The arch list in package.json's build.<platform>.target already tells
 // electron-builder which architectures to produce, so passing --<arch>
 // per-invocation just causes redundant full builds + notarizations.
-run(process.execPath, [electronBuilder, ...builderArgs]);
+run("electron-builder NSIS package", process.execPath, [electronBuilder, ...builderArgs]);
 
 if (process.platform === "win32") {
   const dist = join(cwd, "dist");
+  const packageManifest = JSON.parse(readFileSync(join(cwd, "package.json"), "utf8"));
+  const productName = packageManifest.build?.productName ?? "QuantFlow";
+  const version = packageManifest.version;
+  const installerName = `${productName} Setup ${version}.exe`;
   const candidates = [
     join(dist, "win-unpacked", "QuantFlow.exe"),
     ...readdirSync(dist)
       .filter((name) => name.endsWith(".exe"))
       .map((name) => join(dist, name)),
   ].filter((path) => existsSync(path));
+  const installerCandidates = candidates.filter((path) => basename(path) === installerName);
+  if (installerCandidates.length !== 1) {
+    console.error(
+      `package: phase=release metadata failed: expected exactly one NSIS installer ${installerName}, ` +
+        `found ${JSON.stringify(installerCandidates)}`,
+    );
+    process.exit(1);
+  }
   const artifacts = candidates.map((path) => {
     const quotedPath = path.replaceAll("'", "''");
     const check = spawnSync(
@@ -190,7 +266,20 @@ if (process.platform === "win32") {
   });
   const releaseStatus = {
     contract: "qf.windows.release-status.v1",
-    generated_at: new Date().toISOString(),
+    package: {
+      name: packageManifest.name,
+      productName,
+      version,
+    },
+    build: {
+      commit_sha: buildInputs.commitSha,
+      packaged_at: buildInputs.packagedAt,
+    },
+    installer: {
+      name: installerName,
+      path: installerCandidates[0],
+      authenticode: artifacts.find((artifact) => artifact.path === installerCandidates[0])?.authenticode,
+    },
     artifacts,
   };
   writeFileSync(
@@ -210,6 +299,7 @@ if (process.platform === "win32") {
 if (process.platform !== "win32") {
   console.log("• Restoring node-pty for host architecture…");
   run(
+    "restore node-pty",
     join(cwd, "node_modules", ".bin", "electron-rebuild"),
     ["-f", "-w", "node-pty"],
   );
@@ -222,7 +312,7 @@ if (shouldPublish) {
   const uploadArgs = [join(cwd, "scripts", "upload-to-github.cjs")];
   // Forward --arch so the upload script only publishes the built architectures.
   uploadArgs.push("--arch", builtArches.join(","));
-  run(process.execPath, uploadArgs);
+  run("publish upload", process.execPath, uploadArgs);
 }
 
 // Keep the founder Desktop shortcut aimed at this checkout's win-unpacked exe

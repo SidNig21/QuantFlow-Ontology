@@ -42,6 +42,8 @@ ipcRenderer.on("shell:forward", (_event, target, channel, ...args) => {
 
 contextBridge.exposeInMainWorld("shellApi", {
   getPlatform: (): NodeJS.Platform => process.platform,
+  getBuildIdentity: (): Promise<{ commitSha: string; packagedAt: string }> =>
+    ipcRenderer.invoke("app:build-identity"),
 
   getViewConfig: (): Promise<AllViewConfigs> =>
     ipcRenderer.invoke("shell:get-view-config"),

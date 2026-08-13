@@ -11,6 +11,7 @@
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import { runFrozenPackageInstall } from "../package-install.ts";
 
 const REPO_ROOT = join(import.meta.dir, "../..");
 const READ_TOOLS = join(REPO_ROOT, "tools/qf-read-tools");
@@ -65,6 +66,9 @@ const ALLOW_PREFIXES = [
   // the WO-ACT1-GOLDEN-PATH merge and left this gate red on main, which is the
   // ninth repeat of the omission described above.
   "qa/gates/windows-golden-run.ts",
+  // R13 installed-artifact gate: builds an isolated Kernel path for the
+  // installed process proof, never for product code.
+  "qa/gates/windows-installer.ts",
   // R4 Claude Code adapter: reads QF_KERNEL_DB *only* to assert the app set it,
   // and never uses the value. Verified 2026-08-05 — the file contains no sqlite
   // import, no Database construction, and no other reference to the variable.
@@ -171,13 +175,7 @@ export async function runKernelOnePathGate(): Promise<{ ok: boolean }> {
   const g1 = checkKernelOnePath();
   if (!g1.ok) return { ok: false };
 
-  const installKernel = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-    cwd: KERNEL_PKG,
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  if ((await installKernel.exited) !== 0) {
-    console.error("kernel-one-path: qf-kernel install failed");
+  if (!(await runFrozenPackageInstall("kernel-one-path:qf-kernel", KERNEL_PKG))) {
     return { ok: false };
   }
 
@@ -195,13 +193,7 @@ export async function runKernelOnePathGate(): Promise<{ ok: boolean }> {
   }
   console.log("kernel-one-path G2/G3: PASS");
 
-  const installTools = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-    cwd: READ_TOOLS,
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  if ((await installTools.exited) !== 0) {
-    console.error("kernel-one-path G4: qf-read-tools install failed");
+  if (!(await runFrozenPackageInstall("kernel-one-path:qf-read-tools", READ_TOOLS))) {
     return { ok: false };
   }
 

@@ -10,7 +10,7 @@ process.env.QF_KERNEL_DB = join(root, "kernel.db");
 process.env.QF_ARTIFACT_ROOT = join(root, "artifacts");
 mkdirSync(process.env.QF_ARTIFACT_ROOT, { recursive: true });
 
-const kernel = await import("./kernel");
+const kernel = await import("../src/main/kernel");
 kernel.openAppKernel();
 
 function session(id: string, definition: string, role: string, groups: string[]) {

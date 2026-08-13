@@ -37,3 +37,25 @@ opencode.json
 /collab-electron/.antigravitycli
 qa/.tmp-agent-path/
 *.code-workspace
+# qf-kernel-schema package-local ignores. These stay scoped to this package
+# after removing its nested .gitignore so Bun's local file dependency copy no
+# longer traverses an ignore file on Windows.
+/qf-kernel-schema/**/node_modules
+/qf-kernel-schema/**/out
+/qf-kernel-schema/**/dist
+/qf-kernel-schema/**/*.tgz
+/qf-kernel-schema/**/coverage
+/qf-kernel-schema/**/*.lcov
+/qf-kernel-schema/**/logs
+/qf-kernel-schema/**/_.log
+/qf-kernel-schema/**/report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+/qf-kernel-schema/**/.env
+/qf-kernel-schema/**/.env.development.local
+/qf-kernel-schema/**/.env.test.local
+/qf-kernel-schema/**/.env.production.local
+/qf-kernel-schema/**/.env.local
+/qf-kernel-schema/**/.eslintcache
+/qf-kernel-schema/**/.cache
+/qf-kernel-schema/**/*.tsbuildinfo
+/qf-kernel-schema/**/.idea
+/qf-kernel-schema/**/.DS_Store

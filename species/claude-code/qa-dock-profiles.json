@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "adapter": {
+    "id": "claude-code",
+    "package": "packed/claude-code.aospkg"
+  },
+  "profiles": [
+    {
+      "id": "claude-code-ungranted",
+      "role": "claude-ungranted",
+      "runtime_profile": "claude-code-ungranted",
+      "system_prompt_ref": "prompts/worker.md",
+      "capability_groups": []
+    }
+  ]
+}

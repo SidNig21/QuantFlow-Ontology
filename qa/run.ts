@@ -9,6 +9,7 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join, relative } from "path";
 import { execFileSync } from "child_process";
+import { runFrozenPackageInstall } from "./package-install.ts";
 
 const REPO_ROOT = join(import.meta.dir, "..");
 
@@ -222,16 +223,7 @@ async function bunPackageGate(
   cwd: string,
   testCommand: readonly [string, ...string[]] = ["bun", "test"],
 ): Promise<boolean> {
-  const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-    cwd,
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  const installCode = await install.exited;
-  if (installCode !== 0) {
-    console.error(`${gateName}: bun install exited ${installCode}`);
-    return false;
-  }
+  if (!(await runFrozenPackageInstall(gateName, cwd))) return false;
 
   const proc = Bun.spawn([...testCommand], {
     cwd,
@@ -620,16 +612,7 @@ const gates: Gate[] = [
       if (!checkLifecycleScripts(installPackages, falsifierCommand)) return false;
 
       for (const cwd of installPackages) {
-        const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-          cwd,
-          stdout: "inherit",
-          stderr: "inherit",
-        });
-        const installCode = await install.exited;
-        if (installCode !== 0) {
-          console.error(`typecheck: bun install in ${cwd} exited ${installCode}`);
-          return false;
-        }
+        if (!(await runFrozenPackageInstall("typecheck", cwd))) return false;
       }
       for (const cwd of typecheckPackages) {
         const proc = Bun.spawn(["bunx", "tsc", "--noEmit"], {
@@ -755,6 +738,39 @@ const gates: Gate[] = [
       const { runDockProfileIdentityGate } = await import("./gates/dock-profile-identity.ts");
       const { ok } = await runDockProfileIdentityGate();
       return ok;
+    },
+  },
+  {
+    name: "dock-production-inventory",
+    description:
+      "R13: production Dock excludes QA fixture identities while QA closure retains claude-code-ungranted",
+    run: async () => {
+      const { runDockProductionInventoryGate } = await import(
+        "./gates/dock-production-inventory.ts"
+      );
+      return runDockProductionInventoryGate().ok;
+    },
+  },
+  {
+    name: "hermes-launch-policy",
+    description:
+      "R13: all Hermes launcher branches pass the two QuantFlow MCP toolsets exactly once and preserve one TUI flag",
+    run: async () => {
+      const { runHermesLaunchPolicyGate } = await import(
+        "./gates/hermes-launch-policy.ts"
+      );
+      return runHermesLaunchPolicyGate().ok;
+    },
+  },
+  {
+    name: "windows-installer",
+    description:
+      "R13: finite unsigned NSIS build, honest Authenticode/status metadata, isolated silent install, readiness, and clean shutdown",
+    run: async () => {
+      const { runWindowsInstallerGate } = await import(
+        "./gates/windows-installer.ts"
+      );
+      return (await runWindowsInstallerGate()).ok;
     },
   },
   {

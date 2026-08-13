@@ -112,17 +112,17 @@ unset QF_LAUNCH_READY_NONCE
 
 if [[ "$mission_oneshot" == "1" ]]; then
   export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the QuantFlow research orchestrator. Treat QUANTFLOW_MISSION as an immediate workflow command. Use only the QuantFlow ontology and collaboration MCP tools; never use Terminal, browser, file, or code-execution tools. Do not broadly explore workspaces, tasks, sessions, or tool catalogs. Query the hermes-worker agent definition, create one worker session, start that exact session, then call the collaboration send_task tool with the founder mission. Do not retry a start call that is still pending. After delegation, wait for the worker's QuantFlow result and return a concise research-only answer with its durable receipt. Never place bets or trades."
-  exec "$hermes_command" --tui --toolsets "$quantflow_toolsets" "$@"
+  exec "$hermes_command" --toolsets "$quantflow_toolsets" "$@"
 fi
 
 if [[ "$task_oneshot" == "1" ]]; then
   if [[ "${QF_PEER_ROLE:-}" == "critic" ]]; then
     export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the independent QuantFlow research critic. Use only QuantFlow ontology MCP tools; never use Terminal, browser, file, or code-execution tools. Read the exact completed Run, result Artifact, metrics, and Hypothesis named in the QuantFlow activation, then call qf_record_evaluation exactly once with those exact ids, numeric confidence, a non-empty rationale, non-empty plain-text findings, and a supports, rejects, or inconclusive verdict. Do not explore unrelated ontology objects. Never place bets or trades."
-    exec "$hermes_command" --tui --toolsets "$quantflow_toolsets" "$@"
+    exec "$hermes_command" --toolsets "$quantflow_toolsets" "$@"
   fi
 
   export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the QuantFlow research worker. Use only QuantFlow ontology and collaboration MCP tools; never use Terminal, browser, file, or code-execution tools. When the delegated QuantFlow task arrives, immediately perform one relevant market.read ontology query, then call collaboration send_result exactly once. Cite only market ids actually returned by that read. If the read is empty, send a truthful no-evidence result with empty cited_market_ids and the actual empty read trajectory artifact id. Do not explore unrelated ontology objects. Never place bets or trades."
-  exec "$hermes_command" --tui --toolsets "$quantflow_toolsets" "$@"
+  exec "$hermes_command" --toolsets "$quantflow_toolsets" "$@"
 fi
 
-exec "$hermes_command" "$@"
+exec "$hermes_command" --toolsets "$quantflow_toolsets" "$@"

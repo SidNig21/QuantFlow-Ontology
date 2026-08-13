@@ -1077,8 +1077,18 @@ app.whenReady().then(async () => {
     ),
     windowUrl: mainWindow?.webContents.getURL() ?? "",
     dockProfileIds: getKernelAgentDefinitionIds(),
+    buildIdentity: {
+      commitSha: __GIT_COMMIT_SHA__,
+      packagedAt: __QF_BUILD_TIMESTAMP__,
+    },
   }), {
     description: "Return founder-visible shell and Kernel-backed Dock readiness",
+  });
+  registerMethod("app.build-identity", () => ({
+    commitSha: __GIT_COMMIT_SHA__,
+    packagedAt: __QF_BUILD_TIMESTAMP__,
+  }), {
+    description: "Return the build identity displayed in the shell masthead",
   });
   registerMethod(
     "qf.dock.spawn",

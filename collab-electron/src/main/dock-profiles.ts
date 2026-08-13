@@ -31,6 +31,7 @@ export const PRODUCTION_DOCK_PROFILE_MANIFESTS = [
 /** QA-only inventory used by deterministic collaboration/runtime gates. */
 export const QA_DOCK_PROFILE_MANIFESTS = [
   ...PRODUCTION_DOCK_PROFILE_MANIFESTS,
+  "species/claude-code/qa-dock-profiles.json",
   "tools/qf-proof-agent/dock-profiles.json",
   "tools/runtime-proof/dock-profiles.json",
 ] as const;
@@ -173,12 +174,19 @@ function requireRegularFile(path: string, label: string): void {
 
 function readManifest(
   appRoot: string,
-  rootName: "species" | "tools",
-  adapterDirectory: string,
+  manifestRef: string,
 ): DockProfileManifest {
-  const manifestRef = `${rootName}/${adapterDirectory}/dock-profiles.json`;
   const manifestPath = join(appRoot, manifestRef);
   requireRegularFile(manifestPath, "Dock profile manifest");
+
+  const [rootName, adapterDirectory, fileName] = manifestRef.split("/");
+  if (
+    (rootName !== "species" && rootName !== "tools") ||
+    !adapterDirectory ||
+    (fileName !== "dock-profiles.json" && fileName !== "qa-dock-profiles.json")
+  ) {
+    throw new DockProfilesContractError(`invalid Dock profile manifest ref: ${manifestRef}`);
+  }
 
   let raw: unknown;
   try {
@@ -271,15 +279,7 @@ export function discoverDockProfileManifests(
     ? QA_DOCK_PROFILE_MANIFESTS
     : PRODUCTION_DOCK_PROFILE_MANIFESTS;
   const manifests = required.map((manifestRef) => {
-    const [rootName, adapterDirectory, fileName] = manifestRef.split("/");
-    if (
-      (rootName !== "species" && rootName !== "tools") ||
-      !adapterDirectory ||
-      fileName !== "dock-profiles.json"
-    ) {
-      throw new DockProfilesContractError(`invalid Dock profile manifest ref: ${manifestRef}`);
-    }
-    return readManifest(appRoot, rootName, adapterDirectory);
+    return readManifest(appRoot, manifestRef);
   });
   const definitionIds = new Set<string>();
   for (const manifest of manifests) {

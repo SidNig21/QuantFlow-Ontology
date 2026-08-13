@@ -2,21 +2,15 @@
  * Cold-safe launcher for dock-profile-identity (WO-D1 D4).
  */
 import { join } from "node:path";
+import { runFrozenPackageInstall } from "../package-install.ts";
 
 const CWD = join(import.meta.dir, "dock-profile-identity");
 const KERNEL_PKG = join(import.meta.dir, "../../packages/qf-kernel");
 
 async function install(name: string, cwd: string): Promise<number> {
-  const child = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-    cwd,
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  const code = await child.exited;
-  if (code !== 0) {
-    console.error(`dock-profile-identity: ${name} bun install exited ${code}`);
-  }
-  return code;
+  return (await runFrozenPackageInstall(`dock-profile-identity:${name}`, cwd))
+    ? 0
+    : 1;
 }
 
 async function run(): Promise<number> {
