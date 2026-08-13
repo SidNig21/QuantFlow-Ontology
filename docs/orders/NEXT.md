@@ -1,31 +1,51 @@
-# NEXT — R13-S1 Windows gate board
+# NEXT — R13 Windows v1 release
 
-status: R13 IN PROGRESS — WO-R13-S1 ONLY
+status: R13 IN PROGRESS — `WO-V2-1` ONLY
 authorized-by: founder
-authorized-at: 2026-08-11
-baseline: R0–R12 complete on `wo-r9-research-integrity` at `e20e5d0`
+authorized-at: 2026-08-12
+baseline: R0–R12 complete on `wo-r9-research-integrity`
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13
-active-order: [`WO-R13-S1.md`](WO-R13-S1.md)
+active-order: [`WO-V2-1.md`](WO-V2-1.md)
+scope source: [`../proposals/V2-SCOPE.md`](../proposals/V2-SCOPE.md) — approved 2026-08-12
 
 ## Active outcome
 
-Restore the native-Windows gate board without weakening it: remove the R13 diagnostic from the app sole-writer scan and repair the shared Bun `EPERM` install failure blocking `kernel`, `dock-profile-identity`, and `kernel-one-path`.
+Produce an installable Windows build of the current source, opened from a desktop
+shortcut like any other application, containing everything through R12. The Dock
+must list production profiles only, `hermes-critic` must be launchable, a spawned
+seat must report `5 tools · 0 skills`, and closing the app must leave no processes.
 
 ## Why this is first
 
-The planned first-turn measurement cannot close while a mandatory static gate is red. This is the only sequencing correction to the five-slice R13 plan: make the measuring instruments trustworthy, then measure Hermes, then scope the repair from that evidence.
+Measured 2026-08-12 by driving the installed application: the installed build is
+dated 2026-08-04 and predates all of R9–R12. It has no critic seat, no Research
+Ledger, and hands Hermes 31 tools and 82 skills. **You cannot accept a product you
+cannot install**, so every founder judgement below this rung is unreachable until
+packaging works. This replaced the previous first slice, which repaired the gate
+board — that work is folded into this order because the same red gates block it.
 
 ## Boundary
 
-Only `WO-R13-S1.md` is authorized. Do not diagnose or change Hermes behavior, prompts, native-TUI behavior, consumer UI, installer/signing, R14, or RL. Do not weaken or bypass a gate. Never place bets or trades.
+Only `WO-V2-1.md` is authorized. Do not diagnose or change Hermes behaviour, the
+first-action stall, prompts, native-TUI behaviour, consumer UI, task creation,
+cables, or research-object projections. Do not obtain a signing certificate — the
+artifact states its signing status honestly. No R14–R18. Never place bets or trades.
 
-Before a builder edits code, a separate reviewer must answer the two `PROTOCOL.md` questions for S1: can every gate fail, and does every deliverable have exactly one meaning?
+Before a builder edits code, a reviewer who did not author the order must answer
+the two `PROTOCOL.md` questions: can every gate fail, and does every deliverable
+have exactly one meaning?
 
 ## Current evidence
 
+- Installed app 2026-08-04 vs source 2026-08-12 — verified by running both.
+- `kernel`, `typecheck`, `dock-profile-identity`, `kernel-one-path` fail with the
+  same Bun `EPERM` copy failure for `qf-kernel-schema`.
 - `kernel-sole-writer-app` is red on `collab-electron/src/main/r13-consumer-workflow.check.ts`.
-- `kernel`, `dock-profile-identity`, and `kernel-one-path` reproduce the same Windows Bun `EPERM` copy failure for `qf-kernel-schema`.
-- `schema`, `repo-shape`, `rung-ladder`, and `one-skin` are green at the baseline.
-- [`evidence/r13/PROGRESS.md`](evidence/r13/PROGRESS.md) remains the consumer-workflow progress record.
+- `claude-code-ungranted`, a negative test fixture, ships in the production Dock.
+- Electron Builder stalls traversing the Bun dependency tree.
+- ADD works today: one Dock click produced a governed session, one tile, and a
+  `RUNNING` ledger row in under 15 seconds, with clean shutdown after.
+- [`evidence/r13/PROGRESS.md`](evidence/r13/PROGRESS.md) remains the consumer-workflow record.
 
-After independent verification of S1, rewrite this file to authorize `WO-R13-S2.md` only.
+After independent verification of `WO-V2-1`, rewrite this file to authorize
+`WO-V2-2` only — measure the first Hermes turn, synthetically before live.

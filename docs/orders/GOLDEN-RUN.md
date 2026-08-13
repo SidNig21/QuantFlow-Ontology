@@ -109,7 +109,7 @@ reopen.
 | **R11b** | Large | The quantitative metrics are *correct*, proven against a hand-calculated fixture |
 | **R12** | Large | An independent critic evaluates, and a Report cannot publish without a passing Evaluation |
 
-R10, R11a, R11b, and R12 create the substrate R14 needs: immutable point-in-time datasets,
+R10, R11a, R11b, and R12 create the substrate R18 needs: immutable point-in-time datasets,
 deterministic execution, validated quantitative outcomes, and independent Evaluation history. Recall
 or learning has no honest fitness signal until those facts exist in the Kernel.
 
@@ -117,17 +117,43 @@ or learning has no honest fitness signal until those facts exist in the Kernel.
 
 | # | Size | Proves |
 |---|---|---|
-| **R13** | Large | Windows v1: domain tiles, semantic cables, workflow recovery, onboarding, signed release |
+| **R13** | Large | Windows v1: an installable current build, and one seat that finishes a governed research run |
 
-### Act IV — post-v1 learning
+**R13's scope was narrowed on 2026-08-12.** It previously also carried domain tiles, semantic cables,
+and workflow recovery. Those are founder-facing operating-console work and moved to Act IV, because
+a release rung that also redesigns the canvas cannot close. R13 now delivers two things: a product
+you can install, and proof the existing research loop survives a real model. Its orders are
+`WO-V2-1` and `WO-V2-2`.
+
+### Act IV — the operating console
 
 | # | Size | Proves |
 |---|---|---|
-| **R14** | Large | Recall over real Evaluation history; RL — Track A playbook first, Track B weights after |
+| **R14** | Medium | The founder composes a team by hand and assigns durable work from the canvas |
+| **R15** | Medium | A governed handoff — an Artifact routed to an independent critic whose verdict gates the Report |
+| **R16** | Large | The durable research world is visible and inspectable, not hidden behind terminals |
+| **R17** | Large | Mixed autonomy — agents recruit from the same governed catalog, visibly and attributably |
 
-R14 is post-v1 because it is *downstream*, not because it is unimportant. Evaluation history cannot
-become a fitness function before evaluation history exists. The schema hooks are already seeded —
-`policy`, `environment`, and `run.kind: "training"` all exist today.
+Act IV is the founder-operated half of the product. R14 builds the primitives by hand — create a
+task, assign it, route evidence, review it. R17 then automates *those same governed actions* rather
+than inventing parallel ones, which is why manual composition comes first even though mixed autonomy
+is the preferred end state. Scope detail lives in
+[`../proposals/V2-SCOPE.md`](../proposals/V2-SCOPE.md), which is a proposal and confers no authority.
+
+### Act V — post-v1 learning
+
+| # | Size | Proves |
+|---|---|---|
+| **R18** | Large | Recall over real Evaluation history; RL — Track A playbook first, Track B weights after |
+
+R18 is post-v1 because it is *downstream*, not because it is unimportant. Evaluation history cannot
+become a fitness function before evaluation history exists, and the history is produced by operating
+the console Act IV builds. The schema hooks are already seeded — `policy`, `environment`, and
+`run.kind: "training"` all exist today.
+
+**Renumbered from R14 on 2026-08-12.** The `rung-ladder` gate fails when a rung is marked complete
+while an earlier one is not, so learning had to sit after the Act IV rungs rather than before them.
+Numbering states the dependency; it does not demote the work.
 
 ---
 
@@ -156,6 +182,10 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R12 | complete | `docs/orders/evidence/r12` |
 | R13 | active | `docs/orders/evidence/r13` |
 | R14 | pending | — |
+| R15 | pending | — |
+| R16 | pending | — |
+| R17 | pending | — |
+| R18 | pending | — |
 
 ### Closing a rung
 

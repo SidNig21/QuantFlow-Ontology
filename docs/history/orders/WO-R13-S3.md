@@ -1,4 +1,10 @@
-# WO-R13-S3 — repair the measured consumer blocker
+> **SUPERSEDED 2026-08-12.** The R13 slice plan was replaced by the V2 ladder in
+> [../../proposals/V2-SCOPE.md](../../proposals/V2-SCOPE.md). Its work is not
+> discarded: S1 and S5 became [WO-V2-1](../../orders/WO-V2-1.md) (installable
+> product plus gate-board repair), and S2, S3 and S4 became WO-V2-2 (measure
+> the first Hermes turn, fix the named cause, founder run). Kept for its
+> reasoning and its measured baselines. Not authority.
+# WO-R13-S3 â€” repair the measured consumer blocker
 
 status: open
 assignee: builder
@@ -12,7 +18,7 @@ Repair only the first failed boundary named by S2 and make the normal Hermes con
 
 ## In plain terms
 
-Fix the thing the measurement proves is broken—nothing adjacent and nothing speculative.
+Fix the thing the measurement proves is brokenâ€”nothing adjacent and nothing speculative.
 
 ## Context pack
 
@@ -24,7 +30,7 @@ Fix the thing the measurement proves is broken—nothing adjacent and nothing sp
 
 Before authorization, the verifier replaces this section with one exact implementation seam, one exact expected behavior, and one red-to-green bait derived from S2. Until then, no builder may begin.
 
-The finished order must require the normal Hermes native CLI tile to use the generated QuantFlow ontology and collaboration tools, create durable Kernel work, and remain visible as the seat itself—never as a second generic “session/streaming” tile.
+The finished order must require the normal Hermes native CLI tile to use the generated QuantFlow ontology and collaboration tools, create durable Kernel work, and remain visible as the seat itselfâ€”never as a second generic â€œsession/streamingâ€ tile.
 
 ## Contract
 

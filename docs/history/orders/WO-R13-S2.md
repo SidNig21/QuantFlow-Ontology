@@ -1,4 +1,10 @@
-# WO-R13-S2 — measure the first Hermes turn
+> **SUPERSEDED 2026-08-12.** The R13 slice plan was replaced by the V2 ladder in
+> [../../proposals/V2-SCOPE.md](../../proposals/V2-SCOPE.md). Its work is not
+> discarded: S1 and S5 became [WO-V2-1](../../orders/WO-V2-1.md) (installable
+> product plus gate-board repair), and S2, S3 and S4 became WO-V2-2 (measure
+> the first Hermes turn, fix the named cause, founder run). Kept for its
+> reasoning and its measured baselines. Not authority.
+# WO-R13-S2 â€” measure the first Hermes turn
 
 status: open
 assignee: builder
