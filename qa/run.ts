@@ -122,6 +122,14 @@ function discoverTypecheckInstallPackages(root: string): string[] {
   const installDirs = new Set<string>();
   const queue = [...discoverTypecheckPackages(root)];
 
+  // The Bovada typecheck uses tsconfig paths into collab-electron source, so
+  // that app's external imports are part of the strict typecheck closure even
+  // though collab-electron does not declare its own typecheck script.
+  const collabElectron = join(root, "collab-electron");
+  if (existsSync(join(collabElectron, "package.json"))) {
+    queue.push(collabElectron);
+  }
+
   while (queue.length > 0) {
     const dir = queue.pop()!;
     if (installDirs.has(dir)) continue;

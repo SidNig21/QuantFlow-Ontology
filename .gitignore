@@ -59,3 +59,7 @@ qa/.tmp-agent-path/
 /qf-kernel-schema/**/*.tsbuildinfo
 /qf-kernel-schema/**/.idea
 /qf-kernel-schema/**/.DS_Store
+
+# Gate-owned package installs are disposable and must not poison the clean
+# checkout required by the release/package gates.
+/qa/gates/**/node_modules/

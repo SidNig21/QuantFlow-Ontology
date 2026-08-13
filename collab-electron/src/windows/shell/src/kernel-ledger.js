@@ -1,6 +1,21 @@
 /**
  * Kernel events ledger (WO-g6 D4) — projection only.
  */
+import { projectKernelLedger } from "./glacier-feel.js";
+
+function projectLedgerRows(rows) {
+	const source = Array.isArray(rows) ? rows : [];
+	const byId = new Map(source.map((row) => [row.id, row]));
+	const ordered = projectKernelLedger(source.map((row) => ({
+		id: row.id,
+		type: row.stage,
+		object_type: row.title,
+		created_at: row.created_at,
+	})));
+	return ordered
+		.map((entry) => byId.get(entry.id))
+		.filter(Boolean);
+}
 
 /**
  * @param {HTMLElement} rootEl
@@ -21,7 +36,7 @@ export function createKernelLedger(rootEl, { listEvents, onSubscribe }) {
 	let lastRows = [];
 
 	function render(rows) {
-		lastRows = Array.isArray(rows) ? rows : [];
+		lastRows = projectLedgerRows(rows);
 		listEl.replaceChildren();
 		if (lastRows.length === 0) {
 			if (emptyEl) emptyEl.hidden = false;

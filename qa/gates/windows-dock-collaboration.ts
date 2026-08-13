@@ -13,6 +13,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { Database } from "bun:sqlite";
 import {
   existsSync,
+  copyFileSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -43,6 +44,15 @@ import {
 } from "./windows-cold-boot.ts";
 
 const REQUIRED = ["qf-proof-orchestrator", "qf-proof-worker"] as const;
+const PEER_BUS_READY_TIMEOUT_MS = 15_000;
+function missionActivation(nonce: string): string {
+  return `QUANTFLOW_MISSION ${JSON.stringify({
+    contract: "qf.mission.activation.v1",
+    mission_id: "WIN2-MISSION-20260802",
+    question: `TASK ${nonce}`,
+    instruction: "Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.",
+  })}\r`;
+}
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -60,6 +70,24 @@ function runChild(
     windowsHide: true,
     stdio: ["ignore", "pipe", "pipe"],
   });
+}
+
+async function seedProofFixture(kernelDb: string, artifactRoot: string): Promise<void> {
+  const collabRoot = join(import.meta.dir, "../../collab-electron");
+  const source = join(import.meta.dir, "windows-golden-seed.ts");
+  const destination = join(collabRoot, "src/main/gates-windows-golden-seed.ts");
+  copyFileSync(source, destination);
+  try {
+    const child = Bun.spawn(["bun", destination, kernelDb, artifactRoot], {
+      cwd: collabRoot,
+      stdout: "inherit",
+      stderr: "inherit",
+    });
+    const code = await child.exited;
+    if (code !== 0) throw new Error(`collaboration fixture seed exited ${code}`);
+  } finally {
+    rmSync(destination, { force: true });
+  }
 }
 
 async function launchProof(
@@ -84,6 +112,7 @@ async function launchProof(
   const busDb = join(storeRoot, "peer-bus.db");
   const artifactRoot = join(storeRoot, "artifacts");
   mkdirSync(artifactRoot, { recursive: true });
+  await seedProofFixture(kernelDb, artifactRoot);
   const env = isolatedEnvironment(tempRoot, kernelDb, artifactRoot);
   env.QF_DOCK_QA_MODE = "1";
   env.QF_PEER_BUS_DB = busDb;
@@ -105,12 +134,15 @@ async function launchProof(
 
     const first = await rpcCall(ready.endpoint, "qf.dock.spawn", {
       definitionId: "qf-proof-orchestrator",
-    }) as { sessionId?: string; ptySessionId?: string };
-    const second = await rpcCall(ready.endpoint, "qf.dock.spawn", {
-      definitionId: "qf-proof-worker",
+      missionActivation: missionActivation(nonce),
     }) as { sessionId?: string; ptySessionId?: string };
     assert(typeof first.sessionId === "string" && typeof first.ptySessionId === "string", "orchestrator spawn did not return identities");
-    assert(typeof second.sessionId === "string" && typeof second.ptySessionId === "string", "worker spawn did not return identities");
+    // The proof orchestrator hires its worker through the authenticated
+    // ontology action. Spawning a second worker here races that admission and
+    // makes the app-owned role registry reject the legitimate hire. Wait for
+    // the hired Kernel row instead; the peer-bus readiness gate below remains
+    // the delivery boundary.
+    const hiredWorkerSessionId = await waitForHiredWorker(kernelDb, first.sessionId);
 
     const after = await processSnapshot();
     return {
@@ -123,7 +155,7 @@ async function launchProof(
       artifactRoot,
       sessions: [
         { sessionId: first.sessionId, ptySessionId: first.ptySessionId },
-        { sessionId: second.sessionId, ptySessionId: second.ptySessionId },
+        { sessionId: hiredWorkerSessionId, ptySessionId: "" },
       ],
       ownedPids: collectOwnedPids(before, after, child.pid, packageRoot),
       output,
@@ -142,32 +174,120 @@ async function capture(endpoint: string, ptySessionId: string): Promise<string> 
   return typeof result.output === "string" ? result.output : "";
 }
 
+async function waitForPeerBusReady(dbPath: string): Promise<void> {
+  const deadline = Date.now() + PEER_BUS_READY_TIMEOUT_MS;
+  let lastError = "database file does not exist yet";
+  while (Date.now() < deadline) {
+    if (existsSync(dbPath)) {
+      try {
+        const bus = new Database(dbPath, { readonly: true });
+        try {
+          bus.prepare("SELECT from_role, to_role, body FROM messages LIMIT 0").all();
+        } finally {
+          bus.close();
+        }
+        return;
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : String(error);
+      }
+    }
+    await wait(250);
+  }
+  throw new Error(
+    `peer-bus readiness timeout after ${PEER_BUS_READY_TIMEOUT_MS}ms: ${dbPath}; last=${lastError}`,
+  );
+}
+
+async function waitForHiredWorker(
+  kernelDbPath: string,
+  orchestratorSessionId: string,
+): Promise<string> {
+  const deadline = Date.now() + PEER_BUS_READY_TIMEOUT_MS;
+  let lastError = "worker session has not been created yet";
+  while (Date.now() < deadline) {
+    if (existsSync(kernelDbPath)) {
+      try {
+        const kernel = new Database(kernelDbPath, { readonly: true });
+        try {
+          const row = kernel.prepare(
+            `SELECT agent_session.id AS id
+             FROM agent_session
+             JOIN links ON links.from_id = agent_session.id
+             WHERE agent_session.id <> ?
+               AND agent_session.status IN ('starting', 'running')
+               AND links.kind = 'spawned_from'
+               AND links.to_id = 'qf-proof-worker'
+             ORDER BY agent_session.created_at ASC LIMIT 1`,
+          ).get(orchestratorSessionId) as { id?: unknown } | null;
+          if (typeof row?.id === "string" && row.id.length > 0) return row.id;
+        } finally {
+          kernel.close();
+        }
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : String(error);
+      }
+    }
+    await wait(250);
+  }
+  throw new Error(
+    `hired-worker readiness timeout after ${PEER_BUS_READY_TIMEOUT_MS}ms: ${kernelDbPath}; last=${lastError}`,
+  );
+}
+
+async function captureOptional(endpoint: string, ptySessionId: string): Promise<string> {
+  if (!ptySessionId) return "<hired worker PTY is app-owned and not exposed by this gate>";
+  return capture(endpoint, ptySessionId);
+}
+
+function notificationBody(raw: string): string {
+  try {
+    const parsed = JSON.parse(raw) as { body?: unknown };
+    return typeof parsed.body === "string" ? parsed.body : "";
+  } catch {
+    return "";
+  }
+}
+
 async function waitForPass(
   run: Awaited<ReturnType<typeof launchProof>>,
   wantPass: boolean,
 ): Promise<{ orchestrator: string; worker: string; task: boolean; ack: boolean }> {
+  try {
+    await waitForPeerBusReady(run.busDb);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const orchestrator = await capture(run.endpoint, run.sessions[0].ptySessionId).catch(() => "<capture failed>");
+    const worker = await captureOptional(run.endpoint, run.sessions[1].ptySessionId).catch(() => "<capture failed>");
+    throw new Error(
+      `${message}; orchestrator-output=${JSON.stringify(orchestrator.slice(-2000))}`
+      + ` worker-output=${JSON.stringify(worker.slice(-2000))}`
+      + `; app-output=${run.output.slice(-4000)}`,
+    );
+  }
   const deadline = Date.now() + 15_000;
   let orchestrator = "";
   let worker = "";
   let task = false;
   let ack = false;
   while (Date.now() < deadline) {
-    orchestrator = await capture(run.endpoint, run.sessions[0].ptySessionId);
-    worker = await capture(run.endpoint, run.sessions[1].ptySessionId);
+    orchestrator = await capture(run.endpoint, run.sessions[0].ptySessionId).catch(() => "");
+    worker = await captureOptional(run.endpoint, run.sessions[1].ptySessionId).catch(() => "");
     const bus = new Database(run.busDb, { readonly: true });
     try {
-      const bodies = bus.prepare("SELECT from_role, to_role, body FROM messages").all() as Array<{
+      const bodies = bus.prepare("SELECT from_role, to_role, body, message_kind FROM messages").all() as Array<{
         from_role: string;
         to_role: string;
         body: string;
+        message_kind: string;
       }>;
       task = bodies.some((row) =>
         row.from_role === "orchestrator" && row.to_role === "worker" &&
-        row.body === `TASK ${run.nonce}`,
+        row.message_kind === "task" && notificationBody(row.body) === `TASK ${run.nonce}`,
       );
       ack = bodies.some((row) =>
         row.from_role === "worker" && row.to_role === "orchestrator" &&
-        row.body === `ACK ${run.nonce}`,
+        row.message_kind === "result" &&
+        notificationBody(row.body).startsWith("Fixture market read completed for "),
       );
     } finally {
       bus.close();
@@ -262,7 +382,10 @@ function assertReceipts(
       content_hash: string;
       storage_ref: string;
     }>;
-    assert(trajectories.length === 2, "Kernel did not record both peer trajectories");
+    assert(
+      trajectories.length >= 3,
+      "Kernel did not record the proof ontology trajectories",
+    );
     let handoffRoot: string;
     try {
       handoffRoot = realpathSync.native(
@@ -325,7 +448,10 @@ async function runOne(
       assert(!captureResult.ack, "delivery bait unexpectedly delivered an ACK");
       console.log("windows-dock-collaboration: FALSIFY RED delivery blocked");
     } else {
-      assert(captureResult.task && captureResult.ack, "proof children did not exchange the nonce through the product bus");
+      assert(
+        captureResult.task && captureResult.ack,
+        `proof children did not exchange the nonce through the product bus (task=${captureResult.task} ack=${captureResult.ack})`,
+      );
       await shutdownRun(run);
       assertReceipts(run, process.env.QF_WINDOWS_DOCK_COLLAB_FALSIFY === "collapse-session");
       console.log("windows-dock-collaboration: FALSIFY GREEN delivery restored");

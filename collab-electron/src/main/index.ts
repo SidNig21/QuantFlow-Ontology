@@ -1099,7 +1099,18 @@ app.whenReady().then(async () => {
       if (typeof definitionId !== "string" || definitionId.length === 0) {
         throw new Error("dock spawn requires definitionId");
       }
+      const missionActivation = (params as Record<string, unknown>).missionActivation;
+      if (missionActivation !== undefined) {
+        if (
+          process.env.QF_DOCK_QA_MODE !== "1" ||
+          !definitionId.startsWith("qf-proof-") ||
+          typeof missionActivation !== "string"
+        ) {
+          throw new Error("dock spawn mission activation is QA proof-only");
+        }
+      }
       return await admitAndStartSession(definitionId, {
+        ...(typeof missionActivation === "string" ? { missionActivation } : {}),
         onStarted: projectStartedSession,
       });
     },

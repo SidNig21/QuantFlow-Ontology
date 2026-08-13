@@ -684,6 +684,8 @@ export async function runWindowsColdBootGate(): Promise<{ ok: boolean }> {
   }
 
   const tempRoot = mkdtempSync(join(tmpdir(), "qf-windows-cold-boot-"));
+  const receiptPath = join(EVIDENCE_DIR, "windows-cold-boot-latest.json");
+  const priorReceipt = existsSync(receiptPath) ? readFileSync(receiptPath) : null;
   try {
     const packageRoot = await buildWindowsPackage(tempRoot);
     if (falsify === "missing-runtime") {
@@ -706,6 +708,11 @@ export async function runWindowsColdBootGate(): Promise<{ ok: boolean }> {
     }
     return { ok: false };
   } finally {
+    if (priorReceipt === null) {
+      if (existsSync(receiptPath)) rmSync(receiptPath, { force: true });
+    } else {
+      writeFileSync(receiptPath, priorReceipt);
+    }
     rmSync(tempRoot, { recursive: true, force: true });
   }
 }
