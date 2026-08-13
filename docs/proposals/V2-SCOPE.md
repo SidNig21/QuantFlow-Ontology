@@ -306,12 +306,12 @@ same commit.
 
 Stated plainly rather than faked:
 
-- **The full vault sweep is not done.** The scope assignment asks for every
-  external product across 52 vault notes to be classified into the capability
-  registry. `RESEARCH.md` currently carries 13 classified horizon entries. The
-  remaining seed list — AgentOS, Prime Agent, Modal, Overeasy, PufferLib, WebMCP,
-  OpenTelemetry, AC2, Ari, OpenCUA, CUA-Gym, Foglamp, Compass, Regraft, Zed Delta,
-  Kimi Agent Swarm, and others — is unclassified.
+- ~~The full vault sweep is not done.~~ **Done 2026-08-12.** The Linux research
+  vault was transferred and the combined sweep covers 413 notes across both
+  vaults and the repo — 1,650 URLs, 173 hosts, 70 repositories, 205 arXiv papers.
+  Results in [`CAPABILITY-REGISTRY.md`](CAPABILITY-REGISTRY.md). Three conflicts
+  it surfaced need a founder ruling: Modal's status, which Eve is meant, and
+  which upstream Hermes version is supported.
 - **CONNECT, WATCH, STEER, and REVIEW were not physically audited**, because the
   installed build cannot reach them. They are audited during V2-2's founder run.
 
