@@ -1,0 +1,197 @@
+Welcome, everyone. So I'm going to use this session to kind of expand a little bit on
+what Ankit just mentioned, in particular about how to build production agents at scale as
+it relates to the infrastructure layer. So I want to show you how Orchestrator, a new
+product that we're launching, lays the foundation for building agents that you can trust. So
+everyone here has probably seen a dozen demo layer agents that seemingly tackle some interesting
+business problem or valuable workflow, but in reality, those agents almost always fail
+when you put them in production. But to see why that is, I actually want us to walk through
+building an agent from scratch and then look at all the ways in which that agent can fail
+before showing how Orchestrator, the new product we're launching, actually solves these problems.
+I'll then tie it all together with a demo at the end where we can actually see this running
+on our DevCon stack. But before I build this agent, I kind of want to talk about how these
+agents don't exist in a vacuum. They exist as part of a broader context in part of your
+organization, which has a lot of integrations, data integrations, processes, complex slur
+explodes, et cetera. So all the problems I'm going to show you for a single agent get even
+more difficult to reason about and more challenging when these agents start interacting with each
+other and the rest of your organization. So with that in mind, the agent we're going
+to build today is a patient discharge agent that is responsible for coming up with a discharge
+plan for a patient before they leave the hospital. So what does this look like? This agent works
+by taking in a patient identifier, getting some context from the current date, and then
+passing it off to an agentic loop to actually call some tools and draft a discharge plan
+before finally awaiting for a doctor sign off before executing some real world effects of
+sending off to the pharmacy and billing the insurance. It's pretty simple. Despite this
+agent being simple, it already has a large number of major issues that might not be obvious.
+That's because when you run this agent in production, it's only a matter of time until
+it crashes. And this could be from the process dying, a node upgrading, out of memory issue,
+model failure, model provider outage. There's a million reasons why your agent might fail
+and it will eventually fail. And the first problem is actually that we need to detect
+that the agent failed. And that itself isn't that easy, especially when you have thousands
+of these running in parallel across your organization. And my colleague today is going to talk about
+how we tackle that problem, so I'm not going to touch on it right now. But let's say for
+the purpose of this discussion, we do discover that the agent failed. It's unacceptable for
+us to like just let that be. We need this to succeed eventually because we need to make
+sure the patient gets their prescriptions. We need to make sure their insurance gets billed.
+So let's do the naive thing that we want to do as a software engineer, which is turn it
+off and turn it back on again. Restart the process. Well, the first problem we run into
+for restarted is that the agent has no memory. If the agent's data is only stored locally,
+then when you restart the process, it will be gone. And that's kind of a problem, right?
+You can't resume anything. So the naive solution here would be to take the agent's conversation
+history, maybe store it to disk or a durable store like S3. But this actually is not sufficient
+because when this agent re-exocutes, even if the model stores the -- or if you store the
+model's conversation history, you're actually not going to have the stored results of these
+contextual variables. So to make that concrete, let's take the sense variable here. If I ran
+the agent initially at, let's say, 1158 p.m. on a Tuesday, and then it crashes, and I rerun
+it at 1202 a.m. just four minutes later on a Wednesday, that variable is actually going
+to propagate into these tool calls and resolve to different values. So the fetchlabs call on
+the first run would return Tuesday's labs. The fetchlabs call on the next run would return
+Wednesday's labs. This leads to non-deterministic behavior in your agent that could be really
+hard to reason about and causes a lot of problems. So the next problem we run into is that these
+agents -- restarting an agent can lead to duplicate side effects in the real world, right? Like
+agents are only useful if they're doing something. And you don't want that thing to happen more
+than once. You don't want to send a prescription to the pharmacy twice. You don't want to double
+bill a patient's insurance. And it's not just the functions you see on screen here that might
+double execute. It's also the functions in the tool calls that might double execute. And so we
+have to find a way to handle that as well. And then a third problem is that these agents can't
+wait, but you kind of need them to, right? Like there's a lot of human interaction in real agent
+workflows. Like in this case, we need a doctor to sign off before we send a prescription to a
+pharmacy. We need to make sure that prescription is valid for that patient's. And keeping a long
+lived process open, like doing the naive thing and just having your agent running somewhere,
+lends itself to running into any of the problems I mentioned earlier around out of memory issues,
+nodes, restarts, upgrades, et cetera. And so on top of that, there's also the problem of like,
+if you have thousands of these agents running, that's incurring a lot of compute costs. It starts
+adding up. And then another problem is that you can't easily replay agents. So if you have a bug
+in a service or an API, the naive thing to do would be, oh, I want to hit it again with the thing
+that caused the bug and try to recreate the scenario to try to debug it, basically. You can't really
+do that for agents because the world's moved on. Time has moved forward. Side effects have happened.
+Maybe this person has a new allergy and the check allergies tool call resolves something else than
+it did the first time. It adds too many variables in here to be able to easily figure out what happened
+in the debugging process for these agents. So this highlights one of the central tensions you face
+when building agents, which is that the more capabilities and access an agent has, the more
+powerful it is and the more business value can achieve. But that also leads to more complicated
+and dangerous failure modes for that agent. And this reveals a key insight about agents themselves,
+which is that the bottleneck for an agent's usefulness today is often not intelligence. It
+is trust. Every AI company in the world right now is spending breathtaking amounts of money
+making their model smarter. And it's working. The models are getting smarter. But the difference
+between the current world and a world in which agents accomplish real work is not intelligence.
+It's that we trust those agents to be able to safely complete that work.
+Because when an agent fails, those failures can have real world consequences, whether it's our
+patient getting to their medication multiple times or duplicate database rights leading to
+database corruption, double billing for a purchase. There's many examples of how the agent interactions
+with the world are dangerous and need to be trustworthy for us to rely on them. And these actions
+impact the real world, and they can't be undone. So making agents trustworthy enough to put in
+production is a problem we've been solving at Palantir for years now across many agents and
+many customer use cases. And I want to show now how we've codified a lot of those learnings
+into our new product called Orchestrator. So here's the same discharge agent that I showed earlier,
+except for this time we've made it durable by wrapping it in our new Orchestrator SDK.
+So by introducing only two methods, Orchestrator.run and Orchestrator.signal, we're able to solve all
+the problems that I mentioned earlier and a few more that I'll talk about in a second.
+And the way it works is like this. Wrapping each step in Orchestrator.run causes the operation
+to be executed once and then recorded into the Orchestrator service's ledger. This ledger
+is durably stored so that you don't need to worry about it going away if the agent fails or restarts.
+On every later re-invocation we replay that recorded result from the ledger
+instead of re-executing the code directly. And the doctor sign off, I'll talk about in a second,
+but that's now replaced with our Orchestrator signal and I'll explain how that works in a couple
+slides. So here you can see an actually simplified view of the Orchestrator ledger for a successful
+agent run. You can see that the first ledger entry has the value of day and it actually resolves
+to a specific date. The second and third show actual tool calls the agent made and then the fourth
+shows the actual result of the discharge plan from the agent loop itself. The fifth and sixth
+finally show the side effects that the agent took in this case, sending meds to the pharmacy
+and billing the insurance. So this ledger allows us to resume agents after failure or suspension
+by rehydrating the agent's execution state from the ledger. So let's see what this looks like in
+practice. Imagine that we have a similar failure as before, the agent crashes. Only this time it's
+backed by Orchestrator. On re-invocation, the function reruns top to bottom, but every finished
+Orchestrator dot run call short circuits. It returns the recorded result that we stored in the ledger
+and rehydrates the variable in code with that value. So the date replays to the exact same day
+that it ran the first time. The agent loop has already completed before the crash so we can actually
+skip computing that result entirely, saving us model tokens and time. And critically the medication
+order does not fire a second time regardless of when the crash occurred because we're able to store
+the execution attempt plus an item potency key in the ledger to be able to ensure that we get
+exactly once execution. And once you realize that restarting agents is safe, you realize that you
+can build agents that can stop. And so the way that this works is that the Orchestrator.signal method
+allows these processes to check if a signal has been completed and if it hasn't, allows the agent
+to suspend. And suspend here means that the process is entirely torn down. It has no memory,
+no CPU, no disk. It does not exist anywhere except for in the ledger basically. And it therefore
+costs nothing, which is great. So when the doctor approves, whether that's minutes, hours or days,
+later, the signal is written into the ledger and Orchestrator will spin up a new micro VM,
+re-invote the agent and rehydrate it with the existing state plus the information completed
+from the signal, thus resuming where it left off. And this makes waiting essentially free. And so
+you can have thousands of agents suspended for basically an unbounded amount of time without
+incurring any costs or having to manage their life cycle and don't have to deal with the like
+out-of-memory issues, node restarts, failures, et cetera, all the things I mentioned earlier.
+So to recap, the four problems we introduced in our basic agent are all fixed. But to be clear,
+those are not the only problems you'll face when running an agent in production. There's
+actually a lot more under the surface that I'm just going to mention briefly. So isolation.
+Agents executing code is inherently dangerous, but also extremely powerful. Micro VMs provide
+kernel-level isolation preventing malicious code execution. So we run all of our agents in these
+micro VMs. Sub-agent orchestration. So all the problems I mentioned before get even more challenging
+when you have agents calling agents in essentially creating a large execution graph that can be tens
+or hundreds of agents deep. And so if you have things like failures, retries, cancellations,
+you need to be able to propagate that through the entire graph and manage these life cycles
+of these agents kind of together as a collective security. So security is one of our principles
+in Foundry. And so we obviously have very sophisticated security controls for our agents
+to gate what kind of resources they can have access to and permissioning models for restricting
+how and what agents can interact with in your platform. And then observability at scale.
+So my colleague, Chris, is going to talk about this later. So I'm not going to talk about it now,
+but suffice it to say that observability is very important as well. So I want to show a simplified
+diagram of how these pieces fit together so you can kind of see a little bit of the architecture.
+So starting from left to right, when an agent execution request enters orchestrator,
+we put it into a queue and this queue allows us to support things like back pressure. So if there's
+a model provider outage or you're at token limits, we can actually hold the work in the
+execution request in the queue and wait for those resources to become available. When they do become
+available, we pull it off in our event loop and we then call our core-dite service, which is what
+manages our micro VMs, to spin us up basically a new micro VM and we start running the agent.
+The agent is then free to make tool calls, to execute code in line, call subagents, etc.,
+and continue kind of running until it hits a suspension point. When it hits a suspension point,
+it actually shuts down entirely and exists only in the ledger at this point in orchestrator
+and will wait for some signal service to complete a signal to rehydrate or spin up basically.
+An example of the signal services could be like an LLM call completion, a user approval like we
+showed in the demo earlier, ontology, object additions or removals, timers, web hooks, etc.,
+basically any real world event that you would want to trigger an action can have a signal completion
+event that models it and allows you to respin up your agent from it. When the signal is completed,
+we then rehydrate the agent using the ledger plus the signal data to kind of resume where it left
+off and continue its execution. All of this complexity in this diagram gets distilled down
+into two simple methods, orchestrator.run for executable execution and orchestrator.signal
+for enabling agents that can suspend. And this reflects one of the key design goals in Foundry,
+which is to extract away the complex infrastructure concerns to allow developers to be able to focus
+on building against their business outcomes directly. So with that, let's look at some actual agent
+code running on a Palantir stack to show you how this looks in real life. Great, so here is
+the TypeScript version of the code we just showed. You can see that we have this orchestrator context
+which is our orchestrator SDK. We then have our computing the synths variable,
+which is one of the variables that had a bug in it that we showed earlier. We then load a patient
+from the ontology before finally sending the patient information plus a handful of tool calls
+into this agent running loop which actually computes the plan. And then we finally wait the
+clinician sign off before diving into actually executing the side effects for this discharge
+plan. So sending the medications to the pharmacy and billing the insurance agent.
+So what does it actually look like when we run it? Well, if we come over here and we take a new
+patient, a notional patient, and we hit execution, you can actually see it going through the various
+steps of this agent. It's resolving the admissions date. It's fetching the patient record. That's
+the ontology lookup. Here's calling the different tools. And here it's actually getting the results
+from these tools. And then we actually see that one of our tool calls has a approval process in
+it. So I'll talk about that in a second. But first I just want to dive into this technical details
+tab we added which shows what this ledger actually looks like. So we can see all of these task
+completions. These all represent different orchestrator.run calls. And each one of them stores durably
+the actual resolution of that run call. And so if we were to fail, then we could rehydrate
+using this orchestrator ledger for this particular patient discharge. And so the next thing I want
+to highlight is that we actually have this tool call here called fetch external records. And so
+here's what that code looks like. And the kind of interesting thing is that getting orchestrator
+or getting the agent to suspend is as simple as just adding in this orchestrator.signal method
+and then kind of providing a few fields to fill it out. And then from there you actually have the
+ability to prevent the execution of this tool because this is like an external database manipulation
+tool as an example. So you can want to gate it the approval on a user sign off before you actually
+execute the logic for this tool. So flipping back to our demo, if I hit grant access, actually
+before I get there, so this process is currently suspended. And I just want to re-highlight that
+that means this isn't running anywhere. It's not running on any, there's no memory, no CPU,
+there's nothing. There's no VM associated with this right now. And as soon as I hit grant access,
+it's actually going to spin up a new micro VM, rehydrate from scratch, and actually proceed to
+generating the discharge plan. And so you can kind of see it kicked off. There we go. Now we have a
+plan. This looks pretty good to me. And we have a bill for the insurance. Looks great. And so this
+kind of corresponds in code just to circle back to it to the orchestrator.signal here, which is
+waiting the clinician sign off on the final plan. So if I hit go ahead and hit approve and sign off,
+you'll see that it actually moves forward to fulfilling the side effects of this execution,
+so it's going to dispatch to the pharmacy, and it's going to send the invoice to the insurance
+company. Let's completing this agent loop. Great. So to circle back to where we started,
+the bottleneck for this agent was not intelligent. There's plenty of models out there smart enough
+to date to draft discharge plans. It was trust. And this is just one example of this agent.
+Basically, the same foundational primitives of suspension durability and isolation can be used
+to take any high stakes agent and make it something you can trust with real world data,
+with real world customers and real world consequences. Thank you.

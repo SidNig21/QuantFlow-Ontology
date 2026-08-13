@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantFlow — Ontology Build Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#1B1E24;
+    --panel:#232830;
+    --panel-2:#2B313B;
+    --ink:#E7E9ED;
+    --ink-dim:#9AA3B0;
+    --rule:#39404C;
+    --amber:#F2A93B;
+    --teal:#4FB3A6;
+    --fail:#E0553F;
+    --display:"Bricolage Grotesque",Georgia,serif;
+    --body:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--body);font-size:16px;line-height:1.55;
+    padding:0 20px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  /* ---- masthead ---- */
+  header{padding:56px 0 32px;border-bottom:1px solid var(--rule)}
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--amber);margin:0 0 18px;
+  }
+  h1{
+    font-family:var(--display);font-weight:800;
+    font-size:clamp(34px,9vw,58px);line-height:1.02;letter-spacing:-.02em;
+    margin:0 0 18px;
+  }
+  h1 em{font-style:normal;color:var(--amber)}
+  .standfirst{color:var(--ink-dim);font-size:17px;margin:0;max-width:52ch}
+  .meta{
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+    margin-top:26px;display:flex;flex-wrap:wrap;gap:8px 20px;
+  }
+  .meta b{color:var(--ink);font-weight:500}
+
+  /* ---- rule of the road ---- */
+  .creed{
+    margin:34px 0 8px;padding:20px 22px;background:var(--panel);
+    border-left:3px solid var(--teal);border-radius:2px;
+  }
+  .creed p{margin:0;font-size:15.5px;color:var(--ink-dim)}
+  .creed p + p{margin-top:10px}
+  .creed strong{color:var(--ink);font-weight:600}
+
+  /* ---- stages ---- */
+  section.stage{padding:38px 0 6px;border-bottom:1px solid var(--rule)}
+  .stagehead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .code{
+    font-family:var(--mono);font-size:12px;font-weight:600;
+    color:var(--ground);background:var(--amber);
+    padding:3px 8px;border-radius:2px;letter-spacing:.04em;
+  }
+  .cost{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);letter-spacing:.04em}
+  h2{
+    font-family:var(--display);font-weight:600;
+    font-size:clamp(23px,5.5vw,30px);line-height:1.15;letter-spacing:-.015em;
+    margin:14px 0 12px;
+  }
+  .stage p{margin:0 0 14px;color:var(--ink-dim)}
+  .stage p strong{color:var(--ink);font-weight:600}
+  ul{margin:0 0 16px;padding-left:20px;color:var(--ink-dim)}
+  li{margin-bottom:7px}
+  li strong{color:var(--ink);font-weight:600}
+  code{
+    font-family:var(--mono);font-size:.88em;background:var(--panel-2);
+    padding:1px 5px;border-radius:2px;color:var(--ink);
+  }
+
+  /* ---- signature element: the gate ---- */
+  .gate{
+    margin:20px 0 26px;background:var(--panel);
+    border:1px solid var(--rule);border-radius:3px;overflow:hidden;
+  }
+  .gate-bar{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--panel-2);border-bottom:1px solid var(--rule);
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--fail);flex:none}
+  .gate-label{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-dim);
+  }
+  .gate-state{
+    margin-left:auto;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.1em;color:var(--fail);
+  }
+  .gate-body{padding:14px 16px;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:var(--ink)}
+  .gate-body span{color:var(--teal)}
+
+  /* ---- trap notes ---- */
+  .trap{
+    margin:0 0 22px;padding:14px 16px;background:transparent;
+    border:1px dashed var(--rule);border-radius:3px;
+  }
+  .trap b{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--amber);display:block;margin-bottom:6px;
+  }
+  .trap p{margin:0;font-size:14.5px}
+
+  /* ---- done ---- */
+  .done{padding:44px 0 0}
+  .done h2{color:var(--teal)}
+  footer{
+    margin-top:44px;padding-top:22px;border-top:1px solid var(--rule);
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);line-height:1.8;
+  }
+  @media (max-width:520px){
+    body{padding:0 16px 60px}
+    .gate-body{font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Build order · supersedes planning</p>
+  <h1>QuantFlow<br>Ontology: <em>the road to shipped</em></h1>
+  <p class="standfirst">Eight stages from six described types to a charter that regenerates the system. Every stage exits on a test a machine can fail — not a review, not a doc.</p>
+  <div class="meta">
+    <span><b>Phase 0</b> substrate — done</span>
+    <span><b>Frontier</b> Stage 1</span>
+    <span><b>Rule</b> no stage ships on prose</span>
+  </div>
+</header>
+
+<div class="creed">
+  <p><strong>Two rules that govern the whole road.</strong></p>
+  <p>1 · A stage is done when its gate goes green, never when it feels right. If you can't state the gate as a command or a question an agent answers, the stage isn't defined yet.</p>
+  <p>2 · Governance comes last, not first. Descriptions, lint, lifecycle flags, and conformance tests are added to something that already works. Adding them up front is how the last few months happened.</p>
+</div>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 1</span><span class="cost">one weekend</span></div>
+  <h2>Research plane, ungoverned</h2>
+  <p>Six types in one file: <strong>Hypothesis, Dataset, Run, Artifact, Evaluation, Report.</strong> Each gets a name, a two-sentence description written for an agent to act on, its properties, and its links to the other five. Nothing else — no lint, no lifecycle, no plane structure, no tests.</p>
+  <p>This plane is invariant in the doctrine, which means there is nothing left to decide. It is pure typing. That's exactly why it goes first: zero open questions removes every excuse.</p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">Hand-write fixture rows. Give an agent only this file, then ask:<br><span>"Which Runs from Hypothesis X produced Evaluations above threshold Y?"</span><br>It answers correctly with no hand-holding, or a description is underspecified.</div>
+  </div>
+  <div class="trap">
+    <b>The trap here</b>
+    <p>Reaching for structure before content. If you find yourself designing the file format, stop and write the Hypothesis description instead.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 2</span><span class="cost">2–3 days</span></div>
+  <h2>Bind the plane to the Kernel</h2>
+  <p>Every type gets a real table; the Kernel reads and writes through it. The types stop being a document and become where data actually lives. Reuse the existing conformance machinery rather than rebuilding it.</p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">A live Hermes seat completes one real task, and the resulting <span>Run</span> and <span>Artifact</span> rows exist in the Kernel — queryable, not narrated.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 3</span><span class="cost">~1 week</span></div>
+  <h2>Generated tool plane · two gates</h2>
+  <p>Tools are generated from the types, not hand-written. Each generated action tool is one dumb tool wrapped in two checks — the Coyle spec, made concrete:</p>
+  <ul>
+    <li><strong>Gate 1 · input</strong> — Zod validation of the call's shape at execute. This closes the exact hole the Cursor audit flagged.</li>
+    <li><strong>Gate 2 · output</strong> — the transition-table / ontology check on the result. You already built this machinery in WO-005.</li>
+  </ul>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">A malformed call is rejected at <span>Gate 1</span> before touching the Kernel. An illegal state transition is rejected at <span>Gate 2</span> before it commits. Both failures are proven, not assumed.</div>
+  </div>
+  <div class="trap">
+    <b>The trap here</b>
+    <p>Generating tools for types you haven't proven readable in Stage 1. Bad descriptions produce bad tools silently.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 4</span><span class="cost">~1 week</span></div>
+  <h2>Market plane, derived empirically</h2>
+  <p>Do not design <strong>Venue / Instrument / Quote / MarketEvent</strong> from principles. Load one real market's data and let it force the shape. Then load a structurally different one — a game line and a perp, say — and keep only what survives both.</p>
+  <p>This is where betting stops being types and becomes rows. It is the move that makes "a market of his choosing" a real claim rather than a slogan.</p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">Two structurally different markets load into the same four types with <span>zero new object types added</span>. If either needs a special type, the abstraction failed — fix it now, not later.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 5</span><span class="cost">2–3 days</span></div>
+  <h2>Agent plane</h2>
+  <p>Seats, sessions, tasks, and peer messages become described types like everything else. Most of these rows already exist in the Kernel — this stage is mostly recognition and description, not construction.</p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">An agent answers a cross-plane question — <span>"which seat produced the Run behind this Report"</span> — from the ontology alone.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 6</span><span class="cost">2 days</span></div>
+  <h2>Now add governance</h2>
+  <p>Only now: description-required lint, lifecycle flags (<code>experimental → active</code>), extend-don't-mutate, and the anti-pattern gates. Each is roughly an hour, applied to a system that already works. This is the doctrine's Phase 1 arriving last on purpose.</p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">CI goes red on each of three deliberate sabotages: a missing description, a <span>Run</span> subtype clone, and a property removed from an active type.</div>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 7</span><span class="cost">~1 week</span></div>
+  <h2>The regeneration proof</h2>
+  <p>The charter earns its name only if the system is downstream of it. Change one type in the ontology and everything derived — tables, tools, typed access — regenerates without hand-editing.</p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">Add one property to <span>Evaluation</span>, run codegen, and the new property is callable end to end with <span>zero files edited by hand.</span></div>
+  </div>
+  <div class="trap">
+    <b>Why this stage matters most</b>
+    <p>Until regeneration works, the ontology is documentation. After it works, it is the constitution — and that's the actual difference between a schema and a charter.</p>
+  </div>
+</section>
+
+<section class="stage">
+  <div class="stagehead"><span class="code">STAGE 8</span><span class="cost">later, on evidence</span></div>
+  <h2>Recall layer</h2>
+  <p>Hybrid retrieval over accumulated Runs, Evaluations, and Reports so an agent can ask whether something like this has been tried before. In-Kernel first — stay on the existing substrate rather than standing up a second database and a second service.</p>
+  <p>Build this when the history is big enough to be worth searching, not before. Same rule applies to swapping the execution substrate: <strong>migrate on a failure, never on aesthetics.</strong></p>
+  <div class="gate">
+    <div class="gate-bar"><span class="dot"></span><span class="gate-label">Exit gate</span><span class="gate-state">RED</span></div>
+    <div class="gate-body">An agent retrieves a prior <span>Run</span> relevant to a new Hypothesis that keyword search alone would have missed.</div>
+  </div>
+</section>
+
+<section class="done">
+  <div class="stagehead"><span class="code" style="background:var(--teal)">DONE</span><span class="cost">the only definition that counts</span></div>
+  <h2>Definition of done</h2>
+  <p>A market you choose on the day is loaded into the Market plane without new types. A Hypothesis is stated, a Run executes against a fenced Dataset, an Evaluation scores it, a Report is produced — and every object in that chain was reachable through generated tools an agent used unaided.</p>
+  <p>Everything on this page exists to make that one sentence true. Nothing else is progress.</p>
+</section>
+
+<footer>
+  Stage 1 is the whole difference between a plan and a project.<br>
+  Six types. Descriptions written for an agent. One file.
+</footer>
+
+</div>
+</body>
+</html>

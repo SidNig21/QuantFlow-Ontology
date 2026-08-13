@@ -1,0 +1,164 @@
+Hi everyone, thanks for being here today. Pretty cool talks that we just saw orchestrator for our
+durability layer for agents and what I want to do in this talk is give an update on where we're
+going with agents and a preview of what's coming. So we've learned from you and others in the field
+and we're building a full agent stack to solve the real problems we've seen when making agents
+in production. The stack is built on top of the ontology stack that we know and love.
+So you'll see the lower layers in this talk and some teasers of what's to come.
+So you just saw orchestrator for durability for our agent loops and I'm going to talk about
+our new agent engine and our new agent SDK. Agent engine is the API and runtime layer that hosts
+and runs our agent primitives and the agent SDK helps you easily build agents that run on top.
+Before we go into the agent engine and agent SDK, I want to take a step back and talk about
+the lessons that we learned that led to this agent stack. John talked about lessons we learned
+at the infrastructure layer but I want to talk about lessons we learned at the agent design layer.
+One of the big lessons we've learned is that agents aren't one shape. We've built task agents,
+co-pilots, we've built simple agents, autonomous agents, interactive agents,
+AIFD, AIP analysts, we've built agents that aren't interactive at all in just about everything
+in between. And we learned that any framework needs to handle providing developers ways to build
+all of these agents. We've also learned that agents act with the world and vice versa.
+And the real world is asynchronous. And so in the real world, a reply isn't just when I spin up
+my laptop. An agent could be waiting on a nurse, a lab result, a build system, each of which could
+take a week or more to come back. And the world operates concurrently. A user could be working
+with an agent while an email comes in or two emails come in at once. You have race conditions.
+And so the real world starts to look much more like a distributed system, many agents and many
+humans. And every participant in the system needs a different view. The nurse responding to the
+patient discharge, the hospital admin making sure patient discharges have been done correctly for
+the day, maybe another model providing a feedback loop on the agent response chain. You can't build
+trust without properly rendering the agent to each participant involved. So let's take an example
+that Ankit mentioned earlier. And I want to go into more detail about one of the
+functionalities we've built within AIFD. This is the build functionality within AIFD. And so as a
+user, I have the ability to spin up, build an AIFD, build our long-running jobs. They have a status
+associated with them as such. So they can be started running, canceled, failed. But because
+they're long-running jobs, they can take minutes or hours. So when I'm in an AIFD, I want the ability
+to be able to skip the results of my build and let the session continue. But when those results
+come in, I want to be updated that they've come in and I want my agent to properly respond to those
+results. But if another user canceled the build in a different UI, then my agent should also reflect
+those updates. And these are just some of the requirements of this functionality. And as Ankit
+showed before, what this actually looks like is more of a state machine. And this is a simplified
+version where we have states that transition to other states and rich human-in-the-loop interactions.
+And so you can see as we start to stress test our agents against the requirements in the real
+world, it looks much harder to solve our problems with a simple while loop wrapping simple tool calls.
+Because what we actually have is agents that need to be multiplayer, they need to handle race
+conditions and incoming signals, and they have to have maximal flexibility and be renderable to all
+participants. This is not an easy list. And you may think that I'm laying on the requirements here,
+taking a bit of a strategy credit because this is what we've built. But I'd argue that you've
+seen this before. In Cloud Code, if the terminal dies while the agent is working, you lose all
+your sub-agents work. So this might be slightly annoying or costly in Cloud Code, but in a different
+context, it can have mission-critical implications. On the battlefield, you need to know you're doing
+the right thing. And so in the environments and stakes we operate at, we have to be able to provide
+these requirements to our agents. And so we've built our agents stack to solve the problems
+we've seen in the field. I want to go into a demo to show actually how this looks in practice,
+because I think that's the best way to actually see what we've built here.
+So I'm going to be building on John's example of discharging patients. So our agent has the ability
+to discharge patients. And I'm going to be showing the agent SDK. So the agent SDK makes it extremely
+simple to define complex agents. This is using the SDK, which is actually available here as a beta
+at DevCon. And we have a Canary session later. So I'm very excited to see what you all build.
+And so the agent SDK makes a simple thing simple. I can define a model, system prompt.
+In this agent, I have three tools associated with it, looking at patients, getting their lab results,
+and then discharging the patient. Let's look at the discharge patient tool. Also quite simple.
+Name, description, input schema, and then an async execute function. And this calls our discharge
+patient helper, which actually discharges the patient, and then tells the model that we've
+discharged the patient. Under the hood, the patients are ontology objects, and this is just
+running an action to turn a Boolean field on the patient object from is discharge false to true.
+This is simplified for the purpose of this DevCon demo. You can imagine in the real world,
+there's a lot more complexity. And we're actually going to add some of that complexity
+here in a second. But I want to start by just running this agent and showing what it looks like.
+So I've got my discharge patient portal here, and I'll take my first patient, Aisha Patel,
+and I'll determine her discharge status by running my agent. So we can see we have a list of system
+prompt user messages, assistant messages, these are actually typed as context items. I'll get back
+to that in a second here of why that's important. But if I scroll down, we have the patient's been
+discharged successfully, and we've actually executed the tool call discharge patient. And if we go
+up, we see that our patient's been discharged by discharge agent. And so this is great. Our
+agent runs, but there's a lot that's missing in this agent. One thing, this UI is terrible. We
+probably want a better UI on top of this agent. And we'd also want a nurse approving the agent's
+results. We don't want the agent just charging patients. Nobody signed off on that. And to render
+the agent to the nurse, we also need to be able to render in a format that is valuable for the
+nurse to be able to see the results that might be relevant to the agent's decision. And also,
+we need to make sure that our agent responds to any incoming decision or data coming in. So
+if new lab results come in, our agent needs to be able to reflect upon that and update its decision.
+So you can see the list of requirements starts to expand as we start to stress test our agents
+against the real world. And so what I want to do is actually talk through how we can easily add on
+a few lines of code to make our agent handle this type of complexity.
+Before we do that, though, I want to talk about the primitives that the agent engine offers because
+I think it's important to understand those, to understand how we can build the requirements into
+this agent. So the agent engine is built, is our lower layer, and it provides the APIs for
+building flexible agent. If we can go back to the slides, great. So you saw how orchestrator
+provided durability. On top of orchestrator, we built agent engine, which handles our agent
+primitives, and then the agent SCK on top, which makes it extremely easy to define agents, which
+you just saw here. You can start high with the code I showed, but you can always escape hatch
+down to build in on top of the agent engine API layer. So what makes the SCK and APIs powerful is
+they'll build on these three primitives, context items, events, and effects. So a session, an agent
+session is composed of context items. These are strongly typed data defined by you, the developer
+of the agent. Context items mutate through events, and they're actually, they hold their own state,
+their own strongly typed state. Events return effects, which can acynchronously run and dispatch
+new events. So it's how the agent gets connected to the outside world. If we put these three primitives
+together, what we actually have is an agent loop. New events come into your agent, and these go into
+the event queue. Events are processed through handlers that you define. Those handlers can
+return mutations and effects. Mutations update state, both context item state and session state,
+effects are asynchronous. So they reach out to the real world, like a model provider API,
+and they come back as more dispatched events. And by stitching these three primitives together,
+we actually get an extremely powerful agent loop that under the hood is a distributed state machine.
+So let's go back to the demo, and let's fix our agent here.
+Okay, so I've built a second agent, this patient discharge approval agent. This looks
+quite similar to the agent we just saw. It has a model and system prompt, but it also has
+some context items that I mentioned before, some custom context items, and some event handlers
+for those context items, and the same three tools I have before. So let's start by looking
+at our discharge patient tool, because this is the tool we actually want to update and
+require in our approval now. So it looks quite similar to how we had it before, but instead of
+returning just the string literal and executing the discharge patient within the actual tool,
+we return this pending discharge context item. If we jump into this context item,
+this holds strongly typed state. So the state schema that I have is both the patient ID and
+this approval status. It can be pending approved, denied, and invalidated, and when I create this
+context item, it gets created in the pending state. So this context item mutates its own state
+through events, and these are events that I'm writing in code, and so I can submit a discharge
+approval event, and this event has an approval state associated with it, and I update the context
+item state through returning a mutation, which is approved or denied. And you'll see that if I've
+approved the -- if the nurse has approved the discharge decision, and so I have this event
+coming in with the approval status as approved, we actually then return an effect, which is this
+performed discharge effect. And that effect is handled here, where we call the same discharge
+patient helper, which calls the action in the ontology. And so what we've actually done is we've
+moved the discharge patient effect from the tool call into this context item state, which allows us
+to durably hold this pending state in our agent. I want to show what that actually looks like by
+running a new version of this agent, and if we run this agent, we've also built a UI on top of
+these -- on top of the context items, so it doesn't look as bad as it looked before -- oh, sorry,
+ran it on Aisha, ran it on David Park. And we see the lab results, the lab results look good, there's
+no thing concerning, and so our agent says that we should discharge this patient. I also want to
+show that if I refresh this page, that discharge approval state stays there. So we have this pending,
+it's durable, and if we look at the raw results, which we saw before, this is actually held in the
+agent session as this pending discharge context item, which we saw in the code. And to show how
+powerful context items are, it actually lets us render our front end to the nurse in the way
+that you see here, where the lab results are shown in a user-friendly way. Because if I look at the
+lab results in the agent session, instead of before, which is just printing them to the LLM,
+I now have them as strongly typed state, so I can render them properly on the front end,
+instead of just reg X parsing them on the front end. And you can see in the demo one,
+if we go to Aisha, her lab results are stored as basically a blob. So the last thing I want to
+show is one of the additional requirements that we had, which is our agent needs to be able to
+handle incoming data. So if a new lab results comes in, my agent needs to be able to update to
+reflect that new data. And so I'll go to our lab approval UI, or sorry lab console UI, and I'll
+upload a new lab result for David. And this is a COVID positive test result. You can see my hands
+aren't on the keys, my agents on the left, the lab results on the right, pay attention to the
+agent state. And I intentionally made this a long PDF to OCR, so that we'd have suspense.
+Maybe too long. Okay, there we go. Our lab result came in, our patient reassessed,
+and said this lab result is concerning this patient has COVID, we should not discharge this patient.
+How did that actually happen in the agent? Well, what we did is when we uploaded the lab result
+in our lab console UI, we sent an event to this agent. We sent a new lab result event.
+This came in to our agent as an event that I've typed here. That submit approval, sorry, new lab
+result event came in, got handled through our agent handler, which then dispatched an invalidate
+discharge event, and that got handled in our context item state to set the context item state
+to invalidate it, which rendered to our LLM that the lab, their discharge decision is stale,
+and you need to reassess. And that reran the agent loop, the LLM got more results and decided not to
+discharge the patient. So it wasn't that many lines of code in order to add the complexity
+that we actually require for an agent like this that's actually discharging patients.
+So to recap, what I showed here today was the lower levels of our agent stack. We have an
+agent SDK that makes it extremely easy to define complex agents, and we've also expressed low-level
+primitives with the agent engine to build agents of any shape. All agents built on the SDK run on
+top of orchestrator, our durable infrastructure layer, so you can get all the benefits that John
+mentioned. You'll be able to use a beta version of the agent SDK at DevCon, and we have a canary
+session walking through how to get started. I'm really excited to see what you guys built.
+But as I said at the start, this is just the beginning of the agent stack. The primitives
+powering our pro-code agent SDK are coming to our new low-code agent builder. This will make
+it extremely easy for anyone in your organization to define complex agents.
+And on top of that, we also have a new application called agent manager for monitoring and governing
+your agents. Any agent published in this stack, both pro and low-code, will show up in agent
+manager. This app will be your common pane of glass across the agents in your enterprise.
+And with that, I'd like to hand it back over to Ankit to talk through how we're adding observability
+into every layer of the stack.

@@ -1,0 +1,188 @@
+/**
+ * QuantFlow V2 — CSS token extensions for shell.css
+ *
+ * TARGET: quantflow-electron/src/windows/shell/src/shell.css
+ * ACTION: Merge these into the existing :root block. Do NOT replace existing tokens —
+ *         the existing --bg, --border, --font-sans etc. are kept; these extend the ramp
+ *         with the V2 meaning-palette and per-type rail variables.
+ *
+ * DESIGN AUTHORITY: DESIGN.md §2 (Color) and §6 (Tiles)
+ */
+
+:root {
+  /* ── V2 meaning palette ──────────────────────────────────────
+   * Each hue carries a specific operational meaning.
+   * NEVER reassign these hues to a different meaning.
+   */
+
+  /* Live / running / primary brand identity */
+  --flow:        oklch(0.78 0.16 145);
+  --flow-dim:    oklch(0.62 0.13 145);
+  --flow-bright: oklch(0.90 0.18 145);
+  --flow-glow:   oklch(0.78 0.16 145 / 0.18);
+
+  /* Tool / CLI type distinction (Codex CLI, MCP tools) */
+  --cyan:        oklch(0.72 0.13 210);
+
+  /* Agent / context routes (Hermes, orchestrator, context-service) */
+  --blue:        oklch(0.70 0.14 240);
+
+  /* Queued / backpressure / armed / experimental */
+  --amber:       oklch(0.80 0.14 80);
+
+  /* Error / failed signal */
+  --coral:       oklch(0.68 0.19 25);
+
+  /* Memory / Envoy ONLY — forward-looking, not yet active */
+  --violet:      oklch(0.62 0.16 295);
+
+  /* ── Brand ───────────────────────────────────────────────────
+   * Ivory: the structural color of the QF monogram and tile chrome.
+   * Live Green: the neon accent — cable flow, ports, F arms, signal.
+   * Slate: the dark ground (used for app background).
+   */
+  --ivory:       #f2f0ec;
+  --live-green:  #b7ff00;
+  --slate:       #0a0d12;
+
+  /* ── Canvas field ────────────────────────────────────────────
+   * Calibrated violet floor gradient + green origin glow.
+   * NOT a decorative "AI gradient" — the floor gives depth to the routing field.
+   * The origin glow marks the spawn origin, not a brand hero.
+   */
+  --canvas-gradient:    linear-gradient(to top, #0e0a1a 0%, #0a0a16 26%, #07080f 62%, #06080c 100%);
+  --canvas-origin-glow: radial-gradient(ellipse 70% 55% at 50% 100%, oklch(0.78 0.16 145 / 0.18) 0%, transparent 56%);
+
+  /* ── Per-type tile rail colors ───────────────────────────────
+   * The 2px inset-left box-shadow on .canvas-tile is the type rail.
+   * Set --rail on each [data-tile-type] selector (see below).
+   */
+  --rail-term:    var(--flow);
+  --rail-generic: var(--flow);
+  --rail-codex:   var(--cyan);
+  --rail-agent:   var(--blue);
+  --rail-worker:  var(--amber);
+  --rail-tool:    var(--cyan);
+  --rail-memory:  var(--violet);   /* forward-looking — disabled until Gate 3 */
+  --rail-graph:   var(--blue);
+
+  /* ── Cable kind hues ─────────────────────────────────────────
+   * These extend the existing --cable-pipe / --cable-context / --cable-trigger
+   * if they don't already exist. Match to meaning palette above.
+   */
+  --cable-pipe:    var(--flow);
+  --cable-context: var(--blue);
+  --cable-trigger: var(--amber);
+  --cable-error:   var(--coral);
+
+  /* ── Tile shadows ────────────────────────────────────────────
+   * Three levels: idle, running/selected, error.
+   * The running shadow includes a 1px flow-glow border ring.
+   */
+  --sh-tile:    0 6px 20px rgba(0,0,0,0.4);
+  --sh-running: 0 0 0 1px oklch(0.78 0.16 145 / 0.18), 0 8px 24px rgba(0,0,0,0.55);
+  --sh-error:   0 0 0 1px oklch(0.68 0.19 25 / 0.18), 0 8px 24px rgba(0,0,0,0.55);
+
+  /* ── Type fonts ──────────────────────────────────────────────
+   * Three roles:
+   *   Display / brand  → Space Grotesk (headers, wordmark, large numerals)
+   *   UI labels / body → Geist (→ system-ui fallback)
+   *   Operational      → IBM Plex Mono / Geist Mono (terminals, badges, @routes, coords)
+   */
+  --font-display: 'Space Grotesk', 'Geist', system-ui, sans-serif;
+  --font-sans:    'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'IBM Plex Mono', 'Geist Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  /* ── Motion ──────────────────────────────────────────────────
+   * Glow only signals flow/focus/live. No idle decorative animations.
+   */
+  --cable-flow-duration:  1.6s;   /* cableFlow: live route pulse */
+  --cable-queue-duration: 0.85s;  /* denser amber pulse for queued/backpressure */
+  --cable-pulse-duration: 0.65s;  /* on-send pulse */
+  --led-breathe-duration: 2s;     /* health LED breathe */
+  --tile-entrance:        240ms;  /* tile spawn entrance */
+}
+
+/* ── Per-type tile rail ──────────────────────────────────────────
+ * Applied via box-shadow: inset 2px 0 0 <rail-color>
+ * This goes inside .canvas-tile (already has the base box-shadow).
+ * Add data-tile-type to the tile root element from the spawn pipeline.
+ */
+.canvas-tile[data-tile-type="term"]    { --rail: var(--rail-term); }
+.canvas-tile[data-tile-type="generic"] { --rail: var(--rail-generic); }
+.canvas-tile[data-tile-type="codex"]   { --rail: var(--rail-codex); }
+.canvas-tile[data-tile-type="agent"]   { --rail: var(--rail-agent); }
+.canvas-tile[data-tile-type="worker"]  { --rail: var(--rail-worker); }
+.canvas-tile[data-tile-type="tool"]    { --rail: var(--rail-tool); }
+.canvas-tile[data-tile-type="memory"]  { --rail: var(--rail-memory); }
+.canvas-tile[data-tile-type="graph"]   { --rail: var(--rail-graph); }
+
+/* ── Tile state variants ─────────────────────────────────────────
+ * data-tile-state is set by the canvas renderer based on herdr/PTY state.
+ * Values: idle | running | selected | queued | error | experimental
+ */
+.canvas-tile[data-tile-state="running"] {
+  box-shadow: inset 2px 0 0 var(--rail, var(--flow)), var(--sh-running);
+  border-color: color-mix(in srgb, var(--rail, var(--flow)) 40%, var(--border));
+}
+.canvas-tile[data-tile-state="selected"] {
+  box-shadow: inset 2px 0 0 var(--flow-bright), var(--sh-running);
+  border-color: var(--flow-bright);
+}
+.canvas-tile[data-tile-state="queued"] {
+  box-shadow: inset 2px 0 0 var(--amber), var(--sh-tile);
+  border-color: color-mix(in srgb, var(--amber) 35%, var(--border));
+}
+.canvas-tile[data-tile-state="error"] {
+  box-shadow: inset 2px 0 0 var(--coral), var(--sh-error);
+  border-color: color-mix(in srgb, var(--coral) 45%, var(--border));
+}
+.canvas-tile[data-tile-state="experimental"] {
+  box-shadow: inset 2px 0 0 var(--muted, #4a5466), var(--sh-tile);
+  border-style: dashed;
+  opacity: 0.62;
+}
+
+/* ── Cable state classes ─────────────────────────────────────────
+ * These extend the existing cable-renderer class names.
+ * cable-renderer.js already has: cable-selected, cable-sending, cable-sent, cable-failed
+ * Add these alongside:
+ */
+.cable-queued .cable-main  { stroke: var(--amber); }
+.cable-queued .cable-flow  { stroke: var(--amber); animation-duration: var(--cable-queue-duration); }
+.cable-queued .cable-glow  { stroke: var(--amber); }
+.cable-error  .cable-main  { stroke: var(--coral); stroke-dasharray: 11 7; }
+.cable-error  .cable-glow  { stroke: var(--coral); }
+/* Bundled cable: width handled in cable-renderer.js as 3 + min(count, 5) */
+
+/* ── Health LED ──────────────────────────────────────────────────
+ * .status-led is already in shell.css — extend with state classes.
+ */
+.status-led[data-health="healthy"]  { background: var(--flow);  animation: ledBreathe var(--led-breathe-duration) ease-in-out infinite; }
+.status-led[data-health="degraded"] { background: var(--amber); animation: none; }
+.status-led[data-health="down"]     { background: var(--coral); animation: none; }
+
+@keyframes ledBreathe {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Canvas field background ─────────────────────────────────────
+ * Apply to #panel-viewer or the canvas root element.
+ * The dot-grid is two layers: coarse (88px) + fine (22px).
+ */
+.canvas-field {
+  background:
+    var(--canvas-origin-glow),
+    var(--canvas-gradient);
+}
+.canvas-field::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 88px 88px, 22px 22px;
+}

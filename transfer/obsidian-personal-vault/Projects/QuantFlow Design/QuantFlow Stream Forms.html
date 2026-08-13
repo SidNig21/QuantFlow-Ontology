@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QuantFlow — Stream Forms</title>
+<link rel="stylesheet" href="tokens.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=IBM+Plex+Mono:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
+<style>
+  html, body { margin: 0; padding: 0; background: #07090c; color: #e7ecf2; font-family: 'Geist', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  @keyframes qfSpin       { to { transform: rotate(360deg); } }
+  @keyframes qfBlink      { 50% { opacity: 0; } }
+  @keyframes qfCableFlow      { to { stroke-dashoffset: -32; } }
+  @keyframes qfCableFlowDense { to { stroke-dashoffset: -28; } }
+  @keyframes qfPulseRing  { 0% { transform: scale(0.55); opacity: 0.7; } 100% { transform: scale(1.9); opacity: 0; } }
+  @keyframes qfBreath     { 0%, 100% { transform: scale(0.78); opacity: 0.4; } 50% { transform: scale(1.22); opacity: 1; } }
+  @keyframes qfFilFlow    { 0% { top: -10%; } 100% { top: 100%; } }
+  @keyframes qfPrintHead  { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(8px); opacity: 0.15; } }
+  @keyframes qfMarquee    { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes qfEq         { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+  @keyframes qfDots       { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes qfFill       { 0% { transform: scaleX(0); } 45% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  @keyframes qfScan       { 0% { transform: translateX(-120%); } 100% { transform: translateX(420%); } }
+  @keyframes qfEkgDraw    { 0% { stroke-dashoffset: 560; } 100% { stroke-dashoffset: 0; } }
+  @keyframes qfSealSpin   { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="120" fill="#0a0d12"/>
+    <line x1="42" y1="30" x2="42" y2="90" stroke="#B7FF00" stroke-width="2.5"/>
+    <circle cx="42" cy="34" r="4" fill="#0a0d12" stroke="#B7FF00" stroke-width="2"/>
+    <g stroke="#5fc6d8" stroke-width="2.5"><line x1="50" y1="48" x2="74" y2="48"/><line x1="50" y1="58" x2="68" y2="58"/><line x1="50" y1="68" x2="78" y2="68"/></g>
+  </svg>
+</template>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="v2/qf2-tokens.jsx"></script>
+<script type="text/babel" src="v2/qf2-parts.jsx"></script>
+<script type="text/babel" src="tiles/tt-shared.jsx"></script>
+<script type="text/babel" src="tiles/tt-loaders.jsx"></script>
+<script type="text/babel" src="tiles/tt-ansi.jsx"></script>
+<script type="text/babel" src="tiles/tt-presence.jsx"></script>
+<script type="text/babel" src="tiles/tt-presence-stages.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#B7FF00",
+  "watermark": true,
+  "motion": true
+}/*EDITMODE-END*/;
+
+const ACCENTS = [
+  { v: '#B7FF00', label: 'Live green' },
+  { v: 'oklch(0.72 0.13 210)', label: 'Cyan' },
+  { v: 'oklch(0.70 0.14 240)', label: 'Blue' },
+  { v: 'oklch(0.80 0.14 80)', label: 'Amber' },
+];
+
+const Board = ({ w, h, children }) => {
+  const ref = React.useRef(null);
+  const [scale, setScale] = React.useState(1);
+  React.useLayoutEffect(() => {
+    const el = ref.current; if (!el) return;
+    const fit = () => setScale(Math.min(1, el.clientWidth / w));
+    fit(); const ro = new ResizeObserver(fit); ro.observe(el); return () => ro.disconnect();
+  }, [w]);
+  return (
+    <div ref={ref} style={{ width: '100%' }}>
+      <div style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: 'top left',
+        marginBottom: (scale - 1) * h }}>{children}</div>
+    </div>
+  );
+};
+
+const Group = ({ kicker, title, blurb, children }) => (
+  <section style={{ maxWidth: 1440, margin: '0 auto', padding: '0 28px' }}>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap', marginBottom: 4 }}>
+      <span style={{ fontFamily: QF2.fontMono, fontSize: 11, color: QF2.flow, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{kicker}</span>
+      <h2 style={{ margin: 0, fontFamily: QF2.fontDisplay, fontSize: 26, fontWeight: 600, color: QF2.fg, letterSpacing: '-0.015em' }}>{title}</h2>
+    </div>
+    <p style={{ margin: '0 0 18px', fontSize: 13.5, color: QF2.muted, lineHeight: 1.55, maxWidth: 800 }}>{blurb}</p>
+    <div>{children}</div>
+  </section>
+);
+
+const App = () => {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const cfg = { accent: t.accent, watermark: t.watermark !== false, motion: t.motion !== false };
+
+  return (
+    <React.Fragment>
+      <div style={{ minHeight: '100vh', paddingBottom: 90 }}>
+        <header style={{ maxWidth: 1440, margin: '0 auto', padding: '46px 28px 30px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <QFMark size={52} glow />
+            <div>
+              <div style={{ fontFamily: QF2.fontDisplay, fontSize: 30, fontWeight: 600, letterSpacing: '-0.02em' }}>Stream forms</div>
+              <div style={{ fontFamily: QF2.fontMono, fontSize: 12, color: QF2.muted, letterSpacing: '0.04em', marginTop: 4 }}>
+                no tile · no window · 4 original ways to hold a live herdr session on the canvas
+              </div>
+            </div>
+          </div>
+          <p style={{ maxWidth: 820, marginTop: 18, fontSize: 13.5, lineHeight: 1.6, color: QF2.muted }}>
+            Same job every time — live ANSI streaming from a herdr PTY, identity, status, wireable ports, a not-ready state —
+            but the rectangular container is gone. Four different answers to “what is a session, spatially?”
+          </p>
+        </header>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
+          <Group kicker="1 · cable-native" title="Filament"
+            blurb="The herdr cable grows a voice. The stream rides a luminous vertical spine, each line ticked to it like a timeline and events glowing as nodes. The wire that wires agents together becomes the agent itself.">
+            <Board w={1380} h={760}><StageFilament cfg={cfg} /></Board>
+          </Group>
+
+          <Group kicker="2 · the machine prints" title="Ticker"
+            blurb="A thermal print-head extrudes a tape and the session prints onto it — numbered lines, perforated edges, a torn bottom. The market ticker, reborn for an autonomous research desk.">
+            <Board w={1380} h={800}><StageTicker cfg={cfg} /></Board>
+          </Group>
+
+          <Group kicker="3 · zero chrome" title="Boundless"
+            blurb="No container at all. A single margin rule and a floating label; the stream is set straight onto the canvas grid, which shows through between the lines. The agent writes directly on the infinite plane.">
+            <Board w={1380} h={720}><StageBoundless cfg={cfg} /></Board>
+          </Group>
+
+          <Group kicker="4 · temporal / archival" title="Well-log"
+            blurb="A core sample of the run. A depth gutter timestamps every line and marks significant events; output accumulates as strata you read top to bottom. The live caret is the drill bit at current depth — forensic and replayable.">
+            <Board w={1380} h={800}><StageWellLog cfg={cfg} /></Board>
+          </Group>
+        </div>
+
+        <footer style={{ maxWidth: 1440, margin: '64px auto 0', padding: '0 28px', fontFamily: QF2.fontMono, fontSize: 11, color: QF2.muted2, letterSpacing: '0.04em' }}>
+          Each board is on the real canvas — grid · wires · watermark. Not-ready streams keep the Breath loader. Tweak accent · watermark · motion at right.
+        </footer>
+      </div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Signal hue" />
+        <TweakColor label="Accent" value={t.accent} options={ACCENTS.map(a => a.v)} onChange={(v) => setTweak('accent', v)} />
+        <TweakSection label="Canvas" />
+        <TweakToggle label="Watermark" value={cfg.watermark} onChange={(v) => setTweak('watermark', v)} />
+        <TweakToggle label="Motion" value={cfg.motion} onChange={(v) => setTweak('motion', v)} />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

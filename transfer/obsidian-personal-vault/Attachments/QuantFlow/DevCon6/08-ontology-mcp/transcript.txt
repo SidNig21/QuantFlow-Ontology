@@ -1,0 +1,847 @@
+(upbeat music)
+- Hi, I'm Chad Wilquist.
+I'm an architect at Pounds here.
+Today I've got Mike who leads one of our internal teams
+that drives boundary use inside of Pounds here.
+Thanks for joining me Mike.
+- Thanks Chad, excited to be here.
+- So we've got a fun topic.
+This is something we hear a lot about with MCP.
+We've got the platform MCP, Ontology MCP, all this use.
+And I think no one better to describe
+kind of some really cool use cases of this
+than you and how we're doing it.
+So maybe just can give a riff on what your take is
+on like specifically like the Ontology MCP
+and then we can get into how we're using it.
+- Yeah, definitely.
+Yeah, so as you mentioned, I've been focusing
+on our internal use of Foundry for quite a while here
+at Palantir and we've built at this point
+a pretty large robust ontology that covers.
+Basically all of our connected internal systems
+and Foundry itself has become the source system
+for a lot of our workflows here.
+So we have a pretty good baseline to work from.
+We've got a large set of internal apps
+that people have built in workshop and custom apps
+and OSDK and all kinds of other things going on.
+And in the last couple of years,
+obviously we've onboarded several AI tools
+and in addition to everything that we've
+don't be doing in Foundry.
+So this year we rolled out OMCP,
+basically the Ontology MCP server
+to connect all of those workflows that were happening
+in our AI tools with our internal Foundry instance.
+And so far it's been really valuable.
+We have basically started using it
+for a bunch of internal use cases.
+The one that I'm gonna talk about today
+is more on the internal planning side
+and some of the stuff we're gonna cover
+is basically how you set it up,
+a little bit about how it works generally
+and some of the benefits of it.
+And then I'll actually run through
+what planning looks like notionally internally here.
+So we do this three times a year.
+And yeah, it's been made a lot easier with the OMCP.
+>> Yeah, I think it's cool 'cause like we don't,
+we talk about how we help customers
+and how we want to ontologize their business.
+It's like we have an ontologized
+and we build our entire business and ontology.
+So kind of this is the north star of like,
+if you have everything ontologized in your business,
+these are the cool things.
+You can go do it like have an MCP server
+for your entire business.
+So I think it's pretty cool to get into it.
+So all right, let's just jump into the demo
+and show some cool stuff here.
+>> Yeah, let's do it.
+Yeah, I mean, one of the big benefits here is that,
+I mean, as we've explored with our sort of
+other internal AI tools,
+it's very easy to get into this kind of nest
+of MCP servers and individual connections to things
+and going, you know, you're going to Slack,
+you're going to this and that and it gets,
+it's very sort of bespoke per user.
+A lot of people don't engage with it at all.
+And what OMCP is letting us do is just have them connect
+to one thing, all the data they need is already there.
+It's already modeled, they can just start making use of it
+and they can start writing back to it as well.
+So what I'll start with here.
+>> I want that threat real quick though.
+Like I think what you're saying here is important
+because instead of having an MCP server
+for every different kind of system,
+by modeling all of that into the ontology
+and then giving them one MCP server,
+that means I not just encode the system pieces,
+but the actual business processes across those systems
+and how they interact.
+So they're much more useful.
+So like, I think really the thought here is,
+one MCP server model and the business process backed
+by systems rather than 20 different MCP servers
+on each system is far more effective for the end users
+because of that business process modeling on top of it.
+>> Yeah, exactly.
+I think where you feel at the most is the way
+that you model all the interconnections
+between different object types.
+So if you have five different MCP servers
+and you just throw your AI tool of choice at it
+and say like, de-conflict all these things, find patterns.
+It's going to do it a little differently every time.
+It's going to be pretty error prone.
+It's going to take a lot of time.
+It's going to burn a lot of tokens.
+But having it all modeled in the MCP is let us say like,
+get a lot closer to kind of one-shotting these analyses,
+getting data back in a way that it can actually work with
+and you end up with some pretty nice output at the end of it.
+>> All right, cool, let's get into it.
+>> All right, great.
+Yeah, so to start, let's talk about how we set this thing up.
+As someone that's sort of administrating this,
+it's really exciting and easy for me.
+Basically, all this happens out of a Foundry Dev console.
+This is the same place that you would go
+if you were building like a custom OSDK app
+or something like that.
+So we have a demo one here.
+The first step is you have your ontology SDK.
+This is where you're actually going to define
+what objects you want to make available to your MCP server.
+So you can, and we do use this in a couple of different ways.
+You can either go for breadth
+and you just add sort of everything you've gotten here,
+or you can do more use case specific ones
+and if you want it to have more
+like very targeted use case MCP servers.
+For this case, we tend to bias more towards the broad ones
+and it does a good job of actually
+like navigating all those objects.
+So in this case, we have, as I mentioned,
+we're sort of focusing on planning here.
+So this is sort of a minimized version
+of the ontology that we have internally.
+We've got a few object types to sort of represent the ore.
+We've got developers, we have some teams in here.
+We have some objects that represent our actual plans.
+So we have planned objects, objectives, key results.
+And then we have some of our source systems.
+So we've got like chat messages, support tickets,
+and then a few things from like GitHub pull requests,
+GitHub issues, these are, you know,
+a subset of the things we would use in the real world,
+but they're pretty representative of the type of data
+that we would rely on if we were trying to retrospect
+on how a team was doing or start a plan
+or anything like that.
+>> But I think the other piece here you kind of briefly hit on
+was like it's not just the data though.
+It's like the data, the logic, the actions,
+the connections between them, the security.
+You get all of that, as long as it's not just a data
+where I can do reg with MCP.
+This is like a full fledged operational component
+where like we can actually take actions
+and we can navigate across links
+and we can do all sorts of things.
+>> Yep, yeah, no exactly.
+Yeah, you can kind of see a sense,
+get a sense of what all the links are here.
+And then at the bottom here is all the action types
+that have made available.
+So you can do all kinds of things with this one.
+We can create issues in the real world.
+This would actually like go right back to the source systems
+if they were external ones here.
+And then obviously all of the like planning stuff
+or editing and creating your objectives
+and key results, all that's here too.
+And these are just made available as basically tools
+in the like MCP tool chain for our AI agent.
+Cool, so once you have your objects loaded in,
+it's pretty straightforward.
+There is another MCP tab over here
+and you just turn it on and you have an MCP server.
+So the kind of cool thing that I just wanted to point out here
+is this is pretty much agnostic to whatever tools
+that you use.
+I'm gonna show an example with clod code inside VS code.
+Plug in there and then also codecs and terminal
+but this can and has been used with clod desktop,
+with Gemini, with co-pilot.
+All those things are possible
+and it really doesn't matter.
+The point is you're connecting one thing to all of those
+and everyone's sort of speaking the same language.
+Yeah, I recently had hooked up co-pilot on top of owns
+to be in the customer loved it
+that like all of a sudden their enterprise data
+was making sense inside a co-pilot form.
+So like it's pretty cool to be able to take this approach
+of this business process behind it
+and enable any of these tools that you have
+across your enterprise.
+So now like I can open up Word
+and I have the ontology back stuff
+as I'm writing documents or power points
+or other things that people are doing in their enterprise.
+So I think it's cool to be able to meet them where they are.
+And I think that's the goal behind this
+is to bring the power of the ontology
+to where people are working already.
+Right, yeah, exactly.
+And I have to say, the first time I used this,
+and I think the first time I used it was in flawed code
+and it just felt kind of magical.
+You like hook it up and you just start asking these
+like very generalized questions
+and it comes back with really, really useful stuff.
+And when your workflow is already in there,
+you're editing code, you're doing actual development,
+it's really pretty valuable to be able to have
+all this stuff sort of in there with you.
+It's a really like nice enriched workflow
+where we've been getting a lot of good usage out of it.
+A lot of organic usage people,
+people have really picked up this thing.
+Great, so just to, I think that's basically
+all that we've got in terms of setup here.
+Maybe one other thing to note is that
+everything that's coming through the MCP server,
+the in your AI agent, client, whatever,
+you're basically just offing to Foundry.
+So you get like a scopes down token,
+you have the access that your user has.
+So you basically inherit all the access controls,
+row, column based access controls, security markings.
+That all is reflected in the OMCP server.
+And then even cooler than that, this is exciting to me,
+is if you have one of your AI tools,
+maybe it's a cloud based one, maybe it's a third party one,
+the level of trust that you have
+in terms of the kind of data that it can store,
+if that's lower than what you have in Foundry,
+you can also do marking whitelisting.
+So you could just let a subset of data out dynamically.
+So you could say, anything that's marked as PII,
+don't allow through the MCP server,
+which has been really, really helpful for us.
+>> Oh, so even, this is a,
+I'm learning stuff right now too.
+So we've got the feature where now,
+like if I have access to this in Foundry, great,
+but I don't want these external tools
+'cause I don't have control over how they're going
+to secure the data for PII, for example.
+So even though Mike, you have access to it in Foundry,
+I can only access that in Foundry in the secure enclave,
+first I can't export it out to one of these tools.
+Okay, that's pretty neat.
+I see I learned something new today.
+>> Yeah, it's very cool.
+And it makes it so that you can actually like,
+with some confidence, hook this up to tools that,
+I think it would have been tough to justify
+from like an info spec perspective before.
+But then you can get 99% of the data
+that people really need out there
+and get yourself a little bit unstuck.
+So that was a big deal for us when we got that in here.
+>> That's awesome.
+>> Yeah, cool.
+So I think the next thing was just to maybe talk
+a little bit more about what was going on
+in the ontology here before we actually jump into
+the AI tools.
+I showed this a little bit in the OSDK tab above,
+but we have this use case kind of mapped out here.
+Basically the objects that we've got are broken down
+into like organizational constructs, teams and developers.
+We have our planning objects, so plans OKRs,
+and then our like signal here.
+GitHub issues, Slack messages support tickets.
+So this is really common internally for us.
+Like, you know, we have internal engineers and developers.
+They're doing their actual work in code in GitHub.
+They're committing code all day.
+They're submitting PRs.
+We're filing issues for things that need attention.
+We all have internal like chat channels where we do support.
+Very high volume, lots of stuff coming in there,
+very hard to keep track of.
+We also have a ticketing system.
+So we have, you know, and in real life
+there's more than this as well.
+These are just some of the most common ways
+that we're getting requests, signal, whatever.
+And I'll show you a little bit about how sort of
+we're going to use ONTP to manage all this stuff.
+So when everyone requests features to me on X
+and then they end up here in the ontology
+and then we go build the feature that people want on X
+and release it an hour later, I think the flow there is tight.
+Yep, yeah, exactly, exactly.
+And the thing that I think is really exciting
+in this whole flow is, you know, when you're,
+when you're integrating this into the place
+that people are doing their day-to-day work,
+you can go from synthesizing signal like just the torrent
+of stuff coming in through Slack or whatever
+into actual like issues that you file in GitHub,
+actual code, you know, you can do that whole flow
+sort of in one go here.
+And it's really convenient.
+I've been doing that a lot, a lot internally lately
+and it's just such a more pleasant flow
+than anything I'd done before.
+And yeah, and I think the last thing here is that
+I have added a few actions in here
+that are sort of core to this workflow
+and this is all the stuff for actually creating
+and codifying your plan.
+So right now we've been using Foundry
+to do internal planning and actually a lot of product
+planning for years at this point.
+And it's a great use case.
+It's really valuable to have everything stored
+in like a really well-structured way on the ontology.
+We have, you know, the OKRs are all really discoverable
+why teams are making it easy to deconflict
+and understand what other people are working on
+and when they're delivering it.
+But it's labor intensive to actually codify
+all that stuff.
+So I'll show a little bit about like,
+this is a sort of simplified version
+of what our internal planning app looks like.
+But if you go into these, you can kind of see
+it's nice for reading.
+You can go in and look.
+It's a workshop app, but you know, it looks fine enough.
+It's easy to digest.
+You can peruse through people's plans
+and get a sense of what's going on.
+If you want to add plans, it's form-based.
+So, you know, you're adding OKRs one by one
+to get that structure.
+And historically, that's been fine,
+but it's kind of painful and time-consuming.
+And someone has to go in and do all that.
+The nice thing with OMCP is you can just feed, you know,
+an LLM, your sort of rough plan or just like, you know,
+a text plan and it figures out all the objects for you.
+It navigates all that and it submits all of it.
+So it's taken what was like a valuable and useful
+but time-consuming flow into something
+that you basically don't think about anymore.
+You just write the plan and it figures it out for you
+and gets it all in here.
+That's very slick.
+Yeah, so that as one of the authors of our internal planning
+app, the streamlining here has been very helpful for me
+because I had to feel a lot of questions about it.
+So cool.
+So I think that's about the whole stage
+before we get into actually looking
+at what this thing can do.
+Any other questions or anything before we move over
+to VS Code here?
+No, let's go see how it works.
+I think that's really the key.
+So we got some ideas on how these fit together,
+but, you know, like, what can we do with it?
+Yeah, for sure.
+All right, so in this flow, I think
+a really common thing to do as we're getting
+into our seasonal planning, we do this three times a year.
+The first step is usually some kind of retrospective, right?
+So you want to know how did the last period go?
+Did you accomplish your goals?
+Did it line up with the actual, like,
+support things that were coming in?
+How are you doing on some key metrics?
+This kind of stuff is a very labor-intensive to pull together.
+This could easily take several days of someone's time
+just to get all the chat data and, you know,
+peruse issues and tickets and filter all that stuff.
+So what we're doing here is we're basically using OMCP
+to speed up this whole process.
+So I have a simple code workspace up here.
+In real life, we would have, you know,
+this, you would probably integrate this
+with whatever your actual repo is.
+You see a lot more here.
+For now, what I've done was I ran a retrospective
+for our tech support team.
+This is all notional data, but basically asked it
+to take a look at all of our historical data,
+from Slack, from tickets, from GitHub,
+and run a retrospective for tech support.
+So it comes, it came back with a markdown file.
+I just wrote it locally for me so I can edit it
+and do whatever I need to with it.
+But you can see the kind of stuff that it comes up with
+is like, it's actually really nice.
+And if you don't like the format,
+it's very easy to iterate on it.
+And then it becomes very easy to go ahead
+and do additional ones.
+So, like, for me, as one of the leads of our org,
+like, it's very common that as, you know,
+everyone else is planning,
+I'll wanna go through and do a little bit of my own homework.
+So I could just say, like, okay, now show me
+a similar retrospective for the network engineering team.
+And it'll just cook for a while.
+It'll start looking through all that additional data.
+It knows what it pulled before,
+which was basically, you know, an amalgamation of signal
+from our plans and our support data.
+And it's just gonna start doing that.
+So I can keep writing these things.
+And I think the spoilers that, like, after this is done,
+you can then take that retrospective and say, like,
+all right, this is great.
+Take some of those learnings.
+Look at the stuff that was in the plan last time.
+Look at the stuff that came in from our support data,
+common trends, and now make me a plan,
+which is cool.
+I think in the real world, obviously,
+you have it make you a draft.
+It's based, it's anchored in real life data.
+And then you go and iterate on it.
+We're gonna show sort of like a compressed version
+of that here where I think we mostly one shot the plan,
+which I don't wouldn't necessarily advise,
+but we get pretty close.
+So, yeah, so you can kind of see what it's doing here.
+It's like, okay, we have a good format for reference.
+It found the network engineering team,
+found the lead of the network engineering team.
+It's pulling up the objectives, key results,
+GitHub issues.
+And now it's basically just doing its analysis here.
+So, in a minute, it'll come back with another markdown file
+and it'll have an additional retrospective
+for network engineering.
+So, we'll let that cook for a little bit.
+And while it's doing that,
+I'll give a little bit of a spoiler for what's coming next.
+There it is.
+Okay, here we go.
+Which is basically, we're gonna check Todd's work with.
+- Yeah, I think like I can't understate the,
+or I can't overstate, I mean, how cool it is to,
+'cause our ticketing system is based in ontology
+and then found reading something else.
+All of these are actually like live system of records
+for us that are actually coming together.
+So, the fact that I've got our ontology mapping out
+our ticketing process mapped into our product pieces,
+mapped into all these things,
+that's actually the ontology of how Palantir runs.
+And now I can have these AI agents or components,
+wherever I'm working, like this example in Cloud Code,
+we'll look at others as well.
+But like, how cool it is that I actually have all of that
+in the live system that I can now interrogate,
+build plans iterate over, like, it was just cool to me.
+- Yeah, no, it's like, yeah, I'm like used to it at this point.
+The first time I did this, I was actually blown away.
+I was just asking it questions all day
+about like, what's going on this team?
+What's going on this team?
+It was like a level of visibility
+I just had never had before.
+And this is just what I would do as sort of like a manager here.
+Like, if I was on the network engineering team
+and I saw this, I could go here and say like,
+oh, it's like, we have like terraform issues.
+It's like, you could literally paste this in
+and just say like, go look at all of my config files,
+like, actually help me fix this thing.
+You know, and then, you know, you basically pick up
+your normal Cloud Code workflow from there.
+So it's really great for jumping off
+and getting actual work done outside just planning.
+So in this case, yeah, it came up with, you know,
+it looked at the template, came up with a new version
+for the network engineering team.
+It's a good jumping off point for actually getting
+a plan going.
+So I could say like, okay, you know,
+this is very interesting.
+Make it into our T3 plan.
+And it'll do the same kind of thing.
+It'll come back and it'll draft up another,
+another markdown output.
+I'll show just an example of what that looks like.
+So this is one that I had it pull together
+a couple hours ago for tech support.
+And this one, you know, it gives sources
+of where it found things.
+It sort of says what the general plan is based off
+of what are the main themes.
+And then it just gets right into OKRs.
+Toggle it into a nice rendered mode.
+So you can come and see like here's the,
+here's the, you know, first objective stop IT automation
+from failing silently.
+So, you know, it does a pretty good job
+of synthesizing these things.
+And, you know, if I were the lead of this team,
+I would read through this.
+I would share it with the team.
+I would iterate on a little bit.
+Make sure that we were kind of all in sync
+with the actual work.
+Obviously it's, you know, it's,
+we're still talking LLM's here.
+It's never going to be perfect.
+But like the amount of time that you save
+from just trolling through all that information
+and synthesizing it into something useful is like,
+it's hard, it's hard to overstate.
+- Well, I think now too, like the way that it did all that work.
+So you can really focus on the strategy,
+the real, the thinking part, right,
+is what we don't want to push out to the LLM's.
+It's really around, can it bring all the data together,
+come up with kind of the basis point?
+Now I can think strategically about it
+instead of figuring out where do I find this thing?
+And where is this piece, right?
+I think that's really like allows us to prototype our plans
+in this case, you know, as we go through
+and kind of iterate on the product.
+- I think it's very common to sit to have these feelings
+about like this is the stuff that people were complaining about.
+This is the stuff that was causing a lot of pain,
+but having a real data back view
+makes those conversations so much easier
+and you can just get down to it.
+- Yep.
+- So cool.
+All right, so from here, we'll just let,
+let Claude keep drafting the network engineering one
+in the background.
+I'm going to pivot over to kind of my next step here,
+which is we have a draft.
+Again, in the real world, we iterate on it
+with our team a little bit.
+Something that I always find really helpful though,
+both when doing, you know, like AI driven coding
+and development, but also for written documents like this
+is I'll have a different agent kind of check the work.
+So all this is gone.
+I'm gonna move over to my other window here
+where I have codecs open.
+So I've been doing some other planning work
+in here with codecs and it has access to the same files
+that Claude was writing.
+So I could say, you know, let's take a look
+at the draft plan and me some feedback.
+Is it realistic?
+Is it too ambitious?
+And it'll take a look at it and sort of proofread the work.
+And I've found that even when, you know,
+the first draft looks pretty sane,
+it actually comes back with really, really good feedback.
+And usually--
+- It has access to the file.
+It has access to the ontology as well.
+- Yep, yep, exactly.
+And you can see it's doing all kinds of ontology calls here.
+It's doing a whole bunch of stuff.
+So it's, it does a good job of kind of fetching
+the right information.
+All right.
+- So I think this is like,
+so like the fact that I have one ontology,
+I can use Claude code codecs,
+co-pilot, I can use our AIFD,
+you can do it in platform.
+Like the goal is not one platform.
+The goal is like, we meet you where you are
+with the right intelligence and yep,
+that's really the ontologies kind of play here
+is bringing all that together
+no matter what environment you're in.
+- Yeah, exactly.
+Now, there's an important point there,
+which is that for people that have been doing a lot of AI
+workflows that are watching this.
+Like they'd probably say, this is nice,
+but like you could automate a lot of this.
+And I think that's exactly right.
+And what I would, what I would do going forward from here
+is use our learnings from going through this process manually
+with a few different AI tools.
+And I think the next step here would basically be
+once we like that workflow,
+we can use the other Foundry MCP preserve more
+for building stuff or do it in Foundry and AIFD
+and actually codify this whole workflow.
+So like, we shouldn't in theory have to do any of this stuff.
+Like once we've learned the most valuable version
+of this process, it should just happen.
+And it's pretty easy to go from prototyping here,
+working through this manually with a few AI agents to,
+we've now built this thing in Foundry.
+It happens every couple of months automatically,
+sends you a retrospective, you can go back and forward on it,
+you give it a final draft, it publishes it for you,
+you're done.
+And then you can run further automations to say,
+you know, the kind of deconfliction that I ran manually here,
+it could do sort of like on a weekly basis, right?
+Like you don't necessarily need to wait until you're doing
+planning to get trends from your cat data
+and support channels and things like that.
+That should happen all the time.
+So what we're using this increasingly for is
+that discovery part.
+So when you're off-roading and you need to do one off things,
+this is like, it's tough to beat.
+But obviously you wanna have some consistency
+in how these things are done.
+And this is just a great first step
+to actually launch off into that
+and like really build the workflow in Foundry.
+So it's a nice play back and forth between tools
+that people are used to, getting it back into platform,
+iterating again.
+It's been very like very useful for us.
+Cool, so it looks like it finished here.
+And it actually said this one was realistic.
+I had a draft another one yesterday
+and I said it was wildly unrealistic.
+So this is actually, I guess we're getting better at it.
+So from here, yeah.
+Yes, so what do we do for each other?
+Like as I get it, we can use different ones.
+We can interact with ontology,
+even across different agent coding tools.
+Like, so now when we talk about codifying it
+or like how do I write back or how do I make these plans?
+Like what's the next step?
+So I can do all my typos and flubs that I want
+and I'll figure it out.
+So from there, then, you know,
+we are basically at the end of the planning workflow.
+We say like, okay, we're good with it.
+Let's actually publish this thing.
+It's gonna make a bunch of OMCP calls
+to all those actions that I showed earlier.
+I found a T for the plan,
+oh, Blonde's network engineering, okay, cool.
+So there's no tech support T3 plan yet.
+So let's go ahead and draft it up.
+Okay, no clean.
+Okay, all right.
+So pull the markdown file for T3 and publish that.
+All right, so need a little bit of supervision here,
+but it will get there.
+Cool. Cool.
+So yeah, I mean, from here,
+we're just letting it kind of do its thing, publish it,
+and then it would show up back in that workshop app.
+This is where the rest of the company would consume it.
+Or if they're doing other workflows like in their AI tools,
+they can reference them there too.
+This is nice if you're just doing a general peruse of like,
+"What's going on in TechOps?"
+But if you need more tactical information or your T conflicting,
+you'd probably go back to the AI tool.
+So like--
+But I think that important part is you're talking about,
+I'm collaborating across teams,
+across an entire organization.
+The ontology is at the center, no matter which tool.
+So one team might like using Cloud Code,
+one might be using AI IFT, one might be using codecs,
+another using copilot.
+I don't care if the ontology is that single back-end layer
+across the enterprise and workflows,
+not only for that interactive kind of, you know,
+agent to kind of coding pieces here,
+but if I then want to codify it into a workflow
+that's just happening automatically,
+you can do that inside of Pautier,
+you can do it outside.
+That interoperability and openness is really
+what I'm trying to get at is like,
+"I don't care."
+It really comes back to what is the right thing
+for your organization,
+how do you get the most value out of it?
+And using that ontology to orchestrate all of that.
+Right, yeah.
+And I think maybe another point on top of that is like,
+we've been very fluid with the tools that we use.
+This is obviously a very dynamic industry.
+There's, you know, new things are landing constantly.
+The preferences for which tool developers
+like to use changes on a near daily basis.
+Not feeling stuck with any particular configuration
+or set of tools has been very liberating.
+You can jump again from, you know,
+Cloud Code, to codecs, to copilot,
+to whatever depending on what you need.
+Depending on what latest version happens to have
+the features that people want or latest models or whatever.
+Be able to have that fluidity has been really helpful.
+And, you know, again, a lot of times
+the best thing will be doing it inside Foundry itself.
+But other times, you know, you're meeting users
+where they are and whatever tool happens to be the best today.
+Yeah, no, this is awesome.
+I think the kind of openness,
+because I think we hit on the ontology MCP
+where I'm having MCPs or on that ontology piece,
+but like we also have the platform MCP.
+So you can actually interact and build stuff
+in the platform through MCP
+and then consume it through the ontology, you know, MCP as well.
+So it really is fully like dynamic
+from that standpoint of having MCP integration,
+SDK integration, like that really is kind of the core
+across everything we're doing.
+I mean, how do you have a single ontology
+for that business process?
+But then you can interact with it in all the different ways
+that you need to to kind of meet your needs.
+Yep, yeah, exactly.
+It's like, this would be such a cool workflow
+to actually do this manually once
+and just say connect to the other MCP server
+and start building it in Foundry.
+And it just would take off.
+It would have all the context from your discovery here.
+It would distill it
+and then you would be on your way to a new use case.
+And there's something quite powerful about that.
+You get, you really like raise the competence bar
+every time you go through the process.
+Yeah, all right.
+So it looks like it submitted the plan.
+It's an ontology.
+It's like a bid.
+Yep.
+So let's take a look. It should be one
+of the few T3 plans here.
+There we go, tech support.
+All right, so yeah, it looks like it navigated the ontology.
+It made all the key results and objectives correctly,
+published it all, did a really nice job.
+I didn't have to click through a bunch of forms and things.
+It was easy.
+And I spent zero time on publishing
+and sorting out the formatting of the plan
+and all of my time actually planning.
+And now you have a structured plan
+that integrates with the rest of your product pieces
+or other information in your business.
+And now I have ways I can keep against it
+and do whatever I want.
+Like pretty cool.
+I think having that piece of structured component
+that allows me to process unstructured data, right?
+I think that's back and forth of how organizations
+really work is pretty neat.
+So awesome.
+So now, yeah, so I'm destroying a question in here,
+a typical kind of thing that you might want to know is like,
+where is the tech support team blocked
+on the network engineering team?
+So now that all that is published,
+it can peruse all that and start to understand
+where these teams have interdependencies,
+where they need to file, work, and issues on each other
+and where they are and are not unblocked
+and where they can make progress.
+So I came back pretty quick with that one.
+I came up with a short list of areas
+where they have dependencies on each other.
+Again, this kind of stuff is just so tedious normally
+and being able to just ask these free form questions
+and then just use that as a launching point
+to actually do the work, really, really helpful.
+>> Yeah, and I know like we're a technology company
+showing how we can build different products and these things,
+but as people think about this in their organizations,
+whether that's planning out business events
+or other components or how am I actually
+going to run my business, this same kind of a thing
+could be applied across your sales data
+with your business and supply chain and other things.
+Like that same concept on planning can be happening
+in a lot of different ways, whether that's software,
+supply chain, manufacturing, whatever it is.
+This same ability to have the agility
+and meet people where they are with the tools
+that they're using and making sense.
+Like that is truly kind of the poutier way
+of being open and integrated across everything.
+>> Yeah, no, absolutely.
+I think this demo, the ontology that I showed
+was so like tiny compared to the one
+that we actually have at our disposal internally.
+I mean, the breadth of types of questions
+we've been able to ask and launch off from here
+is like, it's just pretty awesome.
+Like all kinds of our employee history data,
+the things they've worked on, like the types of skills
+that they have being able to do,
+like really more intelligent resource thing,
+understanding the type, you know, for our developer,
+like what are they actually working on?
+What are their pull requests?
+Like what's the shape of things that they've expertise in?
+Like as someone who does a combination
+of technical work and operational work
+from planning, resourcing, hiring, stuff like that,
+just being able to have one place
+where I can ask general questions,
+build these analyses is really, really helpful.
+And I have done a lot of cases where, you know,
+you'll ask a few questions, you get a sense of like,
+okay, these are the kinds of things
+that I want to keep an eye on.
+And then I'll go and I'll make that into like a workshop
+app that has like a dashboard or something like that.
+And that way I can just refer to it.
+So, you know, you have this nice promotion flow
+where you go from exploratory
+up to like a nice codified thing that you just keep referring.
+>> Yeah, yeah.
+Well, this is awesome Mike.
+I really appreciate you taking the time
+to show everyone, like, this is pretty neat
+that I can really integrate with Ontology MCP
+across business workflows.
+I think it's good to get people thinking about
+how do we like think about what is this new world
+looking like?
+You just gave a couple of examples of like resource play,
+what are people working on?
+Like all these other business functions
+that you can now integrate with
+in all the different tools with one centralized knowledge base,
+which is the Ontology.
+So very cool.
+Thank you.
+Yeah, absolutely. Yeah, we're really excited about it.
+I think people are going to love this thing.
+It's really cool.

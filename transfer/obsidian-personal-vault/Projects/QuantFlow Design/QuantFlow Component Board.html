@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuantFlow — Component Exploration Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --sans: 'Geist', system-ui, sans-serif; --mono: 'Geist Mono', ui-monospace, monospace; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #07090d; }
+  .qf-flowline { animation: qfflow 1.4s linear infinite; }
+  .qf-pulse { animation: qfpulse 1.7s ease-in-out infinite; }
+  .qf-ring { animation: qfring 2.4s ease-out infinite; }
+  .qf-blink { animation: qfblink 1s steps(1) infinite; }
+  @keyframes qfflow { to { stroke-dashoffset: -18; } }
+  @keyframes qfpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes qfring { 0% { transform: scale(0.85); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
+  @keyframes qfblink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0.12; } }
+  /* dark canvas + dotted field for the board */
+  .design-canvas { background: radial-gradient(ellipse 80% 70% at 50% 30%, #0d1219, #07090d 80%) !important; }
+  .design-canvas .dc-card { background: transparent !important; box-shadow: none !important; }
+  .dc-sectionhead [contenteditable], .design-canvas .dc-sectionhead div { color: #e7ecf2 !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="console/qf-core.jsx"></script>
+<script type="text/babel" src="console/design-canvas.jsx"></script>
+<script type="text/babel" src="console/qf-board-kit.jsx"></script>
+<script type="text/babel" src="console/qf-board-tiles.jsx"></script>
+<script type="text/babel" src="console/qf-board-rails.jsx"></script>
+<script type="text/babel" src="console/qf-board-panels.jsx"></script>
+
+<script type="text/babel">
+const DIRN = ['Evolution', 'Hedge Desk', 'Cockpit'];
+const DACCENT = ['#34d399', '#cfd6df', '#2dd4bf'];
+
+// stack active + idle tile variants with state captions inside one artboard
+function TileStack({ Comp, n, name, accent }) {
+  return (
+    <div style={{ width: 400 }}>
+      <VarTag n={n} name={name} accent={accent} />
+      <div style={{ padding: '12px 0 0' }}>
+        <StateLabel>running · active</StateLabel>
+        <Comp state="running" />
+        <div style={{ height: 18 }} />
+        <StateLabel>idle · inactive</StateLabel>
+        <Comp state="idle" />
+      </div>
+    </div>
+  );
+}
+function Framed({ children, w, accent, n, name }) {
+  return (
+    <div style={{ width: w }}>
+      <VarTag n={n} name={name} accent={accent} />
+      <div style={{ paddingTop: 12 }}>{children}</div>
+    </div>
+  );
+}
+
+function Board() {
+  return (
+    <DesignCanvas>
+      {/* ── Terminal tile ─────────────────────────────── */}
+      <DCSection id="tile" title="Terminal Tile" subtitle="The soul of the canvas — 3 directions, each shown active + idle">
+        <DCArtboard id="t1" label="01 · Glass Terminal" width={400} height={520}>
+          <TileStack Comp={TileGlass} n={1} name="Glass Terminal" accent={DACCENT[0]} />
+        </DCArtboard>
+        <DCArtboard id="t2" label="02 · Instrument Module" width={400} height={430}>
+          <TileStack Comp={TileInstrument} n={2} name="Instrument Module" accent={DACCENT[1]} />
+        </DCArtboard>
+        <DCArtboard id="t3" label="03 · HUD Node" width={400} height={500}>
+          <TileStack Comp={TileHUD} n={3} name="HUD Node" accent={DACCENT[2]} />
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── Spawn dock ────────────────────────────────── */}
+      <DCSection id="dock" title="Spawn Dock" subtitle="Left rail — how operators add & route modules">
+        <DCArtboard id="d1" label="01 · Spawn Rail" width={248} height={640}>
+          <DockRail h={636} />
+        </DCArtboard>
+        <DCArtboard id="d2" label="02 · Command Palette" width={248} height={640}>
+          <DockPalette h={636} />
+        </DCArtboard>
+        <DCArtboard id="d3" label="03 · Module Tray" width={248} height={640}>
+          <DockTray h={636} />
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── Cables & ports ────────────────────────────── */}
+      <DCSection id="cable" title="Cables & Ports" subtitle="Routing language — active · stale · error · approved on one cluster">
+        <DCArtboard id="c1" label="01 · Routed Bezier" width={540} height={392}><CableBezier /></DCArtboard>
+        <DCArtboard id="c2" label="02 · Orthogonal Bus" width={540} height={392}><CableOrtho /></DCArtboard>
+        <DCArtboard id="c3" label="03 · Taut Filament" width={540} height={392}><CableFilament /></DCArtboard>
+      </DCSection>
+
+      {/* ── Conductor panel ───────────────────────────── */}
+      <DCSection id="panel" title="Conductor / Status / Receipts" subtitle="Right panel — status, the approval gate, and the audit trail">
+        <DCArtboard id="p1" label="01 · Conductor" width={330} height={700}>
+          <Framed w={330} n={1} name="Conductor" accent={DACCENT[0]}><PanelConductor h={636} /></Framed>
+        </DCArtboard>
+        <DCArtboard id="p2" label="02 · Desk Ledger" width={330} height={700}>
+          <Framed w={330} n={2} name="Desk Ledger" accent={DACCENT[1]}><PanelLedger h={636} /></Framed>
+        </DCArtboard>
+        <DCArtboard id="p3" label="03 · Ops HUD" width={330} height={700}>
+          <Framed w={330} n={3} name="Ops HUD" accent={DACCENT[2]}><PanelHUD h={636} /></Framed>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── State chips ───────────────────────────────── */}
+      <DCSection id="chips" title="State Chips" subtitle="idle · running · blocked · awaiting approval · complete — the shared status vocabulary">
+        <DCArtboard id="s1" label="01 · Pill + Light" width={300} height={300}><ChipsPill /></DCArtboard>
+        <DCArtboard id="s2" label="02 · Bracket Tag" width={300} height={300}><ChipsBracket /></DCArtboard>
+        <DCArtboard id="s3" label="03 · Orb + Label" width={300} height={300}><ChipsOrb /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Board />);
+</script>
+</body>
+</html>

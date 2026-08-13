@@ -1,0 +1,362 @@
+(indistinct chatter)
+- You're new?
+- New.
+- New?
+- Here we go.
+- Here we go.
+Expanding.
+Okay, well, there's probably,
+I never know where to start,
+but since I just start with the more intellectual,
+slightly boring thing.
+I don't think anyone was here
+for the inception of PG.
+But in any case, when we get PG,
+we were not only, I mean, still half the world
+where they like it or not,
+just stuck on PG.
+You have to get rid of it.
+You're gonna have to get rid of data protection.
+Still the only product that actually can fight terror
+and protect your underlying data or protects the liberties,
+which is why it's still entrenched.
+But the PG product was not just technically 10 years ahead
+of what, and by the way,
+it's worth mentioning,
+ontology came from PG because,
+and so did FDS because we couldn't actually
+get the NLP stuff to work.
+You had to extend it beyond what we could do with FDS.
+FDS famously stolen from, you know,
+like my experience sitting in the French cafes
+wondering why the food is so good.
+And, and then we had to have like some way
+of enriching the knowledge of the underlying system.
+Ontology came to be good.
+But there was also a way in which the frame was
+a decade ahead,
+at least of what customers understood.
+So there were really different parts about it.
+It was like, we were building this thing,
+both again, a product, but also an intellectual movement.
+A movement that, you know,
+I always would explain it as piggyoing
+in the sense that we brought two opposite
+and pose things together.
+And in German, you had this term,
+alpha-dism, which means the contradiction disappears.
+And the contradiction disappears
+by putting data protection and anti-terror
+in a different frame where they're actually doing similar
+things, meaning augmenting the value of life.
+What is life?
+It's being alive and having rights.
+So think, how are we gonna think of the European version,
+data protection, the American version,
+first, fourth, second, and then maybe.
+And that's actually the advance.
+By the way, it also is very disconcerting
+to people who are anti-aligned
+with doing one or the other.
+So typically you have these movements,
+you know, you have caught as a caricature.
+It's not honestly, in 20 years experience,
+I can tell you, when the doors close,
+none of the caricatures are true.
+I mean, very far left-wing people would tell me
+they don't care about civil liberties.
+I mean, pretty far right-wing people would say,
+I only care about civil liberties.
+But the thing is, it is the belief of this company
+that if you allow either of those balls
+to exist in the extreme, they undermine
+not only their interests at local interests,
+but actually the interests that they say they advocate.
+So the person who only cares about killing terrorists
+wants to live in a world that's not worth defending.
+The people that only care about civil liberties
+end up facilitating the people being in charge
+are actually very far right or left
+and don't care about civil liberties.
+And it's just pre-programmed.
+But in any case, we've had many in and micro iterations
+of this, where we intellectually had AIP, ontology, FDEs,
+Foundry, Maven, to South Sylestric Senkaya, Apollo,
+he's in the background, but no one really understands
+what it's about.
+So it's hard to make that intellectual movement now.
+It actually is going to power some of the stuff
+we're doing in the US space that's
+more sensitive on training models.
+So it may end up with a different frame
+and become quite big, even bigger than it is now.
+But the sovereignty, I think, it's basically
+the same place we were in PG, except for--
+instead of it being the Intel, literally just Intel,
+and some special operations, it's the GDP of the US
+and other people who will follow.
+And it's so-- but then the technical thing of like,
+well, how do you move ontology north to do actual fine tuning?
+How do we make sure the SAC actually works,
+which means, in this case, working quite closely
+with our partners?
+That part is going to be difficult, inspiring,
+interesting, charismatic.
+It's already changing recruitment, the value of the business
+to us, what we're fighting for.
+But there's also this intellectual piece.
+The reason why the Sargon thing, like,
+set off a revolution is because you actually
+do need to reframe how these things work.
+And every single customer, just like in the Intel space,
+they didn't know they needed to reframe away
+from either civil liberties or anti-terror.
+But they knew it.
+They felt it.
+If you're sitting at an Intel service,
+we're just hearing from all the stuff we're doing in France.
+Or any of these other services, you're there
+because you believe in a better society.
+You're mostly not there.
+You're not actually the caricature of people believe.
+You needed both.
+And you needed both to actually get society to adopt.
+And society includes people, like everyone in this room,
+meaning most people don't want to be in one of the other movements.
+They want to be in a society that works better.
+So on the Sargon TV piece, literally any enterprise.
+Of course, the primary focus you see this working already
+is the USG.
+But I get with every enterprise that we
+deal with, good, bad, dysfunctional, great,
+ones we like, ones we're about to love.
+Ones we don't-- where the loving isn't there at all.
+And in fact, I get sent to all the things
+you guys don't want to deal with.
+Like, you know, there's like-- I mean, we famously--
+we, by the way, have clients here.
+So I know you could now see that if the internal external stuff,
+it's just as crazy.
+But I got-- I mean, I famously have
+to explain to people, yeah, I know the IT person.
+I know they taught music.
+I know it's your cousin.
+I know that's rare importance to you.
+And it's not working.
+Yeah.
+So I deal with all that as well.
+They all sense every single one.
+Why was I paying-- why am I paying for tokens
+that lead to this weird kind of slop
+that only make the least productive people happy?
+And as simultaneously, migrate the value of my business
+to a third party.
+And here, it's not fair.
+But wildly unlikable third party.
+By the way, not unlikable to me.
+I've spent a lot of time--
+mostly their aviatario.
+I spend a lot of time with Dario.
+He's not the caricature that many people,
+most Americans believe.
+But there is a problem that they are actually
+unwilling to respond to any questions about how do you
+build the models without ripping off someone's IP
+and migrating their alpha to your model
+and then competing against them.
+And they do this over and over.
+So the clients really feel this.
+So then the challenge for our company
+is twofold, just like PG.
+It's really much more-- we have not had this vibe.
+With Foundry, it was like a very important for most people
+back in top of technology that was hard to sell,
+but crucial to a business.
+Ontology, AIP, had been more charismatic.
+But it's been-- it wasn't a global movement.
+This is a global movement.
+And so the hard part about talking to customers
+is it's a global movement that they understand is needed.
+It's a global movement that we are the leaders of without doubt.
+We're going to stay in the leaders also because just like
+with PG, we are fully aligned with the customers.
+We actually want the customers to succeed.
+We actually get paid.
+We are the only company I know of,
+and definitely the only company at scale,
+that actually is paid as a derivative of value creation
+for the enterprises we work with and serve.
+We do not have any other way of actually getting paid.
+Every other company wants to outsource the risk of failure
+to the client because they know it's going to fail.
+Because to succeed, you would need a full stack from compute
+all the way up now to model training.
+And you'd have to absorb the risk of that not working,
+which means having some kind of business
+intuition about what the value is to the customer.
+A willingness to say, no, FDEs that
+aren't just masturbating and selling tokens, you know?
+It's like, yeah, it's like that's
+what these people like those are actually doing.
+They sell tokens, they have FDEs, that some of them
+aren't expoundarians, they're just selling tokens.
+Just like some of you guys had a social like in high school
+that was virtual, except for your really hard client.
+Yeah, and so that's what's actually going on.
+And the clients are tired of that.
+You do that in your own time.
+That's their basic view.
+Don't show up at my company and do that.
+While my creating the value of the enterprise
+to your company and being very unlikable
+and leading to a wealth tax, you know?
+It's like, hey, remember, it's interesting.
+The link caused by some of this is not fair.
+But there's a societal view that the labs
+are leading to a wealth tax.
+Every single one of our clients is going to pay a wealth tax.
+And while you guys may not have thought the impact of that,
+it does not help the poor.
+It only punishes them almost rich,
+because basically you end up paying 5% of your net worth.
+And then the index fund where you have the rest
+of your worth collapsed.
+Anyways, they're angry about this.
+We're not feeding that anger, but we are providing--
+it is the reason why they are listening.
+And what they want is, very simply,
+we are building a stack that is fully aligned with you
+capturing and maintaining the health of your business.
+And every single tech decision we are making
+is aligned with that.
+And that's basically what you have to tell them.
+Outside version is also the way we
+have to orient the whole business internally.
+Recruitment, rebuilding commercial,
+rebuilding of, rebuilding decisions
+who we partner with, how do we partner?
+And it is a revolution, just like these other revolutions
+we've been part of, except for much larger,
+where we actually are going to define how to talk about it.
+The reason it's hard to talk about it is no one's
+talked about it before.
+Nobody's talking about it.
+And then we are in this unique position.
+I mean, the venture capitalists have these weird things
+where they've taken on billions of dollars.
+And they're actually only interested in scale businesses.
+And they call startups, fail ups, fail downs,
+because they don't have scale.
+And this is a revolution where you need scale,
+and you need product, and you need to know how to do it.
+And there's no time to start a new business.
+By the time you start a new business,
+we have educated the market about their own interests.
+The reason why PG and Maven especially
+are so charismatic and foundry actually work.
+And ontology and AIP work, but not in scale.
+This is going to work, as we plausibly can say,
+we are actually working in your interests.
+And in this case, we're like, yeah,
+and we're going to figure out how to explain this
+to the whole world, including to ourselves first.
+And then we have a whole propaganda department working
+on this, obviously powered by two people who look 12.
+But this is the sounds here you think?
+You know, what can we do?
+In fact, the person who wrote the celebrity document,
+he's British, I feel like can be in public.
+But his primary comment, he's pretty reasonably technical.
+I normally say there's very technical pounders,
+and I guess he could be like a technical echo.
+But he's British, so he hasn't learned how to write
+English as poorly as we have.
+So that's the primary comment.
+So we are going to just completely own this.
+But the way of explaining and the way of doing it
+is completely novel to everyone.
+And that's going to mean a lot of like, hey, I'm not sure.
+I understand the actual way to answer this correctly.
+That's OK.
+The way to answer every question is we are building,
+and that we are building a stack where you will maintain
+the means of your own production.
+You own the means of production.
+We participate because you succeed.
+And we're going to do this.
+Now we're in the business.
+We have to capture this revolution.
+So we have to expand our filter.
+We have to be disciplined, look, the revolution.
+I'm wildly-- I feel like, honestly, I am the most pro.
+I say this in private and someone in private.
+But I really believe, of all partial Europeans that
+are recently important, I am the most pro-European who
+actually says things that could help Europe.
+I am wildly pro-European.
+I actually conspired to get this company
+to be wildly disproportionately European, which it is.
+And look at this office.
+We have to recognize the revolution
+is happening here in America.
+And we will eventually-- people will copy it because they
+have to, honestly, especially, hopefully in Europe.
+Because the decisions they're making are only
+in the interest of hurting Europe.
+But we are in the business of helping our clients,
+and helping our partners.
+So we can't really do anything about that.
+But disproportionately here, maybe not exclusively,
+obviously, we're going to help our government clients ally
+to all over the world do similar things.
+But getting-- we should be able to fully, fully take over
+this movement for the sake of the movement, not even primarily
+for the sake of ourselves.
+Because the way our business works
+is aligned with the tech and our clients.
+And then roll out, which means we're going to up-recruiting.
+We're going to have-- we're building partnerships
+with many people, and maybe, obviously, the most prominent.
+But others that we otherwise would not have been able to build.
+And we're going to rebuild the tech stack around,
+how do we actually do this more efficiently, quicker.
+And we're going to work through talking to clients
+and learn from them what do they understand.
+That's also hard.
+Your building revolution, it's not just what we understand.
+It's what's understandable to them.
+And that's going to be-- with PGA,
+it's a number of years before people understood.
+But I'll tell you what they understood immediately.
+This was the product they wanted.
+And I think we're going to have very similar--
+we already have very similar growth.
+But I think that's going to be very exciting.
+And the other thing I've learned by doing this
+for a long time is it's kind of obvious.
+But when you have the momentum, you just
+have to fight to capture all of it.
+But anyone who's been here for a couple of years
+has seen us next.
+We did not have noticed that I said you have to be all noticed.
+We all noticed.
+Anyways, so with that, I'll turn it over to others.
+But yeah, this is going to be a lot of fun.
+Very harrowing.
+It's nice to have a harrowing challenge.
+And it's hyperbolic.
+But I can tell you, as tall as we are every day of the week,
+and two times on Wednesday, there is no other institution
+that's going to do this.
+That is 100% sure.
+And it's not because we're so perfect.
+It's because we built this thing that is just very aligned
+with this.
+And you just can't rebuild it.
+It's like, it's super weird.
+It's like, I don't understand exactly why you can't rebuild it.
+But I am certain you can't.
+And we're just going to roll out there.
+So with that, I hope you guys have as much fun
+as I'm having currently.
+And take care.

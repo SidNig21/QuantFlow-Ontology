@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantFlow — Proposed UI Additions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --green:#b7ff00; --ink:#f2f0ec; --muted:#7e8a9a; --muted2:#566;
+    --amber:#e2b341; --red:#ff6b6b; --dim:#7fae3f; --teal:#2fe6cf;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#05070b;overflow:hidden}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;width:1623px;height:1202px;transform-origin:center center}
+  #shot{position:absolute;inset:0;width:1623px;height:1202px;display:block}
+  /* gentle veil so floating proposals read clearly over the live UI */
+  #veil{position:absolute;inset:0;background:rgba(5,7,11,0.30);pointer-events:none}
+
+  .card{position:absolute;font-family:var(--mono);
+    background:rgba(15,21,29,0.58);
+    -webkit-backdrop-filter:blur(16px) saturate(1.15);backdrop-filter:blur(16px) saturate(1.15);
+    border:1px solid rgba(255,255,255,0.09);border-radius:12px;
+    box-shadow:0 24px 70px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.07);}
+  .tag{position:absolute;top:-10px;left:14px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.22em;text-transform:uppercase;color:#0a0d12;background:var(--green);
+    padding:2px 7px;border-radius:4px;font-weight:600}
+  .num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+    border-radius:50%;background:var(--green);color:#0a0d12;font-family:var(--mono);
+    font-size:11px;font-weight:600;flex:none}
+  .ttl{font-family:var(--disp);font-weight:600;color:var(--ink);font-size:14px;letter-spacing:.01em}
+  .sub{color:var(--muted);font-size:11.5px;line-height:1.55;letter-spacing:.01em}
+
+  /* ---- status badge ---- */
+  .badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;
+    border-radius:5px;border:1px solid;font-weight:500;line-height:1}
+  .dot{width:6px;height:6px;border-radius:50%;flex:none}
+  .b-run{color:var(--green);border-color:rgba(183,255,0,.42);background:rgba(183,255,0,.09)}
+  .b-run .dot{background:var(--green);box-shadow:0 0 7px var(--green)}
+  .b-idle{color:#9fb0c0;border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.04)}
+  .b-idle .dot{background:#9fb0c0}
+  .b-queue{color:var(--amber);border-color:rgba(226,179,65,.4);background:rgba(226,179,65,.08)}
+  .b-queue .dot{background:var(--amber)}
+  .b-err{color:var(--red);border-color:rgba(255,107,107,.45);background:rgba(255,107,107,.10)}
+  .b-err .dot{background:var(--red);box-shadow:0 0 7px rgba(255,107,107,.7)}
+  .b-done{color:var(--dim);border-color:rgba(127,174,63,.4);background:rgba(127,174,63,.08)}
+  .b-done .dot{background:var(--dim)}
+
+  /* anchor pin dropped on the live UI */
+  .pin{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--green);
+    color:#0a0d12;font-family:var(--mono);font-size:12px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 3px rgba(183,255,0,.22),0 4px 12px rgba(0,0,0,.5);z-index:5}
+  .pin::after{content:'';position:absolute;inset:-7px;border:1px solid rgba(183,255,0,.35);border-radius:50%}
+
+  .row{display:flex;align-items:center;gap:8px}
+  .hpill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+    padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04)}
+
+  .kbd{font-family:var(--mono);font-size:10px;color:var(--muted);border:1px solid rgba(255,255,255,.14);
+    border-radius:4px;padding:1px 5px;background:rgba(255,255,255,.03)}
+
+  /* header strip mock */
+  .hdr{display:flex;align-items:center;gap:9px;padding:8px 12px}
+  .hdr .name{font-family:var(--disp);font-weight:600;color:var(--ink);font-size:13px}
+  .hdr .at{color:var(--muted);font-size:11px;font-family:var(--mono)}
+
+  .legend-title{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .divider{height:1px;background:rgba(255,255,255,.08);margin:11px 0}
+
+  /* command palette */
+  .cp-input{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .cp-input input{all:unset;flex:1;color:var(--ink);font-family:var(--mono);font-size:14px}
+  .cp-row{display:flex;align-items:center;gap:11px;padding:9px 15px;color:#c7d0db;font-size:12.5px;font-family:var(--mono)}
+  .cp-row.sel{background:rgba(183,255,0,.10);color:var(--ink);box-shadow:inset 2px 0 0 var(--green)}
+  .cp-ico{width:16px;height:16px;flex:none;opacity:.8}
+  .cp-sec{padding:7px 15px 3px;color:var(--muted2);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase}
+
+  /* toast */
+  .toast{display:flex;align-items:center;gap:11px;padding:12px 15px}
+  .toast .ic{width:20px;height:20px;border-radius:50%;background:rgba(183,255,0,.14);
+    display:flex;align-items:center;justify-content:center;color:var(--green);flex:none}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <img id="shot" src="annotations/shot.png" alt="QuantFlow screen">
+    <div id="veil"></div>
+
+    <!-- ===== anchor pins on the live UI ===== -->
+    <div class="pin" style="left:600px;top:399px">1</div>   <!-- Coder RUNNING badge -->
+    <div class="pin" style="left:1396px;top:18px">2</div>   <!-- top-right command input -->
+    <div class="pin" style="left:243px;top:1180px">3</div>  <!-- status bar health -->
+    <div class="pin" style="left:765px;top:730px">5</div>   <!-- cable count -->
+    <div class="pin" style="left:1255px;top:455px">6</div>  <!-- conductor NEXT ACTION -->
+
+    <!-- ===== ① status badge system ===== -->
+    <div class="card" style="left:300px;top:150px;width:430px;padding:18px">
+      <div class="tag">Proposed</div>
+      <div class="legend-title"><span class="num">1</span><span class="ttl">Status badge system</span></div>
+      <div class="sub">One token set for every tile header, swapped for the loose <span style="color:var(--ink)">RUNNING / SHELL / AUTO</span> labels. Color = state, always; a dot means live.</div>
+      <div class="divider"></div>
+      <div class="row" style="flex-wrap:wrap;gap:9px">
+        <span class="badge b-run"><span class="dot"></span>Running</span>
+        <span class="badge b-idle"><span class="dot"></span>Idle</span>
+        <span class="badge b-queue"><span class="dot"></span>Queued</span>
+        <span class="badge b-err"><span class="dot"></span>Error</span>
+        <span class="badge b-done"><span class="dot"></span>Done</span>
+      </div>
+      <div class="divider"></div>
+      <div class="sub" style="margin-bottom:8px;color:var(--muted2)">Applied to a tile header:</div>
+      <div style="border:1px solid rgba(255,255,255,.10);border-radius:9px;background:rgba(10,13,18,.55);overflow:hidden">
+        <div class="hdr">
+          <span style="color:var(--green);font-family:var(--mono);font-size:13px">&gt;_</span>
+          <span class="name">Coder</span>
+          <span class="badge b-idle" style="font-size:9px;padding:2px 6px">Shell</span>
+          <span class="at">@shell‑40151</span>
+          <span style="flex:1"></span>
+          <span class="badge b-run"><span class="dot"></span>Running</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ② frosted command palette ===== -->
+    <div class="card" style="left:840px;top:120px;width:420px;padding:0;overflow:hidden">
+      <div class="tag">Proposed · glass earns it here</div>
+      <div class="cp-input">
+        <svg class="cp-ico" viewBox="0 0 24 24" fill="none" stroke="#9fb0c0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        <input value="spawn ver" readonly>
+        <span class="kbd">Ctrl+K</span>
+      </div>
+      <div class="cp-sec">Spawn</div>
+      <div class="cp-row sel"><svg class="cp-ico" viewBox="0 0 24 24" fill="none" stroke="#b7ff00" stroke-width="2"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg>Spawn Verifier <span style="flex:1"></span><span style="color:var(--muted2);font-size:10px">shell · wsl</span></div>
+      <div class="cp-row"><svg class="cp-ico" viewBox="0 0 24 24" fill="none" stroke="#9fb0c0" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>Spawn Hermes (orchestrator)</div>
+      <div class="cp-sec">Route</div>
+      <div class="cp-row"><svg class="cp-ico" viewBox="0 0 24 24" fill="none" stroke="#9fb0c0" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h6a3 3 0 0 1 3 3v6"/></svg>Route Coder → Verifier</div>
+      <div class="cp-row" style="padding-top:10px;padding-bottom:11px;color:var(--muted2);font-size:10.5px">↑↓ navigate · ⏎ run · esc dismiss</div>
+    </div>
+
+    <!-- ===== ④ frosted spawn toast ===== -->
+    <div class="card" style="left:840px;top:430px;width:330px;padding:0;overflow:hidden">
+      <div class="tag">Proposed</div>
+      <div class="toast">
+        <span class="ic">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+        </span>
+        <div>
+          <div style="color:var(--ink);font-size:12.5px;font-family:var(--mono)">Verifier spawned</div>
+          <div style="color:var(--muted);font-size:10.5px;font-family:var(--mono);margin-top:2px">@shell‑2‑35692 · routed from Coder</div>
+        </div>
+        <span style="flex:1"></span>
+        <span class="badge b-run" style="font-size:9px"><span class="dot"></span>Live</span>
+      </div>
+    </div>
+    <div style="position:absolute;left:1172px;top:444px" class="num">4</div>
+
+    <!-- ===== ③ health + zoom pills ===== -->
+    <div class="card" style="left:300px;top:1010px;width:430px;padding:16px">
+      <div class="tag">Proposed</div>
+      <div class="legend-title"><span class="num">3</span><span class="ttl">Status‑bar pills</span></div>
+      <div class="sub" style="margin-bottom:11px">The flat <span style="color:var(--ink)">Health good · Zoom 100%</span> text becomes scannable pills — health carries the same dot semantics as tiles.</div>
+      <div class="row" style="gap:10px;flex-wrap:wrap">
+        <span class="hpill"><span class="dot" style="width:7px;height:7px;background:var(--green);box-shadow:0 0 7px var(--green)"></span>Health good</span>
+        <span class="hpill" style="color:var(--amber)"><span class="dot" style="width:7px;height:7px;background:var(--amber)"></span>Health degraded</span>
+        <span class="hpill">Zoom 100%</span>
+        <span class="hpill">Tiles 2</span>
+      </div>
+    </div>
+
+    <!-- ===== ⑤ in-flight count token ===== -->
+    <div class="card" style="left:470px;top:835px;width:300px;padding:15px">
+      <div class="legend-title"><span class="num">5</span><span class="ttl" style="font-size:13px">In‑flight count</span></div>
+      <div class="sub">The cable <span style="color:var(--green)">2</span> badge → a defined token: number of packets currently routing this edge. Pairs with the live‑green flow language.</div>
+    </div>
+
+    <!-- ===== ⑥ conductor next-action badge ===== -->
+    <div class="card" style="left:1240px;top:560px;width:330px;padding:15px">
+      <div class="tag">Proposed</div>
+      <div class="legend-title"><span class="num">6</span><span class="ttl" style="font-size:13px">Conductor state badges</span></div>
+      <div class="sub" style="margin-bottom:10px">Surface <span style="color:var(--ink)">BLOCKERS</span> / <span style="color:var(--ink)">NEXT ACTION</span> as badges so the panel is glanceable, not all body text.</div>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <span class="badge b-done"><span class="dot"></span>No blockers</span>
+        <span class="badge b-idle"><span class="dot"></span>Monitor canvas</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function fit(){
+    const s=Math.min(window.innerWidth/1623, window.innerHeight/1202);
+    document.getElementById('stage').style.transform=`scale(${s})`;
+  }
+  addEventListener('resize',fit); fit();
+</script>
+</body>
+</html>

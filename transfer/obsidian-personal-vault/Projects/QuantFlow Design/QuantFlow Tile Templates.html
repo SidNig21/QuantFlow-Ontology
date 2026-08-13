@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QuantFlow — Tile Templates · Overview</title>
+<link rel="stylesheet" href="tokens.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=IBM+Plex+Mono:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
+<style>
+  html, body { margin: 0; padding: 0; background: #07090c; color: #e7ecf2;
+    font-family: 'Geist', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+
+  @keyframes qfSpin       { to { transform: rotate(360deg); } }
+  @keyframes qfBlink      { 50% { opacity: 0; } }
+  @keyframes qfCableFlow      { to { stroke-dashoffset: -32; } }
+  @keyframes qfCableFlowDense { to { stroke-dashoffset: -28; } }
+  @keyframes qfPulseRing  { 0% { transform: scale(0.55); opacity: 0.7; } 100% { transform: scale(1.9); opacity: 0; } }
+  @keyframes qfBreath     { 0%, 100% { transform: scale(0.78); opacity: 0.4; } 50% { transform: scale(1.22); opacity: 1; } }
+  @keyframes qfScan       { 0% { transform: translateX(-120%); } 100% { transform: translateX(420%); } }
+  @keyframes qfEkgDraw    { 0% { stroke-dashoffset: 560; } 100% { stroke-dashoffset: 0; } }
+  @keyframes qfMarquee    { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes qfEq         { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+  @keyframes qfSealSpin   { to { transform: rotate(360deg); } }
+  @keyframes qfFill       { 0% { transform: scaleX(0); } 45% { transform: scaleX(1); } 100% { transform: scaleX(0); } }
+  @keyframes qfDots       { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes qfEdge       { 0% { transform: translateX(-80px); } 100% { transform: translateX(480px); } }
+  @keyframes qfSkel       { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.9; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="120" fill="#0a0d12"/>
+    <circle cx="60" cy="60" r="22" fill="none" stroke="#F5F5F0" stroke-width="2.4"/>
+    <g stroke="#F5F5F0" stroke-width="3.2"><line x1="56" y1="48" x2="56" y2="72"/><line x1="56" y1="48" x2="68" y2="48"/><line x1="56" y1="60" x2="65" y2="60"/></g>
+    <circle cx="76" cy="44" r="4" fill="#B7FF00"/>
+  </svg>
+</template>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="v2/qf2-tokens.jsx"></script>
+<script type="text/babel" src="v2/qf2-parts.jsx"></script>
+<script type="text/babel" src="tiles/tt-shared.jsx"></script>
+<script type="text/babel" src="tiles/tt-loaders.jsx"></script>
+<script type="text/babel" src="tiles/tt-01-signal.jsx"></script>
+<script type="text/babel" src="tiles/tt-02-instrument.jsx"></script>
+<script type="text/babel" src="tiles/tt-03-quiet.jsx"></script>
+<script type="text/babel" src="tiles/tt-04-vitals.jsx"></script>
+<script type="text/babel" src="tiles/tt-05-gate.jsx"></script>
+<script type="text/babel" src="tiles/tt-06-board.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#B7FF00",
+  "watermark": true,
+  "motion": true
+}/*EDITMODE-END*/;
+
+const ACCENTS = [
+  { v: '#B7FF00', label: 'Live green' },
+  { v: 'oklch(0.72 0.13 210)', label: 'Cyan' },
+  { v: 'oklch(0.70 0.14 240)', label: 'Blue' },
+  { v: 'oklch(0.80 0.14 80)', label: 'Amber' },
+];
+
+// Scales a fixed-size board to the available column width, no pan/zoom needed.
+const Board = ({ w, h, children }) => {
+  const ref = React.useRef(null);
+  const [scale, setScale] = React.useState(1);
+  React.useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const fit = () => setScale(Math.min(1, el.clientWidth / w));
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [w]);
+  return (
+    <div ref={ref} style={{ width: '100%' }}>
+      <div style={{ width: w, height: h, transform: `scale(${scale})`, transformOrigin: 'top left',
+        marginBottom: (scale - 1) * h }}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const Group = ({ kicker, title, blurb, children }) => (
+  <section style={{ maxWidth: 1440, margin: '0 auto', padding: '0 28px' }}>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap', marginBottom: 4 }}>
+      <span style={{ fontFamily: QF2.fontMono, fontSize: 11, color: QF2.flow, letterSpacing: '0.18em',
+        textTransform: 'uppercase' }}>{kicker}</span>
+      <h2 style={{ margin: 0, fontFamily: QF2.fontDisplay, fontSize: 26, fontWeight: 600, color: QF2.fg,
+        letterSpacing: '-0.015em' }}>{title}</h2>
+    </div>
+    <p style={{ margin: '0 0 18px', fontSize: 13.5, color: QF2.muted, lineHeight: 1.55, maxWidth: 760 }}>{blurb}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>{children}</div>
+  </section>
+);
+
+const App = () => {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const cfg = { accent: t.accent, watermark: t.watermark !== false, motion: t.motion !== false };
+
+  return (
+    <React.Fragment>
+      <div style={{ minHeight: '100vh', paddingBottom: 90 }}>
+        {/* masthead */}
+        <header style={{ maxWidth: 1440, margin: '0 auto', padding: '46px 28px 30px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <QFMark size={52} glow />
+            <div>
+              <div style={{ fontFamily: QF2.fontDisplay, fontSize: 30, fontWeight: 600, letterSpacing: '-0.02em' }}>
+                Tile templates
+              </div>
+              <div style={{ fontFamily: QF2.fontMono, fontSize: 12, color: QF2.muted, letterSpacing: '0.04em', marginTop: 4 }}>
+                5 reworks of the canvas tile · each shown live + not-ready, on the canvas
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 22 }}>
+            {['00 Loading system', '01 Signal — in theme', '02 Instrument ⟷ 03 Quiet — dichotomy', '04 Vitals + 05 Gate Pass — out the park'].map((s, i) => (
+              <span key={i} style={{ fontFamily: QF2.fontMono, fontSize: 10.5, color: QF2.muted2,
+                padding: '5px 10px', borderRadius: 999, border: `1px solid ${QF2.border}`,
+                background: `color-mix(in srgb, ${QF2.tileBg} 60%, transparent)` }}>{s}</span>
+            ))}
+          </div>
+        </header>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
+          <Group kicker="Deliverable" title="The loading system"
+            blurb="What a tile shows before it reaches its herdr session — the rework of your blank blue tile. Five not-ready indicators, one shared language, each tuned to its template.">
+            <Board w={1380} h={720}><StageLoaders cfg={cfg} /></Board>
+          </Group>
+
+          <Group kicker="1 · In theme" title="Signal"
+            blurb="A faithful evolution. Keeps the crosshair lines, ports and rail you like — but the header hierarchy is fixed (one role pill, no duplicate tags) and a live signal-edge rides the top when a session is hot. Loader: Orbit.">
+            <Board w={1380} h={840}><Stage01 cfg={cfg} /></Board>
+          </Group>
+
+          <Group kicker="2 · The dichotomy" title="Instrument ⟷ Quiet"
+            blurb="Two takes on the same tile that are deliberate opposites. Instrument turns the chrome into a trading gauge — live readouts, an activity rail, a throughput footer. Quiet is the inverse: one hairline, a soft name, one dot, all breathing room. Loaders: Scan vs Breath.">
+            <Board w={1380} h={840}><Stage02 cfg={cfg} /></Board>
+            <Board w={1380} h={840}><Stage03 cfg={cfg} /></Board>
+          </Group>
+
+          <Group kicker="3 · Out the park" title="Vitals + Gate Pass"
+            blurb="Bigger swings, each mapped to something core in QuantFlow's ideology. Vitals makes every tile a life-support monitor — a scrolling EKG, a vitals spectrum, ops/min as a heart rate; the canvas becomes an ICU of agents. Gate Pass makes every tile a signed authorization object moving through the gate layer — perforated stub, manifest, stamped verdict. Loaders: Pulse and Seal.">
+            <Board w={1380} h={840}><Stage04 cfg={cfg} /></Board>
+            <Board w={1380} h={840}><Stage05 cfg={cfg} /></Board>
+          </Group>
+        </div>
+
+        <footer style={{ maxWidth: 1440, margin: '64px auto 0', padding: '0 28px',
+          fontFamily: QF2.fontMono, fontSize: 11, color: QF2.muted2, letterSpacing: '0.04em' }}>
+          Tweak the accent hue, watermark and motion from the Tweaks panel. Each board is the tile on the real canvas — grid · wires · watermark.
+        </footer>
+      </div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Signal hue" />
+        <TweakColor label="Accent" value={t.accent} options={ACCENTS.map(a => a.v)} onChange={(v) => setTweak('accent', v)} />
+        <TweakSection label="Canvas" />
+        <TweakToggle label="Watermark" value={cfg.watermark} onChange={(v) => setTweak('watermark', v)} />
+        <TweakToggle label="Motion" value={cfg.motion} onChange={(v) => setTweak('motion', v)} />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

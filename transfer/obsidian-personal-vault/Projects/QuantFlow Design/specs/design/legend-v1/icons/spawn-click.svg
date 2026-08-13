@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+  <title>Spawn at click point</title>
+  <path d="M3 3 L11 11 M11 3 L3 11"></path>
+  <circle cx="7" cy="7" r="2.2"></circle>
+</svg>

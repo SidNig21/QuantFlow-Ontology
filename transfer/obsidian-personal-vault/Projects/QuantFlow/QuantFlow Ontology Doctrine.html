@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantFlow — The Ontology Doctrine</title>
+<style>
+  :root {
+    --bg: #0B0E0C;
+    --surface: #10150F;
+    --surface2: #151B13;
+    --text: #E6EAE0;
+    --muted: #8B948A;
+    --line: #232B21;
+    --accent: #B7FF00;
+    --accent-ink: #07090C;
+    --teal: #2FE6CF;
+    --violet: #C79BFF;
+    --amber: #FFB454;
+    --red: #FF6B5E;
+    --display: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --body: "Charter", "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F5F6F2;
+      --surface: #FFFFFF;
+      --surface2: #EDEFE8;
+      --text: #171C17;
+      --muted: #5A6357;
+      --line: #DDE2D8;
+      --accent: #4F8A00;
+      --accent-ink: #FFFFFF;
+      --teal: #0E8578;
+      --violet: #7A4FC9;
+      --amber: #A66000;
+      --red: #C0392B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B0E0C; --surface: #10150F; --surface2: #151B13; --text: #E6EAE0;
+    --muted: #8B948A; --line: #232B21; --accent: #B7FF00; --accent-ink: #07090C;
+    --teal: #2FE6CF; --violet: #C79BFF; --amber: #FFB454; --red: #FF6B5E;
+  }
+  :root[data-theme="light"] {
+    --bg: #F5F6F2; --surface: #FFFFFF; --surface2: #EDEFE8; --text: #171C17;
+    --muted: #5A6357; --line: #DDE2D8; --accent: #4F8A00; --accent-ink: #FFFFFF;
+    --teal: #0E8578; --violet: #7A4FC9; --amber: #A66000; --red: #C0392B;
+  }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .frame {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.5rem 6rem;
+  }
+
+  /* ---------- header ---------- */
+  header.doc-head {
+    padding: 3.5rem 0 2.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1.2rem;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+  .subtitle {
+    font-size: 1.2rem;
+    color: var(--muted);
+    max-width: 46ch;
+    margin: 0 0 1.6rem;
+    text-wrap: balance;
+  }
+  .meta {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.6rem;
+  }
+  .meta b { color: var(--text); font-weight: 600; }
+
+  /* ---------- layout: rail + content ---------- */
+  .layout {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 3rem;
+    padding-top: 2.5rem;
+  }
+  nav.rail {
+    position: sticky;
+    top: 1.5rem;
+    align-self: start;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  nav.rail a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.35rem 0.6rem;
+    border-left: 2px solid var(--line);
+    transition: color 120ms, border-color 120ms;
+  }
+  nav.rail a:hover, nav.rail a:focus-visible {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    outline: none;
+  }
+  nav.rail .rail-label {
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 0.6rem 0.5rem;
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; gap: 1rem; }
+    nav.rail { position: static; flex-direction: row; flex-wrap: wrap; gap: 0.3rem; border-bottom: 1px solid var(--line); padding-bottom: 1.2rem; }
+    nav.rail .rail-label { display: none; }
+    nav.rail a { border-left: none; border: 1px solid var(--line); border-radius: 3px; padding: 0.3rem 0.55rem; }
+  }
+
+  /* ---------- sections ---------- */
+  main { min-width: 0; }
+  section.part { padding: 2.5rem 0 1.5rem; border-bottom: 1px solid var(--line); }
+  section.part:last-of-type { border-bottom: none; }
+  .part-no {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin: 0 0 0.6rem;
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+    letter-spacing: -0.015em;
+    line-height: 1.12;
+    margin: 0 0 1.2rem;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.14rem;
+    margin: 2rem 0 0.7rem;
+    letter-spacing: -0.01em;
+  }
+  p { max-width: 68ch; margin: 0 0 1.1rem; }
+  ul, ol { max-width: 66ch; margin: 0 0 1.2rem; padding-left: 1.4rem; }
+  li { margin-bottom: 0.45rem; }
+  strong { font-weight: 700; }
+  em { font-style: italic; }
+  a { color: var(--accent); }
+
+  .lede { font-size: 1.14rem; }
+
+  /* ---------- verdict box ---------- */
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--accent);
+    padding: 1.6rem 1.8rem 1.2rem;
+    margin: 2.5rem 0 0;
+  }
+  .verdict .vlabel {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.8rem;
+  }
+  .verdict p { max-width: 75ch; }
+  .verdict p:last-child { margin-bottom: 0.4rem; }
+
+  /* ---------- quotes ---------- */
+  blockquote {
+    margin: 1.6rem 0;
+    padding: 0.2rem 0 0.2rem 1.3rem;
+    border-left: 3px solid var(--teal);
+    color: var(--text);
+    font-style: italic;
+    max-width: 62ch;
+  }
+  blockquote .attr {
+    display: block;
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    letter-spacing: 0.06em;
+  }
+
+  /* ---------- tables ---------- */
+  .table-wrap { overflow-x: auto; margin: 1.4rem 0 1.8rem; border: 1px solid var(--line); }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 620px;
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  td {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    background: var(--surface);
+  }
+  tr:last-child td { border-bottom: none; }
+  td.mono, .mono { font-family: var(--mono); font-size: 0.84em; }
+
+  /* ---------- status chips ---------- */
+  .chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  .chip.have  { color: var(--teal);   border: 1px solid var(--teal); }
+  .chip.seed  { color: var(--violet); border: 1px solid var(--violet); }
+  .chip.gap   { color: var(--amber);  border: 1px solid var(--amber); }
+  .chip.later { color: var(--muted);  border: 1px solid var(--line); }
+  .chip.never { color: var(--red);    border: 1px solid var(--red); }
+  .chip.done  { color: var(--accent-ink); background: var(--accent); border: 1px solid var(--accent); }
+
+  /* ---------- object type tags in charter ---------- */
+  .otype {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    padding: 0.05rem 0.4rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .otype.research { color: var(--teal); background: color-mix(in srgb, var(--teal) 12%, transparent); }
+  .otype.market   { color: var(--violet); background: color-mix(in srgb, var(--violet) 14%, transparent); }
+  .otype.agent    { color: var(--amber); background: color-mix(in srgb, var(--amber) 13%, transparent); }
+
+  /* ---------- code ---------- */
+  pre.code {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    margin: 1.4rem 0 1.8rem;
+  }
+  pre.code .cm { color: var(--muted); }
+  pre.code .kw { color: var(--teal); }
+  pre.code .st { color: var(--violet); }
+
+  pre.mermaid {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1.4rem 0 1.8rem;
+  }
+
+  /* ---------- roadmap phases ---------- */
+  .phase {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 1.4rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .phase:first-of-type { border-top: none; }
+  .phase-id {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    line-height: 1.5;
+  }
+  .phase-id .pnum {
+    display: block;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.7rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .phase h3 { margin-top: 0; }
+  .phase .gate {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1rem;
+    margin: 0.9rem 0 0.4rem;
+    font-size: 0.92rem;
+    max-width: 66ch;
+  }
+  .phase .gate .glabel {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  @media (max-width: 640px) {
+    .phase { grid-template-columns: 1fr; gap: 0.4rem; }
+  }
+
+  /* ---------- claims ladder ---------- */
+  .rung {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 1.2rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--line);
+    max-width: 78ch;
+  }
+  .rung:first-of-type { border-top: none; }
+  .rung .when { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); padding-top: 0.25rem; }
+  .rung p { margin-bottom: 0.3rem; }
+  @media (max-width: 640px) { .rung { grid-template-columns: 1fr; gap: 0.2rem; } }
+
+  /* ---------- footer ---------- */
+  footer.doc-foot {
+    margin-top: 3rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+<header class="doc-head">
+  <p class="eyebrow">QuantFlow · Internal Doctrine · Deliverable</p>
+  <h1>The Ontology Doctrine</h1>
+  <p class="subtitle">How to build a Palantir-grade ontology as a solo developer — market-agnostic, trading-focused, with tools anyone can install.</p>
+  <div class="meta">
+    <span>DATE <b>2026-07-22</b></span>
+    <span>AUTHOR <b>Claude (architect/verifier seat)</b></span>
+    <span>SOURCES <b>DevCon6 talks 00–09 · Cerebras KB · Inspire inventory · repo audit</b></span>
+    <span>STATUS <b>v1 — for founder decision</b></span>
+  </div>
+
+  <div class="verdict">
+    <p class="vlabel">The verdict, up front</p>
+    <p><strong>You are closer than you think, and behind where you think.</strong> A Palantir ontology is four primitives — object types, properties, links, actions — held together by three disciplines: a single governed system of record, a tool surface <em>generated from</em> the schema, and names/descriptions treated as load-bearing agent context. QuantFlow already has the hardest of the three: a sole-writer Kernel with an append-only event log and content-addressed artifacts, gate-enforced. That's the part enterprises take years to accept, and it's running on your machine.</p>
+    <p>What you don't have is the ontology itself — the charter of ~14 named, described, linked object types — and the generated tool plane that falls out of it. That is not months of engine work. It is roughly <strong>one week of modeling and two weeks of codegen</strong>, on top of a collaboration plane you proved working this week. The months were lost rebuilding engines, not because the goal was too big. Stop building engines. Write the charter, generate the tools, and let the agents you already wired do research over it.</p>
+  </div>
+</header>
+
+<div class="layout">
+
+<nav class="rail" aria-label="Report contents">
+  <span class="rail-label">Contents</span>
+  <a href="#part-1">I · What it actually is</a>
+  <a href="#part-2">II · What you have</a>
+  <a href="#part-3">III · Replication kit</a>
+  <a href="#part-4">IV · The charter</a>
+  <a href="#part-5">V · The roadmap</a>
+  <a href="#part-6">VI · Governance of one</a>
+  <a href="#part-7">VII · Claims ladder</a>
+  <a href="#appendix">Appendix · Sources</a>
+</nav>
+
+<main>
+
+<!-- ============================ PART I ============================ -->
+<section class="part" id="part-1">
+  <p class="part-no">Part I</p>
+  <h2>What a Palantir ontology actually is — stripped of the paywall</h2>
+
+  <p class="lede">Strip away Foundry's branding and the ontology is a small grammar plus a set of disciplines. None of it is secret, and none of it requires their platform. Their own DevCon6 talks describe it plainly.</p>
+
+  <h3>The four primitives</h3>
+  <ul>
+    <li><strong>Object types</strong> — the real-world nouns of the business (<em>not</em> mirrors of source tables). One canonical type per real entity.</li>
+    <li><strong>Properties</strong> — typed fields, every one described, with pipeline-noise excluded ("no business value" columns stay out).</li>
+    <li><strong>Links</strong> — pre-wired relationships between types. This is the piece that makes agents reliable: <em>"having it all modeled… lets us get a lot closer to one-shotting these analyses."</em></li>
+    <li><strong>Actions</strong> — the governed verbs. All mutation goes through them; nothing writes to the store directly.</li>
+  </ul>
+
+  <h3>The three disciplines that make it "real"</h3>
+  <ol>
+    <li><strong>One governed system of record.</strong> A single truth layer, mutated only through actions, with lineage. This is the cultural mountain for enterprises — hundreds of ERPs, department silos. For you it's a solved problem: the Kernel is the sole writer, enforced by falsified <span class="mono">qa/</span> gates.</li>
+    <li><strong>Tools follow the ontology, not the reverse.</strong> The single most portable idea from DevCon6: Palantir didn't hand-craft twenty MCP tools. They modeled the object/link/action graph correctly, and generic CRUD + action tools fell out of it for free. That's why their agents chained retrospective → plan → publish → dependency-query without hand-holding.</li>
+    <li><strong>Names and descriptions are agent context.</strong> <em>"These LLMs were not trained on your enterprise's data"</em> — the schema is the grounding an agent reasons over. A vague name that used to cost a human a Slack message now degrades agent decisions directly. Misnomer is "one of the worst anti-patterns."</li>
+  </ol>
+
+  <h3>The proof standard</h3>
+  <p>An ontology is <em>real</em> — not marketing — the day an agent performs cross-object synthesis through generated tools in one shot. Palantir's proof was: synthesize a retrospective from Slack + tickets + GitHub, draft OKRs, publish them back as linked objects, then immediately query cross-team dependencies. QuantFlow's equivalent proof, defined now so you can't move the goalposts later:</p>
+  <blockquote>
+    An orchestrator seat is asked: "What did the last Run on Hypothesis X show, which Evaluation gated it, and should we re-run against the newer Dataset?" — and answers correctly using only tools generated from the schema, in one pass, with every step recorded to the Kernel.
+    <span class="attr">— the QuantFlow one-shot test (Phase 4 exit gate)</span>
+  </blockquote>
+
+  <h3>The honest part about the last few months</h3>
+  <p>The time wasn't lost because the goal was too ambitious. It was lost to <strong>layer confusion</strong> — rebuilding engines (harness, canvas, runtime plumbing) that were already good enough, while the world model those engines exist to serve stayed empty. Your mobile argument yesterday ended at the correct answer: the dock/canvas of heterogeneous agents is the differentiator nothing else ships, and this week the collaboration plane through it became <em>real</em> (peer bus + PTY delivery, verified). The missing organ was never another engine. It's the shared world the agents act on. That's the ontology, and it's Part IV of this document.</p>
+</section>
+
+<!-- ============================ PART II ============================ -->
+<section class="part" id="part-2">
+  <p class="part-no">Part II</p>
+  <h2>What QuantFlow already has — the audited inventory</h2>
+
+  <p>Mapped against the six-layer agent stack Palantir launched at DevCon6. Status is from verified repo state, not docs.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Palantir layer</th><th>What it does there</th><th>QuantFlow equivalent</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Ontology</b></td>
+          <td>Substrate representing the organization; how AIP understands agents</td>
+          <td>SQLite Kernel — sole writer, append-only event log, content-addressed artifacts, schema-generated code</td>
+          <td><span class="chip have">SUBSTRATE HAVE</span> <span class="chip gap">CHARTER GAP</span></td>
+        </tr>
+        <tr>
+          <td><b>Ontology MCP (OMCP)</b></td>
+          <td>One MCP server over the whole graph; CRUD + action tools derived from schema</td>
+          <td>qf-peer-bus proves the MCP plane works and records to Kernel; but <span class="mono">qf_*</span> verbs are hand-grown, not generated</td>
+          <td><span class="chip seed">SEED</span></td>
+        </tr>
+        <tr>
+          <td><b>Agent Engine</b></td>
+          <td>The agent primitive; typed sessions, approval gates</td>
+          <td>Hermes seats (orchestrator / worker / worker2) — BYO harness, the exact pattern Palantir themselves support in SuperRepo</td>
+          <td><span class="chip have">HAVE · PROVEN</span></td>
+        </tr>
+        <tr>
+          <td><b>Orchestrator</b></td>
+          <td>Durable execution, replay, zero-cost suspend</td>
+          <td>Append-only event log gives replayability; no durable suspend/retry semantics yet (Effect is the candidate)</td>
+          <td><span class="chip seed">PARTIAL</span></td>
+        </tr>
+        <tr>
+          <td><b>Agent SDK / Builder</b></td>
+          <td>Pro-code + low-code doors to the same primitives</td>
+          <td>qf-kernel-schema codegen (schema → typed code) — the OSDK move, already yours</td>
+          <td><span class="chip have">HAVE</span></td>
+        </tr>
+        <tr>
+          <td><b>Agent Manager</b></td>
+          <td>Fleet telemetry and observability</td>
+          <td>Canvas + dock (seat spawn rail), agent.log, trajectory artifacts. Palantir <em>retreated</em> from their graph view; your operator wants it — this is the moat</td>
+          <td><span class="chip have">HAVE · DIFFERENTIATOR</span></td>
+        </tr>
+        <tr>
+          <td><b>AIP Evolve</b></td>
+          <td>Automatic model/cost optimization via experiment search</td>
+          <td>Future: Evaluation history as fitness function (backtest metrics beat LLM-as-judge)</td>
+          <td><span class="chip later">LATER</span></td>
+        </tr>
+        <tr>
+          <td><b>Workshop / frontend</b></td>
+          <td>Form-based apps over the ontology</td>
+          <td>Electron canvas — spatial, operator-grade, already renders live seats</td>
+          <td><span class="chip have">HAVE</span></td>
+        </tr>
+        <tr>
+          <td><b>Two-layer permissioning</b></td>
+          <td>User-scoped token + category deny-list for external AI clients</td>
+          <td>Transport-level read/write separation only; category deny-list is a clean future steal for any cloud surface</td>
+          <td><span class="chip later">LATER</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>Read that table honestly:</strong> five of nine layers are HAVE, and one of the HAVEs (the canvas) is something Palantir explicitly walked away from shipping. The two gaps that matter — the charter and the generated tool plane — are the cheapest rows on the board. That is the entire course correction.</p>
+
+  <h3>Also already banked this week</h3>
+  <ul>
+    <li><strong>Real agent-to-agent collaboration</strong> — orchestrator → worker peer message injected into a live TUI, auto-processed, replied to via <span class="mono">send_to_peer</span>, both legs recorded as content-addressed trajectory artifacts. This was the multi-month blocker; it is done and verified.</li>
+    <li><strong>Verification culture</strong> — falsified gates (bait → red → restore → green), cold worktree verification, provenance recomputation. This <em>is</em> governance; Part VI just aims it at the schema.</li>
+    <li><strong>Trajectory store</strong> — every peer message is already a distilled, structured artifact: exactly the "distill-then-embed" shape the Cerebras recall layer will want, done early by accident of discipline.</li>
+  </ul>
+</section>
+
+<!-- ============================ PART III ============================ -->
+<section class="part" id="part-3">
+  <p class="part-no">Part III</p>
+  <h2>The replication kit — every Foundry organ, solo-dev edition</h2>
+
+  <p>The comparison you asked to preserve: Palantir's ideology and tools on the left, the openly available equivalent on the right. Nothing in this table is behind a paywall, a free-tier cap, or a contract. Most of it is already in your repo.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Foundry component</th><th>Palantir's ideology</th><th>Solo-dev tool</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Ontology object store</b></td>
+          <td>One governed truth layer for the organization</td>
+          <td>SQLite via <span class="mono">bun:sqlite</span> / <span class="mono">node:sqlite</span> — the Kernel. Local, owned, no rate limits, sub-millisecond</td>
+          <td><span class="chip have">HAVE</span></td>
+        </tr>
+        <tr>
+          <td><b>Ontology-as-code (<span class="mono">ontology.mts</span>)</b></td>
+          <td>Objects/links/actions defined in TypeScript; live regen; schema drift = lint error</td>
+          <td>A TypeScript charter module in your monorepo; qf-kernel-schema codegen regenerates typed code; a lint that fails when agent tool defs drift from schema</td>
+          <td><span class="chip gap">PHASE 1</span></td>
+        </tr>
+        <tr>
+          <td><b>OSDK codegen</b></td>
+          <td>Schema change → SDK regenerates → type errors surface in dependent code</td>
+          <td>qf-kernel-schema already generates code from schema — extend it to emit tool definitions too</td>
+          <td><span class="chip have">HAVE (EXTEND)</span></td>
+        </tr>
+        <tr>
+          <td><b>Actions / write-back</b></td>
+          <td>All mutation through governed action types; agents publish results as linked objects</td>
+          <td>Kernel commands via <span class="mono">execute()</span> over the append-only event log — stricter than Foundry's, and already gate-enforced</td>
+          <td><span class="chip have">HAVE</span></td>
+        </tr>
+        <tr>
+          <td><b>OMCP server</b></td>
+          <td>One MCP server over the modeled graph; tools derived, not hand-written; client-agnostic</td>
+          <td><span class="mono">@modelcontextprotocol/sdk</span> — the exact stack qf-peer-bus already ships on. Generate per-type read tools + per-action write tools from the charter</td>
+          <td><span class="chip seed">PHASE 2</span></td>
+        </tr>
+        <tr>
+          <td><b>Pipelines</b></td>
+          <td>System-of-record data flows in via pipelines, never via manual actions (anti-Golden-Hammer)</td>
+          <td>Bun scripts + cron, writing through Kernel commands with an ingest trace. One script per source</td>
+          <td><span class="chip gap">PHASE 3</span></td>
+        </tr>
+        <tr>
+          <td><b>Workshop / OSDK apps</b></td>
+          <td>Human surfaces over the ontology</td>
+          <td>The Electron canvas + dock — already superior for your operator (they retreated from the graph; you ship it)</td>
+          <td><span class="chip have">HAVE</span></td>
+        </tr>
+        <tr>
+          <td><b>Agent Engine + harnesses</b></td>
+          <td>BYO third-party harness supported today; Agent SDK "coming soon"</td>
+          <td>Hermes seats + any MCP-speaking agent (Claude Code, Codex, anything). Model-agnostic by construction</td>
+          <td><span class="chip have">HAVE · PROVEN</span></td>
+        </tr>
+        <tr>
+          <td><b>Orchestrator (durable execution)</b></td>
+          <td>Durable ledger, replay with idempotency keys, zero-cost suspend</td>
+          <td>Event-log replay now; <b>Effect</b> (typed retries/errors, from your Inspire inventory) when Runs get long-horizon</td>
+          <td><span class="chip later">PHASE 4+</span></td>
+        </tr>
+        <tr>
+          <td><b>Agent Manager telemetry</b></td>
+          <td>Zero-config fleet observability; time attribution before optimization</td>
+          <td>agent.log + trajectory artifacts + canvas. Add span timing when the loop is live — measure before optimizing</td>
+          <td><span class="chip seed">PARTIAL</span></td>
+        </tr>
+        <tr>
+          <td><b>Recall / knowledge layer</b></td>
+          <td>(Cerebras pattern, same doctrine) distill-then-embed, hybrid retrieval, RRF fusion</td>
+          <td>SQLite <span class="mono">FTS5</span> + <span class="mono">sqlite-vec</span>, RRF k=60, age decay. Trajectories are already distilled — half done</td>
+          <td><span class="chip later">PHASE 5</span></td>
+        </tr>
+        <tr>
+          <td><b>Two-layer permissioning</b></td>
+          <td>User-scoped token + marking deny-list so lower-trust AI clients can't exfiltrate categories</td>
+          <td>Build only when an external/cloud agent first touches the surface: a category deny-list in the generated MCP server</td>
+          <td><span class="chip later">PHASE 5</span></td>
+        </tr>
+        <tr>
+          <td><b>AIP Evolve</b></td>
+          <td>Bounded experiment search over models/configs</td>
+          <td>Evaluation history as fitness. Sharpe/drawdown/hit-rate are objective — better than LLM-as-judge, and unique to your domain</td>
+          <td><span class="chip later">PHASE 6</span></td>
+        </tr>
+        <tr>
+          <td><b>Multi-tenant ACLs, marketplace, fleet scale</b></td>
+          <td>Enterprise machinery</td>
+          <td>Not your problem. A solo operator replicating these is cosplay — skip deliberately</td>
+          <td><span class="chip never">SKIP</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>The 50-object cap, revisited</h3>
+  <p>The free-tier limit that helped push you off Foundry is worth one more look — because Palantir's own governance talk implies a well-modeled ontology is <em>small</em>. God Objects and type-per-system silos are what bloat counts. The charter in Part IV needs <strong>~14 object types</strong>. The cap was never your real constraint; <strong>ownership and real-time were</strong> — and both are solved by staying local. Use the free tier, if at all, as a modeling lab to sanity-check the charter. Never as a dependency. (This is also your own research verdict from talk 00: <em>borrow the doctrine, don't build on the platform</em> — availability fails decisively; there is nothing to <span class="mono">npm install</span>.)</p>
+</section>
+
+<!-- ============================ PART IV ============================ -->
+<section class="part" id="part-4">
+  <p class="part-no">Part IV</p>
+  <h2>The QuantFlow ontology charter — v1 proposal</h2>
+
+  <p class="lede">Domain-driven design, in Palantir's own ordering: understand the domain → design the ontology → map source data onto it. Never the reverse. The domain is <strong>quantitative research</strong> — not football, not HyperLiquid. Markets plug in as data; the research loop is invariant. That is how you stay market-agnostic without being empty.</p>
+
+  <h3>Two planes, one agent layer</h3>
+  <ul>
+    <li><span class="otype research">RESEARCH PLANE</span> — the invariant loop. Identical whether the instrument is a football spread, a perp contract, or an equity. This is the spine.</li>
+    <li><span class="otype market">MARKET PLANE</span> — pluggable per domain. Fed by pipelines only. Adding a new market adds <em>rows</em>, not object types.</li>
+    <li><span class="otype agent">AGENT PLANE</span> — who does the work. Already largely real in the Kernel (species, sessions, trajectories).</li>
+  </ul>
+
+  <pre class="mermaid">
+flowchart LR
+  subgraph RP["RESEARCH PLANE (invariant)"]
+    H["Hypothesis"] -->|TESTS_ON| D["Dataset"]
+    H -->|TESTED_BY| R["Run"]
+    R -->|PRODUCES| A["Artifact"]
+    A -->|EVALUATED_BY| E["Evaluation"]
+    E -->|GATES| REP["Report"]
+  end
+  subgraph AP["AGENT PLANE"]
+    AD["AgentDefinition"] -->|SPAWNS| AS["AgentSession"]
+    AS -->|DRIVES| R
+    AS -->|EMITS| T["Trajectory (Artifact)"]
+  end
+  subgraph MP["MARKET PLANE (pluggable)"]
+    V["Venue"] -->|LISTS| I["Instrument"]
+    I -->|QUOTED_BY| Q["Quote"]
+    I -->|HAS| ME["MarketEvent"]
+  end
+  H -->|TARGETS| I
+  D -->|SNAPSHOTS| Q
+  </pre>
+
+  <h3>The object types (~14, each with a mandatory description)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Plane</th><th>Object type</th><th>What it is (the description agents will read)</th><th>Key links</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Hypothesis</td><td>A falsifiable claim about market behavior, with success criteria declared before any Run</td><td class="mono">TARGETS Instrument · TESTS_ON Dataset</td></tr>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Dataset</td><td>A point-in-time-fenced snapshot of market data a Run may read. Immutable once fenced</td><td class="mono">SNAPSHOTS Quote/MarketEvent</td></tr>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Run</td><td><b>One canonical type.</b> An execution of a Hypothesis against a Dataset. Backtest vs screen vs sim is a property, never a subtype</td><td class="mono">TESTED_BY←Hypothesis · PRODUCES Artifact · DRIVEN_BY AgentSession</td></tr>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Artifact</td><td>Content-addressed output — trajectory, result table, chart, report body. Already live in the Kernel</td><td class="mono">PRODUCED_BY Run · EVALUATED_BY Evaluation</td></tr>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Evaluation</td><td>A Critic's scored judgment of an Artifact against the Hypothesis's declared criteria. Gates publication</td><td class="mono">GATES Report</td></tr>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Report</td><td>The publishable synthesis. Cannot exist without a passing Evaluation — enforced, not suggested</td><td class="mono">DERIVED_FROM Artifact</td></tr>
+        <tr><td><span class="otype research">R</span></td><td class="mono">Mission</td><td>Workspace-level intent: the standing questions this desk is working. Scopes search and recall</td><td class="mono">CONTAINS Hypothesis</td></tr>
+        <tr><td><span class="otype agent">A</span></td><td class="mono">AgentDefinition</td><td>A species: harness, model, profile, tool grants. Already Kernel rows</td><td class="mono">SPAWNS AgentSession</td></tr>
+        <tr><td><span class="otype agent">A</span></td><td class="mono">AgentSession</td><td>A live seat on the canvas. Owns trajectories it emits</td><td class="mono">DRIVES Run · EMITS Artifact</td></tr>
+        <tr><td><span class="otype market">M</span></td><td class="mono">Venue</td><td>Where instruments trade or are quoted: a sportsbook, an exchange</td><td class="mono">LISTS Instrument</td></tr>
+        <tr><td><span class="otype market">M</span></td><td class="mono">Instrument</td><td>A tradeable/betable thing: a game line, a perp, a ticker. The market-agnostic pivot point</td><td class="mono">QUOTED_BY Quote · HAS MarketEvent</td></tr>
+        <tr><td><span class="otype market">M</span></td><td class="mono">Quote</td><td>A priced observation at a timestamp: odds, bid/ask, close. Pipeline-fed only</td><td class="mono">OF Instrument</td></tr>
+        <tr><td><span class="otype market">M</span></td><td class="mono">MarketEvent</td><td>A discrete occurrence affecting an instrument: kickoff, injury news, funding event, settlement</td><td class="mono">ON Instrument</td></tr>
+        <tr><td><span class="otype market">M</span></td><td class="mono">Position</td><td><i>(Later — only when real capital exists.)</i> An actual stake taken on an Instrument per a Report</td><td class="mono">JUSTIFIED_BY Report</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Actions (the governed verbs — deliberately few)</h3>
+  <p>Coherent verbs, not property-level sprawl. Anything pipeline-shaped (quotes, events) gets <em>no</em> action at all — that's the Golden Hammer rule.</p>
+  <ul>
+    <li><span class="mono">propose_hypothesis</span> · <span class="mono">fence_dataset</span> · <span class="mono">start_run</span> / <span class="mono">complete_run</span> · <span class="mono">publish_artifact</span> (exists) · <span class="mono">record_evaluation</span> · <span class="mono">publish_report</span> (rejects without passing Evaluation) · <span class="mono">register_instrument</span></li>
+  </ul>
+
+  <h3>What the charter looks like as code (Phase 1's actual deliverable)</h3>
+  <pre class="code"><span class="cm">// ontology/research.ts — the charter is a module, not a document.</span>
+<span class="cm">// Every type and property carries a description: agents read these.</span>
+defineObjectType({
+  apiName: <span class="st">"Run"</span>,
+  description: <span class="st">"One execution of a Hypothesis against a fenced Dataset. "</span> +
+               <span class="st">"Kind (backtest|screen|simulation) is a property — never a subtype."</span>,
+  status: <span class="st">"experimental"</span>,        <span class="cm">// lifecycle: experimental → active</span>
+  properties: {
+    kind:      { type: <span class="kw">"enum"</span>, values: [<span class="st">"backtest"</span>,<span class="st">"screen"</span>,<span class="st">"simulation"</span>],
+                 description: <span class="st">"Execution mode; differentiates by composition, not type"</span> },
+    startedAt: { type: <span class="kw">"timestamp"</span>, description: <span class="st">"Wall-clock start"</span> },
+    status:    { type: <span class="kw">"enum"</span>, values: [<span class="st">"running"</span>,<span class="st">"complete"</span>,<span class="st">"failed"</span>],
+                 description: <span class="st">"Reported by the execution environment, never set by hand"</span> },
+  },
+  links: {
+    hypothesis: { to: <span class="st">"Hypothesis"</span>, kind: <span class="st">"TESTED_BY"</span>,  description: <span class="st">"The claim under test"</span> },
+    dataset:    { to: <span class="st">"Dataset"</span>,    kind: <span class="st">"READS"</span>,      description: <span class="st">"Fenced data snapshot"</span> },
+    artifacts:  { to: <span class="st">"Artifact"</span>,   kind: <span class="st">"PRODUCES"</span>,   many: <span class="kw">true</span> },
+    session:    { to: <span class="st">"AgentSession"</span>, kind: <span class="st">"DRIVEN_BY"</span>, description: <span class="st">"The seat that ran it"</span> },
+  },
+  actions: {
+    start_run:    { description: <span class="st">"Begin executing a Hypothesis against a Dataset"</span> },
+    complete_run: { description: <span class="st">"Record terminal status + final artifacts"</span> },
+  },
+});
+<span class="cm">// From this one module, codegen emits: SQL DDL → Kernel · typed TS client →</span>
+<span class="cm">// seats · MCP read tools (get/search/traverse) + action tools → the qf server.</span>
+<span class="cm">// Change the schema, everything regenerates, drift becomes a type error.</span></pre>
+
+  <p>That last comment is Palantir's SuperRepo demo — the local embedded ontology, the live-regenerating OSDK, schema-drift-as-lint-error — reproduced with your existing codegen and a Bun monorepo. Their version needs a Foundry contract. Yours needs a week.</p>
+</section>
+
+<!-- ============================ PART V ============================ -->
+<section class="part" id="part-5">
+  <p class="part-no">Part V</p>
+  <h2>The roadmap — six phases, each with a falsifiable gate</h2>
+
+  <p>Same verification culture you already run: no phase is "done" by prose. Each has an exit gate that can go red. Timeboxes assume you + agent builders at current cadence.</p>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">0</span>DONE<br>&nbsp;</div>
+    <div>
+      <h3>The substrate <span class="chip done">BANKED</span></h3>
+      <p>Sole-writer Kernel + event log + content-addressed artifacts. Peer bus with Kernel-recorded trajectories. PTY delivery — live, verified agent collaboration in native TUIs. Canvas + dock with seat spawning. Falsified gate culture. <strong>Do not rebuild any of this. It is finished.</strong></p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">1</span>WEEK 1</div>
+    <div>
+      <h3>The charter</h3>
+      <p>Write <span class="mono">ontology/</span> as code: the ~14 types of Part IV, every type and property described, links and actions declared, lifecycle flag on every type. This is a modeling week, not an engineering month — most shapes already exist informally in the Kernel; you are naming and governing them.</p>
+      <div class="gate"><span class="glabel">Exit gate</span>Schema lint goes red on: a missing description, a subtype-of-Run clone, a property removed from a non-experimental type. Falsified with a bait commit before it counts.</div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">2</span>WEEKS 2–3</div>
+    <div>
+      <h3>The generated tool plane</h3>
+      <p>Extend qf-kernel-schema codegen to emit the MCP server: per-type read tools (<span class="mono">get / search / traverse-links</span>) and per-action write tools, from the charter, on the <span class="mono">@modelcontextprotocol/sdk</span> stack qf-peer-bus already proved. Retire hand-grown <span class="mono">qf_*</span> verbs as generated equivalents land. The peer bus stays as the agent↔agent plane; this is the agent↔world plane beside it.</p>
+      <div class="gate"><span class="glabel">Exit gate</span>Add a brand-new object type to the charter → its tools appear with zero hand-written tool code, and a Hermes seat lists and calls them cold.</div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">3</span>WEEK 4</div>
+    <div>
+      <h3>The first market plane</h3>
+      <p>One pipeline, one source, one market — odds or HyperLiquid, your call, the ontology doesn't care. A Bun script on cron writing <span class="mono">Instrument / Quote / MarketEvent</span> through Kernel commands with an ingest trace. No actions for pipeline-shaped data (Golden Hammer rule). This is the moment the canvas stops being an empty engine.</p>
+      <div class="gate"><span class="glabel">Exit gate</span>Every market row traces to an ingest event (provenance recomputable), and a seat answers a cross-object question about real data — "which instruments moved most since yesterday's fence?" — through generated tools only.</div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">4</span>WEEKS 5–8</div>
+    <div>
+      <h3>The defining loop, agent-run</h3>
+      <p>Orchestrator + workers execute the full loop over the peer bus: <span class="mono">Hypothesis → Dataset → Run → Artifact → Evaluation → Report</span>, every step a Kernel action, every conversation a trajectory artifact. Evaluation gates Report publication mechanically (Ragas-style critic scoring against declared criteria). Add Effect-typed retries where Runs get long.</p>
+      <div class="gate"><span class="glabel">Exit gate</span>The one-shot test from Part I: an orchestrator seat answers "what did the last Run on Hypothesis X show, which Evaluation gated it, should we re-run on the newer Dataset?" correctly, in one pass, tools-only, fully recorded. <b>This is the day QuantFlow is a real ontology.</b></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">5</span>MONTHS 2–3</div>
+    <div>
+      <h3>Recall + trust boundaries</h3>
+      <p>The Cerebras layer: <span class="mono">FTS5 + sqlite-vec</span>, hybrid retrieval fused with RRF (k=60), age decay (betting knowledge expires), Mission-scoped search. Trajectories are already the distilled shape — never embed raw transcripts. Rule stays absolute: <em>retrieval never becomes truth without a Kernel command.</em> First external/cloud agent to touch the surface triggers the marking-style category deny-list in the generated server.</p>
+      <div class="gate"><span class="glabel">Exit gate</span>A seat's answer cites retrieved Reports/Evaluations with artifact hashes; a deny-listed category provably never crosses the MCP boundary (bait-tested).</div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-id"><span class="pnum">6</span>LATER</div>
+    <div>
+      <h3>Evolve-shaped optimization</h3>
+      <p>Evaluation history becomes a fitness function: which strategies, models, and agent configs actually produce passing Evaluations (<span class="mono">which_strategy_knows</span> routing). Backtest metrics are an objective fitness signal LLM-as-judge shops would kill for — your domain hands it to you. Also the finetuning substrate: the trajectory store is training data for the next generation of your own agents.</p>
+      <div class="gate"><span class="glabel">Exit gate</span>Deferred until Phase 4 has months of Evaluation history. Measuring before optimizing is the whole lesson of their telemetry talk.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PART VI ============================ -->
+<section class="part" id="part-6">
+  <p class="part-no">Part VI</p>
+  <h2>Governance of one — anti-patterns as lint rules</h2>
+
+  <p>You have no review board, so governance lives in <span class="mono">qa/</span> gates — the same falsified-gate culture you already run, aimed at the schema. Palantir's six named anti-patterns, translated:</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Palantir anti-pattern</th><th>How it would appear in QuantFlow</th><th>The gate that blocks it</th></tr></thead>
+      <tbody>
+        <tr><td><b>God Object</b></td><td><span class="mono">Run</span> absorbing every tool's raw log fields</td><td>Property-count ceiling + "no ETL noise" review on charter diffs</td></tr>
+        <tr><td><b>Kitchen Sink</b></td><td>Mapping every scraper column 1:1 into <span class="mono">Quote</span></td><td>Charter properties require a description that states business meaning — no meaning, no property</td></tr>
+        <tr><td><b>Silos</b></td><td><span class="mono">BacktestRun</span> / <span class="mono">ScreenerRun</span> / <span class="mono">SimRun</span> as separate types; a type per sportsbook</td><td>Lint: no type name may embed another type's kind enum; new Venue = row, not type</td></tr>
+        <tr><td><b>Action Sprawl</b></td><td><span class="mono">update_run_status</span> + <span class="mono">update_run_cost</span> + <span class="mono">update_run_timing</span></td><td>One coherent <span class="mono">complete_run</span>; action count reviewed per type</td></tr>
+        <tr><td><b>Golden Hammer</b></td><td>A write-action for quotes that a pipeline should feed</td><td>Market-plane types declare <span class="mono">pipelineFed: true</span> → codegen emits no write tools for them</td></tr>
+        <tr><td><b>Misnomer</b></td><td>"Item", "Data", "Thing" — names agents can't reason over</td><td>Non-empty description lint on every type and property (already Phase 1's gate)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ul>
+    <li><strong>Extend, don't mutate:</strong> <span class="mono">status: "experimental" | "active"</span> on every type. A diff that removes/retypes a property on an <em>active</em> type fails CI; capability is added via new linked types. Palantir showed no migration tool either — your schema-diff gate + changelog requirement fills a gap they left open.</li>
+    <li><strong>Descriptions are enforced, not encouraged</strong> — because your own agents read this schema exactly the way AIP's do.</li>
+  </ul>
+</section>
+
+<!-- ============================ PART VII ============================ -->
+<section class="part" id="part-7">
+  <p class="part-no">Part VII</p>
+  <h2>The claims ladder — what you can say, and when</h2>
+
+  <p>You said it yourself: pivoting the marketing to "ontology" means backing it up. The repo-docs lesson applies to marketing too — never claim ahead of what a cold verifier could confirm. Here is the ladder; each rung unlocks on a shipped, gated phase.</p>
+
+  <div class="rung">
+    <div class="when">TODAY</div>
+    <div><p><strong>"An agent-collaboration platform with a governed system of record."</strong> Every agent message is a typed, content-addressed artifact in an append-only log; heterogeneous agents (any model, any harness) collaborate in native TUIs on one canvas. All true, all verified this week.</p></div>
+  </div>
+  <div class="rung">
+    <div class="when">AFTER P1–P2</div>
+    <div><p><strong>"An ontology-defined platform: the agents' tool surface is generated from the schema."</strong> This is the load-bearing Palantir claim — tools follow the ontology. Once codegen ships, you can say it without flinching.</p></div>
+  </div>
+  <div class="rung">
+    <div class="when">AFTER P3–P4</div>
+    <div><p><strong>"AI agents doing end-to-end quantitative research over a governed ontology."</strong> The OMCP-demo equivalent, with the one-shot proof recorded in the Kernel as evidence. This is the demo video. This is the pitch.</p></div>
+  </div>
+  <div class="rung">
+    <div class="when">NEVER</div>
+    <div><p>Palantir affiliation or comparison-by-name in marketing · scale/fleet claims · "enterprise permissioning" before Phase 5 ships · any claim a bait test hasn't survived.</p></div>
+  </div>
+
+  <h3>The course correction, in three sentences</h3>
+  <p><strong>1.</strong> Stop building engines — the substrate, the canvas, and the collaboration plane are done and verified; every additional engine week is the gutter. <strong>2.</strong> Spend one week writing the charter and two generating the tool plane — that's the entire distance between "QuantFlow" and "QuantFlow, an ontology." <strong>3.</strong> Then run the defining loop on one real market and let the recorded one-shot proof be your marketing, because a Palantir-grade ontology isn't a feature list — it's the moment an agent does real cross-object work through tools that fell out of your schema.</p>
+</section>
+
+<!-- ============================ APPENDIX ============================ -->
+<section class="part" id="appendix">
+  <p class="part-no">Appendix</p>
+  <h2>Sources</h2>
+  <ul>
+    <li><span class="mono">DevCon6 00 — The Integration Question</span> · the verdict: borrow doctrine, don't build on platform; availability fails decisively</li>
+    <li><span class="mono">DevCon6 05 — SuperRepo & Agent Development</span> · local embedded ontology, ontology-as-code, schema-drift-as-lint, parallel worktrees</li>
+    <li><span class="mono">DevCon6 08 — Ontology MCP</span> · tools follow the ontology; one server over the graph; two-layer permissioning; one-shot cross-object synthesis</li>
+    <li><span class="mono">DevCon6 09 — Ontology Governance</span> · DDD ordering; the six anti-patterns; extend-don't-mutate; descriptions as agent grounding</li>
+    <li><span class="mono">DevCon6 02/03/04/06/07</span> · durable ledger &amp; suspend; typed context items; time attribution; write-back loop; the graph-view retreat</li>
+    <li><span class="mono">Cerebras KB notes</span> · record vs recall split; distill-then-embed; hybrid retrieval + RRF k=60; retrieval never becomes truth without a Kernel command</li>
+    <li><span class="mono">INSPIRE-USECASES.md</span> · the defining loop; the three-things-first list; Effect, Ragas, WrenAI candidates</li>
+    <li><span class="mono">Repo audit (this week)</span> · peer bus + PTY delivery verified; gate falsification records; trajectory artifacts live</li>
+  </ul>
+</section>
+
+<footer class="doc-foot">
+  QUANTFLOW · THE ONTOLOGY DOCTRINE · v1 · 2026-07-22<br>
+  Prepared by the architect/verifier seat. Every phase gate in this document is falsifiable by construction — if a gate can't go red, it isn't a gate.
+</footer>
+
+</main>
+</div>
+</div>
+</body>
+</html>

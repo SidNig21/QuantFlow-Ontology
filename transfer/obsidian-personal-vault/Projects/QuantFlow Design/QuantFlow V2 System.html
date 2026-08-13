@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuantFlow V2 — Visual System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" />
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #06080c; color: #e7ecf2;
+    font-family: 'Geist', system-ui, sans-serif; }
+  @keyframes qfBlink { 50% { opacity: 0; } }
+  @keyframes qfCableFlow { to { stroke-dashoffset: -32; } }
+  @keyframes qfCableFlowDense { to { stroke-dashoffset: -28; } }
+  @keyframes qfBreathe { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  @keyframes qfSpin { to { transform: rotate(360deg); } }
+  @keyframes qfPulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(2.4); opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="v2/qf2-tokens.jsx"></script>
+<script type="text/babel" src="v2/qf2-parts.jsx"></script>
+<script type="text/babel" src="v2/qf2-shell.jsx"></script>
+<script type="text/babel" src="v2/ab-canvas.jsx"></script>
+<script type="text/babel" src="v2/ab-components.jsx"></script>
+<script type="text/babel" src="v2/ab-chrome.jsx"></script>
+<script type="text/babel" src="v2/ab-inspectors-watchtower.jsx"></script>
+<script type="text/babel" src="v2/ab-brand-tokens.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const App = () => (
+  <DesignCanvas title="QuantFlow V2 — Visual System" subtitle="Live topology console for agent systems. V1 is the DNA; V2 resolves hierarchy, brand clarity, and orchestration readability. Captions carry file targets for handoff — see DESIGN.md / PRODUCT.md.">
+
+    <DCSection id="canvas" title="Canvas — the routed field" subtitle="→ shell/index.html (#grid-canvas, #panel-viewer, #cable-layer) · canvas-rpc.js · cable-renderer.js">
+      <DCArtboard id="active-canvas" label="Active canvas — Codex / Generic / Agent / Worker nodes; live + selected + queued + bundled routes (→ shell renderer)" width={1600} height={1040}>
+        <ActiveCanvas />
+      </DCArtboard>
+      <DCArtboard id="empty-canvas" label="Empty canvas — centered QF origin mark + QuantFlow label + gesture teaching (→ new low-z watermark layer behind #tile-layer)" width={1600} height={1040}>
+        <EmptyCanvas />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="components" title="Components — tiles & cables" subtitle="The signature system: node anatomy + the six cable states. → shell.css .canvas-tile / .tile-*-badge · cable-renderer.js">
+      <DCArtboard id="tile-sheet" label="Tile component sheet — node types + lifecycle states" width={1500} height={1120}>
+        <TileSheet />
+      </DCArtboard>
+      <DCArtboard id="cable-sheet" label="Cable component sheet — route states + route kinds" width={1500} height={720}>
+        <CableSheet />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="chrome" title="Chrome — registry & dock" subtitle="Discoverability + orchestration controls. → nav/src/App.tsx + styles/App.css · shell renderer (Legend)">
+      <DCArtboard id="registry" label="Left registry redesign — system index grouped by agent class" width={1440} height={780}>
+        <RegistrySheet />
+      </DCArtboard>
+      <DCArtboard id="dock" label="Spawn / control dock redesign — modes, groups, runtime targets, states" width={1440} height={780}>
+        <DockSheet />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="inspectors" title="Inspectors — selection detail" subtitle="→ shell renderer selection · cable-inspector.js · herdr-session-spawn.ts / herdr-spawn-input.ts">
+      <DCArtboard id="tile-inspector" label="Selected tile inspector — node, routes, correlation, actions" width={1120} height={760}>
+        <TileInspector />
+      </DCArtboard>
+      <DCArtboard id="cable-inspector" label="Selected cable inspector — endpoints, relay state, connection/correlation id" width={1120} height={680}>
+        <CableInspector />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="system" title="System health — Watchtower" subtitle="Live via herdr events.subscribe (Gate 3). → diagnostics/health-runner.ts · probes.ts · 2s polling stays until Gate 3 (RETIREMENT.md)">
+      <DCArtboard id="watchtower" label="Watchtower — health summary, per-agent status, event stream" width={1600} height={1000}>
+        <Watchtower />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="brand" title="Brand — QF system insignia" subtitle="→ packages/components/src/brand/QFMark.tsx · build/icon.* (compact)">
+      <DCArtboard id="brand-sheet" label="QF brand mark — construction + usage system" width={1500} height={820}>
+        <BrandSheet />
+      </DCArtboard>
+    </DCSection>
+
+    <DCSection id="foundations" title="Foundations — tokens & settings" subtitle="→ shell.css :root (extend ramp) · settings/src/App.tsx">
+      <DCArtboard id="tokens" label="Tokens + settings — color, type, spacing, radius, motion, settings preview" width={1500} height={760}>
+        <TokenSheet />
+      </DCArtboard>
+    </DCSection>
+
+  </DesignCanvas>
+);
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

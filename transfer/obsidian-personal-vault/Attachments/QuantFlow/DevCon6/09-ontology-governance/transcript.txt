@@ -1,0 +1,692 @@
+(soft music)
+Hi, I'm Chad Walquist.
+I'm an architect at Palantir.
+Today, I have Jonas,
+who's a Ford deployed engineer at Palantir.
+Spends a lot of time, like I do,
+talking to customers about the ontology,
+how to model it, right?
+People think about what is this new thing?
+Do I shove my data warehouse into the ontology?
+Like, do I take my system tables?
+What do I need to do to model this
+and really govern it, right?
+So, thank you for joining me to talk about this today.
+Hi, looking forward to talk about the ontology, you know.
+Yeah, so, I think maybe I'll help set the frame
+of what we think about, like,
+when I talk about the ontology,
+it's like, how do I model the real world?
+How it actually exists?
+How do I model your business in the terms,
+in the nouns and verbs of how it's actually operating?
+Not how you need to put a data warehouse
+for some sort of reporting tool to work on it,
+for some system scale.
+Really, the ontology in the Palantir ontology,
+the goal is to model how the real world works,
+which means it's kind of weird
+compared to what people are used to.
+And so, I think this is a topic we get all the time.
+So, I'm glad that we're gonna get to kind of
+demystify this both on the proper way to do things,
+but also some of the anti-patterns that we see
+through all of our experience.
+Yeah, absolutely.
+And, yeah, we came up with these design principles
+and hand-to-patterns.
+They are grounded in the theory of software engineering,
+but then also from what we've experienced in the field,
+and what works in reality, what works for the business,
+to drive a lot of value for the business,
+and but also for the teams that maintain the ontology.
+And these best practices,
+they help a lot building a robust ontology
+and making it future-proof.
+Yeah.
+Well, why don't we just jump into kind of starting with this?
+I know we updated some of the docs,
+we'll put a link out there for people to look at that.
+But as we go through here,
+maybe you can just kind of give me the high level
+on what you think about
+and how you break down the ontology design.
+Yeah, absolutely.
+So basically, we have these four fundamental best practice
+patterns, which is the domain-driven design.
+Don't repeat yourself, open-close principle,
+and composition of our deep hierarchies.
+And let's start with the first one, domain-driven design.
+So if we take a look at the graphic here,
+you basically want to model it in three steps
+before actually building something.
+You want to think and understand the domain
+that you're working with,
+then you want to design the ontology,
+the object types, the links between them
+and the actions on these objects.
+And then finally, map your source data
+and your logic to that ontology.
+So fundamentally, with that principle,
+you model the reality,
+and you're not just replicating something
+that some other software is pushing you into.
+Yeah.
+And let's take a look at an example for this principle.
+So when we take a look here,
+we might have, as an example here,
+have a table in our source system called order data.
+And if we just model that one-to-one
+into our ontology,
+then we would have a lot of different entities in there.
+In that order data,
+you could have customer names and emails.
+You could have technical properties
+from saying here in this example,
+CIM extracted at CIM batch ID,
+does not really have any business value.
+And this would, if you do it like that,
+would introduce anti-patterns.
+So one of that is what we call the God object.
+And it just pollutes your object type
+with team specific or technical properties.
+And then on top of that,
+the object type also represents
+multiple distinct entities.
+And then next to that,
+we also have the kitchen sink, anti-pattern,
+where you just map all source columns one-to-one
+into your object type,
+even though they are not really needed.
+And what that does is someone working on that object type,
+looking at these properties,
+maybe wants to do some changes
+or use it in a workshop application
+or any other front end.
+They are understanding the object type.
+They get confused like,
+do I really need us, what does this actually mean?
+And by keeping the object types focused
+and actually representing different real-world entities,
+it's way easier to understand for business people,
+but also for technical builders.
+>> And it's been an important point though too,
+is like when we think about the ontology,
+this is for how our humans are actually talking.
+Not necessarily how your developers are building reports,
+like what I want ontology is how the business
+actually operates and talks about these terms.
+But also there's like weird stuff I've seen,
+like the batch ID and these other things.
+There's like these technical flags and components
+that are in these objects that often we find
+kind of get ported in rather than the function
+or what people are trying to go do with these things.
+And so it creates a constant friction
+that I'm having to translate back and forth
+for my business users
+because I'm talking in a different language, right?
+>> Yeah, exactly.
+Then people start talking about the same things,
+and it's ultimately the power of the ontology
+that everyone works out from the same base.
+So what does this look like done right?
+>> Yeah, let's take a look at that.
+So rather than just having order data,
+we want to take a look on the domain.
+And if I work with orders, okay, I need the order itself.
+I'm interested about the customer,
+and I'm interested in the product of that order.
+And so I would say, okay, I have three different
+object types here, which is the order, the customer
+and the product.
+And then also identify from the sewer state,
+okay, what are the properties that are needed
+for these different object types
+and how do they relate to each other.
+And first, by modeling these things together,
+it's easier for people to understand looking
+at these object types and using the links
+and seeing the relationships between that.
+Then also future workflows can really benefit
+from these different entities
+because they can build on top of that.
+And if you maybe have a customer support kind of workflow
+that comes after this order workflow,
+you can just bolt it on to the customer.
+And then really have that understanding,
+don't have a high lift of remodeling your ontology
+just because you want to have another use case.
+Ultimately, that means once you build it right
+with the best design principles,
+it's the ontology also compounds more easily.
+And it's quicker to build future workflows and more robust.
+>> Yeah, and I think it's like since for this here,
+this reminds me very much of like dimensional model,
+which can be kind of a trap here, right?
+So like, you know, if I have a dimensional data warehouse,
+this might, the order might be a fact table
+and the customer and product might be dimensions.
+And so it's very tempting to just show
+dimensional data warehouse tables
+straight into ontology objects,
+which can work in some scenarios,
+but you start to get more complicated
+into these relationships across different measures
+and domains and other things as you,
+and that becomes a bottleneck
+because I've modeled stuff in these weird domains
+that don't necessarily cross over nicely.
+And so I think this is where like,
+in a very simple example, this makes a lot of sense,
+but it can be very similar to a dimensional data warehouse
+in this case, right?
+>> Yes, yeah, yeah.
+Yeah, ultimately with that modeling,
+it allows everyone to really work on that same ontology together.
+>> Yeah, and because I might have very complex,
+like we're showing many to one relationships here,
+but I might have many to many across different measures
+or at different granularities.
+And so traditionally, like we account for those
+in very kind of static or predefined ways.
+And I think the goal out of the ontology here is,
+is actually, let's just model all of those complexities
+and allow for the ontology to manage the scaling
+and performance and security and other components
+to be able to work across those kind of conjoined domains.
+'Cause the goal is to create that visual twin
+across your entire business process, right?
+>> Right, right, yeah.
+So, okay, cool, I like this.
+So the domain-driven design really think about
+how the real world works.
+What's the next, what's the next one?
+>> Okay, yeah, let's take a look.
+The next one is don't repeat yourself.
+And so if we look at that at the basic principle is here,
+if you did something three times,
+let's say you have a very similar object type,
+or almost the same three times,
+then you want to refactor that.
+But you can, you should also take that in mind
+when you start modeling the ontology
+and building in the ontology.
+So in this example, if we take a look at the left,
+we have three object types.
+One is a sales customer, one is a support customer,
+one is a billing customer.
+And that all seems to be basically the same.
+And okay, in reality, this might happen,
+you start with a sales use case,
+and then a support use case,
+and maybe at some point a billing use case.
+But keep in mind when you maybe start with the sales use case,
+you don't want to have a sales customer,
+you want to just start with the customer.
+And keep in mind that in the future,
+there might be additional use cases,
+or additional teams working on your ontology object customer.
+In reality, in a business,
+multiple teams, multiple departments,
+work with a customer entity.
+And so the problems that are being introduced here
+is they all have the same properties,
+and someone needs to maintain that.
+And updating a name and one object,
+and not doing it in the third object can cause problems,
+because then at one site of the ontology, your data is stale.
+And instead really model the customer object,
+or if there are really different object types,
+because fundamentally in the business operations,
+you need to separate separation,
+then you can also use an interface here,
+which allows you to just plug in an action
+that knows based on the interface.
+Okay, I have a name, email and the phone number,
+and I can update it with one action, for example,
+and don't need three different actions
+for each individual object type.
+>> Yeah, which I think is an important point here,
+is if I have, because this is how we get
+to not one version of the truth,
+where I have a sales customer, support customer,
+which we see in data landscapes all the time,
+so I think it's the cool, how do I model this effectively?
+So the single customer or the interface approach
+gives us that singular kind of version of the truth,
+but also the interoperability to allow me
+to work on different use cases by using interfaces,
+or other ways to manage all the different components of it,
+so that I still have that one object
+that everyone builds off.
+I think this comes back to the global view
+of the ontology as it should be universal
+across the whole company.
+>> Yeah, yeah, let's take a look deeper into that.
+>> Yep.
+>> So, yeah, basically if you don't adhere
+to this design perspective, what could happen?
+And there's a few anti-patterns that could be established here.
+So, for example, if you go into sales support
+and billing customer each,
+then you would establish department silos,
+because in your sales department,
+you're maybe your CSS team and your billing team,
+they all operate in their own world,
+and one, if they need to collaborate on something,
+being in these silos causes problems,
+because they might look at a case from a customer,
+but then have different conflicting information
+about that customer,
+because it was established in these silos.
+And then the same could be another anti-pattern
+which we could call the system silos.
+And for that one, it's just mapping the entity,
+how it is in the sewer system, almost one-to-one,
+and then you just replicate your silo
+that you have in your existing landscape,
+and not let the different systems like a CRM system
+help their system one-year-piece system talk to each other.
+And where the ontology is really good
+at integrating and breaking down these silos
+from existing landscapes.
+>> Yeah, I think the important piece there too is like,
+most of our customers have N number of ERPs, for example,
+and we have customers that have 70 or hundreds
+or 150 different ERP systems alone,
+all with customer.
+Like it would not be a very scalable approach,
+it wouldn't be very useful to have a customer
+for each single one.
+And I think that how do I create this unified view,
+but then also be able to write back,
+'cause that's the other piece of this
+is the bi-directional component
+where I need to be able to understand
+where did this, what system of this come from,
+which region, which area, or which business unit this ERP is.
+So it's like, I need to be able to combine,
+but understand the lineage and provenance
+of those things to be able to make it actionable, right?
+>> Yes, absolutely.
+>> And then even thinking about the actions
+where you mentioned actionable,
+yeah, we also have some anti-patterns.
+So if you have these three different object types,
+all representing a customer,
+and you need actions to update the properties
+like name, email, and phone,
+then on each individual object type,
+you need to have either one action or three actions,
+however it is needed to update it,
+and it's a multiplier of the resources
+that are getting built for that.
+And that actually also introduces anti-patterns,
+which we call action sprawl.
+So there are two angles here.
+One is, okay, you have actions duplicated
+across the same entities,
+just because these entities are duplicated,
+these object types, and the other part is,
+which we see here in this example is,
+you don't want to have an action
+that updates individual properties like name,
+and then another one for email,
+and another one for phone,
+you would want to have one that updates maybe all three
+to say like update my customer contact information.
+And then the next one,
+which we can also see in this example
+is what we call the golden hammer, anti-pattern.
+And this is,
+comes from the saying,
+if everything you have as a hammer,
+then everything looks like a nail.
+And in this example is maybe you don't want to have an action
+actually to update the contact information,
+because they don't change it frequently,
+and it's maintained or the sources in the source system.
+So you might want to take a pipeline that feeds into it,
+and not an action that you need to execute
+whenever something changes.
+There are other properties,
+maybe in this for our customer,
+where you want to update the properties.
+>> Yeah, well, I think this is the important part,
+because a lot of people think about modeling as data modeling,
+but like we're modeling a business process,
+the data, the logic, the action.
+So this action piece is really important,
+because not only for the human piece,
+but as we talk about agentic world,
+like I need the agents to be able to understand
+the right level at how do I actually go make things happen.
+So that's also the importance here of these actions,
+and in getting this right and mapped correctly,
+is like, I have to think about how do agents work
+in this environment, in the ontology,
+alongside humans, like I have to have these actions
+that make sense so they can go do things for me.
+>> Yes, yes, exactly.
+And then also when you want to drive decisions,
+for people understanding what do these actions do,
+saying, okay, update customer contact information,
+let's move a little bit to the right,
+how good looks like here.
+For this, you know what contact,
+everyone knows what contact information is and so on,
+and just having actions that go into one single property,
+and maybe even the property in some cases
+has some cryptic name, then it's better
+to give it a real good description,
+so everyone knows what this does,
+and it's easily understandable.
+>> Yep, and so having this interface here, for example,
+allows me to implement customer across those different
+interfaces for the sales, the support, or billing,
+so it gives me that flexibility
+while still having that standard view of what a customer is,
+but now it can be implemented in a different way,
+so this is important when we want high reuse
+across ontology, which is really the compounding asset,
+you know, this is how we get the most value
+of ontology is by not repeating ourselves,
+so we can have high reuse,
+so that the next use case is just additive.
+>> Yes, absolutely, and I think one thing to mention
+that's important here as well is,
+if we decide to use the interface,
+because the workflows around these objects
+are fundamentally different,
+and move from sales customers to podcast more,
+and billing customer to an interface,
+then it should be probably something like it's,
+then the object should be a sales lead,
+or a support contact, or a billing account,
+and then separately also have a customer object
+that can be linked to that,
+and because that describes more
+what the purpose of that is for the workflow.
+>> Yeah, yeah, very good.
+I think that's a good rich kind of feedback loop
+of how you start to actually have to deconf these things,
+how the real world's actually working in this stuff,
+so that's great.
+Cool, all right, so we kind of see
+what a good looks like, what's the next pattern?
+>> Yeah, so the next one is the open, close principle.
+And what it basically says is open for extension,
+and closed for modification,
+and now specifically for the ontology, yeah.
+We have the first, the ability,
+what we see in the graphic is to make object types,
+when you create object types, they're experimental,
+and then you can make them active
+once they are ready for production.
+And then it's a flag inside of the ontology
+that shows, okay, this object type
+is now being used in the production environment,
+and gives a signal to develop us, okay,
+I have to be careful here,
+I cannot just change things just like that.
+And that plays together
+with the close for modification principle,
+where you say, okay, I already have something,
+and it should be designed
+that there should not be much change
+with an object type that is active.
+And we can take a look at the example here,
+so we would have an equipment object,
+and then we now have a new use case
+where we say, okay, we now need to certify our equipment.
+And instead of just saying, okay,
+I take the certification information
+and just put it onto the equipment object as new properties,
+instead I can link a new type to the equipment object,
+and then use an interface here,
+and say, okay, all my different equipment,
+or maybe even other object types,
+if we think about equipment,
+what could it be?
+It could be a truck, for example,
+but it also at some point needs certification.
+And then we have our model,
+our equipment certification object type,
+and link it, in the future,
+I can also be linked to a hypothetical truck object.
+And through the interface,
+I can design my actions, my kinetics,
+to then actually wield the certifications,
+and drive the decisions for that.
+And instead of making changes
+in existing, in-production, closed object type.
+- Yeah, and so really the concept here is like,
+I wanted to be additive to the component,
+and I want to be able to extend and build on this
+with new object types and other components,
+but in order if, yes, we have global branching,
+we have all these kind of safeguards
+and change management place,
+but still, if I go remove an indicator
+or a field out of an ontology type,
+that will have ripple effects.
+So yes, you could do that,
+but it's gonna be very expensive from a time
+and overhead standpoint,
+but really it comes back to I want to extend it
+and have these new capabilities are very additive,
+so I'm allowing people to then uptake new capabilities
+as I'm adding it,
+rather than I'm breaking everything
+on existing production objects.
+- Yeah, exactly.
+And if we then also take a look a little bit deeper into that,
+we can also see if you don't do that
+and you so-called overload your object type
+with multiple entities,
+we come back into this Got object anti-pattern.
+And where suddenly we had an equipment
+and it represents a piece of equipment,
+and then the more use cases,
+the more you extend the ontology,
+and then add information to an individual object,
+we get this overloaded big object type then at some point.
+And here we can, it ties back to our first principle
+to think about the main driven design here again,
+to really keep everything focused and easily understandable.
+And links and interfaces help you with that a lot.
+- Yeah, I mean, it's funny 'cause a lot of these principles
+are very similar to object oriented principles, right?
+So, you know, best software engineering.
+So this is really like,
+there's an amalgamation here where I see kind of
+the dimensional data warehousing stuff.
+I see object oriented.
+And really, I think that ontology driven design principles
+are kind of in the middle here
+where I'm trying to not only design the data
+and structure of how the real world works,
+but I'm also having to design the methods and classes
+of what I'm trying to go do in my objects
+around actions and other components
+and then make it reusable and sustainable across them.
+So it is really this kind of middle ground
+between object oriented and data warehousing
+that we hit with the ontology driven design.
+- Yeah, yeah, exactly.
+- Yeah, all right.
+So this really like helps me think through
+how I'm building the object types, the interfaces,
+when to break things apart, when to reuse.
+I think it's very common.
+We see where it's like the God object type is a funny one.
+I laugh about that 'cause I've seen that so often
+where it's just I'm piling new stuff in
+'cause it's the easiest way to get something in
+and then it becomes unsustainable very, very quickly.
+So cool.
+- Yes.
+- All right.
+So the last design principle, what is it?
+- All right.
+So the last one, that's a composition of deep hierarchies.
+And maybe quickly deep hierarchies,
+it could be multiple different object types
+that are linked to each other, but in reality,
+I kind of this parent-child relationship
+that's on a very long chain.
+And so that could be, for example, here,
+we have here an endographic and object type arena,
+office building and restaurant.
+And above that could be a building entity
+and above that could be other entities
+in kind of this parent-child chain.
+And rather than having this long chain
+and then in reality needing to traverse a lot of links.
+And if you wanna make changes,
+you probably at some point need to make changes
+to the whole chain and we'll look a little bit deeper
+into an example there,
+but you want to use interfaces here.
+And let's say you have your different building object types
+and you wanna be able to schedule that kind of building.
+And the behavior can be a little bit different
+depending on the building.
+So if we look at an arena,
+it's maybe you wanna schedule it for events.
+And that's something that needs to be scheduled
+for a day or two.
+And compared to an office building,
+which can also be scheduled,
+but maybe on the lease period for a longer amount of time.
+And all of these different entities,
+they share different properties.
+And so, but fundamentally they can inherit
+the same behavior and the interface allows you to do that.
+And you don't need too many different actions to do that.
+Yeah.
+And so, yeah.
+- As I say, so this kind of also makes me think
+about just like our build materials,
+like something we do all the time in manufacturing space too,
+is like, should I like actually explicitly lay out
+the build materials and the hierarchies of like,
+to produce this product,
+here's all the hierarchy of things in my bomb tree
+that I essentially need to build out.
+Or should I have an object that describes that,
+that allows me to actually explode that kind of bomb out
+and use it across my, you know, in a non-predefined way.
+So like that composition piece makes a lot of sense
+for, you know, predefined deep hierarchies
+that I have that are hard to manage updates
+and like use over time.
+So I think that starting to make sense to me
+as you're describing this is like,
+if I try to predefined a hierarchy,
+like it's going to be out of date the second I publish it.
+And these composition and how I actually build out
+these object types allowed me to actually be
+more flexible over time.
+- Yeah, yeah, that's exactly it.
+And I think here for the composition over the hierarchies,
+a very simple and good example that we see here is
+all of these different building types
+that are in reality probably use differently.
+Share, address and square footage, for example,
+has an example with the building interface.
+And that interface allows us to use actions on all three.
+And we don't need to have specific actions
+for all these three individual object types.
+We just need to have one that works with that interface.
+- Yeah, no, that's very cool.
+I think that's the like, how do I govern and own this over time
+means I need to really take these into principle.
+'Cause I mean, man, if you had separate actions
+and the sprawl of that, we'll do it out of control
+pretty quick, which I think is what people normally see
+in kind of the enterprise space.
+- Absolutely.
+And then if we look a little bit deeper into that,
+we can also talk a little bit about the anti-patterns
+that we have in that area for the composition
+of our hierarchies.
+And here in this example, okay, here we actually see this chain,
+this parent-child relationship chain,
+and it could start with an item and the physical asset
+that goes into a building, then a schedulable building.
+And then ultimately we are at the object type, the arena.
+And what we see here as a one anti-pattern
+is what we call the misnomer.
+So a physical asset or an item that's just reading that,
+I don't really know what it is.
+And an asset can be anything, it can be equipment,
+it can be inventory, or it could be a building.
+So we wanna have good naming conventions here.
+And actually in my opinion, the misnomer
+is one of the worst anti-patterns
+because people working with it get a wrong understanding
+and need to gather a lot of information from other colleagues
+in order to work with the object types.
+And on top of that, when we think about
+agent workflows and agents working with these object types,
+if the naming conventions are bad
+and descriptions are missing for properties
+or for the object types, then agents
+don't have an understanding and make worse decisions.
+So building a nice agent on top of object types,
+giving or helping building inside of the platform.
+For example, with our AIFDE, these descriptions
+and naming everything right helps a lot in the production
+and gives the right context,
+which is one of the big ontology differentiators.
+Yeah, I think especially when we talk about LMs
+plus ontology is really where the magic is,
+how do I represent the real world how it actually operates?
+Because these LMs were not trained on your enterprises' data.
+And so us representing the context
+about how things are actually operating is super important
+so that they can reason across the defective reverse.
+I've created these pseudo-system hierarchy languages
+so that a reporting structure can work
+that I can drill down in is not actually how
+the real world works, right?
+And it's actually more convoluted.
+And so actually that will create a harder time
+for both humans and agents to get to it,
+to the right answer versus if I have a properly composed
+like composition of hierarchies and relationships,
+then I can get to those answers and have agents understand
+and actually navigate the ontology,
+which is really the useful part is like,
+how do I make sure I ground the LM and the agent in the truth?
+Well, I need to represent the truth in the best way.
+And that's what I think we're talking about here.
+Yeah, exactly.
+Very cool.
+So we've got four different design patterns.
+We've got a bunch of anti-patterns,
+a bunch of kind of examples of what we're doing here.
+We've got some new docs.
+We just updated out on the website
+for everyone to go see as well
+so we can put a link to those out there.
+And I'll probably also put a link
+to our ontology explainer out.
+But if you notice, thank you for joining me today.
+This is awesome.
+I think this will be super helpful for everyone
+that asks, how do I model ontology?
+How do I govern it, right?
+Here are just some primers for people to get started.
+No problem.
+It's great to talk about that.
+And the documentation is really great around that
+and helps a lot with understanding these.
+Oh, it's a lot of examples in there.
+Oh, great.
+Yes, that will be good for everybody.
+All right.
+Thanks again.
+Thank you.

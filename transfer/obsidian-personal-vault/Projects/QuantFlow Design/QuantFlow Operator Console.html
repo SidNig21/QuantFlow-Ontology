@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuantFlow — Operator Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --sans: 'Geist', system-ui, sans-serif; --mono: 'Geist Mono', ui-monospace, monospace; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #05070a; overflow: hidden; }
+  #root { width: 100vw; height: 100vh; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #1c2530; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  button { font-family: var(--sans); }
+
+  .qf-flowline {
+    animation: qfflow var(--qf-flow, 1.4s) linear infinite;
+    animation-play-state: var(--qf-flow-play, running);
+  }
+  @keyframes qfflow { to { stroke-dashoffset: -18; } }
+  @keyframes qfpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes qfring { 0% { transform: scale(0.9); opacity: 0.55; } 100% { transform: scale(1.22); opacity: 0; } }
+  @keyframes qfsweep { to { transform: rotate(360deg); } }
+  @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0.1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .qf-flowline { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="logo/cube3d.js"></script>
+<script type="text/babel" src="console/tweaks-panel.jsx"></script>
+<script type="text/babel" src="console/qf-core.jsx"></script>
+<script type="text/babel" src="console/qf-canvas.jsx"></script>
+<script type="text/babel" src="console/qf-cube.jsx"></script>
+<script type="text/babel" src="console/qf-dir1.jsx"></script>
+<script type="text/babel" src="console/qf-dir2.jsx"></script>
+<script type="text/babel" src="console/qf-dir3.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const DIRECTIONS = [
+  { n: 1, key: 'evolution', tab: 'Evolution',  desc: 'Premium QuantFlow',  accent: '#34d399' },
+  { n: 2, key: 'hedge',     tab: 'Hedge Desk',  desc: 'Operator console',   accent: '#cfd6df' },
+  { n: 3, key: 'cockpit',   tab: 'Cockpit',     desc: 'Agent topology',     accent: '#2dd4bf' },
+];
+
+function Switcher({ dir, setDir }) {
+  return (
+    <div style={{ height: 46, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 16,
+      padding: '0 16px', background: '#05070a', borderBottom: '1px solid #11161e' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <span style={{ width: 9, height: 9, transform: 'rotate(45deg)', background: 'linear-gradient(135deg,#2dd4bf,#34d399)', boxShadow: '0 0 9px #2dd4bf' }} />
+        <span style={{ fontFamily: 'var(--mono)', fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', color: '#e7ecf2' }}>QUANTFLOW</span>
+        <span style={{ fontFamily: 'var(--mono)', fontSize: 8.5, color: '#4a5466', letterSpacing: '0.16em', marginTop: 1 }}>OPERATOR CONSOLE</span>
+      </div>
+      <div style={{ flex: 1 }} />
+      <div style={{ display: 'flex', gap: 4, padding: 4, background: '#0a0e14', borderRadius: 11, border: '1px solid #161c25' }}>
+        {DIRECTIONS.map(d => {
+          const on = dir === d.n;
+          return (
+            <button key={d.n} onClick={() => setDir(d.n)} style={{ all: 'unset', cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1,
+              padding: '6px 15px', borderRadius: 8, position: 'relative',
+              background: on ? `${d.accent}1a` : 'transparent',
+              border: `1px solid ${on ? d.accent + '55' : 'transparent'}`,
+              boxShadow: on ? `0 0 18px -8px ${d.accent}` : 'none', transition: 'all 160ms' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 9, color: on ? d.accent : '#5b6573' }}>0{d.n}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: on ? '#e7ecf2' : '#8a96a6' }}>{d.tab}</span>
+              </span>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: 8, color: on ? d.accent : '#4a5466',
+                letterSpacing: '0.08em', paddingLeft: 16 }}>{d.desc}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ flex: 1 }} />
+      <span style={{ fontFamily: 'var(--mono)', fontSize: 8.5, color: '#3a4453', letterSpacing: '0.1em' }}>3 DIRECTIONS · LIVE PROTOTYPE</span>
+    </div>
+  );
+}
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "flowSpeed": 1.4,
+  "gridIntensity": 1.0,
+  "liveFlow": true,
+  "startDirection": "evolution"
+}/*EDITMODE-END*/;
+
+function App() {
+  const S = useScene();
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const startN = DIRECTIONS.find(d => d.key === t.startDirection)?.n || 1;
+  const [dir, setDir] = useState(startN);
+
+  const rootVars = {
+    '--qf-flow': `${t.flowSpeed}s`,
+    '--qf-dot': t.gridIntensity,
+    '--qf-flow-play': t.liveFlow ? 'running' : 'paused',
+  };
+
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
+      background: '#05070a', ...rootVars }}>
+      <Switcher dir={dir} setDir={setDir} />
+      <div style={{ flex: 1, minHeight: 0 }}>
+        {dir === 1 && <Direction1 S={S} />}
+        {dir === 2 && <Direction2 S={S} />}
+        {dir === 3 && <Direction3 S={S} />}
+      </div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Canvas" />
+        <TweakSlider label="Cable flow speed" value={t.flowSpeed} min={0.6} max={3} step={0.1} unit="s"
+          onChange={(v) => setTweak('flowSpeed', v)} />
+        <TweakSlider label="Grid intensity" value={t.gridIntensity} min={0} max={1.6} step={0.1}
+          onChange={(v) => setTweak('gridIntensity', v)} />
+        <TweakToggle label="Animate cable flow" value={t.liveFlow}
+          onChange={(v) => setTweak('liveFlow', v)} />
+        <TweakSection label="Start" />
+        <TweakRadio label="Direction" value={t.startDirection}
+          options={['evolution', 'hedge', 'cockpit']}
+          onChange={(v) => { setTweak('startDirection', v); setDir(DIRECTIONS.find(d => d.key === v).n); }} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+good morning everyone. So as you've heard all this morning, we were giving you a lot of very
+exciting tools to build agents in production. And I want to take a few minutes of your time to talk
+about the experience that underlines all of this, which is the developer experience, that applies
+to agents, but also to your all-new regular development. Now the spoiler is in the title,
+that's what we call the super repo. And my colleague John, who's standing at the back there,
+gave a quick sneak peek of super repo at the last DEF CON. And that's developers, developers,
+developers, developers. Thank you. He may have borrowed this from someone who's a bit more famous,
+but I think that that's how much we care about developers at POUND here. And I think like what
+I want to do this time is talk to you about what's available to you today in terms of super repo,
+but also how it ties into agenda development and all of the features that you can leverage there.
+Before we do this, let's take a quick step back. So you're building an application stack or a new
+workflow that you're trying to automate within Foundry. The way you usually do this is you start
+with pipelines, you get all of your data in, ingest that. And then on top of this, you start adding
+some structure. So you build your ontology, you define some objects and links between them.
+And once you do this, you have a correct schema, you go ahead and try to implement logic into that
+ontology. And this is where you offer functions and then expose them through actions. And once
+you have all of this ready, you try to add something on top of it. So you're adding a UI,
+whether that's a workshop application or something that you built in, you know, using the OSDK and
+let's say a React app. And then increasingly, we're here to talk about the agents as well.
+And so agents are also a user of the rest of the stack, but also something that sits next to it
+at the front end layer at some point. So either it's an agent that's operating your ontology and
+operating your workflow, or it's something that you as a user is interfacing with your stack
+through this agent. And so that entire stack is incredibly powerful and it's standalone and full
+stack on its own, but it's really powerful because it plugs into the rest of the Foundry ecosystem.
+And so for free, you usually get all of this kind of like resource management and security and markings
+and deployability of this throughout the entire stack. Now, on the developer platform team,
+we often speak about developer loops. And so what I mean by that is what does it take for
+you as a developer, let's say you have an existing application, to go from an idea to then implement
+it in the ontology, change your schema, propagate that to functions and actions, and then propagate
+that all the way to the front end application that your users are interacting with. And our goal
+really is to make that developer loop as fast as possible. That matters for developers, but it
+matters like 10-fold or 100-fold for agents. So coding agents that are trying to operate on your
+stack and iterate on new ideas, that loop matters more. And so what we want is we don't want you to
+have to jump between applications at every layer or wait between if I make a change at one layer
+and then I go and try to implement it somewhere else, I have to wait for CI to run in between those.
+So that's something that we don't like because that kind of like slows down your developer loop.
+And often development is not linear. So what you do is you don't know exactly what your ontology
+is going to look like before you go and implement the front end. You discover it iteratively over
+time and back and forth. And it's a very messy process where you have to go back and forth
+between applications. And so what we're trying to do is we're going to try to solve that.
+And the way we're solving that is by condensing this entire stack into what we call the super repo.
+And I'm very pleased to say that super repo is now available in data for DevCon users,
+and it's going to be available to all of you at your own stacks by the end of this month.
+So what's a super repo? Well, the naive version of this is that it's a mono repo that lets you
+do all of the above. And so you can define objects in code. Define all of your ontology there.
+But you can also import objects that exist. So you don't have to start from scratch. You can just
+type import of an existing object and we'll code gen that for you in code. It also lets you define
+functions and actions and also front end applications all within the same repository. And then you
+do that by also leveraging the rest of the platform. So you get security and resource management and
+observability and all of that for free. And then the last stage is there's no point building an
+application if you can't deploy it. So what you'll be able to do is also deploy it to production
+directly from the super repo. And what we'll do is we'll go create all of those resources for you
+from that single mono repo. Now, the way to think about super repo is that this is the way that
+we're defining DevEx for us and the DevEx strategy for the next few years. And so all of the capabilities
+that you've heard about this time and possibly at future DevCons will be part of super repo.
+So you'll be able to define like in the future automations and agents, you'll be able to build
+pipelines. Anything that you can do in the platform should be defined through the super repo.
+And I think importantly what super repo is is it's built on top of the ontology. So it's not just
+about having a full stack framework standing on its own. It really is leveraging the rest of the
+platform and the rest of the ontology. So what I mean by that concretely is let's say your team
+is a team of developers. You're building agents, you're building your ontology in code, your
+functions in code, everything in code and you have your full code stack. We still want you to be
+able to publish those objects and have someone else on another team leverage the same objects
+and actions in your ontology by building workshop applications or automations or maybe analytics on
+that. We don't want those to be separate concepts. We want them all to be compounding on top of
+each other. So let's maybe I'll jump to a demo to show you what that means concretely. But before
+I go there, maybe like very quick. And if you have any questions about any of those blocks,
+take a picture, ask me about it over the next two days. So the reason I said the naive definition
+of super repo is that it's a mono repo that lets you define your ontology as code and everything
+else together is because I think it's a lot more than that. It's about the developer loop that
+comes with it. So what we did is we rebuilt your entire developer stack through a local embedded
+ontology in Rust that runs on your machine, that you can develop against it and that you can test,
+run test cases, integration tests against that as well. And I'll show you in a second what that
+looks like. And so AI agents can leverage that as well. So you can just give an idea of a feature,
+start from the ontology. It can make the ontology change, see it in functions, see the front end,
+and then be able to test all of that using mock data all locally without having to wait for
+processes in between. So that means that you don't have to wait for any external systems or CI checks
+to be able to make a quick change, discover that you made a mistake, go back, do that change again,
+and do that back and forth, back and forth. And what we're trying to do is we're building all of
+that with a first class integrated developer standard tools. So you'll be able to host all of the
+super repo and deploy through first class integrations in the platform. But let's say your team already
+has a GitHub setup with your own circle CI and your opinion about that, you'll also be able to do
+super repo in there and then publish to the platform and still leverage everything else that comes with
+it. And then the last bit here is this deployment through marketplace. We don't believe there's a
+pro code, a good pro code developer experience without a good pro code DevOps experience.
+And so we don't want you to be able to build a super repo and then have to go and click
+your eyes to do this. So what you'll be able to do is using just a found redeploy command,
+whether you run that on your local machine or run that in CI, you'll be able to deploy to as many
+stacks as you want your application. Does that sound exciting? Cool. Do you want to see a quick demo?
+All right. I'll jump to my laptop. Okay. So this is a notional demo of an incident triage
+tool that I built for my team. It's a very simple one. You'll see that we have a bunch of tickets
+here. And if you've been on call at some point, you probably know that you get a bunch of dumps
+of stack traces and messages in those tickets. And you have some metadata that's not filled because
+who has a lot of time for that. And so what I built here is like build a quick agent that
+I'm going to trigger here. What it does is it looks at this ticket. It's an agent that runs in
+platform. And then it's going to analyze a bunch of information called tool calls that gets me my
+on call schedules, et cetera, who's responsible for that part of the stack. And it's going to just
+triage it to decide the severity. It decided who the on call person based on what they work on.
+And then just kind of like from the stack trace triage that. And so all of that is built in a
+super repo. You can actually see the code here from the front end to the ontology to the back end
+that underpins it. It's all defined in the super repo. Now this is kind of like the front end view
+of this, but I wanted to show you the guts of it. So where does my ontology look like behind this?
+So if I pull back the curtain on my application, I have this view which is kind of like my back door
+or admin view of what my ontology looks like. And you can see that I have two concepts in my world.
+So I have the engineer and the incident and the linked by an assignment link between those two
+objects. But if you notice those tickets, so if I like pull this back, if you'll notice I have this
+service field that's not being filled. And my agent doesn't know about how to triage my
+tickets to my services. And that's because I don't have the concept of a service within my world.
+My ontology does not know about services. And that's what we're going to implement very quickly.
+So if I go back to my code, I have this ontology MTS file that defines my ontology and code. I can
+do this programmatically. I can do this in a loop. I can do this with an agent, whatever you prefer.
+And what I'm going to do is come here and just
+uncomment the service object. And so what I should be able to see is if I go back to my ontology,
+kind of like admin view, it will automatically update. And so what it's doing is it's not just
+reading the code in this case. What it's doing is it's reading the ontology backend that's running
+locally and just reflecting that state of the world in here. So I can see very quickly, oh,
+now I have services. And we know about services, but they're kind of like disconnected. So what
+do I do about that? Well, I have to add links, of course. And the way that I do this is I link
+services to incidents, but I also link services together because they're interconnected and they
+have dependencies. And I just need to go there and define a foreign key on the incident object.
+And what we should see is in a second, what we're doing under the hood is we're entirely
+regenerating your OSDK. We're regenerating your OSDK. We're changing the development server. We're
+changing your schema there. And then we're reloading your C data so that you can quickly test your
+code changes. You can quickly test your application live as it's going. And so I think that's kind of
+like a neat way of visualizing all that's happening under the hood of my application. Cool. So now
+I have different objects. I have services. They get linked to incidents. How do I make my agent
+aware of them? So if you've noticed, when I did add the service object and I added the foreign key
+on the incident, I get an error in my editor that says the service ID is missing from my triage
+agent. And so that's a neat way of showing that because I have all of those concepts within the
+super repo, when I make a change, I can tell like my editor and my linter rules can tell me, hey,
+you added the service concept to the triage function, but that you haven't handled this in
+your agent. And so I need to go there and I just click here and it tells me, oh, like, this is my
+triage agent. It's also defined in my super repo. And I can do that. I can add that kind of like
+connection between services and agents. So I'm going to be -- to very quickly just do this.
+I have a prompt here that's presave and it tells my agent to assign services based on the root calls
+and analyzing the stack trace. And then I have a tool call that -- a tool call that gets my service
+topology between the different services. And so what I'm doing here is I use the third-party
+harness. You can bring any harness you want to build an agent within the super repo. And it will
+also be -- we'll have first-class support for agent SDK and everything that Natasha and everyone
+else spoke about today. And so very quickly, I'll define those services. And this is the error in
+question, which is my triage decision was missing the service concept that I added in my ontology.
+I added in my action, but I never updated my agent to do this. And so if we go there, what I should
+see now is if I close this, I should be able to take a ticket, let's say, and then triage it very
+quickly. And hopefully my agent should now be aware of services. And it should be able to kind
+of like show me the service view. One set that I forgot about is -- so I don't have any seed data.
+And I actually forgot about adding seed data to this. If we go back very quickly to my -- to this
+view, you'll notice that I have five objects, three objects, but zero objects for my services.
+And that's because I never went to my services MTS, which exists in my ontology, seed data folder,
+and I never added those. So I need those to do tests and integration tests, but I can just
+go here and uncomment those as well and the service object. And ideally, I should be able to kind
+of like see a change here that tells me that I have those objects reloaded within my local
+embedded ontology. And so let's go back and run this again. It's a five triage log-in latency
+ticket. Ideally, I should be able to get that correctly triage to my off system. So I think I
+like this like services. It seems like I made a mistake in my code, which happens sometimes.
+Let's see where I did that. Probably didn't write the service down. Cool. We can -- we can reach
+the service. So again, those mistakes happen often during the development process. It could
+be a personal -- so still having a problem with that. But the idea here is -- well, we can't skip
+this. That was the last part of the demo. And I can show you that it works right in a few minutes.
+But the idea is that this -- this usually kind of like -- I get this quick feedback and this quick
+developer loop across those different stages. So what I did there is I didn't have to go and add
+that service object to my ontology manually and then define my function and then define kind of
+like the front end for it. I can do this all within the super equally. If I notice that there's a
+mistake or I notice there's a link missing, I'll go debug this in a second. But I can just do that
+quick development. Or I can ask my local coding agents. And what I like about this is I get to spin
+up 20 work trees, for example, and explore different ideas and parallel and they don't conflict with
+each other because they're all running locally against a local embedded ontology. And then I get
+to merge all of this together. So if you go back to the slide. All right. So that whole application
+stack available to you in a super repo and you'll be able to get access to this at this devcon,
+those are the concepts that are available today. Pipelines are not yet available, but they're coming
+in the future. And most importantly, they get, you get to leverage the entirety of the stack rather
+than just one component of it. So very quickly, agent definitions, you can, you get to do that
+today with third party harnesses and agent SDK is coming soon. We focus heavily on typescript
+function editing, but Python is also in the works and it's coming very soon. And then you'll be also
+able to define automates. And we think automates is particularly important for anyone here who's
+doing automatic workflows within your enterprise. You'll be able to do that entirely with agents
+and automates and objects together within your super repo. And then longer term again, as I said
+earlier, you should be thinking about this as your kind of like our dev strategy. So you'll get more
+coverage over time. And this is one of the, this gets me to my last thing here, which is we started
+this super repo idea and like built conviction for it by talking to developers at a previous
+dev con. And so it's really important when you come grab us, talk to us. We have three
+canary sessions running. The entire super repo team is here at this dev con. So just grab us,
+tell us what you like about it, what you hate about it. And hopefully we will work on fixing
+and adding those features. So thank you everyone.

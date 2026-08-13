@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>QuantFlow — Dark Redesign</title>
+<link rel="stylesheet" href="tokens.css" />
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #07090c; color: #e7ecf2;
+    font-family: 'Geist', system-ui, sans-serif; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes cableFlow { to { stroke-dashoffset: -32; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&display=swap" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="artboards/_shared.jsx"></script>
+<script type="text/babel" src="artboards/01_faithful.jsx"></script>
+<script type="text/babel" src="artboards/02_cable.jsx"></script>
+<script type="text/babel" src="artboards/03_glass.jsx"></script>
+<script type="text/babel" src="artboards/04_cable_lab.jsx"></script>
+<script type="text/babel" src="artboards/05_sidebar.jsx"></script>
+<script type="text/babel" src="artboards/06_watchtower.jsx"></script>
+<script type="text/babel" src="artboards/07_full_shell.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "cyan",
+  "sidebarCollapsed": false
+}/*EDITMODE-END*/;
+
+const accentLabel = { green: 'Green · default', amber: 'Amber', cyan: 'Cyan', blue: 'Blue' };
+const ACCENT_SWATCHES = [
+  { key: 'green', hex: 'oklch(0.78 0.16 145)' },
+  { key: 'amber', hex: 'oklch(0.78 0.14 80)'  },
+  { key: 'cyan',  hex: 'oklch(0.78 0.13 200)' },
+  { key: 'blue',  hex: 'oklch(0.72 0.14 250)' },
+];
+
+const AccentSwatchRow = ({ value, onChange }) => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 14px' }}>
+    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>Accent · {accentLabel[value] || value}</span>
+    <div style={{ display: 'flex', gap: 6 }}>
+      {ACCENT_SWATCHES.map(s => {
+        const active = s.key === value;
+        return (
+          <button key={s.key} onClick={() => onChange(s.key)}
+            title={s.key}
+            style={{
+              all: 'unset', cursor: 'pointer',
+              width: 22, height: 22, borderRadius: 5,
+              background: s.hex,
+              outline: active ? '2px solid rgba(255,255,255,0.85)' : '2px solid transparent',
+              outlineOffset: 1,
+              boxShadow: active ? `0 0 10px ${s.hex}` : 'none',
+              transition: 'box-shadow 0.15s ease',
+            }}
+          />
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Wrap FullShell so it picks up tweak values via context (rather than the
+// global broadcast it also supports). Both artboards mount independently
+// so changes apply consistently.
+const FullShellWithTweaks = ({ tweaks }) => {
+  React.useEffect(() => {
+    // Broadcast to the live FullShell mount
+    window.postMessage({ type: '__fs_tweak', accent: tweaks.accent, sidebarCollapsed: tweaks.sidebarCollapsed }, '*');
+  }, [tweaks.accent, tweaks.sidebarCollapsed]);
+  // Set defaults so the artboard renders correctly even before the message arrives
+  window.__FullShellDefaults = { accent: tweaks.accent, sidebarCollapsed: tweaks.sidebarCollapsed };
+  return <FullShell key={`${tweaks.accent}|${tweaks.sidebarCollapsed}`} />;
+};
+
+const App = () => {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <React.Fragment>
+      <DesignCanvas title="QuantFlow — Dark Redesign" subtitle="Three directions + cable lab + full shell">
+        <DCSection id="shell" title="Full shell · everything composed" subtitle="Sidebar registry · spatial chains · bezier cables · purple gradient · Watchtower bottom panel">
+          <DCArtboard id="full-shell" label="07 · Full Shell — sidebar + canvas (Trading · Training · Monitoring chains) + Watchtower" width={1600} height={1040}>
+            <FullShellWithTweaks tweaks={t} />
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="panels" title="New panels · standalone">
+          <DCArtboard id="sidebar-expanded" label="05a · Sidebar — Tile Registry (expanded)" width={252} height={680}>
+            <div style={{ width: 252, height: 680, borderRadius: 10, overflow: 'hidden', border: '1px solid #1c232d' }}>
+              <SidebarRegistry collapsed={false} />
+            </div>
+          </DCArtboard>
+          <DCArtboard id="sidebar-collapsed" label="05b · Sidebar — collapsed rail" width={56} height={680}>
+            <div style={{ width: 56, height: 680, borderRadius: 10, overflow: 'hidden', border: '1px solid #1c232d' }}>
+              <SidebarRegistry collapsed={true} />
+            </div>
+          </DCArtboard>
+          <DCArtboard id="watchtower" label="06 · Watchtower — bottom telemetry panel (events · queues · agents · alerts)" width={1280} height={260}>
+            <div style={{ width: 1280, height: 260, borderRadius: 10, overflow: 'hidden', border: '1px solid #1c232d' }}>
+              <Watchtower />
+            </div>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="cables" title="Cable system · interactive prototype">
+          <DCArtboard id="cable-lab" label="04 · Cable Lab — drag from a port to connect, shift-click cable to delete, parallel cables bundle" width={1280} height={800}>
+            <div style={{ width: 1280, height: 800, background: '#06080c', borderRadius: 10, overflow: 'hidden', border: '1px solid #1c232d', position: 'relative' }}>
+              <CableLab />
+            </div>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="redesign" title="Window redesign · 1280×800">
+          <DCArtboard id="faithful" label="01 · Faithful Dark — port your current layout to the new tokens" width={1280} height={800}>
+            <FaithfulDark />
+          </DCArtboard>
+          <DCArtboard id="cable" label="02 · Cable Foundation — denser, status spines, connection cables, command palette" width={1280} height={800}>
+            <CableFoundation />
+          </DCArtboard>
+          <DCArtboard id="glass" label="03 · Glass Canvas — atmospheric, floating glass panels, slim chrome" width={1280} height={800}>
+            <GlassCanvas />
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Full Shell" />
+        <AccentSwatchRow value={t.accent} onChange={(v) => setTweak('accent', v)} />
+        <TweakToggle
+          label="Sidebar collapsed"
+          value={t.sidebarCollapsed}
+          onChange={(v) => setTweak('sidebarCollapsed', v)}
+        />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

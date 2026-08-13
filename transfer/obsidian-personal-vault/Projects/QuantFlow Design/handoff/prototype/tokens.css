@@ -1,0 +1,44 @@
+/* QuantFlow dark redesign — drop-in tokens.
+   Replaces the :root + .dark blocks in shell.css. */
+
+:root {
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Surface ramp */
+  --bg:           #0a0d12;
+  --bg-rgb:       10, 13, 18;
+  --canvas-bg:    #0c1117;
+  --canvas-bg-hi: #0f141b;
+  --canvas-bg-rgb: 12, 17, 23;
+  --canvas-opacity: 1;
+
+  /* Tile */
+  --tile-bg:      #0f141b;
+  --tile-bg-hi:   #131923;
+  --tile-border:  #1c232d;
+  --tile-border-hi:#2a3340;
+
+  /* Text */
+  --fg:           #e7ecf2;
+  --muted:        #6b7686;
+  --muted-2:      #4a5466;
+  --border:       #1c232d;
+
+  /* Terminal-green accent */
+  --accent:       oklch(0.78 0.16 145);
+  --accent-dim:   oklch(0.62 0.13 145);
+  --accent-glow:  oklch(0.78 0.16 145 / 0.18);
+
+  /* Status colors */
+  --running:      oklch(0.78 0.16 145);
+  --idle:         #6b7686;
+  --error:        oklch(0.68 0.19 25);
+
+  /* Edge dot (already terminal-y) */
+  --edge-dot:       var(--accent);
+  --edge-dot-hover: oklch(0.85 0.17 145);
+
+  --toolbar-height: 38px;
+  --nav-inset: 12px;
+}

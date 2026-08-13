@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantFlow — UI Additions Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0a0d12; --canvas:#0b0f15; --tile:#0f141b; --tile-hi:#131923;
+    --border:#1c232d; --border-hi:#2a3340; --flow:#b7ff00; --ink:#f2f0ec;
+    --muted:#7e8a9a; --muted2:#4a5466; --amber:#e2b341; --red:#ff6b6b; --dim:#7fae3f;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#05070b;overflow:hidden;font-family:var(--mono)}
+  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;flex:none;width:1623px;height:1202px;transform-origin:center center;
+    background:
+      radial-gradient(60% 40% at 50% 108%, rgba(183,255,0,0.07), transparent 60%),
+      linear-gradient(0deg, #0e0a1a 0%, #0b0f15 55%, #0a0d12 100%);
+    color:var(--ink);overflow:hidden}
+
+  /* dot grid */
+  #grid{position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,0.05) 1.4px, transparent 1.4px);
+    background-size:20px 20px;opacity:.5;
+    -webkit-mask-image:radial-gradient(75% 70% at 52% 48%,#000 40%,transparent 92%);
+    mask-image:radial-gradient(75% 70% at 52% 48%,#000 40%,transparent 92%)}
+  #watermark{position:absolute;left:455px;top:330px;opacity:.05}
+
+  /* ===== left dock ===== */
+  #dock{position:absolute;left:0;top:0;width:258px;height:100%;background:var(--bg);
+    border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 16px 14px}
+  .dock-head{display:flex;justify-content:space-between;align-items:baseline}
+  .dock-head b{font-family:var(--disp);font-size:14px;letter-spacing:.06em;color:var(--ink)}
+  .dock-head span{font-size:9px;letter-spacing:.24em;color:var(--muted2)}
+  .seg{display:flex;gap:6px;margin-top:16px}
+  .seg button{flex:1;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+    padding:9px;border-radius:7px;border:1px solid var(--border-hi);background:transparent;
+    color:var(--muted);cursor:pointer}
+  .seg button.on{background:rgba(183,255,0,.10);border-color:rgba(183,255,0,.45);color:var(--flow)}
+  .grp{margin-top:18px}
+  .grp-label{font-size:9px;letter-spacing:.26em;color:var(--muted2);margin-bottom:9px}
+  .item{display:flex;align-items:center;gap:11px;padding:7px 4px;border-radius:7px;cursor:pointer}
+  .item:hover{background:rgba(255,255,255,.03)}
+  .ic{width:30px;height:30px;border-radius:8px;border:1px solid var(--border-hi);
+    display:flex;align-items:center;justify-content:center;color:var(--muted);flex:none;background:var(--tile)}
+  .item .nm{font-family:var(--disp);font-size:13px;color:var(--ink);font-weight:500}
+  .item .ds{font-size:10px;color:var(--muted);margin-top:1px}
+  .tpl{margin-top:9px;border:1px solid var(--border-hi);border-radius:9px;padding:11px;background:var(--tile)}
+  .tpl .nm{font-family:var(--disp);font-size:12.5px;color:var(--ink);font-weight:600}
+  .tpl .ds{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .tpl .meta{font-size:9px;letter-spacing:.14em;color:var(--flow);margin-top:7px}
+  .run{margin-top:auto;display:flex;align-items:center;gap:11px;padding:14px;border-radius:10px;
+    background:rgba(183,255,0,.12);border:1px solid rgba(183,255,0,.4);cursor:pointer}
+  .run b{font-family:var(--disp);font-size:14px;color:var(--flow)}
+  .run .ds{font-size:9px;letter-spacing:.14em;color:var(--dim);margin-top:2px}
+  .dock-foot{display:flex;gap:18px;margin-top:13px;font-size:10px;color:var(--muted2)}
+
+  /* ===== tiles ===== */
+  .tile{position:absolute;border:1px solid var(--border-hi);border-radius:10px;
+    background:var(--tile);box-shadow:0 18px 50px rgba(0,0,0,.45);overflow:hidden}
+  .tile.live{border-color:rgba(183,255,0,.55);box-shadow:0 0 0 1px rgba(183,255,0,.15),0 18px 50px rgba(0,0,0,.5)}
+  .t-head{display:flex;align-items:center;gap:9px;padding:9px 12px;border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,var(--tile-hi),var(--tile))}
+  .t-head .pr{color:var(--flow);font-size:13px}
+  .t-head .name{font-family:var(--disp);font-weight:600;font-size:13px;color:var(--ink)}
+  .t-head .at{font-size:11px;color:var(--muted)}
+  .t-head .sp{flex:1}
+  .t-icn{color:var(--muted2);cursor:pointer;display:flex}
+  .t-body{padding:13px;font-size:12.5px;color:#c7d0db}
+  .t-body .path{color:var(--flow)}
+  .t-body .host{color:#6db3ff}
+  .caret{display:inline-block;width:7px;height:14px;border:1px solid var(--muted);vertical-align:-2px;margin-left:2px}
+
+  /* ports */
+  .port{position:absolute;width:9px;height:9px;border-radius:50%;background:#2a3340;
+    border:1px solid #3a4554;transform:translate(-50%,-50%)}
+  .port.hot{background:var(--flow);border-color:var(--flow);box-shadow:0 0 8px var(--flow)}
+
+  /* ===== status badges (ADDITION 1) ===== */
+  .badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;
+    border-radius:5px;border:1px solid;font-weight:500;line-height:1}
+  .dot{width:6px;height:6px;border-radius:50%;flex:none}
+  .b-run{color:var(--flow);border-color:rgba(183,255,0,.42);background:rgba(183,255,0,.09)}
+  .b-run .dot{background:var(--flow);box-shadow:0 0 7px var(--flow);animation:pulse 1.8s ease-in-out infinite}
+  .b-idle{color:#9fb0c0;border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.04)}
+  .b-idle .dot{background:#9fb0c0}
+  .b-queue{color:var(--amber);border-color:rgba(226,179,65,.4);background:rgba(226,179,65,.08)}
+  .b-queue .dot{background:var(--amber)}
+  .b-err{color:var(--red);border-color:rgba(255,107,107,.45);background:rgba(255,107,107,.10)}
+  .b-err .dot{background:var(--red);box-shadow:0 0 7px rgba(255,107,107,.6)}
+  .b-done{color:var(--dim);border-color:rgba(127,174,63,.4);background:rgba(127,174,63,.08)}
+  .b-done .dot{background:var(--dim)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+  /* ===== conductor ===== */
+  #cond{position:absolute;right:0;top:14px;width:368px;height:calc(100% - 28px);margin-right:14px;
+    background:var(--tile);border:1px solid var(--border-hi);border-radius:12px;padding:18px 18px;
+    display:flex;flex-direction:column;gap:0;overflow:hidden}
+  .cond-top{display:flex;align-items:center;gap:9px}
+  .cond-top b{font-family:var(--disp);font-size:15px;color:var(--ink)}
+  .cond-top .ss{font-size:9px;letter-spacing:.18em;color:var(--muted2);border:1px solid var(--border-hi);padding:2px 6px;border-radius:4px}
+  .cond-top .sp{flex:1}
+  .cond-btn{font-size:10px;color:var(--muted);border:1px solid var(--border-hi);padding:4px 8px;border-radius:5px;cursor:pointer}
+  .cond-note{font-size:11px;color:var(--muted);margin:14px 0 4px;line-height:1.5}
+  .sec{margin-top:15px}
+  .sec .h{font-size:9px;letter-spacing:.2em;color:var(--muted2);margin-bottom:6px}
+  .sec .v{font-size:11.5px;color:#c2ccd8;line-height:1.5}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .act{font-size:11px;color:#c2ccd8;border:1px solid var(--border-hi);padding:6px 11px;border-radius:6px;cursor:pointer}
+  .act:hover{border-color:var(--flow);color:var(--flow)}
+  .gen{font-size:10px;color:var(--muted2);margin-top:auto;padding-top:14px}
+
+  /* ===== command palette (ADDITION 2 — frosted) ===== */
+  #palette{position:absolute;left:770px;top:158px;width:440px;border-radius:13px;overflow:hidden;
+    background:rgba(15,21,29,0.6);-webkit-backdrop-filter:blur(18px) saturate(1.2);
+    backdrop-filter:blur(18px) saturate(1.2);border:1px solid rgba(255,255,255,0.10);
+    box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08);z-index:20}
+  .cp-in{display:flex;align-items:center;gap:11px;padding:15px 17px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .cp-in input{all:unset;flex:1;color:var(--ink);font-family:var(--mono);font-size:15px}
+  .cp-sec{padding:8px 17px 3px;color:var(--muted2);font-size:9px;letter-spacing:.22em;text-transform:uppercase}
+  .cp-row{display:flex;align-items:center;gap:12px;padding:10px 17px;color:#c7d0db;font-size:13px}
+  .cp-row.sel{background:rgba(183,255,0,.10);color:var(--ink);box-shadow:inset 2px 0 0 var(--flow)}
+  .cp-row .r{margin-left:auto;color:var(--muted2);font-size:10px}
+  .cp-foot{padding:9px 17px 12px;color:var(--muted2);font-size:10.5px}
+  .kbd{font-size:10px;color:var(--muted);border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:1px 6px}
+
+  /* ===== toast (ADDITION 4 — frosted) ===== */
+  #toast{position:absolute;left:778px;top:402px;width:300px;border-radius:11px;overflow:hidden;
+    background:rgba(15,21,29,0.6);-webkit-backdrop-filter:blur(16px) saturate(1.15);
+    backdrop-filter:blur(16px) saturate(1.15);border:1px solid rgba(255,255,255,0.10);
+    box-shadow:0 22px 60px rgba(0,0,0,.55);z-index:19;display:flex;align-items:center;gap:11px;padding:12px 14px}
+  #toast .ic2{width:22px;height:22px;border-radius:50%;background:rgba(183,255,0,.14);
+    display:flex;align-items:center;justify-content:center;color:var(--flow);flex:none}
+
+  /* ===== top command input + window controls ===== */
+  #topbar{position:absolute;right:18px;top:14px;display:flex;align-items:center;gap:10px;z-index:8}
+  #topinput{display:flex;align-items:center;gap:8px;background:var(--tile);border:1px solid var(--border-hi);
+    border-radius:7px;padding:6px 10px;width:150px;font-size:11px;color:var(--muted)}
+  .wc{width:13px;height:13px;color:var(--muted2);cursor:pointer}
+
+  /* ===== status bar ===== */
+  #status{position:absolute;left:0;bottom:0;width:100%;height:30px;display:flex;align-items:center;
+    gap:16px;padding:0 16px;background:var(--bg);border-top:1px solid var(--border);font-size:10px;
+    letter-spacing:.08em;color:var(--muted)}
+  #status .lbl{color:var(--muted2)}
+  .hpill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);text-transform:uppercase;letter-spacing:.1em}
+  #status .sp{flex:1}
+
+  /* ===== cable count token (ADDITION 5) ===== */
+  #cableCount{position:absolute;left:769px;top:730px;width:30px;height:30px;border-radius:50%;
+    background:#0d1117;border:1.5px solid var(--flow);color:var(--flow);display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:600;box-shadow:0 0 14px rgba(183,255,0,.4);z-index:6}
+
+  /* ===== addition pins / highlight ===== */
+  .pin{position:absolute;width:24px;height:24px;border-radius:50%;background:var(--flow);color:#0a0d12;
+    font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 4px rgba(183,255,0,.20),0 4px 12px rgba(0,0,0,.5);z-index:40;transition:opacity .2s}
+  .pin::after{content:'';position:absolute;inset:-8px;border:1px solid rgba(183,255,0,.4);border-radius:50%;animation:ring 2.4s ease-out infinite}
+  @keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+  body.clean .pin{opacity:0;pointer-events:none}
+  body.clean .glass-tag{opacity:0}
+  .glass-tag{position:absolute;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:#0a0d12;background:var(--flow);padding:2px 6px;border-radius:4px;font-weight:600;z-index:21;transition:opacity .2s}
+
+  /* toggle */
+  #toggle{position:fixed;top:14px;left:14px;z-index:100;display:flex;align-items:center;gap:9px;
+    background:rgba(15,21,29,.8);border:1px solid var(--border-hi);border-radius:999px;padding:7px 14px;
+    font-family:var(--mono);font-size:11px;color:var(--ink);cursor:pointer;
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  #toggle .sw{width:30px;height:16px;border-radius:999px;background:var(--flow);position:relative;transition:background .2s}
+  #toggle .sw::after{content:'';position:absolute;top:2px;left:16px;width:12px;height:12px;border-radius:50%;background:#0a0d12;transition:left .2s}
+  body.clean #toggle .sw{background:var(--border-hi)}
+  body.clean #toggle .sw::after{left:2px;background:var(--muted)}
+  #legend{position:fixed;bottom:14px;left:14px;z-index:100;font-family:var(--mono);font-size:10.5px;
+    color:var(--muted);background:rgba(15,21,29,.8);border:1px solid var(--border-hi);border-radius:10px;
+    padding:11px 13px;max-width:260px;line-height:1.7;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  #legend b{color:var(--ink);font-family:var(--disp)}
+  #legend .n{color:var(--flow)}
+  body.clean #legend{opacity:.35}
+</style>
+</head>
+<body>
+<div id="toggle" onclick="document.body.classList.toggle('clean')">
+  <span class="sw"></span><span>Highlight additions</span>
+</div>
+<div id="legend">
+  <b>Proposed additions</b><br>
+  <span class="n">1</span> Status badge system · tile headers<br>
+  <span class="n">2</span> Frosted command palette (Ctrl+K)<br>
+  <span class="n">3</span> Status‑bar pills (health/zoom)<br>
+  <span class="n">4</span> Spawn toast (frosted)<br>
+  <span class="n">5</span> In‑flight count token<br>
+  <span class="n">6</span> Conductor state badges
+</div>
+
+<div id="wrap">
+  <div id="stage">
+    <div id="grid"></div>
+    <!-- faint QF watermark (as in the live app) -->
+    <svg id="watermark" width="720" height="540" viewBox="0 0 720 540" fill="none">
+      <circle cx="430" cy="230" r="180" stroke="#fff" stroke-width="6"/>
+      <line x1="540" y1="330" x2="600" y2="395" stroke="#fff" stroke-width="6"/>
+      <g stroke="#fff" stroke-width="9">
+        <line x1="360" y1="150" x2="360" y2="430"/>
+        <line x1="360" y1="150" x2="500" y2="150"/>
+        <line x1="360" y1="285" x2="470" y2="285"/>
+      </g>
+    </svg>
+
+    <!-- ===== LEFT DOCK ===== -->
+    <div id="dock">
+      <div class="dock-head"><b>QF DOCK</b><span>SPAWN RAIL</span></div>
+      <div class="seg">
+        <button class="on">⊕ SPAWN</button>
+        <button>⇄ ROUTE</button>
+      </div>
+      <div class="grp">
+        <div class="grp-label">FLOW</div>
+        <div class="item"><div class="ic" style="color:var(--flow)">◴</div><div><div class="nm">Activity</div><div class="ds">route activity</div></div></div>
+      </div>
+      <div class="grp">
+        <div class="grp-label">SPAWN</div>
+        <div class="item"><div class="ic">&gt;_</div><div><div class="nm">Generic CLI</div><div class="ds">windows‑pty</div></div></div>
+        <div class="item"><div class="ic">⌨</div><div><div class="nm">Codex CLI</div><div class="ds">herdr‑wsl</div></div></div>
+        <div class="item"><div class="ic" style="color:#6db3ff">➤</div><div><div class="nm">Hermes</div><div class="ds">orchestrator</div></div></div>
+        <div class="item"><div class="ic">◈</div><div><div class="nm">Claude Code</div><div class="ds">task‑runner</div></div></div>
+        <div class="item"><div class="ic" style="color:var(--amber)">⚡</div><div><div class="nm">PufferLib worker</div><div class="ds">paper‑trade loop</div></div></div>
+        <div class="item"><div class="ic">&lt;/&gt;</div><div><div class="nm">Python script</div><div class="ds">one‑shot script</div></div></div>
+        <div class="item" style="opacity:.5"><div class="ic">▥</div><div><div class="nm">Envoy memory</div><div class="ds">disabled</div></div></div>
+      </div>
+      <div class="grp">
+        <div class="grp-label" style="display:flex;justify-content:space-between">TEMPLATES <span>1</span></div>
+        <div class="tpl">
+          <div style="display:flex;gap:9px"><div class="ic" style="color:#6db3ff">▦</div>
+          <div><div class="nm">RL Training</div><div class="ds">Hermes to PufferLib · paper…</div><div class="meta">2 TILES · 1 STRING</div></div></div>
+        </div>
+      </div>
+      <div class="run">
+        <div style="color:var(--flow);font-size:18px">▶</div>
+        <div><b>Run Workflow</b><div class="ds">DESCRIBE A TASK FOR HERMES</div></div>
+      </div>
+      <div class="dock-foot"><span>≡ Density …</span><span>◉ Spawn ‑…</span></div>
+    </div>
+
+    <!-- ===== CABLE ===== -->
+    <svg style="position:absolute;inset:0;pointer-events:none;z-index:2" width="1623" height="1202">
+      <defs>
+        <filter id="cbl" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d="M748,598 C800,640 760,700 784,742 C806,782 770,815 814,840"
+        stroke="#b7ff00" stroke-width="2.4" fill="none" filter="url(#cbl)"
+        stroke-dasharray="10 8" stroke-linecap="round">
+        <animate attributeName="stroke-dashoffset" from="0" to="-36" dur="1.1s" repeatCount="indefinite"/>
+      </path>
+    </svg>
+
+    <!-- ===== CODER TILE ===== -->
+    <div class="tile live" style="left:295px;top:392px;width:452px;height:398px">
+      <div class="t-head">
+        <span class="pr">&gt;_</span>
+        <span class="name">Coder</span>
+        <span class="badge b-idle">Shell</span>
+        <span class="badge b-idle">Auto</span>
+        <span class="at">@shell‑40151</span>
+        <span class="sp"></span>
+        <span class="badge b-run"><span class="dot"></span>Running</span>
+        <span class="t-icn" style="margin-left:4px">⟳</span>
+        <span class="t-icn">✕</span>
+      </div>
+      <div class="t-body"><span class="host">rybowen21@DESKTOP‑7VRJQRM</span>:<span class="path">/mnt/c/Users/rybow</span>$ <span class="caret"></span></div>
+    </div>
+    <div class="port" style="left:521px;top:392px"></div>
+    <div class="port hot" style="left:748px;top:598px"></div>
+    <div class="port" style="left:521px;top:790px"></div>
+
+    <!-- ===== VERIFIER TILE ===== -->
+    <div class="tile live" style="left:814px;top:740px;width:452px;height:420px">
+      <div class="t-head">
+        <span class="pr">&gt;_</span>
+        <span class="name">Verifier</span>
+        <span class="badge b-idle">Shell</span>
+        <span class="badge b-idle">Auto</span>
+        <span class="at">@shell‑2‑35692</span>
+        <span class="sp"></span>
+        <span class="badge b-run"><span class="dot"></span>Running</span>
+        <span class="t-icn" style="margin-left:4px">⟳</span>
+        <span class="t-icn">✕</span>
+      </div>
+      <div class="t-body"><span class="host">rybowen21@DESKTOP‑7VRJQRM</span>:<span class="path">/mnt/c/Users/rybow</span>$ <span class="caret"></span></div>
+    </div>
+    <div class="port hot" style="left:814px;top:840px"></div>
+    <div class="port" style="left:1266px;top:940px"></div>
+    <div class="port" style="left:1040px;top:1160px"></div>
+
+    <!-- in-flight count token (5) -->
+    <div id="cableCount">2</div>
+
+    <!-- ===== CONDUCTOR ===== -->
+    <div id="cond">
+      <div class="cond-top">
+        <b>Conductor</b><span class="ss">SINGLE‑STEP</span><span class="sp"></span>
+        <span class="cond-btn">Generate plan</span><span class="cond-btn">Refresh</span><span class="cond-btn">✕</span>
+      </div>
+      <div class="cond-note">No active workflow scope — reading all tiles.</div>
+      <div class="sec"><div class="h">CURRENT PLAN</div><div class="v">Reviewed 2 tile(s), 0 task(s), 1 recent receipt(s). Recommended: No actionable tasks; monitor the canvas.</div></div>
+      <div class="sec"><div class="h">STATE READS</div><div class="v">2 tiles · 0 tasks · 2 state cards · 1 receipts</div></div>
+      <div class="sec"><div class="h">TOOL CALLS</div><div class="v">get_context</div></div>
+      <div class="sec"><div class="h">DELEGATIONS</div><div class="v">None (read‑only)</div></div>
+      <div class="sec"><div class="h">BLOCKERS</div><div class="v" style="margin-top:2px"><span class="badge b-done"><span class="dot"></span>None</span></div></div>
+      <div class="sec"><div class="h">NEXT ACTION</div><div class="v" style="margin-top:2px"><span class="badge b-idle"><span class="dot"></span>Monitor canvas</span></div></div>
+      <div class="actions">
+        <span class="act">Create task</span><span class="act">Spawn worker</span><span class="act">Assign next</span>
+        <span class="act">Submit</span><span class="act">Verify</span><span class="act">Mark ready</span>
+        <span class="act">Loop step</span><span class="act">Approve</span><span class="act">Deny</span>
+      </div>
+      <div class="gen">Generated 11:48:30 PM</div>
+    </div>
+
+    <!-- ===== TOP COMMAND INPUT ===== -->
+    <div id="topbar">
+      <div id="topinput">⌕ spawn ‑ vie…</div>
+      <svg class="wc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="2"/></svg>
+      <svg class="wc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14"/></svg>
+      <svg class="wc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </div>
+
+    <!-- ===== ADDITION 2: FROSTED COMMAND PALETTE ===== -->
+    <div id="palette">
+      <div class="glass-tag" style="top:-9px;left:16px">Frosted · glass earns it over canvas</div>
+      <div class="cp-in">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9fb0c0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        <input value="spawn ver" readonly>
+        <span class="kbd">Ctrl K</span>
+      </div>
+      <div class="cp-sec">Spawn</div>
+      <div class="cp-row sel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b7ff00" stroke-width="2"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg>Spawn Verifier<span class="r">shell · wsl</span></div>
+      <div class="cp-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fb0c0" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>Spawn Hermes<span class="r">orchestrator</span></div>
+      <div class="cp-sec">Route</div>
+      <div class="cp-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fb0c0" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h6a3 3 0 0 1 3 3v6"/></svg>Route Coder → Verifier<span class="r">edge</span></div>
+      <div class="cp-foot">↑↓ navigate · ⏎ run · esc dismiss</div>
+    </div>
+
+    <!-- ===== ADDITION 4: FROSTED TOAST ===== -->
+    <div id="toast">
+      <div class="glass-tag" style="top:-9px;left:14px">Frosted</div>
+      <span class="ic2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <div>
+        <div style="color:var(--ink);font-size:12.5px">Verifier spawned</div>
+        <div style="color:var(--muted);font-size:10.5px;margin-top:2px">@shell‑2‑35692 · routed from Coder</div>
+      </div>
+      <span class="sp" style="flex:1"></span>
+      <span class="badge b-run" style="font-size:8.5px"><span class="dot"></span>Live</span>
+    </div>
+
+    <!-- ===== STATUS BAR ===== -->
+    <div id="status">
+      <span class="lbl">WORKSPACE</span><span style="color:var(--ink)">QuantFlow</span>
+      <span class="hpill">Tiles 2</span>
+      <span class="hpill"><span class="dot" style="width:7px;height:7px;background:var(--flow);box-shadow:0 0 7px var(--flow)"></span>Health good</span>
+      <span class="hpill">Zoom 100%</span>
+      <span class="sp"></span>
+      <span class="lbl">v0.8.0</span><span class="hpill"><span class="kbd" style="border:none;padding:0;color:var(--muted)">Ctrl K</span></span>
+    </div>
+
+    <!-- ===== PINS ===== -->
+    <div class="pin" style="left:640px;top:404px">1</div>
+    <div class="pin" style="left:752px;top:160px">2</div>
+    <div class="pin" style="left:470px;top:1175px">3</div>
+    <div class="pin" style="left:1062px;top:402px">4</div>
+    <div class="pin" style="left:784px;top:730px">5</div>
+    <div class="pin" style="left:1255px;top:560px">6</div>
+  </div>
+</div>
+
+<script>
+  function fit(){
+    const s=Math.min(window.innerWidth/1623, window.innerHeight/1202);
+    document.getElementById('stage').style.transform='scale('+s+')';
+  }
+  addEventListener('resize',fit); fit();
+</script>
+</body>
+</html>

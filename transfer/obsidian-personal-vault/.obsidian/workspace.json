@@ -1,0 +1,267 @@
+{
+  "main": {
+    "id": "b43ed610b689feb6",
+    "type": "split",
+    "children": [
+      {
+        "id": "8bc4ec4a74d0b48d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f6e672c4c05f4d62",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/QuantFlow/QuantFlow Hub.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "QuantFlow Hub"
+            }
+          },
+          {
+            "id": "a33a6d1c28b44a2c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/QuantFlow/Research/Library Deep Dive/Batch B - Intelligence Layer.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Batch B - Intelligence Layer"
+            }
+          },
+          {
+            "id": "2b74d7682e2ada63",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/QuantFlow/Research/QUANTFLOW_RESEARCH_LIBRARY.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "QUANTFLOW_RESEARCH_LIBRARY"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "3d5d3298ab3b829b",
+    "type": "split",
+    "children": [
+      {
+        "id": "b82a1b8c6238f696",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ee6a7db7440a72cc",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "dab0d96ec84b54dd",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "raindrop",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "d197ba7a3886be38",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e33decde2e8bd616",
+    "type": "split",
+    "children": [
+      {
+        "id": "4d5bfb370075ae24",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "014aeccb1bb087ca",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Projects/QuantFlow/Research/library-inventory/_RUBRIC.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for _RUBRIC"
+            }
+          },
+          {
+            "id": "790e0b21d018b996",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Projects/QuantFlow/Research/library-inventory/_RUBRIC.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from _RUBRIC"
+            }
+          },
+          {
+            "id": "96bb019fdbcb2505",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "5e0119edfe78619e",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "2152b788e478bb3f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Projects/QuantFlow/Research/library-inventory/_RUBRIC.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of _RUBRIC"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "code-files:Create Code File": false,
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "2b74d7682e2ada63",
+  "lastOpenFiles": [
+    "Codex 7.28.md",
+    "Projects/QuantFlow/Research/Power 2026 — Electricity Pricing in the Age of AI (Neel Somani).md",
+    "Projects/QuantFlow/Research/Power 2026 — Electricity Pricing in the Age of AI (Neel Somani).md.tmp.2661574.cf6bcab7bfa6",
+    "Projects/QuantFlow/Research/Agents on Data 2026/Agents on Data 2026 — Hub.md",
+    "Projects/QuantFlow/Research/Agents on Data 2026/Agents on Data 2026 — Hub.md.tmp.2661574.ddc25aeeea00",
+    "Projects/QuantFlow/Research/Agents on Data 2026/05 - Superlogical, Hashimoto's Terminal Multiplexer (linkarzu).md",
+    "Projects/QuantFlow/Research/Agents on Data 2026/05 - Superlogical, Hashimoto's Terminal Multiplexer (linkarzu).md.tmp.2661574.5a8d8ca289fd",
+    "Attachments/aod05-superlogical-t1635.jpg",
+    "Attachments/aod05-superlogical-t1757.jpg",
+    "Attachments/aod05-superlogical-t0017.jpg",
+    "Attachments/aod05-superlogical-t1937.jpg",
+    "Attachments/aod05-superlogical-t2055.jpg",
+    "Projects/QuantFlow/Research/Agents on Data 2026/03 - Dr. Karp on Sovereign AI (Palantir All-Hands).md",
+    "Projects/QuantFlow/Research/Agents on Data 2026/03 - Dr. Karp on Sovereign AI (Palantir All-Hands).md.tmp.2661574.3d3b9cfd3c91",
+    "Projects/QuantFlow/Research/Agents on Data 2026/03-karp-transcript-whisper-base-en.txt",
+    "Attachments/aod03-karp-t0425.jpg",
+    "Attachments/aod03-karp-t0030.jpg",
+    "Attachments/aod03-karp-t1255.jpg",
+    "Attachments/aod03-karp-t0912.jpg",
+    "Projects/QuantFlow/Research/Agents on Data 2026/04 - Thinner Agents on a Smarter Substrate (Emil Eifrem, Neo4j).md",
+    "Projects/QuantFlow/Research/Agents on Data 2026/04 - Thinner Agents on a Smarter Substrate (Emil Eifrem, Neo4j).md.tmp.2661574.a9522fa1c9d7",
+    "Attachments/aod04-eifrem-t0327.jpg",
+    "Projects/QuantFlow/Research/Agents on Data 2026/02 - State of Data (Sean Cai).md",
+    "Projects/QuantFlow/Research/Agents on Data 2026/02 - State of Data (Sean Cai).md.tmp.2661574.408bae91c6a6",
+    "Projects/QuantFlow/Research/Agents on Data 2026/01 - Bridgewater's Pocket Analyst (LangChain Interrupt26).md",
+    "Projects/QuantFlow/Research/Agents on Data 2026/01 - Bridgewater's Pocket Analyst (LangChain Interrupt26).md.tmp.2661574.d2f29a3a4bf2",
+    "Projects/QuantFlow/Research/Agents on Data 2026",
+    "Projects/QuantFlow/Research/Library Deep Dive/Batch B - Intelligence Layer.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/09D - CEO-Bench 2606.18543 deep.md.tmp.1898900.a61e7e482752",
+    "Projects/QuantFlow/Research/arxiv-leverage/02D - Conductor 2512.04388 deep.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/09D - CEO-Bench 2606.18543 deep.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/07D - Endless Terminals 2601.16443 deep.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/01D - ActiveGraph 2605.21997 deep.md",
+    "Projects/QuantFlow/Research/Library Deep Dive/Full Sweep/Full Sweep Index.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/00 - INDEX.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/01 - ActiveGraph 2605.21997.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/99 - Parked RL pile.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/07 - Endless Terminals 2601.16443.md",
+    "Projects/QuantFlow/Research/library-inventory/DOCTRINE-LIBRARY-CORRELATIONS.md",
+    "Projects/QuantFlow/Research/ArXiv Product Leverage.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/13 - Domain thesis papers.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/12 - FutureSim 2605.15188.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/11 - Gym-Anything 2604.06126.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/10 - Tandem RL 2510.13551.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/09 - CEO-Bench 2606.18543.md",
+    "Projects/QuantFlow/Research/arxiv-leverage/08 - Polar 2605.24220.md"
+  ]
+}

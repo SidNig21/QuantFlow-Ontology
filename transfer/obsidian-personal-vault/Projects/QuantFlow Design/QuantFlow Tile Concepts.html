@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantFlow — Tile Concepts</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0a0d12;--flow:#b7ff00;--ink:#f2f0ec;--muted:#7e8a9a;--muted2:#4a5466;
+    --blue:#6db3ff;--teal:#2fe6cf;--border:#1a212b;--border-hi:#232c38;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;--disp:'Space Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:
+    radial-gradient(70% 50% at 50% 110%, rgba(183,255,0,0.05), transparent 60%),
+    linear-gradient(0deg,#0e0a1a,#0b0f15 55%,#0a0d12);
+    color:var(--ink);font-family:var(--mono)}
+  body{padding:48px 40px 80px}
+  h1{font-family:var(--disp);font-weight:600;font-size:22px;letter-spacing:.02em;margin:0}
+  .sub{color:var(--muted);font-size:12.5px;margin:8px 0 0;max-width:780px;line-height:1.6}
+  .grid{display:flex;flex-wrap:wrap;gap:40px;margin-top:46px;align-items:flex-start}
+  .col{flex:1;min-width:340px;max-width:440px}
+  .cap{display:flex;align-items:baseline;gap:10px;margin-bottom:5px}
+  .cap .n{font-family:var(--disp);font-weight:600;font-size:15px}
+  .cap .t{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--flow)}
+  .desc{color:var(--muted);font-size:11.5px;line-height:1.55;margin:0 0 18px;height:70px;overflow:hidden}
+  .caret{display:inline-block;width:8px;height:14px;background:var(--flow);vertical-align:-2px;animation:bl 1.1s step-end infinite}
+  @keyframes bl{50%{opacity:0}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .stage{position:relative;height:300px}
+
+  /* ============ A · LIQUID GLASS ============ */
+  .glass{position:relative;height:300px;border-radius:18px;overflow:hidden;
+    background:linear-gradient(145deg,rgba(60,80,110,.20),rgba(20,28,40,.30));
+    -webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -20px 40px rgba(0,0,0,.25)}
+  .glass::before{content:'';position:absolute;top:-40%;left:-10%;width:70%;height:120%;
+    background:linear-gradient(120deg,rgba(255,255,255,.18),transparent 60%);transform:rotate(8deg);pointer-events:none}
+  .glass::after{content:'';position:absolute;inset:0;border-radius:18px;pointer-events:none;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .glass .gh{display:flex;align-items:center;gap:10px;padding:15px 18px}
+  .gh .dot{width:9px;height:9px;border-radius:50%;background:var(--flow);box-shadow:0 0 10px var(--flow);animation:pulse 1.8s ease-in-out infinite}
+  .gh .nm{font-family:var(--disp);font-weight:600;font-size:15px}
+  .gh .role{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#cfe0ff;
+    background:rgba(109,179,255,.18);border:1px solid rgba(109,179,255,.4);padding:2px 8px;border-radius:5px}
+  .gh .grow{flex:1}
+  .gh .meta{font-size:11px;color:rgba(242,240,236,.6)}
+  .glass .gb{padding:4px 18px;font-size:12.5px;line-height:1.7;color:rgba(242,240,236,.82)}
+  .glass .gb .dim{color:rgba(242,240,236,.5)}
+  .glass .pill{position:absolute;left:18px;bottom:16px;display:flex;gap:8px}
+  .gpill{font-size:10px;color:rgba(242,240,236,.7);background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px 11px;
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+
+  /* ============ B · ETCHED / ROUTED ============ */
+  .etch{position:relative;height:300px;background:#0c1015;
+    border:1px solid var(--border-hi);
+    /* chamfered corners — industrial cut */
+    clip-path:polygon(0 14px,14px 0,calc(100% - 14px) 0,100% 14px,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));
+    box-shadow:0 18px 44px rgba(0,0,0,.5)}
+  .etch .eh{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--border);
+    background:repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0 2px,transparent 2px 4px)}
+  .eh .tag{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--flow);
+    border:1px solid rgba(183,255,0,.4);padding:2px 6px;border-radius:3px}
+  .eh .nm{font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.04em}
+  .eh .id{font-size:10.5px;color:var(--muted)}
+  .eh .grow{flex:1}
+  .eh .run{font-size:9px;letter-spacing:.16em;color:var(--flow);display:flex;align-items:center;gap:6px}
+  .eh .run i{width:6px;height:6px;border-radius:50%;background:var(--flow);box-shadow:0 0 7px var(--flow);animation:pulse 1.8s ease-in-out infinite}
+  .etch .eb{padding:16px 18px;font-size:12.5px;line-height:1.7;color:#c2ccd8}
+  .etch .eb .path{color:var(--flow)}
+  .etch .eb .dim{color:var(--muted)}
+  .etch .rail{position:absolute;left:0;top:64px;bottom:34px;width:3px;
+    background:linear-gradient(180deg,transparent,var(--flow) 30%,var(--flow) 70%,transparent)}
+  .etch .ef{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;
+    padding:8px 18px;border-top:1px solid var(--border);font-size:10px;letter-spacing:.08em;color:var(--muted2)}
+  /* bolt nodes at the chamfers */
+  .bolt{position:absolute;width:7px;height:7px;border-radius:50%;background:#1c2530;border:1px solid #3a4554}
+  .bolt.hot{background:var(--flow);border-color:var(--flow);box-shadow:0 0 8px var(--flow)}
+
+  /* ============ C · HOLO EDGE / HUD ============ */
+  .holo{position:relative;height:300px;background:linear-gradient(180deg,rgba(13,19,26,.6),rgba(10,13,18,.35));
+    border-radius:4px;border:1px solid rgba(255,255,255,.06)}
+  .holo .topline{position:absolute;left:0;right:0;top:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--flow),var(--teal),transparent);
+    box-shadow:0 0 12px rgba(183,255,0,.6)}
+  .holo .hh{display:flex;align-items:center;gap:10px;padding:16px 18px 0}
+  .hh .nm{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.06em}
+  .hh .nm .a{color:var(--flow)}
+  .hh .grow{flex:1}
+  .hh .meta{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .holo .scope{position:absolute;left:0;right:0;top:54px;height:46px;opacity:.5}
+  .holo .hb{padding:74px 18px 0;font-size:12.5px;line-height:1.7;color:#c2ccd8}
+  .holo .hb .dim{color:var(--muted)}
+  .holo .hb .path{color:var(--flow)}
+  .holo .hf{position:absolute;left:0;right:0;bottom:0;display:flex;gap:0;
+    border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:var(--muted)}
+  .holo .hf div{flex:1;padding:8px 14px;border-right:1px solid rgba(255,255,255,.06);letter-spacing:.06em}
+  .holo .hf div:last-child{border-right:none;text-align:right}
+  .holo .hf b{color:var(--flow);font-weight:500}
+</style>
+</head>
+<body>
+<h1>QuantFlow — Tile concepts</h1>
+<p class="sub">Three directions for the tile shell itself. Terminal content is placeholder — the point is the frame, surface, and chrome. All on the dark + live-green system.</p>
+
+<div class="grid">
+
+  <!-- A -->
+  <div class="col">
+    <div class="cap"><span class="n">Liquid Glass</span><span class="t">A</span></div>
+    <p class="desc">Translucent frosted slab, glossy top highlight, soft inner bevel. Floats over the routed field — content reads through faint depth. Pill-shaped meta.</p>
+    <div class="stage">
+      <div class="glass">
+        <div class="gh"><span class="dot"></span><span class="nm">Hermes</span><span class="role">orchestrator</span><span class="grow"></span><span class="meta">@hermes‑68521</span></div>
+        <div class="gb">
+          <div style="color:#bcd4ff">Antigravity CLI 1.0.9</div>
+          <div class="dim">rybowen21@gmail.com · Starter Quota</div>
+          <div style="margin-top:8px"><span style="color:var(--flow)">~</span> <span class="caret"></span></div>
+        </div>
+        <div class="pill"><span class="gpill">Gemini 3.5 Flash</span><span class="gpill">herdr:4a15‑2</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="col">
+    <div class="cap"><span class="n">Etched / Routed</span><span class="t">B</span></div>
+    <p class="desc">Industrial node. Chamfered corners with bolt-ports, an engraved hairline header, and a live signal-rail down the left edge — it reads as a physical patch point on the canvas.</p>
+    <div class="stage">
+      <div class="etch">
+        <div class="rail"></div>
+        <div class="eh"><span class="tag">HRM</span><span class="nm">Hermes</span><span class="id">@hermes‑68521</span><span class="grow"></span><span class="run"><i></i>RUNNING</span></div>
+        <div class="eb">
+          <div>Antigravity CLI 1.0.9</div>
+          <div class="dim">Gemini 3.5 Flash (Medium)</div>
+          <div style="margin-top:8px"><span class="path">~</span> <span class="caret"></span></div>
+        </div>
+        <div class="ef"><span>herdr:4a15‑2</span><span>~/.quantflow</span><span style="margin-left:auto">? shortcuts</span></div>
+        <div class="bolt hot" style="left:-3.5px;top:50%"></div>
+        <div class="bolt" style="right:-3.5px;top:50%"></div>
+        <div class="bolt" style="left:50%;bottom:-3.5px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="col">
+    <div class="cap"><span class="n">Holo Edge</span><span class="t">C</span></div>
+    <p class="desc">Near-frameless HUD. A glowing spectrum rail on top, a faint flow-scope behind the header, and a segmented data strip at the base. Minimal chrome — the content sits on the field.</p>
+    <div class="stage">
+      <div class="holo">
+        <div class="topline"></div>
+        <svg class="scope" viewBox="0 0 460 46" preserveAspectRatio="none">
+          <path d="M0,23 L120,23 L140,8 L160,38 L180,16 L200,30 L220,23 L460,23" fill="none" stroke="#b7ff00" stroke-width="1.5"/>
+        </svg>
+        <div class="hh"><span class="nm"><span class="a">▸</span> Hermes</span><span class="grow"></span><span class="meta">running</span></div>
+        <div class="hb">
+          <div class="dim">Antigravity CLI 1.0.9 · Gemini 3.5 Flash</div>
+          <div style="margin-top:6px"><span class="path">~</span> <span class="caret"></span></div>
+        </div>
+        <div class="hf"><div>HERMES</div><div><b>herdr</b> 4a15‑2</div><div>@68521</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
