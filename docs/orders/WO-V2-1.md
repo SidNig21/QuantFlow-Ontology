@@ -44,9 +44,17 @@ below are the landed defects; chat guidance is not authority.
    exactly these four gates: `kernel`, `typecheck`, `dock-profile-identity`,
    `kernel-one-path`. All four fail with
    `EPERM: failed copying files from cache to destination for package qf-kernel-schema`
-   during the gate's own `bun install`. The repair seam is the shared frozen
-   package-install orchestration in `qa/run.ts` and the four named gates; do not
-   change the pinned Bun version, package dependencies, or lockfiles as a repair.
+   during the gate's own `bun install`. The first builder proved in a clean
+   temporary checkout that `--backend copyfile`, cache isolation, and clearing
+   the exact stale destination all fail identically on Bun 1.3.12: Bun attempts
+   to copy `qf-kernel-schema/.gitignore` into the local `file:` dependency and
+   Windows returns `EPERM`. Therefore the repair seam includes relocating the
+   ignore rules from `qf-kernel-schema/.gitignore` into equivalent root
+   `.gitignore` patterns and deleting only that nested `.gitignore`, so the
+   package tree Bun copies no longer contains the failing file. Preserve every
+   existing ignore behavior, and add a regression check for those scoped root
+   rules. Do not change the pinned Bun version, package dependencies, or
+   lockfiles as a repair.
    Do not delete any shared/global cache, weaken assertions, skip installs, swap
    frozen installs for mutable ones, or hide the failure behind an unbounded
    retry. A retry is permitted only if it is bounded, reports the original
@@ -199,6 +207,9 @@ shown green. Both transcripts go in the evidence file.
 - Exercise the shared package-install helper with its deterministic permanent
   copy-failure bait → each of the four repaired gates reports the copy cause and
   exits non-zero; restore the real installer → all four green.
+- Restore `qf-kernel-schema/.gitignore` with its former contents while the
+  equivalent root rules remain → the clean Windows `kernel` install reproduces
+  the `EPERM`; remove the nested file again → all four repaired gates green.
 
 ## Founder acceptance
 
