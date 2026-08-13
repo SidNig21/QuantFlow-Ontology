@@ -266,6 +266,17 @@ failed boundary from a fixed list; fix only that; run the existing question →
 hypothesis → dataset → run → metrics → critic → report chain end to end in the
 packaged app. Certifies Hermes at L4. Absorbs the old S2, S3, S4.
 
+> **Sharpened by the research sweep.** Two pre-existing findings apply directly.
+> First, the correlations table names a synthetic multi-turn seat test — prove a
+> cold seat can drive the generated tools *without* live market risk or model
+> spend. Given a 50%-of-weekly-usage afternoon on 2026-08-10, the measurement
+> half of this slice should run synthetically before it runs live. Second, this
+> is doctrine Phase 4 work, and Effect is the doctrine-named answer for typed
+> retries and errors on long Runs. If the measured boundary turns out to be a
+> timeout, retry, or error-handling failure, Effect is the pre-researched remedy
+> — not a new shopping trip. If it is tool-schema ambiguity (`DEBT.md` #24), it
+> is neither.
+
 **V2-3 · Compose a team.** Dock shows role first and runtime second, with a
 readiness state and capability summary. Founder adds two seats, creates a durable
 Task, assigns it, and sees the assignment on the tile and in the ledger.
@@ -273,6 +284,13 @@ Task, assigns it, and sees the assignment on the tile and in the ledger.
 **V2-4 · Governed handoff.** Founder routes an Artifact to a critic seat. The
 critic publishes an independent Evaluation. A rejecting verdict visibly blocks
 report publication, with the reason and the permitted next step on screen.
+
+> **Sharpened by the research sweep.** The scoring rubric is already chosen:
+> Ragas, doctrine-named for scoring an Artifact against its Hypothesis criteria
+> and feeding `record_evaluation`. R12 today records a verdict, confidence, and
+> rationale; a rubric is the next increment, not a new decision. If two critics
+> ever disagree, `GiannoKlein9/HermesFusion` is the recorded multi-model-panel
+> pattern — parked, not scheduled.
 
 **V2-5 · The research world is visible.** Hypothesis, Dataset, Run, Artifact,
 Evaluation, and Report gain canvas presence and inspectors. Cables carry semantic
@@ -282,6 +300,13 @@ does not yet honour them.
 **V2-6 · Mixed autonomy.** An orchestrator recruits from the same governed
 catalog the founder uses. Every recruited seat shows who spawned it, why, which
 task it owns, and its capability scope.
+
+> **Guardrail for V2-3 and V2-6.** These two slices are where an orchestration
+> framework gets proposed. The doctrine has already named that class a trap:
+> Envoy, Flue, Omnigent, AgentGrid, and Pentagon are **rebuild engines** — they
+> replace the peer bus and Hermes seats rather than serving them. Compose and
+> mixed autonomy are built from Kernel objects, links, and actions that already
+> exist. See [`CAPABILITY-REGISTRY.md`](CAPABILITY-REGISTRY.md) §7.
 
 ---
 

@@ -132,23 +132,26 @@ so they are not re-proposed as new ideas.
 | **Golden Hammer** — write-actions for pipeline-fed data | Anything wanting write actions on quotes or market events |
 | Training frameworks as market plane | `scalarfield.io` · `mni-ml/framework` |
 
-## 8. Conflicts to resolve
+## 8. Conflicts — ruled by the founder 2026-08-12
 
-**Modal.** The correlations document says do not adopt Modal as the default
-sandbox, because Cloudflare is already the doctrine/blueprint answer for
-disposable CPU. `RESEARCH.md`'s horizon inventory lists Modal as a compute
-candidate triggered by local capacity limits. These are reconcilable — not the
-default, available on capacity pressure — but the repo should say so in one
-place rather than two.
+**Modal — REJECTED.** Cloudflare is the execution-provider answer. Modal is not
+a candidate and should not be re-proposed on capacity pressure; that trigger is
+withdrawn. If local Windows capacity is ever exceeded, the question is which
+Cloudflare surface, not whether to add a second vendor. Supersedes the Modal row
+in `RESEARCH.md`'s horizon inventory.
 
-**Eve / `vercel/eve`.** 24 links and 147 mentions, and it appears in two roles:
-a borrowed eval pattern (`defineEval`, session-scoped state) and a rejected host
-(rebuild-engine trap). The registry keeps both, but any future proposal must say
-which Eve it means.
+**Eve — PARKED.** Founder likes it; not in use and not scheduled. It stays in
+the registry in its *reference* role only — the `defineEval` and session-scoped
+state patterns. Eve as a host remains a rebuild-engine trap. No V2 slice depends
+on it, and adopting it needs a fresh decision, not this entry.
 
-**Hermes provenance.** The product runs `NousResearch/hermes-agent`. Nothing in
-the authority set records which upstream version is supported, and the installed
-build reports being 4,192 commits behind. Worth pinning.
+**Hermes version — DELIBERATELY UNPINNED.** Founder ruling: Hermes moves fast
+and tracking it is not worth the cost. QuantFlow therefore treats Hermes as a
+moving upstream and must not assume any version-specific behaviour. Two
+consequences the build has to respect: adapter certification claims are valid
+only for the version measured on the day, and any Hermes-specific workaround
+carries a comment saying it may evaporate on the next update. The 4,192-commits
+-behind report is informational, not a defect.
 
 ## 9. INVENTORY — catalogued, not evaluated
 
