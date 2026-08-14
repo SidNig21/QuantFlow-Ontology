@@ -479,8 +479,8 @@ async function packageInstalled(tempRoot: string): Promise<{ root: string; ident
   const requestedIdentity = setBuildIdentity();
   const result = await runChild(process.execPath, ["run", "package:unsigned"], COLLAB_ROOT, {
     ...process.env,
-    QF_BUILD_COMMIT_SHA: identity.commitSha,
-    QF_BUILD_TIMESTAMP: identity.packagedAt,
+    QF_BUILD_COMMIT_SHA: requestedIdentity.commitSha,
+    QF_BUILD_TIMESTAMP: requestedIdentity.packagedAt,
     NODE_OPTIONS: process.env.NODE_OPTIONS?.includes("--max-old-space-size") ? process.env.NODE_OPTIONS : `${process.env.NODE_OPTIONS ?? ""} --max-old-space-size=8192`.trim(),
   }, 10 * 60 * 1000);
   assert(result.code === 0, `package:unsigned exited ${result.code}: ${tail(result.output)}`);
