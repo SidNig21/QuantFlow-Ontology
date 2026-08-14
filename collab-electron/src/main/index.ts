@@ -46,6 +46,8 @@ import {
   kernelListAgentDefinitions,
   kernelListAgentSessions,
   kernelListTaskDelegations,
+  kernelEnsureSampleResearchDataset,
+  kernelEnsureSyntheticMarketFixture,
   kernelOpenHypothesisForQuestion,
   kernelRunGuidedResearch,
   kernelFinalizeResearchEvaluation,
@@ -1276,6 +1278,32 @@ app.whenReady().then(async () => {
     },
   );
   registerMethod(
+    "qf.research.seed_fixture_dataset",
+    (params) => {
+      if (process.env.QF_HERMES_SYNTHETIC_TEST !== "1") {
+        throw new Error("fixture dataset seeding is synthetic-test-only");
+      }
+      const input = params && typeof params === "object"
+        ? params as Record<string, unknown>
+        : {};
+      const unexpected = Object.keys(input).filter((key) => key !== "include_future_row");
+      if (unexpected.length > 0) {
+        throw new Error(`fixture dataset rejects extra field: ${unexpected[0]}`);
+      }
+      if (input.include_future_row !== undefined && typeof input.include_future_row !== "boolean") {
+        throw new Error("fixture dataset include_future_row must be boolean");
+      }
+      kernelEnsureSyntheticMarketFixture();
+      return kernelEnsureSampleResearchDataset({
+        includeFutureRow: input.include_future_row === true,
+      });
+    },
+    {
+      description:
+        "Synthetic-test-only fixture Dataset setup through the existing app-owned Kernel actions.",
+    },
+  );
+  registerMethod(
     "qf.research.submit_question",
     async (params) => {
       if (!params || typeof params !== "object") {
@@ -1322,6 +1350,7 @@ app.whenReady().then(async () => {
         missionId,
         hypothesisId,
         sessionId: result.sessionId,
+        ptySessionId: result.ptySessionId,
         objective: text,
       };
     },

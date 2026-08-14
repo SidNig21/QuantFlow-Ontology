@@ -27,7 +27,7 @@ if [[ "${1:-}" == "--quantflow-task-oneshot" ]]; then
   shift
 fi
 
-if ! command -v "$hermes_command" >/dev/null 2>&1; then
+if [[ "${QF_HERMES_SYNTHETIC_TEST:-}" != "1" ]] && ! command -v "$hermes_command" >/dev/null 2>&1; then
   echo "QuantFlow Hermes unavailable: install Hermes in the selected Ubuntu/WSL2 distro, then retry." >&2
   exit 127
 fi
@@ -109,6 +109,31 @@ fi
 printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
   "$QF_LAUNCH_READY_NONCE" "$QF_LAUNCH_READY_NONCE"
 unset QF_LAUNCH_READY_NONCE
+
+# Synthetic first-turn and packaged research-chain gates keep the production
+# Hermes Dock profile, launcher, PTY, and app-owned MCP bridges, but replace the
+# provider response with one checked-in responder. This branch is reachable
+# only from an explicit test environment and never from an ordinary Hermes
+# launch, so a production seat cannot silently become a proof seat.
+if [[ "${QF_HERMES_SYNTHETIC_TEST:-}" == "1" ]]; then
+  responder_path="${BASH_SOURCE[0]%/*}/qf-hermes-synthetic-responder.mjs"
+  if [[ ! -f "$responder_path" ]]; then
+    echo "QuantFlow synthetic Hermes responder is missing from the package." >&2
+    exit 2
+  fi
+  # node.exe is a Windows process launched from WSL; give it a Windows path
+  # rather than the /mnt/<drive> spelling that Bash itself can read.
+  responder_windows_path="$(wslpath -w "$responder_path")"
+  bridge_windows_path="$bridge_path"
+  ontology_windows_path="$ontology_bridge_path"
+  if [[ "$bridge_windows_path" == /mnt/* ]]; then
+    bridge_windows_path="$(wslpath -w "$bridge_windows_path")"
+  fi
+  if [[ "$ontology_windows_path" == /mnt/* ]]; then
+    ontology_windows_path="$(wslpath -w "$ontology_windows_path")"
+  fi
+  exec node.exe "$responder_windows_path" --tui "$bridge_windows_path" "$ontology_windows_path"
+fi
 
 if [[ "$mission_oneshot" == "1" ]]; then
   export HERMES_EPHEMERAL_SYSTEM_PROMPT="You are the QuantFlow research orchestrator. Treat QUANTFLOW_MISSION as an immediate workflow command. Use only the QuantFlow ontology and collaboration MCP tools; never use Terminal, browser, file, or code-execution tools. Do not broadly explore workspaces, tasks, sessions, or tool catalogs. Query the hermes-worker agent definition, create one worker session, start that exact session, then call the collaboration send_task tool with the founder mission. Do not retry a start call that is still pending. After delegation, wait for the worker's QuantFlow result and return a concise research-only answer with its durable receipt. Never place bets or trades."

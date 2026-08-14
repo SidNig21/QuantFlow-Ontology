@@ -85,6 +85,8 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/windows-dock-hire.ts",
   "qa/gates/windows-dock-species.ts",
   "qa/gates/windows-research-question.ts",
+  // WO-V2-2: read-only oracle over the isolated packaged research Kernel.
+  "qa/gates/hermes-research.ts",
   "qa/gates/windows-golden-run.ts",
   "qa/gates/windows-golden-seed.ts",
   // Act I R5/R6: gate-only Kernel reopen + bus-only bait DB (not Kernel domain tables).

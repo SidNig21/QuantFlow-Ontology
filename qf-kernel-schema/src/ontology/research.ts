@@ -32,6 +32,7 @@ export const hypothesis = defineObject({
   description:
     "A hypothesis is a falsifiable claim about market behavior. It governs lineage by defining the question that runs, evaluations, and reports must answer.",
   lifecycle: "experimental",
+  capabilityGroup: "research.evaluate",
   properties: z.object({
     claim: z
       .string()
@@ -208,6 +209,7 @@ export const run = defineObject({
   description:
     "A run is the canonical execution record for ingest, feature build, backtest, analysis, or training work. It governs ontology shape by encoding mode in kind instead of creating subtype objects.",
   lifecycle: "experimental",
+  capabilityGroup: "research.evaluate",
   properties: z.object({
     kind: z
       .enum(["ingestion", "feature_build", "backtest", "analysis", "training"])
@@ -235,6 +237,7 @@ export const artifact = defineObject({
   description:
     "An artifact is an immutable, content-addressed output produced by a run or session. Reports remain an artifact kind and must never be split into a separate object type.",
   lifecycle: "experimental",
+  capabilityGroup: "research.evaluate",
   properties: z.object({
     kind: z
       .enum(["strategy_spec", "code", "result_set", "report", "trajectory"])

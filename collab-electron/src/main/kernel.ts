@@ -508,14 +508,20 @@ export function kernelListResearchLedger(limit = 30): ResearchLedgerEntry[] {
 }
 
 /** Explicit onboarding sample: immutable, clearly labeled, and never live market truth. */
-export function kernelEnsureSampleResearchDataset(): Record<string, unknown> {
+export function kernelEnsureSampleResearchDataset(
+  options: { includeFutureRow?: boolean } = {},
+): Record<string, unknown> {
+  const observations = [
+    { observed_at: "2026-08-09T08:00:00.000Z", label: "sample-a", edge: 0.08, settlement: { outcome: "win", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.80" } },
+    { observed_at: "2026-08-09T09:00:00.000Z", label: "sample-b", edge: 0.05, settlement: { outcome: "loss", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.90" } },
+    { observed_at: "2026-08-09T10:00:00.000Z", label: "sample-c", edge: 0.03, settlement: { outcome: "push", stake: "100", decimal_odds: "1.95", closing_decimal_odds: "1.95" } },
+    ...(options.includeFutureRow
+      ? [{ observed_at: "2026-08-09T13:00:00.000Z", label: "sample-future", edge: 0.02, settlement: { outcome: "win", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.80" } }]
+      : []),
+  ];
   const payload = `${JSON.stringify({
     contract: "qf.dataset.v1",
-    observations: [
-      { observed_at: "2026-08-09T08:00:00.000Z", label: "sample-a", edge: 0.08, settlement: { outcome: "win", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.80" } },
-      { observed_at: "2026-08-09T09:00:00.000Z", label: "sample-b", edge: 0.05, settlement: { outcome: "loss", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.90" } },
-      { observed_at: "2026-08-09T10:00:00.000Z", label: "sample-c", edge: 0.03, settlement: { outcome: "push", stake: "100", decimal_odds: "1.95", closing_decimal_odds: "1.95" } },
-    ],
+    observations,
   }, null, 2)}\n`;
   const hash = createHash("sha256").update(payload).digest("hex");
   const directory = join(getArtifactRoot(), "onboarding");
@@ -537,6 +543,43 @@ export function kernelEnsureSampleResearchDataset(): Record<string, unknown> {
       deterministic_score_field: "edge",
     },
   }, { ...trace, span_id: crypto.randomUUID() }) as unknown as Record<string, unknown>;
+}
+
+/** Synthetic Hermes fixture: bounded market context for the app-owned read seam. */
+export function kernelEnsureSyntheticMarketFixture(): Record<string, unknown> {
+  const marketEventId = "event-hermes-synthetic";
+  if (kernelMarketObjectExists(marketEventId)) {
+    return { market_event_id: marketEventId, replayed: true };
+  }
+  const sourcePayload = `${JSON.stringify({ fixture: "wo-v2-2-hermes-market" })}\n`;
+  const sourceHash = createHash("sha256").update(sourcePayload).digest("hex");
+  const directory = join(getArtifactRoot(), "hermes-synthetic");
+  const path = join(directory, `${sourceHash}.json`);
+  mkdirSync(directory, { recursive: true });
+  if (!existsSync(path)) writeFileSync(path, sourcePayload, { encoding: "utf8", flag: "wx" });
+  const trace = { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() };
+  const source = kernelExecute("publish_artifact", {
+    kind: "result_set",
+    path,
+    storage_ref: path,
+    content_hash: sourceHash,
+  }, trace) as { object_id: string };
+  kernelExecute("register_venue", {
+    venue_id: "venue-hermes-synthetic",
+    kind: "sportsbook",
+    name: "Hermes synthetic venue",
+    source_artifact_id: source.object_id,
+    observed_at: "2026-08-09T11:00:00.000Z",
+  }, { ...trace, span_id: crypto.randomUUID() });
+  kernelExecute("schedule_market_event", {
+    market_event_id: marketEventId,
+    sport: "football",
+    starts_at: "2026-08-11T18:00:00.000Z",
+    competition: "Hermes Synthetic League",
+    source_artifact_id: source.object_id,
+    observed_at: "2026-08-09T11:00:00.000Z",
+  }, { ...trace, span_id: crypto.randomUUID() });
+  return { market_event_id: marketEventId, source_artifact_id: source.object_id, replayed: false };
 }
 
 export function kernelOpenHypothesisForQuestion(question: string, datasetId?: string): string {
@@ -605,11 +648,51 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
   }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
   if (verdict !== "supports") return { reportArtifactId: null, hypothesisId, status };
 
+  const run = kernelGetObject("run", runId);
+  const runParams = jsonRecord(run?.params);
+  const resultArtifactId = typeof runParams.result_artifact_id === "string"
+    ? runParams.result_artifact_id
+    : null;
+  const datasetArtifactId = typeof runParams.dataset_artifact_id === "string"
+    ? runParams.dataset_artifact_id
+    : null;
+  const artifactReceipt = (artifactId: string | null): Record<string, unknown> | null => {
+    if (!artifactId) return null;
+    const artifact = kernelGetObject("artifact", artifactId);
+    if (!artifact) return null;
+    return {
+      id: artifactId,
+      content_hash: String(artifact.content_hash),
+    };
+  };
+  const workerResultArtifactId = kernelQueryObjects("artifact", { kind: "trajectory" }, null)
+    .find((artifact) => {
+      const producedByWorker = kernelGetLinks(String(artifact.id), { kind: "produces" }).some((link) => {
+        const session = kernelGetObject("agent_session", link.from_id);
+        return String(session?.label ?? "").toLowerCase().includes("worker");
+      });
+      const derivedFromTrajectory = kernelGetLinks(String(artifact.id), { kind: "derived_from" }).some((link) =>
+        kernelGetObject("artifact", link.to_id)?.kind === "trajectory"
+      );
+      return producedByWorker && derivedFromTrajectory;
+    });
+  const evidenceArtifactId = workerResultArtifactId ? String(workerResultArtifactId.id) : null;
+  const marketReadTrajectoryArtifacts = (evidenceArtifactId ?? resultArtifactId)
+    ? kernelGetLinks(evidenceArtifactId ?? resultArtifactId!, { kind: "derived_from" })
+        .map((link) => artifactReceipt(link.to_id))
+        .filter((value): value is Record<string, unknown> => value !== null)
+    : [];
   const payload = `${JSON.stringify({
     contract: "qf.research.report.v1",
+    evaluation_id: evaluationId,
     hypothesis: kernelGetObject("hypothesis", hypothesisId),
-    run: kernelGetObject("run", runId),
+    run,
     evaluation,
+    evidence: {
+      market_read_trajectory_artifacts: marketReadTrajectoryArtifacts,
+      dataset_artifact: artifactReceipt(datasetArtifactId),
+      result_artifact: artifactReceipt(resultArtifactId),
+    },
   }, null, 2)}\n`;
   const hash = createHash("sha256").update(payload).digest("hex");
   const directory = join(getArtifactRoot(), "reports");

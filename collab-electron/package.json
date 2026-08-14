@@ -80,6 +80,10 @@
         "to": "qf-hermes-launch.sh"
       },
       {
+        "from": "cli/qf-hermes-synthetic-responder.mjs",
+        "to": "qf-hermes-synthetic-responder.mjs"
+      },
+      {
         "from": "packages/collab-canvas-skill",
         "to": "collab-canvas-skill"
       }

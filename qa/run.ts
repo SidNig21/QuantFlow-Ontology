@@ -771,6 +771,28 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "hermes-first-turn-synthetic",
+    description:
+      "WO-V2-2: production Hermes packaged-seat first turn through Dock, PTY, app-owned MCP bridges, Kernel, and deterministic falsifiers",
+    run: async () => {
+      const { runHermesFirstTurnSyntheticGate } = await import(
+        "./gates/hermes-research.ts"
+      );
+      return (await runHermesFirstTurnSyntheticGate()).ok;
+    },
+  },
+  {
+    name: "windows-hermes-research-chain",
+    description:
+      "WO-V2-2: installed production Hermes question-to-report chain with Dataset as-of, R11b metrics, independent Evaluation, lineage hashes, and process cleanup",
+    run: async () => {
+      const { runWindowsHermesResearchChainGate } = await import(
+        "./gates/hermes-research.ts"
+      );
+      return (await runWindowsHermesResearchChainGate()).ok;
+    },
+  },
+  {
     name: "windows-installer",
     description:
       "R13: finite unsigned NSIS build, honest Authenticode/status metadata, isolated silent install, readiness, and clean shutdown",

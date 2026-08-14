@@ -136,6 +136,11 @@ export async function admitNativeTuiDefinition(opts: {
   const usesWslMcpLauncher =
     wantsQuantFlowMcpBridges && opts.terminalTarget?.startsWith("wsl:") === true;
   const usesHermesNativeTui = adapterId === "hermes" && usesWslMcpLauncher;
+  // The deterministic responder is a packaged QA harness only. It preserves
+  // the production Hermes definition and PTY/gateway seams while replacing the
+  // provider process; the normal product path never receives this flag.
+  const syntheticHermes =
+    adapterId === "hermes" && process.env.QF_HERMES_SYNTHETIC_TEST === "1";
   const collaborationBridge = wantsQuantFlowMcpBridges
     ? resolveCollaborationResourcePath("qf-collaboration-mcp.mjs", {
         resourcesPath: process.resourcesPath,
@@ -164,7 +169,7 @@ export async function admitNativeTuiDefinition(opts: {
     );
   }
   const guestCommand = opts.command ?? adapterId;
-  const wslPrerequisite = usesWslMcpLauncher
+  const wslPrerequisite = usesWslMcpLauncher && !syntheticHermes
     ? classifyWslNativeTuiPrerequisites({
         platform: process.platform,
         homeDir: hostHome,
@@ -276,6 +281,7 @@ export async function admitNativeTuiDefinition(opts: {
             ...(process.env.QF_PROOF_NONCE
               ? { QF_PROOF_NONCE: process.env.QF_PROOF_NONCE }
               : {}),
+            ...(syntheticHermes ? { QF_HERMES_SYNTHETIC_TEST: "1" } : {}),
             QF_AGENT_SESSION_ID: sessionId,
             QF_PEER_ROLE: opts.role ?? "",
             QF_LAUNCH_READY_NONCE: readinessNonce,

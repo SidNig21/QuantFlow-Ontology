@@ -1,6 +1,7 @@
 export type RuntimeKernelAdmissionTrace = {
   trace_id: string;
   span_id: string;
+  actor_session_id?: string;
 };
 
 export type RuntimeKernelAdmissionInput<TLive> = {
@@ -43,14 +44,16 @@ export function createKernelAgentSession(
   dependencies: CreateKernelAgentSessionDependencies,
 ): RuntimeKernelAdmissionTrace {
   const { definitionId, sessionId, label, actorSessionId } = input;
-  const trace = dependencies.newTrace();
+  const trace = {
+    ...dependencies.newTrace(),
+    ...(actorSessionId ? { actor_session_id: actorSessionId } : {}),
+  };
   dependencies.execute(
     "create_agent_session",
     {
       session_id: sessionId,
       agent_definition_id: definitionId,
       label,
-      ...(actorSessionId ? { actor_session_id: actorSessionId } : {}),
     },
     trace,
   );
