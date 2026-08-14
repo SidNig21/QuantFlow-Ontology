@@ -1,10 +1,10 @@
 # WO-V2-2 - a seat that finishes work
 
-status: draft
-assignee: unassigned until authorized
+status: open
+assignee: builder
 depends: WO-V2-1 founder accepted
 rung: R13 / V2-2
-authorization: none; draft only until `NEXT.md` names this order after WO-V2-1 founder acceptance
+authorization: founder-via-NEXT
 
 ## Objective
 
@@ -33,22 +33,25 @@ evidence, evaluation, and lineage are visible in the Kernel.
 - V2-1 product candidate
   `c93b04f1d6a448cee299b2a79a6c21204fdc8502`
 
-This file is not an authorization surface. No builder may implement, run a
-live turn, or treat this order as active until a verifier has independently
-confirmed WO-V2-1 founder acceptance and `NEXT.md` has been rewritten to name
-this exact file. A link, `depends` line, scope proposal, or chat instruction
-cannot substitute for that rotation. This order does not edit `NEXT.md` and
-does not authorize V2-3.
+This file is not an authorization surface. It is open because the verifier has
+recorded WO-V2-1 founder acceptance and `NEXT.md` now names this exact file.
+The fresh builder receives this order, `PROTOCOL.md`, and `START_HERE.md`; it
+does not receive builder chat context. A link, `depends` line, scope proposal,
+or chat instruction cannot substitute for that rotation. This order does not
+edit `NEXT.md` and does not authorize V2-3.
 
 ## Measured starting point
 
 The installed V2-1 candidate boots, exposes the six production Dock profiles,
-launches `hermes-critic`, reports `5 tools · 0 skills`, completes deterministic
-packaged collaboration through the app-owned gateway, and shuts down cleanly.
-It does not prove a real Hermes first turn or the complete governed research
-chain. That unknown is this order's only starting defect. The V2-1 evidence
-explicitly says founder acceptance was not performed; the dependency and
-activation rule above therefore remain binding.
+launches `hermes-critic`, and completes deterministic packaged collaboration
+through the app-owned gateway before clean shutdown. The critic's live surface
+is `3 tools · 0 skills`: `collaboration_send_result`,
+`collaboration_send_task`, and `qf_record_evaluation`. The orchestrator count is
+`5 tools · 0 skills` because its role filter grants three ontology tools and the
+standard collaboration surface contributes two. The critic's four intended
+read tools were not visible. V2-1 does not prove a real Hermes first turn or the
+complete governed research chain; that unknown is this order's only starting
+defect.
 
 ## Deliverables
 

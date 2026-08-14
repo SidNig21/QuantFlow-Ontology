@@ -1600,6 +1600,28 @@ Verdict: `PASS`.
 This independent verifier section completes machine acceptance evidence. It
 does not perform or imply the founder acceptance below.
 
-## Founder acceptance — not performed by this builder
+## Founder acceptance — ACCEPTED
 
-Founder acceptance remains intentionally unperformed: install the NSIS artifact, open the desktop shortcut, confirm the candidate identity and timestamp, confirm the production Dock, launch `hermes-critic`, observe `5 tools · 0 skills`, close QuantFlow, and confirm zero install-owned processes.
+Founder verdict: `ACCEPT` on 2026-08-13.
+
+Founder receipts:
+
+- Masthead commit: `c93b04f1d6a448cee299b2a79a6c21204fdc8502`.
+- Build timestamp: `2026-08-14T02:58:00.926Z`.
+- Clean state: six production profiles, no `ungranted`; the pre-existing Kernel
+  had seven `agent_definition` rows including stale `claude-code-ungranted`; the
+  packaged manifest was clean and QA was off.
+- Live `hermes-critic`: `3 tools · 0 skills` —
+  `collaboration_send_result`, `collaboration_send_task`, and
+  `qf_record_evaluation`.
+- Plain-spawn fallback: `hermes --toolsets
+  mcp-quantflow-collaboration,mcp-quantflow-ontology --tui`, with `--tui` once.
+- Shutdown: `11 -> 0`; no WSL Hermes seats remained.
+- `~/.hermes/config.yaml` and `auth.json` were unchanged and remained dated
+  `2026-08-03`.
+
+The `5 tools · 0 skills` count is the orchestrator count: its source role filter
+grants three ontology tools and the standard collaboration surface contributes
+two. The critic live observation was one ontology evaluation tool plus two
+collaboration tools. The critic's four intended read tools were not visible and
+are not claimed here.

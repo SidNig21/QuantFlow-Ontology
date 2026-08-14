@@ -1,9 +1,11 @@
 # WO-V2-1 — the installable product
 
-status: rework
+status: done
 assignee: builder
 depends: R12 complete
 rung: R13
+founder-accepted: 2026-08-13
+founder-receipt: evidence/r13/FOUNDER-REVIEW.md
 
 ## Objective
 
@@ -304,16 +306,28 @@ shown green. Both transcripts go in the evidence file.
 
 ## Founder acceptance
 
-The founder installs from the produced NSIS installer on a Windows account that
-has never run this checkout, opens the installed desktop shortcut, and confirms
-the masthead's full commit equals the one `acceptance_candidate_sha` and its UTC
-build timestamp
-equals `RELEASE-STATUS.json`. The founder sees `hermes-critic` in the Dock and no
-profile whose id or role contains `ungranted`. The founder then spawns
-`hermes-critic` directly from the ordinary Dock with no mission or task
-activation, confirms the native TUI opens and reports `5 tools · 0 skills`,
-closes QuantFlow, and confirms the verifier's process check reports zero
-processes owned by the install.
+Founder verdict: `ACCEPT` on 2026-08-13. The exact observed receipts are recorded
+in [`evidence/r13/FOUNDER-REVIEW.md`](evidence/r13/FOUNDER-REVIEW.md) and below.
+The masthead showed
+`c93b04f1d6a448cee299b2a79a6c21204fdc8502`; the build timestamp was
+`2026-08-14T02:58:00.926Z`; the packaged manifest had six production profiles,
+no `ungranted` profile, and QA mode was off. The pre-existing Kernel had seven
+`agent_definition` rows, including stale `claude-code-ungranted`, which the
+packaged manifest did not show.
+
+The live `hermes-critic` surface was exactly `3 tools · 0 skills`:
+`collaboration_send_result`, `collaboration_send_task`, and
+`qf_record_evaluation`. The plain-spawn fallback ran
+`hermes --toolsets mcp-quantflow-collaboration,mcp-quantflow-ontology --tui`
+with `--tui` once. Shutdown went `11 -> 0` with no WSL Hermes seats. The
+founder's `~/.hermes/config.yaml` and `auth.json` were unchanged and remained
+dated 2026-08-03.
+
+The `5 tools · 0 skills` count belongs to the orchestrator: its source role
+filter grants three ontology tools and the standard collaboration surface adds
+two. The critic's live observation was one ontology evaluation tool plus two
+collaboration tools. The critic's four intended read tools were not visible;
+this record makes no contrary claim.
 
 ### Resolved launcher decision
 

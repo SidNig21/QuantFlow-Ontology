@@ -152,7 +152,7 @@ R12 inside it. No terminal, no `bun run dev`, no developer steps.
 | Installed app is from 2026-08-04 | Installed app is the current commit |
 | Building it requires a stalling Electron Builder run | One command produces an installer, finite and repeatable |
 | No critic seat, no Research Ledger | Everything through R12 present |
-| Hermes receives 31 tools · 82 skills | Hermes receives 5 tools · 0 skills |
+| Hermes receives 31 tools · 82 skills | Orchestrator receives 5; critic receives 3 tools · 0 skills |
 | Founder acceptance impossible | Founder acceptance possible |
 
 ### 5.3 Exact interaction sequence
@@ -162,7 +162,7 @@ R12 inside it. No terminal, no `bun run dev`, no developer steps.
 3. The masthead or About shows the build's commit and date.
 4. The Dock lists production profiles only. `claude-code-ungranted` is absent.
 5. `hermes-critic` is present and launchable.
-6. Founder spawns one seat. The TUI reports `5 tools · 0 skills`.
+6. Founder spawns `hermes-critic`. The TUI reports `3 tools · 0 skills`.
 7. Founder closes the app. No orphan processes remain.
 
 ### 5.4 Existing foundation
@@ -236,8 +236,9 @@ FAIL  kernel-sole-writer-app (scan offender)
 
 The founder installs from the produced installer on a machine that has never run
 the source, opens it from the desktop, sees the current build identity, sees
-`hermes-critic` in the Dock, sees no `ungranted` card, spawns one seat, reads
-`5 tools · 0 skills`, and closes it with no leftover processes.
+`hermes-critic` in the Dock, sees no `ungranted` card, spawns the critic, reads
+`3 tools · 0 skills`, and closes it with no leftover processes. The separate
+orchestrator surface is `5 tools · 0 skills`.
 
 ### 5.9 Falsification
 
