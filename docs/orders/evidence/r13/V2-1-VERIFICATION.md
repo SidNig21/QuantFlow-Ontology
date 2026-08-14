@@ -90,13 +90,13 @@ FAIL  windows-cold-boot
 
 #### Failed command 14 stderr
 ````text
-bun.exe : 
+bun.exe :
 At line:2 char:133
 + ... g '14-stderr.txt'; & bun qa/verify-release.ts 1> $out 2> $err; $exit= ...
 +                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 $ node scripts/postinstall.mjs
 Searching dependency tree
 Building modules: node-pty
@@ -167,7 +167,7 @@ collab-electron\src\main\native-tui-orchestration.test.ts:
 (pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds
 (pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start
 (pass) orchestrateNativeTuiAdmission > duplicate-role preflight revokes a minted capability without starting a process
-(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before 
+(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before
 running
 (pass) orchestrateNativeTuiAdmission > failed admission revokes its in-memory seat capability during owned cleanup
 (pass) orchestrateNativeTuiAdmission > readiness rejection writes no start and cleans every owned runtime seam
@@ -191,19 +191,19 @@ Resolving dependencies
 Resolved, downloaded and extracted [224]
 Saved lockfile
 $ node ./scripts/pack-agent.mjs
-(node:22660) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:22660) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 $ node ./scripts/pack-agent.mjs
-(node:28856) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:28856) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-windows-cold-boot: FAIL app-owned Windows processes remained after shutdown: brave.exe:12740, brave.exe:20012, 
-brave.exe:21844, brave.exe:19052, brave.exe:5244, brave.exe:5472, brave.exe:7132, brave.exe:3612, brave.exe:20468, 
-brave.exe:3532, cmd.exe:14652, conhost.exe:3628, cmd.exe:3700, extension-host.exe:16512, conhost.exe:21976, 
-brave.exe:8440, claude.exe:9012, brave.exe:16056, brave.exe:6700, brave.exe:14712, brave.exe:14272, brave.exe:508, 
-brave.exe:15952, brave.exe:8604, brave.exe:6664, brave.exe:20228, brave.exe:15272, brave.exe:14812, brave.exe:10380, 
-brave.exe:19112, brave.exe:3152, brave.exe:22280, brave.exe:3840, brave.exe:17884, brave.exe:23136, brave.exe:23220, 
+windows-cold-boot: FAIL app-owned Windows processes remained after shutdown: brave.exe:12740, brave.exe:20012,
+brave.exe:21844, brave.exe:19052, brave.exe:5244, brave.exe:5472, brave.exe:7132, brave.exe:3612, brave.exe:20468,
+brave.exe:3532, cmd.exe:14652, conhost.exe:3628, cmd.exe:3700, extension-host.exe:16512, conhost.exe:21976,
+brave.exe:8440, claude.exe:9012, brave.exe:16056, brave.exe:6700, brave.exe:14712, brave.exe:14272, brave.exe:508,
+brave.exe:15952, brave.exe:8604, brave.exe:6664, brave.exe:20228, brave.exe:15272, brave.exe:14812, brave.exe:10380,
+brave.exe:19112, brave.exe:3152, brave.exe:22280, brave.exe:3840, brave.exe:17884, brave.exe:23136, brave.exe:23220,
 brave.exe:23332, brave.exe:23388, brave.exe:23512, brave.exe:23212
 packaged app log: C:\Users\rybow\AppData\Local\Temp\qf-windows-cold-boot-nJ2ahj\packaged-app.log
 shutdown requested: true
@@ -274,15 +274,15 @@ At line:2 char:133
 +                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 Resolved, downloaded and extracted [231]
 Saved lockfile
 $ node ./scripts/pack-agent.mjs
-(node:29404) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:29404) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 $ node ./scripts/pack-agent.mjs
-(node:21376) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:21376) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
@@ -357,17 +357,17 @@ bun install v1.3.12 (700fc117)
 
 14 packages installed [588.00ms]
 bun test v1.3.12 (700fc117)
-bun.exe : 
+bun.exe :
 At line:33 char:3
 +   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 src\attach-kernel-drift.test.ts:
-(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable → 
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable →
 KernelIncompleteInitializationError [16.00ms]
-(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly → warn + getKernelDrift, no 
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly → warn + getKernelDrift, no
 artifact table [15.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) attachKernel WO-K3 drift / incomplete init > clean :memory: writable publish succeeds [16.00ms]
@@ -375,26 +375,26 @@ kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_U
 (pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture readonly → warn + getKernelDrift [16.00ms]
 
 src\busy-timeout.test.ts:
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-T6aYCs\kernel.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-T6aYCs\kernel.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [656.00ms]
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-zEOPL8\kernel.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-zEOPL8\kernel.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
 
 (pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [594.00ms]
 
 src\connection-actions.test.ts:
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-fjXU7g\conn.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-fjXU7g\conn.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-fjXU7g\conn.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-fjXU7g\conn.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) WO-g5a connection write path > create + delete persist through reopen; rejects self-loop and duplicate [31.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) WO-g5a connection write path > delete unknown id refuses
 
 src\connection-readback.test.ts:
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-conn-readback-Tpauyo\k.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-conn-readback-Tpauyo\k.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) connection create read-back > queryObjects({ id }) throws; getObject returns the row [31.00ms]
 
@@ -469,7 +469,7 @@ kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 
 src\market-context.test.ts:
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-(pass) WO-107c trusted market context > creates scheduled context with one provenance event and replays by trace 
+(pass) WO-107c trusted market context > creates scheduled context with one provenance event and replays by trace
 identity
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 (pass) WO-107c trusted market context > rejects blank context row created_at on replay without writes
@@ -482,7 +482,7 @@ kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 (pass) WO-107b market batch runtime > conflicting row state or provenance rejects the entire batch [16.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-(pass) WO-107b market batch runtime > missing source, duplicate IDs, and missing quote foreign key reject before 
+(pass) WO-107b market batch runtime > missing source, duplicate IDs, and missing quote foreign key reject before
 writing
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 (pass) WO-107b market batch runtime > a commit-time failure on the final row rolls back prior rows and events
@@ -493,18 +493,18 @@ kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta
 
 src\open-kernel-create.test.ts:
 (pass) WO-K2 openKernel create / readonly > G3: missing file without create throws and creates nothing
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-IHbPLd\created.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-IHbPLd\created.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) WO-K2 openKernel create / readonly > G3: { create: true } creates the file [15.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 (pass) WO-K2 openKernel create / readonly > G3: :memory: opens without create [16.00ms]
 (pass) WO-K2 openKernel create / readonly > G3: create + readonly together throws
 (pass) WO-K2 openKernel create / readonly > G3: missing file with readonly throws (cannot create)
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=2 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=2
 schema_meta=74
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) WO-K2 openKernel create / readonly > G4: readonly handle cannot write; writable control succeeds [31.00ms]
 
@@ -520,7 +520,7 @@ kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 
 src\r11a-deterministic-execution.test.ts:
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-(pass) R11a deterministic local execution > repeats exact inputs byte-for-byte with complete Kernel provenance 
+(pass) R11a deterministic local execution > repeats exact inputs byte-for-byte with complete Kernel provenance
 [31.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 (pass) R11a deterministic local execution > rejects false repeat claims and changed durable result bytes [16.00ms]
@@ -529,17 +529,17 @@ kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta
 
 src\r11b-metric-correctness.test.ts:
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-(pass) R11b hand-calculated metric correctness > matches exact ROI, hit rate, and closing-line value definitions 
+(pass) R11b hand-calculated metric correctness > matches exact ROI, hit rate, and closing-line value definitions
 [32.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
 (pass) R11b hand-calculated metric correctness > refuses ambiguous numeric money before creating a Run
 
 src\r12-independent-critic.test.ts:
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-(pass) R12 independent critic and report gate > binds a separate critic, findings, target result, metrics, and report 
+(pass) R12 independent critic and report gate > binds a separate critic, findings, target result, metrics, and report
 [47.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-(pass) R12 independent critic and report gate > refuses non-critics, self-review, and rejecting report approval 
+(pass) R12 independent critic and report gate > refuses non-critics, self-review, and rejecting report approval
 [63.00ms]
 
 src\r9-research-integrity.test.ts:
@@ -590,13 +590,13 @@ raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\03-typecheck.log`
 Complete unedited transcript:
 ````text
 bun install v1.3.12 (700fc117)
-bun.exe : 
+bun.exe :
 At line:33 char:3
 +   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 $ node scripts/postinstall.mjs
 Patched winpty.gyp
 Patched binding.gyp
@@ -743,14 +743,14 @@ raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\04-kernel-market-lineage.log`
 
 Complete unedited transcript:
 ````text
-bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-yQNA9o\kernel.db provenance=explicit 
+bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-yQNA9o\kernel.db provenance=explicit
 journal=wal sync=2 schema_meta=74
 At line:33 char:3
 +   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (kernel: path=C:... schema_meta=74:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 kernel-market-lineage: FALSIFY RED empty lineage
 kernel-market-lineage: FALSIFY RED fabricated cite
 kernel-market-lineage: PASS
@@ -786,7 +786,7 @@ At line:33 char:3
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (kernel: path=:m... schema_meta=74:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=74
 kernel: path=\tmp\qf-d1-upgrade-vwLUwO\pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=74
 kernel: path=\tmp\qf-d1-upgrade-vwLUwO\pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=74
@@ -835,7 +835,7 @@ At line:33 char:3
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 Resolved, downloaded and extracted [309]
 Saved lockfile
 
@@ -868,7 +868,7 @@ Bundled 119 modules in 263ms
 
 packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:10832) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:10832) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
@@ -880,7 +880,7 @@ Bundled 1 module in 28ms
 
 packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:29676) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:29676) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
@@ -908,18 +908,18 @@ bun install v1.3.12 (700fc117)
 
 2 packages installed [51.00ms]
 bun test v1.3.12 (700fc117)
-bun.exe : 
+bun.exe :
 At line:33 char:3
 +   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 src\busy-timeout.test.ts:
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-h6oVtZ\kernel.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-h6oVtZ\kernel.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [672.00ms]
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-Y7BaEN\kernel.db provenance=explicit journal=wal sync=1 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-Y7BaEN\kernel.db provenance=explicit journal=wal sync=1
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
 
@@ -946,7 +946,7 @@ bun install v1.3.12 (700fc117)
 + qf-kernel-schema@../../qf-kernel-schema
 
 4 packages installed [60.00ms]
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-A2rFcw\.quantflow\kernel.db provenance=explicit journal=wal 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-A2rFcw\.quantflow\kernel.db provenance=explicit journal=wal
 sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 kernel-one-world G4 PASS
   child D4 boot line: kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-A2rFcw\.quantflow\kernel.db provenance=default journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
@@ -1053,13 +1053,13 @@ release: runId=d56eadbc-0f32-4df2-849e-b980399806e5
 
 == release:install (collab-electron) :: bun install --frozen-lockfile ==
 bun install v1.3.12 (700fc117)
-bun.exe : 
+bun.exe :
 At line:33 char:3
 +   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 $ node scripts/postinstall.mjs
 Patched winpty.gyp
 Patched binding.gyp
@@ -1143,7 +1143,7 @@ collab-electron\src\main\native-tui-orchestration.test.ts:
 (pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds
 (pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start
 (pass) orchestrateNativeTuiAdmission > duplicate-role preflight revokes a minted capability without starting a process
-(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before 
+(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before
 running
 (pass) orchestrateNativeTuiAdmission > failed admission revokes its in-memory seat capability during owned cleanup
 (pass) orchestrateNativeTuiAdmission > readiness rejection writes no start and cleans every owned runtime seam
@@ -1204,7 +1204,7 @@ Bundled 119 modules in 281ms
 
 packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:15200) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:15200) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
@@ -1216,7 +1216,7 @@ Bundled 1 module in 29ms
 
 packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:29612) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:29612) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
@@ -1286,23 +1286,23 @@ PASS  schema-bundle-aliases
 PASS  verb-retirement
 
 == release:kernel-task-delegation (.) :: bun qa/run.ts kernel-task-delegation ==
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\kernel.db provenance=explicit journal=wal sync=2 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\kernel.db provenance=explicit journal=wal sync=2
 schema_meta=74
 kernel-task-delegation: FALSIFY RED forged hire provenance refused
 kernel-task-delegation: FALSIFY RED caller task envelope refused
 kernel-task-delegation: FALSIFY RED forged ontology read receipts refused
 kernel-task-delegation: FALSIFY RED completion lineage refusals
 kernel-task-delegation: FALSIFY RED illegal complete refused
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\kernel.db provenance=explicit journal=wal sync=2 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\kernel.db provenance=explicit journal=wal sync=2
 schema_meta=74
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\empty-kernel.db provenance=explicit journal=wal 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\empty-kernel.db provenance=explicit journal=wal
 sync=2 schema_meta=74
 kernel-task-delegation: FALSIFY RED bus-only assignment absent from Kernel
 kernel-task-delegation: PASS
 PASS  kernel-task-delegation
 
 == release:kernel-market-lineage (.) :: bun qa/run.ts kernel-market-lineage ==
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-bA2ETQ\kernel.db provenance=explicit journal=wal 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-bA2ETQ\kernel.db provenance=explicit journal=wal
 sync=2 schema_meta=74
 kernel-market-lineage: FALSIFY RED empty lineage
 kernel-market-lineage: FALSIFY RED fabricated cite
@@ -1325,14 +1325,14 @@ raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\15-kernel-market-lineage-reru
 
 Complete unedited transcript:
 ````text
-bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-ZuatMg\kernel.db provenance=explicit 
+bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-ZuatMg\kernel.db provenance=explicit
 journal=wal sync=2 schema_meta=74
 At line:33 char:3
 +   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (kernel: path=C:... schema_meta=74:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 kernel-market-lineage: FALSIFY RED empty lineage
 kernel-market-lineage: FALSIFY RED fabricated cite
 kernel-market-lineage: PASS
@@ -1360,7 +1360,7 @@ At line:33 char:3
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 Resolved, downloaded and extracted [150]
 Saved lockfile
 
@@ -1393,7 +1393,7 @@ Bundled 119 modules in 418ms
 
 packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:14104) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:14104) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
@@ -1405,7 +1405,7 @@ Bundled 1 module in 28ms
 
 packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:23324) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:23324) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
@@ -1442,7 +1442,7 @@ At line:33 char:3
 +   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
- 
+
 Resolved, downloaded and extracted [215]
 Saved lockfile
 
@@ -1475,7 +1475,7 @@ Bundled 119 modules in 392ms
 
 packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:15980) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:15980) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
@@ -1487,7 +1487,7 @@ Bundled 1 module in 28ms
 
 packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:31032) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+(node:31032) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
@@ -1495,11 +1495,11 @@ pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\re
 pack-agent: ready claude-code
 windows-cold-boot: building Electron bundle
 windows-cold-boot: creating unpacked Windows package
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-red-GBJBLa\stores\kernel.db 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-red-GBJBLa\stores\kernel.db
 provenance=explicit journal=wal sync=2 schema_meta=74
 windows-dock-collaboration: red orchestrator-tail="mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\r\n\u001b[?25l\u001b[8;26;80t\u001b[H\u001b[K\r\nQF_LAUNCH_READY 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\n\u001b[K\r\nQF_LAUNCH_COMMIT 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\nQUANTFLOW_MISSION {\"contract\":\"qf.mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[9;1H\u001b[?25h\u001b[?25l\u001b[H\u001b[K\r\nQF_LAUNCH_READY 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\n\u001b[K\r\nQF_LAUNCH_COMMIT 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\nQUANTFLOW_MISSION {\"contract\":\"qf.mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[13;1H\u001b[?25h" worker-tail="<hired worker PTY is app-owned and not exposed by this gate>"
 windows-dock-collaboration: FALSIFY RED delivery blocked
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-green-K2MOLb\stores\kernel.db 
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-green-K2MOLb\stores\kernel.db
 provenance=explicit journal=wal sync=2 schema_meta=74
 windows-dock-collaboration: green orchestrator-tail="" worker-tail="<hired worker PTY is app-owned and not exposed by this gate>"
 windows-dock-collaboration: FALSIFY GREEN delivery restored

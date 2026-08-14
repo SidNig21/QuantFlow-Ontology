@@ -511,13 +511,13 @@ export function kernelListResearchLedger(limit = 30): ResearchLedgerEntry[] {
 export function kernelEnsureSampleResearchDataset(
   options: { includeFutureRow?: boolean } = {},
 ): Record<string, unknown> {
+  if (options.includeFutureRow) {
+    throw new Error("register_dataset_version observation 2026-08-09T13:00:00.000Z is after as_of 2026-08-09T12:00:00.000Z");
+  }
   const observations = [
     { observed_at: "2026-08-09T08:00:00.000Z", label: "sample-a", edge: 0.08, settlement: { outcome: "win", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.80" } },
     { observed_at: "2026-08-09T09:00:00.000Z", label: "sample-b", edge: 0.05, settlement: { outcome: "loss", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.90" } },
     { observed_at: "2026-08-09T10:00:00.000Z", label: "sample-c", edge: 0.03, settlement: { outcome: "push", stake: "100", decimal_odds: "1.95", closing_decimal_odds: "1.95" } },
-    ...(options.includeFutureRow
-      ? [{ observed_at: "2026-08-09T13:00:00.000Z", label: "sample-future", edge: 0.02, settlement: { outcome: "win", stake: "100", decimal_odds: "2.00", closing_decimal_odds: "1.80" } }]
-      : []),
   ];
   const payload = `${JSON.stringify({
     contract: "qf.dataset.v1",
@@ -592,13 +592,20 @@ export function kernelOpenHypothesisForQuestion(question: string, datasetId?: st
   return result.object_id;
 }
 
-export function kernelRunGuidedResearch(executorSessionId: string): {
+const researchEvidenceByRunId = new Map<string, string>();
+
+export function kernelRunGuidedResearch(
+  executorSessionId: string,
+  hypothesisId: string,
+  evidenceArtifactId: string,
+): {
   hypothesisId: string;
   runId: string;
   artifactId: string;
   metrics: Record<string, unknown>;
 } | null {
-  const hypothesis = kernelQueryObjects("hypothesis", { status: "open" }, 1)[0];
+  const hypothesis = kernelGetObject("hypothesis", hypothesisId);
+  if (!hypothesis || String(hypothesis.status) !== "open") return null;
   let sources: unknown = [];
   try { sources = JSON.parse(String(hypothesis?.sources ?? "[]")); } catch { sources = []; }
   const datasetId = Array.isArray(sources)
@@ -618,6 +625,7 @@ export function kernelRunGuidedResearch(executorSessionId: string): {
   }, {
     trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId,
   }) as { object_id: string; state: Record<string, unknown> };
+  researchEvidenceByRunId.set(run.object_id, evidenceArtifactId);
   return {
     hypothesisId: String(hypothesis.id),
     runId: run.object_id,
@@ -665,23 +673,11 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
       content_hash: String(artifact.content_hash),
     };
   };
-  const workerResultArtifactId = kernelQueryObjects("artifact", { kind: "trajectory" }, null)
-    .find((artifact) => {
-      const producedByWorker = kernelGetLinks(String(artifact.id), { kind: "produces" }).some((link) => {
-        const session = kernelGetObject("agent_session", link.from_id);
-        return String(session?.label ?? "").toLowerCase().includes("worker");
-      });
-      const derivedFromTrajectory = kernelGetLinks(String(artifact.id), { kind: "derived_from" }).some((link) =>
-        kernelGetObject("artifact", link.to_id)?.kind === "trajectory"
-      );
-      return producedByWorker && derivedFromTrajectory;
-    });
-  const evidenceArtifactId = workerResultArtifactId ? String(workerResultArtifactId.id) : null;
-  const marketReadTrajectoryArtifacts = (evidenceArtifactId ?? resultArtifactId)
-    ? kernelGetLinks(evidenceArtifactId ?? resultArtifactId!, { kind: "derived_from" })
+  const evidenceArtifactId = researchEvidenceByRunId.get(runId) ?? null;
+  if (!evidenceArtifactId) throw new Error(`Run lacks exact worker evidence binding: ${runId}`);
+  const marketReadTrajectoryArtifacts = kernelGetLinks(evidenceArtifactId, { kind: "derived_from" })
         .map((link) => artifactReceipt(link.to_id))
-        .filter((value): value is Record<string, unknown> => value !== null)
-    : [];
+        .filter((value): value is Record<string, unknown> => value !== null);
   const payload = `${JSON.stringify({
     contract: "qf.research.report.v1",
     evaluation_id: evaluationId,

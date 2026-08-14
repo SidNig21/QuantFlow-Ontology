@@ -112,6 +112,8 @@ import {
 } from "./agent-host";
 import { createKernelAgentSession } from "./runtime-kernel-admission";
 
+const researchHypothesisBySession = new Map<string, string>();
+
 function getKernelAgentDefinitionIds(): string[] {
   return kernelListAgentDefinitions()
     .map((row) => row.id)
@@ -1181,7 +1183,9 @@ app.whenReady().then(async () => {
           void (async () => {
             try {
               closeAgentSessionRow(change.workerSessionId);
-              const run = kernelRunGuidedResearch(change.delegatorSessionId);
+              const hypothesisId = researchHypothesisBySession.get(change.delegatorSessionId);
+              if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
+              const run = kernelRunGuidedResearch(change.delegatorSessionId, hypothesisId, change.artifactId);
               if (!run) {
                 closeAgentSessionRow(change.delegatorSessionId);
                 return;
@@ -1293,10 +1297,11 @@ app.whenReady().then(async () => {
       if (input.include_future_row !== undefined && typeof input.include_future_row !== "boolean") {
         throw new Error("fixture dataset include_future_row must be boolean");
       }
-      kernelEnsureSyntheticMarketFixture();
-      return kernelEnsureSampleResearchDataset({
+      const dataset = kernelEnsureSampleResearchDataset({
         includeFutureRow: input.include_future_row === true,
       });
+      kernelEnsureSyntheticMarketFixture();
+      return dataset;
     },
     {
       description:
@@ -1346,6 +1351,7 @@ app.whenReady().then(async () => {
         missionActivation: activationInstruction,
         onStarted: projectStartedSession,
       });
+      researchHypothesisBySession.set(result.sessionId, hypothesisId);
       return {
         missionId,
         hypothesisId,
@@ -1358,6 +1364,83 @@ app.whenReady().then(async () => {
       description:
         "Create a Kernel mission from the founder question and start the orchestrator seat.",
     },
+  );
+  registerMethod(
+    "qf.research.run_kernel_falsifiers",
+    () => {
+      if (process.env.QF_HERMES_SYNTHETIC_TEST !== "1") {
+        throw new Error("Kernel falsifiers are synthetic-test-only");
+      }
+      const dataset = kernelEnsureSampleResearchDataset({ includeFutureRow: false });
+      const datasetRow = kernelGetObject("dataset", String(dataset.object_id));
+      const datasetArtifact = kernelGetObject("artifact", String(datasetRow?.artifact_id));
+      if (!datasetArtifact) throw new Error("Kernel falsifier fixture Artifact is missing");
+      let missingReportReason = "";
+      try {
+        kernelExecute("publish_artifact", {
+          kind: "report",
+          path: String(datasetArtifact.storage_ref),
+          storage_ref: String(datasetArtifact.storage_ref),
+          content_hash: String(datasetArtifact.content_hash),
+          evaluation_id: "evaluation:missing-boundary-falsifier",
+        }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+        throw new Error("missing Evaluation report was accepted");
+      } catch (error) {
+        missingReportReason = String(error);
+        if (!missingReportReason.includes("Evaluation with verdict supports")) throw error;
+      }
+      const hypothesisId = kernelOpenHypothesisForQuestion(
+        "Kernel falsifier rejects unsupported evaluation",
+        String(dataset.object_id),
+      );
+      const executorSessionId = `kernel-falsifier-executor-${crypto.randomUUID()}`;
+      createKernelAgentSession(
+        { sessionId: executorSessionId, definitionId: "hermes-orchestrator", label: "Kernel falsifier executor" },
+        { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
+      );
+      const run = kernelRunGuidedResearch(executorSessionId, hypothesisId, "trajectory:kernel-falsifier-worker");
+      if (!run) throw new Error("Kernel falsifier could not create exact deterministic Run");
+      const criticSessionId = `kernel-falsifier-critic-${crypto.randomUUID()}`;
+      createKernelAgentSession(
+        { sessionId: criticSessionId, definitionId: "hermes-critic", label: "Kernel falsifier critic" },
+        { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
+      );
+      let rejectsReason = "";
+      const evaluation = kernelExecute("record_evaluation", {
+        hypothesis_id: run.hypothesisId,
+        run_id: run.runId,
+        artifact_id: run.artifactId,
+        verdict: "rejects",
+        confidence: 0.9,
+        rationale: "Kernel rejection falsifier control.",
+        findings: "The control intentionally rejects the exact Run.",
+      }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: criticSessionId }) as { object_id: string };
+      const final = kernelFinalizeResearchEvaluation(evaluation.object_id);
+      if (final.reportArtifactId !== null || final.status !== "rejected") {
+        throw new Error("rejects Evaluation unexpectedly produced a Report");
+      }
+      rejectsReason = `status=${final.status}`;
+      let repeatReason = "";
+      try {
+        kernelExecute("execute_deterministic_run", {
+          run_id: `run-kernel-falsifier-repeat-${crypto.randomUUID()}`,
+          dataset_id: String(dataset.object_id),
+          strategy_spec: { contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge" },
+          params: { limit: 2 },
+          repeat_of_run_id: run.runId,
+        }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId });
+        throw new Error("changed deterministic input was accepted as an identical replay");
+      } catch (error) {
+        repeatReason = String(error);
+        if (!repeatReason.includes("repeat") && !repeatReason.includes("mismatch")) throw error;
+      }
+      return {
+        missing_report: { outcome: "rejected", reason: missingReportReason },
+        rejects_evaluation: { outcome: "rejected", reason: rejectsReason, run_id: run.runId, evaluation_id: evaluation.object_id },
+        changed_repeat: { outcome: "rejected", reason: repeatReason, run_id: run.runId },
+      };
+    },
+    { description: "Synthetic-test-only actual Kernel rejection paths for the research gate." },
   );
   const bovadaKernel: BovadaKernelAccess = {
     execute: (_db, command, input, trace) =>

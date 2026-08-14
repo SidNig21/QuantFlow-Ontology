@@ -20,6 +20,7 @@ const KERNEL_DB = process.env.QF_KERNEL_DB;
 const COLLABORATION_BRIDGE = process.env.QF_COLLABORATION_MCP_PATH || process.argv[3];
 const ONTOLOGY_BRIDGE = process.env.QF_ONTOLOGY_MCP_PATH || process.argv[4];
 const MISSION_PREFIX = "QUANTFLOW_MISSION ";
+const SUPPRESS_BOUNDARY = process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY || "";
 
 function byteLength(value) {
   return Buffer.byteLength(value, "utf8");
@@ -29,6 +30,11 @@ function emit(fields) {
   process.stdout.write(`QF_SYNTHETIC ${Object.entries(fields)
     .map(([key, value]) => `${key}=${typeof value === "string" ? value.replace(/[\r\n ]/g, "_") : JSON.stringify(value)}`)
     .join(" ")}\n`);
+}
+
+function emitBoundary(boundary, fields = {}) {
+  if (SUPPRESS_BOUNDARY === boundary) return;
+  emit({ boundary, ...fields });
 }
 
 function requireConfig() {
@@ -209,7 +215,7 @@ function toolNames(tools) { return new Set(tools.map((tool) => tool?.name).filte
 function requireTools(tools, names, label) {
   const actual = toolNames(tools);
   for (const name of names) if (!actual.has(name)) throw new Error(`${label} missing generated tool ${name}`);
-  emit({ boundary: "tool_discovery", role: ROLE, tools: names.join(",") });
+  emitBoundary("tool_discovery", { role: ROLE, tools: names.join(",") });
 }
 
 function ontologyArgs(args) {
@@ -243,6 +249,10 @@ async function nextReview(reader) {
       const match = new RegExp(`${field}=([A-Za-z0-9_-]{1,128})`).exec(carry);
       if (match) values[field] = match[1];
     }
+    const metricsMatch = /metrics=(\{.*\})/.exec(carry);
+    if (metricsMatch) {
+      try { values.metrics = JSON.parse(metricsMatch[1]); } catch { /* keep reading */ }
+    }
     if (values.hypothesis_id && values.run_id && values.artifact_id) return values;
   }
   throw new Error("synthetic critic activation is missing research ids");
@@ -250,48 +260,57 @@ async function nextReview(reader) {
 
 async function orchestrator(reader, ontology, collaboration) {
   const activation = await nextMatching(reader, (line) => parseMission(line));
-  emit({ boundary: "activation_delivery", role: ROLE, mission_id: activation.mission_id ?? "unknown" });
+  emitBoundary("activation_delivery", { role: ROLE, mission_id: activation.mission_id ?? "unknown" });
   const ontologyTools = await ontology.listTools();
   const collaborationTools = await collaboration.listTools();
   requireTools(ontologyTools, ["qf_agent_definition_query", "qf_create_agent_session", "qf_start_agent_session"], "orchestrator ontology");
   requireTools(collaborationTools, ["send_task"], "orchestrator collaboration");
   const definitions = await ontology.callTool("qf_agent_definition_query", ontologyArgs({}));
-  emit({ boundary: "tool_output", role: ROLE, tool: "qf_agent_definition_query" });
+  emitBoundary("tool_output", { role: ROLE, tool: "qf_agent_definition_query" });
   const rows = Array.isArray(definitions?.result) ? definitions.result : [];
   if (!rows.some((row) => row?.id === "hermes-worker")) throw new Error("production hermes-worker definition was not discovered");
   const workerSessionId = `synthetic-worker-${randomUUID()}`;
-  emit({ boundary: "tool_input", role: ROLE, tool: "qf_create_agent_session" });
+  emitBoundary("tool_input", { role: ROLE, tool: "qf_create_agent_session" });
   await ontology.callTool("qf_create_agent_session", ontologyArgs({ session_id: workerSessionId, agent_definition_id: "hermes-worker", label: "Synthetic research worker" }));
-  emit({ boundary: "tool_output", role: ROLE, tool: "qf_create_agent_session" });
-  emit({ boundary: "tool_input", role: ROLE, tool: "qf_start_agent_session" });
+  emitBoundary("tool_output", { role: ROLE, tool: "qf_create_agent_session" });
+  emitBoundary("tool_input", { role: ROLE, tool: "qf_start_agent_session" });
   await ontology.callTool("qf_start_agent_session", ontologyArgs({ session_id: workerSessionId }));
-  emit({ boundary: "tool_output", role: ROLE, tool: "qf_start_agent_session" });
+  emitBoundary("tool_output", { role: ROLE, tool: "qf_start_agent_session" });
   const task = await collaboration.callTool("send_task", collaborationArgs({ to_role: "worker", task: activation.question }));
   if (!task?.taskId) throw new Error("synthetic send_task returned no task id");
-  emit({ boundary: "tool_input", role: ROLE, tool: "send_task", task_id: task.taskId });
+  emitBoundary("tool_input", { role: ROLE, tool: "send_task", task_id: task.taskId });
   const result = await nextMatching(reader, (line) => {
     const match = /^\[QuantFlow RESULT for ([A-Za-z0-9_-]{1,128}) from worker\] (.+)$/.exec(line);
     return match && match[1] === task.taskId ? match : null;
   });
-  emit({ boundary: "tool_output", role: ROLE, tool: "send_task", task_id: task.taskId });
-  emit({ boundary: "first_turn", role: ROLE, task_id: task.taskId });
-  emit({ boundary: "result_return", role: ROLE, task_id: task.taskId });
+  emitBoundary("tool_output", { role: ROLE, tool: "send_task", task_id: task.taskId });
+  emitBoundary("first_turn", { role: ROLE, task_id: task.taskId });
+  emitBoundary("run_control", { role: ROLE, task_id: task.taskId, result_returned: true });
+  emitBoundary("result_return", { role: ROLE, task_id: task.taskId });
   emit({ turn: "complete", role: ROLE, task_id: task.taskId });
 }
 
 async function worker(reader, ontology, collaboration) {
   emit({ boundary: "activation_wait", role: ROLE });
   const task = await nextMatching(reader, parseTask);
-  emit({ boundary: "activation_delivery", role: ROLE, task_id: task.taskId });
+  emitBoundary("activation_delivery", { role: ROLE, task_id: task.taskId });
   const ontologyTools = await ontology.listTools();
   const collaborationTools = await collaboration.listTools();
-  requireTools(ontologyTools, ["qf_market_event_query"], "worker ontology");
+  requireTools(ontologyTools, ["qf_market_event_get", "qf_market_event_query"], "worker ontology");
   requireTools(collaborationTools, ["send_result"], "worker collaboration");
-  emit({ boundary: "tool_input", role: ROLE, tool: "qf_market_event_query" });
+  if (SUPPRESS_BOUNDARY === "tool_input") {
+    try {
+      await ontology.callTool("qf_market_event_get", ontologyArgs({}));
+      throw new Error("qf_market_event_get accepted missing id");
+    } catch (error) {
+      if (!String(error).includes("requires id")) throw error;
+      emit({ falsifier: "gateway_tool_input_rejected", reason: String(error) });
+    }
+  }
+  emitBoundary("tool_input", { role: ROLE, tool: "qf_market_event_query" });
   const marketRead = await ontology.callTool("qf_market_event_query", ontologyArgs({}));
   const rows = Array.isArray(marketRead?.result) ? marketRead.result : [];
-  emit({
-    boundary: "tool_output",
+  emitBoundary("tool_output", {
     role: ROLE,
     tool: "qf_market_event_query",
     artifact_id: marketRead?.artifactId ?? "missing",
@@ -302,7 +321,21 @@ async function worker(reader, ontology, collaboration) {
   }
   const ids = [...new Set(rows.map((row) => row.id))];
   const result = `Deterministic packaged fixture read completed for ${ids.join(", ")}.`;
-  emit({ boundary: "tool_input", role: ROLE, tool: "send_result", task_id: task.taskId });
+  if (SUPPRESS_BOUNDARY === "tool_output") {
+    try {
+      await collaboration.callTool("send_result", collaborationArgs({
+        task_id: task.taskId,
+        result,
+        cited_market_ids: ["market:missing-boundary-falsifier"],
+        read_trajectory_artifact_ids: [marketRead.artifactId],
+      }));
+      throw new Error("send_result accepted an uncited market id");
+    } catch (error) {
+      if (!String(error).includes("cited market id does not exist")) throw error;
+      emit({ falsifier: "gateway_tool_output_rejected", reason: String(error) });
+    }
+  }
+  emitBoundary("tool_input", { role: ROLE, tool: "send_result", task_id: task.taskId });
   const sent = await collaboration.callTool("send_result", collaborationArgs({
     task_id: task.taskId,
     result,
@@ -310,23 +343,24 @@ async function worker(reader, ontology, collaboration) {
     read_trajectory_artifact_ids: [marketRead.artifactId],
   }));
   if (!sent?.artifactId) throw new Error("synthetic send_result returned no artifact id");
-  emit({ boundary: "tool_output", role: ROLE, tool: "send_result", artifact_id: sent.artifactId });
-  emit({ boundary: "first_turn", role: ROLE, task_id: task.taskId });
+  emitBoundary("tool_output", { role: ROLE, tool: "send_result", artifact_id: sent.artifactId });
+  emitBoundary("first_turn", { role: ROLE, task_id: task.taskId });
   emit({ turn: "complete", role: ROLE, task_id: task.taskId });
 }
 
 async function critic(reader, ontology) {
   const ids = await nextReview(reader);
-  emit({ boundary: "activation_delivery", role: ROLE, run_id: ids.run_id });
+  emitBoundary("activation_delivery", { role: ROLE, run_id: ids.run_id });
   const tools = await ontology.listTools();
   requireTools(tools, ["qf_hypothesis_get", "qf_run_get", "qf_artifact_get", "qf_record_evaluation"], "critic ontology");
   for (const [tool, id] of [["qf_hypothesis_get", ids.hypothesis_id], ["qf_run_get", ids.run_id], ["qf_artifact_get", ids.artifact_id]]) {
-    emit({ boundary: "tool_input", role: ROLE, tool });
+    emitBoundary("tool_input", { role: ROLE, tool });
     const read = await ontology.callTool(tool, ontologyArgs({ id }));
     if (!read?.artifactId) throw new Error(`${tool} returned no read trajectory artifact`);
-    emit({ boundary: "tool_output", role: ROLE, tool, artifact_id: read.artifactId });
+    if (read.result?.id !== id) throw new Error(`${tool} returned the wrong object for ${id}`);
+    emitBoundary("tool_output", { role: ROLE, tool, artifact_id: read.artifactId, object_id: id });
   }
-  emit({ boundary: "tool_input", role: ROLE, tool: "qf_record_evaluation" });
+  emitBoundary("tool_input", { role: ROLE, tool: "qf_record_evaluation" });
   const evaluation = await ontology.callTool("qf_record_evaluation", ontologyArgs({
     hypothesis_id: ids.hypothesis_id,
     run_id: ids.run_id,
@@ -337,8 +371,14 @@ async function critic(reader, ontology) {
     findings: "The independent critic observed the exact Hypothesis, Run, and result Artifact named by the app.",
   }));
   if (!evaluation?.result?.object_id) throw new Error("qf_record_evaluation returned no Evaluation id");
-  emit({ boundary: "tool_output", role: ROLE, tool: "qf_record_evaluation", evaluation_id: evaluation.result.object_id });
-  emit({ boundary: "lineage_publication", role: ROLE, evaluation_id: evaluation.result.object_id });
+  emitBoundary("tool_output", { role: ROLE, tool: "qf_record_evaluation", evaluation_id: evaluation.result.object_id });
+  emitBoundary("lineage_publication", {
+    evaluation_id: evaluation.result.object_id,
+    hypothesis_id: ids.hypothesis_id,
+    run_id: ids.run_id,
+    artifact_id: ids.artifact_id,
+    metrics: ids.metrics,
+  });
   emit({ turn: "complete", role: ROLE, evaluation_id: evaluation.result.object_id });
 }
 

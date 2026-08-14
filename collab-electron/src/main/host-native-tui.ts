@@ -141,6 +141,9 @@ export async function admitNativeTuiDefinition(opts: {
   // provider process; the normal product path never receives this flag.
   const syntheticHermes =
     adapterId === "hermes" && process.env.QF_HERMES_SYNTHETIC_TEST === "1";
+  if (syntheticHermes && process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY === "dock_admission") {
+    throw new Error("Synthetic Hermes dock admission suppressed");
+  }
   const collaborationBridge = wantsQuantFlowMcpBridges
     ? resolveCollaborationResourcePath("qf-collaboration-mcp.mjs", {
         resourcesPath: process.resourcesPath,
@@ -282,6 +285,9 @@ export async function admitNativeTuiDefinition(opts: {
               ? { QF_PROOF_NONCE: process.env.QF_PROOF_NONCE }
               : {}),
             ...(syntheticHermes ? { QF_HERMES_SYNTHETIC_TEST: "1" } : {}),
+            ...(syntheticHermes && process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY
+              ? { QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY: process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY }
+              : {}),
             QF_AGENT_SESSION_ID: sessionId,
             QF_PEER_ROLE: opts.role ?? "",
             QF_LAUNCH_READY_NONCE: readinessNonce,

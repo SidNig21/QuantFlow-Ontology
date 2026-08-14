@@ -37,7 +37,7 @@ kernel.kernelExecute("create_mission", {
   mission_id: "mission-r13", name: "Founder question",
   objective: "Did the highest guided-sample edge produce positive ROI?",
 }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
-const run = kernel.kernelRunGuidedResearch("executor");
+const run = kernel.kernelRunGuidedResearch("executor", hypothesisId, "trajectory:r13-test-worker");
 assert.equal(run?.hypothesisId, hypothesisId);
 assert.equal(run?.metrics.roi, "1.000000");
 

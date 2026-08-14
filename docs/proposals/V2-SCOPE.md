@@ -289,6 +289,64 @@ must be able to point at where it appears on screen and say what they can do
 about it. A capability that passes its gate and cannot be pointed at is not
 complete — it is deferred work wearing a green check.
 
+## 5c. Design inputs — from the research vault, not from conversation
+
+Sourced 2026-08-14 from `Projects/QuantFlow/Research/DevCon6/07 - Design Patterns
+for Human-Agent Collaboration.md` (three Palantir product designers, analysed
+2026-07-16) and `Research/scout-ontology-canvas-tools.md` (2026-07-22). These
+predate the V2 scope and were written from primary sources. Where they disagree
+with anything derived in conversation, **they win**.
+
+### The canvas bet is explored territory, and the verdict is favourable
+
+Palantir built a node-graph human-agent collaboration surface — an orchestrator
+box fanning out to five named sub-agents, each a card with its own line items —
+showed it at DevCon 6, and then **demoted it on stage**:
+
+> "Technical users love to see the granularity to see exactly where in the agent
+> chain called out to other agents. But, a little technical for maybe your common
+> analyst."
+
+They paired it against a chronological timeline as the more legible default. The
+vault's own read stands:
+
+> QuantFlow betting the *whole* surface on it, for expert single-user quant
+> workflows (not broad "common analyst" audiences), is a **legitimate contrarian
+> bet rather than an unexplored one.**
+
+This is the answer to "will the canvas actually work." It is not unmapped ground.
+It is ground Palantir mapped and declined **for an audience QuantFlow does not
+have**. QuantFlow has one operator, and that operator is an expert.
+
+### Three patterns that bind R14 to R16
+
+| Pattern | What it obliges | Rung |
+|---|---|---|
+| **Trust and Attribution** | Every output carries an explicit agent-vs-human origin marker on the tile — not a receipt buried in history. Dense chain-of-thought becomes per-actor cards. | R14 |
+| **Encourage Collaboration** | Agent status appears **inline where the work is**, not in a detached side panel. Ask for missing context rather than assuming. Partial-fill and flag uncertainty for human review. | R14, R16 |
+| **Enrich Responses** | Ontology objects, sources and sub-agent links render as **live clickable entities inside the output**, never flattened text. Chain-of-thought collapses rather than disappears. | R16 |
+
+**Pattern 2 is a direct criticism of QuantFlow's current UI.** The named mistake
+is *"human and agent workflows are separated — chat bolted on the side."* Today
+the Ask box, the Dock, the ledger and the activity feed all live in one
+right-hand panel while the canvas holds the work. That is the mistake, described
+by the designers who made it. R14 and R16 must move status onto the work.
+
+### One gap the vault names that is already closed
+
+The talk's anti-slop remedy is a `design.md` — a machine-readable spec the coding
+agent reads before generating UI. The vault marked QuantFlow's equivalent as a
+gap on 2026-07-16. It is not: `collab-electron/src/windows/shared/qf-tokens.css`
+plus the `one-skin` gate is exactly that, and it is *enforced* rather than
+advisory. It caught real drift on 2026-08-12. The vault note predates it.
+
+### Independent confirmation of the R15 rubric
+
+`scout-ontology-canvas-tools.md` reaches Ragas separately from the correlations
+table — *"scoring `Evaluation` objects and critic workflows… results write back
+as Kernel `Evaluation` records."* Two independent vault sources, same answer. The
+V2-4 choice is not a fresh decision.
+
 ## 6. Slices V2-2 to V2-6 — scoped on approval
 
 Each is written one slice ahead of the build front, as GOLDEN-RUN already

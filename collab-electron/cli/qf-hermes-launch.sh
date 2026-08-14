@@ -106,8 +106,10 @@ if [[ -z "${QF_LAUNCH_READY_NONCE:-}" ]]; then
   echo "QuantFlow launcher readiness nonce is missing." >&2
   exit 2
 fi
-printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
-  "$QF_LAUNCH_READY_NONCE" "$QF_LAUNCH_READY_NONCE"
+if [[ "${QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY:-}" != "launch_readiness" ]]; then
+  printf '\nQF_LAUNCH_READY %s\n\nQF_LAUNCH_COMMIT %s\n' \
+    "$QF_LAUNCH_READY_NONCE" "$QF_LAUNCH_READY_NONCE"
+fi
 unset QF_LAUNCH_READY_NONCE
 
 # Synthetic first-turn and packaged research-chain gates keep the production

@@ -89,20 +89,32 @@ function formatDigests(label: string, digests: HermesDigests): string {
   );
 }
 
-function launchSeat(homeGuest: string, profileRootGuest: string, seatId: string): void {
+function makeNoopHermesCommand(root: string): string {
+  const commandWin = join(root, "qf-founder-state-hermes.sh");
+  writeFileSync(
+    commandWin,
+    "#!/bin/sh\nwhile [ \"$#\" -gt 0 ]; do\n  if [ \"$1\" = \"--toolsets\" ]; then shift; [ \"$#\" -gt 0 ] && shift; else shift; fi\ndone\nexit 0\n",
+    "utf8",
+  );
+  const commandGuest = wslPath(commandWin);
+  const chmod = runWsl(["chmod", "+x", commandGuest]);
+  assert(chmod.status === 0, `could not make founder-state Hermes command executable: ${chmod.stderr.trim()}`);
+  return commandGuest;
+}
+
+function launchSeat(homeGuest: string, profileRootGuest: string, seatId: string, commandGuest: string): void {
   assert(existsSync(WRAPPER), `launch wrapper missing: ${WRAPPER}`);
   const result = runWsl([
     "env",
     `HOME=${homeGuest}`,
     `QF_AGENT_SESSION_ID=${seatId}`,
     `QF_QUANTFLOW_HERMES_PROFILE_ROOT=${profileRootGuest}`,
+    `QF_LAUNCH_READY_NONCE=founder-state-${seatId.replace(/[^a-zA-Z0-9_-]/g, "-")}`,
     "bash",
     wslPath(WRAPPER),
     "/tmp/qf-bridge-hermes-founder-state.mjs",
     "/tmp/qf-ontology-hermes-founder-state.mjs",
-    "sh",
-    "-c",
-    "exit 0",
+    commandGuest,
   ]);
   assert(
     result.status === 0,
@@ -155,10 +167,11 @@ function proveScratchLaunchUntouched(): void {
   const root = mkdtempSync(join(tmpdir(), "qf-hermes-founder-state-scratch-"));
   try {
     const { homeGuest } = prepareScratchHome(root);
+    const commandGuest = makeNoopHermesCommand(root);
     const profileRoot = wslPath(join(root, "isolated-profile"));
     const before = photograph(homeGuest);
     assert(before.config && before.auth, "scratch hermes fixtures missing");
-    launchSeat(homeGuest, profileRoot, "seat/founder-state-scratch");
+    launchSeat(homeGuest, profileRoot, "seat/founder-state-scratch", commandGuest);
     const after = photograph(homeGuest);
     assert(
       digestsEqual(before, after),
@@ -180,8 +193,9 @@ function proveRealFounderUntouched(): void {
   );
   const root = mkdtempSync(join(tmpdir(), "qf-hermes-founder-state-real-"));
   try {
+    const commandGuest = makeNoopHermesCommand(root);
     const profileRoot = wslPath(join(root, "isolated-profile"));
-    launchSeat(homeGuest, profileRoot, "seat/founder-state-real");
+    launchSeat(homeGuest, profileRoot, "seat/founder-state-real", commandGuest);
     const after = photograph(homeGuest);
     assert(
       digestsEqual(before, after),
