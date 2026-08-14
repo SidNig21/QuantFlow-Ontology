@@ -476,7 +476,7 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
 }
 
 async function packageInstalled(tempRoot: string): Promise<{ root: string; identity: Identity }> {
-  const identity = setBuildIdentity();
+  const requestedIdentity = setBuildIdentity();
   const result = await runChild(process.execPath, ["run", "package:unsigned"], COLLAB_ROOT, {
     ...process.env,
     QF_BUILD_COMMIT_SHA: identity.commitSha,
@@ -490,8 +490,11 @@ async function packageInstalled(tempRoot: string): Promise<{ root: string; ident
   const installer = readdirSync(dist).map((name) => join(dist, name)).find((path) => path.endsWith(installerName));
   assert(installer && existsSync(installer), `NSIS installer missing: ${installerName}`);
   const status = JSON.parse(readFileSync(join(dist, "RELEASE-STATUS.json"), "utf8")) as Record<string, unknown>;
-  assert((status.build as Record<string, unknown>)?.commit_sha === identity.commitSha, "RELEASE-STATUS candidate SHA drifted");
-  assert((status.build as Record<string, unknown>)?.packaged_at === identity.packagedAt, "RELEASE-STATUS package time drifted");
+  const releaseBuild = status.build as Record<string, unknown>;
+  assert(releaseBuild?.commit_sha === requestedIdentity.commitSha, "RELEASE-STATUS candidate SHA drifted");
+  const packagedAt = String(releaseBuild?.packaged_at ?? "");
+  assert(new Date(packagedAt).toISOString() === packagedAt, "RELEASE-STATUS package time is not canonical ISO UTC");
+  const identity: Identity = { commitSha: requestedIdentity.commitSha, packagedAt };
   const installRoot = join(tempRoot, "installed");
   mkdirSync(installRoot, { recursive: true });
   const installed = await runChild(installer, ["/S", `/D=${installRoot}`], tempRoot, { ...process.env, TEMP: join(tempRoot, "temp"), TMP: join(tempRoot, "temp") }, 2 * 60 * 1000);
