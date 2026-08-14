@@ -1,441 +1,353 @@
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+acceptance_candidate_sha: c93b04f1d6a448cee299b2a79a6c21204fdc8502
 # WO-V2-1 verification
-## HISTORY ONLY Ã¢â‚¬â€ NOT ACCEPTANCE EVIDENCE
 
-Historical product commit (initial builder round):
-`6d4c3558d188641bdb6268fc043e559bb2497e52`
+## HISTORY ONLY — NOT ACCEPTANCE EVIDENCE
 
-Rework product commit (fresh detached acceptance candidate):
-`fe756d68db9d66d135de3cf33cf2ad6b3a79c3e3`
+This section preserves the failed independent verifier round that preceded the product rework. It is not a green claim.
 
-Final evidence commit: this evidence-only commit; the exact final SHA is the
-evidence HEAD reported in the handoff below.
+Historical product/evidence commits: `6d4c3558d188641bdb6268fc043e559bb2497e52`, `fe756d68db9d66d135de3cf33cf2ad6b3a79c3e3`, and `9a08f3d18c66c25e47fcd1dc493655e7b3a05120`. These remain history only.
 
-Environment: native Windows 11 `10.0.26200`, x64, Bun `1.3.12`, Electron
-`40.6.0`, electron-builder `26.8.1`. The package gates below were run from the
-clean commit; generated receipts were restored after test runs.
+### REWORK ROUND 1 AFTER REWRITE — failed verifier receipt preserved
 
-## `bun qa/run.ts kernel` - shared install red/green
+Verifier candidate: `9a08f3d18c66c25e47fcd1dc493655e7b3a05120`.
+Verifier worktree: `C:\tmp\qf-v21-verifier-independent-20260813-9a08`.
+Raw verifier logs: `C:\Users\rybow\qf-v21-verifier-logs-20260813-9a08`.
 
-Red mutation: removed only `"--linker", "isolated"` from
-`qa/package-install.ts`; used a new temporary `BUN_INSTALL_CACHE_DIR`.
+The verifier's command 14 exited `1` at `release:windows-cold-boot`; its direct receipt reported 50 unrelated Brave/Claude/extension-host/cmd/conhost processes as app-owned.
 
-Red command: `bun qa/run.ts kernel`; exit `1`.
+#### Failed command 14 stdout
+````text
+release: runId=d5a9e2d3-73bd-4354-a8e4-732aaf640539
 
-```text
-kernel: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology-act1-golden\packages\qf-kernel\node_modules\qf-kernel-schema
+== release:install (collab-electron) :: bun install --frozen-lockfile ==
 bun install v1.3.12 (700fc117)
-EPERM: failed copying files from cache to destination for package qf-kernel-schema
-3 packages installed [1069.00ms]
-Failed to install 1 package
-kernel: bun install --frozen-lockfile --backend copyfile exited 1; the original Bun install error above is authoritative (no retry was attempted)
-FAIL  kernel
-```
+Patched winpty.gyp
+Patched binding.gyp
+Patched conpty_console_list_agent.ts
+Patched conpty_console_list_agent.js
 
-Restored exact helper command: `bun install --frozen-lockfile --backend
-copyfile --linker isolated`.
++ qf-bovada-football@../tools/qf-bovada-football
++ qf-kernel@../packages/qf-kernel
++ qf-kernel-schema@../qf-kernel-schema
 
-Green rerun: `bun qa/run.ts kernel`; exit `0`; `86 pass`, `0 fail`, `312
-expect() calls`, `PASS  kernel`.
+6 packages installed [43.37s]
 
-## `bun test qa/package-install.test.ts`
-
-Command and exit: `bun test qa/package-install.test.ts` -> `0`.
-
-```text
+== release:unit (.) :: bun qa/windows-unit.ts ==
 bun test v1.3.12 (700fc117)
-qa\package-install.test.ts:
-(pass) shared frozen package install > keeps the Windows copyfile and isolated linker contract explicit
-permanent-copy-failure: bun install --frozen-lockfile --backend copyfile --linker isolated exited 1; the original Bun install error above is authoritative (no retry was attempted)
-(pass) shared frozen package install > permanent copy failures remain red
-(pass) shared frozen package install > preserves qf-kernel-schema ignore rules at the repository root [625.00ms]
-3 pass
-0 fail
-20 expect() calls
-Ran 3 tests across 1 file. [699.00ms]
-```
+windows-unit: PASS
 
-## Initial builder round: `bun qa/run.ts typecheck` (historical)
+== release:windows-cold-boot (.) :: bun qa/run.ts windows-cold-boot ==
+windows-cold-boot: preparing runtime staging
+bun install v1.3.12 (700fc117)
 
-Command and exit: `bun qa/run.ts typecheck` -> `0`; output: `PASS  typecheck`.
+Saved bun.lock (382 packages) [657.00ms]
+bun install v1.3.12 (700fc117)
 
-## `bun qa/run.ts kernel-sole-writer-app` - relocation red/green
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@0.18.2
++ @rivet-dev/agentos-core@0.2.7
 
-Red mutation: placed a bait file in `collab-electron/src/main/` containing
-`kernel.db`. Command exit: `1`.
+349 packages installed [18.02s]
+bun install v1.3.12 (700fc117)
 
-```text
-kernel-sole-writer-app FAIL - offenders:
-  collab-electron/src/main/r13-consumer-workflow.check.ts (kernel-db-filename)
-FAIL  kernel-sole-writer-app
-```
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos@0.2.7
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ zod@4.4.3
 
-Restoration: removed the bait; the diagnostic remains at
-`collab-electron/qa/r13-consumer-workflow.check.ts`. Green rerun exit: `0`.
+408 packages installed [21.14s]
+pack-agent: ready qf-proof-agent
+Bundled 119 modules in 323ms
 
-```text
-kernel-sole-writer-app OK
-PASS  kernel-sole-writer-app
-```
+  acp-main.js  1.26 MB  (entry point)
 
-## `bun qa/run.ts dock-production-inventory` - inventory red/green
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-jox0OE\repo\tools\runtime-proof\packed\qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-jox0OE\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-jox0OE\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+Bundled 1 module in 19ms
 
-Red mutation: restored unchanged `claude-code-ungranted` to the production
-Claude manifest. Command exit: `1`.
+  acp-shim.js  2.15 KB  (entry point)
 
-```text
-dock-production-inventory: duplicate Dock profile id across manifests: claude-code-ungranted
-FAIL  dock-production-inventory
-```
+packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-jox0OE\repo\species\hermes\packed\hermes.tar
+  commands: hermes-acp-shim
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-jox0OE\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-jox0OE\repo\species\hermes\packed\hermes.aospkg
+pack-agent: ready claude-code
+windows-cold-boot: building Electron bundle
+windows-cold-boot: creating unpacked Windows package
+windows-cold-boot: canvas/Dock ready; profiles=["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"] owned-processes=50
+windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-nJ2ahj/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-nJ2ahj\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-nJ2ahj\\stores\\artifacts"}
+FAIL  windows-cold-boot
 
-Restoration: removed the fixture from `species/claude-code/dock-profiles.json`,
-retained it in `species/claude-code/qa-dock-profiles.json`, and registered that
-manifest only in `QA_DOCK_PROFILE_MANIFESTS`. Green exit: `0`.
 
-```text
-dock-production-inventory: production=[{"manifest":"species/hermes/dock-profiles.json","id":"hermes-orchestrator","role":"orchestrator"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-worker","role":"worker"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-worker-2","role":"worker2"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-critic","role":"critic"},{"manifest":"species/claude-code/dock-profiles.json","id":"claude-code-orchestrator","role":"claude-orchestrator"},{"manifest":"species/claude-code/dock-profiles.json","id":"claude-code-worker","role":"claude-worker"}] qaContainsClaudeCodeUngranted=true
-PASS  dock-production-inventory
-```
+````
 
-## `bun qa/run.ts hermes-launch-policy` - fallback red/green
+#### Failed command 14 stderr
+````text
+bun.exe : 
+At line:2 char:133
++ ... g '14-stderr.txt'; & bun qa/verify-release.ts 1> $out 2> $err; $exit= ...
++                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+$ node scripts/postinstall.mjs
+Searching dependency tree
+Building modules: node-pty
+✔ Rebuild Complete
 
-Red mutation: removed only fallback `--toolsets "$quantflow_toolsets"`.
-Command exit: `1`.
+qa\verify-release.test.ts:
+(pass) verify-release stages > requires the native Windows install, unit, package, and static-gate order
+(pass) verify-release stages > deleting Windows cold boot is detectable
+(pass) verify-release stages > keeps Linux as an explicit compatibility route
+(pass) verify-release stages > fails the canonical door closed off Windows
 
-```text
-hermes-launch-policy: mission argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: critic-task argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: worker-task argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: fallback: expected one --toolsets mcp-quantflow-collaboration,mcp-quantflow-ontology, argv=["--tui"]
-FAIL  hermes-launch-policy
-```
+collab-electron\scripts\package-lib\extra-resources.test.ts:
+(pass) extra-resources parsing > rejects non-array extraResources
+(pass) extra-resources parsing > rejects linux extraResources non-array
+(pass) extra-resources parsing > rejects empty from/to and extra keys
+(pass) extra-resources parsing > rejects macros in from and to
+(pass) extra-resources parsing > merges top-level and linux file sets
+(pass) extra-resources parsing > Windows packaging declares collaboration and ontology bridge resources
 
-Restoration: restored fallback allowlist. Green command exit: `0`.
+collab-electron\scripts\package-lib\package-cleanup.test.ts:
+(pass) package verification cleanup > preserves sibling distribution artifacts [16.00ms]
 
-```text
-hermes-launch-policy: mission argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: critic-task argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: worker-task argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: fallback argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
-hermes-launch-policy: PASS
-PASS  hermes-launch-policy
-```
+collab-electron\scripts\package-lib\package-receipt.test.ts:
+(pass) package receipt log path binding > accepts the canonical package verification log [16.00ms]
+(pass) package receipt log path binding > rejects a prefix-sibling root
+(pass) package receipt log path binding > rejects an alternative log inside the collab root [16.00ms]
 
-## `bun qa/run.ts one-skin` - palette red/green
+collab-electron\scripts\package-lib\shared-paths.test.ts:
+(pass) shared production path rules > changing shared input moves both production and inspection consumers [16.00ms]
+(pass) static shared-module dependency > gate and production import package-resource-paths
 
-Red mutation: added `#123456` to non-exempt `shell.css`; command exit: `1`.
+collab-electron\scripts\package-lib\unit-wiring.test.ts:
+(pass) package-closure unit wiring > test-unit.sh executes root qa package-closure tests [16.00ms]
+(pass) package-closure unit wiring > rejects restored cold-import.test.ts path
+(pass) package-closure unit wiring > falsify removing root qa invocation from in-memory script copy
 
-```text
-one-skin FAIL - raw palette/font outside qf-tokens.css:
-  collab-electron/src/windows/shell/src/shell.css (hex x1: #123456)
-totals: hex=1 func-color=0 raw-font-family=0
-FAIL  one-skin
-```
+collab-electron\src\main\app-root.test.ts:
+(pass) selectAppRoot > development uses repository root
+(pass) selectAppRoot > packaged uses resourcesPath
+(pass) selectAppRoot > packaged without resourcesPath fails closed
 
-Restoration: removed bait. Green exit: `0`.
+collab-electron\src\main\cwd-fallback.test.ts:
+(pass) nearestExistingDir > returns the directory itself when it exists
+(pass) nearestExistingDir > returns the nearest existing ancestor when the leaf is missing
+(pass) nearestExistingDir > walks up multiple missing levels
+(pass) nearestExistingDir > returns the parent directory when the path is a file
+(pass) nearestExistingDir > prefers an existing ancestor over the provided fallback
+(pass) nearestExistingDir > defaults the fallback to the home directory
 
-```text
-one-skin OK
-totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
-PASS  one-skin
-```
+collab-electron\src\main\dock-profiles.test.ts:
+(pass) Dock profile manifests > production discovery succeeds without proof packages [16.00ms]
+(pass) Dock profile manifests > QA discovery explicitly includes proof fixtures [31.00ms]
+(pass) Dock profile manifests > QA discovery still fails when a required fixture package is missing [16.00ms]
+(pass) Dock profile manifests > projects only exact missing Hermes Dock state as an adapter diagnostic [15.00ms]
+(pass) Dock profile manifests > registers once, skips identical rows, and preserves conflicts [16.00ms]
+(pass) Dock profile manifests > validates every manifest before making a Kernel call [16.00ms]
+(pass) Dock profile manifests > propagates Kernel registration failures [15.00ms]
+(pass) Dock profile manifests > rejects traversal and duplicate ids [31.00ms]
 
-## `bun run package:unsigned`
+collab-electron\src\main\logger-policy.test.ts:
+(pass) packaged logger transport policy > disables only console logging for packaged Windows
+(pass) packaged logger transport policy > does not swallow non-EPIPE stream failures
+(pass) packaged logger transport policy > keeps console logging for development and non-Windows
 
-From `collab-electron`, command `bun run package:unsigned`; exit `0`; elapsed
-`208.2 seconds`. Complete unedited 300-line transcript:
-`C:\tmp\qf-package-unsigned-transcript.txt`.
+collab-electron\src\main\native-tui-orchestration.test.ts:
+(pass) orchestrateNativeTuiAdmission > create failure leaves no process-local or Kernel compensation residue
+(pass) orchestrateNativeTuiAdmission > start failure records fail and close, cleans maps, then permits same role
+(pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds
+(pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start
+(pass) orchestrateNativeTuiAdmission > duplicate-role preflight revokes a minted capability without starting a process
+(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before 
+running
+(pass) orchestrateNativeTuiAdmission > failed admission revokes its in-memory seat capability during owned cleanup
+(pass) orchestrateNativeTuiAdmission > readiness rejection writes no start and cleans every owned runtime seam
 
-Terminal result:
+collab-electron\src\main\peer-role-registry.test.ts:
+(pass) PeerRoleRegistry > rejects duplicate live roles without rerouting
+(pass) PeerRoleRegistry > unregister is owner-specific
 
-```text
-electron-builder version=26.8.1 os=10.0.26200
-packaging platform=win32 arch=x64 electron=40.6.0
-building target=nsis file=dist\QuantFlow Setup 0.8.4.exe archs=x64 oneClick=false perMachine=false
-Windows signing state: NotSigned Ã‚Â· C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\win-unpacked\QuantFlow.exe
-Windows signing state: NotSigned Ã‚Â· C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\QuantFlow Setup 0.8.4.exe
-Desktop shortcut -> C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\win-unpacked\QuantFlow.exe
-```
+collab-electron\src\main\runtime-adapter.test.ts:
+(pass) runtime adapter metadata > expands one complete runtime-profile token and keeps null on base argv
+(pass) runtime adapter metadata > rejects missing, repeated, partial, and unknown placeholders
+(pass) runtime adapter metadata > rejects unknown keys and duplicate peer selectors
+(pass) runtime adapter metadata > uses base argv for a real default-only profile
+(pass) runtime adapter metadata > resolves sibling metadata and binds it to the package filename
 
-## `bun qa/run.ts windows-installer` - copied-SHA red/green
+ 54 pass
+ 0 fail
+ 143 expect() calls
+Ran 54 tests across 13 files. [374.00ms]
+Resolving dependencies
+Resolved, downloaded and extracted [224]
+Saved lockfile
+$ node ./scripts/pack-agent.mjs
+(node:22660) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+$ node ./scripts/pack-agent.mjs
+(node:28856) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+windows-cold-boot: FAIL app-owned Windows processes remained after shutdown: brave.exe:12740, brave.exe:20012, 
+brave.exe:21844, brave.exe:19052, brave.exe:5244, brave.exe:5472, brave.exe:7132, brave.exe:3612, brave.exe:20468, 
+brave.exe:3532, cmd.exe:14652, conhost.exe:3628, cmd.exe:3700, extension-host.exe:16512, conhost.exe:21976, 
+brave.exe:8440, claude.exe:9012, brave.exe:16056, brave.exe:6700, brave.exe:14712, brave.exe:14272, brave.exe:508, 
+brave.exe:15952, brave.exe:8604, brave.exe:6664, brave.exe:20228, brave.exe:15272, brave.exe:14812, brave.exe:10380, 
+brave.exe:19112, brave.exe:3152, brave.exe:22280, brave.exe:3840, brave.exe:17884, brave.exe:23136, brave.exe:23220, 
+brave.exe:23332, brave.exe:23388, brave.exe:23512, brave.exe:23212
+packaged app log: C:\Users\rybow\AppData\Local\Temp\qf-windows-cold-boot-nJ2ahj\packaged-app.log
+shutdown requested: true
+release:windows-cold-boot: failed with exit 1
 
-Red mutation: after the package wrote `RELEASE-STATUS.json`, changed only
-`build.commit_sha` to forty zeroes. Exit `1`.
 
-```text
-windows-installer: packaging with a 10-minute deadline
-windows-installer: release status SHA 0000000000000000000000000000000000000000 does not equal checkout HEAD
-```
+````
 
-Restoration: reran the unmodified gate; it rebuilt the valid artifact.
+The verifier's command 16 reached readiness but had no direct process exit, shutdown result, or PASS/FAIL verdict. Its exit receipt is **MISSING — not 0**.
 
-## Initial builder round: `bun qa/run.ts windows-installer` - installed-artifact green (historical)
+#### Failed command 16 stdout
+````text
+windows-cold-boot: preparing runtime staging
+bun install v1.3.12 (700fc117)
 
-Command: `bun qa/run.ts windows-installer`; exit `0`; elapsed `245.1 seconds`.
+Saved bun.lock (382 packages) [712.00ms]
+bun install v1.3.12 (700fc117)
 
-```text
-windows-installer: packaging with a 10-minute deadline
-windows-installer: installer=C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\QuantFlow Setup 0.8.4.exe
-windows-installer: Authenticode=NotSigned
-windows-installer: RELEASE-STATUS=C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\RELEASE-STATUS.json
-windows-installer: installed-executable=C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-gyIEsR\installed\QuantFlow.exe
-windows-installer: installed executable=C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-gyIEsR\installed\QuantFlow.exe
-windows-installer: build-identity={"commitSha":"6d4c3558d188641bdb6268fc043e559bb2497e52","packagedAt":"2026-08-13T15:51:01.796Z","displayed":{"commitSha":"6d4c3558d188641bdb6268fc043e559bb2497e52","packagedAt":"2026-08-13T15:51:01.796Z"}}
-windows-installer: production-profiles=[{"id":"hermes-orchestrator","role":"orchestrator"},{"id":"hermes-worker","role":"worker"},{"id":"hermes-worker-2","role":"worker2"},{"id":"hermes-critic","role":"critic"},{"id":"claude-code-orchestrator","role":"claude-orchestrator"},{"id":"claude-code-worker","role":"claude-worker"}]
-windows-installer: install-owned processes=0
-windows-installer: PASS
-PASS  windows-installer
-```
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ @agentclientprotocol/sdk@0.18.2
++ @rivet-dev/agentos-core@0.2.7
 
-Final release metadata: installer
-`C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\QuantFlow Setup 0.8.4.exe`; Authenticode `NotSigned`; commit
-`6d4c3558d188641bdb6268fc043e559bb2497e52`; packaged time
-`2026-08-13T15:51:01.796Z`.
+349 packages installed [18.37s]
+bun install v1.3.12 (700fc117)
 
-## Initial builder round: remaining acceptance commands (historical)
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos@0.2.7
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ zod@4.4.3
 
-Green: `kernel-sole-writer-app`, `kernel`, `typecheck`, `dock-profile-identity`,
-`dock-production-inventory`, `kernel-one-path`, `hermes-launch-policy`,
-`one-skin`, `rung-ladder`, `repo-shape`, `doc-links`, `git diff --check`, and
-`git diff --check origin/wo-r9-research-integrity...HEAD`.
+408 packages installed [22.09s]
+pack-agent: ready qf-proof-agent
+Bundled 119 modules in 388ms
 
-`dock-profile-identity` ended with distinct profile/session identities and
-before/after row counts definitions `2`, sessions `2`, links `15`, events `3`.
-`bun qa/run.ts release-verifier` exited `0` with `PASS  release-verifier`.
+  acp-main.js  1.26 MB  (entry point)
 
-The canonical `bun qa/verify-release.ts` passed install, unit, Windows cold
-boot, and static gates through `one-skin`, then stopped at this unrelated
-pre-existing red gate:
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-2atutw\repo\tools\runtime-proof\packed\qf-toolloop.tar
+  commands: qf-toolloop-acp
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-2atutw\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-2atutw\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+Bundled 1 module in 18ms
 
-```text
-glacier-feel FAIL:
-  - D4: kernel-ledger.js must project via projectKernelLedger
-release:glacier-feel: failed with exit 1
-```
+  acp-shim.js  2.15 KB  (entry point)
 
-Standalone `windows-cold-boot` reached `PASS windows-cold-boot`, proving canvas
-readiness, isolated Kernel/artifact stores, unchanged default user state, and
-clean shutdown. Its PowerShell wrapper reported nonzero only after the pass
-line because delayed dependency-tool stderr arrived after completion; the
-canonical release door accepted the stage.
-
-The separately required `windows-dock-collaboration` run remains red with the
-unrelated harness error:
-
-```text
-windows-dock-collaboration: FAIL unable to open database file
-FAIL  windows-dock-collaboration
-```
-
-No gate, assertion, or production boundary was weakened to bypass either red.
-
-## REWORK ROUND 1 Ã¢â‚¬â€ preserved failed attempt
-
-This section preserves the failed rework evidence; it is not overwritten by
-the final run below.
-
-Defect 1, fresh typecheck red (`C:\tmp\qf-r1-probe-typecheck.txt`):
-
-```text
-../../../collab-electron/scripts/package-lib/package-inspect.ts(24,8): error TS2307: Cannot find module '@electron/asar' or its corresponding type declarations.
-../../../collab-electron/scripts/package-lib/package-inspect.ts(25,35): error TS2307: Cannot find module 'qf-kernel/portable' or its corresponding type declarations.
-../../../collab-electron/scripts/package-lib/package-inspect.ts(624,11): error TS7006: Parameter 'entry' implicitly has an 'any' type.
-../../../collab-electron/src/main/file-filter.ts(1,37): error TS2307: Cannot find module 'ignore' or its corresponding type declarations.
-typecheck: bunx tsc --noEmit in C:\tmp\qf-r1-probe\qa\gates\bovada-football exited 2
-FAIL  typecheck
-```
-
-Defect 2, canonical release red: `glacier-feel` rejected
-`collab-electron/src/windows/shell/src/kernel-ledger.js` because it did not
-project via `projectKernelLedger`.
-
-Defect 3, first packaged collaboration red:
-
-```text
-windows-dock-collaboration: FAIL unable to open database file
-FAIL  windows-dock-collaboration
-```
-
-Defect 4, the earlier ordered run poisoned the next gate with the tracked cold
-boot receipt and gate-local `node_modules` output. This is preserved as the
-defect record; the final cold-boot receipt and installer transcripts below are
-the replacement evidence.
-
-Defect 5, the prior evidence named the initial product commit while claiming
-fresh typecheck/installer results. The historical sections above remain
-unchanged for auditability; the final sections below name the rework product
-commit and distinguish the final evidence HEAD.
-
-## REWORK ROUND 1 Ã¢â‚¬â€ final fresh detached acceptance
-
-Fresh detached worktree: `C:\tmp\qf-V2-1-final2` at product commit
-`fe756d68db9d66d135de3cf33cf2ad6b3a79c3e3`.
-
-No manual cleanup occurred between commands. Raw per-command transcripts:
-`C:\tmp\qf-r1-final-fe756d6-logs\`.
-
-Unedited exit summary:
-
-```text
-01-kernel-sole-writer-app EXIT 0
-02-kernel EXIT 0
-03-typecheck EXIT 0
-04-dock-profile-identity EXIT 0
-05-dock-production-inventory EXIT 0
-06-kernel-one-path EXIT 0
-07-hermes-launch-policy EXIT 0
-08-one-skin EXIT 0
-09-rung-ladder EXIT 0
-10-repo-shape EXIT 0
-11-doc-links EXIT 0
-12-diff-check EXIT 0
-13-verify-release EXIT 1
-14-windows-cold-boot EXIT 0
-15-windows-dock-collaboration EXIT 0
-16-windows-installer EXIT 0
-17-release-range-diff-check EXIT 0
-18-final-diff-check EXIT 0
-```
-
-Fresh typecheck transcript (`03-typecheck.txt`) ended with:
-
-```text
-typecheck: cleared stale local file dependency C:\tmp\qf-V2-1-final2\packages\qf-kernel\node_modules\qf-kernel-schema
-PASS  typecheck
-```
-
-Fresh cold-boot transcript (`14-windows-cold-boot.txt`):
-
-```text
+packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-2atutw\repo\species\hermes\packed\hermes.tar
+  commands: hermes-acp-shim
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-2atutw\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-2atutw\repo\species\hermes\packed\hermes.aospkg
+pack-agent: ready claude-code
+windows-cold-boot: building Electron bundle
+windows-cold-boot: creating unpacked Windows package
 windows-cold-boot: canvas/Dock ready; profiles=["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"] owned-processes=10
-windows-cold-boot: isolated kernel=true artifact-root=true default-user-state-unchanged=true
-windows-cold-boot: clean shutdown requested and all app-owned processes exited
-windows-cold-boot: PASS
-PASS  windows-cold-boot
-```
+windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-JxisC0/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-JxisC0\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-JxisC0\\stores\\artifacts"}
 
-Fresh collaboration transcript (`15-windows-dock-collaboration.txt`):
-
-```text
-windows-dock-collaboration: FALSIFY RED delivery blocked
-windows-dock-collaboration: FALSIFY GREEN delivery restored
-windows-dock-collaboration: PASS
-PASS  windows-dock-collaboration
-```
-
-Fresh installer transcript (`16-windows-installer.txt`):
-
-```text
-windows-installer: Authenticode=NotSigned
-windows-installer: build-identity={"commitSha":"fe756d68db9d66d135de3cf33cf2ad6b3a79c3e3","packagedAt":"2026-08-13T18:07:47.896Z","displayed":{"commitSha":"fe756d68db9d66d135de3cf33cf2ad6b3a79c3e3","packagedAt":"2026-08-13T18:07:47.896Z"}}
-windows-installer: install-owned processes=0
-windows-installer: PASS
-PASS  windows-installer
-```
-
-The one unresolved red is unedited in `13-verify-release.txt`:
-
-```text
-== release:kernel-market-lineage (.) :: bun qa/run.ts kernel-market-lineage ==
-kernel-market-lineage: FAIL publish_artifact report requires evaluation_id
-FAIL  kernel-market-lineage
-release:kernel-market-lineage: failed with exit 1
-```
-
-This unrelated red remains reported; no gate was weakened. Final detached
-status after command 18 was clean:
-
-```text
-## HEAD (no branch)
-```
-
-## Founder acceptance steps
-
-1. Install `C:\Users\rybow\QuantFlow-Ontology-act1-golden\collab-electron\dist\QuantFlow Setup 0.8.4.exe` on a clean Windows account.
-2. Open the installed desktop shortcut, which packaging refreshed to the
-   packaged `win-unpacked\QuantFlow.exe`.
-3. Confirm masthead commit
-   `6d4c3558d188641bdb6268fc043e559bb2497e52` and UTC package time
-   `2026-08-13T15:51:01.796Z`.
-4. Confirm Dock contains `hermes-critic` and no id or role containing
-   `ungranted`.
-5. Spawn `hermes-critic` directly from the ordinary Dock with no mission/task;
-   confirm the native TUI reports `5 tools Ã‚Â· 0 skills`, then close QuantFlow.
-6. Confirm the installed-artifact verifier reports zero install-owned
-   processes. Steps 1-6 remain founder-facing manual confirmation; the
-   automated gate proved silent installation, readiness, identity, inventory,
-   clean shutdown, and zero remaining install-owned processes.
-
-## FINAL ACCEPTANCE Ã¢â‚¬â€ one candidate
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-
-Environment: native Windows 11 10.0.26200, x64, Bun 1.3.12, Electron 40.6.0, electron-builder 26.8.1.
-Detached worktree: C:\tmp\qf-v21-accept-9a08f3d18c66
-Raw transcript directory (unedited command output): C:\tmp\qf-v21-accept-9a08f3d18c66-logs
-
-The candidate identity and final status were captured before the first acceptance command:
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-## HEAD (no branch)
-````
-
-Exit ledger:
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-01-kernel-sole-writer-app EXIT 0
-02-kernel EXIT 0
-03-typecheck EXIT 0
-04-kernel-market-lineage EXIT 0
-05-dock-profile-identity EXIT 0
-06-dock-production-inventory EXIT 0
-07-kernel-one-path EXIT 0
-08-hermes-launch-policy EXIT 0
-09-one-skin EXIT 0
-10-rung-ladder EXIT 0
-11-repo-shape EXIT 0
-12-doc-links EXIT 0
-13-diff-check EXIT 0
-14-verify-release EXIT 0
-15-kernel-market-lineage EXIT 0
-16-windows-cold-boot EXIT 0
-17-windows-dock-collaboration EXIT 0
-18-windows-installer EXIT 0
-19-release-range-diff-check EXIT 0
-20-final-diff-check EXIT 0
 
 ````
 
-### 01 Ã¢â‚¬â€ kernel-sole-writer-app
+#### Failed command 16 stderr
+````text
+bun.exe : Resolving dependencies
+At line:2 char:133
++ ... tderr.txt'; & bun qa/run.ts windows-cold-boot 1> $out 2> $err; $exit= ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Resolved, downloaded and extracted [231]
+Saved lockfile
+$ node ./scripts/pack-agent.mjs
+(node:29404) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+$ node ./scripts/pack-agent.mjs
+(node:21376) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
+vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts kernel-sole-writer-app
-exit_code: 0
-red mutation / restoration: Move the diagnostic back into collab-electron/src/main; restore it under collab-electron/qa and rerun.
-
-Complete transcript (candidate identity line followed by the preserved raw command output):
 
 ````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+
+The prior evidence ledger's green claims for commands 14 and 16 are superseded by these raw receipts and are not acceptance evidence.
+
+## FINAL ACCEPTANCE RUN — exact candidate and exact ordered run
+
+Environment: native Windows 11 `10.0.26200`, x64, Bun `1.3.12`, Electron `40.6.0`, electron-builder `26.8.1`.
+Detached worktree: `C:\tmp\qf-v21-accept-c93b04f`, clean detached HEAD.
+Invocation mode: direct native `&` calls, no `Start-Process` wrappers, one process exit captured after each command.
+Raw transcript directory: `C:\Users\rybow\qf-v21-final-c93b04f-logs`.
+The top-level candidate header is the sole `acceptance_candidate_sha` record. The final evidence commit is separate and is never treated as the product candidate.
+
+### Direct exit ledger
+````text
+candidate=c93b04f1d6a448cee299b2a79a6c21204fdc8502
+worktree=C:\tmp\qf-v21-accept-c93b04f
+mode=direct-native-invocation-no-Start-Process
+01 kernel-sole-writer-app EXIT 0
+02 kernel EXIT 0
+03 typecheck EXIT 0
+04 kernel-market-lineage EXIT 0
+05 dock-profile-identity EXIT 0
+06 dock-production-inventory EXIT 0
+07 kernel-one-path EXIT 0
+08 hermes-launch-policy EXIT 0
+09 one-skin EXIT 0
+10 rung-ladder EXIT 0
+11 repo-shape EXIT 0
+12 doc-links EXIT 0
+13 diff-check EXIT 0
+14 verify-release EXIT 0
+15 kernel-market-lineage-rerun EXIT 0
+16 windows-cold-boot EXIT 0
+17 windows-dock-collaboration EXIT 0
+18 windows-installer EXIT 0
+19 release-range-diff-check EXIT 0
+20 final-diff-check EXIT 0
+````
+
+### 01 — kernel-sole-writer-app
+
+command: `bun qa/run.ts kernel-sole-writer-app`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\01-kernel-sole-writer-app.log`
+
+Complete unedited transcript:
+````text
 kernel-sole-writer-app OK
 PASS  kernel-sole-writer-app
 
-````
-
-### 02 Ã¢â‚¬â€ kernel
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts kernel
-exit_code: 0
-red mutation / restoration: Remove --linker isolated from the shared frozen install; restore the exact copyfile/isolated args and rerun.
-
-Complete transcript (candidate identity line followed by the preserved raw command output):
 
 ````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+
+### 02 — kernel
+
+command: `bun qa/run.ts kernel`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\02-kernel.log`
+
+Complete unedited transcript:
+````text
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
@@ -443,67 +355,248 @@ bun install v1.3.12 (700fc117)
 + qf-kernel-schema@../../qf-kernel-schema
 + zod@4.4.3
 
-14 packages installed [581.00ms]
+14 packages installed [588.00ms]
 bun test v1.3.12 (700fc117)
-bun.exe :
-At line:2 char:48
-+ ... qf-v21-accept-9a08f3d18c66-logs'; & bun qa/run.ts kernel 2>&1 | Tee-O ...
-+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bun.exe : 
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 src\attach-kernel-drift.test.ts:
-(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable Ã¢â€ â€™
-KernelIncompleteInitializationError [15.00ms]
-(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly Ã¢â€ â€™ warn + getKernelDrift, no
-artifact table [16.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta writable → 
+KernelIncompleteInitializationError [16.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > canary-only schema_meta readonly → warn + getKernelDrift, no 
+artifact table [15.00ms]
 kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 (pass) attachKernel WO-K3 drift / incomplete init > clean :memory: writable publish succeeds [16.00ms]
-(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture writable Ã¢â€ â€™ KernelRegistryDriftError [31.00ms]
-(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture readonly Ã¢â€ â€™ warn + getKernelDrift [16.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture writable → KernelRegistryDriftError [31.00ms]
+(pass) attachKernel WO-K3 drift / incomplete init > prior-schema fixture readonly → warn + getKernelDrift [16.00ms]
 
 src\busy-timeout.test.ts:
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-qnbiTp\kernel.db provenance=explicit journal=wal sync=1
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-T6aYCs\kernel.db provenance=explicit journal=wal sync=1 
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
-(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [641.00ms]
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-v1Pvuz\kernel.db provenance=explicit journal=wal sync=1
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [656.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-zEOPL8\kernel.db provenance=explicit journal=wal sync=1 
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
-G2 c…10061 tokens truncated…DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
-vulnerabilities, as the arguments are not escaped, only concatenated.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\species\hermes\packed\hermes.aospkg
-pack-agent: ready claude-code
-windows-cold-boot: building Electron bundle
-windows-cold-boot: creating unpacked Windows package
-windows-cold-boot: canvas/Dock ready; profiles=["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"] owned-processes=10
-windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-uyqmtV/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uyqmtV\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uyqmtV\\stores\\artifacts"}
-windows-cold-boot: isolated kernel=true artifact-root=true default-user-state-unchanged=true
-windows-cold-boot: clean shutdown requested and all app-owned processes exited
-windows-cold-boot: PASS
-PASS  windows-cold-boot
+G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
+
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [594.00ms]
+
+src\connection-actions.test.ts:
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-fjXU7g\conn.db provenance=explicit journal=wal sync=1 
+QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g5a-conn-fjXU7g\conn.db provenance=explicit journal=wal sync=1 
+QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+(pass) WO-g5a connection write path > create + delete persist through reopen; rejects self-loop and duplicate [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+(pass) WO-g5a connection write path > delete unknown id refuses
+
+src\connection-readback.test.ts:
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-conn-readback-Tpauyo\k.db provenance=explicit journal=wal sync=1 
+QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+(pass) connection create read-back > queryObjects({ id }) throws; getObject returns the row [31.00ms]
+
+src\kernel.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > applies generated migration (run + agent_session + events exist)
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > execute start_run; illegal retry writes nothing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+illegal_transitions_rejected=7
+(pass) qf-kernel > counts illegal transition rejections under test [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > command without trace context is rejected
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > create_agent_session requires agent_definition_id and links spawned_from
+replay_assertion=equal live.status=failed rebuilt.status=failed
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > replay rebuilds run status from events and equals live table [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > events carry trace_id from ctx
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > publish_artifact creates content-addressed row via event log
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > publish_artifact rejects hash mismatch and writes nothing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+artifact_row_count_after_double_publish=1
+artifact_event_count_after_double_publish=1
+(pass) qf-kernel > publish_artifact identical bytes twice is idempotent (one row, no second event)
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+artifact_replay_assertion=equal id=229eb2b779d77cfcd8460c1c04c8641f6c43ae35f14a121be52fafadff29de0e kind=result_set
+(pass) qf-kernel > replay rebuilds artifact from events and equals live table [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > publish_artifact requires trace context
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > D1 · republish same bytes with different metadata rejects
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > D2 · replay fails when event content_hash disagrees with identity
+(pass) qf-kernel > D3 · every creationCommands entry has a handler
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > register_agent_definition inserts row with id=name [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > register_agent_definition rejects duplicate name
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > market_event start_event transition end to end (WO-103 D0)
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+G2_objects=[{"t":"artifact","id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"t":"artifact","id":"62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"},{"t":"dataset","id":"dataset:62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"},{"t":"hypothesis","id":"90966248-dfa4-4e65-9759-35227939d8d9"},{"t":"run","id":"run-chain-1"}]
+G2_links=[{"kind":"derived_from","from_id":"dataset:62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb","to_id":"62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"},{"kind":"produces","from_id":"run-chain-1","to_id":"1a9a7cab974b94150659cc3df2e2d51e436f3f8438a2650b60a6075ea42d9689"},{"kind":"tests","from_id":"run-chain-1","to_id":"90966248-dfa4-4e65-9759-35227939d8d9"},{"kind":"uses","from_id":"run-chain-1","to_id":"dataset:62b1010871f4d5a47271d8a5356339edba6c6b2a8e946bfb8337d356505269eb"}]
+(pass) qf-kernel > G2 · hypothesis, Dataset, Run, and result link through execute() only [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > G3 · illegal link kind rejected by endpoint validator before commit
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > G3 · wrong endpoint type rejected by validator not sqlite
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+G4_events=[{"type":"ticket.observed","payload":"{\"command\":\"observe_ticket\",\"origin\":\"operator_supplied\",\"kind\":\"single\",\"external_ref\":\"slip-real\",\"placed_at\":\"2026-07-25T12:00:00.000Z\",\"legs\":[{\"selection\":\"A\",\"price\":1.9}],\"combined_price\":1.9,\"stake\":100,\"payout\":190,\"correlation_note\":\"\",\"grade\":\"win\",\"observation\":true,\"span_id\":\"span-slip\"}"}]
+(pass) qf-kernel > G4 · create_ticket rejects grade; observe_ticket records observation [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) qf-kernel > G4b · creation-policy rejects supplied run status; mechanism is reusable
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > getObject returns row by id
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > queryObjects filters by declared property equality
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > queryObjects limit null returns all rows without cap [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > queryObjects order asc reverses created_at sort
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > getLinks returns edges in either direction
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > unknown type name errors before SQL
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) read layer > unknown filter key errors before SQL [16.00ms]
+
+src\market-context.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107c trusted market context > creates scheduled context with one provenance event and replays by trace 
+identity
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107c trusted market context > rejects blank context row created_at on replay without writes
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107c trusted market context > conflicts are typed and context envelopes reject before any write [16.00ms]
+
+src\market-ingest.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107b market batch runtime > commits one event per row and one derived edge, then exact retry is a no-op
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107b market batch runtime > conflicting row state or provenance rejects the entire batch [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107b market batch runtime > missing source, duplicate IDs, and missing quote foreign key reject before 
+writing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107b market batch runtime > a commit-time failure on the final row rolls back prior rows and events
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107b upgrade chain > pre_d1 reaches current in place and preserves rows, links, and events [47.00ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-107b upgrade chain > d1 reaches current in place and preserves rows, links, and events [16.00ms]
+
+src\open-kernel-create.test.ts:
+(pass) WO-K2 openKernel create / readonly > G3: missing file without create throws and creates nothing
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-IHbPLd\created.db provenance=explicit journal=wal sync=1 
+QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+(pass) WO-K2 openKernel create / readonly > G3: { create: true } creates the file [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) WO-K2 openKernel create / readonly > G3: :memory: opens without create [16.00ms]
+(pass) WO-K2 openKernel create / readonly > G3: create + readonly together throws
+(pass) WO-K2 openKernel create / readonly > G3: missing file with readonly throws (cannot create)
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=1 
+QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=2 
+schema_meta=74
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-k2-open-sL42Fm\ro-write.db provenance=explicit journal=wal sync=1 
+QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+(pass) WO-K2 openKernel create / readonly > G4: readonly handle cannot write; writable control succeeds [31.00ms]
+
+src\r10-dataset-integrity.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R10 point-in-time Dataset integrity > registers immutable bytes and computes the time fence
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R10 point-in-time Dataset integrity > rejects a declared hash that is not the Artifact identity [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R10 point-in-time Dataset integrity > rejects observations after the declared as_of fence
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R10 point-in-time Dataset integrity > rejects durable bytes changed after Artifact publication [16.00ms]
+
+src\r11a-deterministic-execution.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R11a deterministic local execution > repeats exact inputs byte-for-byte with complete Kernel provenance 
+[31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R11a deterministic local execution > rejects false repeat claims and changed durable result bytes [16.00ms]
+kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R11a deterministic local execution > upgrades an existing R10 database in place [15.00ms]
+
+src\r11b-metric-correctness.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R11b hand-calculated metric correctness > matches exact ROI, hit rate, and closing-line value definitions 
+[32.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R11b hand-calculated metric correctness > refuses ambiguous numeric money before creating a Run
+
+src\r12-independent-critic.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R12 independent critic and report gate > binds a separate critic, findings, target result, metrics, and report 
+[47.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R12 independent critic and report gate > refuses non-critics, self-review, and rejecting report approval 
+[63.00ms]
+
+src\r9-research-integrity.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R9 research integrity > resolution without named evidence writes nothing
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
+(pass) R9 research integrity > a report without an independent supporting Evaluation writes nothing [15.00ms]
+
+src\registry-drift.test.ts:
+(pass) detectObjectTypeRegistryDrift > clean: declared, meta, and tables agree → ok
+(pass) detectObjectTypeRegistryDrift > missing: declared absent from meta
+(pass) detectObjectTypeRegistryDrift > retired: meta object no longer declared
+(pass) detectObjectTypeRegistryDrift > inconsistent: meta claims type with no table
+(pass) detectObjectTypeRegistryDrift > inconsistent: orphan non-infra table with no meta claim
+(pass) detectObjectTypeRegistryDrift > infra tables alone never mark inconsistent
+
+src\resolve-artifact-root.test.ts:
+(pass) resolveArtifactRoot > default creates ~/.quantflow/artifacts and returns provenance=default
+(pass) resolveArtifactRoot > env absolute path resolves with provenance=env
+(pass) resolveArtifactRoot > relative env path becomes absolute
+(pass) resolveArtifactRoot > env path that is a regular file throws and leaves the file unchanged
+(pass) resolveArtifactRoot > env path missing throws and creates nothing
+(pass) resolveArtifactRoot > default creates parent ~/.quantflow when missing [16.00ms]
+
+src\resolve-path.test.ts:
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default
+(pass) resolveKernelPath > env absolute path resolves real path with provenance=env
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork)
+(pass) resolveKernelPath > :memory: stays verbatim
+(pass) resolveKernelPath > G3: env parent missing throws and creates nothing
+(pass) resolveKernelPath > G3 control: default creates parent when missing
+
+ 86 pass
+ 0 fail
+ 312 expect() calls
+Ran 86 tests across 16 files. [2.36s]
+PASS  kernel
+
 
 ````
 
 ### 03 — typecheck
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts typecheck
-exit_code: 0
-red mutation / restoration: Change only the exact collab-electron typecheck backend from hardlink to copyfile; restore hardlink and rerun in a fresh worktree.
+command: `bun qa/run.ts typecheck`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\03-typecheck.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 bun install v1.3.12 (700fc117)
-bun.exe :
-At line:2 char:48
-+ ... v21-accept-9a08f3d18c66-logs'; & bun qa/run.ts typecheck 2>&1 | Tee-O ...
-+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bun.exe : 
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 $ node scripts/postinstall.mjs
 Patched winpty.gyp
 Patched binding.gyp
@@ -579,13 +672,13 @@ Building modules: node-pty
 + sharp@0.34.5
 + typescript@5.9.3
 
-2325 packages installed [63.79s]
-typecheck: cleared stale local file dependency C:\tmp\qf-v21-accept-9a08f3d18c66\packages\qf-kernel\node_modules\qf-kernel-schema
+2325 packages installed [66.96s]
+typecheck: cleared stale local file dependency C:\tmp\qf-v21-accept-c93b04f\packages\qf-kernel\node_modules\qf-kernel-schema
 bun install v1.3.12 (700fc117)
 
 + qf-kernel-schema@../../qf-kernel-schema
 
-2 packages installed [56.00ms]
+2 packages installed [58.00ms]
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
@@ -594,21 +687,21 @@ bun install v1.3.12 (700fc117)
 + qf-kernel@../../../packages/qf-kernel
 + qf-kernel-schema@../../../qf-kernel-schema
 
-18 packages installed [630.00ms]
+18 packages installed [605.00ms]
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
 + typescript@5.9.3
 + zod@4.4.3
 
-12 packages installed [603.00ms]
+12 packages installed [590.00ms]
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
 + typescript@5.9.3
 + qf-kernel@../../packages/qf-kernel
 
-16 packages installed [604.00ms]
+16 packages installed [710.00ms]
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
@@ -617,7 +710,7 @@ bun install v1.3.12 (700fc117)
 + qf-kernel@../../packages/qf-kernel
 + zod@4.4.3
 
-198 packages installed [1351.00ms]
+198 packages installed [1211.00ms]
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
@@ -627,7 +720,7 @@ bun install v1.3.12 (700fc117)
 + qf-kernel-schema@../../qf-kernel-schema
 + zod@4.4.3
 
-198 packages installed [1301.00ms]
+198 packages installed [1316.00ms]
 bun install v1.3.12 (700fc117)
 
 + @types/bun@1.3.14
@@ -636,71 +729,67 @@ bun install v1.3.12 (700fc117)
 + qf-kernel-schema@../../qf-kernel-schema
 + zod@4.4.3
 
-16 packages installed [633.00ms]
+16 packages installed [594.00ms]
 PASS  typecheck
+
 
 ````
 
 ### 04 — kernel-market-lineage
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts kernel-market-lineage
-exit_code: 0
-red mutation / restoration: Remove evaluation_id from the accepted report; restore the returned evaluation_id and rerun.
+command: `bun qa/run.ts kernel-market-lineage`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\04-kernel-market-lineage.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-6ulRsB\kernel.db provenance=explicit
+Complete unedited transcript:
+````text
+bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-yQNA9o\kernel.db provenance=explicit 
 journal=wal sync=2 schema_meta=74
-At line:2 char:48
-+ ... a08f3d18c66-logs'; & bun qa/run.ts kernel-market-lineage 2>&1 | Tee-O ...
-+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (kernel: path=C:... schema_meta=74:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 kernel-market-lineage: FALSIFY RED empty lineage
 kernel-market-lineage: FALSIFY RED fabricated cite
 kernel-market-lineage: PASS
 PASS  kernel-market-lineage
 
+
 ````
 
 ### 05 — dock-profile-identity
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts dock-profile-identity
-exit_code: 0
-red mutation / restoration: Use the prior package/profile identity bait; restore the production manifest and rerun.
+command: `bun qa/run.ts dock-profile-identity`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\05-dock-profile-identity.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-dock-profile-identity:qf-kernel: cleared stale local file dependency C:\tmp\qf-v21-accept-9a08f3d18c66\packages\qf-kernel\node_modules\qf-kernel-schema
+Complete unedited transcript:
+````text
+dock-profile-identity:qf-kernel: cleared stale local file dependency C:\tmp\qf-v21-accept-c93b04f\packages\qf-kernel\node_modules\qf-kernel-schema
 bun install v1.3.12 (700fc117)
 
 + qf-kernel-schema@../../qf-kernel-schema
 
-2 packages installed [53.00ms]
+2 packages installed [52.00ms]
 bun install v1.3.12 (700fc117)
 
 + qf-kernel@../../../packages/qf-kernel
 + qf-kernel-schema@../../../qf-kernel-schema
 + typescript@5.9.3
 
-16 packages installed [586.00ms]
+16 packages installed [584.00ms]
 bun.exe : kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=74
-At line:2 char:48
-+ ... a08f3d18c66-logs'; & bun qa/run.ts dock-profile-identity 2>&1 | Tee-O ...
-+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (kernel: path=:m... schema_meta=74:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 kernel: path=(unspecified) provenance=explicit journal=memory sync=2 schema_meta=74
-kernel: path=\tmp\qf-d1-upgrade-2yiKx7\pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=74
-kernel: path=\tmp\qf-d1-upgrade-2yiKx7\pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=74
+kernel: path=\tmp\qf-d1-upgrade-vwLUwO\pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=74
+kernel: path=\tmp\qf-d1-upgrade-vwLUwO\pre-d1.db provenance=explicit journal=wal sync=2 schema_meta=74
 dock-profile-identity: partial new-column-old-links setup
 dock-profile-identity: partial new-column-old-links rejected cleanly
 dock-profile-identity: partial new-links-old-column setup
@@ -728,31 +817,29 @@ dock-profile-identity OK
 {"profileA":"dock-profile-a","profileB":"dock-profile-b","sessionLinks":{"a":"dock-profile-a","b":"dock-profile-b"},"unknownDefinitionResidue":"none","legacyUnlinkedSessions":2,"upgradeRowCounts":{"before":{"definitions":2,"sessions":2,"links":15,"events":3},"after":{"definitions":2,"sessions":2,"links":15,"events":3}}}
 PASS  dock-profile-identity
 
+
 ````
 
 ### 06 — dock-production-inventory
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts dock-production-inventory
-exit_code: 0
-red mutation / restoration: Restore claude-code-ungranted to the production manifest; restore the QA-only split and rerun.
+command: `bun qa/run.ts dock-production-inventory`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\06-dock-production-inventory.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 bun install v1.3.12 (700fc117)
 bun.exe : Resolving dependencies
-At line:2 char:48
-+ ... 3d18c66-logs'; & bun qa/run.ts dock-production-inventory 2>&1 | Tee-O ...
-+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
-Resolved, downloaded and extracted [308]
+ 
+Resolved, downloaded and extracted [309]
 Saved lockfile
 
-Saved bun.lock (382 packages) [735.00ms]
+Saved bun.lock (382 packages) [1092.00ms]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -760,7 +847,7 @@ bun install v1.3.12 (700fc117)
 + @agentclientprotocol/sdk@0.18.2
 + @rivet-dev/agentos-core@0.2.7
 
-349 packages installed [18.92s]
+349 packages installed [18.76s]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -772,78 +859,76 @@ bun install v1.3.12 (700fc117)
 + ai@7.0.31
 + zod@4.4.3
 
-408 packages installed [22.12s]
+408 packages installed [21.65s]
 pack-agent: ready qf-proof-agent
 $ node ./scripts/pack-agent.mjs
-Bundled 119 modules in 306ms
+Bundled 119 modules in 263ms
 
   acp-main.js  1.26 MB  (entry point)
 
-packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-hpGjdO\repo\tools\runtime-proof\packed\qf-toolloop.tar
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:25184) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:10832) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-hpGjdO\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-hpGjdO\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
 $ node ./scripts/pack-agent.mjs
-Bundled 1 module in 18ms
+Bundled 1 module in 28ms
 
   acp-shim.js  2.15 KB  (entry point)
 
-packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-hpGjdO\repo\species\hermes\packed\hermes.tar
+packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:29164) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:29676) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-hpGjdO\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-hpGjdO\repo\species\hermes\packed\hermes.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-HIhyId\repo\species\hermes\packed\hermes.aospkg
 pack-agent: ready claude-code
 dock-production-inventory: production=[{"manifest":"species/hermes/dock-profiles.json","id":"hermes-orchestrator","role":"orchestrator"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-worker","role":"worker"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-worker-2","role":"worker2"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-critic","role":"critic"},{"manifest":"species/claude-code/dock-profiles.json","id":"claude-code-orchestrator","role":"claude-orchestrator"},{"manifest":"species/claude-code/dock-profiles.json","id":"claude-code-worker","role":"claude-worker"}] qaContainsClaudeCodeUngranted=true
 PASS  dock-production-inventory
+
 
 ````
 
 ### 07 — kernel-one-path
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts kernel-one-path
-exit_code: 0
-red mutation / restoration: Use the existing Kernel-path red control; restore the one-path boundary and rerun.
+command: `bun qa/run.ts kernel-one-path`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\07-kernel-one-path.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 kernel-one-path G1: PASS (no illicit env reads or kernel.db literals)
-kernel-one-path:qf-kernel: cleared stale local file dependency C:\tmp\qf-v21-accept-9a08f3d18c66\packages\qf-kernel\node_modules\qf-kernel-schema
+kernel-one-path:qf-kernel: cleared stale local file dependency C:\tmp\qf-v21-accept-c93b04f\packages\qf-kernel\node_modules\qf-kernel-schema
 bun install v1.3.12 (700fc117)
 
 + qf-kernel-schema@../../qf-kernel-schema
 
-2 packages installed [53.00ms]
+2 packages installed [51.00ms]
 bun test v1.3.12 (700fc117)
-bun.exe :
-At line:2 char:48
-+ ... cept-9a08f3d18c66-logs'; & bun qa/run.ts kernel-one-path 2>&1 | Tee-O ...
-+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bun.exe : 
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 src\busy-timeout.test.ts:
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-oKzGQj\kernel.db provenance=explicit journal=wal sync=1
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ok-h6oVtZ\kernel.db provenance=explicit journal=wal sync=1 
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
-(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [656.00ms]
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-eGMXrK\kernel.db provenance=explicit journal=wal sync=1
+(pass) WO-K1 G2 busy_timeout turn-taking > two writers on one file both succeed with default busy_timeout [672.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g2-ctrl-Y7BaEN\kernel.db provenance=explicit journal=wal sync=1 
 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 G2 control: codes [ 0, 2 ] stderr locked evt-b: database is locked
 
-(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [609.00ms]
+(pass) WO-K1 G2 busy_timeout turn-taking > control: busy_timeout=0 makes concurrent BEGIN IMMEDIATE fail [593.00ms]
 
 src\resolve-path.test.ts:
-(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default
+(pass) resolveKernelPath > default creates ~/.quantflow and returns absolute path with provenance=default [16.00ms]
 (pass) resolveKernelPath > env absolute path resolves real path with provenance=env
-(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork) [16.00ms]
+(pass) resolveKernelPath > relative env path becomes absolute (no cwd fork)
 (pass) resolveKernelPath > :memory: stays verbatim
 (pass) resolveKernelPath > G3: env parent missing throws and creates nothing
 (pass) resolveKernelPath > G3 control: default creates parent when missing
@@ -851,36 +936,34 @@ src\resolve-path.test.ts:
  8 pass
  0 fail
  21 expect() calls
-Ran 8 tests across 2 files. [1382.00ms]
+Ran 8 tests across 2 files. [1378.00ms]
 kernel-one-path G2/G3: PASS
-kernel-one-path:qf-read-tools: cleared stale local file dependency C:\tmp\qf-v21-accept-9a08f3d18c66\tools\qf-read-tools\node_modules\qf-kernel
-kernel-one-path:qf-read-tools: cleared stale local file dependency C:\tmp\qf-v21-accept-9a08f3d18c66\tools\qf-read-tools\node_modules\qf-kernel-schema
+kernel-one-path:qf-read-tools: cleared stale local file dependency C:\tmp\qf-v21-accept-c93b04f\tools\qf-read-tools\node_modules\qf-kernel
+kernel-one-path:qf-read-tools: cleared stale local file dependency C:\tmp\qf-v21-accept-c93b04f\tools\qf-read-tools\node_modules\qf-kernel-schema
 bun install v1.3.12 (700fc117)
 
 + qf-kernel@../../packages/qf-kernel
 + qf-kernel-schema@../../qf-kernel-schema
 
-4 packages installed [59.00ms]
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-XeXqPL\.quantflow\kernel.db provenance=explicit journal=wal
+4 packages installed [60.00ms]
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-A2rFcw\.quantflow\kernel.db provenance=explicit journal=wal 
 sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
 kernel-one-world G4 PASS
-  child D4 boot line: kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-XeXqPL\.quantflow\kernel.db provenance=default journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
-  row round-trip id: 73a9d309-17a7-4d36-9a88-ec1712e92a5f
+  child D4 boot line: kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-g4-home-A2rFcw\.quantflow\kernel.db provenance=default journal=wal sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=74
+  row round-trip id: 546336df-abb6-4651-b6dc-af8ef2ddb687
 PASS  kernel-one-path
+
 
 ````
 
 ### 08 — hermes-launch-policy
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts hermes-launch-policy
-exit_code: 0
-red mutation / restoration: Remove the fallback --toolsets allowlist; restore it and rerun.
+command: `bun qa/run.ts hermes-launch-policy`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\08-hermes-launch-policy.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 hermes-launch-policy: mission argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
 hermes-launch-policy: critic-task argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
 hermes-launch-policy: worker-task argv=["--toolsets","mcp-quantflow-collaboration,mcp-quantflow-ontology","--tui"]
@@ -888,107 +971,95 @@ hermes-launch-policy: fallback argv=["--toolsets","mcp-quantflow-collaboration,m
 hermes-launch-policy: PASS
 PASS  hermes-launch-policy
 
+
 ````
 
 ### 09 — one-skin
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts one-skin
-exit_code: 0
-red mutation / restoration: Add a raw non-exempt #123456; remove the bait and rerun.
+command: `bun qa/run.ts one-skin`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\09-one-skin.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 one-skin OK
 totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
 PASS  one-skin
+
 
 ````
 
 ### 10 — rung-ladder
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts rung-ladder
-exit_code: 0
-red mutation / restoration: No mutation in the final acceptance sequence; the gate remains the live ladder check.
+command: `bun qa/run.ts rung-ladder`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\10-rung-ladder.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 rung-ladder: PASS (20 rungs; active=R13; complete=14)
 PASS  rung-ladder
+
 
 ````
 
 ### 11 — repo-shape
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts repo-shape
-exit_code: 0
-red mutation / restoration: No mutation in the final acceptance sequence; the gate remains the live authority-shape check.
+command: `bun qa/run.ts repo-shape`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\11-repo-shape.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 PASS  repo-shape
+
 
 ````
 
 ### 12 — doc-links
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts doc-links
-exit_code: 0
-red mutation / restoration: No mutation in the final acceptance sequence; the gate remains the live document-link check.
+command: `bun qa/run.ts doc-links`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\12-doc-links.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 doc-links: PASS (52 live documents, every pointer resolves)
 PASS  doc-links
 
-````
-
-### 13 — git diff --check
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: git diff --check
-exit_code: 0
-red mutation / restoration: Not applicable; final whitespace invariant.
-
-Complete transcript (candidate identity line followed by preserved raw command output):
 
 ````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+
+### 13 — diff-check
+
+command: `git diff --check`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\13-diff-check.log`
+
+Complete unedited transcript:
+````text
+
 ````
 
 ### 14 — verify-release
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/verify-release.ts
-exit_code: 0
-red mutation / restoration: The release verifier's built-in red controls remain in the complete raw transcript; restoration is part of its green run.
+command: `bun qa/verify-release.ts`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\14-verify-release.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-release: runId=e8eaa2f5-0fa0-40ee-b6ad-778ad595b511
+Complete unedited transcript:
+````text
+release: runId=d56eadbc-0f32-4df2-849e-b980399806e5
 
 == release:install (collab-electron) :: bun install --frozen-lockfile ==
 bun install v1.3.12 (700fc117)
-bun.exe :
-At line:2 char:48
-+ ... 21-accept-9a08f3d18c66-logs'; & bun qa/verify-release.ts 2>&1 | Tee-O ...
-+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bun.exe : 
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 $ node scripts/postinstall.mjs
 Patched winpty.gyp
 Patched binding.gyp
@@ -1002,7 +1073,7 @@ Building modules: node-pty
 + qf-kernel@../packages/qf-kernel
 + qf-kernel-schema@../qf-kernel-schema
 
-6 packages installed [44.83s]
+6 packages installed [45.46s]
 
 == release:unit (.) :: bun qa/windows-unit.ts ==
 bun test v1.3.12 (700fc117)
@@ -1022,19 +1093,19 @@ collab-electron\scripts\package-lib\extra-resources.test.ts:
 (pass) extra-resources parsing > Windows packaging declares collaboration and ontology bridge resources
 
 collab-electron\scripts\package-lib\package-cleanup.test.ts:
-(pass) package verification cleanup > preserves sibling distribution artifacts [15.00ms]
+(pass) package verification cleanup > preserves sibling distribution artifacts
 
 collab-electron\scripts\package-lib\package-receipt.test.ts:
 (pass) package receipt log path binding > accepts the canonical package verification log [16.00ms]
-(pass) package receipt log path binding > rejects a prefix-sibling root [15.00ms]
-(pass) package receipt log path binding > rejects an alternative log inside the collab root [16.00ms]
+(pass) package receipt log path binding > rejects a prefix-sibling root [16.00ms]
+(pass) package receipt log path binding > rejects an alternative log inside the collab root [15.00ms]
 
 collab-electron\scripts\package-lib\shared-paths.test.ts:
 (pass) shared production path rules > changing shared input moves both production and inspection consumers [16.00ms]
 (pass) static shared-module dependency > gate and production import package-resource-paths
 
 collab-electron\scripts\package-lib\unit-wiring.test.ts:
-(pass) package-closure unit wiring > test-unit.sh executes root qa package-closure tests [16.00ms]
+(pass) package-closure unit wiring > test-unit.sh executes root qa package-closure tests
 (pass) package-closure unit wiring > rejects restored cold-import.test.ts path
 (pass) package-closure unit wiring > falsify removing root qa invocation from in-memory script copy
 
@@ -1052,8 +1123,8 @@ collab-electron\src\main\cwd-fallback.test.ts:
 (pass) nearestExistingDir > defaults the fallback to the home directory
 
 collab-electron\src\main\dock-profiles.test.ts:
-(pass) Dock profile manifests > production discovery succeeds without proof packages [32.00ms]
-(pass) Dock profile manifests > QA discovery explicitly includes proof fixtures [15.00ms]
+(pass) Dock profile manifests > production discovery succeeds without proof packages [16.00ms]
+(pass) Dock profile manifests > QA discovery explicitly includes proof fixtures [31.00ms]
 (pass) Dock profile manifests > QA discovery still fails when a required fixture package is missing [16.00ms]
 (pass) Dock profile manifests > projects only exact missing Hermes Dock state as an adapter diagnostic [15.00ms]
 (pass) Dock profile manifests > registers once, skips identical rows, and preserves conflicts [32.00ms]
@@ -1072,7 +1143,7 @@ collab-electron\src\main\native-tui-orchestration.test.ts:
 (pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds
 (pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start
 (pass) orchestrateNativeTuiAdmission > duplicate-role preflight revokes a minted capability without starting a process
-(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before
+(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before 
 running
 (pass) orchestrateNativeTuiAdmission > failed admission revokes its in-memory seat capability during owned cleanup
 (pass) orchestrateNativeTuiAdmission > readiness rejection writes no start and cleans every owned runtime seam
@@ -1091,17 +1162,20 @@ collab-electron\src\main\runtime-adapter.test.ts:
  54 pass
  0 fail
  143 expect() calls
-Ran 54 tests across 13 files. [435.00ms]
+Ran 54 tests across 13 files. [431.00ms]
 windows-unit: PASS
 
 == release:windows-cold-boot (.) :: bun qa/run.ts windows-cold-boot ==
+windows-cold-boot: FALSIFY GREEN ambient processes ignored; ambient=["conhost.exe:8264","conhost.exe:8764","conhost.exe:9516","claude.exe:17784","claude.exe:18288","claude.exe:17572","claude.exe:13188","claude.exe:12356","claude.exe:17144","claude.exe:16728","claude.exe:17844","claude.exe:18844","claude.exe:19244","claude.exe:19016","claude.exe:19432","conhost.exe:2648","conhost.exe:10140","conhost.exe:12276","conhost.exe:9444","conhost.exe:19156","conhost.exe:16756","conhost.exe:12256","brave.exe:12740","brave.exe:20012","brave.exe:21844","brave.exe:19052","brave.exe:5244","brave.exe:5472","brave.exe:7132","brave.exe:3612","brave.exe:20468","brave.exe:3532","cmd.exe:14652","conhost.exe:3628","cmd.exe:3700","extension-host.exe:16512","conhost.exe:21976","brave.exe:8440","claude.exe:9012","brave.exe:16056","brave.exe:6700","brave.exe:14712","brave.exe:14272","brave.exe:508","brave.exe:15952","brave.exe:8604","brave.exe:6664","brave.exe:20228","brave.exe:15272","brave.exe:14812","brave.exe:10380","brave.exe:19112","brave.exe:3152","brave.exe:22280","brave.exe:3840","brave.exe:17884","brave.exe:23136","brave.exe:23220","brave.exe:23332","brave.exe:23388","brave.exe:23512","brave.exe:23212","claude.exe:24468","conhost.exe:16040","cmd.exe:33616","conhost.exe:33656","cmd.exe:33372"]
+windows-cold-boot: FALSIFY RED surviving gate-owned child; pid=17312 ownership={"rootPid":27412,"row":{"pid":17312,"parentPid":27412,"name":"bun.exe","executablePath":"C:\\Users\\rybow\\.bun\\bin\\bun.exe","commandLine":"C:\\Users\\rybow\\.bun\\bin\\bun.exe -e \"setInterval(() => {}, 1000)\""}}
+windows-cold-boot: FALSIFY GREEN ownership restored; pid=17312 remaining-gate-owned-processes=0
 windows-cold-boot: preparing runtime staging
 bun install v1.3.12 (700fc117)
 Resolving dependencies
-Resolved, downloaded and extracted [243]
-
-Saved bun.lock (382 packages) [1.68s]
+Resolved, downloaded and extracted [193]
 Saved lockfile
+
+Saved bun.lock (382 packages) [1306.00ms]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -1109,7 +1183,7 @@ bun install v1.3.12 (700fc117)
 + @agentclientprotocol/sdk@0.18.2
 + @rivet-dev/agentos-core@0.2.7
 
-349 packages installed [18.75s]
+349 packages installed [18.29s]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -1121,41 +1195,44 @@ bun install v1.3.12 (700fc117)
 + ai@7.0.31
 + zod@4.4.3
 
-408 packages installed [22.46s]
+408 packages installed [21.81s]
 pack-agent: ready qf-proof-agent
 $ node ./scripts/pack-agent.mjs
-Bundled 119 modules in 354ms
+Bundled 119 modules in 281ms
 
   acp-main.js  1.26 MB  (entry point)
 
-packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-zw0GxB\repo\tools\runtime-proof\packed\qf-toolloop.tar
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:19744) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:15200) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-zw0GxB\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-zw0GxB\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
 $ node ./scripts/pack-agent.mjs
-Bundled 1 module in 19ms
+Bundled 1 module in 29ms
 
   acp-shim.js  2.15 KB  (entry point)
 
-packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-zw0GxB\repo\species\hermes\packed\hermes.tar
+packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:19172) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:29612) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-zw0GxB\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-zw0GxB\repo\species\hermes\packed\hermes.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-wnHt6H\repo\species\hermes\packed\hermes.aospkg
 pack-agent: ready claude-code
 windows-cold-boot: building Electron bundle
 windows-cold-boot: creating unpacked Windows package
 windows-cold-boot: canvas/Dock ready; profiles=["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"] owned-processes=10
-windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-uhVCUT/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uhVCUT\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uhVCUT\\stores\\artifacts"}
+windows-cold-boot: ownership-receipt={"rootPid":24472,"pids":[3860,4624,10968,18940,23680,24472,27112,30052,31788,32696],"rows":[{"pid":3860,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=7 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=77814190885 --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708992871164437 --mojo-platform-channel-handle=3920 /prefetch:1"},{"pid":4624,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=9 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=77814196032 --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708994745248135 --mojo-platform-channel-handle=3968 /prefetch:1"},{"pid":10968,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=5 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=77813791853 --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708990997080739 --mojo-platform-channel-handle=3428 /prefetch:1"},{"pid":18940,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708990060038890 --mojo-platform-channel-handle=2608 /prefetch:14"},{"pid":23680,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708989122997041 --mojo-platform-channel-handle=2192 /prefetch:11"},{"pid":24472,"parentPid":27412,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe --disable-gpu"},{"pid":27112,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=gpu-process --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --gpu-preferences=SAAAAAAAAADgAAAEAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --use-gl=angle --use-angle=d3d11-warp-webgl --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708988185955192 --mojo-platform-channel-handle=1816 /prefetch:2"},{"pid":30052,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\resources\\app.asar\\out\\main\\pty-sidecar.js --token 23167cb0c61882db958deaed7cafeef4"},{"pid":31788,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=11 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=77823013121 --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708996619331833 --mojo-platform-channel-handle=3600 /prefetch:1"},{"pid":32696,"parentPid":24472,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=13 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=77823018050 --field-trial-handle=1832,i,14570436792529603552,11738309968537143883,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708998493415531 --mojo-platform-channel-handle=4500 /prefetch:1"}]}
+windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-ngLNJ4/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"c93b04f1d6a448cee299b2a79a6c21204fdc8502","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-ngLNJ4\\stores\\artifacts"}
+windows-cold-boot: shutdown-result={"requested":true,"processExitCode":0,"remainingGateOwnedProcesses":0,"ownedPids":[3860,4624,10968,18940,23680,24472,27112,30052,31788,32696]}
 windows-cold-boot: isolated kernel=true artifact-root=true default-user-state-unchanged=true
-windows-cold-boot: clean shutdown requested and all app-owned processes exited
+windows-cold-boot: clean shutdown requested=true remaining-gate-owned-processes=0 process-exit=0
 windows-cold-boot: PASS
 PASS  windows-cold-boot
+windows-cold-boot: direct-process-exit=0
 
 == release:repo-shape (.) :: bun qa/run.ts repo-shape ==
 PASS  repo-shape
@@ -1209,23 +1286,23 @@ PASS  schema-bundle-aliases
 PASS  verb-retirement
 
 == release:kernel-task-delegation (.) :: bun qa/run.ts kernel-task-delegation ==
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-BoloOG\kernel.db provenance=explicit journal=wal sync=2
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\kernel.db provenance=explicit journal=wal sync=2 
 schema_meta=74
 kernel-task-delegation: FALSIFY RED forged hire provenance refused
 kernel-task-delegation: FALSIFY RED caller task envelope refused
 kernel-task-delegation: FALSIFY RED forged ontology read receipts refused
 kernel-task-delegation: FALSIFY RED completion lineage refusals
 kernel-task-delegation: FALSIFY RED illegal complete refused
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-BoloOG\kernel.db provenance=explicit journal=wal sync=2
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\kernel.db provenance=explicit journal=wal sync=2 
 schema_meta=74
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-BoloOG\empty-kernel.db provenance=explicit journal=wal
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-kernel-task-bOP6vK\empty-kernel.db provenance=explicit journal=wal 
 sync=2 schema_meta=74
 kernel-task-delegation: FALSIFY RED bus-only assignment absent from Kernel
 kernel-task-delegation: PASS
 PASS  kernel-task-delegation
 
 == release:kernel-market-lineage (.) :: bun qa/run.ts kernel-market-lineage ==
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-K46Sat\kernel.db provenance=explicit journal=wal
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-bA2ETQ\kernel.db provenance=explicit journal=wal 
 sync=2 schema_meta=74
 kernel-market-lineage: FALSIFY RED empty lineage
 kernel-market-lineage: FALSIFY RED fabricated cite
@@ -1237,58 +1314,57 @@ PASS  observe-door
 
 PASS  release-verification
 
-````
-
-### 15 — kernel-market-lineage rerun
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts kernel-market-lineage
-exit_code: 0
-red mutation / restoration: Remove evaluation_id from the accepted report; restore it and rerun.
-
-Complete transcript (candidate identity line followed by preserved raw command output):
 
 ````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-m0UnH0\kernel.db provenance=explicit
+
+### 15 — kernel-market-lineage-rerun
+
+command: `bun qa/run.ts kernel-market-lineage`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\15-kernel-market-lineage-rerun.log`
+
+Complete unedited transcript:
+````text
+bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-ZuatMg\kernel.db provenance=explicit 
 journal=wal sync=2 schema_meta=74
-At line:2 char:48
-+ ... a08f3d18c66-logs'; & bun qa/run.ts kernel-market-lineage 2>&1 | Tee-O ...
-+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (kernel: path=C:... schema_meta=74:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
+ 
 kernel-market-lineage: FALSIFY RED empty lineage
 kernel-market-lineage: FALSIFY RED fabricated cite
 kernel-market-lineage: PASS
 PASS  kernel-market-lineage
 
+
 ````
 
 ### 16 — windows-cold-boot
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts windows-cold-boot
-exit_code: 0
-red mutation / restoration: Use the existing foreign-store/cold-boot red controls; restore isolated stores and rerun.
+command: `bun qa/run.ts windows-cold-boot`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\16-windows-cold-boot.log`
 
-Complete transcript (candidate identity line followed by preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
+windows-cold-boot: FALSIFY GREEN ambient processes ignored; ambient=["conhost.exe:8264","conhost.exe:8764","conhost.exe:9516","claude.exe:17784","claude.exe:18288","claude.exe:17572","claude.exe:13188","claude.exe:12356","claude.exe:17144","claude.exe:16728","claude.exe:17844","claude.exe:18844","claude.exe:19244","claude.exe:19016","claude.exe:19432","conhost.exe:2648","conhost.exe:10140","conhost.exe:12276","conhost.exe:9444","conhost.exe:19156","conhost.exe:16756","conhost.exe:12256","brave.exe:12740","brave.exe:20012","brave.exe:21844","brave.exe:19052","brave.exe:5244","brave.exe:5472","brave.exe:7132","brave.exe:3612","brave.exe:20468","brave.exe:3532","cmd.exe:14652","conhost.exe:3628","cmd.exe:3700","extension-host.exe:16512","conhost.exe:21976","brave.exe:8440","claude.exe:9012","brave.exe:16056","brave.exe:6700","brave.exe:14712","brave.exe:14272","brave.exe:508","brave.exe:15952","brave.exe:8604","brave.exe:6664","brave.exe:20228","brave.exe:15272","brave.exe:14812","brave.exe:10380","brave.exe:19112","brave.exe:3152","brave.exe:22280","brave.exe:3840","brave.exe:17884","brave.exe:23136","brave.exe:23220","brave.exe:23332","brave.exe:23388","brave.exe:23512","brave.exe:23212","claude.exe:24468","conhost.exe:16040","cmd.exe:33616","conhost.exe:33656","cmd.exe:33372","conhost.exe:21736","conhost.exe:28104"]
+windows-cold-boot: FALSIFY RED surviving gate-owned child; pid=33644 ownership={"rootPid":2784,"row":{"pid":33644,"parentPid":2784,"name":"bun.exe","executablePath":"C:\\Users\\rybow\\.bun\\bin\\bun.exe","commandLine":"C:\\Users\\rybow\\.bun\\bin\\bun.exe -e \"setInterval(() => {}, 1000)\""}}
+windows-cold-boot: FALSIFY GREEN ownership restored; pid=33644 remaining-gate-owned-processes=0
 windows-cold-boot: preparing runtime staging
 bun install v1.3.12 (700fc117)
 bun.exe : Resolving dependencies
-At line:2 char:48
-+ ... pt-9a08f3d18c66-logs'; & bun qa/run.ts windows-cold-boot 2>&1 | Tee-O ...
-+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
-Resolved, downloaded and extracted [119]
-
-Saved bun.lock (382 packages) [767.00ms]
+ 
+Resolved, downloaded and extracted [150]
 Saved lockfile
+
+Saved bun.lock (382 packages) [894.00ms]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -1296,7 +1372,7 @@ bun install v1.3.12 (700fc117)
 + @agentclientprotocol/sdk@0.18.2
 + @rivet-dev/agentos-core@0.2.7
 
-349 packages installed [18.70s]
+349 packages installed [18.51s]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -1308,68 +1384,69 @@ bun install v1.3.12 (700fc117)
 + ai@7.0.31
 + zod@4.4.3
 
-408 packages installed [22.39s]
+408 packages installed [21.79s]
 pack-agent: ready qf-proof-agent
 $ node ./scripts/pack-agent.mjs
-Bundled 119 modules in 380ms
+Bundled 119 modules in 418ms
 
   acp-main.js  1.26 MB  (entry point)
 
-packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\tools\runtime-proof\packed\qf-toolloop.tar
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:27780) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:14104) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
 $ node ./scripts/pack-agent.mjs
-Bundled 1 module in 18ms
+Bundled 1 module in 28ms
 
   acp-shim.js  2.15 KB  (entry point)
 
-packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\species\hermes\packed\hermes.tar
+packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:19636) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:23324) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-LUrdPw\repo\species\hermes\packed\hermes.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-j4D2Ec\repo\species\hermes\packed\hermes.aospkg
 pack-agent: ready claude-code
 windows-cold-boot: building Electron bundle
 windows-cold-boot: creating unpacked Windows package
 windows-cold-boot: canvas/Dock ready; profiles=["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"] owned-processes=10
-windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-uyqmtV/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uyqmtV\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-uyqmtV\\stores\\artifacts"}
+windows-cold-boot: ownership-receipt={"rootPid":33764,"pids":[7320,21852,24668,26620,26816,29548,30804,31028,31452,33764],"rows":[{"pid":7320,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708990060038890 --mojo-platform-channel-handle=2540 /prefetch:14"},{"pid":21852,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=9 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=78041023957 --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708994745248135 --mojo-platform-channel-handle=3988 /prefetch:1"},{"pid":24668,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=7 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=78041017899 --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708992871164437 --mojo-platform-channel-handle=3440 /prefetch:1"},{"pid":26620,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=11 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=78049795593 --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708996619331833 --mojo-platform-channel-handle=3952 /prefetch:1"},{"pid":26816,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=5 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=78040583976 --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708990997080739 --mojo-platform-channel-handle=3416 /prefetch:1"},{"pid":29548,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=renderer --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --app-path=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\resources\\app.asar\" --enable-sandbox --enable-blink-features --disable-blink-features --disable-gpu-compositing --video-capture-use-gpu-memory-buffer --lang=en-US --device-scale-factor=1 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=13 --time-ticks-at-unix-epoch=-1786597988778065 --launch-time-ticks=78049801122 --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708998493415531 --mojo-platform-channel-handle=4484 /prefetch:1"},{"pid":30804,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=gpu-process --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --gpu-preferences=SAAAAAAAAADgAAAEAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --use-gl=angle --use-angle=d3d11-warp-webgl --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708988185955192 --mojo-platform-channel-handle=1876 /prefetch:2"},{"pid":31028,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe\" --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --user-data-dir=\"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\home\\.quantflow\\app\\electron\" --bypasscsp-schemes=collab-file --fetch-schemes=collab-file --streaming-schemes=collab-file --field-trial-handle=1880,i,16890502657806993479,889542669991376805,262144 --enable-features=EnableTransparentHwndEnlargement,PdfUseShowSaveFilePicker --disable-features=LocalNetworkAccessChecks,NetworkServiceSandbox,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --trace-process-track-uuid=3190708989122997041 --mojo-platform-channel-handle=2192 /prefetch:11"},{"pid":31452,"parentPid":33764,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\resources\\app.asar\\out\\main\\pty-sidecar.js --token 93bdfd6753c17690883d9204542aedbd"},{"pid":33764,"parentPid":2784,"name":"QuantFlow.exe","executablePath":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe","commandLine":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\dist\\win-unpacked\\QuantFlow.exe --disable-gpu"}]}
+windows-cold-boot: readiness-receipt={"readiness":{"canvas":true,"windowUrl":"file:///C:/Users/rybow/AppData/Local/Temp/qf-windows-cold-boot-VUNYbv/dist/win-unpacked/resources/app.asar/out/renderer/shell/index.html","dockProfileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"buildIdentity":{"commitSha":"c93b04f1d6a448cee299b2a79a6c21204fdc8502","packagedAt":"development"}},"profileIds":["hermes-orchestrator","hermes-worker","hermes-worker-2","hermes-critic","claude-code-orchestrator","claude-code-worker","claude-code-ungranted","qf-proof-orchestrator","qf-proof-worker","qf-toolloop"],"kernelDb":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\stores\\kernel.db","artifactRoot":"C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-windows-cold-boot-VUNYbv\\stores\\artifacts"}
+windows-cold-boot: shutdown-result={"requested":true,"processExitCode":0,"remainingGateOwnedProcesses":0,"ownedPids":[7320,21852,24668,26620,26816,29548,30804,31028,31452,33764]}
 windows-cold-boot: isolated kernel=true artifact-root=true default-user-state-unchanged=true
-windows-cold-boot: clean shutdown requested and all app-owned processes exited
+windows-cold-boot: clean shutdown requested=true remaining-gate-owned-processes=0 process-exit=0
 windows-cold-boot: PASS
 PASS  windows-cold-boot
+windows-cold-boot: direct-process-exit=0
+
 
 ````
 
 ### 17 — windows-dock-collaboration
 
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts windows-dock-collaboration
-exit_code: 0
-red mutation / restoration: The transcript contains the required delivery-off red control followed by restored delivery and PASS.
+command: `bun qa/run.ts windows-dock-collaboration`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\17-windows-dock-collaboration.log`
 
-Complete transcript (candidate identity line followed by the preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+Complete unedited transcript:
+````text
 windows-cold-boot: preparing runtime staging
 bun install v1.3.12 (700fc117)
 bun.exe : Resolving dependencies
-At line:2 char:48
-+ ... d18c66-logs'; & bun qa/run.ts windows-dock-collaboration 2>&1 | Tee-O ...
-+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At line:33 char:3
++   & $c.exe @($c.args) 2>&1 | Tee-Object -FilePath $logPath
++   ~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Resolving dependencies:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
-
-Resolved, downloaded and extracted [235]
-
-Saved bun.lock (382 packages) [603.00ms]
+ 
+Resolved, downloaded and extracted [215]
 Saved lockfile
+
+Saved bun.lock (382 packages) [1072.00ms]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -1377,7 +1454,7 @@ bun install v1.3.12 (700fc117)
 + @agentclientprotocol/sdk@0.18.2
 + @rivet-dev/agentos-core@0.2.7
 
-349 packages installed [19.72s]
+349 packages installed [18.93s]
 bun install v1.3.12 (700fc117)
 
 + @rivet-dev/agentos-toolchain@0.2.7
@@ -1389,398 +1466,110 @@ bun install v1.3.12 (700fc117)
 + ai@7.0.31
 + zod@4.4.3
 
-408 packages installed [22.18s]
+408 packages installed [21.82s]
 pack-agent: ready qf-proof-agent
 $ node ./scripts/pack-agent.mjs
-Bundled 119 modules in 365ms
+Bundled 119 modules in 392ms
 
   acp-main.js  1.26 MB  (entry point)
 
-packed qf-toolloop@0.1.0 Ã¢â€ â€™ C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-MzfCFp\repo\tools\runtime-proof\packed\qf-toolloop.tar
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\tools\runtime-proof\packed\qf-toolloop.tar
   commands: qf-toolloop-acp
-(node:25536) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:15980) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-MzfCFp\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-MzfCFp\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
 $ node ./scripts/pack-agent.mjs
-Bundled 1 module in 19ms
+Bundled 1 module in 28ms
 
   acp-shim.js  2.15 KB  (entry point)
 
-packed hermes@0.1.0 Ã¢â€ â€™ C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-MzfCFp\repo\species\hermes\packed\hermes.tar
+packed hermes@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\species\hermes\packed\hermes.tar
   commands: hermes-acp-shim
-(node:29496) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security
+(node:31032) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security 
 vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-MzfCFp\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
-pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-MzfCFp\repo\species\hermes\packed\hermes.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\species\hermes\packed\hermes.meta.json {"route":"native_tui","name":"hermes","argv":["--tui"],"command":"hermes","terminal_target":"wsl:auto","peer_delivery":{"mode":"pty_role","runtime_profiles":["default"]},"package":"hermes.aospkg","tools":["kind:think","kind:read","kind:search","kind:fetch","think","web_search","web_extract","browser_navigate","browser_snapshot","read_file","search_files","list_dir"]}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-syWGuz\repo\species\hermes\packed\hermes.aospkg
 pack-agent: ready claude-code
 windows-cold-boot: building Electron bundle
 windows-cold-boot: creating unpacked Windows package
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-red-NvDERb\stores\kernel.db
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-red-GBJBLa\stores\kernel.db 
 provenance=explicit journal=wal sync=2 schema_meta=74
-windows-dock-collaboration: red orchestrator-tail="mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\r\n\u001b[?25l\u001b[8;26;80t\u001b[H\u001b[K\r\nQF_LAUNCH_READY fb00be74-50c8-4229-b7e6-9827020d1f70\u001b[K\r\n\u001b[K\r\nQF_LAUNCH_COMMIT fb00be74-50c8-4229-b7e6-9827020d1f70\u001b[K\r\nQUANTFLOW_MISSION {\"contract\":\"qf.mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[9;1H\u001b[?25h\u001b[?25l\u001b[H\u001b[K\r\nQF_LAUNCH_READY fb00be74-50c8-4229-b7e6-9827020d1f70\u001b[K\r\n\u001b[K\r\nQF_LAUNCH_COMMIT fb00be74-50c8-4229-b7e6-9827020d1f70\u001b[K\r\nQUANTFLOW_MISSION {\"contract\":\"qf.mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[13;1H\u001b[?25h" worker-tail="<hired worker PTY is app-owned and not exposed by this gate>"
+windows-dock-collaboration: red orchestrator-tail="mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\r\n\u001b[?25l\u001b[8;26;80t\u001b[H\u001b[K\r\nQF_LAUNCH_READY 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\n\u001b[K\r\nQF_LAUNCH_COMMIT 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\nQUANTFLOW_MISSION {\"contract\":\"qf.mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[9;1H\u001b[?25h\u001b[?25l\u001b[H\u001b[K\r\nQF_LAUNCH_READY 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\n\u001b[K\r\nQF_LAUNCH_COMMIT 8ad0fe79-c79d-41d1-afac-9541d77cacdb\u001b[K\r\nQUANTFLOW_MISSION {\"contract\":\"qf.mission.activation.v1\",\"mission_id\":\"WIN2-MISSION-20260802\",\"question\":\"TASK WIN2-NONCE-20260802\",\"instruction\":\"Use only QuantFlow MCP tools. Hire the named worker, delegate this mission, and return a receipt.\"}\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\r\n\u001b[K\u001b[13;1H\u001b[?25h" worker-tail="<hired worker PTY is app-owned and not exposed by this gate>"
 windows-dock-collaboration: FALSIFY RED delivery blocked
-kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-green-syq1J0\stores\kernel.db
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-windows-dock-collaboration-green-K2MOLb\stores\kernel.db 
 provenance=explicit journal=wal sync=2 schema_meta=74
 windows-dock-collaboration: green orchestrator-tail="" worker-tail="<hired worker PTY is app-owned and not exposed by this gate>"
 windows-dock-collaboration: FALSIFY GREEN delivery restored
 windows-dock-collaboration: PASS
 PASS  windows-dock-collaboration
 
-````
-
-### 18 Ã¢â‚¬â€ windows-installer
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: bun qa/run.ts windows-installer
-exit_code: 0
-red mutation / restoration: Copy the installer and alter its recorded SHA; restore the produced artifact and rerun.
-
-Complete transcript (candidate identity line followed by the preserved raw command output):
 
 ````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
+
+### 18 — windows-installer
+
+command: `bun qa/run.ts windows-installer`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\18-windows-installer.log`
+
+Complete unedited transcript:
+````text
 windows-installer: packaging with a 10-minute deadline
-windows-installer: installer=C:\tmp\qf-v21-accept-9a08f3d18c66\collab-electron\dist\QuantFlow Setup 0.8.4.exe
+windows-installer: installer=C:\tmp\qf-v21-accept-c93b04f\collab-electron\dist\QuantFlow Setup 0.8.4.exe
 windows-installer: Authenticode=NotSigned
-windows-installer: RELEASE-STATUS=C:\tmp\qf-v21-accept-9a08f3d18c66\collab-electron\dist\RELEASE-STATUS.json
-windows-installer: installed-executable=C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-rQpWp3\installed\QuantFlow.exe
-windows-installer: installed executable=C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-rQpWp3\installed\QuantFlow.exe
-windows-installer: build-identity={"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"2026-08-13T19:45:03.003Z","displayed":{"commitSha":"9a08f3d18c66c25e47fcd1dc493655e7b3a05120","packagedAt":"2026-08-13T19:45:03.003Z"}}
+windows-installer: RELEASE-STATUS=C:\tmp\qf-v21-accept-c93b04f\collab-electron\dist\RELEASE-STATUS.json
+windows-installer: installed-executable=C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-YNH05X\installed\QuantFlow.exe
+windows-installer: installed executable=C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-YNH05X\installed\QuantFlow.exe
+windows-installer: build-identity={"commitSha":"c93b04f1d6a448cee299b2a79a6c21204fdc8502","packagedAt":"2026-08-14T02:58:00.926Z","displayed":{"commitSha":"c93b04f1d6a448cee299b2a79a6c21204fdc8502","packagedAt":"2026-08-14T02:58:00.926Z"}}
 windows-installer: production-profiles=[{"id":"hermes-orchestrator","role":"orchestrator"},{"id":"hermes-worker","role":"worker"},{"id":"hermes-worker-2","role":"worker2"},{"id":"hermes-critic","role":"critic"},{"id":"claude-code-orchestrator","role":"claude-orchestrator"},{"id":"claude-code-worker","role":"claude-worker"}]
 windows-installer: install-owned processes=0
 windows-installer: PASS
 PASS  windows-installer
 
-````
-
-### 19 Ã¢â‚¬â€ release-range-diff-check
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: git diff --check origin/wo-r9-research-integrity...HEAD
-exit_code: 0
-red mutation / restoration: Not applicable; final release-range whitespace invariant.
-
-Complete transcript (candidate identity line followed by the preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-````
-
-### 20 Ã¢â‚¬â€ final diff check
-
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-command: git diff --check
-exit_code: 0
-red mutation / restoration: Not applicable; final whitespace invariant after the entire ordered sequence.
-
-Complete transcript (candidate identity line followed by the preserved raw command output):
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-````
-
-### Falsification transcripts for the rewritten contracts
-
-All falsifiers below were run against the same product candidate 9a08f3d18c66c25e47fcd1dc493655e7b3a05120; red worktrees were uncommitted throwaways and were not acceptance candidates.
-
-#### typecheck hardlink/copyfile red mutation
-
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-bun install v1.3.12 (700fc117)
-bun.exe : ENOENT: No such file or directory: failed to link package: @agentos-software/opencode@0.2.7 (copyfile)
-At line:2 char:74
-+ ... falsify-typecheck-cache-9a08'; & bun qa/run.ts typecheck 2>&1 | Tee-O ...
-+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (ENOENT: No such....2.7 (copyfile):String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
-
-ENOENT: No such file or directory: failed to link package: @aws-sdk/middleware-sdk-s3@3.972.64 (copyfile)
-
-$ node scripts/postinstall.mjs
-Patched winpty.gyp
-Patched binding.gyp
-Patched conpty_console_list_agent.ts
-Patched conpty_console_list_agent.js
-Searching dependency tree
-Building modules: node-pty
-Ã¢Å“â€ Rebuild Complete
-
-+ @assistant-ui/react@0.12.28
-+ @assistant-ui/react-markdown@0.12.11
-+ @blocknote/core@0.47.0
-+ @blocknote/mantine@0.47.0
-+ @blocknote/react@0.47.0
-+ @electron/asar@3.4.1
-+ @electron/notarize@2.5.0
-+ @electron/rebuild@4.2.0
-+ @octokit/rest@22.0.1
-+ @phosphor-icons/react@2.1.7
-+ @posthog/react@1.10.3
-+ @tailwindcss/vite@4.2.0
-+ @tiptap/core@3.20.0
-+ @tiptap/extension-typography@3.20.0
-+ @types/d3@7.4.3
-+ @types/react@19.2.14
-+ @types/react-dom@19.2.3
-+ @vitejs/plugin-react@5.1.4
-+ @xterm/addon-fit@0.11.0
-+ @xterm/addon-unicode11@0.9.0
-+ @xterm/addon-webgl@0.19.0
-+ @xterm/xterm@6.0.0
-+ app-builder-bin@4.2.0
-+ class-variance-authority@0.7.1
-+ clsx@2.1.1
-+ d3@7.9.0
-+ electron@40.6.0
-+ electron-builder@26.8.1
-+ electron-vite@5.0.0
-+ katex@0.16.33
-+ lucide-react@0.576.0
-+ monaco-editor@0.55.1
-+ posthog-js@1.404.1
-+ react@19.2.4
-+ react-dom@19.2.4
-+ react-markdown@10.1.0
-+ rehype-katex@7.0.1
-+ rehype-raw@7.0.0
-+ remark-breaks@4.0.0
-+ remark-gfm@4.0.1
-+ remark-math@6.0.0
-+ streamdown@2.3.0
-+ tailwind-merge@3.5.0
-+ tailwindcss@4.2.0
-+ tsx@4.23.1
-+ use-stick-to-bottom@1.1.3
-+ @agentclientprotocol/claude-agent-acp@0.26.0
-+ @agentclientprotocol/sdk@0.18.2
-+ @lezer/common@1.5.2
-+ @lezer/python@1.1.19
-+ @parcel/watcher@2.5.6
-+ @postlight/parser@2.2.3
-+ @rivet-dev/agentos-core@0.2.7
-+ dependency-cruiser@17.4.3
-+ electron-log@5.4.3
-+ electron-updater@6.8.3
-+ front-matter@4.0.2
-+ ignore@7.0.5
-+ node-pty@1.1.0
-+ posthog-node@5.45.2
-+ qf-bovada-football@../tools/qf-bovada-football
-+ qf-kernel@../packages/qf-kernel
-+ qf-kernel-schema@../qf-kernel-schema
-+ sharp@0.34.5
-+ typescript@5.9.3
-
-2321 packages installed [163.72s]
-Failed to install 2 packages
-typecheck: bun install --frozen-lockfile --backend copyfile --linker isolated exited 1; the original Bun install error
-above is authoritative (no retry was attempted)
-FAIL  typecheck
 
 ````
 
-#### typecheck hardlink restored green rerun
+### 19 — release-range-diff-check
 
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-bun install v1.3.12 (700fc117)
-bun.exe :
-At line:2 char:80
-+ ... y-typecheck-cache-9a08-green'; & bun qa/run.ts typecheck 2>&1 | Tee-O ...
-+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
+command: `git diff --check origin/wo-r9-research-integrity...HEAD`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\19-release-range-diff-check.log`
 
-$ node scripts/postinstall.mjs
-Patched winpty.gyp
-Patched binding.gyp
-Patched conpty_console_list_agent.ts
-Patched conpty_console_list_agent.js
-Searching dependency tree
-Building modules: node-pty
-Ã¢Å“â€ Rebuild Complete
-
-+ @assistant-ui/react@0.12.28
-+ @assistant-ui/react-markdown@0.12.11
-+ @blocknote/core@0.47.0
-+ @blocknote/mantine@0.47.0
-+ @blocknote/react@0.47.0
-+ @electron/asar@3.4.1
-+ @electron/notarize@2.5.0
-+ @electron/rebuild@4.2.0
-+ @octokit/rest@22.0.1
-+ @phosphor-icons/react@2.1.7
-+ @posthog/react@1.10.3
-+ @tailwindcss/vite@4.2.0
-+ @tiptap/core@3.20.0
-+ @tiptap/extension-typography@3.20.0
-+ @types/d3@7.4.3
-+ @types/react@19.2.14
-+ @types/react-dom@19.2.3
-+ @vitejs/plugin-react@5.1.4
-+ @xterm/addon-fit@0.11.0
-+ @xterm/addon-unicode11@0.9.0
-+ @xterm/addon-webgl@0.19.0
-+ @xterm/xterm@6.0.0
-+ app-builder-bin@4.2.0
-+ class-variance-authority@0.7.1
-+ clsx@2.1.1
-+ d3@7.9.0
-+ electron@40.6.0
-+ electron-builder@26.8.1
-+ electron-vite@5.0.0
-+ katex@0.16.33
-+ lucide-react@0.576.0
-+ monaco-editor@0.55.1
-+ posthog-js@1.404.1
-+ react@19.2.4
-+ react-dom@19.2.4
-+ react-markdown@10.1.0
-+ rehype-katex@7.0.1
-+ rehype-raw@7.0.0
-+ remark-breaks@4.0.0
-+ remark-gfm@4.0.1
-+ remark-math@6.0.0
-+ streamdown@2.3.0
-+ tailwind-merge@3.5.0
-+ tailwindcss@4.2.0
-+ tsx@4.23.1
-+ use-stick-to-bottom@1.1.3
-+ @agentclientprotocol/claude-agent-acp@0.26.0
-+ @agentclientprotocol/sdk@0.18.2
-+ @lezer/common@1.5.2
-+ @lezer/python@1.1.19
-+ @parcel/watcher@2.5.6
-+ @postlight/parser@2.2.3
-+ @rivet-dev/agentos-core@0.2.7
-+ dependency-cruiser@17.4.3
-+ electron-log@5.4.3
-+ electron-updater@6.8.3
-+ front-matter@4.0.2
-+ ignore@7.0.5
-+ node-pty@1.1.0
-+ posthog-node@5.45.2
-+ qf-bovada-football@../tools/qf-bovada-football
-+ qf-kernel@../packages/qf-kernel
-+ qf-kernel-schema@../qf-kernel-schema
-+ sharp@0.34.5
-+ typescript@5.9.3
-
-2325 packages installed [151.15s]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ qf-kernel-schema@../../qf-kernel-schema
-+ zod@4.4.3
-
-14 packages installed [694.00ms]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ qf-bovada-football@../../../tools/qf-bovada-football
-+ qf-kernel@../../../packages/qf-kernel
-+ qf-kernel-schema@../../../qf-kernel-schema
-
-18 packages installed [669.00ms]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ zod@4.4.3
-
-12 packages installed [615.00ms]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ qf-kernel@../../packages/qf-kernel
-
-16 packages installed [607.00ms]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ @modelcontextprotocol/sdk@1.29.0
-+ qf-kernel@../../packages/qf-kernel
-+ zod@4.4.3
-
-198 packages installed [2.01s]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ @modelcontextprotocol/sdk@1.29.0
-+ qf-kernel@../../packages/qf-kernel
-+ qf-kernel-schema@../../qf-kernel-schema
-+ zod@4.4.3
-
-198 packages installed [1.94s]
-bun install v1.3.12 (700fc117)
-
-+ @types/bun@1.3.14
-+ typescript@5.9.3
-+ qf-kernel@../../packages/qf-kernel
-+ qf-kernel-schema@../../qf-kernel-schema
-+ zod@4.4.3
-
-16 packages installed [608.00ms]
-PASS  typecheck
+Complete unedited transcript:
+````text
 
 ````
 
-#### kernel-market-lineage missing evaluation_id red mutation
+### 20 — final-diff-check
 
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-iBZMjC\kernel.db provenance=explicit
-journal=wal sync=2 schema_meta=74
-At line:2 char:1
-+ & bun qa/run.ts kernel-market-lineage 2>&1 | Tee-Object -FilePath 'C: ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (kernel: path=C:... schema_meta=74:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
+command: `git diff --check`
+exit_code: `0`
+raw_log: `C:\Users\rybow\qf-v21-final-c93b04f-logs\20-final-diff-check.log`
 
-kernel-market-lineage: FALSIFY RED empty lineage
-kernel-market-lineage: FALSIFY RED fabricated cite
-kernel-market-lineage: FAIL publish_artifact report requires evaluation_id
-FAIL  kernel-market-lineage
+Complete unedited transcript:
+````text
 
 ````
 
-#### kernel-market-lineage evaluation_id restored green rerun
+## Falsification and ownership receipts
 
-````
-acceptance_candidate_sha: 9a08f3d18c66c25e47fcd1dc493655e7b3a05120
-bun.exe : kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-10PvwH\kernel.db provenance=explicit
-journal=wal sync=2 schema_meta=74
-At line:2 char:1
-+ & bun qa/run.ts kernel-market-lineage 2>&1 | Tee-Object -FilePath 'C: ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (kernel: path=C:... schema_meta=74:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
+The command 16 transcript above contains the required live falsifier in the same candidate run:
 
-kernel-market-lineage: FALSIFY RED empty lineage
-kernel-market-lineage: FALSIFY RED fabricated cite
-kernel-market-lineage: PASS
-PASS  kernel-market-lineage
+- Ambient pre-existing Brave, Claude, extension-host, cmd, and conhost processes were listed as ignored and did not enter the ownership receipt.
+- A deliberately surviving gate-owned child printed `FALSIFY RED` with its PID and parent/command-line ownership receipt.
+- The child was terminated and the restoration printed `FALSIFY GREEN ... remaining-gate-owned-processes=0`.
+- The green cold-boot receipt printed readiness, `shutdown-result` with `requested:true`, `processExitCode:0`, `remainingGateOwnedProcesses:0`, `PASS windows-cold-boot`, and `direct-process-exit=0`.
 
-````
+## Release artifact identity
 
-### Release artifact identity
+Installer: `C:\tmp\qf-v21-accept-c93b04f\collab-electron\dist\QuantFlow Setup 0.8.4.exe`
+Authenticode: `NotSigned`.
+Installed executable and packaging receipt are in command 18's complete raw transcript above.
+The displayed build identity and `RELEASE-STATUS.json` both report the sole product candidate and the same UTC packaging timestamp.
 
-Installer: C:\tmp\qf-v21-accept-9a08f3d18c66\collab-electron\dist\QuantFlow Setup 0.8.4.exe
-Authenticode: NotSigned.
-Installed executable: C:\Users\rybow\AppData\Local\Temp\qf-windows-installer-rQpWp3\installed\QuantFlow.exe
-Packaged build identity: commit 9a08f3d18c66c25e47fcd1dc493655e7b3a05120; UTC timestamp 2026-08-13T19:45:03.003Z; displayed and recorded values matched.
+## Founder acceptance — not performed by this builder
 
-### Founder acceptance Ã¢â‚¬â€ not performed by this builder
-
-The founder must install the NSIS artifact above, open the desktop shortcut, confirm masthead commit 9a08f3d18c66c25e47fcd1dc493655e7b3a05120 and timestamp 2026-08-13T19:45:03.003Z, confirm hermes-critic is present and no ungranted profile is present, spawn it from the ordinary Dock, confirm 5 tools Ã‚Â· 0 skills, close QuantFlow, and confirm zero install-owned processes. This builder did not perform founder acceptance.
-
-The docs-only evidence commit SHA is reported separately from the acceptance candidate SHA in the handoff.
+Founder acceptance remains intentionally unperformed: install the NSIS artifact, open the desktop shortcut, confirm the candidate identity and timestamp, confirm the production Dock, launch `hermes-critic`, observe `5 tools · 0 skills`, close QuantFlow, and confirm zero install-owned processes.
