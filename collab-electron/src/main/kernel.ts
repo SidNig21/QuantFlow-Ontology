@@ -686,6 +686,7 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
     evaluation,
     evidence: {
       market_read_trajectory_artifacts: marketReadTrajectoryArtifacts,
+      worker_result_artifact: artifactReceipt(evidenceArtifactId),
       dataset_artifact: artifactReceipt(datasetArtifactId),
       result_artifact: artifactReceipt(resultArtifactId),
     },

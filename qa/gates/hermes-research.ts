@@ -373,6 +373,7 @@ function normalizeOutput(value: string): string {
 
 async function captureFor(launchState: Launch, timeoutMs: number, needle?: string): Promise<string> {
   let latest = "";
+  const capturedBySession = new Map<string, string>();
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const ids = new Set<string>([launchState.ptySessionId]);
@@ -383,10 +384,15 @@ async function captureFor(launchState: Launch, timeoutMs: number, needle?: strin
     const captures = await Promise.all([...ids].map(async (sessionId) => {
       try {
         const captured = await rpcCall(launchState.endpoint, "qf.pty.capture", { sessionId }) as { output?: unknown };
-        return typeof captured.output === "string" ? captured.output : "";
-      } catch { return ""; }
+        return { sessionId, output: typeof captured.output === "string" ? captured.output : "" };
+      } catch { return { sessionId, output: "" }; }
     }));
-    latest = normalizeOutput(captures.filter(Boolean).join("\n--- PTY ---\n"));
+    for (const capture of captures) {
+      if (capture.output.length >= (capturedBySession.get(capture.sessionId)?.length ?? 0)) {
+        capturedBySession.set(capture.sessionId, capture.output);
+      }
+    }
+    latest = normalizeOutput([...capturedBySession.values()].filter(Boolean).join("\n--- PTY ---\n"));
     if (needle && latest.includes(needle)) return latest;
     await wait(250);
   }
@@ -482,7 +488,7 @@ function checkLedger(ledger: BoundaryLedger, failedBoundary: Boundary | null): v
   assert(failures.length === (failedBoundary ? 1 : 0), "machine ledger has an invalid fail count");
   if (!failedBoundary) {
     assert(ledger.failure_mechanism === "none", "green machine ledger has a failure mechanism");
-    assert(ledger.boundaries.every((entry) => entry.outcome === "pass"), "green machine ledger is not fully green");
+    assert(ledger.boundaries.every((entry) => entry.outcome === "pass"), `green machine ledger is not fully green: ${ledger.boundaries.filter((entry) => entry.outcome !== "pass").map((entry) => entry.boundary).join(",")}`);
     return;
   }
   assert(failures[0]?.boundary === failedBoundary, "machine ledger failed boundary drifted");

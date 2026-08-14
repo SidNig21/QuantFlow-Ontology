@@ -403,6 +403,38 @@ founder can then redirect that work** — reassign the Task to the other seat,
 cancel it, or close a seat — and every one of those is a governed Kernel action
 with a visible result, not a UI-only affordance.
 
+> **Design target, approved 2026-08-14.** The founder reviewed GLACIER-faithful
+> mockups of both surfaces and approved the direction. Record of the decisions,
+> so R14's order derives from them rather than re-deriving:
+>
+> **Dock — two jobs, not six.** It answers *what can enter this workspace* and
+> *what is alive right now*. The ask box, the raw Kernel activity feed, the
+> research ledger, and the closed-session graveyard all leave. Catalog groups
+> into Participants / Resources / Recipes. Every row is **role first, runtime
+> second** — `Market Researcher` over `Hermes · native CLI`, never
+> `hermes-worker-2`. Each carries a readiness dot **with its reason** ("Sign in
+> to Claude Code in Ubuntu, then retry"), not one global footnote. Active rows
+> show what a seat *owns*, not merely `RUNNING`, and selecting one focuses its
+> tile.
+>
+> **Tile — the spine is untouched.** Head 44px, vertical id, grip 44px, and
+> state drives the head light and the id colour together, per
+> `design/glacier/tile-spec.html`. The change is a **fact strip** between the
+> head bar and the terminal well, answering five questions without reading
+> terminal output: what Task it owns · who gave it the work · what it has made ·
+> what data it is using · what it needs. Artifacts and Datasets render as live
+> links, never flattened text. Controls sit on the tile foot, not in a panel.
+>
+> **Cost split, measured.** Most of the fact strip is *free projection* of data
+> the Kernel already holds — `Task`, `assigned_to`, `delegated_by`, the `produces`
+> link, and `dataset_version.as_of` all exist today. The genuinely new work is
+> role display names in the profile manifests, per-profile readiness checks, and
+> the two missing Kernel actions behind Reassign and Cancel task.
+>
+> **Do not re-skin without re-allocating.** WO-g3 already re-skinned this Dock
+> with GLACIER tokens and it remained unusable, because the content problem was
+> untouched. Move status onto the tile first, then style what is left.
+
 > **STEER gap, recorded 2026-08-13.** `ADD → ASSIGN → CONNECT → WATCH → STEER →
 > REVIEW` is this document's stated operating loop, and until now STEER appeared
 > in the loop and in **no slice contract**. Without the sentence above, R14 could
