@@ -33,7 +33,7 @@ export const RPC_TIMEOUT_MS = 5_000;
 export const SHUTDOWN_TIMEOUT_MS = 20_000;
 export const POLL_INTERVAL_MS = 250;
 
-type ProcessInfo = {
+export type ProcessInfo = {
   pid: number;
   parentPid: number;
   name: string;
@@ -50,6 +50,12 @@ type TreeSnapshot = {
 type RpcResponse = {
   result?: unknown;
   error?: { message?: unknown };
+};
+
+export type ProcessOwnershipReceipt = {
+  rootPid: number;
+  pids: number[];
+  rows: ProcessInfo[];
 };
 
 // Cold boot is an explicit QA fixture path; normal product boot is Hermes-only.
@@ -290,29 +296,34 @@ function descendants(snapshot: readonly ProcessInfo[], rootPid: number): Set<num
   return result;
 }
 
-function pathMatches(value: string, packageRoot: string): boolean {
-  return value.toLowerCase().replaceAll("/", "\\")
-    .includes(packageRoot.toLowerCase().replaceAll("/", "\\"));
-}
-
 export function collectOwnedPids(
   before: readonly ProcessInfo[],
   after: readonly ProcessInfo[],
   rootPid: number,
-  packageRoot: string,
+  _packageRoot?: string,
 ): Set<number> {
   const beforePids = new Set(before.map((row) => row.pid));
-  const owned = descendants(after, rootPid);
-  for (const row of after) {
-    if (
-      !beforePids.has(row.pid) &&
-      (pathMatches(row.executablePath, packageRoot) ||
-        pathMatches(row.commandLine, packageRoot))
-    ) {
-      owned.add(row.pid);
-    }
+  // Ownership is a launch receipt, not a process-name or path guess.  The
+  // baseline matters: Windows can report an ambient process under the same
+  // desktop ancestry or executable family as the app, and claiming it would
+  // make cleanup both unsafe and non-falsifiable.
+  const owned = new Set<number>();
+  for (const pid of descendants(after, rootPid)) {
+    if (pid === rootPid || !beforePids.has(pid)) owned.add(pid);
   }
   return owned;
+}
+
+export function processOwnershipReceipt(
+  before: readonly ProcessInfo[],
+  after: readonly ProcessInfo[],
+  rootPid: number,
+): ProcessOwnershipReceipt {
+  const pids = [...collectOwnedPids(before, after, rootPid)].sort((a, b) => a - b);
+  const rows = after
+    .filter((row) => pids.includes(row.pid))
+    .sort((a, b) => a.pid - b.pid);
+  return { rootPid, pids, rows };
 }
 
 export function rpcCall(
@@ -439,6 +450,83 @@ export async function terminateOwnedProcessTree(pid: number): Promise<void> {
       () => resolveResult(),
     );
   });
+}
+
+const AMBIENT_PROCESS_NAMES = new Set([
+  "brave.exe",
+  "claude.exe",
+  "extension-host.exe",
+  "cmd.exe",
+  "conhost.exe",
+]);
+
+/**
+ * Live falsifier for the ownership contract.  The child is created by this
+ * gate, then deliberately left alive long enough to prove cleanup red with a
+ * PID and launch-tree receipt.  It is terminated and checked green before the
+ * real app launch, so the falsifier cannot leave machine state behind.
+ */
+export async function runOwnershipFalsifier(): Promise<void> {
+  const before = await processSnapshot();
+  const survivor = spawn(
+    process.execPath,
+    ["-e", "setInterval(() => {}, 1000)"],
+    { windowsHide: true, stdio: ["ignore", "ignore", "ignore"] },
+  );
+  assert(survivor.pid !== undefined, "ownership falsifier child did not provide a PID");
+  const survivorPid = survivor.pid;
+  try {
+    let after: ProcessInfo[] = [];
+    const deadline = Date.now() + 5_000;
+    while (Date.now() < deadline) {
+      after = await processSnapshot();
+      if (after.some((row) => row.pid === survivorPid)) break;
+      await wait(POLL_INTERVAL_MS);
+    }
+    const receipt = processOwnershipReceipt(before, after, process.pid);
+    const survivorRow = receipt.rows.find((row) => row.pid === survivorPid);
+    assert(
+      survivorRow !== undefined,
+      `ownership falsifier child was not in the gate launch tree: pid=${survivorPid}`,
+    );
+
+    const beforePids = new Set(before.map((row) => row.pid));
+    const ambient = after.filter((row) =>
+      beforePids.has(row.pid) && AMBIENT_PROCESS_NAMES.has(row.name.toLowerCase()),
+    );
+    assert(
+      ambient.every((row) => !receipt.pids.includes(row.pid)),
+      `ambient desktop process entered ownership receipt: ${ambient.map((row) => `${row.name}:${row.pid}`).join(", ")}`,
+    );
+    console.log(
+      `windows-cold-boot: FALSIFY GREEN ambient processes ignored; ` +
+        `ambient=${JSON.stringify(ambient.map((row) => `${row.name}:${row.pid}`))}`,
+    );
+
+    const redRemaining = after.filter((row) => row.pid === survivorPid);
+    assert(redRemaining.length === 1, `ownership falsifier child vanished before red check: pid=${survivorPid}`);
+    console.log(
+      `windows-cold-boot: FALSIFY RED surviving gate-owned child; ` +
+        `pid=${survivorPid} ownership=${JSON.stringify({ rootPid: process.pid, row: survivorRow })}`,
+    );
+
+    await terminateOwnedProcessTree(survivorPid);
+    await waitForExit(survivor, SHUTDOWN_TIMEOUT_MS);
+    const restored = (await processSnapshot()).find((row) => row.pid === survivorPid);
+    assert(
+      restored === undefined,
+      `ownership falsifier restoration left gate-owned child alive: pid=${survivorPid}`,
+    );
+    console.log(
+      `windows-cold-boot: FALSIFY GREEN ownership restored; ` +
+        `pid=${survivorPid} remaining-gate-owned-processes=0`,
+    );
+  } finally {
+    if (survivor.exitCode === null && survivor.pid !== undefined) {
+      await terminateOwnedProcessTree(survivor.pid);
+      await waitForExit(survivor, SHUTDOWN_TIMEOUT_MS).catch(() => null);
+    }
+  }
 }
 
 function assertPing(ping: unknown): void {
@@ -608,16 +696,18 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     assert(existsSync(kernelDb), "isolated Kernel database was not created");
     assert(existsSync(artifactRoot) && statSync(artifactRoot).isDirectory(), "isolated Artifact root is not present");
     const afterReadyProcesses = await processSnapshot();
-    ownedPids = collectOwnedPids(beforeProcesses, afterReadyProcesses, child.pid, packageRoot);
+    const ownership = processOwnershipReceipt(beforeProcesses, afterReadyProcesses, child.pid);
+    ownedPids = new Set(ownership.pids);
     assert(ownedPids.size > 0, "no app-owned Windows processes were observed after readiness");
 
     console.log(`windows-cold-boot: canvas/Dock ready; profiles=${JSON.stringify(profileIds)} owned-processes=${ownedPids.size}`);
+    console.log(`windows-cold-boot: ownership-receipt=${JSON.stringify(ownership)}`);
     console.log(`windows-cold-boot: readiness-receipt=${JSON.stringify({ readiness: ready.readiness, profileIds, kernelDb, artifactRoot })}`);
     const shutdown = await rpcCall(ready.endpoint, "app.shutdown");
     assertShutdownReceipt(shutdown);
     cleanShutdownRequested = true;
     const exitCode = await waitForExit(child, SHUTDOWN_TIMEOUT_MS);
-    assert(exitCode === 0 || exitCode === null, `packaged app exited with code ${String(exitCode)}`);
+    assert(exitCode === 0, `packaged app did not provide direct exit code 0 (received ${String(exitCode)})`);
 
     const deadline = Date.now() + SHUTDOWN_TIMEOUT_MS;
     let lingering: ProcessInfo[] = [];
@@ -629,6 +719,14 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     assert(
       lingering.length === 0,
       `app-owned Windows processes remained after shutdown: ${lingering.map((row) => `${row.name}:${row.pid}`).join(", ")}`,
+    );
+    console.log(
+      `windows-cold-boot: shutdown-result=${JSON.stringify({
+        requested: cleanShutdownRequested,
+        processExitCode: exitCode,
+        remainingGateOwnedProcesses: lingering.length,
+        ownedPids: ownership.pids,
+      })}`,
     );
     assert(!existsSync(endpointFile), "JSON-RPC socket breadcrumb remained after shutdown");
     const defaultAfter = snapshotTree(defaultStateRoot);
@@ -648,7 +746,12 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
         dockProfileIds: profileIds,
         screenshot: "external Computer Use capture required",
         defaultUserStateUnchanged: true,
-        shutdown: "rpc app.shutdown; exit code 0; owned process set empty",
+        shutdown: {
+          requested: cleanShutdownRequested,
+          processExitCode: exitCode,
+          remainingGateOwnedProcesses: lingering.length,
+        },
+        ownership,
         recordedAt: new Date().toISOString(),
       }, null, 2) + "\n",
       "utf8",
@@ -657,7 +760,7 @@ async function launchAndProbe(packageRoot: string, tempRoot: string): Promise<vo
     console.log(
       `windows-cold-boot: isolated kernel=${existsSync(kernelDb)} artifact-root=${existsSync(artifactRoot)} default-user-state-unchanged=true`,
     );
-    console.log("windows-cold-boot: clean shutdown requested and all app-owned processes exited");
+    console.log("windows-cold-boot: clean shutdown requested=true remaining-gate-owned-processes=0 process-exit=0");
   } catch (error) {
     writeFileSync(join(tempRoot, "packaged-app.log"), output, "utf8");
     if (child.exitCode === null && child.pid !== undefined) {
@@ -687,6 +790,7 @@ export async function runWindowsColdBootGate(): Promise<{ ok: boolean }> {
   const receiptPath = join(EVIDENCE_DIR, "windows-cold-boot-latest.json");
   const priorReceipt = existsSync(receiptPath) ? readFileSync(receiptPath) : null;
   try {
+    await runOwnershipFalsifier();
     const packageRoot = await buildWindowsPackage(tempRoot);
     if (falsify === "missing-runtime") {
       const bait = join(packageRoot, "resources", "species", "hermes", "dock-profiles.json");
@@ -703,6 +807,14 @@ export async function runWindowsColdBootGate(): Promise<{ ok: boolean }> {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`windows-cold-boot: FAIL ${message}`);
+    console.error(
+      `windows-cold-boot: shutdown-result=${JSON.stringify({
+        requested: message.includes("shutdown requested: true"),
+        processExitCode: 1,
+        remainingGateOwnedProcesses: "not-green",
+        boundedFailure: true,
+      })}`,
+    );
     if (falsify === "missing-runtime") {
       console.error("windows-cold-boot: BAIT RED (missing runtime resource blocked readiness)");
     }

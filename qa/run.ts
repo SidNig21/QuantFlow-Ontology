@@ -956,7 +956,11 @@ async function main() {
     console.log(`${ok ? "PASS" : "FAIL"}  ${g.name}`);
     if (!ok) failed++;
   }
-  process.exit(failed === 0 ? 0 : 1);
+  const exitCode = failed === 0 ? 0 : 1;
+  if (arg === "windows-cold-boot" && selected.length === 1) {
+    console.log(`windows-cold-boot: direct-process-exit=${exitCode}`);
+  }
+  process.exit(exitCode);
 }
 
 main();
