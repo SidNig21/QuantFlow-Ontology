@@ -1,10 +1,10 @@
 # WO-V2-2 verification
 
-Branch: `wo-V2-2`  
-Candidate commit: `f58c59ec5bdc4c1ae2ab3ca0615fc085a8a1c55a`  
-Founder acceptance: `not performed`  
-L4 certification: `pending`  
-Live model turns: `0`  
+Branch: `wo-V2-2`
+Candidate commit: `f58c59ec5bdc4c1ae2ab3ca0615fc085a8a1c55a`
+Founder acceptance: `not performed`
+L4 certification: `pending`
+Live model turns: `0`
 Live market data: `0`
 
 The synthetic proof used the checked-in deterministic responder through the
