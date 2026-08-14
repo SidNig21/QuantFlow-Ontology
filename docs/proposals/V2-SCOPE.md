@@ -257,6 +257,38 @@ signing status honestly, not obtain one. R14/RL. Betting or trading.
 
 ---
 
+## 5b. The visibility rule — binding on every rung
+
+**Every capability a rung adds must arrive with a founder-visible projection, a
+control, and a failure state, in the same rung that adds it.**
+
+Adopted 2026-08-14 at the founder's instruction: *"this is why i want it to be
+reflected visibly in the app as we go."*
+
+This is an acceptance condition, not a preference. It is what stops the ontology
+from decaying into vocabulary. Measured 2026-08-13: **six of eight ontology terms
+had no founder-visible projection at all.** `Task`, `Artifact`, `Evaluation`,
+`Hypothesis`, `Dataset`, `Run`, and `Report` were real rows with real constraints
+— the Kernel genuinely refuses to publish a Report without a passing Evaluation —
+and a founder could not see any of it happen. That is how a correct system
+becomes indistinguishable from a fake one.
+
+| The rung adds | It must also ship |
+|---|---|
+| a durable object | somewhere the founder sees that object exists |
+| an action | a control the founder can operate, not only an agent |
+| a refusal | the reason on screen, and the permitted next step |
+
+**What this does not oblige.** It is not licence to build the whole research
+canvas early — that is R16, and doing all projection up front is exactly the
+horizontal program `GOLDEN-RUN.md` forbids. The obligation is *minimum sufficient
+visibility for what this rung touches*, never maximum.
+
+**Test at founder acceptance.** For every capability a rung claims, the founder
+must be able to point at where it appears on screen and say what they can do
+about it. A capability that passes its gate and cannot be pointed at is not
+complete — it is deferred work wearing a green check.
+
 ## 6. Slices V2-2 to V2-6 — scoped on approval
 
 Each is written one slice ahead of the build front, as GOLDEN-RUN already
