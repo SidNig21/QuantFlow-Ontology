@@ -484,3 +484,48 @@ The successful receipts are preserved: the short-path verifier saw Kernel
 `86 pass, 0 fail`, and the Dock inventory/static gates passed. Those successes
 do not override either red acceptance command. WO-V2-1 has not reached founder
 acceptance, must not be merged, and must not be described as shipped capability.
+
+## REWORK ROUND 1 AFTER REWRITE — independent verification 2026-08-13
+
+Verifier task `019ffccf-2e93-7861-be6a-3743a6cb2ff0` checked the sole
+`acceptance_candidate_sha`
+`9a08f3d18c66c25e47fcd1dc493655e7b3a05120` cold in fresh short-path worktree
+`C:\tmp\qf-v21-verifier-independent-20260813-9a08` and returned REWORK.
+Raw verifier receipts are preserved outside the worktree at
+`C:\Users\rybow\qf-v21-verifier-logs-20260813-9a08`. This is the one permitted
+rework cycle for the rewritten order.
+
+1. **Cold boot claims unrelated desktop processes as app-owned.** Plain
+   language: Ryan's normal open Brave and Claude processes make the release
+   command fail even though the gate did not launch them. `bun
+   qa/verify-release.ts` exited 1 at `release:windows-cold-boot`; its direct
+   receipt reported 50 remaining "app-owned" processes including `brave.exe`,
+   `claude.exe`, `extension-host.exe`, `cmd.exe`, and `conhost.exe`. Repair the
+   ownership proof so it considers only processes demonstrably created by this
+   gate/app launch (for example, recorded launch-tree identity), never all
+   processes sharing a broad executable name or ambient desktop ancestry.
+   Falsify with pre-existing Brave/Claude processes: they must remain untouched
+   and cannot make the gate red. A deliberately surviving process created by
+   the gate must still make cleanup red with its PID and ownership receipt.
+
+2. **Standalone cold boot has no terminal shutdown receipt.** Plain language:
+   the app reached canvas/Dock readiness with the correct candidate identity,
+   but `bun qa/run.ts windows-cold-boot` stopped after the readiness receipt and
+   never produced a direct process exit, clean-shutdown line, or PASS/FAIL
+   verdict. Make shutdown and owned-process cleanup bounded and ensure every run
+   terminates with an actual command exit plus a named failure on timeout. The
+   green receipt must include readiness, shutdown requested, zero remaining
+   gate-owned processes, and `PASS windows-cold-boot` from the same invocation.
+
+3. **The evidence contradicts the fresh verifier.** Plain language:
+   `docs/orders/evidence/r13/V2-1-VERIFICATION.md` correctly names the sole
+   candidate but claims commands 14 and 16 exited 0. The independent run proves
+   command 14 exited 1 and command 16 has no exit receipt. Preserve the current
+   ledger as failed `REWORK ROUND 1 AFTER REWRITE` history, then generate new
+   acceptance evidence only from a complete fresh ordered run at one exact
+   candidate. Do not reinterpret readiness as shutdown or a missing exit as 0.
+
+Rework acceptance is the complete 20-command sequence above, in order, from one
+fresh short-path detached worktree with no cleanup between commands. Any
+remaining red or missing process-exit receipt is a second failed verification
+of the rewritten order and stops it for another rewrite; there is no third lap.
