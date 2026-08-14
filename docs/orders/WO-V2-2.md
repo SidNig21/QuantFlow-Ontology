@@ -1,17 +1,17 @@
-# WO-V2-2 — a seat that finishes work
+# WO-V2-2 - a seat that finishes work
 
-status: open
-assignee: builder
+status: draft
+assignee: unassigned until authorized
 depends: WO-V2-1 founder accepted
 rung: R13 / V2-2
-authorization: draft only until `NEXT.md` names this order
+authorization: none; draft only until `NEXT.md` names this order after WO-V2-1 founder acceptance
 
 ## Objective
 
 Measure one cold Hermes seat's first turn from a fixed boundary list, repair
 only the earliest failed boundary, and prove one benign research question
-finishes the existing question → hypothesis → dataset → run → metrics →
-independent critic → report chain in the installed Windows app.
+finishes the existing question -> hypothesis -> dataset -> run -> metrics ->
+independent critic -> report chain in the installed Windows app.
 
 ## In plain terms
 
@@ -25,13 +25,20 @@ evidence, evaluation, and lineage are visible in the Kernel.
 - `START_HERE.md`
 - `docs/orders/PROTOCOL.md`
 - `docs/orders/AUTONOMY.md`
-- `docs/orders/NEXT.md` — must name this file before implementation starts
+- `docs/orders/NEXT.md` - must name this file before implementation starts
 - `docs/orders/GOLDEN-RUN.md`
 - `docs/DEBT.md`, especially #24 and #32
-- `docs/proposals/V2-SCOPE.md` §6, V2-2
+- `docs/proposals/V2-SCOPE.md` section 6, V2-2
 - `docs/orders/evidence/r13/V2-1-VERIFICATION.md`
 - V2-1 product candidate
   `c93b04f1d6a448cee299b2a79a6c21204fdc8502`
+
+This file is not an authorization surface. No builder may implement, run a
+live turn, or treat this order as active until a verifier has independently
+confirmed WO-V2-1 founder acceptance and `NEXT.md` has been rewritten to name
+this exact file. A link, `depends` line, scope proposal, or chat instruction
+cannot substitute for that rotation. This order does not edit `NEXT.md` and
+does not authorize V2-3.
 
 ## Measured starting point
 
@@ -39,38 +46,71 @@ The installed V2-1 candidate boots, exposes the six production Dock profiles,
 launches `hermes-critic`, reports `5 tools · 0 skills`, completes deterministic
 packaged collaboration through the app-owned gateway, and shuts down cleanly.
 It does not prove a real Hermes first turn or the complete governed research
-chain. That unknown is this order's only starting defect.
+chain. That unknown is this order's only starting defect. The V2-1 evidence
+explicitly says founder acceptance was not performed; the dependency and
+activation rule above therefore remain binding.
 
 ## Deliverables
 
 ### 1. Synthetic first-turn measurement before live use
 
-Add one deterministic, credential-free, network-free packaged-seat probe that
-uses the same Dock admission, PTY activation, app-owned gateway, generated tool
-schemas, Kernel, and result-return seams as Hermes. It uses the checked-in
-golden market fixture and consumes no model or market-provider quota.
+Add and register `hermes-first-turn-synthetic`: one deterministic,
+credential-free, network-free packaged-seat probe that enters through the
+production Hermes profile and uses the same Dock admission, PTY activation,
+app-owned gateway, generated tool schemas, Kernel, and result-return seams as
+Hermes. Only the model/provider response is replaced by a checked-in
+deterministic responder. A different proof species, a direct Kernel script, or
+an unpackaged source launch is not this measurement. It uses the checked-in
+golden market fixture and consumes no model, network, credential, or
+market-provider quota.
 
 The probe records timestamps and one outcome for every boundary below. Exactly
-one earliest failed boundary is named; `unknown`, `other`, and free-text failure
-categories are forbidden.
+one earliest failed boundary is named; `unknown`, `other`, and free-text
+failure categories are forbidden. The ledger is machine-readable and contains
+the full 40-character candidate SHA, the ISO-8601 UTC package timestamp copied
+from the packaged build identity/`RELEASE-STATUS.json` (not the probe clock),
+Hermes seat/session ids, one timestamped entry for each boundary, durable
+measurement artifact ids and content hashes, `failed_boundary`, and
+`failure_mechanism`.
+Each boundary outcome is exactly `pass`, `fail`, or `not_reached`: only
+`failed_boundary` may be `fail`, every later boundary must be `not_reached`, and
+an all-green run must set `failed_boundary: null` and
+`failure_mechanism: none`.
 
-1. `dock_admission` — definition accepted and owned PTY/runtime created.
-2. `launch_readiness` — the seat emits the nonce-bound readiness receipt.
-3. `activation_delivery` — the bounded mission reaches the owned seat.
-4. `first_turn` — the runtime returns one complete usable turn.
-5. `tool_discovery` — expected generated tools and schemas are visible.
-6. `tool_input` — the first generated tool call passes Gate 1 validation.
-7. `tool_output` — its result passes Gate 2/coherence validation.
-8. `run_control` — the bounded research run completes without an unclassified
+`failed_boundary` is exactly one of the ten labels below or `null`.
+`failure_mechanism` is exactly one of `admission_rejected`,
+`readiness_missing`, `activation_missing`, `turn_incomplete`,
+`tool_discovery_missing`, `tool_schema_ambiguity`, `gate1_rejected`,
+`gate2_rejected`, `run_timeout`, `run_retry_exhausted`, `run_typed_error`,
+`run_control_failed`, `lineage_rejected`, `result_return_missing`, or `none`.
+No second category field or free-text category is permitted.
+The mechanism must match the failed boundary: admission/readiness/activation/
+turn use the first four values; `tool_discovery` uses
+`tool_discovery_missing` or `tool_schema_ambiguity`; `tool_input` uses
+`gate1_rejected` or `tool_schema_ambiguity`; `tool_output` uses
+`gate2_rejected`; `run_control` uses one of the four `run_*` values; lineage
+uses `lineage_rejected`; and result return uses `result_return_missing`. A
+non-null failed boundary may not use `none`; only `failed_boundary: null` may
+use `failure_mechanism: none`.
+
+1. `dock_admission` - definition accepted and owned PTY/runtime created.
+2. `launch_readiness` - the seat emits the nonce-bound readiness receipt.
+3. `activation_delivery` - the bounded mission reaches the owned seat.
+4. `first_turn` - the runtime returns one complete usable turn.
+5. `tool_discovery` - expected generated tools and schemas are visible.
+6. `tool_input` - the first generated tool call passes Gate 1 validation.
+7. `tool_output` - its result passes Gate 2/coherence validation.
+8. `run_control` - the bounded research run completes without an unclassified
    timeout, retry loop, or error.
-9. `lineage_publication` — artifacts, independent Evaluation, and Report link
+9. `lineage_publication` - artifacts, independent Evaluation, and Report link
    to the same governed chain.
-10. `result_return` — the cited result reaches the seat/tile and the seat exits.
+10. `result_return` - the cited result reaches the seat/tile and the seat exits.
 
-The durable measurement includes candidate SHA, package timestamp,
-seat/session id, boundary timestamps, selected failure category, and artifact
-ids/hashes. It records `failed_boundary: null` only when all ten boundaries
-have positive receipts.
+The unmodified probe is a required all-pass positive control. The
+falsification switch is synthetic-test-only and must not be honoured by a
+production Hermes path. A synthetic green result never certifies L4; it only
+authorizes the one bounded live turn at Founder acceptance after this proof is
+green.
 
 ### 2. One-boundary repair
 
@@ -78,78 +118,197 @@ Repair only the earliest failed boundary selected by deliverable 1. Do not fix
 the next problem speculatively. If a second boundary remains red after that
 repair, stop and return REWORK.
 
-If the selected boundary is `run_control` because of timeout, retry, or typed
-error handling, use the doctrine-named Effect approach already recorded in
-`V2-SCOPE.md`; do not conduct another framework search. If the selected boundary
-is tool-schema ambiguity, record `DEBT.md` #24 and repair the generated schema
-contract directly; Effect is not the answer.
+The repair is one measured product-boundary change plus only the test or
+receipt change required to prove that same boundary. The builder copies the
+exact `failed_boundary` and `failure_mechanism` from the synthetic ledger into
+the report; it may not relabel the failure after editing.
+
+If and only if `failed_boundary` is `run_control` and the mechanism is exactly
+`run_timeout`, `run_retry_exhausted`, or `run_typed_error`, use the
+doctrine-named Effect approach already recorded in `V2-SCOPE.md`; do not
+conduct another framework search or adopt Effect pre-emptively. If the
+mechanism is `tool_schema_ambiguity` at `tool_discovery` or `tool_input`, record
+the measured trigger for `DEBT.md` #24 and repair the generated schema contract
+directly; Effect is not the answer. Any other mechanism gets no speculative
+framework or second-boundary repair.
 
 ### 3. Packaged governed research chain
 
-From the installed candidate, one benign fixture-backed football research
-question produces, in order, durable Question, Hypothesis, point-in-time
-Dataset, deterministic Run, quantitative Metrics, independent Evaluation, and
-gated Report objects. The Report cites artifact hashes and the Evaluation id.
-No object may be manufactured only for the gate, and no second truth store may
-be introduced.
+Add and register `windows-hermes-research-chain`. In the builder and verifier
+proof it uses the same checked-in deterministic responder as the synthetic
+first-turn measurement, but it must submit the question through the existing
+packaged question seam (the one exercised by `windows-research-question` /
+`windows-golden-run`), not by a direct Kernel script. It produces, in order,
+durable Question, Hypothesis, point-in-time Dataset, deterministic Run,
+quantitative Metrics, the existing result-evidence artifact, an independent
+critic Evaluation, and a gated Report. The founder-visible chain remains
+exactly Question -> Hypothesis -> Dataset -> Run -> Metrics -> independent
+critic/Evaluation -> Report; the artifact is the existing evidence object
+cited by the Evaluation and Report, not a second workflow or a new slice. The
+Report cites the exact artifact content hashes and the Evaluation id. The
+Evaluation must come from a different session identity than the producing
+seat, have verdict `supports`, and a rejecting or missing Evaluation id must
+block publication. The ledger names the exact existing evidence artifacts used
+by the chain: the market-read trajectory artifact, the Dataset artifact, the
+deterministic Run result artifact, and the Report artifact, each with its id
+and content hash. No additional artifact kind may be introduced. No object may
+be manufactured only for the gate, and no second truth store may be introduced.
 
-The synthetic proof runs first. Only after it is green may the builder perform
-one bounded live Hermes turn through the ordinary production Dock. The live
-turn must not print, copy, inspect, or modify credentials and must not use live
-market data; it consumes only the checked-in fixture. Record elapsed time and
-model/provider usage when exposed. Never repeat a live turn to hide a red result.
+The gate may seed only the checked-in fixture market rows. It must not insert
+Question, Hypothesis, Dataset, Run, Metrics, artifact, Evaluation, or Report
+rows with raw SQL or a gate-only shortcut: those chain objects must be created
+through the existing app-owned Kernel actions and the question must travel
+through the existing packaged question path. It must prove the valid fixture
+path with one in-window row and refuse a specifically seeded future-dated row;
+the Dataset and every downstream object must retain the same as-of boundary.
+It must run the existing R11b quantitative metrics contract rather than invent
+a second formula. Two identical deterministic Run inputs must yield the same
+result hash; a changed input must yield a different hash and must not be allowed
+to claim the old one.
+
+The synthetic proof runs first. Builders and verifiers make no live model
+turns. Only after independent verification may the founder perform the one
+bounded live Hermes turn during Founder acceptance through the ordinary
+production Dock profile, with no QA/proof profile and no direct runtime
+invocation. The live turn must not print, copy, inspect, or modify credential
+contents and must not use live market data; it consumes only the checked-in
+fixture. It must make exactly one model turn, with no retry or second attempt;
+record elapsed time and model/provider usage when exposed. Never repeat a live
+turn to hide a red result. A failure in this one turn stops the order and leaves
+L4 uncertified.
 
 ### 4. L4 and product-state receipt
 
-Hermes reaches L4 only when its answer cites the governed Report/Evaluation and
-artifact hashes, the Kernel records the same lineage, the installed app displays
-the completed result, and closing the app leaves zero install-owned processes.
-Founder Hermes configuration and Windows product state remain unchanged except
-for QuantFlow-owned state.
+Hermes reaches L4 only on the one Founder-acceptance live turn, never from the
+synthetic proof, when its answer cites the governed Report/Evaluation and
+artifact hashes, the Kernel records the same lineage, the installed app
+displays the completed result, and closing the app leaves zero install-owned
+processes. The synthetic chain gate must print
+`l4_candidate_ready=true`, `l4_certified=false`, `live_turn_count=0`, and
+`retry_count=0`. Founder acceptance must then record
+`l4_certified=true`, `live_turn_count=1`, and `retry_count=0` with the live
+receipt ids; a model response without the durable governed lineage is not L4.
+
+Run the existing hash-only `hermes-founder-state` gate for the founder's
+Hermes files. The WSL-owned Hermes profile root required by `DEBT.md` #32 must
+remain outside Windows-visible QuantFlow product state: no Linux-only reparse
+symlink may be created under `~/.quantflow/app`, and an unreadable or foreign
+reparse entry fails the product-state receipt. The receipt contains digests and
+state checks only, never credential contents. Founder Hermes configuration and
+Windows product state remain unchanged except for QuantFlow-owned state.
 
 ## Acceptance gates
 
-Builder and verifier run from one fresh short-path detached worktree. The
-verifier repeats every command cold and preserves complete raw output.
+The builder runs on native Windows after authorization and pastes unedited
+output. Per `PROTOCOL.md`, builder checks are package-level plus this order's
+synthetic falsification proof; no builder or verifier command may spend model
+or live-market quota. The builder does not perform founder acceptance or claim
+the cold release proof. The verifier repeats the builder checks cold in a fresh
+short-path detached worktree, then runs the installed packaged synthetic proof
+and preserves complete raw output.
+
+Builder-run:
 
 ```powershell
+bun qa/run.ts repo-shape
+bun qa/run.ts lockfile-committed
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts kernel-one-path
+bun qa/run.ts one-skin
 bun qa/run.ts kernel
 bun qa/run.ts typecheck
 bun qa/run.ts kernel-market-lineage
 bun qa/run.ts hermes-first-turn-synthetic
-bun qa/run.ts windows-hermes-research-chain
+bun qa/run.ts doc-links
+git diff --check
+```
+
+`hermes-first-turn-synthetic` must print the exact ten boundary labels, all
+ledger fields above, the unmodified all-pass positive control, every requested
+red/green falsifier, and the selected earliest boundary. The builder must stop
+if the synthetic proof is not green.
+
+Verifier-run, in a fresh detached worktree at one exact candidate:
+
+```powershell
+bun qa/run.ts repo-shape
+bun qa/run.ts lockfile-committed
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts kernel-one-path
+bun qa/run.ts one-skin
+bun qa/run.ts kernel
+bun qa/run.ts typecheck
+bun qa/run.ts kernel-market-lineage
+bun qa/run.ts hermes-launch-policy
+bun qa/run.ts hermes-founder-state
+bun qa/run.ts hermes-first-turn-synthetic
 bun qa/verify-release.ts
+bun qa/run.ts windows-installer
+bun qa/run.ts windows-hermes-research-chain
+bun qa/run.ts doc-links
 git diff --check origin/wo-r9-research-integrity...HEAD
 git diff --check
 ```
 
-`hermes-first-turn-synthetic` prints all ten boundary receipts and the selected
-earliest boundary. `windows-hermes-research-chain` identifies the installed
-build, session, Question, Hypothesis, Dataset, Run, Metrics, Evaluation, Report,
-cited hashes, result-return receipt, and zero remaining install-owned processes.
+`windows-hermes-research-chain` owns a fresh isolated install of its candidate
+and must launch the installed executable, not the source tree or an unpacked
+directory. It must print the full candidate SHA, package timestamp, installed
+executable path, production Hermes profile id, seat/session id, Question,
+Hypothesis, Dataset as-of, Dataset artifact id/content hash, Run/result hash,
+Metrics, result-artifact id/content hash, independent Evaluation id/verdict,
+Report id/content hash,
+result-return receipt, `founder_state_unchanged=true`,
+`quantflow_windows_state_readable=true`, `live_turn_count=0`,
+`retry_count=0`, `l4_candidate_ready=true`, `l4_certified=false`, and
+`remaining_install_owned_processes=0`. It fails on a missing or mismatched
+identity, a source/unpacked launch, a missing link, a future Dataset row, a
+non-independent or rejecting Evaluation, a Report without the exact
+Evaluation id, a second model turn/retry, an unreadable Windows product-state
+entry, or any remaining process. Ambient Brave, Claude, and other desktop
+processes must not count as app-owned; a deliberately surviving process
+created by this gate must fail with its PID and ownership receipt.
 
 ## Falsification
 
-- Suppress each synthetic boundary receipt one at a time. The gate goes red and
-  names exactly that earliest missing boundary.
-- Feed invalid generated-tool input. Gate 1 rejects it before execution.
-- Feed an incoherent tool result. Gate 2 rejects it before publication.
-- Remove the Evaluation id from Report publication. No Report may appear.
-- Use a Dataset row after its as-of time. The chain goes red.
-- Change a deterministic Run input while claiming the old result hash. Red.
-- Leave one gate-owned runtime alive. Windows acceptance goes red with its PID;
-  restoration returns to zero.
+Every gate this order adds must be shown red on purpose, restored, and shown
+green. Existing gates retain their existing falsification receipts; this order
+does not redefine their semantics. Every red and restored green transcript
+belongs in `docs/orders/evidence/r13/V2-2-VERIFICATION.md`.
 
-Every red and restored green transcript belongs in
-`docs/orders/evidence/r13/V2-2-VERIFICATION.md`.
+- Suppress each synthetic boundary receipt one at a time. The gate goes red and
+  names exactly that earliest missing boundary. Start from the unmodified
+  all-pass positive control; after restoring each single suppression, do not
+  apply the next suppression until its prior green is recorded.
+- Feed invalid generated-tool input after a valid control. Gate 1 rejects it
+  before execution; restore the valid input and show green.
+- Feed an incoherent tool result after a coherent control. Gate 2 rejects it
+  before publication; restore the coherent result and show green.
+- Remove the Evaluation id from Report publication, then repeat with a
+  `rejects` Evaluation. No Report may appear in either red run; restore the
+  real supporting Evaluation id and show green.
+- Use the specifically seeded future Dataset row after the valid in-window
+  control. The Dataset/chain gate goes red and writes no downstream chain;
+  restore the in-window row and show green.
+- Change a deterministic Run input while claiming the old result hash. The
+  gate goes red; restore the original input and show equal hashes for equal
+  inputs and a different hash for the changed input.
+- Leave one gate-owned runtime alive. Windows acceptance goes red with its PID
+  and ownership receipt; ambient processes remain ignored; restoration returns
+  to zero.
 
 ## Constraints
 
 - Research only. Never place a bet or execute a trade.
 - Kernel remains the sole writer; no second database or UI-owned truth.
-- No credential reads, copies, prints, or changes.
+- No credential contents are read, copied, printed, or changed.
 - Synthetic proof precedes the one bounded live Hermes turn.
 - No new provider, framework, orchestration engine, or execution vendor.
+- Effect is permitted only for the exact measured `run_control` mechanisms
+  listed in deliverable 2; it is forbidden for tool-schema ambiguity.
 - Hermes stays unpinned; any workaround says it may evaporate on update.
 - Never weaken a gate or convert a missing exit into success.
 
@@ -163,13 +322,19 @@ live market capture; more than one live model turn; V2-3 or later; RL.
 
 After independent verification, Ryan installs the candidate, opens its desktop
 shortcut, asks the benign fixture-backed question through one ordinary Hermes
-seat, and sees one completed governed Report. Ryan confirms the answer cites
-the same Report, Evaluation, and artifact hashes recorded in the Kernel, closes
-QuantFlow, and confirms zero install-owned processes.
+seat, and sees one completed governed Report. This is the single live model
+turn for the order: the synthetic proof has already run before it and used no
+model or live-market risk. Ryan confirms the answer cites the same Report,
+Evaluation, and artifact hashes recorded in the Kernel, confirms the live
+receipt records `l4_certified=true`, closes QuantFlow, and confirms zero
+install-owned processes. Ryan does not repeat the turn if it is red.
 
 ## Report back
 
-Report the boundary ledger, one selected failed boundary, one repair, all
-red/green falsifiers, every acceptance exit, installed identity/signing state,
-final research-object ids/hashes, model usage if reported, and remaining reds.
-Stop; do not begin V2-3.
+Report the boundary ledger, one selected failed boundary (or `null`), one
+repair, all red/green falsifiers, every acceptance exit, installed
+identity/signing state, final research-object ids/hashes, founder-state and
+Windows-state receipts, model usage if reported, and remaining reds. State
+`founder_acceptance: not performed` and `l4_certified: pending` until the
+founder does the final step. Stop; do not edit `NEXT.md`, authorize this order
+early, or begin V2-3.
