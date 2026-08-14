@@ -1570,6 +1570,36 @@ Authenticode: `NotSigned`.
 Installed executable and packaging receipt are in command 18's complete raw transcript above.
 The displayed build identity and `RELEASE-STATUS.json` both report the sole product candidate and the same UTC packaging timestamp.
 
+## Independent verifier PASS — 2026-08-13
+
+Verifier task: `019fff8a-46b9-77c2-bea7-4e0f69d67504`.
+
+The verifier created fresh detached worktree
+`C:\tmp\qf-v21-final-verify-c93` at the sole acceptance candidate
+`c93b04f1d6a448cee299b2a79a6c21204fdc8502`. Complete independent stdout,
+stderr, and exit receipts are preserved at
+`C:\tmp\qf-v21-final-verify-c93-logs`.
+
+Verdict: `PASS`.
+
+- All 20 commands ran in the required order and exited `0`.
+- Canonical release printed `PASS release-verification`.
+- The post-release `kernel-market-lineage` rerun exited `0`.
+- Ambient Brave and Claude processes were ignored by the ownership proof.
+- The gate-owned surviving-child control went red with its ownership receipt,
+  then restoration went green with zero remaining gate-owned processes.
+- Standalone cold boot printed readiness, shutdown requested, shutdown result
+  exit `0`, zero remaining gate-owned processes, `PASS windows-cold-boot`, and
+  `direct-process-exit=0` from one invocation.
+- Packaged collaboration printed delivery-off red, restoration green, and PASS.
+- The installed artifact identified the exact candidate above, reported
+  Authenticode `NotSigned`, contained `hermes-critic`, contained no ungranted
+  production profile, and left zero install-owned processes.
+- Both diff checks exited `0`; the detached verifier worktree remained clean.
+
+This independent verifier section completes machine acceptance evidence. It
+does not perform or imply the founder acceptance below.
+
 ## Founder acceptance — not performed by this builder
 
 Founder acceptance remains intentionally unperformed: install the NSIS artifact, open the desktop shortcut, confirm the candidate identity and timestamp, confirm the production Dock, launch `hermes-critic`, observe `5 tools · 0 skills`, close QuantFlow, and confirm zero install-owned processes.
