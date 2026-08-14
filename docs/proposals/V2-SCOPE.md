@@ -279,11 +279,27 @@ packaged app. Certifies Hermes at L4. Absorbs the old S2, S3, S4.
 
 **V2-3 · Compose a team.** Dock shows role first and runtime second, with a
 readiness state and capability summary. Founder adds two seats, creates a durable
-Task, assigns it, and sees the assignment on the tile and in the ledger.
+Task, assigns it, and sees the assignment on the tile and in the ledger. **The
+founder can then redirect that work** — reassign the Task to the other seat,
+cancel it, or close a seat — and every one of those is a governed Kernel action
+with a visible result, not a UI-only affordance.
+
+> **STEER gap, recorded 2026-08-13.** `ADD → ASSIGN → CONNECT → WATCH → STEER →
+> REVIEW` is this document's stated operating loop, and until now STEER appeared
+> in the loop and in **no slice contract**. Without the sentence above, R14 could
+> close having delivered *add a seat, assign a task, watch it run* with no way to
+> intervene — technically complete and useless in practice. The full steering
+> surface (send another instruction, add a constraint, request a second opinion,
+> replace a runtime, cancel an in-flight turn) stays deliberately unscoped until
+> the V2-2 founder run shows which controls are actually reached for. Reassign,
+> cancel, and close are the minimum floor.
 
 **V2-4 · Governed handoff.** Founder routes an Artifact to a critic seat. The
 critic publishes an independent Evaluation. A rejecting verdict visibly blocks
-report publication, with the reason and the permitted next step on screen.
+report publication, with the reason and the permitted next step on screen. After
+a rejection the founder can **act on it** — request a revision from the original
+seat, or route the same Artifact to a second critic. A handoff that only draws a
+labelled line and causes no critic work does not satisfy this slice.
 
 > **Sharpened by the research sweep.** The scoring rubric is already chosen:
 > Ragas, doctrine-named for scoring an Artifact against its Hypothesis criteria
