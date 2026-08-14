@@ -498,3 +498,129 @@ Actual: the fresh one-worker fixture passes, but a concurrent or prior
 research object can cause a mismatched Report lineage.
 
 Scope: product lineage-composition defect; order-blocking.
+
+## Round 2 POST-REWORK FAILURE — independent verifier
+
+Verifier candidate: `1b899d813cc021ff16442fc75688aad3e39f7e40`
+
+Verifier worktree: `C:\tmp\qf-v22-verifier-r2-20260814-1b899`
+
+Builder evidence HEAD at verification start: `e1b9c9b420bab6893ebb5b8feb083fb19f22fd24`
+
+Result: `FAIL`. This is the post-rework verifier record. The one permitted
+rework cycle is exhausted; the order remains `status: rework` and must be
+rewritten before another implementation lap. No product code was changed.
+
+In plain terms: the test gets stuck cleaning up the intentionally broken
+launcher, so it cannot prove the remaining boundary protections.
+
+### 1. Founder-state gate retest — PASS
+
+Locations: `qa/gates/hermes-founder-state.ts:92-105`,
+`collab-electron/cli/qf-hermes-launch.sh:105-110,153`.
+
+Command and exit: `bun qa/run.ts hermes-founder-state` — exit `0`.
+
+Expected: nonce/toolset launcher control succeeds and real founder config/auth
+hashes remain unchanged. Actual: the scratch bait went red and restored green;
+the real founder digests were unchanged and the gate printed `PASS`.
+
+Scope: the Round 1 founder-state defect is retested green.
+
+### 2. Exact range diff check retest — PASS
+
+Command and exit: `git diff --check origin/wo-r9-research-integrity...HEAD` —
+exit `0`; working-tree `git diff --check` — exit `0`.
+
+Expected: both checks are clean. Actual: both checks exited `0`.
+
+Scope: the inherited evidence-whitespace blocker is retested green.
+
+### 3. Packaged boundary falsifier suite cannot complete — FAIL
+
+Locations: `qa/gates/hermes-research.ts:515` assigns `red` only after
+`launch(...)` returns; `qa/gates/hermes-research.ts:544-549` skips shutdown
+when that launch throws and immediately calls `rmSync(redRoot, ...)`.
+
+Command and exit: `bun qa/run.ts hermes-first-turn-synthetic` — exit `1`.
+
+Expected: every one of the ten production-path suppressions goes red for its
+exact boundary, restores green, and the command exits `0`.
+
+Actual: the candidate-bound positive ledger, multi-run/multi-worker check,
+actual Gateway Gate 1/Gate 2 reds, Evaluation/Report falsifiers, and the
+`dock_admission` red/green pair ran. The `launch_readiness` suppression then
+failed its intended red receipt cleanup with:
+`hermes-first-turn-synthetic: FAIL EBUSY: resource busy or locked, rm
+'C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-boundary-red-launch_readiness-oBGmzK'`.
+The suppressed launch had not returned a `Launch`, so no owned-process
+shutdown was attempted before removal. The remaining boundary red/green
+receipts were therefore not independently completed by this command.
+
+Scope: verifier acceptance-gate/rework blocker; the packaged production path
+was exercised, but the required falsifier proof is incomplete.
+
+### 4. Machine-readable identity/receipt ledger retest — positive portion PASS
+
+Locations: `qa/gates/hermes-research.ts:448-495`.
+
+Command and exit: `bun qa/run.ts hermes-first-turn-synthetic` — overall exit
+`1` because of defect 3; the positive ledger portion reached before that exit.
+
+Expected: one ledger carries candidate SHA, package timestamp, seat/session
+ids, durable artifact ids/content hashes, all ten outcomes, and exact failure
+vocabulary. Actual: the positive ledger emitted all those fields with
+candidate `1b899d813cc021ff16442fc75688aad3e39f7e40`, all ten `pass` outcomes,
+and `failed_boundary=null`/`failure_mechanism=none`.
+
+Scope: the Round 1 ledger contract is retested structurally green, but the
+overall synthetic acceptance command remains blocked by defect 3.
+
+### 5. Future-Dataset absence retest — PASS
+
+Locations: `qa/gates/hermes-research.ts:180-193`.
+
+Command and exit: `bun qa/run.ts windows-hermes-research-chain` — exit `0`.
+
+Expected: future-Dataset refusal leaves no downstream research objects or
+links. Actual: the gate refused the future row for `after as_of` and its zero
+counts across Hypothesis, Run, Evaluation, Artifact, and links restored green;
+the zero Artifact count covers Report artifacts and zero Run rows leave no
+Metrics-bearing Run.
+
+Scope: the Round 1 two-table coverage defect is retested green on the current
+Kernel object model.
+
+### 6. Critic consumption, independent lineage, and durable hashes retest — PASS
+
+Locations: `collab-electron/cli/qf-hermes-synthetic-responder.mjs:354-385`
+performs the exact generated Hypothesis/Run/Artifact reads before recording
+Evaluation; `qa/gates/hermes-research.ts:307-345` verifies the supporting
+Evaluation, distinct critic/worker lineage, exact metrics, and durable hashes.
+
+Command and exit: `bun qa/run.ts windows-hermes-research-chain` — exit `0`.
+
+Expected: the critic reads the exact chain, is independent, and the Report’s
+trajectory/content hashes match durable bytes. Actual: the installed chain
+printed the exact worker/critic sessions, supporting Evaluation, metrics,
+Dataset/result/worker/trajectory/Report hashes, and exited `0`.
+
+Scope: the Round 1 critic/Report evidence gap is retested green on the
+positive installed chain.
+
+### 7. Exact multi-run Report selection retest — positive portion PASS
+
+Locations: `collab-electron/src/main/kernel.ts:644-680` binds the Evaluation to
+its exact Hypothesis and Run and retrieves evidence through the exact Run id.
+
+Command and exit: `bun qa/run.ts hermes-first-turn-synthetic` — overall exit
+`1` because of defect 3; its multi-run/multi-worker falsifier ran before that
+exit and printed distinct first/second Run and worker identities with exact-run
+evidence restored.
+
+Expected: a second/concurrent chain cannot reuse the first Run’s worker or
+trajectory evidence. Actual: the falsifier printed distinct Run and worker
+ids and accepted only the restored exact-run evidence.
+
+Scope: the Round 1 global-selection composition defect is retested green in
+the executed portion, but the order remains blocked by defect 3.

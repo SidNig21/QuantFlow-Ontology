@@ -108,3 +108,125 @@ Founder-state, installed-chain, and release-verifier gates are verifier-run
 scope and were not performed by this Builder. No founder credentials were
 touched. `founder_acceptance: not performed` and `l4_certified: pending` remain
 the required state; there are no remaining WO-V2-2 Builder acceptance reds.
+
+## Independent verifier — Round 2 post-rework result: FAIL
+
+Verifier worktree: `C:\tmp\qf-v22-verifier-r2-20260814-1b899`
+
+Tested product candidate: `1b899d813cc021ff16442fc75688aad3e39f7e40`
+
+Builder evidence HEAD inspected: `e1b9c9b420bab6893ebb5b8feb083fb19f22fd24`
+
+The verifier fetched `origin`, created a brand-new clean detached worktree at
+the exact candidate, and verified the full authorized range from
+`origin/wo-r9-research-integrity` through the candidate, including the
+approved proposal ancestor `45a916f`. No product code, `NEXT.md`, founder
+acceptance, credentials, live model turn, or live market was touched.
+
+### Cold command receipts
+
+```text
+bun qa/run.ts repo-shape                         exit 0
+bun qa/run.ts lockfile-committed                 exit 0
+bun qa/run.ts kernel-sole-writer                 exit 0
+bun qa/run.ts no-canvas-domain-writes            exit 0
+bun qa/run.ts kernel-sole-writer-app             exit 0
+bun qa/run.ts kernel-one-path                    exit 0
+bun qa/run.ts one-skin                            exit 0
+bun qa/run.ts kernel                              exit 0
+bun qa/run.ts typecheck                           exit 0
+bun qa/run.ts kernel-market-lineage               exit 0
+bun qa/run.ts hermes-launch-policy                exit 0
+bun qa/run.ts hermes-founder-state                exit 0
+git diff --check origin/wo-r9-research-integrity...HEAD exit 0
+git diff --check                                  exit 0
+node --check collab-electron/cli/qf-hermes-synthetic-responder.mjs exit 0
+bun qa/verify-release.ts                          exit 0
+bun qa/run.ts windows-installer                   exit 0
+bun qa/run.ts windows-hermes-research-chain      exit 0
+```
+
+`bun qa/run.ts hermes-first-turn-synthetic` was rerun with a longer bounded
+verifier budget and exited `1`. Its positive packaged chain completed, then
+the boundary falsifier failed at the intentionally suppressed
+`launch_readiness` case:
+
+```text
+hermes-first-turn-synthetic: FAIL EBUSY: resource busy or locked, rm 'C:\Users\rybow\AppData\Local\Temp\qf-boundary-red-launch_readiness-oBGmzK'
+```
+
+The exact defect is at `qa/gates/hermes-research.ts:515,544-549`: if
+`launch(...)` throws before returning, `red` remains `null`, so the `finally`
+block does not call the owned-process shutdown and attempts to remove a still
+busy test root. Expected exit is `0` after all ten boundary red/green pairs;
+actual exit is `1`, so the remaining eight boundary falsifiers do not have an
+independent completion receipt. Scope is the verifier acceptance gate and
+rework blocker, not a product-code repair performed by this verifier.
+
+### Independent packaged receipts before the blocker
+
+The positive synthetic run bound package identity to candidate
+`1b899d813cc021ff16442fc75688aad3e39f7e40`, emitted a single machine-readable
+ledger with all ten boundaries `pass`, and recorded
+`failed_boundary=null`, `failure_mechanism=none`. It also completed the
+multi-run/multi-worker exact-Run evidence check and the actual packaged
+Gateway Gate 1/Gate 2, Evaluation/Report, and changed deterministic-input
+falsifiers before the boundary loop reached the cleanup failure.
+
+The installed-chain identity was:
+
+```text
+windows-hermes-research: installed-identity commitSha=1b899d813cc021ff16442fc75688aad3e39f7e40 authenticode=NotSigned
+windows-hermes-research-chain: future-Dataset refusal=red; downstream=none; restored=green
+windows-hermes-research-chain: founder_state_unchanged=true founder_acceptance=not_performed
+windows-hermes-research-chain: l4_candidate_ready=true l4_certified=false live_turn_count=0 retry_count=0
+windows-hermes-research: process-shutdown remainingGateOwnedProcesses=0
+```
+
+Installed-chain research receipts were:
+
+```text
+hypothesis=c6cdb60f-7c4c-401b-b8c6-050aec40d967
+dataset=dataset:9361d0c3434f1e1f02b5e5729d441587986b120d12757d2486c1c2a4d75fd47f
+dataset_artifact=9361d0c3434f1e1f02b5e5729d441587986b120d12757d2486c1c2a4d75fd47f
+run=run-89526045-cdb2-4c6f-a3fa-e2d51a811ca2
+result_artifact=cba126f77ef6bf9bc099639dc2b91ee339341e1fba88ccdb511b41327f394a16
+worker_result_artifact=4c412a2220eed6a046246effabaef7441197e129f1b8efc45b0b051b8cded82e
+market_read_trajectory=91778062d543370c147876b2b7d3970744d9abebbd12dd1d8fb84b7fc412bfcf
+evaluation=aa6bfa23-36fa-4f57-8e10-f6245db6ec0a
+critic_session=critic-01e7cc1c-23e2-41cf-987f-6951716dd3b1
+report_artifact=1f0b3e1436f9cd25a61bfbf0b141cb3b39cf53a3e821f7fb2968120e5eddeeea
+```
+
+### Round 1 finding retest
+
+1. Founder-state nonce/toolset path: **PASS**, exact gate exit `0`; founder
+   config/auth digests remained unchanged.
+2. Three-dot range diff check: **PASS**, exact command exit `0`.
+3. Production falsifiers: **FAIL**, exact synthetic command exit `1` at
+   launch-readiness cleanup; see the exact file/line and `EBUSY` receipt above.
+4. Single machine-readable ledger: **PASS in the completed positive portion**;
+   candidate/package/session/artifact/hash fields and ten green entries were
+   present before the suite blocker.
+5. Future Dataset: **PASS**, installed-chain exit `0`; zero downstream
+   Hypothesis/Run/Evaluation/Artifact/links, with Metrics represented in Run
+   and Report represented as an Artifact in this Kernel schema.
+6. Critic/Report: **PASS**, installed-chain exit `0`; exact generated reads,
+   independent sessions, Evaluation, metrics, and durable trajectory/report
+   hashes were checked.
+7. Exact multi-run Report selection: **PASS in the completed portion**; the
+   synthetic receipt showed distinct Run/worker identities and exact-run
+   evidence restoration before the suite blocker.
+
+### Final state
+
+```text
+founder_acceptance=not_performed
+l4_certified=pending
+live_turn_count=0
+retry_count=0
+NEXT.md=unchanged
+V2-3/R14+ implementation=not begun
+remaining_red=hermes-first-turn-synthetic exit 1 at launch-readiness falsifier cleanup
+verifier_result=FAIL; order stopped for rewrite; no third lap authorized
+```
