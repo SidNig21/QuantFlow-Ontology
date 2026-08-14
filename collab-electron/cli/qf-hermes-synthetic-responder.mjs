@@ -110,10 +110,9 @@ class PtyLineReader {
 }
 
 function jsonContent(response, label) {
-  if (!response || response.isError || !Array.isArray(response.content)) {
-    throw new Error(`${label} MCP call failed`);
-  }
+  if (!response || !Array.isArray(response.content)) throw new Error(`${label} MCP call failed`);
   const text = response.content.find((item) => item?.type === "text")?.text;
+  if (response.isError) throw new Error(`${label} MCP call failed: ${typeof text === "string" ? text : "unknown error"}`);
   if (typeof text !== "string") throw new Error(`${label} response was not text`);
   try { return JSON.parse(text); } catch { throw new Error(`${label} response was not JSON`); }
 }
@@ -298,6 +297,7 @@ async function worker(reader, ontology, collaboration) {
   const collaborationTools = await collaboration.listTools();
   requireTools(ontologyTools, ["qf_market_event_get", "qf_market_event_query"], "worker ontology");
   requireTools(collaborationTools, ["send_result"], "worker collaboration");
+  let falsifierReceipt = "";
   if (SUPPRESS_BOUNDARY === "tool_input") {
     try {
       await ontology.callTool("qf_market_event_get", ontologyArgs({}));
@@ -305,6 +305,7 @@ async function worker(reader, ontology, collaboration) {
     } catch (error) {
       if (!String(error).includes("requires id")) throw error;
       emit({ falsifier: "gateway_tool_input_rejected", reason: String(error) });
+      falsifierReceipt = ` Gateway falsifier gateway_tool_input_rejected=${String(error).replace(/[\r\n ]/g, "_")}.`;
     }
   }
   emitBoundary("tool_input", { role: ROLE, tool: "qf_market_event_query" });
@@ -320,7 +321,7 @@ async function worker(reader, ontology, collaboration) {
     throw new Error("synthetic market read did not return fixture rows and a trajectory artifact");
   }
   const ids = [...new Set(rows.map((row) => row.id))];
-  const result = `Deterministic packaged fixture read completed for ${ids.join(", ")}.`;
+  let result = `Deterministic packaged fixture read completed for ${ids.join(", ")}.`;
   if (SUPPRESS_BOUNDARY === "tool_output") {
     try {
       await collaboration.callTool("send_result", collaborationArgs({
@@ -333,8 +334,10 @@ async function worker(reader, ontology, collaboration) {
     } catch (error) {
       if (!String(error).includes("cited market id does not exist")) throw error;
       emit({ falsifier: "gateway_tool_output_rejected", reason: String(error) });
+      falsifierReceipt = ` Gateway falsifier gateway_tool_output_rejected=${String(error).replace(/[\r\n ]/g, "_")}.`;
     }
   }
+  result += falsifierReceipt;
   emitBoundary("tool_input", { role: ROLE, tool: "send_result", task_id: task.taskId });
   const sent = await collaboration.callTool("send_result", collaborationArgs({
     task_id: task.taskId,

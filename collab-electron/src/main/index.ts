@@ -1372,8 +1372,8 @@ app.whenReady().then(async () => {
         throw new Error("Kernel falsifiers are synthetic-test-only");
       }
       const dataset = kernelEnsureSampleResearchDataset({ includeFutureRow: false });
-      const datasetRow = kernelGetObject("dataset", String(dataset.object_id));
-      const datasetArtifact = kernelGetObject("artifact", String(datasetRow?.artifact_id));
+      const datasetLinks = kernelGetLinks(String(dataset.object_id), { kind: "derived_from" });
+      const datasetArtifact = kernelGetObject("artifact", String(datasetLinks.find((link) => link.from_id === String(dataset.object_id))?.to_id));
       if (!datasetArtifact) throw new Error("Kernel falsifier fixture Artifact is missing");
       let missingReportReason = "";
       try {
@@ -1405,6 +1405,7 @@ app.whenReady().then(async () => {
         { sessionId: criticSessionId, definitionId: "hermes-critic", label: "Kernel falsifier critic" },
         { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
       );
+      kernelExecute("start_agent_session", { session_id: criticSessionId }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
       let rejectsReason = "";
       const evaluation = kernelExecute("record_evaluation", {
         hypothesis_id: run.hypothesisId,

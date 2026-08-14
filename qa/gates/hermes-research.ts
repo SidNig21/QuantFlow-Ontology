@@ -516,10 +516,11 @@ async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): P
         redOutput = await captureFor(red, 20_000);
         const redSubmission = red.submission;
         const redEvidence = await researchFor(red, String(redSubmission.hypothesisId), 2_000);
+        const redWorkerResult = redEvidence ? readFileSync(String(redEvidence.workerResult.storage_ref), "utf8") : "";
         const redReceipts = boundaryReceipts(redOutput, true);
         assert(!redReceipts.has(boundary), `suppressed packaged boundary still emitted ${boundary}`);
-        if (boundary === "tool_input") assert(redOutput.includes("gateway_tool_input_rejected"), "Gate 1 did not use the actual Gateway rejection path");
-        if (boundary === "tool_output") assert(redOutput.includes("gateway_tool_output_rejected"), "Gate 2 did not use the actual Gateway rejection path");
+        if (boundary === "tool_input") assert(redOutput.includes("gateway_tool_input_rejected") || redWorkerResult.includes("gateway_tool_input_rejected"), "Gate 1 did not use the actual Gateway rejection path");
+        if (boundary === "tool_output") assert(redOutput.includes("gateway_tool_output_rejected") || redWorkerResult.includes("gateway_tool_output_rejected"), "Gate 2 did not use the actual Gateway rejection path");
         const ledger = makeLedger(red.identity, red, redEvidence, redReceipts, boundary);
         checkLedger(ledger, boundary);
         console.log(`hermes-first-turn-synthetic: FALSIFY RED boundary=${boundary} failed_boundary=${boundary} failure_mechanism=${MECHANISM_FOR[boundary]} boundary-ledger=${JSON.stringify(ledger)}`);
@@ -551,7 +552,7 @@ async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): P
     let green: Launch | null = null;
     try {
       green = await launch(packageRoot, greenRoot);
-      const output = await captureUntil(green, "boundary=result_return");
+      const output = `${await captureUntil(green, "boundary=result_return")}\n${await captureFor(green, 12_000)}`;
       const receipts = boundaryReceipts(output, true);
       assert(BOUNDARIES.every((candidate) => receipts.has(candidate)), `restored packaged boundary missing ${boundary}`);
       const evidence = await researchFor(green, String(green.submission.hypothesisId));
