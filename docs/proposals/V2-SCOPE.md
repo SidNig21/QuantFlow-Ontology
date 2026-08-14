@@ -340,6 +340,34 @@ gap on 2026-07-16. It is not: `collab-electron/src/windows/shared/qf-tokens.css`
 plus the `one-skin` gate is exactly that, and it is *enforced* rather than
 advisory. It caught real drift on 2026-08-12. The vault note predates it.
 
+### Two founder reactions, recorded 2026-08-14
+
+**Keep: the canvas and its rotating cube.** Stated without hedging — *"I love the
+canvas with the spinning cube logo, that stays."* This is a constraint on R14 and
+R16, not a preference. When the canvas fills with tiles and research objects, the
+empty-state identity is the obvious thing to delete for space. Do not. It is the
+one element of the current product the founder has never criticised, and it sits
+on the surface the vault says is the correct bet.
+
+**Fix: the Dock.** Stated equally plainly — *"I hate the current dock ui, its so
+ugly."* Measured on 2026-08-12 and 2026-08-13, that reaction is diagnosing
+structure, not styling:
+
+- Machine identifiers are the primary label — `hermes-worker-2` with a raw
+  `WORKER2` badge, so it reads as a process list rather than a team.
+- One narrow right-hand column carries **six** jobs at once: ask box, first-run
+  guidance, launch list, sessions, Kernel activity, research ledger, closed
+  history.
+- The activity feed prints table names — `agent_session.closed`,
+  `connection.deleted`.
+- No grouping or hierarchy: a flat list with near-unreadable secondary text.
+
+**The consequence for scoping.** This is a job-allocation problem, not a skin
+problem — restyling produces a prettier list that is still wrong. Three of those
+six jobs belong on the work itself under Pattern 2 above. R14 must move status
+onto the tile before, or while, the Dock is re-skinned. GLACIER already re-skinned
+the Dock once (WO-g3); it stayed ugly because the content problem was untouched.
+
 ### Independent confirmation of the R15 rubric
 
 `scout-ontology-canvas-tools.md` reaches Ragas separately from the correlations
