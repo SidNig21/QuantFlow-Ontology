@@ -1,10 +1,14 @@
 # WO-V2-2 - a seat that finishes work
 
-status: rework
+status: rewritten
 assignee: builder
 depends: WO-V2-1 founder accepted
 rung: R13 / V2-2
 authorization: founder-via-NEXT
+rework-cycles: 1 of 1 used - exhausted 2026-08-14
+reauthorization: required - the founder must re-point `NEXT.md` at this file
+                 before any implementation lap begins
+rewrite-scope: see "REWRITE - authorized after Round 2" at the end of this file
 
 ## Objective
 
@@ -624,3 +628,205 @@ ids and accepted only the restored exact-run evidence.
 
 Scope: the Round 1 global-selection composition defect is retested green in
 the executed portion, but the order remains blocked by defect 3.
+
+## REWRITE - authorized after Round 2
+
+The one permitted rework cycle is exhausted. Per `AUTONOMY.md`, a second
+verifier failure stops the order for a rewrite and never a third lap. This
+section is that rewrite. It replaces the Round 2 remediation instruction and is
+the only implementation authority for the next builder lap. Everything above it
+is history and retest evidence; nothing above it authorizes new work.
+
+There is no rework cycle left. A verifier failure on this rewrite stops R13 for
+a founder decision, not another lap. Scope accordingly: the deliverables below
+are deliberately small and none of them touch product code.
+
+### In plain terms
+
+The app is not the problem. The test that proves the app reports its own
+failures honestly is the problem. It deliberately breaks the app ten ways; on
+break number two it left a real Windows process holding its scratch files, then
+tried to delete those files and hit `EBUSY`. Eight of the ten protections
+therefore have no independent receipt. This rewrite makes the test clean up
+after its own sabotage, and proves it did.
+
+### Root cause, measured
+
+`qa/gates/hermes-research.ts:145` `launch()` spawns the packaged app at line
+`159` and only computes its owned-process set at line `177`. The readiness wait
+at line `169` throws in between. On that path the function has started a real
+process and returns nothing, so the caller never learns what to shut down.
+
+`qa/gates/hermes-research.ts:511` declares `red: Launch | null = null` and only
+assigns it at line `515` after `launch()` returns. The `finally` at lines
+`544-549` therefore evaluates `if (red)` as false, skips shutdown entirely, and
+calls `rmSync(redRoot, ...)` against a directory the still-live app holds open
+through its Kernel SQLite handle and WAL files.
+
+Observed receipt, candidate `1b899d813cc021ff16442fc75688aad3e39f7e40`:
+
+```text
+hermes-first-turn-synthetic: FAIL EBUSY: resource busy or locked, rm 'C:\Users\rybow\AppData\Local\Temp\qf-boundary-red-launch_readiness-oBGmzK'
+```
+
+Two facts a fresh builder will not otherwise have. First, that exact directory
+and eight further `qf-hermes-*` roots and one `qf-boundary-green-tool_output-*`
+root were still present in `%TEMP%` after the run, with no surviving QuantFlow
+or WSL process. The handles were released after process exit, not with it. The
+leak is therefore a race against Windows handle release, not a permanently
+locked file, and it is not confined to the red branch. Second, `rmSync` is
+called unguarded at five sites in this file - lines `548`, `566`, `661`, `707`,
+and `731` - and the top-level path at lines `654-662` repeats the same
+`if (run)` shape as the boundary loop.
+
+`launch()` is shared by `hermes-first-turn-synthetic` and
+`windows-hermes-research-chain`. Any change here affects both gates and both
+must be re-verified.
+
+### Deliverable A - `launch()` owns what it spawns
+
+`launch()` must never leave a spawned process without an owner. Wrap everything
+after the `spawn` call so that any throw first terminates the spawned process
+tree and waits for its exit, then re-throws the original error unchanged. The
+original error text must survive; the readiness assertions at lines `172-175`
+and the suppression classification at lines `531-536` depend on it.
+
+Ownership must not depend on `collectOwnedPids` having completed. The child PID
+is known at line `168`; use it. If `collectOwnedPids` has already run, terminate
+that fuller set instead.
+
+Expected: after any `launch()` throw, no process spawned by that call survives.
+
+### Deliverable B - one guarded removal helper, used at all five sites
+
+Add a single helper that removes a gate-owned temp root and use it at lines
+`548`, `566`, `661`, `707`, and `731`. No bare `rmSync` of a gate temp root may
+remain in this file. The helper must:
+
+1. Retry on the Windows-transient errno set `rmSync` already recognises -
+   `EBUSY`, `EPERM`, `ENOTEMPTY`, `EMFILE`, `ENFILE` - with a finite, stated
+   bound. `maxRetries` with `retryDelay` is sufficient; the bound must be a
+   named constant, not a literal buried in a call.
+2. Never throw from inside a `finally`. On exhaustion it records the path in a
+   module-level leak list and returns.
+3. Print one receipt per removal that needed more than one attempt, naming the
+   path and the attempt count, so a machine that is merely slow is
+   distinguishable from a machine that is genuinely stuck.
+
+Deterministic shutdown alone is not sufficient and must not be the whole fix.
+Windows releases file handles after process exit rather than with it, and
+Defender and the search indexer take transient handles on new directories. A
+rewrite that only reorders shutdown can still fail intermittently, and there is
+no cycle left to spend on a flake.
+
+### Deliverable C - a cleanup failure may never mask a boundary failure
+
+In the boundary loop the `finally` at lines `544-549` runs while a real
+assertion failure may already be propagating. A throw from `rmSync` there
+replaces that original error, so a genuine defect in any of the ten boundaries
+would be reported as a cleanup problem. Deliverable B item 2 removes the throw;
+this deliverable requires the proof.
+
+Expected: with a boundary assertion forced to fail and a temp root
+simultaneously held busy, the reported failure names the boundary assertion,
+and the leaked path appears as a separate additional receipt.
+
+### Deliverable D - the gate proves it left nothing behind
+
+At the end of both gates, assert that the leak list from Deliverable B is empty
+and that no `qf-boundary-*` or `qf-hermes-*` root created by this run remains
+under the temp directory. Print the receipt in both directions:
+
+```text
+hermes-first-turn-synthetic: temp-cleanup roots_created=<n> roots_remaining=0 retried=<n> leaked=[]
+```
+
+Match only roots this run created. Pre-existing roots from earlier runs are not
+this gate's failure; they must be reported as an informational count and must
+not turn the gate red. Nine such roots exist on the founder's machine now and
+are being preserved as evidence for this order.
+
+This is the receipt that did not exist before. Its absence is why five call
+sites leaked silently for the whole of Round 1 and Round 2.
+
+### Deliverable E - read-only observation, not a repair
+
+The harness fell over on the half-born-seat case: a seat that starts and then
+fails readiness. That case is not a test artifact, it is boundary two of the
+product's own ten. The product's shutdown is proven clean on the healthy path
+by `remaining_install_owned_processes=0`; it is unproven on this path, because
+the test that would have measured it is the test that crashed.
+
+Observe and record only. When the `launch_readiness` suppression fires, capture
+whether the packaged app's own process tree exits on its own within the existing
+`SHUTDOWN_TIMEOUT_MS`, before the harness terminates anything. Print one
+receipt:
+
+```text
+hermes-first-turn-synthetic: half-born-seat self_exit=<true|false> elapsed_ms=<n> pids=<list>
+```
+
+Do not change product code on the strength of this observation, whatever it
+says. If `self_exit=false`, add one `docs/DEBT.md` entry and one line to the
+R14 findings; that is the entire response. Widening this order to fix the
+product is the scope-pressure hard stop in `AUTONOMY.md`.
+
+### Acceptance gates - rewrite
+
+The builder-run and verifier-run command lists in this order are unchanged and
+still apply in full. The verifier must run the complete list, not a subset:
+`launch()` is shared, so `windows-hermes-research-chain` and
+`verify-release.ts` must both be reproduced at the new candidate even though no
+product code changed.
+
+Two additional requirements for this lap:
+
+- `bun qa/run.ts hermes-first-turn-synthetic` must exit `0` with all ten
+  boundary red/green pairs present in one run. Ten reds and ten greens, no
+  gaps. The builder must not report a partial ledger as progress.
+- Both gates must print the Deliverable D cleanup receipt with
+  `roots_remaining=0` and `leaked=[]`.
+
+The verifier must run the synthetic gate twice in the same worktree, back to
+back, and both runs must exit `0`. The first run's temp roots are the second
+run's most likely source of interference, and a single green run does not
+distinguish a fix from a lucky race.
+
+### Falsification - rewrite
+
+Every change above must be shown red on purpose, restored, and shown green,
+with transcripts in `docs/orders/evidence/r13/V2-2-VERIFICATION.md`.
+
+- Revert Deliverable A alone and re-run the `launch_readiness` suppression. The
+  gate reproduces the exact `EBUSY` failure at a `qf-boundary-red-launch_readiness-*`
+  path. Restore and show green.
+- Force the guarded helper's retry bound to zero while a root is genuinely held.
+  The leak list is non-empty, the gate goes red at the Deliverable D assertion,
+  and it names the path. Restore the real bound and show green.
+- Force one boundary assertion to fail while its temp root is held busy. The
+  reported failure names the boundary assertion, not the cleanup, and the leak
+  appears as a separate receipt. This is the Deliverable C proof and it must not
+  be skipped because it is awkward to stage.
+- Leave one `qf-boundary-*` root behind deliberately. Deliverable D goes red and
+  names it; a root created before this run is counted informationally and stays
+  green.
+
+### Out of scope - rewrite
+
+No product code changes of any kind, including any change suggested by
+Deliverable E. No new boundaries, no change to the ten boundary labels, the
+failure vocabulary, or the ledger contract. No re-opening of any Round 1 or
+Round 2 item already retested `PASS`; items 1, 2, 5, and 6 are closed and must
+not be re-litigated. No edit to `NEXT.md`. No founder acceptance. No V2-3. The
+original Out of scope section above still applies in full.
+
+If the work wants anything on this list, that is the scope-pressure hard stop.
+Stop and report; do not widen.
+
+### Report back - rewrite
+
+Report the ten boundary red/green pairs in full, both cleanup receipts, the
+Deliverable E observation, the four falsification transcripts, both consecutive
+synthetic exits, and every acceptance exit. State `founder_acceptance: not
+performed` and `l4_certified: pending`. State the leak list explicitly even when
+empty. Do not edit `NEXT.md` and do not begin V2-3.
