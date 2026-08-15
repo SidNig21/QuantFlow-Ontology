@@ -1,6 +1,6 @@
 # NEXT — R14 WO-RD-2 Research Director recruits and assigns
 
-status: BUILDER DOOR OPEN
+status: BUILDER DOOR OPEN — WO-RD-2 REWORK 1
 active-order: [`WO-RD-2.md`](WO-RD-2.md)
 authorized-by: founder umbrella goal 2026-08-15
 authorized-at: 2026-08-15
@@ -17,9 +17,11 @@ Do not create a worktree, clone, or extra copy. Read exactly:
 2. `docs/orders/PROTOCOL.md`
 3. `docs/orders/WO-RD-2.md`
 
-Execute that order exactly. Do not read chat transcripts or handoff files. Do
-not redesign the order or broaden scope. Run its acceptance matrix once, commit
-and push one immutable candidate, then stop for a fresh independent Verifier.
+The original Builder is authorized only for WO-RD-2's Rework 1 harness
+isolation and its exact short command list. Rework Reader
+`01a007be-039d-7740-b6a5-6608773ca4b2` returned YES/YES PASS with no assertion
+weakening. After full green, commit and push one immutable candidate, then stop
+for a fresh independent Verifier.
 
 Do not run `verify-release`, package/installer gates, a soak, or a second
 consecutive product proof. Never place a bet or trade.

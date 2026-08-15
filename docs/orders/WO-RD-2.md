@@ -1,11 +1,11 @@
 # WO-RD-2 — Research Director recruits and assigns
 
-status: ready — Reader PASS
+status: rework 1 of 2 — harness-isolation Reader PASS
 assignee: builder
 depends: WO-RD-1 done at `5a9a5cea6186b05a4eea5c38f5b8a597a8d02bbf`
 rung: R14 / slice 2 — governed specialist recruitment and durable Task ownership
-authorization: founder umbrella goal 2026-08-15; Reader `01a007a6-325b-71e0-b80d-001ff9f7edc2` answered YES/YES PASS after every defect was landed; `NEXT.md` names this order
-rework-cycle: 0 of 2
+authorization: founder umbrella goal 2026-08-15; initial Reader `01a007a6-325b-71e0-b80d-001ff9f7edc2` answered YES/YES PASS; Rework 1 Reader `01a007be-039d-7740-b6a5-6608773ca4b2` answered YES/YES PASS with no assertion weakening; `NEXT.md` names this order
+rework-cycle: 1 of 2
 
 ## In plain terms
 
@@ -354,3 +354,70 @@ Report only:
 4. falsifier red/green receipts;
 5. what was not proved; and
 6. the next authorized action.
+
+## Rework 1 — isolate the pre-existing team-composition UI harness
+
+Measured 2026-08-15 after the first Builder pass:
+
+```text
+research-director-delegation exit=0 elapsed_ms=65169
+research-director-front-door exit=0 elapsed_ms=22111
+team-composition-ui exit=1 elapsed_ms=121120
+failure=production app RPC timed out
+ui_assertions_exercised=0
+owned_electron_or_bun_processes_after=0
+```
+
+This red does not name a WO-RD-2 product assertion. The existing
+`qa/gates/team-composition-ui.ts` function `connectApp(temp)` ignores `temp`
+and always reads `.package-staging/socket-path`. Its failure-proof app and main
+app also both set `QF_APP_ROOT` to the shared `.package-staging` directory.
+Sequential launches can therefore read a prior app's endpoint or race Windows
+teardown while the next app owns no unique endpoint file; the gate then waits
+until timeout without reporting an early child exit. Multiple preserved
+`.qf-team-composition-ui-*` roots and the stale shared socket file measured the
+same missing isolation.
+
+The original Builder must make exactly this gate-only repair before producing
+a candidate:
+
+1. Every app launch in `team-composition-ui.ts` sets `QF_APP_ROOT` to that
+   launch's already-created unique `temp` root. Keep
+   `QF_UI_PROOF_RESOURCE_ROOT=PROOF_RESOURCES`; production resource loading is
+   not changed.
+2. `connectApp(temp, child, output?)` reads only `join(temp, "socket-path")`.
+   It never reads or removes the shared `.package-staging/socket-path`.
+3. While waiting, a non-null child exit code fails immediately and includes
+   the bounded captured app output when available; it does not spend the
+   45-second budget polling an endpoint that cannot appear.
+4. Apply the same unique-root rule to the failure-proof, delay falsifier, and
+   main green launch. Preserve every existing UI assertion, row/link check,
+   timing threshold, falsifier, and receipt unchanged.
+5. Extract endpoint-resolution and child-exit-classification helpers;
+   production `connectApp` must call both exact helpers. Add a focused test of
+   those helpers proving two distinct roots resolve two distinct endpoint
+   files and a non-null child exit fails before timeout. A disconnected helper
+   that `connectApp` does not call is red. Do not add a runner, wrapper,
+   dependency, retry loop, global cleanup, or package step.
+
+The Builder does not rerun `research-director-delegation` or
+`research-director-front-door` in this rework lap. Run exactly:
+
+```powershell
+cd C:\Users\rybow\QuantFlow-Ontology
+bun test qa/gates/team-composition-ui.test.ts
+bun qa/run.ts team-composition-ui
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts repo-shape
+bun qa/run.ts one-skin
+bun qa/run.ts doc-links
+bun qa/run.ts rung-ladder
+git diff --check
+```
+
+Any red stops the rework. Full green permits one immutable candidate commit and
+push. A fresh independent Verifier then runs the original complete Acceptance
+matrix exactly once against that candidate; the verifier, not the Builder,
+re-measures the corrected WO-RD-2 receipt label. This amendment authorizes no
+product change outside the original scope and no assertion weakening.
