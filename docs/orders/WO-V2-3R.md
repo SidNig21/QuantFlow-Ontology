@@ -1,11 +1,12 @@
 # WO-V2-3R — make the ordinary development Dock launchable
 
-status: building-clarified-after-measured-windows-pack-stop
+status: reauthorization-required-after-two-builder-stops
 assignee: builder
 depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
 rung: R13 / V2-3 founder closure
-authorization: founder standing direction 2026-08-15; `NEXT.md` names this order
+authorization: exhausted after two Builder stops; explicit founder exception required
 rework-cycle: 0 of 1
+builder-attempts: 2 of 2 used — exhausted
 
 ## Objective
 
@@ -92,12 +93,21 @@ Measured during the first Builder attempt, the unmodified Hermes script reaches
 the bundled AgentOS toolchain, which selects the extensionless Windows file
 `C:\Program Files\nodejs\npm` and fails with `spawnSync ... npm ENOENT`. The
 same toolchain already defines `AGENTOS_TOOLCHAIN_NPM` as its executable
-override, and `npm.cmd` is present on `PATH`. On Windows only, the development
-startup must pass `AGENTOS_TOOLCHAIN_NPM=npm.cmd` to the real Hermes pack child
-unless the caller already supplied that variable. This is the one authorized
-resolution: do not edit the Hermes pack script, bundled toolchain, dependencies,
-or machine installation. The focused green and founder paths both enter through
-this development-startup environment.
+override, and `npm.cmd` is present on `PATH`. A second Builder attempt proved
+that the toolchain rejects the bare value `npm.cmd`: its resolver accepts the
+override only when `existsSync(value)` is true, then falls back to the broken
+extensionless file.
+
+On Windows only, development startup must resolve `npm.cmd` to the first
+absolute existing file found by scanning the current `PATH` entries in order,
+then pass that absolute path as `AGENTOS_TOOLCHAIN_NPM` to the real Hermes pack
+child unless the caller already supplied an absolute existing override. If no
+absolute existing `npm.cmd` is found, startup fails closed before packing and
+prints `Hermes pack failed: npm.cmd not found on PATH`. A bare command name is
+not acceptance. This is the only proposed resolution after reauthorization: do
+not edit the Hermes pack script, bundled toolchain, dependencies, or machine
+installation. The focused green and founder paths both enter through this
+development-startup environment.
 
 A missing ignored `.aospkg` is normal clean-checkout state, not a reason to
 open a broken Dock. There is no staleness check or cache reuse in this order.
