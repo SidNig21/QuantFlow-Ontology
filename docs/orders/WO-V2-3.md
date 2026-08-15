@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: short-matrix-authorized
+status: verifier-rework-founder-decision
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: founder-authorized existing short matrix only — 2026-08-15
+reauthorization: verifier red on recurring rejected-submit assertion; founder decision required
 
 ## In plain terms
 
@@ -392,6 +392,44 @@ founder acceptance. After founder acceptance, close the builder door: do not
 authorize V2-3.2, auto-rotate `NEXT.md`, or begin any later product order. The
 next authorized operation will be a founder-direction reset, separately scoped
 and docs-only.
+
+### Independent verification result — recurring rejected-submit assertion RED
+
+Builder candidate `b4405819d590ae842109cf02a0b09f95601b384e` was committed,
+pushed to `wo-V2-3`, and independently measured from a clean checkout whose
+`HEAD` and `origin/wo-V2-3` matched exactly.
+
+The Verifier passed the first six commands:
+
+```text
+PASS repo-shape
+PASS kernel-sole-writer
+PASS no-canvas-domain-writes
+PASS kernel-sole-writer-app
+PASS one-skin
+PASS team-composition
+```
+
+The live production gate then reached both real Hermes seats and crossed the
+production main IPC twice, but failed the same rejected-submit assertion that
+had already been repaired during the standing UI loop:
+
+```text
+team-composition-ui: FAIL rejected Task submit changed Kernel rows or hid the error
+definition=hermes-orchestrator
+definition=hermes-worker
+qf-ui-proof main_ipc=qf:tasks:create
+qf-ui-proof main_ipc=qf:tasks:create
+FAIL team-composition-ui
+EXIT_CODE=1
+```
+
+No Electron child owned by this invocation remained. `doc-links` and
+`git diff --check` did not run because verification stopped at the first red.
+The candidate tree remained clean and no file was edited. This is the same
+assertion recurring after a repair, so the founder's stop condition is met: no
+further Builder, rerun, assertion split, or product edit is authorized until
+the founder decides.
 
 ## Objective
 
