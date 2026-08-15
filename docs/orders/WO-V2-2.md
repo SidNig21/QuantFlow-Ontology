@@ -813,9 +813,14 @@ with transcripts in `docs/orders/evidence/r13/V2-2-VERIFICATION.md`.
 
 ### Out of scope - rewrite
 
-No product code changes of any kind, including any change suggested by
-Deliverable E. No new boundaries, no change to the ten boundary labels, the
-failure vocabulary, or the ledger contract. No re-opening of any Round 1 or
+This rewrite changes exactly two files: `qa/gates/hermes-research.ts` and the
+evidence file `docs/orders/evidence/r13/V2-2-VERIFICATION.md`. Changing the
+first one is required, not forbidden - every deliverable above lives in it.
+
+No product code changes of any kind, meaning nothing under `collab-electron/`,
+`packages/`, or `species/`, and specifically no change suggested by Deliverable
+E. No new boundaries, no change to the ten boundary labels, the failure
+vocabulary, or the ledger contract. No re-opening of any Round 1 or
 Round 2 item already retested `PASS`; items 1, 2, 5, and 6 are closed and must
 not be re-litigated. No edit to `NEXT.md`. No founder acceptance. No V2-3. The
 original Out of scope section above still applies in full.
