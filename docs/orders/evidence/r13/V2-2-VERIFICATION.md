@@ -230,3 +230,183 @@ V2-3/R14+ implementation=not begun
 remaining_red=hermes-first-turn-synthetic exit 1 at launch-readiness falsifier cleanup
 verifier_result=FAIL; order stopped for rewrite; no third lap authorized
 ```
+
+## Rewrite builder run — final candidate
+
+Plain language: the harness now cleans up the processes and temporary folders it creates, reports deliberate failures separately, and leaves no registered test root behind.
+
+Branch: `wo-V2-2`
+Candidate SHA: `ddc95853aef4645d6c9e1bfb5d452f4a156aca83`
+Captured package identity SHA from the final builder run: `3018c4334f88072af8bf14592571f7b88e7d506b`
+Founder acceptance: `not performed`
+L4 certification: `pending`
+Live model turns: `0`
+Live market data: `0`
+Scope check: only `qa/gates/hermes-research.ts` and this evidence file changed; `NEXT.md` was not edited; V2-3 was not started.
+
+### Builder acceptance exits
+
+```text
+PASS  repo-shape
+PASS  lockfile-committed
+PASS  kernel-sole-writer
+no-canvas-domain-writes OK
+PASS  no-canvas-domain-writes
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+kernel-one-path G1: PASS (no illicit env reads or kernel.db literals)
+kernel-one-path G2/G3: PASS
+kernel-one-world G4 PASS
+PASS  kernel-one-path
+one-skin OK
+totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
+PASS  one-skin
+PASS  kernel
+kernel-market-lineage: FALSIFY RED empty lineage
+kernel-market-lineage: FALSIFY RED fabricated cite
+kernel-market-lineage: PASS
+PASS  kernel-market-lineage
+doc-links: PASS (53 live documents, every pointer resolves)
+doc-links: PASS
+PASS  typecheck
+git diff --check: exit 0
+```
+
+Commands and exits:
+
+```text
+bun qa/run.ts repo-shape                         exit 0
+bun qa/run.ts lockfile-committed                 exit 0
+bun qa/run.ts kernel-sole-writer                 exit 0
+bun qa/run.ts no-canvas-domain-writes            exit 0
+bun qa/run.ts kernel-sole-writer-app             exit 0
+bun qa/run.ts kernel-one-path                    exit 0
+bun qa/run.ts one-skin                           exit 0
+bun qa/run.ts kernel                             exit 0
+bun qa/run.ts typecheck                          exit 0
+bun qa/run.ts kernel-market-lineage              exit 0
+bun qa/run.ts hermes-first-turn-synthetic        exit 0
+bun qa/run.ts doc-links                          exit 0
+git diff --check                                  exit 0
+```
+
+### Final positive-control receipts
+
+```text
+hermes-first-turn-synthetic: package-identity={"commitSha":"3018c4334f88072af8bf14592571f7b88e7d506b","packagedAt":"2026-08-15T03:00:48.437Z"}
+hermes-first-turn-synthetic: dock_admission=pass
+hermes-first-turn-synthetic: launch_readiness=pass
+hermes-first-turn-synthetic: l4_candidate_ready=true l4_certified=false live_turn_count=0 retry_count=0
+hermes-first-turn-synthetic: failed_boundary=null repair=none failure_mechanism=none
+hermes-first-turn-synthetic: PASS
+PASS  hermes-first-turn-synthetic
+```
+
+The positive machine ledger emitted the exact ten ordered labels
+`dock_admission`, `launch_readiness`, `activation_delivery`, `first_turn`,
+`tool_discovery`, `tool_input`, `tool_output`, `run_control`,
+`lineage_publication`, and `result_return`, all with `outcome=pass`,
+`failed_boundary=null`, and `failure_mechanism=none`. It carried the candidate
+SHA, packaged timestamp, orchestrator/PTY/worker/critic identities, Dataset,
+deterministic result, worker trajectory, market-read trajectory, and Report
+artifact IDs/content hashes.
+
+### Ten boundary red/green pairs
+
+```text
+hermes-first-turn-synthetic: FALSIFY RED boundary=dock_admission failed_boundary=dock_admission failure_mechanism=admission_rejected
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_dock_admission failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=launch_readiness failed_boundary=launch_readiness failure_mechanism=readiness_missing
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_launch_readiness failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=activation_delivery failed_boundary=activation_delivery failure_mechanism=activation_missing
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_activation_delivery failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=first_turn failed_boundary=first_turn failure_mechanism=turn_incomplete
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_first_turn failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=tool_discovery failed_boundary=tool_discovery failure_mechanism=tool_discovery_missing
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_tool_discovery failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=tool_input failed_boundary=tool_input failure_mechanism=tool_schema_ambiguity
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_tool_input failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=tool_output failed_boundary=tool_output failure_mechanism=gate2_rejected
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_tool_output failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=run_control failed_boundary=run_control failure_mechanism=run_control_failed
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_run_control failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=lineage_publication failed_boundary=lineage_publication failure_mechanism=lineage_rejected
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_lineage_publication failed_boundary=null failure_mechanism=none
+hermes-first-turn-synthetic: FALSIFY RED boundary=result_return failed_boundary=result_return failure_mechanism=result_return_missing
+hermes-first-turn-synthetic: FALSIFY GREEN repair=restore_result_return failed_boundary=null failure_mechanism=none
+```
+
+### Rewrite falsification receipts
+
+```text
+hermes-first-turn-synthetic: FALSIFY RED launch-failure remaining_pids=[42001,42002] cleanup_errors=[] reason=launch-failure retained PIDs: [42001,42002]
+hermes-first-turn-synthetic: FALSIFY RED launch-failure receipt-validator cleanup_errors=corrupted reason=launch-failure cleanup_errors is not an array
+hermes-first-turn-synthetic: FALSIFY GREEN launch-failure remaining_pids=[] cleanup_errors=[]
+hermes-first-turn-synthetic: launch-failure remaining_pids=[]
+cleanup_errors=[]
+
+hermes-first-turn-synthetic: cleanup-leak path=C:\Users\rybow\AppData\Local\Temp\qf-retry-red-EBUSY code=EBUSY attempts=1
+hermes-first-turn-synthetic: FALSIFY RED retry-code=EBUSY attempts=1 reason=retry suppression for EBUSY did not go red at the second call (attempts=1)
+hermes-first-turn-synthetic: temp-cleanup-retry path=C:\Users\rybow\AppData\Local\Temp\qf-retry-green-EBUSY code=EBUSY attempts=2
+hermes-first-turn-synthetic: FALSIFY GREEN retry-code=EBUSY attempts=2 receipt_required=true
+hermes-first-turn-synthetic: cleanup-leak path=C:\Users\rybow\AppData\Local\Temp\qf-retry-red-EPERM code=EPERM attempts=1
+hermes-first-turn-synthetic: FALSIFY RED retry-code=EPERM attempts=1 reason=retry suppression for EPERM did not go red at the second call (attempts=1)
+hermes-first-turn-synthetic: temp-cleanup-retry path=C:\Users\rybow\AppData\Local\Temp\qf-retry-green-EPERM code=EPERM attempts=2
+hermes-first-turn-synthetic: FALSIFY GREEN retry-code=EPERM attempts=2 receipt_required=true
+hermes-first-turn-synthetic: cleanup-leak path=C:\Users\rybow\AppData\Local\Temp\qf-retry-red-ENOTEMPTY code=ENOTEMPTY attempts=1
+hermes-first-turn-synthetic: FALSIFY RED retry-code=ENOTEMPTY attempts=1 reason=retry suppression for ENOTEMPTY did not go red at the second call (attempts=1)
+hermes-first-turn-synthetic: temp-cleanup-retry path=C:\Users\rybow\AppData\Local\Temp\qf-retry-green-ENOTEMPTY code=ENOTEMPTY attempts=2
+hermes-first-turn-synthetic: FALSIFY GREEN retry-code=ENOTEMPTY attempts=2 receipt_required=true
+hermes-first-turn-synthetic: cleanup-leak path=C:\Users\rybow\AppData\Local\Temp\qf-retry-red-EMFILE code=EMFILE attempts=1
+hermes-first-turn-synthetic: FALSIFY RED retry-code=EMFILE attempts=1 reason=retry suppression for EMFILE did not go red at the second call (attempts=1)
+hermes-first-turn-synthetic: temp-cleanup-retry path=C:\Users\rybow\AppData\Local\Temp\qf-retry-green-EMFILE code=EMFILE attempts=2
+hermes-first-turn-synthetic: FALSIFY GREEN retry-code=EMFILE attempts=2 receipt_required=true
+hermes-first-turn-synthetic: cleanup-leak path=C:\Users\rybow\AppData\Local\Temp\qf-retry-red-ENFILE code=ENFILE attempts=1
+hermes-first-turn-synthetic: FALSIFY RED retry-code=ENFILE attempts=1 reason=retry suppression for ENFILE did not go red at the second call (attempts=1)
+hermes-first-turn-synthetic: temp-cleanup-retry path=C:\Users\rybow\AppData\Local\Temp\qf-retry-green-ENFILE code=ENFILE attempts=2
+hermes-first-turn-synthetic: FALSIFY GREEN retry-code=ENFILE attempts=2 receipt_required=true
+
+hermes-first-turn-synthetic: FALSIFY RED static-rm-routing reason=direct gate-root rmSync call remains outside the removal helper (1)
+hermes-first-turn-synthetic: FALSIFY GREEN static-rm-routing helper-only=true
+hermes-first-turn-synthetic: FALSIFY RED tool_output failed_boundary=tool_output failure_mechanism=gate2_rejected error=failed_boundary=tool_output failure_mechanism=gate2_rejected
+hermes-first-turn-synthetic: cleanup-leak path=C:\Users\rybow\AppData\Local\Temp\qf-boundary-falsifier-tool-output code=EBUSY attempts=9
+hermes-first-turn-synthetic: FALSIFY GREEN cleanup-preserved-original=failed_boundary=tool_output failure_mechanism=gate2_rejected
+hermes-first-turn-synthetic: temp-cleanup roots_created=1 roots_remaining=1 leaked=["C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-boundary-falsifier-held"]
+hermes-first-turn-synthetic: FALSIFY RED roots_remaining=1 leaked=["C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-boundary-falsifier-held"] reason=deliberately retained registered root unexpectedly passed cleanup assertion
+hermes-first-turn-synthetic: FALSIFY GREEN preexisting=14 roots_remaining=0 leaked=[]
+hermes-first-turn-synthetic: FALSIFY RED static-mkdtemp-routing reason=gate-owned mkdtempSync calls must route through one creation helper (2)
+hermes-first-turn-synthetic: FALSIFY GREEN static-mkdtemp-routing helper-only=true
+hermes-first-turn-synthetic: FALSIFY RED half-born-seat receipt-validator reason=half-born-seat self_exit=true retained live PIDs
+hermes-first-turn-synthetic: FALSIFY GREEN half-born-seat receipt-validator self_exit=true pids=[]
+```
+
+Observed half-born receipt:
+
+```text
+hermes-first-turn-synthetic: half-born-seat self_exit=false elapsed_ms=20000 pids=[3016,24792,25356,26420,26636,27064,29380,30312,30496,33356,33484]
+```
+
+Final cleanup receipt:
+
+```text
+hermes-first-turn-synthetic: temp-cleanup roots_created=22 roots_remaining=0 retried=0 preexisting=12 leaked=[]
+```
+
+The builder did not perform the verifier-only cold `verify-release.ts`,
+installed `windows-hermes-research-chain`, or founder acceptance. The second
+gate's terminal cleanup receipt remains verifier evidence, not builder
+evidence.
+
+### Rewrite final state
+
+```text
+founder_acceptance=not_performed
+l4_certified=pending
+live_turn_count=0
+retry_count=0
+NEXT.md=unchanged
+V2-3/R14+ implementation=not begun
+remaining_red=none in builder-run acceptance
+builder_result=PASS
+verifier_result=pending
+```
