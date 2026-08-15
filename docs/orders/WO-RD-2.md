@@ -1,11 +1,11 @@
 # WO-RD-2 — Research Director recruits and assigns
 
-status: rework 1 of 2 — harness-isolation Reader PASS
+status: final rewrite 2 of 2 — Reader PASS
 assignee: builder
 depends: WO-RD-1 done at `5a9a5cea6186b05a4eea5c38f5b8a597a8d02bbf`
 rung: R14 / slice 2 — governed specialist recruitment and durable Task ownership
-authorization: founder umbrella goal 2026-08-15; initial Reader `01a007a6-325b-71e0-b80d-001ff9f7edc2` answered YES/YES PASS; Rework 1 Reader `01a007be-039d-7740-b6a5-6608773ca4b2` answered YES/YES PASS with no assertion weakening; `NEXT.md` names this order
-rework-cycle: 1 of 2
+authorization: founder umbrella goal 2026-08-15; initial Reader `01a007a6-325b-71e0-b80d-001ff9f7edc2` answered YES/YES PASS; Rework 1 Reader `01a007be-039d-7740-b6a5-6608773ca4b2` passed its isolation text; final rewrite Reader `01a007c5-d887-7790-abff-d77222381365` answered YES/YES/NO weakening PASS; `NEXT.md` names this order
+rework-cycle: 2 of 2 — exhausted after this candidate
 
 ## In plain terms
 
@@ -147,8 +147,10 @@ cardinality is not exact, the Task projection is exactly
 the existing `Assignment unavailable` text on any tile whose exact session id
 is still named by a malformed link. The exact specialist tile may therefore
 show `No task` after its `assigned_to` link is removed; it must never show a
-guessed delegator or reason. The existing manual Create/Reassign/Cancel
-controls and their error behavior remain unchanged.
+guessed delegator or reason. This order makes no claim about the manual
+Create/Reassign/Cancel renderer controls; `team-composition` preserves only
+their Kernel action and lifecycle contract. Founder steering is the separate
+slice that must prove those visible controls.
 
 ### C. One fast real-shell product proof
 
@@ -250,7 +252,7 @@ cd C:\Users\rybow\QuantFlow-Ontology
 bun test qa/gates/research-director-delegation.test.ts
 bun qa/run.ts research-director-delegation
 bun qa/run.ts research-director-front-door
-bun qa/run.ts team-composition-ui
+bun qa/run.ts team-composition
 bun qa/run.ts kernel-sole-writer
 bun qa/run.ts kernel-sole-writer-app
 bun qa/run.ts repo-shape
@@ -421,3 +423,66 @@ push. A fresh independent Verifier then runs the original complete Acceptance
 matrix exactly once against that candidate; the verifier, not the Builder,
 re-measures the corrected WO-RD-2 receipt label. This amendment authorizes no
 product change outside the original scope and no assertion weakening.
+
+### Rework 1 result — superseded
+
+Rework 1's focused helper test passed in 129 ms. The unchanged legacy live gate
+was red again after 117,620 ms at `production app RPC timed out`; the child had
+not exited and no bounded app output was emitted. The Builder stopped without
+commit or push. Unique endpoint roots were necessary hygiene but did not reach
+the causal startup defect below. Rework 2 supersedes Rework 1's implementation
+instructions; they authorize nothing further.
+
+## Rework 2 — remove the stale legacy harness from this product slice
+
+Read-only diagnosis measured the actual pre-RPC incompatibility:
+
+```text
+tracked production profile=hermes-research-director
+.package-staging profile=hermes-orchestrator
+team-composition-ui resource root=.package-staging
+runBuild refreshes JavaScript only
+RPC socket written=false
+UI assertions exercised=0
+```
+
+`team-composition-ui` is a legacy V2-3 manual-Dock harness. It boots from the
+stale `.package-staging/species` copy, which predates WO-RD-1's required
+Research Director identity. Current startup validation rejects that resource
+tree before JSON-RPC readiness. This is neither a WO-RD-2 product failure nor a
+useful regression measurement of the changed surfaces.
+
+The final Builder lap is exact:
+
+1. Restore `qa/gates/team-composition-ui.ts` to its pre-Rework-1 content and
+   remove the uncommitted `qa/gates/team-composition-ui.test.ts`. Do not repair,
+   run, weaken, or otherwise change that legacy gate in this order.
+2. The Acceptance matrix above permanently replaces
+   `bun qa/run.ts team-composition-ui` with the fast
+   `bun qa/run.ts team-composition`. This does not remove a WO-RD-2 assertion:
+   the new `research-director-delegation` real-shell gate proves the exact
+   Director/specialist tiles and four Kernel-equal Task facts; the focused
+   `task-composition.test.ts` proves the renderer's assigned/unavailable DOM;
+   and `team-composition` proves Task/link projection and lifecycle behavior.
+3. Record the stale `.package-staging` resource-root defect in `docs/DEBT.md`,
+   naming the trigger: repair or retire `team-composition-ui` before any order
+   relies on it again. Do not make that repair inside WO-RD-2.
+4. Do not run a third `team-composition-ui`, a second WO-RD-2 live product
+   proof, or another WO-RD-1 front-door proof in the Builder lap. Run only:
+
+```powershell
+cd C:\Users\rybow\QuantFlow-Ontology
+bun qa/run.ts team-composition
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts repo-shape
+bun qa/run.ts one-skin
+bun qa/run.ts doc-links
+bun qa/run.ts rung-ladder
+git diff --check
+```
+
+Full green permits the immutable candidate commit and push. The independent
+Verifier runs the revised complete Acceptance matrix once. Because the second
+rework cycle is exhausted, any verifier red stops WO-RD-2 for a founder-level
+rewrite; there is no third implementation lap.
