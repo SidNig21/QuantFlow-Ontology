@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 REJECTED-SUBMIT RED — FOUNDER DECISION REQUIRED
+status: V2-3.1 STANDING-AUTHORIZED — ITERATE UI GATE TO GREEN
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,8 +33,8 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-The read-only oracle allowlist and Electron cleanup now pass, but the live UI
-gate reports that a rejected Task submission changed Kernel rows or hid its
-same-tile error. Do not rerun, repair, commit the preserved WIP, start a
-Verifier, or rotate rungs until the founder authorizes a bounded diagnosis.
-Never place bets or trades.
+Fix each distinct defect named by `team-composition-ui` inside the existing tile
+and Dock renderer surfaces or that gate file, and continue until it exits 0.
+Assertions, pass criteria, live Hermes, cleanup, and all other product code stay
+fixed. Stop only on an assertion change, required code outside those surfaces,
+or the same assertion red twice after a fix. Never place bets or trades.

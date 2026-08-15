@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: stopped-on-rejected-submit-red
+status: standing-authorized-to-green
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: allowlist-and-cleanup pass used and exhausted 2026-08-15
+reauthorization: standing founder authorization for remainder of V2-3.1 — 2026-08-15
 
 ## In plain terms
 
@@ -313,6 +313,34 @@ was pushed. The allowlist and process cleanup edits remain preserved
 uncommitted. Further work requires founder authority for one bounded diagnosis
 that reports both sub-receipts separately before any repair; assertions may not
 be changed or weakened.
+
+### Standing founder authorization — iterate V2-3.1 UI gate to green
+
+For the remainder of WO-V2-3.1, fix each distinct defect named by
+`team-composition-ui` and continue until that gate exits 0. Do not return to the
+founder between distinct assertions.
+
+Bounds:
+
+- Change only defects named by `team-composition-ui`.
+- New edits are limited to the existing tile and Dock renderer surfaces plus
+  `qa/gates/team-composition-ui.ts`. Preserve every other existing V2-3.1
+  product and gate change.
+- A compound receipt may be split into distinct named conditions so its failing
+  half is measurable. No assertion, pass criterion, timing limit, falsifier,
+  live Hermes path, or cleanup receipt may be weakened, deleted, relaxed, or
+  replaced.
+- After each distinct fix, rerun the focused gate. Report the measured defect
+  and fix, then continue without asking.
+
+Stop and return to the founder only if an assertion itself must change, product
+code outside the authorized tile/Dock renderer surfaces is required, or the
+same assertion remains red twice after a fix attempt.
+
+Once `team-composition-ui` exits 0, run its two named falsifiers and the full
+short V2-3.1 acceptance matrix. On green, commit and push the complete preserved
+candidate for a fresh independent Verifier. A red outside the authorized UI
+gate scope stops with its exact receipt.
 
 ## Objective
 
