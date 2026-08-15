@@ -1,6 +1,8 @@
 # WO-RD-2 — Research Director recruits and assigns
 
-status: final rewrite 2 of 2 — Reader PASS
+status: done
+verified-candidate: 13beba7fb9a24632946b8f50a319f9df161396c1
+verification: docs/orders/evidence/wo-rd-2/VERIFICATION.md
 assignee: builder
 depends: WO-RD-1 done at `5a9a5cea6186b05a4eea5c38f5b8a597a8d02bbf`
 rung: R14 / slice 2 — governed specialist recruitment and durable Task ownership
