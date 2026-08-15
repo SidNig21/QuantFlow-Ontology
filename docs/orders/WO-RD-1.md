@@ -1,7 +1,7 @@
 # WO-RD-1 — Research Director front door
 
-status: kernel-test-command-reader-pending — product edit complete; root-cwd test command could not resolve package dependency
-assignee: reader
+status: kernel-gate-builder-open — Reader PASS `01a00750-9c97-7800-8bd1-79a1d23d0420`; product edit complete
+assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
 authorization: founder goal 2026-08-15; routed after adversarial Reader PASS
@@ -524,7 +524,7 @@ WO-RD-1 scope and assertions remain unchanged. The Builder runs each command
 at most once, in order, and stops at the first red:
 
 ```powershell
-bun --cwd packages/qf-kernel test src/kernel.test.ts
+bun qa/run.ts kernel
 bun test qa/gates/research-director-front-door.test.ts
 bun qa/run.ts research-director-front-door
 git diff --check
@@ -534,9 +534,12 @@ Full green commits and pushes the complete authorized WO-RD-1 candidate for
 one fresh independent Verifier. Any red stops; no assertion, timing limit,
 fixture, or acceptance criterion may be weakened.
 
-The package-local working directory above is load-bearing. Running the same
-test path from the repository root does not resolve `qf-kernel-schema/commands`
-through the Kernel package's installed dependency and is an order-command
-failure before any assertion executes. The corrected command changes only the
-working directory used by Bun; it does not change the test file, dependency
-graph, product implementation, or acceptance criterion.
+The canonical `kernel` gate above is load-bearing. Running the test path from
+the repository root does not resolve `qf-kernel-schema/commands`; in this
+checkout the package-local dependency directory was also present but empty.
+`qa/run.ts` already defines `kernel` through `bunPackageGate`, which performs a
+frozen install in `packages/qf-kernel` and then runs that package's unmodified
+test suite. Reuse that existing gate. Do not create another installer, helper,
+or dependency workaround. This changes only how the existing Kernel suite is
+prepared and invoked; it does not change test scope, product implementation,
+or acceptance criteria.
