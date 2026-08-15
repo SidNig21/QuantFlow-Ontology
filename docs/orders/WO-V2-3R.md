@@ -100,10 +100,11 @@ adapter failed.
 
 Add one focused gate named `dev-dock-readiness`. It executes the public
 `bun run dev` entrypoint from `collab-electron`; calling an internal preflight
-directly is not acceptance. The gate substitutes only the final Electron child
-launcher so it can record whether Electron was requested and exit without an
-interactive window. It does not substitute either pack command on the green
-path.
+directly is not acceptance. On the green path it substitutes neither pack
+command nor the Electron child: the real Electron process must start, reach its
+production renderer/main Dock, expose its process identifier to the gate, and
+be closed by the gate after the launchability assertions. A spawn request alone
+is not acceptance.
 
 Before that green run, the gate moves these complete generated directories to
 a unique temporary backup outside the repository, if they exist:
@@ -122,16 +123,17 @@ The gate must refuse to start if its unique backup path already exists. No
 unbacked deletion, overwrite, or cleanup of a pre-existing artifact is allowed.
 
 The green run proves both packages are regenerated at the two repository-root
-paths named in Deliverable A before the Electron child is requested. While the
-generated outputs still exist, it boots the production renderer/main against
-an isolated Kernel and proves the real Dock reports the Hermes Orchestrator and
-the Hermes Market Researcher as launchable on this founder machine. Restoration
-runs only after that assertion and renderer/main cleanup complete.
+paths named in Deliverable A before the Electron child starts. The same real
+Electron child boots its production renderer/main against an isolated Kernel;
+the gate proves that process is alive and its real Dock reports the Hermes
+Orchestrator and the Hermes Market Researcher as launchable on this founder
+machine. Restoration runs only after that assertion and real Electron cleanup
+complete.
 
 The gate may inject process execution and temporary paths into the public dev
-entrypoint for its two failure cases and may substitute only the Electron child
-launcher on the green path. Its green receipt must use the real existing pack
-scripts and repository-root manifests. It may not reuse
+entrypoint only for its two failure cases. Its green receipt must use the real
+existing pack scripts, repository-root manifests, and Electron child. It may
+not reuse
 `.package-staging`, synthesize an `.aospkg`, insert an `agent_definition`
 directly, mock availability, or bypass the Dock launch control.
 
@@ -188,9 +190,9 @@ under these concrete breaks:
 development_root=repository
 hermes_package=prepared
 claude_code_package=prepared
-electron_started_after_packages=true
+electron_process_started_after_packages=true
 hermes_orchestrator_launchable=true
-hermes_worker_launchable=true
+hermes_market_researcher_launchable=true
 preexisting_artifacts_restored=true
 PASS dev-dock-readiness
 ```
