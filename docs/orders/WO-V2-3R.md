@@ -1,12 +1,12 @@
 # WO-V2-3R — make the ordinary development Dock launchable
 
-status: reauthorization-required-after-two-builder-stops
+status: founder-exception-authorized-final-continuation
 assignee: builder
 depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
 rung: R13 / V2-3 founder closure
-authorization: exhausted after two Builder stops; explicit founder exception required
+authorization: founder exception 2026-08-15 — handle in-scope implementation detail without another check
 rework-cycle: 0 of 1
-builder-attempts: 2 of 2 used — exhausted
+builder-attempts: 2 used; one final continuation explicitly authorized
 
 ## Objective
 

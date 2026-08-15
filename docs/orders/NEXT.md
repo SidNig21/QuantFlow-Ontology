@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 ordinary development runtime closure
 
-status: STOPPED — TWO BUILDER ATTEMPTS EXHAUSTED; FOUNDER EXCEPTION REQUIRED
+status: AUTHORIZED — FINAL V2-3R CONTINUATION
 authorized-by: founder standing direction to handle the build and delegated founder checks
 authorized-at: 2026-08-15
 baseline: V2-3.1 candidate `b5b6c95` machine-passed; Computer Use founder check rejected runtime launch; closure order Reader-passed at `f504a4a`
@@ -25,9 +25,10 @@ Computer Use receipt is recorded in
 
 ## Work here only
 
-No Builder or Verifier may start until the founder explicitly authorizes one
-final continuation. The prepared continuation remains limited to resolving the
-absolute existing `npm.cmd` from `PATH` in development startup, then executing
+The founder explicitly authorized one final continuation and directed the
+router to handle this in-scope implementation detail without another approval.
+The continuation is limited to resolving the absolute existing `npm.cmd` from
+`PATH` in development startup, then executing
 [`WO-V2-3R.md`](WO-V2-3R.md) exactly in this checkout on branch `wo-V2-3`. No
 second folder, worktree, clone, helper framework, packaged gate, installer,
 release verifier, credential access, Task semantic change, Dock rebuild, or
@@ -35,9 +36,8 @@ Claude Code timeout repair.
 
 ## Stop
 
-Two Builder attempts stopped at the Windows AgentOS npm executable boundary.
-Do not interpret the earlier standing authorization as a third attempt. After
-an explicit founder exception and a fresh
+Two Builder attempts stopped at the Windows AgentOS npm executable boundary;
+the founder has now authorized the exact prepared resolution. After a fresh
 Verifier PASS, the router performs the exact founder-delegated flow with
 Computer Use. Do not begin V2-3.2 or the direction reset before that visible
 acceptance. Never place bets or trades.
