@@ -23,7 +23,12 @@ test("mission activation is one bounded JSON-safe PTY instruction", () => {
   expect(instruction).toContain("\\u009f");
   expect(instruction).toContain('"contract":"qf.mission.activation.v1"');
   expect(instruction).toContain("Report missing data or Strategy/Technique coverage honestly.");
-  expect(instruction).toContain("do not recruit or assign a Task in this slice");
+  expect(instruction).toContain("qf_agent_definition_query");
+  expect(instruction).toContain("select only hermes-worker");
+  expect(instruction).toContain("qf_create_agent_session once");
+  expect(instruction).toContain("qf_start_agent_session once");
+  expect(instruction).toContain("send_task once with to_role=worker");
+  expect(instruction).toContain("Task is not assigned until the Kernel-backed send_task call returns a Task id");
   expect(instruction).toContain("Never place a bet or trade.");
 });
 

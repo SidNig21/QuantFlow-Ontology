@@ -41,6 +41,8 @@ export const WINDOWS_WSL_LAUNCH_ENV_KEYS = [
   // deterministic responder without changing ordinary provider launches.
   "QF_HERMES_SYNTHETIC_TEST",
   "QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY",
+  "QF_HERMES_SYNTHETIC_OLD_NO_RECRUIT",
+  "QF_HERMES_SYNTHETIC_SELECTED_DEFINITION",
 ] as const;
 
 interface ServerOptions {

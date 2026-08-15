@@ -29,7 +29,9 @@ function projection(db: ReturnType<typeof openKernel>) {
     linksFrom: (id, kind) => db
       .query("SELECT from_id, to_id FROM links WHERE from_id = ? AND kind = ? ORDER BY created_at ASC")
       .all(id, kind) as Array<{ from_id: string; to_id: string }>,
-    getObject: () => null,
+    getObject: (type, id) => type === "agent_definition"
+      ? db.query("SELECT * FROM agent_definition WHERE id = ?").get(id) as Record<string, unknown> | null
+      : null,
   });
 }
 
@@ -66,7 +68,7 @@ function assertReceipt(
 
 function assertProductionDockContract(): void {
   const root = join(import.meta.dir, "../../..");
-  const labels = new Set(["Market Researcher", "Orchestrator", "Critic"]);
+  const labels = new Set(["Market Researcher", "Orchestrator", "Critic", "Research Director"]);
   for (const manifestRef of PRODUCTION_DOCK_PROFILE_MANIFESTS) {
     const manifest = JSON.parse(readFileSync(join(root, manifestRef), "utf8")) as {
       profiles?: Array<Record<string, unknown>>;

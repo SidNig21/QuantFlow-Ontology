@@ -25,6 +25,8 @@ export type TaskAssignmentProjection = {
   taskId: string;
   title: string;
   status: "open" | "done" | "cancelled";
+  delegatorDisplayName: string | null;
+  description: string;
   delegatedBySessionId: string | null;
   assignedToSessionId: string | null;
   assignmentState: "assigned" | "unavailable";
@@ -40,18 +42,20 @@ export type TaskDelegationProjectionReader = {
 
 function validTask(
   task: Record<string, unknown>,
-): { taskId: string; title: string; status: "open" | "done" | "cancelled" } | null {
+): { taskId: string; title: string; status: "open" | "done" | "cancelled"; description: string } | null {
   const taskId = task.id;
   const title = task.title;
   const status = task.status;
+  const description = task.description;
   if (
     typeof taskId !== "string" ||
     typeof title !== "string" ||
+    typeof description !== "string" ||
     (status !== "open" && status !== "done" && status !== "cancelled")
   ) {
     return null;
   }
-  return { taskId, title, status };
+  return { taskId, title, status, description };
 }
 
 /**
@@ -75,12 +79,26 @@ export function projectTaskAssignments(
     const assignedIds = assigned
       .map((link) => link.to_id)
       .filter((id): id is string => typeof id === "string" && id.length > 0);
-    const exact = delegated.length === 1 && assigned.length === 1 &&
+    const assignmentLinksExact = delegated.length === 1 && assigned.length === 1 &&
       delegatedIds.length === 1 && assignedIds.length === 1;
+    const delegatorSessionId = assignmentLinksExact ? delegatedIds[0]! : null;
+    const delegatorLineage = delegatorSessionId
+      ? onlyLink(reader, delegatorSessionId, "spawned_from")
+      : null;
+    const delegatorDefinition = delegatorLineage
+      ? reader.getObject("agent_definition", delegatorLineage.to_id)
+      : null;
+    const delegatorDisplayName = typeof delegatorDefinition?.display_name === "string" &&
+      delegatorDefinition.display_name.trim().length > 0
+      ? delegatorDefinition.display_name
+      : null;
+    const exact = assignmentLinksExact && delegatorDisplayName !== null;
     projections.push({
       taskId: task.taskId,
       title: task.title,
       status: task.status,
+      delegatorDisplayName: exact ? delegatorDisplayName : null,
+      description: task.description,
       delegatedBySessionId: exact ? delegatedIds[0]! : null,
       assignedToSessionId: exact ? assignedIds[0]! : null,
       assignmentState: exact ? "assigned" : "unavailable",

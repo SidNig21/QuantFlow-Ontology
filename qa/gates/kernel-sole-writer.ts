@@ -97,6 +97,8 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/team-composition.ts",
   // WO-RD-1: independent read-only oracle over the isolated Research Director UI-proof Kernel.
   "qa/gates/research-director-front-door.ts",
+  // WO-RD-2: independent read-only oracle over the isolated Research Director delegation Kernel.
+  "qa/gates/research-director-delegation.ts",
 ];
 
 /**

@@ -265,6 +265,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "research-director-delegation",
+    description: "WO-RD-2: real Research Director recruitment, durable Task assignment, and specialist canvas receipt",
+    run: async () => {
+      const { runResearchDirectorDelegationGate } = await import("./gates/research-director-delegation.ts");
+      const { ok } = await runResearchDirectorDelegationGate();
+      return ok;
+    },
+  },
+  {
     name: "repo-shape",
     description: "The authority set named by START_HERE exists; CLA machinery stays gone",
     run: () => {

@@ -74,7 +74,14 @@ export function renderTaskFoot(dom, tile, {
 	const session = (Array.isArray(sessions) ? sessions : []).find((row) => row?.id === tile.sessionId);
 	const fact = taskFactForSession(assignments, tile.sessionId);
 	const factRow = node("div", `task-fact task-fact-${fact.state}`);
-	factRow.appendChild(node("span", "task-fact-label", fact.text));
+	if (fact.task?.assignmentState === "assigned") {
+		factRow.appendChild(node("span", "qf-task-title", fact.task.title));
+		factRow.appendChild(node("span", "qf-task-status", String(fact.task.status).toUpperCase()));
+		factRow.appendChild(node("span", "qf-task-delegator", `Assigned by ${fact.task.delegatorDisplayName}`));
+		factRow.appendChild(node("span", "qf-task-reason", fact.task.description));
+	} else {
+		factRow.appendChild(node("span", "task-fact-label", fact.text));
+	}
 	foot.appendChild(factRow);
 
 	if (fact.task?.status === "open" && fact.task.assignedToSessionId === tile.sessionId) {

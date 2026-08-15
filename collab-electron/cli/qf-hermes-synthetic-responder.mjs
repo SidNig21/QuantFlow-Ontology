@@ -21,6 +21,7 @@ const COLLABORATION_BRIDGE = process.env.QF_COLLABORATION_MCP_PATH || process.ar
 const ONTOLOGY_BRIDGE = process.env.QF_ONTOLOGY_MCP_PATH || process.argv[4];
 const MISSION_PREFIX = "QUANTFLOW_MISSION ";
 const SUPPRESS_BOUNDARY = process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY || "";
+const SELECTED_WORKER_DEFINITION = process.env.QF_HERMES_SYNTHETIC_SELECTED_DEFINITION || "hermes-worker";
 
 function byteLength(value) {
   return Buffer.byteLength(value, "utf8");
@@ -295,7 +296,7 @@ async function orchestrator(reader, ontology, collaboration, directorLifecycle =
   if (!rows.some((row) => row?.id === "hermes-worker")) throw new Error("production hermes-worker definition was not discovered");
   const workerSessionId = `synthetic-worker-${randomUUID()}`;
   emitBoundary("tool_input", { role: ROLE, tool: "qf_create_agent_session" });
-  await ontology.callTool("qf_create_agent_session", ontologyArgs({ session_id: workerSessionId, agent_definition_id: "hermes-worker", label: "Synthetic research worker" }));
+  await ontology.callTool("qf_create_agent_session", ontologyArgs({ session_id: workerSessionId, agent_definition_id: SELECTED_WORKER_DEFINITION, label: "Synthetic research worker" }));
   emitBoundary("tool_output", { role: ROLE, tool: "qf_create_agent_session" });
   emitBoundary("tool_input", { role: ROLE, tool: "qf_start_agent_session" });
   await ontology.callTool("qf_start_agent_session", ontologyArgs({ session_id: workerSessionId }));
@@ -312,6 +313,7 @@ async function orchestrator(reader, ontology, collaboration, directorLifecycle =
   emitBoundary("run_control", { role: ROLE, task_id: task.taskId, result_returned: true });
   emitBoundary("result_return", { role: ROLE, task_id: task.taskId });
   emit({ turn: "complete", role: ROLE, task_id: task.taskId });
+  await reader.waitForClose();
 }
 
 export async function completeDirectorTurnAndWait(reader, missionId, emitComplete = () => {
@@ -383,6 +385,7 @@ async function worker(reader, ontology, collaboration) {
   emitBoundary("tool_output", { role: ROLE, tool: "send_result", artifact_id: sent.artifactId });
   emitBoundary("first_turn", { role: ROLE, task_id: task.taskId });
   emit({ turn: "complete", role: ROLE, task_id: task.taskId });
+  await reader.waitForClose();
 }
 
 async function critic(reader, ontology) {
