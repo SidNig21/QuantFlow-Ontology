@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: ui-gate-green-matrix-stopped
+status: short-matrix-authorized
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: UI-gate standing authorization completed; matrix authority required
+reauthorization: founder-authorized existing short matrix only — 2026-08-15
 
 ## In plain terms
 
@@ -369,6 +369,29 @@ renderer surface, but this defect was named by `one-skin`, not
 The complete V2-3.1 work remains preserved uncommitted. Further matrix cleanup
 requires founder authority and may not weaken `one-skin` or change any UI-gate
 assertion.
+
+### Founder reauthorization — complete the existing short matrix, then hard stop
+
+The founder authorizes the Builder to continue through the existing V2-3.1
+short acceptance matrix only.
+
+- Replace the failed-state raw colour fallback `#d45d5d` with the existing
+  GLACIER alert token, `var(--qf-gl-alert)`. Do not add a token and do not alter
+  the `one-skin` assertion.
+- Continue through distinct matrix-named defects only when the required edit is
+  inside the already-authorized V2-3.1 tile/Dock renderer surfaces or gate
+  files. Do not change, delete, weaken, or relax an assertion or pass criterion.
+- Preserve the green production UI path, live Hermes fixture, both falsifier
+  receipts, cleanup receipts, and every existing product change.
+- Stop if a required file is outside that boundary, an assertion must change,
+  or the same assertion remains red after two repair attempts.
+
+On full green, commit and push the complete preserved V2-3.1 candidate and
+return it for one fresh independent Verifier. After Verifier PASS, return for
+founder acceptance. After founder acceptance, close the builder door: do not
+authorize V2-3.2, auto-rotate `NEXT.md`, or begin any later product order. The
+next authorized operation will be a founder-direction reset, separately scoped
+and docs-only.
 
 ## Objective
 

@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 UI GATE GREEN / ONE-SKIN RED — FOUNDER DECISION REQUIRED
+status: V2-3.1 SHORT MATRIX AUTHORIZED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,8 +33,14 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-`team-composition-ui` and both falsifiers are complete. The short matrix stopped
-because `shell.css` contains one raw `#d45d5d`, rejected by `one-skin`. Do not
-repair it, commit the preserved candidate, start a Verifier, or rotate rungs
-until the founder extends authority to matrix-named defects. Never place bets
-or trades.
+`team-composition-ui` and both falsifiers are complete. Replace only the
+failed-state raw `#d45d5d` with existing token `var(--qf-gl-alert)`, then
+continue through distinct short-matrix defects named by a gate when the edit
+stays inside the existing V2-3.1 tile/Dock renderer or gate files. Assertions
+and pass criteria are fixed. Stop on an outside file, an assertion change, or
+the same assertion red after two repair attempts.
+
+On full green, commit and push the preserved candidate for one fresh Verifier.
+After Verifier PASS, stop for founder acceptance. Acceptance closes the builder
+door for a separately authorized founder-direction reset; do not rotate to
+V2-3.2 or any later product order. Never place bets or trades.
