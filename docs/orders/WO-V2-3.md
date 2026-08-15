@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: stopped-for-founder
+status: founder-reauthorized
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: required
+reauthorization: granted 2026-08-15 — live Hermes gate fixture only
 
 ## In plain terms
 
@@ -168,6 +168,34 @@ receipt. No verifier may start, no product change may be committed, and no
 second Builder lap is authorized until the founder decides whether to discard
 the uncommitted work, reauthorize a bounded gate-fixture correction, or rewrite
 the order.
+
+### Founder reauthorization — live Hermes fixture, 2026-08-15
+
+The founder authorizes one bounded continuation of the preserved uncommitted
+V2-3.1 work. This is not a second product rework lap. Its only new authority is
+to replace the failed Claude gate fixture with live production Hermes seats.
+
+- The production Dock launches exactly `hermes-orchestrator` as delegator and
+  `hermes-worker` as assignee through their normal production adapter path.
+- The gate uses the founder's existing Hermes authentication state only by
+  launching Hermes normally. It never reads, prints, copies, changes, or tests
+  credential files.
+- The green proof may not use Claude Code, a synthetic responder, a mocked
+  runtime, a direct Kernel/session insert, or a lower-layer handler call to
+  stand in for either live seat.
+- Preserve the current native `executeJavaScript` click bridge. Do not add or
+  retry DevTools HTTP, CDP debugger attach, another connector, a helper
+  framework, or a dependency.
+- Reuse the existing built artifacts when valid. Run the single bounded
+  `team-composition-ui` proof against live Hermes, then the two order-named
+  falsifiers and the remaining short acceptance commands. The UI gate remains
+  capped at two minutes per invocation.
+- If either Hermes seat fails to become a running Kernel session, the real UI
+  click fails to add exactly one Task, or any receipt is red, stop with that
+  output. No further fixture substitution or retry is authorized.
+
+On green, commit and push the full V2-3.1 candidate for a fresh independent
+Verifier. On red, preserve the work and return to the founder.
 
 ## Objective
 

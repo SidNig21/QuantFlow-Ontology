@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 STOPPED — FOUNDER DECISION REQUIRED
+status: V2-3.1 FOUNDER-REAUTHORIZED — LIVE HERMES FIXTURE ONLY
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,7 +33,7 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-The one permitted rework stopped when the staged Claude native adapter exited
-before creating the first live Kernel seat. Do not start another Builder or
-Verifier, commit the uncommitted product work, or rotate to the harness until
-the founder decides its disposition. Never place bets or trades.
+The founder authorized one bounded continuation using production
+`hermes-orchestrator` and `hermes-worker` seats. Do not use Claude, mocks,
+synthetic responders, another UI connector, package gates, or another retry.
+Any red receipt returns the work to the founder. Never place bets or trades.
