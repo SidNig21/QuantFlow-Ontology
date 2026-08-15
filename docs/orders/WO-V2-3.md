@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: stopped-after-live-hermes-red
+status: founder-reauthorized-background-control-fix
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: used and exhausted 2026-08-15
+reauthorization: one background-control product-fix pass granted 2026-08-15
 
 ## In plain terms
 
@@ -216,6 +216,29 @@ at committed HEAD `bfe3f92500a7c8643c0945692cb87dc440644b58` with the V2-3.1
 implementation and gate changes preserved but uncommitted. The live-seat gate
 fixture is proven; only the background-control product assertion is presently
 red. Further product repair requires new founder authority.
+
+### Founder reauthorization — background control product fix, 2026-08-15
+
+The founder authorizes one product-fix pass for the single remaining measured
+red: the background running Orchestrator's existing `Create Task` control is
+not visible and hit-testable.
+
+- Diagnose and repair only the production renderer/CSS/tile interaction that
+  prevents this existing control from being visible and hit-testable after
+  another tile is raised.
+- Do not alter Task semantics, Kernel actions, IPC contracts, spawn behavior,
+  the live fixture, or any queued UI finding.
+- Retain the proven production `hermes-orchestrator` delegator and
+  `hermes-worker` assignee, native `executeJavaScript` click bridge, production
+  renderer/preload/main/Kernel path, and two-minute per-invocation budget.
+- Run the green `team-composition-ui` proof once after the fix. If it is red,
+  stop immediately with the output. If green, run the two existing named
+  falsifiers and the remaining short acceptance commands exactly once.
+- No fixture substitution, mock, synthetic responder, new connector,
+  dependency, helper, package gate, installer, or retry is authorized.
+
+On a fully green bounded matrix, commit and push the complete preserved V2-3.1
+candidate for a fresh independent Verifier. Any red returns to the founder.
 
 ## Objective
 

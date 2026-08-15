@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 LIVE HERMES RED — FOUNDER DECISION REQUIRED
+status: V2-3.1 BACKGROUND CONTROL FIX — FOUNDER-REAUTHORIZED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,9 +33,7 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-The production `hermes-orchestrator` and `hermes-worker` seats both launched,
-then the UI gate failed because the background Create Task control was not
-visible and hit-testable. The authorized continuation is exhausted. Do not
-start another Builder, Verifier, later rung, or package gate until the founder
-decides the preserved uncommitted work's disposition. Never place bets or
-trades.
+Fix only why the background running Orchestrator's existing Create Task control
+is not visible and hit-testable. Retain the proven live Hermes fixture and all
+other V2-3.1 contracts. One green run may proceed to the named falsifiers and
+short matrix; any red returns to the founder. Never place bets or trades.
