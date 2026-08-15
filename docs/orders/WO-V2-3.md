@@ -1,11 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: founder-rework
+status: stopped-for-founder
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
+reauthorization: required
 
 ## In plain terms
 
@@ -146,6 +147,27 @@ or add a dependency. If the renderer-level proof cannot exercise the
 production preload/main IPC route in this checkout, stop and report the exact
 seam instead of substituting a machine-only unit test. A failed Builder or
 Verifier rework stops V2-3 for founder decision; there is no second rework lap.
+
+### V2-3.1 Builder stop — 2026-08-15
+
+The sole founder-rework Builder lap stopped red before commit or push. Preserve
+the uncommitted implementation and gate files for founder disposition; they are
+not an accepted candidate.
+
+```text
+team-composition-ui: FAIL first live Kernel seat timed out
+[json-rpc] Listening on \\.\pipe\collaborator-13903476-ipc
+[pty] createHostCommandSession ok sessionId=d41921ad8f12cdfa
+[pty] session.exited sessionId=d41921ad8f12cdfa exitCode=1
+```
+
+Measured seam: the production Dock activation and immediate pending-tile route
+ran, but the staged Claude native adapter exited with code 1 before it created
+a running Kernel seat. The UI gate therefore never reached its Task-click
+receipt. No verifier may start, no product change may be committed, and no
+second Builder lap is authorized until the founder decides whether to discard
+the uncommitted work, reauthorize a bounded gate-fixture correction, or rewrite
+the order.
 
 ## Objective
 

@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3 FOUNDER REWORK — `WO-V2-3` V2-3.1 SECTION ONLY
+status: V2-3.1 STOPPED — FOUNDER DECISION REQUIRED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,5 +33,7 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-This is the one permitted rework. Any Builder or Verifier failure stops the
-order for the founder; do not start another lap. Never place bets or trades.
+The one permitted rework stopped when the staged Claude native adapter exited
+before creating the first live Kernel seat. Do not start another Builder or
+Verifier, commit the uncommitted product work, or rotate to the harness until
+the founder decides its disposition. Never place bets or trades.
