@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: standing-authorized-to-green
+status: ui-gate-green-matrix-stopped
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: standing founder authorization for remainder of V2-3.1 — 2026-08-15
+reauthorization: UI-gate standing authorization completed; matrix authority required
 
 ## In plain terms
 
@@ -341,6 +341,34 @@ Once `team-composition-ui` exits 0, run its two named falsifiers and the full
 short V2-3.1 acceptance matrix. On green, commit and push the complete preserved
 candidate for a fresh independent Verifier. A red outside the authorized UI
 gate scope stops with its exact receipt.
+
+### Standing UI loop result — UI gate and falsifiers complete, matrix red
+
+The production UI gate reached green under the standing authorization. Both
+named falsifiers also produced their required receipts without changing an
+assertion:
+
+```text
+task_rows=0 dead_control=true
+FAIL team-composition-ui
+
+pending_visible_ms=13 delayed_external_completion=1500 production_route=1
+PASS team-composition-ui
+```
+
+The short acceptance matrix then stopped at its first red:
+
+```text
+one-skin: shell.css (hex×1: #d45d5d)
+FAIL one-skin
+```
+
+No further edit, commit, or push occurred. `shell.css` is an existing tile/Dock
+renderer surface, but this defect was named by `one-skin`, not
+`team-composition-ui`; the standing authorization did not permit repairing it.
+The complete V2-3.1 work remains preserved uncommitted. Further matrix cleanup
+requires founder authority and may not weaken `one-skin` or change any UI-gate
+assertion.
 
 ## Objective
 
