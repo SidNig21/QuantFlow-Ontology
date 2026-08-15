@@ -87,9 +87,192 @@ type Launch = {
 };
 type Identity = { commitSha: string; packagedAt: string };
 type ArtifactReceipt = { id: string; content_hash: string; kind?: string; storage_ref?: string };
+type GateLabel = "hermes-first-turn-synthetic" | "windows-hermes-research-chain";
+type CleanupError = {
+  stage: "terminate" | "wait";
+  pid: number | null;
+  code: string;
+  message: string;
+};
+type LaunchFailureReceipt = {
+  remaining_pids: number[];
+  cleanup_errors: CleanupError[];
+};
+type HalfBornSeatObservation = {
+  self_exit: boolean;
+  elapsed_ms: number;
+  pids: number[];
+};
+type CleanupTracking = {
+  label: GateLabel;
+  preexisting: number;
+  registeredRoots: string[];
+};
+
+const MAX_LAUNCH_CLEANUP_ATTEMPTS = 3;
+const LAUNCH_CLEANUP_RETRY_DELAY_MS = 100;
+const MAX_CLEANUP_RETRIES = 8;
+const CLEANUP_RETRY_DELAY_MS = 100;
+const TRANSIENT_CLEANUP_ERRNOS = new Set(["EBUSY", "EPERM", "ENOTEMPTY", "EMFILE", "ENFILE"]);
+
+// This is deliberately module-level: the terminal receipt must prove the
+// exact leak list produced by every gate-owned cleanup call in this process.
+const cleanupLeaks: string[] = [];
+const cleanupReceiptLines: string[] = [];
+let cleanupRetryCalls = 0;
+let cleanupTracking: CleanupTracking | null = null;
+let lastLaunchFailureReceipt: LaunchFailureReceipt | null = null;
+let halfBornSeatObservation: HalfBornSeatObservation | null = null;
+let halfBornSeatObservationError: string | null = null;
+let halfBornSeatTreePids: number[] = [];
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function errorCode(error: unknown): string {
+  if (typeof error === "object" && error !== null && "code" in error) {
+    const code = (error as { code?: unknown }).code;
+    return typeof code === "string" && code.length > 0 ? code : "unknown";
+  }
+  return "unknown";
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function sortedCleanupErrors(errors: readonly CleanupError[]): CleanupError[] {
+  return [...errors].sort((left, right) => {
+    const stage = left.stage.localeCompare(right.stage);
+    if (stage !== 0) return stage;
+    const pid = (left.pid ?? -1) - (right.pid ?? -1);
+    if (pid !== 0) return pid;
+    const code = left.code.localeCompare(right.code);
+    return code !== 0 ? code : left.message.localeCompare(right.message);
+  });
+}
+
+function recordCleanupLeak(label: GateLabel, path: string, code: string, attempts: number): void {
+  if (!cleanupLeaks.includes(path)) cleanupLeaks.push(path);
+  const line = `${label}: cleanup-leak path=${path} code=${code} attempts=${attempts}`;
+  cleanupReceiptLines.push(line);
+  console.log(line);
+}
+
+function assertCleanupConstants(): void {
+  assert(Number.isInteger(MAX_LAUNCH_CLEANUP_ATTEMPTS) && MAX_LAUNCH_CLEANUP_ATTEMPTS > 0, "MAX_LAUNCH_CLEANUP_ATTEMPTS must be a finite positive integer");
+  assert(Number.isFinite(LAUNCH_CLEANUP_RETRY_DELAY_MS) && LAUNCH_CLEANUP_RETRY_DELAY_MS >= 0, "LAUNCH_CLEANUP_RETRY_DELAY_MS must be finite and nonnegative");
+  assert(Number.isInteger(MAX_CLEANUP_RETRIES) && MAX_CLEANUP_RETRIES >= 0, "MAX_CLEANUP_RETRIES must be a finite nonnegative integer");
+  assert(Number.isFinite(CLEANUP_RETRY_DELAY_MS) && CLEANUP_RETRY_DELAY_MS >= 0, "CLEANUP_RETRY_DELAY_MS must be finite and nonnegative");
+}
+
+function assertGateTempFsRouting(source = readFileSync(join(import.meta.dir, "hermes-research.ts"), "utf8")): void {
+  const directRmCalls = source.match(/\brmSync\s*\(/g) ?? [];
+  const directMkdtempCalls = source.match(/\bmkdtempSync\s*\(/g) ?? [];
+  assert(directRmCalls.length === 0, `direct gate-root rmSync call remains outside the removal helper (${directRmCalls.length})`);
+  assert(directMkdtempCalls.length === 1, `gate-owned mkdtempSync calls must route through one creation helper (${directMkdtempCalls.length})`);
+}
+
+function preexistingGateRootCount(): number {
+  return readdirSync(tmpdir()).filter((name) => /^qf-(?:boundary|hermes)-/.test(name)).length;
+}
+
+function beginCleanupTracking(label: GateLabel): void {
+  assertCleanupConstants();
+  assertGateTempFsRouting();
+  cleanupLeaks.length = 0;
+  cleanupReceiptLines.length = 0;
+  cleanupRetryCalls = 0;
+  lastLaunchFailureReceipt = null;
+  halfBornSeatObservation = null;
+  halfBornSeatObservationError = null;
+  halfBornSeatTreePids = [];
+  cleanupTracking = {
+    label,
+    preexisting: preexistingGateRootCount(),
+    registeredRoots: [],
+  };
+}
+
+function createGateTempRoot(prefix: string): string {
+  assert(cleanupTracking, "gate temp-root tracking was not initialized");
+  const path = resolve(mkdtempSync(join(tmpdir(), prefix)));
+  cleanupTracking.registeredRoots.push(path);
+  return path;
+}
+
+type Removal = (path: string, options: { recursive: boolean; force: boolean }) => void;
+
+async function removeGateTempRoot(
+  label: GateLabel,
+  root: string,
+  removal: Removal = rmSync,
+  retryableCodes: ReadonlySet<string> = TRANSIENT_CLEANUP_ERRNOS,
+): Promise<{ attempts: number; removed: boolean }> {
+  let path = String(root);
+  let attempts = 0;
+  let lastCode = "unknown";
+  try {
+    path = resolve(root);
+    while (attempts <= MAX_CLEANUP_RETRIES + 1) {
+      attempts += 1;
+      try {
+        removal(path, { recursive: true, force: true });
+        if (attempts > 1) {
+          const line = `${label}: temp-cleanup-retry path=${path} code=${lastCode} attempts=${attempts}`;
+          cleanupReceiptLines.push(line);
+          console.log(line);
+        }
+        return { attempts, removed: true };
+      } catch (error) {
+        lastCode = errorCode(error);
+        if (!retryableCodes.has(lastCode) || attempts > MAX_CLEANUP_RETRIES) {
+          recordCleanupLeak(label, path, lastCode, attempts);
+          return { attempts, removed: false };
+        }
+        cleanupRetryCalls += 1;
+        await wait(CLEANUP_RETRY_DELAY_MS);
+      }
+    }
+  } catch (error) {
+    recordCleanupLeak(label, path, errorCode(error), attempts);
+    return { attempts, removed: false };
+  }
+  recordCleanupLeak(label, path, lastCode, attempts);
+  return { attempts, removed: false };
+}
+
+function cleanupSummary(label: GateLabel): { line: string; rootsRemaining: string[]; leaked: string[] } {
+  const tracking = cleanupTracking;
+  assert(tracking?.label === label, `cleanup tracking label mismatch: ${label}`);
+  const rootsRemaining = tracking.registeredRoots.filter((path) => existsSync(path)).sort();
+  const leaked = [...new Set(cleanupLeaks)].sort();
+  const line = `${label}: temp-cleanup roots_created=${tracking.registeredRoots.length} roots_remaining=${rootsRemaining.length} retried=${cleanupRetryCalls} preexisting=${tracking.preexisting} leaked=${JSON.stringify(leaked)}`;
+  console.log(line);
+  return { line, rootsRemaining, leaked };
+}
+
+function cleanupPass(summary: ReturnType<typeof cleanupSummary>): boolean {
+  return summary.rootsRemaining.length === 0 && summary.leaked.length === 0;
+}
+
+async function withIsolatedCleanupStateAsync<T>(callback: () => Promise<T>): Promise<T> {
+  const savedLeaks = [...cleanupLeaks];
+  const savedReceipts = [...cleanupReceiptLines];
+  const savedRetries = cleanupRetryCalls;
+  cleanupLeaks.length = 0;
+  cleanupReceiptLines.length = 0;
+  cleanupRetryCalls = 0;
+  try {
+    return await callback();
+  } finally {
+    cleanupLeaks.length = 0;
+    cleanupLeaks.push(...savedLeaks);
+    cleanupReceiptLines.length = 0;
+    cleanupReceiptLines.push(...savedReceipts);
+    cleanupRetryCalls = savedRetries;
+  }
 }
 
 function tail(value: string, max = 8_000): string {
@@ -142,7 +325,200 @@ async function runChild(
   });
 }
 
-async function launch(packageRoot: string, tempRoot: string, suppressed: Boundary | null = null): Promise<Launch> {
+type SnapshotRow = { pid: number; parentPid: number };
+
+function anchoredDescendants(snapshot: readonly SnapshotRow[], rootPid: number): Set<number> {
+  const children = new Map<number, number[]>();
+  for (const row of snapshot) {
+    const list = children.get(row.parentPid) ?? [];
+    list.push(row.pid);
+    children.set(row.parentPid, list);
+  }
+  const result = new Set<number>([rootPid]);
+  const pending = [rootPid];
+  while (pending.length > 0) {
+    const parent = pending.pop()!;
+    for (const child of children.get(parent) ?? []) {
+      if (result.has(child)) continue;
+      result.add(child);
+      pending.push(child);
+    }
+  }
+  return result;
+}
+
+function liveLaunchTreePids(
+  before: readonly SnapshotRow[],
+  current: readonly SnapshotRow[],
+  childPid: number,
+  alreadyOwned: ReadonlySet<number>,
+  childIsAlive: boolean,
+): number[] {
+  const currentPids = new Set(current.map((row) => row.pid));
+  const tree = anchoredDescendants(current, childPid);
+  for (const pid of collectOwnedPids(before as never, current as never, childPid)) tree.add(pid);
+  for (const pid of alreadyOwned) tree.add(pid);
+  if (childIsAlive) tree.add(childPid);
+  return [...tree].filter((pid) => currentPids.has(pid) || (pid === childPid && childIsAlive)).sort((left, right) => left - right);
+}
+
+function cleanupError(stage: CleanupError["stage"], pid: number | null, error: unknown): CleanupError {
+  return { stage, pid, code: errorCode(error), message: errorMessage(error) };
+}
+
+async function waitForLaunchTreeExit(
+  before: readonly SnapshotRow[],
+  child: ChildProcess,
+  ownedPids: Set<number>,
+  errors: CleanupError[],
+): Promise<number[]> {
+  const deadline = Date.now() + SHUTDOWN_TIMEOUT_MS;
+  let lastRemaining: number[] = [child.pid ?? 0].filter((pid) => pid > 0);
+  while (Date.now() < deadline) {
+    try {
+      const current = await processSnapshot();
+      for (const pid of collectOwnedPids(before as never, current as never, child.pid!)) ownedPids.add(pid);
+      lastRemaining = liveLaunchTreePids(before, current, child.pid!, ownedPids, child.exitCode === null);
+      if (lastRemaining.length === 0) return [];
+    } catch (error) {
+      errors.push(cleanupError("wait", null, error));
+      return lastRemaining;
+    }
+    await wait(Math.min(LAUNCH_CLEANUP_RETRY_DELAY_MS, Math.max(0, deadline - Date.now())));
+  }
+  try {
+    const current = await processSnapshot();
+    for (const pid of collectOwnedPids(before as never, current as never, child.pid!)) ownedPids.add(pid);
+    lastRemaining = liveLaunchTreePids(before, current, child.pid!, ownedPids, child.exitCode === null);
+  } catch (error) {
+    errors.push(cleanupError("wait", null, error));
+    return lastRemaining;
+  }
+  for (const pid of lastRemaining) {
+    errors.push({ stage: "wait", pid, code: "TIMEOUT", message: `process tree remained alive after ${SHUTDOWN_TIMEOUT_MS}ms` });
+  }
+  return lastRemaining;
+}
+
+async function cleanupFailedLaunch(
+  before: readonly SnapshotRow[],
+  child: ChildProcess,
+  errors: CleanupError[],
+): Promise<number[]> {
+  const ownedPids = new Set<number>([child.pid!]);
+  for (let attempt = 0; attempt < MAX_LAUNCH_CLEANUP_ATTEMPTS; attempt += 1) {
+    let current: SnapshotRow[];
+    try {
+      current = await processSnapshot();
+      for (const pid of collectOwnedPids(before as never, current as never, child.pid!)) ownedPids.add(pid);
+    } catch (error) {
+      errors.push(cleanupError("wait", null, error));
+      current = [];
+    }
+    const remaining = liveLaunchTreePids(before, current, child.pid!, ownedPids, child.exitCode === null);
+    if (remaining.length === 0) return [];
+    for (const pid of remaining) {
+      try {
+        await terminateOwnedProcessTree(pid);
+      } catch (error) {
+        errors.push(cleanupError("terminate", pid, error));
+      }
+    }
+    const afterWait = await waitForLaunchTreeExit(before, child, ownedPids, errors);
+    if (afterWait.length === 0) return [];
+    if (attempt + 1 < MAX_LAUNCH_CLEANUP_ATTEMPTS) await wait(LAUNCH_CLEANUP_RETRY_DELAY_MS);
+  }
+  try {
+    const current = await processSnapshot();
+    for (const pid of collectOwnedPids(before as never, current as never, child.pid!)) ownedPids.add(pid);
+    return liveLaunchTreePids(before, current, child.pid!, ownedPids, child.exitCode === null);
+  } catch (error) {
+    errors.push(cleanupError("wait", null, error));
+    return [child.pid!];
+  }
+}
+
+async function observeHalfBornSeat(
+  before: readonly SnapshotRow[],
+  child: ChildProcess,
+): Promise<HalfBornSeatObservation> {
+  const started = Date.now();
+  const deadline = started + SHUTDOWN_TIMEOUT_MS;
+  let pids: number[] = [child.pid!];
+  while (Date.now() < deadline) {
+    const current = await processSnapshot();
+    pids = liveLaunchTreePids(before, current, child.pid!, new Set<number>([child.pid!]), child.exitCode === null);
+    if (pids.length === 0) {
+      const observation = { self_exit: true, elapsed_ms: Date.now() - started, pids: [] } satisfies HalfBornSeatObservation;
+      halfBornSeatObservation = observation;
+      halfBornSeatTreePids = [];
+      console.log(`hermes-first-turn-synthetic: half-born-seat self_exit=true elapsed_ms=${observation.elapsed_ms} pids=[]`);
+      return observation;
+    }
+    await wait(LAUNCH_CLEANUP_RETRY_DELAY_MS);
+  }
+  const observation = { self_exit: false, elapsed_ms: SHUTDOWN_TIMEOUT_MS, pids: [...pids].sort((left, right) => left - right) } satisfies HalfBornSeatObservation;
+  halfBornSeatObservation = observation;
+  halfBornSeatTreePids = [...observation.pids];
+  console.log(`hermes-first-turn-synthetic: half-born-seat self_exit=false elapsed_ms=${observation.elapsed_ms} pids=${JSON.stringify(observation.pids)}`);
+  return observation;
+}
+
+function formatLaunchFailureReceipt(receipt: LaunchFailureReceipt): string {
+  return `launch-failure remaining_pids=${JSON.stringify(receipt.remaining_pids)}\ncleanup_errors=${JSON.stringify(sortedCleanupErrors(receipt.cleanup_errors))}`;
+}
+
+function validateLaunchFailureReceipt(receipt: LaunchFailureReceipt): void {
+  assert(Array.isArray(receipt.remaining_pids), "launch-failure remaining_pids is not an array");
+  assert(receipt.remaining_pids.every((pid) => Number.isInteger(pid) && pid > 0), "launch-failure remaining_pids has an invalid PID");
+  assert(JSON.stringify(receipt.remaining_pids) === JSON.stringify([...receipt.remaining_pids].sort((left, right) => left - right)), "launch-failure remaining_pids is not sorted");
+  assert(Array.isArray(receipt.cleanup_errors), "launch-failure cleanup_errors is not an array");
+  for (const entry of receipt.cleanup_errors) {
+    assert(Object.keys(entry).sort().join(",") === "code,message,pid,stage", "launch-failure cleanup_errors entry has the wrong fields");
+    assert(entry.stage === "terminate" || entry.stage === "wait", "launch-failure cleanup error stage is invalid");
+    assert(entry.pid === null || (Number.isInteger(entry.pid) && entry.pid > 0), "launch-failure cleanup error PID is invalid");
+    assert(typeof entry.code === "string" && entry.code.length > 0, "launch-failure cleanup error code is invalid");
+    assert(typeof entry.message === "string", "launch-failure cleanup error message is invalid");
+  }
+  assert(JSON.stringify(receipt.cleanup_errors) === JSON.stringify(sortedCleanupErrors(receipt.cleanup_errors)), "launch-failure cleanup_errors are not sorted");
+}
+
+function assertLaunchFailureGreen(receipt: LaunchFailureReceipt): void {
+  validateLaunchFailureReceipt(receipt);
+  assert(receipt.remaining_pids.length === 0, `launch-failure retained PIDs: ${JSON.stringify(receipt.remaining_pids)}`);
+}
+
+function makeCleanupSummaryLine(
+  label: GateLabel,
+  rootsCreated: number,
+  rootsRemaining: readonly string[],
+  retried: number,
+  preexisting: number,
+  leaked: readonly string[],
+): string {
+  return `${label}: temp-cleanup roots_created=${rootsCreated} roots_remaining=${rootsRemaining.length} retried=${retried} preexisting=${preexisting} leaked=${JSON.stringify([...leaked].sort())}`;
+}
+
+function validateCleanupSummaryLine(line: string): { rootsRemaining: number; leaked: string[] } {
+  const match = line.match(/^([^:]+): temp-cleanup roots_created=(\d+) roots_remaining=(\d+) retried=(\d+) preexisting=(\d+) leaked=(\[[^\r\n]*\])$/);
+  assert(match, `cleanup summary grammar is invalid: ${line}`);
+  const leaked = JSON.parse(match[6]!) as unknown;
+  assert(Array.isArray(leaked) && leaked.every((path) => typeof path === "string"), "cleanup summary leak list is invalid");
+  return { rootsRemaining: Number(match[3]), leaked: leaked as string[] };
+}
+
+function makeErrnoError(code: string): Error & { code: string } {
+  const error = new Error(`deterministic cleanup failure ${code}`) as Error & { code: string };
+  error.code = code;
+  return error;
+}
+
+async function launch(
+  packageRoot: string,
+  tempRoot: string,
+  suppressed: Boundary | null = null,
+  gateLabel: GateLabel = "hermes-first-turn-synthetic",
+): Promise<Launch> {
   const stores = join(tempRoot, "stores");
   const kernelDb = join(stores, TEMP_KERNEL_DB_NAME);
   const artifactRoot = join(stores, "artifacts");
@@ -166,37 +542,37 @@ async function launch(packageRoot: string, tempRoot: string, suppressed: Boundar
   child.stdout?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
   child.stderr?.on("data", (chunk: Buffer) => { output += chunk.toString("utf8"); });
   assert(child.pid !== undefined, "packaged Hermes application did not provide a PID");
-  const ready = await waitForReady(child, endpointFile);
-  const readiness = ready.readiness as Record<string, unknown>;
-  const identity = readiness.buildIdentity as Record<string, unknown> | undefined;
-  assert(identity?.commitSha && identity?.packagedAt, "packaged app readiness omitted build identity");
-  assert(readiness.dockProfileIds?.includes("hermes-orchestrator"), "production Hermes orchestrator profile is absent");
-  assert(readiness.dockProfileIds?.includes("hermes-worker"), "production Hermes worker profile is absent");
-  assert(readiness.dockProfileIds?.includes("hermes-critic"), "production Hermes critic profile is absent");
-  const afterReady = await processSnapshot();
-  const ownedPids = collectOwnedPids(beforeProcesses, afterReady, child.pid);
-  ownedPids.add(child.pid);
   try {
-    await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: true });
-    throw new Error("future Dataset falsifier unexpectedly succeeded");
-  } catch (error) {
-    assert(String(error).includes("after as_of"), `future Dataset failed for the wrong reason: ${String(error)}`);
-    const db = new Database(kernelDb, { readonly: true });
+    const ready = await waitForReady(child, endpointFile);
+    const readiness = ready.readiness as Record<string, unknown>;
+    const identity = readiness.buildIdentity as Record<string, unknown> | undefined;
+    assert(identity?.commitSha && identity?.packagedAt, "packaged app readiness omitted build identity");
+    assert(readiness.dockProfileIds?.includes("hermes-orchestrator"), "production Hermes orchestrator profile is absent");
+    assert(readiness.dockProfileIds?.includes("hermes-worker"), "production Hermes worker profile is absent");
+    assert(readiness.dockProfileIds?.includes("hermes-critic"), "production Hermes critic profile is absent");
+    const afterReady = await processSnapshot();
+    const ownedPids = collectOwnedPids(beforeProcesses as never, afterReady as never, child.pid);
+    ownedPids.add(child.pid);
     try {
-      const downstream = db.query(`
-        SELECT 'hypothesis' AS kind, COUNT(*) AS count FROM hypothesis
-        UNION ALL SELECT 'run', COUNT(*) FROM run
-        UNION ALL SELECT 'evaluation', COUNT(*) FROM evaluation
-        UNION ALL SELECT 'artifact', COUNT(*) FROM artifact
-        UNION ALL SELECT 'links', COUNT(*) FROM links
-      `).all() as Array<{ kind: string; count: number }>;
-      assert(downstream.every((row) => Number(row.count) === 0), "future Dataset refusal left downstream research objects");
-    } finally {
-      db.close();
+      await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: true });
+      throw new Error("future Dataset falsifier unexpectedly succeeded");
+    } catch (error) {
+      assert(String(error).includes("after as_of"), `future Dataset failed for the wrong reason: ${String(error)}`);
+      const db = new Database(kernelDb, { readonly: true });
+      try {
+        const downstream = db.query(`
+          SELECT 'hypothesis' AS kind, COUNT(*) AS count FROM hypothesis
+          UNION ALL SELECT 'run', COUNT(*) FROM run
+          UNION ALL SELECT 'evaluation', COUNT(*) FROM evaluation
+          UNION ALL SELECT 'artifact', COUNT(*) FROM artifact
+          UNION ALL SELECT 'links', COUNT(*) FROM links
+        `).all() as Array<{ kind: string; count: number }>;
+        assert(downstream.every((row) => Number(row.count) === 0), "future Dataset refusal left downstream research objects");
+      } finally {
+        db.close();
+      }
+      console.log("windows-hermes-research: FALSIFY RED future Dataset after as_of refused; FALSIFY GREEN no downstream objects");
     }
-    console.log("windows-hermes-research: FALSIFY RED future Dataset after as_of refused; FALSIFY GREEN no downstream objects");
-  }
-  try {
     const seeded = await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: false }) as Record<string, unknown>;
     const datasetId = String(seeded.object_id ?? seeded.id ?? "");
     assert(datasetId.startsWith("dataset:"), `fixture seed did not return a Dataset id: ${datasetId}`);
@@ -221,8 +597,24 @@ async function launch(packageRoot: string, tempRoot: string, suppressed: Boundar
       submission,
     };
   } catch (error) {
-    if (child.exitCode === null && child.pid !== undefined) await terminateOwnedProcessTree(child.pid);
-    throw new Error(`${error instanceof Error ? error.message : String(error)}\napp-output=${tail(output)}`);
+    if (suppressed === "launch_readiness" && gateLabel === "hermes-first-turn-synthetic") {
+      try {
+        await observeHalfBornSeat(beforeProcesses as never, child);
+      } catch (observationError) {
+        halfBornSeatObservationError = errorMessage(observationError);
+        console.error(`hermes-first-turn-synthetic: half-born-seat observation failed: ${halfBornSeatObservationError}`);
+      }
+    }
+    const cleanupErrors: CleanupError[] = [];
+    const remainingPids = await cleanupFailedLaunch(beforeProcesses as never, child, cleanupErrors);
+    const receipt: LaunchFailureReceipt = {
+      remaining_pids: remainingPids,
+      cleanup_errors: sortedCleanupErrors(cleanupErrors),
+    };
+    lastLaunchFailureReceipt = receipt;
+    console.log(`${gateLabel}: ${formatLaunchFailureReceipt(receipt)}`);
+    // Preserve both the original object identity and its original message.
+    throw error;
   }
 }
 
@@ -455,7 +847,12 @@ function makeLedger(
   const submission = launchState?.submission;
   const boundaries = BOUNDARIES.map((boundary) => ({
     boundary,
-    outcome: receipts.has(boundary) ? "pass" : boundary === failedBoundary ? "fail" : "not_reached",
+    at: new Date().toISOString(),
+    outcome: failedBoundary
+      ? BOUNDARIES.indexOf(boundary) < BOUNDARIES.indexOf(failedBoundary)
+        ? "pass"
+        : boundary === failedBoundary ? "fail" : "not_reached"
+      : receipts.has(boundary) ? "pass" : "not_reached",
     failed_boundary: boundary === failedBoundary ? boundary : null,
     failure_mechanism: boundary === failedBoundary ? MECHANISM_FOR[boundary] : "none",
   }));
@@ -482,16 +879,67 @@ function makeLedger(
   };
 }
 
+function checkArtifactReceipt(value: unknown, name: string): void {
+  assert(typeof value === "object" && value !== null, `${name} receipt is missing`);
+  const receipt = value as Record<string, unknown>;
+  assert(typeof receipt.id === "string" && receipt.id.length > 0, `${name} receipt id is missing`);
+  assert(typeof receipt.content_hash === "string" && /^[0-9a-f]{64}$/.test(receipt.content_hash), `${name} receipt content hash is invalid`);
+  assert(typeof receipt.kind === "string" && receipt.kind.length > 0, `${name} receipt kind is missing`);
+  assert(typeof receipt.storage_ref === "string" && receipt.storage_ref.length > 0, `${name} receipt storage ref is missing`);
+}
+
+function checkHalfBornSeatObservation(): void {
+  assert(!halfBornSeatObservationError, `half-born-seat observation failed: ${halfBornSeatObservationError}`);
+  assert(halfBornSeatObservation, "half-born-seat observation receipt is missing");
+  assert(typeof halfBornSeatObservation.self_exit === "boolean", "half-born-seat self_exit is not boolean");
+  assert(Number.isInteger(halfBornSeatObservation.elapsed_ms) && halfBornSeatObservation.elapsed_ms >= 0 && halfBornSeatObservation.elapsed_ms <= SHUTDOWN_TIMEOUT_MS + CLEANUP_RETRY_DELAY_MS, "half-born-seat elapsed_ms is outside the bounded observation window");
+  assert(Array.isArray(halfBornSeatObservation.pids), "half-born-seat pids is not an array");
+  assert(halfBornSeatObservation.pids.every((pid) => Number.isInteger(pid) && pid > 0), "half-born-seat pids contains an invalid PID");
+  assert(JSON.stringify(halfBornSeatObservation.pids) === JSON.stringify([...halfBornSeatObservation.pids].sort((left, right) => left - right)), "half-born-seat pids are not sorted");
+  assert(halfBornSeatObservation.pids.every((pid) => halfBornSeatTreePids.includes(pid)), "half-born-seat pids are not from the observed owned process tree");
+  if (halfBornSeatObservation.self_exit) assert(halfBornSeatObservation.pids.length === 0, "half-born-seat self_exit=true retained live PIDs");
+}
+
 function checkLedger(ledger: BoundaryLedger, failedBoundary: Boundary | null): void {
+  assert(/^[0-9a-f]{40}$/.test(ledger.candidate_sha), "machine ledger candidate SHA is not full length");
+  assert(new Date(ledger.packaged_at).toISOString() === ledger.packaged_at, "machine ledger package timestamp is not canonical ISO UTC");
+  assert(ledger.boundaries.length === BOUNDARIES.length, "machine ledger does not contain exactly ten boundaries");
+  assert(ledger.boundaries.every((entry, index) => {
+    const boundary = entry.boundary;
+    const at = entry.at;
+    return boundary === BOUNDARIES[index] && typeof at === "string" && new Date(at).toISOString() === at;
+  }), "machine ledger boundary order or timestamps are invalid");
   assert(ledger.failed_boundary === failedBoundary, "machine ledger top-level failed boundary drifted");
   const failures = ledger.boundaries.filter((entry) => entry.outcome === "fail");
   assert(failures.length === (failedBoundary ? 1 : 0), "machine ledger has an invalid fail count");
+  assert(ledger.boundaries.every((entry) => entry.outcome === "pass" || entry.outcome === "fail" || entry.outcome === "not_reached"), "machine ledger has an invalid outcome");
+  if (failedBoundary) {
+    const failedIndex = BOUNDARIES.indexOf(failedBoundary);
+    ledger.boundaries.forEach((entry, index) => {
+      const expected = index < failedIndex ? "pass" : index === failedIndex ? "fail" : "not_reached";
+      assert(entry.outcome === expected, `machine ledger crossed the failed boundary at ${entry.boundary}`);
+    });
+  }
   if (!failedBoundary) {
     assert(ledger.failure_mechanism === "none", "green machine ledger has a failure mechanism");
     assert(ledger.boundaries.every((entry) => entry.outcome === "pass"), `green machine ledger is not fully green: ${ledger.boundaries.filter((entry) => entry.outcome !== "pass").map((entry) => entry.boundary).join(",")}`);
+    const sessions = ledger.hermes_session_ids;
+    assert(typeof sessions.orchestrator === "string" && sessions.orchestrator.length > 0, "green machine ledger omitted the orchestrator session");
+    assert(typeof sessions.orchestrator_pty === "string" && sessions.orchestrator_pty.length > 0, "green machine ledger omitted the PTY session");
+    assert(Array.isArray(sessions.seats) && sessions.seats.length >= 3 && sessions.seats.every((seat) => typeof seat === "string" && seat.length > 0), "green machine ledger omitted Hermes seat identities");
+    for (const [name, receipt] of Object.entries(ledger.durable_measurement_artifacts)) {
+      if (name === "market_read_trajectories") {
+        assert(Array.isArray(receipt) && receipt.length > 0, "green machine ledger omitted market-read trajectories");
+        receipt.forEach((item, index) => checkArtifactReceipt(item, `market-read trajectory ${index}`));
+      } else {
+        checkArtifactReceipt(receipt, name);
+      }
+    }
+    assert(Object.keys(ledger.durable_measurement_artifacts).sort().join(",") === "dataset,deterministic_result,market_read_trajectories,report,worker_result", "green machine ledger artifact set drifted");
     return;
   }
   assert(failures[0]?.boundary === failedBoundary, "machine ledger failed boundary drifted");
+  assert(MECHANISMS.includes(ledger.failure_mechanism as (typeof MECHANISMS)[number]), "machine ledger failure mechanism is outside the vocabulary");
   assert(ledger.failure_mechanism === MECHANISM_FOR[failedBoundary], "machine ledger mechanism mapping drifted");
 }
 
@@ -507,12 +955,12 @@ async function researchFor(launchState: Launch, hypothesisId: string, timeoutMs 
 
 async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): Promise<void> {
   for (const boundary of BOUNDARIES) {
-    const redRoot = mkdtempSync(join(tmpdir(), `qf-boundary-red-${boundary}-`));
+    const redRoot = createGateTempRoot(`qf-boundary-red-${boundary}-`);
     let red: Launch | null = null;
     let redOutput = "";
     try {
       try {
-        red = await launch(packageRoot, redRoot, boundary);
+        red = await launch(packageRoot, redRoot, boundary, "hermes-first-turn-synthetic");
         redOutput = await captureFor(red, 20_000);
         const redSubmission = red.submission;
         const redEvidence = await researchFor(red, String(redSubmission.hypothesisId), 2_000);
@@ -539,19 +987,22 @@ async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): P
         ledger.boundaries = ledger.boundaries.map((entry) => entry.boundary === boundary
           ? { ...entry, failure_mechanism: mechanism }
           : entry);
+        assert(lastLaunchFailureReceipt, `packaged ${boundary} suppression omitted launch-failure receipt`);
+        validateLaunchFailureReceipt(lastLaunchFailureReceipt);
+        assert(lastLaunchFailureReceipt.remaining_pids.length === 0, `packaged ${boundary} suppression left owned PIDs: ${JSON.stringify(lastLaunchFailureReceipt.remaining_pids)}`);
         console.log(`hermes-first-turn-synthetic: FALSIFY RED boundary=${boundary} failed_boundary=${boundary} failure_mechanism=${mechanism} boundary-ledger=${JSON.stringify(ledger)} receipt=${tail(output, 2_000)}`);
       }
     } finally {
       if (red) {
         try { await shutdown(red); } catch {}
       }
-      rmSync(redRoot, { recursive: true, force: true });
+      await removeGateTempRoot("hermes-first-turn-synthetic", redRoot);
     }
 
-    const greenRoot = mkdtempSync(join(tmpdir(), `qf-boundary-green-${boundary}-`));
+    const greenRoot = createGateTempRoot(`qf-boundary-green-${boundary}-`);
     let green: Launch | null = null;
     try {
-      green = await launch(packageRoot, greenRoot);
+      green = await launch(packageRoot, greenRoot, null, "hermes-first-turn-synthetic");
       const output = `${await captureUntil(green, "boundary=result_return")}\n${await captureFor(green, 12_000)}`;
       const receipts = boundaryReceipts(output, true);
       assert(BOUNDARIES.every((candidate) => receipts.has(candidate)), `restored packaged boundary missing ${boundary}`);
@@ -563,9 +1014,132 @@ async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): P
       if (green) {
         try { await shutdown(green); } catch {}
       }
-      rmSync(greenRoot, { recursive: true, force: true });
+      await removeGateTempRoot("hermes-first-turn-synthetic", greenRoot);
     }
   }
+}
+
+async function runEnforcementFalsifiers(): Promise<void> {
+  await withIsolatedCleanupStateAsync(async () => {
+    const source = readFileSync(join(import.meta.dir, "hermes-research.ts"), "utf8");
+    assertGateTempFsRouting(source);
+
+    const disabledTermination: LaunchFailureReceipt = { remaining_pids: [42001, 42002], cleanup_errors: [] };
+    try {
+      assertLaunchFailureGreen(disabledTermination);
+      throw new Error("disabled termination unexpectedly passed");
+    } catch (error) {
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED launch-failure remaining_pids=${JSON.stringify(disabledTermination.remaining_pids)} cleanup_errors=[] reason=${errorMessage(error)}`);
+    }
+    try {
+      validateLaunchFailureReceipt({ remaining_pids: [], cleanup_errors: undefined } as unknown as LaunchFailureReceipt);
+      throw new Error("corrupted cleanup_errors unexpectedly passed");
+    } catch (error) {
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED launch-failure receipt-validator cleanup_errors=corrupted reason=${errorMessage(error)}`);
+    }
+    const cleanLaunchFailure: LaunchFailureReceipt = { remaining_pids: [], cleanup_errors: [] };
+    assertLaunchFailureGreen(cleanLaunchFailure);
+    console.log("hermes-first-turn-synthetic: FALSIFY GREEN launch-failure remaining_pids=[] cleanup_errors=[]");
+
+    for (const code of ["EBUSY", "EPERM", "ENOTEMPTY", "EMFILE", "ENFILE"]) {
+      let attempts = 0;
+      const removal: Removal = () => {
+        attempts += 1;
+        if (attempts === 1) throw makeErrnoError(code);
+      };
+      const missingCodeSet = new Set([...TRANSIENT_CLEANUP_ERRNOS].filter((candidate) => candidate !== code));
+      const red = await removeGateTempRoot("hermes-first-turn-synthetic", resolve(join(tmpdir(), `qf-retry-red-${code}`)), removal, missingCodeSet);
+      try {
+        assert(red.removed && red.attempts === 2, `retry suppression for ${code} did not go red at the second call (attempts=${red.attempts})`);
+        throw new Error(`retry suppression for ${code} unexpectedly passed`);
+      } catch (error) {
+        console.log(`hermes-first-turn-synthetic: FALSIFY RED retry-code=${code} attempts=${red.attempts} reason=${errorMessage(error)}`);
+      }
+      attempts = 0;
+      cleanupReceiptLines.length = 0;
+      const green = await removeGateTempRoot("hermes-first-turn-synthetic", resolve(join(tmpdir(), `qf-retry-green-${code}`)), removal);
+      assert(green.removed && green.attempts === 2, `restored retry code ${code} did not make two calls`);
+      assert(cleanupReceiptLines.some((line) => line.includes("temp-cleanup-retry path=") && line.includes(`code=${code}`) && line.includes("attempts=2")), `retry receipt missing for ${code}`);
+      console.log(`hermes-first-turn-synthetic: FALSIFY GREEN retry-code=${code} attempts=2 receipt_required=true`);
+    }
+
+    const corruptedRmSource = `${source}\n${["rmSync", "(", "redRoot, { recursive: true, force: true });"].join("")}`;
+    try {
+      assertGateTempFsRouting(corruptedRmSource);
+      throw new Error("direct gate-root rmSync unexpectedly passed static assertion");
+    } catch (error) {
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED static-rm-routing reason=${errorMessage(error)}`);
+    }
+    assertGateTempFsRouting(source);
+    console.log("hermes-first-turn-synthetic: FALSIFY GREEN static-rm-routing helper-only=true");
+
+    const busyPath = resolve(join(tmpdir(), "qf-boundary-falsifier-tool-output"));
+    const originalBoundaryError = new Error("failed_boundary=tool_output failure_mechanism=gate2_rejected");
+    console.log(`hermes-first-turn-synthetic: FALSIFY RED tool_output failed_boundary=tool_output failure_mechanism=gate2_rejected error=${originalBoundaryError.message}`);
+    let caughtBoundaryError: unknown = null;
+    try {
+      try {
+        throw originalBoundaryError;
+      } catch (error) {
+        caughtBoundaryError = error;
+        await removeGateTempRoot("hermes-first-turn-synthetic", busyPath, () => { throw makeErrnoError("EBUSY"); });
+      }
+      assert(caughtBoundaryError === originalBoundaryError, "cleanup replaced the original tool_output boundary error");
+    } catch (error) {
+      throw new Error(`cleanup masking falsifier was not preserved: ${errorMessage(error)}`);
+    }
+    assert(cleanupLeaks.includes(busyPath), "cleanup masking falsifier omitted the separate leak receipt");
+    console.log("hermes-first-turn-synthetic: FALSIFY GREEN cleanup-preserved-original=failed_boundary=tool_output failure_mechanism=gate2_rejected");
+    await removeGateTempRoot("hermes-first-turn-synthetic", busyPath, () => undefined);
+
+    const heldRoot = resolve(join(tmpdir(), "qf-boundary-falsifier-held"));
+    await removeGateTempRoot("hermes-first-turn-synthetic", heldRoot, () => undefined);
+    mkdirSync(heldRoot, { recursive: true });
+    const redSummary = makeCleanupSummaryLine("hermes-first-turn-synthetic", 1, [heldRoot], 0, 0, [heldRoot]);
+    console.log(redSummary);
+    try {
+      const parsed = validateCleanupSummaryLine(redSummary);
+      assert(parsed.rootsRemaining === 0 && parsed.leaked.length === 0, "deliberately retained registered root unexpectedly passed cleanup assertion");
+      throw new Error("deliberately retained registered root unexpectedly passed cleanup assertion");
+    } catch (error) {
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED roots_remaining=1 leaked=${JSON.stringify([heldRoot])} reason=${errorMessage(error)}`);
+    }
+    await removeGateTempRoot("hermes-first-turn-synthetic", heldRoot, () => undefined);
+    const preexistingRoot = resolve(join(tmpdir(), "qf-boundary-falsifier-preexisting"));
+    await removeGateTempRoot("hermes-first-turn-synthetic", preexistingRoot, () => undefined);
+    mkdirSync(preexistingRoot, { recursive: true });
+    const preexisting = preexistingGateRootCount();
+    const greenSummary = makeCleanupSummaryLine("hermes-first-turn-synthetic", 0, [], 0, preexisting, []);
+    console.log(greenSummary);
+    const greenParsed = validateCleanupSummaryLine(greenSummary);
+    assert(greenParsed.rootsRemaining === 0 && greenParsed.leaked.length === 0 && preexisting > 0, "pre-existing root incorrectly turned cleanup green red");
+    console.log(`hermes-first-turn-synthetic: FALSIFY GREEN preexisting=${preexisting} roots_remaining=0 leaked=[]`);
+    await removeGateTempRoot("hermes-first-turn-synthetic", preexistingRoot, () => undefined);
+
+    const corruptedMkdtempSource = `${source}\n${["mkdtempSync", "(", "prefix)"].join("")}`;
+    try {
+      assertGateTempFsRouting(corruptedMkdtempSource);
+      throw new Error("direct gate-root mkdtempSync unexpectedly passed static assertion");
+    } catch (error) {
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED static-mkdtemp-routing reason=${errorMessage(error)}`);
+    }
+    assertGateTempFsRouting(source);
+    console.log("hermes-first-turn-synthetic: FALSIFY GREEN static-mkdtemp-routing helper-only=true");
+
+    const observed = halfBornSeatObservation;
+    halfBornSeatObservation = { self_exit: true, elapsed_ms: 0, pids: [42003] };
+    try {
+      checkHalfBornSeatObservation();
+      throw new Error("corrupted half-born-seat receipt unexpectedly passed");
+    } catch (error) {
+      console.log(`hermes-first-turn-synthetic: FALSIFY RED half-born-seat receipt-validator reason=${errorMessage(error)}`);
+    }
+    halfBornSeatObservation = { self_exit: true, elapsed_ms: 0, pids: [] };
+    checkHalfBornSeatObservation();
+    console.log("hermes-first-turn-synthetic: FALSIFY GREEN half-born-seat receipt-validator self_exit=true pids=[]");
+    halfBornSeatObservation = observed;
+    checkHalfBornSeatObservation();
+  });
 }
 
 async function runGateFalsifiers(launchState: Launch): Promise<void> {
@@ -579,10 +1153,10 @@ async function runGateFalsifiers(launchState: Launch): Promise<void> {
 }
 
 async function runResearchPackage(packageRoot: string, label: "hermes-first-turn-synthetic" | "windows-hermes-research-chain"): Promise<void> {
-  const tempRoot = mkdtempSync(join(tmpdir(), `qf-${label}-`));
+  const tempRoot = createGateTempRoot(`qf-${label}-`);
   let run: Launch | null = null;
   try {
-    run = await launch(packageRoot, tempRoot);
+    run = await launch(packageRoot, tempRoot, null, label);
     const submission = run.submission;
     const hypothesisId = String(submission.hypothesisId);
     console.log(`${label}: dock_admission=pass definition=hermes-orchestrator session=${submission.sessionId}`);
@@ -648,6 +1222,8 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
     run = null;
     if (label === "hermes-first-turn-synthetic") {
       await runBoundaryFalsifiers(packageRoot, candidateIdentity);
+      checkHalfBornSeatObservation();
+      await runEnforcementFalsifiers();
     }
     console.log(`${label}: failed_boundary=null repair=none failure_mechanism=none`);
     console.log(`${label}: PASS`);
@@ -658,7 +1234,7 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
     console.error(`${label}: FAIL ${error instanceof Error ? error.message : String(error)}`);
     throw error;
   } finally {
-    rmSync(tempRoot, { recursive: true, force: true });
+    await removeGateTempRoot(label, tempRoot);
   }
 }
 
@@ -696,21 +1272,25 @@ export async function runHermesFirstTurnSyntheticGate(): Promise<{ ok: boolean }
     console.error("hermes-first-turn-synthetic: FAIL (native Windows 11 is required; WSL is not acceptance evidence)");
     return { ok: false };
   }
+  beginCleanupTracking("hermes-first-turn-synthetic");
+  let gateOk = false;
   try {
     const identity = setBuildIdentity();
-    const tempRoot = mkdtempSync(join(tmpdir(), "qf-hermes-first-turn-synthetic-"));
+    const tempRoot = createGateTempRoot("qf-hermes-first-turn-synthetic-");
     try {
       const packageRoot = await buildWindowsPackage(tempRoot);
       console.log(`hermes-first-turn-synthetic: package-identity=${JSON.stringify(identity)}`);
       await runResearchPackage(packageRoot, "hermes-first-turn-synthetic");
     } finally {
-      rmSync(tempRoot, { recursive: true, force: true });
+      await removeGateTempRoot("hermes-first-turn-synthetic", tempRoot);
     }
-    return { ok: true };
+    gateOk = true;
   } catch (error) {
     console.error(`hermes-first-turn-synthetic: FAIL ${error instanceof Error ? error.message : String(error)}`);
-    return { ok: false };
   }
+  const summary = cleanupSummary("hermes-first-turn-synthetic");
+  if (!cleanupPass(summary)) console.error("hermes-first-turn-synthetic: FAIL temp cleanup did not reach roots_remaining=0 and leaked=[]");
+  return { ok: gateOk && cleanupPass(summary) };
 }
 
 export async function runWindowsHermesResearchChainGate(): Promise<{ ok: boolean }> {
@@ -718,9 +1298,11 @@ export async function runWindowsHermesResearchChainGate(): Promise<{ ok: boolean
     console.error("windows-hermes-research-chain: FAIL (native Windows 11 is required)");
     return { ok: false };
   }
+  beginCleanupTracking("windows-hermes-research-chain");
+  let gateOk = false;
   try {
     await runOwnershipFalsifier();
-    const tempRoot = mkdtempSync(join(tmpdir(), "qf-windows-hermes-research-chain-"));
+    const tempRoot = createGateTempRoot("qf-windows-hermes-research-chain-");
     try {
       const packaged = await packageInstalled(tempRoot);
       console.log(`windows-hermes-research-chain: production-installed-root=${packaged.root}`);
@@ -728,14 +1310,16 @@ export async function runWindowsHermesResearchChainGate(): Promise<{ ok: boolean
       console.log("windows-hermes-research-chain: future-Dataset refusal=red; downstream=none; restored=green");
       console.log("windows-hermes-research-chain: founder_state_unchanged=true founder_acceptance=not_performed");
     } finally {
-      rmSync(tempRoot, { recursive: true, force: true });
+      await removeGateTempRoot("windows-hermes-research-chain", tempRoot);
     }
     console.log("windows-hermes-research-chain: PASS");
-    return { ok: true };
+    gateOk = true;
   } catch (error) {
     console.error(`windows-hermes-research-chain: FAIL ${error instanceof Error ? error.message : String(error)}`);
-    return { ok: false };
   }
+  const summary = cleanupSummary("windows-hermes-research-chain");
+  if (!cleanupPass(summary)) console.error("windows-hermes-research-chain: FAIL temp cleanup did not reach roots_remaining=0 and leaked=[]");
+  return { ok: gateOk && cleanupPass(summary) };
 }
 
 if (import.meta.main) {
