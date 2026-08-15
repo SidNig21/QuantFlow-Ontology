@@ -697,16 +697,25 @@ anchored at that PID, and any PID already returned by `collectOwnedPids`. The
 child PID is known at line `168`; ownership must not depend on the later
 collection having completed. A termination or wait failure is a cleanup error:
 record it, continue the bounded cleanup attempt, and still re-throw the original
-launch error.
+launch error. `MAX_LAUNCH_CLEANUP_ATTEMPTS` is a named finite positive integer.
+One attempt means one termination request for the current living process-tree
+set followed by a wait bounded by the existing `SHUTDOWN_TIMEOUT_MS`; cleanup
+makes at most that many attempts. Any delay between attempts is a named finite
+nonnegative millisecond constant.
 
 The one ordering exception is Deliverable E's read-only observation. When the
 caught error is the intentionally suppressed `launch_readiness` failure,
 `launch()` records that observation inside its catch before terminating
 anything. Deliverable A cleanup then runs and the same launch error is re-thrown.
 
-Every failed launch prints `launch-failure remaining_pids=<sorted-json-array>`
-after cleanup. Expected: the array is `[]`; any surviving child or descendant
-makes the gate red even if it has already released the temp root.
+Every failed launch prints
+`launch-failure remaining_pids=<sorted-json-array>
+cleanup_errors=<sorted-json-array>` after cleanup. Each cleanup-error entry is
+an object with exactly `stage` (`terminate` or `wait`), `pid` (integer or
+`null`), `code` (string or `unknown`), and `message` (string), sorted by stage,
+then PID, code, and message. The gate validates the field and entry grammar even
+when the array is empty. Expected: `remaining_pids=[]`; any surviving child or
+descendant makes the gate red even if it has already released the temp root.
 
 ### Deliverable B - one guarded removal helper, used at all five sites
 
@@ -715,10 +724,11 @@ Add a single helper that removes a gate-owned temp root and use it at lines
 remain in this file. The helper must:
 
 1. Retry on the Windows-transient errno set `EBUSY`, `EPERM`, `ENOTEMPTY`,
-   `EMFILE`, and `ENFILE`. `MAX_CLEANUP_RETRIES` means retries after the first
-   call; `attempts` means total `rmSync` calls and is therefore at most
-   `MAX_CLEANUP_RETRIES + 1`. The bound and retry delay are named constants, not
-   literals buried in a call.
+   `EMFILE`, and `ENFILE`. `MAX_CLEANUP_RETRIES` is a named finite nonnegative
+   integer and means retries after the first call; `attempts` means total
+   `rmSync` calls and is therefore at most `MAX_CLEANUP_RETRIES + 1`. The retry
+   delay is a named finite nonnegative millisecond constant. Neither value may
+   be `Infinity`, `NaN`, or a literal buried in a call.
 2. Never throw from cleanup, including from a `finally`. A transient error is
    retried to the bound. A non-transient error is not retried. Either kind, if
    unresolved, records the path in the module-level leak list and returns.
@@ -759,8 +769,9 @@ replace or wrap the boundary error.
 
 ### Deliverable D - the gate proves it left nothing behind
 
-At process start, snapshot the count of matching pre-existing roots. Route every
-gate-owned `mkdtempSync` through one creation helper that immediately registers
+At process start, snapshot the count of direct children of the operating-system
+temp directory whose names match exactly `qf-boundary-*` or `qf-hermes-*`.
+Route every gate-owned `mkdtempSync` through one creation helper that immediately registers
 the unique absolute path; add a static assertion that no direct gate-root
 `mkdtempSync` remains outside it. `roots_created` is the size of that registry.
 `roots_remaining` is the number of those registered paths that still exist
@@ -774,6 +785,8 @@ assert that the Deliverable B leak list is empty and `roots_remaining` is zero:
 <gate-label>: temp-cleanup roots_created=<n> roots_remaining=<n> retried=<n> preexisting=<n> leaked=<sorted-json-array>
 ```
 
+`<gate-label>` is exactly `hermes-first-turn-synthetic` or
+`windows-hermes-research-chain`, whichever command is printing the receipt.
 `retried` is the total number of retry calls beyond initial removal calls across
 this invocation. `preexisting` is the start-of-process snapshot count. Match
 only registered roots this run created. Pre-existing roots are informational
@@ -847,7 +860,9 @@ so its receipt validator is falsified rather than its observed boolean value.
 - Disable Deliverable A termination, deliberately leave a descendant alive,
   and force the `launch_readiness` failure while Deliverable B remains active.
   The gate exits nonzero at `launch-failure remaining_pids=[...]`, even if the
-  descendant released the temp root. Restore and require `remaining_pids=[]`.
+  descendant released the temp root. Remove or corrupt the `cleanup_errors`
+  field and show the receipt validator red. Restore and require
+  `remaining_pids=[]` with a valid `cleanup_errors` array.
 - For each of `EBUSY`, `EPERM`, `ENOTEMPTY`, `EMFILE`, and `ENFILE`, inject a
   first-call failure and second-call success. Each case must require two calls
   and its retry receipt. Temporarily remove each code from the retryable set and
