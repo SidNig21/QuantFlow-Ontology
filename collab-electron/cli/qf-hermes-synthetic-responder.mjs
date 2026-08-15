@@ -52,17 +52,23 @@ function requireConfig() {
   }
 }
 
-class PtyLineReader {
+export class PtyLineReader {
   constructor(input) {
     this.input = input;
     this.buffer = "";
     this.lines = [];
     this.waiters = [];
     this.closed = false;
+    this.disposed = false;
+    this.resolveClosed = null;
+    this.closedPromise = new Promise((resolve) => { this.resolveClosed = resolve; });
+    this.onData = (chunk) => this.push(String(chunk));
+    this.onEnd = () => this.close(new Error("PTY input closed"));
+    this.onError = (error) => this.close(error);
     input.setEncoding?.("utf8");
-    input.on("data", (chunk) => this.push(String(chunk)));
-    input.once("end", () => this.close(new Error("PTY input closed")));
-    input.once("error", (error) => this.close(error));
+    input.on("data", this.onData);
+    input.once("end", this.onEnd);
+    input.once("error", this.onError);
   }
 
   push(chunk) {
@@ -88,7 +94,22 @@ class PtyLineReader {
   close(error) {
     if (this.closed) return;
     this.closed = true;
+    this.resolveClosed?.();
     while (this.waiters.length > 0) this.waiters.shift().reject(error);
+  }
+
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.close(new Error("synthetic PTY input disposed"));
+    this.input.off?.("data", this.onData);
+    this.input.off?.("end", this.onEnd);
+    this.input.off?.("error", this.onError);
+    this.input.pause?.();
+  }
+
+  waitForClose() {
+    return this.closedPromise;
   }
 
   next(timeoutMs = MCP_TIMEOUT_MS) {
@@ -257,9 +278,13 @@ async function nextReview(reader) {
   throw new Error("synthetic critic activation is missing research ids");
 }
 
-async function orchestrator(reader, ontology, collaboration) {
+async function orchestrator(reader, ontology, collaboration, directorLifecycle = completeDirectorTurnAndWait) {
   const activation = await nextMatching(reader, (line) => parseMission(line));
   emitBoundary("activation_delivery", { role: ROLE, mission_id: activation.mission_id ?? "unknown" });
+  if (activation.instruction?.includes("do not recruit or assign a Task in this slice")) {
+    await directorLifecycle(reader, activation.mission_id ?? "unknown");
+    return;
+  }
   const ontologyTools = await ontology.listTools();
   const collaborationTools = await collaboration.listTools();
   requireTools(ontologyTools, ["qf_agent_definition_query", "qf_create_agent_session", "qf_start_agent_session"], "orchestrator ontology");
@@ -288,6 +313,15 @@ async function orchestrator(reader, ontology, collaboration) {
   emitBoundary("result_return", { role: ROLE, task_id: task.taskId });
   emit({ turn: "complete", role: ROLE, task_id: task.taskId });
 }
+
+export async function completeDirectorTurnAndWait(reader, missionId, emitComplete = () => {
+  emit({ turn: "complete", role: ROLE, mission_id: missionId });
+}) {
+  emitComplete();
+  await reader.waitForClose();
+}
+
+export { orchestrator };
 
 async function worker(reader, ontology, collaboration) {
   emit({ boundary: "activation_wait", role: ROLE });
@@ -412,6 +446,9 @@ async function run() {
   const reader = new PtyLineReader(process.stdin);
   const ontology = new StdioMcpClient(ONTOLOGY_BRIDGE, "ontology");
   const collaboration = new StdioMcpClient(COLLABORATION_BRIDGE, "collaboration");
+  const releaseReader = () => reader.close(new Error("synthetic PTY terminated"));
+  process.once("SIGTERM", releaseReader);
+  process.once("SIGINT", releaseReader);
   try {
     await ontology.start();
     await collaboration.start();
@@ -419,7 +456,10 @@ async function run() {
     else if (ROLE === "worker") await worker(reader, ontology, collaboration);
     else await orchestrator(reader, ontology, collaboration);
   } finally {
+    process.off("SIGTERM", releaseReader);
+    process.off("SIGINT", releaseReader);
     await Promise.allSettled([ontology.stop(), collaboration.stop()]);
+    reader.dispose();
     process.stdout.write("\u001b[?1049l");
   }
 }

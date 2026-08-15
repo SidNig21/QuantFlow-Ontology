@@ -722,6 +722,7 @@ export function createTileManager({
 		delete dom.container.dataset.spawnRequestId;
 		dom.container.dataset.tileType = tile.type;
 		dom.container.dataset.state = nativeTui ? "running" : "idle";
+		if (tile.definitionId) dom.container.dataset.definitionId = tile.definitionId;
 		dom.container.dataset.sessionId = tile.sessionId;
 		if (tile.role) dom.container.dataset.agentRole = tile.role;
 		dom.contentArea.replaceChildren(dom.contentOverlay);

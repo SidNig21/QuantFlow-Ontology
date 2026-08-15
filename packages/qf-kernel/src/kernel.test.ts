@@ -355,6 +355,42 @@ describe("qf-kernel", () => {
     expect(rows.n).toBe(1);
   });
 
+  test("register_agent_definition accepts Research Director and rejects unknown display names", () => {
+    db = openKernel(":memory:");
+    const result = execute(
+      db,
+      "register_agent_definition",
+      {
+        name: "research-director",
+        role: "orchestrator",
+        package_ref: "/tmp/research-director.aospkg",
+        display_name: "Research Director",
+      },
+      ctx,
+    );
+    expect(result.state.display_name).toBe("Research Director");
+    const row = db
+      .query(`SELECT display_name FROM agent_definition WHERE id = ?`)
+      .get("research-director") as { display_name: string };
+    expect(row.display_name).toBe("Research Director");
+
+    expect(() =>
+      execute(
+        db,
+        "register_agent_definition",
+        {
+          name: "unknown-display-name",
+          role: "test",
+          package_ref: "/tmp/unknown-display-name.aospkg",
+          display_name: "Unknown",
+        },
+        { ...ctx, span_id: "span-2" },
+      ),
+    ).toThrow(
+      'register_agent_definition "display_name" must be Market Researcher, Orchestrator, Research Director, or Critic',
+    );
+  });
+
   test("register_agent_definition rejects duplicate name", () => {
     db = openKernel(":memory:");
     execute(

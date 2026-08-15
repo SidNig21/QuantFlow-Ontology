@@ -36,7 +36,7 @@ export function getAgentTileModel(tile) {
     return null;
   }
   return {
-    identity: tile.displayName || tile.definitionId || tile.userTitle || "Agent CLI",
+    identity: tile.displayName || tile.agentLabel || tile.definitionId || tile.userTitle || "Agent CLI",
     runtime: "Native TUI",
     status: tile.pendingSpawnId
       ? String(tile.pendingStatus || "starting")
@@ -96,6 +96,7 @@ export function createTileDOM(tile, callbacks) {
   container.dataset.tileId = tile.id;
   container.dataset.tileType = tile.type;
   container.dataset.state = tileState(tile);
+  if (tile.definitionId) container.dataset.definitionId = tile.definitionId;
   if (tile.sessionId) container.dataset.sessionId = tile.sessionId;
   if (tile.role) container.dataset.agentRole = tile.role;
   if (tile.pendingSpawnId) {
@@ -416,6 +417,7 @@ export function getTileLabel(tile) {
   }
   if (tile.type === "term") {
     if (tile.userTitle) return { parent: "", name: tile.userTitle };
+    if (tile.agentLabel) return { parent: "", name: tile.agentLabel };
     if (tile.definitionId) {
       return { parent: tile.role ? `${tile.role} / ` : "", name: tile.definitionId };
     }

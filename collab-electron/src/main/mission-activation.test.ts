@@ -21,6 +21,10 @@ test("mission activation is one bounded JSON-safe PTY instruction", () => {
   expect(instruction).toContain("\\u007f");
   expect(instruction).toContain("\\u0085");
   expect(instruction).toContain("\\u009f");
+  expect(instruction).toContain('"contract":"qf.mission.activation.v1"');
+  expect(instruction).toContain("Report missing data or Strategy/Technique coverage honestly.");
+  expect(instruction).toContain("do not recruit or assign a Task in this slice");
+  expect(instruction).toContain("Never place a bet or trade.");
 });
 
 test("mission activation rejects oversize and invalid ids before bytes exist", () => {

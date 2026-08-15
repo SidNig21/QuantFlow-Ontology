@@ -90,6 +90,69 @@ function executeRun(
   );
 }
 
+type Retained0010Shape = "display_name" | "cancelled";
+
+function createR10FixtureWithOnly0010Shape(
+  retainedShape: Retained0010Shape,
+): Database {
+  const raw = new Database(":memory:");
+  raw.exec(readFileSync(migrationSqlPath(), "utf8").toString());
+  raw.query(
+    `DELETE FROM schema_meta WHERE type_name IN ('performed_by', 'reassign_task', 'cancel_task')`,
+  ).run();
+  raw.query(
+    `UPDATE schema_meta SET description = ? WHERE type_name = 'record_evaluation'`,
+  ).run("Record a structured evaluation verdict with metrics against a hypothesis lineage.");
+  const linksSql = (raw
+    .query(`SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'links'`)
+    .get() as { sql: string }).sql
+    .replace("CREATE TABLE links", "CREATE TABLE links_previous")
+    .replace(/,\s*'performed_by'/, "");
+  raw.exec(linksSql);
+  raw.exec(
+    `INSERT INTO links_previous SELECT * FROM links;
+     DROP TABLE links;
+     ALTER TABLE links_previous RENAME TO links;`,
+  );
+  if (retainedShape === "display_name") {
+    raw.exec(
+      `CREATE TABLE task__historical (
+         id TEXT PRIMARY KEY NOT NULL,
+         created_at TEXT NOT NULL,
+         title TEXT NOT NULL,
+         description TEXT NOT NULL,
+         status TEXT NOT NULL,
+         CHECK (status IN ('open', 'done'))
+       );
+       INSERT INTO task__historical (id, created_at, title, description, status)
+         SELECT id, created_at, title, description, status FROM task;
+       DROP TABLE task;
+       ALTER TABLE task__historical RENAME TO task;`,
+    );
+  } else {
+    raw.exec(
+      `CREATE TABLE agent_definition__historical (
+         id TEXT PRIMARY KEY NOT NULL,
+         created_at TEXT NOT NULL,
+         name TEXT NOT NULL,
+         role TEXT NOT NULL,
+         package_ref TEXT NOT NULL,
+         system_prompt_ref TEXT,
+         runtime_profile TEXT,
+         capability_groups TEXT NOT NULL
+       );
+       INSERT INTO agent_definition__historical (
+         id, created_at, name, role, package_ref, system_prompt_ref,
+         runtime_profile, capability_groups
+       ) SELECT id, created_at, name, role, package_ref, system_prompt_ref,
+         runtime_profile, capability_groups FROM agent_definition;
+       DROP TABLE agent_definition;
+       ALTER TABLE agent_definition__historical RENAME TO agent_definition;`,
+    );
+  }
+  return raw;
+}
+
 describe("R11a deterministic local execution", () => {
   test("repeats exact inputs byte-for-byte with complete Kernel provenance", () => {
     const datasetId = createDataset();
@@ -193,7 +256,9 @@ describe("R11a deterministic local execution", () => {
   test("upgrades an existing R10 database in place", () => {
     const raw = new Database(":memory:");
     raw.exec(readFileSync(migrationSqlPath(), "utf8").toString());
-    raw.query(`DELETE FROM schema_meta WHERE type_name = 'performed_by'`).run();
+    raw.query(
+      `DELETE FROM schema_meta WHERE type_name IN ('performed_by', 'reassign_task', 'cancel_task')`,
+    ).run();
     raw.query(
       `UPDATE schema_meta SET description = ? WHERE type_name = 'record_evaluation'`,
     ).run("Record a structured evaluation verdict with metrics against a hypothesis lineage.");
@@ -207,6 +272,37 @@ describe("R11a deterministic local execution", () => {
       `INSERT INTO links_previous SELECT * FROM links;
        DROP TABLE links;
        ALTER TABLE links_previous RENAME TO links;`,
+    );
+    raw.exec(
+      `CREATE TABLE agent_definition__historical (
+         id TEXT PRIMARY KEY NOT NULL,
+         created_at TEXT NOT NULL,
+         name TEXT NOT NULL,
+         role TEXT NOT NULL,
+         package_ref TEXT NOT NULL,
+         system_prompt_ref TEXT,
+         runtime_profile TEXT,
+         capability_groups TEXT NOT NULL
+       );
+       INSERT INTO agent_definition__historical (
+         id, created_at, name, role, package_ref, system_prompt_ref,
+         runtime_profile, capability_groups
+       ) SELECT id, created_at, name, role, package_ref, system_prompt_ref,
+         runtime_profile, capability_groups FROM agent_definition;
+       DROP TABLE agent_definition;
+       ALTER TABLE agent_definition__historical RENAME TO agent_definition;
+       CREATE TABLE task__historical (
+         id TEXT PRIMARY KEY NOT NULL,
+         created_at TEXT NOT NULL,
+         title TEXT NOT NULL,
+         description TEXT NOT NULL,
+         status TEXT NOT NULL,
+         CHECK (status IN ('open', 'done'))
+       );
+       INSERT INTO task__historical (id, created_at, title, description, status)
+         SELECT id, created_at, title, description, status FROM task;
+       DROP TABLE task;
+       ALTER TABLE task__historical RENAME TO task;`,
     );
     expect(classifyKernelShape(raw as unknown as KernelDb)).toBe(
       "deterministic_execution",
@@ -227,5 +323,23 @@ describe("R11a deterministic local execution", () => {
       upgraded.query(`SELECT kind FROM schema_meta WHERE type_name = ?`).get("performed_by"),
     ).toEqual({ kind: "link" });
     raw.close();
+  });
+
+  test("classifies a fixture retaining only the 0010 display_name shape as partial", () => {
+    const raw = createR10FixtureWithOnly0010Shape("display_name");
+    try {
+      expect(classifyKernelShape(raw as unknown as KernelDb)).toBe("partial");
+    } finally {
+      raw.close();
+    }
+  });
+
+  test("classifies a fixture retaining only the 0010 cancelled status as partial", () => {
+    const raw = createR10FixtureWithOnly0010Shape("cancelled");
+    try {
+      expect(classifyKernelShape(raw as unknown as KernelDb)).toBe("partial");
+    } finally {
+      raw.close();
+    }
   });
 });

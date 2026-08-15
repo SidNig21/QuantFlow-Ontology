@@ -1042,7 +1042,10 @@ app.whenReady().then(async () => {
       info.role,
       definitionId.startsWith("qf-proof-")
         ? "DETERMINISTIC PROOF AGENT"
-        : undefined,
+        : String(
+            kernelGetObject("agent_definition", definitionId)?.display_name ??
+              definitionId,
+          ),
     );
   };
   const startPrecreatedSessionWithTile = (
@@ -1233,6 +1236,7 @@ app.whenReady().then(async () => {
                   "Read exactly those Hypothesis, Run, and Artifact objects with generated QuantFlow ontology tools; do not query unrelated objects.",
                   "Then call qf_record_evaluation exactly once with those exact ids, a verdict of supports|rejects|inconclusive, numeric confidence from 0 through 1, a non-empty rationale, and non-empty plain-text findings.",
                 ].join("\n"),
+                "orchestrator",
               );
               await startPrecreatedSessionWithTile(
                 { sessionId: change.delegatorSessionId, role: "orchestrator" },
@@ -1340,9 +1344,16 @@ app.whenReady().then(async () => {
         typeof input.mission_id === "string" && input.mission_id.length > 0
           ? input.mission_id
           : `mission-${crypto.randomUUID()}`;
+      const definitionId =
+        typeof input.definition_id === "string" && input.definition_id.length > 0
+          ? input.definition_id
+          : process.env.QF_DOCK_QA_MODE === "1"
+            ? "qf-proof-orchestrator"
+            : "hermes-research-director";
       const activationInstruction = buildMissionActivationInstruction(
         missionId,
         text,
+        definitionId === "hermes-research-director" ? "research-director" : "orchestrator",
       );
       kernelExecute(
         "create_mission",
@@ -1357,12 +1368,6 @@ app.whenReady().then(async () => {
         text,
         typeof input.dataset_id === "string" ? input.dataset_id : undefined,
       );
-      const definitionId =
-        typeof input.definition_id === "string" && input.definition_id.length > 0
-          ? input.definition_id
-          : process.env.QF_DOCK_QA_MODE === "1"
-            ? "qf-proof-orchestrator"
-            : "hermes-orchestrator";
       const result = await admitAndStartSession(definitionId, {
         missionActivation: activationInstruction,
         onStarted: projectStartedSession,
@@ -1378,7 +1383,7 @@ app.whenReady().then(async () => {
     },
     {
       description:
-        "Create a Kernel mission from the founder question and start the orchestrator seat.",
+        "Create a Kernel mission from the founder question and start the Research Director seat.",
     },
   );
   registerMethod(

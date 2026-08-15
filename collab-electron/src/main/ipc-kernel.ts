@@ -28,6 +28,7 @@ import {
   kernelListResearchLedger,
   kernelListTaskSurface,
   kernelAssertSessionMayClose,
+  kernelGetObject,
   kernelEnsureSampleResearchDataset,
   kernelOpenHypothesisForQuestion,
   kernelListTaskDelegations,
@@ -160,15 +161,25 @@ export function registerKernelHandlers(): void {
     async (event, args?: { question?: string; definitionId?: string; datasetId?: string }) => {
       try {
         assertTrustedSender(event);
+        if (process.env.QF_UI_PROOF === "1") {
+          console.info("qf-ui-proof main_ipc=qf:research:submitQuestion");
+        }
         const question = args?.question;
         if (typeof question !== "string" || question.trim().length === 0) {
           throw new Error("submitQuestion requires non-empty question");
         }
         const text = question.trim();
         const missionId = `mission-${crypto.randomUUID()}`;
+        const definitionId =
+          typeof args?.definitionId === "string" && args.definitionId.length > 0
+            ? args.definitionId
+            : process.env.QF_DOCK_QA_MODE === "1"
+              ? "qf-proof-orchestrator"
+              : "hermes-research-director";
         const activationInstruction = buildMissionActivationInstruction(
           missionId,
           text,
+          definitionId === "hermes-research-director" ? "research-director" : "orchestrator",
         );
         kernelExecute(
           "create_mission",
@@ -179,19 +190,19 @@ export function registerKernelHandlers(): void {
           },
           { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
         );
+        if (process.env.QF_UI_PROOF === "1") {
+          console.info("qf-ui-proof kernel_command=create_mission");
+        }
         const hypothesisId = kernelOpenHypothesisForQuestion(text, args?.datasetId);
-        const definitionId =
-          typeof args?.definitionId === "string" && args.definitionId.length > 0
-            ? args.definitionId
-            : process.env.QF_DOCK_QA_MODE === "1"
-              ? "qf-proof-orchestrator"
-              : "hermes-orchestrator";
         const result = await admitAndStartSession(definitionId, {
           missionActivation: activationInstruction,
           onStarted: (sessionId, sp, info) => {
             invalidateDock();
             sendToShell("shell:forward", "canvas", "sessions-changed");
             if (info?.surface === "native_tui" && info.ptySessionId) {
+              if (process.env.QF_UI_PROOF === "1" && sp === "hermes-research-director") {
+                console.info("qf-ui-proof tile_event_sent=create-term-tile");
+              }
               sendToShell(
                 "shell:forward",
                 "canvas",
@@ -200,6 +211,9 @@ export function registerKernelHandlers(): void {
                 sessionId,
                 sp,
                 info.role,
+                sp.startsWith("qf-proof-")
+                  ? "DETERMINISTIC PROOF AGENT"
+                  : String(kernelGetObject("agent_definition", sp)?.display_name ?? sp),
               );
             }
           },

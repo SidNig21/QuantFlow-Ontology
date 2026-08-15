@@ -1,9 +1,16 @@
 import { describe, expect, test } from "bun:test";
 import {
   formatDockSessionState,
+  researchDirectorRunningStatus,
   visibleDockDefinitions,
   visibleDockSessions,
 } from "./dock.js";
+
+test("Research Director status binds the returned Mission id", () => {
+  expect(researchDirectorRunningStatus("mission-123")).toBe(
+    "Research Director running · Mission mission-123",
+  );
+});
 
 describe("production Dock inventory", () => {
   const definitions = [

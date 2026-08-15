@@ -1466,27 +1466,47 @@ async function init() {
 					minimap.update();
 				}
 				if (channel === "create-term-tile") {
-					const ptySessionId = args[0];
-					const sessionId = args[1];
-					const definitionId = args[2];
-					const role = args[3];
-					const agentLabel = args[4];
-					const size = defaultSize("term");
-					const pos = findAutoPlacement(
-						tiles, size.width, size.height,
-					);
-					const tile = tileManager.createCanvasTile(
-						"term", pos.x, pos.y, {
-							ptySessionId,
-							sessionId,
-							definitionId,
-							role,
+					if (window.__QF_UI_PROOF__ === true) {
+						console.info("qf-ui-proof tile_event_received=create-term-tile");
+					}
+					try {
+						const ptySessionId = args[0];
+						const sessionId = args[1];
+						const definitionId = args[2];
+						const role = args[3];
+						const agentLabel = args[4];
+						const size = defaultSize("term");
+						const pos = findAutoPlacement(
+							tiles, size.width, size.height,
+						);
+						const tile = tileManager.createCanvasTile(
+							"term", pos.x, pos.y, {
+								ptySessionId,
+								sessionId,
+								definitionId,
+								role,
 								agentLabel,
 							},
 						);
-					tileManager.saveCanvasImmediate();
-					tileManager.spawnTerminalWebview(tile, true);
-					minimap.update();
+						tileManager.saveCanvasImmediate();
+						tileManager.spawnTerminalWebview(tile, true);
+						minimap.update();
+						if (window.__QF_UI_PROOF__ === true) {
+							const dom = tileManager.getTileDOMs().get(tile.id);
+							const container = dom?.container;
+							if (
+								container?.getAttribute("data-definition-id") === "hermes-research-director" &&
+								(container.getAttribute("data-session-id") ?? "").length > 0
+							) {
+								console.info("qf-ui-proof tile_dom_identity=present");
+							}
+						}
+					} catch (error) {
+						if (window.__QF_UI_PROOF__ === true) {
+							console.info("qf-ui-proof tile_handler=threw");
+						}
+						throw error;
+					}
 				}
 			}
 		},

@@ -256,6 +256,15 @@ function trackedFiles(): string[] {
 
 const gates: Gate[] = [
   {
+    name: "research-director-front-door",
+    description: "WO-RD-1: real Research Director form admission, durable Mission, exact session, and automatic tile",
+    run: async () => {
+      const { runResearchDirectorFrontDoorGate } = await import("./gates/research-director-front-door.ts");
+      const { ok } = await runResearchDirectorFrontDoorGate();
+      return ok;
+    },
+  },
+  {
     name: "repo-shape",
     description: "The authority set named by START_HERE exists; CLA machinery stays gone",
     run: () => {

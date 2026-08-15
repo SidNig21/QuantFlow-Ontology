@@ -372,6 +372,21 @@ describe("WO-g2 glacier spine DOM", () => {
     restore?.();
   });
 
+  test("uses the Kernel-projected friendly label while retaining exact DOM identity", () => {
+    const dom = createTileDOM({
+      type: "term",
+      id: "tile-director",
+      definitionId: "hermes-research-director",
+      agentLabel: "Research Director",
+      role: "orchestrator",
+      sessionId: "session-director",
+      ptySessionId: "pty-director",
+    }, { onClose: () => {} });
+    expect(dom.container.dataset.definitionId).toBe("hermes-research-director");
+    expect(dom.container.dataset.sessionId).toBe("session-director");
+    expect(dom.container.querySelector(".tile-title-name")?.textContent).toBe("Research Director");
+  });
+
   test("createTileDOM builds spine/head/id/grip/body/screen and cable nodes", () => {
     const closes: string[] = [];
     const fs: string[] = [];

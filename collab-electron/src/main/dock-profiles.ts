@@ -10,7 +10,7 @@ import {
   lstatSync,
   readFileSync,
 } from "node:fs";
-import { join, posix } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { resolveRuntimeAdapterMetadata } from "./runtime-adapter";
 
 export const HERMES_DOCK_MANIFEST_REF = "species/hermes/dock-profiles.json";
@@ -42,9 +42,19 @@ export const REQUIRED_DOCK_PROFILE_MANIFESTS = PRODUCTION_DOCK_PROFILE_MANIFESTS
 export const DOCK_DISPLAY_NAMES = [
   "Market Researcher",
   "Orchestrator",
+  "Research Director",
   "Critic",
 ] as const;
 export type DockDisplayName = (typeof DOCK_DISPLAY_NAMES)[number];
+
+const HERMES_RESEARCH_DIRECTOR_PROFILE = {
+  id: "hermes-research-director",
+  role: "orchestrator",
+  display_name: "Research Director",
+  runtime_profile: "default",
+  system_prompt_ref: "prompts/research-director.md",
+  capability_groups: ["desk.orchestrate"] as const,
+};
 
 export type DockProfileDiscoveryOptions = {
   qaMode?: boolean;
@@ -160,10 +170,44 @@ function displayName(value: unknown, label: string): DockDisplayName {
   const name = trimmedString(value, label);
   if (!(DOCK_DISPLAY_NAMES as readonly string[]).includes(name)) {
     throw new DockProfilesContractError(
-      `${label} must be Market Researcher, Orchestrator, or Critic`,
+      `${label} must be Market Researcher, Orchestrator, Research Director, or Critic`,
     );
   }
   return name as DockDisplayName;
+}
+
+function validateProductionHermesDirector(manifest: DockProfileManifest): void {
+  if (manifest.manifestRef !== HERMES_DOCK_MANIFEST_REF) return;
+  const directorProfiles = manifest.profiles.filter(
+    (profile) => profile.name === HERMES_RESEARCH_DIRECTOR_PROFILE.id,
+  );
+  if (directorProfiles.length !== 1) {
+    throw new DockProfilesContractError(
+      `${manifest.manifestPath} must contain exactly one ${HERMES_RESEARCH_DIRECTOR_PROFILE.id} profile`,
+    );
+  }
+  if (manifest.profiles.some((profile) => profile.name === "hermes-orchestrator")) {
+    throw new DockProfilesContractError(
+      `${manifest.manifestPath} must not contain the retired hermes-orchestrator profile`,
+    );
+  }
+  const director = directorProfiles[0]!;
+  const expected = HERMES_RESEARCH_DIRECTOR_PROFILE;
+  if (
+    director.role !== expected.role ||
+    director.display_name !== expected.display_name ||
+    director.runtime_profile !== expected.runtime_profile ||
+    director.system_prompt_ref !== expected.system_prompt_ref ||
+    JSON.stringify(director.capability_groups) !== JSON.stringify(expected.capability_groups)
+  ) {
+    throw new DockProfilesContractError(
+      `${manifest.manifestPath} ${expected.id} must use the exact Research Director profile contract`,
+    );
+  }
+  requireRegularFile(
+    join(dirname(manifest.manifestPath), expected.system_prompt_ref),
+    "Research Director prompt",
+  );
 }
 
 function normalizedPackagePath(value: unknown, label: string): string {
@@ -309,6 +353,7 @@ export function discoverDockProfileManifests(
   });
   const definitionIds = new Set<string>();
   for (const manifest of manifests) {
+    validateProductionHermesDirector(manifest);
     for (const profile of manifest.profiles) {
       if (definitionIds.has(profile.name)) {
         throw new DockProfilesContractError(

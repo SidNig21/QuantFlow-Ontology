@@ -28,7 +28,7 @@ function seedAdapter(
   profiles: Array<{
     id: string;
     role: string;
-    display_name?: "Market Researcher" | "Orchestrator" | "Critic";
+    display_name?: "Market Researcher" | "Orchestrator" | "Research Director" | "Critic";
     runtime_profile: string | null;
     system_prompt_ref: string | null;
     capability_groups: Array<"market.read" | "desk.orchestrate" | "research.evaluate">;
@@ -94,10 +94,11 @@ function seedAdapter(
 function seedRequired(root: string): void {
   seedAdapter(root, "species/hermes", "hermes", [
     {
-      id: "hermes-orchestrator",
+      id: "hermes-research-director",
       role: "orchestrator",
-      runtime_profile: "qf-orchestrator",
-      system_prompt_ref: "prompts/orchestrator.md",
+      display_name: "Research Director",
+      runtime_profile: "default",
+      system_prompt_ref: "prompts/research-director.md",
       capability_groups: ["desk.orchestrate"],
     },
     {
@@ -115,6 +116,8 @@ function seedRequired(root: string): void {
       capability_groups: ["market.read"],
     },
   ]);
+  mkdirSync(join(root, "species/hermes/prompts"), { recursive: true });
+  writeFileSync(join(root, "species/hermes/prompts/research-director.md"), "director");
   const claudeProfiles = [
     {
       id: "claude-code-orchestrator",
@@ -195,7 +198,7 @@ describe("Dock profile manifests", () => {
     expect(profiles.map((profile) => profile.name).sort()).toEqual([
       "claude-code-orchestrator",
       "claude-code-worker",
-      "hermes-orchestrator",
+      "hermes-research-director",
       "hermes-worker",
       "hermes-worker-2",
     ]);
@@ -206,13 +209,42 @@ describe("Dock profile manifests", () => {
     ).toBe(true);
   });
 
+  test("production discovery requires the exact Research Director contract", () => {
+    const root = freshRoot();
+    const manifest = join(root, "species/hermes/dock-profiles.json");
+    const raw = JSON.parse(readFileSync(manifest, "utf8")) as {
+      profiles: Array<Record<string, unknown>>;
+    };
+    raw.profiles[0]!.id = "hermes-orchestrator";
+    writeFileSync(manifest, `${JSON.stringify(raw)}\n`);
+    expect(() => discoverDockProfileManifests(root)).toThrow(/exactly one hermes-research-director/);
+
+    raw.profiles[0]!.id = "hermes-research-director";
+    raw.profiles[0]!.system_prompt_ref = "prompts/orchestrator.md";
+    writeFileSync(manifest, `${JSON.stringify(raw)}\n`);
+    expect(() => discoverDockProfileManifests(root)).toThrow(/exact Research Director profile contract/);
+  });
+
+  test("invalid display names enumerate the exact four allowed values", () => {
+    const root = freshRoot();
+    const manifest = join(root, "species/hermes/dock-profiles.json");
+    const raw = JSON.parse(readFileSync(manifest, "utf8")) as {
+      profiles: Array<Record<string, unknown>>;
+    };
+    raw.profiles[0]!.display_name = "Director";
+    writeFileSync(manifest, `${JSON.stringify(raw)}\n`);
+    expect(() => discoverDockProfileManifests(root)).toThrow(
+      "must be Market Researcher, Orchestrator, Research Director, or Critic",
+    );
+  });
+
   test("QA discovery explicitly includes proof fixtures", () => {
     const manifests = discoverDockProfileManifests(freshQaRoot(), { qaMode: true });
     expect(manifests.flatMap((manifest) => manifest.profiles).map((profile) => profile.name).sort()).toEqual([
       "claude-code-orchestrator",
       "claude-code-ungranted",
       "claude-code-worker",
-      "hermes-orchestrator",
+      "hermes-research-director",
       "hermes-worker",
       "hermes-worker-2",
       "qf-proof-orchestrator",

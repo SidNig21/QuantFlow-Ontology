@@ -79,8 +79,14 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:tasks:cancel", { taskId }),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
-    submitResearchQuestion: (question: string, datasetId?: string) =>
-      ipcRenderer.invoke("qf:research:submitQuestion", { question, datasetId }),
+    submitResearchQuestion: (question: string, datasetId?: string, definitionId?: string) => {
+      if (UI_PROOF) console.info("qf-ui-proof preload_ipc=qf:research:submitQuestion");
+      return ipcRenderer.invoke("qf:research:submitQuestion", {
+        question,
+        ...(datasetId ? { datasetId } : {}),
+        ...(definitionId ? { definitionId } : {}),
+      });
+    },
     spawnSession: (args: { definitionId: string }) =>
       ipcRenderer.invoke("qf:sessions:spawn", args),
     runTurn: (args: { sessionId: string; prompt?: string }) =>
@@ -446,3 +452,5 @@ contextBridge.exposeInMainWorld("shellApi", {
   }> =>
     ipcRenderer.invoke("browser:info", { webContentsId }),
 });
+
+contextBridge.exposeInMainWorld("__QF_UI_PROOF__", UI_PROOF);

@@ -387,10 +387,11 @@ function registerAgentDefinition(
   if (
     display_name !== "Market Researcher" &&
     display_name !== "Orchestrator" &&
+    display_name !== "Research Director" &&
     display_name !== "Critic"
   ) {
     throw new KernelError(
-      'register_agent_definition "display_name" must be Market Researcher, Orchestrator, or Critic',
+      'register_agent_definition "display_name" must be Market Researcher, Orchestrator, Research Director, or Critic',
     );
   }
   const package_ref = input.package_ref;

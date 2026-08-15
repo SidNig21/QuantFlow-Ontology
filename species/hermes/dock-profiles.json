@@ -6,11 +6,11 @@
   },
   "profiles": [
     {
-      "id": "hermes-orchestrator",
+      "id": "hermes-research-director",
       "role": "orchestrator",
-      "display_name": "Orchestrator",
+      "display_name": "Research Director",
       "runtime_profile": "default",
-      "system_prompt_ref": "prompts/orchestrator.md",
+      "system_prompt_ref": "prompts/research-director.md",
       "capability_groups": ["desk.orchestrate"]
     },
     {

@@ -27,6 +27,10 @@ export function isQaDockDefinition(definitionId) {
 	return String(definitionId ?? "").startsWith("qf-proof-");
 }
 
+export function researchDirectorRunningStatus(missionId) {
+	return `Research Director running · Mission ${String(missionId ?? "")}`;
+}
+
 export function isProductionDockDefinition(row) {
 	const packageRef = String(row?.package_ref ?? "");
 	if (
@@ -389,6 +393,9 @@ export function initDock(panelEl, options = {}) {
 			event.preventDefault();
 			const question = String(questionInput.value ?? "").trim();
 			if (!question) return;
+			if (window.__QF_UI_PROOF__ === true) {
+				console.info("qf-ui-proof renderer_form_submit=1");
+			}
 			questionInput.value = "";
 			questionInput.disabled = true;
 			setQuestionStatus("Starting durable research…");
@@ -396,7 +403,7 @@ export function initDock(panelEl, options = {}) {
 			selectedResearchDatasetId = null;
 			void window.shellApi.qf.submitResearchQuestion(question, datasetId ?? undefined).then((res) => {
 				if (!res?.ok) throw new Error(res?.error?.message ?? "research launch failed");
-				setQuestionStatus("Research started · watch the canvas and ledger", "ok");
+				setQuestionStatus(researchDirectorRunningStatus(res.missionId), "ok");
 				void refresh();
 			}).catch((error) => {
 				questionInput.value = question;
