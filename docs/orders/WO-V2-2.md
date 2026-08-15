@@ -6,8 +6,8 @@ depends: WO-V2-1 founder accepted
 rung: R13 / V2-2
 authorization: founder-via-NEXT
 rework-cycles: 1 of 1 used - exhausted 2026-08-14
-reauthorization: required - the founder must re-point `NEXT.md` at this file
-                 before any implementation lap begins
+reauthorization: satisfied by `NEXT.md` commit
+                 `833a06aa334d3155c88ca794ceb3d2fdc506daa9`
 rewrite-scope: see "REWRITE - authorized after Round 2" at the end of this file
 
 ## Objective
@@ -686,16 +686,27 @@ must be re-verified.
 ### Deliverable A - `launch()` owns what it spawns
 
 `launch()` must never leave a spawned process without an owner. Wrap everything
-after the `spawn` call so that any throw first terminates the spawned process
-tree and waits for its exit, then re-throws the original error unchanged. The
-original error text must survive; the readiness assertions at lines `172-175`
-and the suppression classification at lines `531-536` depend on it.
+after the `spawn` call so that any throw terminates the spawned process tree and
+waits for its exit, then re-throws the same error object without wrapping or
+replacement. Cleanup errors are recorded separately and never replace that
+object. The readiness assertions at lines `172-175` and the suppression
+classification at lines `531-536` depend on the original identity and text.
 
-Ownership must not depend on `collectOwnedPids` having completed. The child PID
-is known at line `168`; use it. If `collectOwnedPids` has already run, terminate
-that fuller set instead.
+The process tree is the union of the spawned child PID, every living descendant
+anchored at that PID, and any PID already returned by `collectOwnedPids`. The
+child PID is known at line `168`; ownership must not depend on the later
+collection having completed. A termination or wait failure is a cleanup error:
+record it, continue the bounded cleanup attempt, and still re-throw the original
+launch error.
 
-Expected: after any `launch()` throw, no process spawned by that call survives.
+The one ordering exception is Deliverable E's read-only observation. When the
+caught error is the intentionally suppressed `launch_readiness` failure,
+`launch()` records that observation inside its catch before terminating
+anything. Deliverable A cleanup then runs and the same launch error is re-thrown.
+
+Every failed launch prints `launch-failure remaining_pids=<sorted-json-array>`
+after cleanup. Expected: the array is `[]`; any surviving child or descendant
+makes the gate red even if it has already released the temp root.
 
 ### Deliverable B - one guarded removal helper, used at all five sites
 
@@ -703,15 +714,26 @@ Add a single helper that removes a gate-owned temp root and use it at lines
 `548`, `566`, `661`, `707`, and `731`. No bare `rmSync` of a gate temp root may
 remain in this file. The helper must:
 
-1. Retry on the Windows-transient errno set `rmSync` already recognises -
-   `EBUSY`, `EPERM`, `ENOTEMPTY`, `EMFILE`, `ENFILE` - with a finite, stated
-   bound. `maxRetries` with `retryDelay` is sufficient; the bound must be a
-   named constant, not a literal buried in a call.
-2. Never throw from inside a `finally`. On exhaustion it records the path in a
-   module-level leak list and returns.
-3. Print one receipt per removal that needed more than one attempt, naming the
-   path and the attempt count, so a machine that is merely slow is
-   distinguishable from a machine that is genuinely stuck.
+1. Retry on the Windows-transient errno set `EBUSY`, `EPERM`, `ENOTEMPTY`,
+   `EMFILE`, and `ENFILE`. `MAX_CLEANUP_RETRIES` means retries after the first
+   call; `attempts` means total `rmSync` calls and is therefore at most
+   `MAX_CLEANUP_RETRIES + 1`. The bound and retry delay are named constants, not
+   literals buried in a call.
+2. Never throw from cleanup, including from a `finally`. A transient error is
+   retried to the bound. A non-transient error is not retried. Either kind, if
+   unresolved, records the path in the module-level leak list and returns.
+3. Print one receipt per removal that needed a retry:
+   `<gate-label>: temp-cleanup-retry path=<absolute-path> code=<errno>
+   attempts=<total-calls>`. An unresolved removal prints
+   `<gate-label>: cleanup-leak path=<absolute-path> code=<errno>
+   attempts=<total-calls>`. Recording without printing does not satisfy this
+   deliverable.
+4. Accept an injected removal function for deterministic gate-only proof. For
+   each of the five transient errno values, the proof makes the first call fail
+   and the second succeed, requires `attempts=2`, and requires the retry receipt.
+5. Add a static assertion in this gate that no direct gate-root `rmSync` call
+   remains outside this helper. All five named production call sites must route
+   through it.
 
 Deterministic shutdown alone is not sufficient and must not be the whole fix.
 Windows releases file handles after process exit rather than with it, and
@@ -727,24 +749,36 @@ replaces that original error, so a genuine defect in any of the ten boundaries
 would be reported as a cleanup problem. Deliverable B item 2 removes the throw;
 this deliverable requires the proof.
 
-Expected: with a boundary assertion forced to fail and a temp root
-simultaneously held busy, the reported failure names the boundary assertion,
-and the leaked path appears as a separate additional receipt.
+Expected proof: force the `tool_output` boundary assertion to fail with
+`failed_boundary=tool_output` and `failure_mechanism=gate2_rejected` while its
+temp root is simultaneously held busy through cleanup exhaustion. The command
+must exit nonzero with the original boundary error unchanged. A separate later
+line must match `<gate-label>: cleanup-leak path=<absolute-path> code=EBUSY
+attempts=<total-calls>`. The cleanup receipt may add evidence; it may never
+replace or wrap the boundary error.
 
 ### Deliverable D - the gate proves it left nothing behind
 
-At the end of both gates, assert that the leak list from Deliverable B is empty
-and that no `qf-boundary-*` or `qf-hermes-*` root created by this run remains
-under the temp directory. Print the receipt in both directions:
+At process start, snapshot the count of matching pre-existing roots. Route every
+gate-owned `mkdtempSync` through one creation helper that immediately registers
+the unique absolute path; add a static assertion that no direct gate-root
+`mkdtempSync` remains outside it. `roots_created` is the size of that registry.
+`roots_remaining` is the number of those registered paths that still exist
+after all cleanup attempts. It is not a fresh global glob and never includes a
+pre-existing root.
+
+At the end of both gates, print the terminal receipt before asserting, then
+assert that the Deliverable B leak list is empty and `roots_remaining` is zero:
 
 ```text
-hermes-first-turn-synthetic: temp-cleanup roots_created=<n> roots_remaining=0 retried=<n> leaked=[]
+<gate-label>: temp-cleanup roots_created=<n> roots_remaining=<n> retried=<n> preexisting=<n> leaked=<sorted-json-array>
 ```
 
-Match only roots this run created. Pre-existing roots from earlier runs are not
-this gate's failure; they must be reported as an informational count and must
-not turn the gate red. Nine such roots exist on the founder's machine now and
-are being preserved as evidence for this order.
+`retried` is the total number of retry calls beyond initial removal calls across
+this invocation. `preexisting` is the start-of-process snapshot count. Match
+only registered roots this run created. Pre-existing roots are informational
+and must not turn the gate red. Nine such roots exist on the founder's machine
+now and are being preserved as evidence for this order.
 
 This is the receipt that did not exist before. Its absence is why five call
 sites leaked silently for the whole of Round 1 and Round 2.
@@ -757,19 +791,28 @@ product's own ten. The product's shutdown is proven clean on the healthy path
 by `remaining_install_owned_processes=0`; it is unproven on this path, because
 the test that would have measured it is the test that crashed.
 
-Observe and record only. When the `launch_readiness` suppression fires, capture
-whether the packaged app's own process tree exits on its own within the existing
-`SHUTDOWN_TIMEOUT_MS`, before the harness terminates anything. Print one
+Observe and record only. When the `launch_readiness` suppression failure is
+recognized inside `launch()`'s catch, start the clock and capture whether the
+packaged app's own process tree exits on its own within the existing
+`SHUTDOWN_TIMEOUT_MS`, before Deliverable A terminates anything. Print one
 receipt:
 
 ```text
-hermes-first-turn-synthetic: half-born-seat self_exit=<true|false> elapsed_ms=<n> pids=<list>
+hermes-first-turn-synthetic: half-born-seat self_exit=<true|false> elapsed_ms=<n> pids=<sorted-json-array>
 ```
 
-Do not change product code on the strength of this observation, whatever it
-says. If `self_exit=false`, add one `docs/DEBT.md` entry and one line to the
-R14 findings; that is the entire response. Widening this order to fix the
-product is the scope-pressure hard stop in `AUTONOMY.md`.
+At the deadline, `pids` is the sorted set from Deliverable A's process-tree
+definition that is still alive. `self_exit=true` requires `pids=[]`; when false,
+the receipt records the still-live set and Deliverable A then terminates it.
+The gate validates the receipt's presence, grammar, timing bound, and PID
+relationship, but either boolean value is a valid observation and does not by
+itself turn the gate red.
+
+Do not change product code or any other repo file on the strength of this
+observation, whatever it says. If `self_exit=false`, report it to the lead and
+founder for a future authorized order; do not add debt or R14 findings in this
+lap. Widening this order to fix the product is the scope-pressure hard stop in
+`AUTONOMY.md`.
 
 ### Acceptance gates - rewrite
 
@@ -783,33 +826,44 @@ Two additional requirements for this lap:
 
 - `bun qa/run.ts hermes-first-turn-synthetic` must exit `0` with all ten
   boundary red/green pairs present in one run. Ten reds and ten greens, no
-  gaps. The builder must not report a partial ledger as progress.
+  gaps. It must also validate and print the Deliverable E observation receipt.
+  The builder must not report a partial ledger as progress.
 - Both gates must print the Deliverable D cleanup receipt with
   `roots_remaining=0` and `leaked=[]`.
 
-The verifier must run the synthetic gate twice in the same worktree, back to
-back, and both runs must exit `0`. The first run's temp roots are the second
-run's most likely source of interference, and a single green run does not
-distinguish a fix from a lucky race.
+The verifier must run the exact synthetic command twice at the same HEAD in the
+same worktree, back to back, with no intervening build, install, reset, manual
+temp cleanup, or other command. Both runs must exit `0`. The first run's temp
+roots are the second run's most likely source of interference, and a single
+green run does not distinguish a fix from a lucky race.
 
 ### Falsification - rewrite
 
-Every change above must be shown red on purpose, restored, and shown green,
-with transcripts in `docs/orders/evidence/r13/V2-2-VERIFICATION.md`.
+Every enforcement change in Deliverables A-D must be shown red on purpose,
+restored, and shown green, with transcripts in
+`docs/orders/evidence/r13/V2-2-VERIFICATION.md`. Deliverable E is observation,
+so its receipt validator is falsified rather than its observed boolean value.
 
-- Revert Deliverable A alone and re-run the `launch_readiness` suppression. The
-  gate reproduces the exact `EBUSY` failure at a `qf-boundary-red-launch_readiness-*`
-  path. Restore and show green.
-- Force the guarded helper's retry bound to zero while a root is genuinely held.
-  The leak list is non-empty, the gate goes red at the Deliverable D assertion,
-  and it names the path. Restore the real bound and show green.
-- Force one boundary assertion to fail while its temp root is held busy. The
-  reported failure names the boundary assertion, not the cleanup, and the leak
-  appears as a separate receipt. This is the Deliverable C proof and it must not
-  be skipped because it is awkward to stage.
-- Leave one `qf-boundary-*` root behind deliberately. Deliverable D goes red and
-  names it; a root created before this run is counted informationally and stays
-  green.
+- Disable Deliverable A termination, deliberately leave a descendant alive,
+  and force the `launch_readiness` failure while Deliverable B remains active.
+  The gate exits nonzero at `launch-failure remaining_pids=[...]`, even if the
+  descendant released the temp root. Restore and require `remaining_pids=[]`.
+- For each of `EBUSY`, `EPERM`, `ENOTEMPTY`, `EMFILE`, and `ENFILE`, inject a
+  first-call failure and second-call success. Each case must require two calls
+  and its retry receipt. Temporarily remove each code from the retryable set and
+  show the deterministic proof red, then restore it green. Separately insert one
+  direct gate-root `rmSync`; the static assertion goes red. Restore green.
+- Force the exact `tool_output` / `gate2_rejected` assertion while its temp root
+  is held through cleanup exhaustion. The command exits nonzero, reports that
+  original boundary failure unchanged, and later prints the exact separate
+  `cleanup-leak ... code=EBUSY attempts=...` receipt. Restore and show green.
+- Leave one registered `qf-boundary-*` root behind deliberately. Deliverable D
+  prints `roots_remaining=1`, names it in `leaked`, and goes red. A root present
+  in the initial snapshot increments `preexisting` and stays green. Insert one
+  direct gate-root `mkdtempSync`; the static assertion goes red. Restore green.
+- Remove or corrupt the Deliverable E receipt. Its validator makes the synthetic
+  gate red. Restore a well-formed receipt; either valid `self_exit` value stays
+  green and Deliverable A still requires final `remaining_pids=[]`.
 
 ### Out of scope - rewrite
 
@@ -831,7 +885,7 @@ Stop and report; do not widen.
 ### Report back - rewrite
 
 Report the ten boundary red/green pairs in full, both cleanup receipts, the
-Deliverable E observation, the four falsification transcripts, both consecutive
+Deliverable E observation, every falsification transcript above, both consecutive
 synthetic exits, and every acceptance exit. State `founder_acceptance: not
 performed` and `l4_certified: pending`. State the leak list explicitly even when
 empty. Do not edit `NEXT.md` and do not begin V2-3.
