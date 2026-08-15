@@ -1,6 +1,7 @@
 # V2-SCOPE.md — the post-V1 product scope
 
-status: **PROPOSAL — no build authority**
+status: source record — stable product language promoted into START_HERE.md and DOCTRINE.md on 2026-08-15; route authority remains GOLDEN-RUN.md and build authority remains NEXT.md.
+The manual-first and no-hidden-orchestrator language below records superseded V2 sequencing; it does not define the default product interaction. DOCTRINE A10 wins.
 authored: 2026-08-12
 baseline measured against: `wo-r9-research-integrity` @ `fd57b26`
 supersedes on approval: `docs/orders/WO-R13-S1..S5`, `docs/orders/NEXT.md`

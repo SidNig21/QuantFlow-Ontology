@@ -1,6 +1,6 @@
 # QuantFlow Ontology
 
-**An AI-native quantitative research platform: heterogeneous AI agents collaborating on a spatial canvas, over a governed ontology.**
+**A Windows-first, ontology-centered quantitative research and learning environment led by a custom Hermes Research Director.**
 
 QuantFlow doesn't compete with agent frameworks — it's the surface they land on. Claude Code, Codex, Hermes, a scraper, an RL worker: any controllable CLI can become a Dock runtime through an adapter package, then appear as one or more founder-visible profiles on the canvas. Profiles keep their own identity while sharing reusable runtime code, collaborate over an MCP bus, and act on a shared, governed world model (the Kernel). New agent tools shipping across the ecosystem aren't competition here — they're inventory.
 
@@ -47,14 +47,14 @@ Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a reco
 - **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
 - **The peer bus** (`tools/qf-peer-bus`) — stdio MCP (`send_to_peer` / `read_inbox` / `list_peers`). Peer messages land as content-addressed `trajectory` artifacts. Transport SQLite stays separate from the Kernel.
 - **Desk + research loop (R0–R12)** — Kernel, Dock seats, durable tasks, and the question → hypothesis → dataset → run → critic → report chain exist in this checkout. V2-1 is the installable current Windows app.
-- **Next visible work (V2-3)** — add two seats, assign a task, see it. See [`docs/orders/NEXT.md`](docs/orders/NEXT.md).
+- **Preserved runtime work** — the unfinished V2-3R native Hermes development-launch candidate remains in the working tree unchanged; product implementation is paused while WO-NORTHSTAR-1 corrects authority.
 - **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward.
 - **Glacier visual program (WO-g1 → g5)** — tokens + ANSI (g1), tile spine (g2), dock masthead/ask/launcher/ledger (g3), shell chrome / file-rail / canvas / z-scale (g4), Kernel-backed **view** cables with dashed honesty + orphan cascade (g5). ADR-0003 allows UI on experimental `connection` without promotion. Reversible checkpoint: tag `glacier-checkpoint-a` (after g5a+g1). Installed asar needs rebuild/package-click to match source.
 - **Verification culture** — work orders, cold worktrees, bait-tested gates. Artifact hashes are recomputed, not trusted.
 
-## The end goal: a real ontology
+## The end goal: a governed research and learning world
 
-The destination is a **Palantir-grade ontology built with tools anyone can install** — object types, properties, links, and actions over the Kernel, with the agents' tool surface *generated from* the schema rather than hand-written. The doctrine (borrowed from Palantir's own published talks, built on none of their platform):
+**QuantFlow is a Windows-first, single-user, ontology-centered quantitative research and learning environment.** Its default front door is **Research Director**, a custom Hermes Agent Profile. Ryan states a research mission naturally; the Director uses governed Kernel actions to plan, recruit exact specialists, assign work, and route evidence. The canvas automatically reveals that active work and lets Ryan steer it. The Dock is optional manual inventory and control. Quantitative research is the invariant domain, sports betting is the first application, and QuantFlow never places a bet or trade.
 
 1. **One governed system of record.** The Kernel is the sole writer. Retrieval, scraping, and agent chatter never become truth without passing through a Kernel command.
 2. **Tools follow the ontology.** Model the object/link/action graph correctly and CRUD + action tools fall out of codegen for free — that's what lets agents one-shot cross-object work instead of being hand-held verb by verb.
@@ -74,11 +74,11 @@ The ontology has three planes:
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) — **V2-3 only** (compose a team) |
-| Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — V2-1 done · V2-2 stopped · V2-3 next · then V2-4, V2-5, V2-6 |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) → [`docs/orders/WO-NORTHSTAR-1.md`](docs/orders/WO-NORTHSTAR-1.md) (the active documentation order) |
+| Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — non-authoritative source record; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
 | Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0–R12 complete; R13 active |
 | Product floor | Installable Windows app (V2-1). Desk golden run works. Research objects exist in the Kernel. |
-| Honest boundary | V2-2's all-day packaged proof is **stopped**. Do not resume it. You cannot yet assign a task from the Dock. |
+| Honest boundary | The custom Hermes Research Director experience and the governed RL/PufferLib learning loop are product destinations, not shipped capabilities. |
 
 ```bash
 bun qa/run.ts rung-ladder    # must say active=R13

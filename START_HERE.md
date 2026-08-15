@@ -14,11 +14,7 @@
 
 ## 0. Mission (fixed)
 
-**QuantFlow is a Windows-first, single-user spatial operating console for AI-assisted quantitative research** — v1 domain: sports betting markets (Bovada; UFC, tennis, football). Agent sessions, execution environments, datasets, tickets, artifacts, and evaluations are **typed objects on an infinite canvas**. Agents stream visible work into tiles, delegate through validated relationships, and publish durable versioned artifacts. Every action carries an end-to-end trace.
-
-Native Windows 11 is the canonical development, packaging, runtime, and founder-proof environment. WSL and Linux are secondary compatibility targets; they never substitute for a Windows acceptance proof.
-
-Research-only: QuantFlow **never places bets or executes trades**. It proposes, backtests, criticizes, evaluates, and reports — the operator acts in the world.
+**QuantFlow is a Windows-first, single-user, ontology-centered quantitative research and learning environment.** Its default front door is **Research Director**, a custom Hermes Agent Profile. Ryan states a research mission naturally; the Director uses governed Kernel actions to plan, recruit exact specialists, assign work, and route evidence. The canvas automatically reveals that active work and lets Ryan steer it. The Dock is optional manual inventory and control. Quantitative research is the invariant domain, sports betting is the first application, and QuantFlow never places a bet or trade.
 
 ## 1. The one rule
 
@@ -26,13 +22,23 @@ Research-only: QuantFlow **never places bets or executes trades**. It proposes, 
 
 At the canvas seam this rule is spelled out as **Canvas-seam Laws A–F** (`docs/LAWS.md`), which carry the same weight as this section. Short form: **a tile that remembers is a bug**; `Tile = render(projection) + dispatch(action)`; commands are rejectable, events are replayable, and the event log is the receipt log.
 
-## 2. The defining v1 workflow (everything else is scope creep until this runs)
+## 2. The product and domain loops
+
+Primary product loop:
 
 ```
-Hypothesis → Dataset (versioned, point-in-time fenced) → Backtest Run (local | sandbox)
-→ Artifact (hashed, durable) → Critic (adversarial, separate session)
-→ Evaluation (CLV, ROI, Monte Carlo bankroll) → Report (full lineage)
+ASK → PLAN → WORK VISIBLY → STEER → REVIEW → LEARN
 ```
+
+First governed domain loop:
+
+```
+Hypothesis → Dataset (versioned, point-in-time fenced) → Run (local | sandbox | training)
+→ Artifact (hashed, durable) → Critic (independent session)
+→ Evaluation (CLV, ROI, calibration, declared criteria) → Report (full lineage)
+```
+
+The domain loop serves the product loop; neither the research chain alone nor manual team composition is the complete product.
 
 ## 3. Authority documents
 
@@ -77,7 +83,7 @@ Bun + TypeScript strict (orchestration) · Electron shell inherited from Collabo
 
    The dependency arrow is the whole test. A thing that plugs into the desk is free; a thing the desk plugs into is expensive. **Substrate proposals get logged, not evaluated, until the Research plane exists** — the ecosystem generates one of these every week and none of them advance the world model.
 
-   The test runs **per layer, never per brand name** — one product can span all three buckets. Worked example (probed 2026-07-24, full case study in `docs/RESEARCH.md`): **agentOS** = its cargo agents (Claude Code, Codex, OpenCode — CLIs, dock items with or without agentOS) + its Rivet Actor durability layer (underlayer, logged as ROADMAP debt #17) + its VM isolation layer (absorbed, if ever needed, as an `execution_environment` row — the quarantine tier for unvetted species — never as the floor).
+   Apply the dependency-arrow test per layer, never per brand. Historical products and predecessor integrations do not become QuantFlow architecture merely by appearing in research notes.
 
 ## 6. License
 

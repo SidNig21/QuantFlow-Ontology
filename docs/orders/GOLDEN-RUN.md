@@ -11,41 +11,26 @@
 
 ## Part I — The golden run
 
-**Act I desk acceptance** is complete when the founder can sit down at a Windows machine and watch
-this happen. It proves the working desk; it is not the complete QuantFlow v1 release.
+1. Ryan asks the custom Hermes Research Director about one bounded upcoming sports market and names the Technique/Strategy version to use.
+2. A durable Mission appears immediately. The Director reports supported data coverage or a visible refusal; it never fabricates unavailable coverage.
+3. The Director uses governed actions to recruit exact specialist sessions and assign durable Tasks. The canvas shows the plan, owners, status, and reasons.
+4. Ryan can clarify, redirect, reassign, cancel, or request a second opinion; each accepted action or refusal is visible and recorded by the Kernel.
+5. Workers publish cited evidence and an Artifact. An independent critic reads the exact Hypothesis, Dataset, Run, Artifact, and metrics before recording an Evaluation. Publication remains evaluation-gated.
+6. The Director returns a candidate or explicit no-candidate result with source times, method, uncertainty, lineage, and a statement that no bet was placed.
+7. After close/reopen, the Mission, sessions, Tasks, evidence, Evaluation, result, and steering history remain available from the Kernel.
 
-> **You type a research question into the canvas.**
->
-> 1. The **orchestrator reads the Dock** — it queries the catalog and sees which agents are
->    available: a Hermes researcher, a Claude Code analyst, a Hermes critic.
-> 2. It decides it needs two of them and **spawns them**. Two new tiles appear on your canvas —
->    because a session is a Kernel object, and tiles render Kernel objects.
-> 3. It **creates tasks and assigns them**. Cables appear between the tiles — because assignment is
->    a link, and links render as cables.
-> 4. A worker **queries the market ontology**, does its work, and **publishes an artifact**. An
->    artifact tile appears, wired to the session that produced it.
-> 5. The orchestrator sees the result and **closes the seats**. Tiles go to stopped. Cables stay.
->
-> **You close the app. You reopen it. Everything is still there** — because none of it lived in the
-> UI. The canvas was reading the Kernel the whole time.
+For this route contract, terms have one meaning:
 
-### Why this Act I gate matters
+- **bounded market** = one `market_event` plus the related `instrument` and timestamped `quote` rows admitted in one point-in-time Dataset;
+- **named Technique/Strategy version** = a stable Strategy id, version, and content hash selected by Ryan or retrieved with lineage; absence produces the coverage refusal in step 2;
+- **exact specialist** = a capability-selected `agent_definition` instantiated as one named `agent_session`; every Task assignment and handoff stores that session id, never only a role or species string;
+- **steering** = all five founder controls named in step 4 are supported; the final product demonstration exercises at least one accepted control and one refused invalid control, both with zero UI-only durable state;
+- **cited result** = Kernel object ids for the data read, observation/source timestamps, Artifact content hashes, and durable links from the Run through Evaluation to the Report;
+- **close/reopen** = terminate the QuantFlow Windows application process and launch it again against the same canonical Kernel.
 
-Because it is **observable**. You can watch it succeed or watch it fail, without reading code, a
-report, or a status table. Every previous definition of done in this repository was a claim someone
-had to be trusted about. This one is a demonstration.
+Conversation is the front door. The canvas is the visible and steerable operating surface. The Dock is optional manual control. The Ontology is the durable world. Quantitative research is the first domain. Learning compounds the evidence.
 
-It is also the prerequisite for everything else the founder wants. Reinforcement learning, PufferLib,
-multi-harness research, automated analysis — all of them are *things you point an orchestrator at*.
-None of them are reachable until an orchestrator can read a catalog, hire a specialist, hand it work,
-and collect a durable result. **The canvas concept is not a detour on the way to the research
-product. It is the machine the research product runs on.**
-
-### What the golden run deliberately does not include
-
-No dataset fencing, no backtest, no critic, no gated report. Those are the research loop — Part III.
-The golden run proves the *desk* works. Part III proves the *research* works. Conflating them is how
-the last four plans died.
+Ryan may perform the same governed actions manually from the Dock and canvas. That is an alternate control path, not a prerequisite. Fixtures prove plumbing; only real data and real model turns prove research judgment.
 
 ---
 
@@ -125,59 +110,34 @@ a release rung that also redesigns the canvas cannot close. R13 now delivers two
 you can install, and proof the existing research loop survives a real model. Its orders are
 `WO-V2-1` and `WO-V2-2`.
 
-### Act IV — the operating console
+### Act IV — governed research world
 
-| # | Size | Proves |
-|---|---|---|
-| **R14** | Medium | The founder composes a team by hand and assigns durable work from the canvas |
-| **R15** | Medium | A governed handoff — an Artifact routed to an independent critic whose verdict gates the Report |
-| **R16** | Large | The durable research world is visible and inspectable, not hidden behind terminals |
-| **R17** | Large | Mixed autonomy — agents recruit from the same governed catalog, visibly and attributably |
+| Rung | Outcome |
+|---|---|
+| **R14** | Research Director: one custom Hermes profile turns a founder mission into visible, exact-session governed work and accepts steering |
+| **R15** | Governed review: an exact critic reads the evidence, records an Evaluation, and visibly gates publication |
+| **R16** | Visible research world: active Mission, Task, Dataset, Run, Artifact receipt, Evaluation, and result are inspectable without reading terminal logs |
+| **R17** | Technique and outcome loop: versioned Strategy/Technique drives forward research; settled operator-supplied outcomes grade calibration and CLV without placing bets |
 
-Act IV is the founder-operated half of the product. R14 builds the primitives by hand — create a
-task, assign it, route evidence, review it. R17 then automates *those same governed actions* rather
-than inventing parallel ones, which is why manual composition comes first even though mixed autonomy
-is the preferred end state. Scope detail lives in
-[`../proposals/V2-SCOPE.md`](../proposals/V2-SCOPE.md), which is a proposal and confers no authority.
+Act IV makes the Research Director experience visible, governed, reviewable, and steerable. Manual
+Dock and canvas actions remain supported as an alternate control path, but they are not the default
+front door. Scope detail lives in [`../proposals/V2-SCOPE.md`](../proposals/V2-SCOPE.md), which is a
+source record and confers no route or build authority.
 
-### Act V — post-v1 recall
+### Act V — learning and recall
 
-| # | Size | Proves |
-|---|---|---|
-| **R18** | Large | Recall over real Evaluation history — the desk retrieves what it learned, and retrieval never becomes truth |
+| Rung | Outcome |
+|---|---|
+| **R18** | Recall: prior evaluated work is retrieved with lineage and never becomes truth merely because it was retrieved |
+| **R19** | Market learning: an RL worker runs a PufferLib Environment, publishes a Policy Artifact, and held-out Evaluation gates founder-controlled promotion/rollback |
+| **R20** | Harness learning: Evaluation history may improve versioned playbooks first and owned-model weights second without creating a second truth store |
 
-R18 is post-v1 because it is *downstream*, not because it is unimportant. Evaluation history cannot
-become a fitness signal before evaluation history exists, and the history is produced by operating
-the console Act IV builds.
-
-**RL is not on this ladder, and that is deliberate (founder ruling, 2026-08-12).** It was previously
-bundled into this rung, which made it look like a platform phase. It is not. Two distinct things were
-conflated:
-
-- **RL on the market** — learning a betting or selection policy. This is *research*, not platform
-  work. It runs as a `run.kind: "training"` Run, executed by an RL worker seat hired from the Dock
-  like any other specialist. The seat is the Dock item; PufferLib and gym environments are the
-  workload it imports inside its sandbox. First environment will be football; not yet specified.
-- **RL on the harness** — agents learning to use QuantFlow better. A real orchestrator use case,
-  deliberately secondary, and still parked.
-
-**The substrate already exists.** `policy` (versioned strategy with mandatory artifact lineage),
-`environment` (the bounded world with its declared data and reward contract), and
-`run.kind: "training"` are all in the schema today. R10 fences Datasets point-in-time, R11a makes
-execution deterministic, R11b proves the metrics, R12 supplies the independent critic.
-
-**R11b's metrics are the reward signal.** `roi`, `hit_rate`, `net_profit`, and `average_clv` — with
-push, void, and missing-settlement handled — are exactly what a betting policy optimises. Do not
-rebuild them for training; they are already proven against a hand-calculated fixture.
-
-**Gate for the RL worker:** the platform is stable (R13 accepted) and a seat can be hired and given
-durable work (R14). It does not need R17 — the founder hires it by hand. **Standing caution:** RL on
-financial markets has a brutal overfit record. The holdout discipline in R10–R12 is what tells you
-whether a result is real, and it is the reason to attempt this at all.
-
-**Renumbered from R14 on 2026-08-12.** The `rung-ladder` gate fails when a rung is marked complete
-while an earlier one is not, so learning had to sit after the Act IV rungs rather than before them.
-Numbering states the dependency; it does not demote the work.
+R18 depends on the independent Evaluation history established by R15–R17. R19 is the first-class
+market-learning destination: its RL worker is a governed Dock seat and PufferLib is workload inside
+the governed RL worker Run, not the application chassis. R19 depends on fenced Datasets, validated
+research outcomes, the Windows product floor, and durable governed work; held-out Evaluation gates
+founder-controlled promotion or rollback. R20 is secondary harness learning and may improve
+versioned playbooks before owned-model weights, while the Kernel remains the sole truth store.
 
 ---
 
@@ -210,6 +170,8 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R16 | pending | — |
 | R17 | pending | — |
 | R18 | pending | — |
+| R19 | pending | — |
+| R20 | pending | — |
 
 ### Closing a rung
 

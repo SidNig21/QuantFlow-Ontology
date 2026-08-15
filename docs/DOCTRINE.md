@@ -449,6 +449,43 @@ none. The debt register moves to `docs/DEBT.md` and remains binding. The Canvas-
 
 ---
 
+### A10 · Research Director product hierarchy (founder-stated 2026-08-15)
+
+QuantFlow is an ontology-centered quantitative research and learning
+environment. The default front door is **Research Director**, a custom Hermes
+Agent Profile registered as the stable `hermes-research-director`
+`agent_definition`. Ryan starts with a natural-language research mission. The
+Director uses capability groups and schema-generated ontology tools to create
+and assign governed work to exact `agent_session` identities. It receives no
+private database, UI-only, filesystem, or alternate mutation path: the Kernel
+remains the sole truth owner.
+
+The canvas is the visible and steerable projection of the Director's real work:
+active participants, Tasks, Datasets, Runs, evidence, Evaluations, refusals, and
+next actions. The Dock remains optional manual specialist inventory and control;
+manual composition is supported but is not the default first interaction. A6's
+active-things-only tile rule and A1's research-only boundary remain unchanged.
+
+The Part I one-shot test remains a domain capability proof. It is not the whole
+product proof. The whole proof begins with Ryan asking the Research Director,
+shows the governed work and independent review, permits steering, returns a
+candidate or honest no-candidate result, and restores the same world after
+close/reopen.
+
+Learning is part of the product destination. Market RL is first; harness
+improvement is secondary. The locked market split is: a tuned model estimates
+probabilities and potential edge; deterministic comparison checks those
+probabilities against de-vigged market prices; a PufferLib policy samples one
+coherent event world and allocates singles/parlays and stakes under declared
+risk/reward constraints. The policy allocates measured edge; it may not invent
+edge. Every training attempt is a `run.kind: "training"` with fenced Dataset,
+Environment, Policy Artifact, held-out Evaluation, and founder-controlled
+promotion or rollback.
+
+Palantir Foundry is a doctrine source for the governed world. Omnigent is a
+design source for heterogeneous runtime adapters. Neither is a runtime
+dependency. AgentOS is predecessor history and is not QuantFlow architecture.
+
 ## Sources
 - [[00 - The Integration Question]] — verdict: borrow doctrine, don't build on platform
 - [[05 - DevX SuperRepo & Agent Development]] — local embedded ontology, ontology-as-code, schema-drift-as-lint, worktrees
