@@ -1,0 +1,356 @@
+# WO-RD-2 — Research Director recruits and assigns
+
+status: ready — Reader PASS
+assignee: builder
+depends: WO-RD-1 done at `5a9a5cea6186b05a4eea5c38f5b8a597a8d02bbf`
+rung: R14 / slice 2 — governed specialist recruitment and durable Task ownership
+authorization: founder umbrella goal 2026-08-15; Reader `01a007a6-325b-71e0-b80d-001ff9f7edc2` answered YES/YES PASS after every defect was landed; `NEXT.md` names this order
+rework-cycle: 0 of 2
+
+## In plain terms
+
+Ryan asks one Research Director, not a row of agents. The Director recruits the
+right production specialist, gives that exact session durable work, and the
+canvas shows who owns the work, its status, and why it exists.
+
+## Outcome
+
+One submission through the verified Research Director form creates the durable
+Mission and Director session from WO-RD-1, then that Director uses only its
+existing QuantFlow tool surfaces to:
+
+1. discover the exact production definition `hermes-worker`;
+2. create and start one exact specialist session from that definition; and
+3. send the founder's exact Mission objective as one durable Task.
+
+The Kernel records exactly one `delegates_to` link from the Director session to
+the specialist session and exactly one `delegated_by` plus one `assigned_to`
+link for the Task. The canvas creates the specialist tile automatically and its
+Task footer visibly names the Task, current status, `Research Director` as the
+delegator, and the exact objective as the reason. No Dock click is required.
+
+This slice proves governed recruitment and assignment. It does not claim that
+the specialist's research is good, that a result passed review, that all
+founder steering controls work, or that live market/Strategy coverage exists.
+It never places a bet or trade.
+
+## Fixed vocabulary
+
+- **Director** means the one new `agent_session` whose single `spawned_from`
+  link names `hermes-research-director`.
+- **specialist** means the one new `agent_session` whose single
+  `spawned_from` link names `hermes-worker`.
+- **the Task** means the one new Kernel `task` whose `description` is the exact
+  trimmed Mission objective, whose status is `open` when created, and whose
+  single `delegated_by` and `assigned_to` links name the Director and specialist
+  sessions respectively. A later `done` state does not change its identity.
+- **visible** means present in the real Electron shell DOM and derived from the
+  Kernel task/session projection. Terminal text, a log line, or a direct
+  database query alone is not visible.
+- **reason** means the Task `description`; it is not model commentary or
+  renderer-only copy.
+
+## Context pack
+
+Read only:
+
+- `START_HERE.md`
+- `docs/orders/PROTOCOL.md`
+- this order
+- `docs/DOCTRINE.md` A10
+- `species/hermes/dock-profiles.json`
+- `species/hermes/prompts/research-director.md`
+- `collab-electron/src/main/mission-activation.ts`
+- `collab-electron/src/main/ontology-role-tools.ts`
+- `collab-electron/src/main/ontology-gateway.ts`
+- `collab-electron/src/main/collaboration-gateway.ts`
+- `collab-electron/src/main/task-delegation-projection.ts`
+- `collab-electron/src/main/kernel.ts`
+- `collab-electron/src/main/index.ts`
+- `collab-electron/cli/qf-collaboration-mcp.mjs`
+- `collab-electron/cli/qf-hermes-launch.sh`
+- `collab-electron/cli/qf-hermes-synthetic-responder.mjs`
+- `collab-electron/src/windows/shell/src/task-composition.js`
+- `collab-electron/src/windows/shell/src/renderer.js`
+- `qa/gates/research-director-front-door.ts`
+- `qa/gates/windows-golden-run.ts`
+- `qa/run.ts`
+- `qa/gates/kernel-sole-writer.ts`
+
+Do not read chat transcripts or handoff prose. The order and repository are the
+authority.
+
+## Deliverables
+
+### A. Lift only the temporary recruitment prohibition
+
+Update `species/hermes/prompts/research-director.md` and the
+`qf.mission.activation.v1` Research Director instruction so both direct the
+Director to perform this exact bounded workflow:
+
+1. call `qf_agent_definition_query` and select only `hermes-worker`;
+2. call `qf_create_agent_session` once for that definition;
+3. call `qf_start_agent_session` once for the returned exact session; and
+4. call collaboration `send_task` once with `to_role=worker` and the founder's
+   exact trimmed Mission objective.
+
+The prompt must say the Task is not assigned until the Kernel-backed tool call
+returns a Task id. It must retain the rules to use only QuantFlow MCP/ontology
+tools and exact Kernel identities, report missing data or Strategy/Technique
+coverage rather than fabricate it, and never place a bet or trade.
+
+Do not add a second recruitment API, expose `create_task` through the ontology
+gateway, call `execute()` from a model adapter, or let the renderer create the
+specialist or Task. The existing path is the product path:
+
+```text
+Director ontology tools -> create/start exact session
+Director collaboration send_task -> Kernel create_task -> peer notification
+Kernel projection -> canvas specialist tile and Task footer
+```
+
+The existing role routing is accepted only because live peer admission permits
+one live recipient for role `worker`, and `send_task` resolves and records that
+recipient's exact session id in `assigned_to`. The proof must bind the created
+specialist session, live recipient, and `assigned_to` id to the same value.
+
+### B. Project the Task's reason and delegator
+
+Extend the existing read-only task-assignment projection with exactly these
+four presentation fields: `title`, `status`, `delegatorDisplayName`, and
+`description`. `delegatorDisplayName` is the exact `display_name` of the Kernel
+`agent_definition` reached through the Task's one `delegated_by` session and
+that session's one `spawned_from` link. For this projection, **exactly
+assigned** means the Task has exactly one `delegated_by`, exactly one
+`assigned_to`, and the delegator session has exactly one `spawned_from` to an
+existing definition with a non-empty `display_name`. If any part is missing or
+duplicated, `assignmentState="unavailable"` and
+`delegatorDisplayName=null`. Do not add storage or query SQLite from the
+renderer.
+
+For an exactly assigned Task, the specialist tile footer must expose four
+separate DOM facts derived from the projection:
+
+- `.qf-task-title`: one text node whose text is the exact projected Task title;
+- `.qf-task-status`: one text node whose text is the projected Kernel status
+  uppercased to `OPEN`, `DONE`, or `CANCELLED`;
+- `.qf-task-delegator`: one text node whose text is exactly `Assigned by `
+  followed by the projected `delegatorDisplayName`; this slice's expected
+  value is exactly `Assigned by Research Director`; and
+- `.qf-task-reason`: one text node whose text is the exact projected Task
+  description.
+
+Do not put multiple facts in one of those nodes. If either Task assignment link
+cardinality is not exact, the Task projection is exactly
+`assignmentState="unavailable"`, `delegatorDisplayName=null`, and both
+`.qf-task-delegator` and `.qf-task-reason` are absent from every tile; retain
+the existing `Assignment unavailable` text on any tile whose exact session id
+is still named by a malformed link. The exact specialist tile may therefore
+show `No task` after its `assigned_to` link is removed; it must never show a
+guessed delegator or reason. The existing manual Create/Reassign/Cancel
+controls and their error behavior remain unchanged.
+
+### C. One fast real-shell product proof
+
+Add and register `research-director-delegation`. It must reuse or extract the
+WO-RD-1 dev-app proof utilities rather than copy its process supervisor. It
+runs the public `bun run dev` entrypoint once on native Windows with isolated
+Kernel, artifact, peer-bus, app-root, and Hermes-profile roots. It uses
+`QF_HERMES_SYNTHETIC_TEST=1` only to make model decisions deterministic and
+sets no QA Dock profile or explicit question-handler definition override.
+
+The green product case starts the public `bun run dev` entrypoint exactly once.
+Falsifiers 1 and 2 run the same real path in their own disposable app/Kernel
+roots, outside that one green run, so their altered inputs cannot contaminate
+the green case's exact-one deltas. All cases remain inside the gate's one
+wall-clock deadline. The gate drives the real Research Director textarea/form
+in the Electron DOM.
+It may use the bounded app control RPC only for readiness, DOM interaction,
+DOM observation, fixture seeding, and shutdown. It may not call
+`qf.research.submit_question`, `qf.dock.spawn`, a preload product action,
+`qf.collaboration.send_task`, an ontology action, or `execute()` directly.
+
+Seed only the already-supported isolated market fixture if needed so the
+deterministic specialist can terminate honestly. The asserted slice ends when
+the Task and both tiles are visible; a fast worker may subsequently complete
+the Task. Both `open` and `done` are valid observed current states, but the
+Kernel event ledger must prove the Task was created in `open` before any
+completion. No Evaluation or Report is required by this order.
+
+After the UI observation, an independent read-only SQLite oracle binds all of
+these exact identities and deltas:
+
+- one Mission and one Director session from the submitted form;
+- one specialist session from `hermes-worker`;
+- one `delegates_to` from that Director to that specialist;
+- one Task whose description equals the Mission objective;
+- one `delegated_by` from that Task to that Director;
+- one `assigned_to` from that Task to that specialist; and
+- one `task.created` event with `events.object_id` equal to that exact Task id
+  and payload field `status="open"`.
+
+The oracle must snapshot the database before and after its read and fail if the
+read changes it. Add only this gate's named file to the existing read-only
+driver-SQL allowlist with the same explanatory pattern as WO-RD-1.
+
+The UI assertion must observe exactly one Director tile and exactly one
+specialist tile, not merely find one among duplicates. For the exact specialist
+tile it reads the four separate Task nodes from Deliverable B and requires
+their exact text values to equal the independent Kernel oracle's title,
+uppercased status, delegator display name prefixed by `Assigned by `, and
+description. Hard-coded renderer text is red. It also asserts no manual Dock
+composition and no old `hermes-orchestrator` session.
+
+The gate has one literal 120,000 ms wall-clock deadline beginning before child
+spawn and covering proof, shutdown, cleanup, and receipts. Reuse the bounded
+watchdog and cleanup mechanisms already proven by WO-RD-1; do not create a new
+runner, detached helper, wrapper, manifest, JSON event stream, or package
+cache. It fails on any owned process, new Electron/Hermes process, disposable
+root, repository change, or deadline overrun left after cleanup.
+
+### D. Falsification is narrow and executable
+
+Before the green proof, run disposable-input falsifiers that demonstrate:
+
+1. restoring the old `do not recruit or assign` instruction yields zero
+   specialist sessions and zero Tasks and is red;
+2. changing the selected definition to `hermes-worker-2` makes the exact
+   `hermes-worker` identity assertion red;
+3. removing or duplicating either the `delegated_by` or `assigned_to` row makes
+   the projection report `Assignment unavailable` and hides delegator/reason
+   facts; and
+4. replacing the projected Task description with renderer-local copy makes the
+   independent Kernel/UI equality assertion red. The fixture uses distinct
+   literal values `KERNEL_REASON_SENTINEL` and `LOCAL_REASON_SENTINEL`; the
+   expected value is read independently from the former, so copying one local
+   value into both sides cannot satisfy the bait; and
+5. making the delegator session's `spawned_from` link missing, duplicated,
+   point at no valid definition, or reach an existing definition whose
+   `display_name` is empty makes the Task projection exactly
+   `assignmentState="unavailable"`, `delegatorDisplayName=null`, with no
+   `.qf-task-delegator` or `.qf-task-reason` node.
+
+Falsifiers 1 and 2 must execute the same real form -> launcher -> Director ->
+Kernel proof path as the green product case, with only the disposable
+instruction or selected-definition input changed; a manufactured row-count
+fixture is not evidence for either. Falsifiers 3 through 5 may use focused
+projection/DOM fixtures. No falsifier may mutate the live repository input
+during the real green app proof. Restore each bait, run the corresponding same
+assertion green, and make the product gate fail if any listed variant's
+restoration-green receipt is missing.
+
+## Acceptance
+
+Run once, in this order, from the named directories:
+
+```powershell
+cd C:\Users\rybow\QuantFlow-Ontology\collab-electron
+bun test src/main/mission-activation.test.ts src/main/task-delegation-projection.test.ts src/main/collaboration-gateway.test.ts src/windows/shell/src/task-composition.test.ts
+cd C:\Users\rybow\QuantFlow-Ontology
+bun test qa/gates/research-director-delegation.test.ts
+bun qa/run.ts research-director-delegation
+bun qa/run.ts research-director-front-door
+bun qa/run.ts team-composition-ui
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts repo-shape
+bun qa/run.ts one-skin
+bun qa/run.ts doc-links
+bun qa/run.ts rung-ladder
+git diff --check
+$candidate = '<immutable builder SHA>'
+git diff --check "$($candidate)^" "$candidate"
+```
+
+Replace the one quoted placeholder when assigning `$candidate`; the following
+command is then literal pasteable PowerShell. `$candidate` is the immutable
+Builder commit under verification. Do not run
+`verify-release`, a Windows package/installer gate, a soak, or a second
+consecutive product proof for this slice. Every command must exit 0. Any red
+receipt stops that verification round.
+
+Required product-gate receipt:
+
+```text
+falsifier=old-no-recruit-instruction result=red
+falsifier=old-no-recruit-instruction result=green
+falsifier=wrong-worker-definition result=red
+falsifier=wrong-worker-definition result=green
+falsifier=assignment-link-cardinality variant=missing-delegated_by result=red
+falsifier=assignment-link-cardinality variant=missing-delegated_by result=green
+falsifier=assignment-link-cardinality variant=duplicate-delegated_by result=red
+falsifier=assignment-link-cardinality variant=duplicate-delegated_by result=green
+falsifier=assignment-link-cardinality variant=missing-assigned_to result=red
+falsifier=assignment-link-cardinality variant=missing-assigned_to result=green
+falsifier=assignment-link-cardinality variant=duplicate-assigned_to result=red
+falsifier=assignment-link-cardinality variant=duplicate-assigned_to result=green
+falsifier=renderer-local-reason result=red
+falsifier=renderer-local-reason result=green
+falsifier=malformed-delegator-lineage variant=missing-spawned_from result=red
+falsifier=malformed-delegator-lineage variant=missing-spawned_from result=green
+falsifier=malformed-delegator-lineage variant=duplicate-spawned_from result=red
+falsifier=malformed-delegator-lineage variant=duplicate-spawned_from result=green
+falsifier=malformed-delegator-lineage variant=missing-definition result=red
+falsifier=malformed-delegator-lineage variant=missing-definition result=green
+falsifier=malformed-delegator-lineage variant=empty-display-name result=red
+falsifier=malformed-delegator-lineage variant=empty-display-name result=green
+director_definition=hermes-research-director director_sessions_added=1
+specialist_definition=hermes-worker specialist_sessions_added=1
+delegates_to_exact=1 director_to_specialist=true
+task_rows_added=1 task_created_open=1
+delegated_by_exact=1 assigned_to_exact=1 exact_session_binding=true
+mission_objective_equals_task_description=true
+director_tile_count=1 specialist_tile_count=1
+ui_task_title=<JSON string exactly equal to Kernel title>
+ui_task_status=<OPEN|DONE exactly equal to uppercased Kernel status>
+ui_task_delegator=Assigned by Research Director
+ui_task_reason=<JSON string exactly equal to Kernel description>
+manual_dock_composition=0 old_orchestrator_sessions_added=0
+oracle=independent_read_only kernel_unchanged_after_oracle=true
+owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
+repository_tree_unchanged=true
+elapsed_ms=<integer less than 120000>
+PASS research-director-delegation
+```
+
+## Scope boundary
+
+Allowed product surfaces are only:
+
+- the Research Director package prompt and Mission activation text/tests;
+- the existing task-assignment projection and tile Task footer/tests; and
+- the smallest existing launcher/responder instrumentation needed by the
+  focused deterministic proof, without changing production behavior.
+
+Gate registration, its focused tests, exact read-only-oracle allowlist entry,
+and evidence/order status files are also allowed. No schema change, new
+dependency, new truth store, Dock redesign, steering controls, critic changes,
+research-object redesign, live-data integration, release packaging, or RL work
+belongs here.
+
+Stop and return an order defect if this outcome requires changing an assertion,
+adding a dependency, changing Task semantics, altering product code outside
+the listed surfaces, reading credentials, or placing a bet/trade. After two
+failed verification/rework cycles, stop for an order rewrite.
+
+## Reader gate
+
+A fresh Reader who did not write this order must answer exactly:
+
+1. Can every acceptance gate actually fail?
+2. Does every deliverable have exactly one meaning?
+
+Every defect is edited into this file. Chat-only guidance is not authority.
+Only after both answers are unqualified yes may this order change to
+`status: ready — Reader PASS` and `NEXT.md` open the Builder door.
+
+## Report back
+
+Report only:
+
+1. what Ryan can now do;
+2. immutable candidate SHA and changed files by responsibility;
+3. the exact product-gate receipt and acceptance command exits/durations;
+4. falsifier red/green receipts;
+5. what was not proved; and
+6. the next authorized action.
