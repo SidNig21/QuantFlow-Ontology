@@ -1,10 +1,9 @@
 # NEXT — R13 founder-ratified north-star correction
 
-status: active — documentation only
+status: BUILDER DOOR CLOSED — RESEARCH DIRECTOR ORDER UNDER READ
 authorized-by: founder
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 remains active
-active-order: [`WO-NORTHSTAR-1.md`](WO-NORTHSTAR-1.md)
 
 ## Active outcome
 

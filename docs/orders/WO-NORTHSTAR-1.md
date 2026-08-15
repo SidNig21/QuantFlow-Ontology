@@ -1,6 +1,6 @@
 # WO-NORTHSTAR-1 — make the Research Director the product front door
 
-status: open — Reader PASS
+status: done
 assignee: docs builder
 depends: founder direction reset at `aebd1bc`
 rung: route correction; R13 remains active
