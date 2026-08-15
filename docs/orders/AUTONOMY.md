@@ -2,7 +2,24 @@
 
 status: **BINDING** on any session given the QuantFlow delivery goal
 authored: 2026-08-12
+amended: 2026-08-14 — founder standing override after the V2-2 matrix burned a day
 governs: the loop in [`PROTOCOL.md`](PROTOCOL.md), run without the founder present
+
+## Founder standing override — 2026-08-14
+
+These rules beat the rest of this file until the founder removes them.
+
+1. Work only in the QuantFlow-Ontology checkout the founder has open. A git
+   branch in that folder is allowed. A second folder, worktree, clone, or
+   detached verifier copy is forbidden.
+2. Do not run `bun qa/verify-release.ts` or any packaged Windows matrix unless
+   the active order names that exact command.
+3. Do not write wrappers, manifest helpers, completion receipts, or new
+   test-running machinery to "make verification reliable."
+4. One authorized order at a time. Visible product first. If the founder cannot
+   click the result, the slice is not done.
+5. Two failed attempts stop the order. Do not start a third lap. Do not invent
+   the next slice to stay busy.
 
 > `PROTOCOL.md` defines the roles and the loop. This file defines how one lead
 > session drives that loop for hours with nobody watching, and exactly where it
