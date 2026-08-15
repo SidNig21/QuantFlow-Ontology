@@ -1,10 +1,11 @@
 # WO-V2-3 — compose a team
 
-status: open
+status: founder-rework
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
+rework-cycle: 1 of 1
 
 ## In plain terms
 
@@ -12,6 +13,100 @@ Ryan adds two agents from the Dock, gives one of them a task, and sees that
 assignment on the tiles. He can move the task to the other agent, cancel it, or
 close a seat, and those changes survive because they live in the Kernel. If this
 is wrong, QuantFlow still only launches idle terminals.
+
+## V2-3.1 founder rework — binding over the original build
+
+The original candidate `97ed7183dab1871b46b1a2a9c25bae309c2d4aa5` passed its
+machine verifier and failed the founder's installed-app check on 2026-08-15.
+This section is the only authorized rework. Where it conflicts with the
+original Proof section, this section wins. The Kernel task actions, links,
+events, schema migration, role labels, and projections already passed and must
+not be rebuilt or reverted.
+
+Founder receipt from the installed candidate:
+
+```text
+Create Task attempts: 3 clicks plus Enter, with one seat and with two
+Kernel query after attempts: task: 0 rows
+Main-process error shown to founder: none
+Seat spawn: about 12 seconds with no visible pending state
+```
+
+In plain terms: Ryan could see a Create Task button, but pressing it created
+nothing and told him nothing. With two tiles the button disappeared from the
+tile he was looking at, and a slow seat launch looked broken because the app
+showed no progress.
+
+### Rework deliverables
+
+1. **A real click creates exactly one Kernel Task or shows an error.** Trace the
+   existing renderer event through preload and `qf:tasks:create`; repair the
+   broken seam rather than bypassing it. Submitting a valid title, completion
+   description, and running assignee from a running Orchestrator tile must
+   create exactly one Task, one `delegated_by`, and one `assigned_to` row. A
+   rejected submission stays at zero rows and renders the returned error in the
+   same tile foot. Repeated clicks while one submission is pending are disabled
+   and cannot create duplicates.
+2. **The control does not disappear behind tile focus.** Every running
+   Orchestrator tile renders its `Create Task` control regardless of z-order.
+   Clicking a tile header or its non-interactive body selects and raises that
+   tile; the grip remains the drag affordance. Form fields and action buttons
+   must not trigger the raise handler or lose their in-progress input.
+3. **Spawn acknowledges the click immediately.** Within 250 ms of activating a
+   ready Dock profile, the canvas shows exactly one ephemeral pending tile with
+   that profile's display name and `STARTING` state, and the Dock row reads
+   `starting…` with duplicate activation disabled. Success reconciles that
+   placeholder to the one live Kernel-backed seat. Failure changes the same
+   placeholder to `FAILED — RETRY` with the returned reason; it never creates a
+   fake `agent_session` row. Pending state is UI-only and is not restored after
+   app restart.
+4. **Add product-level proof of all three seams.** Extend the focused acceptance
+   with one renderer-level gate that exercises the actual DOM controls, preload
+   methods, main IPC handlers, and a temporary Kernel database. It must not
+   replace the existing Kernel-only `team-composition` gate. It must finish in
+   under two minutes and print the Task/link row counts plus the pending-tile
+   timing it measured.
+
+### Rework acceptance
+
+```powershell
+bun qa/run.ts repo-shape
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts one-skin
+bun qa/run.ts team-composition
+bun qa/run.ts team-composition-ui
+bun qa/run.ts doc-links
+git diff --check
+```
+
+`team-composition-ui` must use an actual renderer click and the production
+preload/main IPC route against a temporary Kernel. A direct call to `execute()`,
+`projection()`, or the IPC handler is not UI proof. Its green receipt includes:
+
+```text
+task_rows=1 delegated_by=1 assigned_to=1 create_errors=0
+background_controls=2 header_raised=true form_preserved=true
+pending_visible_ms=<n <= 250> duplicate_spawns=0 failure_retry=true
+```
+
+Falsify it by disconnecting only the Create Task control's dispatch while the
+button still renders. The gate must exit nonzero with
+`task_rows=0 dead_control=true`. Restore the dispatch and rerun the same command
+green. Then delay the synthetic spawn result beyond one second: the pending
+placeholder must still appear within 250 ms. These are the only new
+falsification receipts.
+
+### Rework exclusions and stop
+
+Do not repair closed-tile lifecycle, cables, Dock information architecture,
+GLACIER styling, cross-species routing, or the long Windows harness in this
+lap. Do not package the app, run `verify-release`, create verification helpers,
+or add a dependency. If the renderer-level proof cannot exercise the
+production preload/main IPC route in this checkout, stop and report the exact
+seam instead of substituting a machine-only unit test. A failed Builder or
+Verifier rework stops V2-3 for founder decision; there is no second rework lap.
 
 ## Objective
 
