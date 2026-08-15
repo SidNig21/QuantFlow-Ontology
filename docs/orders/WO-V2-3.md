@@ -74,6 +74,46 @@ re-skin the Dock.
    cancel this task before closing the seat.` After reassign or cancel, the
    existing governed close action is allowed and the tile shows `CLOSED`.
 
+## Exact contract definitions
+
+- **Inventory and profile precedence.** Production means exactly the manifests
+  named by `PRODUCTION_DOCK_PROFILE_MANIFESTS`, in that array's order. QA mode
+  is false. Duplicate definition ids across those manifests are a contract
+  error; no file wins by precedence. `display_name` is added to each profile,
+  to `agent_definition`, and to `register_agent_definition`, so the runtime Dock
+  still reads the Kernel rather than reopening manifests.
+- **Capability display.** The source is the selected Kernel
+  `agent_definition.capability_groups` value written by profile bootstrap.
+  Render the existing groups in stored order using exactly these labels:
+  `desk.orchestrate` → `Orchestrate`, `market.read` → `Market read`, and
+  `research.evaluate` → `Evaluate research`, comma-separated. An empty list
+  renders `No capabilities`; an unknown group is a contract error, not text the
+  UI invents.
+- **Readiness.** The sole source is main-process
+  `getDockDefinitionAvailability(agent_definition)`, extended to return a
+  non-null result for every production adapter. `available=true` means the
+  package, required bridge resources, platform/WSL target, and launch command
+  resolve without reading credentials; show a green dot and `Ready to launch`.
+  `available=false` shows a red dot and the function's per-profile `message`,
+  which must state the missing prerequisite and one next action. Authentication
+  remains launch-time only and is never inspected by readiness.
+- **Trusted delegator.** The selected delegator tile's Kernel `agent_session.id`
+  is supplied by Electron main—not renderer input—as
+  `TrustedExecutionContext.actor_session_id`. The Kernel accepts it only when
+  that session exists and is `running`. The assignee is independently selected
+  from Kernel sessions whose status is `running`.
+- **Receipts.** Successful `reassign_task` appends `task.reassigned`; successful
+  `cancel_task` appends `task.cancelled`. Each is one row in the existing
+  append-only `events` table, in the same transaction as the Task/link change,
+  with `object_type=task`, `object_id=<task_id>`, the trusted trace id, and a
+  payload containing `command`, `previous_assignee_session_id`, and
+  `assignee_session_id` (the preserved final assignee for cancel). Rejections
+  append no event and change no Task or link.
+- **Reopen proof.** The focused gate closes its Kernel handle, opens a new
+  Kernel handle against the same temporary database, and constructs a new
+  projection reader with no carried renderer objects. The founder proof closes
+  and reopens the development app from this same checkout.
+
 ## Proof
 
 Ryan runs the app from this checkout with `bun run dev`, adds two seats, creates
