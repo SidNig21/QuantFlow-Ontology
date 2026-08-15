@@ -904,3 +904,32 @@ Deliverable E observation, every falsification transcript above, both consecutiv
 synthetic exits, and every acceptance exit. State `founder_acceptance: not
 performed` and `l4_certified: pending`. State the leak list explicitly even when
 empty. Do not edit `NEXT.md` and do not begin V2-3.
+
+## Founder verification steer - one-run matrix (2026-08-14)
+
+This section is a founder-authorized verification-only amendment after the
+rewrite implementation was frozen. It changes no implementation, gate,
+assertion, falsifier, boundary, or ledger contract. Where this section conflicts
+with the rewrite's verification procedure above, this section wins.
+
+The requirement for a second consecutive
+`bun qa/run.ts hermes-first-turn-synthetic` invocation is revoked. It was an
+extra verification recommendation, not a product assertion. The verifier runs
+the synthetic command once; that one run must still contain every required
+positive control, all ten red/green boundary pairs, the half-born-seat receipt,
+the launch-cleanup receipt, and the terminal temp-cleanup receipt with
+`roots_remaining=0` and `leaked=[]`.
+
+The authorized measurement target is
+`83bcfc590bb56a853cc21e16a2f58efe96723f99`. The ledger binding to that SHA is
+expected: commits between the implementation commit
+`ddc95853aef4645d6c9e1bfb5d452f4a156aca83` and the measurement target are
+evidence-only.
+
+Run the full verifier matrix using the founder-supplied script
+`C:\tmp\qf-v22-verify.ps1` unchanged, detached, with logs at
+`C:\tmp\qf-v22-logs`. No wrapper, manifest, completion framework, or transcript
+stream is part of acceptance. The durable receipt is `exits.tsv` plus each
+command's direct log. Every command in the verifier list still runs; any nonzero
+exit stops the rung for founder decision. Founder acceptance remains unperformed
+until the completed matrix is independently recorded as PASS.

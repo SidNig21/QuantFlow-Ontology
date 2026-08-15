@@ -52,14 +52,22 @@ Scope pressure or any request to weaken a gate also stops the order.
 
 ## Current receipts
 
-- Rewritten order: [`WO-V2-2.md`](WO-V2-2.md) at `474508b`.
-- Round 2 independent FAIL: [`evidence/r13/V2-2-VERIFICATION.md`](evidence/r13/V2-2-VERIFICATION.md),
-  docs-only verifier commit `7fd8ae5f4752bf407d3f9786b626f8eea007e9e5`.
-- Failed candidate: `1b899d813cc021ff16442fc75688aad3e39f7e40`.
-- Blocking receipt: `hermes-first-turn-synthetic` exited `1` because cleanup
-  hit `EBUSY` on the live suppressed `launch_readiness` temp root.
+- Rewritten order, after the fresh Reader pass: `3018c4334f88072af8bf14592571f7b88e7d506b`.
+- Rewrite implementation: `ddc95853aef4645d6c9e1bfb5d452f4a156aca83`.
+- Builder evidence: `f9e65574030ee66ecdacbe4dbb83dc02ad6cbfb8`.
+- First independent verifier stop: `83bcfc590bb56a853cc21e16a2f58efe96723f99`;
+  the streamed synthetic run exceeded its wrapper and did not produce the
+  required complete receipt.
+- Verification-only helper stop: `ae6d37dfc15f6bd5b48add7da2e42f4da8d250c8`;
+  the helper failed before verification while replacing its manifest. No
+  candidate defect was measured by either orchestration stop.
+- Founder-authorized active measurement: exact detached HEAD `83bcfc590bb56a853cc21e16a2f58efe96723f99`,
+  one synthetic run, full verifier matrix, direct logs under
+  `C:\tmp\qf-v22-logs`.
+- Active `exits.tsv` receipt: the first twelve commands through
+  `hermes-founder-state` exited `0`; the synthetic command is the current gate.
 - Founder acceptance remains unperformed; `l4_certified` remains pending.
 
-The next gate is the fresh adversarial Reader pass over the rewritten order.
-No WO-V2-2 implementation starts until that Reader has answered the two protocol
-questions and every confirmed defect has landed in `WO-V2-2.md`.
+The next gate is completion of the active detached full verifier matrix. Any
+nonzero exit stops R13 for founder decision. A complete green matrix opens the
+founder-acceptance step; it does not authorize V2-3 implementation.
