@@ -1,8 +1,9 @@
 # NEXT — R13 V2-2 first Hermes turn
 
-status: R13 IN PROGRESS — `WO-V2-2` ONLY
+status: R13 REWRITE LAP AUTHORIZED — `WO-V2-2` ONLY
 authorized-by: founder
-authorized-at: 2026-08-13
+authorized-at: 2026-08-14
+authorized-lap: post-Round-2 rewrite at `474508b`
 baseline: R0–R12 complete on `wo-r9-research-integrity`
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13
 active-order: [`WO-V2-2.md`](WO-V2-2.md)
@@ -45,17 +46,20 @@ turn is founder-only after independent verification. Never place bets or trades.
    one fresh detached worktree, returns `PASS` or numbered defects, and does not
    perform founder acceptance.
 
-Unattended operation follows [`AUTONOMY.md`](AUTONOMY.md). Any red verifier,
-second failed rework cycle, scope pressure, or request to weaken a gate stops the
-order.
+Unattended operation follows [`AUTONOMY.md`](AUTONOMY.md). This rewrite lap has
+no rework cycle remaining: any red verifier stops R13 for founder decision.
+Scope pressure or any request to weaken a gate also stops the order.
 
 ## Current receipts
 
-- WO-V2-1 founder review: [`evidence/r13/FOUNDER-REVIEW.md`](evidence/r13/FOUNDER-REVIEW.md).
-- Machine verification: [`evidence/r13/V2-1-VERIFICATION.md`](evidence/r13/V2-1-VERIFICATION.md).
-- V2-1 candidate: `c93b04f1d6a448cee299b2a79a6c21204fdc8502`.
-- Critic live surface: `3 tools · 0 skills`; orchestrator surface: `5 tools · 0 skills`.
+- Rewritten order: [`WO-V2-2.md`](WO-V2-2.md) at `474508b`.
+- Round 2 independent FAIL: [`evidence/r13/V2-2-VERIFICATION.md`](evidence/r13/V2-2-VERIFICATION.md),
+  docs-only verifier commit `7fd8ae5f4752bf407d3f9786b626f8eea007e9e5`.
+- Failed candidate: `1b899d813cc021ff16442fc75688aad3e39f7e40`.
+- Blocking receipt: `hermes-first-turn-synthetic` exited `1` because cleanup
+  hit `EBUSY` on the live suppressed `launch_readiness` temp root.
+- Founder acceptance remains unperformed; `l4_certified` remains pending.
 
-The next gate is the synthetic first-turn measurement. No WO-V2-2 implementation
-starts until the fresh Reader has completed the two protocol questions and the
-founder-authorized order is handed to a fresh Builder.
+The next gate is the fresh adversarial Reader pass over the rewritten order.
+No WO-V2-2 implementation starts until that Reader has answered the two protocol
+questions and every confirmed defect has landed in `WO-V2-2.md`.
