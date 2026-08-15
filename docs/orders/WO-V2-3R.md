@@ -1,6 +1,6 @@
 # WO-V2-3R — make the ordinary development Dock launchable
 
-status: draft-reader-required
+status: draft-reader-rework
 assignee: builder
 depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
 rung: R13 / V2-3 founder closure
@@ -73,9 +73,23 @@ Read only:
 
 ### A. Development startup owns its production Dock packages
 
-Before Electron starts, `bun run dev` invokes the existing Hermes and Claude
-Code production pack scripts from their package roots. A missing ignored
-`.aospkg` is normal clean-checkout state, not a reason to open a broken Dock.
+On every invocation, before Electron starts, `bun run dev` runs these two
+commands in this order, even when outputs already exist:
+
+```powershell
+bun species/hermes/scripts/pack-agent.mjs
+bun species/claude-code/scripts/pack-agent.mjs
+```
+
+They run from the repository root and must produce, respectively:
+
+```text
+species/hermes/packed/hermes.aospkg
+species/claude-code/packed/claude-code.aospkg
+```
+
+A missing ignored `.aospkg` is normal clean-checkout state, not a reason to
+open a broken Dock. There is no staleness check or cache reuse in this order.
 
 Use the existing pack scripts; do not duplicate their packing logic, copy from
 `.package-staging`, or introduce a package cache. If either pack command fails,
@@ -84,16 +98,40 @@ adapter failed.
 
 ### B. The normal development app and the gate share one readiness floor
 
-Add one focused gate named `dev-dock-readiness`. It starts with the two
-generated adapter package outputs absent, runs the real development preflight,
-and proves both packages are regenerated at their repository-root manifest
-paths before app launch. It then boots the production renderer/main against an
-isolated Kernel and proves the real Dock reports the Hermes Orchestrator and
-Market Researcher as launchable on this founder machine.
+Add one focused gate named `dev-dock-readiness`. It executes the public
+`bun run dev` entrypoint from `collab-electron`; calling an internal preflight
+directly is not acceptance. The gate substitutes only the final Electron child
+launcher so it can record whether Electron was requested and exit without an
+interactive window. It does not substitute either pack command on the green
+path.
 
-The gate may inject process execution and temporary paths into the preflight
-for its failure cases, but its green live receipt must use the real existing
-pack scripts and repository-root manifests. It may not reuse
+Before that green run, the gate moves these complete generated directories to
+a unique temporary backup outside the repository, if they exist:
+
+```text
+species/hermes/agent-package/dist
+species/hermes/packed
+species/claude-code/packed
+```
+
+It records a byte hash for every backed-up file. In a `finally` path, it removes
+only artifacts created by the gate, restores the three directories exactly,
+and proves the restored file list and hashes equal the pre-run list and hashes.
+If no directory existed before the run, the `finally` path leaves it absent.
+The gate must refuse to start if its unique backup path already exists. No
+unbacked deletion, overwrite, or cleanup of a pre-existing artifact is allowed.
+
+The green run proves both packages are regenerated at the two repository-root
+paths named in Deliverable A before the Electron child is requested. While the
+generated outputs still exist, it boots the production renderer/main against
+an isolated Kernel and proves the real Dock reports the Hermes Orchestrator and
+the Hermes Market Researcher as launchable on this founder machine. Restoration
+runs only after that assertion and renderer/main cleanup complete.
+
+The gate may inject process execution and temporary paths into the public dev
+entrypoint for its two failure cases and may substitute only the Electron child
+launcher on the green path. Its green receipt must use the real existing pack
+scripts and repository-root manifests. It may not reuse
 `.package-staging`, synthesize an `.aospkg`, insert an `agent_definition`
 directly, mock availability, or bypass the Dock launch control.
 
@@ -101,10 +139,15 @@ directly, mock availability, or bypass the Dock launch control.
 
 Falsify the preflight twice:
 
-1. Make the named Hermes pack command return nonzero. Electron must not launch,
-   the command must exit nonzero, and the message must name Hermes.
-2. Let a pack command report success without creating its expected `.aospkg`.
-   Electron must not launch and the missing output path must be printed.
+1. Substitute the Hermes command only and make it return nonzero. The Claude
+   Code command and Electron child must not run, the dev command must exit
+   nonzero, and stderr must contain `Hermes pack failed`.
+2. Let the real Hermes command complete, substitute the Claude Code command so
+   it returns zero without creating
+   `species/claude-code/packed/claude-code.aospkg`, and remove that expected
+   output only inside the safely backed-up gate interval. The Electron child
+   must not run, the dev command must exit nonzero, and stderr must print that
+   exact missing path.
 
 Restore both conditions and show the same focused gate green. Existing
 readiness checks for missing WSL, missing runtime command, or unsupported
@@ -125,6 +168,20 @@ bun qa/run.ts doc-links
 git diff --check
 ```
 
+The existing gates are regression guards, not substitutes for
+`dev-dock-readiness`. Their existing assertions are unchanged and must go red
+under these concrete breaks:
+
+| Gate | Retained red condition |
+|---|---|
+| `repo-shape` | a required repository path is absent or appears in a forbidden location |
+| `kernel-sole-writer` | a non-Kernel source writes Kernel-owned truth |
+| `kernel-sole-writer-app` | an application source writes Kernel-owned truth outside the approved boundary |
+| `one-skin` | a second renderer skin or forbidden legacy UI surface appears |
+| `team-composition-ui` | its existing renderer-to-preload-to-main-to-isolated-Kernel Task and launch assertions fail; its `.package-staging` fixture is supplemental and does not prove development-package readiness |
+| `doc-links` | an in-scope documentation link resolves to no tracked target |
+| `git diff --check` | the candidate diff contains whitespace errors or conflict markers |
+
 `dev-dock-readiness` must finish within two minutes and print:
 
 ```text
@@ -134,24 +191,36 @@ claude_code_package=prepared
 electron_started_after_packages=true
 hermes_orchestrator_launchable=true
 hermes_worker_launchable=true
+preexisting_artifacts_restored=true
 PASS dev-dock-readiness
 ```
 
 The Builder pastes both falsifier reds and the restored green. A fresh
-independent Verifier reruns the matrix once from a clean tree at the candidate
-SHA. No packaged installer or release matrix runs.
+independent Verifier reruns the matrix once from the same checkout with no
+tracked changes at the candidate SHA, recording `HEAD` and `git status` before
+and after. A changed SHA or tracked tree voids the run. Founder direction for
+this order explicitly replaces PROTOCOL's throwaway-worktree mechanism with
+session separation plus this same-checkout SHA guard; no worktree or clone may
+be created. No packaged installer or release matrix runs.
 
 ## Founder-delegated acceptance
 
 After Verifier PASS, the router uses Computer Use on the normal development
 app. It must:
 
-1. launch an Hermes Orchestrator and Market Researcher from the production Dock;
+1. launch the Dock rows whose species is Hermes and whose roles are
+   `Orchestrator` and `Market Researcher`;
 2. see both reach `running`;
-3. create one Task from the Orchestrator tile and assign it to the researcher;
-4. see the owner on the tile and Dock;
-5. reassign, cancel, close the assigned seat, close and reopen the app; and
-6. see the cancelled Task, final owner, and closed seat restored.
+3. create one Task from the Orchestrator tile, assign it to the running Hermes
+   Market Researcher, and see that researcher as owner on both the Task tile
+   and Dock row;
+4. reassign that same Task to the running Hermes Orchestrator and see the
+   Orchestrator as owner on both surfaces;
+5. cancel that Task, close the Hermes Market Researcher seat, and see the Task
+   remain cancelled with the Orchestrator as final owner;
+6. close and reopen the app; and
+7. see the cancelled Task, Orchestrator final owner, and closed Hermes Market
+   Researcher seat restored.
 
 That visible sequence accepts V2-3.1. Machine green alone does not.
 
