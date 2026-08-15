@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: lifecycle-repair-open — Reader PASS `01a00732-6284-78f3-9c50-0155742760a7`; one-shot two-file pass authorized
+status: falsifier-correction-open — Reader PASS `01a00732-6284-78f3-9c50-0155742760a7`; exact one-line correction authorized
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -426,3 +426,45 @@ still stops the pass immediately; it must not be disguised as a convergence
 red. No further attempt is implied after any red. Full green commits and
 pushes the complete WO-RD-1 candidate for one fresh independent Verifier and
 does not reopen the rework cycle.
+
+## Tooling correction — root the falsifier at its survivor
+
+The reauthorized pass stopped before the live product proof: its cleanup
+falsifier failed before the gate advanced to that proof. Its cleanup falsifier
+calls `collectOwnedPids(before, after, process.pid)`, which roots ownership at
+the gate process. Because `processSnapshot()` itself launches a short-lived
+PowerShell child under that process, the falsifier can report its own
+measurement helper as a leak after the deliberately retained survivor was
+already terminated. The falsifier is awaited before the live proof, and the
+live convergence function emits `convergence_remaining` on both its normal
+green and red exits; therefore its absence in this early-red receipt proves
+that live convergence was not reached. Absence by itself proves only that no
+convergence receipt was emitted, not why.
+
+This is a tooling correction, not another product rework. In
+`qa/gates/research-director-front-door.ts`, the only permitted source diff is
+this one-line root substitution:
+
+```diff
+- const owned = [...collectOwnedPids(before, after, process.pid)].filter((pid) =>
++ const owned = [...collectOwnedPids(before, after, survivor.pid)].filter((pid) =>
+```
+
+The survivor is the falsifier's owned root; its descendants, if any, remain
+included, while transient `processSnapshot()` children under the gate process
+are excluded from both the falsifier's owned set and its restored-green
+receipt. The live proof's existing `bun run dev` ownership root remains
+`child.pid`. Do not change its cleanup assertion, process snapshots, responder,
+product code, or any other source line.
+
+Invoke each listed command at most once, in order. Stop at the first non-zero
+result; run no later command and make no retry or second attempt:
+
+```powershell
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+Any red stops the slice for the founder. Full green commits and pushes the
+complete authorized candidate for one fresh independent Verifier.
