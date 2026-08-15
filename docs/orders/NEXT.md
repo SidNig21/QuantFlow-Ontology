@@ -1,46 +1,39 @@
-# NEXT — R13 V2-3.1 unblock compose-a-team founder check
+# NEXT — R13 V2-3.1 ordinary development runtime closure
 
-status: V2-3.1 FOUNDER REJECTED — RUNTIME LAUNCH BLOCKED
-authorized-by: founder
+status: AUTHORIZED — READER PASS
+authorized-by: founder standing direction to handle the build and delegated founder checks
 authorized-at: 2026-08-15
-baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
+baseline: V2-3.1 candidate `b5b6c95` machine-passed; Computer Use founder check rejected runtime launch; closure order Reader-passed at `f504a4a`
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13
-active-order: [`WO-V2-3.md`](WO-V2-3.md)
+active-order: [`WO-V2-3R.md`](WO-V2-3R.md)
 scope source: [`../proposals/V2-SCOPE.md`](../proposals/V2-SCOPE.md) — approved 2026-08-12
 
 ## Active outcome
 
-The founder clicks Create Task and exactly one Kernel Task appears. The control
-stays discoverable with two tiles, and a slow seat launch shows an immediate
-pending tile instead of twelve seconds of silence. Proof includes a real
-renderer click through production preload/main IPC, not only direct Kernel
-calls.
+An ordinary `bun run dev` prepares the production Hermes packages before the
+real Electron app starts. The Dock can launch definitions
+`hermes-orchestrator` and `hermes-worker`, allowing the visible V2-3.1 founder
+flow to run against the same readiness floor as the focused gate.
 
 ## Why this is next
 
-V2-3's Kernel actions and projections passed, but the installed app's Create
-Task control produced zero Task rows and the original gate never touched the
-UI. The V2-3.1 founder-rework section records the three measured blockers and
-the product-level proof required to close them.
+The separate machine proof passed from `.package-staging`, but the normal
+development app resolved the repository root and displayed every Hermes row as
+unavailable because `species/hermes/packed/hermes.aospkg` did not exist. The
+Computer Use receipt is recorded in
+[`evidence/r13/V2-3-VERIFICATION.md`](evidence/r13/V2-3-VERIFICATION.md).
 
 ## Work here only
 
-Work in this checkout and continue branch `wo-V2-3`. A second folder, worktree,
-clone, detached verifier copy, wrapper, manifest helper, or `verify-release`
-run is forbidden. Only the V2-3.1 founder-rework section is authorized. The
-harness, Dock rebuild, cables, tile lifecycle, GLACIER, cross-species routing,
-V2-2, V2-4+, R14+, and RL are queued or parked, not active.
+Execute [`WO-V2-3R.md`](WO-V2-3R.md) exactly in this checkout on branch
+`wo-V2-3`. No second folder, worktree, clone, helper framework, packaged gate,
+installer, release verifier, credential access, Task semantic change, Dock
+rebuild, or Claude Code timeout repair. The Reader passed the order's two
+protocol questions at commit `f504a4a`.
 
 ## Stop
 
-The independently green candidate failed the founder-delegated Computer Use
-check. Every Hermes profile was unavailable because the development checkout
-lacked `species/hermes/packed/hermes.aospkg`. The launchable Claude Code team-
-composition profile showed immediate `STARTING`, then `FAILED — RETRY` with
-`native-TUI launcher readiness handshake timed out`; the Dock remained at zero
-live participants. No Task interaction was reachable.
-
-This defect is outside the exhausted two-file repair boundary. Do not start a
-Builder or Verifier, accept V2-3.1, rotate to V2-3.2, or begin the direction
-reset until the founder routes the runtime-launch failure. Never place bets or
-trades.
+Stop under the order's named conditions or on any red receipt. After a fresh
+Verifier PASS, the router performs the exact founder-delegated flow with
+Computer Use. Do not begin V2-3.2 or the direction reset before that visible
+acceptance. Never place bets or trades.
