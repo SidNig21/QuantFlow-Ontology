@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 
+const UI_PROOF = process.env.QF_UI_PROOF === "1";
+
 interface ViewConfig {
   src: string;
   preload: string;
@@ -67,7 +69,10 @@ contextBridge.exposeInMainWorld("shellApi", {
       title: string;
       description: string;
       assigneeSessionId: string;
-    }) => ipcRenderer.invoke("qf:tasks:create", args),
+    }) => {
+      if (UI_PROOF) console.info("qf-ui-proof preload=qf:tasks:create");
+      return ipcRenderer.invoke("qf:tasks:create", args);
+    },
     reassignTask: (args: { taskId: string; assigneeSessionId: string }) =>
       ipcRenderer.invoke("qf:tasks:reassign", args),
     cancelTask: (taskId: string) =>

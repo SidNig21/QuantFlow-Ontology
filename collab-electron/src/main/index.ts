@@ -1089,6 +1089,22 @@ app.whenReady().then(async () => {
   }), {
     description: "Return founder-visible shell and Kernel-backed Dock readiness",
   });
+  registerMethod("app.ui.evaluate", async (params) => {
+    if (process.env.QF_UI_PROOF !== "1") {
+      throw new Error("app.ui.evaluate is disabled outside the bounded UI proof");
+    }
+    const expression = (params as Record<string, unknown> | null)?.expression;
+    if (typeof expression !== "string" || expression.trim().length === 0) {
+      throw new Error("app.ui.evaluate requires expression:string");
+    }
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      throw new Error("production shell window is not available");
+    }
+    return mainWindow.webContents.executeJavaScript(expression, true);
+  }, {
+    description: "Bounded production UI proof bridge for the live shell renderer",
+    params: { expression: "JavaScript evaluated in the production shell renderer" },
+  });
   registerMethod("app.build-identity", () => ({
     commitSha: __GIT_COMMIT_SHA__,
     packagedAt: __QF_BUILD_TIMESTAMP__,

@@ -1356,6 +1356,31 @@ async function init() {
 					);
 				}
 			} else if (target === "canvas") {
+				if (channel === "spawn-pending") {
+					const requestId = String(args[0] ?? "");
+					if (requestId && !tiles.some((tile) => tile.pendingSpawnId === requestId)) {
+						tileManager.createPendingSpawnTile({
+							requestId,
+							definitionId: String(args[1] ?? ""),
+							displayName: String(args[2] ?? args[1] ?? "Agent"),
+						});
+						minimap.update();
+					}
+				}
+				if (channel === "spawn-reconciled") {
+					tileManager.reconcilePendingSpawnTile(
+						String(args[0] ?? ""),
+						args[1] && typeof args[1] === "object" ? args[1] : {},
+					);
+					minimap.update();
+				}
+				if (channel === "spawn-failed") {
+					tileManager.reconcilePendingSpawnTile(
+						String(args[0] ?? ""),
+						{ status: "failed", reason: String(args[1] ?? "Spawn failed") },
+					);
+					minimap.update();
+				}
 				if (
 					channel === "handoffs-changed" ||
 					channel === "sessions-changed"
@@ -1837,7 +1862,7 @@ async function init() {
 	if (savedState) {
 		const discovered = await window.shellApi.ptyDiscover?.() ?? [];
 		const livePtyIds = new Set(discovered.map((entry) => entry.sessionId));
-		const savedTiles = savedState.tiles.map((tile) => (
+		const savedTiles = savedState.tiles.filter((tile) => !tile.pendingSpawnId).map((tile) => (
 			tile.type === "term" && tile.sessionId &&
 			tile.ptySessionId && !livePtyIds.has(tile.ptySessionId)
 				? { ...tile, ptySessionId: undefined }

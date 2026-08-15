@@ -508,6 +508,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "team-composition-ui",
+    description:
+      "V2-3.1: production renderer/preload/main Task, tile raise, and Dock pending route",
+    run: async () => {
+      const { runTeamCompositionUiGate } = await import(
+        "./gates/team-composition-ui-launch.ts"
+      );
+      const { ok } = await runTeamCompositionUiGate();
+      return ok;
+    },
+  },
+  {
     name: "acp-fs-confine",
     description:
       "R7: ACP fs confined to QF_ACP_FS_ROOT; unset root not advertised; escape baits refused",

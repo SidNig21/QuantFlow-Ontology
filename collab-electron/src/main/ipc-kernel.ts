@@ -265,6 +265,9 @@ export function registerKernelHandlers(): void {
 
   ipcMain.handle("qf:tasks:create", async (event, args?: unknown) => {
     try {
+      if (process.env.QF_UI_PROOF === "1") {
+        console.log("qf-ui-proof main_ipc=qf:tasks:create");
+      }
       assertTrustedSender(event);
       if (!args || typeof args !== "object" || Array.isArray(args)) {
         throw new Error("Create Task requires title, description, and assignee");
@@ -377,39 +380,62 @@ export function registerKernelHandlers(): void {
   ipcMain.handle(
     "qf:sessions:spawn",
     async (event, args?: unknown) => {
+      let pendingRequestId: string | null = null;
       try {
         assertTrustedSender(event);
         const definitionId = parseDefinitionLaunchRequest(args);
+        pendingRequestId = crypto.randomUUID();
+        const definition = kernelListAgentDefinitions().find(
+          (row) => row.id === definitionId,
+        );
+        sendToShell(
+          "shell:forward",
+          "canvas",
+          "spawn-pending",
+          pendingRequestId,
+          definitionId,
+          String(definition?.display_name ?? definitionId),
+        );
+        const proofDelayMs = Number(process.env.QF_UI_PROOF_DELAY_SPAWN_MS ?? 0);
+        if (Number.isFinite(proofDelayMs) && proofDelayMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, proofDelayMs));
+        }
+        if (process.env.QF_UI_PROOF_FAIL_DEFINITION === definitionId) {
+          throw new Error("external adapter proof failure");
+        }
         const result = await admitAndStartSession(definitionId, {
           onStarted: (sessionId, sp, info) => {
             invalidateDock();
-            if (info?.surface === "native_tui" && info.ptySessionId) {
-              sendToShell(
-                "shell:forward",
-                "canvas",
-                "create-term-tile",
-                info.ptySessionId,
-                sessionId,
-                sp,
-                info.role,
-                sp.startsWith("qf-proof-")
-                  ? "DETERMINISTIC PROOF AGENT"
-                  : undefined,
-              );
-              return;
-            }
             sendToShell(
               "shell:forward",
               "canvas",
-              "create-session-tile",
-              sessionId,
-              sp,
+              "spawn-reconciled",
+              pendingRequestId,
+              {
+                status: "running",
+                sessionId,
+                definitionId: sp,
+                surface: info?.surface,
+                ptySessionId: info?.ptySessionId,
+                role: info?.role,
+              },
             );
           },
         });
         invalidateDock();
         return { ok: true as const, result };
       } catch (err) {
+        if (pendingRequestId) {
+          const error = serializeError(err);
+          sendToShell(
+            "shell:forward",
+            "canvas",
+            "spawn-failed",
+            pendingRequestId,
+            error.message,
+          );
+          invalidateDock();
+        }
         return { ok: false as const, error: serializeError(err) };
       }
     },

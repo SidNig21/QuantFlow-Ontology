@@ -92,6 +92,10 @@ function assertAgentOsSupported(): void {
 }
 
 export function appRoot(): string {
+  const proofResourceRoot = process.env.QF_UI_PROOF_RESOURCE_ROOT?.trim();
+  if (process.env.QF_UI_PROOF === "1" && proofResourceRoot) {
+    return proofResourceRoot;
+  }
   return selectAppRoot({
     isPackaged: app.isPackaged,
     resourcesPath: process.resourcesPath ?? null,

@@ -40,11 +40,12 @@ export function attachDrag(titleBar, tile, {
   isSpaceHeld,
   contentOverlay,
 }) {
-  function startDrag(e, { deferFocus = false } = {}) {
-    if (e.button !== 0) return;
-    if (isSpaceHeld?.()) return;
-    e.preventDefault();
-    if (!deferFocus && onFocus) onFocus(tile.id, e);
+	function startDrag(e, { deferFocus = false } = {}) {
+		if (e.button !== 0) return;
+		if (isSpaceHeld?.()) return;
+		e.preventDefault();
+		const onGrip = e.target?.closest?.(".gl-tile__grip");
+		if (!deferFocus && onFocus && !onGrip) onFocus(tile.id, e);
 
     const startMX = e.clientX;
     const startMY = e.clientY;
@@ -119,9 +120,9 @@ export function attachDrag(titleBar, tile, {
         return;
       }
 
-      if (deferFocus && !moved && onFocus) {
-        onFocus(tile.id, e);
-      }
+		if (deferFocus && !moved && onFocus && !onGrip) {
+			onFocus(tile.id, e);
+		}
 
       container.classList.remove("tile-dragging");
       if (isGroupDrag) {

@@ -83,6 +83,8 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/windows-dock-ontology.ts",
   "qa/gates/windows-dock-capability.ts",
   "qa/gates/windows-dock-hire.ts",
+  // Founder reauthorization 2026-08-15: read-only oracle over the isolated V2-3.1 UI-proof Kernel, following the existing WO-WIN2 / WO-V2-2 precedent.
+  "qa/gates/team-composition-ui.ts",
   "qa/gates/windows-dock-species.ts",
   "qa/gates/windows-research-question.ts",
   // WO-V2-2: read-only oracle over the isolated packaged research Kernel.

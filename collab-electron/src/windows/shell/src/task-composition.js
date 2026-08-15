@@ -61,6 +61,12 @@ export function renderTaskFoot(dom, tile, {
 } = {}) {
 	const foot = dom?.taskFoot;
 	if (!foot) return;
+	const existingForm = foot.querySelector(".task-create-form");
+	const preservedForm = existingForm ? {
+		title: existingForm.querySelector(".task-title")?.value ?? "",
+		description: existingForm.querySelector(".task-description")?.value ?? "",
+		assigneeSessionId: existingForm.querySelector(".task-assignee")?.value ?? "",
+	} : null;
 	foot.replaceChildren();
 	if (!tile?.sessionId) return;
 
@@ -108,29 +114,41 @@ export function renderTaskFoot(dom, tile, {
 		foot.appendChild(actions);
 	}
 
-	if (focused && isOrchestrator(tile, session)) {
-		const create = node("button", "task-create-button", "Create Task");
-		create.addEventListener("click", (event) => {
-			event.stopPropagation();
+	if (isOrchestrator(tile, session)) {
+		const renderCreateForm = (formState = null) => {
 			const form = node("form", "task-create-form");
 			const title = node("input", "task-title");
 			title.placeholder = "Task title";
 			title.required = true;
+			title.value = formState?.title ?? "";
 			const description = node("textarea", "task-description");
 			description.placeholder = "Completion description";
 			description.required = true;
-			const assignee = selectAssignee(sessions, runningSessions(sessions).find((row) => row.id !== tile.sessionId)?.id ?? "");
+			description.value = formState?.description ?? "";
+			const assignee = selectAssignee(
+				sessions,
+				formState?.assigneeSessionId ||
+					(runningSessions(sessions).find((row) => row.id !== tile.sessionId)?.id ?? ""),
+			);
 			const submit = node("button", "task-action", "Create");
 			submit.type = "submit";
+			let submitting = false;
+			const setSubmitting = (value) => {
+				submitting = value;
+				submit.disabled = value;
+				title.disabled = value;
+				description.disabled = value;
+				assignee.disabled = value;
+			};
 			form.appendChild(title);
 			form.appendChild(description);
 			form.appendChild(assignee);
 			form.appendChild(submit);
-			create.replaceWith(form);
-			title.focus();
 			form.addEventListener("submit", async (submitEvent) => {
 				submitEvent.preventDefault();
 				submitEvent.stopPropagation();
+				if (submitting) return;
+				setSubmitting(true);
 				try {
 					await onCreate?.({
 						tileId: tile.id,
@@ -138,11 +156,32 @@ export function renderTaskFoot(dom, tile, {
 						description: description.value.trim(),
 						assigneeSessionId: assignee.value,
 					});
+					const liveForm = foot.querySelector(".task-create-form");
+					liveForm?.querySelector(".task-title") &&
+						(liveForm.querySelector(".task-title").value = "");
+					liveForm?.querySelector(".task-description") &&
+						(liveForm.querySelector(".task-description").value = "");
 				} catch (error) {
+					setSubmitting(false);
 					errorLine(foot, error?.message ?? String(error));
 				}
 			});
-		});
-		foot.appendChild(create);
+			return { form, title };
+		};
+
+		if (preservedForm) {
+			const { form } = renderCreateForm(preservedForm);
+			foot.appendChild(form);
+		} else {
+			const create = node("button", "task-create-button", "Create Task");
+			create.type = "button";
+			create.addEventListener("click", (event) => {
+				event.stopPropagation();
+				const { form, title } = renderCreateForm();
+				create.replaceWith(form);
+				title.focus();
+			});
+			foot.appendChild(create);
+		}
 	}
 }

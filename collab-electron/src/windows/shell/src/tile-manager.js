@@ -6,6 +6,7 @@ import {
 } from "./canvas-state.js";
 import {
 	createTileDOM, positionTile, updateTileTitle, getTileLabel,
+	updatePendingSpawnState,
 	startInlineRename,
 } from "./tile-renderer.js";
 import { toCollabFileUrl } from "@collab/shared/collab-file-url";
@@ -54,7 +55,7 @@ export function createTileManager({
 	function getCanvasStateForSave() {
 		return {
 			version: 1,
-			tiles: tiles.map((t) => ({
+			tiles: tiles.filter((t) => !t.pendingSpawnId).map((t) => ({
 				id: t.id,
 				type: t.type,
 				x: safeCoord(t.x),
@@ -682,6 +683,66 @@ export function createTileManager({
 		return tile;
 	}
 
+	function createPendingSpawnTile({ requestId, definitionId, displayName }) {
+		const size = defaultSize("session");
+		const pos = findAutoPlacement(tiles, size.width, size.height);
+		return createCanvasTile("session", pos.x, pos.y, {
+			width: size.width,
+			height: size.height,
+			pendingSpawnId: requestId,
+			pendingStatus: "starting",
+			definitionId,
+			displayName,
+		});
+	}
+
+	function reconcilePendingSpawnTile(requestId, result = {}) {
+		const tile = tiles.find((candidate) => candidate.pendingSpawnId === requestId);
+		if (!tile) return null;
+		const dom = tileDOMs.get(tile.id);
+		if (!dom) return tile;
+
+		if (result.status === "failed") {
+			tile.pendingStatus = "failed";
+			tile.pendingError = String(result.reason || "Spawn failed");
+			updatePendingSpawnState(dom, tile);
+			return tile;
+		}
+
+		const nativeTui = result.surface === "native_tui";
+		tile.type = nativeTui ? "term" : "session";
+		tile.sessionId = result.sessionId;
+		tile.definitionId = result.definitionId || tile.definitionId;
+		tile.role = result.role || tile.role;
+		if (nativeTui) tile.ptySessionId = result.ptySessionId;
+		delete tile.pendingSpawnId;
+		delete tile.pendingStatus;
+		delete tile.pendingError;
+		delete dom.container.dataset.spawnState;
+		delete dom.container.dataset.spawnRequestId;
+		dom.container.dataset.tileType = tile.type;
+		dom.container.dataset.state = nativeTui ? "running" : "idle";
+		dom.container.dataset.sessionId = tile.sessionId;
+		if (tile.role) dom.container.dataset.agentRole = tile.role;
+		dom.contentArea.replaceChildren(dom.contentOverlay);
+		if (nativeTui) {
+			dom.container.classList.add("agent-cli-tile");
+			dom.container.dataset.agentRuntime = "native-tui";
+			dom.container.dataset.agentStatus = "TUI attached";
+			updateTileTitle(dom, tile);
+			spawnTerminalWebview(tile, true);
+			focusCanvasTile(tile.id);
+		} else {
+			dom.container.classList.remove("agent-cli-tile");
+			delete dom.container.dataset.agentRuntime;
+			delete dom.container.dataset.agentStatus;
+			updateTileTitle(dom, tile);
+			spawnSessionWebview(tile);
+		}
+		saveCanvasImmediate();
+		return tile;
+	}
+
 	function closeCanvasTile(id) {
 		const dom = tileDOMs.get(id);
 		if (dom) {
@@ -988,6 +1049,8 @@ export function createTileManager({
 
 	return {
 		createCanvasTile,
+		createPendingSpawnTile,
+		reconcilePendingSpawnTile,
 		closeCanvasTile,
 		focusCanvasTile,
 		blurCanvasTileGuest,

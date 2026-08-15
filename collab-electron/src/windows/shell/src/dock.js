@@ -224,9 +224,13 @@ export function initDock(panelEl, options = {}) {
 						card.title = String(availability.message ?? "Unavailable");
 					} else {
 						launchable += 1;
+						let spawnInFlight = false;
 						const spawn = async () => {
+							if (spawnInFlight) return;
+							spawnInFlight = true;
 							card.classList.remove("dock-spawn-failed");
 							card.classList.add("dock-spawning");
+							card.setAttribute("aria-disabled", "true");
 							cue.textContent = "starting…";
 							try {
 								const result = await window.shellApi.qf.spawnSession({ definitionId });
@@ -239,6 +243,8 @@ export function initDock(panelEl, options = {}) {
 								card.title = error?.message ?? String(error);
 								card.classList.add("dock-spawn-failed");
 							} finally {
+								spawnInFlight = false;
+								card.removeAttribute("aria-disabled");
 								card.classList.remove("dock-spawning");
 							}
 						};
@@ -248,7 +254,7 @@ export function initDock(panelEl, options = {}) {
 						card.addEventListener("keydown", (event) => {
 							if (event.key === "Enter" || event.key === " ") {
 								event.preventDefault();
-								void spawn();
+								if (card.getAttribute("aria-disabled") !== "true") void spawn();
 							}
 						});
 					}

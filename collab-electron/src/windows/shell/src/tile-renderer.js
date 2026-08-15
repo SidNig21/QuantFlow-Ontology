@@ -36,9 +36,11 @@ export function getAgentTileModel(tile) {
     return null;
   }
   return {
-    identity: tile.definitionId || tile.userTitle || "Agent CLI",
+    identity: tile.displayName || tile.definitionId || tile.userTitle || "Agent CLI",
     runtime: "Native TUI",
-    status: tile.ptySessionId
+    status: tile.pendingSpawnId
+      ? String(tile.pendingStatus || "starting")
+      : tile.ptySessionId
       ? "TUI attached"
       : (tile.sessionId ? "stopped" : "starting"),
     sessionId: tile.sessionId || null,
@@ -94,6 +96,12 @@ export function createTileDOM(tile, callbacks) {
   container.dataset.tileId = tile.id;
   container.dataset.tileType = tile.type;
   container.dataset.state = tileState(tile);
+  if (tile.sessionId) container.dataset.sessionId = tile.sessionId;
+  if (tile.role) container.dataset.agentRole = tile.role;
+  if (tile.pendingSpawnId) {
+    container.dataset.spawnState = String(tile.pendingStatus || "starting");
+    container.dataset.spawnRequestId = tile.pendingSpawnId;
+  }
   const agentModel = getAgentTileModel(tile);
   if (agentModel) {
     container.classList.add("agent-cli-tile");
@@ -164,6 +172,29 @@ export function createTileDOM(tile, callbacks) {
 
   const body = document.createElement("div");
   body.className = "gl-tile__body";
+
+  const raiseBodyTile = (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    const target = event.target;
+    if (
+      target?.closest?.(
+        "button, input, textarea, select, form, webview, .tile-content-overlay, .gl-tile__spine",
+      )
+    ) return;
+    callbacks.onFocus?.(tile.id, event);
+  };
+  body.addEventListener("mousedown", raiseBodyTile);
+  body.addEventListener("click", (event) => {
+    // Element.click() has detail=0 and is useful to accessibility and UI
+    // automation callers; real pointer clicks already raised on mousedown.
+    if (event.detail === 0) raiseBodyTile(event);
+  });
+
+  spine.addEventListener("click", (event) => {
+    if (event.detail !== 0) return;
+    if (event.target?.closest?.(".gl-tile__grip, .gl-tile__head")) return;
+    callbacks.onFocus?.(tile.id, event);
+  });
 
   const titleRow = document.createElement("div");
   titleRow.className = "gl-tile__title";
@@ -310,6 +341,14 @@ export function createTileDOM(tile, callbacks) {
   const contentOverlay = document.createElement("div");
   contentOverlay.className = "tile-content-overlay";
 
+  let pendingState = null;
+  if (tile.pendingSpawnId) {
+    pendingState = document.createElement("div");
+    pendingState.className = "agent-session-pending";
+    contentArea.appendChild(pendingState);
+    updatePendingSpawnState({ pendingState, container }, tile);
+  }
+
   body.appendChild(titleRow);
   body.appendChild(contentArea);
   body.appendChild(taskFoot);
@@ -339,17 +378,20 @@ export function createTileDOM(tile, callbacks) {
     navBack,
     navForward,
     navReload,
+    pendingState,
   };
 }
 
 function tileState(tile) {
   if (tile.type !== "term") return "idle";
+  if (tile.pendingSpawnId) return String(tile.pendingStatus || "starting");
   if (tile.ptySessionId) return "running";
   if (tile.sessionId) return "idle";
   return "idle";
 }
 
 function spineIdLabel(tile, agentModel) {
+  if (tile.displayName && tile.pendingSpawnId) return tile.displayName;
   if (tile.sessionId) return shortId(tile.sessionId);
   if (tile.definitionId) return tile.definitionId;
   if (agentModel?.identity) return agentModel.identity;
@@ -369,6 +411,9 @@ function shortId(id) {
 }
 
 export function getTileLabel(tile) {
+  if (tile.pendingSpawnId && tile.displayName) {
+    return { parent: "", name: tile.displayName };
+  }
   if (tile.type === "term") {
     if (tile.userTitle) return { parent: "", name: tile.userTitle };
     if (tile.definitionId) {
@@ -415,6 +460,29 @@ export function updateTileTitle(dom, tile) {
   titleText.appendChild(parentSpan);
   titleText.appendChild(nameSpan);
   titleText.title = tile.filePath || tile.folderPath || tile.cwd || "";
+}
+
+export function updatePendingSpawnState(dom, tile) {
+  if (!dom || !tile?.pendingSpawnId) return;
+  const status = String(tile.pendingStatus || "starting");
+  const label = String(tile.displayName || tile.definitionId || "Agent");
+  if (dom.container) dom.container.dataset.spawnState = status;
+  if (dom.pendingState) {
+    dom.pendingState.replaceChildren();
+    const name = document.createElement("strong");
+    name.textContent = label;
+    const state = document.createElement("span");
+    state.textContent = status === "failed"
+      ? "FAILED — RETRY"
+      : "STARTING";
+    dom.pendingState.appendChild(name);
+    dom.pendingState.appendChild(state);
+    if (status === "failed" && tile.pendingError) {
+      const reason = document.createElement("small");
+      reason.textContent = String(tile.pendingError);
+      dom.pendingState.appendChild(reason);
+    }
+  }
 }
 
 export function startInlineRename(dom, tile, onCommit) {

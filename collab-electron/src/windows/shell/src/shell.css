@@ -2312,6 +2312,46 @@ body.platform-win {
 	background: color-mix(in srgb, var(--qf-surface) 92%, transparent);
 }
 
+.agent-session-pending {
+	display: grid;
+	place-items: center;
+	align-content: center;
+	gap: 6px;
+	width: 100%;
+	height: 100%;
+	padding: 18px;
+	box-sizing: border-box;
+	font: 11px/1.4 var(--qf-mono);
+	letter-spacing: .08em;
+	text-align: center;
+	text-transform: uppercase;
+	color: var(--qf-muted);
+	background: color-mix(in srgb, var(--qf-surface) 92%, transparent);
+}
+
+.agent-session-pending strong {
+	font: 600 13px/1.2 var(--qf-sans);
+	letter-spacing: .03em;
+	text-transform: none;
+	color: var(--qf-text);
+}
+
+.agent-session-pending span {
+	color: var(--qf-accent);
+}
+
+.canvas-tile[data-spawn-state="failed"] .agent-session-pending span {
+	color: var(--qf-gl-alert);
+}
+
+.agent-session-pending small {
+	max-width: 100%;
+	font: 10px/1.3 var(--qf-sans);
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--qf-muted);
+}
+
 /* Per-tile overlay covering only the webview content area (not title bar).
    Visible when canvas owns focus and this tile is not the focused tile.
    Intercepts clicks that would otherwise be swallowed by the webview surface. */
