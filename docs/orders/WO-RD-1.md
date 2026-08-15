@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: historical-ddl-fixture-builder-open — Reader PASS `01a00762-2c5a-7170-8b4b-ed0752b03aa9`
+status: live-timeout-diagnostic-builder-open — Reader PASS `01a00770-c473-70a3-ab46-937cfdb4766b`
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -620,3 +620,146 @@ or any existing assertion. Do not force or stub a classification result.
 Run the unchanged one-shot matrix from the preceding section. Full green
 commits and pushes the complete candidate for one fresh independent Verifier;
 any red stops with no retry.
+
+## Gate diagnostic — one receipt identifies the live timeout boundary
+
+The historical fixture correction is proven: `bun qa/run.ts kernel` passed
+89/89 in 2.61 seconds, and the focused gate unit tests passed 3/3 in 0.52
+seconds. The single live invocation passed all five falsifiers, then timed out
+at 121,159 ms waiting for the four-part visible predicate; cleanup reported
+zero processes and zero roots. It did not reveal which predicate or upstream
+boundary was red.
+
+Read-only diagnosis `01a0076a-d5ce-7e83-88a2-6283f29681d7` found no provable
+Director-identity mismatch. It proved the gate discards the last renderer RPC
+error/state and does not read the isolated Kernel until after the predicate is
+green. Another blind run is forbidden.
+
+Authorize diagnostic-only edits to
+`qa/gates/research-director-front-door.ts` and its existing focused unit test.
+Preserve every assertion, polling interval, 120-second hard deadline,
+falsifier, cleanup rule, environment, fixture, and product file. Only when the
+visible wait rejects or the outer watchdog fires, emit exactly one JSON line
+prefixed `rd1_timeout_diag=` containing exactly these keys:
+
+```yaml
+failure_boundary: inner_wait_error | outer_watchdog_timeout
+failure_class: app_or_renderer_rpc_failure | ipc_rejected | admission_pending | session_projection_missing | visible_projection_mismatch
+readiness_returned: boolean
+rpc: ok | error
+ui_sample: absent | present
+ui_phase: empty | starting | running | error | other
+input_disabled: boolean
+ledger_has_question: boolean
+director_tile_count: integer
+tile_has_session: boolean
+kernel_read: ok | error
+mission_for_question: boolean
+hypothesis_for_question: boolean
+hypothesis_status: absent | open | other
+director_session_status: absent | starting | running | blocked | terminal | other
+director_definition_exact: boolean
+spawned_from_exact: boolean
+main_ipc_seen: boolean
+create_mission_seen: boolean
+native_admission_returned: boolean
+```
+
+Implementation constraints:
+
+1. Create one shared diagnostic context before `runFrontDoorProof` starts and
+   pass it into that function. It owns the isolated Kernel path, captured output
+   reference, last UI sample, most-recent UI-RPC outcome, and inner-wait marker;
+   none may depend on the proof promise resolving. Set `readiness_returned=true`
+   only after the existing readiness wait returns its endpoint.
+   `failure_boundary` is
+   `inner_wait_error` only when the visible `waitFor` rejects before the outer
+   race wins; otherwise it is `outer_watchdog_timeout`.
+2. `rpc` describes the most recent post-submit `app.ui.evaluate` attempt.
+   `ui_sample=present` means at least one post-submit evaluation succeeded;
+   otherwise all UI fields use `false`, zero, and `ui_phase=empty`. Retain the
+   last successful sample. Derive `ui_phase` exactly: empty status → `empty`;
+   exact `Starting durable research…` → `starting`; exact Director Mission regex
+   → `running`; renderer `data-tone=error` → `error`; every other status →
+   `other`. Discard status, tone, ledger strings, tile ids, and RPC error text
+   after deriving booleans/enums.
+3. Read the existing isolated `kernel.db` once, read-only, synchronously from
+   the single outer-finally emitter immediately before the first root deletion.
+   `kernel_read=error` on missing DB or query failure and all Kernel booleans use
+   false/absent defaults. On success: `mission_for_question` means count of
+   Mission rows with `objective=QUESTION` is at least one;
+   `hypothesis_for_question` means count with `claim=QUESTION` is at least one;
+   `hypothesis_status=open` means every matching row is open, `absent` means
+   zero, otherwise `other`; `director_definition_exact` means exactly one
+   definition row with id `DIRECTOR_ID`. Query sessions through an exact
+   `spawned_from` join to that definition. When exactly one session matches,
+   `director_session_status` is its status mapped to
+   `running|starting|blocked|terminal|other`, and `spawned_from_exact` means that
+   same unprinted session id has exactly one link of kind `spawned_from` to
+   `DIRECTOR_ID`. Zero sessions means `absent/false`; more than one means
+   `other/false`. This preserves diagnosis when no tile exists without
+   attributing another session's link.
+4. `director_tile_count` counts only DOM tiles matching the exact Director
+   `data-definition-id`; `tile_has_session` is true iff at least one such tile
+   has a non-empty `data-session-id`; `ledger_has_question` is true iff an
+   existing ledger row contains the exact in-memory QUESTION. Print none of
+   those source values.
+5. Derive the three boundary booleans only from already-captured output:
+   `qf-ui-proof main_ipc=qf:research:submitQuestion`,
+   `qf-ui-proof kernel_command=create_mission`, and
+   `agent-host: admitted native_tui`. Do not print the captured output.
+6. Derive `failure_class` by first match, exactly: (a)
+   `app_or_renderer_rpc_failure` when readiness did not return,
+   `ui_sample=absent`, or the most recent post-submit UI RPC is `error`; (b)
+   `ipc_rejected` when
+   `ui_phase=error` or either main-IPC/create-Mission boundary is false; (c)
+   `admission_pending` when Mission and Hypothesis exist and Director session is
+   absent or starting; (d) `session_projection_missing` when the Director
+   session is running and either UI phase is not running or no qualified tile
+   has a session; (e) `visible_projection_mismatch` for every remaining allowed
+   combination. This precedence maps every receipt to exactly one class.
+7. One named production emission callback is called by
+   `runResearchDirectorFrontDoorGate` from its outer `finally`, immediately
+   before the first `rmSync`. It may make only captured-memory reads and the one
+   synchronous read-only Kernel read; it may not await, sleep, poll, retry RPC,
+   inspect processes, alter `ok`, suppress the existing red, or retain any
+   process/root. During these two timeout paths, replace raw wait/catch error
+   interpolation with a fixed `research-director-front-door: FAIL live_timeout`
+   label. During any invocation that emits `rd1_timeout_diag`, no stdout or
+   stderr line may contain question text, ids, paths, commands, environment,
+   raw rows, captured output, or error text; emit the existing
+   `convergence_remaining` as count-only for that invocation. Other invocations
+   retain their existing detailed convergence receipt.
+8. Export pure phase, unique-session status, classification, exact-key
+   serializer, and once-only emission helpers for the focused unit test. The
+   same production outer-finally emission callback called by
+   `runResearchDirectorFrontDoorGate` must accept injected diagnostic context,
+   read-only Kernel reader, output writer, and cleanup callback so the unit test
+   exercises the real call site for injected inner-wait and outer-watchdog
+   failures; testing pure helpers alone is insufficient. The test captures the
+   callback's complete stdout/stderr and proves: exact keys; exactly one line;
+   both boundaries; readiness false; all five classes with precedence;
+   deterministic phase/unique-session mapping; emitter-before-cleanup ordering;
+   and absence of hostile sentinel question text, ids, paths, commands,
+   environment, raw rows/output, and error text. Missing, duplicate, or
+   after-cleanup emission must fail. No product source edit is authorized.
+9. Because `runWithWatchdog` does not await its watched task,
+   `convergeLaunchPids` must not print `convergence_remaining` directly. Store
+   its pending rows/count in the same shared context. The outer `finally` owns
+   the only print: emit the existing detailed convergence receipt only when no
+   `rd1_timeout_diag` will emit; emit count-only when it will. The injected
+   outer-watchdog test must fire while convergence is pending and capture output
+   until the watched task settles; any path, command, id, or row field appearing
+   anywhere in that diagnostic invocation fails the test. This buffering may
+   not delay cleanup or make the outer `finally` await the watched task.
+
+Run once:
+
+```powershell
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+```
+
+Stop after that live invocation. PASS proceeds to the remaining matrix; red
+must include exactly one `rd1_timeout_diag` plus the existing zero-cleanup
+receipts and returns to the router for one evidence-based product repair.
