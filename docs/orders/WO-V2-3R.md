@@ -116,6 +116,19 @@ cases it copies only the two production species manifests and packed adapter
 files to a unique temporary resource root, mutates that copy, and deletes only
 that temporary root in `finally`.
 
+The gate calls `discoverDockProfileManifests(temporaryRoot)` directly for both
+red cases; it does not redirect or launch the development app against that
+root. The public `bun run dev` entrypoint is used only for the green proof and
+always resolves the untouched repository root.
+
+In a second unique temporary directory, the gate copies the minimum Hermes
+inputs (`launch.json`, `tools-allowlist.json`, and `scripts/pack-agent.mjs`),
+runs the copied script there, and compares the generated marker and metadata
+byte-for-byte with the tracked repository files. It reads the script source and
+fails if it imports or invokes `child_process`, `Bun.spawn`, `npm`,
+`agentos`, or any non-`node:` package. The repository script is never executed
+in place by the gate or Builder.
+
 The green run proves both tracked adapter markers and metadata files are
 non-empty before the Electron child starts. The same real
 Electron child boots its production renderer/main against an isolated Kernel;
@@ -152,8 +165,6 @@ platform remain unchanged.
 Builder runs, in order:
 
 ```powershell
-node species/hermes/scripts/pack-agent.mjs
-git diff --exit-code -- species/hermes/packed/hermes.aospkg species/hermes/packed/hermes.meta.json
 cd collab-electron
 bun test scripts/package-lib/runtime-staging.test.ts
 cd ..
@@ -181,9 +192,10 @@ under these concrete breaks:
 | `doc-links` | an in-scope documentation link resolves to no tracked target |
 | `git diff --check` | the candidate diff contains whitespace errors or conflict markers |
 
-The Hermes pack/validation step goes red if it invokes an external tool, needs
-an install, emits bytes different from the tracked marker/metadata, or metadata
-does not match `launch.json` and `tools-allowlist.json`. Runtime-staging tests go
+The focused gate's Hermes pack/validation proof goes red if the script contains
+a forbidden import/invocation, needs an install, emits bytes different from the
+tracked marker/metadata, or metadata does not match `launch.json` and
+`tools-allowlist.json`. Runtime-staging tests go
 red if production staging attempts a Hermes install/AgentOS toolchain or omits
 either tracked adapter file.
 
