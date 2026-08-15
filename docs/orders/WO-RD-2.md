@@ -486,3 +486,25 @@ Full green permits the immutable candidate commit and push. The independent
 Verifier runs the revised complete Acceptance matrix once. Because the second
 rework cycle is exhausted, any verifier red stops WO-RD-2 for a founder-level
 rewrite; there is no third implementation lap.
+
+## Founder-authorized closure correction — stale production label set
+
+The first Rework 2 command failed in 266 ms before any Task assertion:
+
+```text
+team-composition: FAIL invalid Dock display name: hermes-research-director
+```
+
+Exact cause: `qa/gates/team-composition.ts` line 71 still allows only
+`Market Researcher`, `Orchestrator`, and `Critic`, while WO-RD-1 already
+verified the production profile's exact friendly label `Research Director`.
+This is a stale gate input contract, not a product or Task-projection failure.
+
+Under the founder's 2026-08-15 umbrella delivery authority and fresh Reader
+`01a007ca-d76b-7e83-a0b2-77e31750ffa0` YES/YES/NO PASS, one closure edit is
+authorized: add exactly `Research Director` to that
+local allowed-label set. Do not remove `Orchestrator` because QA fixtures still
+use it. Do not change a product file, fixture row, Task assertion, receipt, or
+any other gate logic. Re-run Rework 2's same eight-command list from the first
+command. Full green permits the immutable candidate; any red stops with no
+further correction.
