@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: verifier-rework-founder-decision
+status: final-diagnostic-repair-authorized
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: verifier red on recurring rejected-submit assertion; founder decision required
+reauthorization: one final diagnostic-and-repair pass authorized — 2026-08-15
 
 ## In plain terms
 
@@ -442,6 +442,29 @@ reliably read it. The combined gate still did not reveal whether any rows
 changed, because it asserts before printing its two sub-receipts. Any future
 founder-authorized pass must expose both existing conditions before repairing
 the measured disappearing-error mechanism; neither assertion may be relaxed.
+
+### Founder reauthorization — one final disappearing-error pass
+
+The founder authorizes one final V2-3.1 diagnostic-and-repair pass against the
+product candidate introduced at
+`b4405819d590ae842109cf02a0b09f95601b384e`.
+
+1. In `qa/gates/team-composition-ui.ts`, emit the existing
+   `rejected_rows_added` and `rejected_error_in_tile` values before preserving
+   the current assertions unchanged. Run the live gate once.
+2. If rejected submission changed any Task, `delegated_by`, or `assigned_to`
+   row, stop with the receipt and make no product repair.
+3. If all rejected row deltas are zero and the error is not visible, repair
+   only `task-composition.js` so the same-tile rejected-submit error survives
+   normal renderer projection refreshes.
+4. Do not alter Task semantics, assertions, timing limits, live Hermes fixtures,
+   cleanup, or any file outside those two existing V2-3.1 files.
+5. Rerun the live gate exactly once, then run the complete short acceptance
+   matrix. Any red stops. Full green commits and pushes the candidate for one
+   fresh independent Verifier.
+
+No further repair loop is implied. Verifier PASS returns for founder-visible
+acceptance; it does not authorize V2-3.2 or the direction-reset patch.
 
 ## Objective
 

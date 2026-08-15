@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 VERIFIER RED — FOUNDER DECISION REQUIRED
+status: V2-3.1 FINAL DIAGNOSTIC-REPAIR AUTHORIZED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,12 +33,14 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-Candidate `b4405819d590ae842109cf02a0b09f95601b384e` is pushed and clean.
-Its independent Verifier passed the first six short-matrix commands, then the
-live `team-composition-ui` gate failed the recurring rejected-submit assertion:
-`rejected Task submit changed Kernel rows or hid the error`. This is the same
-assertion red after a prior repair, so the founder's stop condition applies.
+Expose `rejected_rows_added` and `rejected_error_in_tile` before the unchanged
+assertions, then run the live gate once. Any rejected row mutation stops. If
+row deltas are zero and the error is missing, repair only
+`task-composition.js` so that error survives projection refreshes. Rerun the
+live gate once, then the complete short matrix. Any red stops; full green
+commits and pushes for one fresh independent Verifier.
 
-Do not start another Builder or Verifier, rerun the gate, split or change the
-assertion, edit product code, rotate to V2-3.2, or begin the founder-direction
-reset until the founder decides. Never place bets or trades.
+Do not alter Task semantics, assertions, timing, fixtures, cleanup, or any file
+outside `task-composition.js` and `team-composition-ui.ts`. Verifier PASS stops
+for founder-visible acceptance and does not rotate to V2-3.2 or begin the
+direction reset. Never place bets or trades.
