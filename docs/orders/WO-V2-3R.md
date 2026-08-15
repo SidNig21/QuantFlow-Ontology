@@ -1,6 +1,6 @@
 # WO-V2-3R — make the ordinary development Dock launchable
 
-status: reader-passed-authorized
+status: building-clarified-after-measured-windows-pack-stop
 assignee: builder
 depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
 rung: R13 / V2-3 founder closure
@@ -87,6 +87,17 @@ They run from the repository root and must produce, respectively:
 species/hermes/packed/hermes.aospkg
 species/claude-code/packed/claude-code.aospkg
 ```
+
+Measured during the first Builder attempt, the unmodified Hermes script reaches
+the bundled AgentOS toolchain, which selects the extensionless Windows file
+`C:\Program Files\nodejs\npm` and fails with `spawnSync ... npm ENOENT`. The
+same toolchain already defines `AGENTOS_TOOLCHAIN_NPM` as its executable
+override, and `npm.cmd` is present on `PATH`. On Windows only, the development
+startup must pass `AGENTOS_TOOLCHAIN_NPM=npm.cmd` to the real Hermes pack child
+unless the caller already supplied that variable. This is the one authorized
+resolution: do not edit the Hermes pack script, bundled toolchain, dependencies,
+or machine installation. The focused green and founder paths both enter through
+this development-startup environment.
 
 A missing ignored `.aospkg` is normal clean-checkout state, not a reason to
 open a broken Dock. There is no staleness check or cache reuse in this order.
@@ -252,10 +263,11 @@ That visible sequence accepts V2-3.1. Machine green alone does not.
 
 ## Stop
 
-Stop if the real Hermes pack script cannot complete from this checkout, Hermes
-remains unavailable after its package exists, an assertion must weaken, a
-dependency is required, or any product file outside the development startup,
-focused gate registration, and existing gate file must change.
+Stop if the real Hermes pack script cannot complete when invoked by development
+startup with the Windows toolchain override above, Hermes remains unavailable
+after its package exists, an assertion must weaken, a dependency is required,
+or any product file outside the development startup, focused gate registration,
+and existing gate file must change.
 
 ## Report back
 
