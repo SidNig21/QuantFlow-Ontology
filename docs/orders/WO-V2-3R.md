@@ -1,17 +1,18 @@
 # WO-V2-3R — make the ordinary development Dock launchable
 
-status: founder-exception-authorized-final-continuation
+status: rewrite-reader-required-after-founder-agentos-steer
 assignee: builder
 depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
 rung: R13 / V2-3 founder closure
-authorization: founder exception 2026-08-15 — handle in-scope implementation detail without another check
+authorization: founder direction 2026-08-15 — production Hermes is native CLI; remove obsolete AgentOS packaging seam
 rework-cycle: 0 of 1
-builder-attempts: 2 used; one final continuation explicitly authorized
+builder-attempts: prior packaging premise retired; rewritten implementation gets one Builder pass
 
 ## Objective
 
-Make the normal `bun run dev` founder path prepare and launch its production
-Hermes participants instead of depending on package artifacts left by a gate.
+Make the normal `bun run dev` founder path launch its production Hermes
+participants from tracked native-CLI adapter assets, with no AgentOS packaging
+step and no dependency on artifacts left by a gate.
 
 ## In plain terms
 
@@ -49,9 +50,10 @@ Read-only trace:
 - `qa/gates/team-composition-ui.ts` sets its resource root to
   `collab-electron/.package-staging`, which contains `hermes.aospkg`.
 - Development `appRoot()` resolves to the repository root.
-- `species/hermes/packed/hermes.aospkg` is generated and intentionally ignored.
-- `collab-electron/scripts/dev.mjs` and `dev.ps1` launch Electron without
-  running the existing production adapter pack scripts.
+- `species/hermes/packed/hermes.aospkg` was generated and intentionally ignored,
+  even though native-TUI launch uses only its identity plus sibling metadata.
+- `collab-electron/scripts/dev.mjs` correctly launches Electron directly; the
+  missing tracked Hermes marker made that clean path appear unavailable.
 
 The green machine proof and red founder proof therefore used different package
 readiness floors.
@@ -72,110 +74,76 @@ Read only:
 
 ## Deliverables
 
-### A. Development startup owns its production Dock packages
+### A. Production Hermes has no AgentOS packaging dependency
 
-On every invocation, before Electron starts, `bun run dev` runs these two
-commands in this order, even when outputs already exist:
+Hermes launches through `route: native_tui`; the `.aospkg` is an adapter identity
+marker and its bytes are never executed. Make that contract explicit and match
+the already-shipped Claude Code native-TUI adapter:
 
-```powershell
-bun species/hermes/scripts/pack-agent.mjs
-bun species/claude-code/scripts/pack-agent.mjs
-```
+1. Track `species/hermes/packed/hermes.aospkg` as a small non-empty QuantFlow
+   marker and keep `hermes.meta.json` tracked beside it.
+2. Rewrite `species/hermes/scripts/pack-agent.mjs` with Node standard-library
+   file/JSON operations only. It validates `launch.json` and
+   `tools-allowlist.json`, writes the marker and the same metadata contract, and
+   invokes no bundler, npm command, AgentOS package, or external toolchain.
+3. Remove unused `@rivet-dev/agentos-core` and
+   `@rivet-dev/agentos-toolchain` dependencies from the Hermes workspace and
+   regenerate its lockfile. Do not add a replacement dependency.
+4. Remove Hermes install/toolchain-adapter work from production runtime staging;
+   run the standard-library pack script in the copied source tree, then stage
+   the marker and metadata. QA-only AgentOS proof species are unchanged.
+5. `bun run dev` performs no packaging or npm discovery. Both production native
+   CLI adapter markers are tracked inputs, so it proceeds directly to the
+   existing Electron launcher.
 
-They run from the repository root and must produce, respectively:
-
-```text
-species/hermes/packed/hermes.aospkg
-species/claude-code/packed/claude-code.aospkg
-```
-
-Measured during the first Builder attempt, the unmodified Hermes script reaches
-the bundled AgentOS toolchain, which selects the extensionless Windows file
-`C:\Program Files\nodejs\npm` and fails with `spawnSync ... npm ENOENT`. The
-same toolchain already defines `AGENTOS_TOOLCHAIN_NPM` as its executable
-override, and `npm.cmd` is present on `PATH`. A second Builder attempt proved
-that the toolchain rejects the bare value `npm.cmd`: its resolver accepts the
-override only when `existsSync(value)` is true, then falls back to the broken
-extensionless file.
-
-On Windows only, development startup must resolve `npm.cmd` to the first
-absolute existing file found by scanning the current `PATH` entries in order,
-then pass that absolute path as `AGENTOS_TOOLCHAIN_NPM` to the real Hermes pack
-child unless the caller already supplied an absolute existing override. If no
-absolute existing `npm.cmd` is found, startup fails closed before packing and
-prints `Hermes pack failed: npm.cmd not found on PATH`. A bare command name is
-not acceptance. This is the only proposed resolution after reauthorization: do
-not edit the Hermes pack script, bundled toolchain, dependencies, or machine
-installation. The focused green and founder paths both enter through this
-development-startup environment.
-
-A missing ignored `.aospkg` is normal clean-checkout state, not a reason to
-open a broken Dock. There is no staleness check or cache reuse in this order.
-
-Use the existing pack scripts; do not duplicate their packing logic, copy from
-`.package-staging`, or introduce a package cache. If either pack command fails,
-development startup exits nonzero before Electron opens and prints which named
-adapter failed.
+The prior `npm ENOENT` and `.cmd EINVAL` receipts prove the removed seam was not
+portable. Do not patch, upgrade, wrap, or invoke AgentOS to repair production
+Hermes. This order does not remove the separate QA-only `agentos` runtime proof
+route from the application.
 
 ### B. The normal development app and the gate share one readiness floor
 
 Add one focused gate named `dev-dock-readiness`. It executes the public
 `bun run dev` entrypoint from `collab-electron`; calling an internal preflight
-directly is not acceptance. On the green path it substitutes neither pack
-command nor the Electron child: the real Electron process must start, reach its
+directly is not acceptance. On the green path the real Electron process must
+start, reach its
 production renderer/main Dock, expose its process identifier to the gate, and
 be closed by the gate after the launchability assertions. A spawn request alone
 is not acceptance.
 
-Before that green run, the gate moves these complete generated directories to
-a unique temporary backup outside the repository, if they exist:
+The gate never moves, removes, or rewrites repository artifacts. For its red
+cases it copies only the two production species manifests and packed adapter
+files to a unique temporary resource root, mutates that copy, and deletes only
+that temporary root in `finally`.
 
-```text
-species/hermes/agent-package/dist
-species/hermes/packed
-species/claude-code/packed
-```
-
-It records a byte hash for every backed-up file. In a `finally` path, it removes
-only artifacts created by the gate, restores the three directories exactly,
-and proves the restored file list and hashes equal the pre-run list and hashes.
-If no directory existed before the run, the `finally` path leaves it absent.
-The gate must refuse to start if its unique backup path already exists. No
-unbacked deletion, overwrite, or cleanup of a pre-existing artifact is allowed.
-
-The green run proves both packages are regenerated at the two repository-root
-paths named in Deliverable A before the Electron child starts. The same real
+The green run proves both tracked adapter markers and metadata files are
+non-empty before the Electron child starts. The same real
 Electron child boots its production renderer/main against an isolated Kernel;
 the gate proves that process is alive and its real Dock reports the Hermes
 Orchestrator and the Hermes Market Researcher as launchable on this founder
 machine. Those assertions mean exactly one row for definition
 `hermes-orchestrator` and exactly one row for definition `hermes-worker`;
 `hermes-worker-2` and any same-label row are not substitutes and need not be
-launched by this order. Restoration runs only after that assertion and real
-Electron cleanup complete.
+launched by this order. Cleanup runs only after that assertion and real Electron
+cleanup complete.
 
-The gate may inject process execution and temporary paths into the public dev
-entrypoint only for its two failure cases. Its green receipt must use the real
-existing pack scripts, repository-root manifests, and Electron child. It may
-not reuse
+Its green receipt must use the real tracked repository-root adapter files and
+Electron child. It may not reuse
 `.package-staging`, synthesize an `.aospkg`, insert an `agent_definition`
 directly, mock availability, or bypass the Dock launch control.
 
 ### C. Failures remain truthful
 
-Falsify the preflight twice:
+Falsify readiness twice in the temporary resource root:
 
-1. Substitute the Hermes command only and make it return nonzero. The Claude
-   Code command and Electron child must not run, the dev command must exit
-   nonzero, and stderr must contain `Hermes pack failed`.
-2. Let the real Hermes command complete, substitute the Claude Code command so
-   it returns zero without creating
-   `species/claude-code/packed/claude-code.aospkg`, and remove that expected
-   output only inside the safely backed-up gate interval. The Electron child
-   must not run, the dev command must exit nonzero, and stderr must print that
-   exact missing path.
+1. Remove only the copied Hermes marker. Dock discovery must report the exact
+   missing runtime-package reason and register no Hermes definitions.
+2. Restore the copied marker and change only copied Hermes metadata to claim
+   `route: agentos`. The native-TUI production-profile check must reject it and
+   register no Hermes definitions.
 
-Restore both conditions and show the same focused gate green. Existing
+Restore both conditions in the disposable copy and show the same focused gate
+green against the untouched repository root. Existing
 readiness checks for missing WSL, missing runtime command, or unsupported
 platform remain unchanged.
 
@@ -184,6 +152,11 @@ platform remain unchanged.
 Builder runs, in order:
 
 ```powershell
+node species/hermes/scripts/pack-agent.mjs
+git diff --exit-code -- species/hermes/packed/hermes.aospkg species/hermes/packed/hermes.meta.json
+cd collab-electron
+bun test scripts/package-lib/runtime-staging.test.ts
+cd ..
 bun qa/run.ts dev-dock-readiness
 bun qa/run.ts repo-shape
 bun qa/run.ts kernel-sole-writer
@@ -208,16 +181,23 @@ under these concrete breaks:
 | `doc-links` | an in-scope documentation link resolves to no tracked target |
 | `git diff --check` | the candidate diff contains whitespace errors or conflict markers |
 
+The Hermes pack/validation step goes red if it invokes an external tool, needs
+an install, emits bytes different from the tracked marker/metadata, or metadata
+does not match `launch.json` and `tools-allowlist.json`. Runtime-staging tests go
+red if production staging attempts a Hermes install/AgentOS toolchain or omits
+either tracked adapter file.
+
 `dev-dock-readiness` must finish within two minutes and print:
 
 ```text
 development_root=repository
-hermes_package=prepared
-claude_code_package=prepared
-electron_process_started_after_packages=true
+hermes_adapter=tracked_native_tui
+claude_code_adapter=tracked_native_tui
+agentos_packaging_used=false
+electron_process_started=true
 hermes_orchestrator_launchable=true
 hermes_worker_definition_launchable=true
-preexisting_artifacts_restored=true
+repository_artifacts_mutated=false
 PASS dev-dock-readiness
 ```
 
@@ -262,6 +242,8 @@ That visible sequence accepts V2-3.1. Machine green alone does not.
 - The normal development app must never depend on leftovers from a previous QA
   or package run.
 - A failed preflight opens no Electron window.
+- Delete the two unused AgentOS dependencies from `species/hermes`; add no
+  dependency, vendor patch, wrapper, cache edit, or replacement package.
 
 ## Out of scope
 
@@ -273,11 +255,11 @@ That visible sequence accepts V2-3.1. Machine green alone does not.
 
 ## Stop
 
-Stop if the real Hermes pack script cannot complete when invoked by development
-startup with the Windows toolchain override above, Hermes remains unavailable
-after its package exists, an assertion must weaken, a dependency is required,
-or any product file outside the development startup, focused gate registration,
-and existing gate file must change.
+Stop if the standard-library Hermes pack/validation script cannot reproduce the
+tracked adapter assets, Hermes remains unavailable with those assets present,
+an assertion must weaken, a new dependency/version is required, or a product
+file outside the development startup, Hermes adapter workspace, runtime staging,
+focused gate registration, and existing gate file must change.
 
 ## Report back
 
