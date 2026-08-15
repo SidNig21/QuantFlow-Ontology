@@ -1,4 +1,4 @@
-# NEXT — WO-RD-2 Research Director recruits and assigns
+# NEXT — R14 WO-RD-2 Research Director recruits and assigns
 
 status: BUILDER DOOR OPEN
 active-order: [`WO-RD-2.md`](WO-RD-2.md)
