@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 VERIFIER PASS — FOUNDER ACCEPTANCE REQUIRED
+status: V2-3.1 FOUNDER REJECTED — RUNTIME LAUNCH BLOCKED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,13 +33,14 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-Candidate `b5b6c950a8269fe448c1db9cbe47aaee65238689` independently passed
-the complete short matrix. The live production receipt created one Task with
-one `delegated_by` and one `assigned_to` link; a rejected submit added zero rows
-and kept its error visible; pending feedback appeared in 25 ms; cleanup left
-zero gate-owned Electron processes.
+The independently green candidate failed the founder-delegated Computer Use
+check. Every Hermes profile was unavailable because the development checkout
+lacked `species/hermes/packed/hermes.aospkg`. The launchable Claude Code team-
+composition profile showed immediate `STARTING`, then `FAILED — RETRY` with
+`native-TUI launcher readiness handshake timed out`; the Dock remained at zero
+live participants. No Task interaction was reachable.
 
-Stop for founder-visible acceptance. Do not start a Builder or Verifier, merge,
-rotate to V2-3.2, or begin the direction reset. After the founder accepts, the
-builder door closes for a separately authorized docs-only north-star reset.
-Never place bets or trades.
+This defect is outside the exhausted two-file repair boundary. Do not start a
+Builder or Verifier, accept V2-3.1, rotate to V2-3.2, or begin the direction
+reset until the founder routes the runtime-launch failure. Never place bets or
+trades.

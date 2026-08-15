@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: verifier-passed-founder-acceptance
+status: founder-rejected-runtime-launch
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: final pass independently verified; founder acceptance required
+reauthorization: founder-delegated Computer Use check rejected visible runtime launch
 
 ## In plain terms
 
@@ -501,6 +501,44 @@ them. Verification changed no file. Evidence is recorded in
 The Builder door is now stopped at founder acceptance. A Verifier PASS does not
 accept the visible product, rotate to V2-3.2, or authorize the founder-direction
 reset.
+
+### Founder-delegated Computer Use acceptance — REJECT
+
+The founder explicitly delegated the visible acceptance interaction to the
+router through Computer Use. The verified development app at build
+`AA041547F3092A4D1213B449463330EE8019FCFD` opened, but the founder path could
+not reach team composition.
+
+Initial Dock receipt:
+
+```text
+0 live · 9 closed · 2 launchable
+Orchestrator — Hermes — Team composition — UNAVAILABLE
+Adapter unavailable: runtime package missing:
+C:\Users\rybow\QuantFlow-Ontology\species\hermes\packed\hermes.aospkg
+```
+
+Computer Use then clicked the launchable Claude Code profile labelled
+`Market Researcher · Team composition · ready`. The pending tile appeared
+immediately, then failed visibly:
+
+```text
+Market Researcher
+FAILED — RETRY
+native-TUI launcher readiness handshake timed out
+0 live · 10 closed · 2 launchable
+```
+
+The immediate pending and visible failure behavior are accepted observations,
+but V2-3.1 is rejected because no participant reached `running`. Therefore the
+founder could not add two seats, create or reassign a Task, cancel it, close the
+assigned seat, or prove reopen continuity. The independent machine proof used a
+prepared live Hermes fixture and did not cover this ordinary development-app
+readiness state.
+
+This failure is outside the final repair's two-file boundary and no rework
+cycle remains. Do not accept V2-3.1, start V2-3.2, or begin the direction reset
+until the founder routes the runtime-launch defect.
 
 ## Objective
 

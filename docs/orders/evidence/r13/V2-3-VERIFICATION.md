@@ -5,7 +5,7 @@ candidate: `b5b6c950a8269fe448c1db9cbe47aaee65238689`
 branch: `wo-V2-3`
 builder task: `01a00684-5d67-7782-9912-e6f961b2cacd`
 verifier task: `01a00688-a23c-75b0-93ba-b4b9d3329ffe`
-result: **MACHINE PASS — FOUNDER ACCEPTANCE REQUIRED**
+result: **MACHINE PASS — FOUNDER-DELEGATED PRODUCT CHECK REJECTED**
 
 ## What is proven
 
@@ -47,3 +47,25 @@ from the Orchestrator tile, and confirm the task owner appears on the tiles.
 Then submit once without a running assignee and confirm the reason stays visible
 for longer than two seconds. Accept or reject this interaction; no code review
 is required.
+
+## Founder-delegated Computer Use result — REJECT
+
+The founder authorized the router to perform this visible check through
+Computer Use. The development app opened at build
+`AA041547F3092A4D1213B449463330EE8019FCFD`.
+
+```text
+Hermes Orchestrator: UNAVAILABLE
+reason: runtime package missing: species/hermes/packed/hermes.aospkg
+
+Claude Code Team composition: ready → STARTING → FAILED — RETRY
+reason: native-TUI launcher readiness handshake timed out
+
+Dock after attempt: 0 live · 10 closed · 2 launchable
+```
+
+The pending tile and failure reason were visible, which confirms those repaired
+UI paths. The product promise remains unaccepted because no participant reached
+`running`, so Task creation, assignment, reassignment, cancellation, seat close,
+and reopen continuity were unreachable. The machine gate's prepared Hermes
+fixture did not prove ordinary development-app readiness.
