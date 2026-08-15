@@ -597,3 +597,29 @@ drift was observed.
 The detached worktree remained clean at the stop. No founder acceptance, live
 model turn, live market quota, or V2-3 work was performed. Per the exact
 authorization, this tooling stop is final for the rerun.
+
+## Founder stop and carried packaging gap — 2026-08-14
+
+Founder decision: stop V2-2 and proceed to V2-3. `NEXT.md` records that
+authorization at commit `0d787daf410fd76e771dc4fb92277b1a7baaa537`.
+
+The V2-2 implementation commit
+`ddc95853aef4645d6c9e1bfb5d452f4a156aca83` is an ancestor of current `main`;
+`git merge-base --is-ancestor ddc95853aef4645d6c9e1bfb5d452f4a156aca83
+HEAD` exited `0` at `0d787daf410fd76e771dc4fb92277b1a7baaa537`.
+
+The final founder-authorized measurement reported the difficult synthetic
+cleanup proof green: all ten boundaries were falsified and restored, the gate
+created 22 temporary roots and left `roots_remaining=0` with `leaked=[]`, and
+`hermes-first-turn-synthetic` exited `0`. `bun qa/verify-release.ts` also
+exited `0` in that measurement. The later `windows-installer` command recorded
+exit `1`, but its direct log ended after the packaging-start banner and carried
+no timeout, package-error, or assertion diagnostic. The verifier process then
+ended without `DONE.txt`; `windows-hermes-research-chain`, `doc-links`, and the
+two diff checks were not recorded.
+
+Result: **V2-2 stopped by founder with a known packaging-proof gap.** The
+cleanup implementation is retained on `main`; the packaged matrix is not
+claimed complete, founder acceptance was not performed, and
+`l4_certified` remains pending. Per `NEXT.md`, this gap is recorded rather than
+retried and does not authorize any further V2-2 test.
