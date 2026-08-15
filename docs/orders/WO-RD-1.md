@@ -1,11 +1,11 @@
 # WO-RD-1 — Research Director front door
 
-status: open — Reader PASS `01a00716-6df9-7d61-92ec-b0de15cf8188`; build-authorized by `NEXT.md`
+status: rework-open — Reader PASS `01a0072b-5e60-76a0-b07b-e16a5a48929f`; final gate-only cycle authorized
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
 authorization: founder goal 2026-08-15; routed after adversarial Reader PASS
-rework-cycle: 0 of 1
+rework-cycle: 1 of 1 — final cycle
 
 ## In plain terms
 
@@ -322,3 +322,49 @@ trades.
 Open with what Ryan can now do. Bind every claim to the candidate SHA and named
 gate receipt. State plainly that recruiting/Task assignment and research
 judgment are next, not shipped.
+
+## Rework — bounded cleanup convergence
+
+The first Builder pass implemented the product path and reached its live proof
+in under three seconds. Its inner cleanup receipt sampled the owned process tree
+immediately after app shutdown and observed `3`, then `1`, descendant processes.
+In both attempts the unchanged outer cleanup then measured zero owned processes
+and zero roots. This names a receipt-timing defect, not permission to ignore or
+subtract a live process.
+
+One gate-only rework is authorized after Reader PASS:
+
+1. After `app.shutdown` and the public `bun run dev` parent exit, and before the
+   proof returns its `launchPids`, poll the already-captured exact `launchPids`
+   until every PID is absent. Here “owned” has one meaning: the PID values in
+   that set, captured once by the existing `collectOwnedPids` launch receipt.
+   Each poll takes a fresh `processSnapshot()` and checks only PID membership;
+   do not recapture ownership or infer it from a parent, name, path, or process
+   family.
+2. The convergence wait starts after that shutdown/parent-exit point and is
+   bounded by the smaller of 5,000 ms and the gate's existing absolute
+   120,000 ms deadline. It is observation only: it may not kill, subtract,
+   rename, or reclassify a process to obtain green. Any owned PID still alive
+   at that bound must make the convergence check red with
+   `owned_process_tree_remaining` non-zero; a later outer cleanup receipt may
+   report what teardown achieved, but it may not turn this red result green.
+3. Only after this bounded convergence reports zero remaining `launchPids` may
+   the existing green cleanup receipt be asserted. The existing outer `finally`
+   remains responsible for best-effort teardown after a red result or watchdog
+   deadline; that teardown is never part of convergence and never earns green.
+
+No product code, existing assertion, pass criterion, existing timeout, fixture,
+baseline, process ownership rule, root cleanup, or other gate behavior may
+change. The only new wait is the bounded natural-exit poll above; the literal
+120,000 ms wall-clock deadline remains hard and non-overridable. The rework
+Builder runs exactly:
+
+```powershell
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+Any red stops. Full green commits and pushes the complete authorized WO-RD-1
+candidate for one fresh independent Verifier, which owns the full Acceptance
+matrix once.

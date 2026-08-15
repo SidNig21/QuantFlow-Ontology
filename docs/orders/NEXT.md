@@ -1,11 +1,11 @@
 # NEXT — R14 Research Director front door
 
-status: BUILDER DOOR OPEN — ONE WO-RD-1 PASS
+status: BUILDER DOOR OPEN — FINAL GATE-ONLY REWORK
 authorized-by: independent verifier
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 founder-closed with named gap; R14 active
 active-order: [`WO-RD-1.md`](WO-RD-1.md)
-reader-receipt: task `01a00716-6df9-7d61-92ec-b0de15cf8188` — PASS after defects landed in the order
+reader-receipt: initial task `01a00716-6df9-7d61-92ec-b0de15cf8188`; cleanup rework task `01a0072b-5e60-76a0-b07b-e16a5a48929f` — PASS
 verifier-receipt: [`WO-V2-3R.md`](WO-V2-3R.md) — candidate `a530c276453bb2f390304bbcf843fd0bf0810796`, full matrix PASS
 
 ## Active outcome
@@ -17,9 +17,11 @@ It passed its adversarial read and is the one authorized product order.
 
 ## Work here only
 
-One fresh Builder may execute `WO-RD-1.md` in this checkout. Run only its fast
-matrix. Do not create a worktree or clone, run a release verifier, package an
-installer, start a long soak, or begin later R14 work.
+The product path is implemented locally. The final gate-only bounded-convergence
+rework passed its fresh read. One separate Builder may change only the focused
+gate, run only the rework matrix, then commit/push the complete candidate for a
+fresh Verifier. Do not create a worktree or clone, run a release verifier,
+package an installer, start a long soak, or begin later R14 work.
 
 ## Stop
 
