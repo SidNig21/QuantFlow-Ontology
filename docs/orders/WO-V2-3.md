@@ -69,13 +69,18 @@ showed no progress.
 4. **Add product-level proof of the three product seams.** The gate covers Task
    creation through the production renderer/preload/main/Kernel path; tile
    raise without control or input loss; and Dock spawn pending/success/failure
-   behavior. Extend the focused acceptance with one renderer-level gate that
+   through the production UI route. It clicks the production Dock activation
+   control, proves the production preload/main spawn route creates exactly one
+   Kernel-backed seat, and proves the same pending tile reconciles to it. Two
+   activations before the first response are disabled or ignored. Extend the
+   focused acceptance with one renderer-level gate that
    launches the production renderer with the production preload, clicks the
    rendered control, proves the preload invokes `qf:tasks:create`, proves the
    production main handler receives it, and proves that handler writes the
    reported rows to a temporary Kernel database. Fixture DOMs, injected or
    mocked preload/main handlers, test doubles, and direct calls to `execute()`,
-   `projection()`, or the IPC handler fail the gate. It must not replace the
+   `projection()`, or the IPC handler fail the green production-path proof. It
+   must not replace the
    existing Kernel-only `team-composition` gate. It must finish in under two
    minutes and print the Task/link row counts plus the pending-tile timing it
    measured.
@@ -102,27 +107,34 @@ receipt includes:
 renderer_click=1 preload=production main_ipc=qf:tasks:create temporary_kernel=1
 task_rows=1 delegated_by=1 assigned_to=1 create_errors=0
 rejected_rows_added=0 rejected_error_in_tile=true duplicate_task_rows=0
-background_controls=<unselected running Orchestrator count> header_raised=1 form_preserved=1
+background_controls=<unselected running Orchestrator count> header_raised=1 body_raised=1
+grip_drag=1 form_preserved=1 action_controls_preserved=1
 pending_visible_ms=<n <= 250> duplicate_spawns=0 failure_retry=true failure_reason=true
 failed_spawn_session_rows_added=0 pending_restored_after_restart=0
 ```
 
 For the z-order receipt, `background_controls` must equal the number of
 unselected running Orchestrator tiles and each counted control must be visible
-and hit-testable. `header_raised=1` only when the clicked tile has the highest
-canvas z-order. `form_preserved=1` only when every entered field value is
-unchanged. The gate also proves that a rejected submission adds zero Task or
-identity-link rows and renders its returned error in the submitting tile; two
-submit activations before the first response add one Task; a failed spawn keeps
-the same tile showing `FAILED — RETRY` plus the returned reason and adds zero
-`agent_session` rows; and restarting while a spawn is pending restores no
-pending tile.
+and hit-testable. `header_raised=1` and `body_raised=1` require separate header
+and non-interactive-body clicks to give the clicked tile the highest canvas
+z-order. `grip_drag=1` requires a grip drag without the header/body raise action
+firing. `form_preserved=1` and `action_controls_preserved=1` require clicking
+every field and action button without raising the tile and with every entered
+field value byte-for-byte unchanged. The gate also proves that a rejected
+submission adds zero Task or identity-link rows and renders its returned error
+in the submitting tile; two submit activations before the first response add
+one Task; a failed spawn keeps the same tile showing `FAILED — RETRY` plus the
+returned reason and adds zero `agent_session` rows; and restarting while a
+spawn is pending restores no pending tile.
 
 Falsify it by disconnecting only the Create Task control's dispatch while the
 button still renders. The gate must exit nonzero with
 `task_rows=0 dead_control=true`. Restore the dispatch and rerun the same command
-green. Then delay the synthetic spawn result beyond one second: the pending
-placeholder must still appear within 250 ms. These are the only new
+green. Then delay the external spawn completion beyond one second after the
+production renderer/preload/main route has been crossed, without replacing
+those layers or the Kernel: the pending placeholder must still appear within
+250 ms. Test doubles remain forbidden in the green proof; this delayed external
+completion is allowed only in the falsification run. These are the only new
 falsification receipts.
 
 ### Rework exclusions and stop
