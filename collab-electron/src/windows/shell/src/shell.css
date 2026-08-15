@@ -495,6 +495,25 @@ body.platform-win {
 	pointer-events: none;
 }
 
+.lrow .dock-adapter,
+.lrow .dock-capabilities,
+.lrow .dock-ready {
+	letter-spacing: 0.04em;
+	text-transform: none;
+}
+
+.lrow .dock-capabilities {
+	color: var(--qf-gl-muted);
+}
+
+.lrow .dock-ready {
+	color: var(--qf-gl-ok);
+}
+
+.lrow .dock-ready.unavailable {
+	color: var(--qf-gl-alert);
+}
+
 .lrow.dock-spawn-failed em {
 	color: var(--qf-gl-alert);
 }
@@ -1625,6 +1644,87 @@ body.platform-win {
 	width: 100%;
 	height: 100%;
 	border: none;
+}
+
+.tile-task-foot {
+	flex: none;
+	margin: 0 12px 12px;
+	min-height: 22px;
+	font-family: var(--qf-mono);
+	font-size: 10px;
+	color: var(--qf-gl-muted);
+}
+
+.task-fact {
+	display: flex;
+	align-items: center;
+	min-height: 20px;
+	padding: 3px 7px;
+	border: 1px solid var(--qf-gl-rule);
+	border-radius: var(--qf-gl-r);
+}
+
+.task-fact-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.task-fact-open .task-fact-label {
+	color: var(--qf-gl-ok);
+}
+
+.task-fact-unavailable .task-fact-label,
+.task-foot-error {
+	color: var(--qf-gl-alert);
+}
+
+.task-foot-actions,
+.task-reassign-row,
+.task-create-form {
+	display: flex;
+	gap: 5px;
+	margin-top: 5px;
+}
+
+.task-create-form {
+	flex-wrap: wrap;
+}
+
+.task-create-form input,
+.task-create-form textarea,
+.task-create-form select,
+.task-reassign-row select {
+	min-width: 0;
+	flex: 1 1 120px;
+	background: var(--qf-gl-screen);
+	color: var(--qf-gl-text);
+	border: 1px solid var(--qf-gl-rule);
+	border-radius: var(--qf-gl-r);
+	padding: 4px 6px;
+	font: inherit;
+}
+
+.task-create-form textarea {
+	flex-basis: 100%;
+	min-height: 38px;
+	resize: vertical;
+}
+
+.task-action,
+.task-create-button {
+	background: transparent;
+	color: var(--qf-gl-ice);
+	border: 1px solid var(--qf-gl-rule);
+	border-radius: var(--qf-gl-r);
+	padding: 3px 7px;
+	font: inherit;
+	cursor: pointer;
+}
+
+.task-action:hover,
+.task-create-button:hover {
+	border-color: var(--qf-gl-ice);
 }
 
 .gl-node {

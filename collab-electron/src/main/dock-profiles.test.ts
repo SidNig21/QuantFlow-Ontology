@@ -28,6 +28,7 @@ function seedAdapter(
   profiles: Array<{
     id: string;
     role: string;
+    display_name?: "Market Researcher" | "Orchestrator" | "Critic";
     runtime_profile: string | null;
     system_prompt_ref: string | null;
     capability_groups: Array<"market.read" | "desk.orchestrate" | "research.evaluate">;
@@ -76,7 +77,16 @@ function seedAdapter(
     `${JSON.stringify({
       schema_version: 1,
       adapter: { id: adapterId, package: `packed/${packageName}` },
-      profiles,
+       profiles: profiles.map((profile) => ({
+         ...profile,
+         display_name: profile.display_name ?? (
+           profile.role.toLowerCase().includes("critic")
+             ? "Critic"
+             : profile.role.toLowerCase().includes("orchestrator")
+               ? "Orchestrator"
+               : "Market Researcher"
+         ),
+       })),
     })}\n`,
   );
 }
@@ -323,6 +333,7 @@ describe("Dock profile manifests", () => {
         {
           id: "same",
           role: "worker",
+          display_name: "Market Researcher",
           runtime_profile: "one",
           system_prompt_ref: null,
           capability_groups: ["market.read"],

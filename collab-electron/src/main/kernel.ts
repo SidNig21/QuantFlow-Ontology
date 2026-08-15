@@ -28,7 +28,9 @@ import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp
 import { QF_APP_DIR } from "./paths";
 import {
   projectTaskDelegations,
+  projectTaskAssignments,
   type TaskDelegationProjection,
+  type TaskAssignmentProjection,
 } from "./task-delegation-projection";
 import { runAtomicResultCommit } from "./atomic-result-commit";
 
@@ -371,6 +373,61 @@ export function kernelListTaskDelegations(): TaskDelegationProjection[] {
     linksFrom: (id, kind) => kernelGetLinks(id, { kind }).filter((link) => link.from_id === id),
     getObject: kernelGetObject,
   });
+}
+
+/** Read every task assignment state, including malformed cardinality. */
+export function kernelListTaskAssignments(): TaskAssignmentProjection[] {
+  return projectTaskAssignments({
+    listTasks: () => kernelQueryObjects("task", {}, null, 0, "asc"),
+    linksFrom: (id, kind) => kernelGetLinks(id, { kind }).filter((link) => link.from_id === id),
+    getObject: kernelGetObject,
+  });
+}
+
+/** Task composition surface: fresh session identity plus assignment projection. */
+export function kernelListTaskSurface(): {
+  sessions: Record<string, unknown>[];
+  assignments: TaskAssignmentProjection[];
+} {
+  const sessions = kernelListAgentSessions().map((session) => {
+    const spawned = kernelGetLinks(String(session.id ?? ""), { kind: "spawned_from" })
+      .filter((link) => link.from_id === session.id);
+    const definition = spawned.length === 1
+      ? kernelGetObject("agent_definition", spawned[0]!.to_id)
+      : null;
+    let capabilityGroups: unknown = definition?.capability_groups ?? [];
+    if (typeof capabilityGroups === "string") {
+      try {
+        capabilityGroups = JSON.parse(capabilityGroups);
+      } catch {
+        capabilityGroups = [];
+      }
+    }
+    return {
+      ...session,
+      definition_id: spawned.length === 1 ? spawned[0]!.to_id : null,
+      role: definition?.role ?? null,
+      display_name: definition?.display_name ?? null,
+      capability_groups: Array.isArray(capabilityGroups) ? capabilityGroups : [],
+    };
+  });
+  return { sessions, assignments: kernelListTaskAssignments() };
+}
+
+/** Close is a governed action; perform the read-only screen refusal before teardown. */
+export function kernelAssertSessionMayClose(sessionId: string): void {
+  const row = getKernelDb()
+    .query(
+      `SELECT 1 AS open_task
+       FROM task
+       JOIN links ON links.from_id = task.id AND links.kind = 'assigned_to'
+       WHERE task.status = 'open' AND links.to_id = ?
+       LIMIT 1`,
+    )
+    .get(sessionId) as { open_task: number } | null;
+  if (row) {
+    throw new Error("Reassign or cancel this task before closing the seat.");
+  }
 }
 
 export function kernelExecute<C extends string>(

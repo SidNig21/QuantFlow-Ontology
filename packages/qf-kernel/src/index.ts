@@ -92,5 +92,6 @@ export {
   TASK_DELEGATION_UPGRADE,
   DETERMINISTIC_EXECUTION_UPGRADE,
   INDEPENDENT_CRITIC_UPGRADE,
+  TASK_COMPOSITION_UPGRADE,
 } from "./upgrade.ts";
 export { seedExperimentalFixtureTable } from "./fixtures.ts";

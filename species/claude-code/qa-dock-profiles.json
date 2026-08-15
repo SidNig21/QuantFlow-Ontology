@@ -8,6 +8,7 @@
     {
       "id": "claude-code-ungranted",
       "role": "claude-ungranted",
+      "display_name": "Market Researcher",
       "runtime_profile": "claude-code-ungranted",
       "system_prompt_ref": "prompts/worker.md",
       "capability_groups": []

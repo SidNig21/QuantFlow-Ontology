@@ -39,6 +39,13 @@ export const QA_DOCK_PROFILE_MANIFESTS = [
 /** Backward-compatible name for the normal product contract. */
 export const REQUIRED_DOCK_PROFILE_MANIFESTS = PRODUCTION_DOCK_PROFILE_MANIFESTS;
 
+export const DOCK_DISPLAY_NAMES = [
+  "Market Researcher",
+  "Orchestrator",
+  "Critic",
+] as const;
+export type DockDisplayName = (typeof DOCK_DISPLAY_NAMES)[number];
+
 export type DockProfileDiscoveryOptions = {
   qaMode?: boolean;
 };
@@ -46,6 +53,7 @@ export type DockProfileDiscoveryOptions = {
 export type DockProfileRegistration = {
   name: string;
   role: string;
+  display_name: DockDisplayName;
   package_ref: string;
   runtime_profile: string | null;
   system_prompt_ref: string | null;
@@ -148,6 +156,16 @@ function nullableTrimmedString(value: unknown, label: string): string | null {
   return trimmedString(value, label);
 }
 
+function displayName(value: unknown, label: string): DockDisplayName {
+  const name = trimmedString(value, label);
+  if (!(DOCK_DISPLAY_NAMES as readonly string[]).includes(name)) {
+    throw new DockProfilesContractError(
+      `${label} must be Market Researcher, Orchestrator, or Critic`,
+    );
+  }
+  return name as DockDisplayName;
+}
+
 function normalizedPackagePath(value: unknown, label: string): string {
   const path = trimmedString(value, label);
   const segments = path.split("/");
@@ -227,7 +245,14 @@ function readManifest(
     const profile = record(value, label);
     exactKeys(
       profile,
-      ["id", "role", "runtime_profile", "system_prompt_ref", "capability_groups"],
+      [
+        "id",
+        "role",
+        "display_name",
+        "runtime_profile",
+        "system_prompt_ref",
+        "capability_groups",
+      ],
       label,
     );
     const name = trimmedString(profile.id, `${label}.id`);
@@ -255,6 +280,7 @@ function readManifest(
     return {
       name,
       role: trimmedString(profile.role, `${label}.role`),
+      display_name: displayName(profile.display_name, `${label}.display_name`),
       package_ref: packageRef,
       runtime_profile: nullableTrimmedString(
         profile.runtime_profile,
@@ -302,6 +328,7 @@ function sameDefinition(
   return String(existing.id ?? "") === expected.name &&
     String(existing.name ?? "") === expected.name &&
     String(existing.role ?? "") === expected.role &&
+    String(existing.display_name ?? "") === expected.display_name &&
     String(existing.package_ref ?? "") === expected.package_ref &&
     (existing.runtime_profile ?? null) === expected.runtime_profile &&
     (existing.system_prompt_ref ?? null) === expected.system_prompt_ref &&

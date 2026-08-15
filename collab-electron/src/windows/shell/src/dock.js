@@ -47,6 +47,45 @@ export function visibleDockDefinitions(definitions, { qaMode = false } = {}) {
 	return rows.filter((row) => qaMode || isProductionDockDefinition(row));
 }
 
+const CAPABILITY_LABELS = Object.freeze({
+	"market.read": "Market data",
+	"desk.orchestrate": "Team composition",
+	"research.evaluate": "Research evaluation",
+});
+
+export function formatDockCapabilities(groups) {
+	if (!Array.isArray(groups)) return [];
+	return groups.map((group) => {
+		const label = CAPABILITY_LABELS[String(group ?? "")];
+		if (!label) throw new Error(`Unknown capability group: ${String(group ?? "")}`);
+		return label;
+	});
+}
+
+export function dockAdapterLabel(adapterId) {
+	const id = String(adapterId ?? "").toLowerCase();
+	if (id === "hermes") return "Hermes";
+	if (id === "claude-code") return "Claude Code";
+	return String(adapterId ?? "Adapter");
+}
+
+export function activeTaskForSession(assignments, sessionId) {
+	if (!Array.isArray(assignments)) return null;
+	return assignments.find((row) =>
+		row?.assignmentState === "assigned" &&
+		row?.status === "open" &&
+		row?.assignedToSessionId === sessionId
+	) ?? null;
+}
+
+export function unavailableTaskForSession(assignments, sessionId) {
+	if (!Array.isArray(assignments)) return null;
+	return assignments.find((row) =>
+		row?.assignmentState === "unavailable" &&
+		(Array.isArray(row?.unavailableSessionIds) && row.unavailableSessionIds.includes(sessionId))
+	) ?? null;
+}
+
 /** Terminal statuses that Clear may hide from the Dock rail. */
 export function isDockTerminalSessionStatus(status) {
 	return ["closed", "cancelled", "failed"].includes(String(status ?? ""));
@@ -99,7 +138,7 @@ export function visibleDockSessions(sessions, clearedThroughIso) {
 }
 
 function sessionSpeciesLabel(row) {
-	return String(row?.label ?? row?.definition_id ?? row?.role ?? "session");
+	return String(row?.display_name ?? row?.label ?? row?.role ?? "session");
 }
 
 /**
@@ -136,10 +175,14 @@ export function initDock(panelEl, options = {}) {
 		if (refreshing) return;
 		refreshing = true;
 		try {
-			const [defsRes, sessRes] = await Promise.all([
+			const [defsRes, sessRes, surfaceRes] = await Promise.all([
 				window.shellApi.qf.listDefinitions(),
 				window.shellApi.qf.listSessions(),
+				window.shellApi.qf.listTaskSurface(),
 			]);
+			const taskAssignments = surfaceRes?.ok && Array.isArray(surfaceRes.assignments)
+				? surfaceRes.assignments
+				: [];
 
 			speciesList.replaceChildren();
 			let launchable = 0;
@@ -163,15 +206,18 @@ export function initDock(panelEl, options = {}) {
 				}
 				for (const row of defs) {
 					const definitionId = String(row.id ?? "");
-					const name = String(row.name ?? definitionId);
-					const role = String(row.role ?? "");
+					const name = String(row.display_name ?? "Unknown role");
+					const adapter = dockAdapterLabel(row.availability?.adapterId);
+					const capabilities = formatDockCapabilities(row.capability_groups);
 					const availability = row.availability;
-					const unavailable = availability?.available === false;
+					const unavailable = availability?.available !== true;
 					const card = el("div", unavailable ? "lrow lrow-unavailable" : "lrow");
 					card.tabIndex = unavailable ? -1 : 0;
 					card.setAttribute("role", "button");
 					card.appendChild(el("b", null, name));
-					if (role) card.appendChild(el("span", null, role));
+					card.appendChild(el("span", "dock-adapter", `${adapter} · native CLI`));
+					card.appendChild(el("span", "dock-capabilities", capabilities.join(" · ")));
+					card.appendChild(el("span", unavailable ? "dock-ready unavailable" : "dock-ready", unavailable ? "unavailable" : "ready"));
 					const cue = el("em", null, unavailable ? "unavailable" : "spawn ⏎");
 					card.appendChild(cue);
 					if (unavailable) {
@@ -218,7 +264,9 @@ export function initDock(panelEl, options = {}) {
 					el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"),
 				);
 			} else {
-				const allSessions = Array.isArray(sessRes.sessions) ? sessRes.sessions : [];
+				const allSessions = surfaceRes?.ok && Array.isArray(surfaceRes.sessions)
+					? surfaceRes.sessions
+					: (Array.isArray(sessRes.sessions) ? sessRes.sessions : []);
 				const sessions = visibleDockSessions(allSessions, sessionsClearedThroughIso);
 				const live = [];
 				const closed = [];
@@ -258,6 +306,10 @@ export function initDock(panelEl, options = {}) {
 					card.appendChild(el("span", "id", shortId(id)));
 					card.appendChild(el("span", "who", sessionSpeciesLabel(row)));
 					card.appendChild(el("span", "st", state.text));
+					const owned = activeTaskForSession(taskAssignments, id);
+					const unavailableTask = unavailableTaskForSession(taskAssignments, id);
+					if (owned) card.appendChild(el("span", "own", `Owns: ${owned.title}`));
+					else if (unavailableTask) card.appendChild(el("span", "own", "Assignment unavailable"));
 
 					if (
 						status === "starting" ||

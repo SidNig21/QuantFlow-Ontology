@@ -87,6 +87,115 @@ function readState(
   return { field, value: row.state };
 }
 
+type TaskAssigneeRow = { id: string; to_id: string };
+
+function exactTaskAssignee(db: KernelDb, taskId: string): TaskAssigneeRow {
+  const rows = db
+    .query(
+      `SELECT id, to_id FROM links WHERE from_id = ? AND kind = 'assigned_to' ORDER BY created_at ASC`,
+    )
+    .all(taskId) as TaskAssigneeRow[];
+  if (rows.length !== 1) {
+    throw new KernelError(`task "${taskId}" assignment unavailable`);
+  }
+  return rows[0]!;
+}
+
+function requireRunningSession(db: KernelDb, sessionId: string): void {
+  const row = db
+    .query(`SELECT status FROM agent_session WHERE id = ?`)
+    .get(sessionId) as { status: string } | null;
+  if (!row) throw new KernelError(`unknown assignee session: ${sessionId}`);
+  if (row.status !== "running") {
+    throw new KernelError(`assignee session must be running: ${sessionId}`);
+  }
+}
+
+function executeTaskGovernance(
+  db: KernelDb,
+  command: "reassign_task" | "cancel_task",
+  input: Record<string, unknown>,
+  trace: TrustedExecutionContext,
+): Record<string, unknown> {
+  const taskId = input.task_id;
+  if (typeof taskId !== "string" || taskId.length === 0) {
+    throw new KernelError(`${command} requires task_id`);
+  }
+  const task = db
+    .query(`SELECT * FROM task WHERE id = ?`)
+    .get(taskId) as Record<string, unknown> | null;
+  if (!task) throw new KernelError(`task "${taskId}" not found`);
+  if (task.status !== "open") {
+    throw new IllegalTransitionError("task", String(task.status), command === "cancel_task" ? "cancelled" : "open");
+  }
+
+  const current = exactTaskAssignee(db, taskId);
+  requireRunningSession(db, current.to_id);
+  const nextAssignee = command === "reassign_task"
+    ? input.assignee_session_id
+    : current.to_id;
+  if (typeof nextAssignee !== "string" || nextAssignee.length === 0) {
+    throw new KernelError("reassign_task requires assignee_session_id");
+  }
+  if (command === "reassign_task") {
+    if (nextAssignee === current.to_id) {
+      throw new KernelError("reassign_task requires a different running session");
+    }
+    requireRunningSession(db, nextAssignee);
+  }
+
+  const event = command === "reassign_task" ? "task.reassigned" : "task.cancelled";
+  const to = command === "reassign_task" ? "open" : "cancelled";
+  const state = db.transaction(() => {
+    if (command === "reassign_task") {
+      db.query(`DELETE FROM links WHERE id = ?`).run(current.id);
+      db.query(
+        `INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'assigned_to', ?, ?, ?)`,
+      ).run(crypto.randomUUID(), taskId, nextAssignee, new Date().toISOString());
+    }
+    if (command === "cancel_task") {
+      db.query(`UPDATE task SET status = 'cancelled' WHERE id = ?`).run(taskId);
+    }
+    appendEvent(db, {
+      type: event,
+      object_type: "task",
+      object_id: taskId,
+      payload: {
+        command,
+        previous_assignee_session_id: current.to_id,
+        assignee_session_id: nextAssignee,
+        span_id: trace.span_id,
+      },
+      trace_id: trace.trace_id,
+    });
+    return db.query(`SELECT * FROM task WHERE id = ?`).get(taskId) as Record<string, unknown>;
+  })();
+  return {
+    kind: "object",
+    object_type: "task",
+    object_id: taskId,
+    from: "open",
+    to,
+    event,
+    state,
+  };
+}
+
+function assertSessionMayClose(db: KernelDb, sessionId: string): void {
+  const row = db
+    .query(
+      `SELECT 1 AS open_task
+       FROM task
+       JOIN links ON links.from_id = task.id AND links.kind = 'assigned_to'
+       WHERE task.status = 'open' AND links.to_id = ?
+       LIMIT 1`,
+    )
+    .get(sessionId) as { open_task: number } | null;
+  if (row) {
+    throw new KernelError("Reassign or cancel this task before closing the seat.");
+  }
+}
+
 /**
  * Execute a Kernel command: creation, transition, or trusted pipeline batch.
  * On rejection: typed error — and write nothing.
@@ -149,6 +258,14 @@ export function execute<C extends string>(
   }
   if (pipeline) {
     return executePipeline(db, pipeline, validatedInput, trace) as ExecuteResultFor<C>;
+  }
+
+  if (command === "reassign_task" || command === "cancel_task") {
+    return executeTaskGovernance(db, command, validatedInput, trace) as ExecuteResultFor<C>;
+  }
+
+  if (command === "close_agent_session") {
+    assertSessionMayClose(db, String(validatedInput.session_id ?? ""));
   }
 
   if (command === "complete_task") {

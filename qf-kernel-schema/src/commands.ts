@@ -160,6 +160,20 @@ export const commands: readonly TransitionCommand[] = [
     to: "done",
     event: "task.completed",
   },
+  {
+    action: "reassign_task",
+    type: "task",
+    from: "open",
+    to: "open",
+    event: "task.reassigned",
+  },
+  {
+    action: "cancel_task",
+    type: "task",
+    from: "open",
+    to: "cancelled",
+    event: "task.cancelled",
+  },
 ] as const;
 
 /**

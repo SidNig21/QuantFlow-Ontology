@@ -92,6 +92,7 @@ const DRIVER_SQL_ALLOW = [
   // Act I R5/R6: gate-only Kernel reopen + bus-only bait DB (not Kernel domain tables).
   "qa/gates/kernel-task-delegation.ts",
   "qa/gates/kernel-market-lineage.ts",
+  "qa/gates/team-composition.ts",
 ];
 
 /**
@@ -135,6 +136,7 @@ const OPEN_ALLOW = [
   "qa/gates/kernel-sole-writer-app.ts",
   "qa/gates/kernel-task-delegation.ts",
   "qa/gates/kernel-market-lineage.ts",
+  "qa/gates/team-composition.ts",
   "qa/gates/windows-golden-run.ts",
   "qa/gates/windows-golden-seed.ts",
 ];
@@ -172,6 +174,7 @@ const WRITE_ALLOW = [
   "qa/gates/bovada-football/run.ts",
   "qa/gates/kernel-task-delegation.ts",
   "qa/gates/kernel-market-lineage.ts",
+  "qa/gates/team-composition.ts",
   // Act I packaged fixture seed writes only through execute().
   "qa/gates/windows-golden-run.ts",
   "qa/gates/windows-golden-seed.ts",

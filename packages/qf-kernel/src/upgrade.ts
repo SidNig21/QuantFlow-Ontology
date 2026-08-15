@@ -15,6 +15,7 @@ export const CONNECTION_ACTIONS_UPGRADE = "connection-actions" as const;
 export const TASK_DELEGATION_UPGRADE = "task-delegation" as const;
 export const DETERMINISTIC_EXECUTION_UPGRADE = "deterministic-execution" as const;
 export const INDEPENDENT_CRITIC_UPGRADE = "independent-critic" as const;
+export const TASK_COMPOSITION_UPGRADE = "task-composition" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -27,6 +28,7 @@ export type KernelShapeState =
   | "connection_actions"
   | "task_delegation"
   | "deterministic_execution"
+  | "task_composition"
   | "current"
   | "partial";
 
@@ -269,6 +271,27 @@ function tablesWithoutTaskStatus(
   return next;
 }
 
+function withoutTaskCompositionColumns(sql: string | undefined): string | undefined {
+  if (!sql) return sql;
+  return sql
+    .replace(/,display_name TEXT NOT NULL/gi, "")
+    .replace(
+      /CHECK\s*\(status\s+IN\s*\('open','done','cancelled'\)\)/gi,
+      "CHECK(status IN('open','done'))",
+    );
+}
+
+function tablesWithoutTaskComposition(
+  tables: Map<string, string>,
+): Map<string, string> {
+  const next = new Map(tables);
+  const agentDef = withoutTaskCompositionColumns(next.get("agent_definition"));
+  if (agentDef) next.set("agent_definition", agentDef);
+  const taskSql = withoutTaskCompositionColumns(next.get("task"));
+  if (taskSql) next.set("task", taskSql);
+  return next;
+}
+
 function tablesWithoutTaskDelegation(
   tables: Map<string, string>,
 ): Map<string, string> {
@@ -303,10 +326,16 @@ function tablesWithoutIndependentCritic(
   return next;
 }
 
+function schemaMetaWithoutTaskComposition(
+  rows: Array<[string, string, string, string]>,
+): Array<[string, string, string, string]> {
+  return rows.filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
+}
+
 function schemaMetaWithoutTaskActions(
   rows: Array<[string, string, string, string]>,
 ): Array<[string, string, string, string]> {
-  return schemaMetaWithoutTaskDelegation(rows).filter(
+  return schemaMetaWithoutTaskComposition(schemaMetaWithoutTaskDelegation(rows)).filter(
     ([typeName, kind]) =>
       kind !== "action" ||
       ![
@@ -314,6 +343,8 @@ function schemaMetaWithoutTaskActions(
         "complete_task",
         "create_connection",
         "delete_connection",
+        "reassign_task",
+        "cancel_task",
       ].includes(typeName),
   );
 }
@@ -347,7 +378,8 @@ function schemaMetaWithoutTaskDelegation(
           ? PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION
           : undefined);
       return description ? [row[0], row[1], row[2], description] : row;
-    });
+    })
+    .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
 }
 
 function schemaMetaWithoutDeterministicExecution(
@@ -370,7 +402,8 @@ function schemaMetaWithoutIndependentCritic(
             PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION,
           ]
         : row,
-    );
+    )
+    .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
 }
 
 function linkKindsWithoutTaskDelegation(linkKinds: readonly string[]): string[] {
@@ -394,8 +427,10 @@ function schemaMetaWithoutConnectionActions(
 }
 
 function predecessorTables(tables: Map<string, string>): Map<string, string> {
-  return tablesWithoutTaskDelegation(
-    tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables)),
+  return tablesWithoutTaskComposition(
+    tablesWithoutTaskDelegation(
+      tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables)),
+    ),
   );
 }
 
@@ -461,7 +496,9 @@ function expectedCapabilityGrants(): StructureSnapshot {
   if (!capabilityGrantsSnapshot) {
     const current = expectedCurrent();
     capabilityGrantsSnapshot = {
-      tables: tablesWithoutTaskDelegation(tablesWithoutTaskStatus(current.tables)),
+      tables: tablesWithoutTaskComposition(
+        tablesWithoutTaskDelegation(tablesWithoutTaskStatus(current.tables)),
+      ),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
     };
@@ -476,7 +513,7 @@ function expectedTaskStatus(): StructureSnapshot {
   if (!taskStatusSnapshot) {
     const current = expectedCurrent();
     taskStatusSnapshot = {
-      tables: tablesWithoutTaskDelegation(current.tables),
+      tables: tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutConnectionActions(
         schemaMetaWithoutTaskDelegation(current.schemaMeta),
@@ -493,7 +530,7 @@ function expectedConnectionActions(): StructureSnapshot {
   if (!connectionActionsSnapshot) {
     const current = expectedCurrent();
     connectionActionsSnapshot = {
-      tables: tablesWithoutTaskDelegation(current.tables),
+      tables: tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskDelegation(current.schemaMeta),
     };
@@ -508,7 +545,7 @@ function expectedTaskDelegation(): StructureSnapshot {
   if (!taskDelegationSnapshot) {
     const current = expectedCurrent();
     taskDelegationSnapshot = {
-      tables: tablesWithoutIndependentCritic(current.tables),
+      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
       schemaMeta: schemaMetaWithoutDeterministicExecution(
         schemaMetaWithoutIndependentCritic(current.schemaMeta),
@@ -525,12 +562,27 @@ function expectedDeterministicExecution(): StructureSnapshot {
   if (!deterministicExecutionSnapshot) {
     const current = expectedCurrent();
     deterministicExecutionSnapshot = {
-      tables: tablesWithoutIndependentCritic(current.tables),
+      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
       schemaMeta: schemaMetaWithoutIndependentCritic(current.schemaMeta),
     };
   }
   return deterministicExecutionSnapshot;
+}
+
+let taskCompositionSnapshot: StructureSnapshot | null = null;
+
+/** Post-0009 / pre-0010 — task delegation exists without V2-3 composition state. */
+function expectedTaskComposition(): StructureSnapshot {
+  if (!taskCompositionSnapshot) {
+    const current = expectedCurrent();
+    taskCompositionSnapshot = {
+      tables: tablesWithoutTaskComposition(current.tables),
+      linkKinds: current.linkKinds,
+      schemaMeta: schemaMetaWithoutTaskComposition(current.schemaMeta),
+    };
+  }
+  return taskCompositionSnapshot;
 }
 
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
@@ -601,6 +653,9 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedDeterministicExecution())) {
     return "deterministic_execution";
   }
+  if (snapshotsEqual(live, expectedTaskComposition())) {
+    return "task_composition";
+  }
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -646,6 +701,7 @@ export function applyKernelUpgradeChain(
     taskDelegationSql: string;
     deterministicExecutionSql: string;
     independentCriticSql: string;
+    taskCompositionSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -712,7 +768,8 @@ export function applyKernelUpgradeChain(
     if (
       state !== "connection_actions" &&
       state !== "task_delegation" &&
-      state !== "deterministic_execution"
+      state !== "deterministic_execution" &&
+      state !== "task_composition"
     ) {
       db.exec(upgrades.connectionActionsSql);
       if (classifyKernelShape(db) !== "connection_actions") {
@@ -722,7 +779,11 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    if (state !== "task_delegation" && state !== "deterministic_execution") {
+    if (
+      state !== "task_delegation" &&
+      state !== "deterministic_execution" &&
+      state !== "task_composition"
+    ) {
       db.exec(upgrades.taskDelegationSql);
       if (classifyKernelShape(db) !== "task_delegation") {
         throw new KernelUpgradeShapeError(
@@ -731,7 +792,7 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    if (state !== "deterministic_execution") {
+    if (state !== "deterministic_execution" && state !== "task_composition") {
       db.exec(upgrades.deterministicExecutionSql);
       if (classifyKernelShape(db) !== "deterministic_execution") {
         throw new KernelUpgradeShapeError(
@@ -740,11 +801,20 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    db.exec(upgrades.independentCriticSql);
-    if (classifyKernelShape(db) !== "current") {
+    if (state !== "task_composition") {
+      db.exec(upgrades.independentCriticSql);
+    }
+    if (classifyKernelShape(db) !== "task_composition") {
       throw new KernelUpgradeShapeError(
         INDEPENDENT_CRITIC_UPGRADE,
-        "0009 did not produce the exact current shape",
+        "0009 did not produce the exact post-0009 shape",
+      );
+    }
+    db.exec(upgrades.taskCompositionSql);
+    if (classifyKernelShape(db) !== "current") {
+      throw new KernelUpgradeShapeError(
+        TASK_COMPOSITION_UPGRADE,
+        "0010 did not produce the exact current shape",
       );
     }
   });
@@ -764,6 +834,7 @@ export function applyProfileIdentityUpgrade(db: KernelDb, upgradeSql: string): v
     state === "connection_actions" ||
     state === "task_delegation" ||
     state === "deterministic_execution" ||
+    state === "task_composition" ||
     state === "current" ||
     state === "uninitialized"
   ) {

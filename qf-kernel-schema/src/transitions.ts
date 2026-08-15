@@ -38,8 +38,9 @@ export const transitions = {
     closed: [],
   },
   task: {
-    open: ["done"],
+    open: ["open", "done", "cancelled"],
     done: [],
+    cancelled: [],
   },
 } as const;
 

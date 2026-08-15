@@ -13,6 +13,7 @@ import { generateUpgradeConnectionActions } from "../src/generate/upgrade-connec
 import { generateUpgradeTaskDelegation } from "../src/generate/upgrade-task-delegation.ts";
 import { generateUpgradeDeterministicExecution } from "../src/generate/upgrade-deterministic-execution.ts";
 import { generateUpgradeIndependentCritic } from "../src/generate/upgrade-independent-critic.ts";
+import { generateUpgradeTaskComposition } from "../src/generate/upgrade-task-composition.ts";
 import { schema } from "../src/schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -69,7 +70,12 @@ writeFileSync(
   generateUpgradeIndependentCritic(),
   "utf8",
 );
+writeFileSync(
+  join(upgradesDir, "0010-task-composition.sql"),
+  generateUpgradeTaskComposition(),
+  "utf8",
+);
 
 console.log(
-  "Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, golden/upgrades/0001-agent-profile-identity.sql, golden/upgrades/0002-market-ingest.sql, golden/upgrades/0003-market-context.sql, golden/upgrades/0004-capability-grants.sql, golden/upgrades/0005-task-status.sql, golden/upgrades/0006-connection-actions.sql, golden/upgrades/0007-task-delegation.sql, golden/upgrades/0008-deterministic-execution.sql, golden/upgrades/0009-independent-critic.sql",
+  "Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, golden/upgrades/0001-agent-profile-identity.sql, golden/upgrades/0002-market-ingest.sql, golden/upgrades/0003-market-context.sql, golden/upgrades/0004-capability-grants.sql, golden/upgrades/0005-task-status.sql, golden/upgrades/0006-connection-actions.sql, golden/upgrades/0007-task-delegation.sql, golden/upgrades/0008-deterministic-execution.sql, golden/upgrades/0009-independent-critic.sql, golden/upgrades/0010-task-composition.sql",
 );

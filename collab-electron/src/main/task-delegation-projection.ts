@@ -14,11 +14,22 @@ export type DelegationLink = {
 export type TaskDelegationProjection = {
   taskId: string;
   title: string;
-  status: "open" | "done";
+  status: "open" | "done" | "cancelled";
   fromSessionId: string;
   toSessionId: string;
   fromRole: string;
   toRole: string;
+};
+
+export type TaskAssignmentProjection = {
+  taskId: string;
+  title: string;
+  status: "open" | "done" | "cancelled";
+  delegatedBySessionId: string | null;
+  assignedToSessionId: string | null;
+  assignmentState: "assigned" | "unavailable";
+  /** Sessions named by malformed links; never used as an owner. */
+  unavailableSessionIds: string[];
 };
 
 export type TaskDelegationProjectionReader = {
@@ -26,6 +37,60 @@ export type TaskDelegationProjectionReader = {
   linksFrom: (id: string, kind: string) => DelegationLink[];
   getObject: (type: "agent_definition", id: string) => Record<string, unknown> | null;
 };
+
+function validTask(
+  task: Record<string, unknown>,
+): { taskId: string; title: string; status: "open" | "done" | "cancelled" } | null {
+  const taskId = task.id;
+  const title = task.title;
+  const status = task.status;
+  if (
+    typeof taskId !== "string" ||
+    typeof title !== "string" ||
+    (status !== "open" && status !== "done" && status !== "cancelled")
+  ) {
+    return null;
+  }
+  return { taskId, title, status };
+}
+
+/**
+ * Project every task's exact assignment cardinality from Kernel rows. A task
+ * with one delegated_by and one assigned_to is assigned; any partial or
+ * duplicate identity is deliberately surfaced as unavailable so the UI can
+ * clear a previously rendered title instead of guessing.
+ */
+export function projectTaskAssignments(
+  reader: TaskDelegationProjectionReader,
+): TaskAssignmentProjection[] {
+  const projections: TaskAssignmentProjection[] = [];
+  for (const rawTask of reader.listTasks()) {
+    const task = validTask(rawTask);
+    if (!task) continue;
+    const delegated = reader.linksFrom(task.taskId, "delegated_by");
+    const assigned = reader.linksFrom(task.taskId, "assigned_to");
+    const delegatedIds = delegated
+      .map((link) => link.to_id)
+      .filter((id): id is string => typeof id === "string" && id.length > 0);
+    const assignedIds = assigned
+      .map((link) => link.to_id)
+      .filter((id): id is string => typeof id === "string" && id.length > 0);
+    const exact = delegated.length === 1 && assigned.length === 1 &&
+      delegatedIds.length === 1 && assignedIds.length === 1;
+    projections.push({
+      taskId: task.taskId,
+      title: task.title,
+      status: task.status,
+      delegatedBySessionId: exact ? delegatedIds[0]! : null,
+      assignedToSessionId: exact ? assignedIds[0]! : null,
+      assignmentState: exact ? "assigned" : "unavailable",
+      unavailableSessionIds: exact
+        ? []
+        : [...new Set([...delegatedIds, ...assignedIds])],
+    });
+  }
+  return projections;
+}
 
 function onlyLink(
   reader: TaskDelegationProjectionReader,
@@ -56,16 +121,9 @@ export function projectTaskDelegations(
 ): TaskDelegationProjection[] {
   const projections: TaskDelegationProjection[] = [];
   for (const task of reader.listTasks()) {
-    const taskId = task.id;
-    const title = task.title;
-    const status = task.status;
-    if (
-      typeof taskId !== "string" ||
-      typeof title !== "string" ||
-      (status !== "open" && status !== "done")
-    ) {
-      continue;
-    }
+    const current = validTask(task);
+    if (!current) continue;
+    const { taskId, title, status } = current;
     const delegatedBy = onlyLink(reader, taskId, "delegated_by");
     const assignedTo = onlyLink(reader, taskId, "assigned_to");
     if (!delegatedBy || !assignedTo) continue;

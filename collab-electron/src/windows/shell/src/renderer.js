@@ -28,6 +28,7 @@ import { createCableController } from "./cable-controller.js";
 import { createCableInspector } from "./cable-inspector.js";
 import { createKernelLedger } from "./kernel-ledger.js";
 import { fitViewportToTiles } from "./glacier-feel.js";
+import { renderTaskFoot } from "./task-composition.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -518,10 +519,11 @@ async function init() {
 		onTerminalTileClosed() {
 			syncTileList();
 		},
-		onTileFocused(tile) {
+		 onTileFocused(tile) {
 			tileListWebview.send(
 				"tile-list:focus", tile?.id || null,
 			);
+			renderTaskFoots();
 		},
 		onTileDblClick(tile) {
 			edgeIndicators.panToTile(tile);
@@ -695,14 +697,54 @@ async function init() {
 		});
 	}
 
+	let taskSurface = { sessions: [], assignments: [] };
+
+	function renderTaskFoots() {
+		for (const [id, dom] of tileManager.getTileDOMs()) {
+			const tile = getTile(id);
+			if (!tile) continue;
+			renderTaskFoot(dom, tile, {
+				focused: tileManager.getFocusedTileId() === id,
+				sessions: taskSurface.sessions,
+				assignments: taskSurface.assignments,
+				onCreate: async (args) => {
+					const result = await window.shellApi.qf.createTask(args);
+					if (!result?.ok) throw new Error(result?.error?.message ?? "Create task failed");
+					await refreshTaskSurface();
+				},
+				onReassign: async (taskId, assigneeSessionId) => {
+					const result = await window.shellApi.qf.reassignTask({ taskId, assigneeSessionId });
+					if (!result?.ok) throw new Error(result?.error?.message ?? "Reassign failed");
+					await refreshTaskSurface();
+				},
+				onCancel: async (taskId) => {
+					const result = await window.shellApi.qf.cancelTask(taskId);
+					if (!result?.ok) throw new Error(result?.error?.message ?? "Cancel failed");
+					await refreshTaskSurface();
+				},
+			});
+		}
+	}
+
+	async function refreshTaskSurface() {
+		const result = await window.shellApi.qf.listTaskSurface();
+		taskSurface = result?.ok
+			? {
+				sessions: Array.isArray(result.sessions) ? result.sessions : [],
+				assignments: Array.isArray(result.assignments) ? result.assignments : [],
+			}
+			: { sessions: [], assignments: [] };
+		renderTaskFoots();
+	}
+
 	let taskProjectionReady = false;
 	let taskProjectionRefresh = Promise.resolve();
 	function scheduleTaskProjectionRefresh() {
 		if (!taskProjectionReady) return taskProjectionRefresh;
 		taskProjectionRefresh = taskProjectionRefresh
 			.then(
-				() => reconcileTaskDelegationCanvas(),
-				() => reconcileTaskDelegationCanvas(),
+				() => Promise.all([reconcileTaskDelegationCanvas(), refreshTaskSurface()]),
+				() => Promise.all([reconcileTaskDelegationCanvas(), refreshTaskSurface()]),
 			)
 			.catch((error) => {
 				console.error("task delegation projection refresh failed", error);
@@ -1414,9 +1456,10 @@ async function init() {
 							sessionId,
 							definitionId,
 							role,
-							agentLabel,
-						},
-					);
+								agentLabel,
+							},
+						);
+					tileManager.saveCanvasImmediate();
 					tileManager.spawnTerminalWebview(tile, true);
 					minimap.update();
 				}

@@ -26,6 +26,8 @@ import {
   kernelListArtifacts,
   kernelListEvents,
   kernelListResearchLedger,
+  kernelListTaskSurface,
+  kernelAssertSessionMayClose,
   kernelEnsureSampleResearchDataset,
   kernelOpenHypothesisForQuestion,
   kernelListTaskDelegations,
@@ -39,6 +41,7 @@ import { QF_EXECUTE_ALLOWLIST } from "./qf-execute-allowlist";
 import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
 import { buildMissionActivationInstruction } from "./mission-activation";
+import { loadState as loadCanvasState } from "./canvas-persistence";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -78,6 +81,30 @@ function broadcast(channel: string, ...args: unknown[]): void {
 
 function invalidateDock(): void {
   broadcast("qf:dock:invalidate");
+}
+
+async function trustedActorForTile(tileId: unknown): Promise<string> {
+  if (typeof tileId !== "string" || tileId.trim().length === 0) {
+    throw new Error("Create Task requires the selected delegator tile");
+  }
+  const state = await loadCanvasState();
+  const tile = state?.tiles.find((candidate) => candidate.id === tileId);
+  const sessionId = tile?.sessionId;
+  if (!sessionId) {
+    throw new Error("Create Task requires a selected agent seat tile");
+  }
+  const session = kernelListAgentSessions().find((row) => row.id === sessionId);
+  if (!session || session.status !== "running") {
+    throw new Error("Create Task requires a running delegator seat");
+  }
+  const surfaceSession = kernelListTaskSurface().sessions.find((row) => row.id === sessionId);
+  if (
+    String(surfaceSession?.role ?? "").toLowerCase() !== "orchestrator" &&
+    surfaceSession?.display_name !== "Orchestrator"
+  ) {
+    throw new Error("Create Task requires an Orchestrator seat");
+  }
+  return sessionId;
 }
 
 export function registerKernelHandlers(): void {
@@ -227,6 +254,97 @@ export function registerKernelHandlers(): void {
     }
   });
 
+  ipcMain.handle("qf:tasks:surface", (event) => {
+    try {
+      assertTrustedSender(event);
+      return { ok: true as const, ...kernelListTaskSurface() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:tasks:create", async (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) {
+        throw new Error("Create Task requires title, description, and assignee");
+      }
+      const input = args as Record<string, unknown>;
+      const actorSessionId = await trustedActorForTile(input.tileId);
+      if (typeof input.title !== "string" || input.title.trim().length === 0) {
+        throw new Error("Create Task requires a non-empty title");
+      }
+      if (typeof input.description !== "string" || input.description.trim().length === 0) {
+        throw new Error("Create Task requires a non-empty completion description");
+      }
+      if (
+        typeof input.assigneeSessionId !== "string" ||
+        input.assigneeSessionId.trim().length === 0
+      ) {
+        throw new Error("Create Task requires a running assignee");
+      }
+      const result = kernelExecute(
+        "create_task",
+        {
+          task_id: `task-${crypto.randomUUID()}`,
+          title: input.title.trim(),
+          description: input.description.trim(),
+          assignee_session_id: input.assigneeSessionId.trim(),
+        },
+        {
+          trace_id: crypto.randomUUID(),
+          span_id: crypto.randomUUID(),
+          actor_session_id: actorSessionId,
+        },
+      );
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:tasks:reassign", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) {
+        throw new Error("Reassign requires task_id and assignee_session_id");
+      }
+      const input = args as Record<string, unknown>;
+      const result = kernelExecute(
+        "reassign_task",
+        {
+          task_id: input.taskId,
+          assignee_session_id: input.assigneeSessionId,
+        },
+        { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+      );
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:tasks:cancel", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) {
+        throw new Error("Cancel requires task_id");
+      }
+      const input = args as Record<string, unknown>;
+      const result = kernelExecute(
+        "cancel_task",
+        { task_id: input.taskId },
+        { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+      );
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
   ipcMain.handle("qf:definitions:list", (event) => {
     try {
       assertTrustedSender(event);
@@ -234,14 +352,20 @@ export function registerKernelHandlers(): void {
       const hermesDiagnostic = getHermesDockDiagnostic();
       if (hermesDiagnostic) diagnostics.push(hermesDiagnostic);
       const definitions = kernelListAgentDefinitions().map((definition) => {
-        if (
-          hermesDiagnostic &&
-          String(definition.package_ref ?? "").startsWith("species/hermes/")
-        ) {
-          return definition;
-        }
         const availability = getDockDefinitionAvailability(definition);
-        return availability ? { ...definition, availability } : definition;
+        let capabilityGroups: unknown = definition.capability_groups;
+        if (typeof capabilityGroups === "string") {
+          try {
+            capabilityGroups = JSON.parse(capabilityGroups);
+          } catch {
+            capabilityGroups = [];
+          }
+        }
+        const normalized = {
+          ...definition,
+          capability_groups: Array.isArray(capabilityGroups) ? capabilityGroups : [],
+        };
+        return availability ? { ...normalized, availability } : normalized;
       });
       return { ok: true as const, definitions, diagnostics };
     } catch (err) {
@@ -445,6 +569,7 @@ export function registerKernelHandlers(): void {
     (event, args: { sessionId: string }) => {
       try {
         assertTrustedSender(event);
+        kernelAssertSessionMayClose(args.sessionId);
         closeAgentSessionRow(args.sessionId);
         invalidateDock();
         return { ok: true as const };

@@ -61,6 +61,17 @@ contextBridge.exposeInMainWorld("shellApi", {
     listResearchLedger: () => ipcRenderer.invoke("qf:research:ledger"),
     loadSampleResearchDataset: () => ipcRenderer.invoke("qf:research:loadSampleDataset"),
     listHandoffs: () => ipcRenderer.invoke("qf:handoffs:list"),
+    listTaskSurface: () => ipcRenderer.invoke("qf:tasks:surface"),
+    createTask: (args: {
+      tileId: string;
+      title: string;
+      description: string;
+      assigneeSessionId: string;
+    }) => ipcRenderer.invoke("qf:tasks:create", args),
+    reassignTask: (args: { taskId: string; assigneeSessionId: string }) =>
+      ipcRenderer.invoke("qf:tasks:reassign", args),
+    cancelTask: (taskId: string) =>
+      ipcRenderer.invoke("qf:tasks:cancel", { taskId }),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
     submitResearchQuestion: (question: string, datasetId?: string) =>

@@ -376,6 +376,23 @@ function registerAgentDefinition(
   if (typeof role !== "string" || role.length === 0) {
     throw new KernelError('register_agent_definition requires non-empty "role"');
   }
+  let display_name = input.display_name;
+  if (display_name === undefined) {
+    display_name = role.toLowerCase().includes("critic")
+      ? "Critic"
+      : role.toLowerCase().includes("orchestrator")
+        ? "Orchestrator"
+        : "Market Researcher";
+  }
+  if (
+    display_name !== "Market Researcher" &&
+    display_name !== "Orchestrator" &&
+    display_name !== "Critic"
+  ) {
+    throw new KernelError(
+      'register_agent_definition "display_name" must be Market Researcher, Orchestrator, or Critic',
+    );
+  }
   const package_ref = input.package_ref;
   if (typeof package_ref !== "string" || package_ref.length === 0) {
     throw new KernelError('register_agent_definition requires non-empty "package_ref"');
@@ -444,6 +461,7 @@ function registerAgentDefinition(
       command: cmd.action,
       name,
       role,
+      display_name,
       package_ref,
       runtime_profile,
       system_prompt_ref,
@@ -452,17 +470,18 @@ function registerAgentDefinition(
     insert: () => {
       const created_at = new Date().toISOString();
       db.query(
-        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, runtime_profile, system_prompt_ref, capability_groups)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO agent_definition (id, created_at, name, role, package_ref, system_prompt_ref, runtime_profile, capability_groups, display_name)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         id,
         created_at,
         name,
         role,
         package_ref,
-        runtime_profile,
         system_prompt_ref,
+        runtime_profile,
         capability_groups_json,
+        display_name,
       );
     },
   });
@@ -595,16 +614,26 @@ function createTask(
   }
 
   const session = db
-    .query(`SELECT id FROM agent_session WHERE id = ?`)
-    .get(assignee_session_id) as { id: string } | null;
+    .query(`SELECT id, status FROM agent_session WHERE id = ?`)
+    .get(assignee_session_id) as { id: string; status: string } | null;
   if (!session) {
     throw new UnknownAssigneeSessionError(assignee_session_id);
   }
+  if (session.status !== "running") {
+    throw new KernelError(
+      `create_task assignee_session_id must name a running session: ${assignee_session_id}`,
+    );
+  }
   const delegator = db
-    .query(`SELECT id FROM agent_session WHERE id = ?`)
-    .get(delegator_session_id) as { id: string } | null;
+    .query(`SELECT id, status FROM agent_session WHERE id = ?`)
+    .get(delegator_session_id) as { id: string; status: string } | null;
   if (!delegator) {
     throw new KernelError(`unknown trusted actor_session_id: ${delegator_session_id}`);
+  }
+  if (delegator.status !== "running") {
+    throw new KernelError(
+      `create_task trusted actor_session_id must name a running session: ${delegator_session_id}`,
+    );
   }
 
   const identityLinks: LinkSpec[] = [

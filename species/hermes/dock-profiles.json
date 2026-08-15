@@ -8,6 +8,7 @@
     {
       "id": "hermes-orchestrator",
       "role": "orchestrator",
+      "display_name": "Orchestrator",
       "runtime_profile": "default",
       "system_prompt_ref": "prompts/orchestrator.md",
       "capability_groups": ["desk.orchestrate"]
@@ -15,6 +16,7 @@
     {
       "id": "hermes-worker",
       "role": "worker",
+      "display_name": "Market Researcher",
       "runtime_profile": "default",
       "system_prompt_ref": "prompts/worker.md",
       "capability_groups": ["market.read"]
@@ -22,6 +24,7 @@
     {
       "id": "hermes-worker-2",
       "role": "worker2",
+      "display_name": "Market Researcher",
       "runtime_profile": "default",
       "system_prompt_ref": "prompts/worker.md",
       "capability_groups": ["market.read"]
@@ -29,6 +32,7 @@
     {
       "id": "hermes-critic",
       "role": "critic",
+      "display_name": "Critic",
       "runtime_profile": "default",
       "system_prompt_ref": "prompts/critic.md",
       "capability_groups": ["research.evaluate"]

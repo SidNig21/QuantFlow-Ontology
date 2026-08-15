@@ -553,7 +553,23 @@ export function createTileManager({
 		window.shellApi.trackEvent("tile_created", { type });
 
 		const dom = createTileDOM(tile, {
-			onClose: (id) => closeCanvasTile(id),
+			onClose: async (id) => {
+				const closing = getTile(id);
+				if (closing?.sessionId) {
+					const result = await window.shellApi?.qf?.closeSession?.(closing.sessionId);
+					if (result?.ok === false) {
+						if (dom?.taskFoot) {
+							dom.taskFoot.replaceChildren();
+							const message = document.createElement("div");
+							message.className = "task-foot-error";
+							message.textContent = result.error?.message ?? "Unable to close seat";
+							dom.taskFoot.appendChild(message);
+						}
+						return;
+					}
+				}
+				closeCanvasTile(id);
+			},
 			onFocus: (id, e) => {
 				if (e && e.shiftKey) {
 					toggleTileSelection(id);
@@ -686,20 +702,6 @@ export function createTileManager({
 			}
 		}
 		removeTile(id);
-		// Session tiles are projections of Kernel agent_session rows. Closing the
-		// chrome without cancelling left live rows in the Dock with no canvas tile
-		// (and reconcile would recreate the tile). Tear down the Kernel session.
-		if (tile?.type === "session" && tile.sessionId) {
-			const sid = tile.sessionId;
-			void window.shellApi?.qf?.cancelSession?.(sid)
-				.then((res) => {
-					if (res && res.ok === false) {
-						return window.shellApi?.qf?.closeSession?.(sid);
-					}
-					return res;
-				})
-				.catch(() => window.shellApi?.qf?.closeSession?.(sid));
-		}
 		void window.shellApi?.qf?.deleteConnectionsForTile?.({ tileId: id })
 			.then(() => {
 				onTileClosed?.(id);

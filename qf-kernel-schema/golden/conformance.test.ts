@@ -491,13 +491,17 @@ describe("agent_session transitions", () => {
 });
 
 describe("task transitions", () => {
+  test("accepts open → open", () => {
+    expect(canTransition("task", "open", "open")).toBe(true);
+    expect(() => assertTransition("task", "open", "open")).not.toThrow();
+  });
   test("accepts open → done", () => {
     expect(canTransition("task", "open", "done")).toBe(true);
     expect(() => assertTransition("task", "open", "done")).not.toThrow();
   });
-  test("rejects open → open", () => {
-    expect(canTransition("task", "open", "open")).toBe(false);
-    expect(() => assertTransition("task", "open", "open")).toThrow(/task.*open.*open/);
+  test("accepts open → cancelled", () => {
+    expect(canTransition("task", "open", "cancelled")).toBe(true);
+    expect(() => assertTransition("task", "open", "cancelled")).not.toThrow();
   });
   test("rejects done → open", () => {
     expect(canTransition("task", "done", "open")).toBe(false);
@@ -507,6 +511,22 @@ describe("task transitions", () => {
     expect(canTransition("task", "done", "done")).toBe(false);
     expect(() => assertTransition("task", "done", "done")).toThrow(/task.*done.*done/);
   });
+  test("rejects done → cancelled", () => {
+    expect(canTransition("task", "done", "cancelled")).toBe(false);
+    expect(() => assertTransition("task", "done", "cancelled")).toThrow(/task.*done.*cancelled/);
+  });
+  test("rejects cancelled → open", () => {
+    expect(canTransition("task", "cancelled", "open")).toBe(false);
+    expect(() => assertTransition("task", "cancelled", "open")).toThrow(/task.*cancelled.*open/);
+  });
+  test("rejects cancelled → done", () => {
+    expect(canTransition("task", "cancelled", "done")).toBe(false);
+    expect(() => assertTransition("task", "cancelled", "done")).toThrow(/task.*cancelled.*done/);
+  });
+  test("rejects cancelled → cancelled", () => {
+    expect(canTransition("task", "cancelled", "cancelled")).toBe(false);
+    expect(() => assertTransition("task", "cancelled", "cancelled")).toThrow(/task.*cancelled.*cancelled/);
+  });
 });
 
-// meta: accept=26 reject=96 total=122
+// meta: accept=28 reject=99 total=127

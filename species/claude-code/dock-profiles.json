@@ -8,6 +8,7 @@
     {
       "id": "claude-code-orchestrator",
       "role": "claude-orchestrator",
+      "display_name": "Orchestrator",
       "runtime_profile": "claude-code-orchestrator",
       "system_prompt_ref": "prompts/orchestrator.md",
       "capability_groups": ["desk.orchestrate"]
@@ -15,6 +16,7 @@
     {
       "id": "claude-code-worker",
       "role": "claude-worker",
+      "display_name": "Market Researcher",
       "runtime_profile": "claude-code-worker",
       "system_prompt_ref": "prompts/worker.md",
       "capability_groups": ["market.read"]

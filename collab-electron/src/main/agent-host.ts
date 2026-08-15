@@ -169,6 +169,7 @@ export function getDefinitionRuntime(definitionId: string): DefinitionRuntime {
 export type DockDefinitionAvailability = {
   available: boolean;
   message: string;
+  adapterId: string;
 };
 
 export function getHermesDockDiagnostic(): DockAdapterDiagnostic | null {
@@ -182,9 +183,42 @@ export function getHermesDockDiagnostic(): DockAdapterDiagnostic | null {
  */
 export function getDockDefinitionAvailability(
   definition: Record<string, unknown>,
-): DockDefinitionAvailability | null {
+): DockDefinitionAvailability {
   const packageRef = String(definition.package_ref ?? "");
-  if (!packageRef.startsWith("species/hermes/")) return null;
+  let runtime: DefinitionRuntime;
+  try {
+    runtime = getDefinitionRuntime(String(definition.id ?? ""));
+  } catch (error) {
+    return {
+      available: false,
+      adapterId: packageRef.split("/")[1] || "unknown",
+      message: `Adapter unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+  const adapterId = runtime.metadata.adapterId;
+  if (!packageRef.startsWith("species/hermes/")) {
+    try {
+      if (runtime.metadata.command) {
+        resolveHostAcpCommand(runtime.metadata.command);
+      }
+      if (runtime.entrypointPath && !existsSync(runtime.entrypointPath)) {
+        throw new Error(`entrypoint missing: ${runtime.entrypointPath}`);
+      }
+    } catch (error) {
+      return {
+        available: false,
+        adapterId,
+        message:
+          `${adapterId} unavailable: ${error instanceof Error ? error.message : String(error)}. ` +
+          "Reinstall QuantFlow or run the development app.",
+      };
+    }
+    return {
+      available: true,
+      adapterId,
+      message: `${adapterId} native CLI is ready; credentials are checked only at launch.`,
+    };
+  }
   const collaborationBridge = resolveCollaborationResourcePath(
     "qf-collaboration-mcp.mjs",
     { resourcesPath: process.resourcesPath, moduleDir: __dirname },
@@ -200,6 +234,7 @@ export function getDockDefinitionAvailability(
   if (!collaborationBridge || !ontologyBridge || !hermesLaunchWrapper) {
     return {
       available: false,
+      adapterId,
       message:
         "Hermes unavailable: QuantFlow collaboration resources are missing. " +
         "Reinstall QuantFlow or run the development app.",
@@ -209,15 +244,11 @@ export function getDockDefinitionAvailability(
   if (process.platform !== "win32") {
     return {
       available: false,
+      adapterId,
       message: "Hermes unavailable: native Windows with WSL2 is required for this seat.",
     };
   }
 
-  const runtime = resolveDefinitionRuntime(
-    String(definition.id ?? ""),
-    appRoot(),
-    getDefinition,
-  );
   const diagnostic = classifyWslNativeTuiPrerequisites({
     platform: process.platform,
     homeDir: homedir(),
@@ -227,10 +258,11 @@ export function getDockDefinitionAvailability(
     resolveWslCommand: (candidate) => resolveHostAcpCommand(candidate),
     guestCommand: runtime.metadata.command ?? "hermes",
   });
-  if (diagnostic) return { available: false, message: diagnostic.message };
+  if (diagnostic) return { available: false, adapterId, message: diagnostic.message };
 
   return {
     available: true,
+    adapterId,
     message:
       "Hermes authentication is checked at launch; if sign-in is required, authenticate in Ubuntu and retry.",
   };
@@ -911,16 +943,24 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
 
 export function closeAgentSessionRow(sessionId: string): void {
   const entry = live.get(sessionId);
-  if (!entry) {
-    try {
-      kernelExecute(
-        "close_agent_session",
-        { session_id: sessionId },
-        newTrace(),
-      );
-    } catch {
-      /* already closed */
+  // Close the Kernel row before tearing down the runtime. The Kernel refusal
+  // for an open assigned task must leave the seat visibly intact.
+  try {
+    kernelExecute(
+      "close_agent_session",
+      { session_id: sessionId },
+      newTrace(),
+    );
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Reassign or cancel this task before closing the seat."
+    ) {
+      throw error;
     }
+    if (!entry) return;
+  }
+  if (!entry) {
     return;
   }
   entry.unsub?.();
@@ -934,15 +974,6 @@ export function closeAgentSessionRow(sessionId: string): void {
     void ensureAgentOs().then((host) =>
       host.destroySession(entry.guestId).catch(() => {}),
     );
-  }
-  try {
-    kernelExecute(
-      "close_agent_session",
-      { session_id: sessionId },
-      newTrace(),
-    );
-  } catch {
-    /* ignore */
   }
   console.log(`agent-host: close ${sessionId}`);
 }

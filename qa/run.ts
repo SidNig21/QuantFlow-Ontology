@@ -498,6 +498,16 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "team-composition",
+    description:
+      "WO-V2-3: Dock roles/readiness and Kernel-backed task create, reassign, cancel, projection, and close guard",
+    run: async () => {
+      const { runTeamCompositionGate } = await import("./gates/team-composition-launch.ts");
+      const { ok } = await runTeamCompositionGate();
+      return ok;
+    },
+  },
+  {
     name: "acp-fs-confine",
     description:
       "R7: ACP fs confined to QF_ACP_FS_ROOT; unset root not advertised; escape baits refused",

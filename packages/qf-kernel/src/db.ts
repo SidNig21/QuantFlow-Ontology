@@ -22,6 +22,7 @@ import {
   TASK_DELEGATION_UPGRADE,
   DETERMINISTIC_EXECUTION_UPGRADE,
   INDEPENDENT_CRITIC_UPGRADE,
+  TASK_COMPOSITION_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -352,7 +353,8 @@ export function attachKernel(
       shape === "task_status" ||
       shape === "connection_actions" ||
       shape === "task_delegation" ||
-      shape === "deterministic_execution")
+      shape === "deterministic_execution" ||
+      shape === "task_composition")
   ) {
     const upgradeOrder = [
       PROFILE_IDENTITY_UPGRADE,
@@ -364,6 +366,7 @@ export function attachKernel(
       TASK_DELEGATION_UPGRADE,
       DETERMINISTIC_EXECUTION_UPGRADE,
       INDEPENDENT_CRITIC_UPGRADE,
+      TASK_COMPOSITION_UPGRADE,
     ];
     const completedByShape = {
       pre_d1: 0,
@@ -375,6 +378,7 @@ export function attachKernel(
       connection_actions: 6,
       task_delegation: 7,
       deterministic_execution: 8,
+      task_composition: 9,
     } as const;
     const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
@@ -420,7 +424,8 @@ export function attachKernel(
       shape === "task_status" ||
       shape === "connection_actions" ||
       shape === "task_delegation" ||
-      shape === "deterministic_execution"
+      shape === "deterministic_execution" ||
+      shape === "task_composition"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -449,6 +454,9 @@ export function attachKernel(
       const independentCriticSql = readFileSync(
         upgradeSqlPath("0009-independent-critic.sql"), "utf8",
       );
+      const taskCompositionSql = readFileSync(
+        upgradeSqlPath("0010-task-composition.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -459,6 +467,7 @@ export function attachKernel(
         taskDelegationSql,
         deterministicExecutionSql,
         independentCriticSql,
+        taskCompositionSql,
       });
     }
   }

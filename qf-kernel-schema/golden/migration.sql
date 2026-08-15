@@ -76,6 +76,8 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('regis
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_agent_session', 'action', 'experimental', 'Create an agent_session by adopting a guest-minted session_id (Kernel never mints). Requires agent_definition_id and atomically links spawned_from; label is presentation-only.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_task', 'action', 'experimental', 'Create an open task with one trusted delegator and one assignee. The Kernel writes delegated_by and assigned_to atomically; callers cannot supply either identity link.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_task', 'action', 'experimental', 'Complete an open task with its durable result artifact. The Kernel accepts it only when trusted worker context owns the assignment and the result derives from that worker''s Kernel-receipted generated ontology read.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('reassign_task', 'action', 'experimental', 'Move an open task to a different running agent_session while preserving its trusted delegator and receipt provenance.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cancel_task', 'action', 'experimental', 'Cancel an open task without deleting its trusted delegator or assignee provenance links.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_connection', 'action', 'experimental', 'Create a typed canvas connection edge (kind data|control|view) between two port refs. It persists projection wiring only through the Kernel command path — never a second truth store or a self-loop.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delete_connection', 'action', 'experimental', 'Delete a connection row by id and append connection.deleted. Hard delete only — the ontology has no tombstone field, and canvas persistence must never keep the edge.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_agent_session', 'action', 'experimental', 'Bring a starting agent session into running (starting → running).');
@@ -377,7 +379,9 @@ CREATE TABLE agent_definition (
   -- Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.
   runtime_profile TEXT,
   -- Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.
-  capability_groups TEXT NOT NULL
+  capability_groups TEXT NOT NULL,
+  -- Founder-facing Dock role label. Production profiles use exactly Market Researcher, Orchestrator, or Critic; never expose a machine id as the primary label.
+  display_name TEXT NOT NULL
 );
 
 -- An agent_session is one durable live seat identity on the canvas. It governs operational lifecycle only and must never store model-internal reasoning states.
@@ -405,7 +409,7 @@ CREATE TABLE task (
   description TEXT NOT NULL,
   -- Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.
   status TEXT NOT NULL,
-  CHECK (status IN ('open', 'done'))
+  CHECK (status IN ('open', 'done', 'cancelled'))
 );
 
 -- A tool is an MCP-exposed capability agents can invoke. It governs action surface by keeping work on declared tools instead of ad-hoc side channels.

@@ -64,6 +64,11 @@ export const agent_definition = defineObject({
       .describe(
         "Capability groups this Dock profile may invoke through the app-owned ontology gateway. Grant groups only — never tool names — so new schema objects join their group without a hand-edited roster.",
       ),
+    display_name: z
+      .string()
+      .describe(
+        "Founder-facing Dock role label. Production profiles use exactly Market Researcher, Orchestrator, or Critic; never expose a machine id as the primary label.",
+      ),
   }),
 });
 
@@ -106,7 +111,7 @@ export const task = defineObject({
         "Completion contract for this task. Write it so a verifier can decide done versus not-done from observable evidence.",
       ),
     status: z
-      .enum(["open", "done"])
+      .enum(["open", "done", "cancelled"])
       .describe(
         "Lifecycle state of this task on the canvas. Transitions must go through the Kernel write path — never ad-hoc SQL — so reopen always sees Kernel truth.",
       ),
@@ -245,6 +250,12 @@ export const register_agent_definition = defineAction({
         "Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names.",
       )
       .optional(),
+    display_name: z
+      .string()
+      .describe(
+        "Founder-facing Dock role label. Production profiles use exactly Market Researcher, Orchestrator, or Critic.",
+      )
+      .optional(),
   }),
 });
 
@@ -364,6 +375,31 @@ export const complete_task = defineAction({
     result_artifact_id: z
       .string()
       .describe("Canonical result trajectory artifact that proves this task's completion lineage."),
+  }),
+});
+
+export const reassign_task = defineAction({
+  name: "reassign_task",
+  description:
+    "Move an open task to a different running agent_session while preserving its trusted delegator and receipt provenance.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    task_id: z.string().describe("Open task id to move."),
+    assignee_session_id: z
+      .string()
+      .describe("Different running agent_session that will own the task."),
+  }),
+});
+
+export const cancel_task = defineAction({
+  name: "cancel_task",
+  description:
+    "Cancel an open task without deleting its trusted delegator or assignee provenance links.",
+  lifecycle: "experimental",
+  capabilityGroup: "desk.orchestrate",
+  input: z.object({
+    task_id: z.string().describe("Open task id to cancel."),
   }),
 });
 

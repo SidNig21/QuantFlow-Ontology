@@ -304,11 +304,15 @@ export function createTileDOM(tile, callbacks) {
   const contentArea = document.createElement("div");
   contentArea.className = "tile-content gl-tile__screen";
 
+  const taskFoot = document.createElement("div");
+  taskFoot.className = "tile-task-foot";
+
   const contentOverlay = document.createElement("div");
   contentOverlay.className = "tile-content-overlay";
 
   body.appendChild(titleRow);
   body.appendChild(contentArea);
+  body.appendChild(taskFoot);
   contentArea.appendChild(contentOverlay);
 
   for (const side of ["n", "e", "s", "w"]) {
@@ -329,6 +333,7 @@ export function createTileDOM(tile, callbacks) {
     titleText,
     contentArea,
     contentOverlay,
+    taskFoot,
     head,
     urlInput,
     navBack,

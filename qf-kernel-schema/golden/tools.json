@@ -1606,6 +1606,10 @@
         "runtime_profile": {
           "description": "Equality filter on runtime_profile. Optional runtime adapter profile selector (for example a Hermes profile name). Never a path to profile home or credential-bearing configuration.",
           "type": "string"
+        },
+        "display_name": {
+          "description": "Equality filter on display_name. Founder-facing Dock role label. Production profiles use exactly Market Researcher, Orchestrator, or Critic; never expose a machine id as the primary label.",
+          "type": "string"
         }
       }
     }
@@ -1780,7 +1784,8 @@
           "type": "string",
           "enum": [
             "open",
-            "done"
+            "done",
+            "cancelled"
           ]
         }
       }
@@ -2820,6 +2825,10 @@
             ]
           },
           "description": "Capability groups this profile may invoke through the ontology gateway. Grant groups only — never individual tool names."
+        },
+        "display_name": {
+          "type": "string",
+          "description": "Founder-facing Dock role label. Production profiles use exactly Market Researcher, Orchestrator, or Critic."
         }
       },
       "required": [
@@ -2910,6 +2919,43 @@
       "required": [
         "task_id",
         "result_artifact_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_reassign_task",
+    "description": "Move an open task to a different running agent_session while preserving its trusted delegator and receipt provenance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Open task id to move."
+        },
+        "assignee_session_id": {
+          "type": "string",
+          "description": "Different running agent_session that will own the task."
+        }
+      },
+      "required": [
+        "task_id",
+        "assignee_session_id"
+      ]
+    }
+  },
+  {
+    "name": "qf_cancel_task",
+    "description": "Cancel an open task without deleting its trusted delegator or assignee provenance links.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Open task id to cancel."
+        }
+      },
+      "required": [
+        "task_id"
       ]
     }
   },
