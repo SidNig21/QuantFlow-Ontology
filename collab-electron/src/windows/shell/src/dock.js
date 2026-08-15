@@ -214,6 +214,7 @@ export function initDock(panelEl, options = {}) {
 					const card = el("div", unavailable ? "lrow lrow-unavailable" : "lrow");
 					card.tabIndex = unavailable ? -1 : 0;
 					card.setAttribute("role", "button");
+					card.setAttribute("data-definition-id", definitionId);
 					card.appendChild(el("b", null, name));
 					card.appendChild(el("span", "dock-adapter", `${adapter} · native CLI`));
 					card.appendChild(el("span", "dock-capabilities", capabilities.join(" · ")));

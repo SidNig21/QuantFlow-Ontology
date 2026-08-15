@@ -12,11 +12,9 @@
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "0.18.2",
-    "@rivet-dev/agentos-core": "0.2.7",
     "qf-kernel": "file:../../packages/qf-kernel"
   },
   "devDependencies": {
-    "@rivet-dev/agentos-toolchain": "0.2.7",
     "@types/bun": "^1.3.14"
   }
 }

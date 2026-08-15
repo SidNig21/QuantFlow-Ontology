@@ -165,34 +165,11 @@ export function prepareRuntimeStaging(
       copySourceTree(join(repoRoot, "tools/runtime-proof"), runtimeProofDir);
     }
 
-    // Each copied species is its own frozen workspace. Install Hermes in the
-    // production path so packing never depends on a checkout's node_modules or
-    // on the QA runtime-proof fixture. QA installs its fixture workspace
-    // separately and gets a separate Windows adapter copy.
-    // qf-kernel is used by the Hermes harness smoke scripts, not by the
-    // deploy-true ACP shim that pack-agent builds. Its nested local
-    // qf-kernel-schema dependency is not portable when this workspace is
-    // copied into a clean temporary root, so remove that harness-only edge in
-    // the copy and regenerate its lockfile before the frozen install.
-    const hermesPackagePath = join(hermesDir, "package.json");
-    const hermesPackage = JSON.parse(readFileSync(hermesPackagePath, "utf8")) as {
-      dependencies?: Record<string, unknown>;
-    };
-    if (!hermesPackage.dependencies?.["qf-kernel"]) {
-      throw new Error("Hermes staging package must declare its harness qf-kernel dependency");
-    }
-    delete hermesPackage.dependencies["qf-kernel"];
-    writeFileSync(hermesPackagePath, `${JSON.stringify(hermesPackage, null, 2)}\n`, "utf8");
-    rmSync(join(hermesDir, "bun.lock"), { force: true });
-    runOrThrow("bun", ["install", "--lockfile-only"], hermesDir);
-
-    const installArgs = ["install", "--frozen-lockfile", "--backend", "copyfile"];
-    runOrThrow("bun", installArgs, hermesDir);
     if (qaMode) {
+      const installArgs = ["install", "--frozen-lockfile", "--backend", "copyfile"];
       runOrThrow("bun", installArgs, runtimeProofDir);
     }
 
-    const hermesAdapter = prepareWindowsToolchainAdapter(hermesDir);
     const proofAdapter = qaMode
       ? prepareWindowsToolchainAdapter(runtimeProofDir)
       : null;
@@ -208,11 +185,10 @@ export function prepareRuntimeStaging(
         runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir);
         runOrThrow("bun", ["run", "pack-agent"], runtimeProofDir, packEnv(proofAdapter));
       }
-      runOrThrow("bun", ["run", "pack-agent"], hermesDir, packEnv(hermesAdapter));
+      runOrThrow("node", ["./scripts/pack-agent.mjs"], hermesDir);
       runOrThrow("node", ["./scripts/pack-agent.mjs"], claudeCodeDir);
     } finally {
       proofAdapter?.cleanup();
-      hermesAdapter?.cleanup();
     }
 
     const stagedRepo = stagingRepo;

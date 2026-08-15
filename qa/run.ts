@@ -498,6 +498,18 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "dev-dock-readiness",
+    description:
+      "V2-3R: public development startup uses tracked native-TUI assets before Electron",
+    run: async () => {
+      const { runDevDockReadinessGate } = await import(
+        "./gates/dev-dock-readiness.ts"
+      );
+      const { ok } = await runDevDockReadinessGate();
+      return ok;
+    },
+  },
+  {
     name: "team-composition",
     description:
       "WO-V2-3: Dock roles/readiness and Kernel-backed task create, reassign, cancel, projection, and close guard",
