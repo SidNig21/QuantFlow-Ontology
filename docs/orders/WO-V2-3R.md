@@ -1,6 +1,6 @@
 # WO-V2-3R — bank the native Hermes runtime prerequisite
 
-status: rework-open — Reader PASS `01a00708-d945-7461-803a-39832ef10bf9`; final cycle authorized by `NEXT.md`
+status: done — independent verifier PASS at candidate `a530c276453bb2f390304bbcf843fd0bf0810796`; correction receipt recorded below
 assignee: builder
 depends: WO-NORTHSTAR-1 verifier PASS `098aa62`; preserved V2-3R product working tree
 rung: R13 runtime closure before R14 Research Director
@@ -377,3 +377,37 @@ The focused gate runs once. Any red stops. Full green commits and pushes all
 authorized product files for one fresh independent Verifier, which runs the
 full Acceptance matrix once. No other file, assertion, dependency, test, or
 product behavior may change.
+
+## Independent verifier receipt — 2026-08-15
+
+Correction: the prior verifier report wrote `...0797`; that was a transcription
+error. The delegated candidate and measured HEAD were exactly
+`a530c276453bb2f390304bbcf843fd0bf0810796`. No matrix command ran and no file
+changed during that earlier report.
+
+The corrected independent verification ran the full Acceptance matrix exactly
+once, in order, from the existing checkout. Baseline and post-run receipts:
+
+- `HEAD=a530c276453bb2f390304bbcf843fd0bf0810796`
+- `BRANCH=wo-V2-3`
+- `STATUS_SHORT=` (clean before and after)
+- `UPSTREAM=origin/wo-V2-3`
+- `LOCAL_UPSTREAM_EQUAL=True`
+- `ELECTRON_HERMES_PROCESS_NAMES=<none>`
+
+Exact matrix receipts:
+
+1. `bun test scripts/package-lib/runtime-staging.test.ts` — `2 pass`, `0 fail`.
+2. `bun qa/run.ts dev-dock-readiness` — both falsifiers red, restored live proof green; `elapsed_ms=13321`; `PASS dev-dock-readiness`.
+3. `bun qa/run.ts repo-shape` — `PASS repo-shape`.
+4. `bun qa/run.ts kernel-sole-writer` — `PASS kernel-sole-writer`.
+5. `bun qa/run.ts kernel-sole-writer-app` — `PASS kernel-sole-writer-app`.
+6. `bun qa/run.ts one-skin` — `PASS one-skin`.
+7. `bun qa/run.ts team-composition-ui` — live renderer/preload/main receipt; `PASS team-composition-ui`.
+8. `bun qa/run.ts doc-links` — `PASS` (56 live documents, every pointer resolves).
+9. `git diff --exit-code b5b6c95 -- collab-electron/src/windows/shell/src/task-composition.js qa/gates/team-composition-ui.ts` — exit 0.
+10. `git diff --check` — exit 0.
+
+The native Hermes runtime prerequisite is verified and banked. This receipt does
+not claim that the Research Director product is shipped; its product order must
+be drafted and independently read next.
