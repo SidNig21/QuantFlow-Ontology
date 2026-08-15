@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: founder-reauthorized
+status: stopped-after-live-hermes-red
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: granted 2026-08-15 — live Hermes gate fixture only
+reauthorization: used and exhausted 2026-08-15
 
 ## In plain terms
 
@@ -196,6 +196,26 @@ to replace the failed Claude gate fixture with live production Hermes seats.
 
 On green, commit and push the full V2-3.1 candidate for a fresh independent
 Verifier. On red, preserve the work and return to the founder.
+
+### Live Hermes continuation result — RED, 2026-08-15
+
+The reauthorized production fixture removed the runtime ambiguity: both named
+Hermes seats reached the real production path successfully. The first green UI
+proof then stopped on a remaining product defect, before falsifiers or the rest
+of the matrix.
+
+```text
+definition=hermes-orchestrator
+definition=hermes-worker
+team-composition-ui: FAIL background Create Task control is not visible and hit-testable
+FAIL team-composition-ui
+```
+
+No falsifier, remaining gate, product commit, or push ran. The checkout remains
+at committed HEAD `bfe3f92500a7c8643c0945692cb87dc440644b58` with the V2-3.1
+implementation and gate changes preserved but uncommitted. The live-seat gate
+fixture is proven; only the background-control product assertion is presently
+red. Further product repair requires new founder authority.
 
 ## Objective
 
