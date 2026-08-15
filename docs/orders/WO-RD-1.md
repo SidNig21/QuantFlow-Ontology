@@ -1,11 +1,11 @@
 # WO-RD-1 — Research Director front door
 
-status: rework-open — Reader PASS `01a0072b-5e60-76a0-b07b-e16a5a48929f`; final gate-only cycle authorized
+status: lifecycle-repair-open — Reader PASS `01a00732-6284-78f3-9c50-0155742760a7`; one-shot two-file pass authorized
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
 authorization: founder goal 2026-08-15; routed after adversarial Reader PASS
-rework-cycle: 1 of 1 — final cycle
+rework-cycle: 1 of 1 exhausted; one founder-goal reauthorization is limited below
 
 ## In plain terms
 
@@ -256,6 +256,7 @@ director_sessions_added=1 spawned_from_exact=1
 mission_visible=true director_tile_visible=true manual_dock_composition=0
 old_orchestrator_sessions_added=0
 oracle=independent_read_only kernel_unchanged_after_oracle=true
+convergence_remaining=[]
 owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
 repository_tree_unchanged=true
 elapsed_ms=<value less than 120000>
@@ -368,3 +369,60 @@ git diff --check
 Any red stops. Full green commits and pushes the complete authorized WO-RD-1
 candidate for one fresh independent Verifier, which owns the full Acceptance
 matrix once.
+
+## Reauthorization — synthetic responder owns its input lifetime
+
+The bounded convergence rework still observed one captured process until the
+outer kill. The gate did not record that row, so no product process identity is
+claimed. Static inspection names one concrete handle defect in the new
+Director-only proof path: `PtyLineReader` attaches a `data` listener to stdin;
+the Director early-return stops both MCP children but never pauses that input,
+so the synthetic responder may keep its Node event loop alive after emitting
+`turn: complete`.
+
+This is one narrowly reauthorized diagnostic-and-repair pass under the
+founder's active goal to finish the slice without per-assertion approval. In
+plain terms: the synthetic proof responder must stop listening to its own
+input when its turn ends, and a cleanup failure must show exactly which
+captured process is still alive.
+
+1. In `collab-electron/cli/qf-hermes-synthetic-responder.mjs`, give
+   `PtyLineReader` exactly one idempotent disposal method. Disposal must reject
+   and remove every pending `next()` waiter (never leave one pending or resolve
+   it as a successful input line), and must pause only the input stream passed
+   to that reader. It must not end or destroy `process.stdin`, touch a parent
+   or real-Hermes stream, or change any other responder state. The method must
+   remain safe when called again, including when the reader was already closed
+   by EOF or error. Call it from `run()`'s existing `finally` after both MCP
+   clients stop, including when startup or the role flow throws. This file is
+   reached only by the synthetic-test path; do not change activation parsing,
+   boundaries, role flows, production Hermes, or any other product behavior.
+2. In `qa/gates/research-director-front-door.ts`, retain the bounded natural
+   convergence check against the exact `launchPids` set captured once by the
+   existing launch receipt. Each poll may take a fresh `processSnapshot()`, but
+   diagnostics must filter the final snapshot by that same PID set and may not
+   recapture ownership or infer it from names, paths, parents, or families.
+   Immediately before the existing non-zero convergence assertion, print one
+   JSON line named `convergence_remaining` whose array contains exactly the
+   remaining captured rows and exactly these keys: `pid`, `parent_pid`, `name`,
+   `executable_path`, and `command_line`. Print
+   `convergence_remaining=[]` on the zero-remaining path. Diagnostics do not
+   alter the PID set, the zero-process acceptance, any count, or any assertion.
+
+Allowed edits are exactly those two files. The command sequence is one-shot:
+invoke no command more than once, stop at the first non-zero result, and do not
+retry, apply another fix, or run a later command after red. Run once:
+
+```powershell
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+If the focused gate's convergence assertion is red, it must first print the
+exact `convergence_remaining` row(s) described above for the founder's
+decision. A unit-test or `git diff --check` red has no process row to print and
+still stops the pass immediately; it must not be disguised as a convergence
+red. No further attempt is implied after any red. Full green commits and
+pushes the complete WO-RD-1 candidate for one fresh independent Verifier and
+does not reopen the rework cycle.
