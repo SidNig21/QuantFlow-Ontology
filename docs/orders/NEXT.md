@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 ordinary development runtime closure
 
-status: AUTHORIZED — NATIVE-CLI REWRITE READER PASS
+status: FOUNDER DIRECTION RESET — BUILDER DOOR CLOSED
 authorized-by: founder standing direction to handle the build and delegated founder checks
 authorized-at: 2026-08-15
 baseline: V2-3.1 candidate `b5b6c95` machine-passed; Computer Use founder check rejected runtime launch; closure order Reader-passed at `f504a4a`
@@ -25,19 +25,14 @@ Computer Use receipt is recorded in
 
 ## Work here only
 
-The founder confirmed AgentOS was dropped from the production direction. The
-rewritten order removes that obsolete packaging seam from the Hermes native-CLI
-path instead of patching it. The Reader passed both protocol questions at
-`060b91c`. Execute
-[`WO-V2-3R.md`](WO-V2-3R.md) exactly in this checkout on branch `wo-V2-3`. No
-second folder, worktree, clone, helper framework, packaged gate, installer,
-release verifier, credential access, Task semantic change, Dock rebuild, or
-Claude Code timeout repair.
+No product implementation, Builder, Verifier, merge, or ladder rotation is
+authorized. The founder rejected the workflow currently being treated as the
+north-star end state. Preserve the uncommitted V2-3R files and all completed
+history while the product intent and authority hierarchy are corrected.
 
 ## Stop
 
-The next Builder attempt must delete the obsolete resolver/toolchain work and
-apply only the Reader-passed tracked native-CLI adapter contract. After a fresh
-Verifier PASS, the router performs the exact founder-delegated flow with
-Computer Use. Do not begin V2-3.2 or the direction reset before that visible
-acceptance. Never place bets or trades.
+Stop. Do not infer a replacement workflow from V2-SCOPE, a handoff, a prior chat,
+or the existing golden scene. Resume only after the founder's actual product
+promise is written plainly and an independent Reader confirms the authority
+documents no longer contradict it. Never place bets or trades.
