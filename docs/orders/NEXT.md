@@ -1,6 +1,6 @@
 # NEXT — R14 Research Director front door
 
-status: BUILDER DOOR OPEN — ONE-LINE FALSIFIER CORRECTION
+status: BUILDER DOOR OPEN — ONE-LINE APP FIXTURE CORRECTION
 authorized-by: independent verifier
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 founder-closed with named gap; R14 active
@@ -17,11 +17,11 @@ It passed its adversarial read and is the one authorized product order.
 
 ## Work here only
 
-The product path is implemented locally. The exact one-line cleanup-falsifier
-ownership-root correction passed its read. One separate Builder may change only
-that line and run the at-most-once matrix. Do not create a worktree or clone,
-run a release verifier, package an installer, start a long soak, or begin later
-R14 work.
+The product path is implemented locally. The exact one-line isolated-app
+fixture correction passed its read. One separate Builder may change only that
+line and run the at-most-once matrix. Do not create a worktree or clone, run a
+release verifier, package an installer, start a long soak, or begin later R14
+work.
 
 ## Stop
 

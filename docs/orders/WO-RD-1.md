@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: falsifier-correction-open — Reader PASS `01a00732-6284-78f3-9c50-0155742760a7`; exact one-line correction authorized
+status: app-fixture-correction-open — Reader PASS `01a00732-6284-78f3-9c50-0155742760a7`; exact one-line fixture correction authorized
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -459,6 +459,34 @@ product code, or any other source line.
 
 Invoke each listed command at most once, in order. Stop at the first non-zero
 result; run no later command and make no retry or second attempt:
+
+```powershell
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+Any red stops the slice for the founder. Full green commits and pushes the
+complete authorized candidate for one fresh independent Verifier.
+
+## Tooling correction — valid isolated app directory
+
+After the falsifier root was corrected, the live proof timed out waiting for
+application readiness with zero leaked processes/roots and an unchanged repo.
+Static inspection gives one exact pre-boot cause: the gate sets
+`QF_APP_ROOT=<runRoot>/app-root` but sets
+`QF_APP_DIR=<runRoot>/app-dir` as its sibling. Existing `paths.ts` rejects that
+before RPC startup because `QF_APP_DIR` must be contained beneath
+`QF_APP_ROOT`. The independently green `dev-dock-readiness` gate uses
+`QF_APP_DIR=<appRoot>/app`.
+
+This is one gate-fixture correction. In
+`qa/gates/research-director-front-door.ts`, change only the `appDir` declaration
+from `join(runRoot, "app-dir")` to `join(appRoot, "app")`. Do not change product
+code, environment contracts, readiness criteria, timeout, output capture,
+cleanup, or any other line.
+
+Run each command at most once and stop at first red:
 
 ```powershell
 bun test qa/gates/research-director-front-door.test.ts
