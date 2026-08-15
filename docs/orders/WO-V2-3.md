@@ -34,33 +34,79 @@ re-skin the Dock.
 
 ## Deliverables
 
-1. **Dock names the role first.** Production profiles show a human role
-   (`Market Researcher`, `Orchestrator`, `Critic`) over the runtime
-   (`Hermes · native CLI`). Machine ids like `hermes-worker-2` are not the
-   primary label. QA / `ungranted` profiles stay out of the production Dock.
-2. **Create and assign a Task from the app.** The founder creates one Task and
-   assigns it to a live seat without typing a Kernel command. The write goes
-   through `execute()`. The assignment is `task → assigned_to → agent_session`.
-3. **The tile and ledger show the assignment.** The assigned seat's tile shows
-   the Task title. The ledger shows who owns it. Close and reopen still show it.
-4. **Redirect.** Reassign the Task to the other seat, cancel the Task, and close
-   a seat. Each is a Kernel action with a visible result. UI-only state is a
-   defect.
+1. **Dock names the role first and explains readiness.** A production profile
+   is one loaded from the production `species/*/dock-profiles.json` inventory,
+   never a QA fixture or an id containing `ungranted`. Every production profile
+   has one required `display_name`: `Market Researcher`, `Orchestrator`, or
+   `Critic`. Missing or unknown display names fail the inventory gate; the UI
+   must not fall back to the machine id. The primary row is `display_name`; the
+   secondary row is `Hermes · native CLI` or `Claude Code · native CLI`, derived
+   from its adapter. Each row also shows its capability groups and a per-profile
+   readiness dot. A non-ready row states its own actionable reason; no global
+   readiness footnote satisfies this deliverable.
+2. **Create and assign one Task from the app.** A `Create Task` control lives in
+   the selected delegator/orchestrator tile foot, not in a detached side panel.
+   It requires a non-empty title, non-empty completion description, and one
+   assignee selected from currently `running` sessions. Submit calls the existing
+   `create_task` action through `execute()` with trusted delegator context;
+   creation and initial assignment are one atomic action. The Kernel writes
+   exactly one `delegated_by` and one `assigned_to` link.
+3. **Project assignment from Kernel truth.** The assigned seat's tile fact strip
+   shows the open Task title and `OPEN`; the Dock Active row for that same seat
+   shows `Owns: <Task title>`. Both projections read the Task plus its exact-one
+   `assigned_to` link from the Kernel. With no assignment they show `No task`;
+   missing or duplicate assignment links show `Assignment unavailable` and must
+   never retain a stale title. Closing and reopening the app produces the same
+   title, status, and owner from the same Kernel rows.
+4. **Add exactly two governed Task actions.** `reassign_task(task_id,
+   assignee_session_id)` is allowed only for an `open` Task and a different
+   `running` session. It atomically replaces the one `assigned_to` link and
+   preserves `delegated_by`. `cancel_task(task_id)` changes only an `open` Task
+   to `cancelled`; it preserves both identity links for provenance. Both actions
+   are schema-defined, generated, routed through `execute()`, event-receipted,
+   and reject unknown Tasks, non-running assignees, illegal status, and no-op
+   reassignment without writing anything.
+5. **Redirect and close visibly.** `Reassign` and `Cancel` controls live in the
+   Task fact strip/tile foot. After reassign, the old seat shows `No task` and
+   the second running seat shows the title. After cancel, the owning tile shows
+   the title plus `CANCELLED`, and its Dock row no longer claims active work.
+   Closing a seat that owns an open Task is refused on screen with `Reassign or
+   cancel this task before closing the seat.` After reassign or cancel, the
+   existing governed close action is allowed and the tile shows `CLOSED`.
 
 ## Proof
 
-Ryan opens the installed or `bun run dev` app, adds two seats, assigns a task,
-sees it, reassigns it, cancels it. That is acceptance.
+Ryan runs the app from this checkout with `bun run dev`, adds two seats, creates
+one Task from the orchestrator tile, assigns it to seat A, sees it on seat A and
+in Dock Active, reassigns it to seat B, cancels it, then closes seat B. He
+reopens the app and sees the cancelled Task, final owner, and closed seat from
+Kernel state. That is acceptance; this order does not rebuild an installer.
 
-Builder tests, focused only:
+Builder commands, focused and bounded:
 
-- Dock role label test (production inventory, no `ungranted`)
-- create / assign / reassign / cancel through `execute()`, then a Kernel read
-  after a simulated reopen
-- tile / ledger projection reads Kernel assignment, not a UI cache
+```powershell
+bun qa/run.ts repo-shape
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts one-skin
+bun qa/run.ts team-composition
+bun qa/run.ts doc-links
+git diff --check
+```
 
-No 19-command matrix. No installer loop. Falsify assign by dropping
-`assigned_to` — the tile must go red, then restore green.
+`team-composition` is one focused gate and must finish within two minutes. It
+loads the production profile inventory, exercises create / assign / reassign /
+cancel through `execute()`, closes and reopens a fresh Kernel reader on the same
+temporary database, and renders the tile/Dock projection from those rows. It
+goes red on a missing role label, QA/ungranted production profile, UI-cached
+assignment, illegal/no-op action that writes, or lost reopen state.
+
+No 19-command matrix. No installer loop. Falsify the focused gate by removing
+the fixture Task's `assigned_to` link: the projection must return the named
+`Assignment unavailable` failure and the gate must exit nonzero. Restore the
+exact-one link and show the same command green. This red/green pair is the only
+new falsification proof required by this order.
 
 ## Out of scope
 
