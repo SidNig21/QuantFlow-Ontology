@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: stopped-on-gate-law-red
+status: founder-reauthorized-gate-only-cleanup
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: background-control pass used and exhausted 2026-08-15
+reauthorization: one allowlist-and-cleanup pass granted 2026-08-15
 
 ## In plain terms
 
@@ -263,10 +263,33 @@ FAIL kernel-sole-writer
 ```
 
 No product or gate commit was made and nothing was pushed. The background
-control behavior is measured green, but V2-3.1 remains unaccepted because its
-new gate bypasses the Kernel read boundary and does not own a clean process
-lifecycle. Further work requires founder authority limited to those two gate
-defects; the product scope may not widen.
+control behavior is measured green. The gate's direct SQLite access is an
+independent read-only oracle over its isolated UI-proof Kernel, matching the
+existing WO-WIN2 and WO-V2-2 precedent; the defect is the missing named
+allowlist entry, not the read path. The gate also does not yet own a clean
+process lifecycle. Further work requires founder authority limited to those two
+gate defects; the product scope may not widen.
+
+### Founder reauthorization — read-only oracle allowlist and cleanup, 2026-08-15
+
+The founder authorizes one gate-only pass with exactly two changes:
+
+1. Add only `qa/gates/team-composition-ui.ts` to
+   `DRIVER_SQL_ALLOW` in `qa/gates/kernel-sole-writer.ts`, carrying an adjacent
+   comment that it is a read-only oracle over the isolated V2-3.1 UI-proof
+   Kernel and follows the existing WO-WIN2 / WO-V2-2 precedent. Keep the gate's
+   `Database(path, { readonly: true })` independent measurement. Do not route
+   these reads through the Kernel API and do not add any other allowlist entry.
+2. Make the existing UI gate terminate every Electron child it spawned and
+   exit cleanly on Windows after green, red, timeout, or exception. It must
+   leave zero gate-owned Electron processes without a manual cleanup step.
+
+No assertion, receipt, product code, live Hermes fixture, native click bridge,
+two-minute budget, or falsifier may change. Run `kernel-sole-writer` first; on
+green, run the live `team-composition-ui` proof, its two named falsifiers, and
+the remaining short acceptance commands once. Any red stops. A fully green
+matrix commits and pushes the complete preserved V2-3.1 candidate for a fresh
+Verifier.
 
 ## Objective
 
