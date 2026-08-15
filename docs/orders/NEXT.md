@@ -1,7 +1,7 @@
 # NEXT — R14 Research Director front door
 
-status: BUILDER DOOR OPEN — LIVE TIMEOUT DIAGNOSTIC
-authorized-by: founder goal; diagnostic `01a0076a-d5ce-7e83-88a2-6283f29681d7`; Reader PASS `01a00770-c473-70a3-ab46-937cfdb4766b`
+status: BUILDER DOOR OPEN — DIRECTOR TILE LIFECYCLE REPAIR
+authorized-by: founder goal; live diagnostic Builder `01a0077b-0849-73b2-8feb-401b3fa3a6d1`; lifecycle diagnosis `01a0078c-3800-7282-a612-bed0a601fe60`; repair Reader PASS `01a00788-119e-7003-aad8-2afe70f153a2`
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 founder-closed with named gap; R14 active
 active-order: [`WO-RD-1.md`](WO-RD-1.md)
@@ -17,20 +17,15 @@ It passed its adversarial read and is the one authorized product order.
 
 ## Work here only
 
-The product path is implemented locally and builds. The isolated-app fixture
-correction exposed one product blocker: Kernel registration still rejects the
-ratified exact `Research Director` display label before RPC readiness. The
-narrow two-file compatibility amendment in WO-RD-1 passed adversarial read.
-The authorized product edit is complete, but its first test command failed
-before collection because the Kernel package dependency was not materialized.
-The metadata half of the stale R11a fixture is corrected, but the same assertion
-proved the fixture still retains exactly two later 0010 table definitions. The
-historical fixture is now green. The live UI proof timed out with clean shutdown
-but without identifying its red boundary. The gate-only redacted diagnostic
-receipt passed adversarial read. One fresh Builder may implement only that
-gate/test diagnostic and run its one unit invocation plus one live invocation.
-Do not create a worktree or clone, run a release verifier, package an installer,
-start a long soak, or begin later R14 work.
+The product path is implemented locally and builds. The historical R11a fixture
+is green. The redacted live diagnostic proved the form, IPC, Kernel command,
+native admission, running Mission status, and visible ledger while finding zero
+surviving Director tiles; all cleanup counts were zero. Read-only lifecycle
+inspection names a proof-responder create-then-exit race and a causal-receipt
+gap. The final Product repair section in WO-RD-1 passed adversarial read. One
+fresh Builder may implement only that section and run its three-command focused
+matrix once. Do not create a worktree or clone, run a release verifier, package
+an installer, start a long soak, or begin later R14 work.
 
 ## Stop
 

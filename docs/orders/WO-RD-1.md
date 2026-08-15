@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: live-timeout-diagnostic-builder-open — Reader PASS `01a00770-c473-70a3-ab46-937cfdb4766b`
+status: Director-tile lifecycle repair Builder open — Reader PASS `01a00788-119e-7003-aad8-2afe70f153a2`
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -763,3 +763,94 @@ bun qa/run.ts research-director-front-door
 Stop after that live invocation. PASS proceeds to the remaining matrix; red
 must include exactly one `rd1_timeout_diag` plus the existing zero-cleanup
 receipts and returns to the router for one evidence-based product repair.
+
+## Product repair — persistent Director proof seat and causal tile receipt
+
+The one authorized live diagnostic returned this exact red state while every
+cleanup receipt remained zero:
+
+```text
+readiness_returned=true rpc=ok ui_phase=running input_disabled=false
+ledger_has_question=true director_tile_count=0 tile_has_session=false
+main_ipc_seen=true create_mission_seen=true native_admission_returned=true
+```
+
+Static lifecycle inspection names the smallest source-backed cause. Native-TUI
+admission calls `onStarted` with a PTY id before returning. That callback sends
+`create-term-tile`. For this Director-only proof, however, the deterministic
+responder emits `turn: complete` and immediately returns; its `finally` then
+disposes stdin and exits. The renderer deliberately removes the matching term
+tile on `pty:exit`. The gate can therefore miss a correctly created tile after
+the proof fixture destroys the seat it is meant to keep observable.
+
+This pass authorizes only the following repair and causal receipt:
+
+1. In `collab-electron/cli/qf-hermes-synthetic-responder.mjs`, the exact
+   Director-only branch identified by the activation instruction
+   `do not recruit or assign a Task in this slice` must emit its existing
+   `turn: complete`, then remain pending until its owning PTY input closes or
+   the process receives its normal termination signal. Implement one explicit
+   lifecycle handshake using the reader's existing close/end/error state; do
+   not use a sleep, interval, network call, second process, or new dependency.
+   Other orchestrator, worker, and critic fixture flows retain their current
+   return/exit behavior. The existing `finally` still stops both MCP children,
+   disposes the reader idempotently, and restores the terminal. App shutdown
+   must release or terminate the handshake within the existing cleanup bounds.
+2. Add `QF_UI_PROOF`-only, behavior-neutral receipts at the existing hops:
+   `tile_event_sent=create-term-tile` immediately before the main process sends
+   the Director tile event; `tile_event_received=create-term-tile` on entry to
+   that exact renderer handler; and `tile_dom_identity=present` only after the
+   newly created DOM node has both exact attributes
+   `data-definition-id="hermes-research-director"` and a non-empty
+   `data-session-id`. If that handler throws, emit only
+   `tile_handler=threw` and rethrow the same error. Do not catch, suppress,
+   retry, or translate product behavior.
+3. In `qa/gates/research-director-front-door.ts`, capture the runtime
+   `renderer_form_submit` and `preload_ipc` lines already emitted by the real
+   renderer and preload; a source-text check is not a production-boundary
+   receipt. After the existing visible predicate becomes green and before app
+   shutdown, assert exactly one form submission and presence of the preload,
+   main, Kernel, tile-event-sent, tile-event-received, and tile-DOM-identity
+   receipts, plus absence of `tile_handler=threw`. Print exactly:
+
+   ```text
+   tile_projection_hops=sent,received,dom_identity handler_threw=false
+   ```
+
+   `automatic_tile=1` remains derived from the independently observed visible
+   tile and is not treated as evidence for those hop receipts. On a timeout,
+   extend the existing redacted diagnostic with only four booleans named
+   `tile_event_sent`, `tile_event_received`, `tile_handler_threw`, and
+   `tile_dom_identity_present`, derived from captured fixed receipt strings.
+   Print no ids, arguments, paths, raw output, or errors.
+4. In `qa/gates/research-director-front-door.test.ts`, use the production
+   lifecycle helper and production receipt validator to prove before the live
+   run that: Director completion occurs before lifecycle release; the Director
+   branch remains pending until injected close/termination; it settles after
+   release; all listeners are removed; the responder contains no fixed dwell
+   sleep; each missing hop makes the receipt validator red; handler-threw makes
+   it red; and the complete hop set makes it green. The test must fail if the
+   Director early return is restored. Static source substring checks alone do
+   not satisfy the lifecycle proof.
+
+The deliverables have one meaning: keep only the Director proof seat alive for
+the owning PTY lifetime, and prove each existing tile-projection hop without
+changing that path. Do not alter the visible predicate, session/Task semantics,
+tile removal policy, PTY shutdown, process ownership, cleanup assertions,
+fixture identity, polling interval, or literal 120,000 ms deadline. No file
+outside the responder, `ipc-kernel.ts`, `renderer.js`, the focused gate, and its
+focused test is authorized.
+
+Builder runs each command once, in order, stopping at the first red:
+
+```powershell
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+The live run must finish below 120 seconds with the existing complete green
+receipt, the new causal hop receipt, and zero convergence/process/Hermes/root
+cleanup counts. Any red, fixed sleep, missing hop, repeated assertion failure,
+or cleanup survivor stops the slice. Full green commits and pushes the complete
+WO-RD-1 candidate for one fresh independent Verifier; no later R14 work begins.
