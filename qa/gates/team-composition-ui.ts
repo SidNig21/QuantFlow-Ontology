@@ -430,6 +430,7 @@ export async function runTeamCompositionUiGate(): Promise<Result> {
       duplicateRows: afterAccepted.tasks - taskBefore.tasks - 1,
     };
 
+    console.log(`rejected_rows_added=${taskReceipt.rejectedRows.tasks} rejected_error_in_tile=${taskReceipt.rejected}`);
     assert(zReceipt.header && zReceipt.body && zReceipt.grip, "tile raise/grip interaction receipt failed");
     assert(taskReceipt.accepted && taskReceipt.rows.tasks === 1 && taskReceipt.rows.delegated === 1 && taskReceipt.rows.assigned === 1, "accepted production Task rows are wrong");
     assert(taskReceipt.duplicateRows === 0, "duplicate Task submit wrote an extra row");
@@ -442,7 +443,7 @@ export async function runTeamCompositionUiGate(): Promise<Result> {
     const finalCounts = readCounts(dbPath);
     console.log(`renderer_click=1 preload=${preloadSeen ? "production" : "missing"} main_ipc=${mainSeen ? "qf:tasks:create" : "missing"} temporary_kernel=1`);
     console.log(`task_rows=${finalCounts.tasks} delegated_by=${finalCounts.delegated} assigned_to=${finalCounts.assigned} create_errors=0`);
-    console.log(`rejected_rows_added=${taskReceipt.rejectedRows.tasks} rejected_error_in_tile=${taskReceipt.rejected} duplicate_task_rows=${taskReceipt.duplicateRows}`);
+    console.log(`duplicate_task_rows=${taskReceipt.duplicateRows}`);
     console.log(`background_controls=${backgroundControls} header_raised=${zReceipt.header ? 1 : 0} body_raised=${zReceipt.body ? 1 : 0}`);
     console.log(`grip_drag=${zReceipt.grip ? 1 : 0} form_preserved=${taskReceipt.preserved ? 1 : 0} action_controls_preserved=${taskReceipt.actionsPreserved ? 1 : 0}`);
     console.log(`pending_visible_ms=${Math.round(firstSpawn.pendingVisibleMs)} duplicate_spawns=${duplicateSpawns} failure_retry=1 failure_reason=1`);

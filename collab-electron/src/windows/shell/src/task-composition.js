@@ -67,6 +67,7 @@ export function renderTaskFoot(dom, tile, {
 		description: existingForm.querySelector(".task-description")?.value ?? "",
 		assigneeSessionId: existingForm.querySelector(".task-assignee")?.value ?? "",
 	} : null;
+	const preservedError = foot.querySelector(".task-foot-error")?.textContent ?? "";
 	foot.replaceChildren();
 	if (!tile?.sessionId) return;
 
@@ -184,4 +185,6 @@ export function renderTaskFoot(dom, tile, {
 			foot.appendChild(create);
 		}
 	}
+
+	if (preservedError) errorLine(foot, preservedError);
 }
