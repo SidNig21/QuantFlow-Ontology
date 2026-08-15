@@ -1,7 +1,7 @@
 # WO-RD-1 — Research Director front door
 
-status: kernel-display-contract-builder-open — Reader PASS `01a0074c-f897-7dd0-8973-6381fe3998c3`
-assignee: builder
+status: kernel-test-command-reader-pending — product edit complete; root-cwd test command could not resolve package dependency
+assignee: reader
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
 authorization: founder goal 2026-08-15; routed after adversarial Reader PASS
@@ -524,7 +524,7 @@ WO-RD-1 scope and assertions remain unchanged. The Builder runs each command
 at most once, in order, and stops at the first red:
 
 ```powershell
-bun test packages/qf-kernel/src/kernel.test.ts
+bun --cwd packages/qf-kernel test src/kernel.test.ts
 bun test qa/gates/research-director-front-door.test.ts
 bun qa/run.ts research-director-front-door
 git diff --check
@@ -533,3 +533,10 @@ git diff --check
 Full green commits and pushes the complete authorized WO-RD-1 candidate for
 one fresh independent Verifier. Any red stops; no assertion, timing limit,
 fixture, or acceptance criterion may be weakened.
+
+The package-local working directory above is load-bearing. Running the same
+test path from the repository root does not resolve `qf-kernel-schema/commands`
+through the Kernel package's installed dependency and is an order-command
+failure before any assertion executes. The corrected command changes only the
+working directory used by Bun; it does not change the test file, dependency
+graph, product implementation, or acceptance criterion.
