@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: kernel-gate-builder-open — Reader PASS `01a00750-9c97-7800-8bd1-79a1d23d0420`; product edit complete
+status: historical-fixture-builder-open — Reader PASS `01a0075c-0c0c-7c32-85b1-0656ce6de8bd`
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -543,3 +543,41 @@ test suite. Reuse that existing gate. Do not create another installer, helper,
 or dependency workaround. This changes only how the existing Kernel suite is
 prepared and invoked; it does not change test scope, product implementation,
 or acceptance criteria.
+
+## Baseline correction — R11a fixture represents its historical schema
+
+The first canonical Kernel gate stopped in 3.143 seconds with 86 passing tests
+and one failure: `R11a deterministic local execution > upgrades an existing
+R10 database in place` expected `deterministic_execution` and received
+`partial`. Read-only diagnosis `01a00755-a34a-7652-94f1-cfcc33c99b25`
+established that this failure cannot enter either WO-RD-1 Kernel edit: the R11a
+test owns a separate in-memory database and calls only schema-shape upgrade
+logic.
+
+The fixture begins with today's generated migration and removes historical
+metadata to recreate the pre-R11a shape. Commit `97ed7183` later added
+`reassign_task` and `cancel_task` metadata, but the fixture still removes only
+`performed_by`. The production classifier already excludes all three rows when
+constructing the corresponding historical expectation. The fixture therefore
+describes no historical schema and correctly classifies as `partial`.
+
+Authorize exactly one test-fixture correction in
+`packages/qf-kernel/src/r11a-deterministic-execution.test.ts`: in the existing
+`upgrades an existing R10 database in place` setup, delete the
+`schema_meta` rows for exact type names `performed_by`, `reassign_task`, and
+`cancel_task` before classification. Use one literal, deterministic deletion
+statement. Do not edit `upgrade.ts`, generated migration/schema files, product
+code, expected classifications, or any assertion.
+
+Then run each command at most once, in order, and stop on first red:
+
+```powershell
+bun qa/run.ts kernel
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+This correction must make the historical fixture accurate; it may not skip,
+relax, rename, or narrow the Kernel suite. Full green commits and pushes the
+complete WO-RD-1 candidate for a fresh independent Verifier. Any red stops.
