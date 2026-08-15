@@ -127,8 +127,11 @@ paths named in Deliverable A before the Electron child starts. The same real
 Electron child boots its production renderer/main against an isolated Kernel;
 the gate proves that process is alive and its real Dock reports the Hermes
 Orchestrator and the Hermes Market Researcher as launchable on this founder
-machine. Restoration runs only after that assertion and real Electron cleanup
-complete.
+machine. Those assertions mean exactly one row for definition
+`hermes-orchestrator` and exactly one row for definition `hermes-worker`;
+`hermes-worker-2` and any same-label row are not substitutes and need not be
+launched by this order. Restoration runs only after that assertion and real
+Electron cleanup complete.
 
 The gate may inject process execution and temporary paths into the public dev
 entrypoint only for its two failure cases. Its green receipt must use the real
@@ -192,7 +195,7 @@ hermes_package=prepared
 claude_code_package=prepared
 electron_process_started_after_packages=true
 hermes_orchestrator_launchable=true
-hermes_market_researcher_launchable=true
+hermes_worker_definition_launchable=true
 preexisting_artifacts_restored=true
 PASS dev-dock-readiness
 ```
@@ -210,19 +213,20 @@ be created. No packaged installer or release matrix runs.
 After Verifier PASS, the router uses Computer Use on the normal development
 app. It must:
 
-1. launch the Dock rows whose species is Hermes and whose roles are
-   `Orchestrator` and `Market Researcher`;
+1. launch exactly definitions `hermes-orchestrator` and `hermes-worker` from
+   the production Dock; their visible roles are `Orchestrator` and
+   `Market Researcher`, respectively;
 2. see both reach `running`;
 3. create one Task from the Orchestrator tile, assign it to the running Hermes
-   Market Researcher, and see that researcher as owner on both the Task tile
-   and Dock row;
+   `hermes-worker`, and see `hermes-worker` as owner on both the Task tile and
+   Dock row;
 4. reassign that same Task to the running Hermes Orchestrator and see the
    Orchestrator as owner on both surfaces;
-5. cancel that Task, close the Hermes Market Researcher seat, and see the Task
-   remain cancelled with the Orchestrator as final owner;
+5. cancel that Task, close the `hermes-worker` seat, and see the Task remain
+   cancelled with `hermes-orchestrator` as final owner;
 6. close and reopen the app; and
-7. see the cancelled Task, Orchestrator final owner, and closed Hermes Market
-   Researcher seat restored.
+7. see the cancelled Task, `hermes-orchestrator` final owner, and closed
+   `hermes-worker` seat restored.
 
 That visible sequence accepts V2-3.1. Machine green alone does not.
 
