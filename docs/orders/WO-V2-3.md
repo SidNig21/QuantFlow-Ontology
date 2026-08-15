@@ -431,6 +431,18 @@ assertion recurring after a repair, so the founder's stop condition is met: no
 further Builder, rerun, assertion split, or product edit is authorized until
 the founder decides.
 
+Read-only tracing after the stop identified one product mechanism without
+changing the candidate. `task-composition.js` appends the rejected-submit error
+only as a `.task-foot-error` DOM child. The same renderer's next
+`renderTaskFoot()` call starts with `foot.replaceChildren()`, and
+`renderer.js` schedules that projection refresh every 1,500 ms. No renderer
+state preserves or restores the error. Therefore a real rejection message can
+appear and then be erased by the normal projection loop; the founder cannot
+reliably read it. The combined gate still did not reveal whether any rows
+changed, because it asserts before printing its two sub-receipts. Any future
+founder-authorized pass must expose both existing conditions before repairing
+the measured disappearing-error mechanism; neither assertion may be relaxed.
+
 ## Objective
 
 Deliver the V2-3 founder promise from `docs/proposals/V2-SCOPE.md`: compose a
