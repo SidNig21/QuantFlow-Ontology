@@ -1,6 +1,6 @@
 # WO-V2-3R — make the ordinary development Dock launchable
 
-status: rewrite-reader-required-after-founder-agentos-steer
+status: reader-passed-authorized-native-cli-rewrite
 assignee: builder
 depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
 rung: R13 / V2-3 founder closure

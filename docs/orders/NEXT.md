@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 ordinary development runtime closure
 
-status: NATIVE-CLI REWRITE — READER REQUIRED BEFORE BUILDER
+status: AUTHORIZED — NATIVE-CLI REWRITE READER PASS
 authorized-by: founder standing direction to handle the build and delegated founder checks
 authorized-at: 2026-08-15
 baseline: V2-3.1 candidate `b5b6c95` machine-passed; Computer Use founder check rejected runtime launch; closure order Reader-passed at `f504a4a`
@@ -27,8 +27,8 @@ Computer Use receipt is recorded in
 
 The founder confirmed AgentOS was dropped from the production direction. The
 rewritten order removes that obsolete packaging seam from the Hermes native-CLI
-path instead of patching it. A Builder may resume after the Reader passes the
-new boundary. After PASS, execute
+path instead of patching it. The Reader passed both protocol questions at
+`060b91c`. Execute
 [`WO-V2-3R.md`](WO-V2-3R.md) exactly in this checkout on branch `wo-V2-3`. No
 second folder, worktree, clone, helper framework, packaged gate, installer,
 release verifier, credential access, Task semantic change, Dock rebuild, or
