@@ -515,3 +515,85 @@ founder_state_retry_sha256: 79999BE183658715507C4A32A892F1325249077D7352F1ED83D3
 The detached worktree was clean at the time of this append; only this
 docs-only failure record is being added now. No product or gate repair was
 made.
+
+## R13 independent verifier authorization rerun — tooling stop — 2026-08-14
+
+role: brand-new independent verifier; builder reasoning not used
+candidate_under_test: `83bcfc590bb56a853cc21e16a2f58efe96723f99`
+implementation_candidate: `ddc95853aef4645d6c9e1bfb5d452f4a156aca83`
+exact_detached_worktree: `C:\tmp\qf-v22-rerun-20260814-083b`
+external_log_directory: `C:\tmp\qf-v22-rerun-logs-20260814-083b`
+helper: `C:\tmp\qf-v22-rerun-helper-20260814-083b.ps1`
+helper_pid: `33588`
+founder_acceptance: not performed
+l4_certified: pending
+
+Result: **STOP — tooling defect; no verifier PASS/FAIL receipt.** In plain
+terms, the first static check passed, but the helper could not save its
+required durable manifest, so no synthetic proof or later release gate may be
+treated as verified and this authorized attempt is not repeated.
+
+### Helper receipt
+
+The hidden helper opened the first command's stdout and stderr before launch.
+`bun qa/run.ts repo-shape` printed `PASS  repo-shape` and exited `0`, but while
+persisting that record the helper raised:
+
+```text
+Exception calling "Replace" with "3" argument(s): "The path is not of a legal form."
+```
+
+The helper atomically wrote a STOP completion receipt and ended without being
+killed or restarted. The immediate synthetic pair was never reached, so the
+required two synthetic runs, their ten red/green boundary pairs, half-born-seat
+receipt, terminal cleanup receipts, and every later verifier command are
+missing. This is recorded as a tooling defect, not as a verifier PASS or a
+product red.
+
+```text
+completion: C:\tmp\qf-v22-rerun-logs-20260814-083b\completion-receipt.json
+completion_sha256: 4F1F6D2609543C1B443F618CED70DB8823268E14C3BB7F2FA402D53A6249D64F
+completion_status: STOP
+completion_reason: helper exception during manifest atomic replacement
+durable_manifest: C:\tmp\qf-v22-rerun-logs-20260814-083b\acceptance-manifest.json
+durable_manifest_sha256: 4F53CDA18C2BAA0C0354BB5F9A3ECBE5ED12AB4D8E11BA873C2F11161202B945
+durable_manifest_contents: []
+provisional_manifest_tmp: C:\tmp\qf-v22-rerun-logs-20260814-083b\acceptance-manifest.json.tmp
+helper_sha256: 6E3D69A0DEE9790AA348E3CD1E6EE9D801A03ACB308C894DE50227F1BBDE7E52
+first_stdout: C:\tmp\qf-v22-rerun-logs-20260814-083b\001-repo-shape.stdout.log
+first_stdout_sha256: F50D2185A6F23E43A540E46399A37D22D69E13288D42CAE16A5D711682205E0A
+first_stderr: C:\tmp\qf-v22-rerun-logs-20260814-083b\001-repo-shape.stderr.log
+first_stderr_sha256: E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855
+recorded_command: `bun qa/run.ts repo-shape`
+recorded_command_exit: `0` (provisional record only; not in durable manifest)
+synthetic_run_1: not started
+synthetic_run_2: not started
+later_matrix_commands: not started
+```
+
+No matrix command was run after the helper stop. In particular, no install,
+reset, manual cleanup, or second verifier attempt was performed.
+
+### Independent scope inspection
+
+The read-only diff from baseline `3018c4334f88072af8bf14592571f7b88e7d506b`
+through the tested HEAD returned exactly:
+
+```text
+M docs/orders/evidence/r13/V2-2-VERIFICATION.md
+M qa/gates/hermes-research.ts
+```
+
+The protected-path diff for `collab-electron/`, `packages/`, `species/`, and
+`docs/orders/NEXT.md` was empty. The ten `BOUNDARIES` labels and their
+`MECHANISM_FOR` mapping matched baseline exactly (normalized block SHA-256
+`480b0a4d69958fc0834f3011ffa57b6feb37f4c1588432f36a1f5c8d1b59af55` at both
+baseline and HEAD). The `BoundaryLedger` field contract also matched exactly
+(normalized type SHA-256
+`1155b3bea3e0effd7c7a233148142e0a68129bc960d24852ccaef1ee7eda3796` at both
+baseline and HEAD). No product code, `NEXT.md`, boundary, or ledger-contract
+drift was observed.
+
+The detached worktree remained clean at the stop. No founder acceptance, live
+model turn, live market quota, or V2-3 work was performed. Per the exact
+authorization, this tooling stop is final for the rerun.
