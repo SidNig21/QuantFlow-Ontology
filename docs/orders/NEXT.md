@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 FINAL DIAGNOSTIC-REPAIR AUTHORIZED
+status: V2-3.1 VERIFIER PASS — FOUNDER ACCEPTANCE REQUIRED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,14 +33,13 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-Expose `rejected_rows_added` and `rejected_error_in_tile` before the unchanged
-assertions, then run the live gate once. Any rejected row mutation stops. If
-row deltas are zero and the error is missing, repair only
-`task-composition.js` so that error survives projection refreshes. Rerun the
-live gate once, then the complete short matrix. Any red stops; full green
-commits and pushes for one fresh independent Verifier.
+Candidate `b5b6c950a8269fe448c1db9cbe47aaee65238689` independently passed
+the complete short matrix. The live production receipt created one Task with
+one `delegated_by` and one `assigned_to` link; a rejected submit added zero rows
+and kept its error visible; pending feedback appeared in 25 ms; cleanup left
+zero gate-owned Electron processes.
 
-Do not alter Task semantics, assertions, timing, fixtures, cleanup, or any file
-outside `task-composition.js` and `team-composition-ui.ts`. Verifier PASS stops
-for founder-visible acceptance and does not rotate to V2-3.2 or begin the
-direction reset. Never place bets or trades.
+Stop for founder-visible acceptance. Do not start a Builder or Verifier, merge,
+rotate to V2-3.2, or begin the direction reset. After the founder accepts, the
+builder door closes for a separately authorized docs-only north-star reset.
+Never place bets or trades.

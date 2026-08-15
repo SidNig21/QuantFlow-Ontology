@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: final-diagnostic-repair-authorized
+status: verifier-passed-founder-acceptance
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: one final diagnostic-and-repair pass authorized — 2026-08-15
+reauthorization: final pass independently verified; founder acceptance required
 
 ## In plain terms
 
@@ -465,6 +465,42 @@ product candidate introduced at
 
 No further repair loop is implied. Verifier PASS returns for founder-visible
 acceptance; it does not authorize V2-3.2 or the direction-reset patch.
+
+### Final independent verification — PASS
+
+Candidate `b5b6c950a8269fe448c1db9cbe47aaee65238689` was pushed to
+`wo-V2-3` and independently verified from a clean tree whose `HEAD` and remote
+branch matched exactly. The complete short matrix passed.
+
+```text
+PASS repo-shape
+PASS kernel-sole-writer
+PASS no-canvas-domain-writes
+PASS kernel-sole-writer-app
+PASS one-skin
+PASS team-composition
+PASS team-composition-ui
+PASS doc-links
+git diff --check: exit 0
+
+renderer_click=1 preload=production main_ipc=qf:tasks:create temporary_kernel=1
+task_rows=1 delegated_by=1 assigned_to=1 create_errors=0
+rejected_rows_added=0 rejected_error_in_tile=true duplicate_task_rows=0
+background_controls=1 header_raised=1 body_raised=1
+grip_drag=1 form_preserved=1 action_controls_preserved=1
+pending_visible_ms=25 duplicate_spawns=0 failure_retry=1 failure_reason=1
+failed_spawn_session_rows_added=0 pending_restored_after_restart=0
+Gate-owned Electron processes after cleanup: 0
+```
+
+The live proof exercised the production Hermes `Orchestrator` and `Market
+Researcher` seats. No release or packaged Windows gate ran; this order forbids
+them. Verification changed no file. Evidence is recorded in
+`docs/orders/evidence/r13/V2-3-VERIFICATION.md`.
+
+The Builder door is now stopped at founder acceptance. A Verifier PASS does not
+accept the visible product, rotate to V2-3.2, or authorize the founder-direction
+reset.
 
 ## Objective
 
