@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 GATE-ONLY CLEANUP — FOUNDER-REAUTHORIZED
+status: V2-3.1 REJECTED-SUBMIT RED — FOUNDER DECISION REQUIRED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,8 +33,8 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-Add only `qa/gates/team-composition-ui.ts` to `DRIVER_SQL_ALLOW` as the named
-read-only oracle over its isolated proof Kernel, and make its Electron cleanup
-exit with zero gate-owned processes. Do not change assertions, product code,
-the live Hermes fixture, or any other allowlist. Any red returns to the
-founder. Never place bets or trades.
+The read-only oracle allowlist and Electron cleanup now pass, but the live UI
+gate reports that a rejected Task submission changed Kernel rows or hid its
+same-tile error. Do not rerun, repair, commit the preserved WIP, start a
+Verifier, or rotate rungs until the founder authorizes a bounded diagnosis.
+Never place bets or trades.

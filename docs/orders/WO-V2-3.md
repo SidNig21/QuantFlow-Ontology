@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: founder-reauthorized-gate-only-cleanup
+status: stopped-on-rejected-submit-red
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: one allowlist-and-cleanup pass granted 2026-08-15
+reauthorization: allowlist-and-cleanup pass used and exhausted 2026-08-15
 
 ## In plain terms
 
@@ -290,6 +290,29 @@ green, run the live `team-composition-ui` proof, its two named falsifiers, and
 the remaining short acceptance commands once. Any red stops. A fully green
 matrix commits and pushes the complete preserved V2-3.1 candidate for a fresh
 Verifier.
+
+### Gate-only cleanup result — infrastructure green, product receipt red
+
+The two authorized gate changes passed their own checks:
+
+```text
+kernel-sole-writer: PASS
+Gate-owned Electron processes after cleanup: 0
+```
+
+The unchanged live Hermes UI proof then stopped on its next product receipt:
+
+```text
+team-composition-ui: FAIL rejected Task submit changed Kernel rows or hid the error
+```
+
+The combined receipt does not distinguish whether row cardinality changed,
+same-tile error rendering failed, or both. The named falsifiers and remaining
+acceptance commands did not run. No product or gate commit was made and nothing
+was pushed. The allowlist and process cleanup edits remain preserved
+uncommitted. Further work requires founder authority for one bounded diagnosis
+that reports both sub-receipts separately before any repair; assertions may not
+be changed or weakened.
 
 ## Objective
 
