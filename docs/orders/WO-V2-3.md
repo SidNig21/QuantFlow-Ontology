@@ -1,12 +1,12 @@
 # WO-V2-3 — compose a team
 
-status: founder-reauthorized-background-control-fix
+status: stopped-on-gate-law-red
 assignee: builder
 depends: V2-1 founder accepted; V2-2 packaged matrix stopped
 rung: R13 / V2-3
 authorization: founder-via-NEXT
 rework-cycle: 1 of 1
-reauthorization: one background-control product-fix pass granted 2026-08-15
+reauthorization: background-control pass used and exhausted 2026-08-15
 
 ## In plain terms
 
@@ -239,6 +239,34 @@ not visible and hit-testable.
 
 On a fully green bounded matrix, commit and push the complete preserved V2-3.1
 candidate for a fresh independent Verifier. Any red returns to the founder.
+
+### Background-control pass result — product green, acceptance red, 2026-08-15
+
+The authorized product change was isolated to `tile-manager.js`. The live
+Hermes UI proof reached the required product receipt:
+
+```text
+background_controls=1
+header_raised=1 body_raised=1
+pending_visible_ms=19
+Task and spawn receipts: green
+```
+
+The command did not exit cleanly: its Windows wrapper hung during Electron
+child cleanup after printing the receipt and one orphaned Electron process was
+stopped. The Builder then ran the short matrix and stopped at its first red:
+
+```text
+kernel-sole-writer: Law E claim failure(s):
+- [driver/sql] qa/gates/team-composition-ui.ts (bun:sqlite)
+FAIL kernel-sole-writer
+```
+
+No product or gate commit was made and nothing was pushed. The background
+control behavior is measured green, but V2-3.1 remains unaccepted because its
+new gate bypasses the Kernel read boundary and does not own a clean process
+lifecycle. Further work requires founder authority limited to those two gate
+defects; the product scope may not widen.
 
 ## Objective
 

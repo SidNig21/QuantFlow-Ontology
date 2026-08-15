@@ -1,6 +1,6 @@
 # NEXT — R13 V2-3.1 unblock compose-a-team founder check
 
-status: V2-3.1 BACKGROUND CONTROL FIX — FOUNDER-REAUTHORIZED
+status: V2-3.1 PRODUCT GREEN / GATE RED — FOUNDER DECISION REQUIRED
 authorized-by: founder
 authorized-at: 2026-08-15
 baseline: V2-3 candidate `97ed718` verifier-passed and founder-rejected; task table stayed empty
@@ -33,7 +33,8 @@ V2-2, V2-4+, R14+, and RL are queued or parked, not active.
 
 ## Stop
 
-Fix only why the background running Orchestrator's existing Create Task control
-is not visible and hit-testable. Retain the proven live Hermes fixture and all
-other V2-3.1 contracts. One green run may proceed to the named falsifiers and
-short matrix; any red returns to the founder. Never place bets or trades.
+The background control now passes the live Hermes UI receipt, but the gate
+wrapper hung during Electron cleanup and `kernel-sole-writer` rejected the
+gate's direct `bun:sqlite` use. Do not commit the preserved product work, start
+a Verifier, or rotate rungs until the founder authorizes or rejects a gate-only
+cleanup. Never place bets or trades.
