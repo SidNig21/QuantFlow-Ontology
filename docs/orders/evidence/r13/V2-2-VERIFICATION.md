@@ -410,3 +410,108 @@ remaining_red=none in builder-run acceptance
 builder_result=PASS
 verifier_result=pending
 ```
+
+## R13 independent verifier final failure — 2026-08-14
+
+role: independent verifier; builder reasoning not used
+candidate_under_test: `f9e65574030ee66ecdacbe4dbb83dc02ad6cbfb8`
+implementation_candidate: `ddc95853aef4645d6c9e1bfb5d452f4a156aca83`
+exact_detached_worktree: `C:\tmp\qf-v22-verifier-20260814-independent`
+builder_evidence_sha256_before_verifier_record: `0BE4F3D766E488086BCE227FEE8B4508C3BD681B36B5E718208677C99084BD76`
+founder_acceptance: not performed
+l4_certified: pending
+
+Result: **FAIL — final R13 stop for founder decision.** In plain terms, the
+fresh proof started its first full synthetic replay but did not finish, so the
+required ten-breaker proof and the required second immediate replay do not
+exist as receipts.
+
+### Cold verifier command exits
+
+The following exact commands completed with exit `0` before the stop:
+
+```text
+bun qa/run.ts repo-shape                         exit 0
+bun qa/run.ts lockfile-committed                 exit 0
+bun qa/run.ts kernel-sole-writer                 exit 0
+bun qa/run.ts no-canvas-domain-writes            exit 0
+bun qa/run.ts kernel-sole-writer-app             exit 0
+bun qa/run.ts kernel-one-path                    exit 0
+bun qa/run.ts one-skin                           exit 0
+bun qa/run.ts kernel                            exit 0
+bun qa/run.ts typecheck                          exit 0
+bun qa/run.ts kernel-market-lineage              exit 0
+bun qa/run.ts hermes-launch-policy               exit 0
+bun qa/run.ts hermes-founder-state               exit 0  (exact retry after a batch-wrapper timeout)
+```
+
+The first batch wrapper timed out at shell exit `124` while the founder-state
+command was still in WSL startup; it did not produce a Bun exit. The exact
+founder-state command was then rerun unchanged and completed with exit `0`,
+printing both scratch mutation falsifier receipts, unchanged real founder
+digests, and `hermes-founder-state: PASS`.
+
+### Mandatory rewrite-lap result
+
+One PowerShell invocation opened the durable run-1 stdout/stderr files before
+starting run 1, invoked the exact synthetic command, and then was required to
+invoke run 2 immediately. The wrapper timed out after `604027 ms` with shell
+exit `124` before run 1 returned. Therefore:
+
+```text
+bun qa/run.ts hermes-first-turn-synthetic run 1: Bun exit not recorded; wrapper timeout
+bun qa/run.ts hermes-first-turn-synthetic run 2: not started
+synthetic exit receipt: absent
+```
+
+The complete durable run-1 stdout contains only one boundary red/green pair:
+`dock_admission` (`admission_rejected` then restored). It also contains
+`launch-failure remaining_pids=[]` and `cleanup_errors=[]`. It contains no
+terminal `temp-cleanup` receipt, no half-born-seat receipt, and no remaining
+boundary pairs. The run-2 stdout/stderr files and the combined exit receipt do
+not exist because run 2 was never invoked. This is an incomplete ten-red /
+ten-green ledger and a missing required second receipt, regardless of the
+partial positive output.
+
+Per the no-rework rule, these exact later commands were not run after the
+synthetic stop: `bun qa/verify-release.ts`, `bun qa/run.ts windows-installer`,
+`bun qa/run.ts windows-hermes-research-chain`, `bun qa/run.ts doc-links`,
+`git diff --check origin/wo-r9-research-integrity...HEAD`, and
+`git diff --check`.
+
+### Independent scope inspection
+
+The rewrite tree from `3018c4334f88072af8bf14592571f7b88e7d506b` through this
+candidate contains exactly these two files:
+
+```text
+M docs/orders/evidence/r13/V2-2-VERIFICATION.md
+M qa/gates/hermes-research.ts
+```
+
+The protected-path diff for `collab-electron/`, `packages/`, `species/`, and
+`docs/orders/NEXT.md` is empty. The ten `BOUNDARIES` labels, the `MECHANISMS`
+failure vocabulary, and the existing ledger fields/mapping are unchanged;
+the implementation diff adds cleanup/receipt enforcement and ledger
+validation but does not add a boundary, rename a label, or alter the ledger
+contract. No V2-3 work or founder acceptance was performed.
+
+### Durable verifier logs
+
+All files below are outside the detached worktree and were written during the
+run:
+
+```text
+manifest: C:\tmp\qf-v22-verifier-logs-20260814-independent\acceptance-exits.tsv
+manifest_sha256: E7427FC34B304805A5500408BDCDA384FB3BDD2AECF39077B678A32A30C16CF3
+run1_stdout: C:\tmp\qf-v22-verifier-logs-20260814-independent\hermes-first-turn-synthetic-run1.stdout.log
+run1_stdout_sha256: 4D117ADBBD051A04BDCEC604C3004E703D04E61A9A520EC18B7073006BB381BD
+run1_stderr: C:\tmp\qf-v22-verifier-logs-20260814-independent\hermes-first-turn-synthetic-run1.stderr.log
+run1_stderr_sha256: B86790BD5A1E29B1647BE406BB4EED06A9C624C9E10167E6D6D23F83A8DA8EFA
+founder_state_retry: C:\tmp\qf-v22-verifier-logs-20260814-independent\hermes-founder-state-retry.log
+founder_state_retry_sha256: 79999BE183658715507C4A32A892F1325249077D7352F1ED83D353089A67051C
+```
+
+The detached worktree was clean at the time of this append; only this
+docs-only failure record is being added now. No product or gate repair was
+made.
