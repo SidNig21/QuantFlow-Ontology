@@ -43,29 +43,42 @@ showed no progress.
    existing renderer event through preload and `qf:tasks:create`; repair the
    broken seam rather than bypassing it. Submitting a valid title, completion
    description, and running assignee from a running Orchestrator tile must
-   create exactly one Task, one `delegated_by`, and one `assigned_to` row. A
-   rejected submission stays at zero rows and renders the returned error in the
-   same tile foot. Repeated clicks while one submission is pending are disabled
-   and cannot create duplicates.
+   add exactly one new Task, one new `delegated_by`, and one new `assigned_to`
+   row for each isolated valid submission. A rejected submission adds zero new
+   rows of those three types and renders the returned error in the same tile
+   foot. Immediately after the first accepted click and until its response,
+   disable and ignore additional submits.
 2. **The control does not disappear behind tile focus.** Every running
-   Orchestrator tile renders its `Create Task` control regardless of z-order.
-   Clicking a tile header or its non-interactive body selects and raises that
-   tile; the grip remains the drag affordance. Form fields and action buttons
-   must not trigger the raise handler or lose their in-progress input.
-3. **Spawn acknowledges the click immediately.** Within 250 ms of activating a
-   ready Dock profile, the canvas shows exactly one ephemeral pending tile with
+   Orchestrator tile has a visible, hit-testable `Create Task` control after any
+   other tile is selected or raised. Clicking a tile header or its
+   non-interactive body selects it and gives it the highest canvas z-order; the
+   grip remains the drag affordance. Form fields and action buttons must not
+   trigger the raise handler, and already-entered form values remain byte-for-
+   byte unchanged.
+3. **Spawn acknowledges the click immediately.** Measure
+   `pending_visible_ms` from the timestamp of the user activation event to the
+   first rendered frame in which that activation's pending tile is visible and
+   hit-testable; require `pending_visible_ms <= 250`. The canvas shows exactly
+   one ephemeral pending tile with
    that profile's display name and `STARTING` state, and the Dock row reads
    `starting…` with duplicate activation disabled. Success reconciles that
    placeholder to the one live Kernel-backed seat. Failure changes the same
    placeholder to `FAILED — RETRY` with the returned reason; it never creates a
    fake `agent_session` row. Pending state is UI-only and is not restored after
    app restart.
-4. **Add product-level proof of all three seams.** Extend the focused acceptance
-   with one renderer-level gate that exercises the actual DOM controls, preload
-   methods, main IPC handlers, and a temporary Kernel database. It must not
-   replace the existing Kernel-only `team-composition` gate. It must finish in
-   under two minutes and print the Task/link row counts plus the pending-tile
-   timing it measured.
+4. **Add product-level proof of the three product seams.** The gate covers Task
+   creation through the production renderer/preload/main/Kernel path; tile
+   raise without control or input loss; and Dock spawn pending/success/failure
+   behavior. Extend the focused acceptance with one renderer-level gate that
+   launches the production renderer with the production preload, clicks the
+   rendered control, proves the preload invokes `qf:tasks:create`, proves the
+   production main handler receives it, and proves that handler writes the
+   reported rows to a temporary Kernel database. Fixture DOMs, injected or
+   mocked preload/main handlers, test doubles, and direct calls to `execute()`,
+   `projection()`, or the IPC handler fail the gate. It must not replace the
+   existing Kernel-only `team-composition` gate. It must finish in under two
+   minutes and print the Task/link row counts plus the pending-tile timing it
+   measured.
 
 ### Rework acceptance
 
@@ -81,15 +94,29 @@ bun qa/run.ts doc-links
 git diff --check
 ```
 
-`team-composition-ui` must use an actual renderer click and the production
-preload/main IPC route against a temporary Kernel. A direct call to `execute()`,
-`projection()`, or the IPC handler is not UI proof. Its green receipt includes:
+`team-composition-ui` uses an actual renderer click and the production
+renderer, preload, and main IPC route against a temporary Kernel. Its green
+receipt includes:
 
 ```text
+renderer_click=1 preload=production main_ipc=qf:tasks:create temporary_kernel=1
 task_rows=1 delegated_by=1 assigned_to=1 create_errors=0
-background_controls=2 header_raised=true form_preserved=true
-pending_visible_ms=<n <= 250> duplicate_spawns=0 failure_retry=true
+rejected_rows_added=0 rejected_error_in_tile=true duplicate_task_rows=0
+background_controls=<unselected running Orchestrator count> header_raised=1 form_preserved=1
+pending_visible_ms=<n <= 250> duplicate_spawns=0 failure_retry=true failure_reason=true
+failed_spawn_session_rows_added=0 pending_restored_after_restart=0
 ```
+
+For the z-order receipt, `background_controls` must equal the number of
+unselected running Orchestrator tiles and each counted control must be visible
+and hit-testable. `header_raised=1` only when the clicked tile has the highest
+canvas z-order. `form_preserved=1` only when every entered field value is
+unchanged. The gate also proves that a rejected submission adds zero Task or
+identity-link rows and renders its returned error in the submitting tile; two
+submit activations before the first response add one Task; a failed spawn keeps
+the same tile showing `FAILED — RETRY` plus the returned reason and adds zero
+`agent_session` rows; and restarting while a spawn is pending restores no
+pending tile.
 
 Falsify it by disconnecting only the Create Task control's dispatch while the
 button still renders. The gate must exit nonzero with
