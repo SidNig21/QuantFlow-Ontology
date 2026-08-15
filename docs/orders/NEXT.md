@@ -1,7 +1,7 @@
 # NEXT — R14 Research Director front door
 
-status: BUILDER DOOR OPEN — R11A HISTORICAL FIXTURE
-authorized-by: founder goal; diagnosis `01a00755-a34a-7652-94f1-cfcc33c99b25`; Reader PASS `01a0075c-0c0c-7c32-85b1-0656ce6de8bd`
+status: BUILDER DOOR OPEN — R11A HISTORICAL DDL FIXTURE
+authorized-by: founder goal; exact diff `01a0075f-3fae-7bf2-9be8-b7156db3c9e7`; Reader PASS `01a00762-2c5a-7170-8b4b-ed0752b03aa9`
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 founder-closed with named gap; R14 active
 active-order: [`WO-RD-1.md`](WO-RD-1.md)
@@ -23,10 +23,11 @@ ratified exact `Research Director` display label before RPC readiness. The
 narrow two-file compatibility amendment in WO-RD-1 passed adversarial read.
 The authorized product edit is complete, but its first test command failed
 before collection because the Kernel package dependency was not materialized.
-The canonical `kernel` gate exposed one stale R11a historical fixture unrelated
-to the Director candidate. The exact one-file fixture correction in WO-RD-1
-passed adversarial read. One fresh Builder may apply that correction and run the
-one-shot short matrix. Do not create a worktree or clone, run a release
+The metadata half of the stale R11a fixture is corrected, but the same assertion
+proved the fixture still retains exactly two later 0010 table definitions. The
+one-file historical-DDL correction and its two negative controls passed
+adversarial read. One fresh Builder may implement that exact correction and run
+the one-shot short matrix. Do not create a worktree or clone, run a release
 verifier, package an installer, start a long soak, or begin later R14 work.
 
 ## Stop

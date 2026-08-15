@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: historical-fixture-builder-open — Reader PASS `01a0075c-0c0c-7c32-85b1-0656ce6de8bd`
+status: historical-ddl-fixture-builder-open — Reader PASS `01a00762-2c5a-7170-8b4b-ed0752b03aa9`
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -581,3 +581,42 @@ git diff --check
 This correction must make the historical fixture accurate; it may not skip,
 relax, rename, or narrow the Kernel suite. Full green commits and pushes the
 complete WO-RD-1 candidate for a fresh independent Verifier. Any red stops.
+
+## Baseline correction supplement — remove the two 0010 table shapes
+
+The approved metadata deletion ran and the same assertion remained red. Exact
+read-only comparison `01a0075f-3fae-7bf2-9be8-b7156db3c9e7` found no remaining
+link or `schema_meta` mismatch. It found exactly two current table definitions
+that the historical fixture still retained:
+
+- `agent_definition` still has 0010's `display_name TEXT NOT NULL` column;
+- `task` still allows 0010's `cancelled` status instead of exact historical
+  `CHECK (status IN ('open', 'done'))`.
+
+`classifyKernelShape()` compares normalized `sqlite_master` DDL, so row deletion
+cannot correct either difference. Authorize only the existing isolated fixture
+test file, `packages/qf-kernel/src/r11a-deterministic-execution.test.ts`, to
+rebuild those two empty fixture tables after its metadata/link reconstruction:
+
+1. Rebuild `agent_definition` with exact historical columns `id`, `created_at`,
+   `name`, `role`, `package_ref`, nullable `system_prompt_ref`, nullable
+   `runtime_profile`, and `capability_groups`; preserve rows through an explicit
+   column-list `INSERT ... SELECT`; omit only `display_name`.
+2. Rebuild `task` with exact historical columns `id`, `created_at`, `title`,
+   `description`, and `status`, plus exact
+   `CHECK (status IN ('open', 'done'))`; preserve rows through an explicit
+   column-list `INSERT ... SELECT`.
+3. Add two focused under-repaired controls in the same test file: one fixture
+   retaining only `display_name`, and one retaining only the `cancelled` status,
+   must each classify as `partial`. These controls must call the real
+   `classifyKernelShape()` and may not mock, replace, or copy its implementation.
+
+Use one literal `raw.exec` block for the two production-fixture rebuilds. Test
+helpers may remove duplication for the two controls only if they remain local
+to this test file and expose which single 0010 shape is retained. Do not edit
+`upgrade.ts`, generated schema/migrations, product code, expected classifications,
+or any existing assertion. Do not force or stub a classification result.
+
+Run the unchanged one-shot matrix from the preceding section. Full green
+commits and pushes the complete candidate for one fresh independent Verifier;
+any red stops with no retry.
