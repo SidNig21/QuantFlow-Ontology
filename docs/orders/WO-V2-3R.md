@@ -1,12 +1,12 @@
 # WO-V2-3R — bank the native Hermes runtime prerequisite
 
-status: open — Reader PASS `01a006f7-c251-7601-a560-b70b5a09a47e`; build-authorized by `NEXT.md`
+status: rework-open — Reader PASS `01a00708-d945-7461-803a-39832ef10bf9`; final cycle authorized by `NEXT.md`
 assignee: builder
 depends: WO-NORTHSTAR-1 verifier PASS `098aa62`; preserved V2-3R product working tree
 rung: R13 runtime closure before R14 Research Director
 authorization: founder goal 2026-08-15; routed by `NEXT.md` after adversarial Reader PASS
-rework-cycle: 0 of 1
-builder-attempts: prior packaging premise retired; rewritten implementation gets one Builder pass
+rework-cycle: 1 of 1 — final cycle
+builder-attempts: initial pass spent; one gate-named rework pass remains after Reader PASS
 
 ## Objective
 
@@ -338,3 +338,42 @@ Director is shipped. Then provide the candidate SHA, changed files,
 the unedited acceptance output, both falsifier reds, restored green, elapsed
 time, and any remaining limit. Commit and push to `wo-V2-3`; do not merge or
 rotate `NEXT.md`.
+
+## Rework — exact visible definition identity
+
+The first Builder pass reached the live production Dock after both falsifiers
+went red correctly. Exact Kernel IDs `hermes-orchestrator` and `hermes-worker`
+were present once and available, but the final visible-card receipt counted the
+display label `Market Researcher`. A second valid definition,
+`hermes-worker-2`, deliberately shares that label, so label cardinality cannot
+identify the required card.
+
+This final rework cycle has exactly two deliverables:
+
+1. In `collab-electron/src/windows/shell/src/dock.js`, put the existing
+   `definitionId` on every rendered definition card as the non-visible DOM
+   attribute `data-definition-id`. Do not change labels, ordering, filtering,
+   availability, spawn behavior, or styling.
+2. In `qa/gates/dev-dock-readiness.ts`, select the two live ready Dock cards by
+   the exact attributes `data-definition-id="hermes-orchestrator"` and
+   `data-definition-id="hermes-worker"`. Assert exactly one of each, retain the
+   existing Hermes adapter and ready-state checks, and do not count display
+   labels. `hermes-worker-2` remains valid and must neither satisfy nor fail the
+   `hermes-worker` receipt.
+
+This changes only the measurement identity; it does not relax, remove, or
+replace the existing pass criterion. All earlier runtime candidate work remains
+preserved. Builder rework runs only:
+
+```powershell
+cd collab-electron
+bun test src/windows/shell/src/dock.test.ts
+cd ..
+bun qa/run.ts dev-dock-readiness
+git diff --check
+```
+
+The focused gate runs once. Any red stops. Full green commits and pushes all
+authorized product files for one fresh independent Verifier, which runs the
+full Acceptance matrix once. No other file, assertion, dependency, test, or
+product behavior may change.

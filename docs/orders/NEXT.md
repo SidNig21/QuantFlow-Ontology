@@ -1,11 +1,11 @@
 # NEXT — R13 native Hermes runtime prerequisite
 
-status: BUILDER DOOR OPEN — ONE FOCUSED PASS
+status: BUILDER DOOR OPEN — FINAL FOCUSED REWORK
 authorized-by: founder
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 remains active
 active-order: [`WO-V2-3R.md`](WO-V2-3R.md)
-reader-receipt: task `01a006f7-c251-7601-a560-b70b5a09a47e` — PASS after two rounds
+reader-receipt: initial task `01a006f7-c251-7601-a560-b70b5a09a47e`; final rework task `01a00708-d945-7461-803a-39832ef10bf9` — PASS
 
 ## Active outcome
 
@@ -22,9 +22,10 @@ V2-3R product files are the authorized candidate. Inspect them before editing;
 do not discard or recreate them. No worktree, clone, helper framework, release
 verifier, packaged installer, long soak, or Research Director product work.
 
-The Builder gets one focused pass. Run only the order's named matrix. The
-`dev-dock-readiness` gate has a hard 120-second ceiling; the whole matrix must
-remain a short feedback loop.
+The first Builder pass named an ambiguous visible-card receipt after exact
+Kernel IDs had already passed. The final exact-definition-identity rework has
+passed its fresh read. One separate Builder may now run only the narrow rework
+matrix; the independent Verifier owns the full matrix.
 
 ## Stop
 
