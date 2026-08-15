@@ -1,0 +1,324 @@
+# WO-RD-1 — Research Director front door
+
+status: open — Reader PASS `01a00716-6df9-7d61-92ec-b0de15cf8188`; build-authorized by `NEXT.md`
+assignee: builder
+depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
+rung: R14 / slice 1 — conversation, durable mission, exact Director session
+authorization: founder goal 2026-08-15; routed after adversarial Reader PASS
+rework-cycle: 0 of 1
+
+## In plain terms
+
+Ryan gets one trustworthy place to ask a research question; if this is wrong,
+the question can disappear or open the wrong worker without showing what happened.
+
+## Outcome
+
+Ryan opens QuantFlow, asks one bounded sports-research question through the
+visible Research Director surface, and immediately sees a durable Mission plus
+one live canvas tile for the exact custom Hermes profile
+`hermes-research-director`. The session receives the Mission activation and is
+available for continued conversation in its native Hermes tile.
+
+This is the first honest vertical slice of R14. It proves the front door and
+identity, not the rest of R14. It does not yet claim autonomous recruiting,
+durable Task assignment, all five steering controls, independent review, live
+market coverage, research judgment, learning, recall, or a finished Dock.
+
+## Founder language
+
+QuantFlow opens with one clear place to start: **Research Director**. Ask it a
+question such as “NFL Week 2 is coming up; use Strategy qf-nfl-v1 and tell me
+what data coverage we have before looking for opportunities.” QuantFlow records
+that intent before the model acts, opens the Director on the canvas, and shows
+the Mission in the research ledger. It never places a bet or invents coverage.
+
+## Context pack
+
+Read only:
+
+- `START_HERE.md`
+- `docs/orders/PROTOCOL.md`
+- this order
+- `docs/DOCTRINE.md` A10
+- `species/hermes/dock-profiles.json`
+- `species/hermes/prompts/orchestrator.md`
+- `collab-electron/src/main/dock-profiles.ts`
+- `collab-electron/src/preload/shell.ts`
+- `collab-electron/src/main/mission-activation.ts`
+- `collab-electron/src/main/ipc-kernel.ts`
+- `collab-electron/src/main/index.ts`
+- `collab-electron/cli/qf-hermes-launch.sh`
+- `collab-electron/cli/qf-hermes-synthetic-responder.mjs`
+- `collab-electron/src/windows/shell/index.html`
+- `collab-electron/src/windows/shell/src/dock.js`
+- `collab-electron/src/windows/shell/src/tile-renderer.js`
+- `collab-electron/src/windows/shell/src/tile-manager.js`
+- `qa/run.ts`
+- `qa/gates/kernel-sole-writer.ts`
+
+## Deliverables
+
+### A. One exact custom Hermes profile
+
+Replace the temporary production manifest profile `hermes-orchestrator` with:
+
+```yaml
+id: hermes-research-director
+role: orchestrator
+display_name: Research Director
+runtime_profile: default
+system_prompt_ref: prompts/research-director.md
+capability_groups: [desk.orchestrate]
+```
+
+This is an exact production-profile contract, not an example. The production
+Hermes manifest must contain exactly one entry with those six values, with id
+`hermes-research-director`; it must contain no `hermes-orchestrator` entry. The
+package-owned prompt is exactly
+`species/hermes/prompts/research-director.md`, and profile validation must
+reject a missing Director, a duplicate Director, the old id, or any other
+prompt ref for that id before it calls the Kernel. QA proof profiles may remain
+in QA-only manifests, and an explicit handler override may still select one;
+neither changes the production default.
+
+Add that prompt as a tracked package-owned file. It tells the Director:
+
+- the founder Mission is its charter;
+- it uses only QuantFlow MCP/ontology tools and exact Kernel identities;
+- it must report missing data or Strategy/Technique coverage visibly instead
+  of fabricating facts;
+- it may recruit governed specialists only through a later authorized slice;
+  this slice does not recruit or assign a Task, and it may not pretend it did
+  until the Kernel records one; and
+- it never places bets or trades.
+
+The old `hermes-orchestrator` is absent from the production Hermes manifest and
+is never the default question target. Historical Kernel rows are not deleted in
+this slice; `DEBT.md` #35 remains the explicit retirement/reconciliation gap.
+The active isolated proof Kernel must contain exactly one new Director
+definition. Do not rename the role: `orchestrator` deliberately retains the
+existing focused three-tool roster for this slice.
+
+Update `DOCK_DISPLAY_NAMES`, `DockDisplayName`, and the exact error contract in
+`collab-electron/src/main/dock-profiles.ts` (plus its focused tests) so
+`Research Director` is a valid exact value. The rejection text must enumerate
+the four allowed values in this order: `Market Researcher, Orchestrator,
+Research Director, or Critic`. Do not relax exact manifest-key, stable-profile,
+prompt-ref, or capability validation.
+
+### B. Research Director is the default conversation front door
+
+The visible shell heading is exactly `Research Director`, not `Agent workspace`
+or `Ask QuantFlow`. Its textarea placeholder is exactly
+`Ask the Research Director about a bounded market mission…`. The specialist
+catalog remains below as optional manual control.
+
+The renderer submits through the existing preload method
+`window.shellApi.qf.submitResearchQuestion`; it does not gain a second question
+API. With `definitionId`/`definition_id` omitted and `QF_DOCK_QA_MODE` unset or
+not `1`, both production handlers must select
+`hermes-research-director`. With QA mode set, both retain
+`qf-proof-orchestrator`; a non-empty explicit definition override wins in the
+same way it does today. The focused UI proof exercises the first, production
+case, not a QA or explicit override.
+
+Submitting through the existing form must traverse renderer → preload → main →
+Kernel. Both production handlers — IPC `qf:research:submitQuestion` and RPC
+`qf.research.submit_question` — default to
+`hermes-research-director`. Their explicit `definitionId`/`definition_id` proof
+override and QA-mode `qf-proof-orchestrator` behavior remain unchanged.
+
+The returned visible status is exactly `Research Director running · Mission <missionId>`,
+with the returned Mission id substituted for `<missionId>`. The form is
+disabled only while admission is in flight; an error restores the founder's
+question and displays the real error.
+
+### C. Kernel truth appears without manual composition
+
+One successful form submission creates, through existing Kernel commands:
+
+- exactly one Mission whose objective is the founder's exact trimmed question;
+- exactly one open Hypothesis created by the existing question path;
+- exactly one running `agent_session` with exactly one `spawned_from` link to
+  `hermes-research-director`; and
+- one native-Hermes canvas tile for that exact session.
+
+“Exactly one” means one new row relative to the empty isolated proof Kernel for
+this submission, not that a founder's already-used Kernel is wiped. The returned
+Mission, Hypothesis, session, link, and tile identities must all bind to that
+same submission. The proof stops after this front-door state; it neither waits
+for nor asserts worker, Task, Run, Artifact, Evaluation, or Report behavior.
+
+The Mission is visible in the existing research ledger with its objective. The
+tile shows the friendly `Research Director` label and exposes exact non-visible
+DOM identity as
+`data-definition-id="hermes-research-director"` and
+`data-session-id="<returned session id>"`. Obtain the friendly label from the
+Kernel definition; do not create a renderer-only identity table.
+
+Update the bounded `qf.mission.activation.v1` instruction so it addresses the
+Research Director contract: acknowledge the founder Mission, use only
+QuantFlow tools, report coverage/refusal honestly, plan future governed work
+with exact IDs without recruiting in this slice, and never place a bet or
+trade. Retain its JSON-safe byte limits, single post-readiness write, Mission
+id, and exact question.
+
+No Mission, Hypothesis, session, tile, or status may depend on direct SQLite
+writes, renderer-local durable state, a manually spawned seat, or the Dock
+catalog button.
+
+### D. One fast product proof
+
+Add the registered gate `research-director-front-door`. It starts the public
+`bun run dev` entrypoint from `collab-electron` against an isolated Kernel and
+the tracked repository resource root, using the existing deterministic Hermes
+responder only to avoid model cost. It runs on native Windows, sets
+`QF_HERMES_SYNTHETIC_TEST=1`, explicitly unsets `QF_DOCK_QA_MODE` and any
+definition override, and therefore exercises the production Director default
+through the real Hermes launcher/PTY/gateway seam. It must drive the actual
+textarea/form in the real Electron renderer by filling the DOM control and
+submitting that form. The existing app control channel is allowed only for
+readiness, DOM input/form submission, DOM observation, and shutdown. The gate
+may not invoke a product action RPC, preload method, submit-question RPC,
+`qf.dock.spawn`, or `execute()` directly; it may not mock the renderer, preload,
+main handler, Kernel, or responder; and it may not use `.package-staging`.
+
+The proof must emit and assert a production-boundary receipt showing the one
+submission crossed renderer form → preload IPC
+`qf:research:submitQuestion` → main IPC handler → Kernel command. A proof that
+only sees status text, invokes the exposed API directly, or reads a UI fixture
+is red. `QF_UI_PROOF` instrumentation may report these boundaries, but it must
+not change admission, return values, or Kernel behavior.
+
+The gate independently opens its isolated Kernel SQLite file read-only after
+the UI action, in a separate oracle path that uses no app API. The oracle takes
+its own before/after byte and mtime snapshot and fails if a read changes the
+database. Add only this named gate to the existing read-only driver-SQL
+allowlist, with a comment identifying it as an independent UI-proof oracle;
+never allowlist the whole `qa/gates` tree.
+
+It proves all Deliverable C rows/links, the exact visible Mission ledger row,
+the exact friendly Director tile, the returned Mission-id status, and no
+`hermes-orchestrator` session. It does not click or invoke the Dock catalog and
+reports `manual_dock_composition=0`. It closes the app and reports separate
+baseline-subtracted counts for the owned Electron process tree, Electron
+processes, Hermes processes, and disposable roots. It fails if any count is
+non-zero or if the repository tree differs from its pre-run snapshot.
+
+The 120,000 ms ceiling is a hard wall-clock deadline starting before the first
+child spawn and including UI proof, oracle reads, shutdown, and cleanup. A
+watchdog must terminate the owned process tree at the deadline, record any
+remaining process/root as a failure, and make the gate exit non-zero by the
+deadline; cleanup may not contain an unbounded await after the watchdog fires.
+The production deadline is the literal 120,000 ms and is not environment
+overridable; only the watchdog helper's unit test may inject a shorter clock.
+The timeout receipt always prints `elapsed_ms`, including the red path.
+
+Falsify before green in disposable manifest copies:
+
+1. replace only the Director id with `hermes-orchestrator`; discovery must be
+   red because the required stable Director is missing; and
+2. change only the Director prompt ref back to `prompts/orchestrator.md`;
+   discovery/profile validation must be red because the custom prompt contract
+   is missing; and
+3. in a disposable product-source copy, bypass the form's production preload
+   submission or the automatic session-tile projection; the boundary/tile
+   assertions must be red; and
+4. in a disposable gate-input copy, retain one owned process/root during
+   cleanup and run the receipt validators; the process-tree and root checks
+   must be red, then green after restoration. The watchdog helper is also
+   tested with an injected short deadline and a never-settling task; it must
+   return red without an unbounded cleanup wait. Restore all inputs before the
+   real proof.
+
+Restore the disposable inputs, then run the real UI proof against untouched
+repository assets. The repository tree must be byte-identical before/after.
+
+Required green receipt:
+
+```text
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+falsifier=cleanup-retained-process-or-root result=red
+falsifier=watchdog-never-settles result=red
+production_manifest_director=hermes-research-director exact=true
+production_manifest_old_orchestrator_entries=0
+default_ipc_definition=hermes-research-director
+default_rpc_definition=hermes-research-director
+qa_override_preserved=true explicit_override_preserved=true
+front_door=Research Director
+renderer_form_submit=1 preload_ipc=qf:research:submitQuestion main_ipc=qf:research:submitQuestion
+mission_rows_added=1 hypothesis_rows_added=1
+director_definition=hermes-research-director
+director_sessions_added=1 spawned_from_exact=1
+mission_visible=true director_tile_visible=true manual_dock_composition=0
+old_orchestrator_sessions_added=0
+oracle=independent_read_only kernel_unchanged_after_oracle=true
+owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
+repository_tree_unchanged=true
+elapsed_ms=<value less than 120000>
+PASS research-director-front-door
+```
+
+## Acceptance
+
+Builder runs once, in order:
+
+```powershell
+cd collab-electron
+bun test src/main/mission-activation.test.ts src/main/dock-profiles.test.ts src/windows/shell/src/dock.test.ts src/windows/shell/src/tile-renderer.test.ts
+cd ..
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+bun qa/run.ts repo-shape
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts one-skin
+bun qa/run.ts doc-links
+git diff --check
+```
+
+A fresh independent Verifier records candidate SHA/status/upstream before and
+after, runs this matrix once, and changes no product file. Any red, SHA change,
+tracked change, leak, missing receipt, or 120-second focused-gate breach stops
+the slice. No release verifier, installer, package gate, long soak, worktree,
+clone, or helper framework.
+
+On PASS, Verifier writes the concise receipt at
+`docs/orders/evidence/wo-rd-1/VERIFICATION.md`, marks this order done, closes
+the Builder door in `NEXT.md`, commits only those docs, and pushes `wo-V2-3`.
+
+## Visible acceptance
+
+After machine PASS, the router may use Computer Use on an isolated ordinary-dev
+app to submit one bounded founder-style sports question. It accepts only seeing
+the exact Mission id, `Research Director running`, a friendly Director tile,
+and the Mission objective in the ledger. It does not judge market research,
+authorize bets, or claim the rest of R14.
+
+## Scope
+
+Allowed product surfaces: the Hermes production profile/prompt; exact profile
+validation; both existing submit-question handlers; Mission activation;
+Research Director copy/status; tile identity/label projection; the new focused
+gate and its registration/read-only allowlist entry; directly related tests.
+
+No new dependency, schema object/action/link, database, state store, adapter,
+tool, credential read, network integration, live market feed, Task behavior,
+critic path, RL code, recall, Dock redesign, or report publication.
+
+## Stop
+
+Stop if the form cannot reach the exact profile without changing schema or
+adding a dependency; if a pass criterion must weaken; if a product file outside
+the allowed surfaces is required; if the same assertion is red twice after one
+scoped fix; or if the focused gate exceeds 120 seconds. Never place bets or
+trades.
+
+## Report
+
+Open with what Ryan can now do. Bind every claim to the candidate SHA and named
+gate receipt. State plainly that recruiting/Task assignment and research
+judgment are next, not shipped.

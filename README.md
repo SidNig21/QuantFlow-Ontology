@@ -47,7 +47,7 @@ Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a reco
 - **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
 - **The peer bus** (`tools/qf-peer-bus`) — stdio MCP (`send_to_peer` / `read_inbox` / `list_peers`). Peer messages land as content-addressed `trajectory` artifacts. Transport SQLite stays separate from the Kernel.
 - **Desk + research loop (R0–R12)** — Kernel, Dock seats, durable tasks, and the question → hypothesis → dataset → run → critic → report chain exist in this checkout. V2-1 is the installable current Windows app.
-- **Preserved runtime work** — the unfinished V2-3R native Hermes development-launch candidate remains in the working tree unchanged; product implementation is paused while WO-NORTHSTAR-1 corrects authority.
+- **Native Hermes development runtime** — WO-V2-3R is independently verified; the authorized R14 front-door slice now builds the exact custom Research Director on that runtime.
 - **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward.
 - **Glacier visual program (WO-g1 → g5)** — tokens + ANSI (g1), tile spine (g2), dock masthead/ask/launcher/ledger (g3), shell chrome / file-rail / canvas / z-scale (g4), Kernel-backed **view** cables with dashed honesty + orphan cascade (g5). ADR-0003 allows UI on experimental `connection` without promotion. Reversible checkpoint: tag `glacier-checkpoint-a` (after g5a+g1). Installed asar needs rebuild/package-click to match source.
 - **Verification culture** — work orders, cold worktrees, bait-tested gates. Artifact hashes are recomputed, not trusted.
@@ -70,18 +70,18 @@ The ontology has three planes:
 
 ## Status
 
-**As of 2026-08-14 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
+**As of 2026-08-15 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) → [`docs/orders/WO-NORTHSTAR-1.md`](docs/orders/WO-NORTHSTAR-1.md) (the active documentation order) |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) → [`docs/orders/WO-RD-1.md`](docs/orders/WO-RD-1.md) (the one active product order) |
 | Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — non-authoritative source record; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
-| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0–R12 complete; R13 active |
+| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — its R13 founder-close exception preserves the open packaging-proof gap; [`NEXT.md`](docs/orders/NEXT.md) names the current R14 handoff |
 | Product floor | Installable Windows app (V2-1). Desk golden run works. Research objects exist in the Kernel. |
 | Honest boundary | The custom Hermes Research Director experience and the governed RL/PufferLib learning loop are product destinations, not shipped capabilities. |
 
 ```bash
-bun qa/run.ts rung-ladder    # must say active=R13
+bun qa/run.ts rung-ladder    # must say active=R14
 bun qa/run.ts --list         # every registered gate
 ```
 

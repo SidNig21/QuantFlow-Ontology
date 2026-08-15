@@ -164,14 +164,21 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R11a | complete | `docs/orders/evidence/r11a` |
 | R11b | complete | `docs/orders/evidence/r11b` |
 | R12 | complete | `docs/orders/evidence/r12` |
-| R13 | active | `docs/orders/evidence/r13` |
-| R14 | pending | — |
+| R13 | complete | `docs/orders/evidence/r13` |
+| R14 | active | `docs/orders/evidence/r14` |
 | R15 | pending | — |
 | R16 | pending | — |
 | R17 | pending | — |
 | R18 | pending | — |
 | R19 | pending | — |
 | R20 | pending | — |
+
+**R13 founder-close exception (2026-08-14).** The founder explicitly stopped
+V2-2 and authorized the route to proceed with the packaging-proof gap recorded
+in `docs/orders/evidence/r13/V2-2-VERIFICATION.md`. `complete` here means the
+rung no longer blocks product work; it does not claim the missing installer
+receipt, founder live turn, or L4 certification. Those remain named release
+debt and must be re-measured before a release that relies on them.
 
 ### Closing a rung
 
