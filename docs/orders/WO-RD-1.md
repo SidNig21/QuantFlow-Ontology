@@ -1,6 +1,6 @@
 # WO-RD-1 — Research Director front door
 
-status: app-fixture-correction-open — Reader PASS `01a00732-6284-78f3-9c50-0155742760a7`; exact one-line fixture correction authorized
+status: kernel-display-contract-builder-open — Reader PASS `01a0074c-f897-7dd0-8973-6381fe3998c3`
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
@@ -496,3 +496,40 @@ git diff --check
 
 Any red stops the slice for the founder. Full green commits and pushes the
 complete authorized candidate for one fresh independent Verifier.
+
+## Compatibility amendment — Kernel accepts the ratified Director label
+
+After the isolated app directory was corrected, the application built cleanly
+but the live proof still timed out before RPC readiness. Static inspection
+names the first product blocker: `packages/qf-kernel/src/create.ts` rejects the
+ratified exact `display_name: Research Director` while
+`collab-electron/src/main/dock-profiles.ts` and the production manifest accept
+it. Profile bootstrap runs before the RPC server starts, so this stale Kernel
+enumeration aborts startup.
+
+This amendment authorizes only the compatibility needed for Deliverable A:
+
+1. In `packages/qf-kernel/src/create.ts`, add exact `Research Director` to the
+   accepted `display_name` values. Update the rejection message to enumerate
+   the four accepted labels in this order: `Market Researcher`,
+   `Orchestrator`, `Research Director`, `Critic`.
+2. In `packages/qf-kernel/src/kernel.test.ts`, add one focused contract test
+   proving a definition with exact `display_name: Research Director` is
+   accepted and persisted, and that an unknown display name is still rejected
+   with the four-value error. Do not change schemas, commands, actions, links,
+   defaults, roles, capabilities, or any other Kernel behavior.
+
+The only newly allowed product files are those two Kernel files. All prior
+WO-RD-1 scope and assertions remain unchanged. The Builder runs each command
+at most once, in order, and stops at the first red:
+
+```powershell
+bun test packages/qf-kernel/src/kernel.test.ts
+bun test qa/gates/research-director-front-door.test.ts
+bun qa/run.ts research-director-front-door
+git diff --check
+```
+
+Full green commits and pushes the complete authorized WO-RD-1 candidate for
+one fresh independent Verifier. Any red stops; no assertion, timing limit,
+fixture, or acceptance criterion may be weakened.

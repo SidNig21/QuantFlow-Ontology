@@ -1,7 +1,7 @@
 # NEXT — R14 Research Director front door
 
-status: BUILDER DOOR OPEN — ONE-LINE APP FIXTURE CORRECTION
-authorized-by: independent verifier
+status: BUILDER DOOR OPEN — KERNEL DISPLAY CONTRACT
+authorized-by: founder goal; independent Reader PASS `01a0074c-f897-7dd0-8973-6381fe3998c3`
 authorized-at: 2026-08-15
 route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R13 founder-closed with named gap; R14 active
 active-order: [`WO-RD-1.md`](WO-RD-1.md)
@@ -17,11 +17,13 @@ It passed its adversarial read and is the one authorized product order.
 
 ## Work here only
 
-The product path is implemented locally. The exact one-line isolated-app
-fixture correction passed its read. One separate Builder may change only that
-line and run the at-most-once matrix. Do not create a worktree or clone, run a
-release verifier, package an installer, start a long soak, or begin later R14
-work.
+The product path is implemented locally and builds. The isolated-app fixture
+correction exposed one product blocker: Kernel registration still rejects the
+ratified exact `Research Director` display label before RPC readiness. The
+narrow two-file compatibility amendment in WO-RD-1 passed adversarial read.
+One fresh Builder may make exactly that amendment and run its one-shot focused
+matrix. Do not create a worktree or clone, run a release verifier, package an
+installer, start a long soak, or begin later R14 work.
 
 ## Stop
 
