@@ -1,6 +1,8 @@
 # WO-RD-1 — Research Director front door
 
-status: Director-tile lifecycle repair Builder open — Reader PASS `01a00788-119e-7003-aad8-2afe70f153a2`
+status: done
+verified-candidate: 5a9a5cea6186b05a4eea5c38f5b8a597a8d02bbf
+verification: docs/orders/evidence/wo-rd-1/VERIFICATION.md
 assignee: builder
 depends: WO-NORTHSTAR-1 PASS; R13 founder-closed with its packaging-proof gap recorded; WO-V2-3R candidate `a530c27` independently verified
 rung: R14 / slice 1 — conversation, durable mission, exact Director session
