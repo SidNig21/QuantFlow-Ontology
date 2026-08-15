@@ -1,10 +1,10 @@
-# WO-V2-3R — make the ordinary development Dock launchable
+# WO-V2-3R — bank the native Hermes runtime prerequisite
 
-status: paused-by-founder-direction-reset
+status: open — Reader PASS `01a006f7-c251-7601-a560-b70b5a09a47e`; build-authorized by `NEXT.md`
 assignee: builder
-depends: WO-V2-3 candidate `b5b6c95` machine-passed and founder-rejected
-rung: R13 / V2-3 founder closure
-authorization: founder direction 2026-08-15 — production Hermes is native CLI; remove obsolete AgentOS packaging seam
+depends: WO-NORTHSTAR-1 verifier PASS `098aa62`; preserved V2-3R product working tree
+rung: R13 runtime closure before R14 Research Director
+authorization: founder goal 2026-08-15; routed by `NEXT.md` after adversarial Reader PASS
 rework-cycle: 0 of 1
 builder-attempts: prior packaging premise retired; rewritten implementation gets one Builder pass
 
@@ -12,14 +12,38 @@ builder-attempts: prior packaging premise retired; rewritten implementation gets
 
 Make the normal `bun run dev` founder path launch its production Hermes
 participants from tracked native-CLI adapter assets, with no AgentOS packaging
-step and no dependency on artifacts left by a gate.
+step and no dependency on artifacts left by a gate, so the custom Hermes
+Research Director can be implemented on a working ordinary-development runtime.
 
 ## In plain terms
 
-Ryan opens the development app, sees an available Orchestrator and Market
-Researcher, launches both, and can finish the V2-3 founder check. Today the test
-app works only because its private staging folder already contains Hermes;
-the normal app says Hermes is missing and cannot compose a team.
+Ryan opens the development app and its production Hermes runtime is genuinely
+available. Today the test app works only because its private staging folder
+already contains Hermes; the normal app says Hermes is missing. This order fixes
+that prerequisite only. It does not claim that the temporary `Orchestrator`
+profile is the ratified Research Director experience.
+
+## Product fit after the north-star correction
+
+`DOCTRINE.md` A10 makes `hermes-research-director` the stable product profile.
+That identity, prompt, mission UX, governed recruiting, and visible steering
+belong to R14 and are deliberately not smuggled into this already-built runtime
+repair. Passing this order means the native Hermes adapter can launch from the
+ordinary app. It does not mean the Research Director product slice has shipped.
+
+## Authority and profile lock
+
+This order passed its adversarial read in task
+`01a006f7-c251-7601-a560-b70b5a09a47e`. The Builder door is open only while
+`NEXT.md` names this exact file. The existing V2-3R product working tree is the
+authorized implementation candidate; the Builder must inspect and preserve its
+valid work rather than recreate it in another checkout.
+
+The only profiles exercised here are the already-existing temporary definitions
+`hermes-orchestrator` and `hermes-worker`. They are adapter-prerequisite smoke
+fixtures, not `hermes-research-director`; no name, prompt, capability, or
+mission claim about the ratified Research Director may be added or altered by
+this order, and its acceptance receipt may not claim that product is shipped.
 
 ## Measured rejection
 
@@ -80,21 +104,32 @@ Hermes launches through `route: native_tui`; the `.aospkg` is an adapter identit
 marker and its bytes are never executed. Make that contract explicit and match
 the already-shipped Claude Code native-TUI adapter:
 
-1. Track `species/hermes/packed/hermes.aospkg` as a small non-empty QuantFlow
-   marker and keep `hermes.meta.json` tracked beside it.
+1. Track `species/hermes/packed/hermes.aospkg` as exactly the UTF-8 bytes for
+   `QuantFlow Hermes native-TUI adapter` followed by one LF byte (`0x0A`), and
+   keep `hermes.meta.json` tracked beside it. The marker has no executable
+   payload.
 2. Rewrite `species/hermes/scripts/pack-agent.mjs` with Node standard-library
    file/JSON operations only. It validates `launch.json` and
    `tools-allowlist.json`, writes the marker and the same metadata contract, and
    invokes no bundler, npm command, AgentOS package, or external toolchain.
+   The Hermes metadata contract has exactly these keys, with no extras:
+   `route`, `name`, `command`, `terminal_target`, `argv`, `peer_delivery`,
+   `package`, and `tools`; `route`, `name`, `command`, `terminal_target`,
+   `argv`, `peer_delivery.mode`, and `peer_delivery.runtime_profiles` are
+   copied from `launch.json`, `tools` is copied from the allowlist, and
+   `package` is `hermes.aospkg`.
 3. Remove unused `@rivet-dev/agentos-core` and
    `@rivet-dev/agentos-toolchain` dependencies from the Hermes workspace and
-   regenerate its lockfile. Do not add a replacement dependency.
+   regenerate its lockfile. The post-change package manifest and lockfile must
+   contain neither package name (including as a transitive lockfile entry), and
+   no replacement dependency may be added.
 4. Remove Hermes install/toolchain-adapter work from production runtime staging;
    run the standard-library pack script in the copied source tree, then stage
    the marker and metadata. QA-only AgentOS proof species are unchanged.
-5. `bun run dev` performs no packaging or npm discovery. Both production native
-   CLI adapter markers are tracked inputs, so it proceeds directly to the
-   existing Electron launcher.
+5. `bun run dev` performs no packaging, npm discovery, AgentOS discovery, or
+   pack-script override on the ordinary path. Both production native CLI
+   adapter markers are tracked inputs, so it proceeds directly to the existing
+   Electron launcher.
 
 The prior `npm ENOENT` and `.cmd EINVAL` receipts prove the removed seam was not
 portable. Do not patch, upgrade, wrap, or invoke AgentOS to repair production
@@ -113,8 +148,10 @@ is not acceptance.
 
 The gate never moves, removes, or rewrites repository artifacts. For its red
 cases it copies only the two production species manifests and packed adapter
-files to a unique temporary resource root, mutates that copy, and deletes only
-that temporary root in `finally`.
+files — exactly the two `dock-profiles.json` manifests, both species' packed
+adapter files, and Claude Code's existing packed `claude-code.mjs` — to a
+unique temporary resource root, mutates that copy, and deletes only that
+temporary root in `finally`.
 
 The gate calls `discoverDockProfileManifests(temporaryRoot)` directly for both
 red cases; it does not redirect or launch the development app against that
@@ -129,6 +166,12 @@ fails if it imports or invokes `child_process`, `Bun.spawn`, `npm`,
 `agentos`, or any non-`node:` package. The repository script is never executed
 in place by the gate or Builder.
 
+The pack proof also fails if either removed AgentOS package name remains in
+`species/hermes/package.json` or `species/hermes/bun.lock`. The ordinary-startup
+proof separately fails if `dev.mjs` or `dev.ps1` still discovers npm, AgentOS,
+a pack script, or `.package-staging` on the normal path; the QA-only staging
+path may retain its existing AgentOS behavior.
+
 The green run proves both tracked adapter markers and metadata files are
 non-empty before the Electron child starts. The same real
 Electron child boots its production renderer/main against an isolated Kernel;
@@ -139,6 +182,13 @@ machine. Those assertions mean exactly one row for definition
 `hermes-worker-2` and any same-label row are not substitutes and need not be
 launched by this order. Cleanup runs only after that assertion and real Electron
 cleanup complete.
+
+The live proof must use the existing app RPC/UI seam, not a manifest-only,
+Kernel-direct, static, or mocked check: a live Electron PID, the app readiness
+response, `window.shellApi.qf.listDefinitions()`, and the visible Dock launch
+rows must all agree on those exact two IDs and their available status. The
+reported package/resource paths must resolve under the repository root; a
+`.package-staging` or synthesized package result is a failing proof.
 
 Its green receipt must use the real tracked repository-root adapter files and
 Electron child. It may not reuse
@@ -175,6 +225,7 @@ bun qa/run.ts kernel-sole-writer-app
 bun qa/run.ts one-skin
 bun qa/run.ts team-composition-ui
 bun qa/run.ts doc-links
+git diff --exit-code b5b6c95 -- collab-electron/src/windows/shell/src/task-composition.js qa/gates/team-composition-ui.ts
 git diff --check
 ```
 
@@ -190,7 +241,15 @@ under these concrete breaks:
 | `one-skin` | a second renderer skin or forbidden legacy UI surface appears |
 | `team-composition-ui` | its existing renderer-to-preload-to-main-to-isolated-Kernel Task and launch assertions fail; its `.package-staging` fixture is supplemental and does not prove development-package readiness |
 | `doc-links` | an in-scope documentation link resolves to no tracked target |
+| candidate-product-file diff | either of the two named V2-3R product files differs from candidate `b5b6c95` |
 | `git diff --check` | the candidate diff contains whitespace errors or conflict markers |
+
+The candidate-product-file diff is intentionally narrow: it compares only
+`collab-electron/src/windows/shell/src/task-composition.js` and
+`qa/gates/team-composition-ui.ts` with `b5b6c95`. It does not claim that every
+currently dirty V2-3R runtime or order file matches that candidate; those paths
+are governed by this order's scoped deliverables and the existing-checkout
+constraint.
 
 The focused gate's Hermes pack/validation proof goes red if the script contains
 a forbidden import/invocation, needs an install, emits bytes different from the
@@ -199,7 +258,9 @@ tracked marker/metadata, or metadata does not match `launch.json` and
 red if production staging attempts a Hermes install/AgentOS toolchain or omits
 either tracked adapter file.
 
-`dev-dock-readiness` must finish within two minutes and print:
+`dev-dock-readiness` starts a monotonic timer before its first disposable
+operation, fails non-zero at 120,000 ms, and prints `elapsed_ms=<value>` before
+the final PASS. It must finish within two minutes and print:
 
 ```text
 development_root=repository
@@ -210,6 +271,7 @@ electron_process_started=true
 hermes_orchestrator_launchable=true
 hermes_worker_definition_launchable=true
 repository_artifacts_mutated=false
+elapsed_ms=<value less than 120000>
 PASS dev-dock-readiness
 ```
 
@@ -221,27 +283,14 @@ this order explicitly replaces PROTOCOL's throwaway-worktree mechanism with
 session separation plus this same-checkout SHA guard; no worktree or clone may
 be created. No packaged installer or release matrix runs.
 
-## Founder-delegated acceptance
+## Visible prerequisite acceptance
 
-After Verifier PASS, the router uses Computer Use on the normal development
-app. It must:
-
-1. launch exactly definitions `hermes-orchestrator` and `hermes-worker` from
-   the production Dock; their visible roles are `Orchestrator` and
-   `Market Researcher`, respectively;
-2. see both reach `running`;
-3. create one Task from the Orchestrator tile, assign it to the running Hermes
-   `hermes-worker`, and see `hermes-worker` as owner on both the Task tile and
-   Dock row;
-4. reassign that same Task to the running Hermes Orchestrator and see the
-   Orchestrator as owner on both surfaces;
-5. cancel that Task, close the `hermes-worker` seat, and see the Task remain
-   cancelled with `hermes-orchestrator` as final owner;
-6. close and reopen the app; and
-7. see the cancelled Task, `hermes-orchestrator` final owner, and closed
-   `hermes-worker` seat restored.
-
-That visible sequence accepts V2-3.1. Machine green alone does not.
+After Verifier PASS, a separate Computer Use check may open the ordinary
+development app, launch the existing temporary definitions
+`hermes-orchestrator` and `hermes-worker`, observe both reach `running`, close
+them, and observe no remaining QuantFlow-owned Hermes process. It performs no
+Task composition and makes no Research Director claim. A failure is a numbered
+runtime defect; a pass accepts only the native adapter prerequisite.
 
 ## Contract
 
@@ -250,10 +299,16 @@ That visible sequence accepts V2-3.1. Machine green alone does not.
 - The Kernel remains the sole truth owner. This order adds no object, link,
   action, schema change, state store, dependency, or credential access.
 - Preserve candidate `b5b6c95`, the live Hermes UI proof, its falsifiers,
-  cleanup, and all Task semantics and assertions.
+  cleanup, and all Task semantics and assertions. In particular,
+  `collab-electron/src/windows/shell/src/task-composition.js` and
+  `qa/gates/team-composition-ui.ts` remain byte-for-byte unchanged from that
+  candidate; this order may change only the runtime-plumbing paths named in its
+  Deliverables and the focused-gate registration.
 - The normal development app must never depend on leftovers from a previous QA
   or package run.
-- A failed preflight opens no Electron window.
+- The two failed disposable discovery cases open no Electron window; the
+  public green path starts Electron only after its untouched repository-root
+  readiness checks pass.
 - Delete the two unused AgentOS dependencies from `species/hermes`; add no
   dependency, vendor patch, wrapper, cache edit, or replacement package.
 
@@ -261,8 +316,11 @@ That visible sequence accepts V2-3.1. Machine green alone does not.
 
 - Repairing the Claude Code readiness-handshake timeout.
 - Reconciling or retiring stale Kernel `agent_definition` rows (`DEBT.md` #35).
+- Renaming or implementing `hermes-research-director`, changing its prompt or
+  tools, mission planning, recruiting, task delivery, steering, or research
+  judgment. Those are the next R14 product order.
 - Rebuilding the Dock, cables, seat states, cross-species delivery, the long
-  Windows suite, V2-3.2, or the founder-direction reset.
+  Windows suite, or V2-3.2.
 - Changing Hermes authentication or inspecting credentials.
 
 ## Stop
@@ -275,7 +333,8 @@ focused gate registration, and existing gate file must change.
 
 ## Report back
 
-Open with what Ryan can now do. Then provide the candidate SHA, changed files,
+Open with what runtime prerequisite is now banked without claiming the Research
+Director is shipped. Then provide the candidate SHA, changed files,
 the unedited acceptance output, both falsifier reds, restored green, elapsed
 time, and any remaining limit. Commit and push to `wo-V2-3`; do not merge or
 rotate `NEXT.md`.
