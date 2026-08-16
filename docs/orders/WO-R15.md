@@ -1,7 +1,7 @@
 # WO-R15 — Governed critic review and publication gate
 
-status: exceptional verifier rework — exact reopen delta required
-assignee: Builder
+status: done
+assignee: complete
 depends: R14 PASS at `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 rung: R15 — governed review
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
@@ -15,6 +15,8 @@ rework-cycle: 1 of 1 used — exhausted
 verifier-round-1: candidate `9173abe7039190208c299da40472d923ead6c057`; R15 gates PASS, `founder-steering` FAIL `reopen Task/session/link snapshot changed`; cleanup zero
 verifier-round-2: candidate `4c6a638dc4db0966dfce22636e753fabb0345fd9`; same reopen Task/session/link mismatch reproduced after shutdown suppression; cleanup zero
 exceptional-reauthorization: founder standing umbrella authority 2026-08-16 covers this same in-scope defect; no acceptance change
+final-candidate: `5d8b2f42205220f466878b32f6b17b41b4732fa8`
+verifier-pass: task `01a009ea-528a-73f1-9600-ac111ffbb004`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5` - 18 of 18 native exits zero, cleanup zero
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
 ## In plain terms
@@ -551,3 +553,10 @@ test that fails on the exact shutdown/reopen mutation without launching the full
 Electron gate. Preserve the first shutdown fix unless evidence proves it wrong.
 Then run the focused deterministic test and founder-steering during repair, and
 the full literal matrix exactly once at final candidate. A further red stops.
+
+### Completion receipt
+
+The receipt-safe independent Verifier bound all 18 commands to candidate
+`5d8b2f42205220f466878b32f6b17b41b4732fa8`. Every native exit was zero,
+founder-steering reported reopen equality, and no relevant process or temporary
+root remained. See [R15 verification](evidence/r15/VERIFICATION.md).
