@@ -8,6 +8,7 @@ authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
 reader-round-1: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; all defects below landed
 reader-round-2: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; ten remaining defects landed
 reader-round-3: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; five final defects landed
+reader-round-4: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; three final gate/meaning defects landed
 rework-cycle: 0 of 1 used
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
@@ -182,6 +183,17 @@ Kernel block reason, `PUBLICATION BLOCKED`, and both next actions. Supporting
 state displays `PUBLISHED`, Report id, and content hash. No state claims a bet,
 wager, order, or trade occurred.
 
+Kernel projection exposes the publication blocking reason as exactly
+`{code, message}`. For `rejects`, code is exactly
+`EVALUATION_REJECTS_PUBLICATION` and message is exactly
+`Publication blocked: the independent review rejected this research.` For
+`inconclusive`, code is exactly `EVALUATION_INCONCLUSIVE_PUBLICATION` and
+message is exactly
+`Publication blocked: the independent review was inconclusive.` The DOM renders
+the exact message and exposes the exact code as a machine-readable fact. The
+order-authored expected manifest contains these literals; fixture-, renderer-,
+gate-, or Builder-selected alternatives fail.
+
 ### Full close/reopen
 
 **close/reopen** means closing the Electron window, terminating Main and all
@@ -293,10 +305,19 @@ broker, and Kernel-write seams. The deterministic proof substitutes only the
 responder behind the admitted production transport; the live proof substitutes
 nothing.
 
-`governed-review` has a 180-second total limit and allocates three distinct
-temporary Kernel/app roots, one each for `rejects`, `inconclusive`, and direct
-`supports`. No database, process, session, Task, fixture id, renderer state, or
-expected-facts object is reused across roots. In each non-supporting root, first
+`governed-review` has a 180-second total limit and allocates four distinct
+temporary Kernel/app roots: request-refusal, `rejects`, `inconclusive`, and
+direct `supports`. No database, process, session, Task, fixture id, renderer
+state, or expected-facts object is reused across roots. In request-refusal,
+click Request review for a Task whose source-work lineage is invalid; assert no
+critic session or review Task, and exactly one `action_refusal_receipt` with
+`task_id: null`, `triggering_evaluation_id: null`, and the originating attempt
+id. Repeat that UUID concurrently and after full reopen and assert the identical
+refusal with no additional write. In each valid root, repeat the original
+Request-review UUID concurrently and after reopen and assert the original
+admission result with no additional critic session, review Task, Evaluation,
+findings Artifact, or Report. Cleanup expectations cover all four roots. In
+each non-supporting root, first
 assert blocked state and zero Report facts. Then click Request revision while
 the executor is running and assert exactly one correctly assigned/linked
 revision Task. Repeat that same attempt concurrently and after full reopen and
@@ -324,6 +345,14 @@ assignee, status, attempt id, and link; every Report id, kind, hash, publication
 Evaluation, source id, and lineage edge. DOM facts include critic identity,
 four scores, overall, verdict, rationale, block reason, actions, publication
 state, Report id, and hash. Missing, extra, reordered, or unequal facts fail.
+
+Both non-supporting deterministic responders submit leading/trailing whitespace
+in rationale, findings code, and findings message. The immutable manifest
+contains only the trimmed values and independently computes the exact normalized
+findings bytes/hash and Report bytes/hash; storing untrimmed text fails. Focused
+Kernel tests separately reject whitespace-only rationale/code/message, empty
+`evidence_refs`, duplicate references, and every foreign reference, and prove
+that valid reference order is preserved.
 
 After opaque runtime ids are bound, the independent Oracle may substitute only
 those ids into the order-authored exact Report-envelope template. It serializes
@@ -379,8 +408,16 @@ exact restoration must go green:
 18. modify resolved Hermes config/auth;
 19a. leak one known child process while checker remains unchanged;
 19b. leak one allocated root while checker remains unchanged; and
-20. leak R14 QA hold into a normal worker; and
-21. commit a supporting Evaluation/Task completion before Report creation.
+20. leak R14 QA hold into a normal worker;
+21. commit a supporting Evaluation/Task completion before Report creation;
+22a. create a critic session or review Task after invalid source-work refusal;
+22b. treat a repeated Request-review UUID as a new admission;
+23a. store untrimmed rationale/findings strings;
+23b. accept an empty evidence-reference array;
+23c. accept duplicate evidence references;
+23d. accept a foreign evidence reference; and
+24. change either publication-blocking code or message while leaving the gate
+    and expected manifest unchanged.
 
 Every numbered/subnumbered entry receives its own red and restored-green output.
 No falsifier may alter the gate, assertion, expected manifest, timeout, or
