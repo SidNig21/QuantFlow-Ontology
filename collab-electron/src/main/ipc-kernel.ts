@@ -28,6 +28,7 @@ import {
   kernelListArtifacts,
   kernelListEvents,
   kernelListResearchLedger,
+  kernelFindOpenSecondOpinion,
   kernelListTaskSurface,
   kernelAssertSessionMayClose,
   kernelGetObject,
@@ -46,6 +47,7 @@ import { isTrustedSender } from "./trusted-sender";
 import { parseDefinitionLaunchRequest } from "./definition-runtime";
 import { buildMissionActivationInstruction } from "./mission-activation";
 import { loadState as loadCanvasState } from "./canvas-persistence";
+import { resolveSecondOpinionAdmission } from "./second-opinion-admission";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -516,20 +518,27 @@ export function registerKernelHandlers(): void {
       const taskId = input.taskId;
       if (typeof taskId !== "string") throw new Error("Second opinion requires task_id");
       const actorSessionId = directorForTask(taskId);
-      const defs = kernelListAgentDefinitions().filter((definition) => String(definition.id ?? "") === "hermes-critic");
-      if (process.env.QF_DOCK_QA_MODE === "1" || defs.length !== 1) throw new Error("The production Critic is unavailable.");
-      const availability = getDockDefinitionAvailability(defs[0]!);
-      if (!availability.available) throw new Error("The production Critic is unavailable.");
-      const idle = kernelListAgentSessions().filter((session) => {
-        if (session.status !== "running" || !session.id) return false;
-        const spawned = kernelGetLinks(String(session.id), { kind: "spawned_from" }).filter((link) => link.from_id === session.id);
-        const openTasks = kernelGetLinks(String(session.id), { kind: "assigned_to" }).filter((link) => link.to_id === session.id);
-        return spawned.length === 1 && spawned[0]!.to_id === "hermes-critic" && openTasks.every((link) => kernelGetObject("task", link.from_id)?.status !== "open");
-      });
-      if (idle.length > 1) throw new Error("More than one idle production Critic is available.");
-      const criticSessionId = process.env.QF_FOUNDER_STEERING_FALSIFY === "second_opinion_wrong_definition"
-        ? String(kernelListAgentSessions().find((session) => session.status === "running" && session.id && kernelGetLinks(String(session.id), { kind: "spawned_from" }).some((link) => link.to_id === "hermes-worker"))?.id ?? "wrong-critic")
-        : idle.length === 1 ? String(idle[0]!.id) : (await admitAndStartSession("hermes-critic")).sessionId;
+      const admission = await resolveSecondOpinionAdmission(
+        () => kernelFindOpenSecondOpinion(taskId),
+        async () => {
+          const defs = kernelListAgentDefinitions().filter((definition) => String(definition.id ?? "") === "hermes-critic");
+          if (process.env.QF_DOCK_QA_MODE === "1" || defs.length !== 1) throw new Error("The production Critic is unavailable.");
+          const availability = getDockDefinitionAvailability(defs[0]!);
+          if (!availability.available) throw new Error("The production Critic is unavailable.");
+          const idle = kernelListAgentSessions().filter((session) => {
+            if (session.status !== "running" || !session.id) return false;
+            const spawned = kernelGetLinks(String(session.id), { kind: "spawned_from" }).filter((link) => link.from_id === session.id);
+            const openTasks = kernelGetLinks(String(session.id), { kind: "assigned_to" }).filter((link) => link.to_id === session.id);
+            return spawned.length === 1 && spawned[0]!.to_id === "hermes-critic" && openTasks.every((link) => kernelGetObject("task", link.from_id)?.status !== "open");
+          });
+          if (idle.length > 1) throw new Error("More than one idle production Critic is available.");
+          return process.env.QF_FOUNDER_STEERING_FALSIFY === "second_opinion_wrong_definition"
+            ? String(kernelListAgentSessions().find((session) => session.status === "running" && session.id && kernelGetLinks(String(session.id), { kind: "spawned_from" }).some((link) => link.to_id === "hermes-worker"))?.id ?? "wrong-critic")
+            : idle.length === 1 ? String(idle[0]!.id) : (await admitAndStartSession("hermes-critic")).sessionId;
+        },
+      );
+      if (admission.kind === "already_open") throw new Error("A second-opinion Task is already open.");
+      const criticSessionId = admission.criticSessionId;
       const source = kernelGetObject("task", taskId);
       const result = kernelExecute("request_second_opinion", { task_id: taskId, critic_session_id: criticSessionId }, trace(actorSessionId ?? undefined));
       const accepted = result as unknown as { accepted_event_id?: string; review_task_id?: string; critic_session_id?: string };

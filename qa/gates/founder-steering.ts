@@ -7,8 +7,10 @@ import { Database } from "bun:sqlite";
 import {
   collectOwnedPids,
   isolatedEnvironment,
+  ownedProcessRows,
   processSnapshot,
   rpcCall,
+  terminateOwnedProcesses,
   terminateOwnedProcessTree,
   wait,
   waitForExit,
@@ -28,6 +30,18 @@ const RELEVANT = new Set([
 
 export type NormalizedHistoryFact = [number, string, string, string, string | null, string | null, string | null, string | null];
 
+export type VisibleTaskSessionLinkFact = {
+  session_id: string;
+  definition_id: string;
+  task_id: string | null;
+  title: string | null;
+  status: string | null;
+  description: string | null;
+  delegated_by_session_id: string | null;
+  assigned_to_session_id: string | null;
+  history: NormalizedHistoryFact[];
+};
+
 export function normalizeHistoryFacts(rows: Array<Record<string, unknown>>): NormalizedHistoryFact[] {
   return rows.map((row) => [
     Number(row.sequence), String(row.event_id), String(row.kind), String(row.task_id),
@@ -36,6 +50,24 @@ export function normalizeHistoryFacts(rows: Array<Record<string, unknown>>): Nor
     row.outcome == null || row.outcome === "" ? null : String(row.outcome),
     row.target_session_id == null || row.target_session_id === "" ? null : String(row.target_session_id),
   ]);
+}
+
+export function normalizeVisibleTaskSessionLinkFacts(
+  rows: Array<Record<string, unknown>>,
+): VisibleTaskSessionLinkFact[] {
+  return rows.map((row) => ({
+    session_id: String(row.session_id ?? ""),
+    definition_id: String(row.definition_id ?? ""),
+    task_id: row.task_id == null || row.task_id === "" ? null : String(row.task_id),
+    title: row.title == null || row.title === "" ? null : String(row.title),
+    status: row.status == null || row.status === "" ? null : String(row.status),
+    description: row.description == null || row.description === "" ? null : String(row.description),
+    delegated_by_session_id: row.delegated_by_session_id == null || row.delegated_by_session_id === "" ? null : String(row.delegated_by_session_id),
+    assigned_to_session_id: row.assigned_to_session_id == null || row.assigned_to_session_id === "" ? null : String(row.assigned_to_session_id),
+    history: Array.isArray(row.history)
+      ? normalizeHistoryFacts(row.history as Array<Record<string, unknown>>)
+      : [],
+  })).sort((a, b) => a.session_id.localeCompare(b.session_id));
 }
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -119,19 +151,25 @@ async function launch(root: string, kernelDb: string, artifactRoot: string, appR
   const output: string[] = [];
   child.stdout?.on("data", (chunk: Buffer) => output.push(chunk.toString("utf8")));
   child.stderr?.on("data", (chunk: Buffer) => output.push(chunk.toString("utf8")));
-  const endpointFile = join(appRoot, "socket-path");
-  const endpoint = await waitFor("app readiness", async () => {
-    if (child.exitCode !== null) throw new Error(`app exited ${String(child.exitCode)}${output.length ? `: ${output.join("").slice(-4_000)}` : ""}`);
-    if (!existsSync(endpointFile)) return null;
-    const value = readFileSync(endpointFile, "utf8").trim();
-    if (!value) return null;
-    try {
-      const ready = await rpcCall(value, "app.readiness", {});
-      return (ready as Record<string, unknown>).canvas === true ? value : null;
-    } catch { return null; }
-  }, Date.now() + 45_000);
-  const owned = new Set(collectOwnedPids(before, await processSnapshot(), child.pid));
-  return { child, endpoint, owned };
+  try {
+    const endpointFile = join(appRoot, "socket-path");
+    const endpoint = await waitFor("app readiness", async () => {
+      if (child.exitCode !== null) throw new Error(`app exited ${String(child.exitCode)}${output.length ? `: ${output.join("").slice(-4_000)}` : ""}`);
+      if (!existsSync(endpointFile)) return null;
+      const value = readFileSync(endpointFile, "utf8").trim();
+      if (!value) return null;
+      try {
+        const ready = await rpcCall(value, "app.readiness", {});
+        return (ready as Record<string, unknown>).canvas === true ? value : null;
+      } catch { return null; }
+    }, Date.now() + 45_000);
+    const owned = new Set(collectOwnedPids(before, await processSnapshot(), child.pid));
+    return { child, endpoint, owned };
+  } catch (error) {
+    if (child.exitCode === null && child.pid !== undefined) await terminateOwnedProcessTree(child.pid);
+    await waitForExit(child, 5_000).catch(() => null);
+    throw error;
+  }
 }
 
 async function closeLaunch(child: ChildProcess, endpoint: string, owned: Set<number>): Promise<void> {
@@ -235,8 +273,11 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
   let criticId = "";
   let oracle: NormalizedHistoryFact[] = [];
   let savedSnapshot: unknown;
+  const ownedPids = new Set<number>();
+  let ok = false;
   try {
     launchOne = await launch(root, kernelDb, artifactRoot, appRoot, hermesRoot);
+    for (const pid of launchOne.owned) ownedPids.add(pid);
     await rpcCall(launchOne.endpoint, "app.ui.evaluate", { expression: `(() => { const input = document.querySelector('#dock-question-input'); const form = document.querySelector('#dock-question-form'); if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement)) throw new Error('Research Director form is missing'); input.value = ${JSON.stringify(QUESTION)}; input.dispatchEvent(new Event('input', { bubbles: true })); form.requestSubmit(); return true; })()` });
     await waitFor("original Task", async () => {
       const rows = dbRows(kernelDb, "SELECT id, title, description, status FROM task WHERE description = ?", QUESTION);
@@ -308,34 +349,58 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
     await rpcCall(launchOne.endpoint, "app.ui.evaluate", { expression: "window.shellApi.qf.listTaskSurface()" });
     const visible = await rpcCall(launchOne.endpoint, "app.ui.evaluate", { expression: "[...document.querySelectorAll('.task-history-fact')].map((row) => ({sequence:row.dataset.sequence,event_id:row.dataset.eventId,kind:row.dataset.kind,task_id:row.dataset.taskId,mode:row.dataset.mode,text:row.dataset.text,outcome:row.dataset.outcome,target_session_id:row.dataset.targetSessionId}))" }) as Array<Record<string, unknown>>;
     assert(JSON.stringify(normalizeHistoryFacts(visible)) === JSON.stringify(oracle), "launch-one visible history differs from Kernel Oracle");
+    const visibleTaskSessionLinks = await waitFor("launch-one visible Task/session/link facts", async () => {
+      const rows = await rpcCall(launchOne!.endpoint, "app.ui.evaluate", { expression: `([...document.querySelectorAll('.canvas-tile[data-session-id]')].map((tile) => { const fact = tile.querySelector('.task-fact'); return { session_id: tile.getAttribute('data-session-id'), definition_id: tile.getAttribute('data-definition-id'), task_id: fact?.dataset.taskId ?? null, title: fact?.querySelector('.qf-task-title')?.textContent ?? null, status: fact?.querySelector('.qf-task-status')?.textContent ?? null, description: fact?.querySelector('.qf-task-reason')?.textContent ?? null, delegated_by_session_id: fact?.dataset.delegatedBySessionId ?? null, assigned_to_session_id: fact?.dataset.assignedToSessionId ?? null, history: [...(fact?.querySelectorAll('.task-history-fact') ?? [])].map((row) => ({sequence: row.dataset.sequence, event_id: row.dataset.eventId, kind: row.dataset.kind, task_id: row.dataset.taskId, mode: row.dataset.mode, text: row.dataset.text, outcome: row.dataset.outcome, target_session_id: row.dataset.targetSessionId})) }; }))` });
+      const normalized = normalizeVisibleTaskSessionLinkFacts(rows as Array<Record<string, unknown>>);
+      return normalized.length > 0 ? normalized : null;
+    }, Date.now() + 15_000);
     await closeLaunch(launchOne.child, launchOne.endpoint, launchOne.owned); launchOne = null;
     launchTwo = await launch(root, kernelDb, artifactRoot, appRoot, hermesRoot);
+    for (const pid of launchTwo.owned) ownedPids.add(pid);
     await waitFor("reopened history", async () => {
       const visible = await rpcCall(launchTwo!.endpoint, "app.ui.evaluate", { expression: "[...document.querySelectorAll('.task-history-fact')].map((row) => ({sequence:row.dataset.sequence,event_id:row.dataset.eventId,kind:row.dataset.kind,task_id:row.dataset.taskId,mode:row.dataset.mode,text:row.dataset.text,outcome:row.dataset.outcome,target_session_id:row.dataset.targetSessionId}))" }) as Array<Record<string, unknown>>;
       return JSON.stringify(normalizeHistoryFacts(visible)) === JSON.stringify(oracle) ? true : null;
     }, Date.now() + 15_000);
+    const reopenedVisibleTaskSessionLinks = await waitFor("launch-two visible Task/session/link facts", async () => {
+      const rows = await rpcCall(launchTwo!.endpoint, "app.ui.evaluate", { expression: `([...document.querySelectorAll('.canvas-tile[data-session-id]')].map((tile) => { const fact = tile.querySelector('.task-fact'); return { session_id: tile.getAttribute('data-session-id'), definition_id: tile.getAttribute('data-definition-id'), task_id: fact?.dataset.taskId ?? null, title: fact?.querySelector('.qf-task-title')?.textContent ?? null, status: fact?.querySelector('.qf-task-status')?.textContent ?? null, description: fact?.querySelector('.qf-task-reason')?.textContent ?? null, delegated_by_session_id: fact?.dataset.delegatedBySessionId ?? null, assigned_to_session_id: fact?.dataset.assignedToSessionId ?? null, history: [...(fact?.querySelectorAll('.task-history-fact') ?? [])].map((row) => ({sequence: row.dataset.sequence, event_id: row.dataset.eventId, kind: row.dataset.kind, task_id: row.dataset.taskId, mode: row.dataset.mode, text: row.dataset.text, outcome: row.dataset.outcome, target_session_id: row.dataset.targetSessionId})) }; }))` });
+      const normalized = normalizeVisibleTaskSessionLinkFacts(rows as Array<Record<string, unknown>>);
+      return JSON.stringify(normalized) === JSON.stringify(visibleTaskSessionLinks) ? normalized : null;
+    }, Date.now() + 15_000);
+    assert(JSON.stringify(reopenedVisibleTaskSessionLinks) === JSON.stringify(visibleTaskSessionLinks), "launch-two visible Task/session/link facts differ from launch one");
     assert(JSON.stringify(snapshot(kernelDb, [taskId, reviewTaskId], [directorId, workerOneId, workerTwoId, criticId])) === JSON.stringify(savedSnapshot), "reopen Task/session/link snapshot changed");
     await closeLaunch(launchTwo.child, launchTwo.endpoint, launchTwo.owned); launchTwo = null;
     const elapsed = Math.round(performance.now() - startedAt);
     assert(elapsed < FOUNDER_STEERING_DEADLINE_MS, `focused gate exceeded ${FOUNDER_STEERING_DEADLINE_MS}ms`);
     console.log(`task_id=${taskId} director_session_id=${directorId} worker_one_session_id=${workerOneId} worker_two_session_id=${workerTwoId} critic_session_id=${criticId} review_task_id=${reviewTaskId}`);
     for (const fact of oracle) console.log(`ledger=${JSON.stringify(fact)}`);
-    console.log("ui_equality=launch_one_oracle=true launch_two_reopen=true");
+    console.log("ui_equality=launch_one_oracle=true launch_two_reopen=true visible_task_session_link_equality=true");
     console.log(`delivery_targets=clarify:${workerOneId} redirect:${workerOneId} reassign:${workerTwoId} second_opinion:${criticId} cancel:${preCancelSessionId}`);
-    console.log("processes_remaining=0 roots_remaining=0 leaked=[]");
     console.log(`elapsed_ms=${elapsed}`);
-    console.log("PASS founder-steering");
-    return { ok: true };
+    ok = true;
   } catch (error) {
     const failedFalsifier = falsifierName();
     if (failedFalsifier) console.error(`FALSIFY RED ${failedFalsifier}`);
     console.error(`founder-steering: FAIL ${error instanceof Error ? error.message : String(error)}`);
-    return { ok: false };
   } finally {
     if (launchOne) await closeLaunch(launchOne.child, launchOne.endpoint, launchOne.owned).catch(() => {});
     if (launchTwo) await closeLaunch(launchTwo.child, launchTwo.endpoint, launchTwo.owned).catch(() => {});
+    await terminateOwnedProcesses(ownedPids, 10_000).catch(() => {});
     rmSync(root, { recursive: true, force: true });
+    const afterCleanup = await processSnapshot();
+    const remainingOwned = ownedProcessRows(afterCleanup, ownedPids);
+    const rootsRemaining = existsSync(root) ? [root] : [];
+    const leaked = [...rootsRemaining];
+    console.log(`processes_remaining=${remainingOwned.length} roots_remaining=${rootsRemaining.length} leaked=${JSON.stringify(leaked)}`);
+    if (remainingOwned.length > 0) {
+      console.log(`owned_processes_remaining_details=${JSON.stringify(remainingOwned.map((row) => ({ pid: row.pid, name: row.name })))}`);
+    }
+    if (remainingOwned.length !== 0 || rootsRemaining.length !== 0 || leaked.length !== 0) {
+      console.error("founder-steering: FAIL cleanup did not reach measured zero residue");
+      ok = false;
+    }
   }
+  if (ok) console.log("PASS founder-steering");
+  return { ok };
 }
 
 if (import.meta.main) process.exit((await runFounderSteeringGate()).ok ? 0 : 1);

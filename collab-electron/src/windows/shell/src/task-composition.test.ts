@@ -5,6 +5,7 @@ class FakeElement {
   className = "";
   textContent = "";
   value = "";
+  dataset: Record<string, string> = {};
   children: FakeElement[] = [];
   listeners = new Map<string, (event: unknown) => void>();
 

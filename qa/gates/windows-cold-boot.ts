@@ -326,6 +326,31 @@ export function processOwnershipReceipt(
   return { rootPid, pids, rows };
 }
 
+export function ownedProcessRows(
+  snapshot: readonly ProcessInfo[],
+  ownedPids: ReadonlySet<number>,
+): ProcessInfo[] {
+  return snapshot
+    .filter((row) => ownedPids.has(row.pid))
+    .sort((a, b) => a.pid - b.pid);
+}
+
+/** Terminate every currently live PID in the gate's launch receipt and wait
+ * for a fresh snapshot to show that each one has exited. */
+export async function terminateOwnedProcesses(
+  ownedPids: ReadonlySet<number>,
+  timeoutMs = 10_000,
+): Promise<ProcessInfo[]> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const live = ownedProcessRows(await processSnapshot(), ownedPids);
+    if (live.length === 0) return [];
+    for (const row of live) await terminateOwnedProcessTree(row.pid);
+    await wait(Math.min(POLL_INTERVAL_MS, Math.max(1, deadline - Date.now())));
+  }
+  return ownedProcessRows(await processSnapshot(), ownedPids);
+}
+
 export function rpcCall(
   endpoint: string,
   method: string,

@@ -509,6 +509,23 @@ export function kernelListEvents(limit = 40): Array<{
   }>;
 }
 
+/** Read-only Kernel truth for the source-bound open review duplicate guard. */
+export function kernelFindOpenSecondOpinion(sourceTaskId: string): string | null {
+  const row = getKernelDb().query(
+    `SELECT json_extract(events.payload, '$.review_task_id') AS review_task_id
+     FROM events
+     JOIN task ON task.id = json_extract(events.payload, '$.review_task_id')
+     WHERE events.type = 'task.second_opinion_requested'
+       AND json_extract(events.payload, '$.source_task_id') = ?
+       AND task.status = 'open'
+     ORDER BY events.rowid ASC
+     LIMIT 1`,
+  ).get(sourceTaskId) as { review_task_id?: unknown } | null;
+  return typeof row?.review_task_id === "string" && row.review_task_id.length > 0
+    ? row.review_task_id
+    : null;
+}
+
 type EventsListener = () => void;
 const eventsListeners = new Set<EventsListener>();
 

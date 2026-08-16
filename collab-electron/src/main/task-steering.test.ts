@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { normalizeTaskInstruction } from "../../../packages/qf-kernel/src/task-governance.ts";
 import { closeKernel, openKernel } from "../../../packages/qf-kernel/src/db-bun.ts";
 import { execute } from "../../../packages/qf-kernel/src/execute.ts";
+import { resolveSecondOpinionAdmission } from "./second-opinion-admission";
 
 describe("Task steering normalization", () => {
   test("normalizes CRLF and CR to LF without changing founder text", () => {
@@ -31,5 +32,30 @@ describe("Task steering normalization", () => {
     } finally {
       closeKernel(db);
     }
+  });
+
+  test("rejected repeated second opinion does not call recruiter or add a session", async () => {
+    let recruiterCalls = 0;
+    const sessions = ["critic-1"];
+    const recruit = async () => {
+      recruiterCalls += 1;
+      const id = `critic-${sessions.length + 1}`;
+      sessions.push(id);
+      return id;
+    };
+
+    await expect(resolveSecondOpinionAdmission(() => null, recruit)).resolves.toEqual({
+      kind: "critic",
+      criticSessionId: "critic-2",
+    });
+    expect(recruiterCalls).toBe(1);
+    const callsBeforeRepeat = recruiterCalls;
+    const sessionsBeforeRepeat = [...sessions];
+    await expect(resolveSecondOpinionAdmission(() => "review-1", recruit)).resolves.toEqual({
+      kind: "already_open",
+      reviewTaskId: "review-1",
+    });
+    expect(recruiterCalls).toBe(callsBeforeRepeat);
+    expect(sessions).toEqual(sessionsBeforeRepeat);
   });
 });

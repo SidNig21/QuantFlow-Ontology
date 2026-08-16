@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   collectOwnedPids,
+  ownedProcessRows,
   processOwnershipReceipt,
   type ProcessInfo,
 } from "./windows-cold-boot.ts";
@@ -49,5 +50,17 @@ describe("windows-cold-boot process ownership", () => {
     expect(receipt.rootPid).toBe(400);
     expect(receipt.pids).toEqual([400, 401]);
     expect(receipt.rows.find((row) => row.pid === 401)?.parentPid).toBe(400);
+  });
+
+  test("reports every live owned PID with its exact process identity", () => {
+    const live = ownedProcessRows([
+      process(500, 1, "bun.exe"),
+      process(501, 500, "electron.exe"),
+      process(600, 1, "unrelated.exe"),
+    ], new Set([500, 501]));
+    expect(live.map((row) => [row.pid, row.name])).toEqual([
+      [500, "bun.exe"],
+      [501, "electron.exe"],
+    ]);
   });
 });

@@ -15,8 +15,10 @@ import { Database } from "bun:sqlite";
 import {
   collectOwnedPids,
   isolatedEnvironment,
+  ownedProcessRows,
   processSnapshot,
   rpcCall,
+  terminateOwnedProcesses,
   terminateOwnedProcessTree,
   wait,
   waitForExit,
@@ -276,6 +278,11 @@ async function runRealCase(
   const output: string[] = [];
   let child: ChildProcess | null = null;
   let endpoint: string | null = null;
+  const recordOwnedProcesses = async (): Promise<void> => {
+    if (!child?.pid) return;
+    const snapshot = await processSnapshot();
+    for (const pid of collectOwnedPids(beforeProcesses, snapshot, child.pid)) ownedPids.add(pid);
+  };
   try {
     child = spawn("bun", ["run", "dev"], {
       cwd: COLLAB_ROOT,
@@ -376,6 +383,7 @@ async function runRealCase(
       console.log(`ui_task_delegator=${ui.delegator}`);
       console.log(`ui_task_reason=${JSON.stringify(ui.reason)}`);
       console.log(`manual_dock_composition=0 old_orchestrator_sessions_added=0`);
+      await recordOwnedProcesses();
       await rpcCall(endpoint, "app.shutdown", {});
       return { oracle, greenUi: ui };
     }
@@ -398,11 +406,14 @@ async function runRealCase(
       assert(after.wrongSpecialistSessions === before.wrongSpecialistSessions + 1, "wrong definition falsifier did not select hermes-worker-2");
       console.log("falsifier=wrong-worker-definition result=red");
     }
+    await recordOwnedProcesses();
     await rpcCall(endpoint, "app.shutdown", {});
     return { oracle: null, greenUi: null };
   } finally {
     if (child) {
+      await recordOwnedProcesses().catch(() => {});
       if (child.exitCode === null && endpoint) await rpcCall(endpoint, "app.shutdown", {}).catch(() => {});
+      await recordOwnedProcesses().catch(() => {});
       if (child.exitCode === null && child.pid !== undefined) await terminateOwnedProcessTree(child.pid);
       await waitForExit(child, 5_000).catch(() => null);
     }
@@ -562,15 +573,18 @@ export async function runResearchDirectorDelegationGate(): Promise<{ ok: boolean
     await terminateOwnedProcessTree(activeChild.pid);
     await waitForExit(activeChild, 5_000).catch(() => null);
   }
+  await terminateOwnedProcesses(ownedPids, 10_000);
   for (const root of roots) rmSync(root, { recursive: true, force: true });
   const afterProcesses = await processSnapshot();
-  const remainingOwned = [...ownedPids].filter((pid) => afterProcesses.some((row) => row.pid === pid));
-  const baseline = new Set<number>();
-  const remainingElectron = afterProcesses.filter((row) => !baseline.has(row.pid) && row.name.toLowerCase() === "electron.exe");
-  const remainingHermes = afterProcesses.filter((row) => !baseline.has(row.pid) && `${row.name} ${row.commandLine}`.toLowerCase().includes("hermes"));
+  const remainingOwned = ownedProcessRows(afterProcesses, ownedPids);
+  const remainingElectron = remainingOwned.filter((row) => row.name.toLowerCase() === "electron.exe");
+  const remainingHermes = remainingOwned.filter((row) => `${row.name} ${row.commandLine}`.toLowerCase().includes("hermes"));
   const rootsRemaining = roots.filter((root) => existsSync(root));
   const repositoryUnchanged = repositoryBefore === repoReceipt();
   console.log(`owned_process_tree_remaining=${remainingOwned.length} electron_processes_remaining=${remainingElectron.length} hermes_processes_remaining=${remainingHermes.length} roots_remaining=${rootsRemaining.length}`);
+  if (remainingOwned.length > 0) {
+    console.log(`owned_process_tree_remaining_details=${JSON.stringify(remainingOwned.map((row) => ({ pid: row.pid, name: row.name })))}`);
+  }
   console.log(`repository_tree_unchanged=${repositoryUnchanged ? "true" : "false"}`);
   const elapsed = Date.now() - startedAt;
   console.log(`elapsed_ms=${elapsed}`);
