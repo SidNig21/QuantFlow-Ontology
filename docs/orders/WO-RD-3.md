@@ -1,6 +1,6 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: blocked — rewritten lap red; founder decision required
+status: open — founder-authorized gate-only synchronization pass
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
@@ -380,3 +380,21 @@ fixture, Kernel semantics, or acceptance criterion.
 No further Builder lap is authorized. The uncommitted product/gate edits remain
 preserved in this checkout for a founder-authorized gate-only synchronization
 pass.
+
+## Founder authorization — gate-only synchronization pass
+
+Authorized in the delivery task on 2026-08-15. This is not another product
+rework and changes no acceptance criterion. One fresh Builder may edit only
+`qa/gates/founder-steering.ts` to:
+
+1. use the existing bounded `waitFor` for asynchronously projected Task
+   controls;
+2. return `null`/not-ready instead of throwing while a requested control is not
+   yet present; and
+3. perform each button plus form/chooser submission in one renderer evaluation
+   so periodic Task-foot refresh cannot erase intermediate DOM state.
+
+Preserve every product/schema/responder edit, fixture, assertion, falsifier,
+timeout, cleanup rule, and command. Run the focused gate once after the edit.
+Any red stops. Green continues through the exact falsifier pairs and Builder
+matrix, then commits and pushes one candidate for a fresh independent Verifier.
