@@ -1,27 +1,27 @@
-# NEXT — R14 after WO-RD-2 Research Director delegation
+# NEXT — WO-RD-3 founder steering
 
-status: BUILDER DOOR CLOSED — WO-RD-2 VERIFIED
-verified-candidate: 13beba7fb9a24632946b8f50a319f9df161396c1 on wo-V2-3
-verification: [WO-RD-2 verification](evidence/wo-rd-2/VERIFICATION.md)
-verified-at: 2026-08-15
+status: AUTHORIZED — BUILDER DOOR OPEN
+authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
-route: [`GOLDEN-RUN.md`](GOLDEN-RUN.md) · R14 active
-active-order: none — builder door closed after WO-RD-2
-depends-receipt: [WO-RD-1 verification](evidence/wo-rd-1/VERIFICATION.md) — candidate `5a9a5cea6186b05a4eea5c38f5b8a597a8d02bbf`
-wo-rd-2-verifier-receipt: [WO-RD-2 verification](evidence/wo-rd-2/VERIFICATION.md) — candidate `13beba7fb9a24632946b8f50a319f9df161396c1`, revised full matrix PASS
+active-order: [WO-RD-3](WO-RD-3.md)
+route: [GOLDEN-RUN.md](GOLDEN-RUN.md) · R14 active
+depends-receipt: [WO-RD-2 verification](evidence/wo-rd-2/VERIFICATION.md) — candidate `13beba7fb9a24632946b8f50a319f9df161396c1`
+reader-receipt: task `01a007d7-e59d-79d2-bf68-ed832015b6b1` — PASS at order commit `bdefeb4`
 
-## Verified outcome
+## Authorized outcome
 
-WO-RD-2 is done. One Research Director submission recruited the exact
-production specialist, created one durable Task with exact assignment links,
-and showed the Kernel-equal Task facts on exactly one specialist canvas tile.
+Ryan can clarify, redirect, reassign, cancel, or request a second opinion from
+the exact durable Task tile. Every accepted action and the required invalid
+refusal is visible from Kernel truth; exact runtime delivery is receipted.
 
-## Next
+## Builder instructions
 
-The R14 Builder door is closed after WO-RD-2. No new builder work is
-authorized from this file until a verifier rotates NEXT to a new order with
-its own acceptance. Never place bets or trades.
+Read `START_HERE.md`, `docs/orders/PROTOCOL.md`, and
+`docs/orders/WO-RD-3.md`, then execute that order exactly in this checkout on
+branch `wo-V2-3`. Do not create a worktree, clone, second folder, installer,
+release/package run, soak, or helper framework. Run only the order's bounded
+Builder matrix and falsifiers. Commit and push; do not merge or self-verify.
 
 ## Stop
 
-Stop here until the verifier rotates NEXT to a new authorized order.
+No R15 work begins from this file. Never place bets or trades.

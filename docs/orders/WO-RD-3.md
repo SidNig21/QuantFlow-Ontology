@@ -1,10 +1,10 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: draft — Reader required before authorization
+status: open — authorized for Builder
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
-authorization: founder umbrella goal 2026-08-15, subject to the mandatory fresh Reader pass
+authorization: founder umbrella goal 2026-08-15; fresh Reader `01a007d7-e59d-79d2-bf68-ed832015b6b1` returned PASS at `bdefeb4`
 rework-cycle: 0 of 2
 
 ## Objective
