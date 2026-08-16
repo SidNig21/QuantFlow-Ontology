@@ -9,6 +9,7 @@ reader-round-1: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; all defects be
 reader-round-2: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; ten remaining defects landed
 reader-round-3: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; five final defects landed
 reader-round-4: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; three final gate/meaning defects landed
+reader-round-5: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; static-matrix, refusal-shape, and replay defects landed
 rework-cycle: 0 of 1 used
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
@@ -92,12 +93,17 @@ delivery, and becomes `completed` in the same Kernel transaction that commits
 its Evaluation binding. Critic exit or malformed output makes it `failed`.
 There are exactly two receipt kinds. A `delivery_receipt` always names an
 existing review Task and may terminate it as `completed`, `failed`, or
-`refused`. An `action_refusal_receipt` names no Task (`task_id: null`) and
-contains action kind, source-work tuple, nullable triggering Evaluation id,
-attempt id, stable reason code, message, and timestamp. Request-review/source-
-work refusal requires that Evaluation id be `null`; Revision/Second-critic
-refusal requires the exact non-supporting Evaluation id. Source-work refusal, offline
-revision, and failed second-critic admission use only
+`refused`. An `action_refusal_receipt` has exactly: action kind, selected source
+Task id, nullable source-work tuple, nullable triggering Evaluation id, attempt
+id, stable reason code, message, timestamp, and `task_id: null`. Invalid
+source-work refusal records the selected Task id, `source_work: null`, and
+`triggering_evaluation_id: null`. Request-review refusal after a valid tuple was
+frozen records that exact tuple and `triggering_evaluation_id: null`.
+Revision/Second-critic refusal records the exact tuple and exact non-supporting
+Evaluation id. A partial, guessed, or mismatched tuple rejects. Invalid source
+work uses reason code `INVALID_SOURCE_WORK` and message exactly
+`Review requires one succeeded Run with one exact Hypothesis, result Artifact, executor, and R14 source-Task lineage.`
+Source-work refusal, offline revision, and failed second-critic admission use only
 `action_refusal_receipt`. A created review Task rejected after delivery begins
 becomes Task state `refused` and receives a `delivery_receipt`. No Task remains
 `pending` after a terminal receipt. Failed/refused paths create no Evaluation or
@@ -261,6 +267,17 @@ Main never invents a replacement UUID for an incoming action. Persisted key is
 Second critic use separate namespaces. Duplicate attempts suppress only objects
 attributable to that duplicate, not unrelated later critic work.
 
+Acceptance replay of an already-terminal UUID is not a founder click: the
+Electron renderer test driver redelivers the previously captured request bytes
+through the production preload/Main action IPC. It may not call Main handlers
+or the Kernel directly. That transport redelivery returns the original durable
+result or refusal and performs no write. Every action's initial request still
+begins with the required real Electron click. In the request-refusal and
+valid-root product steps, `repeat after full reopen` means this exact
+production-IPC transport redelivery. Separately assert that a fresh visible
+click after the terminal result carries a new UUID and is treated as a new
+founder request.
+
 Request review's persisted key is
 `(request_review, selected_source_task_id, attempt_id)`. For initial source-work
 refusal, `action_refusal_receipt.triggering_evaluation_id` is exactly `null`;
@@ -345,6 +362,11 @@ assignee, status, attempt id, and link; every Report id, kind, hash, publication
 Evaluation, source id, and lineage edge. DOM facts include critic identity,
 four scores, overall, verdict, rationale, block reason, actions, publication
 state, Report id, and hash. Missing, extra, reordered, or unequal facts fail.
+The request-refusal fixture uses exactly two result links to make lineage
+invalid and expects the literal refusal code/message above. The expected durable
+manifest and read-only SQLite Oracle include every `delivery_receipt` and
+`action_refusal_receipt`, with exact kind, fields, cardinality, and attempt
+binding.
 
 Both non-supporting deterministic responders submit leading/trailing whitespace
 in rationale, findings code, and findings message. The immutable manifest
@@ -412,6 +434,8 @@ exact restoration must go green:
 21. commit a supporting Evaluation/Task completion before Report creation;
 22a. create a critic session or review Task after invalid source-work refusal;
 22b. treat a repeated Request-review UUID as a new admission;
+22c. persist a partial, guessed, or non-null source-work tuple for invalid
+     source-work refusal;
 23a. store untrimmed rationale/findings strings;
 23b. accept an empty evidence-reference array;
 23c. accept duplicate evidence references;
@@ -450,6 +474,9 @@ bun qa/run.ts founder-steering
 bun qa/run.ts research-director-delegation
 bun qa/run.ts kernel-sole-writer
 bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts lockfile-committed
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts doc-action-surface
 bun qa/run.ts repo-shape
 bun qa/run.ts one-skin
 bun qa/run.ts doc-links
