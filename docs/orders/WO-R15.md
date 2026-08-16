@@ -6,6 +6,7 @@ depends: R14 PASS at `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 rung: R15 — governed review
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
 reader-round-1: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; all defects below landed
+reader-round-2: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; ten remaining defects landed
 rework-cycle: 0 of 1 used
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
@@ -83,10 +84,17 @@ fail.
 
 A review Task is created `pending`, becomes `running` only after successful
 delivery, and becomes `completed` in the same Kernel transaction that commits
-its Evaluation binding. Critic exit or malformed output makes it `failed`;
-pre-delivery Kernel rejection records `refused`. Each durable receipt contains
-Task id, critic session id, attempt id, terminal state, stable reason code,
-message, and timestamp. Failed/refused paths create no Evaluation or Report.
+its Evaluation binding. Critic exit or malformed output makes it `failed`.
+There are exactly two receipt kinds. A `delivery_receipt` always names an
+existing review Task and may terminate it as `completed`, `failed`, or
+`refused`. An `action_refusal_receipt` names no Task (`task_id: null`) and
+contains action kind, source-work tuple, triggering Evaluation id, attempt id,
+stable reason code, message, and timestamp. Source-work refusal, offline
+revision, and failed second-critic admission use only
+`action_refusal_receipt`. A created review Task rejected after delivery begins
+becomes Task state `refused` and receives a `delivery_receipt`. No Task remains
+`pending` after a terminal receipt. Failed/refused paths create no Evaluation or
+Report.
 
 ### Strict Ragas rubric
 
@@ -105,9 +113,16 @@ The derived verdict is:
 
 A supplied verdict that differs rejects before any Evaluation write.
 `confidence` is a finite JSON number in `[0,1]`; `rationale` is non-empty after
-trimming; `findings_artifact_id` names an immutable non-empty Artifact linked to
-the Evaluation. Tests exercise every score individually at `0.49`, `0.50`,
-`0.79`, and `0.80`.
+trimming. `qf_record_evaluation` accepts `findings`, never
+`findings_artifact_id`. `findings` is a non-empty ordered JSON array whose
+elements have exactly `{code, severity, message, evidence_refs}`. `code` and
+trimmed `message` are non-empty strings; `severity` is `info|warning|error`;
+`evidence_refs` is an array of exact source-work ids with no foreign id. In the
+same Kernel transaction as the Evaluation, the Kernel canonicalizes the array
+to JSON, creates one immutable Artifact of kind `evaluation_findings`, links it
+to the Evaluation, and stores the resulting `findings_artifact_id`. Caller,
+Main, renderer, gate, and critic cannot supply or replace that id. Tests exercise
+every score individually at `0.49`, `0.50`, `0.79`, and `0.80`.
 
 Existing R11b execution metrics remain byte-for-byte under `run_metrics`; rubric
 scores never replace them. A pre-R15 Evaluation projects `rubric: null` and
@@ -117,11 +132,15 @@ with no invented numeric value or zero.
 ### Publication
 
 Publication is an automatic Kernel-owned transition after committing
-`supports`; R15 adds no Publish button. Report payload is the exact bytes of the
-source result Artifact, copied through the Kernel publication command into one
-Artifact of kind `report`. Renderer- or critic-supplied content rejects. Report
-content hash equals source content hash, and Report row plus lineage commit
-atomically.
+`supports`; R15 adds no Publish button. Main asks the Kernel to generate one
+canonical JSON envelope `qf.research.report.v2` containing the immutable
+source-work tuple, source result Artifact id/content hash, publication
+Evaluation id, rubric/verdict/rationale, and findings Artifact id/content hash.
+The Kernel canonicalizes and writes those bytes as one Artifact of kind
+`report`; renderer-, critic-, gate-, or caller-supplied Report bytes/content
+reject. The Report content hash is the hash of its own canonical envelope, while
+the embedded source-result hash must equal the existing result Artifact. Report
+row, bytes, and lineage commit atomically.
 
 Uniqueness is global per five-id source-work tuple. The first successful
 supporting Evaluation becomes immutable `publication_evaluation_id`. Retries
@@ -188,12 +207,16 @@ Both `rejects` and `inconclusive` show and support:
    immutable tuple. Admission/launch failure commits neither session nor Task,
    only the standard refusal receipt.
 
-Main creates one UUID attempt id for the first accepted UI action and reuses it
-for retries. Persisted idempotency key is
+The renderer creates one UUID before sending an action IPC, disables duplicate
+activation synchronously, and reuses that UUID for every transport retry until
+a terminal result/refusal arrives. Main validates and persists it before launch
+or domain mutation. Concurrent IPC carrying the same UUID returns the same
+result. After reopen, a pending action exposes `Retry`, which reuses its
+persisted UUID; a terminal action exposes the ordinary action control, whose
+next deliberate click creates a new UUID and therefore a new founder request.
+Main never invents a replacement UUID for an incoming action. Persisted key is
 `(action_kind, source_work, triggering_evaluation_id, attempt_id)`; Revision and
-Second critic have separate namespaces. Concurrent and post-reopen repeats
-return the original result/refusal without another launch/domain write. A new
-attempt id is a new founder request. Duplicate attempts suppress only objects
+Second critic use separate namespaces. Duplicate attempts suppress only objects
 attributable to that duplicate, not unrelated later critic work.
 
 A later supporting second Evaluation may publish but never deletes, rewrites,
@@ -207,15 +230,19 @@ database access, mock Main/preload handler, direct `execute()` proof shortcut,
 or second store. R14 delegation/steering stay green and its QA hold never affects
 normal workers.
 
-Before launch, an independent cleanup checker records every allocated root,
-launch PID/creation time, complete descendant tree, and complete config/auth
-manifest resolved by the production Hermes launcher, including existence bits
-and hashes. Every success, failure, and timeout path re-enumerates the same
-targets. PASS requires all allocated roots absent, all descendants exited, and
-identical manifests. Print literal paths, PIDs, creation times, hashes, and zero
-residue counts; a product summary boolean is not evidence. Timeout begins before
-launch and ends only after assertions and cleanup. At 180/240 seconds, mark red,
-terminate the full owned tree, run the same checker, and print timeout phase.
+Before launch, an independent cleanup checker records the system-process
+baseline, allocated-root list, and resolved config/auth manifest. Launch the app
+in one checker-owned OS job/process group; immediately record its root PID and
+creation time, and continuously include every process entering that job. After
+every success, failure, and timeout, enumerate the job and full system process
+table against the baseline, then verify every process attributable to the
+launch exited and every allocated root is absent. Late, detached, or previously
+unrecorded descendants are residue and fail. PASS also requires identical
+config/auth existence bits and hashes. Print literal paths, PIDs, creation
+times, hashes, and zero residue counts; a product summary boolean is not
+evidence. Timeout begins before launch and ends only after assertions and
+cleanup. At 180/240 seconds, mark red, terminate the full owned tree, run the
+same checker, and print timeout phase.
 
 ## Product gates
 
@@ -231,15 +258,29 @@ nothing.
 `governed-review` has a 180-second total limit and allocates three distinct
 temporary Kernel/app roots, one each for `rejects`, `inconclusive`, and direct
 `supports`. No database, process, session, Task, fixture id, renderer state, or
-expected-facts object is reused across roots. Both non-supporting fixtures prove
-zero Report bytes/rows/links, exact Kernel block reason, both actions,
-publication refusal, and full reopen. The supports fixture proves exact
-Evaluation and one automatic Report without revision.
+expected-facts object is reused across roots. In each non-supporting root, first
+assert blocked state and zero Report facts. Then click Request revision while
+the executor is running and assert exactly one correctly assigned/linked
+revision Task. Repeat that same attempt concurrently and after full reopen and
+assert no additional write. Stop the executor, submit a new revision attempt,
+and assert only `ORIGINAL_EXECUTOR_NOT_RUNNING` with no domain write. Click
+Second critic, assert one new distinct session/review Task, let its deterministic
+responder record `supports`, and assert one automatic Report while the first
+Evaluation remains visible and durable. Repeat Second-critic and publication
+attempts concurrently and after reopen and assert no duplicate session, Task,
+Evaluation, Report, or lineage. Perform the full sequence independently for both
+`rejects` and `inconclusive`. The direct supports root proves exact Evaluation
+and one automatic Report without revision.
 
-Before app launch, build an immutable expected manifest from literal fixture ids
-and expected transitions. Compare it independently with (a) SQLite read-only
-after writes stop and (b) Electron DOM. Expectations may not derive from
-SQLite, Kernel projection, renderer state, or implementation output. Durable
+Before app launch, build an immutable expected-predicate manifest containing
+literal source ids, rubric inputs, verdicts, block reasons, content hashes,
+cardinalities, lifecycle transitions, and lineage predicates. Runtime-generated
+ids occupy typed symbolic slots. Bind each slot exactly once from the first
+production operation receipt that creates that object; validate format and
+global uniqueness; then compare that bound value independently with broker,
+SQLite, and DOM facts. No slot may bind from SQLite or DOM, be rebound, or
+derive any non-opaque expected value. Missing, additional, multiply bound,
+unequal, or relationally invalid ids fail. Durable
 facts include every Evaluation field; every review/revision Task id, kind,
 assignee, status, attempt id, and link; every Report id, kind, hash, publication
 Evaluation, source id, and lineage edge. DOM facts include critic identity,
@@ -248,13 +289,17 @@ state, Report id, and hash. Missing, extra, reordered, or unequal facts fail.
 
 `governed-review-live` has a 240-second total limit and uses one real launched
 production `hermes-critic` against an isolated deterministic source-work
-fixture. Before the positive review, dispatch `qf_publish_artifact` through the
-same production broker using that admitted critic principal; it must be denied
-and create zero Report bytes/rows/links. Live PASS then requires broker-recorded
-successful exact reads followed by successful `qf_record_evaluation`, with the
-Oracle finding the Evaluation bound to those invocation ids. Authentication or
-model unavailability is red, never permission to substitute a fake. Global
-Hermes config/auth manifests must be identical before/after.
+fixture. Complete the positive review first and capture its Report/Artifact/link
+set, which may contain the one legitimate automatic Report when the real verdict
+supports. Then dispatch `qf_publish_artifact` through the production broker
+using the same admitted critic principal. PASS requires broker denial and an
+identical before/after Report/Artifact/link set, with no row or link attributable
+to the denied invocation. No admission barrier, transport pause, or QA-only
+production hook may be added. Live PASS also requires broker-recorded successful
+exact reads followed by successful `qf_record_evaluation`, with the Oracle
+finding the Evaluation bound to those invocation ids. Authentication/model
+unavailability is red, never permission to substitute a fake. Global Hermes
+config/auth manifests are identical before/after.
 
 Add `qa/gates/governed-review.test.ts` to prove gate parsing, independent
 manifest comparison, timeout propagation, and measured cleanup. A failed
@@ -269,7 +314,8 @@ exact restoration must go green:
 1. omit one required critic tool;
 2. add a fifth critic ontology tool;
 3. make independence admit executor-as-critic;
-4. trust post-activation caller Run/Artifact ids;
+4a. trust a post-activation caller Run id;
+4b. trust a post-activation caller Artifact id;
 5. trust critic-supplied verdict;
 6. let a non-supporting Evaluation publish;
 7. show a transport verdict without Kernel Evaluation;
@@ -278,22 +324,31 @@ exact restoration must go green:
 10. return revision success without durable Task;
 11. reuse the first critic;
 12. omit one persisted visible fact on reopen;
-13. accept invalid rubric or wrong `overall`;
-14. overwrite `run_metrics` or invent legacy zeros;
+13a. accept one invalid rubric shape/value;
+13b. persist an incorrect Kernel `overall`;
+14a. overwrite existing `run_metrics`;
+14b. invent rubric zeros for a legacy Evaluation;
 15. remove Report uniqueness and replay concurrently;
 16. write domain state during offline revision refusal;
 17. remove attempt-id uniqueness;
 18. modify resolved Hermes config/auth;
-19. leak one known child/root while checker remains unchanged; and
+19a. leak one known child process while checker remains unchanged;
+19b. leak one allocated root while checker remains unchanged; and
 20. leak R14 QA hold into a normal worker.
 
-Record every red and restored-green output. No falsifier may alter the gate,
-assertion, expected manifest, timeout, or fixture identity.
+Every numbered/subnumbered entry receives its own red and restored-green output.
+No falsifier may alter the gate, assertion, expected manifest, timeout, or
+fixture identity.
 
 ## Literal Builder matrix
 
 Run every command once after final repair state. No package, installer,
 `verify-release`, or soak command is authorized.
+
+Under the active R14+ founder override, this order explicitly assigns this
+literal focused, product, regression, and static matrix to both Builder and
+Verifier in place of `PROTOCOL.md`'s legacy package/cold split. No package or
+release gate is authorized.
 
 ```text
 cd collab-electron
@@ -315,18 +370,24 @@ git diff --check
 git diff --check 0c53d00071c1b685ef090526f02ad97233be3274 HEAD
 ```
 
-If implementation affects another existing focused contract, append its literal
-test path to the relevant `bun test` command before the final matrix and record
-that order edit in the candidate. Do not omit a changed focused test. Any red
-stops that matrix and is diagnosed under standing in-scope authority.
+Every added or modified `*.test.ts` path reported by
+`git diff --name-only 0c53d00071c1b685ef090526f02ad97233be3274 HEAD`
+must appear literally in a `bun test` command. If implementation requires a
+production-contract change outside files exercised by listed tests, stop before
+that change and route a docs-only amendment naming its existing focused test;
+the Builder may not self-certify an unlisted contract as unaffected. Any red
+stops the matrix and is diagnosed under standing in-scope authority.
 
 ## Verifier acceptance
 
 Builder and Verifier use the founder's single checkout; no throwaway worktree or
-package/release gate. A fresh different-model Verifier records
-`git rev-parse HEAD`, `git status --porcelain`, process/root baseline, and
-upstream parity before and after. It edits nothing and requires identical SHA,
-clean status, and no new residue.
+package/release gate. Candidate branch is `wo-R15`. Before and after the matrix,
+a fresh different-model Verifier runs `git rev-parse HEAD`,
+`git rev-parse refs/remotes/origin/wo-R15`, and `git status --porcelain`; both
+SHAs equal the immutable candidate and status is empty. It also records the
+process/root baseline and requires no new residue. The Verifier makes no edit
+during the matrix. Only after recording unchanged post-matrix SHA/status may it
+create and commit `docs/orders/evidence/r15/VERIFICATION.md`.
 
 The Verifier runs the literal matrix once and records for every named inspection
 the machine receipt, expected predicate, observed value, and PASS/FAIL. Prose
