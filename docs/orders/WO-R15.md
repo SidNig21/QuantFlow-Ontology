@@ -1,6 +1,6 @@
 # WO-R15 — Governed critic review and publication gate
 
-status: verifier rework — reopen persistence regression
+status: exceptional verifier rework — exact reopen delta required
 assignee: Builder
 depends: R14 PASS at `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 rung: R15 — governed review
@@ -13,6 +13,8 @@ reader-round-5: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; static-matrix,
 reader-pass: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` at `94a33bb` — YES/YES PASS
 rework-cycle: 1 of 1 used — exhausted
 verifier-round-1: candidate `9173abe7039190208c299da40472d923ead6c057`; R15 gates PASS, `founder-steering` FAIL `reopen Task/session/link snapshot changed`; cleanup zero
+verifier-round-2: candidate `4c6a638dc4db0966dfce22636e753fabb0345fd9`; same reopen Task/session/link mismatch reproduced after shutdown suppression; cleanup zero
+exceptional-reauthorization: founder standing umbrella authority 2026-08-16 covers this same in-scope defect; no acceptance change
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
 ## In plain terms
@@ -536,3 +538,16 @@ Preserve every R15 behavior and gate. Diagnose against candidate `9173abe7` and
 the durable receipt `C:\tmp\qf-r15-founder-steering.log`. After the focused
 repair is green, run the full literal matrix once at the final candidate. This
 is the order's only rework cycle; another red stops for router/founder decision.
+
+### Exceptional exact-defect pass
+
+The final Verifier reproduced the same mismatch at `4c6a638d`; therefore the
+first shutdown suppression was insufficient. Before another product edit, make
+the unchanged founder-steering gate print the exact pre/post Task, session, and
+link row deltas on failure, including ids and differing fields. Diagnostic
+output may be added, but no predicate, fixture, timing, or pass criterion may
+change. Repair only the named durable-state cause and add a focused deterministic
+test that fails on the exact shutdown/reopen mutation without launching the full
+Electron gate. Preserve the first shutdown fix unless evidence proves it wrong.
+Then run the focused deterministic test and founder-steering during repair, and
+the full literal matrix exactly once at final candidate. A further red stops.

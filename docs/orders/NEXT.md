@@ -1,6 +1,6 @@
 # NEXT — R15 governed critic review
 
-status: BUILDER REWORK AUTHORIZED — 1 OF 1
+status: EXCEPTIONAL BUILDER REWORK AUTHORIZED — EXACT DELTA REQUIRED
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R15](WO-R15.md)
@@ -14,6 +14,7 @@ reader-round-5: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; final sta
 reader-receipt: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` at `94a33bb` — YES/YES PASS
 standing-authority: diagnose and repair in-scope delivery defects without further founder prompts
 verifier-round-1: candidate `9173abe7039190208c299da40472d923ead6c057`; R15 gates PASS; `founder-steering` reopen snapshot FAIL; cleanup zero
+verifier-round-2: candidate `4c6a638dc4db0966dfce22636e753fabb0345fd9`; same reopen snapshot FAIL reproduced; cleanup zero
 
 ## Authorized outcome
 
