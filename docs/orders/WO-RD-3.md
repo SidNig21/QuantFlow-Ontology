@@ -1,11 +1,11 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: rework — final Builder correction authorized
+status: rewritten — fresh Reader required before Builder
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
 authorization: founder umbrella goal 2026-08-15; fresh Reader `01a007d7-e59d-79d2-bf68-ed832015b6b1` returned PASS at `bdefeb4`
-rework-cycle: 2 of 2 — exhausted after this candidate
+rework-cycle: 2 of 2 exhausted; rewrite-cycle: 0 of 1
 
 ## Objective
 
@@ -156,7 +156,7 @@ Run once, in this order:
 
 ```powershell
 cd collab-electron
-bun test src/main/task-steering.test.ts src/main/task-delegation-projection.test.ts src/windows/shell/src/task-composition.test.ts
+bun test cli/qf-hermes-synthetic-responder.test.ts src/main/task-steering.test.ts src/main/task-delegation-projection.test.ts src/windows/shell/src/task-composition.test.ts
 cd ..
 bun test qa/gates/founder-steering.test.ts
 bun qa/run.ts founder-steering
@@ -273,3 +273,43 @@ then read-only polling of only the returned session id. Do not change the
 120-second whole-gate budget, any product behavior, assertion, falsifier,
 cleanup rule, or matrix command. This is the final rework cycle. Any red receipt
 after this correction stops WO-RD-3 with no further lap.
+
+## REWRITE — role-complete synthetic production fixture
+
+Everything above remains the product contract and acceptance. The two rework
+cycles are history and authorize no third lap. This rewrite adds one measured
+prerequisite repair, then authorizes one fresh Builder to complete the unchanged
+order from the preserved uncommitted product edits.
+
+The final timeout was not a slow admission. Independent read-only diagnosis
+task `01a007fb-99ca-7561-910d-7ff0e0c76370` traced this exact path:
+
+1. production definition `hermes-worker-2` carries peer role `worker2`;
+2. `qf.dock.spawn` reaches normal definition-backed admission and waits for
+   launcher readiness;
+3. `collab-electron/cli/qf-hermes-synthetic-responder.mjs` rejects every role
+   except `orchestrator|worker|critic` before it emits its readiness transition;
+4. the host therefore waits for a receipt the rejected child cannot emit.
+
+The rewrite authorizes exactly this additional repair:
+
+- In `collab-electron/cli/qf-hermes-synthetic-responder.mjs`, accept exact role
+  `worker2` in the synthetic configuration check and dispatch `worker2` through
+  the existing `worker()` behavior.
+- Preserve `QF_PEER_ROLE=worker2`, the distinct Kernel session, definition
+  `hermes-worker-2`, and peer-registry key `worker2`. Do not alias it to
+  `worker`, remove peer registration, spawn a fixture-only fake, retry
+  admission, or extend any timeout.
+- Add focused test `collab-electron/cli/qf-hermes-synthetic-responder.test.ts`
+  that imports or spawns the responder without network or a live app and proves
+  `worker2` passes role validation and selects worker
+  behavior while an unknown role still fails. The test must complete in under
+  10 seconds.
+- Add that exact test file to the first Builder unit command in this order.
+  Nothing else in the matrix, eight falsifiers, 120-second product-gate budget,
+  cleanup, Oracle, UI, Kernel, or runtime-delivery acceptance changes.
+
+The earlier red receipts plus the source diagnosis are the falsification for
+this prerequisite. The rewritten Builder must show the focused worker2 test
+green before running the full Builder matrix once. Any red command in the
+rewritten lap stops the order; there is no rework cycle after this rewrite.
