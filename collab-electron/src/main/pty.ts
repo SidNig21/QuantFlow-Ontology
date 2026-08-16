@@ -1038,7 +1038,7 @@ export async function killSession(
     try {
       const client = getSidecarClient();
       await client.killSession(sessionId);
-      emitPtySessionExit(sessionId, -1);
+      if (!shuttingDown) emitPtySessionExit(sessionId, -1);
     } catch {
       // Session may already be dead
     }
