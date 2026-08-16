@@ -127,6 +127,40 @@ function snapshot(path: string, taskIds: string[], sessionIds: string[]): unknow
   } finally { db.close(); }
 }
 
+function snapshotRowDelta(before: unknown, after: unknown): unknown {
+  const beforeRow = before as Record<string, unknown>;
+  const afterRow = after as Record<string, unknown>;
+  const fields = [...new Set([...Object.keys(beforeRow), ...Object.keys(afterRow)])].sort();
+  return fields.flatMap((field) => {
+    const hasBefore = Object.prototype.hasOwnProperty.call(beforeRow, field);
+    const hasAfter = Object.prototype.hasOwnProperty.call(afterRow, field);
+    if (hasBefore === hasAfter && JSON.stringify(beforeRow[field]) === JSON.stringify(afterRow[field])) return [];
+    return [{ field, before: hasBefore ? beforeRow[field] : "<missing>", after: hasAfter ? afterRow[field] : "<missing>" }];
+  });
+}
+
+function snapshotDelta(before: unknown, after: unknown): unknown {
+  const beforeSnapshot = before as { tasks: Array<Record<string, unknown>>; sessions: Array<Record<string, unknown>>; links: Array<Record<string, unknown>> };
+  const afterSnapshot = after as { tasks: Array<Record<string, unknown>>; sessions: Array<Record<string, unknown>>; links: Array<Record<string, unknown>> };
+  const rows = (beforeRows: Array<Record<string, unknown>>, afterRows: Array<Record<string, unknown>>, key: (row: Record<string, unknown>) => string) => {
+    const beforeByKey = new Map(beforeRows.map((row) => [key(row), row]));
+    const afterByKey = new Map(afterRows.map((row) => [key(row), row]));
+    const added = [...afterByKey.entries()].filter(([rowKey]) => !beforeByKey.has(rowKey)).map(([id, row]) => ({ id, fields: snapshotRowDelta({}, row) }));
+    const removed = [...beforeByKey.entries()].filter(([rowKey]) => !afterByKey.has(rowKey)).map(([id, row]) => ({ id, fields: snapshotRowDelta(row, {}) }));
+    const changed = [...beforeByKey.entries()].filter(([rowKey]) => afterByKey.has(rowKey)).map(([id, row]) => ({ id, fields: snapshotRowDelta(row, afterByKey.get(id)) })).filter((delta) => (delta.fields as unknown[]).length > 0);
+    return { added, removed, changed };
+  };
+  return {
+    tasks: rows(beforeSnapshot.tasks, afterSnapshot.tasks, (row) => String(row.id)),
+    sessions: rows(beforeSnapshot.sessions, afterSnapshot.sessions, (row) => String(row.id)),
+    links: rows(beforeSnapshot.links, afterSnapshot.links, (row) => `${String(row.kind)}|${String(row.from_id)}|${String(row.to_id)}`),
+  };
+}
+
+function printSnapshotDelta(before: unknown, after: unknown): void {
+  console.error(`founder-steering: reopen Task/session/link row delta ${JSON.stringify(snapshotDelta(before, after))}`);
+}
+
 function dbRows(path: string, sql: string, ...args: unknown[]): Array<Record<string, unknown>> {
   const db = new Database(path, { readonly: true });
   try { return db.query(sql).all(...args) as Array<Record<string, unknown>>; } finally { db.close(); }
@@ -367,7 +401,9 @@ export async function runFounderSteeringGate(): Promise<{ ok: boolean }> {
       return JSON.stringify(normalized) === JSON.stringify(visibleTaskSessionLinks) ? normalized : null;
     }, Date.now() + 15_000);
     assert(JSON.stringify(reopenedVisibleTaskSessionLinks) === JSON.stringify(visibleTaskSessionLinks), "launch-two visible Task/session/link facts differ from launch one");
-    assert(JSON.stringify(snapshot(kernelDb, [taskId, reviewTaskId], [directorId, workerOneId, workerTwoId, criticId])) === JSON.stringify(savedSnapshot), "reopen Task/session/link snapshot changed");
+    const reopenedSnapshot = snapshot(kernelDb, [taskId, reviewTaskId], [directorId, workerOneId, workerTwoId, criticId]);
+    if (JSON.stringify(reopenedSnapshot) !== JSON.stringify(savedSnapshot)) printSnapshotDelta(savedSnapshot, reopenedSnapshot);
+    assert(JSON.stringify(reopenedSnapshot) === JSON.stringify(savedSnapshot), "reopen Task/session/link snapshot changed");
     await closeLaunch(launchTwo.child, launchTwo.endpoint, launchTwo.owned); launchTwo = null;
     const elapsed = Math.round(performance.now() - startedAt);
     assert(elapsed < FOUNDER_STEERING_DEADLINE_MS, `focused gate exceeded ${FOUNDER_STEERING_DEADLINE_MS}ms`);

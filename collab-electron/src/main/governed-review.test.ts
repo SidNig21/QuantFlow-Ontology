@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { ontologyToolsForRole } from "./ontology-role-tools.ts";
+import { setShuttingDown, shouldEmitPtySessionExit } from "./pty.ts";
 
 describe("R15 production governed-review seams", () => {
   test("critic policy is exact and least privilege", () => {
@@ -25,5 +26,29 @@ describe("R15 production governed-review seams", () => {
     expect(gateway).toContain("kernelRecordGovernedToolReceipt");
     expect(renderer).toContain("window.shellApi.qf.requestReview");
     expect(gateway).toContain("qf_record_evaluation");
+  });
+
+  test("sidecar shutdown exit preserves the durable Task/session/link snapshot", () => {
+    const before = {
+      task: { id: "task-1", status: "cancelled" },
+      session: { id: "session-1", status: "running" },
+      links: [{ kind: "assigned_to", from_id: "task-1", to_id: "session-1" }],
+    };
+    const after = structuredClone(before);
+    const applyPtyExit = () => {
+      if (shouldEmitPtySessionExit()) after.session.status = "closed";
+    };
+
+    setShuttingDown(true);
+    try {
+      applyPtyExit();
+      expect(after).toEqual(before);
+
+      setShuttingDown(false);
+      applyPtyExit();
+      expect(after.session.status).toBe("closed");
+    } finally {
+      setShuttingDown(false);
+    }
   });
 });

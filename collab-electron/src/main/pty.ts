@@ -94,6 +94,11 @@ export function setShuttingDown(value: boolean): void {
   shuttingDown = value;
 }
 
+/** Shutdown teardown must not turn a sidecar exit notification into Kernel state. */
+export function shouldEmitPtySessionExit(): boolean {
+  return !shuttingDown;
+}
+
 function getWebContents(): typeof import("electron").webContents | null {
   try {
     return require("electron").webContents;
@@ -308,7 +313,7 @@ async function doEnsureSidecar(): Promise<void> {
         sidecarSessionIds.delete(sessionId);
         sidecarPowerShellSessionIds.delete(sessionId);
         deleteSessionMeta(sessionId);
-        emitPtySessionExit(sessionId, exitCode);
+        if (shouldEmitPtySessionExit()) emitPtySessionExit(sessionId, exitCode);
       }
     });
   }
@@ -1038,7 +1043,7 @@ export async function killSession(
     try {
       const client = getSidecarClient();
       await client.killSession(sessionId);
-      if (!shuttingDown) emitPtySessionExit(sessionId, -1);
+      if (shouldEmitPtySessionExit()) emitPtySessionExit(sessionId, -1);
     } catch {
       // Session may already be dead
     }
