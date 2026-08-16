@@ -131,20 +131,22 @@ The gate uses one isolated temporary Kernel and one isolated app/user-data/resou
 In exactly two launches against the same isolated Kernel it must:
 
 1. On launch one, submit through the visible Research Director form. The synthetic Director uses the real generated discovery/spawn/collaboration tools to create the specialist and original Task; no domain row is seeded after launch.
-2. accept one Clarify and prove Task description unchanged, exact instruction delivered, accepted/delivered receipts present, and visible history equals Kernel;
-3. accept one Redirect and prove Task description changed exactly once, previous value retained in receipt, exact instruction delivered, and visible history equals Kernel;
-4. create the second specialist as gate setup through exactly one call to existing app RPC `qf.dock.spawn` with `{ definitionId: "hermes-worker-2" }` and explicit RPC timeout `20_000` ms. Never put the spawn call inside a retry/poll loop: the shared RPC helper defaults to 5 seconds while synthetic Hermes launcher readiness may take 10 seconds, so abandoning and repeating the call can create half-observed seats. This is the same definition-backed admission used by the Dock and is not evidence for any claimed founder control. After the one call returns, poll only the returned exact session id until it has one `spawned_from` link to `hermes-worker-2` and `running` state; then use the visible `Reassign` control and prove the new exact runtime received the current Task description while both tiles project Kernel truth;
-5. request one second opinion and prove exactly one `hermes-critic` session plus one linked open review Task and exact delivery;
-6. cancel the original Task and prove the Task is durable, the assigned live runtime stopped, and all history remains visible;
-7. click `Cancel` again and require exactly `CANCEL_ALREADY_FINAL`, its exact visible message, one Kernel refusal receipt, and zero Task/link/session change from the pre-click snapshot;
+2. accept one Clarify and prove Task description unchanged, exact instruction acknowledged by the captured assignee child, accepted/delivered receipts present, and visible history equals Kernel;
+3. accept one Redirect and prove Task description changed exactly once, the `task.redirected` payload's `previous_description` equals the pre-click description byte-for-byte, the exact new instruction is acknowledged by the captured assignee child, and visible history equals Kernel;
+4. create the second specialist as gate setup through exactly one call to existing app RPC `qf.dock.spawn` with `{ definitionId: "hermes-worker-2" }` and explicit RPC timeout `20_000` ms. Never put the spawn call inside a retry/poll loop: the shared RPC helper defaults to 5 seconds while synthetic Hermes launcher readiness may take 10 seconds, so abandoning and repeating the call can create half-observed seats. This is the same definition-backed admission used by the Dock and is not evidence for any claimed founder control. After the one call returns, poll only the returned exact session id until it has one `spawned_from` link to `hermes-worker-2` and `running` state; then use the visible `Reassign` control. Require the old tile to show no active Task, the new tile to show the exact title/status/delegator/reason, and only the new runtime to acknowledge the current Task description;
+5. request one second opinion and prove exactly one running session with one `spawned_from -> hermes-critic`, exactly one new open review Task with exact `assigned_to`/`delegated_by` links and source-bound event, exact source/review Task ids in the critic child acknowledgement, and the exact review Task on the critic tile;
+6. before cancel, capture the current assignee's Kernel session id and live synthetic acknowledgement channel. Cancel once, then require Task status `cancelled`, session status `cancelled`, Kernel-to-PTY capture unavailable, the pre-cancel owned child PID absent, and all history still visible. A `task.cancel_outcome` receipt alone cannot satisfy runtime stop;
+7. immediately before clicking `Cancel` the second time, snapshot exact Task fields, assignment/delegator links, and all involved session fields. After the click require exactly `CANCEL_ALREADY_FINAL`, its exact visible message, one new Kernel refusal receipt, and byte-equal pre/post domain snapshots excluding only the new refusal event;
 8. Close launch one completely. On launch two, reconstruct the tiles/history from the same Kernel and prove equality, then close it;
 9. report `processes_remaining=0 roots_remaining=0 leaked=[]` and finish under 120 seconds.
 
-The relevant event kinds are exactly `task.clarified`, `task.redirected`, `task.steering_delivery`, `task.steering_refused`, `task.reassigned`, `task.reassignment_delivery`, `task.second_opinion_requested`, `task.second_opinion_delivery`, `task.cancelled`, and `task.cancel_outcome`. The independent read-only Oracle orders them by `(sequence,event_id)` and normalizes each to `[sequence,event_id,kind,task_id,mode,text,outcome,target_session_id]`, using JSON `null` for an inapplicable field. The gate compares that ordered array to separate visible DOM facts carrying the same eight values; extra/missing/reordered facts fail.
+The relevant event kinds are exactly `task.clarified`, `task.redirected`, `task.steering_delivery`, `task.steering_refused`, `task.reassigned`, `task.reassignment_delivery`, `task.second_opinion_requested`, `task.second_opinion_delivery`, `task.cancelled`, and `task.cancel_outcome`. The independent read-only Oracle orders them by `(sequence,event_id)` and normalizes each to `[sequence,event_id,kind,task_id,mode,text,outcome,target_session_id]`, using JSON `null` for an inapplicable field. The gate compares that ordered array to separate visible DOM facts carrying the same eight values; extra/missing/reordered facts fail. It separately reads and asserts Redirect's exact `previous_description`, which is not part of the display tuple.
 
 The reopen snapshot is exact: for the source and review Tasks, `[id,title,description,status]`; for the Director, both specialists, and critic, `[id,status]`; and for every `spawned_from|delegated_by|assigned_to` link touching those ids, `[kind,from_id,to_id]`, each collection sorted lexically by id then kind/from/to. Reopen equality means the launch-two normalized DOM/event array and this Task/session/link snapshot exactly equal the launch-one Oracle snapshot.
 
-The cleanup baseline is the process ids and existing directories recorded before launch one. `processes_remaining` counts only child/descendant process ids created by the gate that are still live after cleanup. `roots_remaining`/`leaked` count only gate-created paths under its unique `qf-founder-steering-<uuid>` root. Elapsed time uses `performance.now()` immediately before launch one's process spawn through final child/root cleanup after launch two.
+The cleanup baseline is the process ids and existing directories recorded before launch one. `processes_remaining` counts only child/descendant process ids created by the gate that are still live after cleanup. After closing every owned handle and child, the gate removes its unique `qf-founder-steering-<uuid>` root through the repository's guarded Windows cleanup helper and asserts `existsSync(root) === false`; `roots_remaining` is `0|1` from that measurement and `leaked` is `[]|[exact root]`. The printed cleanup line is derived from measured values and any nonzero value fails before PASS. Elapsed time uses `performance.now()` immediately before launch one's process spawn through final child/root cleanup after launch two.
+
+Synthetic delivery is independently observable. In QA mode only, the checked-in responder parses the three exact JSON contracts from Deliverables B, C, and E and emits `QF_SYNTHETIC delivery_received role=<exact role> contract=<exact contract> task_id=<id>` plus source/review ids for second opinion only after its PTY reader received that exact envelope. Add proof-only app RPC `qf.session.capture` behind `QF_UI_PROOF=1`; it accepts a Kernel `agent_session` id, resolves the owned PTY through `agentActivity.getPtySessionId`, and returns captured output or exact error `Session runtime unavailable.` It exposes no write. The gate uses this child output—not main's delivery receipt—to prove the intended runtime received each envelope, and proves excluded children did not emit the matching acknowledgement.
 
 The gate prints one compact ledger with exact Task/session ids and one line per accepted/refused action. It fails on any absent/duplicate relation or receipt, UI/Kernel mismatch, wrong runtime delivery, stale renderer state, uncontrolled process/root residue, or elapsed time over budget.
 
@@ -185,7 +187,28 @@ The builder must show each named condition red, restore the owning seam, then sh
 7. `cancel-left-runtime-working`
 8. `ui-history-survived-with-kernel-history-removed`
 
-For falsifiers 2–7, each QA-only switch must replace or suppress the named dependency at the owning production boundary before launch while the normal gate assertions and expected values remain byte-for-byte identical. A switch may not branch inside an assertion, Oracle, DOM expected-value builder, PASS printer, or cleanup check. The red transcript must name the unchanged assertion that failed.
+For falsifiers 2–7, each QA-only switch must replace or suppress the named dependency at the owning production boundary before launch while the normal gate assertions and expected values remain byte-for-byte identical. A switch may not branch inside an assertion, Oracle, DOM expected-value builder, PASS printer, or cleanup check. The red transcript must name the unchanged assertion that failed. Exact product-path switches and red observations are:
+
+| Falsifier | `QF_FOUNDER_STEERING_FALSIFY` | Required red observation |
+|---|---|---|
+| 2 | `clarify_mutated_description` | read-only Task description changed |
+| 3 | `redirect_lost_previous_description` | exact `previous_description` absent/wrong |
+| 4 | `reassign_delivered_to_old_session` | old child acknowledged or new child did not |
+| 5 | `second_opinion_wrong_definition` | critic definition/session/Task cardinality mismatch |
+| 6 | `refusal_not_kernel_backed` | visible refusal lacks matching Kernel event |
+| 7 | `cancel_left_runtime_working` | session, PTY mapping, or owned PID remains live |
+| 8 | `ui_history_survived_with_kernel_history_removed` | refreshed DOM retains facts absent from projection |
+
+Run each product-path pair with the table value. Red must exit nonzero and print `FALSIFY RED <falsifier name>` beside the unchanged failed assertion; restored must exit 0 and print the normal PASS ledger. A timeout or failure before the named assertion is not a receipt.
+
+```powershell
+$env:QF_FOUNDER_STEERING_FALSIFY = '<table value>'
+bun qa/run.ts founder-steering
+if ($LASTEXITCODE -eq 0) { throw 'falsifier did not go red' }
+Remove-Item Env:QF_FOUNDER_STEERING_FALSIFY
+bun qa/run.ts founder-steering
+if ($LASTEXITCODE -ne 0) { throw 'restored gate did not return green' }
+```
 
 `non-main-direct-execute-shortcut` uses the repository's existing writer guard exactly: `$env:QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE='1'; bun qa/run.ts kernel-sole-writer` must exit nonzero and name the planted non-allowlisted `execute` call; after removing that environment variable, `bun qa/run.ts kernel-sole-writer` must exit 0. Do not change the guard or its allowlists for this proof.
 
@@ -300,11 +323,13 @@ The rewrite authorizes exactly this additional repair:
   `hermes-worker-2`, and peer-registry key `worker2`. Do not alias it to
   `worker`, remove peer registration, spawn a fixture-only fake, retry
   admission, or extend any timeout.
-- Add focused test `collab-electron/cli/qf-hermes-synthetic-responder.test.ts`
-  that imports or spawns the responder without network or a live app and proves
-  `worker2` passes role validation and selects worker
-  behavior while an unknown role still fails. The test must complete in under
-  10 seconds.
+- Export one pure role selector from the production responder module and make
+  `run()` use that same selector for dispatch. Add focused test
+  `collab-electron/cli/qf-hermes-synthetic-responder.test.ts` that imports the
+  production selector and proves exact `worker2 -> worker()` dispatch, exact
+  `worker -> worker()`, `critic -> critic()`, `orchestrator -> orchestrator()`,
+  and unknown-role rejection. A parallel helper or source-text assertion does
+  not count. It performs no network/live-app work and completes under 10 seconds.
 - Add that exact test file to the first Builder unit command in this order.
   Nothing else in the matrix, eight falsifiers, 120-second product-gate budget,
   cleanup, Oracle, UI, Kernel, or runtime-delivery acceptance changes.
@@ -313,3 +338,10 @@ The earlier red receipts plus the source diagnosis are the falsification for
 this prerequisite. The rewritten Builder must show the focused worker2 test
 green before running the full Builder matrix once. Any red command in the
 rewritten lap stops the order; there is no rework cycle after this rewrite.
+
+Reader `01a007fe-f6a4-77e1-b270-1a522b52a1b4` found the proof gaps corrected
+above before the rewritten Builder door opened: prior-description was not read,
+delivery/cancel trusted host receipts instead of child state, repeated cancel
+lacked a pre-click snapshot, cleanup text was hard-coded, falsifier commands
+were unnamed, and the worker2 test could have bypassed production dispatch.
+These findings are now order requirements, not chat guidance.
