@@ -1,6 +1,6 @@
 # NEXT — R15 governed critic review
 
-status: BUILDER AUTHORIZED
+status: BUILDER REWORK AUTHORIZED — 1 OF 1
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R15](WO-R15.md)
@@ -13,6 +13,7 @@ reader-round-4: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 3 final d
 reader-round-5: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; final static/refusal/replay defects landed in WO-R15
 reader-receipt: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` at `94a33bb` — YES/YES PASS
 standing-authority: diagnose and repair in-scope delivery defects without further founder prompts
+verifier-round-1: candidate `9173abe7039190208c299da40472d923ead6c057`; R15 gates PASS; `founder-steering` reopen snapshot FAIL; cleanup zero
 
 ## Authorized outcome
 
@@ -23,7 +24,8 @@ revision and second-critic actions without erasing the first verdict.
 
 ## Builder instructions
 
-One fresh Builder is authorized to execute `WO-R15.md` on branch `wo-R15` in
+One fresh Builder is authorized to execute the single named verifier rework in
+`WO-R15.md` on branch `wo-R15` in
 this checkout. It reads only `START_HERE.md`, `docs/orders/PROTOCOL.md`, this
 file, and the active order before implementation. The founder's standing
 authority covers diagnosis and repair of in-scope defects without per-assertion

@@ -1,6 +1,6 @@
 # WO-R15 — Governed critic review and publication gate
 
-status: building — adversarial Reader YES/YES PASS
+status: verifier rework — reopen persistence regression
 assignee: Builder
 depends: R14 PASS at `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 rung: R15 — governed review
@@ -11,7 +11,8 @@ reader-round-3: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; five final def
 reader-round-4: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; three final gate/meaning defects landed
 reader-round-5: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; static-matrix, refusal-shape, and replay defects landed
 reader-pass: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` at `94a33bb` — YES/YES PASS
-rework-cycle: 0 of 1 used
+rework-cycle: 1 of 1 used — exhausted
+verifier-round-1: candidate `9173abe7039190208c299da40472d923ead6c057`; R15 gates PASS, `founder-steering` FAIL `reopen Task/session/link snapshot changed`; cleanup zero
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
 ## In plain terms
@@ -526,3 +527,12 @@ side effects, actions, DOM/SQLite equality, live proof, or cleanup. It writes
 Stop only if an acceptance criterion must change, repair crosses this explicit
 scope, or real Hermes cannot run after one bounded attempt. In-scope defects do
 not require a founder prompt. No R16 implementation begins from this order.
+
+### Authorized verifier rework
+
+Repair only the named `founder-steering` reopen Task/session/link persistence
+regression without changing its assertions, fixtures, timing, or cleanup proof.
+Preserve every R15 behavior and gate. Diagnose against candidate `9173abe7` and
+the durable receipt `C:\tmp\qf-r15-founder-steering.log`. After the focused
+repair is green, run the full literal matrix once at the final candidate. This
+is the order's only rework cycle; another red stops for router/founder decision.
