@@ -165,8 +165,8 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R11b | complete | `docs/orders/evidence/r11b` |
 | R12 | complete | `docs/orders/evidence/r12` |
 | R13 | complete | `docs/orders/evidence/r13` |
-| R14 | active | `docs/orders/evidence/r14` |
-| R15 | pending | — |
+| R14 | complete | `docs/orders/evidence/r14` |
+| R15 | active | `docs/orders/evidence/r15` |
 | R16 | pending | — |
 | R17 | pending | — |
 | R18 | pending | — |

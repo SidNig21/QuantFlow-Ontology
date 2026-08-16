@@ -1,6 +1,8 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: open — independent verifier rework
+status: done
+verified-candidate: 24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa
+verification: docs/orders/evidence/r14/VERIFICATION.md
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
