@@ -274,6 +274,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "founder-steering",
+    description: "R14: visible Task steering, reassignment delivery, second opinion, cancellation, and durable history",
+    run: async () => {
+      const { runFounderSteeringGate } = await import("./gates/founder-steering.ts");
+      const { ok } = await runFounderSteeringGate();
+      return ok;
+    },
+  },
+  {
     name: "repo-shape",
     description: "The authority set named by START_HERE exists; CLA machinery stays gone",
     run: () => {

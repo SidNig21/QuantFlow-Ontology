@@ -46,6 +46,7 @@ import {
   type NativeTuiLive,
   type NativeTuiOrchestrationDependencies,
 } from "./native-tui-orchestration";
+import * as agentActivity from "./agent-activity";
 
 export type { NativeTuiLive } from "./native-tui-orchestration";
 
@@ -80,6 +81,7 @@ export function installNativeTuiPtyExitHook(
     ptyToKernel.delete(ptySessionId);
     revokeLiveSeatCapability(ptyToCapability.get(ptySessionId));
     ptyToCapability.delete(ptySessionId);
+    agentActivity.sessionEnd({ session_id: kernelId });
     console.log(
       `agent-host: native_tui pty exited pty=${ptySessionId} → close kernel=${kernelId}`,
     );
@@ -285,6 +287,9 @@ export async function admitNativeTuiDefinition(opts: {
               ? { QF_PROOF_NONCE: process.env.QF_PROOF_NONCE }
               : {}),
             ...(syntheticHermes ? { QF_HERMES_SYNTHETIC_TEST: "1" } : {}),
+            ...(syntheticHermes && process.env.QF_FOUNDER_STEERING_HOLD === "1"
+              ? { QF_FOUNDER_STEERING_HOLD: "1" }
+              : {}),
             ...(syntheticHermes && process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY
               ? { QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY: process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY }
               : {}),
@@ -321,10 +326,14 @@ export async function admitNativeTuiDefinition(opts: {
     ptyMapSet: (ptySessionId, sessionId) => {
       ptyToKernel.set(ptySessionId, sessionId);
       ptyToCapability.set(ptySessionId, seatCapability);
+      agentActivity.sessionStart({ session_id: sessionId, cwd: process.cwd() });
+      agentActivity.linkPtySession(sessionId, ptySessionId);
     },
     ptyMapDelete: (ptySessionId) => {
+      const sessionId = ptyToKernel.get(ptySessionId);
       ptyToKernel.delete(ptySessionId);
       ptyToCapability.delete(ptySessionId);
+      if (sessionId) agentActivity.sessionEnd({ session_id: sessionId });
     },
     peerAssertAvailable: assertSeatRoleAvailable,
     peerRegister: registerSeatPty,
@@ -391,6 +400,7 @@ export async function cancelNativeTuiSession(
   revokeLiveSeatCapability(entry.seatCapability);
   ptyToKernel.delete(entry.ptySessionId);
   ptyToCapability.delete(entry.ptySessionId);
+  agentActivity.sessionEnd({ session_id: sessionId });
   await killSession(entry.ptySessionId).catch(() => {});
   try {
     kernelExecute(
@@ -401,24 +411,17 @@ export async function cancelNativeTuiSession(
   } catch {
     /* already terminal */
   }
-  try {
-    kernelExecute(
-      "close_agent_session",
-      { session_id: sessionId },
-      newTrace(),
-    );
-  } catch {
-    /* ignore */
-  }
-  console.log(`agent-host: native_tui cancel+close ${sessionId}`);
+  console.log(`agent-host: native_tui cancel ${sessionId}`);
 }
 
 export async function tearDownNativeTui(entry: NativeTuiLive): Promise<void> {
   if (entry.peerRole) {
     unregisterSeatPty(entry.peerRole, entry.ptySessionId);
   }
+  const sessionId = kernelSessionIdForNativePty(entry.ptySessionId);
   revokeLiveSeatCapability(entry.seatCapability);
   ptyToKernel.delete(entry.ptySessionId);
   ptyToCapability.delete(entry.ptySessionId);
+  if (sessionId) agentActivity.sessionEnd({ session_id: sessionId });
   await killSession(entry.ptySessionId).catch(() => {});
 }

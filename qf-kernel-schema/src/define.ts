@@ -38,6 +38,8 @@ export type DefinedAction<T extends z.ZodRawShape = z.ZodRawShape> = {
   lifecycle: Lifecycle;
   operatorOnly?: boolean;
   pipelineOnly?: boolean;
+  /** App-internal action; never appears in generated MCP/model tools. */
+  internalOnly?: boolean;
   /** Ontology gateway capability group this action tool inherits. */
   capabilityGroup?: CapabilityGroup;
   input: z.ZodObject<T>;
@@ -225,6 +227,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
   lifecycle: Lifecycle;
   operatorOnly?: boolean;
   pipelineOnly?: boolean;
+  internalOnly?: boolean;
   capabilityGroup?: CapabilityGroup;
   input: z.ZodObject<T>;
 }): DefinedAction<T> {
@@ -239,6 +242,7 @@ export function defineAction<T extends z.ZodRawShape>(opts: {
     lifecycle: opts.lifecycle,
     operatorOnly: opts.operatorOnly,
     pipelineOnly: opts.pipelineOnly,
+    internalOnly: opts.internalOnly,
     capabilityGroup: opts.capabilityGroup,
     input: opts.input,
   };
@@ -729,12 +733,14 @@ export function lintActionSurface(
   commandList: readonly CommandEdge[],
   creationList: readonly CreationCommandEdge[] = [],
   pipelineList: readonly PipelineCommandEdge[] = [],
+  internalList: readonly { action: string }[] = [],
 ): void {
   const actionNames = new Set(schema.actions.map((a) => a.name));
   const wired = new Set<string>();
   for (const cmd of commandList) wired.add(cmd.action);
   for (const cmd of creationList) wired.add(cmd.action);
   for (const cmd of pipelineList) wired.add(cmd.action);
+  for (const cmd of internalList) wired.add(cmd.action);
 
   const unwired = [...actionNames].filter((n) => !wired.has(n)).sort();
   if (unwired.length > 0) {

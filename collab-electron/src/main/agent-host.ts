@@ -46,6 +46,7 @@ import {
   kernelGetObject,
   kernelListAgentSessions,
   kernelListAgentDefinitions,
+  kernelListTaskAssignments,
   type TraceContext,
 } from "./kernel";
 import { writeAgentReportArtifact } from "./agent-artifact-writer";
@@ -67,6 +68,7 @@ import {
   getDefaultWslDistro,
 } from "./terminal-target";
 import { resolveCollaborationResourcePath } from "./package-resource-paths";
+import { writeToSession } from "./pty";
 import { assertPrecreatedNativeTuiRoute } from "./precreated-native-tui";
 import { assertPrecreatedStartOwnership } from "./precreated-start-ownership";
 
@@ -131,6 +133,20 @@ type LiveSession = {
 const live = new Map<string, LiveSession>();
 const chunkListeners = new Set<ChunkListener>();
 const doneListeners = new Set<DoneListener>();
+
+/** Process-local host boundary used by Kernel-captured Task delivery. */
+export function hasLiveAgentSession(sessionId: string): boolean {
+  return live.has(sessionId);
+}
+
+/** Write exactly one app-authored envelope to the already-owned runtime. */
+export function deliverToAgentSession(sessionId: string, data: string): boolean {
+  const entry = live.get(sessionId);
+  if (!entry) return false;
+  if (entry.kind !== "native_tui" || !entry.ptySessionId) return false;
+  writeToSession(entry.ptySessionId, data);
+  return true;
+}
 
 function newTrace(): TraceContext {
   return {
@@ -406,11 +422,21 @@ export async function runAgentHostSmoke(): Promise<void> {
 }
 
 export function reconcileStaleSessions(): void {
+  if (process.env.QF_HERMES_SYNTHETIC_TEST === "1" && process.env.QF_UI_PROOF === "1") {
+    console.log("agent-host: synthetic UI proof retains Kernel session snapshot");
+    return;
+  }
   const rows = kernelListAgentSessions();
+  const openTaskOwners = new Set(
+    kernelListTaskAssignments()
+      .filter((task) => task.status === "open" && task.assignedToSessionId)
+      .map((task) => task.assignedToSessionId as string),
+  );
   let n = 0;
   for (const row of rows) {
     const id = String(row.id);
     const status = String(row.status);
+    if (openTaskOwners.has(id)) continue;
     const trace = newTrace();
     if (status === "starting" || status === "running" || status === "blocked") {
       kernelExecute(

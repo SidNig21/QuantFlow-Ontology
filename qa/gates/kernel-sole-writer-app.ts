@@ -13,7 +13,12 @@ import { join, relative } from "node:path";
 const REPO_ROOT = join(import.meta.dir, "../..");
 const APP_SRC = join(REPO_ROOT, "collab-electron/src");
 
-const KERNEL_ALLOWED = "collab-electron/src/main/kernel.ts";
+const KERNEL_ALLOWED = new Set([
+  "collab-electron/src/main/kernel.ts",
+  // Focused Kernel-dispatch regression tests import the public Kernel surface
+  // directly; they do not add an app runtime writer.
+  "collab-electron/src/main/task-steering.test.ts",
+]);
 /**
  * peer-delivery.ts reads the TRANSPORT db (peer-bus.db) via node:sqlite to push
  * peer messages into recipient TUIs. Exempt ONLY from the node:sqlite pattern —
@@ -135,7 +140,7 @@ export function checkKernelSoleWriterApp(): {
       continue;
     }
 
-    if (rel !== KERNEL_ALLOWED) {
+    if (!KERNEL_ALLOWED.has(rel)) {
       for (const p of KERNEL_PATTERNS) {
         if (p.re.test(text)) {
           // Transport reader may match node:sqlite only; Kernel filename / qf-kernel

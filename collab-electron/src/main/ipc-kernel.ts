@@ -8,6 +8,8 @@ import {
   admitAndStartSession,
   cancelAgentSession,
   closeAgentSessionRow,
+  deliverToAgentSession,
+  hasLiveAgentSession,
   onSessionChunk,
   onSessionDone,
   runTurn,
@@ -29,6 +31,7 @@ import {
   kernelListTaskSurface,
   kernelAssertSessionMayClose,
   kernelGetObject,
+  kernelGetLinks,
   kernelEnsureSampleResearchDataset,
   kernelOpenHypothesisForQuestion,
   kernelListTaskDelegations,
@@ -82,6 +85,85 @@ function broadcast(channel: string, ...args: unknown[]): void {
 
 function invalidateDock(): void {
   broadcast("qf:dock:invalidate");
+}
+
+type TaskActionName = "clarify" | "redirect" | "reassign" | "cancel" | "second_opinion";
+type TaskRefusalCode =
+  | "TASK_NOT_FOUND" | "TASK_NOT_OPEN" | "ACTOR_NOT_DELEGATOR" | "ASSIGNMENT_CARDINALITY"
+  | "ASSIGNEE_NOT_RUNNING" | "INSTRUCTION_EMPTY" | "INSTRUCTION_TOO_LARGE"
+  | "INSTRUCTION_CONTROL_BYTES" | "REASSIGN_NOOP" | "REASSIGN_TARGET_NOT_RUNNING"
+  | "CRITIC_DEFINITION_UNAVAILABLE" | "CRITIC_SESSION_AMBIGUOUS"
+  | "SECOND_OPINION_ALREADY_OPEN" | "CANCEL_ALREADY_FINAL";
+
+function trace(actorSessionId?: string): { trace_id: string; span_id: string; actor_session_id?: string } {
+  return {
+    trace_id: crypto.randomUUID(),
+    span_id: crypto.randomUUID(),
+    ...(actorSessionId ? { actor_session_id: actorSessionId } : {}),
+  };
+}
+
+function directorForTask(taskId: string): string | null {
+  const links = kernelGetLinks(taskId, { kind: "delegated_by" }).filter((link) => link.from_id === taskId);
+  return links.length === 1 && links[0]?.to_id ? links[0].to_id : null;
+}
+
+function refusalCode(error: unknown, action: TaskActionName): TaskRefusalCode {
+  const code = (error as { code?: unknown })?.code;
+  if (typeof code === "string") return code as TaskRefusalCode;
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.includes("More than one idle production Critic")) return "CRITIC_SESSION_AMBIGUOUS";
+  if (message.includes("second-opinion Task is already open")) return "SECOND_OPINION_ALREADY_OPEN";
+  if (message.includes("not found")) return "TASK_NOT_FOUND";
+  if (message.includes("cancelled")) return action === "cancel" ? "CANCEL_ALREADY_FINAL" : "TASK_NOT_OPEN";
+  if (message.includes("not open") || message.includes("Illegal transition")) return "TASK_NOT_OPEN";
+  if (message.includes("assignment") || message.includes("assigned")) return "ASSIGNMENT_CARDINALITY";
+  if (message.includes("different")) return "REASSIGN_NOOP";
+  if (message.includes("running")) return action === "reassign" ? "REASSIGN_TARGET_NOT_RUNNING" : "ASSIGNEE_NOT_RUNNING";
+  if (message.includes("critic")) return "CRITIC_DEFINITION_UNAVAILABLE";
+  return action === "reassign" ? "REASSIGN_TARGET_NOT_RUNNING" : "TASK_NOT_FOUND";
+}
+
+function recordRefusal(
+  action: TaskActionName,
+  taskId: string | null,
+  error: unknown,
+  actorSessionId?: string,
+  attemptId = crypto.randomUUID(),
+): { attempt_id: string; code: TaskRefusalCode; message: string } {
+  const code = refusalCode(error, action);
+  if (process.env.QF_FOUNDER_STEERING_FALSIFY === "refusal_not_kernel_backed") {
+    return { attempt_id: attemptId, code, message: error instanceof Error ? error.message : String(error) };
+  }
+  const result = kernelExecute(
+    "record_task_steering_refusal",
+    { attempt_id: attemptId, attempted_action: action, task_id: taskId, reason_code: code },
+    trace(actorSessionId),
+  ) as { message?: string };
+  return { attempt_id: attemptId, code, message: result.message ?? (error instanceof Error ? error.message : String(error)) };
+}
+
+function deliveryEnvelope(taskId: string, mode: "clarify" | "redirect", instruction: string): string {
+  return `${JSON.stringify({ contract: "qf.task.steering.v1", task_id: taskId, mode, instruction })}\r`;
+}
+
+function assignmentEnvelope(taskId: string, title: string, instruction: string): string {
+  return `${JSON.stringify({ contract: "qf.task.assignment.v1", task_id: taskId, title, instruction })}\r`;
+}
+
+async function deliverAccepted(
+  acceptedEventId: string,
+  targetSessionId: string,
+  envelope: string,
+  actorSessionId?: string,
+): Promise<boolean> {
+  const delivered = deliverToAgentSession(targetSessionId, envelope);
+  kernelExecute(
+    "record_task_steering_delivery",
+    { accepted_event_id: acceptedEventId, outcome: delivered ? "delivered" : "delivery_failed" },
+    trace(actorSessionId),
+  );
+  return delivered;
 }
 
 async function trustedActorForTile(tileId: unknown): Promise<string> {
@@ -321,43 +403,144 @@ export function registerKernelHandlers(): void {
     }
   });
 
-  ipcMain.handle("qf:tasks:reassign", (event, args?: unknown) => {
+  ipcMain.handle("qf:tasks:reassign", async (event, args?: unknown) => {
+    const attemptId = crypto.randomUUID();
     try {
       assertTrustedSender(event);
       if (!args || typeof args !== "object" || Array.isArray(args)) {
         throw new Error("Reassign requires task_id and assignee_session_id");
       }
       const input = args as Record<string, unknown>;
+      const actorSessionId = directorForTask(String(input.taskId ?? ""));
       const result = kernelExecute(
         "reassign_task",
         {
           task_id: input.taskId,
           assignee_session_id: input.assigneeSessionId,
         },
-        { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+        trace(actorSessionId ?? undefined),
+      );
+      const accepted = result as unknown as { accepted_event_id?: string; assignee_session_id?: string; previous_assignee_session_id?: string; state?: Record<string, unknown> };
+      if (!accepted.accepted_event_id || !accepted.assignee_session_id) throw new Error("reassign did not return captured assignee");
+      await deliverAccepted(
+        accepted.accepted_event_id,
+        process.env.QF_FOUNDER_STEERING_FALSIFY === "reassign_delivered_to_old_session" && accepted.previous_assignee_session_id
+          ? accepted.previous_assignee_session_id
+          : accepted.assignee_session_id,
+        assignmentEnvelope(String(input.taskId), String(accepted.state?.title ?? ""), String(accepted.state?.description ?? "")),
+        actorSessionId ?? undefined,
       );
       invalidateDock();
       return { ok: true as const, result };
     } catch (err) {
+      const input = args && typeof args === "object" && !Array.isArray(args) ? args as Record<string, unknown> : {};
+      const taskId = typeof input.taskId === "string" ? input.taskId : null;
+      recordRefusal("reassign", taskId, err, taskId ? directorForTask(taskId) ?? undefined : undefined, attemptId);
       return { ok: false as const, error: serializeError(err) };
     }
   });
 
-  ipcMain.handle("qf:tasks:cancel", (event, args?: unknown) => {
+  ipcMain.handle("qf:tasks:cancel", async (event, args?: unknown) => {
+    const attemptId = crypto.randomUUID();
     try {
       assertTrustedSender(event);
       if (!args || typeof args !== "object" || Array.isArray(args)) {
         throw new Error("Cancel requires task_id");
       }
       const input = args as Record<string, unknown>;
+      const taskId = String(input.taskId ?? "");
+      const actorSessionId = directorForTask(taskId);
       const result = kernelExecute(
         "cancel_task",
-        { task_id: input.taskId },
-        { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+        { task_id: taskId },
+        trace(actorSessionId ?? undefined),
+      );
+      const accepted = result as unknown as { accepted_event_id?: string; assignee_session_id?: string };
+      if (!accepted.accepted_event_id || !accepted.assignee_session_id) throw new Error("cancel did not return captured assignee");
+      const wasLive = hasLiveAgentSession(accepted.assignee_session_id);
+      if (wasLive && process.env.QF_FOUNDER_STEERING_FALSIFY !== "cancel_left_runtime_working") await cancelAgentSession(accepted.assignee_session_id);
+      const session = kernelGetObject("agent_session", accepted.assignee_session_id);
+      const outcome = wasLive
+        ? "runtime_stopped"
+        : session && ["closed", "cancelled", "failed"].includes(String(session.status))
+          ? "already_stopped"
+          : "stop_failed";
+      kernelExecute(
+        "record_task_cancel_outcome",
+        { accepted_event_id: accepted.accepted_event_id, outcome, error_class: outcome === "stop_failed" ? "runtime_state_mismatch" : null },
+        trace(actorSessionId ?? undefined),
       );
       invalidateDock();
       return { ok: true as const, result };
     } catch (err) {
+      const input = args && typeof args === "object" && !Array.isArray(args) ? args as Record<string, unknown> : {};
+      const taskId = typeof input.taskId === "string" ? input.taskId : null;
+      recordRefusal("cancel", taskId, err, taskId ? directorForTask(taskId) ?? undefined : undefined, attemptId);
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:tasks:steer", async (event, args?: unknown) => {
+    const attemptId = crypto.randomUUID();
+    let action: TaskActionName = "clarify";
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Steering requires task_id, mode, and instruction");
+      const input = args as Record<string, unknown>;
+      const taskId = input.taskId;
+      const mode = input.mode;
+      action = mode === "redirect" ? "redirect" : "clarify";
+      if (typeof taskId !== "string" || (mode !== "clarify" && mode !== "redirect") || typeof input.instruction !== "string") throw new Error("Steering requires task_id, mode, and instruction");
+      const actorSessionId = directorForTask(taskId);
+      const command = mode === "clarify" ? "clarify_task" : "redirect_task";
+      const result = kernelExecute(command, { task_id: taskId, instruction: input.instruction }, trace(actorSessionId ?? undefined));
+      const accepted = result as unknown as { accepted_event_id?: string; assignee_session_id?: string; instruction?: string };
+      if (!accepted.accepted_event_id || !accepted.assignee_session_id || typeof accepted.instruction !== "string") throw new Error("steering did not return captured delivery fields");
+      await deliverAccepted(accepted.accepted_event_id, accepted.assignee_session_id, deliveryEnvelope(taskId, mode, accepted.instruction), actorSessionId ?? undefined);
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (err) {
+      const input = args && typeof args === "object" && !Array.isArray(args) ? args as Record<string, unknown> : {};
+      const taskId = typeof input.taskId === "string" ? input.taskId : null;
+      recordRefusal(action, taskId, err, taskId ? directorForTask(taskId) ?? undefined : undefined, attemptId);
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:tasks:secondOpinion", async (event, args?: unknown) => {
+    const attemptId = crypto.randomUUID();
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Second opinion requires task_id");
+      const input = args as Record<string, unknown>;
+      const taskId = input.taskId;
+      if (typeof taskId !== "string") throw new Error("Second opinion requires task_id");
+      const actorSessionId = directorForTask(taskId);
+      const defs = kernelListAgentDefinitions().filter((definition) => String(definition.id ?? "") === "hermes-critic");
+      if (process.env.QF_DOCK_QA_MODE === "1" || defs.length !== 1) throw new Error("The production Critic is unavailable.");
+      const availability = getDockDefinitionAvailability(defs[0]!);
+      if (!availability.available) throw new Error("The production Critic is unavailable.");
+      const idle = kernelListAgentSessions().filter((session) => {
+        if (session.status !== "running" || !session.id) return false;
+        const spawned = kernelGetLinks(String(session.id), { kind: "spawned_from" }).filter((link) => link.from_id === session.id);
+        const openTasks = kernelGetLinks(String(session.id), { kind: "assigned_to" }).filter((link) => link.to_id === session.id);
+        return spawned.length === 1 && spawned[0]!.to_id === "hermes-critic" && openTasks.every((link) => kernelGetObject("task", link.from_id)?.status !== "open");
+      });
+      if (idle.length > 1) throw new Error("More than one idle production Critic is available.");
+      const criticSessionId = process.env.QF_FOUNDER_STEERING_FALSIFY === "second_opinion_wrong_definition"
+        ? String(kernelListAgentSessions().find((session) => session.status === "running" && session.id && kernelGetLinks(String(session.id), { kind: "spawned_from" }).some((link) => link.to_id === "hermes-worker"))?.id ?? "wrong-critic")
+        : idle.length === 1 ? String(idle[0]!.id) : (await admitAndStartSession("hermes-critic")).sessionId;
+      const source = kernelGetObject("task", taskId);
+      const result = kernelExecute("request_second_opinion", { task_id: taskId, critic_session_id: criticSessionId }, trace(actorSessionId ?? undefined));
+      const accepted = result as unknown as { accepted_event_id?: string; review_task_id?: string; critic_session_id?: string };
+      if (!accepted.accepted_event_id || !accepted.review_task_id || !accepted.critic_session_id) throw new Error("second opinion did not return captured delivery fields");
+      await deliverAccepted(accepted.accepted_event_id, accepted.critic_session_id, `${JSON.stringify({ contract: "qf.task.second_opinion.v1", source_task_id: taskId, review_task_id: accepted.review_task_id, title: source?.title ?? "", instruction: source?.description ?? "" })}\r`, actorSessionId ?? undefined);
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (err) {
+      const input = args && typeof args === "object" && !Array.isArray(args) ? args as Record<string, unknown> : {};
+      const taskId = typeof input.taskId === "string" ? input.taskId : null;
+      recordRefusal("second_opinion", taskId, err, taskId ? directorForTask(taskId) ?? undefined : undefined, attemptId);
       return { ok: false as const, error: serializeError(err) };
     }
   });

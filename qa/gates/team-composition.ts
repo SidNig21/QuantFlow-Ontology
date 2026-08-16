@@ -142,25 +142,25 @@ export async function runTeamCompositionGate(): Promise<{ ok: boolean }> {
       "Reassign or cancel this task before closing the seat.",
     );
     expectRejected(
-      () => execute(db, "reassign_task", { task_id: "unknown-task", assignee_session_id: "composition-seat-worker-b" }, trace()),
+      () => execute(db, "reassign_task", { task_id: "unknown-task", assignee_session_id: "composition-seat-worker-b" }, trace("composition-seat-orchestrator")),
       "not found",
     );
     expectRejected(
-      () => execute(db, "reassign_task", { task_id: "composition-task", assignee_session_id: "composition-seat-worker-a" }, trace()),
-      "different running session",
+      () => execute(db, "reassign_task", { task_id: "composition-task", assignee_session_id: "composition-seat-worker-a" }, trace("composition-seat-orchestrator")),
+      "different running seat",
     );
 
     execute(db, "reassign_task", {
       task_id: "composition-task",
       assignee_session_id: "composition-seat-worker-b",
-    }, trace());
+    }, trace("composition-seat-orchestrator"));
     assertReceipt(db, "task.reassigned", "composition-task", "reassign_task", "composition-seat-worker-a", "composition-seat-worker-b");
     const reassignedProjection = projection(db);
     assert(taskFactForSession(reassignedProjection, "composition-seat-worker-a").text === "No task", "old assignee retained stale task");
     assert(taskFactForSession(reassignedProjection, "composition-seat-worker-b").text === "Validate team composition · OPEN", "new assignee tile fact missing");
     assert(activeTaskForSession(reassignedProjection, "composition-seat-worker-b")?.title === "Validate team composition", "Dock did not move Owns projection");
 
-    execute(db, "cancel_task", { task_id: "composition-task" }, trace());
+    execute(db, "cancel_task", { task_id: "composition-task" }, trace("composition-seat-orchestrator"));
     assertReceipt(db, "task.cancelled", "composition-task", "cancel_task", "composition-seat-worker-b", "composition-seat-worker-b");
     const cancelled = db.query("SELECT status FROM task WHERE id = ?").get("composition-task") as { status: string };
     assert(cancelled.status === "cancelled", "cancel_task did not close task lifecycle");
@@ -172,7 +172,7 @@ export async function runTeamCompositionGate(): Promise<{ ok: boolean }> {
     assert(activeTaskForSession(projection(db), "composition-seat-worker-b") === null, "cancelled task remained active in Dock");
     expectRejected(
       () => execute(db, "cancel_task", { task_id: "composition-task" }, trace()),
-      "Illegal transition",
+      "already cancelled",
     );
     execute(db, "close_agent_session", { session_id: "composition-seat-worker-b" }, trace());
     assert((db.query("SELECT status FROM agent_session WHERE id = ?").get("composition-seat-worker-b") as { status: string }).status === "closed", "closed seat did not reach CLOSED");

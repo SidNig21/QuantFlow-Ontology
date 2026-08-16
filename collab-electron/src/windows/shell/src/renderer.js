@@ -714,12 +714,22 @@ async function init() {
 				},
 				onReassign: async (taskId, assigneeSessionId) => {
 					const result = await window.shellApi.qf.reassignTask({ taskId, assigneeSessionId });
-					if (!result?.ok) throw new Error(result?.error?.message ?? "Reassign failed");
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Reassign failed"); }
 					await refreshTaskSurface();
 				},
 				onCancel: async (taskId) => {
 					const result = await window.shellApi.qf.cancelTask(taskId);
-					if (!result?.ok) throw new Error(result?.error?.message ?? "Cancel failed");
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Cancel failed"); }
+					await refreshTaskSurface();
+				},
+				onSteer: async (taskId, mode, instruction) => {
+					const result = await window.shellApi.qf.steerTask({ taskId, mode, instruction });
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Steering failed"); }
+					await refreshTaskSurface();
+				},
+				onSecondOpinion: async (taskId) => {
+					const result = await window.shellApi.qf.requestSecondOpinion(taskId);
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Second opinion failed"); }
 					await refreshTaskSurface();
 				},
 			});
@@ -1534,7 +1544,8 @@ async function init() {
 				tile?.type === "term" &&
 				tile.ptySessionId === payload.sessionId
 			) {
-				tileManager.closeCanvasTile(id);
+				if (tile.sessionId) tileManager.markTerminalStopped(id);
+				else tileManager.closeCanvasTile(id);
 				minimap.update();
 				break;
 			}

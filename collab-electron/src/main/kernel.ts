@@ -31,6 +31,7 @@ import {
   projectTaskAssignments,
   type TaskDelegationProjection,
   type TaskAssignmentProjection,
+  type TaskHistoryFact,
 } from "./task-delegation-projection";
 import { runAtomicResultCommit } from "./atomic-result-commit";
 
@@ -384,6 +385,43 @@ export function kernelListTaskAssignments(): TaskAssignmentProjection[] {
   });
 }
 
+export function kernelListTaskHistory(taskId: string): TaskHistoryFact[] {
+  if (process.env.QF_FOUNDER_STEERING_FALSIFY === "ui_history_survived_with_kernel_history_removed") {
+    historyReadCount += 1;
+    if (historyReadCount > 1) return [];
+  }
+  const kinds = new Set([
+    "task.clarified", "task.redirected", "task.steering_delivery", "task.steering_refused",
+    "task.reassigned", "task.reassignment_delivery", "task.second_opinion_requested",
+    "task.second_opinion_delivery", "task.cancelled", "task.cancel_outcome",
+  ]);
+  const rows = getKernelDb().query(
+    "SELECT rowid AS sequence, id, type, object_id, payload FROM events ORDER BY rowid ASC, id ASC",
+  ).all() as Array<{ sequence: number; id: string; type: string; object_id: string; payload: string }>;
+  const facts: TaskHistoryFact[] = [];
+  for (const row of rows) {
+    if (!kinds.has(row.type)) continue;
+    let payload: Record<string, unknown> = {};
+    try {
+      const parsed = JSON.parse(row.payload) as unknown;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) payload = parsed as Record<string, unknown>;
+    } catch { continue; }
+    const rowTaskId = String(payload.task_id ?? payload.source_task_id ?? row.object_id);
+    if (rowTaskId !== taskId && row.object_id !== taskId) continue;
+    const accepted = row.type.endsWith("_refused") ? "refused" : row.type.endsWith("_delivery") || row.type === "task.cancel_outcome" ? payload.outcome ?? null : "accepted";
+    facts.push({
+      sequence: Number(row.sequence), event_id: row.id, kind: row.type, task_id: rowTaskId,
+      mode: typeof payload.mode === "string" ? payload.mode : row.type === "task.second_opinion_requested" || row.type === "task.second_opinion_delivery" ? "second_opinion" : row.type === "task.reassigned" || row.type === "task.reassignment_delivery" ? "reassign" : null,
+      text: typeof payload.instruction === "string" ? payload.instruction : typeof payload.new_description === "string" ? payload.new_description : typeof payload.message === "string" ? payload.message : null,
+      outcome: typeof accepted === "string" ? accepted : null,
+      target_session_id: typeof payload.target_session_id === "string" ? payload.target_session_id : typeof payload.assignee_session_id === "string" ? payload.assignee_session_id : typeof payload.critic_session_id === "string" ? payload.critic_session_id : null,
+    });
+  }
+  return facts;
+}
+
+let historyReadCount = 0;
+
 /** Task composition surface: fresh session identity plus assignment projection. */
 export function kernelListTaskSurface(): {
   sessions: Record<string, unknown>[];
@@ -411,7 +449,13 @@ export function kernelListTaskSurface(): {
       capability_groups: Array.isArray(capabilityGroups) ? capabilityGroups : [],
     };
   });
-  return { sessions, assignments: kernelListTaskAssignments() };
+  return {
+    sessions,
+    assignments: kernelListTaskAssignments().map((assignment) => ({
+      ...assignment,
+      history: kernelListTaskHistory(assignment.taskId),
+    })),
+  };
 }
 
 /** Close is a governed action; perform the read-only screen refusal before teardown. */

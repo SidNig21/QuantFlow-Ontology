@@ -16,6 +16,7 @@ export const TASK_DELEGATION_UPGRADE = "task-delegation" as const;
 export const DETERMINISTIC_EXECUTION_UPGRADE = "deterministic-execution" as const;
 export const INDEPENDENT_CRITIC_UPGRADE = "independent-critic" as const;
 export const TASK_COMPOSITION_UPGRADE = "task-composition" as const;
+export const TASK_STEERING_UPGRADE = "task-steering" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -29,6 +30,7 @@ export type KernelShapeState =
   | "task_delegation"
   | "deterministic_execution"
   | "task_composition"
+  | "task_steering"
   | "current"
   | "partial";
 
@@ -377,7 +379,7 @@ function schemaMetaWithoutTaskDelegation(
         (row[0] === "record_evaluation"
           ? PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION
           : undefined);
-      return description ? [row[0], row[1], row[2], description] : row;
+      return description ? [row[0], row[1], row[2], description] as [string, string, string, string] : row;
     })
     .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
 }
@@ -399,8 +401,8 @@ function schemaMetaWithoutIndependentCritic(
             row[0],
             row[1],
             row[2],
-            PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION,
-          ]
+          PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION,
+        ] as [string, string, string, string]
         : row,
     )
     .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
@@ -585,6 +587,23 @@ function expectedTaskComposition(): StructureSnapshot {
   return taskCompositionSnapshot;
 }
 
+let taskSteeringSnapshot: StructureSnapshot | null = null;
+function expectedTaskSteering(): StructureSnapshot {
+  if (!taskSteeringSnapshot) {
+    const current = expectedCurrent();
+    const steeringNames = new Set([
+      "clarify_task", "redirect_task", "record_task_steering_delivery",
+      "record_task_steering_refusal", "record_task_cancel_outcome", "request_second_opinion",
+    ]);
+    taskSteeringSnapshot = {
+      tables: current.tables,
+      linkKinds: current.linkKinds,
+      schemaMeta: current.schemaMeta.filter(([name]) => !steeringNames.has(name)),
+    };
+  }
+  return taskSteeringSnapshot;
+}
+
 function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
   for (const name of [...ONTOLOGY_TABLES, "links", "schema_meta"]) {
     if (a.tables.get(name) !== b.tables.get(name)) return false;
@@ -656,6 +675,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedTaskComposition())) {
     return "task_composition";
   }
+  if (snapshotsEqual(live, expectedTaskSteering())) return "task_steering";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -702,6 +722,7 @@ export function applyKernelUpgradeChain(
     deterministicExecutionSql: string;
     independentCriticSql: string;
     taskCompositionSql: string;
+    taskSteeringSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -769,7 +790,8 @@ export function applyKernelUpgradeChain(
       state !== "connection_actions" &&
       state !== "task_delegation" &&
       state !== "deterministic_execution" &&
-      state !== "task_composition"
+      state !== "task_composition" &&
+      state !== "task_steering"
     ) {
       db.exec(upgrades.connectionActionsSql);
       if (classifyKernelShape(db) !== "connection_actions") {
@@ -782,7 +804,8 @@ export function applyKernelUpgradeChain(
     if (
       state !== "task_delegation" &&
       state !== "deterministic_execution" &&
-      state !== "task_composition"
+      state !== "task_composition" &&
+      state !== "task_steering"
     ) {
       db.exec(upgrades.taskDelegationSql);
       if (classifyKernelShape(db) !== "task_delegation") {
@@ -792,7 +815,7 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    if (state !== "deterministic_execution" && state !== "task_composition") {
+    if (state !== "deterministic_execution" && state !== "task_composition" && state !== "task_steering") {
       db.exec(upgrades.deterministicExecutionSql);
       if (classifyKernelShape(db) !== "deterministic_execution") {
         throw new KernelUpgradeShapeError(
@@ -801,16 +824,19 @@ export function applyKernelUpgradeChain(
         );
       }
     }
-    if (state !== "task_composition") {
+    if (state !== "task_composition" && state !== "task_steering") {
       db.exec(upgrades.independentCriticSql);
     }
-    if (classifyKernelShape(db) !== "task_composition") {
-      throw new KernelUpgradeShapeError(
-        INDEPENDENT_CRITIC_UPGRADE,
-        "0009 did not produce the exact post-0009 shape",
-      );
+    if (state !== "task_steering") {
+      if (classifyKernelShape(db) !== "task_composition") {
+        throw new KernelUpgradeShapeError(
+          INDEPENDENT_CRITIC_UPGRADE,
+          "0009 did not produce the exact post-0009 shape",
+        );
+      }
+      db.exec(upgrades.taskCompositionSql);
     }
-    db.exec(upgrades.taskCompositionSql);
+    db.exec(upgrades.taskSteeringSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
         TASK_COMPOSITION_UPGRADE,

@@ -1,5 +1,5 @@
 import baselineJson from "../schema-baseline.json" with { type: "json" };
-import { commands, creationCommands, pipelineCommands } from "./commands.ts";
+import { commands, creationCommands, pipelineCommands, internalCommands } from "./commands.ts";
 import {
   type ActiveSchemaBaseline,
   lintCommands,
@@ -88,6 +88,12 @@ import {
   cancel_agent_session,
   fail_agent_session,
   close_agent_session,
+  clarify_task,
+  redirect_task,
+  record_task_steering_delivery,
+  record_task_steering_refusal,
+  record_task_cancel_outcome,
+  request_second_opinion,
 } from "./ontology/agent.ts";
 import { transitions } from "./transitions.ts";
 
@@ -175,6 +181,12 @@ export const schema: Schema = {
     cancel_agent_session,
     fail_agent_session,
     close_agent_session,
+    clarify_task,
+    redirect_task,
+    record_task_steering_delivery,
+    record_task_steering_refusal,
+    record_task_cancel_outcome,
+    request_second_opinion,
     publish_artifact,
     record_evaluation,
     resolve_hypothesis,
@@ -186,4 +198,4 @@ const skipActiveFreeze = process.env.QF_SCHEMA_SKIP_ACTIVE_FREEZE === "1";
 
 lintSchema(schema, transitions, activeSchemaBaseline, { skipActiveFreeze });
 lintCommands(schema, transitions, commands, creationCommands, pipelineCommands);
-lintActionSurface(schema, commands, creationCommands, pipelineCommands);
+lintActionSurface(schema, commands, creationCommands, pipelineCommands, internalCommands);

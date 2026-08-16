@@ -59,6 +59,9 @@ export {
   UnknownAgentDefinitionError,
   UnknownSpeciesError,
   SpawnedFromLinkRejectedError,
+  TaskRefusalError,
+  TASK_REFUSAL_MESSAGES,
+  type TaskRefusalCode,
 } from "./errors.ts";
 export { eventCount, execute } from "./execute.ts";
 export type {

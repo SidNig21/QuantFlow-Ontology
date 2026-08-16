@@ -31,6 +31,49 @@ export class KernelError extends Error {
   }
 }
 
+export type TaskRefusalCode =
+  | "TASK_NOT_FOUND"
+  | "TASK_NOT_OPEN"
+  | "ACTOR_NOT_DELEGATOR"
+  | "ASSIGNMENT_CARDINALITY"
+  | "ASSIGNEE_NOT_RUNNING"
+  | "INSTRUCTION_EMPTY"
+  | "INSTRUCTION_TOO_LARGE"
+  | "INSTRUCTION_CONTROL_BYTES"
+  | "REASSIGN_NOOP"
+  | "REASSIGN_TARGET_NOT_RUNNING"
+  | "CRITIC_DEFINITION_UNAVAILABLE"
+  | "CRITIC_SESSION_AMBIGUOUS"
+  | "SECOND_OPINION_ALREADY_OPEN"
+  | "CANCEL_ALREADY_FINAL";
+
+export const TASK_REFUSAL_MESSAGES: Record<TaskRefusalCode, string> = {
+  TASK_NOT_FOUND: "Task not found.",
+  TASK_NOT_OPEN: "This Task is no longer open.",
+  ACTOR_NOT_DELEGATOR: "Only the Task's delegator can steer it.",
+  ASSIGNMENT_CARDINALITY: "Task assignment is unavailable.",
+  ASSIGNEE_NOT_RUNNING: "The assigned seat is not running.",
+  INSTRUCTION_EMPTY: "Enter an instruction.",
+  INSTRUCTION_TOO_LARGE: "Instruction must be 4,096 UTF-8 bytes or fewer.",
+  INSTRUCTION_CONTROL_BYTES: "Instruction contains unsupported control characters.",
+  REASSIGN_NOOP: "Choose a different running seat.",
+  REASSIGN_TARGET_NOT_RUNNING: "The new owner must be running.",
+  CRITIC_DEFINITION_UNAVAILABLE: "The production Critic is unavailable.",
+  CRITIC_SESSION_AMBIGUOUS: "More than one idle production Critic is available.",
+  SECOND_OPINION_ALREADY_OPEN: "A second-opinion Task is already open.",
+  CANCEL_ALREADY_FINAL: "This Task is already cancelled.",
+};
+
+export class TaskRefusalError extends KernelError {
+  readonly code: TaskRefusalCode;
+
+  constructor(code: TaskRefusalCode) {
+    super(TASK_REFUSAL_MESSAGES[code]);
+    this.name = "TaskRefusalError";
+    this.code = code;
+  }
+}
+
 /** Market batch input cannot be represented as deterministic Kernel state — nothing written. */
 export class MarketIngestValidationError extends KernelError {
   readonly reason: string;

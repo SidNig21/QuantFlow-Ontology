@@ -40,6 +40,7 @@ export const WINDOWS_WSL_LAUNCH_ENV_KEYS = [
   // Explicitly test-only: lets the packaged Hermes wrapper select the
   // deterministic responder without changing ordinary provider launches.
   "QF_HERMES_SYNTHETIC_TEST",
+  "QF_FOUNDER_STEERING_HOLD",
   "QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY",
   "QF_HERMES_SYNTHETIC_OLD_NO_RECRUIT",
   "QF_HERMES_SYNTHETIC_SELECTED_DEFINITION",

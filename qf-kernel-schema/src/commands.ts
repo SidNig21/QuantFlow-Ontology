@@ -297,6 +297,16 @@ export const pipelineCommands: readonly PipelineCommand[] = [
   },
 ] as const;
 
+/** App-owned commands. These are Kernel actions, but never agent/model tools. */
+export const internalCommands: readonly { action: string }[] = [
+  { action: "clarify_task" },
+  { action: "redirect_task" },
+  { action: "record_task_steering_delivery" },
+  { action: "record_task_steering_refusal" },
+  { action: "record_task_cancel_outcome" },
+  { action: "request_second_opinion" },
+] as const;
+
 /** All legal (type, from, to) edges from the transition tables. */
 export function allTransitionEdges(): Array<{ type: StatefulType; from: string; to: string }> {
   const edges: Array<{ type: StatefulType; from: string; to: string }> = [];

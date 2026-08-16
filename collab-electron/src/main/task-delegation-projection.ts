@@ -32,6 +32,18 @@ export type TaskAssignmentProjection = {
   assignmentState: "assigned" | "unavailable";
   /** Sessions named by malformed links; never used as an owner. */
   unavailableSessionIds: string[];
+  history?: TaskHistoryFact[];
+};
+
+export type TaskHistoryFact = {
+  sequence: number;
+  event_id: string;
+  kind: string;
+  task_id: string;
+  mode: string | null;
+  text: string | null;
+  outcome: string | null;
+  target_session_id: string | null;
 };
 
 export type TaskDelegationProjectionReader = {

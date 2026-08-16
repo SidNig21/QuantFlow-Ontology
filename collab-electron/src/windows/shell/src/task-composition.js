@@ -51,6 +51,28 @@ function errorLine(foot, message) {
 	foot.appendChild(node("div", "task-foot-error", message));
 }
 
+function renderHistory(foot, history) {
+	if (!Array.isArray(history)) return;
+	const list = node("div", "task-history");
+	for (const fact of history) {
+		const row = node("div", "task-history-fact");
+		row.dataset.eventId = String(fact?.event_id ?? "");
+		row.dataset.sequence = String(fact?.sequence ?? "");
+		row.dataset.kind = String(fact?.kind ?? "");
+		row.dataset.taskId = String(fact?.task_id ?? "");
+		row.dataset.mode = fact?.mode == null ? "" : String(fact.mode);
+		row.dataset.text = fact?.text == null ? "" : String(fact.text);
+		row.dataset.outcome = fact?.outcome == null ? "" : String(fact.outcome);
+		row.dataset.targetSessionId = fact?.target_session_id == null ? "" : String(fact.target_session_id);
+		row.appendChild(node("span", "task-history-action", String(fact?.kind ?? "")));
+		row.appendChild(node("span", "task-history-text", fact?.text == null ? "" : String(fact.text)));
+		row.appendChild(node("span", "task-history-outcome", fact?.outcome == null ? "" : String(fact.outcome)));
+		row.appendChild(node("span", "task-history-target", fact?.target_session_id == null ? "" : String(fact.target_session_id)));
+		list.appendChild(row);
+	}
+	foot.appendChild(list);
+}
+
 export function renderTaskFoot(dom, tile, {
 	focused = false,
 	sessions = [],
@@ -58,6 +80,8 @@ export function renderTaskFoot(dom, tile, {
 	onCreate,
 	onReassign,
 	onCancel,
+	onSteer,
+	onSecondOpinion,
 } = {}) {
 	const foot = dom?.taskFoot;
 	if (!foot) return;
@@ -83,11 +107,21 @@ export function renderTaskFoot(dom, tile, {
 		factRow.appendChild(node("span", "task-fact-label", fact.text));
 	}
 	foot.appendChild(factRow);
+	if (fact.task?.assignmentState === "assigned") renderHistory(foot, fact.task.history);
 
-	if (fact.task?.status === "open" && fact.task.assignedToSessionId === tile.sessionId) {
+	if ((fact.task?.status === "open" || fact.task?.status === "cancelled") && fact.task.assignedToSessionId === tile.sessionId) {
 		const actions = node("div", "task-foot-actions");
 		const reassign = node("button", "task-action", "Reassign");
 		const cancel = node("button", "task-action task-action-cancel", "Cancel");
+		const clarify = node("button", "task-action", "Clarify");
+		const redirect = node("button", "task-action", "Redirect");
+		const secondOpinion = node("button", "task-action", "Second opinion");
+		if (fact.task.status !== "open") {
+			reassign.disabled = true;
+			clarify.disabled = true;
+			redirect.disabled = true;
+			secondOpinion.disabled = true;
+		}
 		reassign.addEventListener("click", (event) => {
 			event.stopPropagation();
 			const chooser = selectAssignee(sessions, "");
@@ -117,8 +151,39 @@ export function renderTaskFoot(dom, tile, {
 				errorLine(foot, error?.message ?? String(error));
 			}
 		});
+		const openSteer = (mode) => {
+			const form = node("form", "task-steering-form");
+			const input = node("textarea", "task-steering-input");
+			input.placeholder = mode === "clarify" ? "Add context" : "New completion description";
+			input.required = true;
+			const submit = node("button", "task-action", "Submit");
+			submit.type = "submit";
+			form.appendChild(input);
+			form.appendChild(submit);
+			actions.replaceChildren(form);
+			input.focus();
+			form.addEventListener("submit", async (submitEvent) => {
+				submitEvent.preventDefault();
+				submitEvent.stopPropagation();
+				try {
+					await onSteer?.(fact.task.taskId, mode, input.value);
+				} catch (error) {
+					errorLine(foot, error?.message ?? String(error));
+				}
+			});
+		};
+		clarify.addEventListener("click", (event) => { event.stopPropagation(); openSteer("clarify"); });
+		redirect.addEventListener("click", (event) => { event.stopPropagation(); openSteer("redirect"); });
+		secondOpinion.addEventListener("click", async (event) => {
+			event.stopPropagation();
+			try { await onSecondOpinion?.(fact.task.taskId); }
+			catch (error) { errorLine(foot, error?.message ?? String(error)); }
+		});
 		actions.appendChild(reassign);
 		actions.appendChild(cancel);
+		actions.appendChild(clarify);
+		actions.appendChild(redirect);
+		actions.appendChild(secondOpinion);
 		foot.appendChild(actions);
 	}
 

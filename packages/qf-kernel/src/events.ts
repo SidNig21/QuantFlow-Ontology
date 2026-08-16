@@ -14,7 +14,7 @@ export function appendEvent(
     payload: Record<string, unknown>;
     trace_id: string;
   },
-): void {
+): string {
   const id = crypto.randomUUID();
   const created_at = new Date().toISOString();
   db.query(
@@ -29,4 +29,5 @@ export function appendEvent(
     opts.trace_id,
     created_at,
   );
+  return id;
 }

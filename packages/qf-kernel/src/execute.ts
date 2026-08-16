@@ -12,7 +12,7 @@ import {
 import { assertTransition } from "qf-kernel-schema/validate";
 import { executeCreation } from "./create.ts";
 import type { KernelDb } from "./db.ts";
-import { IllegalTransitionError, KernelError } from "./errors.ts";
+import { IllegalTransitionError, KernelError, TaskRefusalError, TASK_REFUSAL_MESSAGES, type TaskRefusalCode } from "./errors.ts";
 import { appendEvent } from "./events.ts";
 import {
   extractCreationEnvelope,
@@ -20,11 +20,265 @@ import {
   type LinkSpec,
 } from "./links.ts";
 import { executePipeline } from "./pipeline.ts";
-import type { ExecuteResultFor } from "./results.ts";
+import type { ExecuteResultFor, ObjectExecuteResult } from "./results.ts";
 import { requireTrace, type TrustedExecutionContext } from "./trace.ts";
 import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 
+
+const CONTROL_BYTES = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/u;
+type TaskRow = { id: string; title: string; description: string; status: string };
+type LinkRow = { id: string; to_id: string };
+type EventRow = { id: string; type: string; object_id: string; payload: string };
+
+export type TaskGovernanceResult = ObjectExecuteResult & {
+  event_id: string;
+  accepted_event_id?: string;
+  previous_assignee_session_id?: string;
+  assignee_session_id?: string;
+  target_session_id?: string;
+  message?: string;
+  review_task_id?: string;
+  source_task_id?: string;
+};
+
+export function normalizeTaskInstruction(value: string): string {
+  return value.replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+}
+
+function validateInstruction(value: string): string {
+  const normalized = normalizeTaskInstruction(value);
+  if (normalized.trim().length === 0) throw new TaskRefusalError("INSTRUCTION_EMPTY");
+  if (Buffer.byteLength(normalized, "utf8") > 4096) throw new TaskRefusalError("INSTRUCTION_TOO_LARGE");
+  if (CONTROL_BYTES.test(normalized)) throw new TaskRefusalError("INSTRUCTION_CONTROL_BYTES");
+  return normalized;
+}
+
+function readTask(db: KernelDb, taskId: string): TaskRow {
+  const row = db.query("SELECT id, title, description, status FROM task WHERE id = ?").get(taskId) as TaskRow | null;
+  if (!row) throw new TaskRefusalError("TASK_NOT_FOUND");
+  return row;
+}
+
+function exactLink(db: KernelDb, taskId: string, kind: "delegated_by" | "assigned_to"): LinkRow {
+  const rows = db.query("SELECT id, to_id FROM links WHERE from_id = ? AND kind = ? ORDER BY created_at ASC, id ASC").all(taskId, kind) as LinkRow[];
+  if (rows.length !== 1 || !rows[0]!.to_id) throw new TaskRefusalError(kind === "assigned_to" ? "ASSIGNMENT_CARDINALITY" : "ACTOR_NOT_DELEGATOR");
+  return rows[0]!;
+}
+
+function requireOpen(row: TaskRow): void {
+  if (row.status === "cancelled") throw new TaskRefusalError("CANCEL_ALREADY_FINAL");
+  if (row.status !== "open") throw new TaskRefusalError("TASK_NOT_OPEN");
+}
+
+function requireDirector(db: KernelDb, taskId: string, actor: string | undefined): { directorId: string; assigneeId: string } {
+  if (!actor) throw new TaskRefusalError("ACTOR_NOT_DELEGATOR");
+  const directorId = exactLink(db, taskId, "delegated_by").to_id;
+  if (directorId !== actor) throw new TaskRefusalError("ACTOR_NOT_DELEGATOR");
+  const assigneeId = exactLink(db, taskId, "assigned_to").to_id;
+  const row = db.query("SELECT status FROM agent_session WHERE id = ?").get(assigneeId) as { status: string } | null;
+  if (!row || row.status !== "running") throw new TaskRefusalError("ASSIGNEE_NOT_RUNNING");
+  return { directorId, assigneeId };
+}
+
+function taskResult(row: TaskRow, event: string, eventId: string, from: string, to: string, extras: Record<string, unknown> = {}): TaskGovernanceResult {
+  return { kind: "object", object_type: "task", object_id: row.id, from, to, event, event_id: eventId, state: row as Record<string, unknown>, ...extras } as TaskGovernanceResult;
+}
+
+function payload(row: EventRow): Record<string, unknown> {
+  try {
+    const value = JSON.parse(row.payload) as unknown;
+    return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  } catch { return {}; }
+}
+
+function eventById(db: KernelDb, id: string): EventRow {
+  const row = db.query("SELECT id, type, object_id, payload FROM events WHERE id = ?").get(id) as EventRow | null;
+  if (!row) throw new KernelError("accepted event not found");
+  return row;
+}
+
+function receiptResult(event: EventRow, eventId: string, data: Record<string, unknown>): TaskGovernanceResult {
+  const id = String(data.task_id ?? event.object_id);
+  const row = { id, title: "", description: "", status: "open" };
+  return taskResult(row, event.type, eventId, "", "", {
+    accepted_event_id: event.id,
+    target_session_id: data.target_session_id ?? data.assignee_session_id ?? data.critic_session_id ?? null,
+    outcome: data.outcome ?? null,
+    message: data.message,
+  });
+}
+
+export function executeTaskSteering(db: KernelDb, command: "clarify_task" | "redirect_task", input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const taskId = String(input.task_id ?? "");
+  const instruction = validateInstruction(String(input.instruction ?? ""));
+  const tx = db.transaction(() => {
+    const current = readTask(db, taskId);
+    requireOpen(current);
+    const { directorId, assigneeId } = requireDirector(db, taskId, trace.actor_session_id);
+    const previousDescription = current.description;
+    if (command === "redirect_task" || (command === "clarify_task" && process.env.QF_FOUNDER_STEERING_FALSIFY === "clarify_mutated_description")) db.query("UPDATE task SET description = ? WHERE id = ?").run(instruction, taskId);
+    const eventType = command === "clarify_task" ? "task.clarified" : "task.redirected";
+    const eventId = appendEvent(db, {
+      type: eventType,
+      object_type: "task",
+      object_id: taskId,
+      payload: {
+        task_id: taskId, director_session_id: directorId, assignee_session_id: assigneeId,
+        actor_session_id: directorId, mode: command === "clarify_task" ? "clarify" : "redirect", instruction,
+        ...(command === "redirect_task" ? { ...(process.env.QF_FOUNDER_STEERING_FALSIFY === "redirect_lost_previous_description" ? {} : { previous_description: previousDescription }), new_description: instruction } : {}),
+      },
+      trace_id: trace.trace_id,
+    });
+    const state = db.query("SELECT id, title, description, status FROM task WHERE id = ?").get(taskId) as TaskRow;
+    return taskResult(state, eventType, eventId, "open", "open", {
+      accepted_event_id: eventId, assignee_session_id: assigneeId, target_session_id: assigneeId,
+      mode: command === "clarify_task" ? "clarify" : "redirect", instruction,
+      previous_description: command === "redirect_task" ? previousDescription : null,
+    });
+  });
+  return tx();
+}
+
+export function executeTaskGovernanceAction(db: KernelDb, command: "reassign_task" | "cancel_task", input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const taskId = String(input.task_id ?? "");
+  const tx = db.transaction(() => {
+    const row = readTask(db, taskId);
+    requireOpen(row);
+    const { assigneeId: currentAssigneeId } = requireDirector(db, taskId, trace.actor_session_id);
+    const next = command === "reassign_task" ? String(input.assignee_session_id ?? "") : currentAssigneeId;
+    if (command === "reassign_task") {
+      if (!next || next === currentAssigneeId) throw new TaskRefusalError("REASSIGN_NOOP");
+      const target = db.query("SELECT status FROM agent_session WHERE id = ?").get(next) as { status: string } | null;
+      if (!target || target.status !== "running") throw new TaskRefusalError("REASSIGN_TARGET_NOT_RUNNING");
+      const currentLink = db.query("SELECT id FROM links WHERE from_id = ? AND kind = 'assigned_to'").get(taskId) as { id: string };
+      db.query("DELETE FROM links WHERE id = ?").run(currentLink.id);
+      db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'assigned_to', ?, ?, ?)").run(crypto.randomUUID(), taskId, next, new Date().toISOString());
+    } else {
+      db.query("UPDATE task SET status = 'cancelled' WHERE id = ?").run(taskId);
+    }
+    const eventType = command === "reassign_task" ? "task.reassigned" : "task.cancelled";
+    const eventId = appendEvent(db, {
+      type: eventType, object_type: "task", object_id: taskId,
+      payload: { command, task_id: taskId, previous_assignee_session_id: currentAssigneeId, assignee_session_id: next, actor_session_id: trace.actor_session_id, ...(command === "reassign_task" ? { new_assignee_session_id: next } : {}), span_id: trace.span_id },
+      trace_id: trace.trace_id,
+    });
+    const state = db.query("SELECT id, title, description, status FROM task WHERE id = ?").get(taskId) as TaskRow;
+    return taskResult(state, eventType, eventId, "open", command === "reassign_task" ? "open" : "cancelled", {
+      accepted_event_id: eventId, previous_assignee_session_id: currentAssigneeId, assignee_session_id: next, target_session_id: next,
+    });
+  });
+  return tx();
+}
+
+export function executeTaskSteeringDelivery(db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const accepted = eventById(db, String(input.accepted_event_id ?? ""));
+  if (!["task.clarified", "task.redirected", "task.reassigned", "task.second_opinion_requested"].includes(accepted.type)) {
+    throw new KernelError("delivery requires an accepted Task action event");
+  }
+  const acceptedPayload = payload(accepted);
+  const deliveryType = accepted.type === "task.reassigned" ? "task.reassignment_delivery" : accepted.type === "task.second_opinion_requested" ? "task.second_opinion_delivery" : "task.steering_delivery";
+  const prior = (db.query("SELECT id, type, object_id, payload FROM events WHERE type = ?").all(deliveryType) as EventRow[]).find((row) => payload(row).accepted_event_id === accepted.id);
+  if (prior) return receiptResult(prior, prior.id, payload(prior));
+  const target = acceptedPayload.assignee_session_id ?? acceptedPayload.critic_session_id;
+  const eventId = appendEvent(db, {
+    type: deliveryType, object_type: "task", object_id: accepted.object_id,
+    payload: {
+      accepted_event_id: accepted.id, task_id: acceptedPayload.task_id ?? accepted.object_id,
+      mode: acceptedPayload.mode ?? (accepted.type === "task.reassigned" ? "reassign" : "second_opinion"),
+      actor_session_id: acceptedPayload.actor_session_id ?? acceptedPayload.director_session_id ?? null,
+      target_session_id: target ?? null, outcome: input.outcome,
+    },
+    trace_id: trace.trace_id,
+  });
+  return receiptResult({ ...accepted, type: deliveryType }, eventId, { task_id: acceptedPayload.task_id ?? accepted.object_id, target_session_id: target ?? null, outcome: input.outcome });
+}
+
+export function executeTaskSteeringRefusal(db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const attemptId = String(input.attempt_id ?? "");
+  const existing = (db.query("SELECT id, type, object_id, payload FROM events WHERE type = 'task.steering_refused'").all() as EventRow[]).find((row) => payload(row).attempt_id === attemptId);
+  if (existing) return receiptResult(existing, existing.id, payload(existing));
+  const taskId = typeof input.task_id === "string" ? input.task_id : null;
+  const code = String(input.reason_code) as TaskRefusalCode;
+  const message = TASK_REFUSAL_MESSAGES[code];
+  const eventId = appendEvent(db, {
+    type: "task.steering_refused", object_type: "task", object_id: taskId ?? attemptId,
+    payload: { attempt_id: attemptId, attempted_action: input.attempted_action, task_id: taskId, reason_code: code, message, actor_session_id: trace.actor_session_id ?? null },
+    trace_id: trace.trace_id,
+  });
+  return receiptResult({ id: eventId, type: "task.steering_refused", object_id: taskId ?? attemptId, payload: JSON.stringify({ task_id: taskId, message }) }, eventId, { task_id: taskId, reason_code: code, message });
+}
+
+export function executeTaskCancelOutcome(db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const accepted = eventById(db, String(input.accepted_event_id ?? ""));
+  if (accepted.type !== "task.cancelled") throw new KernelError("cancel outcome requires task.cancelled");
+  const prior = (db.query("SELECT id, type, object_id, payload FROM events WHERE type = 'task.cancel_outcome'").all() as EventRow[]).find((row) => payload(row).accepted_event_id === accepted.id);
+  if (prior) return receiptResult(prior, prior.id, payload(prior));
+  const acceptedPayload = payload(accepted);
+  const target = acceptedPayload.assignee_session_id ?? acceptedPayload.previous_assignee_session_id ?? null;
+  const eventId = appendEvent(db, {
+    type: "task.cancel_outcome", object_type: "task", object_id: accepted.object_id,
+    payload: { accepted_event_id: accepted.id, task_id: acceptedPayload.task_id ?? accepted.object_id, target_session_id: target, outcome: input.outcome, error_class: input.error_class ?? null },
+    trace_id: trace.trace_id,
+  });
+  return receiptResult({ ...accepted, type: "task.cancel_outcome" }, eventId, { task_id: acceptedPayload.task_id ?? accepted.object_id, target_session_id: target, outcome: input.outcome });
+}
+
+export function executeSecondOpinion(db: KernelDb, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  const taskId = String(input.task_id ?? "");
+  const criticId = String(input.critic_session_id ?? "");
+  const tx = db.transaction(() => {
+    const source = readTask(db, taskId);
+    requireOpen(source);
+    const { directorId } = requireDirector(db, taskId, trace.actor_session_id);
+    const critic = db.query("SELECT status FROM agent_session WHERE id = ?").get(criticId) as { status: string } | null;
+    const criticLinks = db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'spawned_from'").all(criticId) as Array<{ to_id: string }>;
+    if (!critic || critic.status !== "running" || criticLinks.length !== 1 || criticLinks[0]!.to_id !== "hermes-critic") throw new TaskRefusalError("CRITIC_DEFINITION_UNAVAILABLE");
+    const priorEvents = db.query("SELECT id, type, object_id, payload FROM events WHERE type = 'task.second_opinion_requested'").all() as EventRow[];
+    for (const prior of priorEvents) {
+      const priorPayload = payload(prior);
+      const reviewId = priorPayload.review_task_id;
+      if (priorPayload.source_task_id === taskId && typeof reviewId === "string" && (db.query("SELECT status FROM task WHERE id = ?").get(reviewId) as { status: string } | null)?.status === "open") throw new TaskRefusalError("SECOND_OPINION_ALREADY_OPEN");
+    }
+    const reviewId = crypto.randomUUID();
+    const title = `Second opinion — ${source.title}`;
+    const description = `Independently review Task ${taskId}: ${source.description}`;
+    const createdAt = new Date().toISOString();
+    db.query("INSERT INTO task (id, created_at, title, description, status) VALUES (?, ?, ?, ?, 'open')").run(reviewId, createdAt, title, description);
+    db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'delegated_by', ?, ?, ?)").run(crypto.randomUUID(), reviewId, directorId, createdAt);
+    db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'assigned_to', ?, ?, ?)").run(crypto.randomUUID(), reviewId, criticId, createdAt);
+    appendEvent(db, { type: "task.created", object_type: "task", object_id: reviewId, payload: { command: "create_task", status: "open", title, description, delegator_session_id: directorId, assignee_session_id: criticId }, trace_id: trace.trace_id });
+    const eventId = appendEvent(db, {
+      type: "task.second_opinion_requested", object_type: "task", object_id: taskId,
+      payload: { source_task_id: taskId, review_task_id: reviewId, task_id: taskId, director_session_id: directorId, actor_session_id: directorId, critic_session_id: criticId, title: source.title, instruction: source.description },
+      trace_id: trace.trace_id,
+    });
+    const state = db.query("SELECT id, title, description, status FROM task WHERE id = ?").get(reviewId) as TaskRow;
+    return taskResult(state, "task.second_opinion_requested", eventId, "", "open", { accepted_event_id: eventId, source_task_id: taskId, review_task_id: reviewId, target_session_id: criticId, critic_session_id: criticId });
+  });
+  return tx();
+}
+
+export function executeInternalTaskAction(db: KernelDb, command: string, input: Record<string, unknown>, trace: TrustedExecutionContext): TaskGovernanceResult {
+  switch (command) {
+    case "clarify_task":
+    case "redirect_task": return executeTaskSteering(db, command, input, trace);
+    case "record_task_steering_delivery": return executeTaskSteeringDelivery(db, input, trace);
+    case "record_task_steering_refusal": return executeTaskSteeringRefusal(db, input, trace);
+    case "record_task_cancel_outcome": return executeTaskCancelOutcome(db, input, trace);
+    case "request_second_opinion": return executeSecondOpinion(db, input, trace);
+    default: throw new KernelError(`Unknown internal command "${command}"`);
+  }
+}
+
 const actionByName = new Map(schema.actions.map((action) => [action.name, action]));
+const INTERNAL_TASK_ACTIONS = new Set([
+  "clarify_task",
+  "redirect_task",
+  "record_task_steering_delivery",
+  "record_task_steering_refusal",
+  "record_task_cancel_outcome",
+  "request_second_opinion",
+]);
 
 function objectId(cmd: TransitionCommand, input: Record<string, unknown>): string {
   const key = transitionIdFields[cmd.type];
@@ -117,6 +371,8 @@ function executeTaskGovernance(
   input: Record<string, unknown>,
   trace: TrustedExecutionContext,
 ): Record<string, unknown> {
+  return executeTaskGovernanceAction(db, command, input, trace);
+  /*
   const taskId = input.task_id;
   if (typeof taskId !== "string" || taskId.length === 0) {
     throw new KernelError(`${command} requires task_id`);
@@ -178,7 +434,7 @@ function executeTaskGovernance(
     to,
     event,
     state,
-  };
+  }; */
 }
 
 function assertSessionMayClose(db: KernelDb, sessionId: string): void {
@@ -215,10 +471,11 @@ export function execute<C extends string>(
   const pipeline = creation
     ? undefined
     : pipelineCommands.find((candidate) => candidate.action === command);
-  const transitionSample = creation || pipeline
+  const internalTaskAction = INTERNAL_TASK_ACTIONS.has(command);
+  const transitionSample = creation || pipeline || internalTaskAction
     ? undefined
     : commands.find((candidate) => candidate.action === command);
-  if (!creation && !pipeline && !transitionSample) {
+  if (!creation && !pipeline && !transitionSample && !internalTaskAction) {
     throw new KernelError(`Unknown command "${command}"`);
   }
 
@@ -260,8 +517,12 @@ export function execute<C extends string>(
     return executePipeline(db, pipeline, validatedInput, trace) as ExecuteResultFor<C>;
   }
 
+  if (INTERNAL_TASK_ACTIONS.has(command)) {
+    return executeInternalTaskAction(db, command, validatedInput, trace) as unknown as ExecuteResultFor<C>;
+  }
+
   if (command === "reassign_task" || command === "cancel_task") {
-    return executeTaskGovernance(db, command, validatedInput, trace) as ExecuteResultFor<C>;
+    return executeTaskGovernance(db, command as "reassign_task" | "cancel_task", validatedInput, trace) as unknown as ExecuteResultFor<C>;
   }
 
   if (command === "close_agent_session") {

@@ -23,6 +23,7 @@ import {
   DETERMINISTIC_EXECUTION_UPGRADE,
   INDEPENDENT_CRITIC_UPGRADE,
   TASK_COMPOSITION_UPGRADE,
+  TASK_STEERING_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -354,7 +355,8 @@ export function attachKernel(
       shape === "connection_actions" ||
       shape === "task_delegation" ||
       shape === "deterministic_execution" ||
-      shape === "task_composition")
+      shape === "task_composition" ||
+      shape === "task_steering")
   ) {
     const upgradeOrder = [
       PROFILE_IDENTITY_UPGRADE,
@@ -367,6 +369,7 @@ export function attachKernel(
       DETERMINISTIC_EXECUTION_UPGRADE,
       INDEPENDENT_CRITIC_UPGRADE,
       TASK_COMPOSITION_UPGRADE,
+      TASK_STEERING_UPGRADE,
     ];
     const completedByShape = {
       pre_d1: 0,
@@ -379,6 +382,7 @@ export function attachKernel(
       task_delegation: 7,
       deterministic_execution: 8,
       task_composition: 9,
+      task_steering: 10,
     } as const;
     const required = upgradeOrder.slice(completedByShape[shape]).join(",");
     process.stderr.write(
@@ -425,7 +429,8 @@ export function attachKernel(
       shape === "connection_actions" ||
       shape === "task_delegation" ||
       shape === "deterministic_execution" ||
-      shape === "task_composition"
+      shape === "task_composition" ||
+      shape === "task_steering"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",
@@ -457,6 +462,9 @@ export function attachKernel(
       const taskCompositionSql = readFileSync(
         upgradeSqlPath("0010-task-composition.sql"), "utf8",
       );
+      const taskSteeringSql = readFileSync(
+        upgradeSqlPath("0011-task-steering.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -468,6 +476,7 @@ export function attachKernel(
         deterministicExecutionSql,
         independentCriticSql,
         taskCompositionSql,
+        taskSteeringSql,
       });
     }
   }

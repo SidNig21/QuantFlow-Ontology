@@ -1572,6 +1572,32 @@ body.platform-win {
 	resize: vertical;
 }
 
+.task-steering-form {
+	display: flex;
+	gap: var(--qf-space-2);
+	width: 100%;
+}
+
+.task-steering-input {
+	min-height: 3.5rem;
+	flex: 1;
+}
+
+.task-history {
+	display: grid;
+	gap: var(--qf-space-1);
+	margin-top: var(--qf-space-2);
+	max-height: 8rem;
+	overflow: auto;
+}
+
+.task-history-fact {
+	display: grid;
+	grid-template-columns: auto 1fr auto auto;
+	gap: var(--qf-space-2);
+	font-size: 0.72rem;
+}
+
 .task-action,
 .task-create-button {
 	background: transparent;

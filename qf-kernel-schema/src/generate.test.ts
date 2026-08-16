@@ -15,6 +15,7 @@ import { generateUpgradeConnectionActions } from "./generate/upgrade-connection-
 import { generateUpgradeTaskDelegation } from "./generate/upgrade-task-delegation.ts";
 import { generateUpgradeDeterministicExecution } from "./generate/upgrade-deterministic-execution.ts";
 import { generateUpgradeIndependentCritic } from "./generate/upgrade-independent-critic.ts";
+import { generateUpgradeTaskSteering } from "./generate/upgrade-task-steering.ts";
 import { schema } from "./schema.ts";
 
 const goldenDir = join(import.meta.dir, "..", "golden");
@@ -137,6 +138,10 @@ describe("golden outputs", () => {
       "2df9f05c66efba16f3493082f5cfd191cbbb3c696ee42f5abe204fbe65a3b820",
     );
   });
+
+  test("task-steering upgrade matches golden byte-for-byte", () => {
+    expect(generateUpgradeTaskSteering()).toBe(readFileSync(join(goldenDir, "upgrades", "0011-task-steering.sql"), "utf8"));
+  });
 });
 
 describe("determinism", () => {
@@ -182,7 +187,7 @@ describe("mcp tool descriptions", () => {
 
   test("read tool count is three per object plus one action per action", () => {
     const tools = JSON.parse(generateMcp(schema)) as Array<{ name: string }>;
-    expect(tools).toHaveLength(schema.objects.length * 3 + schema.actions.length);
+    expect(tools).toHaveLength(schema.objects.length * 3 + schema.actions.filter((action) => action.internalOnly !== true).length);
     const readSuffixes = ["_get", "_query", "_links"] as const;
     for (const object of schema.objects) {
       for (const suffix of readSuffixes) {

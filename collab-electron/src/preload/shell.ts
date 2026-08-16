@@ -77,6 +77,10 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:tasks:reassign", args),
     cancelTask: (taskId: string) =>
       ipcRenderer.invoke("qf:tasks:cancel", { taskId }),
+    steerTask: (args: { taskId: string; mode: "clarify" | "redirect"; instruction: string }) =>
+      ipcRenderer.invoke("qf:tasks:steer", args),
+    requestSecondOpinion: (taskId: string) =>
+      ipcRenderer.invoke("qf:tasks:secondOpinion", { taskId }),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
     submitResearchQuestion: (question: string, datasetId?: string, definitionId?: string) => {

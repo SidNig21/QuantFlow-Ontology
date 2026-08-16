@@ -777,6 +777,25 @@ export function createTileManager({
 		saveCanvasImmediate();
 	}
 
+	function markTerminalStopped(id) {
+		const tile = getTile(id);
+		const dom = tileDOMs.get(id);
+		if (!tile?.sessionId || !dom) return false;
+		if (dom.webview) {
+			dom.contentArea.removeChild(dom.webview);
+			dom.webview = null;
+		}
+		tile.ptySessionId = undefined;
+		dom.container.dataset.state = "stopped";
+		dom.container.dataset.agentStatus = "Session stopped";
+		const stopped = document.createElement("div");
+		stopped.className = "agent-session-stopped";
+		stopped.textContent = "Session stopped";
+		dom.contentArea.appendChild(stopped);
+		saveCanvasDebounced();
+		return true;
+	}
+
 	function createFileTile(type, cx, cy, filePath, extra = {}) {
 		const tile = createCanvasTile(type, cx, cy, { ...extra, filePath });
 		const dom = tileDOMs.get(tile.id);
@@ -1053,6 +1072,7 @@ export function createTileManager({
 		createPendingSpawnTile,
 		reconcilePendingSpawnTile,
 		closeCanvasTile,
+		markTerminalStopped,
 		focusCanvasTile,
 		blurCanvasTileGuest,
 		clearTileFocusRing,

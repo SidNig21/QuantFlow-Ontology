@@ -713,6 +713,69 @@ Close a running, cancelled, or failed agent session (→ closed).
 - **input:**
 - `session_id` — Agent session to close.
 
+### `clarify_task`
+
+Append bounded founder context to an open Director-delegated Task without changing its durable description.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `task_id` — Original open Task id whose current work is being steered.
+- `instruction` — Founder instruction, normalized to LF and bounded to 4,096 UTF-8 bytes.
+
+### `redirect_task`
+
+Replace an open Director-delegated Task description while retaining the previous description in the receipt log.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `task_id` — Original open Task id whose current work is being steered.
+- `instruction` — Founder instruction, normalized to LF and bounded to 4,096 UTF-8 bytes.
+
+### `record_task_steering_delivery`
+
+Record the host delivery outcome for one accepted Task steering event, deriving all identity fields from that event.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `accepted_event_id` — Kernel event id of the accepted steering, reassignment, or second-opinion event.
+- `outcome` — Whether the captured runtime boundary accepted the one delivery attempt.
+
+### `record_task_steering_refusal`
+
+Record one refused founder Task action with its canonical reason and derived founder-visible message.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `attempt_id` — Electron-generated UUID for this visible submit attempt.
+- `attempted_action` — Visible action the founder attempted.
+- `task_id` — Optional original Task id, when the submit named one.
+- `reason_code` — Canonical Kernel refusal code.
+
+### `record_task_cancel_outcome`
+
+Record the one host outcome after an accepted Task cancellation, deriving the target from the cancellation event.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `accepted_event_id` — Kernel event id of the accepted task.cancelled event.
+- `outcome` — Governed host cancellation outcome.
+- `error_class` — Non-secret error class when stop_failed; omitted for successful outcomes.
+
+### `request_second_opinion`
+
+Create exactly one open review Task assigned to a captured production Critic session for the original open Task.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `task_id` — Original open Task id to review.
+- `critic_session_id` — Running production hermes-critic session captured by the host.
+
 ### `publish_artifact`
 
 Publish an immutable content-addressed artifact (must land before sandbox death).

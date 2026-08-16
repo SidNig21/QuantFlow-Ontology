@@ -403,6 +403,80 @@ export const cancel_task = defineAction({
   }),
 });
 
+const steeringInput = {
+  task_id: z.string().describe("Original open Task id whose current work is being steered."),
+  instruction: z.string().describe("Founder instruction, normalized to LF and bounded to 4,096 UTF-8 bytes."),
+};
+
+export const clarify_task = defineAction({
+  name: "clarify_task",
+  description: "Append bounded founder context to an open Director-delegated Task without changing its durable description.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object(steeringInput),
+});
+
+export const redirect_task = defineAction({
+  name: "redirect_task",
+  description: "Replace an open Director-delegated Task description while retaining the previous description in the receipt log.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object(steeringInput),
+});
+
+export const record_task_steering_delivery = defineAction({
+  name: "record_task_steering_delivery",
+  description: "Record the host delivery outcome for one accepted Task steering event, deriving all identity fields from that event.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object({
+    accepted_event_id: z.string().describe("Kernel event id of the accepted steering, reassignment, or second-opinion event."),
+    outcome: z.enum(["delivered", "delivery_failed"]).describe("Whether the captured runtime boundary accepted the one delivery attempt."),
+  }),
+});
+
+export const record_task_steering_refusal = defineAction({
+  name: "record_task_steering_refusal",
+  description: "Record one refused founder Task action with its canonical reason and derived founder-visible message.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object({
+    attempt_id: z.string().describe("Electron-generated UUID for this visible submit attempt."),
+    attempted_action: z.enum(["clarify", "redirect", "reassign", "cancel", "second_opinion"]).describe("Visible action the founder attempted."),
+    task_id: z.string().nullable().optional().describe("Optional original Task id, when the submit named one."),
+    reason_code: z.enum([
+      "TASK_NOT_FOUND", "TASK_NOT_OPEN", "ACTOR_NOT_DELEGATOR", "ASSIGNMENT_CARDINALITY",
+      "ASSIGNEE_NOT_RUNNING", "INSTRUCTION_EMPTY", "INSTRUCTION_TOO_LARGE",
+      "INSTRUCTION_CONTROL_BYTES", "REASSIGN_NOOP", "REASSIGN_TARGET_NOT_RUNNING",
+      "CRITIC_DEFINITION_UNAVAILABLE", "CRITIC_SESSION_AMBIGUOUS",
+      "SECOND_OPINION_ALREADY_OPEN", "CANCEL_ALREADY_FINAL",
+    ]).describe("Canonical Kernel refusal code."),
+  }),
+});
+
+export const record_task_cancel_outcome = defineAction({
+  name: "record_task_cancel_outcome",
+  description: "Record the one host outcome after an accepted Task cancellation, deriving the target from the cancellation event.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object({
+    accepted_event_id: z.string().describe("Kernel event id of the accepted task.cancelled event."),
+    outcome: z.enum(["runtime_stopped", "already_stopped", "stop_failed"]).describe("Governed host cancellation outcome."),
+    error_class: z.string().nullable().optional().describe("Non-secret error class when stop_failed; omitted for successful outcomes."),
+  }),
+});
+
+export const request_second_opinion = defineAction({
+  name: "request_second_opinion",
+  description: "Create exactly one open review Task assigned to a captured production Critic session for the original open Task.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object({
+    task_id: z.string().describe("Original open Task id to review."),
+    critic_session_id: z.string().describe("Running production hermes-critic session captured by the host."),
+  }),
+});
+
 export const create_connection = defineAction({
   name: "create_connection",
   description:

@@ -66,6 +66,7 @@ import { resolveLivePeerRecipient } from "./live-peer-recipient";
 import { livePtyIdsForRole } from "./peer-delivery";
 import { kernelSessionIdForNativePty } from "./host-native-tui";
 import { requireLiveSeatCapability } from "./live-seat-capability";
+import * as agentActivity from "./agent-activity";
 import { buildMissionActivationInstruction } from "./mission-activation";
 import { registerIntegrationsIpc } from "./integrations";
 import {
@@ -1148,6 +1149,19 @@ app.whenReady().then(async () => {
       return { output: await pty.captureSession(sessionId, 200) };
     },
     { description: "Capture a spawned proof tile's terminal output for the Windows gate." },
+  );
+  registerMethod(
+    "qf.session.capture",
+    async (params) => {
+      if (process.env.QF_UI_PROOF !== "1") throw new Error("Session runtime unavailable.");
+      if (!params || typeof params !== "object") throw new Error("Session runtime unavailable.");
+      const sessionId = (params as Record<string, unknown>).sessionId;
+      if (typeof sessionId !== "string" || sessionId.length === 0) throw new Error("Session runtime unavailable.");
+      const ptySessionId = agentActivity.getPtySessionId(sessionId);
+      if (!ptySessionId) throw new Error("Session runtime unavailable.");
+      return { output: await pty.captureSession(ptySessionId, 200) };
+    },
+    { description: "Proof-only capture of the owned PTY for one Kernel agent session." },
   );
   registerMethod(
     "qf.task_delegations.list",

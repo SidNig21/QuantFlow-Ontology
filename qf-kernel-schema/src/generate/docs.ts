@@ -61,6 +61,7 @@ export function generateDocs(schema: Schema): string {
     lines.push(`- **lifecycle:** \`${action.lifecycle}\``);
     if (action.operatorOnly === true) lines.push("- **operator-only:** `true`");
     if (action.pipelineOnly === true) lines.push("- **pipeline-only:** `true`");
+    if (action.internalOnly === true) lines.push("- **internal-only:** `true`");
     lines.push("- **input:**");
     lines.push(...propertyLines(action.input.shape));
     lines.push("");

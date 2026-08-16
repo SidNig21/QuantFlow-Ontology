@@ -103,9 +103,9 @@ type ActionLike = {
 
 /** Central schema policy for whether an action may be registered on the agent MCP surface. */
 export function isActionServedToAgents(
-  action: Pick<DefinedAction, "operatorOnly" | "pipelineOnly">,
+  action: Pick<DefinedAction, "operatorOnly" | "pipelineOnly" | "internalOnly">,
 ): boolean {
-  return action.operatorOnly !== true && action.pipelineOnly !== true;
+  return action.operatorOnly !== true && action.pipelineOnly !== true && action.internalOnly !== true;
 }
 
 /** Build MCP tools served to agents (reads + actions outside trusted-only boundaries). */
@@ -163,6 +163,7 @@ export function generateMcp(schema: Schema): string {
   }
 
   for (const action of schema.actions) {
+    if (action.internalOnly === true) continue;
     tools.push(actionToolForAction(action));
   }
 

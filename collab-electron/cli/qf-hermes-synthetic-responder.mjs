@@ -22,6 +22,7 @@ const ONTOLOGY_BRIDGE = process.env.QF_ONTOLOGY_MCP_PATH || process.argv[4];
 const MISSION_PREFIX = "QUANTFLOW_MISSION ";
 const SUPPRESS_BOUNDARY = process.env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY || "";
 const SELECTED_WORKER_DEFINITION = process.env.QF_HERMES_SYNTHETIC_SELECTED_DEFINITION || "hermes-worker";
+const STEERING_HOLD_FLAG = "QF_FOUNDER_STEERING_HOLD";
 
 function byteLength(value) {
   return Buffer.byteLength(value, "utf8");
@@ -31,6 +32,10 @@ function emit(fields) {
   process.stdout.write(`QF_SYNTHETIC ${Object.entries(fields)
     .map(([key, value]) => `${key}=${typeof value === "string" ? value.replace(/[\r\n ]/g, "_") : JSON.stringify(value)}`)
     .join(" ")}\n`);
+}
+
+function emitTerminalReceipt(line) {
+  process.stdout.write(`\u001b[2K\r${line}\r\n`);
 }
 
 function emitBoundary(boundary, fields = {}) {
@@ -48,7 +53,7 @@ function requireConfig() {
     ["QF_ONTOLOGY_MCP_PATH", ONTOLOGY_BRIDGE],
   ].filter(([, value]) => !value).map(([name]) => name);
   if (missing.length > 0) throw new Error(`synthetic Hermes config missing ${missing.join(",")}`);
-  if (!["orchestrator", "worker", "critic"].includes(ROLE)) {
+  if (!["orchestrator", "worker", "worker2", "critic"].includes(ROLE)) {
     throw new Error(`unsupported synthetic Hermes role: ${ROLE}`);
   }
 }
@@ -259,12 +264,59 @@ function parseTask(line) {
   return match ? { taskId: match[1], task: match[2] } : null;
 }
 
+function parseDelivery(line) {
+  if (!line.startsWith("{")) return null;
+  let value;
+  try { value = JSON.parse(line); } catch { return null; }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  if (value.contract === "qf.task.steering.v1" &&
+      typeof value.task_id === "string" &&
+      (value.mode === "clarify" || value.mode === "redirect") &&
+      typeof value.instruction === "string") return value;
+  if (value.contract === "qf.task.assignment.v1" &&
+      typeof value.task_id === "string" &&
+      typeof value.title === "string" &&
+      typeof value.instruction === "string") return value;
+  if (value.contract === "qf.task.second_opinion.v1" &&
+      typeof value.source_task_id === "string" &&
+      typeof value.review_task_id === "string" &&
+      typeof value.title === "string" &&
+      typeof value.instruction === "string") return value;
+  return null;
+}
+
+function emitDeliveryReceipt(delivery) {
+  const taskId = delivery.task_id ?? delivery.review_task_id;
+  const suffix = delivery.contract === "qf.task.second_opinion.v1"
+    ? ` source_task_id=${delivery.source_task_id} review_task_id=${delivery.review_task_id}`
+    : "";
+  process.stdout.write(`QF_SYNTHETIC delivery_received role=${ROLE} contract=${delivery.contract} task_id=${taskId}${suffix}\n`);
+  emitTerminalReceipt(`QF_SYNTHETIC delivery_ack role=${ROLE} task_id=${taskId}`);
+  if (delivery.contract === "qf.task.second_opinion.v1") {
+    emitTerminalReceipt(`QF_SYNTHETIC delivery_binding source_task_id=${delivery.source_task_id}`);
+    emitTerminalReceipt(`QF_SYNTHETIC delivery_binding review_task_id=${delivery.review_task_id}`);
+  }
+}
+
+async function consumeDeliveries(reader) {
+  while (!reader.closed) {
+    try {
+      const delivery = parseDelivery(cleanPtyLine(await reader.next()));
+      if (delivery) emitDeliveryReceipt(delivery);
+    } catch {
+      return;
+    }
+  }
+}
+
 async function nextReview(reader) {
   const values = {};
   let carry = "";
   const deadline = Date.now() + MCP_TIMEOUT_MS;
   while (Date.now() < deadline) {
     const line = cleanPtyLine(await reader.next(Math.max(1, deadline - Date.now())));
+    const delivery = parseDelivery(line);
+    if (delivery?.contract === "qf.task.second_opinion.v1") return { secondOpinion: delivery };
     carry = `${carry}\n${line}`.slice(-8_192);
     for (const field of ["hypothesis_id", "run_id", "artifact_id"]) {
       const match = new RegExp(`${field}=([A-Za-z0-9_-]{1,128})`).exec(carry);
@@ -325,10 +377,17 @@ export async function completeDirectorTurnAndWait(reader, missionId, emitComplet
 
 export { orchestrator };
 
-async function worker(reader, ontology, collaboration) {
+export async function worker(reader, ontology, collaboration) {
   emit({ boundary: "activation_wait", role: ROLE });
-  const task = await nextMatching(reader, parseTask);
+  const task = await nextWorkerActivation(reader);
   emitBoundary("activation_delivery", { role: ROLE, task_id: task.taskId });
+  void consumeDeliveries(reader);
+  if (task.delivery) emitDeliveryReceipt(task.delivery);
+  if (process.env[STEERING_HOLD_FLAG] === "1") {
+    emitTerminalReceipt(`QF_SYNTHETIC readiness=steering_hold task_id=${task.taskId}`);
+    await reader.waitForClose();
+    return;
+  }
   const ontologyTools = await ontology.listTools();
   const collaborationTools = await collaboration.listTools();
   requireTools(ontologyTools, ["qf_market_event_get", "qf_market_event_query"], "worker ontology");
@@ -390,6 +449,11 @@ async function worker(reader, ontology, collaboration) {
 
 async function critic(reader, ontology) {
   const ids = await nextReview(reader);
+  if (ids.secondOpinion) {
+    emitDeliveryReceipt(ids.secondOpinion);
+    await reader.waitForClose();
+    return;
+  }
   emitBoundary("activation_delivery", { role: ROLE, run_id: ids.run_id });
   const tools = await ontology.listTools();
   requireTools(tools, ["qf_hypothesis_get", "qf_run_get", "qf_artifact_get", "qf_record_evaluation"], "critic ontology");
@@ -422,6 +486,13 @@ async function critic(reader, ontology) {
   emit({ turn: "complete", role: ROLE, evaluation_id: evaluation.result.object_id });
 }
 
+export function selectRoleHandler(role) {
+  if (role === "orchestrator") return orchestrator;
+  if (role === "worker" || role === "worker2") return worker;
+  if (role === "critic") return critic;
+  throw new Error(`unsupported synthetic Hermes role: ${role}`);
+}
+
 async function nextMatching(reader, parser) {
   const deadline = Date.now() + MCP_TIMEOUT_MS;
   while (Date.now() < deadline) {
@@ -430,6 +501,16 @@ async function nextMatching(reader, parser) {
     if (parsed) return parsed;
   }
   throw new Error("synthetic Hermes activation timed out");
+}
+
+async function nextWorkerActivation(reader) {
+  return nextMatching(reader, (line) => {
+    const task = parseTask(line);
+    if (task) return { ...task, delivery: null };
+    const delivery = parseDelivery(line);
+    if (delivery?.contract !== "qf.task.assignment.v1") return null;
+    return { taskId: delivery.task_id, task: delivery.instruction, delivery };
+  });
 }
 
 function cleanPtyLine(line) {
@@ -455,9 +536,8 @@ async function run() {
   try {
     await ontology.start();
     await collaboration.start();
-    if (ROLE === "critic") await critic(reader, ontology);
-    else if (ROLE === "worker") await worker(reader, ontology, collaboration);
-    else await orchestrator(reader, ontology, collaboration);
+    const handler = selectRoleHandler(ROLE);
+    await handler(reader, ontology, collaboration);
   } finally {
     process.off("SIGTERM", releaseReader);
     process.off("SIGINT", releaseReader);
