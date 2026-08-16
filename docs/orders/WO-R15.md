@@ -1,221 +1,305 @@
 # WO-R15 — Governed critic review and publication gate
 
-status: drafted — adversarial Reader required before build
-assignee: builder after Reader PASS
+status: revised after adversarial Reader — reread required before build
+assignee: builder after Reader YES/YES PASS
 depends: R14 PASS at `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 rung: R15 — governed review
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
+reader-round-1: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; all defects below landed
 rework-cycle: 0 of 1 used
+R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
 ## In plain terms
 
-The founder sends completed research to an exact independent Hermes critic. The
-critic reads the real Hypothesis, Run, and result Artifact, scores them against
-one declared rubric, and records one Kernel Evaluation. A rejecting or
-inconclusive Evaluation visibly blocks Report publication and explains what can
-happen next. A supporting Evaluation allows exactly one linked Report. The
-founder can request a revision or route the same evidence to a second independent
-critic without erasing the first verdict.
+The founder clicks Request review on completed research. An exact independent
+Hermes critic reads the real Hypothesis, Run, and result Artifact, scores them
+with one strict rubric, and records one Kernel Evaluation. A rejecting or
+inconclusive Evaluation visibly blocks Report publication and offers revision
+or a second critic. A supporting Evaluation automatically permits exactly one
+linked Report. Earlier verdicts remain durable.
 
-## Outcome
+## Outcome and UI boundary
 
-Starting from one succeeded research Run with its exact Hypothesis, result
-Artifact, executor session, and R14 Task provenance:
+R15 adds one `Request review` control to the existing selected-source-Task
+research detail surface. It adds no canvas object, research-object tile, or full
+inspector. The control is enabled only when the selected Task resolves to one
+valid succeeded source-work tuple. Acceptance begins with a real Electron click
+through production preload and Main IPC; direct Kernel invocation does not
+satisfy the handoff proof.
 
-1. the founder requests review through the visible Task/research surface;
-2. QuantFlow admits an exact `hermes-critic` session and creates one durable
-   review Task linked to the source Task and Artifact;
-3. that critic reads the exact Hypothesis, Run, and Artifact through generated
-   read tools before it may record an Evaluation;
-4. the Kernel records the independent critic, strict rubric scores, verdict,
-   confidence, rationale, findings, and exact lineage;
-5. `rejects` or `inconclusive` leaves publication visibly blocked with the
-   Kernel reason and two actions: Request revision and Second critic;
-6. `supports` permits one Report tied to that Evaluation and no other; and
-7. all review, blocking, action, and publication facts survive close/reopen.
+The click must:
 
-This rung makes review and publication governance work. R16 owns dedicated
-canvas objects and full inspectors for every research object. R15 may add only
-the compact review/publication projection needed to understand and operate this
-gate.
+1. freeze the exact source-work tuple in one Kernel read transaction;
+2. admit an exact `hermes-critic` and create one durable review Task;
+3. deliver that tuple through the production runtime transport;
+4. require three exact successful reads before `qf_record_evaluation`;
+5. record one strict, independent Evaluation and terminal review-Task state;
+6. block or automatically publish according to the derived verdict; and
+7. preserve all visible and durable facts across full process close/reopen.
 
-## Fixed vocabulary
+R16 owns dedicated research-object tiles and full inspectors. R15 adds only the
+compact review/publication facts and actions required to operate this gate.
 
-- **source work** is one exact tuple of source Task, Hypothesis, succeeded Run,
-  result Artifact, and executor session. Every id is Kernel-derived; the
-  renderer or critic may not substitute one.
-- **exact critic** is one running `agent_session` with one `spawned_from` link
-  to production definition `hermes-critic`, whose definition has capability
-  `research.evaluate`, and whose id differs from the Run executor.
-- **review Task** is the durable Task created for that exact critic and linked
-  to both the source Task and result Artifact. A terminal prompt or canvas cable
-  without this Task is not a handoff.
-- **read** means successful calls by the exact critic to generated tools
-  `qf_hypothesis_get`, `qf_run_get`, and `qf_artifact_get` for the three exact
-  source ids. Main-process queries, fixture objects, or prompt text do not count.
-- **Ragas rubric** is this exact strict object of finite numbers from 0 through
-  1: `faithfulness`, `answer_relevancy`, `context_precision`, and
-  `context_recall`. No extra score key is accepted. `overall` is the arithmetic
-  mean calculated by the Kernel, not supplied by the critic.
-- **derived verdict** is `supports` only when all four rubric scores are at
-  least `0.80`; `rejects` when any score is below `0.50`; otherwise it is
-  `inconclusive`. A critic-supplied verdict that differs is rejected before any
-  Evaluation write.
-- **blocked publication** means no Report Artifact and no Report lineage link
-  exist, and the visible projection displays the Evaluation verdict, rationale,
-  Kernel refusal reason, and permitted next actions.
-- **published** means exactly one `report` Artifact exists whose publication
-  gate names the exact supporting Evaluation and source lineage. UI copy or an
-  unindexed file is not publication.
-- **visible** means rendered in the real Electron shell from Kernel projection.
-  Terminal output and direct SQLite reads are evidence Oracles, not visible UI.
+## Fixed vocabulary and invariants
 
-## Context pack
+### Source work
 
-Read only what the active role receives under `PROTOCOL.md`. The Builder must
-read `START_HERE.md`, `PROTOCOL.md`, this order, and the directly relevant R12,
-R14, Kernel Evaluation/Report, critic profile/tool-policy, task projection, and
-renderer files. Do not read chat handoffs or Builder reasoning.
+**source work** is the immutable tuple
+`(source_task_id, hypothesis_id, run_id, result_artifact_id, executor_session_id)`
+obtained in one Kernel read transaction. The Run is `succeeded`; its hypothesis
+and executor ids equal the tuple; its unique result link targets
+`result_artifact_id`; and the R14 provenance link connects `source_task_id` to
+that Run. Missing, multiple, or unequal members refuse activation before any
+critic session or review Task is created. The tuple is copied into the review
+Task and cannot be replaced by later renderer, Main, or critic input.
+
+### Exact critic and qualifying reads
+
+Critic identity is admitted `agent_session.id`. Admission requires exactly one
+`spawned_from` link to immutable production definition `hermes-critic`,
+capability `research.evaluate`, exactly these four ontology tools, and zero
+skills:
+
+- `qf_hypothesis_get`
+- `qf_run_get`
+- `qf_artifact_get`
+- `qf_record_evaluation`
+
+The critic receives no `qf_publish_artifact`, Task/Dataset/outcome mutation,
+betting, trading, shell, filesystem, browser, or broad ontology toolset. The
+session differs from the Run executor and every prior critic for the source
+work, and is `running` at admission and each invocation. Display identity comes
+only from the Kernel-projected definition.
+
+A qualifying tool receipt is emitted only by the production runtime tool broker
+and contains critic session id, review Task id, invocation id, tool name,
+canonical arguments, successful result, and broker sequence number. Successful
+exact-id Hypothesis, Run, and Artifact reads precede the successful Evaluation
+write. The Evaluation stores that record invocation id. Critic text,
+Main-generated receipts, failed calls, wrong ids/sessions, or post-write reads
+fail.
+
+### Review Task lifecycle
+
+A review Task is created `pending`, becomes `running` only after successful
+delivery, and becomes `completed` in the same Kernel transaction that commits
+its Evaluation binding. Critic exit or malformed output makes it `failed`;
+pre-delivery Kernel rejection records `refused`. Each durable receipt contains
+Task id, critic session id, attempt id, terminal state, stable reason code,
+message, and timestamp. Failed/refused paths create no Evaluation or Report.
+
+### Strict Ragas rubric
+
+Rubric input has exactly four own keys and no others: `faithfulness`,
+`answer_relevancy`, `context_precision`, and `context_recall`. Each is already a
+finite JSON number in inclusive range `[0,1]`. Strings, nulls, booleans, NaN,
+infinities, missing, inherited, or extra keys reject atomically. Thresholds use
+unrounded inputs. The Kernel computes `overall = sum / 4` and rejects a supplied
+`overall`.
+
+The derived verdict is:
+
+- `supports` only when every score is at least `0.80`;
+- `rejects` when any score is below `0.50`; and
+- `inconclusive` otherwise.
+
+A supplied verdict that differs rejects before any Evaluation write.
+`confidence` is a finite JSON number in `[0,1]`; `rationale` is non-empty after
+trimming; `findings_artifact_id` names an immutable non-empty Artifact linked to
+the Evaluation. Tests exercise every score individually at `0.49`, `0.50`,
+`0.79`, and `0.80`.
+
+Existing R11b execution metrics remain byte-for-byte under `run_metrics`; rubric
+scores never replace them. A pre-R15 Evaluation projects `rubric: null` and
+`overall: null`, preserves every old field, and renders `Rubric unavailable`
+with no invented numeric value or zero.
+
+### Publication
+
+Publication is an automatic Kernel-owned transition after committing
+`supports`; R15 adds no Publish button. Report payload is the exact bytes of the
+source result Artifact, copied through the Kernel publication command into one
+Artifact of kind `report`. Renderer- or critic-supplied content rejects. Report
+content hash equals source content hash, and Report row plus lineage commit
+atomically.
+
+Uniqueness is global per five-id source-work tuple. The first successful
+supporting Evaluation becomes immutable `publication_evaluation_id`. Retries
+return the same Report id/hash. Later supporting Evaluations remain durable but
+cannot replace the publication Evaluation or create another Report. Enforce
+this with a Kernel uniqueness constraint.
+
+For `rejects` and `inconclusive`, no Report bytes, row, or link exist. Visible
+state displays critic name, four scores, overall, verdict, rationale, exact
+Kernel block reason, `PUBLICATION BLOCKED`, and both next actions. Supporting
+state displays `PUBLISHED`, Report id, and content hash. No state claims a bet,
+wager, order, or trade occurred.
+
+### Full close/reopen
+
+**close/reopen** means closing the Electron window, terminating Main and all
+children, closing every Kernel/database handle, launching a new process against
+the same isolated root without reinjecting fixtures, navigating through
+production UI to the source Task, and recapturing facts. Renderer reload alone
+does not count.
 
 ## Deliverables
 
-### A — Critic read authority is explicit and least-privilege
+### A — Least-privilege production critic policy
 
-1. The production `hermes-critic` launch policy exposes the three exact read
-   tools plus `qf_record_evaluation`.
-2. It does not expose `qf_publish_artifact`, Task mutation, Dataset mutation,
-   outcome observation, betting, trading, shell, filesystem, or browser tools.
-3. Keep `0 skills`. Do not grant a broad ontology toolset to obtain four names.
-4. A focused policy test proves the exact allowlist and fails if any required
-   read disappears or any forbidden write appears.
+Bind the exact policy above to production `hermes-critic`. A focused policy
+test fails for any missing required tool, any fifth ontology tool, any skill, or
+resolution from a non-production definition.
 
-### B — One real handoff causes critic work
+### B — One visible handoff causes critic work
 
-1. Reuse R14's governed Second-opinion/review Task path; do not create a second
-   review transport or truth store.
-2. The activation envelope names the review Task, source Task, Hypothesis, Run,
-   and result Artifact ids. Main derives every id from Kernel lineage.
-3. The exact critic must emit independently captured tool-call receipts for all
-   three reads and `record_evaluation`. An Evaluation inserted by the gate or
-   main on the critic's behalf fails.
-4. The review Task becomes complete only after the Evaluation write succeeds.
-   Critic exit, malformed output, or rejected Evaluation leaves an explicit
-   failed/refused delivery receipt and no Report.
+Reuse R14's governed review-Task transport and truth store. Main freezes source
+work, sends its exact ids, and records broker receipts. The critic itself must
+perform all reads and `record_evaluation`; the gate/Main may not write an
+Evaluation on its behalf. Review-Task lifecycle follows the fixed contract.
 
-### C — Strict rubric and Kernel Evaluation
+### C — Kernel Evaluation and migration
 
-1. Extend `record_evaluation` with the strict Ragas rubric defined above. The
-   Kernel calculates `overall` and validates the derived verdict atomically.
-2. Preserve the existing R11b Run metrics under a distinct `run_metrics` field;
-   rubric scores may not overwrite or masquerade as execution metrics.
-3. Kernel lineage still requires a succeeded Run, its exact result Artifact,
-   independent admitted critic, durable findings, and no self-review.
-4. Evaluation projection exposes critic identity, all four scores, overall,
-   verdict, confidence, rationale, findings reference, and source ids.
-5. Schema migration and reopen preserve older Evaluations without inventing
-   rubric values. Legacy rows project rubric as unavailable, never as zeros.
+Extend `record_evaluation`, schema, migration, and projections with the strict
+rubric, broker invocation binding, findings Artifact, distinct `run_metrics`,
+derived verdict, and legacy-null behavior. Preserve independent admitted-critic,
+succeeded-Run, exact-result, durable-findings, and no-self-review laws.
 
-### D — Publication is visibly governed
+### D — Visibly governed publication
 
-1. Report publication remains Kernel-owned and accepts only the exact
-   supporting Evaluation for the source work.
-2. `rejects` and `inconclusive` each produce no Report bytes, row, or link.
-3. `supports` publishes exactly one Report. Replay is idempotent and cannot
-   select another Run, Artifact, critic, or Evaluation.
-4. The compact visible projection shows `REVIEW`, exact critic display name,
-   rubric scores, verdict, rationale, and `PUBLICATION BLOCKED` or `PUBLISHED`.
-5. Blocked copy names the Kernel reason and shows Request revision and Second
-   critic. Published state shows the Report Artifact id/content hash. It does
-   not claim a bet, wager, order, or trade was placed.
+Implement automatic publication and uniqueness exactly as defined. The compact
+projection appears on the existing source-Task detail surface and is derived
+only from Kernel truth. A renderer-only verdict, unindexed file, or report with
+the wrong bytes/hash/evaluation is a failure.
 
-### E — Rejection has two governed next actions
+### E — Non-supporting Evaluation has two governed next actions
 
-1. **Request revision** creates one new durable revision Task assigned to the
-   original executor session, linked to the source Task, rejected Evaluation,
-   and result Artifact. It preserves the rejected Evaluation and original Run.
-   If that executor is not running, the action refuses before writing and says
-   to reassign or recruit a replacement.
-2. **Second critic** admits a new session from the same production
-   `hermes-critic` definition, creates a distinct review Task over the same
-   source work, and forbids reuse of either the executor or first critic.
-3. Repeated clicks are idempotent by attempt id: no duplicate revision Task,
-   critic session, review Task, Evaluation, or Report.
-4. A later supporting second Evaluation may publish; it does not delete,
-   rewrite, or hide the first rejection.
+Both `rejects` and `inconclusive` show and support:
 
-### F — Persistence, cleanup, and prior behavior
+1. **Request revision.** Create one new durable revision Task assigned to the
+   original executor and linked to source Task, triggering non-supporting
+   Evaluation, and result Artifact. Preserve the original Run and Evaluation.
+   If the executor is not `running`, create no Task, session, Artifact,
+   Evaluation, Report, or lineage; write only idempotent refusal
+   `ORIGINAL_EXECUTOR_NOT_RUNNING` with UI text
+   `Reassign this work or recruit a replacement before requesting revision.`
+2. **Second critic.** Admit a new production critic session unequal to executor
+   and every prior critic, plus a distinct assigned review Task containing the
+   immutable tuple. Admission/launch failure commits neither session nor Task,
+   only the standard refusal receipt.
 
-1. Close/reopen preserves the exact Evaluation(s), review/revision Tasks,
-   publication state, visible rubric facts, and lineage.
-2. Every gate-owned process and temporary root is baselined, drained, freshly
-   measured, and printed after cleanup. Any residue fails before PASS.
-3. R14 Director delegation and founder steering remain green. Normal workers
-   still complete work; R14's QA-only hold does not leak into R15 production.
-4. The Kernel remains the sole writer. No renderer database access, mock
-   main/preload handler, direct `execute()` proof shortcut, or second store.
+Main creates one UUID attempt id for the first accepted UI action and reuses it
+for retries. Persisted idempotency key is
+`(action_kind, source_work, triggering_evaluation_id, attempt_id)`; Revision and
+Second critic have separate namespaces. Concurrent and post-reopen repeats
+return the original result/refusal without another launch/domain write. A new
+attempt id is a new founder request. Duplicate attempts suppress only objects
+attributable to that duplicate, not unrelated later critic work.
+
+A later supporting second Evaluation may publish but never deletes, rewrites,
+or hides the first non-supporting Evaluation.
+
+### F — Persistence, sole writer, and cleanup
+
+Full close/reopen preserves Evaluations, review/revision Tasks, publication
+state, rubric facts, actions, and lineage. The Kernel is sole writer: no renderer
+database access, mock Main/preload handler, direct `execute()` proof shortcut,
+or second store. R14 delegation/steering stay green and its QA hold never affects
+normal workers.
+
+Before launch, an independent cleanup checker records every allocated root,
+launch PID/creation time, complete descendant tree, and complete config/auth
+manifest resolved by the production Hermes launcher, including existence bits
+and hashes. Every success, failure, and timeout path re-enumerates the same
+targets. PASS requires all allocated roots absent, all descendants exited, and
+identical manifests. Print literal paths, PIDs, creation times, hashes, and zero
+residue counts; a product summary boolean is not evidence. Timeout begins before
+launch and ends only after assertions and cleanup. At 180/240 seconds, mark red,
+terminate the full owned tree, run the same checker, and print timeout phase.
 
 ## Product gates
 
-Add `qa/gates/governed-review.ts`, focused pure/unit tests, and register only the
-product gate in `qa/run.ts`.
+Add and register exactly `governed-review` and `governed-review-live` in
+`qa/run.ts`; register no other new gate.
 
-The product gate uses one isolated Kernel/app root and the real Electron
-renderer→preload→main→Kernel path. It may use checked-in deterministic worker and
-critic responders for exhaustive boundary falsification, but it must exercise
-the production profiles, admission, tool policies, generated read tools,
-runtime delivery, Evaluation write, and Report gate. It must complete within
-180 seconds and print a measured cleanup line.
+Both proofs begin with the same production Electron `Request review` click and
+traverse identical preload, Main activation, admission, runtime delivery,
+broker, and Kernel-write seams. The deterministic proof substitutes only the
+responder behind the admitted production transport; the live proof substitutes
+nothing.
 
-Add one bounded `governed-review-live` proof using a real launched
-`hermes-critic` profile against a deterministic isolated source-work fixture.
-The real critic must call the three read tools and `qf_record_evaluation`; main
-or the gate may not synthesize its Evaluation. It runs once with a 240-second
-limit, preserves global Hermes config/auth hashes, performs no package build,
-and prints exact ids, tool receipts, verdict, and cleanup. Authentication or
-model unavailability is a red environmental receipt, not permission to replace
-the real critic with a fake.
+`governed-review` has a 180-second total limit and allocates three distinct
+temporary Kernel/app roots, one each for `rejects`, `inconclusive`, and direct
+`supports`. No database, process, session, Task, fixture id, renderer state, or
+expected-facts object is reused across roots. Both non-supporting fixtures prove
+zero Report bytes/rows/links, exact Kernel block reason, both actions,
+publication refusal, and full reopen. The supports fixture proves exact
+Evaluation and one automatic Report without revision.
 
-The deterministic product gate must prove both branches in separate isolated
-fixtures:
+Before app launch, build an immutable expected manifest from literal fixture ids
+and expected transitions. Compare it independently with (a) SQLite read-only
+after writes stop and (b) Electron DOM. Expectations may not derive from
+SQLite, Kernel projection, renderer state, or implementation output. Durable
+facts include every Evaluation field; every review/revision Task id, kind,
+assignee, status, attempt id, and link; every Report id, kind, hash, publication
+Evaluation, source id, and lineage edge. DOM facts include critic identity,
+four scores, overall, verdict, rationale, block reason, actions, publication
+state, Report id, and hash. Missing, extra, reordered, or unequal facts fail.
 
-- rejection: no Report, visible block, revision Task, distinct second critic,
-  later supporting Evaluation, then exactly one Report; and
-- direct support: exact Evaluation and exactly one Report without revision.
+`governed-review-live` has a 240-second total limit and uses one real launched
+production `hermes-critic` against an isolated deterministic source-work
+fixture. Before the positive review, dispatch `qf_publish_artifact` through the
+same production broker using that admitted critic principal; it must be denied
+and create zero Report bytes/rows/links. Live PASS then requires broker-recorded
+successful exact reads followed by successful `qf_record_evaluation`, with the
+Oracle finding the Evaluation bound to those invocation ids. Authentication or
+model unavailability is red, never permission to substitute a fake. Global
+Hermes config/auth manifests must be identical before/after.
 
-The independent SQLite Oracle reads only the isolated gate database and compares
-the complete ordered Evaluation/Task/Artifact/link facts with separate visible
-DOM facts. Direct database reads never cause writes or stand in for UI.
+Add `qa/gates/governed-review.test.ts` to prove gate parsing, independent
+manifest comparison, timeout propagation, and measured cleanup. A failed
+assertion, skipped branch, timeout, or residue must produce nonzero exit.
 
 ## Required falsifiers
 
-Each named falsifier must make `governed-review` red, then the restored source
-must make it green. Record both outputs.
+Each mutation changes the named production boundary, not assertions,
+expectations, timeout, or fixture identity. Unchanged gates must go red, then
+exact restoration must go green:
 
-1. Remove one critic read tool from the production allowlist.
-2. Bind the Run executor as critic.
-3. Substitute a different Run or Artifact after activation.
-4. Supply a verdict inconsistent with the strict rubric threshold.
-5. Attempt Report publication from `rejects` or `inconclusive`.
-6. Render a verdict with no Kernel Evaluation.
-7. Make Request revision create no durable linked Task.
-8. Reuse the first critic for Second critic.
-9. Delete one visible rubric or publication fact after reopen.
-10. Leave one owned process or gate root after cleanup.
+1. omit one required critic tool;
+2. add a fifth critic ontology tool;
+3. make independence admit executor-as-critic;
+4. trust post-activation caller Run/Artifact ids;
+5. trust critic-supplied verdict;
+6. let a non-supporting Evaluation publish;
+7. show a transport verdict without Kernel Evaluation;
+8. accept critic-authored read receipts;
+9. complete review Task before Evaluation commit;
+10. return revision success without durable Task;
+11. reuse the first critic;
+12. omit one persisted visible fact on reopen;
+13. accept invalid rubric or wrong `overall`;
+14. overwrite `run_metrics` or invent legacy zeros;
+15. remove Report uniqueness and replay concurrently;
+16. write domain state during offline revision refusal;
+17. remove attempt-id uniqueness;
+18. modify resolved Hermes config/auth;
+19. leak one known child/root while checker remains unchanged; and
+20. leak R14 QA hold into a normal worker.
 
-No falsifier may edit an assertion, expected output, timeout, or fixture
-identity. Plant the defect in the named product boundary, observe red, restore
-the exact source, observe green.
+Record every red and restored-green output. No falsifier may alter the gate,
+assertion, expected manifest, timeout, or fixture identity.
 
-## Builder acceptance matrix
+## Literal Builder matrix
 
-Run only focused commands. Do not run package, installer, `verify-release`, or
-soak suites.
+Run every command once after final repair state. No package, installer,
+`verify-release`, or soak command is authorized.
 
 ```text
 cd collab-electron
-bun test <exact critic-policy, review-IPC, projection, and renderer test files added or changed by this order>
+bun test cli/qf-hermes-synthetic-responder.test.ts src/main/governed-review.test.ts src/main/ontology-role-tools.test.ts src/windows/shell/src/task-composition.test.ts
 cd ..
-bun test <exact Kernel/schema tests added or changed by this order>
+bun test packages/qf-kernel/src/r12-independent-critic.test.ts packages/qf-kernel/src/r15-governed-review.test.ts qf-kernel-schema/src/generate.test.ts
 bun test qa/gates/governed-review.test.ts
 bun qa/run.ts governed-review
 bun qa/run.ts governed-review-live
@@ -228,38 +312,40 @@ bun qa/run.ts one-skin
 bun qa/run.ts doc-links
 bun qa/run.ts rung-ladder
 git diff --check
-git diff --check "<candidate>^" "<candidate>"
+git diff --check 0c53d00071c1b685ef090526f02ad97233be3274 HEAD
 ```
 
-Before implementation, the Builder replaces angle-bracket test placeholders in
-its receipt with the exact files it changed. It may not omit a changed focused
-test. Every command is invoked once after the final repair state; any red stops
-that matrix and is diagnosed under the founder's standing in-scope authority.
+If implementation affects another existing focused contract, append its literal
+test path to the relevant `bun test` command before the final matrix and record
+that order edit in the candidate. Do not omit a changed focused test. Any red
+stops that matrix and is diagnosed under standing in-scope authority.
 
 ## Verifier acceptance
 
-A fresh independent Verifier uses the immutable candidate SHA, clean checkout,
-and same matrix once. It also inspects the critic's exact tool allowlist,
-independence, read receipts, rubric derivation, blocked/published side effects,
-revision/second-critic behavior, visible/durable equality, real-Hermes receipt,
-and measured cleanup. It writes `docs/orders/evidence/r15/VERIFICATION.md` only
-after PASS.
+Builder and Verifier use the founder's single checkout; no throwaway worktree or
+package/release gate. A fresh different-model Verifier records
+`git rev-parse HEAD`, `git status --porcelain`, process/root baseline, and
+upstream parity before and after. It edits nothing and requires identical SHA,
+clean status, and no new residue.
+
+The Verifier runs the literal matrix once and records for every named inspection
+the machine receipt, expected predicate, observed value, and PASS/FAIL. Prose
+inspection alone cannot satisfy tool policy, identity, broker receipts, rubric,
+side effects, actions, DOM/SQLite equality, live proof, or cleanup. It writes
+`docs/orders/evidence/r15/VERIFICATION.md` only after PASS.
 
 ## Out of scope
 
-- Dedicated R16 canvas tiles/inspectors for every research object.
-- Strategy/Technique versions or operator-supplied outcome grading.
-- Recall, embeddings, vector stores, PufferLib, policy promotion, or harness
-  learning.
-- Cross-species panel review; R15 proves independent governed review with exact
-  production Hermes critics.
-- Any bet, wager, order, trade, wallet, account, or execution-provider action.
+- Dedicated R16 canvas tiles/inspectors for each research object.
+- Strategy/Technique, operator outcome grading, recall, vector stores,
+  PufferLib, policy promotion, or harness learning.
+- Cross-species panel review; R15 proves exact production Hermes critics.
+- Any bet, wager, order, trade, wallet, account, or execution action.
 - Package, installer, release, signing, upload, or founder-global Hermes
-  configuration changes.
+  configuration mutation.
 
 ## Stop conditions
 
-Stop and return to the router only if an acceptance criterion itself must
-change, a required repair crosses this order's explicit scope, or real Hermes
-cannot run after one bounded attempt. In-scope implementation defects do not
-require another founder prompt. No R16 implementation begins from this order.
+Stop only if an acceptance criterion must change, repair crosses this explicit
+scope, or real Hermes cannot run after one bounded attempt. In-scope defects do
+not require a founder prompt. No R16 implementation begins from this order.
