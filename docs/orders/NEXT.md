@@ -1,6 +1,6 @@
 # NEXT — WO-RD-3 founder steering
 
-status: BUILDER DOOR CLOSED — WO-RD-3 REWRITE AWAITS READER
+status: AUTHORIZED WO-RD-3 REWRITE — FINAL BUILDER DOOR OPEN
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-RD-3](WO-RD-3.md)
@@ -10,6 +10,7 @@ reader-receipt: task `01a007d7-e59d-79d2-bf68-ed832015b6b1` — PASS at order co
 rework-receipt: first Builder stopped before matrix/commit because it called nonexistent app RPC `qf:spawnSession`; Rework 1 binds setup to existing `qf.dock.spawn`
 final-rework-receipt: Rework 1 used the 5-second RPC default inside a retry loop while synthetic admission may take 10 seconds; Rework 2 makes one call with 20-second timeout, then polls only the returned session
 rewrite-diagnosis: task `01a007fb-99ca-7561-910d-7ff0e0c76370` proved the checked-in synthetic responder rejects production role `worker2` before readiness
+rewrite-reader-receipt: task `01a007fe-f6a4-77e1-b270-1a522b52a1b4` — PASS at order commit `420a381`
 
 ## Authorized outcome
 
@@ -19,9 +20,13 @@ refusal is visible from Kernel truth; exact runtime delivery is receipted.
 
 ## Builder instructions
 
-No Builder is authorized until a fresh Reader passes the appended REWRITE.
-After that pass, the router will reopen this door with the exact Builder
-instructions. Preserve the current uncommitted product edits.
+Read `START_HERE.md`, `docs/orders/PROTOCOL.md`,
+`docs/orders/AUTONOMY.md`, this file, and the full `docs/orders/WO-RD-3.md`.
+Execute the appended REWRITE and unchanged order exactly in this checkout on
+branch `wo-V2-3`, preserving the current uncommitted product edits. This is the
+single rewritten Builder lap: any red command stops with no rework. Do not
+create another checkout, package/release run, soak, helper framework, or R15
+work. Commit and push a green candidate; do not merge or self-verify.
 
 ## Stop
 

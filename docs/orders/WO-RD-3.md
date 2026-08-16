@@ -1,11 +1,11 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: rewritten — fresh Reader required before Builder
+status: rewritten — authorized for one fresh Builder
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
-authorization: founder umbrella goal 2026-08-15; fresh Reader `01a007d7-e59d-79d2-bf68-ed832015b6b1` returned PASS at `bdefeb4`
-rework-cycle: 2 of 2 exhausted; rewrite-cycle: 0 of 1
+authorization: founder umbrella goal 2026-08-15; initial Reader `01a007d7-e59d-79d2-bf68-ed832015b6b1` PASS at `bdefeb4`; rewrite Reader `01a007fe-f6a4-77e1-b270-1a522b52a1b4` PASS at `420a381`
+rework-cycle: 2 of 2 exhausted; rewrite-cycle: 1 of 1 — no later lap
 
 ## Objective
 
