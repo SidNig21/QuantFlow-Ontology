@@ -1,6 +1,6 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: rewritten — authorized for one fresh Builder
+status: blocked — rewritten lap red; founder decision required
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
@@ -345,3 +345,38 @@ delivery/cancel trusted host receipts instead of child state, repeated cancel
 lacked a pre-click snapshot, cleanup text was hard-coded, falsifier commands
 were unnamed, and the worker2 test could have bypassed production dispatch.
 These findings are now order requirements, not chat guidance.
+
+## Rewritten Builder result — STOP
+
+Fresh rewritten Builder task `01a00806-7a19-79a2-895f-713aa6f99596`
+completed the role-complete responder, focused selector test, child
+acknowledgement/capture seams, and stronger Oracle/cancel/cleanup gate code in
+the preserved working tree. The exact selector/unit commands were green. Its
+first live `bun qa/run.ts founder-steering` exited 1 before a named assertion:
+
+```text
+Script failed to execute...
+```
+
+Per the rewrite contract it ran no matrix, falsifier lap, commit, push, merge,
+or R15 work. Cleanup was attempted but no final measured cleanup ledger printed.
+
+Read-only diagnostic task `01a0080d-bba5-74a0-b10b-6175907da68d` traced a
+proven gate synchronization defect:
+
+- `clickTaskButton` throws when the requested tile button is absent;
+- the gate waits only for the Kernel Task row before its first `Clarify` click;
+- renderer Task projection is asynchronous, so Kernel-green can precede the
+  `.canvas-tile`/button DOM;
+- the later form/chooser expressions carry the same projection-refresh race.
+
+The smallest correction is gate-only: make visible button/form/chooser actions
+retry through the existing bounded `waitFor`, returning `null/not ready` when
+the DOM has not projected yet instead of throwing. For each action, click and
+submit/select in one renderer evaluation so a periodic Task-foot refresh cannot
+erase the intermediate form. This changes no product code, assertion, timeout,
+fixture, Kernel semantics, or acceptance criterion.
+
+No further Builder lap is authorized. The uncommitted product/gate edits remain
+preserved in this checkout for a founder-authorized gate-only synchronization
+pass.

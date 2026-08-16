@@ -1,6 +1,6 @@
 # NEXT — WO-RD-3 founder steering
 
-status: AUTHORIZED WO-RD-3 REWRITE — FINAL BUILDER DOOR OPEN
+status: BLOCKED — WO-RD-3 REWRITE RED; BUILDER DOOR CLOSED
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-RD-3](WO-RD-3.md)
@@ -11,6 +11,8 @@ rework-receipt: first Builder stopped before matrix/commit because it called non
 final-rework-receipt: Rework 1 used the 5-second RPC default inside a retry loop while synthetic admission may take 10 seconds; Rework 2 makes one call with 20-second timeout, then polls only the returned session
 rewrite-diagnosis: task `01a007fb-99ca-7561-910d-7ff0e0c76370` proved the checked-in synthetic responder rejects production role `worker2` before readiness
 rewrite-reader-receipt: task `01a007fe-f6a4-77e1-b270-1a522b52a1b4` — PASS at order commit `420a381`
+rewrite-builder-receipt: task `01a00806-7a19-79a2-895f-713aa6f99596` — selector/unit green, live gate red before named assertion, no commit/push
+renderer-diagnosis: task `01a0080d-bba5-74a0-b10b-6175907da68d` — gate throws before asynchronous Task projection; gate-only bounded synchronization required
 
 ## Authorized outcome
 
@@ -20,13 +22,10 @@ refusal is visible from Kernel truth; exact runtime delivery is receipted.
 
 ## Builder instructions
 
-Read `START_HERE.md`, `docs/orders/PROTOCOL.md`,
-`docs/orders/AUTONOMY.md`, this file, and the full `docs/orders/WO-RD-3.md`.
-Execute the appended REWRITE and unchanged order exactly in this checkout on
-branch `wo-V2-3`, preserving the current uncommitted product edits. This is the
-single rewritten Builder lap: any red command stops with no rework. Do not
-create another checkout, package/release run, soak, helper framework, or R15
-work. Commit and push a green candidate; do not merge or self-verify.
+No Builder is authorized. Preserve the current uncommitted product/gate edits.
+Founder authorization is required for the gate-only bounded DOM synchronization
+described in WO-RD-3's final STOP record. No product assertion, timeout, fixture,
+or semantic change is proposed.
 
 ## Stop
 
