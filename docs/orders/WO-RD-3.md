@@ -1,11 +1,11 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: rework — one Builder correction authorized
+status: rework — final Builder correction authorized
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
 authorization: founder umbrella goal 2026-08-15; fresh Reader `01a007d7-e59d-79d2-bf68-ed832015b6b1` returned PASS at `bdefeb4`
-rework-cycle: 1 of 2
+rework-cycle: 2 of 2 — exhausted after this candidate
 
 ## Objective
 
@@ -133,7 +133,7 @@ In exactly two launches against the same isolated Kernel it must:
 1. On launch one, submit through the visible Research Director form. The synthetic Director uses the real generated discovery/spawn/collaboration tools to create the specialist and original Task; no domain row is seeded after launch.
 2. accept one Clarify and prove Task description unchanged, exact instruction delivered, accepted/delivered receipts present, and visible history equals Kernel;
 3. accept one Redirect and prove Task description changed exactly once, previous value retained in receipt, exact instruction delivered, and visible history equals Kernel;
-4. create the second specialist as gate setup through the existing app RPC `qf.dock.spawn` with `{ definitionId: "hermes-worker-2" }`. This is the same definition-backed admission used by the Dock and is not evidence for any claimed founder control. Require its returned exact session id, one `spawned_from` link to `hermes-worker-2`, and `running` state before using the visible `Reassign` control; then prove the new exact runtime received the current Task description while both tiles project Kernel truth;
+4. create the second specialist as gate setup through exactly one call to existing app RPC `qf.dock.spawn` with `{ definitionId: "hermes-worker-2" }` and explicit RPC timeout `20_000` ms. Never put the spawn call inside a retry/poll loop: the shared RPC helper defaults to 5 seconds while synthetic Hermes launcher readiness may take 10 seconds, so abandoning and repeating the call can create half-observed seats. This is the same definition-backed admission used by the Dock and is not evidence for any claimed founder control. After the one call returns, poll only the returned exact session id until it has one `spawned_from` link to `hermes-worker-2` and `running` state; then use the visible `Reassign` control and prove the new exact runtime received the current Task description while both tiles project Kernel truth;
 5. request one second opinion and prove exactly one `hermes-critic` session plus one linked open review Task and exact delivery;
 6. cancel the original Task and prove the Task is durable, the assigned live runtime stopped, and all history remains visible;
 7. click `Cancel` again and require exactly `CANCEL_ALREADY_FINAL`, its exact visible message, one Kernel refusal receipt, and zero Task/link/session change from the pre-click snapshot;
@@ -255,3 +255,21 @@ falsifier, time limit, cleanup condition, and matrix command. This is Rework 1;
 if the same second-specialist assertion is red again after this correction, or
 any other assertion repeats red after its one correction, stop for router
 decision. No R15 work begins.
+
+## Rework 2 — wait for the one admission already in flight
+
+Rework 1 corrected the method name, but the gate left `qf.dock.spawn` inside
+`waitFor` and used `rpcCall`'s 5,000 ms default. The exact receipt was:
+
+```text
+second specialist timed out: RPC timeout: qf.dock.spawn
+```
+
+The measured synthetic Hermes admission boundary may wait 10,000 ms in
+`host-native-tui.ts`; a 5,000 ms client timeout abandons the response while the
+server continues the admission, and the outer retry can start another one.
+Rework exactly Deliverable F step 4: one RPC call, explicit 20,000 ms timeout,
+then read-only polling of only the returned session id. Do not change the
+120-second whole-gate budget, any product behavior, assertion, falsifier,
+cleanup rule, or matrix command. This is the final rework cycle. Any red receipt
+after this correction stops WO-RD-3 with no further lap.
