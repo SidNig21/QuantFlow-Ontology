@@ -1,11 +1,11 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: open — authorized for Builder
+status: rework — one Builder correction authorized
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
 authorization: founder umbrella goal 2026-08-15; fresh Reader `01a007d7-e59d-79d2-bf68-ed832015b6b1` returned PASS at `bdefeb4`
-rework-cycle: 0 of 2
+rework-cycle: 1 of 2
 
 ## Objective
 
@@ -133,7 +133,7 @@ In exactly two launches against the same isolated Kernel it must:
 1. On launch one, submit through the visible Research Director form. The synthetic Director uses the real generated discovery/spawn/collaboration tools to create the specialist and original Task; no domain row is seeded after launch.
 2. accept one Clarify and prove Task description unchanged, exact instruction delivered, accepted/delivered receipts present, and visible history equals Kernel;
 3. accept one Redirect and prove Task description changed exactly once, previous value retained in receipt, exact instruction delivered, and visible history equals Kernel;
-4. reassign to a second running specialist and prove the new exact runtime received the current Task description while both tiles project Kernel truth;
+4. create the second specialist as gate setup through the existing app RPC `qf.dock.spawn` with `{ definitionId: "hermes-worker-2" }`. This is the same definition-backed admission used by the Dock and is not evidence for any claimed founder control. Require its returned exact session id, one `spawned_from` link to `hermes-worker-2`, and `running` state before using the visible `Reassign` control; then prove the new exact runtime received the current Task description while both tiles project Kernel truth;
 5. request one second opinion and prove exactly one `hermes-critic` session plus one linked open review Task and exact delivery;
 6. cancel the original Task and prove the Task is durable, the assigned live runtime stopped, and all history remains visible;
 7. click `Cancel` again and require exactly `CANCEL_ALREADY_FINAL`, its exact visible message, one Kernel refusal receipt, and zero Task/link/session change from the pre-click snapshot;
@@ -235,3 +235,23 @@ Return only:
 5. exact accepted/refused Kernel ledger plus UI-equality and delivery targets;
 6. process/root cleanup receipt;
 7. remaining limits, especially anything deferred to R15.
+
+## Rework 1 — exact second-specialist admission route
+
+Builder lap `01a007df-8512-7d20-96ca-bad1abbbbed9` stopped before the matrix,
+commit, or push after the same setup assertion stayed red twice. Its final
+receipt was:
+
+```text
+second specialist timed out: Method not found: qf:spawnSession
+```
+
+The order had required a second running specialist but did not name its gate
+setup boundary. The live app RPC is `qf.dock.spawn`, registered in
+`collab-electron/src/main/index.ts`; `qf:spawnSession` is an IPC/preload name and
+is not an app RPC. Rework only the setup call to the exact route and assertions
+now stated in Deliverable F step 4. Preserve every product edit, assertion,
+falsifier, time limit, cleanup condition, and matrix command. This is Rework 1;
+if the same second-specialist assertion is red again after this correction, or
+any other assertion repeats red after its one correction, stop for router
+decision. No R15 work begins.
