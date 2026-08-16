@@ -296,16 +296,6 @@ contextBridge.exposeInMainWorld("shellApi", {
     ipcRenderer.send("analytics:track-event", name, properties);
   },
 
-  // Integrations
-  getAgents: () =>
-    ipcRenderer.invoke("integrations:get-agents"),
-  installSkill: (agentId: string) =>
-    ipcRenderer.invoke("integrations:install-skill", agentId),
-  hasOfferedPlugin: () =>
-    ipcRenderer.invoke("integrations:has-offered-plugin"),
-  markPluginOffered: () =>
-    ipcRenderer.invoke("integrations:mark-plugin-offered"),
-
   getHomePath: (): string => ipcRenderer.sendSync("get-home-path"),
 
   ptyKillSession: (sessionId: string): Promise<void> =>

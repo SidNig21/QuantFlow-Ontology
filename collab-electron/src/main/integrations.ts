@@ -8,7 +8,6 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { QF_APP_ROOT } from "./paths";
 import { execSync } from "node:child_process";
 
 export type AgentId = "claude" | "codex" | "gemini";
@@ -133,22 +132,6 @@ export function uninstallSkill(id: AgentId): void {
   if (existsSync(target)) rmSync(target);
 }
 
-// -- plugin offered marker --
-
-function markerPath(): string {
-  return join(QF_APP_ROOT, "canvas-plugin-offered");
-}
-
-export function hasOfferedPlugin(): boolean {
-  return existsSync(markerPath());
-}
-
-export function markPluginOffered(): void {
-  const dir = QF_APP_ROOT;
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(markerPath(), new Date().toISOString(), "utf-8");
-}
-
 // -- IPC --
 
 export function getAgentStatuses(): AgentStatus[] {
@@ -204,13 +187,4 @@ export function registerIntegrationsIpc(): void {
       }
     },
   );
-
-  ipcMain.handle("integrations:has-offered-plugin", () =>
-    hasOfferedPlugin(),
-  );
-
-  ipcMain.handle("integrations:mark-plugin-offered", () => {
-    markPluginOffered();
-    return { ok: true };
-  });
 }

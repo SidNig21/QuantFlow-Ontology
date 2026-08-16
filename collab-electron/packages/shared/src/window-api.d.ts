@@ -488,8 +488,6 @@ export interface CollabApi {
   getAgents: () => Promise<AgentInfo[]>;
   installSkill: (agentId: string) => Promise<SkillResult>;
   uninstallSkill: (agentId: string) => Promise<SkillResult>;
-  hasOfferedPlugin: () => Promise<boolean>;
-  markPluginOffered: () => Promise<{ ok: boolean }>;
 
   // Agent activity
   onAgentEvent: (cb: (event: AgentEvent) => void) => Unsubscribe;

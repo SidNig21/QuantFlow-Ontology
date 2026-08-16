@@ -1765,7 +1765,6 @@ async function init() {
 		setTimeout(() => {
 			loadingOverlay.remove();
 		}, 350);
-		checkFirstLaunchDialog();
 	});
 
 	// -- Drag-and-drop (window-level) --
@@ -1936,101 +1935,6 @@ async function init() {
 
 	window.addEventListener("beforeunload", () => {
 		tileManager.saveCanvasImmediate();
-	});
-}
-
-async function checkFirstLaunchDialog() {
-	const offered = await window.shellApi.hasOfferedPlugin();
-	if (offered) return;
-
-	const agents = await window.shellApi.getAgents();
-
-	const dialog =
-		document.getElementById("canvas-skill-dialog");
-	const agentsContainer =
-		document.getElementById("canvas-skill-agents");
-	const skipBtn =
-		document.getElementById("canvas-skill-skip");
-	const installBtn =
-		document.getElementById("canvas-skill-install");
-	if (
-		!dialog || !agentsContainer || !skipBtn || !installBtn
-	) return;
-
-	agentsContainer.innerHTML = "";
-	const checkboxes = [];
-
-	for (const agent of agents) {
-		const row = document.createElement("label");
-		row.className = "canvas-skill-agent-row";
-
-		const checkbox = document.createElement("input");
-		checkbox.type = "checkbox";
-		checkbox.checked = agent.detected;
-		checkbox.dataset.agentId = agent.id;
-		checkboxes.push(checkbox);
-
-		const name = document.createElement("span");
-		name.className = "agent-name";
-		name.textContent = agent.name;
-
-		const badge = document.createElement("span");
-		badge.className = agent.detected
-			? "agent-badge detected"
-			: "agent-badge not-found";
-		badge.textContent =
-			agent.detected ? "detected" : "not found";
-
-		row.appendChild(checkbox);
-		row.appendChild(name);
-		row.appendChild(badge);
-		agentsContainer.appendChild(row);
-	}
-
-	dialog.classList.remove("hidden");
-
-	function closeDialog() {
-		dialog.classList.add("hidden");
-		window.shellApi.markPluginOffered();
-	}
-
-	skipBtn.addEventListener(
-		"click", closeDialog, { once: true },
-	);
-
-	installBtn.addEventListener("click", async function onInstall() {
-		installBtn.disabled = true;
-		installBtn.textContent = "Installing…";
-		// Clear previous error if retrying
-		dialog.querySelector(".canvas-skill-error")?.remove();
-		const errors = [];
-		for (const cb of checkboxes) {
-			if (cb.checked) {
-				try {
-					const result = await window.shellApi.installSkill(
-						cb.dataset.agentId,
-					);
-					if (result && !result.ok) {
-						errors.push(`${cb.dataset.agentId}: ${result.error}`);
-					}
-				} catch (err) {
-					errors.push(`${cb.dataset.agentId}: ${err.message || err}`);
-				}
-			}
-		}
-		if (errors.length > 0) {
-			installBtn.textContent = "Install";
-			installBtn.disabled = false;
-			const errEl = document.createElement("p");
-			errEl.className = "canvas-skill-error";
-			errEl.textContent =
-				`Install failed: ${errors.join("; ")}`;
-			dialog.querySelector("#canvas-skill-actions")
-				?.insertAdjacentElement("beforebegin", errEl);
-			return;
-		}
-		installBtn.removeEventListener("click", onInstall);
-		closeDialog();
 	});
 }
 

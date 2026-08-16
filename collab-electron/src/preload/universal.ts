@@ -468,10 +468,6 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.invoke("integrations:install-skill", agentId),
   uninstallSkill: (agentId: string) =>
     ipcRenderer.invoke("integrations:uninstall-skill", agentId),
-  hasOfferedPlugin: () =>
-    ipcRenderer.invoke("integrations:has-offered-plugin"),
-  markPluginOffered: () =>
-    ipcRenderer.invoke("integrations:mark-plugin-offered"),
 
   // IPC event listeners (nav, viewer, terminal)
   onFocusSearch: (cb: () => void) => {
