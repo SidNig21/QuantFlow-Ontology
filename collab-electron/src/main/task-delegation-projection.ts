@@ -33,6 +33,8 @@ export type TaskAssignmentProjection = {
   /** Sessions named by malformed links; never used as an owner. */
   unavailableSessionIds: string[];
   history?: TaskHistoryFact[];
+  reviewable?: boolean;
+  reviewProjection?: Record<string, unknown> | null;
 };
 
 export type TaskHistoryFact = {

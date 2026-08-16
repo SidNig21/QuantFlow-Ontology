@@ -81,6 +81,14 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:tasks:steer", args),
     requestSecondOpinion: (taskId: string) =>
       ipcRenderer.invoke("qf:tasks:secondOpinion", { taskId }),
+    getGovernedReviewProjection: (sourceTaskId: string) =>
+      ipcRenderer.invoke("qf:review:projection", { sourceTaskId }),
+    requestReview: (args: { sourceTaskId: string; attemptId: string }) =>
+      ipcRenderer.invoke("qf:review:request", args),
+    requestRevision: (args: { sourceTaskId: string; evaluationId: string; attemptId: string }) =>
+      ipcRenderer.invoke("qf:review:revision", args),
+    requestSecondCritic: (args: { sourceTaskId: string; evaluationId: string; attemptId: string }) =>
+      ipcRenderer.invoke("qf:review:secondCritic", args),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
     submitResearchQuestion: (question: string, datasetId?: string, definitionId?: string) => {

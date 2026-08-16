@@ -240,7 +240,7 @@ export const artifact = defineObject({
   capabilityGroup: "research.evaluate",
   properties: z.object({
     kind: z
-      .enum(["strategy_spec", "code", "result_set", "report", "trajectory"])
+      .enum(["strategy_spec", "code", "result_set", "report", "trajectory", "evaluation_findings"])
       .describe(
         "Artifact family discriminator. Trajectory and report entries should contain distilled outputs, never raw transcript dumps.",
       ),
@@ -287,6 +287,38 @@ export const evaluation = defineObject({
       .describe(
         "Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.",
       ),
+    rubric: jsonObject
+      .describe("Strict four-score Ragas rubric used to derive the verdict; null for legacy evaluations.")
+      .nullable(),
+    overall: z
+      .number()
+      .describe("Unrounded arithmetic mean of the four rubric scores; null for legacy evaluations.")
+      .nullable(),
+    run_metrics: jsonObject
+      .describe("The immutable R11b execution metrics preserved separately from critic rubric scores.")
+      .nullable(),
+    findings_artifact_id: z
+      .string()
+      .describe("Kernel-created immutable Artifact containing canonical evaluation findings.")
+      .nullable(),
+    broker_invocation_id: z
+      .string()
+      .describe("Production broker invocation receipt that successfully wrote this Evaluation.")
+      .nullable(),
+    review_task_id: z
+      .string()
+      .describe("Governed review Task that produced this Evaluation.")
+      .nullable(),
+    source_work: jsonObject
+      .describe("Frozen source-work tuple evaluated by the independent critic.")
+      .nullable(),
+    publication_report_id: z
+      .string()
+      .describe("Immutable Report Artifact published by the first supporting Evaluation, when present.")
+      .nullable(),
+    block_reason: jsonObject
+      .describe("Kernel-derived publication block reason for rejecting or inconclusive evaluations.")
+      .nullable(),
   }),
 });
 
@@ -583,7 +615,15 @@ export const record_evaluation = defineAction({
       .describe("Verdict relative to the hypothesis."),
     confidence: z.number().describe("Confidence in the verdict (0–1)."),
     rationale: z.string().describe("Rationale text."),
-    findings: z.string().describe("Durable critic findings text authored by this seat."),
+    findings: z.union([
+      z.string(),
+      z.array(z.object({
+        code: z.string(),
+        severity: z.enum(["info", "warning", "error"]),
+        message: z.string(),
+        evidence_refs: z.array(z.string()),
+      })),
+    ]).describe("Durable critic findings: R15 uses an ordered strict finding array; legacy critics may send text."),
     hypothesis_id: z
       .string()
       .describe("Hypothesis this evaluation answers."),
@@ -593,6 +633,11 @@ export const record_evaluation = defineAction({
     artifact_id: z
       .string()
       .describe("Exact result Artifact produced by the Run."),
+    rubric: jsonObject.describe("Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.").optional(),
+    overall: z.number().describe("Rejected when supplied; the Kernel derives the arithmetic mean.").optional(),
+    source_work: jsonObject.describe("Frozen source-work tuple copied from the review Task.").optional(),
+    review_task_id: z.string().describe("Governed review Task id receiving this evaluation.").optional(),
+    broker_invocation_id: z.string().describe("Production runtime broker invocation id for qf_record_evaluation.").optional(),
   }),
 });
 

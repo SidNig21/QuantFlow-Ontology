@@ -732,6 +732,21 @@ async function init() {
 					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Second opinion failed"); }
 					await refreshTaskSurface();
 				},
+				onRequestReview: async (taskId, attemptId) => {
+					const result = await window.shellApi.qf.requestReview({ sourceTaskId: taskId, attemptId });
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Request review failed"); }
+					await refreshTaskSurface();
+				},
+				onRequestRevision: async (taskId, evaluationId, attemptId) => {
+					const result = await window.shellApi.qf.requestRevision({ sourceTaskId: taskId, evaluationId, attemptId });
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Request revision failed"); }
+					await refreshTaskSurface();
+				},
+				onSecondCritic: async (taskId, evaluationId, attemptId) => {
+					const result = await window.shellApi.qf.requestSecondCritic({ sourceTaskId: taskId, evaluationId, attemptId });
+					if (!result?.ok) { await refreshTaskSurface(); throw new Error(result?.error?.message ?? "Second critic failed"); }
+					await refreshTaskSurface();
+				},
 			});
 		}
 	}

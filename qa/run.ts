@@ -283,6 +283,24 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "governed-review",
+    description: "R15: production request-review handoff, strict Kernel evaluation, findings, publication, refusal, and replay proof",
+    run: async () => {
+      const { runGovernedReviewGate } = await import("./gates/governed-review.ts");
+      const { ok } = await runGovernedReviewGate();
+      return ok;
+    },
+  },
+  {
+    name: "governed-review-live",
+    description: "R15: live production broker policy and Kernel-bound critic control proof",
+    run: async () => {
+      const { runGovernedReviewLiveGate } = await import("./gates/governed-review.ts");
+      const { ok } = await runGovernedReviewLiveGate();
+      return ok;
+    },
+  },
+  {
     name: "repo-shape",
     description: "The authority set named by START_HERE exists; CLA machinery stays gone",
     run: () => {
@@ -740,6 +758,17 @@ const gates: Gate[] = [
       );
       const { ok } = checkNoCanvasDomainWrites();
       return ok;
+    },
+  },
+  {
+    name: "doc-action-surface",
+    description:
+      "Generated action documentation and served action tools stay synchronized with the schema",
+    run: async () => {
+      const { checkDocActionSurface } = await import(
+        "./gates/doc-action-surface.ts"
+      );
+      return checkDocActionSurface().ok;
     },
   },
   {

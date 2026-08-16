@@ -465,6 +465,9 @@ export function attachKernel(
       const taskSteeringSql = readFileSync(
         upgradeSqlPath("0011-task-steering.sql"), "utf8",
       );
+      const governedReviewSql = readFileSync(
+        upgradeSqlPath("0012-governed-review.sql"), "utf8",
+      );
       applyKernelUpgradeChain(db, {
         profileIdentitySql,
         marketIngestSql,
@@ -477,6 +480,7 @@ export function attachKernel(
         independentCriticSql,
         taskCompositionSql,
         taskSteeringSql,
+        governedReviewSql,
       });
     }
   }

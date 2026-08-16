@@ -82,6 +82,9 @@ export function renderTaskFoot(dom, tile, {
 	onCancel,
 	onSteer,
 	onSecondOpinion,
+	onRequestReview,
+	onRequestRevision,
+	onSecondCritic,
 } = {}) {
 	const foot = dom?.taskFoot;
 	if (!foot) return;
@@ -111,6 +114,72 @@ export function renderTaskFoot(dom, tile, {
 	}
 	foot.appendChild(factRow);
 	if (fact.task?.assignmentState === "assigned") renderHistory(foot, fact.task.history);
+
+	if (fact.task?.assignmentState === "assigned" && fact.task.reviewable) {
+		const review = fact.task.reviewProjection;
+		if (review) {
+			const reviewFacts = node("div", "governed-review-facts");
+			reviewFacts.dataset.verdict = String(review.verdict ?? "");
+			reviewFacts.dataset.criticName = String(review.critic_name ?? "");
+			reviewFacts.dataset.overall = review.overall == null ? "" : String(review.overall);
+			reviewFacts.dataset.rationale = String(review.rationale ?? "");
+			reviewFacts.appendChild(node("span", "governed-review-state", String(review.state ?? "")));
+			reviewFacts.appendChild(node("span", "governed-review-critic", String(review.critic_name ?? "")));
+			reviewFacts.appendChild(node("span", "governed-review-verdict", String(review.verdict ?? "")));
+			if (review.rubric) for (const key of ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]) {
+				const score = node("span", `governed-review-score governed-review-score-${key}`, `${key}: ${String(review.rubric[key])}`);
+				reviewFacts.appendChild(score);
+			}
+			reviewFacts.appendChild(node("span", "governed-review-overall", `overall: ${review.overall == null ? "null" : String(review.overall)}`));
+			reviewFacts.appendChild(node("span", "governed-review-rationale", String(review.rationale ?? "")));
+			if (review.block_reason?.message) {
+				reviewFacts.dataset.blockReasonCode = String(review.block_reason.code ?? "");
+				reviewFacts.appendChild(node("span", "governed-review-block-code", String(review.block_reason.code ?? "")));
+				reviewFacts.appendChild(node("span", "governed-review-block-reason", String(review.block_reason.message)));
+			}
+			if (review.publication?.report_id) reviewFacts.appendChild(node("span", "governed-review-report", String(review.publication.report_id)));
+			foot.appendChild(reviewFacts);
+			if (Array.isArray(review.actions) && review.actions.length > 0) {
+				const nextActions = node("div", "governed-review-actions");
+				const revision = node("button", "task-action governed-review-revision", "Request revision");
+				const second = node("button", "task-action governed-review-second", "Second critic");
+				revision.addEventListener("click", async (event) => {
+					event.stopPropagation();
+					try { await onRequestRevision?.(fact.task.taskId, String(review.evaluation_id), crypto.randomUUID()); }
+					catch (error) { errorLine(foot, error?.message ?? String(error)); }
+				});
+				second.addEventListener("click", async (event) => {
+					event.stopPropagation();
+					try { await onSecondCritic?.(fact.task.taskId, String(review.evaluation_id), crypto.randomUUID()); }
+					catch (error) { errorLine(foot, error?.message ?? String(error)); }
+				});
+				nextActions.appendChild(revision);
+				nextActions.appendChild(second);
+				foot.appendChild(nextActions);
+			}
+		}
+		const reviewButton = node("button", "task-action governed-review-request", "Request review");
+		let reviewAttemptId = null;
+		let reviewSubmitting = false;
+		reviewButton.addEventListener("click", async (event) => {
+			event.stopPropagation();
+			if (reviewSubmitting) return;
+			reviewAttemptId ??= crypto.randomUUID();
+			reviewSubmitting = true;
+			reviewButton.disabled = true;
+			try {
+				await onRequestReview?.(fact.task.taskId, reviewAttemptId);
+				reviewAttemptId = null;
+				reviewSubmitting = false;
+				reviewButton.disabled = false;
+			} catch (error) {
+				reviewSubmitting = false;
+				reviewButton.disabled = false;
+				errorLine(foot, error?.message ?? String(error));
+			}
+		});
+		foot.appendChild(reviewButton);
+	}
 
 	if ((fact.task?.status === "open" || fact.task?.status === "cancelled") && fact.task.assignedToSessionId === tile.sessionId) {
 		const actions = node("div", "task-foot-actions");

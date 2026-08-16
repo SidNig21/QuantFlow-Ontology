@@ -334,7 +334,7 @@ CREATE TABLE artifact (
   content_hash TEXT NOT NULL,
   -- Durable location that stores the referenced bytes. Publication should occur before ephemeral sandboxes can be reclaimed.
   storage_ref TEXT NOT NULL,
-  CHECK (kind IN ('strategy_spec', 'code', 'result_set', 'report', 'trajectory'))
+  CHECK (kind IN ('strategy_spec', 'code', 'result_set', 'report', 'trajectory', 'evaluation_findings'))
 );
 
 -- An evaluation is a structured verdict on whether evidence supports a hypothesis. It governs publication and resolution decisions by separating verdict semantics from confidence scoring.
@@ -353,6 +353,24 @@ CREATE TABLE evaluation (
   confidence REAL NOT NULL,
   -- Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.
   rationale TEXT NOT NULL,
+  -- Strict four-score Ragas rubric used to derive the verdict; null for legacy evaluations.
+  rubric TEXT,
+  -- Unrounded arithmetic mean of the four rubric scores; null for legacy evaluations.
+  overall REAL,
+  -- The immutable R11b execution metrics preserved separately from critic rubric scores.
+  run_metrics TEXT,
+  -- Kernel-created immutable Artifact containing canonical evaluation findings.
+  findings_artifact_id TEXT,
+  -- Production broker invocation receipt that successfully wrote this Evaluation.
+  broker_invocation_id TEXT,
+  -- Governed review Task that produced this Evaluation.
+  review_task_id TEXT,
+  -- Frozen source-work tuple evaluated by the independent critic.
+  source_work TEXT,
+  -- Immutable Report Artifact published by the first supporting Evaluation, when present.
+  publication_report_id TEXT,
+  -- Kernel-derived publication block reason for rejecting or inconclusive evaluations.
+  block_reason TEXT,
   CHECK (verdict IN ('supports', 'rejects', 'inconclusive'))
 );
 

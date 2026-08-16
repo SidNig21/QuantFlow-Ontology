@@ -23,6 +23,9 @@ import {
   kernelParseOntologyActionTool,
   kernelParseOntologyReadTool,
   kernelQueryObjects,
+  kernelGovernedReviewContextForSession,
+  kernelGovernedReviewNextSequence,
+  kernelRecordGovernedToolReceipt,
 } from "./kernel";
 import { notifySessionCanvasProjection } from "./session-canvas-projector";
 import { invokePrecreatedStart } from "./precreated-start-ownership";
@@ -148,6 +151,14 @@ export function callOntologyReadTool(
       direction === "from" ? link.from_id === id : link.to_id === id
     );
   }
+  const governed = kernelGovernedReviewContextForSession(identity.sessionId);
+  if (governed && (toolName === "qf_hypothesis_get" || toolName === "qf_run_get" || toolName === "qf_artifact_get")) {
+    kernelRecordGovernedToolReceipt({
+      invocation_id: crypto.randomUUID(), session_id: identity.sessionId, task_id: governed.taskId,
+      tool_name: toolName, arguments: args, result,
+      broker_sequence: kernelGovernedReviewNextSequence(identity.sessionId),
+    });
+  }
   const { artifactId } = recordTrajectory(
     identity,
     toolName,
@@ -187,6 +198,20 @@ export async function callOntologyTool(
   assertCapability(identity, toolName);
 
   const input: Record<string, unknown> = { ...args };
+  const governed = action === "record_evaluation" && identity.role === "critic"
+    ? kernelGovernedReviewContextForSession(identity.sessionId)
+    : null;
+  const governedInvocationId = governed ? crypto.randomUUID() : null;
+  if (governed && governedInvocationId) {
+    input.review_task_id = governed.taskId;
+    input.source_work = governed.sourceWork;
+    input.broker_invocation_id = governedInvocationId;
+    kernelRecordGovernedToolReceipt({
+      invocation_id: governedInvocationId, session_id: identity.sessionId, task_id: governed.taskId,
+      tool_name: "qf_record_evaluation", arguments: input, result: { status: "pending" }, success: false,
+      broker_sequence: kernelGovernedReviewNextSequence(identity.sessionId),
+    });
+  }
   if (action === "create_agent_session") {
     if (typeof input.session_id !== "string" || input.session_id.length === 0) {
       input.session_id = `hire-${crypto.randomUUID()}`;

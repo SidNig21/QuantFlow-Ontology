@@ -37,6 +37,7 @@ import {
   TICKET_ORIGIN,
 } from "./creation-policy.ts";
 import { executeDeterministicRun } from "./deterministic-execution.ts";
+import { recordGovernedEvaluation } from "./governed-review.ts";
 
 const TICKET_GRADES = ["pending", "win", "loss", "push", "void"] as const;
 
@@ -1073,6 +1074,13 @@ function recordEvaluation(
   links: LinkSpec[],
   envelope?: CreationEnvelopePresence,
 ): ObjectExecuteResult {
+  // R15 is deliberately a separate strict path. The legacy string-findings
+  // branch below remains for pre-R15 evaluations and preserves their
+  // run-metrics shape and behavior.
+  if (input.rubric !== undefined || Array.isArray(input.findings)) {
+    const governed = recordGovernedEvaluation(db, input, trace);
+    return creationResult(cmd, String(governed.id), cmd.event, governed);
+  }
   if (links.length > 0 || envelope?.links || envelope?.bytes) {
     throw new KernelError(
       "record_evaluation lineage and findings bytes are Kernel-owned",

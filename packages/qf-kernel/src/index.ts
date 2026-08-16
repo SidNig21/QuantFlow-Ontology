@@ -81,6 +81,27 @@ export { contentHash } from "./hash.ts";
 export { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 export { replayArtifactAndAssert, replayRunAndAssert } from "./replay.ts";
 export {
+  GOVERNED_CRITIC_TOOLS,
+  INVALID_SOURCE_WORK_MESSAGE,
+  REVISION_EXECUTOR_NOT_RUNNING_MESSAGE,
+  bindSourceWork,
+  ensureGovernedReviewSchema,
+  freezeSourceWork,
+  governedReviewProjection,
+  markGovernedDelivery,
+  recordGovernedEvaluation,
+  recordGovernedToolReceipt,
+  requestGovernedReview,
+  requestRevision,
+  requestSecondCritic,
+  type Finding,
+  type GovernedActionKind,
+  type GovernedReviewAdmission,
+  type GovernedReviewTrace,
+  type Rubric,
+  type SourceWork,
+} from "./governed-review.ts";
+export {
   resolvePackageRef,
   resolveSpeciesPackage,
 } from "./species.ts";

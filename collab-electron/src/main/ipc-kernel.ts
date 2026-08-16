@@ -37,6 +37,13 @@ import {
   kernelOpenHypothesisForQuestion,
   kernelListTaskDelegations,
   onKernelEvents,
+  kernelFreezeSourceWork,
+  kernelRequestGovernedReview,
+  kernelMarkGovernedDelivery,
+  kernelRequestRevision,
+  kernelRequestSecondCritic,
+  kernelGovernedReviewProjection,
+  kernelGovernedAttemptExists,
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
@@ -88,6 +95,8 @@ function broadcast(channel: string, ...args: unknown[]): void {
 function invalidateDock(): void {
   broadcast("qf:dock:invalidate");
 }
+
+const governedReviewInFlight = new Map<string, Promise<unknown>>();
 
 type TaskActionName = "clarify" | "redirect" | "reassign" | "cancel" | "second_opinion";
 type TaskRefusalCode =
@@ -356,6 +365,99 @@ export function registerKernelHandlers(): void {
     try {
       assertTrustedSender(event);
       return { ok: true as const, ...kernelListTaskSurface() };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:review:projection", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      const sourceTaskId = args && typeof args === "object" && !Array.isArray(args)
+        ? String((args as Record<string, unknown>).sourceTaskId ?? "") : "";
+      if (!sourceTaskId) throw new Error("Review projection requires sourceTaskId");
+      return { ok: true as const, projection: kernelGovernedReviewProjection(sourceTaskId) };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:review:request", async (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Request review requires sourceTaskId and attemptId");
+      const input = args as Record<string, unknown>;
+      const sourceTaskId = typeof input.sourceTaskId === "string" ? input.sourceTaskId : "";
+      const attemptId = typeof input.attemptId === "string" ? input.attemptId : "";
+      if (!sourceTaskId || !attemptId) throw new Error("Request review requires sourceTaskId and attemptId");
+      const key = `request_review\0${sourceTaskId}\0${attemptId}`;
+      if (kernelGovernedAttemptExists("request_review", sourceTaskId, attemptId)) {
+        return { ok: true as const, result: kernelRequestGovernedReview(sourceTaskId, attemptId, null) };
+      }
+      const inFlight = governedReviewInFlight.get(key);
+      if (inFlight) return await inFlight as { ok: true; result: unknown };
+      const operation = (async () => {
+      // Freeze/validate before any critic admission. Invalid source work therefore
+      // produces only the Kernel refusal receipt and no runtime child.
+      let valid = true;
+      try { kernelFreezeSourceWork(sourceTaskId); } catch { valid = false; }
+      let criticSessionId: string | null = null;
+      if (valid) {
+        const admitted = await admitAndStartSession("hermes-critic");
+        criticSessionId = admitted.sessionId;
+      }
+      const result = kernelRequestGovernedReview(sourceTaskId, attemptId, criticSessionId);
+      if (result.kind === "admitted" && result.review_task_id && result.critic_session_id) {
+        const delivered = deliverToAgentSession(result.critic_session_id, `${JSON.stringify({ contract: "qf.governed_review.v1", review_task_id: result.review_task_id, source_work: result.source_work })}\r`);
+        kernelMarkGovernedDelivery(result.review_task_id, delivered ? "delivered" : "failed");
+      }
+      invalidateDock();
+      return { ok: true as const, result };
+      })();
+      governedReviewInFlight.set(key, operation);
+      try { return await operation; } finally { governedReviewInFlight.delete(key); }
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:review:revision", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Request revision requires sourceTaskId, evaluationId, and attemptId");
+      const input = args as Record<string, unknown>;
+      const sourceTaskId = String(input.sourceTaskId ?? "");
+      const evaluationId = String(input.evaluationId ?? "");
+      const attemptId = String(input.attemptId ?? "");
+      const work = kernelFreezeSourceWork(sourceTaskId);
+      const result = kernelRequestRevision(work, evaluationId, attemptId);
+      invalidateDock();
+      return { ok: true as const, result };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:review:secondCritic", async (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("Second critic requires sourceTaskId, evaluationId, and attemptId");
+      const input = args as Record<string, unknown>;
+      const sourceTaskId = String(input.sourceTaskId ?? "");
+      const evaluationId = String(input.evaluationId ?? "");
+      const attemptId = String(input.attemptId ?? "");
+      const work = kernelFreezeSourceWork(sourceTaskId);
+      if (kernelGovernedAttemptExists("second_critic", sourceTaskId, attemptId)) {
+        return { ok: true as const, result: kernelRequestSecondCritic(work, evaluationId, attemptId, null) };
+      }
+      const admitted = await admitAndStartSession("hermes-critic");
+      const result = kernelRequestSecondCritic(work, evaluationId, attemptId, admitted.sessionId);
+      if (result.kind === "admitted" && result.review_task_id && result.critic_session_id) {
+        const delivered = deliverToAgentSession(result.critic_session_id, `${JSON.stringify({ contract: "qf.governed_review.v1", review_task_id: result.review_task_id, source_work: result.source_work })}\r`);
+        kernelMarkGovernedDelivery(result.review_task_id, delivered ? "delivered" : "failed");
+      }
+      invalidateDock();
+      return { ok: true as const, result };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

@@ -22,6 +22,15 @@ import {
   type LinkRow,
   type TraceContext,
   type TrustedExecutionContext,
+  bindSourceWork,
+  freezeSourceWork,
+  governedReviewProjection,
+  markGovernedDelivery,
+  recordGovernedToolReceipt,
+  requestGovernedReview,
+  requestRevision,
+  requestSecondCritic,
+  type SourceWork,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
 import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp";
@@ -451,10 +460,18 @@ export function kernelListTaskSurface(): {
   });
   return {
     sessions,
-    assignments: kernelListTaskAssignments().map((assignment) => ({
-      ...assignment,
-      history: kernelListTaskHistory(assignment.taskId),
-    })),
+    assignments: kernelListTaskAssignments().map((assignment) => {
+      let reviewable = false;
+      try {
+        reviewable = Boolean(getKernelDb().query("SELECT 1 AS ok FROM qf_review_source_work WHERE source_task_id = ?").get(assignment.taskId));
+      } catch { /* R15 support tables are created lazily by the Kernel seam. */ }
+      return {
+        ...assignment,
+        history: kernelListTaskHistory(assignment.taskId),
+        reviewable,
+        reviewProjection: reviewable ? kernelGovernedReviewProjection(assignment.taskId) : null,
+      };
+    }),
   };
 }
 
@@ -482,6 +499,69 @@ export function kernelExecute<C extends string>(
   const result = execute(getKernelDb(), command, input, trace);
   notifyKernelEvents();
   return result;
+}
+
+export function kernelBindSourceWork(work: SourceWork): SourceWork {
+  return bindSourceWork(getKernelDb(), work, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+}
+
+export function kernelFreezeSourceWork(sourceTaskId: string): SourceWork {
+  return freezeSourceWork(getKernelDb(), sourceTaskId);
+}
+
+export function kernelRequestGovernedReview(sourceTaskId: string, attemptId: string, criticSessionId: string | null) {
+  return requestGovernedReview(getKernelDb(), sourceTaskId, attemptId, criticSessionId, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+}
+
+export function kernelMarkGovernedDelivery(reviewTaskId: string, outcome: "delivered" | "failed"): void {
+  markGovernedDelivery(getKernelDb(), reviewTaskId, outcome, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+}
+
+export function kernelRecordGovernedToolReceipt(args: Parameters<typeof recordGovernedToolReceipt>[1]): void {
+  recordGovernedToolReceipt(getKernelDb(), args, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+}
+
+export function kernelGovernedReviewContextForSession(sessionId: string): { taskId: string; sourceWork: SourceWork } | null {
+  try {
+    const row = getKernelDb().query("SELECT task_id, source_work FROM qf_review_task WHERE critic_session_id = ? AND lifecycle = 'running' ORDER BY created_at ASC LIMIT 1").get(sessionId) as { task_id: string; source_work: string } | null;
+    if (!row) return null;
+    return { taskId: row.task_id, sourceWork: JSON.parse(row.source_work) as SourceWork };
+  } catch {
+    return null;
+  }
+}
+
+export function kernelGovernedReviewNextSequence(sessionId: string): number {
+  try {
+    const row = getKernelDb().query("SELECT COALESCE(MAX(broker_sequence), 0) + 1 AS next FROM qf_review_invocation WHERE session_id = ?").get(sessionId) as { next: number };
+    return Number(row.next);
+  } catch {
+    return 1;
+  }
+}
+
+export function kernelRecordGovernedEvaluation(input: Record<string, unknown>, actorSessionId: string): Record<string, unknown> {
+  return kernelExecute("record_evaluation", input, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: actorSessionId }).state;
+}
+
+export function kernelRequestRevision(work: SourceWork, evaluationId: string, attemptId: string) {
+  return requestRevision(getKernelDb(), work, evaluationId, attemptId, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+}
+
+export function kernelRequestSecondCritic(work: SourceWork, evaluationId: string, attemptId: string, criticSessionId: string | null) {
+  return requestSecondCritic(getKernelDb(), work, evaluationId, attemptId, criticSessionId, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+}
+
+export function kernelGovernedReviewProjection(sourceTaskId: string): Record<string, unknown> | null {
+  return governedReviewProjection(getKernelDb(), sourceTaskId);
+}
+
+export function kernelGovernedAttemptExists(actionKind: string, sourceTaskId: string, attemptId: string): boolean {
+  try {
+    return Boolean(getKernelDb().query("SELECT 1 AS ok FROM qf_review_attempt WHERE action_kind = ? AND source_task_id = ? AND attempt_id = ?").get(actionKind, sourceTaskId, attemptId));
+  } catch {
+    return false;
+  }
 }
 
 /** Newest-first Kernel receipt log for the shell ledger (projection only). */

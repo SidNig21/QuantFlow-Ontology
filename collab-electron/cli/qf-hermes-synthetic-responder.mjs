@@ -282,6 +282,12 @@ function parseDelivery(line) {
       typeof value.review_task_id === "string" &&
       typeof value.title === "string" &&
       typeof value.instruction === "string") return value;
+  if (value.contract === "qf.governed_review.v1" &&
+      typeof value.review_task_id === "string" &&
+      value.source_work && typeof value.source_work === "object" &&
+      typeof value.source_work.hypothesis_id === "string" &&
+      typeof value.source_work.run_id === "string" &&
+      typeof value.source_work.result_artifact_id === "string") return value;
   return null;
 }
 
@@ -317,6 +323,7 @@ async function nextReview(reader) {
     const line = cleanPtyLine(await reader.next(Math.max(1, deadline - Date.now())));
     const delivery = parseDelivery(line);
     if (delivery?.contract === "qf.task.second_opinion.v1") return { secondOpinion: delivery };
+    if (delivery?.contract === "qf.governed_review.v1") return { governedReview: delivery, ...delivery.source_work };
     carry = `${carry}\n${line}`.slice(-8_192);
     for (const field of ["hypothesis_id", "run_id", "artifact_id"]) {
       const match = new RegExp(`${field}=([A-Za-z0-9_-]{1,128})`).exec(carry);
@@ -454,7 +461,7 @@ async function critic(reader, ontology) {
     await reader.waitForClose();
     return;
   }
-  emitBoundary("activation_delivery", { role: ROLE, run_id: ids.run_id });
+  emitBoundary("activation_delivery", { role: ROLE, run_id: ids.run_id, review_task_id: ids.review_task_id ?? "unknown" });
   const tools = await ontology.listTools();
   requireTools(tools, ["qf_hypothesis_get", "qf_run_get", "qf_artifact_get", "qf_record_evaluation"], "critic ontology");
   for (const [tool, id] of [["qf_hypothesis_get", ids.hypothesis_id], ["qf_run_get", ids.run_id], ["qf_artifact_get", ids.artifact_id]]) {
@@ -472,7 +479,14 @@ async function critic(reader, ontology) {
     verdict: "supports",
     confidence: 0.9,
     rationale: "The deterministic fixture run matches the declared hypothesis and bounded evidence.",
-    findings: "The independent critic observed the exact Hypothesis, Run, and result Artifact named by the app.",
+    ...(ids.review_task_id ? { rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 } } : {}),
+    findings: ids.review_task_id ? [{
+      code: "EXACT_SOURCE_READ",
+      severity: "info",
+      message: "The independent critic observed the exact Hypothesis, Run, and result Artifact named by the app.",
+      evidence_refs: [ids.hypothesis_id, ids.run_id, ids.artifact_id],
+    }] : "The independent critic observed the exact Hypothesis, Run, and result Artifact named by the app.",
+    ...(ids.review_task_id ? { review_task_id: ids.review_task_id, source_work: ids.source_work } : {}),
   }));
   if (!evaluation?.result?.object_id) throw new Error("qf_record_evaluation returned no Evaluation id");
   emitBoundary("tool_output", { role: ROLE, tool: "qf_record_evaluation", evaluation_id: evaluation.result.object_id });

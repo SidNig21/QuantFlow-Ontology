@@ -1331,7 +1331,8 @@
             "code",
             "result_set",
             "report",
-            "trajectory"
+            "trajectory",
+            "evaluation_findings"
           ]
         },
         "content_hash": {
@@ -1433,6 +1434,26 @@
         },
         "rationale": {
           "description": "Equality filter on rationale. Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.",
+          "type": "string"
+        },
+        "overall": {
+          "description": "Equality filter on overall. Unrounded arithmetic mean of the four rubric scores; null for legacy evaluations.",
+          "type": "number"
+        },
+        "findings_artifact_id": {
+          "description": "Equality filter on findings_artifact_id. Kernel-created immutable Artifact containing canonical evaluation findings.",
+          "type": "string"
+        },
+        "broker_invocation_id": {
+          "description": "Equality filter on broker_invocation_id. Production broker invocation receipt that successfully wrote this Evaluation.",
+          "type": "string"
+        },
+        "review_task_id": {
+          "description": "Equality filter on review_task_id. Governed review Task that produced this Evaluation.",
+          "type": "string"
+        },
+        "publication_report_id": {
+          "description": "Equality filter on publication_report_id. Immutable Report Artifact published by the first supporting Evaluation, when present.",
           "type": "string"
         }
       }
@@ -3175,8 +3196,46 @@
           "description": "Rationale text."
         },
         "findings": {
-          "type": "string",
-          "description": "Durable critic findings text authored by this seat."
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "info",
+                      "warning",
+                      "error"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "code",
+                  "severity",
+                  "message",
+                  "evidence_refs"
+                ]
+              }
+            }
+          ],
+          "description": "Durable critic findings: R15 uses an ordered strict finding array; legacy critics may send text."
         },
         "hypothesis_id": {
           "type": "string",
@@ -3189,6 +3248,34 @@
         "artifact_id": {
           "type": "string",
           "description": "Exact result Artifact produced by the Run."
+        },
+        "rubric": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {},
+          "description": "Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall."
+        },
+        "overall": {
+          "type": "number",
+          "description": "Rejected when supplied; the Kernel derives the arithmetic mean."
+        },
+        "source_work": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {},
+          "description": "Frozen source-work tuple copied from the review Task."
+        },
+        "review_task_id": {
+          "type": "string",
+          "description": "Governed review Task id receiving this evaluation."
+        },
+        "broker_invocation_id": {
+          "type": "string",
+          "description": "Production runtime broker invocation id for qf_record_evaluation."
         }
       },
       "required": [

@@ -172,6 +172,15 @@ An evaluation is a structured verdict on whether evidence supports a hypothesis.
 - `verdict` — Disposition of the evidence against the hypothesis. This field carries gating semantics; confidence does not override it.
 - `confidence` — Confidence score for the selected verdict on a 0-1 scale. Use it for prioritization and review, not as a substitute for verdict semantics.
 - `rationale` — Human- and agent-readable explanation for the verdict. It should name the decisive evidence rather than restating the metric payload.
+- `rubric` — Strict four-score Ragas rubric used to derive the verdict; null for legacy evaluations.
+- `overall` — Unrounded arithmetic mean of the four rubric scores; null for legacy evaluations.
+- `run_metrics` — The immutable R11b execution metrics preserved separately from critic rubric scores.
+- `findings_artifact_id` — Kernel-created immutable Artifact containing canonical evaluation findings.
+- `broker_invocation_id` — Production broker invocation receipt that successfully wrote this Evaluation.
+- `review_task_id` — Governed review Task that produced this Evaluation.
+- `source_work` — Frozen source-work tuple evaluated by the independent critic.
+- `publication_report_id` — Immutable Report Artifact published by the first supporting Evaluation, when present.
+- `block_reason` — Kernel-derived publication block reason for rejecting or inconclusive evaluations.
 
 ### `workspace`
 
@@ -797,10 +806,15 @@ Record an independent critic verdict over a succeeded deterministic Run. The Ker
 - `verdict` — Verdict relative to the hypothesis.
 - `confidence` — Confidence in the verdict (0–1).
 - `rationale` — Rationale text.
-- `findings` — Durable critic findings text authored by this seat.
+- `findings` — Durable critic findings: R15 uses an ordered strict finding array; legacy critics may send text.
 - `hypothesis_id` — Hypothesis this evaluation answers.
 - `run_id` — Succeeded deterministic Run evaluated.
 - `artifact_id` — Exact result Artifact produced by the Run.
+- `rubric` — Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.
+- `overall` — Rejected when supplied; the Kernel derives the arithmetic mean.
+- `source_work` — Frozen source-work tuple copied from the review Task.
+- `review_task_id` — Governed review Task id receiving this evaluation.
+- `broker_invocation_id` — Production runtime broker invocation id for qf_record_evaluation.
 
 ### `resolve_hypothesis`
 

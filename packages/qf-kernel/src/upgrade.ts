@@ -17,6 +17,7 @@ export const DETERMINISTIC_EXECUTION_UPGRADE = "deterministic-execution" as cons
 export const INDEPENDENT_CRITIC_UPGRADE = "independent-critic" as const;
 export const TASK_COMPOSITION_UPGRADE = "task-composition" as const;
 export const TASK_STEERING_UPGRADE = "task-steering" as const;
+export const GOVERNED_REVIEW_UPGRADE = "governed-review" as const;
 
 export type KernelShapeState =
   | "uninitialized"
@@ -294,6 +295,24 @@ function tablesWithoutTaskComposition(
   return next;
 }
 
+/** Strip the R15 evaluation/artifact columns from the pre-R15 predecessor shape. */
+function tablesWithoutGovernedReview(tables: Map<string, string>): Map<string, string> {
+  const next = new Map(tables);
+  const artifact = next.get("artifact")?.replace(/,'evaluation_findings'/gi, "");
+  if (artifact) next.set("artifact", artifact);
+  const evaluation = next.get("evaluation")?.replace(/,rubric TEXT/gi, "")
+    .replace(/,overall REAL/gi, "")
+    .replace(/,run_metrics TEXT/gi, "")
+    .replace(/,findings_artifact_id TEXT/gi, "")
+    .replace(/,broker_invocation_id TEXT/gi, "")
+    .replace(/,review_task_id TEXT/gi, "")
+    .replace(/,source_work TEXT/gi, "")
+    .replace(/,publication_report_id TEXT/gi, "")
+    .replace(/,block_reason TEXT/gi, "");
+  if (evaluation) next.set("evaluation", evaluation);
+  return next;
+}
+
 function tablesWithoutTaskDelegation(
   tables: Map<string, string>,
 ): Map<string, string> {
@@ -429,11 +448,11 @@ function schemaMetaWithoutConnectionActions(
 }
 
 function predecessorTables(tables: Map<string, string>): Map<string, string> {
-  return tablesWithoutTaskComposition(
+  return tablesWithoutGovernedReview(tablesWithoutTaskComposition(
     tablesWithoutTaskDelegation(
       tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables)),
     ),
-  );
+  ));
 }
 
 /** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
@@ -515,7 +534,7 @@ function expectedTaskStatus(): StructureSnapshot {
   if (!taskStatusSnapshot) {
     const current = expectedCurrent();
     taskStatusSnapshot = {
-      tables: tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)),
+      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutConnectionActions(
         schemaMetaWithoutTaskDelegation(current.schemaMeta),
@@ -532,7 +551,7 @@ function expectedConnectionActions(): StructureSnapshot {
   if (!connectionActionsSnapshot) {
     const current = expectedCurrent();
     connectionActionsSnapshot = {
-      tables: tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)),
+      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskDelegation(current.schemaMeta),
     };
@@ -547,7 +566,7 @@ function expectedTaskDelegation(): StructureSnapshot {
   if (!taskDelegationSnapshot) {
     const current = expectedCurrent();
     taskDelegationSnapshot = {
-      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
+      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
       schemaMeta: schemaMetaWithoutDeterministicExecution(
         schemaMetaWithoutIndependentCritic(current.schemaMeta),
@@ -564,7 +583,7 @@ function expectedDeterministicExecution(): StructureSnapshot {
   if (!deterministicExecutionSnapshot) {
     const current = expectedCurrent();
     deterministicExecutionSnapshot = {
-      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
+      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
       schemaMeta: schemaMetaWithoutIndependentCritic(current.schemaMeta),
     };
@@ -579,7 +598,7 @@ function expectedTaskComposition(): StructureSnapshot {
   if (!taskCompositionSnapshot) {
     const current = expectedCurrent();
     taskCompositionSnapshot = {
-      tables: tablesWithoutTaskComposition(current.tables),
+      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)),
       linkKinds: current.linkKinds,
       schemaMeta: schemaMetaWithoutTaskComposition(current.schemaMeta),
     };
@@ -596,7 +615,7 @@ function expectedTaskSteering(): StructureSnapshot {
       "record_task_steering_refusal", "record_task_cancel_outcome", "request_second_opinion",
     ]);
     taskSteeringSnapshot = {
-      tables: current.tables,
+      tables: tablesWithoutGovernedReview(current.tables),
       linkKinds: current.linkKinds,
       schemaMeta: current.schemaMeta.filter(([name]) => !steeringNames.has(name)),
     };
@@ -723,6 +742,7 @@ export function applyKernelUpgradeChain(
     independentCriticSql: string;
     taskCompositionSql: string;
     taskSteeringSql: string;
+    governedReviewSql: string;
   },
 ): void {
   const state = assertWritableUpgradeShape(db);
@@ -837,6 +857,7 @@ export function applyKernelUpgradeChain(
       db.exec(upgrades.taskCompositionSql);
     }
     db.exec(upgrades.taskSteeringSql);
+    db.exec(upgrades.governedReviewSql);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
         TASK_COMPOSITION_UPGRADE,
