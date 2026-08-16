@@ -1,6 +1,6 @@
 # NEXT — R15 governed critic review
 
-status: READER REQUIRED — BUILDER DOOR CLOSED
+status: BUILDER AUTHORIZED
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R15](WO-R15.md)
@@ -11,7 +11,7 @@ reader-round-2: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 10 remain
 reader-round-3: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 5 final defects landed in WO-R15
 reader-round-4: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 3 final defects landed in WO-R15
 reader-round-5: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; final static/refusal/replay defects landed in WO-R15
-reader-receipt: pending reread of corrected order
+reader-receipt: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` at `94a33bb` — YES/YES PASS
 standing-authority: diagnose and repair in-scope delivery defects without further founder prompts
 
 ## Authorized outcome
@@ -23,11 +23,11 @@ revision and second-critic actions without erasing the first verdict.
 
 ## Builder instructions
 
-No Builder is authorized yet. One fresh Reader must answer exactly the two
-`PROTOCOL.md` questions for `WO-R15.md`: can every acceptance gate actually
-fail, and does every deliverable have exactly one meaning? Every defect lands in
-the order. A YES/YES PASS opens the Builder door under the founder umbrella
-authorization.
+One fresh Builder is authorized to execute `WO-R15.md` on branch `wo-R15` in
+this checkout. It reads only `START_HERE.md`, `docs/orders/PROTOCOL.md`, this
+file, and the active order before implementation. The founder's standing
+authority covers diagnosis and repair of in-scope defects without per-assertion
+prompts. The Builder stops only at the order's explicit stop conditions.
 
 ## Stop
 

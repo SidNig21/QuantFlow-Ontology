@@ -1,7 +1,7 @@
 # WO-R15 — Governed critic review and publication gate
 
-status: revised after adversarial Reader — reread required before build
-assignee: builder after Reader YES/YES PASS
+status: building — adversarial Reader YES/YES PASS
+assignee: Builder
 depends: R14 PASS at `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 rung: R15 — governed review
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
@@ -10,6 +10,7 @@ reader-round-2: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; ten remaining 
 reader-round-3: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; five final defects landed
 reader-round-4: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; three final gate/meaning defects landed
 reader-round-5: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; static-matrix, refusal-shape, and replay defects landed
+reader-pass: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` at `94a33bb` — YES/YES PASS
 rework-cycle: 0 of 1 used
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
