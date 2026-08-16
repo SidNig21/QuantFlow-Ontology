@@ -1,6 +1,6 @@
-# NEXT — WO-RD-3 founder steering
+# NEXT — R14 WO-RD-3 founder steering
 
-status: AUTHORIZED — DIAGNOSIS-BACKED GATE SEQUENCING REPAIR
+status: AUTHORIZED — INDEPENDENT VERIFIER REWORK
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-RD-3](WO-RD-3.md)
@@ -17,6 +17,8 @@ founder-authorization: 2026-08-15 — perform the required gate-only synchroniza
 gate-only-builder-receipt: task `01a00917-9de4-7ee2-b5d8-056cfe6cb211` — pure test green; single live gate red `Task control Clarify timed out`; no matrix/commit/push
 sequencing-diagnosis: task `01a0091b-f6ab-71a0-b4bd-bafb8c84a50b` — gate waits up to 55 seconds for worker-2 before Clarify, contrary to the order; worker may complete Task and correctly remove controls
 standing-authority: 2026-08-15 — diagnose and repair in-scope delivery defects without further founder prompts
+candidate-receipt: `6423b711e1dc06b646017473e4cfa6d8439f35b5` — Builder matrix green and pushed
+verifier-receipt: task `01a0097e-1b8b-7aa0-8bb9-c6ae5d34a4ce` — FAIL; delegation cleanup measured one owned process and source audit named three proof/side-effect defects
 
 ## Authorized outcome
 
@@ -26,12 +28,13 @@ refusal is visible from Kernel truth; exact runtime delivery is receipted.
 
 ## Builder instructions
 
-One fresh Builder is authorized to apply WO-RD-3's diagnosis-backed gate-only
-sequencing repair while preserving all current uncommitted product and gate
-edits. Green proceeds through the exact matrix, commit/push, and a fresh
-Verifier. In-scope reds are diagnosed and repaired under standing authority;
-only a required acceptance change or scope-boundary crossing returns to the
-founder. No R15 implementation begins before WO-RD-3 verification.
+One fresh Builder is authorized to repair the four exact defects in WO-RD-3's
+independent Verifier receipt: deterministic owned-process cleanup in the
+delegation regression; measured post-cleanup founder receipts; no critic
+recruitment before a repeated Second-opinion rejection; and launch-two visible
+Task/session/link equality. Green proceeds through the exact focused matrix,
+commit/push, and one fresh Verifier. In-scope reds continue under standing
+authority. No R15 implementation begins before WO-RD-3 verification.
 
 ## Stop
 

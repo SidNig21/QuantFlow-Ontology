@@ -1,6 +1,6 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: open — standing-authority gate sequencing repair
+status: open — independent verifier rework
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
@@ -445,3 +445,29 @@ standing authority when it remains in scope; ask only if an acceptance
 criterion must change or the repair crosses the work-order boundary. Green
 continues through the exact order matrix, commit/push, and a fresh independent
 Verifier.
+
+## Independent Verifier result — rework required
+
+Candidate `6423b711e1dc06b646017473e4cfa6d8439f35b5` passed the Builder's
+focused product matrix and seven falsifier pairs. Fresh independent Verifier
+task `01a0097e-1b8b-7aa0-8bb9-c6ae5d34a4ce` stopped on one measured cleanup
+red in `research-director-delegation` and found three additional defects by
+source inspection:
+
+1. delegation cleanup reported `owned_process_tree_remaining=1` despite zero
+   Electron/Hermes processes and zero roots;
+2. founder-steering printed a constant zero-leak receipt before deleting and
+   measuring its root;
+3. repeated Second opinion could recruit a new critic before the Kernel rejects
+   the already-open review Task; and
+4. launch two compared durable database history/snapshot but did not compare
+   visible Task/session/link facts with launch one.
+
+The founder's standing authority opens one rework for these exact defects. No
+acceptance condition changes: cleanup must be derived from post-cleanup
+measurement; rejected repeat review must cause no recruitment side effect; and
+reopen proof must compare the visible facts, not only durable storage. The
+delegation regression may add bounded deterministic termination/wait and named
+remaining-PID evidence, but may not ignore, subtract, or relabel a live owned
+process. Run the focused matrix once after repair, commit/push one candidate,
+then use a fresh independent Verifier.
