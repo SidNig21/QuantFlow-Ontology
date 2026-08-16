@@ -8,6 +8,7 @@ route: [GOLDEN-RUN.md](GOLDEN-RUN.md) · R15 active
 depends-receipt: [R14 verification](evidence/r14/VERIFICATION.md) — candidate `24c418a3d5126eef3dcb2e05e8eff0a4c9fd85fa`
 reader-round-1: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 15 defects landed in WO-R15
 reader-round-2: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 10 remaining defects landed in WO-R15
+reader-round-3: task `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; 5 final defects landed in WO-R15
 reader-receipt: pending reread of corrected order
 standing-authority: diagnose and repair in-scope delivery defects without further founder prompts
 

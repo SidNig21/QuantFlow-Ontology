@@ -7,6 +7,7 @@ rung: R15 — governed review
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
 reader-round-1: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; all defects below landed
 reader-round-2: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; ten remaining defects landed
+reader-round-3: `01a0099b-d069-7f61-8cfe-f6dfe9cede91` — NO/NO; five final defects landed
 rework-cycle: 0 of 1 used
 R15_BUILD_BASE_SHA: `0c53d00071c1b685ef090526f02ad97233be3274`
 
@@ -58,16 +59,19 @@ Task and cannot be replaced by later renderer, Main, or critic input.
 
 Critic identity is admitted `agent_session.id`. Admission requires exactly one
 `spawned_from` link to immutable production definition `hermes-critic`,
-capability `research.evaluate`, exactly these four ontology tools, and zero
-skills:
+capability `research.evaluate`, exactly these four agent-visible callable tools
+total, and zero skills:
 
 - `qf_hypothesis_get`
 - `qf_run_get`
 - `qf_artifact_get`
 - `qf_record_evaluation`
 
-The critic receives no `qf_publish_artifact`, Task/Dataset/outcome mutation,
-betting, trading, shell, filesystem, browser, or broad ontology toolset. The
+Internal runtime-control operations that are not agent-callable tools are
+outside this count. No callable tool from any other namespace or category is
+exposed. The critic therefore receives no `qf_publish_artifact`,
+Task/Dataset/outcome mutation, betting, trading, collaboration, shell,
+filesystem, browser, or broad ontology toolset. The
 session differs from the Run executor and every prior critic for the source
 work, and is `running` at admission and each invocation. Display identity comes
 only from the Kernel-projected definition.
@@ -88,8 +92,10 @@ its Evaluation binding. Critic exit or malformed output makes it `failed`.
 There are exactly two receipt kinds. A `delivery_receipt` always names an
 existing review Task and may terminate it as `completed`, `failed`, or
 `refused`. An `action_refusal_receipt` names no Task (`task_id: null`) and
-contains action kind, source-work tuple, triggering Evaluation id, attempt id,
-stable reason code, message, and timestamp. Source-work refusal, offline
+contains action kind, source-work tuple, nullable triggering Evaluation id,
+attempt id, stable reason code, message, and timestamp. Request-review/source-
+work refusal requires that Evaluation id be `null`; Revision/Second-critic
+refusal requires the exact non-supporting Evaluation id. Source-work refusal, offline
 revision, and failed second-critic admission use only
 `action_refusal_receipt`. A created review Task rejected after delivery begins
 becomes Task state `refused` and receives a `delivery_receipt`. No Task remains
@@ -112,14 +118,20 @@ The derived verdict is:
 - `inconclusive` otherwise.
 
 A supplied verdict that differs rejects before any Evaluation write.
-`confidence` is a finite JSON number in `[0,1]`; `rationale` is non-empty after
-trimming. `qf_record_evaluation` accepts `findings`, never
+`confidence` is a finite JSON number in `[0,1]`. The Kernel trims `rationale`
+before validation and stores only the trimmed non-empty string.
+`qf_record_evaluation` accepts `findings`, never
 `findings_artifact_id`. `findings` is a non-empty ordered JSON array whose
-elements have exactly `{code, severity, message, evidence_refs}`. `code` and
-trimmed `message` are non-empty strings; `severity` is `info|warning|error`;
-`evidence_refs` is an array of exact source-work ids with no foreign id. In the
+elements have exactly `{code, severity, message, evidence_refs}`. The Kernel
+trims `code` and `message` before validation and stores only their trimmed
+non-empty strings. `severity` is `info|warning|error`; `evidence_refs` is a
+non-empty, duplicate-free ordered array whose members are drawn only from the
+five immutable source-work values. Input and findings-array order are preserved;
+empty, duplicate, or foreign references reject atomically. In the
 same Kernel transaction as the Evaluation, the Kernel canonicalizes the array
-to JSON, creates one immutable Artifact of kind `evaluation_findings`, links it
+as UTF-8 bytes of `JSON.stringify` with exact element key order
+`code,severity,message,evidence_refs`, no replacer/spacing/BOM/trailing newline,
+creates one immutable Artifact of kind `evaluation_findings`, links it
 to the Evaluation, and stores the resulting `findings_artifact_id`. Caller,
 Main, renderer, gate, and critic cannot supply or replace that id. Tests exercise
 every score individually at `0.49`, `0.50`, `0.79`, and `0.80`.
@@ -131,16 +143,32 @@ with no invented numeric value or zero.
 
 ### Publication
 
-Publication is an automatic Kernel-owned transition after committing
-`supports`; R15 adds no Publish button. Main asks the Kernel to generate one
-canonical JSON envelope `qf.research.report.v2` containing the immutable
-source-work tuple, source result Artifact id/content hash, publication
-Evaluation id, rubric/verdict/rationale, and findings Artifact id/content hash.
-The Kernel canonicalizes and writes those bytes as one Artifact of kind
-`report`; renderer-, critic-, gate-, or caller-supplied Report bytes/content
-reject. The Report content hash is the hash of its own canonical envelope, while
-the embedded source-result hash must equal the existing result Artifact. Report
-row, bytes, and lineage commit atomically.
+Publication is an automatic Kernel-owned transition inside
+`qf_record_evaluation`; R15 adds no Publish button and Main performs no second
+publication call. The Report envelope has exactly this shape and no extra or
+missing key:
+
+```json
+{"schema":"qf.research.report.v2","source_work":{"source_task_id":"<id>","hypothesis_id":"<id>","run_id":"<id>","result_artifact_id":"<id>","executor_session_id":"<id>"},"source_result":{"artifact_id":"<id>","content_hash":"<hash>"},"publication_evaluation":{"evaluation_id":"<id>","critic_session_id":"<id>","rubric":{"faithfulness":0,"answer_relevancy":0,"context_precision":0,"context_recall":0},"overall":0,"verdict":"supports","confidence":0,"rationale":"<normalized rationale>","findings_artifact_id":"<id>","findings_content_hash":"<hash>"}}
+```
+
+`source_result.artifact_id` equals `source_work.result_artifact_id`. Every
+Evaluation field equals the immutable supporting Evaluation selected as
+`publication_evaluation_id`; verdict is exactly `supports`. Findings id/hash
+equal its linked `evaluation_findings` Artifact. Canonical Report bytes are
+UTF-8 bytes of `JSON.stringify` with no replacer or spacing applied to an object
+constructed recursively in the exact key order shown, with no BOM or trailing
+newline. Report content hash uses the existing Kernel Artifact-content hash
+algorithm over exactly those bytes. Renderer-, critic-, gate-, Main-, or
+caller-supplied Report bytes/content reject.
+
+For the first supporting Evaluation, `qf_record_evaluation` commits Evaluation,
+completed review Task, findings Artifact, canonical Report bytes/row,
+`publication_evaluation_id`, and all lineage in one Kernel transaction. Failure
+of any Report/lineage write rolls all of them back. A later supporting
+Evaluation for already-published source work commits that Evaluation while
+returning the existing immutable Report/publication Evaluation without another
+Report write.
 
 Uniqueness is global per five-id source-work tuple. The first successful
 supporting Evaluation becomes immutable `publication_evaluation_id`. Retries
@@ -167,8 +195,9 @@ does not count.
 ### A — Least-privilege production critic policy
 
 Bind the exact policy above to production `hermes-critic`. A focused policy
-test fails for any missing required tool, any fifth ontology tool, any skill, or
-resolution from a non-production definition.
+test fails for any missing required tool, any fifth agent-callable tool
+regardless of namespace/category, any skill, or resolution from a non-production
+definition.
 
 ### B — One visible handoff causes critic work
 
@@ -207,7 +236,8 @@ Both `rejects` and `inconclusive` show and support:
    immutable tuple. Admission/launch failure commits neither session nor Task,
    only the standard refusal receipt.
 
-The renderer creates one UUID before sending an action IPC, disables duplicate
+Request review, Request revision, and Second critic all use this contract. The
+renderer creates one UUID before sending an action IPC, disables duplicate
 activation synchronously, and reuses that UUID for every transport retry until
 a terminal result/refusal arrives. Main validates and persists it before launch
 or domain mutation. Concurrent IPC carrying the same UUID returns the same
@@ -218,6 +248,14 @@ Main never invents a replacement UUID for an incoming action. Persisted key is
 `(action_kind, source_work, triggering_evaluation_id, attempt_id)`; Revision and
 Second critic use separate namespaces. Duplicate attempts suppress only objects
 attributable to that duplicate, not unrelated later critic work.
+
+Request review's persisted key is
+`(request_review, selected_source_task_id, attempt_id)`. For initial source-work
+refusal, `action_refusal_receipt.triggering_evaluation_id` is exactly `null`;
+for Revision/Second critic it is the exact non-supporting Evaluation id and may
+not be null. Every refusal contains the originating UI attempt id. Concurrent
+and post-reopen Request-review retries return the original admission result or
+refusal without another critic session/review Task.
 
 A later supporting second Evaluation may publish but never deletes, rewrites,
 or hides the first non-supporting Evaluation.
@@ -287,6 +325,13 @@ Evaluation, source id, and lineage edge. DOM facts include critic identity,
 four scores, overall, verdict, rationale, block reason, actions, publication
 state, Report id, and hash. Missing, extra, reordered, or unequal facts fail.
 
+After opaque runtime ids are bound, the independent Oracle may substitute only
+those ids into the order-authored exact Report-envelope template. It serializes
+and hashes the template independently without calling the production envelope
+builder/canonicalizer, then compares expected bytes/hash with stored Report
+bytes, SQLite facts, and DOM hash. This is the sole exception to the prohibition
+on deriving non-opaque expectations from symbolic ids.
+
 `governed-review-live` has a 240-second total limit and uses one real launched
 production `hermes-critic` against an isolated deterministic source-work
 fixture. Complete the positive review first and capture its Report/Artifact/link
@@ -312,7 +357,7 @@ expectations, timeout, or fixture identity. Unchanged gates must go red, then
 exact restoration must go green:
 
 1. omit one required critic tool;
-2. add a fifth critic ontology tool;
+2. add a fifth critic agent-callable tool from any namespace/category;
 3. make independence admit executor-as-critic;
 4a. trust a post-activation caller Run id;
 4b. trust a post-activation caller Artifact id;
@@ -334,11 +379,17 @@ exact restoration must go green:
 18. modify resolved Hermes config/auth;
 19a. leak one known child process while checker remains unchanged;
 19b. leak one allocated root while checker remains unchanged; and
-20. leak R14 QA hold into a normal worker.
+20. leak R14 QA hold into a normal worker; and
+21. commit a supporting Evaluation/Task completion before Report creation.
 
 Every numbered/subnumbered entry receives its own red and restored-green output.
 No falsifier may alter the gate, assertion, expected manifest, timeout, or
 fixture identity.
+
+The focused Kernel transaction test forces Report persistence failure and
+requires zero new Evaluation, findings Artifact, completed Task, Report, or
+lineage. Falsifier 21 makes that partial commit possible; unchanged
+`governed-review` must go red before exact restoration returns green.
 
 ## Literal Builder matrix
 
