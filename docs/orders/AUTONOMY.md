@@ -7,7 +7,10 @@ governs: the loop in [`PROTOCOL.md`](PROTOCOL.md), run without the founder prese
 
 ## Founder standing override — 2026-08-14
 
-These rules beat the rest of this file until the founder removes them.
+These rules beat the rest of this file until the founder removes them. They also
+beat PROTOCOL's older fresh-worktree and cold-release instructions where those
+instructions conflict with rules 1–3 below; the founder reaffirmed that exact
+precedence on 2026-08-15.
 
 1. Work only in the QuantFlow-Ontology checkout the founder has open. A git
    branch in that folder is allowed. A second folder, worktree, clone, or
@@ -23,7 +26,8 @@ These rules beat the rest of this file until the founder removes them.
 
 > `PROTOCOL.md` defines the roles and the loop. This file defines how one lead
 > session drives that loop for hours with nobody watching, and exactly where it
-> must stop. If the two disagree, `PROTOCOL.md` wins.
+> must stop. If the two disagree, `PROTOCOL.md` wins except for the founder
+> standing override above, whose named checkout and release-gate rules win.
 
 ## The lead session is a router, not a builder
 

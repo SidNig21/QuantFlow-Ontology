@@ -88,6 +88,14 @@ Corollary — **the founder's four checks, which need no technical knowledge.** 
 
 **Cold-run-is-verifier-only rule (learned the hard way, WO-004a — an order-authoring defect, three occurrences):** the cold run belongs to the **verifier**, in a throwaway worktree. **No order may instruct a builder to delete `node_modules`.**
 
+**Current founder override.** While `AUTONOMY.md`'s 2026-08-14 standing override
+remains active, its one-checkout rule replaces the throwaway-worktree procedure
+for routed V2/R14+ orders, and its named ban on release/package gates applies
+unless the active order names one. Separation remains separate chat sessions;
+the verifier records an immutable SHA before and after and nobody edits the
+checkout during its matrix. The founder reaffirmed this precedence on
+2026-08-15.
+
 The reason is that builders share the founder's single working tree. WO-005 and WO-004a both carried `rm -rf tools/*/node_modules qf-kernel-schema/node_modules packages/*/node_modules` as a builder step — correct for a builder with a private clone, destructive where the builders actually stand (~1.9 GB of installed dependencies, `tools/runtime-proof` alone 1.8 GB). Two builders independently noticed and routed around it: WO-005's deferred the cold run to the verifier, WO-004a's invented a clean-room worktree. Both were right *in spite of* the order. The third would have run it.
 
 So the split is now fixed:
