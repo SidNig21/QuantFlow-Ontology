@@ -1,6 +1,6 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: blocked — authorized gate-only synchronization pass red
+status: open — standing-authority gate sequencing repair
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
@@ -416,6 +416,32 @@ The prior generic renderer exception is gone. The requested `Clarify` control
 still did not become visible on the Task tile within the unchanged 15-second
 bound. Per this order, the Builder ran no second live attempt, falsifier lap,
 matrix, commit, push, Verifier, or R15 work. The full authorized implementation
-and gate edits remain preserved and uncommitted in the one checkout. Further
-repair requires a new founder decision because the final authorized pass is
-spent.
+and gate edits remain preserved and uncommitted in the one checkout. The later
+standing-authority clarification below supersedes that pass's founder-prompt
+requirement for in-scope delivery defects.
+
+## Standing-authority diagnosis and repair
+
+The founder clarified on 2026-08-15 that all in-scope delivery defects are
+already authorized and must not stop for another founder prompt. Read-only
+diagnostic task `01a0091b-f6ab-71a0-b4bd-bafb8c84a50b` proved the red is gate
+sequencing, not product projection:
+
+- the gate proves the original Task open, then admits and polls the second
+  specialist for as much as 55 seconds before requesting `Clarify`;
+- that order contradicts this work order's sequence, which requires Clarify
+  and Redirect before second-specialist setup;
+- the live synthetic worker may correctly complete the Task during that delay;
+- the renderer correctly hides Clarify/Redirect/Reassign/Second opinion after
+  a Task is no longer open.
+
+One fresh Builder must edit only `qa/gates/founder-steering.ts`: move the
+existing second-specialist admission/poll block from before Clarify to after
+Clarify and Redirect and immediately before Reassign. Preserve the existing
+admission path, assertions, fixtures, product/schema/responder behavior,
+timeouts, falsifiers, and cleanup. Run the focused unit sequence and the live
+gate once. Any new red must be diagnosed and repaired within the founder's
+standing authority when it remains in scope; ask only if an acceptance
+criterion must change or the repair crosses the work-order boundary. Green
+continues through the exact order matrix, commit/push, and a fresh independent
+Verifier.

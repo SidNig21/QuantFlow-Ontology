@@ -1,6 +1,6 @@
 # NEXT — WO-RD-3 founder steering
 
-status: BLOCKED — GATE-ONLY PASS RED; BUILDER DOOR CLOSED
+status: AUTHORIZED — DIAGNOSIS-BACKED GATE SEQUENCING REPAIR
 authorized-at: 2026-08-15
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-RD-3](WO-RD-3.md)
@@ -15,6 +15,8 @@ rewrite-builder-receipt: task `01a00806-7a19-79a2-895f-713aa6f99596` — selecto
 renderer-diagnosis: task `01a0080d-bba5-74a0-b10b-6175907da68d` — gate throws before asynchronous Task projection; gate-only bounded synchronization required
 founder-authorization: 2026-08-15 — perform the required gate-only synchronization and finish WO-RD-3
 gate-only-builder-receipt: task `01a00917-9de4-7ee2-b5d8-056cfe6cb211` — pure test green; single live gate red `Task control Clarify timed out`; no matrix/commit/push
+sequencing-diagnosis: task `01a0091b-f6ab-71a0-b4bd-bafb8c84a50b` — gate waits up to 55 seconds for worker-2 before Clarify, contrary to the order; worker may complete Task and correctly remove controls
+standing-authority: 2026-08-15 — diagnose and repair in-scope delivery defects without further founder prompts
 
 ## Authorized outcome
 
@@ -24,10 +26,12 @@ refusal is visible from Kernel truth; exact runtime delivery is receipted.
 
 ## Builder instructions
 
-No Builder is authorized. Preserve the current uncommitted WO-RD-3 product and
-gate edits. The final founder-authorized gate-only pass is spent and its named
-red receipt is recorded in WO-RD-3. A new founder decision is required before
-any implementation or live-gate rerun. No R15 work begins.
+One fresh Builder is authorized to apply WO-RD-3's diagnosis-backed gate-only
+sequencing repair while preserving all current uncommitted product and gate
+edits. Green proceeds through the exact matrix, commit/push, and a fresh
+Verifier. In-scope reds are diagnosed and repaired under standing authority;
+only a required acceptance change or scope-boundary crossing returns to the
+founder. No R15 implementation begins before WO-RD-3 verification.
 
 ## Stop
 
