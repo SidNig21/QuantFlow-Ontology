@@ -1,6 +1,6 @@
 # WO-RD-3 — Founder steering over live Director work
 
-status: open — founder-authorized gate-only synchronization pass
+status: blocked — authorized gate-only synchronization pass red
 assignee: builder
 depends: WO-RD-2 done at `13beba7fb9a24632946b8f50a319f9df161396c1`; independently verified in `docs/orders/evidence/wo-rd-2/VERIFICATION.md`
 rung: R14 / slice 3 — clarify, redirect, reassign, cancel, and request a second opinion
@@ -398,3 +398,24 @@ Preserve every product/schema/responder edit, fixture, assertion, falsifier,
 timeout, cleanup rule, and command. Run the focused gate once after the edit.
 Any red stops. Green continues through the exact falsifier pairs and Builder
 matrix, then commits and pushes one candidate for a fresh independent Verifier.
+
+## Gate-only synchronization result — STOP
+
+Fresh Builder task `01a00917-9de4-7ee2-b5d8-056cfe6cb211` made only the
+authorized edit in `qa/gates/founder-steering.ts`. The focused pure test was
+green. The single authorized live run then produced this named red receipt:
+
+```text
+bun qa/run.ts founder-steering
+founder-steering: FAIL Task control Clarify timed out
+FAIL  founder-steering
+exit code: 1
+```
+
+The prior generic renderer exception is gone. The requested `Clarify` control
+still did not become visible on the Task tile within the unchanged 15-second
+bound. Per this order, the Builder ran no second live attempt, falsifier lap,
+matrix, commit, push, Verifier, or R15 work. The full authorized implementation
+and gate edits remain preserved and uncommitted in the one checkout. Further
+repair requires a new founder decision because the final authorized pass is
+spent.
