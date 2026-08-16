@@ -47,6 +47,13 @@ claims runtime data/control behavior. No link means no cable.
 availability, and a bounded text preview when the stored bytes are valid UTF-8.
 The preview is never the source of truth and never replaces the hash.
 
+Artifact preview is exact: Main streams and hashes the full file first. If the
+hash differs, it returns no bytes. If byte length exceeds 65,536, the inspector
+shows exactly `Preview unavailable: artifact exceeds 65536 bytes`. Otherwise
+the full bytes must decode through fatal UTF-8. Invalid UTF-8 shows exactly
+`Preview unavailable: artifact is not UTF-8`. Valid text renders the first 2,048
+Unicode code points and appends one `…` only when more code points exist.
+
 ## Exact visible world
 
 The production Main process returns one immutable read projection for the world
@@ -88,16 +95,28 @@ missing are never collapsed into one display state.
 ## Mission to Task truth
 
 Add one canonical durable link kind, `belongs_to`, from `task` to `mission`.
-`create_task` accepts exactly one trusted `mission_id` for Research Director
-delegation and atomically writes that link with the Task. The R14 Director
-delivery carries the exact Mission id already assigned by Main. A missing,
-unknown, or caller-substituted Mission id refuses before Task creation. Manual
-Tasks created outside a Mission remain valid and show `Mission not linked`; the
-renderer must not infer membership from equal text, timestamps, or proximity.
+For Research Director delegation, `mission_id` exists only in trusted execution
+context beside `actor_session_id`; it is not an action/tool input and any
+caller-supplied `mission_id` field rejects. Main binds the new Mission id to the
+exact admitted Director session before activation, and the production peer-bus
+Task write receives that binding as trusted context. `create_task` atomically
+writes `belongs_to` with the Task. If the binding is absent after restart,
+unknown, or belongs to another Director session, Task creation refuses before
+any row/link/event with code `MISSION_CONTEXT_REQUIRED` and visible message
+`Reopen the Mission and ask the Research Director to delegate this work again.`
+Manual Tasks created outside the Research Director path remain valid and show
+`Mission not linked`; the renderer never infers membership from equal text,
+timestamps, or proximity.
 
 The existing R14 flow must therefore produce exactly one `belongs_to` link. No
 historical Task is backfilled by a guess. This is the only new domain relation in
 R16.
+
+The existing `tests` relation must also be written by the deterministic research
+path. `execute_deterministic_run` accepts an exact existing `hypothesis_id` and
+atomically writes one `tests` link from the new Run. The supporting R16 path and
+all new Director research Runs require it. Legacy calls without that field
+remain readable and render `Lineage incomplete: tests`; they are not backfilled.
 
 ## World traversal and cables
 
@@ -107,16 +126,33 @@ Traversal starts from the exact selected root and follows only these facts:
 - R15 source-work binding from source Task to Hypothesis, Run, result Artifact,
   and executor session;
 - `tests`, `uses`, `produces`, `evaluated_by`, `performed_by`, `gates`,
-  `assigned_to`, and `delegated_by` durable links;
+  `assigned_to`, `delegated_by`, and `delegates_to` durable links;
 - Evaluation fields that name findings Artifact, review Task, Report, and source
   work.
 
 Source-work/Evaluation field references admit tiles but do not draw cables unless
 a corresponding durable link exists. Required supporting-fixture cable labels
-are `belongs_to`, `tests`, `uses`, `produces`, `evaluated_by`, `performed_by`,
-`gates`, `assigned_to`, and `delegated_by`, each at its exact endpoints and
-cardinality. A missing required link shows `Lineage incomplete: <kind>` on the
-nearest owning tile and draws no substitute cable.
+and endpoints are exactly:
+
+1. source Task `belongs_to` Mission;
+2. source Task `assigned_to` executor session;
+3. source Task `delegated_by` Director session;
+4. Director session `delegates_to` executor session;
+5. Run `tests` Hypothesis;
+6. Run `uses` Dataset;
+7. Run `produces` result Artifact;
+8. Hypothesis, Run, and result Artifact each `evaluated_by` the Evaluation;
+9. Evaluation `performed_by` critic session;
+10. critic session `produces` findings Artifact; and
+11. Evaluation `gates` Report.
+
+These are 13 cables total. The three agent-session endpoints reuse their
+existing exact session tiles and are not counted among the nine research tiles.
+The Dataset's `derived_from` source Artifact remains an Artifact receipt inside
+the Dataset inspector because that source Artifact is not a world tile in this
+rung; therefore it draws no cable. A missing required link shows
+`Lineage incomplete: <kind>` on the nearest owning tile and draws no substitute
+cable.
 
 All semantic cables reuse the existing Glacier cable implementation and
 `connection` write boundary. Their source is the current Kernel projection, not
@@ -128,6 +164,11 @@ labels, endpoints, and lineage may not.
 `Show research world` appears on the selected Mission and eligible source Task.
 It is disabled with an inline exact reason when the root cannot resolve a world.
 Activation reveals or focuses the existing tiles; it never duplicates them.
+Mission without one `belongs_to` Task shows exactly `No linked research Task yet.`
+Task without an R15 source-work binding shows exactly
+`This Task has no completed research lineage yet.` More than one eligible source
+Task under a Mission shows a compact Task chooser ordered by creation time then
+id; choosing one is required before reveal.
 
 First reveal uses deterministic lanes around the world root:
 
@@ -138,6 +179,15 @@ First reveal uses deterministic lanes around the world root:
 Existing user-moved positions win on later reveals. New tiles occupy the nearest
 free slots in their lane and never cover the rotating cube, Dock, or another
 tile. `Tidy` remains the operator's explicit global layout control.
+
+Every research tile uses the existing 420 by 280 canvas footprint. Compact and
+expanded inspector modes do not resize that footprint; the expanded detail body
+scrolls inside it. Initial positions snap to the existing 20-pixel baseline.
+Lane columns are separated by the existing 420-pixel column width plus 24-pixel
+gutter; rows use 280 pixels plus 24-pixel gutter. Treat existing tiles, the live
+Dock rectangle, and the live cube rectangle expanded by 24 pixels as occupied.
+For a collision, advance by one 20-pixel baseline step in stable object-id order
+until free. Persist only the final app-local geometry.
 
 Tab reaches every research tile and its visible controls. Enter expands or
 collapses. Escape collapses. Existing cable keyboard parity remains green.
@@ -189,11 +239,15 @@ Before the first launch, construct the supporting fixture only through Kernel
 commands and exact R14/R15 production helpers. The fixture contains one Mission,
 one source Task, one Hypothesis, one Dataset plus source Artifact, one succeeded
 Run, one result Artifact, one supporting Evaluation, one findings Artifact, and
-one Report. Freeze an independent expected manifest before Electron starts.
+one Report, plus the exact Director, executor, and critic session tiles. It
+contains the 13 literal projected links above. Other durable links may exist,
+but the projection excludes kinds not named in `World traversal and cables`.
+Freeze an independent expected manifest before Electron starts.
 
 The gate must prove:
 
-1. visible click reveals exactly one tile per expected object id/type;
+1. visible Mission-root and Task-root clicks each reveal the same exact world,
+   with exactly one tile per expected object id/type;
 2. every collapsed and expanded field equals the independent manifest;
 3. full ids/hashes are accessible and no value came from fixture constants in
    renderer code;
