@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "d4534d4",
+    "commit": "6290b1f",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "6e55c925865a49c1"
+    "fingerprint": "db7a86fd438bbf36"
   },
   "stats": {
     "live": 105,
@@ -50,18 +50,18 @@
     "unexplainedCoverage": 0,
     "stripCandidates": 13,
     "violations": 15,
-    "governanceUnknown": 3,
+    "governanceUnknown": 2,
     "legacyLeads": 9,
     "nodes": 106,
     "loopsBroken": 4,
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 41,
+    "undecided": 40,
     "allClear": false,
     "decisions": {
-      "total": 46,
-      "undecided": 41,
+      "total": 45,
+      "undecided": 40,
       "keep": 2,
       "repair": 3,
       "remove": 0,
@@ -2933,7 +2933,7 @@
       "kb": 27.4,
       "x": 1.24,
       "z": -0.45,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 0,
       "dml": 4,
@@ -38356,70 +38356,47 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/links.ts:links:insert-into",
+      "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
       "classification": "needs-verification",
       "disposition": "needs-verification",
-      "fn": "writeLinks",
-      "table": "links",
+      "fn": "appendEvent",
+      "table": "events",
       "verb": "INSERT INTO",
-      "persistence": "domain-truth",
+      "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "kernel-internal",
       "governance": "unknown",
       "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/deterministic-execution.ts, packages/qf-kernel/src/market-ingest.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts, packages/qf-kernel/src/insert.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
       "evidence": [
         {
           "type": "static",
-          "file": "packages/qf-kernel/src/links.ts",
+          "file": "packages/qf-kernel/src/events.ts",
           "lines": [
-            170
+            21
           ]
         }
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:instrument:insert-into",
+      "id": "persistence:packages/qf-kernel/src/insert.ts:run:insert-into",
       "classification": "needs-verification",
       "disposition": "needs-verification",
-      "fn": "ingestMarketBatch",
-      "table": "instrument",
+      "fn": "insertRun",
+      "table": "run",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
       "reachability": "unknown",
       "governance": "unknown",
       "confidence": "low",
-      "why": "No caller of ingestMarketBatch() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
+      "why": "No caller of insertRun() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
       "evidence": [
         {
           "type": "static",
-          "file": "packages/qf-kernel/src/market-ingest.ts",
+          "file": "packages/qf-kernel/src/insert.ts",
           "lines": [
-            482
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:quote:insert-into",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ingestMarketBatch",
-      "table": "quote",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "unknown",
-      "governance": "unknown",
-      "confidence": "low",
-      "why": "No caller of ingestMarketBatch() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/market-ingest.ts",
-          "lines": [
-            504
+            30
           ]
         }
       ]
@@ -38801,10 +38778,10 @@
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "governed",
+      "reachability": "inside-write-door",
       "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of insertArtifact() is inside the write door, so production reaches this SQL only through a governed action.",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
       "evidence": [
         {
           "type": "static",
@@ -38824,10 +38801,10 @@
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "governed",
+      "reachability": "inside-write-door",
       "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of executeDeterministicRun() is inside the write door, so production reaches this SQL only through a governed action.",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
       "evidence": [
         {
           "type": "static",
@@ -38847,10 +38824,10 @@
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "governed",
+      "reachability": "inside-write-door",
       "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of executeDeterministicRun() is inside the write door, so production reaches this SQL only through a governed action.",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
       "evidence": [
         {
           "type": "static",
@@ -38870,29 +38847,6 @@
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "governed",
-      "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of executeDeterministicRun() is inside the write door, so production reaches this SQL only through a governed action.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/deterministic-execution.ts",
-          "lines": [
-            627
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
-      "classification": "persistence-ok",
-      "disposition": "keep",
-      "fn": "appendEvent",
-      "table": "events",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
@@ -38900,9 +38854,9 @@
       "evidence": [
         {
           "type": "static",
-          "file": "packages/qf-kernel/src/events.ts",
+          "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            21
+            627
           ]
         }
       ]
@@ -39184,24 +39138,24 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/insert.ts:run:insert-into",
+      "id": "persistence:packages/qf-kernel/src/links.ts:links:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "insertRun",
-      "table": "run",
+      "fn": "writeLinks",
+      "table": "links",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "inside-write-door",
+      "reachability": "governed",
       "governance": "compliant",
-      "confidence": "high",
-      "why": "Inside the declared write door.",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of writeLinks() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
           "type": "static",
-          "file": "packages/qf-kernel/src/insert.ts",
+          "file": "packages/qf-kernel/src/links.ts",
           "lines": [
-            30
+            170
           ]
         }
       ]
@@ -39215,10 +39169,10 @@
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "governed",
+      "reachability": "inside-write-door",
       "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of scheduleMarketEvent() is inside the write door, so production reaches this SQL only through a governed action.",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
       "evidence": [
         {
           "type": "static",
@@ -39238,16 +39192,62 @@
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "governed",
+      "reachability": "inside-write-door",
       "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of registerVenue() is inside the write door, so production reaches this SQL only through a governed action.",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
       "evidence": [
         {
           "type": "static",
           "file": "packages/qf-kernel/src/market-context.ts",
           "lines": [
             278
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:instrument:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "ingestMarketBatch",
+      "table": "instrument",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/market-ingest.ts",
+          "lines": [
+            482
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:quote:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "ingestMarketBatch",
+      "table": "quote",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/market-ingest.ts",
+          "lines": [
+            504
           ]
         }
       ]
@@ -39261,7 +39261,7 @@
       "verb": "INSERT INTO",
       "persistence": "schema-migration",
       "sourceClass": "migration",
-      "reachability": "inside-write-door",
+      "reachability": "kernel-internal",
       "governance": "compliant",
       "confidence": "high",
       "why": "schema-migration — outside the domain the Kernel owns.",
@@ -39703,24 +39703,17 @@
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/links.ts:links:insert-into",
+      "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
       "kind": "persistence",
-      "what": "links insert into",
-      "where": "packages/qf-kernel/src/links.ts",
+      "what": "events insert into",
+      "where": "packages/qf-kernel/src/events.ts",
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:instrument:insert-into",
+      "id": "persistence:packages/qf-kernel/src/insert.ts:run:insert-into",
       "kind": "persistence",
-      "what": "instrument insert into",
-      "where": "packages/qf-kernel/src/market-ingest.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:quote:insert-into",
-      "kind": "persistence",
-      "what": "quote insert into",
-      "where": "packages/qf-kernel/src/market-ingest.ts",
+      "what": "run insert into",
+      "where": "packages/qf-kernel/src/insert.ts",
       "verdict": "undecided"
     },
     {

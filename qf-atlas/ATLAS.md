@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ d4534d4` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 6290b1f` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**41 of 46 findings have not been looked at.**
+**40 of 45 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 41 |
+| `undecided` | 40 |
 | `repair` | 3 |
 | `remove` | 0 |
 | `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 41 findings still need a decision.
+**Not all clear.** 40 findings still need a decision.
 
 ## The four hops
 
@@ -320,7 +320,7 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**15 confirmed**, 3 unknown (gray — not counted as debt).
+**15 confirmed**, 2 unknown (gray — not counted as debt).
 
 | File | Table | Verb | Kind | Reach | Confidence |
 |---|---|---|---|---|---|

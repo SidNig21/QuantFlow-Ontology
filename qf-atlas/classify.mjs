@@ -23,7 +23,24 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { insideWriteDoor, WRITE_DOOR } from "./extract.mjs";
+// AUTHORITY IS DERIVED, NOT TYPED. This module used to import `insideWriteDoor`, a
+// predicate over a hand-written Set of six filenames, and membership short-circuited
+// every SQL site in the file to `compliant / high`. That is architectural authority
+// resting on a string: add a file and its writes are trusted forever on no evidence,
+// or rename the real dispatcher and the Set still reads green while the mutation path
+// moves somewhere this analyzer is not looking.
+//
+// The door is now injected from writedoor.mjs, which reads the Kernel's own dispatch
+// structure. There is deliberately NO fallback to the old allowlist: a silent fallback
+// is the exact drift the contract forbids, so an unset door throws instead.
+let DOOR = null;
+export function setWriteDoor(door) { DOOR = door; }
+const insideWriteDoor = (p) => {
+  if (!DOOR) throw new Error(
+    "qf-atlas/classify.mjs: no derived write door was set. Refusing to classify "
+    + "persistence against a hand-typed filename allowlist — call setWriteDoor() first.");
+  return DOOR.isDoor(p);
+};
 
 const KERNEL = "packages/qf-kernel/";
 const isAppFile = (p) => !insideWriteDoor(p) && !p.startsWith(KERNEL);
@@ -246,7 +263,7 @@ export function commandRoots(index, read, repo, relOf) {
   const roots = new Set();
   const names = byRecName(index);
   for (const rec of index.values()) if (insideWriteDoor(rec.file)) roots.add(recKey(rec));
-  for (const door of WRITE_DOOR) {
+  for (const door of (DOOR?.files ?? [])) {
     let text = "";
     try { text = readFileSync(join(repo, door), "utf8"); } catch { continue; }
     for (const m of text.matchAll(/^\s{2,}([a-z][a-z0-9_]*)\s*:\s*([A-Za-z_$][\w$]*)\s*,\s*$/gm)) {

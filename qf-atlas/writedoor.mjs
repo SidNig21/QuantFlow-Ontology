@@ -144,6 +144,40 @@ export function deriveWriteDoor({ astOf, schemaActions, kernelPrefix = "packages
 }
 
 /**
+ * The predicate classification actually consults, built from the derivation.
+ *
+ * This is what replaces `insideWriteDoor`. Three differences that matter:
+ *
+ *   1. AUTHORITY IS DERIVED. `isDoor` is true for a file that declares a dispatched
+ *      action implementation or declares the dispatcher — facts read from the Kernel,
+ *      not a name someone typed.
+ *
+ *   2. NO BLANKET HIGH CONFIDENCE. The allowlist made every SQL site in a listed file
+ *      `compliant / high`. Four of its six entries — insert.ts, events.ts, db.ts,
+ *      upgrade.ts — implement no dispatched action, so they lose that blanket and are
+ *      judged on their own evidence. Measured result: upgrade.ts is compliant because
+ *      its callers are kernel-internal, events.ts and insert.ts become honest gray, and
+ *      db.ts produces no persistence row at all. Derived reasons, not assumed ones.
+ *
+ *   3. IT CAN REFUSE. When the derivation is `unknown` — the dispatcher was renamed or
+ *      moved — `usable` is false and the caller must degrade to gray. Silently falling
+ *      back to the allowlist is the drift the contract forbids.
+ */
+export function makeDoor(derivation) {
+  const files = new Set(derivation.doorFiles);
+  // Generated schema SQL is still generated: it is a build product of the ontology,
+  // not hand-written mutation, and the schema directory is a declaration of that.
+  const GENERATED = ["qf-kernel-schema/"];
+  return {
+    state: derivation.state,
+    reason: derivation.reason,
+    usable: derivation.state !== "unknown",
+    isDoor: (p) => files.has(p) || GENERATED.some((g) => p.startsWith(g)),
+    files: [...files],
+  };
+}
+
+/**
  * Is a bare `execute(` call the governed door, or an unrelated method that happens to
  * be named execute? The old check matched the identifier anywhere, so ANY `x.execute()`
  * earned write-door credit. It was correct only by luck: the one match in the app is

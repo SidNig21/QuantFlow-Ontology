@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 52,
-  "total": 52,
+  "passed": 55,
+  "total": 55,
   "results": [
     {
       "n": 1,
@@ -97,7 +97,7 @@
       "n": 16,
       "name": "headline counts equal the canonical model",
       "passed": true,
-      "detail": "stats.violations=15 vs persistence=15; gray 3 vs 3"
+      "detail": "stats.violations=15 vs persistence=15; gray 2 vs 2"
     },
     {
       "n": 17,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 41 -> 40"
+      "detail": "verdict=remove undecided 40 -> 39"
     },
     {
       "n": 33,
@@ -314,6 +314,24 @@
       "name": "a renamed dispatcher makes the door unknown, not green",
       "passed": true,
       "detail": "state=unknown -- no function named `execute` was found in the Kernel; the dispatc"
+    },
+    {
+      "n": 53,
+      "name": "the filename allowlist no longer confers compliance",
+      "passed": true,
+      "detail": "24 trusted site(s), every one in a derived door file"
+    },
+    {
+      "n": 54,
+      "name": "the authority swap loses no confirmed violation",
+      "passed": true,
+      "detail": "15 confirmed violation(s) across 1 file(s); governed-review.ts red=true"
+    },
+    {
+      "n": 55,
+      "name": "classification refuses to run without a derived door",
+      "passed": true,
+      "detail": "throwsWithoutDoor=true allowlistImportRemoved=true"
     }
   ]
 }

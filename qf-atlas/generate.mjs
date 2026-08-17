@@ -14,12 +14,12 @@ import { walk, fileFacts, extractWires, pushWires, stripCandidates, violations, 
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
-import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage } from "./classify.mjs";
+import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage, setWriteDoor } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 import { reachability, blastRadius } from "./reach.mjs";
 import { analyzeFile, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
 import { coverageMatrix } from "./coverage-matrix.mjs";
-import { deriveWriteDoor, schemaActionNames } from "./writedoor.mjs";
+import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
 import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
 import { readdirSync } from "node:fs";
 
@@ -52,6 +52,20 @@ const files = walk(REPO).map((f) => rel(f)).filter((f) => layerOf(f) !== null);
 const facts = fileFacts(files.map((f) => join(REPO, f)));
 const factOf = new Map(facts.map((f) => [f.path, f]));
 
+// ─── AST — syntax facts from the TypeScript compiler (contract section H) ────
+// Regex may be supplementary evidence and may never create a high-confidence red on
+// its own. Two immediate proofs the parser fixes real damage: kernel.ts reports 0
+// process spawns where the regex claimed 15, and governed-review.ts — the file whose
+// coverage gap made the violation count a FLOOR rather than a total — resolves all 28
+// of its SQL sites to an enclosing symbol where the regex indexer managed 16 of 27.
+const astOf = new Map();
+for (const p of walk(REPO, [], true).map((f) => rel(f)))
+  astOf.set(p, analyzeFile(p, read(join(REPO, p))));
+if (!tsAvailable())
+  console.warn(`qf-atlas: WARNING — TypeScript unavailable (${tsUnavailableReason()}). `
+    + "Every AST-backed fact degrades to `unsupported` with that reason attached; "
+    + "nothing silently falls back to regex confidence.");
+
 const mainFiles     = files.filter((f) => f.startsWith("collab-electron/src/main/")).map((f) => join(REPO, f));
 const preloadFiles  = files.filter((f) => f.startsWith("collab-electron/src/preload/")).map((f) => join(REPO, f));
 const rendererFiles = files.filter((f) => f.startsWith("collab-electron/src/windows/") || f.startsWith("collab-electron/packages/")).map((f) => join(REPO, f));
@@ -79,6 +93,40 @@ const push = pushWires(mainFiles, preloadFiles, rendererFiles);
 
 const strip = stripCandidates(wires, facts);
 const breaches = violations(facts);
+
+// ─── THE GOVERNED WRITE DOOR, DERIVED (contract section D) ───────────────────
+// `WRITE_DOOR` is six filenames typed by hand, and membership short-circuits
+// classification to `compliant / high` for every SQL site in the file. That is
+// authority resting on a string. The Kernel's own dispatch structure is now read
+// instead, and the two disagree badly — only execute.ts and create.ts appear in both:
+//
+//   trusted by the allowlist, NOT supported by the dispatch structure
+//     insert.ts, events.ts, db.ts, upgrade.ts        <- FALSE KEEP risk
+//   implements a dispatched action, NOT in the allowlist
+//     deterministic-execution.ts, market-context.ts,
+//     market-ingest.ts, pipeline.ts                  <- their SQL is being adjudicated
+//                                                       as a potential violation
+//
+// market-ingest.ts currently carries a confirmed persistence finding while
+// implementing a governed action, which is the false-red the contract's falsifier 5
+// exists to prevent.
+//
+// The allowlist is NOT removed in this commit: swapping the authority rewires
+// classify.mjs and would put the whole 50-falsifier suite at risk in one step. The
+// derivation is published, the divergence is a first-class finding, and the swap is
+// the next change — with the divergence report as its acceptance test.
+const schemaActions = schemaActionNames(astOf);
+const writeDoor = deriveWriteDoor({ astOf, schemaActions });
+writeDoor.declaredAllowlist = [...WRITE_DOOR];
+writeDoor.divergence = {
+  trustedButNotDerived: [...WRITE_DOOR].filter((f) => !writeDoor.doorFiles.includes(f)),
+  derivedButNotTrusted: writeDoor.doorFiles.filter((f) => !WRITE_DOOR.has(f)),
+};
+
+// Install the derived door. classify.mjs throws if this is skipped — there is no
+// fallback to the allowlist, because a silent fallback is the drift being removed.
+const door = makeDoor(writeDoor);
+setWriteDoor(door);
 
 // Semantic persistence classification replaces the old "SQL outside an allowlist
 // is a violation" rule, which called transport bookkeeping a domain breach.
@@ -350,19 +398,6 @@ const reachOf = new Map(reach.rows.map((r) => [r.path, r.reach]));
 // so "what breaks if I change this?" was answerable for 1 of 234 files while the
 // data for all 234 sat in memory. Withholding it because a file is not red is
 // backwards: the question is asked BEFORE the change, when nothing is red yet.
-// ─── AST — syntax facts from the TypeScript compiler (contract section H) ────
-// Regex may be supplementary evidence and may never create a high-confidence red on
-// its own. Two immediate proofs the parser fixes real damage: kernel.ts reports 0
-// process spawns where the regex claimed 15, and governed-review.ts — the file whose
-// coverage gap made the violation count a FLOOR rather than a total — resolves all 28
-// of its SQL sites to an enclosing symbol where the regex indexer managed 16 of 27.
-const astOf = new Map();
-for (const p of walk(REPO, [], true).map((f) => rel(f)))
-  astOf.set(p, analyzeFile(p, read(join(REPO, p))));
-if (!tsAvailable())
-  console.warn(`qf-atlas: WARNING — TypeScript unavailable (${tsUnavailableReason()}). `
-    + "Every AST-backed fact degrades to `unsupported` with that reason attached; "
-    + "nothing silently falls back to regex confidence.");
 
 // PER-ANALYZER COVERAGE for every scanned file (contract section H). The previous
 // coverage model answered one question — could the SQL indexer read this file — for
@@ -384,34 +419,6 @@ const matrix = coverageMatrix({
                        // `ownership: unsupported` with that stated as the reason.
 });
 
-// ─── THE GOVERNED WRITE DOOR, DERIVED (contract section D) ───────────────────
-// `WRITE_DOOR` is six filenames typed by hand, and membership short-circuits
-// classification to `compliant / high` for every SQL site in the file. That is
-// authority resting on a string. The Kernel's own dispatch structure is now read
-// instead, and the two disagree badly — only execute.ts and create.ts appear in both:
-//
-//   trusted by the allowlist, NOT supported by the dispatch structure
-//     insert.ts, events.ts, db.ts, upgrade.ts        <- FALSE KEEP risk
-//   implements a dispatched action, NOT in the allowlist
-//     deterministic-execution.ts, market-context.ts,
-//     market-ingest.ts, pipeline.ts                  <- their SQL is being adjudicated
-//                                                       as a potential violation
-//
-// market-ingest.ts currently carries a confirmed persistence finding while
-// implementing a governed action, which is the false-red the contract's falsifier 5
-// exists to prevent.
-//
-// The allowlist is NOT removed in this commit: swapping the authority rewires
-// classify.mjs and would put the whole 50-falsifier suite at risk in one step. The
-// derivation is published, the divergence is a first-class finding, and the swap is
-// the next change — with the divergence report as its acceptance test.
-const schemaActions = schemaActionNames(astOf);
-const writeDoor = deriveWriteDoor({ astOf, schemaActions });
-writeDoor.declaredAllowlist = [...WRITE_DOOR];
-writeDoor.divergence = {
-  trustedButNotDerived: [...WRITE_DOOR].filter((f) => !writeDoor.doorFiles.includes(f)),
-  derivedButNotTrusted: writeDoor.doorFiles.filter((f) => !WRITE_DOOR.has(f)),
-};
 
 const loops = buildLoops(wires, lifetime);
 

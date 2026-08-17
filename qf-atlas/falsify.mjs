@@ -889,6 +889,47 @@ record(52, "a renamed dispatcher makes the door unknown, not green", ...(() => {
   } finally { writeAtomic(abs, original); }
 })());
 
+
+// 53 · The hand-typed allowlist no longer confers compliance. Membership used to
+// short-circuit every SQL site in a listed file to compliant/high. Four of its six
+// entries implement no dispatched Kernel action, so none of them may still be trusted
+// on the strength of appearing in that Set.
+record(53, "the filename allowlist no longer confers compliance", ...(() => {
+  const wd = before.writeDoor;
+  if (!wd) return [false, "no write-door derivation in the model"];
+  const derived = new Set(wd.doorFiles);
+  const trusted = (before.persistence ?? []).filter((x) => x.reachability === "inside-write-door");
+  const unearned = trusted.filter((x) => !derived.has(x.evidence[0].file));
+  const stillTrusted = wd.divergence.trustedButNotDerived.filter((f) =>
+    trusted.some((x) => x.evidence[0].file === f));
+  return [unearned.length === 0 && stillTrusted.length === 0,
+    unearned.length ? (unearned.length + " site(s) trusted without a derived door, e.g. " + unearned[0].evidence[0].file)
+      : stillTrusted.length ? ("allowlist-only file still trusted: " + stillTrusted.join(", "))
+      : (trusted.length + " trusted site(s), every one in a derived door file")];
+})());
+
+// 54 · The swap must not launder a real violation away. A refactor of the analyzer
+// that quietly drops a confirmed defect is worse than the defect: the map would go
+// green for a reason that has nothing to do with the code improving.
+record(54, "the authority swap loses no confirmed violation", ...(() => {
+  const v = (before.persistence ?? []).filter((x) => x.governance === "violation");
+  const files = [...new Set(v.map((x) => x.evidence[0].file))];
+  const gr = files.some((f) => f.endsWith("governed-review.ts"));
+  return [v.length > 0 && gr,
+    v.length + " confirmed violation(s) across " + files.length + " file(s); governed-review.ts red=" + gr];
+})());
+
+// 55 · No silent fallback. classify.mjs must REFUSE to classify when no derived door
+// has been installed, rather than quietly reverting to the allowlist — a silent
+// fallback is precisely the drift this work removes.
+record(55, "classification refuses to run without a derived door", ...(() => {
+  const src = readFileSync(join(REPO, "qf-atlas/classify.mjs"), "utf8");
+  const throws = src.includes("Refusing to classify") && src.includes("setWriteDoor");
+  const noImport = !src.includes("insideWriteDoor, WRITE_DOOR");
+  return [throws && noImport,
+    "throwsWithoutDoor=" + throws + " allowlistImportRemoved=" + noImport];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 
