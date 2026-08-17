@@ -10,7 +10,8 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel } from "./extract.mjs";
+import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel, read } from "./extract.mjs";
+import { addFourthHop } from "./hop4.mjs";
 
 const OUT = join(REPO, "qf-atlas");
 
@@ -46,6 +47,11 @@ const preloadFiles  = files.filter((f) => f.startsWith("collab-electron/src/prel
 const rendererFiles = files.filter((f) => f.startsWith("collab-electron/src/windows/") || f.startsWith("collab-electron/packages/")).map((f) => join(REPO, f));
 
 const { wires, bridges, bridgeMethodCount, usedMethodCount } = extractWires(mainFiles, preloadFiles, rendererFiles);
+// hop 4 — main -> Kernel. Runs before strip/status so "cheats" is visible everywhere.
+const indexFiles = files
+  .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
+  .map((f) => join(REPO, f));
+const hop4Stats = addFourthHop(wires, mainFiles, indexFiles, read, rel);
 const strip = stripCandidates(wires, facts);
 const breaches = violations(facts);
 
