@@ -9,7 +9,14 @@ export function renderMarkdown(m) {
   const out = [];
   const p = (s = "") => out.push(s);
   const bucket = (b) => m.strip.filter((s) => s.bucket === b);
-  const prod = m.violations.filter((v) => v.scope === "product");
+  // CANONICAL SOURCE. Everything below reads the semantic classifier. The legacy
+  // regex detector survives in the model as `legacyLeads` and is deliberately not
+  // rendered: it counted transport bookkeeping and Kernel internals as product
+  // breaches, and this brief was still printing that number after the classifier
+  // had already disproved it.
+  const confirmed = (m.persistence ?? []).filter((p) => p.governance === "violation");
+  const grayGov = (m.persistence ?? []).filter((p) => p.governance === "unknown");
+  const covGaps = (m.coverage ?? []).filter((c) => c.status === "partial" || c.status === "unindexed");
 
   p(`# How QuantFlow runs`);
   p();
@@ -88,7 +95,7 @@ export function renderMarkdown(m) {
   p();
   for (const [b, title, note] of [
     ["broken-now", "Broken now — fix or remove", "these fail at runtime today"],
-    ["safe-leftover", "Safe leftover — delete", "registered in main, unreachable from anywhere"],
+    ["safe-leftover", "Removal candidate — static evidence only", "registered in main, no static caller found; needs package + dynamic-caller proof before deletion"],
     ["maybe-later", "Maybe later — do NOT delete on sight", "works end to end, but nothing calls it yet"],
   ]) {
     const items = bucket(b);
@@ -113,12 +120,62 @@ export function renderMarkdown(m) {
   p(`\`db.ts\`, \`upgrade.ts\`, plus generated schema SQL. Any other file holding SQL appears`);
   p(`here automatically, so a new one cannot arrive quietly.`);
   p();
-  p(`**${prod.length} in product code**, ${m.violations.length - prod.length} in QA harnesses (a gate seeding its own fixture is expected).`);
+  p(`The question is not "does this file contain INSERT". It is **can production domain`);
+  p(`state reach this SQL without first entering a governed action?** Domain tables come`);
+  p(`from the generated schema; reachability follows call sites and the Kernel command table.`);
   p();
-  p(`| File | Statements |`);
-  p(`|---|---:|`);
-  for (const v of prod) p(`| \`${v.where}\` | ${v.lines.length >= 6 ? "6+" : v.lines.length} |`);
+  p(`**${confirmed.length} confirmed**, ${grayGov.length} unknown (gray — not counted as debt).`);
   p();
+  if (confirmed.length) {
+    p(`| File | Table | Kind | Reach | Confidence |`);
+    p(`|---|---|---|---|---|`);
+    for (const v of confirmed)
+      p(`| \`${v.evidence[0].file}\` | \`${v.table}\` | ${v.persistence} | ${v.reachability} | ${v.confidence} |`);
+    p();
+  }
+  p(`Deliberately **not** violations, and each was reported as one before the classifier`);
+  p(`learned the difference: transport bookkeeping (\`messages\` is not a domain table),`);
+  p(`Kernel command implementations dispatched by \`execute()\`, schema migrations,`);
+  p(`generated SQL, and QA fixture seeding.`);
+  p();
+
+  // ── 4b. coverage — silence must never read as clean ───────────────────────
+  p(`## What the analyzer could not read (${covGaps.length})`);
+  p();
+  p(`**Absence of a finding is not proof of compliance.** These files hold SQL the function`);
+  p(`indexer could not resolve, so governance analysis never saw it. They are gray, and they`);
+  p(`prevent a clean architectural result.`);
+  p();
+  if (covGaps.length) {
+    p(`| File | Coverage | SQL in text | SQL resolved |`);
+    p(`|---|---|---:|---:|`);
+    for (const c of covGaps.slice(0, 15))
+      p(`| \`${c.path}\` | ${c.status} | ${c.sqlInText ?? 0} | ${c.sqlIndexed ?? 0} |`);
+    if (covGaps.length > 15) p(`| …${covGaps.length - 15} more | | | see \`atlas.json\` |`);
+    p();
+  }
+  p(`> \`governed-review.ts\` is in this table. The confirmed-violation count above is`);
+  p(`> therefore a **floor**, not a total — it was computed from a partial read of the very`);
+  p(`> file the finding concerns.`);
+  p();
+
+  // ── 4c. protocol variants ─────────────────────────────────────────────────
+  if ((m.protocolVariants ?? []).length) {
+    p(`## Protocol variants (${m.protocolVariants.length})`);
+    p();
+    p(`Electron runs two protocols on one channel name: \`ipcMain.on\` receives`);
+    p(`\`ipcRenderer.send\`, \`ipcMain.handle\` answers \`ipcRenderer.invoke\`. They do not`);
+    p(`overwrite each other, so registering both is **not** duplicate ownership.`);
+    p();
+    p(`| Channel | Registered | Called via | Unused variant | Disposition |`);
+    p(`|---|---|---|---|---|`);
+    for (const v of m.protocolVariants)
+      p(`| \`${v.channel}\` | ${v.modes.join(" + ")} | ${v.callerModes.join(", ") || "—"} | ${v.unusedModes.join(", ") || "none"} | **${v.disposition}** |`);
+    p();
+    p(`\`investigate\` is not \`delete\`: a packaged or dynamically-loaded caller must be ruled`);
+    p(`out before the unused variant can be removed.`);
+    p();
+  }
 
   // ── 5. lifetime ───────────────────────────────────────────────────────────
   p(`## Process lifetime`);
@@ -145,7 +202,11 @@ export function renderMarkdown(m) {
   p();
   p(`\`--check\` compares a fingerprint of the model with \`branch\`, \`commit\` and`);
   p(`\`generatedAt\` excluded, so a plain commit does not trip it but moved code does.`);
-  p(`**The map cannot lie for longer than one commit.**`);
+  p(`**The map cannot drift from its generator for longer than one commit.** Generator`);
+  p(`correctness is a separate question, protected by the falsifiers and by independent`);
+  p(`verification. \`--check\` proves the outputs match the generator; it never proves the`);
+  p(`generator is right — this branch shipped fingerprint-current outputs that were still`);
+  p(`reporting a disproved violation count.`);
   p();
   return out.join("\n");
 }

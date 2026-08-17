@@ -64,8 +64,9 @@ run without anyone editing anything. That is the whole design.
 ## Keeping it honest
 
 `--check` regenerates in memory and compares against the committed files. Code
-moved and the map did not → exit 1. **The map cannot lie for longer than one
-commit.**
+moved and the map did not → exit 1. **The map cannot drift from its generator for
+longer than one commit.** Generator correctness is separate, protected by the
+falsifiers and independent verification.
 
 Wire it into CI the same way generated schema files are already diffed. It is
 deliberately not registered in `qa/run.ts` yet — that file belongs to the active

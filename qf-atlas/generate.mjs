@@ -69,6 +69,27 @@ const lifetime = lifetimeWires({
 const strip = stripCandidates(wires, facts);
 const breaches = violations(facts);
 
+// Semantic persistence classification replaces the old "SQL outside an allowlist
+// is a violation" rule, which called transport bookkeeping a domain breach.
+const fnIndex = indexFunctions(indexFiles, read, rel);
+const fnCallers = callerIndex(fnIndex);
+const governedFns = governedClosure(fnIndex, fnCallers, commandRoots(fnIndex, read, REPO, rel));
+const persistence = classifyPersistence({
+  index: fnIndex,
+  callers: fnCallers,
+  domain: domainTables(REPO),
+  governed: governedFns,
+  relOf: rel,
+});
+
+// Coverage: absence of a finding must never be indistinguishable from clean.
+const inScope = (p) => p.startsWith("collab-electron/src/main/")
+  || p.startsWith("packages/qf-kernel/") || p.startsWith("tools/");
+const coverageRows = coverage({
+  files, inScope, index: fnIndex, read, joinRepo: (p) => join(REPO, p),
+});
+
+
 // ─── build nodes ─────────────────────────────────────────────────────────────
 const groups = new Map();
 for (const path of files) {
@@ -146,11 +167,38 @@ for (const w of wires) {
   if (nid) byId.get(nid).wires.push(w.channel);
 }
 
-// node status is derived, never assigned by hand
+// Node status comes from the SEMANTIC model, never from the legacy regex
+// detector. `violations(facts)` stays only as a low-confidence lead generator:
+// it counted transport bookkeeping and Kernel internals as product breaches, so
+// letting it colour a node red would paint known false positives onto the map.
+//
+//   red   confirmed governance violation
+//   gray  unknown governance, or the analyser could not fully read the file
+//   amber protocol variant / removal candidate awaiting evidence
+//   blue  reaches execute() — healthy plumbing, behaviour not claimed
+const coverageOf = new Map(coverageRows.map((c) => [c.path, c.status]));
+const violationFiles = new Set(
+  persistence.filter((p) => p.governance === "violation").map((p) => p.evidence[0].file));
+const unknownFiles = new Set(
+  persistence.filter((p) => p.governance === "unknown").map((p) => p.evidence[0].file));
+const variantFiles = new Set(
+  protocolVariants.flatMap((v) => v.registrations.map((r) => r.split(":")[0])));
+
 for (const n of nodes) {
-  const broken = n.breaches.some((b) => b.scope === "product") || n.strip.some((s) => s.kind === "dead-wire");
-  const stale  = n.strip.length > 0;
-  n.status = broken ? "alert" : stale ? "warn" : n.executes > 0 ? "ice" : "ok";
+  n.persistence = persistence.filter((p) => n.files.some((f) => f.path === p.evidence[0].file));
+  n.coverage = n.files.map((f) => coverageOf.get(f.path) ?? "out-of-scope");
+  const paths = n.files.map((f) => f.path);
+
+  const confirmed = paths.some((p) => violationFiles.has(p));
+  const grayGovernance = paths.some((p) => unknownFiles.has(p));
+  const grayCoverage = n.coverage.some((c) => c === "partial" || c === "unindexed");
+  const amber = paths.some((p) => variantFiles.has(p)) || n.strip.length > 0;
+
+  n.status = confirmed ? "alert"
+    : (grayGovernance || grayCoverage) ? "gray"
+    : amber ? "warn"
+    : n.executes > 0 ? "ice"
+    : "ok";
 }
 
 // ─── layout: concentric rings per floor, biggest at the centre. deterministic.
@@ -178,26 +226,6 @@ for (const L of LAYERS) {
   layerExtent[L.id] = +(maxR + 1.1).toFixed(2);
 }
 
-// Semantic persistence classification replaces the old "SQL outside an allowlist
-// is a violation" rule, which called transport bookkeeping a domain breach.
-const fnIndex = indexFunctions(indexFiles, read, rel);
-const fnCallers = callerIndex(fnIndex);
-const governedFns = governedClosure(fnIndex, fnCallers, commandRoots(fnIndex, read, REPO, rel));
-const persistence = classifyPersistence({
-  index: fnIndex,
-  callers: fnCallers,
-  domain: domainTables(REPO),
-  governed: governedFns,
-  relOf: rel,
-});
-
-// Coverage: absence of a finding must never be indistinguishable from clean.
-const inScope = (p) => p.startsWith("collab-electron/src/main/")
-  || p.startsWith("packages/qf-kernel/") || p.startsWith("tools/");
-const coverageRows = coverage({
-  files, inScope, index: fnIndex, read, joinRepo: (p) => join(REPO, p),
-});
-
 const loops = buildLoops(wires, lifetime);
 
 // ─── model ───────────────────────────────────────────────────────────────────
@@ -219,8 +247,13 @@ const model = {
     channels: wires.length,
     bridges, bridgeMethods: bridgeMethodCount, bridgeMethodsUsed: usedMethodCount,
     stripCandidates: strip.length,
-    violations: breaches.filter((b) => b.scope === "product").length,
-    violationsQa: breaches.filter((b) => b.scope === "qa").length,
+    // Canonical: confirmed governance violations from the semantic classifier.
+    violations: persistence.filter((p) => p.governance === "violation").length,
+    governanceUnknown: persistence.filter((p) => p.governance === "unknown").length,
+    // Legacy regex detector, retained ONLY as a low-confidence lead. It counts
+    // transport SQL and Kernel internals as breaches, so it must never appear as
+    // the headline number or colour a node.
+    legacyLeads: breaches.filter((b) => b.scope === "product").length,
     nodes: nodes.length,
     loopsBroken: loops.filter((l) => l.health !== "ok").length,
     loopsTotal: loops.length,
@@ -241,7 +274,7 @@ const model = {
   lifetime,
   persistence,
   strip,
-  violations: breaches,
+  legacyLeads: breaches,   // low-confidence leads only — not the canonical finding set
 };
 
 // Staleness must track the CODE, not the commit. The map records the commit it
@@ -302,4 +335,4 @@ console.log(`qf-atlas: wrote atlas.json + atlas.html + ATLAS.md`);
 console.log(`  ${files.length} files · ${nodes.length} subsystems · ${wires.length} IPC channels`);
 console.log(`  wires: ${counts.live} live · ${counts.unreached} unreached · ${counts.unused} unused · ${counts.dead} DEAD`);
 console.log(`  loops: ${loops.filter(l=>l.health==="ok").length}/${loops.length} healthy · ${loops.filter(l=>l.health!=="ok").map(l=>l.name).join(", ")}`);
-console.log(`  ${strip.length} strip candidates · ${breaches.filter(b=>b.scope==="product").length} product write-door violations (+${breaches.filter(b=>b.scope==="qa").length} qa)`);
+console.log(`  ${strip.length} strip candidates · ${persistence.filter(p=>p.governance==="violation").length} confirmed violations · ${persistence.filter(p=>p.governance==="unknown").length} gray · ${coverageRows.filter(c=>c.status==="partial"||c.status==="unindexed").length} coverage gaps`);

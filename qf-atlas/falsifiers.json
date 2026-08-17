@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 14,
-  "total": 14,
+  "passed": 20,
+  "total": 20,
   "results": [
     {
       "n": 1,
@@ -30,10 +30,8 @@
     {
       "n": 5,
       "name": "governed Kernel internals are NOT falsely flagged",
-      "passed": [
-        true,
-        "deterministic-execution.ts: 3 finding(s), 0 violation(s)"
-      ]
+      "passed": true,
+      "detail": "deterministic-execution.ts: 3 finding(s), 0 violation(s)"
     },
     {
       "n": 6,
@@ -49,19 +47,15 @@
     },
     {
       "n": 8,
-      "name": "every production file gets a source class",
-      "passed": [
-        false,
-        "430 file(s) carry no sourceClass"
-      ]
+      "name": "coverage ledger is complete, unique and well-formed",
+      "passed": true,
+      "detail": "430 rows, all unique and legal; 43 findings all carry sourceClass"
     },
     {
       "n": 9,
       "name": "resolved finding disappears from the model",
-      "passed": [
-        true,
-        "app:commit-sha present now; deletion is the founder's call, not the harness's"
-      ]
+      "passed": true,
+      "detail": "app:commit-sha present now; deletion is the founder's call, not the harness's"
     },
     {
       "n": 10,
@@ -90,10 +84,44 @@
     {
       "n": 14,
       "name": "active app bypass to domain SQL is high-confidence red",
-      "passed": [
-        true,
-        "domain-truth/high, wire=cheats, hop4=cheats"
-      ]
+      "passed": true,
+      "detail": "domain-truth/high, wire=cheats, hop4=cheats"
+    },
+    {
+      "n": 15,
+      "name": "META: a [false, …] tuple cannot be counted as a pass",
+      "passed": true,
+      "detail": "record() threw TypeError"
+    },
+    {
+      "n": 16,
+      "name": "headline counts equal the canonical model",
+      "passed": true,
+      "detail": "stats.violations=4 vs persistence=4; gray 13 vs 13"
+    },
+    {
+      "n": 17,
+      "name": "transport SQL is not a violation in JSON or Markdown",
+      "passed": true,
+      "detail": "json=clean markdown=clean"
+    },
+    {
+      "n": 18,
+      "name": "coverage gaps appear in the agent brief",
+      "passed": true,
+      "detail": "33 gaps in model; brief shows section=true"
+    },
+    {
+      "n": 19,
+      "name": "protocol variants are investigate, not duplicate-owner",
+      "passed": true,
+      "detail": "2 variants, dispositions=investigate, inBrief=true"
+    },
+    {
+      "n": 20,
+      "name": "static-only findings are removal candidates, not safe deletes",
+      "passed": true,
+      "detail": "phrased as removal candidate"
     }
   ]
 }

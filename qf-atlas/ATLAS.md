@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-generator @ 36e9c3f` on 2026-08-17 by
+> Generated from `atlas-generator @ ab185c2` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -93,9 +93,9 @@ _these fail at runtime today_
 
 None.
 
-### Safe leftover — delete (5)
+### Removal candidate — static evidence only (5)
 
-_registered in main, unreachable from anywhere_
+_registered in main, no static caller found; needs package + dynamic-caller proof before deletion_
 
 - `app:commit-sha` — collab-electron/src/main/ipc-workspace.ts:236
 - `pty:foreground-process` — collab-electron/src/main/index.ts:842
@@ -130,19 +130,66 @@ The declared write door is `execute.ts`, `create.ts`, `insert.ts`, `events.ts`,
 `db.ts`, `upgrade.ts`, plus generated schema SQL. Any other file holding SQL appears
 here automatically, so a new one cannot arrive quietly.
 
-**9 in product code**, 8 in QA harnesses (a gate seeding its own fixture is expected).
+The question is not "does this file contain INSERT". It is **can production domain
+state reach this SQL without first entering a governed action?** Domain tables come
+from the generated schema; reachability follows call sites and the Kernel command table.
 
-| File | Statements |
-|---|---:|
-| `collab-electron/src/main/kernel.ts` | 6+ |
-| `packages/qf-kernel/src/governed-review.ts` | 6+ |
-| `packages/qf-kernel/src/deterministic-execution.ts` | 4 |
-| `tools/qf-peer-bus/src/bus.ts` | 4 |
-| `collab-electron/src/main/peer-delivery.ts` | 2 |
-| `packages/qf-kernel/src/fixtures.ts` | 2 |
-| `packages/qf-kernel/src/market-context.ts` | 2 |
-| `packages/qf-kernel/src/market-ingest.ts` | 2 |
-| `packages/qf-kernel/src/links.ts` | 1 |
+**4 confirmed**, 13 unknown (gray — not counted as debt).
+
+| File | Table | Kind | Reach | Confidence |
+|---|---|---|---|---|
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `task` | domain-truth | bypass | high |
+
+Deliberately **not** violations, and each was reported as one before the classifier
+learned the difference: transport bookkeeping (`messages` is not a domain table),
+Kernel command implementations dispatched by `execute()`, schema migrations,
+generated SQL, and QA fixture seeding.
+
+## What the analyzer could not read (33)
+
+**Absence of a finding is not proof of compliance.** These files hold SQL the function
+indexer could not resolve, so governance analysis never saw it. They are gray, and they
+prevent a clean architectural result.
+
+| File | Coverage | SQL in text | SQL resolved |
+|---|---|---:|---:|
+| `collab-electron/src/main/kernel.ts` | partial | 7 | 5 |
+| `packages/qf-kernel/src/create.ts` | partial | 13 | 11 |
+| `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
+| `packages/qf-kernel/src/deterministic-execution.ts` | partial | 4 | 3 |
+| `packages/qf-kernel/src/errors.ts` | partial | 1 | 0 |
+| `packages/qf-kernel/src/events.ts` | partial | 1 | 0 |
+| `packages/qf-kernel/src/execute.ts` | partial | 10 | 7 |
+| `packages/qf-kernel/src/governed-review.ts` | partial | 27 | 16 |
+| `packages/qf-kernel/src/insert.ts` | partial | 1 | 0 |
+| `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 0 |
+| `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/host-acp-bridge.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/peer-role-registry.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/qf-execute-allowlist.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/sidecar/ring-buffer.ts` | unindexed | 0 | 0 |
+| …18 more | | | see `atlas.json` |
+
+> `governed-review.ts` is in this table. The confirmed-violation count above is
+> therefore a **floor**, not a total — it was computed from a partial read of the very
+> file the finding concerns.
+
+## Protocol variants (2)
+
+Electron runs two protocols on one channel name: `ipcMain.on` receives
+`ipcRenderer.send`, `ipcMain.handle` answers `ipcRenderer.invoke`. They do not
+overwrite each other, so registering both is **not** duplicate ownership.
+
+| Channel | Registered | Called via | Unused variant | Disposition |
+|---|---|---|---|---|
+| `pty:write` | invoke + send | send | invoke | **investigate** |
+| `pty:send-raw-keys` | invoke + send | send | invoke | **investigate** |
+
+`investigate` is not `delete`: a packaged or dynamically-loaded caller must be ruled
+out before the unused variant can be removed.
 
 ## Process lifetime
 
@@ -173,4 +220,8 @@ bun qf-atlas/generate.mjs --check   # exit 1 if the committed map is stale
 
 `--check` compares a fingerprint of the model with `branch`, `commit` and
 `generatedAt` excluded, so a plain commit does not trip it but moved code does.
-**The map cannot lie for longer than one commit.**
+**The map cannot drift from its generator for longer than one commit.** Generator
+correctness is a separate question, protected by the falsifiers and by independent
+verification. `--check` proves the outputs match the generator; it never proves the
+generator is right — this branch shipped fingerprint-current outputs that were still
+reporting a disproved violation count.
