@@ -13,6 +13,7 @@
 //   qf:review:*               → kernelRequestGovernedReview → raw DML
 
 import { insideWriteDoor } from "./extract.mjs";
+import { sqlSites } from "./classify.mjs";
 
 const DOOR = new Set(["execute", "executeCommand"]);
 const RE_DML = /\b(?:CREATE TABLE|INSERT INTO|UPDATE\s+[a-z_]+\s+SET|DELETE FROM|ALTER TABLE|DROP TABLE)\b/i;
@@ -126,11 +127,13 @@ export function indexFunctions(files, read, relOf) {
           door: DOOR.has(name) || [...calls].some((x) => DOOR.has(x)),
           // SQL written by a file that is not part of the declared write door
           dml: RE_DML.test(body) && !insideWriteDoor(path),
+          sqlSites: sqlSites(body),
           disk: RE_DISK.test(body),
           calls,
         };
         // keep the richer definition when a name is defined more than once
-        if (!prev || (!prev.door && rec.door) || (!prev.dml && rec.dml) || (!prev.disk && rec.disk)) index.set(name, rec);
+        if (!prev || (!prev.door && rec.door) || (!prev.dml && rec.dml) || (!prev.disk && rec.disk)
+            || ((rec.sqlSites?.length ?? 0) > (prev.sqlSites?.length ?? 0))) index.set(name, rec);
       }
     }
   }

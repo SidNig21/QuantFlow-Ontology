@@ -7,13 +7,15 @@
 // qf-kernel-schema/golden/. Nobody hand-edits atlas.html. If the code moves and
 // the map does not, --check goes red.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel, read } from "./extract.mjs";
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
+import { domainTables, classifyPersistence, callerIndex, sourceClass, commandRoots, governedClosure } from "./classify.mjs";
+import { indexFunctions } from "./hop4.mjs";
 
 const OUT = join(REPO, "qf-atlas");
 
@@ -48,7 +50,7 @@ const mainFiles     = files.filter((f) => f.startsWith("collab-electron/src/main
 const preloadFiles  = files.filter((f) => f.startsWith("collab-electron/src/preload/")).map((f) => join(REPO, f));
 const rendererFiles = files.filter((f) => f.startsWith("collab-electron/src/windows/") || f.startsWith("collab-electron/packages/")).map((f) => join(REPO, f));
 
-const { wires, bridges, bridgeMethodCount, usedMethodCount } = extractWires(mainFiles, preloadFiles, rendererFiles);
+const { wires, duplicates, bridges, bridgeMethodCount, usedMethodCount } = extractWires(mainFiles, preloadFiles, rendererFiles);
 // hop 4 — main -> Kernel. Runs before strip/status so "cheats" is visible everywhere.
 const indexFiles = files
   .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
@@ -176,6 +178,19 @@ for (const L of LAYERS) {
   layerExtent[L.id] = +(maxR + 1.1).toFixed(2);
 }
 
+// Semantic persistence classification replaces the old "SQL outside an allowlist
+// is a violation" rule, which called transport bookkeeping a domain breach.
+const fnIndex = indexFunctions(indexFiles, read, rel);
+const fnCallers = callerIndex(fnIndex);
+const governedFns = governedClosure(fnIndex, fnCallers, commandRoots(fnIndex, read, REPO, rel));
+const persistence = classifyPersistence({
+  index: fnIndex,
+  callers: fnCallers,
+  domain: domainTables(REPO),
+  governed: governedFns,
+  relOf: rel,
+});
+
 const loops = buildLoops(wires, lifetime);
 
 // ─── model ───────────────────────────────────────────────────────────────────
@@ -213,7 +228,9 @@ const model = {
   })),
   loops,
   wires,
+  duplicates,
   lifetime,
+  persistence,
   strip,
   violations: breaches,
 };
@@ -250,9 +267,28 @@ if (process.argv.includes("--check")) {
   process.exit(0);
 }
 
-writeFileSync(join(OUT, "atlas.json"), json);
-writeFileSync(join(OUT, "atlas.html"), html);
-writeFileSync(join(OUT, "ATLAS.md"), md);
+// Windows holds transient locks on files an editor or indexer has open, so a
+// rapid regenerate loop (the falsifier harness) hits errno -4094 mid-write.
+// Write to a sibling temp file and rename: rename is atomic and retryable, and a
+// half-written atlas.json would fail --check for the wrong reason.
+function writeAtomic(path, contents) {
+  const tmp = `${path}.tmp-${process.pid}`;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      writeFileSync(tmp, contents);
+      renameSync(tmp, path);
+      return;
+    } catch (err) {
+      if (attempt === 4) throw err;
+      const until = Date.now() + 60 * (attempt + 1);
+      while (Date.now() < until) { /* brief backoff without pulling in a timer */ }
+    }
+  }
+}
+
+writeAtomic(join(OUT, "atlas.json"), json);
+writeAtomic(join(OUT, "atlas.html"), html);
+writeAtomic(join(OUT, "ATLAS.md"), md);
 console.log(`qf-atlas: wrote atlas.json + atlas.html + ATLAS.md`);
 console.log(`  ${files.length} files · ${nodes.length} subsystems · ${wires.length} IPC channels`);
 console.log(`  wires: ${counts.live} live · ${counts.unreached} unreached · ${counts.unused} unused · ${counts.dead} DEAD`);

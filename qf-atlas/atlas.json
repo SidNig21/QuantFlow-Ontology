@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "298e9ed",
+    "commit": "cde4bc6",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "5c72fd6992d84453"
+    "fingerprint": "80f2f427cd56cb9d"
   },
   "stats": {
     "live": 107,
@@ -13495,6 +13495,26 @@
       }
     }
   ],
+  "duplicates": [
+    {
+      "id": "duplicate-owner:pty:write",
+      "channel": "pty:write",
+      "owners": [
+        "collab-electron/src/main/index.ts:766",
+        "collab-electron/src/main/index.ts:772"
+      ],
+      "why": "2 handlers register this one channel. One responsibility, more than one owner — the later registration usually wins silently."
+    },
+    {
+      "id": "duplicate-owner:pty:send-raw-keys",
+      "channel": "pty:send-raw-keys",
+      "owners": [
+        "collab-electron/src/main/index.ts:786",
+        "collab-electron/src/main/index.ts:792"
+      ],
+      "why": "2 handlers register this one channel. One responsibility, more than one owner — the later registration usually wins silently."
+    }
+  ],
   "lifetime": [
     {
       "kind": "lifetime",
@@ -13627,6 +13647,997 @@
           "layer": "quit",
           "present": true,
           "detail": "watcher.stopWorker()"
+        }
+      ]
+    }
+  ],
+  "persistence": [
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "markGovernedDelivery",
+      "table": "qf_review_receipt",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_receipt`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "bindSourceWork",
+      "table": "qf_review_source_work",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_source_work`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:update",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "markGovernedDelivery",
+      "table": "qf_review_task",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:update",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "markGovernedDelivery",
+      "table": "task",
+      "verb": "UPDATE",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "high",
+      "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "createReviewTask",
+      "table": "links",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_attempt",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "persistAttempt",
+      "table": "qf_review_attempt",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_invocation",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_publication",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            54
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_receipt",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            47
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_source_work",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_task",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "createReviewTask",
+      "table": "qf_review_task",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "createReviewTask",
+      "table": "task",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/links.ts:links:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "writeLinks",
+      "table": "links",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "kernel-internal",
+      "governance": "unknown",
+      "confidence": "medium",
+      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/deterministic-execution.ts, packages/qf-kernel/src/market-ingest.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/links.ts",
+          "lines": [
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:instrument:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ingestMarketBatch",
+      "table": "instrument",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "unknown",
+      "governance": "unknown",
+      "confidence": "low",
+      "why": "No caller of ingestMarketBatch() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/market-ingest.ts",
+          "lines": [
+            67
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/market-ingest.ts:quote:insert-into",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "ingestMarketBatch",
+      "table": "quote",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "unknown",
+      "governance": "unknown",
+      "confidence": "low",
+      "why": "No caller of ingestMarketBatch() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/market-ingest.ts",
+          "lines": [
+            89
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:collab-electron/src/main/kernel.ts:messages:alter-table",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "openPeerBus",
+      "table": "messages",
+      "verb": "ALTER TABLE",
+      "persistence": "transport-bookkeeping",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/kernel.ts",
+          "lines": [
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:collab-electron/src/main/kernel.ts:messages:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "peerBusReadInbox",
+      "table": "messages",
+      "verb": "UPDATE",
+      "persistence": "transport-bookkeeping",
+      "sourceClass": "product",
+      "reachability": "unknown",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/kernel.ts",
+          "lines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:collab-electron/src/main/peer-delivery.ts:messages:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "poll",
+      "table": "messages",
+      "verb": "UPDATE",
+      "persistence": "transport-bookkeeping",
+      "sourceClass": "transport",
+      "reachability": "unknown",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/peer-delivery.ts",
+          "lines": [
+            29
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:agent_definition:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "registerAgentDefinition",
+      "table": "agent_definition",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            105
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:agent_session:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "createAgentSession",
+      "table": "agent_session",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            73
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:artifact:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "publishArtifact",
+      "table": "artifact",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            125
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:connection:delete-from",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "deleteConnection",
+      "table": "connection",
+      "verb": "DELETE FROM",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:connection:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "createConnection",
+      "table": "connection",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            58
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:dataset:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "registerDatasetVersion",
+      "table": "dataset",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            150
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:evaluation:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordEvaluation",
+      "table": "evaluation",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            184
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:hypothesis:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "createHypothesis",
+      "table": "hypothesis",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:mission:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "createMission",
+      "table": "mission",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            31
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:run:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "createRun",
+      "table": "run",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            50
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/deterministic-execution.ts:execution_environment:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeDeterministicRun",
+      "table": "execution_environment",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of executeDeterministicRun() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/deterministic-execution.ts",
+          "lines": [
+            142
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/deterministic-execution.ts:run:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeDeterministicRun",
+      "table": "run",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of executeDeterministicRun() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/deterministic-execution.ts",
+          "lines": [
+            177
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/deterministic-execution.ts:strategy:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeDeterministicRun",
+      "table": "strategy",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of executeDeterministicRun() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/deterministic-execution.ts",
+          "lines": [
+            103
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/execute.ts:links:delete-from",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeTaskGovernanceAction",
+      "table": "links",
+      "verb": "DELETE FROM",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/execute.ts",
+          "lines": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/execute.ts:links:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeTaskGovernanceAction",
+      "table": "links",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/execute.ts",
+          "lines": [
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/execute.ts:task:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeSecondOpinion",
+      "table": "task",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/execute.ts",
+          "lines": [
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/execute.ts:task:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "executeTaskSteering",
+      "table": "task",
+      "verb": "UPDATE",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/execute.ts",
+          "lines": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/fixtures.ts:experimental:create-table",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "seedExperimentalFixtureTable",
+      "table": "experimental",
+      "verb": "CREATE TABLE",
+      "persistence": "qa-fixture",
+      "sourceClass": "QA",
+      "reachability": "bypass",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "qa-fixture — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/fixtures.ts",
+          "lines": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/fixtures.ts:experimental:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "seedExperimentalFixtureTable",
+      "table": "experimental",
+      "verb": "INSERT INTO",
+      "persistence": "qa-fixture",
+      "sourceClass": "QA",
+      "reachability": "bypass",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "qa-fixture — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/fixtures.ts",
+          "lines": [
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:artifact:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "insertArtifact",
+      "table": "artifact",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of insertArtifact() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/market-context.ts:market_event:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "scheduleMarketEvent",
+      "table": "market_event",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of scheduleMarketEvent() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/market-context.ts",
+          "lines": [
+            33
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/market-context.ts:venue:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "registerVenue",
+      "table": "venue",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of registerVenue() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/market-context.ts",
+          "lines": [
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/upgrade.ts:schema_meta:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "normalizeSql",
+      "table": "schema_meta",
+      "verb": "INSERT INTO",
+      "persistence": "schema-migration",
+      "sourceClass": "migration",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "schema-migration — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/upgrade.ts",
+          "lines": [
+            147
+          ]
         }
       ]
     }

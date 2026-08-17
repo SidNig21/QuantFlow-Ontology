@@ -99,11 +99,28 @@ const RE = {
 export function extractWires(mainFiles, preloadFiles, rendererFiles) {
   // where each channel is registered in main
   const registered = new Map();          // channel -> {file,line,kind}
+  // Every registration is recorded, not only the first. Keeping just the first
+  // hid second owners completely — and "old code left alive beside new code" is
+  // the failure mode that matters most in this repo, more than plain dead code.
+  const allRegistrations = new Map();    // channel -> [{file,line,kind}]
+  const note = (ch, entry) => {
+    if (!allRegistrations.has(ch)) allRegistrations.set(ch, []);
+    allRegistrations.get(ch).push(entry);
+    if (!registered.has(ch)) registered.set(ch, entry);
+  };
   for (const f of mainFiles) {
     const t = read(f);
-    for (const m of matches(t, RE.handle)) if (!registered.has(m.value)) registered.set(m.value, { file: rel(f), line: m.line, kind: "handle" });
-    for (const m of matches(t, RE.on))     if (!registered.has(m.value)) registered.set(m.value, { file: rel(f), line: m.line, kind: "on" });
+    for (const m of matches(t, RE.handle)) note(m.value, { file: rel(f), line: m.line, kind: "handle" });
+    for (const m of matches(t, RE.on))     note(m.value, { file: rel(f), line: m.line, kind: "on" });
   }
+  const duplicates = [...allRegistrations.entries()]
+    .filter(([, list]) => list.length > 1)
+    .map(([channel, owners]) => ({
+      id: `duplicate-owner:${channel}`,
+      channel,
+      owners: owners.map((o) => `${o.file}:${o.line}`),
+      why: `${owners.length} handlers register this one channel. One responsibility, more than one owner — the later registration usually wins silently.`,
+    }));
 
   // where each channel is called from preload, and under which bridge method
   const called = new Map();              // channel -> {file,line}
@@ -156,7 +173,7 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
     });
   }
   wires.sort((a, b) => a.channel.localeCompare(b.channel));
-  return { wires, bridges: [...bridges], bridgeMethodCount: bridgeMethods.size, usedMethodCount: usedMethods.size };
+  return { wires, duplicates, bridges: [...bridges], bridgeMethodCount: bridgeMethods.size, usedMethodCount: usedMethods.size };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

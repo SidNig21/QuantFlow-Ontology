@@ -1,0 +1,73 @@
+{
+  "ran": "2026-08-17",
+  "passed": 10,
+  "total": 10,
+  "results": [
+    {
+      "n": 1,
+      "name": "unreachable IPC handler is detected",
+      "passed": true,
+      "detail": "bucket=safe-leftover"
+    },
+    {
+      "n": 2,
+      "name": "broken preload -> main channel is detected",
+      "passed": true,
+      "detail": "status=dead"
+    },
+    {
+      "n": 3,
+      "name": "ungoverned domain write is detected",
+      "passed": true,
+      "detail": "domain-truth / medium"
+    },
+    {
+      "n": 4,
+      "name": "transport SQL is NOT falsely flagged",
+      "passed": true,
+      "detail": "1 finding(s), governance=compliant"
+    },
+    {
+      "n": 5,
+      "name": "governed Kernel internals are NOT falsely flagged",
+      "passed": [
+        true,
+        "deterministic-execution.ts: 3 finding(s), 0 violation(s)"
+      ]
+    },
+    {
+      "n": 6,
+      "name": "unreaped worker is detected",
+      "passed": true,
+      "detail": "status=unreaped"
+    },
+    {
+      "n": 7,
+      "name": "duplicate handler for one channel is detected",
+      "passed": true,
+      "detail": "2 owners"
+    },
+    {
+      "n": 8,
+      "name": "every production file gets a source class",
+      "passed": [
+        false,
+        "430 file(s) carry no sourceClass"
+      ]
+    },
+    {
+      "n": 9,
+      "name": "resolved finding disappears from the model",
+      "passed": [
+        true,
+        "app:commit-sha present now; deletion is the founder's call, not the harness's"
+      ]
+    },
+    {
+      "n": 10,
+      "name": "stale map fails --check",
+      "passed": true,
+      "detail": "--check exited non-zero on moved code"
+    }
+  ]
+}
