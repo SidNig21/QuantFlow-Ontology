@@ -196,14 +196,55 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
   }
 
   // which bridge methods the renderer actually calls
-  const rendererText = rendererFiles.map(read).join("\n");
+  //
+  // This set must stay a SUBSET of the declared methods. It did not: any property
+  // read off a bridge object was counted as usage, so `usedMethodCount` (158)
+  // exceeded `bridgeMethodCount` (127) — an impossible ratio that survived because
+  // nothing rendered the two numbers together until ATLAS.md drew them side by side.
+  //
+  // A bridge property the renderer reads that the preload never declared is not
+  // usage. It is one of two findings, and the map may not silently absorb either:
+  //   · the renderer calls a method that does not exist  → broken at hop 1
+  //   · the preload declares it in a form the regex missed → coverage gap
+  const rendererSources = rendererFiles.map((f) => [rel(f), read(f)]);
+  const rendererText = rendererSources.map(([, t]) => t).join("\n");
   const usedMethods = new Set();
+  const undeclared = new Set();
   for (const b of bridges)
     for (const m of matches(rendererText, new RegExp(`${b}\\.([A-Za-z_$][\\w$]*)`)))
-      usedMethods.add(m.value);
+      (bridgeMethods.has(m.value) ? usedMethods : undeclared).add(m.value);
   // bare destructured usage, e.g.  const {listArtifacts} = window.shellApi
   for (const [method] of bridgeMethods)
     if (new RegExp(`\\b${method}\\s*\\(`).test(rendererText)) usedMethods.add(method);
+
+  // Every property key the preload declares, whether or not it pairs with an
+  // invoke channel. `bridgeMethods` pairs a method to a channel, so an
+  // `ipcRenderer.on` subscriber never lands in it — which means that map alone
+  // cannot answer the question "does this method exist at all?".
+  //
+  // Deliberately loose: a name appearing as a key anywhere in a preload file
+  // counts as declared, including inside a type annotation. That biases toward
+  // UNDER-reporting breaks, which is the correct direction — a false accusation
+  // that a live call site is broken would get working code deleted.
+  const preloadKeys = new Set();
+  for (const f of preloadFiles)
+    for (const m of matches(stripComments(read(f)), /(?:^|[{,;\s])([A-Za-z_$][\w$]*)\s*[:(]/))
+      preloadKeys.add(m.value);
+
+  // Hop 1 was only ever checked in one direction: "is this declared method
+  // used?". Nothing asked the reverse — "does this used method exist?" — so a
+  // renderer awaiting a bridge method the preload never exposed threw at runtime
+  // and the map reported the loop green.
+  const bridgeBlindSpots = [];
+  const brokenBridgeCalls = [];
+  for (const name of [...undeclared].sort()) {
+    if (preloadKeys.has(name)) { bridgeBlindSpots.push(name); continue; }
+    const callers = [];
+    for (const [path, t] of rendererSources)
+      for (const m of matches(t, new RegExp(`\\.(${name})\\s*\\(`)))
+        callers.push(`${path}:${m.line}`);
+    brokenBridgeCalls.push({ method: name, callers });
+  }
 
   classifyRegistrations(allCalls);
 
@@ -235,7 +276,14 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
     });
   }
   wires.sort((a, b) => a.channel.localeCompare(b.channel));
-  return { wires, duplicates, protocolVariants, bridges: [...bridges], bridgeMethodCount: bridgeMethods.size, usedMethodCount: usedMethods.size };
+  return {
+    wires, duplicates, protocolVariants,
+    bridges: [...bridges],
+    bridgeMethodCount: bridgeMethods.size,
+    usedMethodCount: usedMethods.size,
+    bridgeBlindSpots,
+    brokenBridgeCalls,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

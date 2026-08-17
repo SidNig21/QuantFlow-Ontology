@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "aa88cb7",
+    "commit": "864f9d0",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "65f76f267243fbe9"
+    "fingerprint": "1e03ff8d8601e7bf"
   },
   "stats": {
     "live": 105,
@@ -19,7 +19,9 @@
       "api"
     ],
     "bridgeMethods": 127,
-    "bridgeMethodsUsed": 158,
+    "bridgeMethodsUsed": 113,
+    "brokenBridgeCalls": 2,
+    "bridgeBlindSpots": 43,
     "stripCandidates": 13,
     "violations": 15,
     "governanceUnknown": 3,
@@ -29,11 +31,11 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 49,
+    "undecided": 51,
     "allClear": false,
     "decisions": {
-      "total": 49,
-      "undecided": 49,
+      "total": 51,
+      "undecided": 51,
       "keep": 0,
       "repair": 0,
       "remove": 0,
@@ -11050,9 +11052,9 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/windows/nav/src/main.tsx",
-        "collab-electron/src/windows/settings/src/main.tsx",
+        "collab-electron/src/windows/viewer/src/main.tsx",
         "collab-electron/src/windows/terminal/src/main.tsx",
-        "collab-electron/src/windows/viewer/src/main.tsx"
+        "collab-electron/src/windows/settings/src/main.tsx"
       ],
       "importerCount": 4
     },
@@ -11274,15 +11276,13 @@
     },
     {
       "path": "collab-electron/src/windows/terminal-list/src/App.tsx",
-      "reach": "reachable",
-      "importers": [
-        "collab-electron/src/windows/terminal-list/src/main.tsx"
-      ],
-      "importerCount": 1
+      "reach": "unreachable",
+      "importers": [],
+      "importerCount": 0
     },
     {
       "path": "collab-electron/src/windows/terminal-list/src/main.tsx",
-      "reach": "entrypoint",
+      "reach": "unreachable",
       "importers": [],
       "importerCount": 0
     },
@@ -11591,18 +11591,20 @@
     "collab-electron/src/main/index.ts",
     "collab-electron/src/preload/shell.ts",
     "collab-electron/src/preload/universal.ts",
-    "collab-electron/src/windows/agent-chat/src/main.tsx",
-    "collab-electron/src/windows/artifact-tile/src/main.tsx",
-    "collab-electron/src/windows/graph-tile/src/main.tsx",
     "collab-electron/src/windows/nav/src/main.tsx",
-    "collab-electron/src/windows/session-tile/src/main.tsx",
+    "collab-electron/src/windows/viewer/src/main.tsx",
+    "collab-electron/src/windows/terminal/src/main.tsx",
     "collab-electron/src/windows/settings/src/main.tsx",
     "collab-electron/src/windows/shell/src/renderer.js",
-    "collab-electron/src/windows/terminal/src/main.tsx",
-    "collab-electron/src/windows/terminal-list/src/main.tsx",
     "collab-electron/src/windows/terminal-tile/src/main.tsx",
+    "collab-electron/src/windows/graph-tile/src/main.tsx",
+    "collab-electron/src/windows/artifact-tile/src/main.tsx",
+    "collab-electron/src/windows/session-tile/src/main.tsx",
     "collab-electron/src/windows/tile-list/src/main.tsx",
-    "collab-electron/src/windows/viewer/src/main.tsx"
+    "collab-electron/src/windows/agent-chat/src/main.tsx"
+  ],
+  "unbuiltWindows": [
+    "terminal-list"
   ],
   "blastRadius": {
     "packages/qf-kernel/src/governed-review.ts": [
@@ -17325,6 +17327,65 @@
       "why": "Registered for both protocols; preload only calls via send. The invoke variant looks legacy, but a packaged or dynamic caller must be ruled out before removing it."
     }
   ],
+  "brokenBridgeCalls": [
+    {
+      "method": "onTerminalListMessage",
+      "callers": [
+        "collab-electron/src/windows/terminal-list/src/App.tsx:54"
+      ]
+    },
+    {
+      "method": "ptyForegroundProcess",
+      "callers": [
+        "collab-electron/src/windows/terminal/src/App.tsx:202"
+      ]
+    }
+  ],
+  "bridgeBlindSpots": [
+    "focusAgentSession",
+    "getBuildIdentity",
+    "isDirectory",
+    "notifyCwdChanged",
+    "notifyPtySessionId",
+    "offCdTo",
+    "offPtyData",
+    "offPtyExit",
+    "onAgentPromptComplete",
+    "onAgentPromptError",
+    "onAgentSessionFailed",
+    "onAgentSessionReady",
+    "onAgentUpdate",
+    "onBrowserTileFocusUrl",
+    "onCanvasPinch",
+    "onCanvasRpcRequest",
+    "onCdTo",
+    "onFileRenamed",
+    "onFileSelected",
+    "onFilesDeleted",
+    "onFocusSearch",
+    "onFocusTab",
+    "onFolderSelected",
+    "onForwardToWebview",
+    "onFsChanged",
+    "onLoadingDone",
+    "onLoadingStatus",
+    "onNavVisibility",
+    "onPrefChanged",
+    "onPtyData",
+    "onPtyExit",
+    "onReplayData",
+    "onRunInTerminal",
+    "onScopeChanged",
+    "onSettingsToggle",
+    "onShortcut",
+    "onTileListMessage",
+    "onUpdateStatus",
+    "onWikilinksUpdated",
+    "onWorkspaceAdded",
+    "onWorkspaceRemoved",
+    "qf",
+    "sendToHost"
+  ],
   "lifetime": [
     {
       "kind": "lifetime",
@@ -19362,6 +19423,20 @@
       "kind": "unreachable",
       "what": "cube3d.js",
       "where": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreachable:collab-electron/src/windows/terminal-list/src/App.tsx",
+      "kind": "unreachable",
+      "what": "App.tsx",
+      "where": "collab-electron/src/windows/terminal-list/src/App.tsx",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreachable:collab-electron/src/windows/terminal-list/src/main.tsx",
+      "kind": "unreachable",
+      "what": "main.tsx",
+      "where": "collab-electron/src/windows/terminal-list/src/main.tsx",
       "verdict": "undecided"
     },
     {

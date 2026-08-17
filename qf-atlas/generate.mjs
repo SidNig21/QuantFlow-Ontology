@@ -53,7 +53,7 @@ const mainFiles     = files.filter((f) => f.startsWith("collab-electron/src/main
 const preloadFiles  = files.filter((f) => f.startsWith("collab-electron/src/preload/")).map((f) => join(REPO, f));
 const rendererFiles = files.filter((f) => f.startsWith("collab-electron/src/windows/") || f.startsWith("collab-electron/packages/")).map((f) => join(REPO, f));
 
-const { wires, duplicates, protocolVariants, bridges, bridgeMethodCount, usedMethodCount } = extractWires(mainFiles, preloadFiles, rendererFiles);
+const { wires, duplicates, protocolVariants, bridges, bridgeMethodCount, usedMethodCount, bridgeBlindSpots, brokenBridgeCalls } = extractWires(mainFiles, preloadFiles, rendererFiles);
 // hop 4 — main -> Kernel. Runs before strip/status so "cheats" is visible everywhere.
 const indexFiles = files
   .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
@@ -237,11 +237,28 @@ for (const L of LAYERS) {
 // else describes what a file does; nothing asked whether it is still ours.
 const productFiles = files.filter((f) =>
   f.startsWith("collab-electron/src/") || f.startsWith("packages/qf-kernel/src/"));
+// The renderer entry list must come from the BUILD, not from a directory listing.
+// Listing `src/windows/*` and assuming each one is an entry granted `entrypoint`
+// — the strongest reachability verdict there is — to `windows/terminal-list/`, a
+// window electron-vite has no input for and `out/renderer/` has never contained.
+// A dead window was being laundered into the one verdict nothing questions, and
+// the broken bridge call inside it (`onTerminalListMessage`) stayed hidden behind
+// that verdict. Read the build config; report the difference as a finding.
+const viteConfig = read(join(REPO, "collab-electron/electron.vite.config.ts"));
+const builtWindows = new Set(
+  [...viteConfig.matchAll(/["']src\/windows\/([\w-]+)\/index\.html["']/g)].map((m) => m[1]));
+const windowDirs = readdirSync(join(REPO, "collab-electron/src/windows"), { withFileTypes: true })
+  .filter((d) => d.isDirectory()).map((d) => d.name);
+const unbuiltWindows = windowDirs.filter((d) => !builtWindows.has(d) && d !== "shared");
+if (!builtWindows.size)
+  throw new Error("qf-atlas: parsed zero renderer entries from electron.vite.config.ts — "
+    + "the entry regex no longer matches the build config, and every window would be "
+    + "reported unreachable. Fix the parse rather than shipping that.");
+
 const reach = reachability({
   repo: REPO, rel,
   files: productFiles,
-  htmlEntries: readdirSync(join(REPO, "collab-electron/src/windows"))
-    .map((d) => `collab-electron/src/windows/${d}/index.html`),
+  htmlEntries: [...builtWindows].map((d) => `collab-electron/src/windows/${d}/index.html`),
   extraEntries: [
     "collab-electron/src/main/index.ts",
     "collab-electron/src/preload/shell.ts",
@@ -280,6 +297,8 @@ const model = {
     ...counts,
     channels: wires.length,
     bridges, bridgeMethods: bridgeMethodCount, bridgeMethodsUsed: usedMethodCount,
+    brokenBridgeCalls: brokenBridgeCalls.length,
+    bridgeBlindSpots: bridgeBlindSpots.length,
     stripCandidates: strip.length,
     // Canonical: confirmed governance violations from the semantic classifier.
     violations: persistence.filter((p) => p.governance === "violation").length,
@@ -304,10 +323,13 @@ const model = {
   coverage: coverageRows,
   reach: reach.rows,
   entrypoints: reach.entries,
+  unbuiltWindows,
   blastRadius: blastFor,
   wires,
   duplicates,
   protocolVariants,
+  brokenBridgeCalls,
+  bridgeBlindSpots,
   lifetime,
   persistence,
   strip,

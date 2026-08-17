@@ -522,6 +522,62 @@ record(33, "bare 'accepted' cannot hide a finding", ...(() => {
   });
 })());
 
+const VITE = "collab-electron/electron.vite.config.ts";
+const WINDOW_ENTRY = /["']src\/windows\/([\w-]+)\/index\.html["']/g;
+
+// 34 · A window with no input in the build config cannot load, so it may never
+// hold a reachability verdict that implies it runs. The entry list used to be a
+// directory listing, which handed `terminal-list` the verdict `entrypoint` — the
+// strongest claim this map makes — for a window `out/renderer/` has never held.
+// Recomputed from the build config here so the test cannot inherit the bug.
+record(34, "a window the build never compiles is not an entrypoint", ...(() => {
+  const built = new Set([...readFileSync(join(REPO, VITE), "utf8").matchAll(WINDOW_ENTRY)]
+    .map((x) => x[1]));
+  if (!built.size) return [false, "could not parse any renderer entry from the build config"];
+  const laundered = before.reach.filter((r) => {
+    const w = r.path.match(/^collab-electron\/src\/windows\/([\w-]+)\//)?.[1];
+    return w && w !== "shared" && !built.has(w)
+      && r.reach !== "unreachable" && r.reach !== "test-only";
+  });
+  return [laundered.length === 0,
+    laundered.length
+      ? `${laundered.length} file(s) in unbuilt windows still claim reachability, e.g. ${laundered[0].reach} ${laundered[0].path}`
+      : `${built.size} built window(s), ${(before.unbuiltWindows ?? []).length} unbuilt, 0 laundered`];
+})());
+
+// 35 · If the entry parse ever stops matching, every window becomes unreachable
+// and the map would report the entire renderer as dead debt. That must fail loudly,
+// not produce a confident wrong answer.
+record(35, "the generator fails closed when it cannot parse renderer entries", ...(() => {
+  const abs = join(REPO, VITE);
+  const original = readFileSync(abs, "utf8");
+  const gutted = original.replace(/src\/windows\/([\w-]+)\/index\.html/g, "src/gone/$1/index.html");
+  if (gutted === original) return [false, "could not construct the fixture"];
+  try {
+    writeAtomic(abs, gutted);
+    let threw = false;
+    try { model(); } catch { threw = true; }
+    return [threw, threw
+      ? "generator refused to produce a map"
+      : "generator produced a map with zero renderer entries"];
+  } finally { writeAtomic(abs, original); }
+})());
+
+// 36 · The broken-bridge-call report accuses product code of a runtime defect.
+// A false accusation here gets working code deleted, so every entry must be
+// independently confirmed absent from the preload AND carry a call site.
+record(36, "a broken bridge call is never a false accusation", ...(() => {
+  const pre = ["shell.ts", "universal.ts"]
+    .map((f) => readFileSync(join(REPO, "collab-electron/src/preload", f), "utf8")).join("\n");
+  const calls = before.brokenBridgeCalls ?? [];
+  const wrong = calls.filter((b) => new RegExp(`(^|[{,;\\s])${b.method}\\s*[:(]`, "m").test(pre));
+  const noEvidence = calls.filter((b) => !b.callers?.length);
+  return [wrong.length === 0 && noEvidence.length === 0,
+    wrong.length ? `${wrong[0].method} IS declared in the preload`
+      : noEvidence.length ? `${noEvidence[0].method} reported with no call site`
+      : `${calls.length} broken call(s), all absent from the preload, all with evidence`];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

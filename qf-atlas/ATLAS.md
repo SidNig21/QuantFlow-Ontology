@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ aa88cb7` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 864f9d0` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**49 of 49 findings have not been looked at.**
+**51 of 51 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,18 +16,58 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 49 |
+| `undecided` | 51 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 49 findings still need a decision.
+**Not all clear.** 51 findings still need a decision.
 
 ## The four hops
 
 QuantFlow is an Electron research console. Every operator action crosses four hops,
 and it can die or cheat at any one of them:
+
+```mermaid
+flowchart TD
+  R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
+  P["<b>2 · preload</b><br/>3 bridges · 127 methods<br/>113 of them called"]
+  M["<b>3 · main</b><br/>123 IPC channels<br/>105 live · 13 unused · 0 dead"]
+  H{"<b>4 · is it governed?</b>"}
+  E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
+  DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
+
+  R --> P --> M --> H
+  H -->|"write-door 14"| E
+  E --> DB
+  X["<b>raw SQL</b><br/>never enters a<br/>governed action"]
+  H -->|"cheats 6"| X
+  FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
+  H -->|"writes-disk 9"| FS
+  RO["<b>read-only</b><br/>no mutation seen"]
+  H -->|"read-only 94"| RO
+  X -.->|"ungoverned — this is the breach"| DB
+
+  QA["<b>QA · governance</b><br/>13 subsystems<br/>asserts the rules above"]
+  SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
+  SC["<b>Schema · generated contract</b><br/>5 subsystems<br/>generated, never hand-edited"]
+  QA -.->|"gates"| H
+  SC -.->|"defines the tables"| DB
+  SP -.->|"drives the UI as an operator would"| R
+
+  classDef good fill:#0b3d2e,stroke:#1f9d6b,color:#e8fff5
+  classDef bad fill:#4a1220,stroke:#e5484d,color:#ffe8ea
+  classDef gray fill:#2a2a2e,stroke:#6b6b73,color:#e6e6ea
+  classDef truth fill:#10243d,stroke:#3b82f6,color:#e6f0ff
+  class E,RO good
+  class X,FS bad
+  class QA,SP,SC gray
+  class DB,R,P,M,H truth
+```
+
+Green is governed, red is not, **gray is unmeasured — which this map may never report
+as clean.** The same model renders interactively in `qf-atlas/atlas.html`.
 
 ```
 1 renderer      a window surface calls a bridge method       shellApi.createTask()
@@ -47,6 +87,42 @@ handler that mutates state without `execute()` is cheating even when it works.
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
 | `read-only` | no mutation seen | 94 |
+
+### Broken at hop 1 (2)
+
+A window calls a bridge method the preload **does not expose**. This throws
+`TypeError: … is not a function` the moment the code path runs. It is invisible to
+every other check here: the channel is registered in main, the preload is healthy, and
+the loop reads green — because nothing was asking whether the method on the calling end
+exists.
+
+| Method | Called from | Exists in preload |
+|---|---|---|
+| `onTerminalListMessage` | `collab-electron/src/windows/terminal-list/src/App.tsx:54` | **no** |
+| `ptyForegroundProcess` | `collab-electron/src/windows/terminal/src/App.tsx:202` | **no** |
+
+These are **product defects, not map findings** — fix the call site or restore the
+method. Removing the call site is only correct if the feature is genuinely gone.
+
+> Detection is deliberately biased toward silence: a name appearing as a key anywhere
+> in a preload file counts as declared, type annotations included. A missed break is
+> recoverable; a false accusation gets working code deleted.
+
+**43 bridge methods exist but could not be paired to a channel.**
+Almost all are `on*`/`off*` event subscribers, and they are unpaired for a structural
+reason, not a parsing one — see the next paragraph.
+
+#### The push direction is not modelled
+
+Everything above traces **renderer → main**: `invoke`/`send` going out, a handler
+answering. The main process also pushes the other way — `webContents.send` out, an
+`ipcRenderer.on` subscriber receiving — and **this analyzer has no pattern for that
+direction at all.** Those channels are not wires here, cannot be reported live, unused
+or dead, and do not appear in any count on this page.
+
+So: a push channel whose subscriber was deleted looks exactly like a push channel that
+works. Do not read a green loop as covering event delivery. This is a **known hole**,
+recorded here because the rule of this map is that silence may never read as clean.
 
 ## The jobs an operator actually does
 
@@ -129,17 +205,52 @@ and each window's own script — so this is a file-level graph, not a call graph
 
 | | Files | Meaning |
 |---|---:|---|
-| `entrypoint` | 15 | the app starts here |
-| `reachable` | 145 | imported from an entrypoint |
+| `entrypoint` | 14 | the app starts here |
+| `reachable` | 144 | imported from an entrypoint |
 | `process-entry` | 3 | launched by path, not imported (workers) |
 | `package-entry` | 1 | named in a workspace package's exports |
 | `test-only` | 0 | reached only from tests |
-| **`unreachable`** | **12** | **nothing imports it — start here** |
+| **`unreachable`** | **14** | **nothing imports it — start here** |
 
-### Unreachable (12)
+### Windows the build never compiles (1)
 
-Nothing in the product imports these. That is evidence, not a verdict: check package
-inclusion and dynamic loading before deleting anything.
+A directory under `src/windows/` with no input in `electron.vite.config.ts`. It has no
+bundle in `out/renderer/`, so it **cannot load** — the code is unrunnable, not merely
+uncalled.
+
+- `collab-electron/src/windows/terminal-list/`
+
+> This section exists because the entry list used to be a directory listing. That
+> handed `terminal-list` the verdict `entrypoint` — the strongest
+> reachability claim this map can make — for a window the build has no input for.
+> Renderer entries are now parsed from the build config, and the generator throws
+> rather than continue if that parse returns nothing.
+
+### Unreachable (14) — ask the founder, do not delete
+
+Nothing in the product imports these. **`unreachable` is a question, not a verdict.**
+Two different situations produce byte-for-byte identical evidence:
+
+| | Looks like | Correct action |
+|---|---|---|
+| **built ahead of the UI** | unreachable | keep — the caller is a future rung |
+| **abandoned** | unreachable | remove |
+
+The code does not record which one it is. Neither does the git history, and neither
+would runtime tracing — code built ahead of its UI never executes either, so a trace
+marks it dead exactly like real corpse code. **Intent is not recoverable from the
+repository.** The only source is the founder, and the only place to put the answer is a
+verdict in `qf-atlas/decisions.json`.
+
+> This section exists because an agent reading this map proposed deleting the `a2a-*`
+> modules as "a fossil". They are agent-to-agent collaboration — the founding concept
+> of the project, named as a plane in `README.md`. The map was right that nothing
+> imports them. The inference drawn from that was wrong, and no amount of further
+> static analysis would have prevented it.
+
+Before proposing removal of anything below, rule out: workspace package exports,
+dynamic `import()`, path-launched processes, packaging manifests, and QA gates that
+assert the file exists. Then ask.
 
 - `collab-electron/src/main/a2a-artifact-store.ts`
 - `collab-electron/src/main/a2a-bus.ts`
@@ -149,6 +260,8 @@ inclusion and dynamic loading before deleting anything.
 - `collab-electron/src/main/sidecar/ring-buffer.ts`
 - `collab-electron/src/main/sidecar/server.ts`
 - `collab-electron/src/windows/shared/flow-cube/cube3d.js`
+- `collab-electron/src/windows/terminal-list/src/App.tsx`
+- `collab-electron/src/windows/terminal-list/src/main.tsx`
 - `packages/qf-kernel/src/db-bun.ts`
 - `packages/qf-kernel/src/fixtures.ts`
 - `packages/qf-kernel/src/insert.ts`

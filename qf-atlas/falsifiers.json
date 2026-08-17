@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 33,
-  "total": 33,
+  "passed": 36,
+  "total": 36,
   "results": [
     {
       "n": 1,
@@ -193,13 +193,31 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 49 -> 48"
+      "detail": "verdict=remove undecided 51 -> 50"
     },
     {
       "n": 33,
       "name": "bare 'accepted' cannot hide a finding",
       "passed": true,
       "detail": "verdict=undecided (accepted without owner, reason and expiry does not count as a decision)"
+    },
+    {
+      "n": 34,
+      "name": "a window the build never compiles is not an entrypoint",
+      "passed": true,
+      "detail": "11 built window(s), 1 unbuilt, 0 laundered"
+    },
+    {
+      "n": 35,
+      "name": "the generator fails closed when it cannot parse renderer entries",
+      "passed": true,
+      "detail": "generator refused to produce a map"
+    },
+    {
+      "n": 36,
+      "name": "a broken bridge call is never a false accusation",
+      "passed": true,
+      "detail": "2 broken call(s), all absent from the preload, all with evidence"
     }
   ]
 }

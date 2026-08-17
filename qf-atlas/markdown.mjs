@@ -53,6 +53,12 @@ export function renderMarkdown(m) {
   p(`QuantFlow is an Electron research console. Every operator action crosses four hops,`);
   p(`and it can die or cheat at any one of them:`);
   p();
+  // The same map the founder sees in atlas.html, as a diagram that renders in
+  // GitHub, Cursor and most agent tools while staying greppable text underneath.
+  // An agent reading only the tables was working from a worse picture than the
+  // human it was reporting to, for no reason other than that nobody drew it here.
+  for (const line of diagram(m)) p(line);
+  p();
   p("```");
   p("1 renderer      a window surface calls a bridge method       shellApi.createTask()");
   p("2 preload       the contextBridge forwards a named channel   ipcRenderer.invoke(\"qf:tasks:create\")");
@@ -71,6 +77,55 @@ export function renderMarkdown(m) {
   p(`| \`writes-disk\` | writes a file; never reaches the Kernel at all | ${m.wires.filter((w) => w.hop4?.kind === "writes-disk").length} |`);
   p(`| \`unknown\` | handler file not fully read; not claimed read-only | ${m.wires.filter((w) => w.hop4?.kind === "unknown").length} |`);
   p(`| \`read-only\` | no mutation seen | ${m.wires.filter((w) => w.hop4?.kind === "read-only").length} |`);
+  p();
+
+  // ── 1b. hop 1, checked in the other direction ─────────────────────────────
+  // Hop 1 was only ever asked "is this declared method used?". The reverse
+  // question — "does this used method exist?" — is what catches a renderer
+  // awaiting a bridge method the preload never exposed.
+  const broken = m.brokenBridgeCalls ?? [];
+  p(`### Broken at hop 1 (${broken.length})`);
+  p();
+  p(`A window calls a bridge method the preload **does not expose**. This throws`);
+  p(`\`TypeError: … is not a function\` the moment the code path runs. It is invisible to`);
+  p(`every other check here: the channel is registered in main, the preload is healthy, and`);
+  p(`the loop reads green — because nothing was asking whether the method on the calling end`);
+  p(`exists.`);
+  p();
+  if (!broken.length) {
+    p(`None.`);
+    p();
+  } else {
+    p(`| Method | Called from | Exists in preload |`);
+    p(`|---|---|---|`);
+    for (const b of broken)
+      p(`| \`${b.method}\` | ${b.callers.map((c) => `\`${c}\``).join(", ") || "—"} | **no** |`);
+    p();
+    p(`These are **product defects, not map findings** — fix the call site or restore the`);
+    p(`method. Removing the call site is only correct if the feature is genuinely gone.`);
+    p();
+  }
+  p(`> Detection is deliberately biased toward silence: a name appearing as a key anywhere`);
+  p(`> in a preload file counts as declared, type annotations included. A missed break is`);
+  p(`> recoverable; a false accusation gets working code deleted.`);
+  p();
+  if ((m.bridgeBlindSpots ?? []).length) {
+    p(`**${m.bridgeBlindSpots.length} bridge methods exist but could not be paired to a channel.**`);
+    p(`Almost all are \`on*\`/\`off*\` event subscribers, and they are unpaired for a structural`);
+    p(`reason, not a parsing one — see the next paragraph.`);
+    p();
+  }
+  p(`#### The push direction is not modelled`);
+  p();
+  p(`Everything above traces **renderer → main**: \`invoke\`/\`send\` going out, a handler`);
+  p(`answering. The main process also pushes the other way — \`webContents.send\` out, an`);
+  p(`\`ipcRenderer.on\` subscriber receiving — and **this analyzer has no pattern for that`);
+  p(`direction at all.** Those channels are not wires here, cannot be reported live, unused`);
+  p(`or dead, and do not appear in any count on this page.`);
+  p();
+  p(`So: a push channel whose subscriber was deleted looks exactly like a push channel that`);
+  p(`works. Do not read a green loop as covering event delivery. This is a **known hole**,`);
+  p(`recorded here because the rule of this map is that silence may never read as clean.`);
   p();
 
   // ── 2. the loops ──────────────────────────────────────────────────────────
@@ -132,11 +187,48 @@ export function renderMarkdown(m) {
   p(`| \`test-only\` | ${byReach("test-only").length} | reached only from tests |`);
   p(`| **\`unreachable\`** | **${byReach("unreachable").length}** | **nothing imports it — start here** |`);
   p();
-  if (byReach("unreachable").length) {
-    p(`### Unreachable (${byReach("unreachable").length})`);
+  if ((m.unbuiltWindows ?? []).length) {
+    p(`### Windows the build never compiles (${m.unbuiltWindows.length})`);
     p();
-    p(`Nothing in the product imports these. That is evidence, not a verdict: check package`);
-    p(`inclusion and dynamic loading before deleting anything.`);
+    p(`A directory under \`src/windows/\` with no input in \`electron.vite.config.ts\`. It has no`);
+    p(`bundle in \`out/renderer/\`, so it **cannot load** — the code is unrunnable, not merely`);
+    p(`uncalled.`);
+    p();
+    for (const w of m.unbuiltWindows) p(`- \`collab-electron/src/windows/${w}/\``);
+    p();
+    p(`> This section exists because the entry list used to be a directory listing. That`);
+    p(`> handed \`${m.unbuiltWindows[0]}\` the verdict \`entrypoint\` — the strongest`);
+    p(`> reachability claim this map can make — for a window the build has no input for.`);
+    p(`> Renderer entries are now parsed from the build config, and the generator throws`);
+    p(`> rather than continue if that parse returns nothing.`);
+    p();
+  }
+  if (byReach("unreachable").length) {
+    p(`### Unreachable (${byReach("unreachable").length}) — ask the founder, do not delete`);
+    p();
+    p(`Nothing in the product imports these. **\`unreachable\` is a question, not a verdict.**`);
+    p(`Two different situations produce byte-for-byte identical evidence:`);
+    p();
+    p(`| | Looks like | Correct action |`);
+    p(`|---|---|---|`);
+    p(`| **built ahead of the UI** | unreachable | keep — the caller is a future rung |`);
+    p(`| **abandoned** | unreachable | remove |`);
+    p();
+    p(`The code does not record which one it is. Neither does the git history, and neither`);
+    p(`would runtime tracing — code built ahead of its UI never executes either, so a trace`);
+    p(`marks it dead exactly like real corpse code. **Intent is not recoverable from the`);
+    p(`repository.** The only source is the founder, and the only place to put the answer is a`);
+    p(`verdict in \`qf-atlas/decisions.json\`.`);
+    p();
+    p(`> This section exists because an agent reading this map proposed deleting the \`a2a-*\``);
+    p(`> modules as "a fossil". They are agent-to-agent collaboration — the founding concept`);
+    p(`> of the project, named as a plane in \`README.md\`. The map was right that nothing`);
+    p(`> imports them. The inference drawn from that was wrong, and no amount of further`);
+    p(`> static analysis would have prevented it.`);
+    p();
+    p(`Before proposing removal of anything below, rule out: workspace package exports,`);
+    p(`dynamic \`import()\`, path-launched processes, packaging manifests, and QA gates that`);
+    p(`assert the file exists. Then ask.`);
     p();
     for (const r of byReach("unreachable")) p(`- \`${r.path}\``);
     p();
@@ -296,4 +388,77 @@ export function renderMarkdown(m) {
   p(`reporting a disproved violation count.`);
   p();
   return out.join("\n");
+}
+
+// ── the picture ───────────────────────────────────────────────────────────────
+// Mermaid, because it renders as a diagram in GitHub/Cursor and stays diffable,
+// greppable text in the file. Every number below is read from the model, so the
+// diagram cannot drift from the tables beside it.
+//
+// The spine is the four hops, which is a real mechanism with a real direction.
+// Floors 5, 3 and 1 are NOT on that spine and are deliberately drawn to the side
+// rather than wired into it — stacking them into the flow would draw call edges
+// that do not exist.
+function diagram(m) {
+  const hop4 = (kind) => m.wires.filter((w) => w.hop4?.kind === kind).length;
+  const onFloor = (id) => m.nodes.filter((n) => n.layer === id).length;
+  const floor = (id) => m.layers.find((l) => l.id === id)?.name ?? `floor ${id}`;
+  const s = m.stats;
+  const cheats = hop4("cheats");
+  const unknown = hop4("unknown");
+
+  const d = [];
+  const spine = [];   // hop-4 outcomes that actually occur
+  const good = ["E"], bad = [], gray = [];
+  // A node declared with a zero count renders as an orphan box, which reads as
+  // "this category exists and is empty" — indistinguishable from a bug in the
+  // walker. Only declare an outcome that has at least one wire on it.
+  const outcome = (n, id, decl, edge, cls) => {
+    if (!n) return;
+    spine.push(`  ${id}${decl}`, `  H -->|"${edge} ${n}"| ${id}`);
+    cls.push(id);
+  };
+
+  d.push("```mermaid");
+  d.push("flowchart TD");
+  d.push(`  R["<b>1 · renderer</b><br/>${onFloor(4)} surface subsystems<br/>calls a bridge method"]`);
+  d.push(`  P["<b>2 · preload</b><br/>${s.bridges.length} bridges · ${s.bridgeMethods} methods<br/>${s.bridgeMethodsUsed} of them called"]`);
+  d.push(`  M["<b>3 · main</b><br/>${s.channels} IPC channels<br/>${s.live} live · ${s.unused} unused · ${s.dead} dead"]`);
+  d.push(`  H{"<b>4 · is it governed?</b>"}`);
+  d.push(`  E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]`);
+  d.push(`  DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]`);
+  d.push("");
+  d.push(`  R --> P --> M --> H`);
+  d.push(`  H -->|"write-door ${hop4("write-door")}"| E`);
+  d.push(`  E --> DB`);
+  outcome(cheats, "X", `["<b>raw SQL</b><br/>never enters a<br/>governed action"]`, "cheats", bad);
+  outcome(hop4("writes-disk"), "FS", `["<b>filesystem</b><br/>never reaches<br/>the Kernel"]`, "writes-disk", bad);
+  outcome(hop4("read-only"), "RO", `["<b>read-only</b><br/>no mutation seen"]`, "read-only", good);
+  outcome(unknown, "U", `["<b>unknown</b><br/>handler not fully read"]`, "unknown", gray);
+  d.push(...spine);
+  if (cheats) d.push(`  X -.->|"ungoverned — this is the breach"| DB`);
+  d.push("");
+  // Floors 5, 3 and 1 are off the hop spine. They get dotted edges describing the
+  // relationship they actually have, never a solid call arrow they do not.
+  d.push(`  QA["<b>${floor(5)}</b><br/>${onFloor(5)} subsystems<br/>asserts the rules above"]`);
+  d.push(`  SP["<b>${floor(3)}</b><br/>${onFloor(3)} subsystems<br/>launched by path,<br/>not imported"]`);
+  d.push(`  SC["<b>${floor(1)}</b><br/>${onFloor(1)} subsystems<br/>generated, never hand-edited"]`);
+  d.push(`  QA -.->|"gates"| H`);
+  d.push(`  SC -.->|"defines the tables"| DB`);
+  d.push(`  SP -.->|"drives the UI as an operator would"| R`);
+  gray.push("QA", "SP", "SC");
+  d.push("");
+  d.push(`  classDef good fill:#0b3d2e,stroke:#1f9d6b,color:#e8fff5`);
+  d.push(`  classDef bad fill:#4a1220,stroke:#e5484d,color:#ffe8ea`);
+  d.push(`  classDef gray fill:#2a2a2e,stroke:#6b6b73,color:#e6e6ea`);
+  d.push(`  classDef truth fill:#10243d,stroke:#3b82f6,color:#e6f0ff`);
+  d.push(`  class ${good.join(",")} good`);
+  if (bad.length) d.push(`  class ${bad.join(",")} bad`);
+  d.push(`  class ${gray.join(",")} gray`);
+  d.push(`  class DB,R,P,M,H truth`);
+  d.push("```");
+  d.push("");
+  d.push(`Green is governed, red is not, **gray is unmeasured — which this map may never report`);
+  d.push(`as clean.** The same model renders interactively in \`qf-atlas/atlas.html\`.`);
+  return d;
 }
