@@ -5,7 +5,7 @@
 //
 //   write-door   it reaches execute(), the sole sanctioned mutation path
 //   cheats       it reaches SQL that never passes through execute()
-//   read-only    it mutates nothing
+//   read-only    no mutation seen (not proof of none when coverage is partial)
 //
 // Resolution is by function name across the repo, followed transitively, because
 // handlers reach the Kernel through aliases:
@@ -32,10 +32,13 @@ export function decomment(t) {
     .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
 }
 
-/** Body from the first `{` at or after `from`, brace-matched, quote-aware. */
-function bodyAt(text, from) {
-  const open = text.indexOf("{", from);
-  if (open === -1) return "";
+/** Body from the `{` at `open`, brace-matched, quote-aware. */
+function bodyAt(text, open) {
+  if (open < 0 || text[open] !== "{") {
+    const found = text.indexOf("{", open);
+    if (found === -1) return "";
+    open = found;
+  }
   let depth = 0, quote = null;
   for (let i = open; i < text.length; i++) {
     const c = text[i], prev = text[i - 1];
@@ -47,11 +50,99 @@ function bodyAt(text, from) {
   return text.slice(open, Math.min(text.length, open + 8000));
 }
 
+/**
+ * Skip a `(…)`, `{…}`, `[…]`, or `<…>` group. Braces inside a parameter list
+ * are TypeScript types (`db: { query: string }`), not the function body.
+ * Taking the first `{` after `function name(` is how hop 4 called a write
+ * `read-only`: the body never made it into the index.
+ */
+function skipGroup(text, start) {
+  const open = text[start];
+  const close = open === "(" ? ")" : open === "{" ? "}" : open === "[" ? "]" : open === "<" ? ">" : "";
+  if (!close) return -1;
+  let depth = 0, quote = null;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i], prev = text[i - 1];
+    if (quote) { if (c === quote && prev !== "\\") quote = null; continue; }
+    if (c === '"' || c === "'" || c === "`") { quote = c; continue; }
+    if (c === open) depth++;
+    else if (c === close) {
+      depth--;
+      if (depth === 0) return i;
+    } else if (open === "(" || open === "<") {
+      if (c === "{" || c === "(" || c === "[") {
+        const inner = skipGroup(text, i);
+        if (inner < 0) return -1;
+        i = inner;
+      }
+    }
+  }
+  return -1;
+}
+
+/** After `:`, skip one TypeScript type so the next `{` is the body, not `{ a: string }`. */
+function skipTsType(text, from) {
+  let i = from;
+  while (i < text.length && /\s/.test(text[i])) i++;
+  let paren = 0, bracket = 0, angle = 0, quote = null;
+  for (; i < text.length; i++) {
+    const c = text[i], prev = text[i - 1];
+    if (quote) { if (c === quote && prev !== "\\") quote = null; continue; }
+    if (c === '"' || c === "'" || c === "`") { quote = c; continue; }
+    if (c === "<") angle++;
+    else if (c === ">" && angle) angle--;
+    else if (c === "(") paren++;
+    else if (c === ")" && paren) paren--;
+    else if (c === "[") bracket++;
+    else if (c === "]" && bracket) bracket--;
+    else if (c === "{" && paren === 0 && bracket === 0 && angle === 0) {
+      const end = skipGroup(text, i);
+      if (end < 0) return i;
+      let j = end + 1;
+      while (j < text.length && /\s/.test(text[j])) j++;
+      return text[j] === "{" ? j : i;
+    }
+  }
+  return i;
+}
+
+/**
+ * Function body after a signature that starts at `<` or `(`.
+ * `handlerSeed` already walks to `=>` so a typed callback does not steal the
+ * body; named functions used the first `{` and did.
+ */
+export function functionBody(text, sigOpen) {
+  let i = sigOpen;
+  if (text[i] === "<") {
+    const end = skipGroup(text, i);
+    if (end < 0) return "";
+    i = end + 1;
+    while (i < text.length && /\s/.test(text[i])) i++;
+  }
+  if (text[i] !== "(") return bodyAt(text, sigOpen);
+  const paramsEnd = skipGroup(text, i);
+  if (paramsEnd < 0) return "";
+  i = paramsEnd + 1;
+  while (i < text.length && /\s/.test(text[i])) i++;
+  if (text[i] === ":") {
+    i = skipTsType(text, i + 1);
+    while (i < text.length && /\s/.test(text[i])) i++;
+  }
+  if (text[i] === "{") return bodyAt(text, i);
+  if (text[i] === "=" && text[i + 1] === ">") {
+    i += 2;
+    while (i < text.length && /\s/.test(text[i])) i++;
+    if (text[i] === "{") return bodyAt(text, i);
+    return expressionAt(text, i);
+  }
+  return "";
+}
+
 /** The body of a named function declared in `text`, or "" if it is not there. */
 export function bodyOf(text, fnName) {
   const re = new RegExp(`(?:export\\s+)?(?:async\\s+)?function\\s+${fnName}\\s*[<(]`);
   const m = re.exec(text);
-  return m ? bodyAt(text, m.index + m[0].length) : "";
+  return m ? functionBody(text, m.index + m[0].length - 1) : "";
 }
 
 /** A concise arrow body: everything up to the `)` that closes ipcMain.handle(. */
@@ -117,7 +208,7 @@ export function indexFunctions(files, read, relOf) {
       let m;
       while ((m = re.exec(text))) {
         const name = m[1];
-        const body = bodyAt(text, m.index + m[0].length);
+        const body = functionBody(text, m.index + m[0].length - 1);
         if (!body) continue;
         const calls = new Set();
         const cr = /([A-Za-z_$][\w$]*)\s*\(/g;
@@ -200,6 +291,8 @@ export function classify(seedCalls, index, maxDepth = 5, own = {}, names = null)
     frontier = next;
   }
   // Cheating outranks the write door: a handler that reaches both is the finding.
+  // This is reachability only — any SQL-flagged function counts, including idempotent
+  // CREATE TABLE on bookkeeping tables the persistence classifier treats as compliant.
   const kind = via.dml ? "cheats" : via.door ? "write-door" : via.disk ? "writes-disk" : "read-only";
   return { kind, viaDoor: via.door?.[0] ?? null, viaDml: via.dml?.[0] ?? null,
            dmlFile: via.dml?.[1] ?? null, viaDisk: via.disk?.[0] ?? null, diskFile: via.disk?.[1] ?? null };
@@ -240,6 +333,7 @@ export function addFourthHop(wires, handlerFiles, indexFiles, read, relOf) {
         w.hop4.kind === "write-door" ? `execute() via ${w.hop4.viaDoor}`
         : w.hop4.kind === "cheats"   ? `raw SQL via ${w.hop4.viaDml} (${w.hop4.dmlFile})`
         : w.hop4.kind === "writes-disk" ? `writes a file via ${w.hop4.viaDisk} — never reaches the Kernel`
+        : w.hop4.kind === "unknown" ? "unknown — hop 4 did not fully read this handler"
         : "read-only — mutates nothing",
     });
     // A wire that is live end to end but cheats at the Kernel is not healthy.

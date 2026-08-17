@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-generator @ 30590ea` on 2026-08-17 by
+> Generated from `atlas-generator @ 8e766b3` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -23,34 +23,47 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 9 |
-| `cheats` | reaches SQL that never passes through `execute()` | 4 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
+| `cheats` | reaches SQL that never passes through `execute()` | 6 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
-| `read-only` | mutates nothing | 106 |
+| `unknown` | handler file not fully read; not claimed read-only | 0 |
+| `read-only` | no mutation seen | 98 |
 
 ## The jobs an operator actually does
 
-6 of 8 loops are healthy.
+4 of 8 loops are healthy.
 A loop is only as good as its worst wire. **The loop names are authored product intent;
 every status below is derived from the code.**
 
-**What green does not mean.** A healthy loop proves the wiring exists and is governed —
-the channel is reachable, a handler answers it, and it reaches `execute()`. It does not
-prove the job produces the right outcome. *Assign* is green because the IPC path is
-intact; nothing here checks whether the human path actually notifies the seat, which is
-where it has failed before. Read the score as **"the plumbing is connected"**, not
-**"the product works"**. Behaviour is what gates and rungs are for.
+**What loop health means.** A red loop means a channel on that job reaches SQL the hop-4
+walker flags outside `execute()` — reachability, not severity. It does **not** mean the
+job is four broken product features when four loops read unhealthy. Idempotent `CREATE TABLE`
+on review bookkeeping tables can mark *Create a Task* or *Show the research world* as cheating
+at the Kernel even when no domain table is written on that path. For severity, read the
+confirmed-violations table below; for wiring, read the loop table.
+
+**What green does not mean.** A healthy loop proves the wiring exists and reaches `execute()`
+on every channel in the loop — not that the job produces the right outcome. Read the score as
+**"the plumbing is connected"**, not **"the product works"**. Behaviour is what gates and rungs
+are for.
 
 | Loop | Health | What it is |
 |---|---|---|
 | **Ask a research question** | ✅ ok | The front door. A founder question becomes a Mission and a Task for the Research Director. |
-| **Create a Task** | ✅ ok | A Task is written to the Kernel and shown on the canvas. |
+| **Create a Task** | 🔴 **broken** 1/1 | A Task is written to the Kernel and shown on the canvas. |
 | **Assign and reassign** | ✅ ok | Move a Task to a seat. The agent path notifies the seat; the human path is where delivery has failed before. |
 | **Spawn a seat** | ✅ ok | Start a runtime the operator can watch: a PTY, then an agent session on top of it. |
 | **Steer and cancel** | ✅ ok | Interrupt work in flight without losing the record of it. |
 | **Review and publish** | 🔴 **broken** 4/4 | The governed critic path. R15 shipped on this, and R16 renders it. |
-| **Show the research world** | ✅ ok | Everything R16 must reveal on the canvas: the ledger, the task surface, artifacts, events and cables. |
+| **Show the research world** | 🟠 degraded 1/6 | Everything R16 must reveal on the canvas: the ledger, the task surface, artifacts, events and cables. |
 | **Close the app** | 🟠 degraded 4/6 | Quit must stop every worker it started. This loop is made of lifetime wires, not IPC. |
+
+### 🔴 Create a Task
+
+A Task is written to the Kernel and shown on the canvas.
+
+- `qf:tasks:create` — **cheats**
+  - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
 
 ### 🔴 Review and publish
 
@@ -64,6 +77,13 @@ The governed critic path. R15 shipped on this, and R16 renders it.
   - breaks at **kernel**: raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)
 - `qf:review:projection` — **unused**, and cheats at the Kernel
   - breaks at **renderer**: getGovernedReviewProjection()
+  - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
+
+### 🟠 Show the research world
+
+Everything R16 must reveal on the canvas: the ledger, the task surface, artifacts, events and cables.
+
+- `qf:tasks:surface` — **cheats**
   - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
 
 ### 🟠 Close the app
@@ -134,7 +154,7 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**14 confirmed**, 4 unknown (gray — not counted as debt).
+**15 confirmed**, 3 unknown (gray — not counted as debt).
 
 | File | Table | Verb | Kind | Reach | Confidence |
 |---|---|---|---|---|---|
@@ -142,6 +162,7 @@ from the generated schema; reachability follows call sites and the Kernel comman
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | INSERT INTO | non-domain-store | bypass | medium |
@@ -159,7 +180,7 @@ which are not in the golden schema),
 Kernel command implementations dispatched by `execute()`, schema migrations,
 generated SQL, and QA fixture seeding.
 
-## What the analyzer could not read (30)
+## What the analyzer could not read (27)
 
 **Absence of a finding is not proof of compliance.** These files hold SQL the function
 indexer could not resolve, so governance analysis never saw it. They are gray, and they
@@ -168,21 +189,21 @@ prevent a clean architectural result.
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
 | `packages/qf-kernel/src/upgrade.ts` | partial | 1 | 3 |
-| `packages/qf-kernel/src/governed-review.ts` | partial | 28 | 16 |
 | `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 0 |
-| `packages/qf-kernel/src/create.ts` | partial | 13 | 11 |
-| `collab-electron/src/main/kernel.ts` | partial | 7 | 5 |
+| `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
-| `packages/qf-kernel/src/events.ts` | partial | 1 | 0 |
-| `packages/qf-kernel/src/insert.ts` | partial | 1 | 0 |
 | `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/host-acp-bridge.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/peer-role-registry.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/qf-execute-allowlist.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/sidecar/client.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/sidecar/ring-buffer.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/updater/index.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/vite-raw.d.ts` | unindexed | 0 | 0 |
-| …15 more | | | see `atlas.json` |
+| `packages/qf-kernel/src/errors.ts` | unindexed | 0 | 0 |
+| `packages/qf-kernel/src/index.ts` | unindexed | 0 | 0 |
+| `packages/qf-kernel/src/portable.ts` | unindexed | 0 | 0 |
+| …12 more | | | see `atlas.json` |
 
 > `governed-review.ts` is in this table. The confirmed-violation count above is
 > therefore a **floor**, not a total — it was computed from a partial read of the very

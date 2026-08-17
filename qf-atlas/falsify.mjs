@@ -9,7 +9,7 @@
 // The tree is restored in a finally block; the run refuses to start dirty so a
 // crash can never be mistaken for your own edits.
 
-import { writeFileSync, unlinkSync, existsSync, readFileSync } from "node:fs";
+import { writeFileSync, unlinkSync, existsSync, readFileSync, renameSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { REPO } from "./extract.mjs";
@@ -388,12 +388,53 @@ record(25, "channel-name UPDATE/DELETE does not gray a file",
       return [!!cov && !gray, cov ? `coverage=${cov.status} unrecognised=${cov.sqlUnrecognised ?? 0}` : "file not covered"];
     }));
 
+// 26 · a `{` in a TypeScript parameter type must not hide SQL from hop 4
+record(26, "typed-brace SQL does not leave hop 4 read-only",
+  ...withFile(`${MAIN}/zz-falsify-26.ts`,
+    `import { ipcMain } from "electron";\n` +
+    `export function seedMission(db: { query: (s: string) => { run: (...a: unknown[]) => void } }){\n` +
+    `  db.query("INSERT OR IGNORE INTO mission (id) VALUES (?)").run("x");\n` +
+    `}\n` +
+    `export function r(){ ipcMain.handle("qf:falsify:typedbrace", async () => seedMission({ query: () => ({ run() {} }) })); }\n`,
+    (m) => {
+      const w = m.wires.find((x) => x.channel === "qf:falsify:typedbrace");
+      const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-26.ts"));
+      const v = m.persistence.find((p) => p.evidence[0].file.endsWith("zz-falsify-26.ts") && p.governance === "violation");
+      const hop = w?.hop4?.kind;
+      const ok = hop === "cheats" || (cov?.status === "partial" && hop && hop !== "read-only");
+      return [!!ok, `hop4=${hop} coverage=${cov?.status} violation=${!!v}`];
+    }));
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 
 const passed = results.filter((r) => r.passed).length;
 console.log(`\n${passed}/${results.length} falsifiers pass`);
-writeFileSync(join(REPO, "qf-atlas", "falsifiers.json"),
-  JSON.stringify({ ran: new Date().toISOString().slice(0, 10), passed, total: results.length, results }, null, 2) + "\n");
+
+// The generator writes its outputs atomically because Windows holds transient
+// locks (errno -4094) during rapid regeneration. The harness did not, so a run
+// could pass 26 tests, fail to write the receipt, exit non-zero, and leave the
+// PREVIOUS run's receipt on disk looking current. A stale green receipt is the
+// precise failure this harness exists to prevent, so it writes the same way.
+const receiptPath = join(REPO, "qf-atlas", "falsifiers.json");
+const receipt = JSON.stringify(
+  { ran: new Date().toISOString().slice(0, 10), passed, total: results.length, results }, null, 2) + "\n";
+let written = false;
+for (let attempt = 0; attempt < 5 && !written; attempt++) {
+  try {
+    const tmp = `${receiptPath}.tmp-${process.pid}`;
+    writeFileSync(tmp, receipt);
+    renameSync(tmp, receiptPath);
+    written = true;
+  } catch (err) {
+    if (attempt === 4) {
+      // Never exit 0 on an unwritten receipt: the file on disk is now stale.
+      console.error(`FAILED to write ${receiptPath}: ${err.code}. The receipt on disk is STALE.`);
+      process.exit(3);
+    }
+    const until = Date.now() + 80 * (attempt + 1);
+    while (Date.now() < until) { /* brief backoff */ }
+  }
+}
 console.log("receipts written to qf-atlas/falsifiers.json");
 process.exit(passed === results.length ? 0 : 1);

@@ -1,14 +1,14 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "30590ea",
+    "commit": "8e766b3",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "a7df1669455af443"
+    "fingerprint": "bcf6e628ea71e7cd"
   },
   "stats": {
-    "live": 107,
+    "live": 105,
     "unreached": 5,
     "unused": 13,
     "dead": 0,
@@ -21,11 +21,11 @@
     "bridgeMethods": 127,
     "bridgeMethodsUsed": 158,
     "stripCandidates": 18,
-    "violations": 14,
-    "governanceUnknown": 4,
+    "violations": 15,
+    "governanceUnknown": 3,
     "legacyLeads": 9,
     "nodes": 106,
-    "loopsBroken": 2,
+    "loopsBroken": 4,
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0
@@ -2705,7 +2705,7 @@
       "kb": 49.2,
       "x": 1.01,
       "z": 0.85,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 1,
       "dml": 13,
@@ -7002,8 +7002,8 @@
       "members": [
         {
           "channel": "qf:tasks:create",
-          "status": "live",
-          "hop4": "write-door",
+          "status": "cheats",
+          "hop4": "cheats",
           "hops": [
             {
               "layer": "renderer",
@@ -7022,16 +7022,16 @@
             },
             {
               "layer": "kernel",
-              "present": true,
-              "detail": "execute() via kernelExecute"
+              "present": false,
+              "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
             }
           ],
-          "breakAt": null
+          "breakAt": "kernel"
         }
       ],
-      "worst": "live",
-      "health": "ok",
-      "brokenCount": 0,
+      "worst": "cheats",
+      "health": "broken",
+      "brokenCount": 1,
       "total": 1
     },
     {
@@ -7174,7 +7174,7 @@
         {
           "channel": "qf:sessions:runTurn",
           "status": "live",
-          "hop4": "read-only",
+          "hop4": "write-door",
           "hops": [
             {
               "layer": "renderer",
@@ -7194,7 +7194,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "read-only — mutates nothing"
+              "detail": "execute() via kernelExecute"
             }
           ],
           "breakAt": null
@@ -7477,8 +7477,8 @@
         },
         {
           "channel": "qf:tasks:surface",
-          "status": "live",
-          "hop4": "read-only",
+          "status": "cheats",
+          "hop4": "cheats",
           "hops": [
             {
               "layer": "renderer",
@@ -7497,11 +7497,11 @@
             },
             {
               "layer": "kernel",
-              "present": true,
-              "detail": "read-only — mutates nothing"
+              "present": false,
+              "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
             }
           ],
-          "breakAt": null
+          "breakAt": "kernel"
         },
         {
           "channel": "qf:artifacts:list",
@@ -7616,9 +7616,9 @@
           "breakAt": null
         }
       ],
-      "worst": "live",
-      "health": "ok",
-      "brokenCount": 0,
+      "worst": "cheats",
+      "health": "degraded",
+      "brokenCount": 1,
       "total": 6
     },
     {
@@ -7755,50 +7755,14 @@
       "status": "partial",
       "indexedFns": 56,
       "sqlInText": 7,
-      "sqlIndexed": 5,
+      "sqlIndexed": 6,
       "sqlUnrecognised": 0,
-      "why": "7 SQL site(s) in the text, 5 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "packages/qf-kernel/src/create.ts",
-      "status": "partial",
-      "indexedFns": 25,
-      "sqlInText": 13,
-      "sqlIndexed": 11,
-      "sqlUnrecognised": 0,
-      "why": "13 SQL site(s) in the text, 11 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "why": "7 SQL site(s) in the text, 6 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/db.ts",
       "status": "partial",
-      "indexedFns": 14,
-      "sqlInText": 1,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0,
-      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "packages/qf-kernel/src/events.ts",
-      "status": "partial",
-      "indexedFns": 1,
-      "sqlInText": 1,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0,
-      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "packages/qf-kernel/src/governed-review.ts",
-      "status": "partial",
-      "indexedFns": 32,
-      "sqlInText": 28,
-      "sqlIndexed": 16,
-      "sqlUnrecognised": 0,
-      "why": "28 SQL site(s) in the text, 16 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "packages/qf-kernel/src/insert.ts",
-      "status": "partial",
-      "indexedFns": 1,
+      "indexedFns": 12,
       "sqlInText": 1,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0,
@@ -7848,6 +7812,14 @@
     },
     {
       "path": "collab-electron/src/main/qf-execute-allowlist.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/client.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
@@ -8057,7 +8029,7 @@
     {
       "path": "collab-electron/src/main/agent-host.ts",
       "status": "indexed",
-      "indexedFns": 30,
+      "indexedFns": 28,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8201,7 +8173,7 @@
     {
       "path": "collab-electron/src/main/git-replay-worker.ts",
       "status": "indexed",
-      "indexedFns": 15,
+      "indexedFns": 14,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8273,7 +8245,7 @@
     {
       "path": "collab-electron/src/main/index.ts",
       "status": "indexed",
-      "indexedFns": 36,
+      "indexedFns": 32,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8289,7 +8261,7 @@
     {
       "path": "collab-electron/src/main/ipc-browser.ts",
       "status": "indexed",
-      "indexedFns": 6,
+      "indexedFns": 4,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8313,7 +8285,7 @@
     {
       "path": "collab-electron/src/main/ipc-filesystem.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 3,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8321,7 +8293,7 @@
     {
       "path": "collab-electron/src/main/ipc-kernel.ts",
       "status": "indexed",
-      "indexedFns": 17,
+      "indexedFns": 15,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8551,14 +8523,6 @@
       "sqlUnrecognised": 0
     },
     {
-      "path": "collab-electron/src/main/sidecar/client.ts",
-      "status": "indexed",
-      "indexedFns": 1,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
       "path": "collab-electron/src/main/sidecar/entry.ts",
       "status": "indexed",
       "indexedFns": 1,
@@ -8585,7 +8549,7 @@
     {
       "path": "collab-electron/src/main/sidecar/server.ts",
       "status": "indexed",
-      "indexedFns": 3,
+      "indexedFns": 1,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8625,7 +8589,7 @@
     {
       "path": "collab-electron/src/main/terminal-target.ts",
       "status": "indexed",
-      "indexedFns": 14,
+      "indexedFns": 13,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8649,7 +8613,7 @@
     {
       "path": "collab-electron/src/main/updater/update-manager.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 4,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8689,7 +8653,7 @@
     {
       "path": "collab-electron/src/main/workspace-graph-python.ts",
       "status": "indexed",
-      "indexedFns": 25,
+      "indexedFns": 23,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8700,6 +8664,14 @@
       "indexedFns": 15,
       "sqlInText": 0,
       "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/create.ts",
+      "status": "indexed",
+      "indexedFns": 24,
+      "sqlInText": 13,
+      "sqlIndexed": 13,
       "sqlUnrecognised": 0
     },
     {
@@ -8721,15 +8693,23 @@
     {
       "path": "packages/qf-kernel/src/deterministic-execution.ts",
       "status": "indexed",
-      "indexedFns": 21,
+      "indexedFns": 19,
       "sqlInText": 4,
       "sqlIndexed": 4,
       "sqlUnrecognised": 0
     },
     {
+      "path": "packages/qf-kernel/src/events.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 1,
+      "sqlIndexed": 1,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "packages/qf-kernel/src/execute.ts",
       "status": "indexed",
-      "indexedFns": 31,
+      "indexedFns": 29,
       "sqlInText": 7,
       "sqlIndexed": 7,
       "sqlUnrecognised": 0
@@ -8743,11 +8723,27 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "packages/qf-kernel/src/governed-review.ts",
+      "status": "indexed",
+      "indexedFns": 31,
+      "sqlInText": 28,
+      "sqlIndexed": 28,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "packages/qf-kernel/src/hash.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
       "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/insert.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 1,
+      "sqlIndexed": 1,
       "sqlUnrecognised": 0
     },
     {
@@ -8937,7 +8933,7 @@
     {
       "path": "tools/qf-read-tools/src/gates/action-transport.ts",
       "status": "indexed",
-      "indexedFns": 7,
+      "indexedFns": 4,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8961,7 +8957,7 @@
     {
       "path": "tools/qf-read-tools/src/gates/tool-discovery.ts",
       "status": "indexed",
-      "indexedFns": 18,
+      "indexedFns": 17,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8969,7 +8965,7 @@
     {
       "path": "tools/qf-read-tools/src/harness.ts",
       "status": "indexed",
-      "indexedFns": 16,
+      "indexedFns": 13,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8985,7 +8981,7 @@
     {
       "path": "tools/qf-read-tools/src/server.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 1,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9025,7 +9021,7 @@
     {
       "path": "tools/qf-vault-projection/src/load-schema.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 1,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9065,7 +9061,7 @@
     {
       "path": "tools/runtime-proof/src/proof.ts",
       "status": "indexed",
-      "indexedFns": 11,
+      "indexedFns": 10,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -13456,7 +13452,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -13466,8 +13462,8 @@
       },
       "calledAt": null,
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "kernelExecute",
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
@@ -13544,7 +13540,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -13558,8 +13554,8 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "kernelExecute",
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
@@ -13590,7 +13586,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -13604,8 +13600,8 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "kernelExecute",
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
@@ -13636,7 +13632,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -13650,8 +13646,8 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "kernelExecute",
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
@@ -13958,7 +13954,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -13972,12 +13968,12 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "kernelExecute",
         "viaDml": null,
         "dmlFile": null,
-        "viaDisk": null,
-        "diskFile": null
+        "viaDisk": "kernelEnsureSampleResearchDataset",
+        "diskFile": "collab-electron/src/main/kernel.ts"
       }
     },
     {
@@ -14111,7 +14107,7 @@
       },
       "hop4": {
         "kind": "cheats",
-        "viaDoor": null,
+        "viaDoor": "orchestrateNativeTuiAdmission",
         "viaDml": "markGovernedDelivery",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
@@ -14203,7 +14199,7 @@
       },
       "hop4": {
         "kind": "cheats",
-        "viaDoor": null,
+        "viaDoor": "orchestrateNativeTuiAdmission",
         "viaDml": "markGovernedDelivery",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
@@ -14418,7 +14414,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via kernelExecute"
         }
       ],
       "registeredAt": {
@@ -14432,8 +14428,8 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "kernelExecute",
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
@@ -14464,7 +14460,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "execute() via orchestrateNativeTuiAdmission"
         }
       ],
       "registeredAt": {
@@ -14478,8 +14474,8 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
-        "viaDoor": null,
+        "kind": "write-door",
+        "viaDoor": "orchestrateNativeTuiAdmission",
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
@@ -14535,8 +14531,8 @@
     {
       "channel": "qf:tasks:create",
       "method": "createTask",
-      "status": "live",
-      "breakAt": null,
+      "status": "cheats",
+      "breakAt": "kernel",
       "hops": [
         {
           "layer": "renderer",
@@ -14555,8 +14551,8 @@
         },
         {
           "layer": "kernel",
-          "present": true,
-          "detail": "execute() via kernelExecute"
+          "present": false,
+          "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
         }
       ],
       "registeredAt": {
@@ -14570,10 +14566,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "cheats",
         "viaDoor": "kernelExecute",
-        "viaDml": null,
-        "dmlFile": null,
+        "viaDml": "ensureGovernedReviewSchema",
+        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null
       }
@@ -14719,8 +14715,8 @@
     {
       "channel": "qf:tasks:surface",
       "method": "listTaskSurface",
-      "status": "live",
-      "breakAt": null,
+      "status": "cheats",
+      "breakAt": "kernel",
       "hops": [
         {
           "layer": "renderer",
@@ -14739,8 +14735,8 @@
         },
         {
           "layer": "kernel",
-          "present": true,
-          "detail": "read-only — mutates nothing"
+          "present": false,
+          "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
         }
       ],
       "registeredAt": {
@@ -14754,10 +14750,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
+        "kind": "cheats",
         "viaDoor": null,
-        "viaDml": null,
-        "dmlFile": null,
+        "viaDml": "ensureGovernedReviewSchema",
+        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null
       }
@@ -16280,6 +16276,29 @@
       ]
     },
     {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "recordGovernedToolReceipt",
+      "table": "qf_review_invocation",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_invocation`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            325
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
       "classification": "governance-violation",
       "disposition": "repair",
@@ -16510,29 +16529,6 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:artifact:insert-into",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "insertArtifact",
-      "table": "artifact",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "unknown",
-      "governance": "unknown",
-      "confidence": "low",
-      "why": "No caller of insertArtifact() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            407
-          ]
-        }
-      ]
-    },
-    {
       "id": "persistence:packages/qf-kernel/src/links.ts:links:insert-into",
       "classification": "needs-verification",
       "disposition": "needs-verification",
@@ -16625,6 +16621,29 @@
       ]
     },
     {
+      "id": "persistence:collab-electron/src/main/kernel.ts:messages:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "peerBusNotify",
+      "table": "messages",
+      "verb": "INSERT INTO",
+      "persistence": "transport-bookkeeping",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/kernel.ts",
+          "lines": [
+            203
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:collab-electron/src/main/kernel.ts:messages:update",
       "classification": "persistence-ok",
       "disposition": "keep",
@@ -16633,7 +16652,7 @@
       "verb": "UPDATE",
       "persistence": "transport-bookkeeping",
       "sourceClass": "product",
-      "reachability": "unknown",
+      "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
       "why": "transport-bookkeeping — outside the domain the Kernel owns.",
@@ -16901,6 +16920,52 @@
       ]
     },
     {
+      "id": "persistence:packages/qf-kernel/src/create.ts:task:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "createTask",
+      "table": "task",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            663
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:ticket:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "insertTicketRow",
+      "table": "ticket",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            1425
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/deterministic-execution.ts:artifact:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
@@ -16988,6 +17053,29 @@
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
             627
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "appendEvent",
+      "table": "events",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/events.ts",
+          "lines": [
+            21
           ]
         }
       ]
@@ -17126,6 +17214,167 @@
           "file": "packages/qf-kernel/src/fixtures.ts",
           "lines": [
             13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:artifact:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "insertArtifact",
+      "table": "artifact",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of insertArtifact() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            407
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:evaluation:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedEvaluation",
+      "table": "evaluation",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            471
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:evaluation:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedEvaluation",
+      "table": "evaluation",
+      "verb": "UPDATE",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            483
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-or-ignore-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedEvaluation",
+      "table": "links",
+      "verb": "INSERT OR IGNORE INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            467
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedEvaluation",
+      "table": "qf_review_invocation",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            485
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedEvaluation",
+      "table": "qf_review_publication",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            480
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/insert.ts:run:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "insertRun",
+      "table": "run",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/insert.ts",
+          "lines": [
+            30
           ]
         }
       ]

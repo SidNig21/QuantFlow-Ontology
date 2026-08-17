@@ -48,7 +48,8 @@ export function renderMarkdown(m) {
   p(`| \`write-door\` | reaches \`execute()\`, the sole sanctioned mutation path | ${m.wires.filter((w) => w.hop4?.kind === "write-door").length} |`);
   p(`| \`cheats\` | reaches SQL that never passes through \`execute()\` | ${m.wires.filter((w) => w.hop4?.kind === "cheats").length} |`);
   p(`| \`writes-disk\` | writes a file; never reaches the Kernel at all | ${m.wires.filter((w) => w.hop4?.kind === "writes-disk").length} |`);
-  p(`| \`read-only\` | mutates nothing | ${m.wires.filter((w) => w.hop4?.kind === "read-only").length} |`);
+  p(`| \`unknown\` | handler file not fully read; not claimed read-only | ${m.wires.filter((w) => w.hop4?.kind === "unknown").length} |`);
+  p(`| \`read-only\` | no mutation seen | ${m.wires.filter((w) => w.hop4?.kind === "read-only").length} |`);
   p();
 
   // ── 2. the loops ──────────────────────────────────────────────────────────
@@ -58,12 +59,17 @@ export function renderMarkdown(m) {
   p(`A loop is only as good as its worst wire. **The loop names are authored product intent;`);
   p(`every status below is derived from the code.**`);
   p();
-  p(`**What green does not mean.** A healthy loop proves the wiring exists and is governed —`);
-  p(`the channel is reachable, a handler answers it, and it reaches \`execute()\`. It does not`);
-  p(`prove the job produces the right outcome. *Assign* is green because the IPC path is`);
-  p(`intact; nothing here checks whether the human path actually notifies the seat, which is`);
-  p(`where it has failed before. Read the score as **"the plumbing is connected"**, not`);
-  p(`**"the product works"**. Behaviour is what gates and rungs are for.`);
+  p(`**What loop health means.** A red loop means a channel on that job reaches SQL the hop-4`);
+  p(`walker flags outside \`execute()\` — reachability, not severity. It does **not** mean the`);
+  p(`job is four broken product features when four loops read unhealthy. Idempotent \`CREATE TABLE\``);
+  p(`on review bookkeeping tables can mark *Create a Task* or *Show the research world* as cheating`);
+  p(`at the Kernel even when no domain table is written on that path. For severity, read the`);
+  p(`confirmed-violations table below; for wiring, read the loop table.`);
+  p();
+  p(`**What green does not mean.** A healthy loop proves the wiring exists and reaches \`execute()\``);
+  p(`on every channel in the loop — not that the job produces the right outcome. Read the score as`);
+  p(`**"the plumbing is connected"**, not **"the product works"**. Behaviour is what gates and rungs`);
+  p(`are for.`);
   p();
   p(`| Loop | Health | What it is |`);
   p(`|---|---|---|`);

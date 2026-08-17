@@ -195,14 +195,18 @@ export function callersOf(rec, index, names) {
 export function reachability(rec, index, names, governed, appReach) {
   const filePath = rec.file;
   if (insideWriteDoor(filePath)) return { value: "inside-write-door", callers: [] };
-  if (governed?.has(recKey(rec))) return { value: "governed", callers: [] };
 
   const sites = callersOf(rec, index, names);
   const origins = appOrigins(rec, index, names, appReach);
 
+  // App-reachable outranks the governed set. A function can sit in both when
+  // execute() calls it AND kernel.ts does: CREATE TABLE in
+  // ensureGovernedReviewSchema was marked compliant while production still
+  // reaches it from the review bypass. Cheating outranks the write door.
   if (appReach?.has(recKey(rec))) {
     return { value: "bypass", callers: origins.slice(0, 4) };
   }
+  if (governed?.has(recKey(rec))) return { value: "governed", callers: [] };
   if (!sites.size) return { value: "unknown", callers: [] };
 
   const appCallers = [...sites].filter(isAppFile);

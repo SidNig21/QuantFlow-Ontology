@@ -27,6 +27,8 @@ docs/*
 !docs/readme-assets/**
 !docs/proposals/
 !docs/proposals/**
+!docs/plans/
+!docs/plans/**
 .collaborator
 .superpowers
 .claude/
