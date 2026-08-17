@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-generator @ 1f35a82` on 2026-08-17 by
+> Generated from `atlas-generator @ 298e9ed` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -33,6 +33,13 @@ handler that mutates state without `execute()` is cheating even when it works.
 6 of 8 loops are healthy.
 A loop is only as good as its worst wire. **The loop names are authored product intent;
 every status below is derived from the code.**
+
+**What green does not mean.** A healthy loop proves the wiring exists and is governed —
+the channel is reachable, a handler answers it, and it reaches `execute()`. It does not
+prove the job produces the right outcome. *Assign* is green because the IPC path is
+intact; nothing here checks whether the human path actually notifies the seat, which is
+where it has failed before. Read the score as **"the plumbing is connected"**, not
+**"the product works"**. Behaviour is what gates and rungs are for.
 
 | Loop | Health | What it is |
 |---|---|---|
@@ -90,7 +97,6 @@ None.
 
 _registered in main, unreachable from anywhere_
 
-> the Evaluation tile. Deleting this bucket wholesale would remove the next rung.
 - `app:commit-sha` — collab-electron/src/main/ipc-workspace.ts:236
 - `pty:foreground-process` — collab-electron/src/main/index.ts:842
 - `qf:a2a:dispatch` — collab-electron/src/main/ipc-kernel.ts:778

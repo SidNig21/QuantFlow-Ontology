@@ -51,6 +51,13 @@ export function renderMarkdown(m) {
   p(`A loop is only as good as its worst wire. **The loop names are authored product intent;`);
   p(`every status below is derived from the code.**`);
   p();
+  p(`**What green does not mean.** A healthy loop proves the wiring exists and is governed —`);
+  p(`the channel is reachable, a handler answers it, and it reaches \`execute()\`. It does not`);
+  p(`prove the job produces the right outcome. *Assign* is green because the IPC path is`);
+  p(`intact; nothing here checks whether the human path actually notifies the seat, which is`);
+  p(`where it has failed before. Read the score as **"the plumbing is connected"**, not`);
+  p(`**"the product works"**. Behaviour is what gates and rungs are for.`);
+  p();
   p(`| Loop | Health | What it is |`);
   p(`|---|---|---|`);
   for (const l of m.loops) {
@@ -90,10 +97,11 @@ export function renderMarkdown(m) {
     p(`_${note}_`);
     p();
     if (!items.length) { p(`None.`); p(); continue; }
-    if (b === "maybe-later")
+    if (b === "maybe-later") {
       p(`> \`qf:review:projection\` is in this bucket and is exactly what R16 needs to render`);
       p(`> the Evaluation tile. Deleting this bucket wholesale would remove the next rung.`);
-    if (b === "maybe-later") p();
+      p();
+    }
     for (const s of items) p(`- \`${s.what}\` — ${s.where}`);
     p();
   }

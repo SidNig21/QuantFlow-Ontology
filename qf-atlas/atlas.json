@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "1f35a82",
+    "commit": "298e9ed",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
