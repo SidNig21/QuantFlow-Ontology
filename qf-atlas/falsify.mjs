@@ -981,6 +981,46 @@ record(58, "a transport module is not reported as a responsibility owner", ...((
       : "no transport module is credited with owning a responsibility"];
 })());
 
+// ── NORTH STAR — contract item 29 ──────────────────────────────────────────
+
+// 59 · contract 29 — every ratified loop appears in the generated model. The map
+// carried an obsolete eight-loop model long after the product loop was ratified, so an
+// agent reading it was told the wrong shape of the product.
+record(59, "every north-star loop appears in the model", ...(() => {
+  const WANT = ["ASK", "PLAN", "RECRUIT", "ASSIGN", "WATCH", "STEER", "PUBLISH",
+    "REVIEW", "REOPEN", "LEARN", "CLOSE"];
+  const got = (before.northStar ?? []).map((l) => l.name);
+  const missing = WANT.filter((w) => !got.includes(w));
+  const extra = got.filter((g) => !WANT.includes(g));
+  return [missing.length === 0 && extra.length === 0 && got.length === WANT.length,
+    missing.length ? `missing: ${missing.join(", ")}`
+      : extra.length ? `unexpected: ${extra.join(", ")}`
+      : `${got.length} loops, exactly the ratified set`];
+})());
+
+// 60 · The four tiers must stay APART. A statically connected loop is not a working
+// product loop, and the previous model's single colour was being read as though it
+// were. Also: an `unproven` tier must say WHY, or it is an unexplained unknown.
+record(60, "evidence tiers are not collapsed into one green", ...(() => {
+  const ns = before.northStar ?? [];
+  if (!ns.length) return [false, "no north-star loops in the model"];
+  const TIERS = ["static", "gate", "runtime", "founder"];
+  const missingTier = ns.filter((l) => TIERS.some((t) => !l.evidence?.[t]?.state));
+  if (missingTier.length) return [false, `${missingTier.length} loop(s) missing a tier, e.g. ${missingTier[0].name}`];
+  // Unproven without a reason is the failure mode; unproven with one is honest.
+  const silent = [];
+  for (const l of ns)
+    for (const t of TIERS)
+      if (l.evidence[t].state === "unproven" && !l.evidence[t].detail) silent.push(`${l.name}.${t}`);
+  if (silent.length) return [false, `${silent.length} unproven tier(s) with no stated reason, e.g. ${silent[0]}`];
+  // A loop may only carry the full badge when all four tiers are actually proven.
+  const overclaimed = ns.filter((l) => l.badge === "SGRF"
+    && !(l.evidence.runtime.state === "proven" && l.evidence.founder.state === "proven"));
+  return [overclaimed.length === 0,
+    overclaimed.length ? `${overclaimed[0].name} claims SGRF without runtime and founder proof`
+      : `${ns.length} loops x 4 tiers, all present, every unproven tier gives a reason, 0 overclaimed`];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

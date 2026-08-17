@@ -21,6 +21,7 @@ import { analyzeFile, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.
 import { coverageMatrix } from "./coverage-matrix.mjs";
 import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
 import { detectOwnership } from "./ownership.mjs";
+import { buildNorthStar, northStarStats } from "./northstar.mjs";
 import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
 import { readdirSync } from "node:fs";
 
@@ -429,6 +430,21 @@ const matrix = coverageMatrix({
 
 const loops = buildLoops(wires, lifetime);
 
+// ─── THE RATIFIED NORTH STAR (contract section I) ────────────────────────────
+// 11 loops, and four evidence tiers kept APART. The eight-loop model produced one
+// colour per loop, and a green one was routinely read as "this feature works". It only
+// ever meant the plumbing was connected. `legacyLoops` is retained in the model for one
+// release so nothing that reads it breaks, and is not rendered.
+const gateExists = (name) =>
+  existsSync(join(REPO, `qa/gates/${name}.ts`)) || existsSync(join(REPO, `qa/gates/${name}/run.ts`));
+const northStar = buildNorthStar({
+  wires, lifetime, gateExists,
+  // Neither tier has a source in this repo yet. Passing null makes every loop report
+  // `unproven` WITH a reason, which is the honest state — not a gap to be hidden.
+  runtimeEvidence: null,
+  founderEvidence: null,
+});
+
 const wiresTouching = (p) => wires.filter((w) =>
   w.registeredAt?.file === p || w.calledAt?.file === p);
 const loopsTouching = (channels) => loops
@@ -487,6 +503,7 @@ const model = {
     ast: { available: tsAvailable(), version: tsVersion, files: astOf.size },
     coverageFiles: matrix.files,
     ownership: ownership.stats,
+    northStar: northStarStats(northStar),
     writeDoor: { state: writeDoor.state, ...writeDoor.stats,
       divergent: writeDoor.divergence.trustedButNotDerived.length + writeDoor.divergence.derivedButNotTrusted.length },
     unexplainedCoverage: matrix.unexplained.length,
@@ -510,7 +527,9 @@ const model = {
     spawns: n.spawns, writes: n.writes, dml: n.dml, executes: n.executes,
     files: n.files, strip: n.strip, breaches: n.breaches, wires: n.wires,
   })),
-  loops,
+  northStar,
+  // Retained one release so nothing reading `loops` breaks. Not rendered.
+  legacyLoops: loops,
   coverage: coverageRows,
   writeDoor,
   ownership: ownership.findings,

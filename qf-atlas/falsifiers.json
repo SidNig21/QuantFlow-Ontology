@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 58,
-  "total": 58,
+  "passed": 60,
+  "total": 60,
   "results": [
     {
       "n": 1,
@@ -350,6 +350,18 @@
       "name": "a transport module is not reported as a responsibility owner",
       "passed": true,
       "detail": "no transport module is credited with owning a responsibility"
+    },
+    {
+      "n": 59,
+      "name": "every north-star loop appears in the model",
+      "passed": true,
+      "detail": "11 loops, exactly the ratified set"
+    },
+    {
+      "n": 60,
+      "name": "evidence tiers are not collapsed into one green",
+      "passed": true,
+      "detail": "11 loops x 4 tiers, all present, every unproven tier gives a reason, 0 overclaimed"
     }
   ]
 }

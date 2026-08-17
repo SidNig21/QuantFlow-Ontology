@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 7e2bfbc` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ cd644d1` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -151,78 +151,70 @@ architectural red on its own — promoting any of this to a confirmed defect req
 AST pass. 7 send sites build their channel or target
 dynamically and are recorded as explicit coverage boundaries rather than omitted.
 
-## The jobs an operator actually does
+## The product loop
 
-4 of 8 loops are healthy.
-A loop is only as good as its worst wire. **The loop names are authored product intent;
-every status below is derived from the code.**
+`ASK PLAN RECRUIT ASSIGN WATCH STEER PUBLISH REVIEW REOPEN LEARN CLOSE`
 
-**What loop health means.** A red loop means a channel on that job reaches SQL the hop-4
-walker flags outside `execute()` — reachability, not severity. It does **not** mean the
-job is four broken product features when four loops read unhealthy. Idempotent `CREATE TABLE`
-on review bookkeeping tables can mark *Create a Task* or *Show the research world* as cheating
-at the Kernel even when no domain table is written on that path. For severity, read the
-confirmed-violations table below; for wiring, read the loop table.
+Every loop carries **four independent evidence tiers**. They are never averaged, and a
+badge is not a score:
 
-**What green does not mean.** A healthy loop proves the wiring exists and reaches `execute()`
-on every channel in the loop — not that the job produces the right outcome. Read the score as
-**"the plumbing is connected"**, not **"the product works"**. Behaviour is what gates and rungs
-are for.
+| | |
+|---|---|
+| `S` static | the wiring exists and reaches `execute()` on every channel |
+| `G` gate | a focused QA gate covering this loop is present in the repo |
+| `R` runtime | the loop was observed executing |
+| `F` founder | the founder has confirmed it does its job |
 
-| Loop | Health | What it is |
-|---|---|---|
-| **Ask a research question** | ✅ ok | The front door. A founder question becomes a Mission and a Task for the Research Director. |
-| **Create a Task** | 🔴 **broken** 1/1 | A Task is written to the Kernel and shown on the canvas. |
-| **Assign and reassign** | ✅ ok | Move a Task to a seat. The agent path notifies the seat; the human path is where delivery has failed before. |
-| **Spawn a seat** | ✅ ok | Start a runtime the operator can watch: a PTY, then an agent session on top of it. |
-| **Steer and cancel** | ✅ ok | Interrupt work in flight without losing the record of it. |
-| **Review and publish** | 🔴 **broken** 4/4 | The governed critic path. R15 shipped on this, and R16 renders it. |
-| **Show the research world** | 🟠 degraded 1/6 | Everything R16 must reveal on the canvas: the ledger, the task surface, artifacts, events and cables. |
-| **Close the app** | 🟠 degraded 4/6 | Quit must stop every worker it started. This loop is made of lifetime wires, not IPC. |
+**`S` alone is not `SGRF`.** 7 of 11 loops are statically connected; 0 carry all four tiers.
 
-### 🔴 Create a Task
+| Loop | Badge | Static | Gate | Runtime | Founder |
+|---|---|---|---|---|---|
+| **ASK** | `SG` | connected | covered | unproven | unproven |
+| **PLAN** | `G` | broken | covered | unproven | unproven |
+| **RECRUIT** | `SG` | connected | covered | unproven | unproven |
+| **ASSIGN** | `G` | broken | covered | unproven | unproven |
+| **WATCH** | `SG` | connected | covered | unproven | unproven |
+| **STEER** | `SG` | connected | covered | unproven | unproven |
+| **PUBLISH** | `SG` | connected | covered | unproven | unproven |
+| **REVIEW** | `G` | broken | covered | unproven | unproven |
+| **REOPEN** | `SG` | connected | covered | unproven | unproven |
+| **LEARN** | `SG` | connected | covered | unproven | unproven |
+| **CLOSE** | `G` | degraded | covered | unproven | unproven |
 
-A Task is written to the Kernel and shown on the canvas.
+Runtime and founder read `unproven` on every loop, and that is the honest state: no
+runtime trace and no founder-confirmation record exist in this repo. **Unproven with a
+stated reason is not a gap** — it is the difference between an unknown and a lie.
 
-- `qf:tasks:create` — **cheats**
-  - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
+### PLAN — broken
 
-### 🔴 Review and publish
+The question is decomposed into Tasks the Kernel records.
+
+- `qf:tasks:create` — **cheats**: reaches SQL the hop-4 walker places outside execute()
+
+### ASSIGN — broken
+
+A Task moves to a seat. The agent path notifies the seat; the human path is where delivery has failed before.
+
+- `qf:tasks:surface` — **cheats**: reaches SQL the hop-4 walker places outside execute()
+
+### REVIEW — broken
 
 The governed critic path. R15 shipped on this, and R16 renders it.
 
-- `qf:review:request` — **cheats**
-  - breaks at **kernel**: raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)
-- `qf:review:revision` — **cheats**
-  - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
-- `qf:review:secondCritic` — **cheats**
-  - breaks at **kernel**: raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)
-- `qf:review:projection` — **unused**, and cheats at the Kernel
-  - breaks at **renderer**: getGovernedReviewProjection()
-  - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
+- `qf:review:request` — **cheats**: reaches SQL the hop-4 walker places outside execute()
+- `qf:review:projection` — **cheats**: reaches SQL the hop-4 walker places outside execute()
+- `qf:review:revision` — **cheats**: reaches SQL the hop-4 walker places outside execute()
+- `qf:review:secondCritic` — **cheats**: reaches SQL the hop-4 walker places outside execute()
 
-### 🟠 Show the research world
+### CLOSE — degraded
 
-Everything R16 must reveal on the canvas: the ledger, the task surface, artifacts, events and cables.
+Sessions and processes end cleanly, and nothing keeps running after the app closes.
 
-- `qf:tasks:surface` — **cheats**
-  - breaks at **kernel**: raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)
+- `agent:kill` — **unused**: breaks at renderer
 
-### 🟠 Close the app
-
-Quit must stop every worker it started. This loop is made of lifetime wires, not IPC.
-
-- `acp-agent.ts` — **unreaped**
-  - breaks at **quit**: collab-electron/src/main/index.ts never stops it
-  - This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
-- `sidecar/server.ts` — **unreaped**
-  - breaks at **quit**: collab-electron/src/main/index.ts never stops it
-  - This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
-- `tmux.ts` — **unreaped**
-  - breaks at **quit**: collab-electron/src/main/index.ts never stops it
-  - This module starts 1 process and the quit path never stops it. A closed seat can outlive the app.
-- `pty.ts` — **partial**
-  - Stopped by setShuttingDown, killAllAndWait, but shutdownSidecarIfIdle is conditional — that resource survives a close while busy.
+A `gate` tier of `covered` means the nominated gate FILE is present. It never claims
+the gate passed — running it is out of scope for a sub-60-second check, and asserting a
+pass nobody observed is the fake green this separation exists to prevent.
 
 ## What is actually part of the product
 

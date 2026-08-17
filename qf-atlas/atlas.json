@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "7e2bfbc",
+    "commit": "cd644d1",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "ec75568d5b34ed48"
+    "fingerprint": "40aff93e9d1c4371"
   },
   "stats": {
     "live": 105,
@@ -34,7 +34,7 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 558
+      "files": 559
     },
     "coverageFiles": 539,
     "ownership": {
@@ -42,6 +42,18 @@
       "contested": 6,
       "highConfidence": 4,
       "unclaimed": 1
+    },
+    "northStar": {
+      "loops": 11,
+      "staticConnected": 7,
+      "staticDegraded": 1,
+      "staticBroken": 3,
+      "gateCovered": 11,
+      "gatePartial": 0,
+      "gateUncovered": 0,
+      "runtimeProven": 0,
+      "founderProven": 0,
+      "fullyProven": 0
     },
     "writeDoor": {
       "state": "partial",
@@ -6917,7 +6929,557 @@
       "wires": []
     }
   ],
-  "loops": [
+  "northStar": [
+    {
+      "id": "ask",
+      "name": "ASK",
+      "blurb": "A founder question becomes a Mission and a Task for the Research Director.",
+      "members": [
+        {
+          "channel": "qf:research:submitQuestion",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "1/1 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "3/3 nominated gate(s) present: research-director-front-door, windows-research-question, hermes-research",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "plan",
+      "name": "PLAN",
+      "blurb": "The question is decomposed into Tasks the Kernel records.",
+      "members": [
+        {
+          "channel": "qf:tasks:create",
+          "status": "cheats",
+          "hop4": "cheats",
+          "why": "reaches SQL the hop-4 walker places outside execute()"
+        },
+        {
+          "channel": "qf:execute",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "broken",
+          "detail": "1/2 channels live",
+          "broken": [
+            {
+              "channel": "qf:tasks:create",
+              "status": "cheats",
+              "why": "reaches SQL the hop-4 walker places outside execute()"
+            }
+          ]
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "2/2 nominated gate(s) present: research-director-delegation, kernel-task-delegation",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "G",
+      "unreaped": []
+    },
+    {
+      "id": "recruit",
+      "name": "RECRUIT",
+      "blurb": "A team is composed from agent definitions — which runtimes are available and hired.",
+      "members": [
+        {
+          "channel": "qf:definitions:list",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "1/1 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "4/4 nominated gate(s) present: team-composition, team-composition-ui, windows-dock-hire, dock-registry",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "assign",
+      "name": "ASSIGN",
+      "blurb": "A Task moves to a seat. The agent path notifies the seat; the human path is where delivery has failed before.",
+      "members": [
+        {
+          "channel": "qf:tasks:reassign",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        },
+        {
+          "channel": "qf:tasks:surface",
+          "status": "cheats",
+          "hop4": "cheats",
+          "why": "reaches SQL the hop-4 walker places outside execute()"
+        },
+        {
+          "channel": "qf:handoffs:list",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "broken",
+          "detail": "2/3 channels live",
+          "broken": [
+            {
+              "channel": "qf:tasks:surface",
+              "status": "cheats",
+              "why": "reaches SQL the hop-4 walker places outside execute()"
+            }
+          ]
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "2/2 nominated gate(s) present: kernel-task-delegation, agent-path",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "G",
+      "unreaped": []
+    },
+    {
+      "id": "watch",
+      "name": "WATCH",
+      "blurb": "The operator can see work in flight: a PTY, then an agent session on top of it.",
+      "members": [
+        {
+          "channel": "pty:create",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        },
+        {
+          "channel": "agent:spawn",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        },
+        {
+          "channel": "qf:sessions:spawn",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        },
+        {
+          "channel": "qf:sessions:runTurn",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        },
+        {
+          "channel": "qf:sessions:list",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "5/5 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "2/2 nominated gate(s) present: observe-door, windows-dock-species",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "steer",
+      "name": "STEER",
+      "blurb": "Interrupt or redirect work in flight without losing the record of it.",
+      "members": [
+        {
+          "channel": "qf:tasks:steer",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        },
+        {
+          "channel": "qf:tasks:cancel",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        },
+        {
+          "channel": "agent:cancel",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        },
+        {
+          "channel": "qf:sessions:cancel",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "4/4 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "2/2 nominated gate(s) present: founder-steering, kernel-one-path",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "publish",
+      "name": "PUBLISH",
+      "blurb": "Work product lands in the governed artifact store.",
+      "members": [
+        {
+          "channel": "qf:artifacts:list",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "1/1 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "2/2 nominated gate(s) present: artifact-root, publish-artifact-root",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "review",
+      "name": "REVIEW",
+      "blurb": "The governed critic path. R15 shipped on this, and R16 renders it.",
+      "members": [
+        {
+          "channel": "qf:review:request",
+          "status": "cheats",
+          "hop4": "cheats",
+          "why": "reaches SQL the hop-4 walker places outside execute()"
+        },
+        {
+          "channel": "qf:review:projection",
+          "status": "cheats",
+          "hop4": "cheats",
+          "why": "reaches SQL the hop-4 walker places outside execute()"
+        },
+        {
+          "channel": "qf:review:revision",
+          "status": "cheats",
+          "hop4": "cheats",
+          "why": "reaches SQL the hop-4 walker places outside execute()"
+        },
+        {
+          "channel": "qf:review:secondCritic",
+          "status": "cheats",
+          "hop4": "cheats",
+          "why": "reaches SQL the hop-4 walker places outside execute()"
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "broken",
+          "detail": "0/4 channels live",
+          "broken": [
+            {
+              "channel": "qf:review:request",
+              "status": "cheats",
+              "why": "reaches SQL the hop-4 walker places outside execute()"
+            },
+            {
+              "channel": "qf:review:projection",
+              "status": "cheats",
+              "why": "reaches SQL the hop-4 walker places outside execute()"
+            },
+            {
+              "channel": "qf:review:revision",
+              "status": "cheats",
+              "why": "reaches SQL the hop-4 walker places outside execute()"
+            },
+            {
+              "channel": "qf:review:secondCritic",
+              "status": "cheats",
+              "why": "reaches SQL the hop-4 walker places outside execute()"
+            }
+          ]
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "1/1 nominated gate(s) present: governed-review",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "G",
+      "unreaped": []
+    },
+    {
+      "id": "reopen",
+      "name": "REOPEN",
+      "blurb": "A settled Task is reopened for another pass, or a second opinion is requested.",
+      "members": [
+        {
+          "channel": "qf:tasks:secondOpinion",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "1/1 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "1/1 nominated gate(s) present: verb-retirement",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "learn",
+      "name": "LEARN",
+      "blurb": "Evaluations and events feed back so the next pass is better informed.",
+      "members": [
+        {
+          "channel": "qf:events:list",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        },
+        {
+          "channel": "qf:research:ledger",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "connected",
+          "detail": "2/2 channels live",
+          "broken": []
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "1/1 nominated gate(s) present: kernel-market-lineage",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "SG",
+      "unreaped": []
+    },
+    {
+      "id": "close",
+      "name": "CLOSE",
+      "blurb": "Sessions and processes end cleanly, and nothing keeps running after the app closes.",
+      "members": [
+        {
+          "channel": "qf:sessions:close",
+          "status": "live",
+          "hop4": "write-door",
+          "why": null
+        },
+        {
+          "channel": "pty:kill",
+          "status": "live",
+          "hop4": "read-only",
+          "why": null
+        },
+        {
+          "channel": "agent:kill",
+          "status": "unused",
+          "hop4": "read-only",
+          "why": "breaks at renderer"
+        }
+      ],
+      "evidence": {
+        "static": {
+          "state": "degraded",
+          "detail": "2/3 channels live",
+          "broken": [
+            {
+              "channel": "agent:kill",
+              "status": "unused",
+              "why": "breaks at renderer"
+            }
+          ]
+        },
+        "gate": {
+          "state": "covered",
+          "detail": "2/2 nominated gate(s) present: windows-cold-boot, boot-reconcile",
+          "missing": [],
+          "note": "gate PRESENCE only — this tier never claims a gate passed, because running it is out of scope for a <=60s check"
+        },
+        "runtime": {
+          "state": "unproven",
+          "detail": "no runtime trace exists in this repo; a channel-fire recorder would be needed, and by itself it could only veto a delete, never authorize one"
+        },
+        "founder": {
+          "state": "unproven",
+          "detail": "no founder confirmation is recorded for this loop"
+        }
+      },
+      "badge": "G",
+      "unreaped": [
+        {
+          "module": "collab-electron/src/main/acp-agent.ts",
+          "status": "unreaped"
+        },
+        {
+          "module": "collab-electron/src/main/sidecar/server.ts",
+          "status": "unreaped"
+        },
+        {
+          "module": "collab-electron/src/main/tmux.ts",
+          "status": "unreaped"
+        },
+        {
+          "module": "collab-electron/src/main/pty.ts",
+          "status": "partial"
+        }
+      ]
+    }
+  ],
+  "legacyLoops": [
     {
       "id": "ask",
       "name": "Ask a research question",

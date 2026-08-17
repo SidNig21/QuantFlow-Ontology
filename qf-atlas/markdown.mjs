@@ -165,46 +165,56 @@ export function renderMarkdown(m) {
   p(`dynamically and are recorded as explicit coverage boundaries rather than omitted.`);
   p();
 
-  // ── 2. the loops ──────────────────────────────────────────────────────────
-  p(`## The jobs an operator actually does`);
+  // ── 2. the north star (contract section I) ────────────────────────────────
+  // Four evidence tiers, reported SEPARATELY. The previous model gave one colour per
+  // loop, and a green one was routinely read as "this feature works" when it only ever
+  // meant the plumbing was connected. Collapsing four questions into one answer is how
+  // a loop with no test, no runtime observation and no human confirmation came to look
+  // finished.
+  const ns = m.northStar ?? [];
+  const nss = m.stats?.northStar ?? {};
+  p(`## The product loop`);
   p();
-  p(`${m.stats.loopsTotal - m.stats.loopsBroken} of ${m.stats.loopsTotal} loops are healthy.`);
-  p(`A loop is only as good as its worst wire. **The loop names are authored product intent;`);
-  p(`every status below is derived from the code.**`);
+  p("`ASK PLAN RECRUIT ASSIGN WATCH STEER PUBLISH REVIEW REOPEN LEARN CLOSE`");
   p();
-  p(`**What loop health means.** A red loop means a channel on that job reaches SQL the hop-4`);
-  p(`walker flags outside \`execute()\` — reachability, not severity. It does **not** mean the`);
-  p(`job is four broken product features when four loops read unhealthy. Idempotent \`CREATE TABLE\``);
-  p(`on review bookkeeping tables can mark *Create a Task* or *Show the research world* as cheating`);
-  p(`at the Kernel even when no domain table is written on that path. For severity, read the`);
-  p(`confirmed-violations table below; for wiring, read the loop table.`);
+  p(`Every loop carries **four independent evidence tiers**. They are never averaged, and a`);
+  p(`badge is not a score:`);
   p();
-  p(`**What green does not mean.** A healthy loop proves the wiring exists and reaches \`execute()\``);
-  p(`on every channel in the loop — not that the job produces the right outcome. Read the score as`);
-  p(`**"the plumbing is connected"**, not **"the product works"**. Behaviour is what gates and rungs`);
-  p(`are for.`);
+  p(`| | |`);
+  p(`|---|---|`);
+  p("| `S` static | the wiring exists and reaches `execute()` on every channel |");
+  p("| `G` gate | a focused QA gate covering this loop is present in the repo |");
+  p("| `R` runtime | the loop was observed executing |");
+  p("| `F` founder | the founder has confirmed it does its job |");
   p();
-  p(`| Loop | Health | What it is |`);
-  p(`|---|---|---|`);
-  for (const l of m.loops) {
-    const badge = l.health === "ok" ? "✅ ok" : l.health === "broken" ? `🔴 **broken** ${l.brokenCount}/${l.total}` : `🟠 degraded ${l.brokenCount}/${l.total}`;
-    p(`| **${l.name}** | ${badge} | ${l.blurb} |`);
-  }
+  p("**`S` alone is not `SGRF`.** " + (nss.staticConnected ?? 0) + " of " + ns.length
+    + " loops are statically connected; " + (nss.fullyProven ?? 0) + " carry all four tiers.");
   p();
-
-  for (const l of m.loops.filter((x) => x.health !== "ok")) {
-    p(`### ${l.health === "broken" ? "🔴" : "🟠"} ${l.name}`);
+  p(`| Loop | Badge | Static | Gate | Runtime | Founder |`);
+  p(`|---|---|---|---|---|---|`);
+  for (const l of ns)
+    p(`| **${l.name}** | \`${l.badge}\` | ${l.evidence.static.state} | ${l.evidence.gate.state}`
+      + ` | ${l.evidence.runtime.state} | ${l.evidence.founder.state} |`);
+  p();
+  p("Runtime and founder read `unproven` on every loop, and that is the honest state: no");
+  p(`runtime trace and no founder-confirmation record exist in this repo. **Unproven with a`);
+  p(`stated reason is not a gap** — it is the difference between an unknown and a lie.`);
+  p();
+  for (const l of ns.filter((x) => x.evidence.static.state !== "connected")) {
+    p(`### ${l.name} — ${l.evidence.static.state}`);
     p();
     p(l.blurb);
     p();
-    for (const mem of l.members.filter((x) => x.status !== "live" && x.status !== "reaped")) {
-      const alsoCheats = mem.hop4 === "cheats" && mem.status !== "cheats";
-      p(`- \`${mem.channel}\` — **${mem.status}**${alsoCheats ? ", and cheats at the Kernel" : ""}`);
-      for (const h of mem.hops.filter((x) => !x.present)) p(`  - breaks at **${h.layer}**: ${h.detail}`);
-      if (mem.why) p(`  - ${mem.why}`);
-    }
+    for (const b of l.evidence.static.broken)
+      p(`- \`${b.channel}\` — **${b.status}**${b.why ? `: ${b.why}` : ""}`);
+    if (l.evidence.gate.missing.length)
+      p(`- nominated gate absent: ${l.evidence.gate.missing.join(", ")}`);
     p();
   }
+  p("A `gate` tier of `covered` means the nominated gate FILE is present. It never claims");
+  p(`the gate passed — running it is out of scope for a sub-60-second check, and asserting a`);
+  p(`pass nobody observed is the fake green this separation exists to prevent.`);
+  p();
 
   // ── 2b. what is actually yours ────────────────────────────────────────────
   const reach = m.reach ?? [];
