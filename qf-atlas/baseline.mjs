@@ -65,7 +65,9 @@ export function expiredExceptions(baseline) {
     .map(([id, ex]) => ({ id, ...ex }));
 }
 
-/** Write the baseline forward: carried debt stays, resolved debt is tombstoned. */
+/** Write the baseline forward: carried debt stays, resolved debt is tombstoned.
+ *  `updated` is the SHA of the map snapshot whose reds were recorded, not the
+ *  later commit that stored this file on disk. */
 export function advance(baseline, current, commit) {
   const next = { version: 1, updated: commit, findings: {}, exceptions: baseline.exceptions ?? {} };
   const known = baseline.findings ?? {};

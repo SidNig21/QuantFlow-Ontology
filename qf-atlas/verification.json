@@ -2,8 +2,14 @@
   "role": "verifier",
   "verdict": "PASS",
   "candidate": "40de63bc6e477a016d85f2b93460391389f5dd98",
+  "acceptedHead": "698b0003d68cffcdc59abe8de4cd093fda8b7549",
   "verifiedAt": "2026-08-17T18:45:00Z",
   "independentOfBuilder": true,
+  "baseline": {
+    "updated": "40de63b",
+    "entries": 22,
+    "meaning": "`baseline.json` `updated` is the SHA of the map snapshot whose confirmed reds were grandfathered as known debt. It is not the close commit. `acceptedHead` (698b000) recorded the Verifier PASS, seeded this file, and the category-membership repair. That repair did not change the red set, so the grandfathered snapshot stays 40de63b."
+  },
   "localStateAtStart": {
     "head": "40de63bc6e477a016d85f2b93460391389f5dd98",
     "commitsAheadOfOrigin": 0,
