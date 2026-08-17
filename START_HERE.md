@@ -59,6 +59,8 @@ to walk that ladder continuously and where it must stop. Neither authorizes work
 
 Two surfaces are **generated and cannot go stale** — prefer them over any prose: `qf-kernel-schema/golden/ONTOLOGY.md` for the live schema (byte-checked against the generator), and `bun qa/run.ts --list` for the live gates.
 
+If this branch has `qf-atlas/`, `qf-atlas/ATLAS.md` is a generated wiring map of the current tree — not Kernel truth, not the running app, not an order. Read it before changing IPC or SQL write paths. Regenerate it at the end of a rung (`bun qf-atlas/generate.mjs`). It cannot authorize work.
+
 `docs/history/` is superseded material, kept for reasoning. **Nothing in it is authority and nothing in it reactivates by being read.**
 
 The predecessor repo (`SidNig21/QuantFlow`) is the **parts shop**: read-only reference, organ harvest by explicit order only. Never copy code from it without an order saying so.

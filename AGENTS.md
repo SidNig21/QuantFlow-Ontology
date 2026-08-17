@@ -20,6 +20,10 @@ Background, only as needed: `docs/DOCTRINE.md` (plan of record, the *why*),
 `docs/LAWS.md` (canvas-seam laws, same weight as the One Rule), `docs/DEBT.md`
 (known debt — binding, blocks nothing).
 
+If this branch has `qf-atlas/`, that is a **generated wiring map** — not Kernel truth,
+not the running app, not an order. Read `qf-atlas/ATLAS.md` before changing IPC, SQL
+write paths, or proposing deletes. It cannot authorize work. The app does not launch it.
+
 **`NEXT.md` is the build authority** (DOCTRINE A9). There is no ladder file to consult and no
 roadmap to select from. The old ones are in `docs/history/` and are not authority — if one names a
 rung, that is history, not permission. If `NEXT.md` closes the door, stop and say so.
@@ -137,6 +141,11 @@ Never hand-edit `golden/` to make a test pass. That is a second truth store — 
 - Force-pushing, rebasing shared history, or touching `main` directly.
 
 ## When you finish
+
+**If `qf-atlas/` is on this branch:** regenerate it before you report
+(`bun qf-atlas/generate.mjs`). Commit the map if it changed. Atlas findings are
+proposals, not deletes. Do this at the end of every rung so the next agent is not
+reading a map of the previous tree.
 
 Report **evidence, not conclusions**. For each deliverable: what you did, the command that
 proves it, and the output. For each gate: the bait transcript. Then one paragraph on any
