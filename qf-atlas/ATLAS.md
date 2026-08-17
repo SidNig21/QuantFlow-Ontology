@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ c3d0930` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ d27c34b` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**48 of 48 findings have not been looked at.**
+**39 of 44 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 48 |
-| `repair` | 0 |
+| `undecided` | 39 |
+| `repair` | 3 |
 | `remove` | 0 |
-| `keep` | 0 |
+| `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 48 findings still need a decision.
+**Not all clear.** 39 findings still need a decision.
 
 ## The four hops
 
@@ -88,7 +88,7 @@ handler that mutates state without `execute()` is cheating even when it works.
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
 | `read-only` | no mutation seen | 94 |
 
-### Broken at hop 1 (2)
+### Broken at hop 1 (1)
 
 A window calls a bridge method the preload **does not expose**. This throws
 `TypeError: … is not a function` the moment the code path runs. It is invisible to
@@ -98,7 +98,6 @@ exists.
 
 | Method | Called from | Exists in preload |
 |---|---|---|
-| `onTerminalListMessage` | `collab-electron/src/windows/terminal-list/src/App.tsx:54` | **no** |
 | `ptyForegroundProcess` | `collab-electron/src/windows/terminal/src/App.tsx:202` | **no** |
 
 These are **product defects, not map findings** — fix the call site or restore the
@@ -210,23 +209,9 @@ and each window's own script — so this is a file-level graph, not a call graph
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
-| **`unreachable`** | **9** | **nothing imports it — start here** |
+| **`unreachable`** | **6** | **nothing imports it — start here** |
 
-### Windows the build never compiles (1)
-
-A directory under `src/windows/` with no input in `electron.vite.config.ts`. It has no
-bundle in `out/renderer/`, so it **cannot load** — the code is unrunnable, not merely
-uncalled.
-
-- `collab-electron/src/windows/terminal-list/`
-
-> This section exists because the entry list used to be a directory listing. That
-> handed `terminal-list` the verdict `entrypoint` — the strongest
-> reachability claim this map can make — for a window the build has no input for.
-> Renderer entries are now parsed from the build config, and the generator throws
-> rather than continue if that parse returns nothing.
-
-### Unreachable (9) — ask the founder, do not delete
+### Unreachable (6) — ask the founder, do not delete
 
 Nothing in the product imports these. **`unreachable` is a question, not a verdict.**
 Two different situations produce byte-for-byte identical evidence:
@@ -252,15 +237,12 @@ Before proposing removal of anything below, rule out: workspace package exports,
 dynamic `import()`, path-launched processes, packaging manifests, and QA gates that
 assert the file exists. Then ask.
 
-- `collab-electron/packages/shared/src/utils.ts`
 - `collab-electron/src/main/a2a-bus.ts`
 - `collab-electron/src/main/a2a-orchestra.ts`
 - `collab-electron/src/main/species-launch.ts`
 - `collab-electron/src/main/species-surface.ts`
 - `collab-electron/src/main/species-tools.ts`
 - `collab-electron/src/windows/shared/flow-cube/cube3d.js`
-- `collab-electron/src/windows/terminal-list/src/App.tsx`
-- `collab-electron/src/windows/terminal-list/src/main.tsx`
 
 ## What to remove
 

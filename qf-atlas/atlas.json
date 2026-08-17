@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "c3d0930",
+    "commit": "d27c34b",
     "generatedAt": "2026-08-17",
-    "filesScanned": 430,
+    "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "ad6c1833a1dcf1e1"
+    "fingerprint": "11ca030419e879b9"
   },
   "stats": {
     "live": 105,
@@ -20,7 +20,7 @@
     ],
     "bridgeMethods": 127,
     "bridgeMethodsUsed": 113,
-    "brokenBridgeCalls": 2,
+    "brokenBridgeCalls": 1,
     "bridgeBlindSpots": 43,
     "stripCandidates": 13,
     "violations": 15,
@@ -31,13 +31,13 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 48,
+    "undecided": 39,
     "allClear": false,
     "decisions": {
-      "total": 48,
-      "undecided": 48,
-      "keep": 0,
-      "repair": 0,
+      "total": 44,
+      "undecided": 39,
+      "keep": 2,
+      "repair": 3,
       "remove": 0,
       "accepted": 0,
       "allClear": false
@@ -4859,8 +4859,8 @@
     {
       "id": "4:residue",
       "layer": 4,
-      "name": "79 small modules*",
-      "kb": 168.6,
+      "name": "76 small modules*",
+      "kb": 162.7,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -4912,16 +4912,6 @@
         {
           "path": "collab-electron/packages/shared/src/path-utils.ts",
           "kb": 5.8,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/terminal-list/src/App.tsx",
-          "kb": 5.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5530,16 +5520,6 @@
           "executes": 0
         },
         {
-          "path": "collab-electron/packages/shared/src/utils.ts",
-          "kb": 0.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
           "kb": 0.2,
           "spawns": 0,
@@ -5551,16 +5531,6 @@
         },
         {
           "path": "collab-electron/src/windows/shell/src/workspace-manager.js",
-          "kb": 0.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/terminal-list/src/main.tsx",
           "kb": 0.2,
           "spawns": 0,
           "spawnsLive": 0,
@@ -9273,10 +9243,6 @@
       "status": "out-of-scope"
     },
     {
-      "path": "collab-electron/packages/shared/src/utils.ts",
-      "status": "out-of-scope"
-    },
-    {
       "path": "collab-electron/packages/shared/src/viewer-item.ts",
       "status": "out-of-scope"
     },
@@ -9558,14 +9524,6 @@
     },
     {
       "path": "collab-electron/src/windows/shell/src/workspace-manager.js",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/terminal-list/src/App.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/terminal-list/src/main.tsx",
       "status": "out-of-scope"
     },
     {
@@ -10589,12 +10547,6 @@
         "collab-electron/packages/components/src/TreeView/useFileTree.ts"
       ],
       "importerCount": 14
-    },
-    {
-      "path": "collab-electron/packages/shared/src/utils.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
     },
     {
       "path": "collab-electron/packages/shared/src/viewer-item.ts",
@@ -11839,18 +11791,6 @@
       "importerCount": 0
     },
     {
-      "path": "collab-electron/src/windows/terminal-list/src/App.tsx",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
-    },
-    {
-      "path": "collab-electron/src/windows/terminal-list/src/main.tsx",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
-    },
-    {
       "path": "collab-electron/src/windows/terminal-tile/src/App.tsx",
       "reach": "reachable",
       "importers": [
@@ -12208,9 +12148,7 @@
     "collab-electron/src/windows/tile-list/src/main.tsx",
     "collab-electron/src/windows/agent-chat/src/main.tsx"
   ],
-  "unbuiltWindows": [
-    "terminal-list"
-  ],
+  "unbuiltWindows": [],
   "blastRadius": {
     "packages/qf-kernel/src/governed-review.ts": [
       "packages/qf-kernel/src/index.ts",
@@ -17956,12 +17894,6 @@
   ],
   "brokenBridgeCalls": [
     {
-      "method": "onTerminalListMessage",
-      "callers": [
-        "collab-electron/src/windows/terminal-list/src/App.tsx:54"
-      ]
-    },
-    {
       "method": "ptyForegroundProcess",
       "callers": [
         "collab-electron/src/windows/terminal/src/App.tsx:202"
@@ -19997,18 +19929,13 @@
       "verdict": "undecided"
     },
     {
-      "id": "unreachable:collab-electron/packages/shared/src/utils.ts",
-      "kind": "unreachable",
-      "what": "utils.ts",
-      "where": "collab-electron/packages/shared/src/utils.ts",
-      "verdict": "undecided"
-    },
-    {
       "id": "unreachable:collab-electron/src/main/a2a-bus.ts",
       "kind": "unreachable",
       "what": "a2a-bus.ts",
       "where": "collab-electron/src/main/a2a-bus.ts",
-      "verdict": "undecided"
+      "verdict": "keep",
+      "why": "GATE-ANCHORED. qa/gates/artifact-root/run.ts:350 reads this exact path, and :359/:362 assert it imports AND calls the production A2A artifact store. Deleting it turns a gate red, which is the one thing this work may never do to make the map greener.",
+      "owner": "founder"
     },
     {
       "id": "unreachable:collab-electron/src/main/a2a-orchestra.ts",
@@ -20022,7 +19949,9 @@
       "kind": "unreachable",
       "what": "species-launch.ts",
       "where": "collab-electron/src/main/species-launch.ts",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "why": "ORPHANED, NOT DEAD. Nothing imports it, but collab-electron/scripts/package-lib/shared-paths.test.ts:38 reads its source and asserts it contains './package-resource-paths', and WO-008c documents its launch-precedence chain as live behaviour. A module that a test pins and no code imports is a wiring defect, not a deletion candidate.",
+      "owner": "founder"
     },
     {
       "id": "unreachable:collab-electron/src/main/species-surface.ts",
@@ -20036,42 +19965,27 @@
       "kind": "unreachable",
       "what": "species-tools.ts",
       "where": "collab-electron/src/main/species-tools.ts",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "why": "Same shape as species-launch.ts: shared-paths.test.ts:42 pins its content, nothing imports it. WO-008a also uses it as the ACP sole-writer perimeter bait target.",
+      "owner": "founder"
     },
     {
       "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
       "kind": "unreachable",
       "what": "cube3d.js",
       "where": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/windows/terminal-list/src/App.tsx",
-      "kind": "unreachable",
-      "what": "App.tsx",
-      "where": "collab-electron/src/windows/terminal-list/src/App.tsx",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/windows/terminal-list/src/main.tsx",
-      "kind": "unreachable",
-      "what": "main.tsx",
-      "where": "collab-electron/src/windows/terminal-list/src/main.tsx",
-      "verdict": "undecided"
-    },
-    {
-      "id": "broken-bridge-call:onTerminalListMessage",
-      "kind": "broken-bridge-call",
-      "what": "onTerminalListMessage",
-      "where": "collab-electron/src/windows/terminal-list/src/App.tsx:54",
-      "verdict": "undecided"
+      "verdict": "keep",
+      "why": "Founder-authored brand engine. qa/gates/one-skin.ts:21 allowlists this exact path as one of two justified palette exceptions, and WO-007 describes it as imported verbatim as founder input. flow-cube-watermark.js does not import it (the apparent import at line 16 is a usage comment), so 'unimported' is accurate and irrelevant: it is an asset, not dead wiring.",
+      "owner": "founder"
     },
     {
       "id": "broken-bridge-call:ptyForegroundProcess",
       "kind": "broken-bridge-call",
       "what": "ptyForegroundProcess",
       "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "why": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
+      "owner": "founder"
     }
   ],
   "decisionOrphans": []
