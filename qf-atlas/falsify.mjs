@@ -483,8 +483,28 @@ record(30, "confirmed findings carry a blast radius", ...(() => {
 
 // ── DECISIONS ──────────────────────────────────────────────────────────────
 const DECISIONS = "qf-atlas/decisions.json";
-const ledgerWith = (obj) => JSON.stringify({ decisions: obj }, null, 2);
-const firstUnreachable = () => (before.reach.find((r) => r.reach === "unreachable") ?? {}).path;
+// The fixture must be ADDITIVE. This used to emit a ledger containing only the
+// fixture entry, which was invisible while decisions.json was empty. Once the real
+// ledger carried five verdicts, the fixture silently deleted all five: test 32 added
+// one decision, removed five, and watched undecided go 39 -> 43 — reporting the
+// decision mechanism broken when the fixture was the only thing broken.
+const committedLedger = (() => {
+  try { return JSON.parse(readFileSync(join(REPO, DECISIONS), "utf8")); }
+  catch { return { decisions: {} }; }
+})();
+const ledgerWith = (obj) => JSON.stringify(
+  { ...committedLedger, decisions: { ...(committedLedger.decisions ?? {}), ...obj } }, null, 2);
+
+// Must return a finding that is actually UNDECIDED. Picking merely the first
+// `unreachable` row would eventually select one the founder had already ruled on —
+// overriding a verdict rather than adding one, so the undecided count would not move
+// and the test would fail for a reason that has nothing to do with what it checks.
+const firstUnreachable = () => {
+  const open = new Set(before.decisions
+    .filter((d) => d.kind === "unreachable" && d.verdict === "undecided")
+    .map((d) => d.where));
+  return (before.reach.find((r) => r.reach === "unreachable" && open.has(r.path)) ?? {}).path;
+};
 
 // 31 · a finding nobody has ruled on is undecided
 record(31, "a new finding arrives as undecided",

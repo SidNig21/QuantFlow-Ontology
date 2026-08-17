@@ -1,6 +1,6 @@
 {
   "ran": "2026-08-17",
-  "passed": 43,
+  "passed": 42,
   "total": 43,
   "results": [
     {
@@ -49,7 +49,7 @@
       "n": 8,
       "name": "coverage ledger is complete, unique and well-formed",
       "passed": true,
-      "detail": "430 rows, all unique and legal; 55 findings all carry sourceClass"
+      "detail": "427 rows, all unique and legal; 55 findings all carry sourceClass"
     },
     {
       "n": 9,
@@ -192,8 +192,8 @@
     {
       "n": 32,
       "name": "a recorded verdict clears undecided",
-      "passed": true,
-      "detail": "verdict=remove undecided 48 -> 47"
+      "passed": false,
+      "detail": "verdict=remove undecided 39 -> 43"
     },
     {
       "n": 33,
@@ -205,7 +205,7 @@
       "n": 34,
       "name": "a window the build never compiles is not an entrypoint",
       "passed": true,
-      "detail": "11 built window(s), 1 unbuilt, 0 laundered"
+      "detail": "11 built window(s), 0 unbuilt, 0 laundered"
     },
     {
       "n": 35,
@@ -217,7 +217,7 @@
       "n": 36,
       "name": "a broken bridge call is never a false accusation",
       "passed": true,
-      "detail": "2 broken call(s), all absent from the preload, all with evidence"
+      "detail": "1 broken call(s), all absent from the preload, all with evidence"
     },
     {
       "n": 37,
@@ -241,7 +241,7 @@
       "n": 40,
       "name": "no product file is silently missing from the reach analysis",
       "passed": true,
-      "detail": "237 product files, all present in reach"
+      "detail": "234 product files, all present in reach"
     },
     {
       "n": 41,
