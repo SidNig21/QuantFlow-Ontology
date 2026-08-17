@@ -255,4 +255,52 @@ export function classifyPersistence({ index, callers, domain, governed, relOf })
     (sev[b.governance] - sev[a.governance]) || a.id.localeCompare(b.id));
 }
 
+/**
+ * COVERAGE. Absence of a finding must never mean "the analyzer skipped it".
+ * qf-peer-bus writes `messages` from a syntactic form the function indexer does
+ * not resolve, so it produced no finding at all — indistinguishable from clean.
+ * Every analysed file now reports how well it was actually read:
+ *
+ *   indexed     at least one function resolved, and every SQL site sits in one
+ *   partial     SQL or IPC present in the text that no indexed function covers
+ *   unindexed   in scope for analysis, nothing resolved at all
+ *   out-of-scope not analysed by design (renderer, scripts, generated)
+ *
+ * `partial` and `unindexed` are gray: they block a clean architectural result
+ * rather than silently counting as green.
+ */
+export function coverage({ files, inScope, index, read, joinRepo }) {
+  const byFile = new Map();
+  for (const [, rec] of index) {
+    if (!byFile.has(rec.file)) byFile.set(rec.file, { fns: 0, sql: 0 });
+    const e = byFile.get(rec.file);
+    e.fns += 1;
+    e.sql += rec.sqlSites?.length ?? 0;
+  }
+
+  const rows = [];
+  for (const path of files) {
+    if (!inScope(path)) { rows.push({ path, status: "out-of-scope" }); continue; }
+    const seen = byFile.get(path);
+    const text = read(joinRepo(path));
+    const textSql = sqlSites(text).length;
+    const status = !seen ? (textSql ? "partial" : "unindexed")
+      : textSql > seen.sql ? "partial"
+      : "indexed";
+    rows.push({
+      path, status,
+      indexedFns: seen?.fns ?? 0,
+      sqlInText: textSql,
+      sqlIndexed: seen?.sql ?? 0,
+      ...(status === "partial" && {
+        why: `${textSql} SQL site(s) in the text, ${seen?.sql ?? 0} resolved into a function. The unresolved ones are invisible to governance analysis.`,
+      }),
+    });
+  }
+  return rows.sort((a, b) => {
+    const r = { partial: 0, unindexed: 1, indexed: 2, "out-of-scope": 3 };
+    return r[a.status] - r[b.status] || a.path.localeCompare(b.path);
+  });
+}
+
 export { TRANSPORT_TABLES };

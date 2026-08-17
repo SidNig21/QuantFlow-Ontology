@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "cde4bc6",
+    "commit": "7319c1f",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "80f2f427cd56cb9d"
+    "fingerprint": "5eaf8f441dc0a036"
   },
   "stats": {
     "live": 107,
@@ -7748,6 +7748,2230 @@
       "total": 6
     }
   ],
+  "coverage": [
+    {
+      "path": "collab-electron/src/main/kernel.ts",
+      "status": "partial",
+      "indexedFns": 56,
+      "sqlInText": 7,
+      "sqlIndexed": 5,
+      "why": "7 SQL site(s) in the text, 5 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/create.ts",
+      "status": "partial",
+      "indexedFns": 25,
+      "sqlInText": 13,
+      "sqlIndexed": 11,
+      "why": "13 SQL site(s) in the text, 11 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/db.ts",
+      "status": "partial",
+      "indexedFns": 14,
+      "sqlInText": 1,
+      "sqlIndexed": 0,
+      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/deterministic-execution.ts",
+      "status": "partial",
+      "indexedFns": 19,
+      "sqlInText": 4,
+      "sqlIndexed": 3,
+      "why": "4 SQL site(s) in the text, 3 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/errors.ts",
+      "status": "partial",
+      "indexedFns": 0,
+      "sqlInText": 1,
+      "sqlIndexed": 0,
+      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/events.ts",
+      "status": "partial",
+      "indexedFns": 1,
+      "sqlInText": 1,
+      "sqlIndexed": 0,
+      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/execute.ts",
+      "status": "partial",
+      "indexedFns": 31,
+      "sqlInText": 10,
+      "sqlIndexed": 7,
+      "why": "10 SQL site(s) in the text, 7 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/governed-review.ts",
+      "status": "partial",
+      "indexedFns": 32,
+      "sqlInText": 27,
+      "sqlIndexed": 16,
+      "why": "27 SQL site(s) in the text, 16 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/insert.ts",
+      "status": "partial",
+      "indexedFns": 1,
+      "sqlInText": 1,
+      "sqlIndexed": 0,
+      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "tools/qf-peer-bus/src/bus.ts",
+      "status": "partial",
+      "indexedFns": 0,
+      "sqlInText": 4,
+      "sqlIndexed": 0,
+      "why": "4 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "collab-electron/src/main/env.d.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/host-acp-bridge.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/peer-role-registry.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/qf-execute-allowlist.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/ring-buffer.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/updater/index.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/vite-raw.d.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/index.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/portable.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/results.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/task-governance.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/constants.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/errors.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/index.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-peer-bus/src/server.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-proof-agent/scripts/pack-agent.mjs",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-proof-agent/src/qf-proof-agent.mjs",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/fixtures/experimental-schema.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/fixtures/observe-leak-schema.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/fixtures/experimental-schema.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/cli.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/load-schema.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/runtime-proof/scripts/pack-agent.mjs",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/a2a-artifact-store.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/a2a-bus.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/a2a-orchestra.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/acp-agent.ts",
+      "status": "indexed",
+      "indexedFns": 17,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/acp-fs-root.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/agent-activity.ts",
+      "status": "indexed",
+      "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/agent-artifact-writer.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/agent-host.ts",
+      "status": "indexed",
+      "indexedFns": 29,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/analytics.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/app-migration.ts",
+      "status": "indexed",
+      "indexedFns": 10,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/app-root.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/atomic-result-commit.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/bovada-capture-rpc.ts",
+      "status": "indexed",
+      "indexedFns": 17,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/canvas-persistence.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/canvas-rpc.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/cdp.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/cli-installer.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/collaboration-gateway.ts",
+      "status": "indexed",
+      "indexedFns": 12,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/config.ts",
+      "status": "indexed",
+      "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/connections-ipc.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/cwd-fallback.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/definition-runtime.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/dock-profiles.ts",
+      "status": "indexed",
+      "indexedFns": 13,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/file-filter.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/files.ts",
+      "status": "indexed",
+      "indexedFns": 11,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/git-replay-worker.ts",
+      "status": "indexed",
+      "indexedFns": 15,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/git-replay.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/host-acp-permission.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/host-acp-turn.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/host-mounts.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/host-native-tui.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/image-service.ts",
+      "status": "indexed",
+      "indexedFns": 13,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/image-worker.ts",
+      "status": "indexed",
+      "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/import-service.ts",
+      "status": "indexed",
+      "indexedFns": 7,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/index.ts",
+      "status": "indexed",
+      "indexedFns": 36,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/integrations.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-browser.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-canvas.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-endpoint.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-filesystem.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-kernel.ts",
+      "status": "indexed",
+      "indexedFns": 13,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-knowledge.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-misc.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-workspace.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/json-rpc-server.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/launcher-readiness.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/live-peer-recipient.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/live-seat-capability.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/logger-policy.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/logger.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/mission-activation.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/native-tui-orchestration.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ontology-gateway.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ontology-read-dispatch.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ontology-role-tools.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/ontology-trajectory-context.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/package-resource-paths.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/paths.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/peer-delivery.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 2,
+      "sqlIndexed": 2
+    },
+    {
+      "path": "collab-electron/src/main/peer-notification.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/precreated-native-tui.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/precreated-start-ownership.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/pty-display.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/pty.ts",
+      "status": "indexed",
+      "indexedFns": 44,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/runtime-adapter.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/runtime-kernel-admission.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/second-opinion-admission.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/session-canvas-projector.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/client.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/entry.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/log.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/protocol.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/sidecar/server.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/species-launch.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/species-surface.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/species-tools.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/task-delegation-projection.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/terminal-target.ts",
+      "status": "indexed",
+      "indexedFns": 14,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/tmux.ts",
+      "status": "indexed",
+      "indexedFns": 18,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/trusted-sender.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/updater/update-manager.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/watcher-worker.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/watcher.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/wikilink-index.ts",
+      "status": "indexed",
+      "indexedFns": 17,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/workspace-config.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/workspace-graph-python.ts",
+      "status": "indexed",
+      "indexedFns": 25,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/src/main/workspace-graph.ts",
+      "status": "indexed",
+      "indexedFns": 15,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/creation-policy.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/db-bun.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/fixtures.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 2,
+      "sqlIndexed": 2
+    },
+    {
+      "path": "packages/qf-kernel/src/hash.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/links.ts",
+      "status": "indexed",
+      "indexedFns": 7,
+      "sqlInText": 1,
+      "sqlIndexed": 1
+    },
+    {
+      "path": "packages/qf-kernel/src/market-context.ts",
+      "status": "indexed",
+      "indexedFns": 11,
+      "sqlInText": 2,
+      "sqlIndexed": 2
+    },
+    {
+      "path": "packages/qf-kernel/src/market-ingest.ts",
+      "status": "indexed",
+      "indexedFns": 14,
+      "sqlInText": 2,
+      "sqlIndexed": 2
+    },
+    {
+      "path": "packages/qf-kernel/src/ontology-read-receipt.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/pipeline.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/read.ts",
+      "status": "indexed",
+      "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/registry-drift.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/replay.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/resolve-artifact-root.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/resolve-path.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/species.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/trace.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/upgrade.ts",
+      "status": "indexed",
+      "indexedFns": 47,
+      "sqlInText": 1,
+      "sqlIndexed": 3
+    },
+    {
+      "path": "tools/qf-bovada-football/src/artifact-store.ts",
+      "status": "indexed",
+      "indexedFns": 10,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/gate.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/parser.ts",
+      "status": "indexed",
+      "indexedFns": 22,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/runner.ts",
+      "status": "indexed",
+      "indexedFns": 20,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-bovada-football/src/transport.ts",
+      "status": "indexed",
+      "indexedFns": 7,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-peer-bus/src/harness.ts",
+      "status": "indexed",
+      "indexedFns": 7,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+      "status": "indexed",
+      "indexedFns": 11,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/artifact-root.ts",
+      "status": "indexed",
+      "indexedFns": 3,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/discovery.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/gates/action-transport.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/gates/kernel-one-world.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
+      "status": "indexed",
+      "indexedFns": 11,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/gates/tool-discovery.ts",
+      "status": "indexed",
+      "indexedFns": 16,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/harness.ts",
+      "status": "indexed",
+      "indexedFns": 10,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/register.ts",
+      "status": "indexed",
+      "indexedFns": 6,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-read-tools/src/server.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/assert-kernel-db.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/assert-vault-root.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/env.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/gate.ts",
+      "status": "indexed",
+      "indexedFns": 22,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/project.ts",
+      "status": "indexed",
+      "indexedFns": 10,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/runtime-proof/src/listeners.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/runtime-proof/src/processes.ts",
+      "status": "indexed",
+      "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "tools/runtime-proof/src/proof.ts",
+      "status": "indexed",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0
+    },
+    {
+      "path": "collab-electron/cli/collab-cli.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/cli/qf-collaboration-mcp.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/cli/qf-hermes-synthetic-responder.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/cli/qf-ontology-mcp.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/CodeEditorView/CodeEditorView.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/CodeEditorView/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/CodeEditorView/monaco-react-shim.d.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ConceptList/ConceptList.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ConceptList/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/Editor.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/EditorConflictBanner.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/ImageBlock.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/WikiLink.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/WikiLinkAutocomplete.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ExcerptDisplay/ExcerptDisplay.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ExcerptDisplay/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/FolderTableView/FolderTableView.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/FolderTableView/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ImageView/ImageView.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ItemDetailView/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/ItemDetailView/ItemDetailView.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Markdown/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Markdown/Markdown.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/SourceList/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/SourceList/SourceList.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Terminal/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Terminal/TerminalTab.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/Terminal/theme.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/fileIcons.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/Helpers.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/SearchSortControls.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/TreeView.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/types.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useDragDrop.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useFileTree.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useImageThumbnail.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useInlineRename.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useMultiSelect.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useWorkspaceFileTree.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/vite-env.d.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/ForceDirectedGraph.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/forceGraph.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/hueMap.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/index.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/ReplayTimeline.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/types.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/useReplayEngine.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/collab-file-url.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/dark-mode.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/extract-cover-image.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/filepath.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/image.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/path-utils.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/pdf.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/replay-types.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/types.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/utils.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/viewer-item.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/packages/shared/src/window-api.d.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/after-pack-pty.cjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/clean.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/dev.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/fix-artifacts.cjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/local-bin.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/notarize.cjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/extra-resources.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/fileset-expand.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/package-cleanup.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/package-inspect.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/package-receipt.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/package-resource-paths-reexport.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/preflight.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/run-id.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-lib/runtime-staging.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package-verify.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/package.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/postinstall.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/refresh-desktop-shortcut.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/run-local-bin.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/scripts/upload-to-github.cjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/preload/shell.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/preload/universal.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/AgentThread.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/dev-shim.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/MarkdownText.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/ToolCallCard.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/agent-chat/src/use-acp-runtime.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/artifact-tile/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/artifact-tile/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/artifact-tile/src/result-payload.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/graph-tile/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/graph-tile/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/nav/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/nav/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/session-tile/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/session-tile/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/settings/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/settings/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shared/PostHogProvider.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/cable-controller.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/cable-inspector.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/cable-math.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/cable-overlay.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/canvas-layout.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/canvas-minimap.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/canvas-place.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/canvas-rpc.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/canvas-state.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/canvas-viewport.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/dark-mode.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/dock.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/edge-indicators.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/glacier-feel.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/kernel-ledger.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/panel-manager.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/renderer.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/task-composition.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/tile-interactions.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/tile-manager.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/tile-renderer.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/tooltip.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/webview-factory.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/workspace-manager.js",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/terminal-list/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/terminal-list/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/terminal-tile/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/terminal-tile/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/terminal/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/terminal/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/tile-list/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/tile-list/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/viewer/src/App.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "collab-electron/src/windows/viewer/src/main.tsx",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/fixtures/kernel-drift/prior-schema/schema.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/acp-fs-confine.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/action-transport.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/agent-path.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/agent-path/pack.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/agent-path/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/artifact-root.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/artifact-root/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/boot-reconcile.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/boot-reconcile/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/bovada-football/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dev-dock-readiness.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/doc-action-surface.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/doc-links.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-definition-launch.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-definition-launch/fake-cli.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-definition-launch/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-production-inventory.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-profile-identity.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-profile-identity/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-registry.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-registry/pack.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/dock-registry/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/founder-steering.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/glacier-feel.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/governed-review.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/hermes-founder-state.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/hermes-launch-policy.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/hermes-research.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-drift.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-drift/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-market-lineage-launch.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-market-lineage.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-one-path.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-sole-writer-app.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-sole-writer.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-task-delegation-launch.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/kernel-task-delegation.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/market-context.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/market-ingest.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/market-ingest/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/no-canvas-domain-writes.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/observe-door.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/one-skin.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/package-closure.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/package-closure/executors.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/package-closure/lazy-loader.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/package-closure/modes.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/product-identity.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/publish-artifact-root.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/release-verifier.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/research-director-delegation.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/research-director-front-door.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/rung-ladder.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/schema-bundle-aliases.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/team-composition-launch.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/team-composition-ui-launch.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/team-composition-ui.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/team-composition.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/tool-discovery.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/vault-projection.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/vault-projection/fixture-seed.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/verb-retirement.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-cold-boot.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-dock-capability.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-dock-collaboration.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-dock-hire.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-dock-ontology.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-dock-species.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-golden-run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-golden-seed.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-installer.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/windows-research-question.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/package-install.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/run.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/verify-release-linux.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/verify-release.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/windows-unit.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/scripts/generate.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/scripts/update-schema-baseline.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/commands.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/define.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/conformance.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/docs.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/mcp.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/sql.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-agent-profile-identity.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-capability-grants.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-connection-actions.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-deterministic-execution.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-governed-review.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-independent-critic.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-market-context.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-market-ingest.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-task-composition.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-task-delegation.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-task-status.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/generate/upgrade-task-steering.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/link-endpoints.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/ontology/agent.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/ontology/market.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/ontology/research.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/schema.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/transition-meta.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/transitions.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qf-kernel-schema/src/validate.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/claude-code/packed/claude-code.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/claude-code/scripts/pack-agent.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/claude-code/src/claude-code.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/critic-mock/agent-package/src/acp-main.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/critic-mock/register.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/critic-mock/scripts/pack-agent.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/a2a-4tile-smoke.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/a2a-core.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/a2a-proof-script.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/agent-package/src/acp-shim.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/d0-smoke.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/host-acp-client.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/host-acp-policy.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/host-admit-kernel.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/host-turn-smoke.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/register.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/scripts/pack-agent.mjs",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "species/hermes/tui-pty-smoke.ts",
+      "status": "out-of-scope"
+    }
+  ],
   "wires": [
     {
       "channel": "agent:cancel",
@@ -7783,7 +10007,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 690
+        "line": 690,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -7828,7 +10053,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 614
+        "line": 614,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -7873,7 +10099,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 695
+        "line": 695,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -7918,7 +10145,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 685
+        "line": 685,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -7963,7 +10191,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 700
+        "line": 700,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -8008,7 +10237,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 680
+        "line": 680,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8053,7 +10283,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 251
+        "line": 251,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -8098,7 +10329,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 308
+        "line": 308,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -8143,7 +10375,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 48
+        "line": 48,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8230,7 +10463,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 249
+        "line": 249,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8275,7 +10509,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 369
+        "line": 369,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8320,7 +10555,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 438
+        "line": 438,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8365,7 +10601,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 455
+        "line": 455,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8410,7 +10647,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 354
+        "line": 354,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8455,7 +10693,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 359
+        "line": 359,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8500,7 +10739,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 433
+        "line": 433,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8545,7 +10785,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 364
+        "line": 364,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8590,7 +10831,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 374
+        "line": 374,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8635,7 +10877,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 445
+        "line": 445,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8680,7 +10923,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 643
+        "line": 643,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -8725,7 +10969,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 244
+        "line": 244,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8770,7 +11015,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 293
+        "line": 293,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -8815,7 +11061,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 246
+        "line": 246,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -8860,7 +11107,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 248
+        "line": 248,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8905,7 +11153,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 303
+        "line": 303,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8950,7 +11199,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 299
+        "line": 299,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -8995,7 +11245,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 55
+        "line": 55,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9040,7 +11291,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 454
+        "line": 454,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9085,7 +11337,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 317
+        "line": 317,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9130,7 +11383,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 434
+        "line": 434,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -9175,7 +11429,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 248
+        "line": 248,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9220,7 +11475,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 432
+        "line": 432,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -9265,7 +11521,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 270
+        "line": 270,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9310,7 +11567,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 252
+        "line": 252,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9355,7 +11613,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 274
+        "line": 274,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9400,7 +11659,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 276
+        "line": 276,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9445,7 +11705,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 280
+        "line": 280,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9490,7 +11751,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 268
+        "line": 268,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9535,7 +11797,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 294
+        "line": 294,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9580,7 +11843,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 296
+        "line": 296,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -9625,7 +11889,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 298
+        "line": 298,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9670,7 +11935,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 272
+        "line": 272,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9715,7 +11981,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 341
+        "line": 341,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -9760,7 +12027,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 311
+        "line": 311,
+        "kind": "sendSync"
       },
       "hop4": {
         "kind": "read-only",
@@ -9805,7 +12073,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 302
+        "line": 302,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9850,7 +12119,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 304
+        "line": 304,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9895,7 +12165,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 310
+        "line": 310,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -9940,7 +12211,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 300
+        "line": 300,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -9985,7 +12257,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 282
+        "line": 282,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10030,7 +12303,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 466
+        "line": 466,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10075,7 +12349,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 468
+        "line": 468,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -10120,7 +12395,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 470
+        "line": 470,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10165,7 +12441,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 288
+        "line": 288,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -10210,7 +12487,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 284
+        "line": 284,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -10255,7 +12533,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 286
+        "line": 286,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -10300,7 +12579,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 232
+        "line": 232,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -10345,7 +12625,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 278
+        "line": 278,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -10390,7 +12671,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 138
+        "line": 138,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10435,7 +12717,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 140
+        "line": 140,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10480,7 +12763,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 323
+        "line": 323,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10525,7 +12809,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 352
+        "line": 352,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10570,7 +12855,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 349
+        "line": 349,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10657,7 +12943,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 314
+        "line": 314,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10702,7 +12989,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 385
+        "line": 385,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10747,7 +13035,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 378
+        "line": 378,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10792,7 +13081,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 367
+        "line": 367,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -10837,7 +13127,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 360
+        "line": 360,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -10882,7 +13173,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 317
+        "line": 317,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -11053,7 +13345,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 62
+        "line": 62,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11098,7 +13391,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 118
+        "line": 118,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11143,7 +13437,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 120
+        "line": 120,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11188,7 +13483,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 122
+        "line": 122,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11233,7 +13529,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 111
+        "line": 111,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11278,7 +13575,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 92
+        "line": 92,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11323,7 +13621,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 124
+        "line": 124,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11368,7 +13667,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 61
+        "line": 61,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -11413,7 +13713,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 65
+        "line": 65,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11458,7 +13759,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 63
+        "line": 63,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11503,7 +13805,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 64
+        "line": 64,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11548,7 +13851,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 96
+        "line": 96,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -11593,7 +13897,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 85
+        "line": 85,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "cheats",
@@ -11638,7 +13943,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 87
+        "line": 87,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "cheats",
@@ -11683,7 +13989,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 89
+        "line": 89,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "cheats",
@@ -11728,7 +14035,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 91
+        "line": 91,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "cheats",
@@ -11773,7 +14081,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 107
+        "line": 107,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -11818,7 +14127,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 109
+        "line": 109,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -11863,7 +14173,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 93
+        "line": 93,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11908,7 +14219,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 167
+        "line": 167,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11953,7 +14265,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 105
+        "line": 105,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -11998,7 +14311,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 103
+        "line": 103,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12043,7 +14357,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 79
+        "line": 79,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -12088,7 +14403,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 74
+        "line": 74,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -12133,7 +14449,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 77
+        "line": 77,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -12178,7 +14495,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 83
+        "line": 83,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -12223,7 +14541,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 81
+        "line": 81,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "write-door",
@@ -12268,7 +14587,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 66
+        "line": 66,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12313,7 +14633,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 618
+        "line": 618,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12358,7 +14679,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 620
+        "line": 620,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12403,7 +14725,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 213
+        "line": 213,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12448,7 +14771,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 212
+        "line": 212,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12493,7 +14817,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 214
+        "line": 214,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12538,7 +14863,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 51
+        "line": 51,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12583,7 +14909,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 305
+        "line": 305,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12628,7 +14955,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 256
+        "line": 256,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12673,7 +15001,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 450
+        "line": 450,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12718,7 +15047,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 235
+        "line": 235,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12763,7 +15093,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 236
+        "line": 236,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12808,7 +15139,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 234
+        "line": 234,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -12853,7 +15185,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 237
+        "line": 237,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12898,7 +15231,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 290
+        "line": 290,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12943,7 +15277,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 223
+        "line": 223,
+        "kind": "send"
       },
       "hop4": {
         "kind": "read-only",
@@ -12988,7 +15323,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 337
+        "line": 337,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13033,7 +15369,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 333
+        "line": 333,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13078,7 +15415,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 335
+        "line": 335,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13123,7 +15461,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 258
+        "line": 258,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13168,7 +15507,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 260
+        "line": 260,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13213,7 +15553,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 254
+        "line": 254,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -13258,7 +15599,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 320
+        "line": 320,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13303,7 +15645,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 257
+        "line": 257,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13348,7 +15691,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 343
+        "line": 343,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13393,7 +15737,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/shell.ts",
-        "line": 256
+        "line": 256,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13438,7 +15783,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 446
+        "line": 446,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "read-only",
@@ -13483,7 +15829,8 @@
       },
       "calledAt": {
         "file": "collab-electron/src/preload/universal.ts",
-        "line": 326
+        "line": 326,
+        "kind": "invoke"
       },
       "hop4": {
         "kind": "writes-disk",
@@ -13495,24 +15842,49 @@
       }
     }
   ],
-  "duplicates": [
+  "duplicates": [],
+  "protocolVariants": [
     {
-      "id": "duplicate-owner:pty:write",
+      "id": "protocol-variants:pty:write",
       "channel": "pty:write",
-      "owners": [
-        "collab-electron/src/main/index.ts:766",
-        "collab-electron/src/main/index.ts:772"
+      "modes": [
+        "invoke",
+        "send"
       ],
-      "why": "2 handlers register this one channel. One responsibility, more than one owner — the later registration usually wins silently."
+      "registrations": [
+        "collab-electron/src/main/index.ts:766 (invoke)",
+        "collab-electron/src/main/index.ts:772 (send)"
+      ],
+      "callerModes": [
+        "send"
+      ],
+      "unusedModes": [
+        "invoke"
+      ],
+      "confidence": "medium",
+      "disposition": "investigate",
+      "why": "Registered for both protocols; preload only calls via send. The invoke variant looks legacy, but a packaged or dynamic caller must be ruled out before removing it."
     },
     {
-      "id": "duplicate-owner:pty:send-raw-keys",
+      "id": "protocol-variants:pty:send-raw-keys",
       "channel": "pty:send-raw-keys",
-      "owners": [
-        "collab-electron/src/main/index.ts:786",
-        "collab-electron/src/main/index.ts:792"
+      "modes": [
+        "invoke",
+        "send"
       ],
-      "why": "2 handlers register this one channel. One responsibility, more than one owner — the later registration usually wins silently."
+      "registrations": [
+        "collab-electron/src/main/index.ts:786 (invoke)",
+        "collab-electron/src/main/index.ts:792 (send)"
+      ],
+      "callerModes": [
+        "send"
+      ],
+      "unusedModes": [
+        "invoke"
+      ],
+      "confidence": "medium",
+      "disposition": "investigate",
+      "why": "Registered for both protocols; preload only calls via send. The invoke variant looks legacy, but a packaged or dynamic caller must be ruled out before removing it."
     }
   ],
   "lifetime": [

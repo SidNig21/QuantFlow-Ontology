@@ -166,6 +166,67 @@ record(10, "stale map fails --check",
       }
     }));
 
+// 11 · handle + on for one channel are two PROTOCOLS, not two owners
+record(11, "handle + on is protocol variants, NOT duplicate owner",
+  ...withFile(`${MAIN}/zz-falsify-11.ts`,
+    `import { ipcMain } from "electron";\n` +
+    `const shared = async () => 1;\n` +
+    `export function r(){ ipcMain.handle("qf:falsify:dual", shared); ipcMain.on("qf:falsify:dual", shared); }\n`,
+    (m) => {
+      const dup = m.duplicates.find((d) => d.channel === "qf:falsify:dual");
+      const pv = m.protocolVariants.find((p) => p.channel === "qf:falsify:dual");
+      return [!dup && !!pv && pv.modes.length === 2,
+        `duplicate_owner=${!!dup} protocol_variants=${pv ? pv.modes.length : 0}`];
+    }));
+
+// 12 · two handle registrations for one channel IS a duplicate owner
+record(12, "two handle registrations is a duplicate owner",
+  ...withFile(`${MAIN}/zz-falsify-12.ts`,
+    `import { ipcMain } from "electron";\n` +
+    `const a = async () => 1; const b = async () => 2;\n` +
+    `export function r(){ ipcMain.handle("qf:falsify:conflict", a); ipcMain.handle("qf:falsify:conflict", b); }\n`,
+    (m) => {
+      const dup = m.duplicates.find((d) => d.channel === "qf:falsify:conflict");
+      return [!!dup && dup.mode === "invoke", dup ? `mode=${dup.mode}, ${dup.owners.length} owners` : "not detected"];
+    }));
+
+// 13 · SQL the indexer cannot resolve must surface as a coverage gap, never silence
+record(13, "unresolvable SQL becomes a coverage gap, not silence",
+  ...withFile(`${MAIN}/zz-falsify-13.ts`,
+    // a class method — a shape the function indexer does not resolve
+    `export class Repo {\n  save(db){ db.query("INSERT INTO mission (id) VALUES (?)").run("x"); }\n}\n`,
+    (m) => {
+      const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-13.ts"));
+      const gap = cov && (cov.status === "partial" || cov.status === "unindexed");
+      return [gap, cov ? `coverage=${cov.status} sqlInText=${cov.sqlInText} sqlIndexed=${cov.sqlIndexed}` : "file not covered at all"];
+    }));
+
+// 14 · a live app bypass: preload -> main -> exported helper -> domain SQL, no execute()
+record(14, "active app bypass to domain SQL is high-confidence red", (() => {
+  const helper = join(REPO, `${MAIN}/zz-falsify-14-helper.ts`);
+  const handler = join(REPO, `${MAIN}/zz-falsify-14.ts`);
+  const pre = join(REPO, "collab-electron/src/preload/zz-falsify-14.ts");
+  try {
+    writeFileSync(helper,
+      `import { getKernelDb } from "./kernel";\n` +
+      `export function bypassWrite(name){ getKernelDb().query("INSERT INTO mission (id, name) VALUES (?, ?)").run("m", name); }\n`);
+    writeFileSync(handler,
+      `import { ipcMain } from "electron";\nimport { bypassWrite } from "./zz-falsify-14-helper";\n` +
+      `export function r(){ ipcMain.handle("qf:falsify:bypass", async (_e, n) => bypassWrite(n)); }\n`);
+    writeFileSync(pre,
+      `import { ipcRenderer } from "electron";\n` +
+      `export const callBypass = (n) => ipcRenderer.invoke("qf:falsify:bypass", n);\n`);
+    const m = model();
+    const v = m.persistence.find((p) => p.evidence[0].file.endsWith("zz-falsify-14-helper.ts") && p.governance === "violation");
+    const w = m.wires.find((x) => x.channel === "qf:falsify:bypass");
+    return [!!v && v.confidence === "high",
+      v ? `${v.persistence}/${v.confidence}, wire=${w?.status ?? "?"}, hop4=${w?.hop4?.kind ?? "?"}`
+        : "no violation raised for a live renderer-reachable domain write"];
+  } finally {
+    for (const f of [helper, handler, pre]) if (existsSync(f)) unlinkSync(f);
+  }
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

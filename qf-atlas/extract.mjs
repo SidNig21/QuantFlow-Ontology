@@ -113,22 +113,82 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
     for (const m of matches(t, RE.handle)) note(m.value, { file: rel(f), line: m.line, kind: "handle" });
     for (const m of matches(t, RE.on))     note(m.value, { file: rel(f), line: m.line, kind: "on" });
   }
-  const duplicates = [...allRegistrations.entries()]
-    .filter(([, list]) => list.length > 1)
-    .map(([channel, owners]) => ({
-      id: `duplicate-owner:${channel}`,
-      channel,
-      owners: owners.map((o) => `${o.file}:${o.line}`),
-      why: `${owners.length} handlers register this one channel. One responsibility, more than one owner — the later registration usually wins silently.`,
-    }));
+  // IPC MODE IS PART OF IDENTITY.
+  //
+  // Electron runs two different protocols on the same channel name:
+  //   ipcMain.on(ch)     receives ipcRenderer.send() / sendSync()  — event
+  //   ipcMain.handle(ch) answers ipcRenderer.invoke()              — request/response
+  //
+  // They do not overwrite each other, so registering both is NOT duplicate
+  // ownership. Reporting pty:write that way was a confident red produced by an
+  // incomplete model — the exact failure this analyzer exists to prevent.
+  //
+  //   same channel + same mode + different implementations → duplicate owner
+  //   same channel + different modes                       → protocol variants
+  const modeOf = (kind) => (kind === "handle" ? "invoke" : "send");
+  const duplicates = [];
+  const protocolVariants = [];
+
+  // Deferred until the preload scan below has filled allCalls — which protocol a
+  // caller uses is what decides whether a registered variant is live.
+  const classifyRegistrations = (allCalls) => {
+  for (const [channel, list] of allRegistrations) {
+    const byMode = new Map();
+    for (const r of list) {
+      const mode = modeOf(r.kind);
+      if (!byMode.has(mode)) byMode.set(mode, []);
+      byMode.get(mode).push(r);
+    }
+
+    for (const [mode, regs] of byMode)
+      if (regs.length > 1)
+        duplicates.push({
+          id: `duplicate-owner:${channel}:${mode}`,
+          channel, mode,
+          owners: regs.map((o) => `${o.file}:${o.line}`),
+          confidence: "high",
+          why: `${regs.length} ${mode === "invoke" ? "handle" : "on"} registrations for one channel and mode. Same protocol, more than one owner — this is a genuine conflict.`,
+        });
+
+    if (byMode.size > 1) {
+      // Which variant does production actually use? The preload's call mode decides.
+      const callerModes = new Set(
+        (allCalls.get(channel) ?? []).map((c) => (c.kind === "invoke" ? "invoke" : "send")));
+      const unusedModes = [...byMode.keys()].filter((m) => !callerModes.has(m));
+      protocolVariants.push({
+        id: `protocol-variants:${channel}`,
+        channel,
+        modes: [...byMode.keys()],
+        registrations: list.map((o) => `${o.file}:${o.line} (${modeOf(o.kind)})`),
+        callerModes: [...callerModes],
+        unusedModes,
+        confidence: unusedModes.length ? "medium" : "low",
+        disposition: unusedModes.length ? "investigate" : "keep",
+        why: unusedModes.length
+          ? `Registered for both protocols; preload only calls via ${[...callerModes].join(", ") || "no caller found"}. The ${unusedModes.join(", ")} variant looks legacy, but a packaged or dynamic caller must be ruled out before removing it.`
+          : `Registered for both protocols and both are called. Dual transport by design.`,
+      });
+    }
+  }
+  };
 
   // where each channel is called from preload, and under which bridge method
   const called = new Map();              // channel -> {file,line}
+  const allCalls = new Map();            // channel -> [{file,line,kind}]  kind: invoke|send|sendSync
   const bridgeMethods = new Map();       // method  -> channel
   const bridges = new Set();
   for (const f of preloadFiles) {
     const t = read(f);
-    for (const m of matches(t, RE.invoke)) if (!called.has(m.value)) called.set(m.value, { file: rel(f), line: m.line });
+    // Capture the call mode, not just the channel: which protocol the preload
+    // uses is what decides whether a registered variant is actually live.
+    for (const m of t.matchAll(/ipcRenderer\.(invoke|sendSync|send)\(\s*["'`]([^"'`]+)["'`]/g)) {
+      const kind = m[1];
+      const channel = m[2];
+      const line = t.slice(0, m.index).split("\n").length;
+      if (!allCalls.has(channel)) allCalls.set(channel, []);
+      allCalls.get(channel).push({ file: rel(f), line, kind });
+      if (!called.has(channel)) called.set(channel, { file: rel(f), line, kind });
+    }
     for (const m of matches(t, RE.bridge)) bridges.add(m.value);
     const r = new RegExp(RE.bridgeFn.source, "g");
     let m;
@@ -144,6 +204,8 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
   // bare destructured usage, e.g.  const {listArtifacts} = window.shellApi
   for (const [method] of bridgeMethods)
     if (new RegExp(`\\b${method}\\s*\\(`).test(rendererText)) usedMethods.add(method);
+
+  classifyRegistrations(allCalls);
 
   const channelToMethod = new Map();
   for (const [method, ch] of bridgeMethods) if (!channelToMethod.has(ch)) channelToMethod.set(ch, method);
@@ -173,7 +235,7 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
     });
   }
   wires.sort((a, b) => a.channel.localeCompare(b.channel));
-  return { wires, duplicates, bridges: [...bridges], bridgeMethodCount: bridgeMethods.size, usedMethodCount: usedMethods.size };
+  return { wires, duplicates, protocolVariants, bridges: [...bridges], bridgeMethodCount: bridgeMethods.size, usedMethodCount: usedMethods.size };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

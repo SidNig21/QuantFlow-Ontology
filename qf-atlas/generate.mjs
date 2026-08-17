@@ -14,7 +14,7 @@ import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, RE
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
-import { domainTables, classifyPersistence, callerIndex, sourceClass, commandRoots, governedClosure } from "./classify.mjs";
+import { domainTables, classifyPersistence, callerIndex, sourceClass, commandRoots, governedClosure, coverage } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 
 const OUT = join(REPO, "qf-atlas");
@@ -50,7 +50,7 @@ const mainFiles     = files.filter((f) => f.startsWith("collab-electron/src/main
 const preloadFiles  = files.filter((f) => f.startsWith("collab-electron/src/preload/")).map((f) => join(REPO, f));
 const rendererFiles = files.filter((f) => f.startsWith("collab-electron/src/windows/") || f.startsWith("collab-electron/packages/")).map((f) => join(REPO, f));
 
-const { wires, duplicates, bridges, bridgeMethodCount, usedMethodCount } = extractWires(mainFiles, preloadFiles, rendererFiles);
+const { wires, duplicates, protocolVariants, bridges, bridgeMethodCount, usedMethodCount } = extractWires(mainFiles, preloadFiles, rendererFiles);
 // hop 4 — main -> Kernel. Runs before strip/status so "cheats" is visible everywhere.
 const indexFiles = files
   .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
@@ -191,6 +191,13 @@ const persistence = classifyPersistence({
   relOf: rel,
 });
 
+// Coverage: absence of a finding must never be indistinguishable from clean.
+const inScope = (p) => p.startsWith("collab-electron/src/main/")
+  || p.startsWith("packages/qf-kernel/") || p.startsWith("tools/");
+const coverageRows = coverage({
+  files, inScope, index: fnIndex, read, joinRepo: (p) => join(REPO, p),
+});
+
 const loops = buildLoops(wires, lifetime);
 
 // ─── model ───────────────────────────────────────────────────────────────────
@@ -227,8 +234,10 @@ const model = {
     files: n.files, strip: n.strip, breaches: n.breaches, wires: n.wires,
   })),
   loops,
+  coverage: coverageRows,
   wires,
   duplicates,
+  protocolVariants,
   lifetime,
   persistence,
   strip,

@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 10,
-  "total": 10,
+  "passed": 14,
+  "total": 14,
   "results": [
     {
       "n": 1,
@@ -68,6 +68,32 @@
       "name": "stale map fails --check",
       "passed": true,
       "detail": "--check exited non-zero on moved code"
+    },
+    {
+      "n": 11,
+      "name": "handle + on is protocol variants, NOT duplicate owner",
+      "passed": true,
+      "detail": "duplicate_owner=false protocol_variants=2"
+    },
+    {
+      "n": 12,
+      "name": "two handle registrations is a duplicate owner",
+      "passed": true,
+      "detail": "mode=invoke, 2 owners"
+    },
+    {
+      "n": 13,
+      "name": "unresolvable SQL becomes a coverage gap, not silence",
+      "passed": true,
+      "detail": "coverage=partial sqlInText=1 sqlIndexed=0"
+    },
+    {
+      "n": 14,
+      "name": "active app bypass to domain SQL is high-confidence red",
+      "passed": [
+        true,
+        "domain-truth/high, wire=cheats, hop4=cheats"
+      ]
     }
   ]
 }
