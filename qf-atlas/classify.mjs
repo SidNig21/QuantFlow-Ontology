@@ -22,6 +22,15 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { insideWriteDoor, WRITE_DOOR } from "./extract.mjs";
 
+/** Comments are prose, not code. Coverage and fileFacts must agree about this,
+ *  or a file like errors.ts — which only mentions "CREATE TABLE" in a note —
+ *  becomes a permanent false gray. Newlines are preserved so lines stay aligned. */
+export function stripCodeComments(text) {
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
+    .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
+}
+
 // ── 1 · the domain, straight from the generated schema ──────────────────────
 export function domainTables(repo) {
   const sql = [
@@ -42,7 +51,41 @@ export function domainTables(repo) {
 // a queue write a domain mutation is the false positive that discredits the map.
 const TRANSPORT_TABLES = new Set(["messages", "message_queue", "outbox"]);
 
-const SQL_SITE = /\b(CREATE TABLE(?:\s+IF NOT EXISTS)?|INSERT INTO|UPDATE|DELETE FROM|ALTER TABLE|DROP TABLE)\s+"?([a-z_][a-z0-9_]*)"?/gi;
+// SQLite allows a conflict clause between the verb and the target:
+//   INSERT OR IGNORE INTO mission …   INSERT OR REPLACE INTO …   REPLACE INTO …
+// The old pattern required a literal "INSERT INTO", so `INSERT OR IGNORE INTO
+// mission` scored ZERO SQL sites. The file then reported coverage=indexed with
+// nothing to find, and a real domain write read as clean.
+const SQL_SITE = new RegExp(
+  "\\b(" +
+    "CREATE\\s+TABLE(?:\\s+IF\\s+NOT\\s+EXISTS)?|" +
+    "INSERT(?:\\s+OR\\s+(?:IGNORE|REPLACE|ROLLBACK|ABORT|FAIL))?\\s+INTO|" +
+    "REPLACE\\s+INTO|" +
+    "UPDATE(?:\\s+OR\\s+(?:IGNORE|REPLACE|ROLLBACK|ABORT|FAIL))?|" +
+    "DELETE\\s+FROM|ALTER\\s+TABLE|DROP\\s+TABLE" +
+  ")\\s+\"?([a-z_][a-z0-9_]*)\"?", "gi");
+
+// Broadening the precise pattern only fixes the shapes we thought of. This is
+// the backstop: any SQL-looking verb at all. If the loose scan finds more than
+// the precise scan resolves, the file has SQL this analyzer does not understand,
+// and it must go gray. Unknown syntax may never be indistinguishable from clean.
+const SQL_SUSPICION = /\b(INSERT|REPLACE|UPSERT|MERGE|UPDATE|DELETE|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE|TRUNCATE)\b/gi;
+
+/**
+ * How many SQL-ish verbs appear at all, however written — counted ONLY inside
+ * string and template literals.
+ *
+ * Scanning raw source made `map.delete(...)`, the JavaScript `delete` operator
+ * and any `.update(` method match, which turned 83 files gray instead of 33.
+ * Graying everything is safer than false-clean but just as useless. SQL in this
+ * codebase is always a quoted string, so quoted text is the honest place to look.
+ */
+export function sqlSuspicionCount(text) {
+  let count = 0;
+  for (const m of text.matchAll(/"([^"\\]|\\.)*"|'([^'\\]|\\.)*'|`([^`\\]|\\.)*`/g))
+    count += (m[0].match(SQL_SUSPICION) ?? []).length;
+  return count;
+}
 
 /** Every SQL write in a file, with its target table and line. */
 export function sqlSites(text) {
@@ -109,7 +152,7 @@ export function reachability(fnName, callers, filePath, governed) {
  */
 export function commandRoots(index, read, repo, relOf) {
   const roots = new Set();
-  for (const [name, rec] of index) if (insideWriteDoor(rec.file)) roots.add(name);
+  for (const rec of index.values()) if (insideWriteDoor(rec.file)) roots.add(rec.name);
   for (const door of WRITE_DOOR) {
     let text = "";
     try { text = readFileSync(join(repo, door), "utf8"); } catch { continue; }
@@ -130,13 +173,14 @@ export function governedClosure(index, callers, roots) {
   const governed = new Set(roots);
   for (let pass = 0; pass < 8; pass++) {
     let grew = false;
-    for (const [name, rec] of index) {
+    for (const rec of index.values()) {
+      const name = rec.name;
       if (governed.has(name)) continue;
       const sites = callers.get(name);
       if (!sites || sites.size === 0) continue;
       const everyCallerGoverned = [...sites].every(
         (file) => insideWriteDoor(file) ||
-          [...index].some(([n, r]) => r.file === file && governed.has(n) && r.calls.has(name)));
+          [...index.values()].some((r) => r.file === file && governed.has(r.name) && r.calls.has(name)));
       if (everyCallerGoverned) { governed.add(name); grew = true; }
     }
     if (!grew) break;
@@ -163,7 +207,8 @@ export function callerIndex(index) {
 export function classifyPersistence({ index, callers, domain, governed, relOf }) {
   const findings = [];
 
-  for (const [fnName, rec] of index) {
+  for (const rec of index.values()) {
+    const fnName = rec.name;
     if (!rec.sqlSites?.length) continue;
     const cls = sourceClass(rec.file);
     const reach = reachability(fnName, callers, rec.file, governed);
@@ -282,18 +327,31 @@ export function coverage({ files, inScope, index, read, joinRepo }) {
   for (const path of files) {
     if (!inScope(path)) { rows.push({ path, status: "out-of-scope" }); continue; }
     const seen = byFile.get(path);
-    const text = read(joinRepo(path));
+    // Comments are prose. `errors.ts` says "CREATE TABLE" in a note, and counting
+    // that made it a permanent false gray. fileFacts already strips comments;
+    // coverage did not, so the two disagreed about the same file.
+    const text = stripCodeComments(read(joinRepo(path)));
     const textSql = sqlSites(text).length;
-    const status = !seen ? (textSql ? "partial" : "unindexed")
+    const suspicion = sqlSuspicionCount(text);
+    // SQL the precise parser could not resolve. This is what makes unknown
+    // syntax gray instead of clean.
+    const unresolved = Math.max(0, suspicion - textSql);
+
+    const status = unresolved > 0 ? "partial"
+      : !seen ? (textSql ? "partial" : "unindexed")
       : textSql > seen.sql ? "partial"
       : "indexed";
+
     rows.push({
       path, status,
       indexedFns: seen?.fns ?? 0,
       sqlInText: textSql,
       sqlIndexed: seen?.sql ?? 0,
+      sqlUnrecognised: unresolved,
       ...(status === "partial" && {
-        why: `${textSql} SQL site(s) in the text, ${seen?.sql ?? 0} resolved into a function. The unresolved ones are invisible to governance analysis.`,
+        why: unresolved > 0
+          ? `${suspicion} SQL verb(s) present, ${textSql} in a shape this analyzer parses. ${unresolved} unrecognised — governance analysis cannot see them, so this file cannot be called clean.`
+          : `${textSql} SQL site(s) in the text, ${seen?.sql ?? 0} resolved into a function. The unresolved ones are invisible to governance analysis.`,
       }),
     });
   }

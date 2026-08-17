@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 20,
-  "total": 20,
+  "passed": 23,
+  "total": 23,
   "results": [
     {
       "n": 1,
@@ -31,7 +31,7 @@
       "n": 5,
       "name": "governed Kernel internals are NOT falsely flagged",
       "passed": true,
-      "detail": "deterministic-execution.ts: 3 finding(s), 0 violation(s)"
+      "detail": "deterministic-execution.ts: 4 finding(s), 0 violation(s)"
     },
     {
       "n": 6,
@@ -49,7 +49,7 @@
       "n": 8,
       "name": "coverage ledger is complete, unique and well-formed",
       "passed": true,
-      "detail": "430 rows, all unique and legal; 43 findings all carry sourceClass"
+      "detail": "430 rows, all unique and legal; 44 findings all carry sourceClass"
     },
     {
       "n": 9,
@@ -109,7 +109,7 @@
       "n": 18,
       "name": "coverage gaps appear in the agent brief",
       "passed": true,
-      "detail": "33 gaps in model; brief shows section=true"
+      "detail": "40 gaps in model; brief shows section=true"
     },
     {
       "n": 19,
@@ -122,6 +122,24 @@
       "name": "static-only findings are removal candidates, not safe deletes",
       "passed": true,
       "detail": "phrased as removal candidate"
+    },
+    {
+      "n": 21,
+      "name": "INSERT OR IGNORE is caught, not read as clean",
+      "passed": true,
+      "detail": "violation=true hop4=cheats coverage=indexed"
+    },
+    {
+      "n": 22,
+      "name": "same-named functions in different files stay distinct",
+      "passed": true,
+      "detail": "insertArtifact findings span 3 file(s): collab-electron/src/main/zz-falsify-22.ts, packages/qf-kernel/src/deterministic-execution.ts, packages/qf-kernel/src/governed-review.ts"
+    },
+    {
+      "n": 23,
+      "name": "evidence line numbers are file-relative",
+      "passed": true,
+      "detail": "every violation line contains its table"
     }
   ]
 }

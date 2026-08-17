@@ -16,7 +16,10 @@ import { insideWriteDoor } from "./extract.mjs";
 import { sqlSites } from "./classify.mjs";
 
 const DOOR = new Set(["execute", "executeCommand"]);
-const RE_DML = /\b(?:CREATE TABLE|INSERT INTO|UPDATE\s+[a-z_]+\s+SET|DELETE FROM|ALTER TABLE|DROP TABLE)\b/i;
+// Must recognise the same shapes as classify.mjs, or hop 4 reports `read-only`
+// for a handler that reaches `INSERT OR IGNORE INTO mission`. The two detectors
+// disagreeing is how a caught violation still showed a clean wire.
+const RE_DML = /\b(?:CREATE\s+TABLE|INSERT(?:\s+OR\s+\w+)?\s+INTO|REPLACE\s+INTO|UPDATE(?:\s+OR\s+\w+)?\s+[a-z_]+\s+SET|DELETE\s+FROM|ALTER\s+TABLE|DROP\s+TABLE)\b/i;
 // A handler that writes a file mutates state even when it never touches the
 // Kernel. Calling that "read-only" hid agent-messages.json and canvas-state.json
 // — the two files behind the second-truth-store finding.
@@ -121,27 +124,49 @@ export function indexFunctions(files, read, relOf) {
         let c;
         while ((c = cr.exec(body))) calls.add(c[1]);
         const path = relOf(f);
-        const prev = index.get(name);
-        const rec = {
+        // IDENTITY IS FILE + NAME, NOT NAME.
+        //
+        // Keying by name alone silently discarded one of two definitions. There
+        // are two `insertArtifact` functions — one in deterministic-execution.ts
+        // behind a governed command, one in governed-review.ts — and the index
+        // kept the review body while inheriting the other file's callers, which
+        // marked a review function governed. Same-named functions must stay apart.
+        const key = `${path}::${name}`;
+        // SQL line numbers must be FILE-relative. sqlSites() measures inside the
+        // extracted body, so a finding reported "line 10" when file line 10 was a
+        // constant declaration. Offset by where the body actually starts.
+        const bodyStart = text.indexOf(body, m.index);
+        const lineOffset = bodyStart >= 0 ? text.slice(0, bodyStart).split("\n").length - 1 : 0;
+        index.set(key, {
+          name,
           file: path,
           door: DOOR.has(name) || [...calls].some((x) => DOOR.has(x)),
           // SQL written by a file that is not part of the declared write door
           dml: RE_DML.test(body) && !insideWriteDoor(path),
-          sqlSites: sqlSites(body),
+          sqlSites: sqlSites(body).map((s) => ({ ...s, line: s.line + lineOffset })),
           disk: RE_DISK.test(body),
           calls,
-        };
-        // keep the richer definition when a name is defined more than once
-        if (!prev || (!prev.door && rec.door) || (!prev.dml && rec.dml) || (!prev.disk && rec.disk)
-            || ((rec.sqlSites?.length ?? 0) > (prev.sqlSites?.length ?? 0))) index.set(name, rec);
+        });
       }
     }
   }
   return index;
 }
 
+/** name -> every record with that name. Same-named functions no longer collide,
+ *  so a lookup must consider all candidates rather than one arbitrary winner. */
+export function byName(index) {
+  const m = new Map();
+  for (const rec of index.values()) {
+    if (!m.has(rec.name)) m.set(rec.name, []);
+    m.get(rec.name).push(rec);
+  }
+  return m;
+}
+
 /** Follow the calls of `seed` through the index; report how the Kernel is reached. */
-export function classify(seedCalls, index, maxDepth = 5, own = {}) {
+export function classify(seedCalls, index, maxDepth = 5, own = {}, names = null) {
+  const candidates = names ?? byName(index);
   const seen = new Set();
   // The handler body itself counts. Only inspecting the functions it calls made
   // a handler that writes a file inline look read-only.
@@ -163,12 +188,14 @@ export function classify(seedCalls, index, maxDepth = 5, own = {}) {
       if (seen.has(name)) continue;
       seen.add(name);
       if (DOOR.has(name) && !via.door) via.door = [name];
-      const rec = index.get(name);
-      if (!rec) continue;
-      if (rec.door && !via.door) via.door = [name];
-      if (rec.dml && !via.dml) via.dml = [name, rec.file];
-      if (rec.disk && !via.disk && d < DISK_DEPTH) via.disk = [name, rec.file];
-      for (const c of rec.calls) if (!seen.has(c)) next.push(c);
+      // Conservative across same-named definitions: if ANY candidate cheats, the
+      // path can cheat. Picking one arbitrarily is what hid the collision.
+      for (const rec of candidates.get(name) ?? []) {
+        if (rec.door && !via.door) via.door = [name];
+        if (rec.dml && !via.dml) via.dml = [name, rec.file];
+        if (rec.disk && !via.disk && d < DISK_DEPTH) via.disk = [name, rec.file];
+        for (const c of rec.calls) if (!seen.has(c)) next.push(c);
+      }
     }
     frontier = next;
   }

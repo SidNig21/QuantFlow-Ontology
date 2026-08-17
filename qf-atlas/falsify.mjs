@@ -325,6 +325,50 @@ record(20, "static-only findings are removal candidates, not safe deletes", ...(
   return [!overclaims, overclaims ? "brief still says 'Safe leftover — delete'" : "phrased as removal candidate"];
 })());
 
+// ── FROM INDEPENDENT REVIEW ────────────────────────────────────────────────
+// 21-23 exist because an outside verifier broke the analyzer three ways that
+// none of the 20 tests above could see.
+
+// 21 · the exact fixture that failed acceptance: INSERT OR IGNORE
+record(21, "INSERT OR IGNORE is caught, not read as clean",
+  ...withFile(`${MAIN}/zz-falsify-21.ts`,
+    `import { ipcMain } from "electron";\nimport { getKernelDb } from "./kernel";\n` +
+    `export function seedMission(name){ getKernelDb().query("INSERT OR IGNORE INTO mission (id, name) VALUES (?, ?)").run("m", name); }\n` +
+    `export function r(){ ipcMain.handle("qf:falsify:orignore", async (_e, n) => seedMission(n)); }\n`,
+    (m) => {
+      const v = m.persistence.find((p) => p.evidence[0].file.endsWith("zz-falsify-21.ts") && p.governance === "violation");
+      const w = m.wires.find((x) => x.channel === "qf:falsify:orignore");
+      const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-21.ts"));
+      // Caught outright, or at minimum gray. Never clean-and-silent.
+      const ok = (!!v && w?.hop4?.kind === "cheats") || cov?.status === "partial";
+      return [ok, `violation=${!!v} hop4=${w?.hop4?.kind} coverage=${cov?.status}`];
+    }));
+
+// 22 · two functions sharing a name must not merge into one record
+record(22, "same-named functions in different files stay distinct",
+  ...withFile(`${MAIN}/zz-falsify-22.ts`,
+    `export function insertArtifact(db){ db.query("INSERT INTO mission (id) VALUES (?)").run("x"); }\n`,
+    (m) => {
+      // the real repo already has two insertArtifact definitions; adding a third
+      // must not erase either of the originals
+      const files = new Set(m.persistence
+        .filter((p) => p.fn === "insertArtifact")
+        .map((p) => p.evidence[0].file));
+      return [files.size >= 2, `insertArtifact findings span ${files.size} file(s): ${[...files].join(", ") || "none"}`];
+    }));
+
+// 23 · evidence must point at the line the SQL is actually on
+record(23, "evidence line numbers are file-relative", ...(() => {
+  const bad = [];
+  for (const p of before.persistence.filter((x) => x.governance === "violation")) {
+    const line = p.evidence[0].lines?.[0];
+    if (!line) { bad.push(`${p.id} has no line`); continue; }
+    const src = readFileSync(join(REPO, p.evidence[0].file), "utf8").split("\n")[line - 1] ?? "";
+    if (!new RegExp(p.table, "i").test(src)) bad.push(`${p.evidence[0].file}:${line} does not mention ${p.table}`);
+  }
+  return [bad.length === 0, bad.length ? bad.slice(0, 3).join(" · ") : "every violation line contains its table"];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

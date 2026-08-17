@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "e492b1f",
+    "commit": "e69a03b",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "9c2914492ec065b8"
+    "fingerprint": "5576eed237caefa9"
   },
   "stats": {
     "live": 107,
@@ -716,7 +716,7 @@
       "kb": 12.9,
       "x": 2.03,
       "z": -1.69,
-      "status": "ok",
+      "status": "gray",
       "spawns": 1,
       "writes": 3,
       "dml": 0,
@@ -760,7 +760,7 @@
       "kb": 34.7,
       "x": 0.45,
       "z": 2.6,
-      "status": "ok",
+      "status": "gray",
       "spawns": 0,
       "writes": 1,
       "dml": 0,
@@ -1176,7 +1176,7 @@
       "kb": 77.5,
       "x": 1.01,
       "z": 0.85,
-      "status": "warn",
+      "status": "gray",
       "spawns": 0,
       "writes": 1,
       "dml": 0,
@@ -2780,7 +2780,7 @@
       "kb": 23.6,
       "x": -0.91,
       "z": 2.48,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 1,
       "dml": 4,
@@ -3046,7 +3046,7 @@
       "kb": 30.4,
       "x": 0.23,
       "z": -1.3,
-      "status": "ok",
+      "status": "gray",
       "spawns": 0,
       "writes": 0,
       "dml": 3,
@@ -4689,7 +4689,7 @@
       "kb": 16.4,
       "x": -1.69,
       "z": -2.03,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 0,
       "dml": 0,
@@ -4869,7 +4869,7 @@
       "kb": 11.5,
       "x": 2.03,
       "z": -1.69,
-      "status": "ok",
+      "status": "gray",
       "spawns": 0,
       "writes": 0,
       "dml": 0,
@@ -7751,12 +7751,94 @@
   ],
   "coverage": [
     {
+      "path": "collab-electron/src/main/acp-agent.ts",
+      "status": "partial",
+      "indexedFns": 17,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 1,
+      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/agent-host.ts",
+      "status": "partial",
+      "indexedFns": 30,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 3,
+      "why": "3 SQL verb(s) present, 0 in a shape this analyzer parses. 3 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/connections-ipc.ts",
+      "status": "partial",
+      "indexedFns": 10,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 2,
+      "why": "2 SQL verb(s) present, 0 in a shape this analyzer parses. 2 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/import-service.ts",
+      "status": "partial",
+      "indexedFns": 7,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 2,
+      "why": "2 SQL verb(s) present, 0 in a shape this analyzer parses. 2 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/ipc-endpoint.ts",
+      "status": "partial",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 1,
+      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/ipc-filesystem.ts",
+      "status": "partial",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 1,
+      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/ipc-workspace.ts",
+      "status": "partial",
+      "indexedFns": 9,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 1,
+      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
       "indexedFns": 56,
       "sqlInText": 7,
       "sqlIndexed": 5,
+      "sqlUnrecognised": 0,
       "why": "7 SQL site(s) in the text, 5 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "collab-electron/src/main/updater/index.ts",
+      "status": "partial",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 2,
+      "why": "2 SQL verb(s) present, 0 in a shape this analyzer parses. 2 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "collab-electron/src/main/updater/update-manager.ts",
+      "status": "partial",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 10,
+      "why": "10 SQL verb(s) present, 0 in a shape this analyzer parses. 10 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "packages/qf-kernel/src/create.ts",
@@ -7764,6 +7846,7 @@
       "indexedFns": 25,
       "sqlInText": 13,
       "sqlIndexed": 11,
+      "sqlUnrecognised": 0,
       "why": "13 SQL site(s) in the text, 11 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
@@ -7772,22 +7855,7 @@
       "indexedFns": 14,
       "sqlInText": 1,
       "sqlIndexed": 0,
-      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "packages/qf-kernel/src/deterministic-execution.ts",
-      "status": "partial",
-      "indexedFns": 19,
-      "sqlInText": 4,
-      "sqlIndexed": 3,
-      "why": "4 SQL site(s) in the text, 3 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "packages/qf-kernel/src/errors.ts",
-      "status": "partial",
-      "indexedFns": 0,
-      "sqlInText": 1,
-      "sqlIndexed": 0,
+      "sqlUnrecognised": 0,
       "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
@@ -7796,23 +7864,26 @@
       "indexedFns": 1,
       "sqlInText": 1,
       "sqlIndexed": 0,
+      "sqlUnrecognised": 0,
       "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/execute.ts",
       "status": "partial",
       "indexedFns": 31,
-      "sqlInText": 10,
+      "sqlInText": 7,
       "sqlIndexed": 7,
-      "why": "10 SQL site(s) in the text, 7 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "sqlUnrecognised": 1,
+      "why": "8 SQL verb(s) present, 7 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
       "status": "partial",
       "indexedFns": 32,
-      "sqlInText": 27,
+      "sqlInText": 28,
       "sqlIndexed": 16,
-      "why": "27 SQL site(s) in the text, 16 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "sqlUnrecognised": 0,
+      "why": "28 SQL site(s) in the text, 16 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/insert.ts",
@@ -7820,7 +7891,17 @@
       "indexedFns": 1,
       "sqlInText": 1,
       "sqlIndexed": 0,
-      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "sqlUnrecognised": 1,
+      "why": "2 SQL verb(s) present, 1 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+    },
+    {
+      "path": "packages/qf-kernel/src/upgrade.ts",
+      "status": "partial",
+      "indexedFns": 49,
+      "sqlInText": 1,
+      "sqlIndexed": 3,
+      "sqlUnrecognised": 29,
+      "why": "30 SQL verb(s) present, 1 in a shape this analyzer parses. 29 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "tools/qf-peer-bus/src/bus.ts",
@@ -7828,1085 +7909,1177 @@
       "indexedFns": 0,
       "sqlInText": 4,
       "sqlIndexed": 0,
+      "sqlUnrecognised": 0,
       "why": "4 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "tools/runtime-proof/src/proof.ts",
+      "status": "partial",
+      "indexedFns": 11,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 1,
+      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "collab-electron/src/main/env.d.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/host-acp-bridge.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/peer-role-registry.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/qf-execute-allowlist.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/ring-buffer.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/updater/index.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/vite-raw.d.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/errors.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/index.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/portable.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/results.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/task-governance.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/constants.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/errors.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/index.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-peer-bus/src/server.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-proof-agent/scripts/pack-agent.mjs",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "tools/qf-proof-agent/src/qf-proof-agent.mjs",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/fixtures/experimental-schema.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/fixtures/observe-leak-schema.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/fixtures/experimental-schema.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/src/cli.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "tools/qf-vault-projection/src/load-schema.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/runtime-proof/scripts/pack-agent.mjs",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/a2a-artifact-store.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/a2a-bus.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/a2a-orchestra.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/acp-agent.ts",
-      "status": "indexed",
-      "indexedFns": 17,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/acp-fs-root.ts",
       "status": "indexed",
       "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/agent-activity.ts",
       "status": "indexed",
       "indexedFns": 8,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/agent-artifact-writer.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/agent-host.ts",
-      "status": "indexed",
-      "indexedFns": 29,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/analytics.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/app-migration.ts",
       "status": "indexed",
       "indexedFns": 10,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/app-root.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/atomic-result-commit.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/bovada-capture-rpc.ts",
       "status": "indexed",
       "indexedFns": 17,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/canvas-persistence.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/canvas-rpc.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/cdp.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/cli-installer.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/collaboration-gateway.ts",
       "status": "indexed",
       "indexedFns": 12,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/config.ts",
       "status": "indexed",
       "indexedFns": 8,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/connections-ipc.ts",
-      "status": "indexed",
-      "indexedFns": 9,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/cwd-fallback.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/definition-runtime.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/dock-profiles.ts",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 14,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/file-filter.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/files.ts",
       "status": "indexed",
       "indexedFns": 11,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/git-replay-worker.ts",
       "status": "indexed",
       "indexedFns": 15,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/git-replay.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/host-acp-permission.ts",
       "status": "indexed",
-      "indexedFns": 6,
+      "indexedFns": 7,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/host-acp-turn.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/host-mounts.ts",
       "status": "indexed",
-      "indexedFns": 4,
+      "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/host-native-tui.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/image-service.ts",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 14,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/image-worker.ts",
       "status": "indexed",
       "indexedFns": 8,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/import-service.ts",
-      "status": "indexed",
-      "indexedFns": 7,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/index.ts",
       "status": "indexed",
       "indexedFns": 36,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/integrations.ts",
       "status": "indexed",
       "indexedFns": 9,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ipc-browser.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ipc-canvas.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/ipc-endpoint.ts",
-      "status": "indexed",
-      "indexedFns": 5,
-      "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/ipc-filesystem.ts",
-      "status": "indexed",
-      "indexedFns": 5,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ipc-kernel.ts",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 17,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ipc-knowledge.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ipc-misc.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/ipc-workspace.ts",
-      "status": "indexed",
-      "indexedFns": 9,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ipc.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/json-rpc-server.ts",
       "status": "indexed",
       "indexedFns": 9,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/launcher-readiness.ts",
       "status": "indexed",
-      "indexedFns": 3,
+      "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/live-peer-recipient.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/live-seat-capability.ts",
       "status": "indexed",
       "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/logger-policy.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/logger.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/mission-activation.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/native-tui-orchestration.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ontology-gateway.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ontology-read-dispatch.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ontology-role-tools.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/ontology-trajectory-context.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/package-resource-paths.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/paths.ts",
       "status": "indexed",
       "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/peer-delivery.ts",
       "status": "indexed",
       "indexedFns": 9,
       "sqlInText": 2,
-      "sqlIndexed": 2
+      "sqlIndexed": 2,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/peer-notification.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/precreated-native-tui.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/precreated-start-ownership.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/pty-display.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/pty.ts",
       "status": "indexed",
       "indexedFns": 44,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/runtime-adapter.ts",
       "status": "indexed",
-      "indexedFns": 9,
+      "indexedFns": 13,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/runtime-kernel-admission.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/second-opinion-admission.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/session-canvas-projector.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/client.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/entry.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/log.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/protocol.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/server.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/species-launch.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/species-surface.ts",
       "status": "indexed",
       "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/species-tools.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/task-delegation-projection.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/terminal-target.ts",
       "status": "indexed",
       "indexedFns": 14,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/tmux.ts",
       "status": "indexed",
       "indexedFns": 18,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/trusted-sender.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "collab-electron/src/main/updater/update-manager.ts",
-      "status": "indexed",
-      "indexedFns": 5,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/watcher-worker.ts",
       "status": "indexed",
       "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/watcher.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/wikilink-index.ts",
       "status": "indexed",
       "indexedFns": 17,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/workspace-config.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/workspace-graph-python.ts",
       "status": "indexed",
       "indexedFns": 25,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/src/main/workspace-graph.ts",
       "status": "indexed",
       "indexedFns": 15,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/creation-policy.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/db-bun.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/deterministic-execution.ts",
+      "status": "indexed",
+      "indexedFns": 21,
+      "sqlInText": 4,
+      "sqlIndexed": 4,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/fixtures.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 2,
-      "sqlIndexed": 2
+      "sqlIndexed": 2,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/hash.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/links.ts",
       "status": "indexed",
       "indexedFns": 7,
       "sqlInText": 1,
-      "sqlIndexed": 1
+      "sqlIndexed": 1,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/market-context.ts",
       "status": "indexed",
       "indexedFns": 11,
       "sqlInText": 2,
-      "sqlIndexed": 2
+      "sqlIndexed": 2,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/market-ingest.ts",
       "status": "indexed",
-      "indexedFns": 14,
+      "indexedFns": 16,
       "sqlInText": 2,
-      "sqlIndexed": 2
+      "sqlIndexed": 2,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/ontology-read-receipt.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/pipeline.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/read.ts",
       "status": "indexed",
       "indexedFns": 8,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/registry-drift.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/replay.ts",
       "status": "indexed",
       "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/resolve-artifact-root.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/resolve-path.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/species.ts",
       "status": "indexed",
-      "indexedFns": 1,
+      "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "packages/qf-kernel/src/trace.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "packages/qf-kernel/src/upgrade.ts",
-      "status": "indexed",
-      "indexedFns": 47,
-      "sqlInText": 1,
-      "sqlIndexed": 3
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/artifact-store.ts",
       "status": "indexed",
-      "indexedFns": 10,
+      "indexedFns": 11,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/gate.ts",
       "status": "indexed",
-      "indexedFns": 3,
+      "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/parser.ts",
       "status": "indexed",
-      "indexedFns": 22,
+      "indexedFns": 23,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/runner.ts",
       "status": "indexed",
-      "indexedFns": 20,
+      "indexedFns": 21,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-bovada-football/src/transport.ts",
       "status": "indexed",
       "indexedFns": 7,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
       "status": "indexed",
-      "indexedFns": 6,
+      "indexedFns": 7,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-peer-bus/src/harness.ts",
       "status": "indexed",
-      "indexedFns": 7,
+      "indexedFns": 8,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
       "status": "indexed",
-      "indexedFns": 11,
+      "indexedFns": 13,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "tools/qf-proof-agent/src/qf-proof-agent.mjs",
+      "status": "indexed",
+      "indexedFns": 13,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/artifact-root.ts",
       "status": "indexed",
       "indexedFns": 3,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/discovery.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/gates/action-transport.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 7,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/gates/kernel-one-world.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
       "status": "indexed",
-      "indexedFns": 11,
+      "indexedFns": 14,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/gates/tool-discovery.ts",
       "status": "indexed",
-      "indexedFns": 16,
+      "indexedFns": 18,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/harness.ts",
       "status": "indexed",
-      "indexedFns": 10,
+      "indexedFns": 16,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/register.ts",
       "status": "indexed",
       "indexedFns": 6,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-read-tools/src/server.ts",
       "status": "indexed",
-      "indexedFns": 1,
+      "indexedFns": 2,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/src/assert-kernel-db.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/src/assert-vault-root.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/src/env.ts",
       "status": "indexed",
       "indexedFns": 1,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/src/gate.ts",
       "status": "indexed",
-      "indexedFns": 22,
+      "indexedFns": 25,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "tools/qf-vault-projection/src/load-schema.ts",
+      "status": "indexed",
+      "indexedFns": 2,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/qf-vault-projection/src/project.ts",
       "status": "indexed",
       "indexedFns": 10,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
       "status": "indexed",
       "indexedFns": 4,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/runtime-proof/src/listeners.ts",
       "status": "indexed",
       "indexedFns": 5,
       "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "tools/runtime-proof/src/processes.ts",
       "status": "indexed",
       "indexedFns": 8,
       "sqlInText": 0,
-      "sqlIndexed": 0
-    },
-    {
-      "path": "tools/runtime-proof/src/proof.ts",
-      "status": "indexed",
-      "indexedFns": 9,
-      "sqlInText": 0,
-      "sqlIndexed": 0
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
     },
     {
       "path": "collab-electron/cli/collab-cli.mjs",
@@ -16043,7 +16216,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            10
+            313
           ]
         }
       ]
@@ -16066,7 +16239,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            9
+            214
           ]
         }
       ]
@@ -16089,7 +16262,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            7
+            310
           ]
         }
       ]
@@ -16112,7 +16285,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            8
+            311
           ]
         }
       ]
@@ -16135,7 +16308,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            7
+            271
           ]
         }
       ]
@@ -16158,7 +16331,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            36
+            132
           ]
         }
       ]
@@ -16181,7 +16354,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            2
+            262
           ]
         }
       ]
@@ -16204,7 +16377,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            23
+            119
           ]
         }
       ]
@@ -16227,7 +16400,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            54
+            150
           ]
         }
       ]
@@ -16250,7 +16423,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            47
+            143
           ]
         }
       ]
@@ -16273,7 +16446,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            3
+            99
           ]
         }
       ]
@@ -16296,7 +16469,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            8
+            104
           ]
         }
       ]
@@ -16319,7 +16492,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            8
+            272
           ]
         }
       ]
@@ -16342,7 +16515,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            6
+            270
           ]
         }
       ]
@@ -16365,7 +16538,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/links.ts",
           "lines": [
-            12
+            170
           ]
         }
       ]
@@ -16388,7 +16561,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/market-ingest.ts",
           "lines": [
-            67
+            482
           ]
         }
       ]
@@ -16411,7 +16584,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/market-ingest.ts",
           "lines": [
-            89
+            504
           ]
         }
       ]
@@ -16434,7 +16607,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            7
+            163
           ]
         }
       ]
@@ -16457,7 +16630,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            10
+            238
           ]
         }
       ]
@@ -16480,7 +16653,7 @@
           "type": "static",
           "file": "collab-electron/src/main/peer-delivery.ts",
           "lines": [
-            29
+            122
           ]
         }
       ]
@@ -16503,7 +16676,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            105
+            475
           ]
         }
       ]
@@ -16526,7 +16699,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            73
+            571
           ]
         }
       ]
@@ -16549,7 +16722,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            125
+            357
           ]
         }
       ]
@@ -16572,7 +16745,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            17
+            772
           ]
         }
       ]
@@ -16595,7 +16768,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            58
+            742
           ]
         }
       ]
@@ -16618,7 +16791,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            150
+            998
           ]
         }
       ]
@@ -16641,7 +16814,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            184
+            1259
           ]
         }
       ]
@@ -16664,7 +16837,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            30
+            835
           ]
         }
       ]
@@ -16687,7 +16860,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            31
+            1336
           ]
         }
       ]
@@ -16710,7 +16883,30 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            50
+            1061
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/deterministic-execution.ts:artifact:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "insertArtifact",
+      "table": "artifact",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "why": "Internal implementation: every caller of insertArtifact() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/deterministic-execution.ts",
+          "lines": [
+            500
           ]
         }
       ]
@@ -16733,7 +16929,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            142
+            666
           ]
         }
       ]
@@ -16756,7 +16952,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            177
+            701
           ]
         }
       ]
@@ -16779,7 +16975,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/deterministic-execution.ts",
           "lines": [
-            103
+            627
           ]
         }
       ]
@@ -16802,7 +16998,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            13
+            154
           ]
         }
       ]
@@ -16825,7 +17021,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            14
+            155
           ]
         }
       ]
@@ -16848,7 +17044,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            21
+            246
           ]
         }
       ]
@@ -16871,7 +17067,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            9
+            119
           ]
         }
       ]
@@ -16894,7 +17090,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/fixtures.ts",
           "lines": [
-            3
+            6
           ]
         }
       ]
@@ -16917,7 +17113,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/fixtures.ts",
           "lines": [
-            10
+            13
           ]
         }
       ]
@@ -16940,7 +17136,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            13
+            407
           ]
         }
       ]
@@ -16963,7 +17159,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/market-context.ts",
           "lines": [
-            33
+            323
           ]
         }
       ]
@@ -16986,7 +17182,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/market-context.ts",
           "lines": [
-            22
+            278
           ]
         }
       ]
@@ -17009,7 +17205,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            147
+            195
           ]
         }
       ]

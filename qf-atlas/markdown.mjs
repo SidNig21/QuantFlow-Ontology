@@ -149,7 +149,14 @@ export function renderMarkdown(m) {
   if (covGaps.length) {
     p(`| File | Coverage | SQL in text | SQL resolved |`);
     p(`|---|---|---:|---:|`);
-    for (const c of covGaps.slice(0, 15))
+    // Worst first: unrecognised SQL, then most unread SQL. Alphabetical order
+    // pushed qf-peer-bus — the known hole — past the truncation point, so the
+    // brief silently stopped showing the example it exists to surface.
+    const ranked = [...covGaps].sort((a, b) =>
+      (b.sqlUnrecognised ?? 0) - (a.sqlUnrecognised ?? 0) ||
+      ((b.sqlInText ?? 0) - (b.sqlIndexed ?? 0)) - ((a.sqlInText ?? 0) - (a.sqlIndexed ?? 0)) ||
+      (b.sqlInText ?? 0) - (a.sqlInText ?? 0));
+    for (const c of ranked.slice(0, 15))
       p(`| \`${c.path}\` | ${c.status} | ${c.sqlInText ?? 0} | ${c.sqlIndexed ?? 0} |`);
     if (covGaps.length > 15) p(`| …${covGaps.length - 15} more | | | see \`atlas.json\` |`);
     p();
