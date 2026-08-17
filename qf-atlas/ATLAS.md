@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 4bf7e1f` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ ac04806` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -328,7 +328,17 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**15 confirmed**, 2 unknown (gray — not counted as debt).
+**3 confirmed at `high` confidence**, 12 more at `medium`,
+2 unknown (gray — not counted as debt).
+
+The split matters. A `high` row is a domain-truth write reached from outside a governed
+action. A `medium` row is usually a store that is not in the golden schema — real, but a
+weaker claim, and it should not be read as the same kind of defect.
+
+> `bun qf-atlas/ratchet.mjs` reports a larger figure than this section. It counts a
+> different set: persistence violations **plus** broken wires, unreaped processes and
+> high-confidence duplicate owners — every class the baseline treats as red. This
+> section is persistence only.
 
 | File | Table | Verb | Kind | Reach | Confidence |
 |---|---|---|---|---|---|

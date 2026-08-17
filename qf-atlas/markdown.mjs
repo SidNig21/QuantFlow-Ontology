@@ -362,7 +362,24 @@ export function renderMarkdown(m) {
   p(`state reach this SQL without first entering a governed action?** Domain tables come`);
   p(`from the generated schema; reachability follows call sites and the Kernel command table.`);
   p();
-  p(`**${confirmed.length} confirmed**, ${grayGov.length} unknown (gray — not counted as debt).`);
+  // "15 confirmed" counted 11 medium-confidence rows as confirmed defects, and the ratchet
+  // simultaneously printed a larger number because it also counts strip, lifetime and
+  // ownership reds. Two figures under one word, neither qualified.
+  {
+    const hi = confirmed.filter((v) => v.confidence === "high");
+    const rest = confirmed.filter((v) => v.confidence !== "high");
+    p(`**${hi.length} confirmed at \`high\` confidence**, ${rest.length} more at \`medium\`,`);
+    p(`${grayGov.length} unknown (gray — not counted as debt).`);
+    p();
+    p(`The split matters. A \`high\` row is a domain-truth write reached from outside a governed`);
+    p(`action. A \`medium\` row is usually a store that is not in the golden schema — real, but a`);
+    p(`weaker claim, and it should not be read as the same kind of defect.`);
+    p();
+    p(`> \`bun qf-atlas/ratchet.mjs\` reports a larger figure than this section. It counts a`);
+    p(`> different set: persistence violations **plus** broken wires, unreaped processes and`);
+    p(`> high-confidence duplicate owners — every class the baseline treats as red. This`);
+    p(`> section is persistence only.`);
+  }
   p();
   if (confirmed.length) {
     p(`| File | Table | Verb | Kind | Reach | Confidence |`);

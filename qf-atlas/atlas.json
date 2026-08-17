@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "4bf7e1f",
+    "commit": "ac04806",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "18e98ef3bd056cdf"
+    "fingerprint": "74f57fa91013fc62"
   },
   "stats": {
     "live": 106,
@@ -11391,6 +11391,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11413,6 +11416,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11435,6 +11442,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11457,6 +11468,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11479,6 +11493,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11501,6 +11518,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11523,6 +11545,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11545,6 +11570,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11573,6 +11602,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11592,6 +11624,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11605,6 +11640,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -11632,6 +11672,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11651,6 +11694,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11670,6 +11716,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11689,6 +11738,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11708,6 +11760,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11727,6 +11782,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11746,6 +11804,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11765,6 +11826,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11784,6 +11848,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11803,6 +11870,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11822,6 +11892,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11841,6 +11914,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11860,6 +11936,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11879,6 +11958,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11898,6 +11980,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11917,6 +12002,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11936,6 +12024,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11955,6 +12046,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11974,6 +12068,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -11993,6 +12090,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12012,6 +12112,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12031,6 +12134,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12050,6 +12156,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12063,6 +12172,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12090,6 +12203,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12109,6 +12225,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12128,6 +12247,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12147,6 +12269,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12166,6 +12291,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12185,6 +12313,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12198,6 +12329,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12225,6 +12360,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12244,6 +12382,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12263,6 +12404,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12282,6 +12426,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12301,6 +12448,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12320,6 +12470,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12333,6 +12486,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12360,6 +12518,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12379,6 +12540,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12392,6 +12556,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12419,6 +12587,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12438,6 +12609,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12457,6 +12631,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12476,6 +12653,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12495,6 +12675,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12514,6 +12697,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12527,6 +12713,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12554,6 +12744,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12573,6 +12766,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12586,6 +12782,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12613,6 +12813,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12632,6 +12835,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12645,6 +12851,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12672,6 +12882,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12685,6 +12898,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12712,6 +12929,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12725,6 +12945,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12752,6 +12976,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12771,6 +12998,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12790,6 +13020,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12803,6 +13036,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12830,6 +13067,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -12843,6 +13083,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12864,6 +13109,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12886,6 +13135,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12908,6 +13161,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12930,6 +13188,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12952,6 +13214,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12974,6 +13240,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -12996,6 +13266,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13018,6 +13291,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13040,6 +13317,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13062,6 +13343,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13084,6 +13368,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13106,6 +13394,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -13128,6 +13420,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -13149,6 +13445,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13171,6 +13470,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13193,6 +13496,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13215,6 +13522,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13237,6 +13548,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13259,6 +13574,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13281,6 +13599,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13303,6 +13625,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13325,6 +13650,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13347,6 +13675,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13369,6 +13702,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13391,6 +13728,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13413,6 +13754,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13435,6 +13780,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13457,6 +13806,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13502,6 +13855,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
@@ -13522,6 +13879,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
@@ -13537,6 +13898,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13559,6 +13924,10 @@
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "dynamic",
+      "blockers": {
+        "ipcRequest": "runtime-proof",
+        "ipcPush": "runtime-proof"
+      },
       "ipcPush": "dynamic",
       "persistence": "not-applicable",
       "lifetime": "indexed",
@@ -13576,6 +13945,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13603,6 +13976,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13622,6 +13998,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13676,6 +14055,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13695,6 +14077,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13708,6 +14093,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13735,6 +14124,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13748,6 +14140,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13775,6 +14171,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13788,6 +14187,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13815,6 +14218,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13834,6 +14240,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13853,6 +14262,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -13871,6 +14283,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13890,6 +14305,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13903,6 +14321,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -13930,6 +14352,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13949,6 +14374,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13968,6 +14396,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -13981,6 +14412,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14008,6 +14443,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14027,6 +14465,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14040,6 +14481,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14067,6 +14512,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14080,6 +14528,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14101,6 +14554,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14128,6 +14585,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14141,6 +14601,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14168,6 +14632,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14187,6 +14654,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14217,6 +14687,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14244,6 +14718,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14281,6 +14758,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14300,6 +14780,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14335,6 +14818,10 @@
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
       "lifetime": "partial",
+      "blockers": {
+        "lifetime": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
@@ -14356,6 +14843,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14369,6 +14859,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14396,6 +14890,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14415,6 +14912,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -14427,6 +14927,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14454,6 +14958,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14473,6 +14980,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14492,6 +15002,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -14510,6 +15023,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14529,6 +15045,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14543,6 +15062,11 @@
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "dynamic",
+      "blockers": {
+        "ipcRequest": "runtime-proof",
+        "ipcPush": "runtime-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcPush": "dynamic",
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
@@ -14568,6 +15092,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14587,6 +15114,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14606,6 +15136,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14625,6 +15158,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -14643,6 +15179,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14659,6 +15198,9 @@
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "partial",
+      "blockers": {
+        "persistence": "ast-coverage"
+      },
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "indexed",
@@ -14674,6 +15216,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14695,6 +15242,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14722,6 +15273,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14735,6 +15289,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14762,6 +15320,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14775,6 +15336,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14802,6 +15367,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14815,6 +15383,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14842,6 +15414,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14861,6 +15436,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14874,6 +15452,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14901,6 +15483,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14914,6 +15499,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14953,6 +15542,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -14980,6 +15573,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -14999,6 +15595,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15018,6 +15617,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15037,6 +15639,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15050,6 +15655,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15077,6 +15686,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15090,6 +15702,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15117,6 +15733,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15136,6 +15755,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "lifetime": "starts no long-lived child process",
@@ -15148,6 +15770,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15175,6 +15801,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15188,6 +15817,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15215,6 +15848,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15228,6 +15864,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15255,6 +15895,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15268,6 +15911,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15295,6 +15942,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15314,6 +15964,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15328,6 +15981,10 @@
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "dynamic",
+      "blockers": {
+        "ipcRequest": "runtime-proof",
+        "ipcPush": "runtime-proof"
+      },
       "ipcPush": "dynamic",
       "persistence": "not-applicable",
       "lifetime": "indexed",
@@ -15351,6 +16008,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15364,6 +16024,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15391,6 +16055,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15410,6 +16077,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15458,6 +16128,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15485,6 +16159,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15504,6 +16181,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15523,6 +16203,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15542,6 +16225,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15555,6 +16241,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15582,6 +16272,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15595,6 +16288,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15622,6 +16319,9 @@
       "lifetime": "indexed",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15634,6 +16334,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15660,6 +16364,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
@@ -15680,6 +16388,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
@@ -15700,6 +16412,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
@@ -15715,6 +16431,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15754,6 +16474,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15775,6 +16499,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15802,6 +16530,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15815,6 +16546,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15842,6 +16577,9 @@
       "lifetime": "indexed",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15854,6 +16592,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15881,6 +16623,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15900,6 +16645,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -15913,6 +16661,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -15940,6 +16693,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "lifetime": "starts no long-lived child process",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -15951,6 +16707,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -15978,6 +16739,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16014,6 +16778,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16033,6 +16800,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16052,6 +16822,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16071,6 +16844,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16090,6 +16866,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -16103,6 +16882,11 @@
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "dynamic",
+      "blockers": {
+        "ipcRequest": "runtime-proof",
+        "ipcPush": "runtime-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcPush": "dynamic",
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
@@ -16128,6 +16912,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16147,6 +16934,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16166,6 +16956,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16185,6 +16978,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16204,6 +17000,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16223,6 +17022,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16242,6 +17044,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16261,6 +17066,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16280,6 +17088,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16293,6 +17104,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16320,6 +17135,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16339,6 +17157,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16358,6 +17179,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16377,6 +17201,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16396,6 +17223,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16415,6 +17245,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16434,6 +17267,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16453,6 +17289,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16472,6 +17311,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16490,6 +17332,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
@@ -16511,6 +17357,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16530,6 +17379,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16549,6 +17401,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16562,6 +17417,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16589,6 +17448,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16608,6 +17470,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16621,6 +17486,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16642,6 +17511,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16669,6 +17542,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16688,6 +17564,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16701,6 +17580,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16728,6 +17611,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16747,6 +17633,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16766,6 +17655,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16779,6 +17671,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16806,6 +17702,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16819,6 +17718,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16846,6 +17749,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16859,6 +17765,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16886,6 +17796,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16903,6 +17816,10 @@
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
       "lifetime": "partial",
+      "blockers": {
+        "lifetime": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
@@ -16918,6 +17835,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16945,6 +17866,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16958,6 +17882,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -16985,6 +17913,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -16998,6 +17929,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17025,6 +17960,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17038,6 +17976,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17065,6 +18007,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17078,6 +18023,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17105,6 +18054,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17118,6 +18070,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17145,6 +18101,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "lifetime": "starts no long-lived child process",
@@ -17163,6 +18122,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17176,6 +18138,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17203,6 +18169,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17216,6 +18185,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17243,6 +18216,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17262,6 +18238,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17275,6 +18254,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17302,6 +18285,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17321,6 +18307,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17334,6 +18323,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17361,6 +18354,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17380,6 +18376,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17399,6 +18398,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17418,6 +18420,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17437,6 +18442,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17456,6 +18464,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17475,6 +18486,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17494,6 +18508,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17513,6 +18530,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
@@ -17526,6 +18546,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17548,6 +18572,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "lifetime": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -17570,6 +18600,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17592,6 +18626,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17657,6 +18695,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17674,6 +18715,10 @@
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
+      "blockers": {
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
@@ -17715,6 +18760,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17735,6 +18783,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17772,6 +18823,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17809,6 +18863,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17829,6 +18886,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17848,6 +18908,10 @@
       "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
@@ -17863,6 +18927,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -17891,6 +18960,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17904,6 +18976,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -17932,6 +19008,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17945,6 +19024,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -17973,6 +19057,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -17992,6 +19079,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18006,6 +19096,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -18034,6 +19129,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18054,6 +19152,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18068,6 +19169,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18090,6 +19195,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -18112,6 +19222,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18134,6 +19248,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18156,6 +19274,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18178,6 +19300,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18206,6 +19332,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18220,6 +19349,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18248,6 +19381,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18268,6 +19404,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18282,6 +19421,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18323,6 +19466,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18351,6 +19498,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18371,6 +19521,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18391,6 +19544,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18410,6 +19566,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "unsupported",
+      "blockers": {
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ownership": "unsupported",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
@@ -18432,6 +19592,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18452,6 +19615,9 @@
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
@@ -18466,6 +19632,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18488,6 +19657,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18510,6 +19682,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18532,6 +19708,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18554,6 +19733,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18576,6 +19759,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18598,6 +19785,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18620,6 +19810,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18642,6 +19836,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18664,6 +19861,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18686,6 +19887,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18708,6 +19913,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18730,6 +19939,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18752,6 +19964,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18774,6 +19989,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18796,6 +20014,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18818,6 +20040,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18840,6 +20066,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18862,6 +20091,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -18883,6 +20115,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18905,6 +20141,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18927,6 +20166,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -18948,6 +20190,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18970,6 +20216,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -18992,6 +20241,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -19013,6 +20266,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19035,6 +20291,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19057,6 +20316,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19079,6 +20342,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19101,6 +20367,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19123,6 +20392,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19145,6 +20418,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -19166,6 +20442,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19188,6 +20468,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19210,6 +20494,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19232,6 +20519,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19254,6 +20545,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19276,6 +20570,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19298,6 +20595,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19320,6 +20621,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -19341,6 +20645,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19363,6 +20670,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -19385,6 +20697,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19407,6 +20723,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19429,6 +20748,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19451,6 +20773,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19473,6 +20798,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19495,6 +20824,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19517,6 +20849,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19539,6 +20874,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19561,6 +20899,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19583,6 +20924,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19605,6 +20949,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19627,6 +20975,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19649,6 +21000,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19671,6 +21025,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19693,6 +21051,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19715,6 +21076,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19737,6 +21102,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19759,6 +21127,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19781,6 +21152,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19803,6 +21178,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19825,6 +21203,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19847,6 +21229,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -19868,6 +21253,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19890,6 +21279,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -19911,6 +21303,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19933,6 +21329,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19955,6 +21354,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19977,6 +21379,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -19999,6 +21405,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20021,6 +21431,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20043,6 +21457,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20065,6 +21483,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20087,6 +21509,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20109,6 +21535,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20131,6 +21561,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20153,6 +21586,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20175,6 +21612,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20197,6 +21638,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20219,6 +21663,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20241,6 +21689,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20263,6 +21715,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20285,6 +21740,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20307,6 +21765,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20329,6 +21791,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20351,6 +21817,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20373,6 +21842,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20395,6 +21868,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20417,6 +21894,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20439,6 +21920,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20461,6 +21945,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20483,6 +21972,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20505,6 +21998,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20527,6 +22024,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20549,6 +22050,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20571,6 +22077,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20593,6 +22104,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20615,6 +22131,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20637,6 +22158,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20659,6 +22185,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "indexed",
@@ -20680,6 +22210,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20702,6 +22237,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20724,6 +22264,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20746,6 +22291,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20768,6 +22318,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20790,6 +22345,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20812,6 +22372,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -20834,6 +22399,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20856,6 +22424,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20878,6 +22450,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20900,6 +22476,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20922,6 +22502,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20944,6 +22528,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20966,6 +22554,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -20988,6 +22580,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21010,6 +22606,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21032,6 +22632,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21054,6 +22658,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21076,6 +22684,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21098,6 +22710,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21120,6 +22736,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21142,6 +22762,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21164,6 +22788,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21186,6 +22815,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21208,6 +22841,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21230,6 +22867,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21252,6 +22894,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21274,6 +22921,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21296,6 +22948,9 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21318,6 +22973,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21340,6 +22999,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21362,6 +23025,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21384,6 +23052,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21406,6 +23078,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21428,6 +23104,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21450,6 +23131,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21472,6 +23157,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21494,6 +23184,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21516,6 +23211,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21538,6 +23238,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21560,6 +23266,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21582,6 +23293,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21604,6 +23319,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21626,6 +23346,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21648,6 +23372,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21670,6 +23399,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21692,6 +23426,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21714,6 +23454,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "partial",
@@ -21736,6 +23482,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21758,6 +23509,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21780,6 +23536,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21802,6 +23563,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21824,6 +23590,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21846,6 +23617,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21868,6 +23643,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21890,6 +23670,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21912,6 +23697,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21934,6 +23724,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21956,6 +23751,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -21978,6 +23778,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22000,6 +23805,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22021,6 +23831,12 @@
       "path": "tools/qf-read-tools/src/gates/tool-discovery.ts",
       "worst": "unsupported",
       "imports": "dynamic",
+      "blockers": {
+        "imports": "runtime-proof",
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "reach": "unsupported",
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
@@ -22044,6 +23860,12 @@
       "path": "tools/qf-read-tools/src/harness.ts",
       "worst": "unsupported",
       "imports": "dynamic",
+      "blockers": {
+        "imports": "runtime-proof",
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "reach": "unsupported",
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
@@ -22068,6 +23890,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22089,6 +23916,12 @@
       "path": "tools/qf-read-tools/src/server.ts",
       "worst": "unsupported",
       "imports": "dynamic",
+      "blockers": {
+        "imports": "runtime-proof",
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "reach": "unsupported",
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
@@ -22113,6 +23946,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22135,6 +23973,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22157,6 +24000,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22179,6 +24027,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22201,6 +24054,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22223,6 +24081,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22244,6 +24108,12 @@
       "path": "tools/qf-vault-projection/src/load-schema.ts",
       "worst": "unsupported",
       "imports": "dynamic",
+      "blockers": {
+        "imports": "runtime-proof",
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "reach": "unsupported",
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
@@ -22268,6 +24138,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22290,6 +24165,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22312,6 +24192,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22334,6 +24219,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22356,6 +24246,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22378,6 +24274,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22400,6 +24300,12 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22422,6 +24328,10 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -22444,6 +24354,11 @@
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "packaging": "package-proof",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
@@ -40852,12 +42767,12 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "06741de",
+      "commit": "4bf7e1f",
       "generatedAt": "2026-08-17"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "4bf7e1f",
+      "commit": "ac04806",
       "generatedAt": "2026-08-17"
     },
     "verdict": "better",

@@ -53,16 +53,24 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
     const app = applicability(path);
     const cell = {};
     const reasons = {};
-    const set = (k, state, why) => { cell[k] = state; if (why) reasons[k] = why; };
+    // A reason must name a BLOCKER CATEGORY, not restate the absence. `unexplained` used to
+    // be a truthiness test on this string, so "no reach row was produced for this path" —
+    // which names nothing — scored identically to a real blocker on 133 files. The zero it
+    // produced could not become non-zero as long as every path wrote some string.
+    const set = (k, state, why, blocker) => {
+      cell[k] = state;
+      if (why) reasons[k] = why;
+      if (blocker) (cell.blockers ??= {})[k] = blocker;
+    };
 
     // ── imports ────────────────────────────────────────────────────────────
-    if (!a) set("imports", "unsupported", "file was not handed to the parser");
+    if (!a) set("imports", "unsupported", "file was not handed to the parser", "ast-coverage");
     else if (a.coverage.imports !== "indexed")
-      set("imports", a.coverage.imports, a.coverage.reason ?? "parser reported incomplete facts");
+      set("imports", a.coverage.imports, a.coverage.reason ?? "parser reported incomplete facts", "ast-coverage");
     else {
       const dyn = a.unresolved.filter((u) => /import/i.test(u.what));
       if (dyn.length) set("imports", "dynamic",
-        `${dyn.length} import specifier(s) computed at runtime (line ${dyn.map((d) => d.line).join(", ")})`);
+        `${dyn.length} import specifier(s) computed at runtime (line ${dyn.map((d) => d.line).join(", ")})`, "runtime-proof");
       else set("imports", "indexed");
     }
     // Reachability is a separate claim from parsing: a file can be parsed and still
@@ -72,7 +80,8 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
         app.qa || app.species || path.startsWith("collab-electron/cli/")
           || path.startsWith("collab-electron/scripts/") || app.schema
           ? "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated"
-          : "no reach row was produced for this path");
+          : "no reach row was produced for this path",
+        "scope-boundary");
     else set("reach", "indexed");
 
     // ── IPC, both directions ───────────────────────────────────────────────
@@ -86,7 +95,7 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
       const why = unresolvedIpc.length
         ? `${unresolvedIpc.length} channel name(s) built from a variable or template (line ${unresolvedIpc.map((u) => u.line).join(", ")})`
         : null;
-      set("ipcRequest", state, why);
+      set("ipcRequest", state, why, state === "dynamic" ? "runtime-proof" : null);
       // The push direction is a DIFFERENT measurement. This used to assign the identical
       // state and reason to both cells, so the model reported two dimensions and had made
       // one. A file with no push traffic is not "indexed" for push — it is not-applicable.
@@ -97,7 +106,7 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
         set("ipcPush", "not-applicable", "no webContents.send and no ipcRenderer.on in this file");
       else if (pushDynamic.length)
         set("ipcPush", "dynamic",
-          `${pushDynamic.length} push channel name(s) built from a variable or template`);
+          `${pushDynamic.length} push channel name(s) built from a variable or template`, "runtime-proof");
       else set("ipcPush", "indexed");
     }
 
@@ -109,10 +118,10 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
       const interpolated = sql.filter((s) => s.interpolated);
       if (orphan.length)
         set("persistence", "partial",
-          `${orphan.length} of ${sql.length} SQL site(s) are not inside a named function, so no call path can be traced`);
+          `${orphan.length} of ${sql.length} SQL site(s) are not inside a named function, so no call path can be traced`, "ast-coverage");
       else if (interpolated.length)
         set("persistence", "partial",
-          `${interpolated.length} of ${sql.length} SQL site(s) are template literals; the table name may be computed`);
+          `${interpolated.length} of ${sql.length} SQL site(s) are template literals; the table name may be computed`, "ast-coverage");
       else set("persistence", "indexed");
     }
 
@@ -121,19 +130,19 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
     if (!spawnsLive.length) set("lifetime", "not-applicable", "starts no long-lived child process");
     else if (lifetimeOf.has(path)) set("lifetime", "indexed");
     else set("lifetime", "partial",
-      `${spawnsLive.length} long-lived spawn(s) found by the parser but no reap analysis was produced for this file`);
+      `${spawnsLive.length} long-lived spawn(s) found by the parser but no reap analysis was produced for this file`, "ast-coverage");
 
     // ── packaging ──────────────────────────────────────────────────────────
     if (buildIncluded.has(path)) set("packaging", "indexed");
     else if (app.qa || path.includes(".test.")) set("packaging", "not-applicable", "test or QA code does not ship");
     else set("packaging", "unsupported",
-      "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven");
+      "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven", "package-proof");
 
     // ── ownership ──────────────────────────────────────────────────────────
     if (ownershipOf && ownershipOf.has(path)) set("ownership", "indexed");
     else if (!app.product) set("ownership", "not-applicable", "responsibility ownership is evaluated for product code only");
     else set("ownership", "unsupported",
-      "no architectural responsibility is claimed for this file by the ownership policy");
+      "no architectural responsibility is claimed for this file by the ownership policy", "scope-boundary");
 
     const states = ANALYZERS.map((k) => cell[k]).filter(Boolean);
     const worst = states.includes("unsupported") ? "unsupported"
@@ -146,7 +155,8 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
     // behind "unexplained undecided = 0": it makes an unexplained gap impossible to
     // produce rather than merely discouraged.
     const unexplained = Object.entries(cell)
-      .filter(([k, v]) => v !== "indexed" && v !== "not-applicable" && !reasons[k])
+      .filter(([k, v]) => typeof v === "string" && v !== "indexed" && v !== "not-applicable"
+        && !(reasons[k] && cell.blockers?.[k]))
       .map(([k]) => k);
 
     return { path, worst, ...cell, reasons, unexplained };
