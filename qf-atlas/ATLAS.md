@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-generator @ bdf80c4` on 2026-08-17 by
+> Generated from `atlas-generator @ 30590ea` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -134,21 +134,32 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**4 confirmed**, 13 unknown (gray — not counted as debt).
+**14 confirmed**, 4 unknown (gray — not counted as debt).
 
-| File | Table | Kind | Reach | Confidence |
-|---|---|---|---|---|
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `task` | domain-truth | bypass | high |
+| File | Table | Verb | Kind | Reach | Confidence |
+|---|---|---|---|---|---|
+| `packages/qf-kernel/src/governed-review.ts` | `links` | INSERT INTO | domain-truth | bypass | high |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | UPDATE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `task` | INSERT INTO | domain-truth | bypass | high |
+| `packages/qf-kernel/src/governed-review.ts` | `task` | UPDATE | domain-truth | bypass | high |
 
 Deliberately **not** violations, and each was reported as one before the classifier
-learned the difference: transport bookkeeping (`messages` is not a domain table),
+learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
+which are not in the golden schema),
 Kernel command implementations dispatched by `execute()`, schema migrations,
 generated SQL, and QA fixture seeding.
 
-## What the analyzer could not read (40)
+## What the analyzer could not read (30)
 
 **Absence of a finding is not proof of compliance.** These files hold SQL the function
 indexer could not resolve, so governance analysis never saw it. They are gray, and they
@@ -157,21 +168,21 @@ prevent a clean architectural result.
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
 | `packages/qf-kernel/src/upgrade.ts` | partial | 1 | 3 |
-| `collab-electron/src/main/updater/update-manager.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/agent-host.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/connections-ipc.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/import-service.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/updater/index.ts` | partial | 0 | 0 |
-| `packages/qf-kernel/src/insert.ts` | partial | 1 | 0 |
-| `packages/qf-kernel/src/execute.ts` | partial | 7 | 7 |
-| `collab-electron/src/main/acp-agent.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/ipc-endpoint.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/ipc-filesystem.ts` | partial | 0 | 0 |
-| `collab-electron/src/main/ipc-workspace.ts` | partial | 0 | 0 |
-| `tools/runtime-proof/src/proof.ts` | partial | 0 | 0 |
 | `packages/qf-kernel/src/governed-review.ts` | partial | 28 | 16 |
 | `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 0 |
-| …25 more | | | see `atlas.json` |
+| `packages/qf-kernel/src/create.ts` | partial | 13 | 11 |
+| `collab-electron/src/main/kernel.ts` | partial | 7 | 5 |
+| `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
+| `packages/qf-kernel/src/events.ts` | partial | 1 | 0 |
+| `packages/qf-kernel/src/insert.ts` | partial | 1 | 0 |
+| `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/host-acp-bridge.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/peer-role-registry.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/qf-execute-allowlist.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/sidecar/ring-buffer.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/updater/index.ts` | unindexed | 0 | 0 |
+| `collab-electron/src/main/vite-raw.d.ts` | unindexed | 0 | 0 |
+| …15 more | | | see `atlas.json` |
 
 > `governed-review.ts` is in this table. The confirmed-violation count above is
 > therefore a **floor**, not a total — it was computed from a partial read of the very

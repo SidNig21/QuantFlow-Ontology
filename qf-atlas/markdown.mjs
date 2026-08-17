@@ -127,14 +127,15 @@ export function renderMarkdown(m) {
   p(`**${confirmed.length} confirmed**, ${grayGov.length} unknown (gray — not counted as debt).`);
   p();
   if (confirmed.length) {
-    p(`| File | Table | Kind | Reach | Confidence |`);
-    p(`|---|---|---|---|---|`);
+    p(`| File | Table | Verb | Kind | Reach | Confidence |`);
+    p(`|---|---|---|---|---|---|`);
     for (const v of confirmed)
-      p(`| \`${v.evidence[0].file}\` | \`${v.table}\` | ${v.persistence} | ${v.reachability} | ${v.confidence} |`);
+      p(`| \`${v.evidence[0].file}\` | \`${v.table}\` | ${v.verb} | ${v.persistence} | ${v.reachability} | ${v.confidence} |`);
     p();
   }
   p(`Deliberately **not** violations, and each was reported as one before the classifier`);
-  p(`learned the difference: transport bookkeeping (\`messages\` is not a domain table),`);
+  p(`learned the difference: transport bookkeeping (tables created by the peer-bus DDL,`);
+  p(`which are not in the golden schema),`);
   p(`Kernel command implementations dispatched by \`execute()\`, schema migrations,`);
   p(`generated SQL, and QA fixture seeding.`);
   p();

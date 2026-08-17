@@ -17,10 +17,16 @@
 //   2. REACHABILITY comes from call sites: a SQL-bearing function whose every
 //      caller sits inside the declared write door is governed internals; one
 //      called from outside is a bypass.
+//   Function identity is file + name. Keying the governed set by bare name made
+//   a main-process insertArtifact inherit callers from the Kernel helper of the
+//   same name and read as governed — a domain write reported as internals.
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { insideWriteDoor, WRITE_DOOR } from "./extract.mjs";
+
+const KERNEL = "packages/qf-kernel/";
+const isAppFile = (p) => !insideWriteDoor(p) && !p.startsWith(KERNEL);
 
 /** Comments are prose, not code. Coverage and fileFacts must agree about this,
  *  or a file like errors.ts — which only mentions "CREATE TABLE" in a note —
@@ -29,6 +35,19 @@ export function stripCodeComments(text) {
   return text
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
     .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
+}
+
+export function recKey(rec) {
+  return `${rec.file}::${rec.name}`;
+}
+
+export function byRecName(index) {
+  const m = new Map();
+  for (const rec of index.values()) {
+    if (!m.has(rec.name)) m.set(rec.name, []);
+    m.get(rec.name).push(rec);
+  }
+  return m;
 }
 
 // ── 1 · the domain, straight from the generated schema ──────────────────────
@@ -46,10 +65,27 @@ export function domainTables(repo) {
   return tables;
 }
 
-// Tables that carry messages between agents rather than research truth. Derived
-// intent, declared once: transport is a real architectural category, and calling
-// a queue write a domain mutation is the false positive that discredits the map.
-const TRANSPORT_TABLES = new Set(["messages", "message_queue", "outbox"]);
+/** Transport tables are derived: CREATE TABLE in the peer-bus files, minus the
+ *  golden schema. Not a hand-kept list of names. A queue called anything else
+ *  that is created there is transport; a domain table created there is still
+ *  domain. kernel.ts holds the in-process peer-bus DDL. */
+const TRANSPORT_CREATE_FILES = [
+  "tools/qf-peer-bus/src/bus.ts",
+  "collab-electron/src/main/peer-delivery.ts",
+  "collab-electron/src/main/kernel.ts",
+];
+
+export function transportTables(repo, domain) {
+  const tables = new Set();
+  for (const rel of TRANSPORT_CREATE_FILES) {
+    let text = "";
+    try { text = readFileSync(join(repo, rel), "utf8"); } catch { continue; }
+    for (const site of sqlSites(text)) {
+      if (/^CREATE\s+TABLE/i.test(site.verb) && !domain.has(site.table)) tables.add(site.table);
+    }
+  }
+  return tables;
+}
 
 // SQLite allows a conflict clause between the verb and the target:
 //   INSERT OR IGNORE INTO mission …   INSERT OR REPLACE INTO …   REPLACE INTO …
@@ -66,10 +102,23 @@ const SQL_SITE = new RegExp(
   ")\\s+\"?([a-z_][a-z0-9_]*)\"?", "gi");
 
 // Broadening the precise pattern only fixes the shapes we thought of. This is
-// the backstop: any SQL-looking verb at all. If the loose scan finds more than
-// the precise scan resolves, the file has SQL this analyzer does not understand,
-// and it must go gray. Unknown syntax may never be indistinguishable from clean.
-const SQL_SUSPICION = /\b(INSERT|REPLACE|UPSERT|MERGE|UPDATE|DELETE|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE|TRUNCATE)\b/gi;
+// the backstop: SQL-shaped verbs inside strings. Bare UPDATE/DELETE matched
+// channel names ("session/update", "qf:connections:delete") and grayed files
+// that hold no SQL. Require the SQL continuation (INTO / FROM / TABLE / a
+// table name after UPDATE), not the English word.
+const SQL_SUSPICION = new RegExp(
+  "\\b(?:" +
+    "INSERT(?:\\s+OR\\s+\\w+)?\\s+INTO|" +
+    "REPLACE\\s+INTO|" +
+    "UPSERT|" +
+    "MERGE(?:\\s+INTO)?|" +
+    "UPDATE(?:\\s+OR\\s+\\w+)?\\s+[a-z_][\\w]*\\s+SET|" +
+    "DELETE\\s+FROM|" +
+    "CREATE\\s+TABLE|" +
+    "ALTER\\s+TABLE|" +
+    "DROP\\s+TABLE|" +
+    "TRUNCATE(?:\\s+TABLE)?" +
+  ")\\b", "gi");
 
 /**
  * How many SQL-ish verbs appear at all, however written — counted ONLY inside
@@ -118,29 +167,65 @@ export function sourceClass(path) {
 
 // ── 3 · reachability: is this SQL behind the write door? ────────────────────
 /**
+ * Callers of THIS definition. Same-named functions in other files do not share
+ * a caller set — that is how a main-process insertArtifact inherited the Kernel
+ * helper's callers and read as governed.
+ *
+ * Other-file calls to a bare name count only when the name is unique in the
+ * index. If two insertArtifact functions exist, a call in file A attaches only
+ * to the definition in file A.
+ */
+export function callersOf(rec, index, names) {
+  const unique = (names.get(rec.name) ?? []).length === 1;
+  const files = new Set();
+  for (const caller of index.values()) {
+    if (!caller.calls.has(rec.name)) continue;
+    if (caller.file === rec.file || unique) files.add(caller.file);
+  }
+  return files;
+}
+
+/**
  * A SQL-bearing function is `governed` when every call site sits inside the
  * declared write door — that is the "internal Kernel command implementation"
  * the brief asks us not to mislabel. It is a `bypass` when anything outside the
- * door can call it. `unknown` when we cannot find a caller at all.
+ * door can call it, including a same-file hop (kernel.ts → requestGovernedReview
+ * → createReviewTask). `unknown` when we cannot find a caller at all.
  */
-export function reachability(fnName, callers, filePath, governed) {
+export function reachability(rec, index, names, governed, appReach) {
+  const filePath = rec.file;
   if (insideWriteDoor(filePath)) return { value: "inside-write-door", callers: [] };
-  if (governed?.has(fnName)) return { value: "governed", callers: [] };
-  const sites = callers.get(fnName);
-  if (!sites || sites.size === 0) return { value: "unknown", callers: [] };
+  if (governed?.has(recKey(rec))) return { value: "governed", callers: [] };
 
-  // The question is whether PRODUCTION can reach this SQL without a governed
-  // action — not whether the Kernel calls its own helpers. `writeLinks` is used
-  // by create.ts and by other Kernel modules; that is internals. A caller in the
-  // app (collab-electron/**) is the thing that means production got in another way.
-  const KERNEL = "packages/qf-kernel/";
-  const appCallers = [...sites].filter((c) => !insideWriteDoor(c) && !c.startsWith(KERNEL));
+  const sites = callersOf(rec, index, names);
+  const origins = appOrigins(rec, index, names, appReach);
+
+  if (appReach?.has(recKey(rec))) {
+    return { value: "bypass", callers: origins.slice(0, 4) };
+  }
+  if (!sites.size) return { value: "unknown", callers: [] };
+
+  const appCallers = [...sites].filter(isAppFile);
   if (appCallers.length) return { value: "bypass", callers: appCallers.slice(0, 4) };
 
   const outsideDoor = [...sites].filter((c) => !insideWriteDoor(c));
   if (!outsideDoor.length) return { value: "governed", callers: [...sites].slice(0, 4) };
-  // Kernel-internal callers only, none of them proven governed: real but weak.
   return { value: "kernel-internal", callers: outsideDoor.slice(0, 4) };
+}
+
+function appOrigins(rec, index, names, appReach, seen = new Set()) {
+  const k = recKey(rec);
+  if (seen.has(k)) return [];
+  seen.add(k);
+  const direct = [...callersOf(rec, index, names)].filter(isAppFile);
+  if (direct.length) return direct;
+  const out = [];
+  for (const caller of index.values()) {
+    if (caller.file !== rec.file || !caller.calls.has(rec.name)) continue;
+    if (!appReach?.has(recKey(caller))) continue;
+    out.push(...appOrigins(caller, index, names, appReach, seen));
+  }
+  return [...new Set(out)];
 }
 
 /**
@@ -149,49 +234,86 @@ export function reachability(fnName, callers, filePath, governed) {
  * by execute(), never called directly, so a caller-only analysis reported them as
  * unreachable bypasses. This is the exact "internal Kernel command implementation"
  * the brief says must not be mislabelled.
+ *
+ * Roots are file+name keys. Adding a bare name marked every insertArtifact
+ * governed because one of them sat behind a command.
  */
 export function commandRoots(index, read, repo, relOf) {
   const roots = new Set();
-  for (const rec of index.values()) if (insideWriteDoor(rec.file)) roots.add(rec.name);
+  const names = byRecName(index);
+  for (const rec of index.values()) if (insideWriteDoor(rec.file)) roots.add(recKey(rec));
   for (const door of WRITE_DOOR) {
     let text = "";
     try { text = readFileSync(join(repo, door), "utf8"); } catch { continue; }
-    // `command_name: implementationFn,` inside a dispatch map
-    for (const m of text.matchAll(/^\s{2,}([a-z][a-z0-9_]*)\s*:\s*([A-Za-z_$][\w$]*)\s*,\s*$/gm))
-      roots.add(m[2]);
+    for (const m of text.matchAll(/^\s{2,}([a-z][a-z0-9_]*)\s*:\s*([A-Za-z_$][\w$]*)\s*,\s*$/gm)) {
+      const defs = names.get(m[2]) ?? [];
+      if (defs.length === 1) roots.add(recKey(defs[0]));
+      else {
+        for (const d of defs)
+          if (insideWriteDoor(d.file) || d.file.startsWith(KERNEL)) roots.add(recKey(d));
+      }
+    }
   }
   return roots;
 }
 
 /**
  * Grow the governed set to a fixpoint: a function is governed when every caller
- * of it is already governed. `writeLinks` is called only from create.ts and from
- * other governed command implementations, so it is Kernel internals — not a
- * bypass — even though it lives outside the six declared door files.
+ * of it is already governed. Keys are file+name.
  */
-export function governedClosure(index, callers, roots) {
+export function governedClosure(index, names, roots) {
   const governed = new Set(roots);
   for (let pass = 0; pass < 8; pass++) {
     let grew = false;
     for (const rec of index.values()) {
-      const name = rec.name;
-      if (governed.has(name)) continue;
-      const sites = callers.get(name);
-      if (!sites || sites.size === 0) continue;
+      const k = recKey(rec);
+      if (governed.has(k)) continue;
+      const sites = callersOf(rec, index, names);
+      if (!sites.size) continue;
       const everyCallerGoverned = [...sites].every(
         (file) => insideWriteDoor(file) ||
-          [...index.values()].some((r) => r.file === file && governed.has(r.name) && r.calls.has(name)));
-      if (everyCallerGoverned) { governed.add(name); grew = true; }
+          [...index.values()].some((r) => r.file === file && governed.has(recKey(r)) && r.calls.has(rec.name)));
+      if (everyCallerGoverned) { governed.add(k); grew = true; }
     }
     if (!grew) break;
   }
   return governed;
 }
 
-/** name -> Set(files that call it), across every indexed file. */
+/**
+ * App-reachable: called from collab-electron (or another non-Kernel file), or
+ * called in the same file by a function that is already app-reachable.
+ * That is the createReviewTask case: kernel.ts names requestGovernedReview,
+ * which calls createReviewTask in the same file. Direct-caller-only analysis
+ * called that "not a path production reaches."
+ */
+export function appReachableKeys(index, names) {
+  const recs = [...index.values()];
+  const tainted = new Set();
+  for (let pass = 0; pass < 16; pass++) {
+    let grew = false;
+    for (const rec of recs) {
+      const k = recKey(rec);
+      if (tainted.has(k)) continue;
+      if ([...callersOf(rec, index, names)].some(isAppFile)) {
+        tainted.add(k); grew = true; continue;
+      }
+      const hop = recs.some((c) =>
+        c.file === rec.file &&
+        tainted.has(recKey(c)) &&
+        c.calls.has(rec.name));
+      if (hop) { tainted.add(k); grew = true; }
+    }
+    if (!grew) break;
+  }
+  return tainted;
+}
+
+/** name -> Set(files that call it). Kept for callers that still want the merged
+ *  view; classification no longer uses it for governance. */
 export function callerIndex(index) {
   const callers = new Map();
-  for (const [name, rec] of index)
+  for (const rec of index.values())
     for (const callee of rec.calls) {
       if (!callers.has(callee)) callers.set(callee, new Set());
       callers.get(callee).add(rec.file);
@@ -204,20 +326,20 @@ export function callerIndex(index) {
  * Returns one finding per SQL-bearing function, carrying every dimension the
  * brief requires. Nothing collapses into a single red/green.
  */
-export function classifyPersistence({ index, callers, domain, governed, relOf }) {
+export function classifyPersistence({ index, names, domain, transport, governed, appReach, relOf }) {
   const findings = [];
+  const nameIndex = names ?? byRecName(index);
 
   for (const rec of index.values()) {
     const fnName = rec.name;
     if (!rec.sqlSites?.length) continue;
     const cls = sourceClass(rec.file);
-    const reach = reachability(fnName, callers, rec.file, governed);
+    const reach = reachability(rec, index, nameIndex, governed, appReach);
 
     for (const site of rec.sqlSites) {
       const isDomain = domain.has(site.table);
-      const isTransport = TRANSPORT_TABLES.has(site.table);
+      const isTransport = transport.has(site.table) && !isDomain;
 
-      // What KIND of persistence is this?
       const persistence =
         cls === "generated" ? "generated-sql"
         : cls === "migration" ? "schema-migration"
@@ -226,7 +348,6 @@ export function classifyPersistence({ index, callers, domain, governed, relOf })
         : isDomain ? "domain-truth"
         : "non-domain-store";
 
-      // Governance follows from kind + reachability, never from the file name.
       let governance, confidence, why;
       if (persistence !== "domain-truth" && persistence !== "non-domain-store") {
         governance = "compliant";
@@ -241,23 +362,15 @@ export function classifyPersistence({ index, callers, domain, governed, relOf })
         confidence = "medium";
         why = `Internal implementation: every caller of ${fnName}() is inside the write door, so production reaches this SQL only through a governed action.`;
       } else if (persistence === "domain-truth" && cls === "product"
-                 && !rec.file.startsWith("packages/qf-kernel/")) {
-        // App code must never hold domain SQL. Whether anything calls it yet is
-        // irrelevant — the Kernel is the sole writer, so the presence of this SQL
-        // outside the Kernel package IS the violation. Reachability only sharpens
-        // confidence. Without this rule a brand-new ungoverned write read as gray.
+                 && !rec.file.startsWith(KERNEL)) {
         governance = "violation";
         confidence = reach.value === "bypass" ? "high" : "medium";
         why = `App code writes the domain table \`${site.table}\` directly. The Kernel is the sole writer; this SQL sits outside the Kernel package entirely.`;
       } else if (reach.value === "kernel-internal") {
-        // Reached only from inside the Kernel package. Not a product bypass;
-        // still worth a look, so it is gray rather than green or red.
         governance = "unknown";
         confidence = "medium";
         why = `Called only from inside packages/qf-kernel (${reach.callers.join(", ")}). Kernel internals, not a path production reaches on its own. Needs verification.`;
       } else if (reach.value === "unknown") {
-        // The brief is explicit: unknown is gray, not green AND not red. Calling
-        // an unresolved call path a violation manufactures debt that does not exist.
         governance = "unknown";
         confidence = "low";
         why = `No caller of ${fnName}() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.`;
@@ -289,7 +402,6 @@ export function classifyPersistence({ index, callers, domain, governed, relOf })
     }
   }
 
-  // one finding per file+table+verb, keep the most severe
   const best = new Map();
   const sev = { violation: 3, unknown: 2, "approved-exception": 1, compliant: 0 };
   for (const f of findings) {
@@ -327,14 +439,9 @@ export function coverage({ files, inScope, index, read, joinRepo }) {
   for (const path of files) {
     if (!inScope(path)) { rows.push({ path, status: "out-of-scope" }); continue; }
     const seen = byFile.get(path);
-    // Comments are prose. `errors.ts` says "CREATE TABLE" in a note, and counting
-    // that made it a permanent false gray. fileFacts already strips comments;
-    // coverage did not, so the two disagreed about the same file.
     const text = stripCodeComments(read(joinRepo(path)));
     const textSql = sqlSites(text).length;
     const suspicion = sqlSuspicionCount(text);
-    // SQL the precise parser could not resolve. This is what makes unknown
-    // syntax gray instead of clean.
     const unresolved = Math.max(0, suspicion - textSql);
 
     const status = unresolved > 0 ? "partial"
@@ -360,5 +467,3 @@ export function coverage({ files, inScope, index, read, joinRepo }) {
     return r[a.status] - r[b.status] || a.path.localeCompare(b.path);
   });
 }
-
-export { TRANSPORT_TABLES };

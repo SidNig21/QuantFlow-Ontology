@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 23,
-  "total": 23,
+  "passed": 25,
+  "total": 25,
   "results": [
     {
       "n": 1,
@@ -97,7 +97,7 @@
       "n": 16,
       "name": "headline counts equal the canonical model",
       "passed": true,
-      "detail": "stats.violations=4 vs persistence=4; gray 13 vs 13"
+      "detail": "stats.violations=14 vs persistence=14; gray 4 vs 4"
     },
     {
       "n": 17,
@@ -109,7 +109,7 @@
       "n": 18,
       "name": "coverage gaps appear in the agent brief",
       "passed": true,
-      "detail": "40 gaps in model; brief shows section=true"
+      "detail": "30 gaps in model; brief shows section=true"
     },
     {
       "n": 19,
@@ -133,13 +133,25 @@
       "n": 22,
       "name": "same-named functions in different files stay distinct",
       "passed": true,
-      "detail": "insertArtifact findings span 3 file(s): collab-electron/src/main/zz-falsify-22.ts, packages/qf-kernel/src/deterministic-execution.ts, packages/qf-kernel/src/governed-review.ts"
+      "detail": "mine=violation/mission files=3"
     },
     {
       "n": 23,
       "name": "evidence line numbers are file-relative",
       "passed": true,
       "detail": "every violation line contains its table"
+    },
+    {
+      "n": 24,
+      "name": "createReviewTask is a bypass, not kernel-internal gray",
+      "passed": true,
+      "detail": "violation/bypass table=task"
+    },
+    {
+      "n": 25,
+      "name": "channel-name UPDATE/DELETE does not gray a file",
+      "passed": true,
+      "detail": "coverage=indexed unrecognised=0"
     }
   ]
 }

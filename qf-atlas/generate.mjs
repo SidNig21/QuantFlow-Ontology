@@ -14,7 +14,7 @@ import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, RE
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
-import { domainTables, classifyPersistence, callerIndex, sourceClass, commandRoots, governedClosure, coverage } from "./classify.mjs";
+import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 
 const OUT = join(REPO, "qf-atlas");
@@ -72,13 +72,17 @@ const breaches = violations(facts);
 // Semantic persistence classification replaces the old "SQL outside an allowlist
 // is a violation" rule, which called transport bookkeeping a domain breach.
 const fnIndex = indexFunctions(indexFiles, read, rel);
-const fnCallers = callerIndex(fnIndex);
-const governedFns = governedClosure(fnIndex, fnCallers, commandRoots(fnIndex, read, REPO, rel));
+const fnNames = byRecName(fnIndex);
+const domain = domainTables(REPO);
+const governedFns = governedClosure(fnIndex, fnNames, commandRoots(fnIndex, read, REPO, rel));
+const appReach = appReachableKeys(fnIndex, fnNames);
 const persistence = classifyPersistence({
   index: fnIndex,
-  callers: fnCallers,
-  domain: domainTables(REPO),
+  names: fnNames,
+  domain,
+  transport: transportTables(REPO, domain),
   governed: governedFns,
+  appReach,
   relOf: rel,
 });
 

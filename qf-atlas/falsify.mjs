@@ -349,12 +349,14 @@ record(22, "same-named functions in different files stay distinct",
   ...withFile(`${MAIN}/zz-falsify-22.ts`,
     `export function insertArtifact(db){ db.query("INSERT INTO mission (id) VALUES (?)").run("x"); }\n`,
     (m) => {
-      // the real repo already has two insertArtifact definitions; adding a third
-      // must not erase either of the originals
+      const mine = m.persistence.find((p) => p.evidence[0].file.endsWith("zz-falsify-22.ts"));
       const files = new Set(m.persistence
         .filter((p) => p.fn === "insertArtifact")
         .map((p) => p.evidence[0].file));
-      return [files.size >= 2, `insertArtifact findings span ${files.size} file(s): ${[...files].join(", ") || "none"}`];
+      // Presence is not enough: the third insertArtifact used to be marked
+      // governed because it shared a name with a Kernel helper.
+      const ok = mine?.governance === "violation" && mine.table === "mission" && files.size >= 3;
+      return [ok, `mine=${mine?.governance}/${mine?.table} files=${files.size}`];
     }));
 
 // 23 · evidence must point at the line the SQL is actually on
@@ -368,6 +370,23 @@ record(23, "evidence line numbers are file-relative", ...(() => {
   }
   return [bad.length === 0, bad.length ? bad.slice(0, 3).join(" · ") : "every violation line contains its table"];
 })());
+
+// 24 · same-file hop from an app caller is a bypass, not "production cannot reach this"
+record(24, "createReviewTask is a bypass, not kernel-internal gray", ...(() => {
+  const f = before.persistence.find((p) => p.fn === "createReviewTask" && p.table === "task");
+  return [f?.governance === "violation" && f.reachability === "bypass",
+    f ? `${f.governance}/${f.reachability} table=${f.table}` : "createReviewTask task write not found"];
+})());
+
+// 25 · English "update"/"delete" in a channel name is not unread SQL
+record(25, "channel-name UPDATE/DELETE does not gray a file",
+  ...withFile(`${MAIN}/zz-falsify-25.ts`,
+    `export function ping(){ return "session/update"; }\nexport function kill(){ return "qf:connections:delete"; }\n`,
+    (m) => {
+      const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-25.ts"));
+      const gray = cov && (cov.status === "partial" || (cov.sqlUnrecognised ?? 0) > 0);
+      return [!!cov && !gray, cov ? `coverage=${cov.status} unrecognised=${cov.sqlUnrecognised ?? 0}` : "file not covered"];
+    }));
 
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });

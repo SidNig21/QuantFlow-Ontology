@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "bdf80c4",
+    "commit": "30590ea",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "5576eed237caefa9"
+    "fingerprint": "a7df1669455af443"
   },
   "stats": {
     "live": 107,
@@ -21,8 +21,8 @@
     "bridgeMethods": 127,
     "bridgeMethodsUsed": 158,
     "stripCandidates": 18,
-    "violations": 4,
-    "governanceUnknown": 13,
+    "violations": 14,
+    "governanceUnknown": 4,
     "legacyLeads": 9,
     "nodes": 106,
     "loopsBroken": 2,
@@ -716,7 +716,7 @@
       "kb": 12.9,
       "x": 2.03,
       "z": -1.69,
-      "status": "gray",
+      "status": "ok",
       "spawns": 1,
       "writes": 3,
       "dml": 0,
@@ -760,7 +760,7 @@
       "kb": 34.7,
       "x": 0.45,
       "z": 2.6,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 1,
       "dml": 0,
@@ -1176,7 +1176,7 @@
       "kb": 77.5,
       "x": 1.01,
       "z": 0.85,
-      "status": "gray",
+      "status": "warn",
       "spawns": 0,
       "writes": 1,
       "dml": 0,
@@ -2855,7 +2855,7 @@
       "kb": 30.9,
       "x": -1.01,
       "z": -0.85,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 0,
       "dml": 7,
@@ -2893,7 +2893,7 @@
       "status": "alert",
       "spawns": 0,
       "writes": 1,
-      "dml": 27,
+      "dml": 28,
       "executes": 0,
       "files": [
         {
@@ -2902,7 +2902,7 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 27,
+          "dml": 28,
           "dmlLines": [
             99,
             104,
@@ -2919,7 +2919,7 @@
         {
           "kind": "outside-write-door",
           "scope": "product",
-          "what": "27 SQL statements outside execute()",
+          "what": "28 SQL statements outside execute()",
           "where": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
             99,
@@ -4156,7 +4156,7 @@
       "status": "ok",
       "spawns": 0,
       "writes": 0,
-      "dml": 66,
+      "dml": 67,
       "executes": 0,
       "files": [
         {
@@ -4192,7 +4192,7 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
-          "dml": 8,
+          "dml": 9,
           "dmlLines": [
             23,
             27,
@@ -4869,7 +4869,7 @@
       "kb": 11.5,
       "x": 2.03,
       "z": -1.69,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 0,
       "dml": 0,
@@ -7751,69 +7751,6 @@
   ],
   "coverage": [
     {
-      "path": "collab-electron/src/main/acp-agent.ts",
-      "status": "partial",
-      "indexedFns": 17,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 1,
-      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/agent-host.ts",
-      "status": "partial",
-      "indexedFns": 30,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 3,
-      "why": "3 SQL verb(s) present, 0 in a shape this analyzer parses. 3 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/connections-ipc.ts",
-      "status": "partial",
-      "indexedFns": 10,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 2,
-      "why": "2 SQL verb(s) present, 0 in a shape this analyzer parses. 2 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/import-service.ts",
-      "status": "partial",
-      "indexedFns": 7,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 2,
-      "why": "2 SQL verb(s) present, 0 in a shape this analyzer parses. 2 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/ipc-endpoint.ts",
-      "status": "partial",
-      "indexedFns": 5,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 1,
-      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/ipc-filesystem.ts",
-      "status": "partial",
-      "indexedFns": 5,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 1,
-      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/ipc-workspace.ts",
-      "status": "partial",
-      "indexedFns": 9,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 1,
-      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
       "indexedFns": 56,
@@ -7821,24 +7758,6 @@
       "sqlIndexed": 5,
       "sqlUnrecognised": 0,
       "why": "7 SQL site(s) in the text, 5 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "collab-electron/src/main/updater/index.ts",
-      "status": "partial",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 2,
-      "why": "2 SQL verb(s) present, 0 in a shape this analyzer parses. 2 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
-      "path": "collab-electron/src/main/updater/update-manager.ts",
-      "status": "partial",
-      "indexedFns": 5,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 10,
-      "why": "10 SQL verb(s) present, 0 in a shape this analyzer parses. 10 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "packages/qf-kernel/src/create.ts",
@@ -7868,15 +7787,6 @@
       "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
-      "path": "packages/qf-kernel/src/execute.ts",
-      "status": "partial",
-      "indexedFns": 31,
-      "sqlInText": 7,
-      "sqlIndexed": 7,
-      "sqlUnrecognised": 1,
-      "why": "8 SQL verb(s) present, 7 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
-    },
-    {
       "path": "packages/qf-kernel/src/governed-review.ts",
       "status": "partial",
       "indexedFns": 32,
@@ -7891,8 +7801,8 @@
       "indexedFns": 1,
       "sqlInText": 1,
       "sqlIndexed": 0,
-      "sqlUnrecognised": 1,
-      "why": "2 SQL verb(s) present, 1 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+      "sqlUnrecognised": 0,
+      "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/upgrade.ts",
@@ -7900,8 +7810,8 @@
       "indexedFns": 49,
       "sqlInText": 1,
       "sqlIndexed": 3,
-      "sqlUnrecognised": 29,
-      "why": "30 SQL verb(s) present, 1 in a shape this analyzer parses. 29 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
+      "sqlUnrecognised": 1,
+      "why": "2 SQL verb(s) present, 1 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "tools/qf-peer-bus/src/bus.ts",
@@ -7911,15 +7821,6 @@
       "sqlIndexed": 0,
       "sqlUnrecognised": 0,
       "why": "4 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
-      "path": "tools/runtime-proof/src/proof.ts",
-      "status": "partial",
-      "indexedFns": 11,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 1,
-      "why": "1 SQL verb(s) present, 0 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "collab-electron/src/main/env.d.ts",
@@ -7955,6 +7856,14 @@
     },
     {
       "path": "collab-electron/src/main/sidecar/ring-buffer.ts",
+      "status": "unindexed",
+      "indexedFns": 0,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/updater/index.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
@@ -8114,6 +8023,14 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/acp-agent.ts",
+      "status": "indexed",
+      "indexedFns": 17,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/acp-fs-root.ts",
       "status": "indexed",
       "indexedFns": 4,
@@ -8133,6 +8050,14 @@
       "path": "collab-electron/src/main/agent-artifact-writer.ts",
       "status": "indexed",
       "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/agent-host.ts",
+      "status": "indexed",
+      "indexedFns": 30,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8221,6 +8146,14 @@
       "path": "collab-electron/src/main/config.ts",
       "status": "indexed",
       "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/connections-ipc.ts",
+      "status": "indexed",
+      "indexedFns": 10,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8330,6 +8263,14 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/import-service.ts",
+      "status": "indexed",
+      "indexedFns": 7,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/index.ts",
       "status": "indexed",
       "indexedFns": 36,
@@ -8362,6 +8303,22 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/ipc-endpoint.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-filesystem.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/ipc-kernel.ts",
       "status": "indexed",
       "indexedFns": 17,
@@ -8381,6 +8338,14 @@
       "path": "collab-electron/src/main/ipc-misc.ts",
       "status": "indexed",
       "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "collab-electron/src/main/ipc-workspace.ts",
+      "status": "indexed",
+      "indexedFns": 9,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8682,6 +8647,14 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/updater/update-manager.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/watcher-worker.ts",
       "status": "indexed",
       "indexedFns": 4,
@@ -8751,6 +8724,14 @@
       "indexedFns": 21,
       "sqlInText": 4,
       "sqlIndexed": 4,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/execute.ts",
+      "status": "indexed",
+      "indexedFns": 31,
+      "sqlInText": 7,
+      "sqlIndexed": 7,
       "sqlUnrecognised": 0
     },
     {
@@ -9077,6 +9058,14 @@
       "path": "tools/runtime-proof/src/processes.ts",
       "status": "indexed",
       "indexedFns": 8,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "tools/runtime-proof/src/proof.ts",
+      "status": "indexed",
+      "indexedFns": 11,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -16199,10 +16188,148 @@
   ],
   "persistence": [
     {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "createReviewTask",
+      "table": "links",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "high",
+      "why": "Writes the domain table `links` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            271
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_attempt",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_attempt`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            132
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "persistAttempt",
+      "table": "qf_review_attempt",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_attempt`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            262
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_invocation",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_invocation`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            119
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_publication",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_publication`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            150
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_receipt",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_receipt`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            143
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:insert-into",
       "classification": "governance-violation",
       "disposition": "repair",
-      "fn": "markGovernedDelivery",
+      "fn": "persistRefusal",
       "table": "qf_review_receipt",
       "verb": "INSERT INTO",
       "persistence": "non-domain-store",
@@ -16216,7 +16343,30 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            313
+            256
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_source_work",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_source_work`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            99
           ]
         }
       ]
@@ -16245,6 +16395,52 @@
       ]
     },
     {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "ensureGovernedReviewSchema",
+      "table": "qf_review_task",
+      "verb": "CREATE TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            104
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "createReviewTask",
+      "table": "qf_review_task",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            272
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:update",
       "classification": "governance-violation",
       "disposition": "repair",
@@ -16263,6 +16459,29 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
             310
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "createReviewTask",
+      "table": "task",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "high",
+      "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            270
           ]
         }
       ]
@@ -16291,231 +16510,24 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:artifact:insert-into",
       "classification": "needs-verification",
       "disposition": "needs-verification",
-      "fn": "createReviewTask",
-      "table": "links",
+      "fn": "insertArtifact",
+      "table": "artifact",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
       "sourceClass": "product",
-      "reachability": "kernel-internal",
+      "reachability": "unknown",
       "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
+      "confidence": "low",
+      "why": "No caller of insertArtifact() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
       "evidence": [
         {
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            271
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ensureGovernedReviewSchema",
-      "table": "qf_review_attempt",
-      "verb": "CREATE TABLE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            132
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:insert-into",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "persistAttempt",
-      "table": "qf_review_attempt",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            262
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ensureGovernedReviewSchema",
-      "table": "qf_review_invocation",
-      "verb": "CREATE TABLE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            119
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ensureGovernedReviewSchema",
-      "table": "qf_review_publication",
-      "verb": "CREATE TABLE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            150
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ensureGovernedReviewSchema",
-      "table": "qf_review_receipt",
-      "verb": "CREATE TABLE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            143
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ensureGovernedReviewSchema",
-      "table": "qf_review_source_work",
-      "verb": "CREATE TABLE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            99
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "ensureGovernedReviewSchema",
-      "table": "qf_review_task",
-      "verb": "CREATE TABLE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            104
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:insert-into",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "createReviewTask",
-      "table": "qf_review_task",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            272
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
-      "classification": "needs-verification",
-      "disposition": "needs-verification",
-      "fn": "createReviewTask",
-      "table": "task",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "kernel-internal",
-      "governance": "unknown",
-      "confidence": "medium",
-      "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            270
+            407
           ]
         }
       ]
@@ -17119,29 +17131,6 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:artifact:insert-into",
-      "classification": "persistence-ok",
-      "disposition": "keep",
-      "fn": "insertArtifact",
-      "table": "artifact",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "governed",
-      "governance": "compliant",
-      "confidence": "medium",
-      "why": "Internal implementation: every caller of insertArtifact() is inside the write door, so production reaches this SQL only through a governed action.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            407
-          ]
-        }
-      ]
-    },
-    {
       "id": "persistence:packages/qf-kernel/src/market-context.ts:market_event:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
@@ -17376,7 +17365,7 @@
     {
       "kind": "outside-write-door",
       "scope": "product",
-      "what": "27 SQL statements outside execute()",
+      "what": "28 SQL statements outside execute()",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "lines": [
         99,

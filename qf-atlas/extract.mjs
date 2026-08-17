@@ -92,7 +92,7 @@ const RE = {
   // Only these keep running after the call returns, so only these need reaping.
   spawnLive: /\b(?:spawn|execFile|fork)\s*\(/,
   diskWrite: /\b(?:writeFile|writeFileSync|appendFile|appendFileSync|createWriteStream)\(/,
-  dml:       /\b(?:CREATE TABLE|INSERT INTO|UPDATE\s+[a-z_]+\s+SET|DELETE FROM|ALTER TABLE|DROP TABLE)\b/i,
+  dml:       /\b(?:CREATE\s+TABLE|INSERT(?:\s+OR\s+\w+)?\s+INTO|REPLACE\s+INTO|UPDATE(?:\s+OR\s+\w+)?\s+[a-z_]+\s+SET|DELETE\s+FROM|ALTER\s+TABLE|DROP\s+TABLE)\b/i,
   execute:   /\bexecute(?:Command)?\(/,
 };
 
