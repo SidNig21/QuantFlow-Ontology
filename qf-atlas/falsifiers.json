@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 50,
-  "total": 50,
+  "passed": 52,
+  "total": 52,
   "results": [
     {
       "n": 1,
@@ -302,6 +302,18 @@
       "name": "every non-clean coverage cell carries a named reason",
       "passed": true,
       "detail": "unexplained=0; every partial/unsupported/dynamic cell names its blocker"
+    },
+    {
+      "n": 51,
+      "name": "the write door is derived from the Kernel, not from a filename list",
+      "passed": true,
+      "detail": "state=partial dispatched=17/41 door=6 files; divergence from the allowlist=8"
+    },
+    {
+      "n": 52,
+      "name": "a renamed dispatcher makes the door unknown, not green",
+      "passed": true,
+      "detail": "state=unknown -- no function named `execute` was found in the Kernel; the dispatc"
     }
   ]
 }

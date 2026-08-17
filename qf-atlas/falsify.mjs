@@ -847,6 +847,48 @@ record(50, "every non-clean coverage cell carries a named reason", ...(() => {
       : `unexplained=${before.stats.unexplainedCoverage}; every partial/unsupported/dynamic cell names its blocker`];
 })());
 
+
+// 51 · The write door must be DERIVED from the Kernel's dispatch structure, not
+// trusted because a filename sits in a hand-typed Set. Membership in that Set
+// short-circuits classification to compliant/high for every SQL site in the file —
+// authority resting on a string. The derivation disagrees with the allowlist on 8 of
+// 10 files, and only execute.ts and create.ts appear in both.
+record(51, "the write door is derived from the Kernel, not from a filename list", ...(() => {
+  const wd = before.writeDoor;
+  if (!wd) return [false, "no write-door derivation in the model"];
+  if (!wd.dispatcherFiles?.length)
+    return [false, "no dispatcher located: a function named execute was not found in the Kernel"];
+  if (!wd.stats.dispatched)
+    return [false, "no schema action was mapped to an implementation identifier"];
+  // The derivation must be able to report itself incomplete rather than pretend.
+  const honest = wd.state === "derived" || (wd.state === "partial" && !!wd.reason);
+  const div = wd.divergence.trustedButNotDerived.length + wd.divergence.derivedButNotTrusted.length;
+  return [honest && div > 0,
+    `state=${wd.state} dispatched=${wd.stats.dispatched}/${wd.stats.actions} `
+    + `door=${wd.stats.doorFiles} files; divergence from the allowlist=${div}`];
+})());
+
+// 52 · A moved or renamed dispatcher must make Atlas go unknown, never stay green.
+// This is the exact drift the contract names: "A renamed or moved write door must
+// cause Atlas to adapt or go unknown/red, not silently remain green."
+record(52, "a renamed dispatcher makes the door unknown, not green", ...(() => {
+  const EX = "packages/qf-kernel/src/execute.ts";
+  const abs = join(REPO, EX);
+  const original = readFileSync(abs, "utf8");
+  // The dispatcher is declared `export function execute<C extends string>(`. A probe
+  // that anchors on the exact text is a probe that reports its own premise broken
+  // the first time a generic parameter or an `async` shows up.
+  const DECL = /function +execute *[<(]/;
+  if (!DECL.test(original))
+    return [false, "execute.ts no longer declares a function named execute"];
+  try {
+    writeAtomic(abs, original.replace(DECL, "function dispatchGoverned<C extends string>("));
+    const wd = model().writeDoor;
+    return [wd.state === "unknown" && !!wd.reason,
+      `state=${wd.state}${wd.reason ? " -- " + wd.reason.slice(0, 64) : " with NO reason"}`];
+  } finally { writeAtomic(abs, original); }
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

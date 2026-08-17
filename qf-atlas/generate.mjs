@@ -10,7 +10,7 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { walk, fileFacts, extractWires, pushWires, stripCandidates, violations, gitMeta, REPO, rel, read, IS_TEST } from "./extract.mjs";
+import { walk, fileFacts, extractWires, pushWires, stripCandidates, violations, gitMeta, REPO, rel, read, IS_TEST, WRITE_DOOR } from "./extract.mjs";
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
@@ -19,6 +19,7 @@ import { indexFunctions } from "./hop4.mjs";
 import { reachability, blastRadius } from "./reach.mjs";
 import { analyzeFile, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
 import { coverageMatrix } from "./coverage-matrix.mjs";
+import { deriveWriteDoor, schemaActionNames } from "./writedoor.mjs";
 import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
 import { readdirSync } from "node:fs";
 
@@ -383,6 +384,35 @@ const matrix = coverageMatrix({
                        // `ownership: unsupported` with that stated as the reason.
 });
 
+// ─── THE GOVERNED WRITE DOOR, DERIVED (contract section D) ───────────────────
+// `WRITE_DOOR` is six filenames typed by hand, and membership short-circuits
+// classification to `compliant / high` for every SQL site in the file. That is
+// authority resting on a string. The Kernel's own dispatch structure is now read
+// instead, and the two disagree badly — only execute.ts and create.ts appear in both:
+//
+//   trusted by the allowlist, NOT supported by the dispatch structure
+//     insert.ts, events.ts, db.ts, upgrade.ts        <- FALSE KEEP risk
+//   implements a dispatched action, NOT in the allowlist
+//     deterministic-execution.ts, market-context.ts,
+//     market-ingest.ts, pipeline.ts                  <- their SQL is being adjudicated
+//                                                       as a potential violation
+//
+// market-ingest.ts currently carries a confirmed persistence finding while
+// implementing a governed action, which is the false-red the contract's falsifier 5
+// exists to prevent.
+//
+// The allowlist is NOT removed in this commit: swapping the authority rewires
+// classify.mjs and would put the whole 50-falsifier suite at risk in one step. The
+// derivation is published, the divergence is a first-class finding, and the swap is
+// the next change — with the divergence report as its acceptance test.
+const schemaActions = schemaActionNames(astOf);
+const writeDoor = deriveWriteDoor({ astOf, schemaActions });
+writeDoor.declaredAllowlist = [...WRITE_DOOR];
+writeDoor.divergence = {
+  trustedButNotDerived: [...WRITE_DOOR].filter((f) => !writeDoor.doorFiles.includes(f)),
+  derivedButNotTrusted: writeDoor.doorFiles.filter((f) => !WRITE_DOOR.has(f)),
+};
+
 const loops = buildLoops(wires, lifetime);
 
 const wiresTouching = (p) => wires.filter((w) =>
@@ -442,6 +472,8 @@ const model = {
     pushChannels: push.stats,
     ast: { available: tsAvailable(), version: tsVersion, files: astOf.size },
     coverageFiles: matrix.files,
+    writeDoor: { state: writeDoor.state, ...writeDoor.stats,
+      divergent: writeDoor.divergence.trustedButNotDerived.length + writeDoor.divergence.derivedButNotTrusted.length },
     unexplainedCoverage: matrix.unexplained.length,
     stripCandidates: strip.length,
     // Canonical: confirmed governance violations from the semantic classifier.
@@ -465,6 +497,7 @@ const model = {
   })),
   loops,
   coverage: coverageRows,
+  writeDoor,
   analyzerCoverage: matrix.rows,
   analyzerTally: matrix.tally,
   unexplainedCoverage: matrix.unexplained,

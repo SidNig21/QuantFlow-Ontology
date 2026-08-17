@@ -232,7 +232,20 @@ export function analyzeFile(relPath, text) {
       }
       if (ts.isNewExpression(node)) { /* handled below */ }
 
-      f.calls.push({ name, line, enclosing: enc?.name ?? null,
+      // The `name:` of an options object: `defineAction({ name: "create_task", … })`.
+      // Without this the only way to learn action names was the exported const, which
+      // is snake_case for objects and links too — so `agent_definition` and
+      // `delegates_to` were being counted as governed actions and the write-door
+      // derivation reported itself `partial` on 39 phantom unmapped actions.
+      let optionsName = null;
+      const first = node.arguments[0];
+      if (first && ts.isObjectLiteralExpression(first))
+        for (const prop of first.properties)
+          if (ts.isPropertyAssignment(prop) && prop.name?.getText() === "name") {
+            optionsName = literalArg(prop.initializer);
+            break;
+          }
+      f.calls.push({ name, line, enclosing: enc?.name ?? null, optionsName,
         args: node.arguments.map(literalArg).filter((a) => a !== null).slice(0, 3) });
     }
     // `new Worker(path)` is a long-lived child too.

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "78fc312",
+    "commit": "d4534d4",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "d7789ba1172e63f8"
+    "fingerprint": "6e55c925865a49c1"
   },
   "stats": {
     "live": 105,
@@ -34,9 +34,19 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 556
+      "files": 557
     },
     "coverageFiles": 539,
+    "writeDoor": {
+      "state": "partial",
+      "actions": 41,
+      "dispatched": 17,
+      "implementations": 17,
+      "doorFiles": 6,
+      "unmapped": 24,
+      "unresolved": 0,
+      "divergent": 8
+    },
     "unexplainedCoverage": 0,
     "stripCandidates": 13,
     "violations": 15,
@@ -10071,6 +10081,332 @@
       "status": "out-of-scope"
     }
   ],
+  "writeDoor": {
+    "state": "partial",
+    "reason": "24 of 41 schema actions have no dispatch entry, so the table read is incomplete",
+    "actions": [
+      "block_agent_session",
+      "cancel_agent_session",
+      "cancel_run",
+      "cancel_task",
+      "clarify_task",
+      "close_agent_session",
+      "complete_run",
+      "complete_task",
+      "create_agent_session",
+      "create_connection",
+      "create_hypothesis",
+      "create_mission",
+      "create_run",
+      "create_task",
+      "create_ticket",
+      "delete_connection",
+      "execute_deterministic_run",
+      "fail_agent_session",
+      "fail_run",
+      "grade_ticket",
+      "ingest_market_batch",
+      "observe_ticket",
+      "publish_artifact",
+      "reassign_task",
+      "record_evaluation",
+      "record_task_cancel_outcome",
+      "record_task_steering_delivery",
+      "record_task_steering_refusal",
+      "redirect_task",
+      "register_agent_definition",
+      "register_dataset_version",
+      "register_venue",
+      "request_second_opinion",
+      "resolve_hypothesis",
+      "schedule_market_event",
+      "settle_event",
+      "start_agent_session",
+      "start_event",
+      "start_run",
+      "unblock_agent_session",
+      "void_event"
+    ],
+    "dispatch": {
+      "publish_artifact": [
+        {
+          "impl": "publishArtifact",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1510
+        }
+      ],
+      "create_agent_session": [
+        {
+          "impl": "createAgentSession",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1511
+        }
+      ],
+      "create_task": [
+        {
+          "impl": "createTask",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1512
+        }
+      ],
+      "create_connection": [
+        {
+          "impl": "createConnection",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1513
+        }
+      ],
+      "delete_connection": [
+        {
+          "impl": "deleteConnection",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1514
+        }
+      ],
+      "register_agent_definition": [
+        {
+          "impl": "registerAgentDefinition",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1515
+        }
+      ],
+      "create_hypothesis": [
+        {
+          "impl": "createHypothesis",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1516
+        }
+      ],
+      "register_dataset_version": [
+        {
+          "impl": "registerDatasetVersion",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1517
+        }
+      ],
+      "create_run": [
+        {
+          "impl": "createRun",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1518
+        }
+      ],
+      "execute_deterministic_run": [
+        {
+          "impl": "executeDeterministicRun",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1519
+        }
+      ],
+      "record_evaluation": [
+        {
+          "impl": "recordEvaluation",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1520
+        }
+      ],
+      "create_mission": [
+        {
+          "impl": "createMission",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1521
+        }
+      ],
+      "create_ticket": [
+        {
+          "impl": "createTicket",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1522
+        }
+      ],
+      "observe_ticket": [
+        {
+          "impl": "observeTicket",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1523
+        }
+      ],
+      "register_venue": [
+        {
+          "impl": "registerVenue",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1524
+        }
+      ],
+      "schedule_market_event": [
+        {
+          "impl": "scheduleMarketEvent",
+          "file": "packages/qf-kernel/src/create.ts",
+          "line": 1525
+        }
+      ],
+      "ingest_market_batch": [
+        {
+          "impl": "ingestMarketBatch",
+          "file": "packages/qf-kernel/src/pipeline.ts",
+          "line": 16
+        }
+      ]
+    },
+    "dispatcherFiles": [
+      {
+        "file": "packages/qf-kernel/src/execute.ts",
+        "line": 459
+      }
+    ],
+    "implementations": {
+      "publishArtifact": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 227,
+        "kind": "function"
+      },
+      "registerAgentDefinition": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 365,
+        "kind": "function"
+      },
+      "createAgentSession": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 493,
+        "kind": "function"
+      },
+      "createTask": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 579,
+        "kind": "function"
+      },
+      "createConnection": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 679,
+        "kind": "function"
+      },
+      "deleteConnection": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 750,
+        "kind": "function"
+      },
+      "createHypothesis": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 800,
+        "kind": "function"
+      },
+      "registerDatasetVersion": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 843,
+        "kind": "function"
+      },
+      "createRun": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 1006,
+        "kind": "function"
+      },
+      "recordEvaluation": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 1069,
+        "kind": "function"
+      },
+      "createMission": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 1300,
+        "kind": "function"
+      },
+      "createTicket": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 1443,
+        "kind": "function"
+      },
+      "observeTicket": {
+        "file": "packages/qf-kernel/src/create.ts",
+        "line": 1475,
+        "kind": "function"
+      },
+      "executeDeterministicRun": {
+        "file": "packages/qf-kernel/src/deterministic-execution.ts",
+        "line": 518,
+        "kind": "function"
+      },
+      "registerVenue": {
+        "file": "packages/qf-kernel/src/market-context.ts",
+        "line": 250,
+        "kind": "function"
+      },
+      "scheduleMarketEvent": {
+        "file": "packages/qf-kernel/src/market-context.ts",
+        "line": 284,
+        "kind": "function"
+      },
+      "ingestMarketBatch": {
+        "file": "packages/qf-kernel/src/market-ingest.ts",
+        "line": 411,
+        "kind": "function"
+      }
+    },
+    "doorFiles": [
+      "packages/qf-kernel/src/create.ts",
+      "packages/qf-kernel/src/deterministic-execution.ts",
+      "packages/qf-kernel/src/execute.ts",
+      "packages/qf-kernel/src/market-context.ts",
+      "packages/qf-kernel/src/market-ingest.ts",
+      "packages/qf-kernel/src/pipeline.ts"
+    ],
+    "unmappedActions": [
+      "block_agent_session",
+      "cancel_agent_session",
+      "cancel_run",
+      "cancel_task",
+      "clarify_task",
+      "close_agent_session",
+      "complete_run",
+      "complete_task",
+      "fail_agent_session",
+      "fail_run",
+      "grade_ticket",
+      "reassign_task",
+      "record_task_cancel_outcome",
+      "record_task_steering_delivery",
+      "record_task_steering_refusal",
+      "redirect_task",
+      "request_second_opinion",
+      "resolve_hypothesis",
+      "settle_event",
+      "start_agent_session",
+      "start_event",
+      "start_run",
+      "unblock_agent_session",
+      "void_event"
+    ],
+    "unresolvedImplementations": [],
+    "stats": {
+      "actions": 41,
+      "dispatched": 17,
+      "implementations": 17,
+      "doorFiles": 6,
+      "unmapped": 24,
+      "unresolved": 0
+    },
+    "declaredAllowlist": [
+      "packages/qf-kernel/src/execute.ts",
+      "packages/qf-kernel/src/create.ts",
+      "packages/qf-kernel/src/insert.ts",
+      "packages/qf-kernel/src/events.ts",
+      "packages/qf-kernel/src/db.ts",
+      "packages/qf-kernel/src/upgrade.ts"
+    ],
+    "divergence": {
+      "trustedButNotDerived": [
+        "packages/qf-kernel/src/insert.ts",
+        "packages/qf-kernel/src/events.ts",
+        "packages/qf-kernel/src/db.ts",
+        "packages/qf-kernel/src/upgrade.ts"
+      ],
+      "derivedButNotTrusted": [
+        "packages/qf-kernel/src/deterministic-execution.ts",
+        "packages/qf-kernel/src/market-context.ts",
+        "packages/qf-kernel/src/market-ingest.ts",
+        "packages/qf-kernel/src/pipeline.ts"
+      ]
+    }
+  },
   "analyzerCoverage": [
     {
       "path": "collab-electron/cli/bovada-market-cli.test.ts",
