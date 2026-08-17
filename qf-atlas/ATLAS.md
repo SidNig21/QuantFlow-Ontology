@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 8d4be7e` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 79c7b48` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -401,9 +401,10 @@ prevent a clean architectural result.
 | `packages/qf-kernel/src/portable.ts` | unindexed | 0 | 0 |
 | …12 more | | | see `atlas.json` |
 
-> `governed-review.ts` is in this table. The confirmed-violation count above is
-> therefore a **floor**, not a total — it was computed from a partial read of the very
-> file the finding concerns.
+> **No file carrying a confirmed violation is in this table.** Every file with a
+> confirmed finding was fully read, so the violation count is a total rather than a
+> floor. The gaps above are in files that carry no confirmed finding — they still
+> prevent a clean architectural result, because a gap cannot be called compliant.
 
 ## Protocol variants (2)
 

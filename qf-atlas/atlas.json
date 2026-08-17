@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "8d4be7e",
+    "commit": "79c7b48",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",

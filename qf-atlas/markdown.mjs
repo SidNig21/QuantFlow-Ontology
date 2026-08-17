@@ -405,10 +405,27 @@ export function renderMarkdown(m) {
     if (covGaps.length > 15) p(`| …${covGaps.length - 15} more | | | see \`atlas.json\` |`);
     p();
   }
-  p(`> \`governed-review.ts\` is in this table. The confirmed-violation count above is`);
-  p(`> therefore a **floor**, not a total — it was computed from a partial read of the very`);
-  p(`> file the finding concerns.`);
-  p();
+  // DERIVED, not asserted. This paragraph used to state flatly that the violation count
+  // was a floor because governed-review.ts was a partial read. The AST pass now resolves
+  // all of that file's SQL sites, so the sentence had become false in the direction of
+  // UNDER-claiming — the map was disowning a number it had earned. A caveat hardcoded
+  // against a specific file outlives the condition it describes.
+  {
+    const gap = covGaps.find((c) => c.path.endsWith("governed-review.ts"));
+    const violationFiles = new Set(confirmed.map((v) => v.evidence[0].file));
+    const gappedViolators = covGaps.filter((c) => violationFiles.has(c.path));
+    if (gap || gappedViolators.length) {
+      p(`> ${gappedViolators.length ? gappedViolators.map((c) => `\`${c.path.split("/").pop()}\``).join(", ") : "A file carrying a confirmed violation"}`);
+      p(`> ${gappedViolators.length === 1 ? "is" : "are"} in this table, so the confirmed-violation count above is a **floor**, not a`);
+      p(`> total: it was computed from a partial read of the very file the finding concerns.`);
+    } else {
+      p(`> **No file carrying a confirmed violation is in this table.** Every file with a`);
+      p(`> confirmed finding was fully read, so the violation count is a total rather than a`);
+      p(`> floor. The gaps above are in files that carry no confirmed finding — they still`);
+      p(`> prevent a clean architectural result, because a gap cannot be called compliant.`);
+    }
+    p();
+  }
 
   // ── 4c. protocol variants ─────────────────────────────────────────────────
   if ((m.protocolVariants ?? []).length) {
