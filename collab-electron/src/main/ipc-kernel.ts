@@ -14,12 +14,6 @@ import {
   onSessionDone,
   runTurn,
 } from "./agent-host";
-import {
-  createRegisteredElectronBus,
-  getRegisteredBus,
-  type PublishAndDeliverOpts,
-} from "./a2a-bus";
-import { spawnA2aFourSeats } from "./a2a-orchestra";
 import { registerHostAcpPermissionHandlers } from "./host-acp-permission";
 import {
   kernelExecute,
@@ -744,100 +738,6 @@ export function registerKernelHandlers(): void {
           );
           invalidateDock();
         }
-        return { ok: false as const, error: serializeError(err) };
-      }
-    },
-  );
-
-  /** Cold/harness only — not product dock. Spawn 4 A2A seats without the paced movie. */
-  ipcMain.handle("qf:a2a:spawnSeats", async (event) => {
-    try {
-      assertTrustedSender(event);
-      const { busId, bus } = createRegisteredElectronBus();
-      const seats = await spawnA2aFourSeats(bus, {
-        onTile: (sessionId, sp, ptySessionId) => {
-          invalidateDock();
-          sendToShell(
-            "shell:forward",
-            "canvas",
-            "create-term-tile",
-            ptySessionId,
-            sessionId,
-            sp,
-          );
-        },
-      });
-      invalidateDock();
-      return { ok: true as const, busId, seats };
-    } catch (err) {
-      return { ok: false as const, error: serializeError(err) };
-    }
-  });
-
-  /** WO-008e: one Kernel publish + host delivery to target seats. */
-  ipcMain.handle(
-    "qf:a2a:dispatch",
-    (
-      event,
-      args?: PublishAndDeliverOpts & { busId?: string },
-    ) => {
-      try {
-        assertTrustedSender(event);
-        if (!args?.busId || typeof args.busId !== "string") {
-          return {
-            ok: false as const,
-            error: {
-              name: "InvalidArgs",
-              message: "qf:a2a:dispatch requires busId:string",
-            },
-          };
-        }
-        if (!args.hop || !args.fromRole || !args.toRoles || !args.body) {
-          return {
-            ok: false as const,
-            error: {
-              name: "InvalidArgs",
-              message:
-                "qf:a2a:dispatch requires hop, fromRole, toRoles, body",
-            },
-          };
-        }
-        const bus = getRegisteredBus(args.busId);
-        const { busId: _busId, ...opts } = args;
-        const result = bus.publishAndDeliver(opts);
-        return { ok: true as const, result };
-      } catch (err) {
-        return { ok: false as const, error: serializeError(err) };
-      }
-    },
-  );
-
-  ipcMain.handle(
-    "qf:a2a:setDelivery",
-    (event, args?: { busId?: string; enabled?: boolean }) => {
-      try {
-        assertTrustedSender(event);
-        if (!args?.busId || typeof args.busId !== "string") {
-          return {
-            ok: false as const,
-            error: {
-              name: "InvalidArgs",
-              message: "qf:a2a:setDelivery requires busId:string",
-            },
-          };
-        }
-        if (typeof args.enabled !== "boolean") {
-          return {
-            ok: false as const,
-            error: {
-              name: "InvalidArgs",
-              message: "qf:a2a:setDelivery requires enabled:boolean",
-            },
-          };
-        }
-        getRegisteredBus(args.busId).setDeliveryEnabled(args.enabled);
-        return { ok: true as const, enabled: args.enabled };
-      } catch (err) {
         return { ok: false as const, error: serializeError(err) };
       }
     },

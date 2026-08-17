@@ -233,7 +233,6 @@ export function registerWorkspaceHandlers(
 ): void {
   ipcMain.handle("config:get", () => appConfig);
   ipcMain.handle("app:version", () => app.getVersion());
-  ipcMain.handle("app:commit-sha", () => __GIT_COMMIT_SHA__);
   ipcMain.handle("app:build-identity", () => ({
     commitSha: __GIT_COMMIT_SHA__,
     packagedAt: __QF_BUILD_TIMESTAMP__,

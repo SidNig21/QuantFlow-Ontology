@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ 56f3fce` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ d543b01` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**51 of 51 findings have not been looked at.**
+**49 of 49 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 51 |
+| `undecided` | 49 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 51 findings still need a decision.
+**Not all clear.** 49 findings still need a decision.
 
 ## The four hops
 
@@ -42,11 +42,11 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 14 |
 | `cheats` | reaches SQL that never passes through `execute()` | 6 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 98 |
+| `read-only` | no mutation seen | 94 |
 
 ## The jobs an operator actually does
 
@@ -130,17 +130,20 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 15 | the app starts here |
-| `reachable` | 148 | imported from an entrypoint |
+| `reachable` | 145 | imported from an entrypoint |
 | `process-entry` | 3 | launched by path, not imported (workers) |
 | `package-entry` | 1 | named in a workspace package's exports |
 | `test-only` | 0 | reached only from tests |
-| **`unreachable`** | **9** | **nothing imports it — start here** |
+| **`unreachable`** | **12** | **nothing imports it — start here** |
 
-### Unreachable (9)
+### Unreachable (12)
 
 Nothing in the product imports these. That is evidence, not a verdict: check package
 inclusion and dynamic loading before deleting anything.
 
+- `collab-electron/src/main/a2a-artifact-store.ts`
+- `collab-electron/src/main/a2a-bus.ts`
+- `collab-electron/src/main/a2a-orchestra.ts`
 - `collab-electron/src/main/sidecar/entry.ts`
 - `collab-electron/src/main/sidecar/log.ts`
 - `collab-electron/src/main/sidecar/ring-buffer.ts`
@@ -165,15 +168,11 @@ _these fail at runtime today_
 
 None.
 
-### Removal candidate — static evidence only (5)
+### Removal candidate — static evidence only (0)
 
 _registered in main, no static caller found; needs package + dynamic-caller proof before deletion_
 
-- `app:commit-sha` — collab-electron/src/main/ipc-workspace.ts:236
-- `pty:foreground-process` — collab-electron/src/main/index.ts:842
-- `qf:a2a:dispatch` — collab-electron/src/main/ipc-kernel.ts:778
-- `qf:a2a:setDelivery` — collab-electron/src/main/ipc-kernel.ts:815
-- `qf:a2a:spawnSeats` — collab-electron/src/main/ipc-kernel.ts:753
+None.
 
 ### Maybe later — do NOT delete on sight (13)
 
@@ -231,7 +230,7 @@ from the generated schema; reachability follows call sites and the Kernel comman
 Everything that imports the file, directly or transitively. This is what breaks if the
 change is wrong.
 
-`packages/qf-kernel/src/governed-review.ts` — **14 files depend on it**
+`packages/qf-kernel/src/governed-review.ts` — **12 files depend on it**
 
 ```
   packages/qf-kernel/src/portable.ts
@@ -244,7 +243,7 @@ change is wrong.
   collab-electron/src/main/host-native-tui.ts
   collab-electron/src/main/agent-host.ts
   collab-electron/src/main/connections-ipc.ts
-  …4 more
+  …2 more
 ```
 
 Deliberately **not** violations, and each was reported as one before the classifier
