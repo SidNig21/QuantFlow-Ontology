@@ -1098,6 +1098,62 @@ record(63, "a coverage regression is reported as worse, not better", ...(() => {
     `verdict=${d.verdict} coverageWorse=${d.stats.coverageWorse}`];
 })());
 
+// ── RATCHET + BASELINE — contract section 7 / item K ───────────────────────
+const RATCHET = join(REPO, "qf-atlas", "ratchet.mjs");
+const runRatchet = (args = []) => {
+  try {
+    const out = execFileSync(node, [RATCHET, ...args], { cwd: REPO, encoding: "utf8", stdio: "pipe" });
+    return { code: 0, out };
+  } catch (err) {
+    return { code: err.status ?? 1, out: `${err.stdout ?? ""}${err.stderr ?? ""}` };
+  }
+};
+
+// 64 · A red the baseline does not know about must FAIL the ratchet. With an empty
+// baseline present, every current confirmed red is by definition unknown, so the check
+// must go red — otherwise the ratchet permits arbitrary new debt.
+record(64, "the ratchet fails on a red the baseline does not know", ...(() => {
+  const empty = JSON.stringify({ version: 1, updated: null, findings: {}, exceptions: {} }, null, 2);
+  return withFileRaw("qf-atlas/baseline.json", empty, () => {
+    const r = runRatchet();
+    return [r.code === 1 && r.out.includes("NEW RED"),
+      `exit=${r.code} sawNewRed=${r.out.includes("NEW RED")}`];
+  });
+})());
+
+// 65 · Seeding is gated on INDEPENDENT verification. A baseline seeded from an unverified
+// analyzer launders every current defect into "known debt" on the authority of a tool
+// nobody has checked — the "dump of everything unknown" the contract forbids.
+record(65, "the baseline refuses to seed without an independent receipt", ...(() => {
+  if (existsSync(join(REPO, "qf-atlas", "verification.json")))
+    return [false, "a verification receipt exists, so this gate cannot be observed here"];
+  const r = runRatchet(["--seed"]);
+  const refused = r.code === 2 && /REFUSING to seed/.test(r.out);
+  const wroteAnyway = existsSync(join(REPO, "qf-atlas", "baseline.json"));
+  return [refused && !wroteAnyway,
+    `exit=${r.code} refused=${refused} baselineWritten=${wroteAnyway}`];
+})());
+
+// 66 · The analyzer's own sources must not perturb the map's fingerprint. `astOf` used to
+// walk the whole repo, so adding a module to qf-atlas/ changed `stats.ast.files` and the
+// committed map reported STALE — creating ratchet.mjs alone did it. A staleness signal
+// that fires on analyzer edits trains everyone to ignore it.
+record(66, "adding an analyzer file does not make the map stale", ...(() => {
+  const probe = "qf-atlas/zz-falsify-66.mjs";
+  // Regenerate FIRST. Several checks above restore their fixture in a finally block
+  // without regenerating, so atlas.json on disk can already be stale relative to the
+  // tree — and this probe would then report staleness it did not cause.
+  execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
+  return withFileRaw(probe, "export const unused = 1;\n", () => {
+    try {
+      execFileSync(node, [GEN, "--check"], { cwd: REPO, stdio: "pipe" });
+      return [true, "fingerprint unchanged by a new qf-atlas module"];
+    } catch (err) {
+      return [false, `--check went stale after adding ${probe}: ${String(err.stdout ?? "").trim().slice(0, 90)}`];
+    }
+  });
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

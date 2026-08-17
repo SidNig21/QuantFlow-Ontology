@@ -60,8 +60,13 @@ const factOf = new Map(facts.map((f) => [f.path, f]));
 // process spawns where the regex claimed 15, and governed-review.ts — the file whose
 // coverage gap made the violation count a FLOOR rather than a total — resolves all 28
 // of its SQL sites to an enclosing symbol where the regex indexer managed 16 of 27.
+// Scoped to files the model actually describes. Walking the whole repo pulled qf-atlas's
+// OWN sources into `astOf`, so `stats.ast.files` counted the analyzer's files and the
+// fingerprint moved every time a module was added here — adding ratchet.mjs alone made
+// the committed map report STALE. The map is a projection of the product; editing the
+// analyzer may change what it SAYS, but it must not make the map stale by existing.
 const astOf = new Map();
-for (const p of walk(REPO, [], true).map((f) => rel(f)))
+for (const p of walk(REPO, [], true).map((f) => rel(f)).filter((f) => layerOf(f) !== null))
   astOf.set(p, analyzeFile(p, read(join(REPO, p))));
 if (!tsAvailable())
   console.warn(`qf-atlas: WARNING — TypeScript unavailable (${tsUnavailableReason()}). `

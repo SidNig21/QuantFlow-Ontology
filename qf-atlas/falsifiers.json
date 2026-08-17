@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 63,
-  "total": 63,
+  "passed": 66,
+  "total": 66,
   "results": [
     {
       "n": 1,
@@ -380,6 +380,24 @@
       "name": "a coverage regression is reported as worse, not better",
       "passed": true,
       "detail": "verdict=worse coverageWorse=1"
+    },
+    {
+      "n": 64,
+      "name": "the ratchet fails on a red the baseline does not know",
+      "passed": true,
+      "detail": "exit=1 sawNewRed=true"
+    },
+    {
+      "n": 65,
+      "name": "the baseline refuses to seed without an independent receipt",
+      "passed": true,
+      "detail": "exit=2 refused=true baselineWritten=false"
+    },
+    {
+      "n": 66,
+      "name": "adding an analyzer file does not make the map stale",
+      "passed": true,
+      "detail": "fingerprint unchanged by a new qf-atlas module"
     }
   ]
 }
