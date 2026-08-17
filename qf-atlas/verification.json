@@ -1,0 +1,43 @@
+{
+  "role": "verifier",
+  "verdict": "PASS",
+  "candidate": "40de63bc6e477a016d85f2b93460391389f5dd98",
+  "verifiedAt": "2026-08-17T18:45:00Z",
+  "independentOfBuilder": true,
+  "localStateAtStart": {
+    "head": "40de63bc6e477a016d85f2b93460391389f5dd98",
+    "commitsAheadOfOrigin": 0,
+    "verificationJsonPresent": false,
+    "completedVerifierPassPresent": false
+  },
+  "readerFindingsInspected": {
+    "#7": "PASS — brief splits 3 high / 12 medium; ratchet caveat present; no unqualified lump",
+    "#13": "FAIL then repaired — unexplained-coverage still treated any truthy blocker string as a category. Injecting prose 'no reach row was produced for this path' as the blocker left unexplainedCoverage at 0. Repair: coverage-matrix.mjs accepts only ast-coverage | runtime-proof | package-proof | scope-boundary."
+  },
+  "defectRepairs": [
+    {
+      "id": 1,
+      "claim": "Reader #13 category check",
+      "result": "repaired; fixtures re-run PASS"
+    }
+  ],
+  "falsifiers": {
+    "passed": 74,
+    "total": 74,
+    "exit": 0
+  },
+  "adversarialFixtures": [
+    {
+      "id": "V1",
+      "attack": "Replace every coverage blocker with the old prose string 'no reach row was produced for this path'",
+      "expect": "unexplainedCoverage > 0 (category membership, not truthy prose)",
+      "result": "PASS after defect 1 repair (522 unexplained while poisoned; 0 after restore)"
+    },
+    {
+      "id": "V2",
+      "attack": "Renderer-reachable INSERT INTO mission outside execute()",
+      "expect": "high-confidence violation; HIGH count +1; medium unchanged; brief still splits",
+      "result": "PASS (high 3→4, medium 12→12, briefSplits=true; restored)"
+    }
+  ]
+}

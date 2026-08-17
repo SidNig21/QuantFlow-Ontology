@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "updated": "40de63b",
+  "findings": {
+    "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "links",
+      "confidence": "high",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_attempt",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_attempt",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_invocation",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_invocation",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_publication",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_receipt",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_receipt",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_source_work",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_source_work",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_task",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_task",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:update": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "qf_review_task",
+      "confidence": "medium",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "task",
+      "confidence": "high",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:task:update": {
+      "kind": "governance-violation",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "table": "task",
+      "confidence": "high",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "lifetime:collab-electron/src/main/acp-agent.ts": {
+      "kind": "unreaped-worker",
+      "file": "collab-electron/src/main/acp-agent.ts",
+      "status": "unreaped",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "lifetime:collab-electron/src/main/sidecar/server.ts": {
+      "kind": "unreaped-worker",
+      "file": "collab-electron/src/main/sidecar/server.ts",
+      "status": "unreaped",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "lifetime:collab-electron/src/main/tmux.ts": {
+      "kind": "unreaped-worker",
+      "file": "collab-electron/src/main/tmux.ts",
+      "status": "unreaped",
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "ownership:session-lifecycle": {
+      "kind": "duplicate-ownership",
+      "file": "collab-electron/src/main/host-acp-permission.ts",
+      "claimants": 5,
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "ownership:task-delivery": {
+      "kind": "duplicate-ownership",
+      "file": "packages/qf-kernel/src/execute.ts",
+      "claimants": 5,
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "ownership:review-publication": {
+      "kind": "duplicate-ownership",
+      "file": "packages/qf-kernel/src/governed-review.ts",
+      "claimants": 6,
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    },
+    "ownership:artifact-storage": {
+      "kind": "duplicate-ownership",
+      "file": "packages/qf-kernel/src/create.ts",
+      "claimants": 7,
+      "state": "open",
+      "first_seen": "40de63b",
+      "last_seen": "40de63b"
+    }
+  },
+  "exceptions": {}
+}

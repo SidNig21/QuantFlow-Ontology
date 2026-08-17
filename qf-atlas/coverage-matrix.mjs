@@ -154,9 +154,10 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
     // Every non-clean cell must carry a reason. This assertion is the mechanism
     // behind "unexplained undecided = 0": it makes an unexplained gap impossible to
     // produce rather than merely discouraged.
+    const CATEGORIES = new Set(["ast-coverage", "runtime-proof", "package-proof", "scope-boundary"]);
     const unexplained = Object.entries(cell)
       .filter(([k, v]) => typeof v === "string" && v !== "indexed" && v !== "not-applicable"
-        && !(reasons[k] && cell.blockers?.[k]))
+        && !(reasons[k] && CATEGORIES.has(cell.blockers?.[k])))
       .map(([k]) => k);
 
     return { path, worst, ...cell, reasons, unexplained };
