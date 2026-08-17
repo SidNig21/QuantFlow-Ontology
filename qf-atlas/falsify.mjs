@@ -202,11 +202,25 @@ record(8, "coverage ledger is complete, unique and well-formed", ...(() => {
     : `duplicates=${dupes.length} badStatus=${badStatus.length} missingFromLedger=${missing.length} findingsWithoutSourceClass=${noClass.length}`];
 })());
 
-// 9 · deleting a verified safe leftover removes its node
-record(9, "resolved finding disappears from the model", ...(() => {
-  const had = before.strip.some((s) => s.what === "app:commit-sha");
-  return [had, had ? "app:commit-sha present now; deletion is the founder's call, not the harness's"
-                   : "expected leftover missing"];
+// 9 · a finding must never outlive the code it points at
+//
+// This was a placeholder that asserted `app:commit-sha` was still present,
+// written while deletion was hypothetical. Batch 1 deleted it and the test went
+// red — correctly, but it was watching the wrong thing. The real invariant is
+// that a resolved finding disappears: the map may not accuse code that is gone.
+record(9, "no finding survives the code it points at", ...(() => {
+  const stale = [];
+  for (const s of before.strip) {
+    const file = s.where.split(":")[0];
+    let text = "";
+    try { text = readFileSync(join(REPO, file), "utf8"); } catch { stale.push(`${s.what} -> ${file} does not exist`); continue; }
+    // the channel a strip candidate names must still be registered in that file
+    const channel = s.what.includes("→") ? s.what.split("→").pop().trim() : s.what;
+    if (!text.includes(channel)) stale.push(`${s.what} not found in ${file}`);
+  }
+  return [stale.length === 0,
+    stale.length ? `${stale.length} stale: ${stale.slice(0, 3).join(" · ")}`
+      : `all ${before.strip.length} strip candidates still exist in the source they name`];
 })());
 
 // 10 · stale check

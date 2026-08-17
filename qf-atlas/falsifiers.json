@@ -53,9 +53,9 @@
     },
     {
       "n": 9,
-      "name": "resolved finding disappears from the model",
+      "name": "no finding survives the code it points at",
       "passed": true,
-      "detail": "app:commit-sha present now; deletion is the founder's call, not the harness's"
+      "detail": "all 13 strip candidates still exist in the source they name"
     },
     {
       "n": 10,
@@ -181,7 +181,7 @@
       "n": 30,
       "name": "confirmed findings carry a blast radius",
       "passed": true,
-      "detail": "1 file(s), e.g. governed-review.ts has 14 dependants"
+      "detail": "1 file(s), e.g. governed-review.ts has 12 dependants"
     },
     {
       "n": 31,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 51 -> 50"
+      "detail": "verdict=remove undecided 49 -> 48"
     },
     {
       "n": 33,
