@@ -1,9 +1,28 @@
 # How QuantFlow runs
 
-> Generated from `atlas-generator @ 119c8e7` on 2026-08-17 by
+> Generated from `atlas-generator @ e2f7658` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
+
+## Where this repo stands
+
+**51 of 51 findings have not been looked at.**
+
+That is the number to drive to zero — not the number of findings. Some gaps cannot be
+parsed without a compiler, and some debt is deliberate, so zero findings is not
+reachable. Zero *unlooked-at* is. Record a verdict in `qf-atlas/decisions.json` and a
+finding stops being undecided. Add debt and the number goes back up.
+
+| Verdict | Count |
+|---|---:|
+| `undecided` | 51 |
+| `repair` | 0 |
+| `remove` | 0 |
+| `keep` | 0 |
+| `accepted` | 0 |
+
+**Not all clear.** 51 findings still need a decision.
 
 ## The four hops
 
@@ -102,6 +121,39 @@ Quit must stop every worker it started. This loop is made of lifetime wires, not
 - `pty.ts` — **partial**
   - Stopped by setShuttingDown, killAllAndWait, but shutdownSidecarIfIdle is conditional — that resource survives a close while busy.
 
+## What is actually part of the product
+
+Every other section describes what a file *does*. This one asks whether the file is
+still yours. Imports are walked from the app's real entrypoints — main, both preloads,
+and each window's own script — so this is a file-level graph, not a call graph.
+
+| | Files | Meaning |
+|---|---:|---|
+| `entrypoint` | 15 | the app starts here |
+| `reachable` | 148 | imported from an entrypoint |
+| `process-entry` | 3 | launched by path, not imported (workers) |
+| `package-entry` | 1 | named in a workspace package's exports |
+| `test-only` | 0 | reached only from tests |
+| **`unreachable`** | **9** | **nothing imports it — start here** |
+
+### Unreachable (9)
+
+Nothing in the product imports these. That is evidence, not a verdict: check package
+inclusion and dynamic loading before deleting anything.
+
+- `collab-electron/src/main/sidecar/entry.ts`
+- `collab-electron/src/main/sidecar/log.ts`
+- `collab-electron/src/main/sidecar/ring-buffer.ts`
+- `collab-electron/src/main/sidecar/server.ts`
+- `collab-electron/src/windows/shared/flow-cube/cube3d.js`
+- `packages/qf-kernel/src/db-bun.ts`
+- `packages/qf-kernel/src/fixtures.ts`
+- `packages/qf-kernel/src/insert.ts`
+- `packages/qf-kernel/src/task-governance.ts`
+
+Launched by path rather than imported, so "nobody imports it" is expected:
+`git-replay-worker.ts`, `image-worker.ts`, `watcher-worker.ts`.
+
 ## What to remove
 
 Three buckets, because they call for three different actions. **Do not treat these as
@@ -173,6 +225,27 @@ from the generated schema; reachability follows call sites and the Kernel comman
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | UPDATE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `task` | INSERT INTO | domain-truth | bypass | high |
 | `packages/qf-kernel/src/governed-review.ts` | `task` | UPDATE | domain-truth | bypass | high |
+
+### Before you edit these
+
+Everything that imports the file, directly or transitively. This is what breaks if the
+change is wrong.
+
+`packages/qf-kernel/src/governed-review.ts` — **14 files depend on it**
+
+```
+  packages/qf-kernel/src/portable.ts
+  packages/qf-kernel/src/create.ts
+  collab-electron/src/main/kernel.ts
+  packages/qf-kernel/src/execute.ts
+  collab-electron/src/main/index.ts
+  collab-electron/src/main/ipc.ts
+  collab-electron/src/main/ontology-gateway.ts
+  collab-electron/src/main/host-native-tui.ts
+  collab-electron/src/main/agent-host.ts
+  collab-electron/src/main/connections-ipc.ts
+  …4 more
+```
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,

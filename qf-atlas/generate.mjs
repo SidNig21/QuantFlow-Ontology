@@ -16,6 +16,9 @@ import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
 import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
+import { reachability, blastRadius } from "./reach.mjs";
+import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
+import { readdirSync } from "node:fs";
 
 const OUT = join(REPO, "qf-atlas");
 
@@ -230,6 +233,33 @@ for (const L of LAYERS) {
   layerExtent[L.id] = +(maxR + 1.1).toFixed(2);
 }
 
+// REACHABILITY — is this file part of the running product at all? Everything
+// else describes what a file does; nothing asked whether it is still ours.
+const productFiles = files.filter((f) =>
+  f.startsWith("collab-electron/src/") || f.startsWith("packages/qf-kernel/src/"));
+const reach = reachability({
+  repo: REPO, rel,
+  files: productFiles,
+  htmlEntries: readdirSync(join(REPO, "collab-electron/src/windows"))
+    .map((d) => `collab-electron/src/windows/${d}/index.html`),
+  extraEntries: [
+    "collab-electron/src/main/index.ts",
+    "collab-electron/src/preload/shell.ts",
+    "collab-electron/src/preload/universal.ts",
+  ],
+  isTest: (f) => /.(test|spec)./.test(f),
+  packageDirs: ["packages/qf-kernel", "qf-kernel-schema",
+    "collab-electron/packages/components", "collab-electron/packages/shared",
+    "collab-electron/packages/theme"],
+});
+const reachOf = new Map(reach.rows.map((r) => [r.path, r.reach]));
+
+// BLAST RADIUS — what an agent needs BEFORE it edits a file carrying a finding.
+const blastFor = {};
+for (const p of new Set(persistence.filter((x) => x.governance === "violation")
+    .map((x) => x.evidence[0].file)))
+  blastFor[p] = blastRadius(reach.importedBy, p, 25);
+
 const loops = buildLoops(wires, lifetime);
 
 // ─── model ───────────────────────────────────────────────────────────────────
@@ -272,6 +302,9 @@ const model = {
   })),
   loops,
   coverage: coverageRows,
+  reach: reach.rows,
+  entrypoints: reach.entries,
+  blastRadius: blastFor,
   wires,
   duplicates,
   protocolVariants,
@@ -291,6 +324,16 @@ const fingerprint = createHash("sha256")
   .digest("hex")
   .slice(0, 16);
 model.meta.fingerprint = fingerprint;
+
+// DECISIONS — the record of what was already looked at. The headline number is
+// "undecided", because zero findings is not reachable but zero unlooked-at is.
+const ledger = loadDecisions(join(OUT, "decisions.json"));
+const decided = applyDecisions(currentFindings(model), ledger);
+model.decisions = decided.rows;
+model.decisionOrphans = decided.orphans;
+model.stats.undecided = decided.summary.undecided;
+model.stats.allClear = decided.summary.allClear;
+model.stats.decisions = decided.summary;
 
 mkdirSync(OUT, { recursive: true });
 const json = JSON.stringify(model, null, 2);
@@ -339,4 +382,5 @@ console.log(`qf-atlas: wrote atlas.json + atlas.html + ATLAS.md`);
 console.log(`  ${files.length} files · ${nodes.length} subsystems · ${wires.length} IPC channels`);
 console.log(`  wires: ${counts.live} live · ${counts.unreached} unreached · ${counts.unused} unused · ${counts.dead} DEAD`);
 console.log(`  loops: ${loops.filter(l=>l.health==="ok").length}/${loops.length} healthy · ${loops.filter(l=>l.health!=="ok").map(l=>l.name).join(", ")}`);
+console.log(`  decisions: ${model.stats.undecided} undecided of ${model.stats.decisions.total}${model.stats.allClear ? " — ALL CLEAR" : ""}`);
 console.log(`  ${strip.length} strip candidates · ${persistence.filter(p=>p.governance==="violation").length} confirmed violations · ${persistence.filter(p=>p.governance==="unknown").length} gray · ${coverageRows.filter(c=>c.status==="partial"||c.status==="unindexed").length} coverage gaps`);

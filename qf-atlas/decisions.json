@@ -1,0 +1,22 @@
+{
+  "$comment": [
+    "The ONE file in qf-atlas a human edits by hand. Everything else is generated.",
+    "",
+    "Maps a finding id (from atlas.json) to what you decided about it.",
+    "Anything not listed here counts as 'undecided'.",
+    "",
+    "  keep      intentional, not debt",
+    "  repair    real, scheduled -> becomes a work order",
+    "  remove    confirmed dead -> becomes a deletion batch",
+    "  accepted  known debt you are living with. REQUIRES why, owner and expires,",
+    "            or it does not count as a decision and stays undecided.",
+    "",
+    "All clear means undecided == 0. It does not mean zero findings: some coverage",
+    "gaps are unparseable without a compiler, and some debt is deliberate.",
+    "",
+    "Ids are semantic, so they survive edits inside a file. Renaming a file or",
+    "moving the SQL retires the old id and raises a fresh undecided one, which is",
+    "correct: code that moved deserves another look."
+  ],
+  "decisions": {}
+}

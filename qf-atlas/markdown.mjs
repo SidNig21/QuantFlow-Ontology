@@ -26,6 +26,27 @@ export function renderMarkdown(m) {
   p(`> Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.`);
   p();
 
+  // ── 0. the one number that matters ────────────────────────────────────────
+  const dec = m.stats?.decisions ?? { total: 0, undecided: 0 };
+  p(`## Where this repo stands`);
+  p();
+  p(`**${dec.undecided} of ${dec.total} findings have not been looked at.**`);
+  p();
+  p(`That is the number to drive to zero — not the number of findings. Some gaps cannot be`);
+  p(`parsed without a compiler, and some debt is deliberate, so zero findings is not`);
+  p(`reachable. Zero *unlooked-at* is. Record a verdict in \`qf-atlas/decisions.json\` and a`);
+  p(`finding stops being undecided. Add debt and the number goes back up.`);
+  p();
+  p(`| Verdict | Count |`);
+  p(`|---|---:|`);
+  for (const v of ["undecided", "repair", "remove", "keep", "accepted"])
+    p(`| \`${v}\` | ${dec[v] ?? 0} |`);
+  p();
+  p(dec.allClear
+    ? `**ALL CLEAR** — every finding carries a verdict.`
+    : `**Not all clear.** ${dec.undecided} findings still need a decision.`);
+  p();
+
   // ── 1. the model ──────────────────────────────────────────────────────────
   p(`## The four hops`);
   p();
@@ -93,6 +114,39 @@ export function renderMarkdown(m) {
     p();
   }
 
+  // ── 2b. what is actually yours ────────────────────────────────────────────
+  const reach = m.reach ?? [];
+  const byReach = (k) => reach.filter((r) => r.reach === k);
+  p(`## What is actually part of the product`);
+  p();
+  p(`Every other section describes what a file *does*. This one asks whether the file is`);
+  p(`still yours. Imports are walked from the app's real entrypoints — main, both preloads,`);
+  p(`and each window's own script — so this is a file-level graph, not a call graph.`);
+  p();
+  p(`| | Files | Meaning |`);
+  p(`|---|---:|---|`);
+  p(`| \`entrypoint\` | ${byReach("entrypoint").length} | the app starts here |`);
+  p(`| \`reachable\` | ${byReach("reachable").length} | imported from an entrypoint |`);
+  p(`| \`process-entry\` | ${byReach("process-entry").length} | launched by path, not imported (workers) |`);
+  p(`| \`package-entry\` | ${byReach("package-entry").length} | named in a workspace package's exports |`);
+  p(`| \`test-only\` | ${byReach("test-only").length} | reached only from tests |`);
+  p(`| **\`unreachable\`** | **${byReach("unreachable").length}** | **nothing imports it — start here** |`);
+  p();
+  if (byReach("unreachable").length) {
+    p(`### Unreachable (${byReach("unreachable").length})`);
+    p();
+    p(`Nothing in the product imports these. That is evidence, not a verdict: check package`);
+    p(`inclusion and dynamic loading before deleting anything.`);
+    p();
+    for (const r of byReach("unreachable")) p(`- \`${r.path}\``);
+    p();
+  }
+  if (byReach("process-entry").length) {
+    p(`Launched by path rather than imported, so "nobody imports it" is expected:`);
+    p(byReach("process-entry").map((r) => `\`${r.path.split("/").pop()}\``).join(", ") + ".");
+    p();
+  }
+
   // ── 3. strip ──────────────────────────────────────────────────────────────
   p(`## What to remove`);
   p();
@@ -138,6 +192,25 @@ export function renderMarkdown(m) {
     for (const v of confirmed)
       p(`| \`${v.evidence[0].file}\` | \`${v.table}\` | ${v.verb} | ${v.persistence} | ${v.reachability} | ${v.confidence} |`);
     p();
+  }
+  // Blast radius: the question an agent needs answered BEFORE it edits.
+  const blast = m.blastRadius ?? {};
+  const blastFiles = Object.keys(blast).filter((f) => blast[f].length);
+  if (blastFiles.length) {
+    p(`### Before you edit these`);
+    p();
+    p(`Everything that imports the file, directly or transitively. This is what breaks if the`);
+    p(`change is wrong.`);
+    p();
+    for (const f of blastFiles) {
+      p(`\`${f}\` — **${blast[f].length} files depend on it**`);
+      p();
+      p("```");
+      for (const d of blast[f].slice(0, 10)) p(`  ${d}`);
+      if (blast[f].length > 10) p(`  …${blast[f].length - 10} more`);
+      p("```");
+      p();
+    }
   }
   p(`Deliberately **not** violations, and each was reported as one before the classifier`);
   p(`learned the difference: transport bookkeeping (tables created by the peer-bus DDL,`);

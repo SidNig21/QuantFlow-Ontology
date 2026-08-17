@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 26,
-  "total": 26,
+  "passed": 33,
+  "total": 33,
   "results": [
     {
       "n": 1,
@@ -158,6 +158,48 @@
       "name": "typed-brace SQL does not leave hop 4 read-only",
       "passed": true,
       "detail": "hop4=cheats coverage=indexed violation=true"
+    },
+    {
+      "n": 27,
+      "name": "an unimported file is unreachable",
+      "passed": true,
+      "detail": "reach=unreachable"
+    },
+    {
+      "n": 28,
+      "name": "core Kernel files are never reported unreachable",
+      "passed": true,
+      "detail": "db.ts, execute.ts, create.ts all reachable"
+    },
+    {
+      "n": 29,
+      "name": "spawned workers are process entries, not dead",
+      "passed": true,
+      "detail": "3 worker file(s), 0 wrongly dead"
+    },
+    {
+      "n": 30,
+      "name": "confirmed findings carry a blast radius",
+      "passed": true,
+      "detail": "1 file(s), e.g. governed-review.ts has 14 dependants"
+    },
+    {
+      "n": 31,
+      "name": "a new finding arrives as undecided",
+      "passed": true,
+      "detail": "verdict=undecided"
+    },
+    {
+      "n": 32,
+      "name": "a recorded verdict clears undecided",
+      "passed": true,
+      "detail": "verdict=remove undecided 51 -> 50"
+    },
+    {
+      "n": 33,
+      "name": "bare 'accepted' cannot hide a finding",
+      "passed": true,
+      "detail": "verdict=undecided (accepted without owner, reason and expiry does not count as a decision)"
     }
   ]
 }

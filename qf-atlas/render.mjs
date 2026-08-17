@@ -31,7 +31,10 @@ aside.right{border-right:none;border-left:1px solid var(--rule);padding:var(--s6
 .tab.on{color:var(--text);border-bottom-color:var(--ice)}
 .grp{font-size:var(--t-micro);letter-spacing:.09em;text-transform:uppercase;color:var(--dim);
   padding:var(--s5) var(--s6) var(--s2);display:flex}
-.grp b{margin-left:auto;font-family:var(--mono);color:var(--faint)}
+.grp-floor{width:100%;background:none;border:none;border-left:2px solid transparent;
+  cursor:pointer;text-align:left;font:inherit}
+.grp-floor:hover,.grp-floor.on{background:var(--panel3);color:var(--text);border-left-color:var(--ice)}
+.grp-floor b{margin-left:auto;font-family:var(--mono);color:var(--faint)}
 .item{display:flex;gap:var(--s3);align-items:baseline;width:100%;background:none;border:none;
   color:var(--muted);font-size:var(--t-meta);text-align:left;padding:3px var(--s6);cursor:pointer;
   border-left:2px solid transparent}
@@ -109,7 +112,7 @@ mark{background:#2b3410;color:var(--text);padding:0 2px}
     <button class="btn on" id="play">Pause</button>
     <button class="btn" id="reset">Reset view</button>
     <button class="btn" id="broken">Broken only</button>
-    <button class="btn" id="back" style="display:none">← Leave process</button>
+    <button class="btn" id="back" style="display:none">← Leave floor</button>
   </div>
   <div class="stat" id="stat"></div>
   <div class="legend">
@@ -148,7 +151,8 @@ const EDGES=[...edgeMap.values()].filter(e=>e.from&&e.to&&e.from!==e.to);
 
 const cv=document.getElementById("c"),cx=cv.getContext("2d");
 let W=0,H=0,DPR=Math.min(devicePixelRatio||1,2);
-let cam={x:0,y:0,z:1},drag=null,sel=null,hover=null,focus=null,playing=true,brokenOnly=false;
+let cam={x:0,y:0,z:1},drag=null,sel=null,hover=null,focus=null,layerFocus=null,playing=true,brokenOnly=false;
+const layerHits=[];
 const t0=performance.now();
 const TILE=64,LIFT=200;
 
@@ -161,7 +165,23 @@ function fitView(){const bot=(M.layers.length-1)*LIFT,
     spread=Math.max(...M.layers.map(l=>l.extent||4.4))*2*TILE*.46;
   cam.x=0;cam.y=-bot/2;cam.z=Math.max(.3,Math.min(1,(H-96)/(bot+spread*2)));}
 function nodeSize(n){return Math.max(15,Math.min(46,13+Math.sqrt(n.kb)*3.1));}
-function visible(n){return !focus||n.id===focus||EDGES.some(e=>(e.from===focus&&e.to===n.id)||(e.to===focus&&e.from===n.id));}
+function fitLayer(id){const L=M.layers.find(l=>l.id===id);
+  const spread=(L.extent||4.4)*2*TILE*.46;
+  cam.x=0;cam.y=-L.y*LIFT;cam.z=Math.max(.55,Math.min(2.2,(H-96)/(spread*2+120)));}
+function onFloor(){return layerFocus!==null||focus!==null;}
+function visible(n){if(layerFocus!==null&&n.layer!==layerFocus) return false;
+  return !focus||n.id===focus||EDGES.some(e=>(e.from===focus&&e.to===n.id)||(e.to===focus&&e.from===n.id));}
+function edgeVisible(e){const A=byId[e.from],B=byId[e.to];
+  if(layerFocus!==null&&(A.layer!==layerFocus||B.layer!==layerFocus)) return false;
+  if(focus&&e.from!==focus&&e.to!==focus) return false;
+  return true;}
+function pointInPoly(x,y,pts){let inside=false;
+  for(let i=0,j=pts.length-1;i<pts.length;j=i++){
+    const xi=pts[i].x,yi=pts[i].y,xj=pts[j].x,yj=pts[j].y;
+    if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) inside=!inside;
+  }
+  return inside;}
+function pickLayer(mx,my){for(const L of layerHits){if(pointInPoly(mx,my,L.pts)) return L.id;} return null;}
 
 function draw(){
   const T=(performance.now()-t0)/1000;
@@ -169,11 +189,16 @@ function draw(){
   const FF=getComputedStyle(document.body).fontFamily;
   const order=[...M.layers].sort((a,b)=>b.y-a.y);
 
+  layerHits.length=0;
   for(const L of order){
     const s=L.extent||4.4,pts=[[-s,-s],[s,-s],[s,s],[-s,s]].map(([a,b])=>proj(iso(a,b,L.id)));
+    layerHits.push({id:L.id,pts});
+    const isolated=layerFocus!==null,isHere=L.id===layerFocus,dim=isolated&&!isHere;
     cx.beginPath();cx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(q=>cx.lineTo(q.x,q.y));cx.closePath();
-    cx.fillStyle=\`rgba(21,32,52,\${(focus?.18:.30)+L.y*.05})\`;cx.fill();
-    cx.strokeStyle=L.id===0?"#33466a":"#22314b";cx.lineWidth=L.id===0?1.4:1;cx.stroke();
+    cx.fillStyle=dim?"rgba(6,10,18,.72)":\`rgba(21,32,52,\${(focus?.18:.30)+L.y*.05})\`;cx.fill();
+    cx.strokeStyle=isHere?"#5cc8ff":(L.id===0?"#33466a":"#22314b");
+    cx.lineWidth=isHere?2:(L.id===0?1.4:1);cx.stroke();
+    if(dim){cx.save();cx.fillStyle="rgba(6,10,18,.35)";cx.fill();cx.restore();continue;}
     cx.save();cx.globalAlpha=focus?.22:.5;cx.strokeStyle="#1a2740";cx.lineWidth=.5;
     for(let g=-s+0.6;g<=s-0.6;g+=s/4){
       let a=proj(iso(g,-s,L.id)),b=proj(iso(g,s,L.id));
@@ -184,15 +209,15 @@ function draw(){
     cx.restore();
     const lp=proj(iso(-s,s,L.id));
     cx.save();cx.translate(lp.x+10,lp.y-6);
-    cx.fillStyle=focus?"#3b4b68":"#7288ab";cx.font="600 12px "+FF;
+    cx.fillStyle=isHere?"#5cc8ff":(focus?"#3b4b68":"#7288ab");cx.font="600 12px "+FF;
     cx.fillText(\`LVL \${L.id}  \${L.name}\`,0,0);cx.restore();
   }
 
   // ── wires. a packet stops where the flow actually dies ──
   for(const e of EDGES){
     if(brokenOnly&&e.status==="live") continue;
+    if(!edgeVisible(e)) continue;
     const A=byId[e.from],B=byId[e.to];
-    if(focus&&e.from!==focus&&e.to!==focus) continue;
     const pa=proj(iso(A.x,A.z,A.layer)),pb=proj(iso(B.x,B.z,B.layer));
     const on=(sel&&(e.from===sel||e.to===sel));
     cx.beginPath();cx.moveTo(pa.x,pa.y);cx.lineTo(pb.x,pb.y);
@@ -225,6 +250,7 @@ function draw(){
   // ── blocks ──
   const labels=[];
   for(const L of order) for(const n of M.nodes.filter(n=>n.layer===L.id)){
+    if(layerFocus!==null&&n.layer!==layerFocus) continue;
     if(brokenOnly&&n.status!=="alert"&&n.status!=="warn") continue;
     const dim=focus&&!visible(n);
     const p=proj(iso(n.x,n.z,n.layer)),s=nodeSize(n)*cam.z,h=s*.62;
@@ -257,9 +283,10 @@ function draw(){
   cx.textAlign="left";
 
   const s=M.stats;
+  const floorLine=layerFocus!==null?"<br><span style=\\"color:#5cc8ff\\">LVL "+layerFocus+" only</span>":"";
   document.getElementById("stat").innerHTML=
     \`\${M.meta.filesScanned} files · \${M.nodes.length} subsystems<br>\`+
-    \`\${s.channels} IPC channels · \${EDGES.length} wires<br>\`+
+    \`\${s.channels} IPC channels · \${EDGES.length} wires\${floorLine}<br>\`+
     \`<span style="color:#ff8a75">\${s.unreached+s.dead} unreached/dead</span> · \`+
     \`<span style="color:#f2c260">\${s.unused} unused</span><br>\`+
     \`\${M.meta.branch} @ \${M.meta.commit} · \${M.meta.generatedAt}\`;
@@ -278,11 +305,16 @@ addEventListener("mouseup",()=>{drag=null;cv.classList.remove("drag")});
 addEventListener("mousemove",e=>{
   const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
   if(drag){cam.x+=(e.clientX-drag.x)/cam.z;cam.y+=(e.clientY-drag.y)/cam.z;drag={x:e.clientX,y:e.clientY};return}
-  if(mx<0||my<0||mx>r.width||my>r.height){hover=null;return}
-  const n=pick(mx,my);hover=n?n.id:null;cv.style.cursor=n?"pointer":"grab";
+  if(mx<0||my<0||mx>r.width||my>r.height){hover=null;cv.style.cursor="grab";return}
+  const n=pick(mx,my);
+  if(n){hover=n.id;cv.style.cursor="pointer";return}
+  hover=null;cv.style.cursor=pickLayer(mx,my)!==null?"pointer":"grab";
 });
-cv.addEventListener("click",e=>{const r=cv.getBoundingClientRect();
-  const n=pick(e.clientX-r.left,e.clientY-r.top);if(n)select(n.id);});
+cv.addEventListener("click",e=>{const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
+  const n=pick(mx,my);
+  if(n){select(n.id);return}
+  const lid=pickLayer(mx,my);
+  if(lid!==null) isolateLayer(lid);});
 cv.addEventListener("dblclick",e=>{const r=cv.getBoundingClientRect();
   const n=pick(e.clientX-r.left,e.clientY-r.top);if(n)enter(n.id);});
 cv.addEventListener("wheel",e=>{e.preventDefault();
@@ -290,14 +322,68 @@ cv.addEventListener("wheel",e=>{e.preventDefault();
 
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 
-// ── zoom into a process ──
+// ── zoom into a process or isolate a floor ──
+function backLabel(){return focus?"← Leave process":"← Leave floor";}
+function syncBack(){const b=document.getElementById("back");
+  if(onFloor()){b.style.display="";b.textContent=backLabel();}else b.style.display="none";}
+function showFloorPanel(id){
+  const L=M.layers.find(l=>l.id===id);
+  const ns=M.nodes.filter(n=>n.layer===id).sort((a,b)=>b.kb-a.kb);
+  const wires=EDGES.filter(edgeVisible);
+  document.getElementById("panel").innerHTML=\`
+    <span class="tag ice">LVL \${id} · \${esc(L.name)}</span>
+    <h1>Floor \${id}</h1>
+    <p class="sub">\${ns.length} subsystems on this level · \${wires.length} internal wires shown</p>
+    <p class="prose">Click a block to inspect it. Double-click to zoom into one process.
+    Other floors are hidden until you leave this view.</p>
+    <h2>Subsystems</h2>
+    \${ns.map(n=>\`<div class="row" style="cursor:pointer" onclick="select('\${n.id}')"><b>\${esc(n.name)}</b>
+       <span style="color:\${TONE[n.status]||"#8fa3c0"}">\${n.kb} KB · \${n.status}</span></div>\`).join("")}\`;
+}
+function showHomePanel(){
+  document.getElementById("panel").innerHTML=\`
+    <span class="tag ice">generated projection</span>
+    <h1>QuantFlow Atlas</h1>
+    <p class="sub">How the program is wired right now, read straight from the code on
+     <span style="font-family:var(--mono)">\${M.meta.branch} @ \${M.meta.commit}</span>.
+     Not Kernel truth. Not the running app.</p>
+    <h2>What the wires mean</h2>
+    <p class="prose">Every wire is one real IPC channel traced across three hops:
+    <mark>renderer → preload → main</mark>. A packet travels the wire only as far as the code
+    actually carries it. Where it stops, an × marks the break — that is where work dies.</p>
+    <div class="row"><b>Click a floor</b><span>isolate one level on the map</span></div>
+    <div class="row"><b>Click a block</b><span>files, wires, what to strip</span></div>
+    <div class="row"><b>Double-click a block</b><span>zoom inside the process</span></div>
+    <div class="row"><b>Strip tab</b><span>everything that should be removed</span></div>
+    <div class="row"><b>Wires tab</b><span>every channel by health</span></div>
+    <h2>Right now</h2>
+    <div class="row"><b>Live end to end</b><span style="color:#5cc8ff">\${M.stats.live}</span></div>
+    <div class="row"><b>Unused by renderer</b><span style="color:#f2c260">\${M.stats.unused}</span></div>
+    <div class="row"><b>Unreached in main</b><span style="color:#ff8a75">\${M.stats.unreached}</span></div>
+    <div class="row"><b>Dead (fails at runtime)</b><span style="color:#ff8a75">\${M.stats.dead}</span></div>
+    <div class="row"><b>Strip candidates</b><span style="color:#ff8a75">\${M.stats.stripCandidates}</span></div>
+    <h2>Staying true</h2>
+    <p class="prose">Nobody edits this file. <span style="font-family:var(--mono)">bun qf-atlas/generate.mjs</span>
+    rewrites it from source; <span style="font-family:var(--mono)">--check</span> fails the build when the
+    map and the code disagree.</p>\`;
+}
+function isolateLayer(id){
+  if(layerFocus===id&&!focus){layerFocus=null;syncBack();fitView();renderRail(document.querySelector(".tab.on")?.dataset.tab||"map");showHomePanel();return;}
+  layerFocus=id;focus=null;syncBack();fitLayer(id);renderRail("map");showFloorPanel(id);
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab==="map"));
+}
 function enter(id){
+  if(layerFocus!==null&&byId[id].layer!==layerFocus) return;
   focus=id;const n=byId[id];
   cam.x=-iso(n.x,n.z,n.layer).x;cam.y=-iso(n.x,n.z,n.layer).y;cam.z=1.5;
-  document.getElementById("back").style.display="";
-  select(id);
+  syncBack();select(id);
 }
-function leave(){focus=null;document.getElementById("back").style.display="none";fitView();}
+function leave(){
+  if(focus){focus=null;
+    if(layerFocus!==null){syncBack();fitLayer(layerFocus);showFloorPanel(layerFocus);return;}
+    syncBack();fitView();return;}
+  if(layerFocus!==null){layerFocus=null;syncBack();fitView();renderRail(document.querySelector(".tab.on")?.dataset.tab||"map");showHomePanel();}
+}
 document.getElementById("back").onclick=leave;
 
 function wirePath(w){
@@ -372,9 +458,10 @@ function renderRail(tab){
   } else if(tab==="map"){
     rail.innerHTML=M.layers.map(L=>{
       const ns=M.nodes.filter(n=>n.layer===L.id).sort((a,b)=>b.kb-a.kb);
-      return \`<div class="grp">LVL \${L.id} · \${esc(L.name)}<b>\${ns.length}</b></div>\`+
-        ns.map(n=>\`<button class="item \${n.status==="alert"?"alert":n.status==="warn"?"warn":""}"
-          data-id="\${n.id}" data-act="node">\${esc(n.name)}<span class="k">\${n.kb}</span></button>\`).join("");
+      return \`<button type="button" class="grp grp-floor \${layerFocus===L.id?"on":""}" data-layer="\${L.id}">
+        LVL \${L.id} · \${esc(L.name)}<b>\${ns.length}</b></button>\`+
+        (layerFocus===null||layerFocus===L.id?ns.map(n=>\`<button class="item \${n.status==="alert"?"alert":n.status==="warn"?"warn":""}"
+          data-id="\${n.id}" data-act="node">\${esc(n.name)}<span class="k">\${n.kb}</span></button>\`).join(""):"");
     }).join("");
   } else if(tab==="strip"){
     const kinds={};for(const s of M.strip)(kinds[s.kind]||=[]).push(s);
@@ -392,6 +479,8 @@ function renderRail(tab){
   }
 }
 rail.addEventListener("click",e=>{
+  const floor=e.target.closest(".grp-floor");
+  if(floor){isolateLayer(Number(floor.dataset.layer));return}
   const b=e.target.closest(".item");if(!b)return;
   if(b.dataset.act==="node") select(b.dataset.id);
   else if(b.dataset.act==="wire") selectWire(b.dataset.id);
@@ -402,36 +491,12 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>renderRail(t.dataset.
 
 document.getElementById("play").onclick=e=>{playing=!playing;
   e.target.textContent=playing?"Pause":"Resume";e.target.classList.toggle("on",playing)};
-document.getElementById("reset").onclick=()=>{leave();};
+document.getElementById("reset").onclick=()=>{focus=null;layerFocus=null;syncBack();fitView();showHomePanel();};
 document.getElementById("broken").onclick=e=>{brokenOnly=!brokenOnly;e.target.classList.toggle("on",brokenOnly)};
 addEventListener("resize",()=>{resize();if(!focus)fitView()});
-window.enter=enter;
+window.enter=enter;window.isolateLayer=isolateLayer;
 
-resize();fitView();renderRail("loops");
-document.getElementById("panel").innerHTML=\`
-  <span class="tag ice">generated projection</span>
-  <h1>QuantFlow Atlas</h1>
-  <p class="sub">How the program is wired right now, read straight from the code on
-   <span style="font-family:var(--mono)">\${M.meta.branch} @ \${M.meta.commit}</span>.
-   Not Kernel truth. Not the running app.</p>
-  <h2>What the wires mean</h2>
-  <p class="prose">Every wire is one real IPC channel traced across three hops:
-  <mark>renderer → preload → main</mark>. A packet travels the wire only as far as the code
-  actually carries it. Where it stops, an × marks the break — that is where work dies.</p>
-  <div class="row"><b>Click a block</b><span>files, wires, what to strip</span></div>
-  <div class="row"><b>Double-click a block</b><span>zoom inside the process</span></div>
-  <div class="row"><b>Strip tab</b><span>everything that should be removed</span></div>
-  <div class="row"><b>Wires tab</b><span>every channel by health</span></div>
-  <h2>Right now</h2>
-  <div class="row"><b>Live end to end</b><span style="color:#5cc8ff">\${M.stats.live}</span></div>
-  <div class="row"><b>Unused by renderer</b><span style="color:#f2c260">\${M.stats.unused}</span></div>
-  <div class="row"><b>Unreached in main</b><span style="color:#ff8a75">\${M.stats.unreached}</span></div>
-  <div class="row"><b>Dead (fails at runtime)</b><span style="color:#ff8a75">\${M.stats.dead}</span></div>
-  <div class="row"><b>Strip candidates</b><span style="color:#ff8a75">\${M.stats.stripCandidates}</span></div>
-  <h2>Staying true</h2>
-  <p class="prose">Nobody edits this file. <span style="font-family:var(--mono)">bun qf-atlas/generate.mjs</span>
-  rewrites it from source; <span style="font-family:var(--mono)">--check</span> fails the build when the
-  map and the code disagree.</p>\`;
+resize();fitView();renderRail("loops");showHomePanel();
 draw();
 </script>
 `;

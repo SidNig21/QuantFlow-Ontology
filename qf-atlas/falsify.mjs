@@ -49,6 +49,25 @@ function record(n, name, passed, detail) {
   if (detail) console.log(`        ${detail}`);
 }
 
+/** Windows holds transient locks (errno -4094). The generator and the receipt
+ *  already write atomically; the fixture writer did not, so a locked write left
+ *  a falsifier fixture behind IN decisions.json — corrupting the very ledger the
+ *  test was checking. Same treatment. */
+function writeAtomic(abs, contents) {
+  for (let i = 0; i < 5; i++) {
+    try {
+      const tmp = `${abs}.tmp-${process.pid}`;
+      writeFileSync(tmp, contents);
+      renameSync(tmp, abs);
+      return;
+    } catch (err) {
+      if (i === 4) throw err;
+      const until = Date.now() + 80 * (i + 1);
+      while (Date.now() < until) { /* backoff */ }
+    }
+  }
+}
+
 /** Write a temp file and assert WITHOUT regenerating — for the staleness test,
  *  where calling model() first makes the artefact current and the check can
  *  never observe the drift it exists to catch. */
@@ -56,9 +75,9 @@ function withFileRaw(path, contents, assertFn) {
   const abs = join(REPO, path);
   const existed = existsSync(abs);
   const original = existed ? readFileSync(abs, "utf8") : null;
-  try { writeFileSync(abs, contents); return assertFn(); }
+  try { writeAtomic(abs, contents); return assertFn(); }
   finally {
-    if (existed) writeFileSync(abs, original);
+    if (existed) writeAtomic(abs, original);
     else if (existsSync(abs)) unlinkSync(abs);
   }
 }
@@ -69,10 +88,10 @@ function withFile(path, contents, assertFn) {
   const existed = existsSync(abs);
   const original = existed ? readFileSync(abs, "utf8") : null;
   try {
-    writeFileSync(abs, contents);
+    writeAtomic(abs, contents);
     return assertFn(model());
   } finally {
-    if (existed) writeFileSync(abs, original);
+    if (existed) writeAtomic(abs, original);
     else if (existsSync(abs)) unlinkSync(abs);
   }
 }
@@ -404,6 +423,90 @@ record(26, "typed-brace SQL does not leave hop 4 read-only",
       const ok = hop === "cheats" || (cov?.status === "partial" && hop && hop !== "read-only");
       return [!!ok, `hop4=${hop} coverage=${cov?.status} violation=${!!v}`];
     }));
+
+// ── REACHABILITY ───────────────────────────────────────────────────────────
+// A throwaway version of this analysis reported create.ts and db.ts as dead
+// because it did not follow the workspace-package import `qf-kernel/portable`.
+// db.ts has 21 importers. Locking that specific lie down first.
+
+// 27 · a file nothing imports is unreachable
+record(27, "an unimported file is unreachable",
+  ...withFile(`${MAIN}/zz-falsify-27.ts`,
+    `export function orphan(){ return 1; }\n`,
+    (m) => {
+      const r = m.reach.find((x) => x.path.endsWith("zz-falsify-27.ts"));
+      return [r?.reach === "unreachable", r ? `reach=${r.reach}` : "file absent from the reach ledger"];
+    }));
+
+// 28 · the load-bearing files can NEVER be unreachable — this is the lock that
+// caught the bad probe
+record(28, "core Kernel files are never reported unreachable", ...(() => {
+  const core = ["packages/qf-kernel/src/db.ts", "packages/qf-kernel/src/execute.ts", "packages/qf-kernel/src/create.ts"];
+  const bad = core.filter((c) => {
+    const r = before.reach.find((x) => x.path === c);
+    return !r || r.reach === "unreachable" || r.reach === "test-only";
+  });
+  return [bad.length === 0, bad.length ? `WRONGLY DEAD: ${bad.join(", ")}` : core.map((c) => c.split("/").pop()).join(", ") + " all reachable"];
+})());
+
+// 29 · a worker launched by path is a process entry, not dead code
+record(29, "spawned workers are process entries, not dead", ...(() => {
+  const workers = before.reach.filter((r) => /worker\.ts$/.test(r.path));
+  const wrong = workers.filter((w) => w.reach === "unreachable");
+  return [workers.length > 0 && wrong.length === 0,
+    `${workers.length} worker file(s), ${wrong.length} wrongly dead`];
+})());
+
+// 30 · blast radius is populated for files carrying confirmed findings
+record(30, "confirmed findings carry a blast radius", ...(() => {
+  const files = [...new Set(before.persistence.filter((p) => p.governance === "violation")
+    .map((p) => p.evidence[0].file))];
+  const missing = files.filter((f) => !(before.blastRadius?.[f]?.length));
+  return [files.length > 0 && missing.length === 0,
+    missing.length ? `no dependants computed for ${missing.join(", ")}`
+      : `${files.length} file(s), e.g. ${files[0].split("/").pop()} has ${before.blastRadius[files[0]].length} dependants`];
+})());
+
+// ── DECISIONS ──────────────────────────────────────────────────────────────
+const DECISIONS = "qf-atlas/decisions.json";
+const ledgerWith = (obj) => JSON.stringify({ decisions: obj }, null, 2);
+const firstUnreachable = () => (before.reach.find((r) => r.reach === "unreachable") ?? {}).path;
+
+// 31 · a finding nobody has ruled on is undecided
+record(31, "a new finding arrives as undecided",
+  ...withFile(`${MAIN}/zz-falsify-31.ts`,
+    `export function orphan(){ return 1; }\n`,
+    (m) => {
+      const d = m.decisions.find((x) => x.id === "unreachable:collab-electron/src/main/zz-falsify-31.ts");
+      return [d?.verdict === "undecided", d ? `verdict=${d.verdict}` : "finding not in the decision ledger"];
+    }));
+
+// 32 · recording a verdict takes it out of undecided
+record(32, "a recorded verdict clears undecided", ...(() => {
+  const target = firstUnreachable();
+  if (!target) return [false, "no unreachable finding to decide on"];
+  const id = `unreachable:${target}`;
+  return withFile(DECISIONS,
+    ledgerWith({ [id]: { verdict: "remove", why: "falsifier", owner: "test", expires: "2099-01-01" } }),
+    (m) => {
+      const d = m.decisions.find((x) => x.id === id);
+      return [d?.verdict === "remove" && m.stats.undecided < before.stats.undecided,
+        `verdict=${d?.verdict} undecided ${before.stats.undecided} -> ${m.stats.undecided}`];
+    });
+})());
+
+// 33 · "accepted" without owner, reason and expiry is NOT a decision.
+// Otherwise the whole ledger can be zeroed with one careless entry.
+record(33, "bare 'accepted' cannot hide a finding", ...(() => {
+  const target = firstUnreachable();
+  if (!target) return [false, "no unreachable finding to test"];
+  const id = `unreachable:${target}`;
+  return withFile(DECISIONS, ledgerWith({ [id]: { verdict: "accepted" } }), (m) => {
+    const d = m.decisions.find((x) => x.id === id);
+    return [d?.verdict === "undecided",
+      d ? `verdict=${d.verdict}${d.note ? ` (${d.note})` : ""}` : "finding vanished"];
+  });
+})());
 
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
