@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ f514b1d` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 4aa02d1` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -315,9 +315,11 @@ from the generated schema; reachability follows call sites and the Kernel comman
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong.
+change is wrong. **`atlas.json` carries this for every file** — 232 of
+234 — not only the ones carrying a finding, because the question is
+asked before the change, when nothing is red yet.
 
-`packages/qf-kernel/src/governed-review.ts` — **34 files depend on it**
+`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 5
 
 ```
   packages/qf-kernel/src/index.ts
@@ -330,8 +332,23 @@ change is wrong.
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
   qa/gates/dock-registry/run.ts
-  …24 more
+  …30 more
 ```
+
+### Blast-radius coverage
+
+**232 of 234 files** carry a blast radius in `atlas.json`. The rest have
+no dependents, no dependencies and no wires, so there is nothing to report for them.
+
+Most-depended-on files — change these last:
+
+| File | Dependents | Imports | Wires |
+|---|---:|---:|---:|
+| `packages/qf-kernel/src/registry-drift.ts` | 54+ | 0 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 54+ | 1 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 54+ | 3 | 0 |
+| `packages/qf-kernel/src/db.ts` | 49+ | 4 | 0 |
+| `packages/qf-kernel/src/errors.ts` | 49+ | 0 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,

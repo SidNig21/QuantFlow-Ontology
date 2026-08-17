@@ -1,6 +1,6 @@
 {
   "ran": "2026-08-17",
-  "passed": 43,
+  "passed": 42,
   "total": 43,
   "results": [
     {
@@ -180,8 +180,8 @@
     {
       "n": 30,
       "name": "confirmed findings carry a blast radius",
-      "passed": true,
-      "detail": "1 file(s), e.g. governed-review.ts has 34 dependants"
+      "passed": false,
+      "detail": "no dependants computed for packages/qf-kernel/src/governed-review.ts"
     },
     {
       "n": 31,

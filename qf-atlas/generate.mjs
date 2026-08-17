@@ -337,12 +337,46 @@ const reach = reachability({
 const reachOf = new Map(reach.rows.map((r) => [r.path, r.reach]));
 
 // BLAST RADIUS — what an agent needs BEFORE it edits a file carrying a finding.
-const blastFor = {};
-for (const p of new Set(persistence.filter((x) => x.governance === "violation")
-    .map((x) => x.evidence[0].file)))
-  blastFor[p] = blastRadius(reach.importedBy, p, 25);
-
+// MANDATORY FOR V1, and it used to exist for exactly one file. `importedBy` is
+// computed for the whole graph; only confirmed-violation files got a blast radius,
+// so "what breaks if I change this?" was answerable for 1 of 234 files while the
+// data for all 234 sat in memory. Withholding it because a file is not red is
+// backwards: the question is asked BEFORE the change, when nothing is red yet.
 const loops = buildLoops(wires, lifetime);
+
+const wiresTouching = (p) => wires.filter((w) =>
+  w.registeredAt?.file === p || w.calledAt?.file === p);
+const loopsTouching = (channels) => loops
+  .filter((l) => l.members.some((m) => channels.includes(m.channel)))
+  .map((l) => l.name);
+
+const blastFor = {};
+for (const r of reach.rows) {
+  const direct = [...(reach.importedBy.get(r.path) ?? [])];
+  const transitive = blastRadius(reach.importedBy, r.path, 40);
+  const channels = wiresTouching(r.path).map((w) => w.channel);
+  // Only carry an entry when there is something to say. A file with no dependents,
+  // no dependencies and no wires would otherwise add an empty object per row and
+  // bloat the model without answering anything.
+  if (!direct.length && !transitive.length && !channels.length && !r.importCount) continue;
+  blastFor[r.path] = {
+    reach: r.reach,
+    directDependents: direct,
+    transitiveDependents: transitive.filter((f) => !direct.includes(f)),
+    transitiveTruncated: transitive.length >= 40,
+    directDependencies: reach.dependsOn?.get(r.path) ?? [],
+    affectedWires: channels,
+    affectedLoops: loopsTouching(channels),
+    // Lifetime is only meaningful for a module that starts a long-lived process.
+    affectedProcesses: lifetime.filter((l) => l.module === r.path)
+      .map((l) => ({ spawns: l.spawns, reaped: l.status })),
+    packaged: r.reach === "entrypoint" || r.reach === "process-entry" ? "build-declared"
+      : r.reach === "package-entry" ? "package-export"
+      : r.reach === "reachable" ? "bundled-via-import"
+      : r.reach === "test-only" ? "test-only"
+      : "not-reached",
+  };
+}
 
 // ─── model ───────────────────────────────────────────────────────────────────
 const counts = {

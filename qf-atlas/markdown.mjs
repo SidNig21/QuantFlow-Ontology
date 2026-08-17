@@ -287,22 +287,47 @@ export function renderMarkdown(m) {
   }
   // Blast radius: the question an agent needs answered BEFORE it edits.
   const blast = m.blastRadius ?? {};
-  const blastFiles = Object.keys(blast).filter((f) => blast[f].length);
-  if (blastFiles.length) {
+  const total = (b) => b.directDependents.length + b.transitiveDependents.length;
+  if (confirmed.length) {
     p(`### Before you edit these`);
     p();
     p(`Everything that imports the file, directly or transitively. This is what breaks if the`);
-    p(`change is wrong.`);
+    p(`change is wrong. **\`atlas.json\` carries this for every file** — ${Object.keys(blast).length} of`);
+    p(`${(m.reach ?? []).length} — not only the ones carrying a finding, because the question is`);
+    p(`asked before the change, when nothing is red yet.`);
     p();
-    for (const f of blastFiles) {
-      p(`\`${f}\` — **${blast[f].length} files depend on it**`);
+    for (const f of new Set(confirmed.map((v) => v.evidence[0].file))) {
+      const b = blast[f];
+      if (!b) continue;
+      p(`\`${f}\` — **${total(b)} files depend on it**, it imports ${b.directDependencies.length}`);
+      if (b.affectedWires.length) p(`  · wires: ${b.affectedWires.map((c) => `\`${c}\``).join(", ")}`);
+      if (b.affectedLoops.length) p(`  · loops: ${b.affectedLoops.join(", ")}`);
       p();
       p("```");
-      for (const d of blast[f].slice(0, 10)) p(`  ${d}`);
-      if (blast[f].length > 10) p(`  …${blast[f].length - 10} more`);
+      for (const d of [...b.directDependents, ...b.transitiveDependents].slice(0, 10)) p(`  ${d}`);
+      if (total(b) > 10) p(`  …${total(b) - 10} more`);
       p("```");
       p();
     }
+  }
+  // Contract delivery item 10 — a blast-radius coverage summary, so a reader can see
+  // how much of the repo the question is answerable for rather than inferring it.
+  {
+    const rows = m.reach ?? [];
+    const withBlast = Object.keys(blast).length;
+    const heavy = Object.entries(blast).sort((a, b) => total(b[1]) - total(a[1])).slice(0, 5);
+    p(`### Blast-radius coverage`);
+    p();
+    p(`**${withBlast} of ${rows.length} files** carry a blast radius in \`atlas.json\`. The rest have`);
+    p(`no dependents, no dependencies and no wires, so there is nothing to report for them.`);
+    p();
+    p(`Most-depended-on files — change these last:`);
+    p();
+    p(`| File | Dependents | Imports | Wires |`);
+    p(`|---|---:|---:|---:|`);
+    for (const [f, b] of heavy)
+      p(`| \`${f}\` | ${total(b)}${b.transitiveTruncated ? "+" : ""} | ${b.directDependencies.length} | ${b.affectedWires.length} |`);
+    p();
   }
   p(`Deliberately **not** violations, and each was reported as one before the classifier`);
   p(`learned the difference: transport bookkeeping (tables created by the peer-bus DDL,`);

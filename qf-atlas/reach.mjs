@@ -226,6 +226,12 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
   const entrySet = new Set(entries);
   const launched = (p) => quoted.has(p.split("/").pop().replace(/\.ts$/, ".js")) || quoted.has(p.split("/").pop());
 
+  // Outgoing edges for EVERY row, not only walked files. An unreachable file is
+  // never traversed, so without this its own dependencies are unknown — and
+  // "what does this use?" is one of the twelve questions the map must answer.
+  const dependsOn = new Map();
+  for (const f of files) if (rowScope(f) && !isTest(f)) dependsOn.set(f, edgesFrom(f));
+
   const rows = files.filter((f) => rowScope(f) && !isTest(f) && !f.endsWith(".d.ts")).map((path) => ({
     path,
     // `package-entry` is checked before `reachable` because package entries now
@@ -239,9 +245,11 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
       : "unreachable",
     importers: [...(importedBy.get(path) ?? [])].slice(0, 6),
     importerCount: (importedBy.get(path) ?? new Set()).size,
+    imports: (dependsOn.get(path) ?? []).slice(0, 12),
+    importCount: (dependsOn.get(path) ?? []).length,
   }));
 
-  return { entries, rows, importedBy };
+  return { entries, rows, importedBy, dependsOn };
 }
 
 /**
