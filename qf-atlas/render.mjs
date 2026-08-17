@@ -95,7 +95,8 @@ mark{background:#2b3410;color:var(--text);padding:0 2px}
 <aside>
   <span class="eyebrow">QuantFlow · Atlas</span>
   <div class="tabs">
-    <button class="tab on" data-tab="map">Map</button>
+    <button class="tab on" data-tab="loops">Loops</button>
+    <button class="tab" data-tab="map">Map</button>
     <button class="tab" data-tab="strip">Strip</button>
     <button class="tab" data-tab="wires">Wires</button>
   </div>
@@ -124,7 +125,7 @@ mark{background:#2b3410;color:var(--text);padding:0 2px}
 <script>
 const M = ${data};
 const TONE={ok:"#6fe3a8",ice:"#5cc8ff",warn:"#f2c260",alert:"#ff8a75"};
-const WIRE={live:"#5cc8ff",unused:"#f2c260",unreached:"#ff8a75",dead:"#ff8a75"};
+const WIRE={live:"#5cc8ff",unused:"#f2c260",unreached:"#ff8a75",dead:"#ff8a75",cheats:"#ff8a75"};
 const byId=Object.fromEntries(M.nodes.map(n=>[n.id,n]));
 const nodeOfFile=new Map();
 for(const n of M.nodes) for(const f of n.files) nodeOfFile.set(f.path,n.id);
@@ -140,7 +141,7 @@ for(const w of M.wires){
   if(!edgeMap.has(key)) edgeMap.set(key,{from,to,channels:[],status:"live"});
   const e=edgeMap.get(key);
   e.channels.push(w);
-  const rank={live:0,unused:1,unreached:2,dead:3};
+  const rank={live:0,unused:1,cheats:2,unreached:3,dead:4};
   if(rank[w.status]>rank[e.status]) e.status=w.status;
 }
 const EDGES=[...edgeMap.values()].filter(e=>e.from&&e.to&&e.from!==e.to);
@@ -202,7 +203,9 @@ function draw(){
 
     // where the packet stops: 1.0 live, .55 unused (reaches main, nobody asked),
     // .28 unreached/dead (never really leaves)
-    const stopAt=e.status==="live"?1:e.status==="unused"?.55:.28;
+    // cheats reaches main and mutates outside the Kernel: the packet arrives,
+    // so the break belongs at the far end, not partway down the wire.
+    const stopAt=e.status==="live"?1:e.status==="cheats"?.92:e.status==="unused"?.55:.28;
     if(playing){
       const k=((T*.26)+(e.channels.length*.07))%1;
       const kk=Math.min(k,stopAt);
@@ -335,6 +338,7 @@ function selectWire(ch){
     <p class="sub">\${w.status==="live"?"This flow completes end to end."
       :w.status==="unused"?"Reaches main, but no renderer file ever calls it."
       :w.status==="unreached"?"Registered in main. Nothing calls it — the renderer cannot reach it."
+      :w.status==="cheats"?"Reaches main and completes, but mutates state without going through execute(). The work happens; it is not governed."
       :"Called from preload with no handler in main. This fails at runtime."}</p>
     <h2>The path a packet takes</h2>\${wirePath(w)}
     \${w.breakAt?\`<div class="card alert" style="margin-top:var(--s6)"><b>Stops at: \${esc(w.breakAt)}</b>
@@ -343,11 +347,29 @@ function selectWire(ch){
         :"The packet leaves preload and finds no handler."}</p></div>\`:""}\`;
 }
 
+function selectLife(mod){
+  const l=M.lifetime.find(x=>x.module.endsWith(mod)); if(!l) return;
+  document.getElementById("panel").innerHTML=\`
+    <span class="tag \${l.status==="reaped"?"ok":l.status==="partial"?"warn":"alert"}">lifetime · \${esc(l.status)}</span>
+    <div class="ttl">\${esc(l.module.split("/").pop())}</div>
+    <p class="sub">\${esc(l.why)}</p>
+    <h2>spawn &rarr; reap</h2>
+    <div class="path">\${l.hops.map((h,i)=>
+      \`<div class="hop \${h.present?"":"off"}"><span class="dot"></span><span class="lbl">\${h.layer}</span><span class="val">\${esc(h.detail)}</span></div>\`+
+      (i<l.hops.length-1?\`<div class="conn \${l.hops[i+1].present?"":"off"}"></div>\`:"")).join("")}</div>\`;
+}
+
 // ── rails ──
 const rail=document.getElementById("rail");
 function renderRail(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
-  if(tab==="map"){
+  if(tab==="loops"){
+    rail.innerHTML=M.loops.map(L=>{
+      const dot=L.health==="ok"?"#6fe3a8":L.health==="broken"?"#ff8a75":"#f2c260";
+      return \`<div class="grp">\${esc(L.name)}<b style="color:\${dot}">\${L.health==="ok"?"ok":L.brokenCount+"/"+L.total}</b></div>\`+
+        L.members.map(x=>\`<button class="item \${x.status==="live"||x.status==="reaped"?"":x.status==="unused"?"warn":"alert"}" data-id="\${esc(x.channel)}" data-act="\${L.lifetime?"life":"wire"}">\${esc(x.channel)}<span class="k">\${esc(x.status)}</span></button>\`).join("");
+    }).join("");
+  } else if(tab==="map"){
     rail.innerHTML=M.layers.map(L=>{
       const ns=M.nodes.filter(n=>n.layer===L.id).sort((a,b)=>b.kb-a.kb);
       return \`<div class="grp">LVL \${L.id} · \${esc(L.name)}<b>\${ns.length}</b></div>\`+
@@ -373,6 +395,7 @@ rail.addEventListener("click",e=>{
   const b=e.target.closest(".item");if(!b)return;
   if(b.dataset.act==="node") select(b.dataset.id);
   else if(b.dataset.act==="wire") selectWire(b.dataset.id);
+  else if(b.dataset.act==="life") selectLife(b.dataset.id);
   else{const nid=nodeOfFile.get(b.dataset.id);if(nid)select(nid);}
 });
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>renderRail(t.dataset.tab));
@@ -384,7 +407,7 @@ document.getElementById("broken").onclick=e=>{brokenOnly=!brokenOnly;e.target.cl
 addEventListener("resize",()=>{resize();if(!focus)fitView()});
 window.enter=enter;
 
-resize();fitView();renderRail("map");
+resize();fitView();renderRail("loops");
 document.getElementById("panel").innerHTML=\`
   <span class="tag ice">generated projection</span>
   <h1>QuantFlow Atlas</h1>

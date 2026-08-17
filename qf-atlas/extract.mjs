@@ -85,7 +85,12 @@ const RE = {
   bridge:    /exposeInMainWorld\(\s*["'`]([^"'`]+)["'`]/,
   // preload method name -> the channel it forwards to, e.g.  listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list")
   bridgeFn:  /([A-Za-z_$][\w$]*)\s*:\s*(?:async\s*)?\([^)]*\)\s*(?::[^=]+)?=>[\s\S]{0,220}?ipcRenderer\.(?:invoke|send|sendSync)\(\s*["'`]([^"'`]+)["'`]/,
-  spawn:     /\b(?:spawn|spawnSync|execFile|execFileSync|fork|exec)\(/,
+  // Bare `exec` matched `regex.exec(text)` and reported 15 process spawns in
+  // kernel.ts, which starts none. main imports execFile/execFileSync/execSync/
+  // spawn and never bare exec, so the alternative is dropped rather than guessed at.
+  spawn:     /\b(?:spawnSync|spawn|execFileSync|execFile|execSync|fork)\s*\(/,
+  // Only these keep running after the call returns, so only these need reaping.
+  spawnLive: /\b(?:spawn|execFile|fork)\s*\(/,
   diskWrite: /\b(?:writeFile|writeFileSync|appendFile|appendFileSync|createWriteStream)\(/,
   dml:       /\b(?:CREATE TABLE|INSERT INTO|UPDATE\s+[a-z_]+\s+SET|DELETE FROM|ALTER TABLE|DROP TABLE)\b/i,
   execute:   /\bexecute(?:Command)?\(/,
@@ -167,6 +172,7 @@ export function fileFacts(files) {
       path: rel(f),
       kb: +(statSync(f).size / 1024).toFixed(1),
       spawns: matches(code, RE.spawn).length,
+      spawnsLive: matches(code, RE.spawnLive).length,
       writes: matches(code, RE.diskWrite).length,
       dml: dmlHits.length,
       dmlLines: dmlHits.slice(0, 6).map((h) => h.line),
@@ -185,6 +191,8 @@ export function stripCandidates(wires, facts) {
   for (const w of wires.filter((w) => w.status === "unreached")) {
     strip.push({
       kind: "unreached-ipc",
+      bucket: "safe-leftover",
+      advice: "Safe to delete. Nothing can reach it today.",
       what: w.channel,
       where: `${w.registeredAt.file}:${w.registeredAt.line}`,
       why: "Registered in main; nothing in preload calls it. The renderer cannot reach this handler.",
@@ -193,6 +201,11 @@ export function stripCandidates(wires, facts) {
   for (const w of wires.filter((w) => w.status === "unused")) {
     strip.push({
       kind: "unused-bridge",
+      bucket: "maybe-later",
+      // NOT "safe to delete". qf:review:projection is unused today and is
+      // exactly what R16 needs to render the Evaluation tile. Deleting the
+      // unused bucket wholesale would remove the next rung.
+      advice: "Do not delete on sight. This works end to end and may be a surface the next rung needs.",
       what: `${w.method}() → ${w.channel}`,
       where: `${w.calledAt.file}:${w.calledAt.line}`,
       why: "Exposed on the contextBridge and wired to a live handler, but no renderer file calls it.",
@@ -201,6 +214,8 @@ export function stripCandidates(wires, facts) {
   for (const w of wires.filter((w) => w.status === "dead")) {
     strip.push({
       kind: "dead-wire",
+      bucket: "broken-now",
+      advice: "Fix or remove. This call fails at runtime today.",
       what: w.channel,
       where: `${w.calledAt.file}:${w.calledAt.line}`,
       why: "Preload calls this channel and no main handler registers it. This call fails at runtime.",

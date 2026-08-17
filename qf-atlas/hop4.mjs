@@ -22,7 +22,7 @@ const RE_DML = /\b(?:CREATE TABLE|INSERT INTO|UPDATE\s+[a-z_]+\s+SET|DELETE FROM
 const RE_DISK = /\b(?:writeFile|writeFileSync|appendFile|appendFileSync|createWriteStream)\s*\(/;
 
 /** Strip comments, preserving offsets so brace matching stays aligned. */
-function decomment(t) {
+export function decomment(t) {
   return t
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
     .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
@@ -41,6 +41,13 @@ function bodyAt(text, from) {
     else if (c === "}") { depth--; if (depth === 0) return text.slice(open, i + 1); }
   }
   return text.slice(open, Math.min(text.length, open + 8000));
+}
+
+/** The body of a named function declared in `text`, or "" if it is not there. */
+export function bodyOf(text, fnName) {
+  const re = new RegExp(`(?:export\\s+)?(?:async\\s+)?function\\s+${fnName}\\s*[<(]`);
+  const m = re.exec(text);
+  return m ? bodyAt(text, m.index + m[0].length) : "";
 }
 
 /** A concise arrow body: everything up to the `)` that closes ipcMain.handle(. */

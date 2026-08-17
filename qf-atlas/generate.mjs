@@ -11,7 +11,9 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel, read } from "./extract.mjs";
-import { addFourthHop } from "./hop4.mjs";
+import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
+import { lifetimeWires } from "./lifetime.mjs";
+import { buildLoops } from "./loops.mjs";
 
 const OUT = join(REPO, "qf-atlas");
 
@@ -52,6 +54,16 @@ const indexFiles = files
   .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
   .map((f) => join(REPO, f));
 const hop4Stats = addFourthHop(wires, mainFiles, indexFiles, read, rel);
+
+// Lifetime wires: spawn -> reap. Close-kill can never look like a missing invoke.
+const spawners = facts
+  .filter((f) => f.path.startsWith("collab-electron/src/main/") && f.spawnsLive > 0)
+  .map((f) => ({ path: f.path, spawns: f.spawnsLive }));
+const lifetime = lifetimeWires({
+  spawners,
+  bootFile: join(REPO, "collab-electron/src/main/index.ts"),
+  read, relOf: rel, decomment, bodyOf,
+});
 const strip = stripCandidates(wires, facts);
 const breaches = violations(facts);
 
@@ -164,6 +176,8 @@ for (const L of LAYERS) {
   layerExtent[L.id] = +(maxR + 1.1).toFixed(2);
 }
 
+const loops = buildLoops(wires, lifetime);
+
 // ─── model ───────────────────────────────────────────────────────────────────
 const counts = {
   live:      wires.filter((w) => w.status === "live").length,
@@ -186,6 +200,10 @@ const model = {
     violations: breaches.filter((b) => b.scope === "product").length,
     violationsQa: breaches.filter((b) => b.scope === "qa").length,
     nodes: nodes.length,
+    loopsBroken: loops.filter((l) => l.health !== "ok").length,
+    loopsTotal: loops.length,
+    unreaped: lifetime.filter((l) => l.status === "unreaped").length,
+    conditionalReap: lifetime.filter((l) => l.status === "conditional").length,
   },
   layers: LAYERS.map(({ id, name, y }) => ({ id, name, y, extent: layerExtent[id] })),
   nodes: nodes.map((n) => ({
@@ -193,7 +211,9 @@ const model = {
     spawns: n.spawns, writes: n.writes, dml: n.dml, executes: n.executes,
     files: n.files, strip: n.strip, breaches: n.breaches, wires: n.wires,
   })),
+  loops,
   wires,
+  lifetime,
   strip,
   violations: breaches,
 };
@@ -236,4 +256,5 @@ writeFileSync(join(OUT, "ATLAS.md"), md);
 console.log(`qf-atlas: wrote atlas.json + atlas.html + ATLAS.md`);
 console.log(`  ${files.length} files · ${nodes.length} subsystems · ${wires.length} IPC channels`);
 console.log(`  wires: ${counts.live} live · ${counts.unreached} unreached · ${counts.unused} unused · ${counts.dead} DEAD`);
+console.log(`  loops: ${loops.filter(l=>l.health==="ok").length}/${loops.length} healthy · ${loops.filter(l=>l.health!=="ok").map(l=>l.name).join(", ")}`);
 console.log(`  ${strip.length} strip candidates · ${breaches.filter(b=>b.scope==="product").length} product write-door violations (+${breaches.filter(b=>b.scope==="qa").length} qa)`);
