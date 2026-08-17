@@ -8,6 +8,7 @@
 // the map does not, --check goes red.
 
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel } from "./extract.mjs";
 
@@ -191,6 +192,17 @@ const model = {
   violations: breaches,
 };
 
+// Staleness must track the CODE, not the commit. The map records the commit it
+// was generated from, so comparing raw text would report stale immediately after
+// every commit — including the commit that adds the map. The fingerprint covers
+// the substantive model only, with volatile identity fields excluded.
+const { commit: _c, generatedAt: _g, branch: _b, ...stableMeta } = model.meta;
+const fingerprint = createHash("sha256")
+  .update(JSON.stringify({ ...model, meta: stableMeta }))
+  .digest("hex")
+  .slice(0, 16);
+model.meta.fingerprint = fingerprint;
+
 mkdirSync(OUT, { recursive: true });
 const json = JSON.stringify(model, null, 2);
 const { renderHtml } = await import("./render.mjs");
@@ -199,13 +211,12 @@ const html = renderHtml(model);
 const md = renderMarkdown(model);
 
 if (process.argv.includes("--check")) {
-  let stale = [];
-  for (const [file, next] of [["atlas.json", json], ["atlas.html", html], ["ATLAS.md", md]]) {
-    const p = join(OUT, file);
-    if (!existsSync(p) || readFileSync(p, "utf8") !== next) stale.push(file);
-  }
+  const p = join(OUT, "atlas.json");
+  const committed = existsSync(p) ? JSON.parse(readFileSync(p, "utf8")).meta?.fingerprint : null;
+  const stale = committed !== fingerprint
+    ? [`atlas.json fingerprint ${committed ?? "missing"} != ${fingerprint}`] : [];
   if (stale.length) {
-    console.error(`qf-atlas: STALE — ${stale.join(", ")} do not match the code.`);
+    console.error(`qf-atlas: STALE — ${stale.join(", ")}`);
     console.error("The map is a projection. Run: bun qf-atlas/generate.mjs");
     process.exit(1);
   }

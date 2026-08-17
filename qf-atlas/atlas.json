@@ -1,10 +1,11 @@
 {
   "meta": {
     "branch": "atlas-generator",
-    "commit": "984986d",
+    "commit": "2a67902",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
-    "note": "Generated projection of the code. Not Kernel truth, not the running app."
+    "note": "Generated projection of the code. Not Kernel truth, not the running app.",
+    "fingerprint": "4dd9021e8788b435"
   },
   "stats": {
     "live": 110,
