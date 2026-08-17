@@ -563,9 +563,29 @@ const model = {
 // was generated from, so comparing raw text would report stale immediately after
 // every commit — including the commit that adds the map. The fingerprint covers
 // the substantive model only, with volatile identity fields excluded.
+// ─── the DIFF view's data: this tree vs the last commit ──────────────────────
+// Minimal by intent — it renders what diff.mjs already computes, so the HTML can answer
+// "did this change make the architecture better or worse" without a second command. If
+// there is no committed atlas.json to compare against, it says so rather than pretending.
+try {
+  const { execFileSync } = await import("node:child_process");
+  const { atlasDiff } = await import("./diff.mjs");
+  const prior = JSON.parse(execFileSync("git", ["show", "HEAD:qf-atlas/atlas.json"],
+    { cwd: REPO, encoding: "utf8", maxBuffer: 1 << 28 }));
+  model.diffVsHead = atlasDiff(prior, model);
+} catch {
+  model.diffVsHead = { unavailable: true,
+    why: "no atlas.json committed at HEAD to compare against" };
+}
+
 const { commit: _c, generatedAt: _g, branch: _b, ...stableMeta } = model.meta;
+// `diffVsHead` is EXCLUDED from the fingerprint along with the commit identity. It
+// describes the distance between this working tree and the last commit, so it changes
+// every time a commit lands — folding it in would make `--check` report stale after
+// every commit, which is the false alarm the fingerprint was built to avoid.
+const { diffVsHead: _d, ...stableModel } = model;
 const fingerprint = createHash("sha256")
-  .update(JSON.stringify({ ...model, meta: stableMeta }))
+  .update(JSON.stringify({ ...stableModel, meta: stableMeta }))
   .digest("hex")
   .slice(0, 16);
 model.meta.fingerprint = fingerprint;

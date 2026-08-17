@@ -103,6 +103,7 @@ mark{background:#2b3410;color:var(--text);padding:0 2px}
     <button class="tab" data-tab="own">Owners</button>
     <button class="tab" data-tab="cover">Coverage</button>
     <button class="tab" data-tab="strip">Demolition</button>
+    <button class="tab" data-tab="diff">Diff</button>
     <button class="tab" data-tab="wires">Wires</button>
   </div>
   <div id="rail"></div>
@@ -507,6 +508,30 @@ function renderRail(tab){
         Object.entries(states).filter(([s])=>s!=="indexed"&&s!=="not-applicable")
           .map(([s,n])=>\`<div class="item warn" style="cursor:default">\${esc(s)}<span class="k">\${n}</span></div>\`).join("");
     }).join("")+\`<div class="grp">unexplained<b style="color:\${(M.unexplainedCoverage||[]).length?"#ff8a75":"#6fe3a8"}">\${(M.unexplainedCoverage||[]).length}</b></div>\`;
+  } else if(tab==="diff"){
+    // Did this change make the architecture better or worse? Compared against the last
+    // commit. 'added' means the code got worse; 'newly detected' means the analyzer got
+    // better — conflating those would score every new detector as a regression.
+    const D=M.diffVsHead;
+    if(!D||D.unavailable){
+      rail.innerHTML=\`<div class="grp">no comparison<b>—</b></div>
+        <div class="item" style="cursor:default">\${esc(D&&D.why?D.why:"no diff computed")}</div>\`;
+    } else {
+      const s=D.stats, col=D.verdict==="worse"?"#ff8a75":D.verdict==="better"?"#6fe3a8":D.verdict==="mixed"?"#f2c260":"#8b8b95";
+      const grp=(label,n,cls,rows,fmt)=>!n?"":\`<div class="grp">\${esc(label)}<b>\${n}</b></div>\`+
+        (rows||[]).slice(0,14).map(r=>\`<div class="item \${cls}" style="cursor:default">\${esc(fmt(r))}</div>\`).join("");
+      rail.innerHTML=
+        \`<div class="grp" style="color:\${col}">\${esc(D.verdict)}<b style="color:\${col}">\${esc(D.from.commit||"?")}&rarr;\${esc(D.to.commit||"?")}</b></div>
+         <div class="item" style="cursor:default;color:var(--muted)">\${esc(D.why)}</div>
+         <div class="grp">undecided<b>\${s.undecidedFrom}&rarr;\${s.undecidedTo}</b></div>\`
+        +grp("added — code got worse",s.added,"alert",D.added,r=>\`\${r.kind}: \${r.what||r.id}\`)
+        +grp("newly detected — analyzer got better",s.newlyDetected,"warn",D.newlyDetected,r=>\`\${r.kind}: \${r.what||r.id}\`)
+        +grp("resolved",s.resolved,"",D.resolved,r=>\`\${r.kind}: \${r.what||r.id}\`)
+        +grp("regressed",s.regressed,"alert",D.regressed,r=>\`\${r.kind}: \${r.what||r.id}\`)
+        +grp("coverage worse",s.coverageWorse,"alert",(D.changedCoverage||[]).filter(c=>c.direction==="worse"),c=>\`\${c.analyzer}: \${c.path.split("/").pop()} \${c.from}→\${c.to}\`)
+        +grp("coverage better",s.coverageBetter,"",(D.changedCoverage||[]).filter(c=>c.direction==="better"),c=>\`\${c.analyzer}: \${c.path.split("/").pop()} \${c.from}→\${c.to}\`)
+        +grp("ownership moved",s.changedOwner,"warn",D.changedOwner,o=>\`\${o.id.replace("ownership:","")} +\${o.gained.length} -\${o.lost.length}\`);
+    }
   } else if(tab==="map"){
     rail.innerHTML=M.layers.map(L=>{
       const ns=M.nodes.filter(n=>n.layer===L.id).sort((a,b)=>b.kb-a.kb);

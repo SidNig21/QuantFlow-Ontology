@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "79c7b48",
+    "commit": "06741de",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -40550,6 +40550,397 @@
       "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
     }
   ],
+  "diffVsHead": {
+    "from": {
+      "branch": "atlas-strip-1",
+      "commit": "79c7b48",
+      "generatedAt": "2026-08-17"
+    },
+    "to": {
+      "branch": "atlas-strip-1",
+      "commit": "06741de",
+      "generatedAt": "2026-08-17"
+    },
+    "verdict": "better",
+    "why": "46 improvement(s), nothing added or hidden",
+    "added": [],
+    "newlyDetected": [],
+    "resolved": [
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+        "kind": "persistence",
+        "what": "links insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
+        "kind": "persistence",
+        "what": "qf_review_attempt create table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_attempt insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
+        "kind": "persistence",
+        "what": "qf_review_invocation create table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_invocation insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
+        "kind": "persistence",
+        "what": "qf_review_publication create table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
+        "kind": "persistence",
+        "what": "qf_review_receipt create table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_receipt insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
+        "kind": "persistence",
+        "what": "qf_review_source_work create table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_source_work insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
+        "kind": "persistence",
+        "what": "qf_review_task create table",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_task insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:update",
+        "kind": "persistence",
+        "what": "qf_review_task update",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+        "kind": "persistence",
+        "what": "task insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:update",
+        "kind": "persistence",
+        "what": "task update",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
+        "kind": "persistence",
+        "what": "events insert into",
+        "where": "packages/qf-kernel/src/events.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/insert.ts:run:insert-into",
+        "kind": "persistence",
+        "what": "run insert into",
+        "where": "packages/qf-kernel/src/insert.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:agentKill() → agent:kill",
+        "kind": "unused-bridge",
+        "what": "agentKill() → agent:kill",
+        "where": "collab-electron/src/preload/universal.ts:695",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:openFolder() → dialog:open-folder",
+        "kind": "unused-bridge",
+        "what": "openFolder() → dialog:open-folder",
+        "where": "collab-electron/src/preload/universal.ts:454",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:openImageDialog() → dialog:open-image",
+        "kind": "unused-bridge",
+        "what": "openImageDialog() → dialog:open-image",
+        "where": "collab-electron/src/preload/universal.ts:317",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:countFiles() → fs:count-files",
+        "kind": "unused-bridge",
+        "what": "countFiles() → fs:count-files",
+        "where": "collab-electron/src/preload/universal.ts:270",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:getHomePath() → get-home-path",
+        "kind": "unused-bridge",
+        "what": "getHomePath() → get-home-path",
+        "where": "collab-electron/src/preload/shell.ts:311",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:deleteConnectionsForTile() → qf:connections:deleteForTile",
+        "kind": "unused-bridge",
+        "what": "deleteConnectionsForTile() → qf:connections:deleteForTile",
+        "where": "collab-electron/src/preload/shell.ts:122",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:getGovernedReviewProjection() → qf:review:projection",
+        "kind": "unused-bridge",
+        "what": "getGovernedReviewProjection() → qf:review:projection",
+        "where": "collab-electron/src/preload/shell.ts:85",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:permissionDecision() → qf:sessions:permissionDecision",
+        "kind": "unused-bridge",
+        "what": "permissionDecision() → qf:sessions:permissionDecision",
+        "where": "collab-electron/src/preload/universal.ts:167",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:openSettings() → settings:open",
+        "kind": "unused-bridge",
+        "what": "openSettings() → settings:open",
+        "where": "collab-electron/src/preload/shell.ts:212",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:openExternal() → shell:open-external",
+        "kind": "unused-bridge",
+        "what": "openExternal() → shell:open-external",
+        "where": "collab-electron/src/preload/shell.ts:305",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:runInTerminal() → viewer:run-in-terminal",
+        "kind": "unused-bridge",
+        "what": "runInTerminal() → viewer:run-in-terminal",
+        "where": "collab-electron/src/preload/universal.ts:290",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:workspaceRemove() → workspace:remove",
+        "kind": "unused-bridge",
+        "what": "workspaceRemove() → workspace:remove",
+        "where": "collab-electron/src/preload/shell.ts:256",
+        "note": "was undecided"
+      },
+      {
+        "id": "unused-bridge:updateFrontmatter() → workspace:update-frontmatter",
+        "kind": "unused-bridge",
+        "what": "updateFrontmatter() → workspace:update-frontmatter",
+        "where": "collab-electron/src/preload/universal.ts:326",
+        "note": "was undecided"
+      },
+      {
+        "id": "lifetime:collab-electron/src/main/acp-agent.ts",
+        "kind": "lifetime",
+        "what": "unreaped",
+        "where": "collab-electron/src/main/acp-agent.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "lifetime:collab-electron/src/main/sidecar/server.ts",
+        "kind": "lifetime",
+        "what": "unreaped",
+        "where": "collab-electron/src/main/sidecar/server.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "lifetime:collab-electron/src/main/tmux.ts",
+        "kind": "lifetime",
+        "what": "unreaped",
+        "where": "collab-electron/src/main/tmux.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "lifetime:collab-electron/src/main/pty.ts",
+        "kind": "lifetime",
+        "what": "partial",
+        "where": "collab-electron/src/main/pty.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "protocol-variants:pty:write",
+        "kind": "protocol-variant",
+        "what": "pty:write",
+        "where": "collab-electron/src/main/index.ts:766 (invoke)",
+        "note": "was undecided"
+      },
+      {
+        "id": "protocol-variants:pty:send-raw-keys",
+        "kind": "protocol-variant",
+        "what": "pty:send-raw-keys",
+        "where": "collab-electron/src/main/index.ts:786 (invoke)",
+        "note": "was undecided"
+      },
+      {
+        "id": "unreachable:collab-electron/src/main/a2a-bus.ts",
+        "kind": "unreachable",
+        "what": "a2a-bus.ts",
+        "where": "collab-electron/src/main/a2a-bus.ts",
+        "note": "was keep"
+      },
+      {
+        "id": "unreachable:collab-electron/src/main/a2a-orchestra.ts",
+        "kind": "unreachable",
+        "what": "a2a-orchestra.ts",
+        "where": "collab-electron/src/main/a2a-orchestra.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "unreachable:collab-electron/src/main/species-launch.ts",
+        "kind": "unreachable",
+        "what": "species-launch.ts",
+        "where": "collab-electron/src/main/species-launch.ts",
+        "note": "was repair"
+      },
+      {
+        "id": "unreachable:collab-electron/src/main/species-surface.ts",
+        "kind": "unreachable",
+        "what": "species-surface.ts",
+        "where": "collab-electron/src/main/species-surface.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "unreachable:collab-electron/src/main/species-tools.ts",
+        "kind": "unreachable",
+        "what": "species-tools.ts",
+        "where": "collab-electron/src/main/species-tools.ts",
+        "note": "was repair"
+      },
+      {
+        "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
+        "kind": "unreachable",
+        "what": "cube3d.js",
+        "where": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
+        "note": "was keep"
+      },
+      {
+        "id": "broken-bridge-call:ptyForegroundProcess",
+        "kind": "broken-bridge-call",
+        "what": "ptyForegroundProcess",
+        "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
+        "note": "was repair"
+      },
+      {
+        "id": "push:cd-to",
+        "kind": "push-no-sender",
+        "what": "cd-to",
+        "where": "collab-electron/src/preload/universal.ts:98",
+        "note": "was undecided"
+      },
+      {
+        "id": "push:shell:loading-status",
+        "kind": "push-no-sender",
+        "what": "shell:loading-status",
+        "where": "collab-electron/src/preload/shell.ts:172",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:session-lifecycle",
+        "kind": "duplicate-ownership",
+        "what": "Session lifecycle",
+        "where": "collab-electron/src/main/host-acp-permission.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:runtime-admission",
+        "kind": "duplicate-ownership",
+        "what": "Runtime launch / admission",
+        "where": "collab-electron/src/main/agent-host.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:task-delivery",
+        "kind": "duplicate-ownership",
+        "what": "Exact task delivery",
+        "where": "packages/qf-kernel/src/execute.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:process-cleanup",
+        "kind": "duplicate-ownership",
+        "what": "Process cleanup",
+        "where": "collab-electron/src/main/acp-agent.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:review-publication",
+        "kind": "duplicate-ownership",
+        "what": "Research review / publication",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "ownership:artifact-storage",
+        "kind": "duplicate-ownership",
+        "what": "Artifact storage",
+        "where": "packages/qf-kernel/src/create.ts",
+        "note": "was undecided"
+      }
+    ],
+    "regressed": [],
+    "changedConfidence": [],
+    "changedOwner": [],
+    "changedCoverage": [],
+    "stats": {
+      "added": 0,
+      "newlyDetected": 0,
+      "resolved": 51,
+      "regressed": 0,
+      "changedConfidence": 0,
+      "changedOwner": 0,
+      "coverageWorse": 0,
+      "coverageBetter": 0,
+      "undecidedFrom": 46,
+      "undecidedTo": null
+    }
+  },
   "decisions": [
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
