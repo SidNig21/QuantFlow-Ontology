@@ -98,6 +98,11 @@ function withFile(path, contents, assertFn) {
 
 const MAIN = "collab-electron/src/main";
 
+// The diff is compared in-process rather than by shelling out to `--diff`, so the
+// checks can build synthetic "before" models the CLI could never produce. Top-level
+// await keeps the rest of the harness synchronous.
+const { atlasDiff } = await import("./diff.mjs");
+
 console.log("qf-atlas falsifiers — each injects a real defect, then restores\n");
 if (!gitClean()) {
   console.error("Refusing to run: the working tree has changes outside qf-atlas/.");
@@ -1019,6 +1024,78 @@ record(60, "evidence tiers are not collapsed into one green", ...(() => {
   return [overclaimed.length === 0,
     overclaimed.length ? `${overclaimed[0].name} claims SGRF without runtime and founder proof`
       : `${ns.length} loops x 4 tiers, all present, every unproven tier gives a reason, 0 overclaimed`];
+})());
+
+// ── STABLE IDS + DIFF — contract items 21, 30 ──────────────────────────────
+
+// 61 · contract 21 — moving code without changing meaning must preserve the finding's
+// identity. Line numbers are EVIDENCE; the id is `persistence:<file>:<table>:<verb>`.
+// If identity drifted with position, every reformat would retire the whole ledger and
+// resurrect it as fresh undecided findings — and a recorded verdict would silently stop
+// applying to the thing it was recorded against.
+record(61, "moving a finding to another line preserves its id", ...(() => {
+  const TARGET = "packages/qf-kernel/src/governed-review.ts";
+  const abs = join(REPO, TARGET);
+  const original = readFileSync(abs, "utf8");
+  const idsBefore = (before.persistence ?? [])
+    .filter((p) => p.evidence[0].file === TARGET).map((p) => p.id).sort();
+  if (idsBefore.length < 3) return [false, `only ${idsBefore.length} findings in ${TARGET} to test with`];
+  const linesBefore = (before.persistence ?? [])
+    .filter((p) => p.evidence[0].file === TARGET).flatMap((p) => p.evidence[0].lines ?? []);
+  try {
+    // 40 blank lines at the top: every SQL site moves, nothing means anything different.
+    const pad = new Array(40).fill("").join("\n");
+    writeAtomic(abs, `${pad}\n${original}`);
+    const m = model();
+    const after = (m.persistence ?? []).filter((p) => p.evidence[0].file === TARGET);
+    const idsAfter = after.map((p) => p.id).sort();
+    const same = idsBefore.length === idsAfter.length
+      && idsBefore.every((id, i) => id === idsAfter[i]);
+    const moved = after.some((p) => (p.evidence[0].lines ?? []).some((n) => !linesBefore.includes(n)));
+    return [same && moved,
+      same
+        ? (moved ? `${idsAfter.length} ids identical, evidence lines shifted` : "ids identical but no line moved — the fixture did not take")
+        : `id set changed: ${idsBefore.length} -> ${idsAfter.length}`];
+  } finally { writeAtomic(abs, original); }
+})());
+
+// 62 · contract 30 — the diff detects a newly introduced violation AND a resolved one.
+// Without this the map can describe a state but not a change, which is the question
+// asked after every commit.
+record(62, "the diff detects an introduced and a resolved violation", ...(() => {
+  const FIX = `${MAIN}/zz-falsify-62.ts`;
+  const abs = join(REPO, FIX);
+  try {
+    writeAtomic(abs,
+      `import { getKernelDb } from "./kernel";\n`
+      + `export function sneak() { getKernelDb().query("INSERT INTO mission (id) VALUES (?)").run("x"); }\n`);
+    const dirty = model();
+    // clean -> dirty must ADD it, and it must be classed `added`, not `newly-detected`:
+    // the finding KIND already exists, so this is the code getting worse.
+    const forward = atlasDiff(before, dirty);
+    const gained = forward.added.find((x) => String(x.id).includes("zz-falsify-62"));
+    // dirty -> clean must RESOLVE it.
+    const back = atlasDiff(dirty, before);
+    const lost = back.resolved.find((x) => String(x.id).includes("zz-falsify-62"));
+    return [!!gained && !!lost && forward.verdict === "worse",
+      `added=${!!gained} resolved=${!!lost} forwardVerdict=${forward.verdict}`];
+  } finally { if (existsSync(abs)) unlinkSync(abs); }
+})());
+
+// 63 · A coverage regression must never read as an improvement. A finding that vanishes
+// because the analyzer stopped being able to read the file is a regression wearing the
+// costume of a fix, and a net finding count cannot tell the two apart.
+record(63, "a coverage regression is reported as worse, not better", ...(() => {
+  // Synthesise a prior model whose coverage was better than the current one, leaving the
+  // finding set identical. A count-based verdict would call this "unchanged".
+  const priorRows = (before.analyzerCoverage ?? []).map((r) => ({ ...r }));
+  const victim = priorRows.find((r) => r.persistence === "partial");
+  if (!victim) return [false, "no partial persistence cell to build the fixture from"];
+  victim.persistence = "indexed";
+  const prior = { ...before, analyzerCoverage: priorRows };
+  const d = atlasDiff(prior, before);
+  return [d.verdict === "worse" && d.stats.coverageWorse > 0,
+    `verdict=${d.verdict} coverageWorse=${d.stats.coverageWorse}`];
 })());
 
 // restore the committed model

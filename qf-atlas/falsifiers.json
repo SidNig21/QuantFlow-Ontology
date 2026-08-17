@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 60,
-  "total": 60,
+  "passed": 63,
+  "total": 63,
   "results": [
     {
       "n": 1,
@@ -362,6 +362,24 @@
       "name": "evidence tiers are not collapsed into one green",
       "passed": true,
       "detail": "11 loops x 4 tiers, all present, every unproven tier gives a reason, 0 overclaimed"
+    },
+    {
+      "n": 61,
+      "name": "moving a finding to another line preserves its id",
+      "passed": true,
+      "detail": "21 ids identical, evidence lines shifted"
+    },
+    {
+      "n": 62,
+      "name": "the diff detects an introduced and a resolved violation",
+      "passed": true,
+      "detail": "added=true resolved=true forwardVerdict=worse"
+    },
+    {
+      "n": 63,
+      "name": "a coverage regression is reported as worse, not better",
+      "passed": true,
+      "detail": "verdict=worse coverageWorse=1"
     }
   ]
 }

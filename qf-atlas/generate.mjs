@@ -582,6 +582,38 @@ const { renderMarkdown } = await import("./markdown.mjs");
 const html = renderHtml(model);
 const md = renderMarkdown(model);
 
+// ─── --diff <ref> ────────────────────────────────────────────────────────────
+// "Did this commit make QuantFlow architecturally better or worse?" Reads the
+// atlas.json committed at <ref> and compares the current model against it. Six
+// dimensions, because a net finding count cannot answer the question: a commit that
+// resolves two findings and hides a third by breaking the analyzer's read of a file
+// would score positive while the map knows strictly less than before.
+const diffAt = process.argv.indexOf("--diff");
+if (diffAt !== -1) {
+  const ref = process.argv[diffAt + 1];
+  if (!ref) {
+    console.error("qf-atlas: --diff needs a git ref, e.g. --diff HEAD~1");
+    process.exit(2);
+  }
+  const { execFileSync } = await import("node:child_process");
+  const { atlasDiff, renderDiff } = await import("./diff.mjs");
+  let priorText;
+  try {
+    priorText = execFileSync("git", ["show", `${ref}:qf-atlas/atlas.json`],
+      { cwd: REPO, encoding: "utf8", maxBuffer: 1 << 28 });
+  } catch {
+    console.error(`qf-atlas: no committed atlas.json at ${ref} — nothing to compare against.`);
+    process.exit(2);
+  }
+  const d = atlasDiff(JSON.parse(priorText), model);
+  console.log(renderDiff(d));
+  writeAtomic(join(OUT, "atlas-diff.json"), JSON.stringify(d, null, 2));
+  console.log(`\nwrote qf-atlas/atlas-diff.json`);
+  // A diff is a report, not a gate: exit 0 even when the verdict is `worse`, so a
+  // human reads the reason rather than a CI job swallowing it.
+  process.exit(0);
+}
+
 if (process.argv.includes("--check")) {
   const p = join(OUT, "atlas.json");
   const committed = existsSync(p) ? JSON.parse(readFileSync(p, "utf8")).meta?.fingerprint : null;

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "cd644d1",
+    "commit": "45a510e",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "40aff93e9d1c4371"
+    "fingerprint": "d6ab7f673e398268"
   },
   "stats": {
     "live": 105,
@@ -34,7 +34,7 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 559
+      "files": 560
     },
     "coverageFiles": 539,
     "ownership": {

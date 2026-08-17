@@ -65,3 +65,4 @@ qa/.tmp-agent-path/
 # Gate-owned package installs are disposable and must not poison the clean
 # checkout required by the release/package gates.
 /qa/gates/**/node_modules/
+qf-atlas/atlas-diff.json
