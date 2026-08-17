@@ -52,6 +52,13 @@ export function currentFindings(model) {
   for (const r of model.reach ?? [])
     if (r.reach === "unreachable")
       out.push({ id: `unreachable:${r.path}`, kind: "unreachable", what: r.path.split("/").pop(), where: r.path });
+  // A renderer awaiting a bridge method the preload never exposed throws at
+  // runtime. These were reported in the brief but not registered as findings, so
+  // they could not receive a verdict and could never be driven to zero — a
+  // finding class outside this ledger is invisible to "all clear".
+  for (const b of model.brokenBridgeCalls ?? [])
+    out.push({ id: `broken-bridge-call:${b.method}`, kind: "broken-bridge-call",
+      what: b.method, where: b.callers?.[0] ?? "no call site recorded" });
   return out;
 }
 

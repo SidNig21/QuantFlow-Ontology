@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 864f9d0` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 7d20480` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**51 of 51 findings have not been looked at.**
+**49 of 49 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 51 |
+| `undecided` | 49 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 51 findings still need a decision.
+**Not all clear.** 49 findings still need a decision.
 
 ## The four hops
 
@@ -205,12 +205,12 @@ and each window's own script — so this is a file-level graph, not a call graph
 
 | | Files | Meaning |
 |---|---:|---|
-| `entrypoint` | 14 | the app starts here |
-| `reachable` | 144 | imported from an entrypoint |
-| `process-entry` | 3 | launched by path, not imported (workers) |
+| `entrypoint` | 18 | the app starts here |
+| `reachable` | 147 | imported from an entrypoint |
+| `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 1 | named in a workspace package's exports |
 | `test-only` | 0 | reached only from tests |
-| **`unreachable`** | **14** | **nothing imports it — start here** |
+| **`unreachable`** | **10** | **nothing imports it — start here** |
 
 ### Windows the build never compiles (1)
 
@@ -226,7 +226,7 @@ uncalled.
 > Renderer entries are now parsed from the build config, and the generator throws
 > rather than continue if that parse returns nothing.
 
-### Unreachable (14) — ask the founder, do not delete
+### Unreachable (10) — ask the founder, do not delete
 
 Nothing in the product imports these. **`unreachable` is a question, not a verdict.**
 Two different situations produce byte-for-byte identical evidence:
@@ -255,10 +255,6 @@ assert the file exists. Then ask.
 - `collab-electron/src/main/a2a-artifact-store.ts`
 - `collab-electron/src/main/a2a-bus.ts`
 - `collab-electron/src/main/a2a-orchestra.ts`
-- `collab-electron/src/main/sidecar/entry.ts`
-- `collab-electron/src/main/sidecar/log.ts`
-- `collab-electron/src/main/sidecar/ring-buffer.ts`
-- `collab-electron/src/main/sidecar/server.ts`
 - `collab-electron/src/windows/shared/flow-cube/cube3d.js`
 - `collab-electron/src/windows/terminal-list/src/App.tsx`
 - `collab-electron/src/windows/terminal-list/src/main.tsx`
@@ -266,9 +262,6 @@ assert the file exists. Then ask.
 - `packages/qf-kernel/src/fixtures.ts`
 - `packages/qf-kernel/src/insert.ts`
 - `packages/qf-kernel/src/task-governance.ts`
-
-Launched by path rather than imported, so "nobody imports it" is expected:
-`git-replay-worker.ts`, `image-worker.ts`, `watcher-worker.ts`.
 
 ## What to remove
 

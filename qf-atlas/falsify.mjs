@@ -578,6 +578,28 @@ record(36, "a broken bridge call is never a false accusation", ...(() => {
       : `${calls.length} broken call(s), all absent from the preload, all with evidence`];
 })());
 
+// 37 · Every input the build declares must be an entrypoint. The hardcoded entry
+// list named main and the two preloads but omitted the `pty-sidecar` input and
+// the three workers, so sidecar/entry.ts, server.ts, log.ts and ring-buffer.ts
+// were reported unreachable — i.e. deletable. Deleting them breaks every terminal
+// in the app. This is the FALSE DELETE direction and it is the worst output this
+// tool can produce, so the check re-parses the build config itself.
+record(37, "every build input is an entrypoint, not deletable debt", ...(() => {
+  const cfg = readFileSync(join(REPO, VITE), "utf8");
+  const inputs = [...cfg.matchAll(/resolve\(\s*__dirname\s*,\s*"([^"]+)"/g)]
+    .map((x) => x[1])
+    .filter((p) => p.startsWith("src/") && /\.(ts|tsx|js|jsx)$/.test(p))
+    .map((p) => `collab-electron/${p}`);
+  if (inputs.length < 5)
+    return [false, `re-parsed only ${inputs.length} code entries from the build config`];
+  const verdict = new Map(before.reach.map((r) => [r.path, r.reach]));
+  const wrong = inputs.filter((p) => verdict.get(p) !== "entrypoint");
+  return [wrong.length === 0,
+    wrong.length
+      ? `${wrong.length} build input(s) not marked entrypoint: ${wrong.map((p) => `${p}=${verdict.get(p) ?? "absent"}`).join(", ")}`
+      : `${inputs.length} code entries, all entrypoint`];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 36,
-  "total": 36,
+  "passed": 37,
+  "total": 37,
   "results": [
     {
       "n": 1,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 51 -> 50"
+      "detail": "verdict=remove undecided 49 -> 48"
     },
     {
       "n": 33,
@@ -218,6 +218,12 @@
       "name": "a broken bridge call is never a false accusation",
       "passed": true,
       "detail": "2 broken call(s), all absent from the preload, all with evidence"
+    },
+    {
+      "n": 37,
+      "name": "every build input is an entrypoint, not deletable debt",
+      "passed": true,
+      "detail": "7 code entries, all entrypoint"
     }
   ]
 }

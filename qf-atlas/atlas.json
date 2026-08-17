@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "864f9d0",
+    "commit": "7d20480",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "1e03ff8d8601e7bf"
+    "fingerprint": "2c60a1b1d64b0e25"
   },
   "stats": {
     "live": 105,
@@ -31,11 +31,11 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 51,
+    "undecided": 49,
     "allClear": false,
     "decisions": {
-      "total": 51,
-      "undecided": 51,
+      "total": 49,
+      "undecided": 49,
       "keep": 0,
       "repair": 0,
       "remove": 0,
@@ -10298,14 +10298,14 @@
       "path": "collab-electron/src/main/file-filter.ts",
       "reach": "reachable",
       "importers": [
+        "collab-electron/src/main/git-replay-worker.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/image-service.ts",
         "collab-electron/src/main/files.ts",
         "collab-electron/src/main/ipc-filesystem.ts",
-        "collab-electron/src/main/ipc-workspace.ts",
-        "collab-electron/src/main/workspace-graph.ts"
+        "collab-electron/src/main/ipc-workspace.ts"
       ],
-      "importerCount": 6
+      "importerCount": 7
     },
     {
       "path": "collab-electron/src/main/files.ts",
@@ -10322,7 +10322,7 @@
     },
     {
       "path": "collab-electron/src/main/git-replay-worker.ts",
-      "reach": "process-entry",
+      "reach": "entrypoint",
       "importers": [],
       "importerCount": 0
     },
@@ -10396,7 +10396,7 @@
     },
     {
       "path": "collab-electron/src/main/image-worker.ts",
-      "reach": "process-entry",
+      "reach": "entrypoint",
       "importers": [],
       "importerCount": 0
     },
@@ -10445,9 +10445,10 @@
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/json-rpc-server.ts",
         "collab-electron/src/main/pty.ts",
+        "collab-electron/src/main/sidecar/server.ts",
         "collab-electron/src/main/sidecar/protocol.ts"
       ],
-      "importerCount": 4
+      "importerCount": 5
     },
     {
       "path": "collab-electron/src/main/ipc-filesystem.ts",
@@ -10752,36 +10753,44 @@
     },
     {
       "path": "collab-electron/src/main/sidecar/entry.ts",
-      "reach": "unreachable",
+      "reach": "entrypoint",
       "importers": [],
       "importerCount": 0
     },
     {
       "path": "collab-electron/src/main/sidecar/log.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/sidecar/server.ts"
+      ],
+      "importerCount": 1
     },
     {
       "path": "collab-electron/src/main/sidecar/protocol.ts",
       "reach": "reachable",
       "importers": [
+        "collab-electron/src/main/sidecar/entry.ts",
         "collab-electron/src/main/pty.ts",
+        "collab-electron/src/main/sidecar/server.ts",
         "collab-electron/src/main/sidecar/client.ts"
       ],
-      "importerCount": 2
+      "importerCount": 4
     },
     {
       "path": "collab-electron/src/main/sidecar/ring-buffer.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/sidecar/server.ts"
+      ],
+      "importerCount": 1
     },
     {
       "path": "collab-electron/src/main/sidecar/server.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/sidecar/entry.ts"
+      ],
+      "importerCount": 1
     },
     {
       "path": "collab-electron/src/main/task-delegation-projection.ts",
@@ -10839,7 +10848,7 @@
     },
     {
       "path": "collab-electron/src/main/watcher-worker.ts",
-      "reach": "process-entry",
+      "reach": "entrypoint",
       "importers": [],
       "importerCount": 0
     },
@@ -11589,8 +11598,12 @@
   ],
   "entrypoints": [
     "collab-electron/src/main/index.ts",
-    "collab-electron/src/preload/shell.ts",
+    "collab-electron/src/main/sidecar/entry.ts",
+    "collab-electron/src/main/watcher-worker.ts",
+    "collab-electron/src/main/git-replay-worker.ts",
+    "collab-electron/src/main/image-worker.ts",
     "collab-electron/src/preload/universal.ts",
+    "collab-electron/src/preload/shell.ts",
     "collab-electron/src/windows/nav/src/main.tsx",
     "collab-electron/src/windows/viewer/src/main.tsx",
     "collab-electron/src/windows/terminal/src/main.tsx",
@@ -19391,34 +19404,6 @@
       "verdict": "undecided"
     },
     {
-      "id": "unreachable:collab-electron/src/main/sidecar/entry.ts",
-      "kind": "unreachable",
-      "what": "entry.ts",
-      "where": "collab-electron/src/main/sidecar/entry.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/sidecar/log.ts",
-      "kind": "unreachable",
-      "what": "log.ts",
-      "where": "collab-electron/src/main/sidecar/log.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/sidecar/ring-buffer.ts",
-      "kind": "unreachable",
-      "what": "ring-buffer.ts",
-      "where": "collab-electron/src/main/sidecar/ring-buffer.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/sidecar/server.ts",
-      "kind": "unreachable",
-      "what": "server.ts",
-      "where": "collab-electron/src/main/sidecar/server.ts",
-      "verdict": "undecided"
-    },
-    {
       "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
       "kind": "unreachable",
       "what": "cube3d.js",
@@ -19465,6 +19450,20 @@
       "kind": "unreachable",
       "what": "task-governance.ts",
       "where": "packages/qf-kernel/src/task-governance.ts",
+      "verdict": "undecided"
+    },
+    {
+      "id": "broken-bridge-call:onTerminalListMessage",
+      "kind": "broken-bridge-call",
+      "what": "onTerminalListMessage",
+      "where": "collab-electron/src/windows/terminal-list/src/App.tsx:54",
+      "verdict": "undecided"
+    },
+    {
+      "id": "broken-bridge-call:ptyForegroundProcess",
+      "kind": "broken-bridge-call",
+      "what": "ptyForegroundProcess",
+      "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
       "verdict": "undecided"
     }
   ],

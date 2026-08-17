@@ -244,26 +244,45 @@ const productFiles = files.filter((f) =>
 // A dead window was being laundered into the one verdict nothing questions, and
 // the broken bridge call inside it (`onTerminalListMessage`) stayed hidden behind
 // that verdict. Read the build config; report the difference as a finding.
+// EVERY entry comes from the build. Hardcoding them produced both failure modes:
+//   · a FALSE KEEP — `src/windows/terminal-list/` has no input here and no bundle
+//     in out/renderer/, yet was labelled `entrypoint`, the strongest verdict this
+//     map issues. An agent would have kept or "fixed" code that cannot load.
+//   · a FALSE DELETE — the hardcoded entry list named main and the two preloads
+//     but omitted the `pty-sidecar` input (src/main/sidecar/entry.ts) and the
+//     three workers. That reported sidecar/entry.ts, server.ts, log.ts and
+//     ring-buffer.ts as unreachable. Deleting them breaks every terminal in the
+//     app. False deletes are the worst thing this tool can emit, so the entry
+//     list may never be a list someone typed.
+// Multi-line `resolve(\n __dirname,\n "…")` is the norm in this config, so the
+// whitespace class has to span newlines.
 const viteConfig = read(join(REPO, "collab-electron/electron.vite.config.ts"));
+const declaredInputs = [...viteConfig.matchAll(/resolve\(\s*__dirname\s*,\s*"([^"]+)"/g)]
+  .map((m) => m[1])
+  // `src/` only: the config also resolves alias targets and output dirs, and an
+  // alias target is not an entry. Anchoring here keeps portable.ts out.
+  .filter((p) => p.startsWith("src/") && /\.(ts|tsx|js|jsx|html)$/.test(p))
+  .map((p) => `collab-electron/${p}`);
+const htmlEntries = [...new Set(declaredInputs.filter((p) => p.endsWith(".html")))];
+const codeEntries = [...new Set(declaredInputs.filter((p) => !p.endsWith(".html")))];
+
 const builtWindows = new Set(
-  [...viteConfig.matchAll(/["']src\/windows\/([\w-]+)\/index\.html["']/g)].map((m) => m[1]));
+  htmlEntries.map((p) => p.match(/windows\/([\w-]+)\/index\.html$/)?.[1]).filter(Boolean));
 const windowDirs = readdirSync(join(REPO, "collab-electron/src/windows"), { withFileTypes: true })
   .filter((d) => d.isDirectory()).map((d) => d.name);
 const unbuiltWindows = windowDirs.filter((d) => !builtWindows.has(d) && d !== "shared");
-if (!builtWindows.size)
-  throw new Error("qf-atlas: parsed zero renderer entries from electron.vite.config.ts — "
-    + "the entry regex no longer matches the build config, and every window would be "
-    + "reported unreachable. Fix the parse rather than shipping that.");
+if (!builtWindows.size || !codeEntries.length)
+  throw new Error("qf-atlas: parsed "
+    + `${builtWindows.size} renderer and ${codeEntries.length} code entries from `
+    + "electron.vite.config.ts. The entry regex no longer matches the build config. "
+    + "Every unmatched entry's import tree would be reported unreachable — i.e. "
+    + "deletable. Fix the parse rather than shipping that.");
 
 const reach = reachability({
   repo: REPO, rel,
   files: productFiles,
-  htmlEntries: [...builtWindows].map((d) => `collab-electron/src/windows/${d}/index.html`),
-  extraEntries: [
-    "collab-electron/src/main/index.ts",
-    "collab-electron/src/preload/shell.ts",
-    "collab-electron/src/preload/universal.ts",
-  ],
+  htmlEntries,
+  extraEntries: codeEntries,
   isTest: (f) => /.(test|spec)./.test(f),
   packageDirs: ["packages/qf-kernel", "qf-kernel-schema",
     "collab-electron/packages/components", "collab-electron/packages/shared",
