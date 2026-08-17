@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "7d20480",
+    "commit": "c551665",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "2c60a1b1d64b0e25"
+    "fingerprint": "010d6768a0060c3f"
   },
   "stats": {
     "live": 105,
@@ -31,11 +31,11 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 49,
+    "undecided": 48,
     "allClear": false,
     "decisions": {
-      "total": 49,
-      "undecided": 49,
+      "total": 48,
+      "undecided": 48,
       "keep": 0,
       "repair": 0,
       "remove": 0,
@@ -10793,6 +10793,24 @@
       "importerCount": 1
     },
     {
+      "path": "collab-electron/src/main/species-launch.ts",
+      "reach": "unreachable",
+      "importers": [],
+      "importerCount": 0
+    },
+    {
+      "path": "collab-electron/src/main/species-surface.ts",
+      "reach": "unreachable",
+      "importers": [],
+      "importerCount": 0
+    },
+    {
+      "path": "collab-electron/src/main/species-tools.ts",
+      "reach": "unreachable",
+      "importers": [],
+      "importerCount": 0
+    },
+    {
       "path": "collab-electron/src/main/task-delegation-projection.ts",
       "reach": "reachable",
       "importers": [
@@ -11076,6 +11094,14 @@
       "importerCount": 1
     },
     {
+      "path": "collab-electron/src/windows/shell/src/cable-inspector.js",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/shell/src/renderer.js"
+      ],
+      "importerCount": 1
+    },
+    {
       "path": "collab-electron/src/windows/shell/src/cable-math.js",
       "reach": "reachable",
       "importers": [
@@ -11089,9 +11115,10 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/windows/shell/src/renderer.js",
-        "collab-electron/src/windows/shell/src/cable-controller.js"
+        "collab-electron/src/windows/shell/src/cable-controller.js",
+        "collab-electron/src/windows/shell/src/cable-inspector.js"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "collab-electron/src/windows/shell/src/canvas-layout.js",
@@ -11176,9 +11203,10 @@
       "importers": [
         "collab-electron/src/windows/shell/src/renderer.js",
         "collab-electron/src/windows/shell/src/cable-overlay.js",
+        "collab-electron/src/windows/shell/src/cable-inspector.js",
         "collab-electron/src/windows/shell/src/kernel-ledger.js"
       ],
-      "importerCount": 3
+      "importerCount": 4
     },
     {
       "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
@@ -11341,10 +11369,11 @@
       "path": "packages/qf-kernel/src/create.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/execute.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "packages/qf-kernel/src/creation-policy.ts",
@@ -11356,22 +11385,24 @@
     },
     {
       "path": "packages/qf-kernel/src/db-bun.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
+      "reach": "reachable",
+      "importers": [
+        "packages/qf-kernel/src/index.ts"
+      ],
+      "importerCount": 1
     },
     {
       "path": "packages/qf-kernel/src/db.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/read.ts",
+        "packages/qf-kernel/src/db-bun.ts",
         "packages/qf-kernel/src/create.ts",
-        "packages/qf-kernel/src/pipeline.ts",
-        "packages/qf-kernel/src/execute.ts",
-        "packages/qf-kernel/src/ontology-read-receipt.ts"
+        "packages/qf-kernel/src/pipeline.ts"
       ],
-      "importerCount": 14
+      "importerCount": 18
     },
     {
       "path": "packages/qf-kernel/src/deterministic-execution.ts",
@@ -11385,14 +11416,14 @@
       "path": "packages/qf-kernel/src/errors.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/read.ts",
         "packages/qf-kernel/src/create.ts",
-        "packages/qf-kernel/src/pipeline.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "packages/qf-kernel/src/pipeline.ts"
       ],
-      "importerCount": 16
+      "importerCount": 18
     },
     {
       "path": "packages/qf-kernel/src/events.ts",
@@ -11411,37 +11442,41 @@
       "path": "packages/qf-kernel/src/execute.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "packages/qf-kernel/src/fixtures.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0
+      "reach": "reachable",
+      "importers": [
+        "packages/qf-kernel/src/index.ts"
+      ],
+      "importerCount": 1
     },
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "packages/qf-kernel/src/hash.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/ontology-read-receipt.ts",
         "packages/qf-kernel/src/governed-review.ts",
-        "packages/qf-kernel/src/market-context.ts",
-        "packages/qf-kernel/src/deterministic-execution.ts"
+        "packages/qf-kernel/src/market-context.ts"
       ],
-      "importerCount": 7
+      "importerCount": 8
     },
     {
       "path": "packages/qf-kernel/src/index.ts",
@@ -11451,7 +11486,7 @@
     },
     {
       "path": "packages/qf-kernel/src/insert.ts",
-      "reach": "unreachable",
+      "reach": "test-only",
       "importers": [],
       "importerCount": 0
     },
@@ -11487,24 +11522,26 @@
       "path": "packages/qf-kernel/src/ontology-read-receipt.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/execute.ts"
       ],
-      "importerCount": 3
+      "importerCount": 4
     },
     {
       "path": "packages/qf-kernel/src/pipeline.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/execute.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "packages/qf-kernel/src/portable.ts",
-      "reach": "reachable",
+      "reach": "package-entry",
       "importers": [
         "collab-electron/src/main/kernel.ts"
       ],
@@ -11514,62 +11551,77 @@
       "path": "packages/qf-kernel/src/read.ts",
       "reach": "reachable",
       "importers": [
-        "packages/qf-kernel/src/portable.ts"
+        "packages/qf-kernel/src/index.ts",
+        "packages/qf-kernel/src/portable.ts",
+        "packages/qf-kernel/src/species.ts"
       ],
-      "importerCount": 1
+      "importerCount": 3
     },
     {
       "path": "packages/qf-kernel/src/registry-drift.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/db.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "packages/qf-kernel/src/replay.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "packages/qf-kernel/src/resolve-artifact-root.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/governed-review.ts",
         "packages/qf-kernel/src/deterministic-execution.ts"
       ],
-      "importerCount": 4
+      "importerCount": 5
     },
     {
       "path": "packages/qf-kernel/src/resolve-path.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "packages/qf-kernel/src/results.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts",
         "packages/qf-kernel/src/pipeline.ts",
         "packages/qf-kernel/src/execute.ts",
-        "packages/qf-kernel/src/market-context.ts",
-        "packages/qf-kernel/src/deterministic-execution.ts"
+        "packages/qf-kernel/src/market-context.ts"
       ],
-      "importerCount": 7
+      "importerCount": 8
+    },
+    {
+      "path": "packages/qf-kernel/src/species.ts",
+      "reach": "reachable",
+      "importers": [
+        "packages/qf-kernel/src/index.ts",
+        "packages/qf-kernel/src/portable.ts"
+      ],
+      "importerCount": 2
     },
     {
       "path": "packages/qf-kernel/src/task-governance.ts",
-      "reach": "unreachable",
+      "reach": "test-only",
       "importers": [],
       "importerCount": 0
     },
@@ -11590,10 +11642,11 @@
       "path": "packages/qf-kernel/src/upgrade.ts",
       "reach": "reachable",
       "importers": [
+        "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/db.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     }
   ],
   "entrypoints": [
@@ -11621,6 +11674,7 @@
   ],
   "blastRadius": {
     "packages/qf-kernel/src/governed-review.ts": [
+      "packages/qf-kernel/src/index.ts",
       "packages/qf-kernel/src/portable.ts",
       "packages/qf-kernel/src/create.ts",
       "collab-electron/src/main/kernel.ts",
@@ -19404,6 +19458,27 @@
       "verdict": "undecided"
     },
     {
+      "id": "unreachable:collab-electron/src/main/species-launch.ts",
+      "kind": "unreachable",
+      "what": "species-launch.ts",
+      "where": "collab-electron/src/main/species-launch.ts",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreachable:collab-electron/src/main/species-surface.ts",
+      "kind": "unreachable",
+      "what": "species-surface.ts",
+      "where": "collab-electron/src/main/species-surface.ts",
+      "verdict": "undecided"
+    },
+    {
+      "id": "unreachable:collab-electron/src/main/species-tools.ts",
+      "kind": "unreachable",
+      "what": "species-tools.ts",
+      "where": "collab-electron/src/main/species-tools.ts",
+      "verdict": "undecided"
+    },
+    {
       "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
       "kind": "unreachable",
       "what": "cube3d.js",
@@ -19422,34 +19497,6 @@
       "kind": "unreachable",
       "what": "main.tsx",
       "where": "collab-electron/src/windows/terminal-list/src/main.tsx",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:packages/qf-kernel/src/db-bun.ts",
-      "kind": "unreachable",
-      "what": "db-bun.ts",
-      "where": "packages/qf-kernel/src/db-bun.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:packages/qf-kernel/src/fixtures.ts",
-      "kind": "unreachable",
-      "what": "fixtures.ts",
-      "where": "packages/qf-kernel/src/fixtures.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:packages/qf-kernel/src/insert.ts",
-      "kind": "unreachable",
-      "what": "insert.ts",
-      "where": "packages/qf-kernel/src/insert.ts",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:packages/qf-kernel/src/task-governance.ts",
-      "kind": "unreachable",
-      "what": "task-governance.ts",
-      "where": "packages/qf-kernel/src/task-governance.ts",
       "verdict": "undecided"
     },
     {

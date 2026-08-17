@@ -17,15 +17,22 @@ const rel = (p) => relative(REPO, p).split(sep).join("/");
 
 const SKIP_DIR = /^(node_modules|dist|out|build|coverage|\.git|\.package-staging.*)$/;
 const CODE = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
-const IS_TEST = /\.(test|spec)\.|\.check\.ts$/;
+// Exported so nobody types a second definition of "test file". A divergent copy
+// in generate.mjs (`/.(test|spec)./`, unescaped dots, no `.check.ts`) is how the
+// `test-only` verdict came to be unreachable in practice.
+export const IS_TEST = /\.(test|spec)\.|\.check\.ts$/;
 
-export function walk(dir, out = []) {
+/** `keepTests` includes test files, which the default walk strips. Reachability
+ *  needs them: without a test file set there is nothing to seed the test walk
+ *  from, and every test-only file falls through to `unreachable` — i.e. to
+ *  "delete me". */
+export function walk(dir, out = [], keepTests = false) {
   let entries;
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return out; }
   for (const e of entries) {
     const p = join(dir, e.name);
-    if (e.isDirectory()) { if (!SKIP_DIR.test(e.name)) walk(p, out); }
-    else if (CODE.test(e.name) && !IS_TEST.test(e.name)) out.push(p);
+    if (e.isDirectory()) { if (!SKIP_DIR.test(e.name)) walk(p, out, keepTests); }
+    else if (CODE.test(e.name) && (keepTests || !IS_TEST.test(e.name))) out.push(p);
   }
   return out;
 }

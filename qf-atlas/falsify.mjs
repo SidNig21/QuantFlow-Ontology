@@ -12,7 +12,7 @@
 import { writeFileSync, unlinkSync, existsSync, readFileSync, renameSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
-import { REPO } from "./extract.mjs";
+import { REPO, rel, walk, IS_TEST } from "./extract.mjs";
 
 const GEN = join(REPO, "qf-atlas", "generate.mjs");
 const node = process.execPath;
@@ -598,6 +598,51 @@ record(37, "every build input is an entrypoint, not deletable debt", ...(() => {
     wrong.length
       ? `${wrong.length} build input(s) not marked entrypoint: ${wrong.map((p) => `${p}=${verdict.get(p) ?? "absent"}`).join(", ")}`
       : `${inputs.length} code entries, all entrypoint`];
+})());
+
+// 38 · A package's `exports` are ROOTS. They used to be a label applied after the
+// walk, so nothing a package re-exported was traversed: qf-kernel/src/index.ts read
+// `package-entry` while db-bun.ts (re-exported at index.ts:39) and fixtures.ts
+// (index.ts:118) read `unreachable` — the bucket the brief calls "start here".
+// A FALSE DELETE on the Kernel's own public surface.
+record(38, "files a package re-exports are not deletable debt", ...(() => {
+  const idx = readFileSync(join(REPO, "packages/qf-kernel/src/index.ts"), "utf8");
+  const reExported = ["db-bun", "fixtures"].filter((n) => new RegExp(`["']\\./${n}\\.ts["']`).test(idx));
+  if (reExported.length < 2)
+    return [false, `index.ts no longer re-exports both probes (found ${reExported.join(", ") || "none"})`];
+  const verdict = new Map(before.reach.map((r) => [r.path, r.reach]));
+  const wrong = reExported.filter((n) => verdict.get(`packages/qf-kernel/src/${n}.ts`) === "unreachable");
+  return [wrong.length === 0,
+    wrong.length ? `${wrong.join(", ")} re-exported by index.ts yet reported unreachable`
+      : `${reExported.length} re-exported file(s), none reported unreachable`];
+})());
+
+// 39 · The `test-only` verdict existed in the vocabulary and had NEVER been
+// emitted: the file list handed to reachability strips tests, so the test walk was
+// seeded from an empty array. Every test-reached file fell through to
+// `unreachable`. A verdict that cannot occur is worse than a missing one — it
+// makes the bucket above it look complete.
+record(39, "test-only is a verdict that actually occurs", ...(() => {
+  const rows = before.reach.filter((r) => r.reach === "test-only");
+  return [rows.length > 0,
+    rows.length ? `${rows.length} test-only: ${rows.map((r) => r.path.split("/").pop()).join(", ")}`
+      : "zero test-only rows — the test walk is seeded from an empty set again"];
+})());
+
+// 40 · Silent exclusion, the failure no verdict can flag. A divergent local copy of
+// the test-file regex — `/.(test|spec)./`, unescaped dots — matched "/species"
+// because "/" + "spec" + "i" satisfies it, so all three species-*.ts files were
+// classed as tests and dropped from the reach rows entirely. Not mislabelled:
+// absent. Every product file must carry a row.
+record(40, "no product file is silently missing from the reach analysis", ...(() => {
+  const universe = walk(REPO, [], true).map((f) => rel(f)).filter((f) =>
+    (f.startsWith("collab-electron/src/") || f.startsWith("packages/qf-kernel/src/"))
+    && !IS_TEST.test(f) && !f.endsWith(".d.ts"));
+  const seen = new Set(before.reach.map((r) => r.path));
+  const missing = universe.filter((f) => !seen.has(f));
+  return [missing.length === 0,
+    missing.length ? `${missing.length} file(s) absent from reach, e.g. ${missing.slice(0, 3).join(", ")}`
+      : `${universe.length} product files, all present in reach`];
 })());
 
 // restore the committed model

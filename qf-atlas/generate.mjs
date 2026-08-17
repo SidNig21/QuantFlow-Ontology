@@ -10,7 +10,7 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel, read } from "./extract.mjs";
+import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel, read, IS_TEST } from "./extract.mjs";
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
@@ -283,7 +283,12 @@ const reach = reachability({
   files: productFiles,
   htmlEntries,
   extraEntries: codeEntries,
-  isTest: (f) => /.(test|spec)./.test(f),
+  // One definition of "test file", imported. The local copy here was
+  // `/.(test|spec)./` — unescaped dots, no `.check.ts` — a second, divergent
+  // answer to a question the walk had already answered.
+  isTest: (f) => IS_TEST.test(f),
+  testFiles: walk(REPO, [], true).map((f) => rel(f)).filter((f) => IS_TEST.test(f)
+    && (f.startsWith("collab-electron/") || f.startsWith("packages/") || f.startsWith("qa/"))),
   packageDirs: ["packages/qf-kernel", "qf-kernel-schema",
     "collab-electron/packages/components", "collab-electron/packages/shared",
     "collab-electron/packages/theme"],

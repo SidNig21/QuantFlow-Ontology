@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 37,
-  "total": 37,
+  "passed": 40,
+  "total": 40,
   "results": [
     {
       "n": 1,
@@ -181,7 +181,7 @@
       "n": 30,
       "name": "confirmed findings carry a blast radius",
       "passed": true,
-      "detail": "1 file(s), e.g. governed-review.ts has 12 dependants"
+      "detail": "1 file(s), e.g. governed-review.ts has 13 dependants"
     },
     {
       "n": 31,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 49 -> 48"
+      "detail": "verdict=remove undecided 48 -> 47"
     },
     {
       "n": 33,
@@ -224,6 +224,24 @@
       "name": "every build input is an entrypoint, not deletable debt",
       "passed": true,
       "detail": "7 code entries, all entrypoint"
+    },
+    {
+      "n": 38,
+      "name": "files a package re-exports are not deletable debt",
+      "passed": true,
+      "detail": "2 re-exported file(s), none reported unreachable"
+    },
+    {
+      "n": 39,
+      "name": "test-only is a verdict that actually occurs",
+      "passed": true,
+      "detail": "2 test-only: insert.ts, task-governance.ts"
+    },
+    {
+      "n": 40,
+      "name": "no product file is silently missing from the reach analysis",
+      "passed": true,
+      "detail": "181 product files, all present in reach"
     }
   ]
 }

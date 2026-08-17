@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 7d20480` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ c551665` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**49 of 49 findings have not been looked at.**
+**48 of 48 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 49 |
+| `undecided` | 48 |
 | `repair` | 0 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 49 findings still need a decision.
+**Not all clear.** 48 findings still need a decision.
 
 ## The four hops
 
@@ -206,11 +206,11 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 147 | imported from an entrypoint |
+| `reachable` | 150 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
-| `package-entry` | 1 | named in a workspace package's exports |
-| `test-only` | 0 | reached only from tests |
-| **`unreachable`** | **10** | **nothing imports it — start here** |
+| `package-entry` | 2 | named in a workspace package's exports |
+| `test-only` | 2 | reached only from tests |
+| **`unreachable`** | **9** | **nothing imports it — start here** |
 
 ### Windows the build never compiles (1)
 
@@ -226,7 +226,7 @@ uncalled.
 > Renderer entries are now parsed from the build config, and the generator throws
 > rather than continue if that parse returns nothing.
 
-### Unreachable (10) — ask the founder, do not delete
+### Unreachable (9) — ask the founder, do not delete
 
 Nothing in the product imports these. **`unreachable` is a question, not a verdict.**
 Two different situations produce byte-for-byte identical evidence:
@@ -255,13 +255,12 @@ assert the file exists. Then ask.
 - `collab-electron/src/main/a2a-artifact-store.ts`
 - `collab-electron/src/main/a2a-bus.ts`
 - `collab-electron/src/main/a2a-orchestra.ts`
+- `collab-electron/src/main/species-launch.ts`
+- `collab-electron/src/main/species-surface.ts`
+- `collab-electron/src/main/species-tools.ts`
 - `collab-electron/src/windows/shared/flow-cube/cube3d.js`
 - `collab-electron/src/windows/terminal-list/src/App.tsx`
 - `collab-electron/src/windows/terminal-list/src/main.tsx`
-- `packages/qf-kernel/src/db-bun.ts`
-- `packages/qf-kernel/src/fixtures.ts`
-- `packages/qf-kernel/src/insert.ts`
-- `packages/qf-kernel/src/task-governance.ts`
 
 ## What to remove
 
@@ -336,9 +335,10 @@ from the generated schema; reachability follows call sites and the Kernel comman
 Everything that imports the file, directly or transitively. This is what breaks if the
 change is wrong.
 
-`packages/qf-kernel/src/governed-review.ts` — **12 files depend on it**
+`packages/qf-kernel/src/governed-review.ts` — **13 files depend on it**
 
 ```
+  packages/qf-kernel/src/index.ts
   packages/qf-kernel/src/portable.ts
   packages/qf-kernel/src/create.ts
   collab-electron/src/main/kernel.ts
@@ -348,8 +348,7 @@ change is wrong.
   collab-electron/src/main/ontology-gateway.ts
   collab-electron/src/main/host-native-tui.ts
   collab-electron/src/main/agent-host.ts
-  collab-electron/src/main/connections-ipc.ts
-  …2 more
+  …3 more
 ```
 
 Deliberately **not** violations, and each was reported as one before the classifier

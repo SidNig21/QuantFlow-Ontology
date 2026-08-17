@@ -99,7 +99,7 @@ function windowEntries(repo, htmlPaths, rel) {
 /**
  * @param roots  { repo, rel, files, htmlEntries, extraEntries, isTest }
  */
-export function reachability({ repo, rel, files, htmlEntries, extraEntries = [], isTest, packageDirs = [] }) {
+export function reachability({ repo, rel, files, htmlEntries, extraEntries = [], isTest, packageDirs = [], testFiles = [] }) {
   const packages = workspacePackages(repo, packageDirs);
   const entries = [
     ...extraEntries.filter((e) => existsSync(join(repo, e))),
@@ -120,10 +120,24 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
     return out;
   };
 
+  // Package entries are ROOTS, not labels. This block used to sit below the walk
+  // and only decorate the export file itself, so nothing a package re-exported
+  // was ever traversed: `packages/qf-kernel/src/index.ts` was labelled
+  // `package-entry` while `db-bun.ts` (re-exported at index.ts:39) and
+  // `fixtures.ts` (index.ts:118) came out `unreachable` — the bucket the brief
+  // titles "nothing imports it — start here". A consumer importing the package
+  // reaches both. That was a FALSE DELETE on the Kernel's own public surface.
+  const packageEntry = new Set();
+  for (const pkg of packages.values())
+    for (const target of Object.values(pkg.exports ?? {})) {
+      const r = resolveImport(repo, join(pkg.dir, "package.json"), target, null);
+      if (r) packageEntry.add(rel(r));
+    }
+
   // walk 1 — the product, tests excluded entirely
   const product = new Set();
   const importedBy = new Map();                 // file -> Set(files that import it)
-  const queue = [...entries];
+  const queue = [...entries, ...packageEntry];
   while (queue.length) {
     const f = queue.shift();
     if (product.has(f) || isTest(f)) continue;
@@ -138,8 +152,15 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
   // walk 2 — same again but starting from tests, to separate "dead" from
   // "test-only". A file only tests import is not product code, but it is also
   // not abandoned, and calling both of those "unreachable" would be a lie.
+  // `files` is produced by a walk that STRIPS test files, so `files.filter(isTest)`
+  // was always empty and this walk never ran. Consequence: the `test-only` verdict
+  // documented above had never once been emitted — the committed model held zero
+  // such rows — and every test-reached file fell through to `unreachable`.
+  // `packages/qf-kernel/src/task-governance.ts`, whose only importer is
+  // `task-steering.test.ts`, was being offered up for deletion. The caller now
+  // supplies the test files explicitly.
   const fromTests = new Set();
-  const tq = files.filter(isTest);
+  const tq = testFiles.length ? [...testFiles] : files.filter(isTest);
   while (tq.length) {
     const f = tq.shift();
     if (fromTests.has(f)) continue;
@@ -163,21 +184,17 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
     for (const m of text.matchAll(/["'`]([^"'`]*\.(?:ts|tsx|js|mjs|cjs))["'`]/g))
       quoted.add(m[1].split("/").pop());
   }
-  const packageEntry = new Set();
-  for (const pkg of packages.values())
-    for (const target of Object.values(pkg.exports ?? {})) {
-      const r = resolveImport(repo, join(pkg.dir, "package.json"), target, null);
-      if (r) packageEntry.add(rel(r));
-    }
-
   const entrySet = new Set(entries);
   const launched = (p) => quoted.has(p.split("/").pop().replace(/\.ts$/, ".js")) || quoted.has(p.split("/").pop());
 
   const rows = files.filter((f) => !isTest(f) && !f.endsWith(".d.ts")).map((path) => ({
     path,
+    // `package-entry` is checked before `reachable` because package entries now
+    // seed the walk, so they are members of `product`. The export surface stays a
+    // distinct label: it is reachable for a different reason than an import edge.
     reach: entrySet.has(path) ? "entrypoint"
-      : product.has(path) ? "reachable"
       : packageEntry.has(path) ? "package-entry"
+      : product.has(path) ? "reachable"
       : launched(path) ? "process-entry"
       : fromTests.has(path) ? "test-only"
       : "unreachable",
