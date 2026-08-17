@@ -53,8 +53,23 @@ export function workspacePackages(repo, dirs) {
   return map;
 }
 
-export function resolveImport(repo, fromFile, spec, packages = null) {
+export function resolveImport(repo, fromFile, spec, packages = null, aliases = null) {
   if (!spec.startsWith(".")) {
+    // Build ALIASES win over package `exports`. The windows import
+    // `@collab/components/TreeView/WorkspaceTree`, which the renderer resolves
+    // through the alias map in electron.vite.config.ts:83-90 — not through the
+    // package's `exports`, whose `"./*": "./src/*/index.ts"` wildcard does not
+    // describe those deep paths at all. Without alias resolution the import edge
+    // vanishes and 31 React components the app renders every session read
+    // `unreachable`. Same class of bug as every other one on this branch: the
+    // analyzer must read the build, not guess.
+    if (aliases) {
+      for (const [find, replacement] of aliases) {
+        if (spec !== find && !spec.startsWith(`${find}/`)) continue;
+        const rest = spec.slice(find.length).replace(/^\//, "");
+        return resolveImport(repo, "__alias__", `./${rest ? `${replacement}/${rest}` : replacement}`, null, null);
+      }
+    }
     if (!packages) return null;
     // "qf-kernel/portable" -> name "qf-kernel", subpath "./portable"
     const parts = spec.split("/");
@@ -99,7 +114,19 @@ function windowEntries(repo, htmlPaths, rel) {
 /**
  * @param roots  { repo, rel, files, htmlEntries, extraEntries, isTest }
  */
-export function reachability({ repo, rel, files, htmlEntries, extraEntries = [], isTest, packageDirs = [], testFiles = [] }) {
+/**
+ * `anchors` are roots OUTSIDE the product that legitimately import product code:
+ * QA gates, species runtimes, the CLI bridges, packaging scripts. They are launched
+ * by path or by a harness, never imported, so no product file points at them — and
+ * anything they alone import used to fall to `unreachable`. Walking from them is
+ * MONOTONIC in the safe direction: extra roots can only turn a false delete into a
+ * true keep, never the reverse.
+ *
+ * `rowScope` keeps verdicts scoped to the product even though the walk is wider.
+ * Without it, widening the walk would hand every QA gate its own `unreachable` row
+ * — trading one false-delete class for a bigger one, since nothing imports a gate.
+ */
+export function reachability({ repo, rel, files, htmlEntries, extraEntries = [], isTest, packageDirs = [], testFiles = [], anchors = [], rowScope = () => true, aliases = [] }) {
   const packages = workspacePackages(repo, packageDirs);
   const entries = [
     ...extraEntries.filter((e) => existsSync(join(repo, e))),
@@ -113,7 +140,7 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
     for (const re of SPECS) {
       re.lastIndex = 0;
       for (const m of text.matchAll(re)) {
-        const r = resolveImport(repo, file, m[1], packages);
+        const r = resolveImport(repo, file, m[1], packages, aliases);
         if (r) out.push(rel(r));
       }
     }
@@ -137,7 +164,7 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
   // walk 1 — the product, tests excluded entirely
   const product = new Set();
   const importedBy = new Map();                 // file -> Set(files that import it)
-  const queue = [...entries, ...packageEntry];
+  const queue = [...entries, ...packageEntry, ...anchors];
   while (queue.length) {
     const f = queue.shift();
     if (product.has(f) || isTest(f)) continue;
@@ -177,17 +204,29 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
   //
   // Both are found by evidence, not by an allowlist: a basename quoted anywhere
   // in reachable source counts as a launch reference.
+  // A filename inside a QA assertion is NOT a launch reference. Once anchors were
+  // walked, `qa/gates/artifact-root/run.ts:426` — `const expected = ["a2a-bus.ts",
+  // "agent-host.ts"]` — handed a2a-bus.ts the verdict `process-entry`, i.e. "a live
+  // worker, do not delete". A false KEEP manufactured by the widening itself.
+  // Two independent guards: anchors never contribute quotes, and the quoting file
+  // must actually launch something. The build-derived entry list plus falsifier 37
+  // now cover the real workers and the sidecar, so this heuristic is a backstop and
+  // can afford to be strict.
+  const LAUNCHES = /\b(?:fork|spawnSync|spawn|execFileSync|execFile|execSync|utilityProcess|new\s+Worker)\b/;
+  const anchorSet = new Set(anchors);
   const quoted = new Set();
   for (const f of [...product, ...entries]) {
+    if (anchorSet.has(f)) continue;
     let text = "";
     try { text = readFileSync(join(repo, f), "utf8"); } catch { continue; }
+    if (!LAUNCHES.test(text)) continue;
     for (const m of text.matchAll(/["'`]([^"'`]*\.(?:ts|tsx|js|mjs|cjs))["'`]/g))
       quoted.add(m[1].split("/").pop());
   }
   const entrySet = new Set(entries);
   const launched = (p) => quoted.has(p.split("/").pop().replace(/\.ts$/, ".js")) || quoted.has(p.split("/").pop());
 
-  const rows = files.filter((f) => !isTest(f) && !f.endsWith(".d.ts")).map((path) => ({
+  const rows = files.filter((f) => rowScope(f) && !isTest(f) && !f.endsWith(".d.ts")).map((path) => ({
     path,
     // `package-entry` is checked before `reachable` because package entries now
     // seed the walk, so they are members of `product`. The export surface stays a

@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 40,
-  "total": 40,
+  "passed": 43,
+  "total": 43,
   "results": [
     {
       "n": 1,
@@ -181,7 +181,7 @@
       "n": 30,
       "name": "confirmed findings carry a blast radius",
       "passed": true,
-      "detail": "1 file(s), e.g. governed-review.ts has 13 dependants"
+      "detail": "1 file(s), e.g. governed-review.ts has 34 dependants"
     },
     {
       "n": 31,
@@ -241,7 +241,25 @@
       "n": 40,
       "name": "no product file is silently missing from the reach analysis",
       "passed": true,
-      "detail": "181 product files, all present in reach"
+      "detail": "237 product files, all present in reach"
+    },
+    {
+      "n": 41,
+      "name": "alias-resolved imports keep their target reachable",
+      "passed": true,
+      "detail": "45 component files, none unreachable"
+    },
+    {
+      "n": 42,
+      "name": "an importer outside the product still anchors its target",
+      "passed": true,
+      "detail": "reach=reachable, importers=qa/gates/artifact-root/run.ts"
+    },
+    {
+      "n": 43,
+      "name": "a filename in a QA assertion does not confer process-entry",
+      "passed": true,
+      "detail": "reach=unreachable"
     }
   ]
 }

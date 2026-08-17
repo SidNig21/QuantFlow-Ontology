@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ c551665` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ c3d0930` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -206,7 +206,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 150 | imported from an entrypoint |
+| `reachable` | 206 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -252,7 +252,7 @@ Before proposing removal of anything below, rule out: workspace package exports,
 dynamic `import()`, path-launched processes, packaging manifests, and QA gates that
 assert the file exists. Then ask.
 
-- `collab-electron/src/main/a2a-artifact-store.ts`
+- `collab-electron/packages/shared/src/utils.ts`
 - `collab-electron/src/main/a2a-bus.ts`
 - `collab-electron/src/main/a2a-orchestra.ts`
 - `collab-electron/src/main/species-launch.ts`
@@ -335,20 +335,20 @@ from the generated schema; reachability follows call sites and the Kernel comman
 Everything that imports the file, directly or transitively. This is what breaks if the
 change is wrong.
 
-`packages/qf-kernel/src/governed-review.ts` — **13 files depend on it**
+`packages/qf-kernel/src/governed-review.ts` — **34 files depend on it**
 
 ```
   packages/qf-kernel/src/index.ts
   packages/qf-kernel/src/portable.ts
   packages/qf-kernel/src/create.ts
-  collab-electron/src/main/kernel.ts
-  packages/qf-kernel/src/execute.ts
-  collab-electron/src/main/index.ts
-  collab-electron/src/main/ipc.ts
-  collab-electron/src/main/ontology-gateway.ts
-  collab-electron/src/main/host-native-tui.ts
-  collab-electron/src/main/agent-host.ts
-  …3 more
+  qa/gates/agent-path/run.ts
+  qa/gates/artifact-root/run.ts
+  qa/gates/boot-reconcile/run.ts
+  qa/gates/bovada-football/run.ts
+  qa/gates/dock-definition-launch/run.ts
+  qa/gates/dock-profile-identity/run.ts
+  qa/gates/dock-registry/run.ts
+  …24 more
 ```
 
 Deliberately **not** violations, and each was reported as one before the classifier

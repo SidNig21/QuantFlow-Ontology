@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "c551665",
+    "commit": "c3d0930",
     "generatedAt": "2026-08-17",
     "filesScanned": 430,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "010d6768a0060c3f"
+    "fingerprint": "ad6c1833a1dcf1e1"
   },
   "stats": {
     "live": 105,
@@ -10099,10 +10099,518 @@
   ],
   "reach": [
     {
-      "path": "collab-electron/src/main/a2a-artifact-store.ts",
+      "path": "collab-electron/packages/components/src/CodeEditorView/CodeEditorView.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/CodeEditorView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/CodeEditorView/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/ConceptList/ConceptList.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ConceptList/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/ConceptList/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ItemDetailView/ItemDetailView.tsx",
+        "collab-electron/packages/components/src/SourceList/SourceList.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/Editor.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Editor/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/EditorConflictBanner.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Editor/Editor.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/ImageBlock.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Editor/Editor.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ItemDetailView/ItemDetailView.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/WikiLink.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Editor/index.ts",
+        "collab-electron/packages/components/src/Editor/Editor.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/Editor/WikiLinkAutocomplete.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Editor/index.ts",
+        "collab-electron/packages/components/src/Editor/Editor.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/ExcerptDisplay/ExcerptDisplay.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ExcerptDisplay/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/ExcerptDisplay/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/SourceList/SourceList.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/FolderTableView/FolderTableView.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/FolderTableView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/FolderTableView/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/ImageView/ImageView.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/ItemDetailView/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/ItemDetailView/ItemDetailView.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ItemDetailView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Markdown/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ItemDetailView/ItemDetailView.tsx",
+        "collab-electron/packages/components/src/SourceList/SourceList.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/Markdown/Markdown.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Markdown/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/SourceList/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/ItemDetailView/ItemDetailView.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/SourceList/SourceList.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/SourceList/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Terminal/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/terminal/src/App.tsx",
+        "collab-electron/src/windows/terminal-tile/src/App.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/Terminal/TerminalTab.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Terminal/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/Terminal/theme.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/Terminal/index.ts",
+        "collab-electron/packages/components/src/Terminal/TerminalTab.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/fileIcons.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts",
+        "collab-electron/packages/components/src/TreeView/TreeView.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/Helpers.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts",
+        "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx",
+        "collab-electron/packages/components/src/TreeView/TreeView.tsx"
+      ],
+      "importerCount": 3
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/nav/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/SearchSortControls.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/TreeView.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts",
+        "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/types.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts",
+        "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx",
+        "collab-electron/packages/components/src/TreeView/useWorkspaceFileTree.ts",
+        "collab-electron/packages/components/src/TreeView/useFileTree.ts",
+        "collab-electron/packages/components/src/TreeView/TreeView.tsx",
+        "collab-electron/packages/components/src/TreeView/SearchSortControls.tsx"
+      ],
+      "importerCount": 6
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useDragDrop.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useFileTree.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/nav/src/App.tsx",
+        "collab-electron/packages/components/src/TreeView/index.ts",
+        "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx",
+        "collab-electron/packages/components/src/TreeView/useWorkspaceFileTree.ts",
+        "collab-electron/packages/components/src/TreeView/TreeView.tsx",
+        "collab-electron/packages/components/src/TreeView/useMultiSelect.ts"
+      ],
+      "importerCount": 6
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useImageThumbnail.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/TreeView.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useInlineRename.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useMultiSelect.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/TreeView/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/useWorkspaceFileTree.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/nav/src/App.tsx",
+        "collab-electron/packages/components/src/TreeView/index.ts",
+        "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx"
+      ],
+      "importerCount": 3
+    },
+    {
+      "path": "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/nav/src/App.tsx",
+        "collab-electron/packages/components/src/TreeView/index.ts"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/ForceDirectedGraph.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/index.ts",
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/forceGraph.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/ForceDirectedGraph.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/hueMap.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/index.ts",
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/index.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx",
+        "collab-electron/src/windows/graph-tile/src/App.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/ReplayTimeline.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/index.ts",
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/types.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/index.ts",
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx",
+        "collab-electron/packages/components/src/WorkspaceGraph/ForceDirectedGraph.tsx",
+        "collab-electron/packages/components/src/WorkspaceGraph/useReplayEngine.ts",
+        "collab-electron/packages/components/src/WorkspaceGraph/forceGraph.ts"
+      ],
+      "importerCount": 5
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/useReplayEngine.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/packages/components/src/WorkspaceGraph/index.ts"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/shared/src/collab-file-url.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/image-worker.ts",
+        "collab-electron/src/main/image-service.ts",
+        "collab-electron/src/windows/viewer/src/App.tsx",
+        "collab-electron/src/windows/shell/src/tile-manager.js",
+        "collab-electron/packages/shared/src/extract-cover-image.ts"
+      ],
+      "importerCount": 8
+    },
+    {
+      "path": "collab-electron/packages/shared/src/dark-mode.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/nav/src/main.tsx",
+        "collab-electron/src/windows/viewer/src/main.tsx",
+        "collab-electron/src/windows/terminal/src/main.tsx",
+        "collab-electron/src/windows/settings/src/main.tsx",
+        "collab-electron/src/windows/graph-tile/src/main.tsx",
+        "collab-electron/src/windows/artifact-tile/src/main.tsx"
+      ],
+      "importerCount": 8
+    },
+    {
+      "path": "collab-electron/packages/shared/src/extract-cover-image.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/shared/src/filepath.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/packages/shared/src/image.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/file-filter.ts",
+        "collab-electron/src/windows/viewer/src/App.tsx",
+        "collab-electron/packages/components/src/WorkspaceGraph/WorkspaceGraph.tsx",
+        "collab-electron/packages/components/src/TreeView/useImageThumbnail.ts"
+      ],
+      "importerCount": 4
+    },
+    {
+      "path": "collab-electron/packages/shared/src/path-utils.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/pty.ts",
+        "collab-electron/src/main/image-service.ts",
+        "collab-electron/src/main/terminal-target.ts",
+        "collab-electron/src/main/sidecar/server.ts",
+        "collab-electron/src/windows/nav/src/App.tsx"
+      ],
+      "importerCount": 19
+    },
+    {
+      "path": "collab-electron/packages/shared/src/pdf.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/file-filter.ts",
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 2
+    },
+    {
+      "path": "collab-electron/packages/shared/src/replay-types.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/git-replay-worker.ts",
+        "collab-electron/src/preload/universal.ts",
+        "collab-electron/src/main/git-replay.ts",
+        "collab-electron/src/main/ipc-misc.ts",
+        "collab-electron/packages/shared/src/types.ts"
+      ],
+      "importerCount": 6
+    },
+    {
+      "path": "collab-electron/packages/shared/src/types.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx",
+        "collab-electron/src/main/ipc-filesystem.ts",
+        "collab-electron/src/main/ipc-workspace.ts",
+        "collab-electron/packages/components/src/TreeView/WorkspaceTree.tsx",
+        "collab-electron/packages/components/src/TreeView/useWorkspaceFileTree.ts",
+        "collab-electron/packages/components/src/TreeView/useFileTree.ts"
+      ],
+      "importerCount": 14
+    },
+    {
+      "path": "collab-electron/packages/shared/src/utils.ts",
       "reach": "unreachable",
       "importers": [],
       "importerCount": 0
+    },
+    {
+      "path": "collab-electron/packages/shared/src/viewer-item.ts",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/viewer/src/App.tsx"
+      ],
+      "importerCount": 1
+    },
+    {
+      "path": "collab-electron/src/main/a2a-artifact-store.ts",
+      "reach": "reachable",
+      "importers": [
+        "qa/gates/artifact-root/run.ts"
+      ],
+      "importerCount": 1
     },
     {
       "path": "collab-electron/src/main/a2a-bus.ts",
@@ -10128,9 +10636,10 @@
       "path": "collab-electron/src/main/acp-fs-root.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/acp-fs-confine.ts",
         "collab-electron/src/main/acp-agent.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "collab-electron/src/main/agent-activity.ts",
@@ -10147,9 +10656,10 @@
       "path": "collab-electron/src/main/agent-artifact-writer.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/agent-host.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "collab-electron/src/main/agent-host.ts",
@@ -10176,12 +10686,13 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/product-identity.ts",
         "collab-electron/src/main/git-replay.ts",
         "collab-electron/src/main/image-service.ts",
         "collab-electron/src/main/ipc-workspace.ts",
         "collab-electron/src/main/workspace-config.ts"
       ],
-      "importerCount": 5
+      "importerCount": 6
     },
     {
       "path": "collab-electron/src/main/app-root.ts",
@@ -10281,18 +10792,24 @@
       "path": "collab-electron/src/main/definition-runtime.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/ipc-kernel.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "collab-electron/src/main/dock-profiles.ts",
       "reach": "reachable",
       "importers": [
-        "collab-electron/src/main/agent-host.ts"
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "collab-electron/scripts/package-lib/runtime-staging.ts",
+        "qa/gates/dev-dock-readiness.ts",
+        "qa/gates/dock-definition-launch/run.ts",
+        "qa/gates/dock-production-inventory.ts",
+        "qa/gates/research-director-front-door.ts"
       ],
-      "importerCount": 1
+      "importerCount": 9
     },
     {
       "path": "collab-electron/src/main/file-filter.ts",
@@ -10580,9 +11097,10 @@
       "path": "collab-electron/src/main/native-tui-orchestration.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/host-native-tui.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "collab-electron/src/main/ontology-gateway.ts",
@@ -10620,24 +11138,25 @@
       "path": "collab-electron/src/main/package-resource-paths.ts",
       "reach": "reachable",
       "importers": [
+        "collab-electron/scripts/package-lib/package-resource-paths-reexport.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/runtime-adapter.ts"
       ],
-      "importerCount": 3
+      "importerCount": 4
     },
     {
       "path": "collab-electron/src/main/paths.ts",
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/product-identity.ts",
         "collab-electron/src/main/config.ts",
         "collab-electron/src/main/kernel.ts",
         "collab-electron/src/main/host-native-tui.ts",
-        "collab-electron/src/main/json-rpc-server.ts",
-        "collab-electron/src/main/pty.ts"
+        "collab-electron/src/main/json-rpc-server.ts"
       ],
-      "importerCount": 14
+      "importerCount": 15
     },
     {
       "path": "collab-electron/src/main/peer-delivery.ts",
@@ -10660,9 +11179,10 @@
       "path": "collab-electron/src/main/peer-role-registry.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/peer-delivery.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "collab-electron/src/main/precreated-native-tui.ts",
@@ -10712,20 +11232,23 @@
       "path": "collab-electron/src/main/runtime-adapter.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/dev-dock-readiness.ts",
+        "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts"
       ],
-      "importerCount": 3
+      "importerCount": 5
     },
     {
       "path": "collab-electron/src/main/runtime-kernel-admission.ts",
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/agent-host.ts"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "collab-electron/src/main/second-opinion-admission.ts",
@@ -10814,9 +11337,10 @@
       "path": "collab-electron/src/main/task-delegation-projection.ts",
       "reach": "reachable",
       "importers": [
+        "qa/gates/research-director-delegation.ts",
         "collab-electron/src/main/kernel.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "collab-electron/src/main/terminal-target.ts",
@@ -11105,10 +11629,11 @@
       "path": "collab-electron/src/windows/shell/src/cable-math.js",
       "reach": "reachable",
       "importers": [
+        "qa/gates/glacier-feel.ts",
         "collab-electron/src/windows/shell/src/cable-overlay.js",
         "collab-electron/src/windows/shell/src/cable-controller.js"
       ],
-      "importerCount": 2
+      "importerCount": 3
     },
     {
       "path": "collab-electron/src/windows/shell/src/cable-overlay.js",
@@ -11202,11 +11727,12 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/windows/shell/src/renderer.js",
+        "qa/gates/glacier-feel.ts",
         "collab-electron/src/windows/shell/src/cable-overlay.js",
         "collab-electron/src/windows/shell/src/cable-inspector.js",
         "collab-electron/src/windows/shell/src/kernel-ledger.js"
       ],
-      "importerCount": 4
+      "importerCount": 5
     },
     {
       "path": "collab-electron/src/windows/shell/src/handoff-layer.js",
@@ -11242,9 +11768,10 @@
       "path": "collab-electron/src/windows/shell/src/task-composition.js",
       "reach": "reachable",
       "importers": [
-        "collab-electron/src/windows/shell/src/renderer.js"
+        "collab-electron/src/windows/shell/src/renderer.js",
+        "qa/gates/research-director-delegation.ts"
       ],
-      "importerCount": 1
+      "importerCount": 2
     },
     {
       "path": "collab-electron/src/windows/shell/src/tile-interactions.js",
@@ -11397,12 +11924,12 @@
       "importers": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "qa/gates/market-ingest/run.ts",
         "packages/qf-kernel/src/read.ts",
         "packages/qf-kernel/src/db-bun.ts",
-        "packages/qf-kernel/src/create.ts",
-        "packages/qf-kernel/src/pipeline.ts"
+        "packages/qf-kernel/src/create.ts"
       ],
-      "importerCount": 18
+      "importerCount": 19
     },
     {
       "path": "packages/qf-kernel/src/deterministic-execution.ts",
@@ -11481,8 +12008,15 @@
     {
       "path": "packages/qf-kernel/src/index.ts",
       "reach": "package-entry",
-      "importers": [],
-      "importerCount": 0
+      "importers": [
+        "qa/gates/agent-path/run.ts",
+        "qa/gates/artifact-root/run.ts",
+        "qa/gates/boot-reconcile/run.ts",
+        "qa/gates/bovada-football/run.ts",
+        "qa/gates/dock-definition-launch/run.ts",
+        "qa/gates/dock-profile-identity/run.ts"
+      ],
+      "importerCount": 31
     },
     {
       "path": "packages/qf-kernel/src/insert.ts",
@@ -11543,9 +12077,13 @@
       "path": "packages/qf-kernel/src/portable.ts",
       "reach": "package-entry",
       "importers": [
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "qa/gates/market-ingest/run.ts",
+        "tools/qf-bovada-football/src/artifact-store.ts",
+        "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts"
       ],
-      "importerCount": 1
+      "importerCount": 5
     },
     {
       "path": "packages/qf-kernel/src/read.ts",
@@ -11644,9 +12182,10 @@
       "importers": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "qa/gates/dock-profile-identity/run.ts",
         "packages/qf-kernel/src/db.ts"
       ],
-      "importerCount": 3
+      "importerCount": 4
     }
   ],
   "entrypoints": [
@@ -11677,16 +12216,37 @@
       "packages/qf-kernel/src/index.ts",
       "packages/qf-kernel/src/portable.ts",
       "packages/qf-kernel/src/create.ts",
-      "collab-electron/src/main/kernel.ts",
-      "packages/qf-kernel/src/execute.ts",
-      "collab-electron/src/main/index.ts",
-      "collab-electron/src/main/ipc.ts",
-      "collab-electron/src/main/ontology-gateway.ts",
-      "collab-electron/src/main/host-native-tui.ts",
-      "collab-electron/src/main/agent-host.ts",
-      "collab-electron/src/main/connections-ipc.ts",
-      "collab-electron/src/main/ipc-kernel.ts",
-      "collab-electron/src/main/host-acp-turn.ts"
+      "qa/gates/agent-path/run.ts",
+      "qa/gates/artifact-root/run.ts",
+      "qa/gates/boot-reconcile/run.ts",
+      "qa/gates/bovada-football/run.ts",
+      "qa/gates/dock-definition-launch/run.ts",
+      "qa/gates/dock-profile-identity/run.ts",
+      "qa/gates/dock-registry/run.ts",
+      "qa/gates/kernel-drift/run.ts",
+      "qa/gates/kernel-market-lineage.ts",
+      "qa/gates/kernel-task-delegation.ts",
+      "qa/gates/market-ingest/run.ts",
+      "qa/gates/team-composition.ts",
+      "qa/gates/windows-golden-seed.ts",
+      "species/critic-mock/register.ts",
+      "species/hermes/a2a-4tile-smoke.ts",
+      "species/hermes/host-admit-kernel.ts",
+      "species/hermes/register.ts",
+      "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
+      "tools/qf-peer-bus/src/bus.ts",
+      "tools/qf-peer-bus/src/harness.ts",
+      "tools/qf-read-tools/src/artifact-root.ts",
+      "tools/qf-read-tools/src/gates/action-transport.ts",
+      "tools/qf-read-tools/src/gates/kernel-one-world.ts",
+      "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
+      "tools/qf-read-tools/src/gates/tool-discovery.ts",
+      "tools/qf-read-tools/src/harness.ts",
+      "tools/qf-read-tools/src/register.ts",
+      "tools/qf-read-tools/src/server.ts",
+      "tools/qf-vault-projection/src/cli.ts",
+      "tools/qf-vault-projection/src/gate.ts",
+      "tools/qf-vault-projection/src/project.ts"
     ]
   },
   "wires": [
@@ -19437,10 +19997,10 @@
       "verdict": "undecided"
     },
     {
-      "id": "unreachable:collab-electron/src/main/a2a-artifact-store.ts",
+      "id": "unreachable:collab-electron/packages/shared/src/utils.ts",
       "kind": "unreachable",
-      "what": "a2a-artifact-store.ts",
-      "where": "collab-electron/src/main/a2a-artifact-store.ts",
+      "what": "utils.ts",
+      "where": "collab-electron/packages/shared/src/utils.ts",
       "verdict": "undecided"
     },
     {

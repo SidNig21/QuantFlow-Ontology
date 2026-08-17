@@ -235,8 +235,26 @@ for (const L of LAYERS) {
 
 // REACHABILITY — is this file part of the running product at all? Everything
 // else describes what a file does; nothing asked whether it is still ours.
-const productFiles = files.filter((f) =>
-  f.startsWith("collab-electron/src/") || f.startsWith("packages/qf-kernel/src/"));
+// The row universe — files that get a reachability VERDICT.
+// `collab-electron/packages/*` belongs here and was missing: the build config
+// aliases and bundles those as product source (renderer aliases at
+// electron.vite.config.ts:83-90, externalizeDeps.exclude at :41), yet 59 files had
+// no reach row at all. Not unreachable — absent. Silent exclusion again.
+const PRODUCT = ["collab-electron/src/", "collab-electron/packages/", "packages/qf-kernel/src/"];
+const inProduct = (f) => PRODUCT.some((p) => f.startsWith(p));
+const productFiles = files.filter(inProduct);
+
+// External anchors — launched by path, by CI, or by a harness, and never imported,
+// so no product file points at them. Anything they ALONE import was falling to
+// `unreachable`: that is why all three a2a-* modules read as dead when
+// qa/gates/artifact-root/run.ts:31 imports a2a-artifact-store.ts directly.
+// Walking from these is monotonic in the safe direction — extra roots can only turn
+// a false delete into a true keep. Their own reachability is a different question,
+// so `rowScope` keeps them from acquiring verdicts of their own; without that,
+// widening would hand every QA gate an `unreachable` row and trade one false-delete
+// class for a larger one.
+const ANCHOR = ["qa/", "species/", "collab-electron/cli/", "collab-electron/scripts/", "tools/"];
+const anchors = files.filter((f) => ANCHOR.some((p) => f.startsWith(p)));
 // The renderer entry list must come from the BUILD, not from a directory listing.
 // Listing `src/windows/*` and assuming each one is an entry granted `entrypoint`
 // — the strongest reachability verdict there is — to `windows/terminal-list/`, a
@@ -266,6 +284,26 @@ const declaredInputs = [...viteConfig.matchAll(/resolve\(\s*__dirname\s*,\s*"([^
 const htmlEntries = [...new Set(declaredInputs.filter((p) => p.endsWith(".html")))];
 const codeEntries = [...new Set(declaredInputs.filter((p) => !p.endsWith(".html")))];
 
+// The alias map, also from the build. `@collab/components` declares
+// `"exports": { "./*": "./src/*/index.ts" }`, a wildcard that does not describe the
+// deep paths the windows import (`@collab/components/TreeView/WorkspaceTree`), so
+// package `exports` cannot resolve them. The build resolves them by alias. Both
+// spellings appear in the config: an object map in the renderer block and an
+// array of {find, replacement} in the main block. Regex `find:` entries are skipped
+// — the one that exists (`qf-kernel/portable`) is already served by packageDirs.
+const aliasPairs = [
+  ...viteConfig.matchAll(/"(@[\w./-]+)"\s*:\s*resolve\(\s*__dirname\s*,\s*"([^"]+)"/g),
+  ...viteConfig.matchAll(/find:\s*"([^"]+)"\s*,\s*\n?\s*replacement:\s*resolve\(\s*__dirname\s*,\s*"([^"]+)"/g),
+].map((m) => [m[1], `collab-electron/${m[2]}`.replace(/[^/]+\/\.\.\//g, "")]);
+const aliases = [...new Map(aliasPairs).entries()]
+  // Longest specifier first: "@collab/components" must win over a hypothetical
+  // "@collab" prefix rather than losing to whichever the regex found first.
+  .sort((a, b) => b[0].length - a[0].length);
+if (!aliases.length)
+  throw new Error("qf-atlas: parsed zero build aliases from electron.vite.config.ts. "
+    + "Every @collab/* import edge would vanish and the component packages would all "
+    + "report unreachable — i.e. deletable. Fix the parse rather than shipping that.");
+
 const builtWindows = new Set(
   htmlEntries.map((p) => p.match(/windows\/([\w-]+)\/index\.html$/)?.[1]).filter(Boolean));
 const windowDirs = readdirSync(join(REPO, "collab-electron/src/windows"), { withFileTypes: true })
@@ -281,6 +319,9 @@ if (!builtWindows.size || !codeEntries.length)
 const reach = reachability({
   repo: REPO, rel,
   files: productFiles,
+  anchors,
+  aliases,
+  rowScope: inProduct,
   htmlEntries,
   extraEntries: codeEntries,
   // One definition of "test file", imported. The local copy here was

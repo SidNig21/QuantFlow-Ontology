@@ -635,14 +635,59 @@ record(39, "test-only is a verdict that actually occurs", ...(() => {
 // classed as tests and dropped from the reach rows entirely. Not mislabelled:
 // absent. Every product file must carry a row.
 record(40, "no product file is silently missing from the reach analysis", ...(() => {
+  // Must track the generator's PRODUCT scope. This list said
+  // collab-electron/src + packages/qf-kernel/src after the scope had already grown
+  // to include collab-electron/packages — so the guard passed while covering 181 of
+  // 237 rows. A check that silently under-covers is the same failure it exists to catch.
   const universe = walk(REPO, [], true).map((f) => rel(f)).filter((f) =>
-    (f.startsWith("collab-electron/src/") || f.startsWith("packages/qf-kernel/src/"))
+    ["collab-electron/src/", "collab-electron/packages/", "packages/qf-kernel/src/"]
+      .some((p) => f.startsWith(p))
     && !IS_TEST.test(f) && !f.endsWith(".d.ts"));
   const seen = new Set(before.reach.map((r) => r.path));
   const missing = universe.filter((f) => !seen.has(f));
   return [missing.length === 0,
     missing.length ? `${missing.length} file(s) absent from reach, e.g. ${missing.slice(0, 3).join(", ")}`
       : `${universe.length} product files, all present in reach`];
+})());
+
+// 41 · Alias-resolved imports are real edges. `@collab/components` declares
+// `exports: { "./*": "./src/*/index.ts" }`, a wildcard that does not describe the deep
+// paths the windows import, so package `exports` cannot resolve them — the build
+// alias does. Without alias support, 31 React components the app renders every
+// session read `unreachable`. FALSE DELETE.
+record(41, "alias-resolved imports keep their target reachable", ...(() => {
+  const rows = before.reach.filter((r) => r.path.startsWith("collab-electron/packages/components/src/"));
+  if (rows.length < 10) return [false, `only ${rows.length} component rows — the row scope no longer covers them`];
+  const dead = rows.filter((r) => r.reach === "unreachable");
+  return [dead.length === 0,
+    dead.length ? `${dead.length}/${rows.length} components unreachable, e.g. ${dead[0].path}`
+      : `${rows.length} component files, none unreachable`];
+})());
+
+// 42 · An importer outside collab-electron/src still counts. a2a-artifact-store.ts is
+// imported by qa/gates/artifact-root/run.ts:31 and read `unreachable` for as long as
+// the graph universe stopped at the product directories.
+record(42, "an importer outside the product still anchors its target", ...(() => {
+  const gate = readFileSync(join(REPO, "qa/gates/artifact-root/run.ts"), "utf8");
+  if (!/a2a-artifact-store/.test(gate))
+    return [false, "the gate no longer imports a2a-artifact-store — this probe needs a new anchor"];
+  const row = before.reach.find((r) => r.path.endsWith("main/a2a-artifact-store.ts"));
+  return [row?.reach === "reachable",
+    row ? `reach=${row.reach}, importers=${row.importers.join(", ") || "none"}` : "row absent"];
+})());
+
+// 43 · A filename inside a QA assertion is NOT a launch reference. Once anchors were
+// walked, `["a2a-bus.ts", "agent-host.ts"]` at qa/gates/artifact-root/run.ts:426 gave
+// a2a-bus.ts the verdict `process-entry` — "a live worker, do not delete". A false
+// KEEP manufactured by the widening itself, which would have hidden the file from the
+// expunge for good.
+record(43, "a filename in a QA assertion does not confer process-entry", ...(() => {
+  const gate = readFileSync(join(REPO, "qa/gates/artifact-root/run.ts"), "utf8");
+  if (!/"a2a-bus\.ts"/.test(gate))
+    return [false, "the gate no longer names a2a-bus.ts in a string — this probe needs a new subject"];
+  const row = before.reach.find((r) => r.path.endsWith("main/a2a-bus.ts"));
+  return [!!row && row.reach !== "process-entry",
+    row ? `reach=${row.reach}` : "row absent"];
 })());
 
 // restore the committed model
