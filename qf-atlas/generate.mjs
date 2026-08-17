@@ -20,6 +20,7 @@ import { reachability, blastRadius } from "./reach.mjs";
 import { analyzeFile, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
 import { coverageMatrix } from "./coverage-matrix.mjs";
 import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
+import { detectOwnership } from "./ownership.mjs";
 import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
 import { readdirSync } from "node:fs";
 
@@ -399,6 +400,12 @@ const reachOf = new Map(reach.rows.map((r) => [r.path, r.reach]));
 // data for all 234 sat in memory. Withholding it because a file is not red is
 // backwards: the question is asked BEFORE the change, when nothing is red yet.
 
+// ─── ARCHITECTURAL RESPONSIBILITY OWNERSHIP (contract section F) ─────────────
+// The duplicate detector catches two handlers on one channel. It cannot catch the
+// failure this repo actually has: old code left alive beside new code, under a
+// different name, on a different channel, doing the same job.
+const ownership = detectOwnership({ astOf, domainTables: domain, relOf: rel });
+
 // PER-ANALYZER COVERAGE for every scanned file (contract section H). The previous
 // coverage model answered one question — could the SQL indexer read this file — for
 // 164 of 427 files and called the other 263 `out-of-scope`. Nothing recorded whether
@@ -415,9 +422,9 @@ const buildIncluded = new Set([
 const matrix = coverageMatrix({
   files: walk(REPO, [], true).map((f) => rel(f)).filter((f) => layerOf(f) !== null),
   astOf, reachOf: reachSet, lifetimeOf: lifetimeSet, buildIncluded,
-  ownershipOf: null,   // section F not implemented yet — every product file reports
-                       // `ownership: unsupported` with that stated as the reason.
+  ownershipOf: ownership.byFile,
 });
+
 
 
 const loops = buildLoops(wires, lifetime);
@@ -479,6 +486,7 @@ const model = {
     pushChannels: push.stats,
     ast: { available: tsAvailable(), version: tsVersion, files: astOf.size },
     coverageFiles: matrix.files,
+    ownership: ownership.stats,
     writeDoor: { state: writeDoor.state, ...writeDoor.stats,
       divergent: writeDoor.divergence.trustedButNotDerived.length + writeDoor.divergence.derivedButNotTrusted.length },
     unexplainedCoverage: matrix.unexplained.length,
@@ -505,6 +513,8 @@ const model = {
   loops,
   coverage: coverageRows,
   writeDoor,
+  ownership: ownership.findings,
+  responsibilities: ownership.responsibilities,
   analyzerCoverage: matrix.rows,
   analyzerTally: matrix.tally,
   unexplainedCoverage: matrix.unexplained,

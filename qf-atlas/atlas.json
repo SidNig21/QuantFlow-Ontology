@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "6290b1f",
+    "commit": "7e2bfbc",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "db7a86fd438bbf36"
+    "fingerprint": "ec75568d5b34ed48"
   },
   "stats": {
     "live": 105,
@@ -34,9 +34,15 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 557
+      "files": 558
     },
     "coverageFiles": 539,
+    "ownership": {
+      "responsibilities": 10,
+      "contested": 6,
+      "highConfidence": 4,
+      "unclaimed": 1
+    },
     "writeDoor": {
       "state": "partial",
       "actions": 41,
@@ -57,11 +63,11 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 40,
+    "undecided": 46,
     "allClear": false,
     "decisions": {
-      "total": 45,
-      "undecided": 40,
+      "total": 51,
+      "undecided": 46,
       "keep": 2,
       "repair": 3,
       "remove": 0,
@@ -10407,6 +10413,411 @@
       ]
     }
   },
+  "ownership": [
+    {
+      "id": "ownership:session-lifecycle",
+      "responsibility": "session-lifecycle",
+      "name": "Session lifecycle",
+      "status": "multiple-claimants",
+      "disposition": "INVESTIGATE",
+      "confidence": "high",
+      "evidenceLevel": "S",
+      "owners": [
+        {
+          "file": "collab-electron/src/main/host-acp-permission.ts",
+          "weak": [],
+          "strong": [
+            "ipcMain.handle(\"qf:sessions:permissionDecision\") at line 54"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/create.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO agent_session at line 571"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "collab-electron/src/main/agent-host.ts",
+          "weak": [
+            "exports startPrecreatedNativeTuiSession() at line 546",
+            "exports cancelAgentSession() at line 925",
+            "exports closeAgentSessionRow() at line 974"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/host-native-tui.ts",
+          "weak": [
+            "exports cancelNativeTuiSession() at line 392"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/kernel.ts",
+          "weak": [
+            "exports kernelAssertSessionMayClose() at line 479"
+          ],
+          "strong": [],
+          "weight": "weak"
+        }
+      ],
+      "ownerCount": 5,
+      "strongOwnerCount": 2,
+      "why": "2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "note": null
+    },
+    {
+      "id": "ownership:runtime-admission",
+      "responsibility": "runtime-admission",
+      "name": "Runtime launch / admission",
+      "status": "multiple-claimants",
+      "disposition": "INVESTIGATE",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "owners": [
+        {
+          "file": "collab-electron/src/main/agent-host.ts",
+          "weak": [
+            "exports admitAndStartSession() at line 480"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/host-native-tui.ts",
+          "weak": [
+            "exports admitNativeTuiDefinition() at line 92"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/native-tui-orchestration.ts",
+          "weak": [
+            "exports orchestrateNativeTuiAdmission() at line 83"
+          ],
+          "strong": [],
+          "weight": "weak"
+        }
+      ],
+      "ownerCount": 3,
+      "strongOwnerCount": 0,
+      "why": "3 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
+      "note": null
+    },
+    {
+      "id": "ownership:task-delivery",
+      "responsibility": "task-delivery",
+      "name": "Exact task delivery",
+      "status": "multiple-claimants",
+      "disposition": "INVESTIGATE",
+      "confidence": "high",
+      "evidenceLevel": "S",
+      "owners": [
+        {
+          "file": "packages/qf-kernel/src/execute.ts",
+          "weak": [
+            "exports executeTaskSteering() at line 111",
+            "exports executeTaskSteeringDelivery() at line 173",
+            "exports executeTaskSteeringRefusal() at line 196"
+          ],
+          "strong": [
+            "UPDATE task at line 119",
+            "UPDATE task at line 157",
+            "INSERT INTO task at line 246"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO task at line 270",
+            "UPDATE task at line 311",
+            "UPDATE task at line 488"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/create.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO task at line 663"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "collab-electron/src/main/kernel.ts",
+          "weak": [
+            "exports kernelListTaskAssignments() at line 389"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/task-delegation-projection.ts",
+          "weak": [
+            "exports projectTaskAssignments() at line 81"
+          ],
+          "strong": [],
+          "weight": "weak"
+        }
+      ],
+      "ownerCount": 5,
+      "strongOwnerCount": 3,
+      "why": "3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "note": null
+    },
+    {
+      "id": "ownership:layout-persistence",
+      "responsibility": "layout-persistence",
+      "name": "Layout / cache persistence",
+      "status": "unclaimed",
+      "disposition": "INVESTIGATE",
+      "confidence": "low",
+      "evidenceLevel": "S",
+      "owners": [],
+      "why": "no product file matched this responsibility's signals — either it is not implemented, or the policy's patterns do not match how this repo names it"
+    },
+    {
+      "id": "ownership:process-cleanup",
+      "responsibility": "process-cleanup",
+      "name": "Process cleanup",
+      "status": "multiple-claimants",
+      "disposition": "INVESTIGATE",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "owners": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "weak": [
+            "exports killAllAgents() at line 370"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/git-replay.ts",
+          "weak": [
+            "exports stopWorker() at line 75"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "weak": [
+            "exports killSession() at line 1034",
+            "exports killAll() at line 1080",
+            "exports killAllAndWait() at line 1101"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/watcher.ts",
+          "weak": [
+            "exports stopWorker() at line 78"
+          ],
+          "strong": [],
+          "weight": "weak"
+        }
+      ],
+      "ownerCount": 4,
+      "strongOwnerCount": 0,
+      "why": "4 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
+      "note": null
+    },
+    {
+      "id": "ownership:review-publication",
+      "responsibility": "review-publication",
+      "name": "Research review / publication",
+      "status": "multiple-claimants",
+      "disposition": "INVESTIGATE",
+      "confidence": "high",
+      "evidenceLevel": "S",
+      "owners": [
+        {
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "weak": [
+            "exports ensureGovernedReviewSchema() at line 97",
+            "exports requestGovernedReview() at line 277",
+            "exports governedReviewProjection() at line 551"
+          ],
+          "strong": [
+            "INSERT INTO evaluation at line 471",
+            "UPDATE evaluation at line 483"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/create.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO evaluation at line 1259"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "collab-electron/src/main/kernel.ts",
+          "weak": [
+            "exports kernelRequestGovernedReview() at line 512",
+            "exports kernelGovernedReviewContextForSession() at line 524",
+            "exports kernelGovernedReviewNextSequence() at line 534"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/second-opinion-admission.ts",
+          "weak": [
+            "exports resolveSecondOpinionAdmission() at line 6"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "packages/qf-kernel/src/creation-policy.ts",
+          "weak": [
+            "exports requireObservedGrade() at line 38"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "packages/qf-kernel/src/execute.ts",
+          "weak": [
+            "exports executeSecondOpinion() at line 226"
+          ],
+          "strong": [],
+          "weight": "weak"
+        }
+      ],
+      "ownerCount": 6,
+      "strongOwnerCount": 2,
+      "why": "2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "note": null
+    },
+    {
+      "id": "ownership:artifact-storage",
+      "responsibility": "artifact-storage",
+      "name": "Artifact storage",
+      "status": "multiple-claimants",
+      "disposition": "INVESTIGATE",
+      "confidence": "high",
+      "evidenceLevel": "S",
+      "owners": [
+        {
+          "file": "packages/qf-kernel/src/create.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO artifact at line 357",
+            "INSERT INTO artifact at line 1220"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/deterministic-execution.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO artifact at line 500"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "weak": [],
+          "strong": [
+            "INSERT INTO artifact at line 407"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "collab-electron/src/main/a2a-artifact-store.ts",
+          "weak": [
+            "exports createA2aArtifactStore() at line 26"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/agent-artifact-writer.ts",
+          "weak": [
+            "exports writeAgentReportArtifact() at line 30"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "collab-electron/src/main/kernel.ts",
+          "weak": [
+            "exports getArtifactRoot() at line 113"
+          ],
+          "strong": [],
+          "weight": "weak"
+        },
+        {
+          "file": "packages/qf-kernel/src/resolve-artifact-root.ts",
+          "weak": [
+            "exports resolveArtifactRoot() at line 25"
+          ],
+          "strong": [],
+          "weight": "weak"
+        }
+      ],
+      "ownerCount": 7,
+      "strongOwnerCount": 3,
+      "why": "3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "note": null
+    }
+  ],
+  "responsibilities": [
+    {
+      "id": "domain-mutation",
+      "name": "Domain truth / mutation"
+    },
+    {
+      "id": "session-lifecycle",
+      "name": "Session lifecycle"
+    },
+    {
+      "id": "runtime-admission",
+      "name": "Runtime launch / admission"
+    },
+    {
+      "id": "task-delivery",
+      "name": "Exact task delivery"
+    },
+    {
+      "id": "tool-authorization",
+      "name": "Tool authorization"
+    },
+    {
+      "id": "canvas-projection",
+      "name": "Canvas domain projection"
+    },
+    {
+      "id": "layout-persistence",
+      "name": "Layout / cache persistence"
+    },
+    {
+      "id": "process-cleanup",
+      "name": "Process cleanup"
+    },
+    {
+      "id": "review-publication",
+      "name": "Research review / publication"
+    },
+    {
+      "id": "artifact-storage",
+      "name": "Artifact storage"
+    }
+  ],
   "analyzerCoverage": [
     {
       "path": "collab-electron/cli/bovada-market-cli.test.ts",
@@ -12431,7 +12842,7 @@
     },
     {
       "path": "collab-electron/src/main/a2a-artifact-store.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -12439,11 +12850,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -12507,7 +12917,7 @@
     },
     {
       "path": "collab-electron/src/main/acp-agent.ts",
-      "worst": "unsupported",
+      "worst": "dynamic",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "dynamic",
@@ -12515,12 +12925,11 @@
       "persistence": "not-applicable",
       "lifetime": "indexed",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "1 channel name(s) built from a variable or template (line 84)",
         "ipcPush": "1 channel name(s) built from a variable or template (line 84)",
-        "persistence": "no SQL DML or DDL in this file",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "persistence": "no SQL DML or DDL in this file"
       },
       "unexplained": []
     },
@@ -12582,7 +12991,7 @@
     },
     {
       "path": "collab-electron/src/main/agent-artifact-writer.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -12590,17 +12999,16 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
     {
       "path": "collab-electron/src/main/agent-host.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -12608,10 +13016,9 @@
       "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -13121,7 +13528,7 @@
     },
     {
       "path": "collab-electron/src/main/git-replay.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -13129,10 +13536,9 @@
       "persistence": "not-applicable",
       "lifetime": "indexed",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
-        "persistence": "no SQL DML or DDL in this file",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "persistence": "no SQL DML or DDL in this file"
       },
       "unexplained": []
     },
@@ -13176,7 +13582,7 @@
     },
     {
       "path": "collab-electron/src/main/host-acp-permission.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -13184,11 +13590,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -13230,7 +13635,7 @@
     },
     {
       "path": "collab-electron/src/main/host-native-tui.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -13238,11 +13643,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -13560,7 +13964,7 @@
     },
     {
       "path": "collab-electron/src/main/kernel.ts",
-      "worst": "unsupported",
+      "worst": "partial",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -13568,11 +13972,10 @@
       "persistence": "partial",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "1 of 7 SQL site(s) are not inside a named function, so no call path can be traced",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -13826,7 +14229,7 @@
     },
     {
       "path": "collab-electron/src/main/native-tui-orchestration.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -13834,11 +14237,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -14199,7 +14601,7 @@
     },
     {
       "path": "collab-electron/src/main/pty.ts",
-      "worst": "unsupported",
+      "worst": "dynamic",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "dynamic",
@@ -14207,12 +14609,11 @@
       "persistence": "not-applicable",
       "lifetime": "indexed",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "1 channel name(s) built from a variable or template (line 1292)",
         "ipcPush": "1 channel name(s) built from a variable or template (line 1292)",
-        "persistence": "no SQL DML or DDL in this file",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "persistence": "no SQL DML or DDL in this file"
       },
       "unexplained": []
     },
@@ -14292,7 +14693,7 @@
     },
     {
       "path": "collab-electron/src/main/second-opinion-admission.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -14300,17 +14701,16 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
     {
       "path": "collab-electron/src/main/session-canvas-projector.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -14318,11 +14718,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -14592,7 +14991,7 @@
     },
     {
       "path": "collab-electron/src/main/task-delegation-projection.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -14600,11 +14999,10 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -14836,7 +15234,7 @@
     },
     {
       "path": "collab-electron/src/main/watcher.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "indexed",
@@ -14844,10 +15242,9 @@
       "persistence": "not-applicable",
       "lifetime": "indexed",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
-        "persistence": "no SQL DML or DDL in this file",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "persistence": "no SQL DML or DDL in this file"
       },
       "unexplained": []
     },
@@ -16383,7 +16780,7 @@
     },
     {
       "path": "packages/qf-kernel/src/create.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
@@ -16391,18 +16788,17 @@
       "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
     {
       "path": "packages/qf-kernel/src/creation-policy.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
@@ -16410,13 +16806,12 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -16462,7 +16857,7 @@
     },
     {
       "path": "packages/qf-kernel/src/deterministic-execution.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
@@ -16470,12 +16865,11 @@
       "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -16520,7 +16914,7 @@
     },
     {
       "path": "packages/qf-kernel/src/execute.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
@@ -16528,12 +16922,11 @@
       "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -16558,7 +16951,7 @@
     },
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
@@ -16566,12 +16959,11 @@
       "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -17078,7 +17470,7 @@
     },
     {
       "path": "packages/qf-kernel/src/resolve-artifact-root.ts",
-      "worst": "unsupported",
+      "worst": "indexed",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
@@ -17086,13 +17478,12 @@
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
-      "ownership": "unsupported",
+      "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+        "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
     },
@@ -21272,7 +21663,8 @@
     },
     "ownership": {
       "not-applicable": 172,
-      "unsupported": 367
+      "unsupported": 347,
+      "indexed": 20
     },
     "reach": {
       "unsupported": 305,
@@ -39922,6 +40314,54 @@
       "what": "shell:loading-status",
       "where": "collab-electron/src/preload/shell.ts:172",
       "reason": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
+      "verdict": "undecided"
+    },
+    {
+      "id": "ownership:session-lifecycle",
+      "kind": "duplicate-ownership",
+      "what": "Session lifecycle",
+      "where": "collab-electron/src/main/host-acp-permission.ts",
+      "reason": "2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "verdict": "undecided"
+    },
+    {
+      "id": "ownership:runtime-admission",
+      "kind": "duplicate-ownership",
+      "what": "Runtime launch / admission",
+      "where": "collab-electron/src/main/agent-host.ts",
+      "reason": "3 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
+      "verdict": "undecided"
+    },
+    {
+      "id": "ownership:task-delivery",
+      "kind": "duplicate-ownership",
+      "what": "Exact task delivery",
+      "where": "packages/qf-kernel/src/execute.ts",
+      "reason": "3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "verdict": "undecided"
+    },
+    {
+      "id": "ownership:process-cleanup",
+      "kind": "duplicate-ownership",
+      "what": "Process cleanup",
+      "where": "collab-electron/src/main/acp-agent.ts",
+      "reason": "4 files export names matching this responsibility, but on NAME evidence only; the contract forbids name matching alone from producing a confirmed defect, so this needs a human read",
+      "verdict": "undecided"
+    },
+    {
+      "id": "ownership:review-publication",
+      "kind": "duplicate-ownership",
+      "what": "Research review / publication",
+      "where": "packages/qf-kernel/src/governed-review.ts",
+      "reason": "2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
+      "verdict": "undecided"
+    },
+    {
+      "id": "ownership:artifact-storage",
+      "kind": "duplicate-ownership",
+      "what": "Artifact storage",
+      "where": "packages/qf-kernel/src/create.ts",
+      "reason": "3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
       "verdict": "undecided"
     }
   ],

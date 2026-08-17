@@ -71,6 +71,13 @@ export function currentFindings(model) {
           ? `${(r.senders?.[0] ?? r.listeners[0]).file}:${(r.senders?.[0] ?? r.listeners[0]).line}`
           : "no site recorded",
         reason: r.why });
+  // Ownership findings. Only contested responsibilities are decidable: an unclaimed
+  // one is a statement about the POLICY's signals, not about the code, so ruling on it
+  // would record a verdict against the wrong thing.
+  for (const o of model.ownership ?? [])
+    if (o.status === "multiple-claimants")
+      out.push({ id: o.id, kind: "duplicate-ownership", what: o.name,
+        where: o.owners?.[0]?.file ?? "no claimant recorded", reason: o.why });
   return out;
 }
 

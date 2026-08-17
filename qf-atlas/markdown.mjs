@@ -418,6 +418,43 @@ export function renderMarkdown(m) {
     p();
   }
 
+  // ── 4d. responsibility ownership ──────────────────────────────────────────
+  const own = m.ownership ?? [];
+  const contested = own.filter((o) => o.status === "multiple-claimants");
+  p("## Who owns what (" + contested.length + " contested of " + (m.responsibilities ?? []).length + ")");
+  p();
+  p("Duplicate ownership is bigger than duplicate IPC registration. The duplicate detector");
+  p("catches two handlers on one channel; it cannot catch the failure this repo actually");
+  p("has — **old code left alive beside new code, under a different name, on a different**");
+  p("**channel, doing the same job.**");
+  p();
+  p("The responsibility list is an explicit architectural *policy*. It declares which jobs");
+  p("are canonical; it does not decide who implements them — every claimant below is");
+  p("discovered from the AST.");
+  p();
+  p("| Responsibility | Claimants | Structural | Confidence |");
+  p("|---|---:|---:|---|");
+  for (const o of own)
+    p("| " + o.name + " | " + (o.ownerCount ?? 0) + " | " + (o.strongOwnerCount ?? 0) + " | "
+      + (o.status === "unclaimed" ? "— *unclaimed*" : o.confidence) + " |");
+  p();
+  for (const o of contested.filter((x) => x.confidence === "high")) {
+    p("### " + o.name);
+    p();
+    p(o.why);
+    p();
+    for (const c of o.owners)
+      p("- " + (c.weight === "strong" ? "**" + c.file + "**" : "`" + c.file + "`")
+        + " — " + (c.strong[0] ?? c.weak[0] ?? "no evidence recorded"));
+    p();
+  }
+  p("**`strong` is structural** — the file mutates the responsibility's table or owns its");
+  p("channel family. **`weak` is a name match only**, and the contract forbids name matching");
+  p("from producing a confirmed defect on its own, so a responsibility contested on weak");
+  p("evidence alone reads `medium` and needs a human. Transport modules — the preloads and");
+  p("the `ipc-*.ts` surface — are excluded: registering a channel is routing, not owning.");
+  p();
+
   // ── 5. lifetime ───────────────────────────────────────────────────────────
   p(`## Process lifetime`);
   p();

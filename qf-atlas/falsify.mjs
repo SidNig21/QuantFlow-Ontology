@@ -930,6 +930,57 @@ record(55, "classification refuses to run without a derived door", ...(() => {
     "throwsWithoutDoor=" + throws + " allowlistImportRemoved=" + noImport];
 })());
 
+// ── OWNERSHIP — contract items 25, 26 ──────────────────────────────────────
+
+// 56 · contract 25 — a second implementation of one responsibility is detected EVEN
+// WITH AN UNRELATED FILENAME. This is the failure the duplicate-channel detector cannot
+// see: old code alive beside new code, different name, different channel, same job. The
+// fixture writes the artifact table from a file whose name says nothing about artifacts.
+record(56, "a second responsibility owner is found despite an unrelated name",
+  ...withFile(`${MAIN}/zz-falsify-56.ts`,
+    `export function persistBlobRecord(db) {\n`
+    + `  db.query("INSERT INTO artifact (id) VALUES (?)").run("x");\n`
+    + `}\n`,
+    (m) => {
+      const o = (m.ownership ?? []).find((x) => x.responsibility === "artifact-storage");
+      if (!o) return [false, "artifact-storage responsibility absent from the model"];
+      const hit = o.owners.find((c) => c.file.endsWith("zz-falsify-56.ts"));
+      return [!!hit && hit.weight === "strong",
+        hit ? `claimant found, weight=${hit.weight}` : "the new writer was not detected as a claimant"];
+    }));
+
+// 57 · contract 26 — fixing the second owner clears the finding. A detector that cannot
+// go quiet again is not evidence; it is noise that happens to point at a real thing.
+record(57, "removing the second owner clears the ownership finding", ...(() => {
+  const o = (before.ownership ?? []).find((x) => x.responsibility === "artifact-storage");
+  if (!o) return [false, "artifact-storage responsibility absent from the model"];
+  const leftover = o.owners.filter((c) => c.file.includes("zz-falsify"));
+  return [leftover.length === 0,
+    leftover.length ? `fixture claimant survived restoration: ${leftover[0].file}`
+      : `${o.ownerCount} genuine claimants, no fixture residue`];
+})());
+
+// 58 · Transport is not ownership. Registering a channel is routing: the preload
+// forwards, and the ipc-*.ts surface dispatches to whoever does the work. Counting a
+// registration as a claim reported preload/universal.ts as a STRUCTURAL co-owner of
+// session lifecycle AND tool authorization, and ipc-kernel.ts as co-owner of four
+// separate responsibilities — six fabricated conflicts out of nine findings on the
+// first run of this analyzer.
+record(58, "a transport module is not reported as a responsibility owner", ...(() => {
+  const bad = [];
+  for (const o of before.ownership ?? [])
+    for (const c of o.owners ?? []) {
+      const base = c.file.slice(c.file.lastIndexOf("/") + 1);
+      const transport = c.file.startsWith("collab-electron/src/preload/")
+        || base === "ipc.ts" || (base.startsWith("ipc-") && base.endsWith(".ts"))
+        || base === "canvas-rpc.ts";
+      if (transport && c.weight === "strong") bad.push(`${o.responsibility} <- ${c.file}`);
+    }
+  return [bad.length === 0,
+    bad.length ? `${bad.length} transport module(s) counted as structural owners: ${bad[0]}`
+      : "no transport module is credited with owning a responsibility"];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 

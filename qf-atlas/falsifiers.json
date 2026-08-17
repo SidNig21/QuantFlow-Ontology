@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 55,
-  "total": 55,
+  "passed": 58,
+  "total": 58,
   "results": [
     {
       "n": 1,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 40 -> 39"
+      "detail": "verdict=remove undecided 46 -> 45"
     },
     {
       "n": 33,
@@ -332,6 +332,24 @@
       "name": "classification refuses to run without a derived door",
       "passed": true,
       "detail": "throwsWithoutDoor=true allowlistImportRemoved=true"
+    },
+    {
+      "n": 56,
+      "name": "a second responsibility owner is found despite an unrelated name",
+      "passed": true,
+      "detail": "claimant found, weight=strong"
+    },
+    {
+      "n": 57,
+      "name": "removing the second owner clears the ownership finding",
+      "passed": true,
+      "detail": "7 genuine claimants, no fixture residue"
+    },
+    {
+      "n": 58,
+      "name": "a transport module is not reported as a responsibility owner",
+      "passed": true,
+      "detail": "no transport module is credited with owning a responsibility"
     }
   ]
 }

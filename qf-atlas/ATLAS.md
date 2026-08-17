@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 6290b1f` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 7e2bfbc` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**40 of 45 findings have not been looked at.**
+**46 of 51 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 40 |
+| `undecided` | 46 |
 | `repair` | 3 |
 | `remove` | 0 |
 | `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 40 findings still need a decision.
+**Not all clear.** 46 findings still need a decision.
 
 ## The four hops
 
@@ -426,6 +426,76 @@ overwrite each other, so registering both is **not** duplicate ownership.
 
 `investigate` is not `delete`: a packaged or dynamically-loaded caller must be ruled
 out before the unused variant can be removed.
+
+## Who owns what (6 contested of 10)
+
+Duplicate ownership is bigger than duplicate IPC registration. The duplicate detector
+catches two handlers on one channel; it cannot catch the failure this repo actually
+has — **old code left alive beside new code, under a different name, on a different**
+**channel, doing the same job.**
+
+The responsibility list is an explicit architectural *policy*. It declares which jobs
+are canonical; it does not decide who implements them — every claimant below is
+discovered from the AST.
+
+| Responsibility | Claimants | Structural | Confidence |
+|---|---:|---:|---|
+| Session lifecycle | 5 | 2 | high |
+| Runtime launch / admission | 3 | 0 | medium |
+| Exact task delivery | 5 | 3 | high |
+| Layout / cache persistence | 0 | 0 | — *unclaimed* |
+| Process cleanup | 4 | 0 | medium |
+| Research review / publication | 6 | 2 | high |
+| Artifact storage | 7 | 3 | high |
+
+### Session lifecycle
+
+2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
+
+- **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
+- **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 571
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 546
+- `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 392
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 479
+
+### Exact task delivery
+
+3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
+
+- **packages/qf-kernel/src/execute.ts** — UPDATE task at line 119
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO task at line 270
+- **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 663
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 389
+- `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
+
+### Research review / publication
+
+2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
+
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 471
+- **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1259
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 512
+- `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
+- `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
+- `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 226
+
+### Artifact storage
+
+3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
+
+- **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 357
+- **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 500
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 407
+- `collab-electron/src/main/a2a-artifact-store.ts` — exports createA2aArtifactStore() at line 26
+- `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentReportArtifact() at line 30
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 113
+- `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
+
+**`strong` is structural** — the file mutates the responsibility's table or owns its
+channel family. **`weak` is a name match only**, and the contract forbids name matching
+from producing a confirmed defect on its own, so a responsibility contested on weak
+evidence alone reads `medium` and needs a human. Transport modules — the preloads and
+the `ipc-*.ts` surface — are excluded: registering a channel is routing, not owning.
 
 ## Process lifetime
 
