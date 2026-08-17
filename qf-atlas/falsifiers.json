@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 66,
-  "total": 66,
+  "passed": 68,
+  "total": 68,
   "results": [
     {
       "n": 1,
@@ -398,6 +398,18 @@
       "name": "adding an analyzer file does not make the map stale",
       "passed": true,
       "detail": "fingerprint unchanged by a new qf-atlas module"
+    },
+    {
+      "n": 67,
+      "name": "the HTML reads no model field that does not exist",
+      "passed": true,
+      "detail": "13 model fields read by the HTML, all present"
+    },
+    {
+      "n": 68,
+      "name": "every canonical dimension reaches Markdown and HTML",
+      "passed": true,
+      "detail": "5 dimensions present in JSON, Markdown and HTML"
     }
   ]
 }

@@ -658,6 +658,6 @@ writeAtomic(join(OUT, "ATLAS.md"), md);
 console.log(`qf-atlas: wrote atlas.json + atlas.html + ATLAS.md`);
 console.log(`  ${files.length} files · ${nodes.length} subsystems · ${wires.length} IPC channels`);
 console.log(`  wires: ${counts.live} live · ${counts.unreached} unreached · ${counts.unused} unused · ${counts.dead} DEAD`);
-console.log(`  loops: ${loops.filter(l=>l.health==="ok").length}/${loops.length} healthy · ${loops.filter(l=>l.health!=="ok").map(l=>l.name).join(", ")}`);
+console.log(`  legacy loops: ${loops.filter(l=>l.health==="ok").length}/${loops.length} healthy · ${loops.filter(l=>l.health!=="ok").map(l=>l.name).join(", ")}`);
 console.log(`  decisions: ${model.stats.undecided} undecided of ${model.stats.decisions.total}${model.stats.allClear ? " — ALL CLEAR" : ""}`);
 console.log(`  ${strip.length} strip candidates · ${persistence.filter(p=>p.governance==="violation").length} confirmed violations · ${persistence.filter(p=>p.governance==="unknown").length} gray · ${coverageRows.filter(c=>c.status==="partial"||c.status==="unindexed").length} coverage gaps`);

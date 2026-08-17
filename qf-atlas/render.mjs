@@ -98,9 +98,11 @@ mark{background:#2b3410;color:var(--text);padding:0 2px}
 <aside>
   <span class="eyebrow">QuantFlow · Atlas</span>
   <div class="tabs">
-    <button class="tab on" data-tab="loops">Loops</button>
+    <button class="tab on" data-tab="north">Loops</button>
     <button class="tab" data-tab="map">Map</button>
-    <button class="tab" data-tab="strip">Strip</button>
+    <button class="tab" data-tab="own">Owners</button>
+    <button class="tab" data-tab="cover">Coverage</button>
+    <button class="tab" data-tab="strip">Demolition</button>
     <button class="tab" data-tab="wires">Wires</button>
   </div>
   <div id="rail"></div>
@@ -393,6 +395,28 @@ function wirePath(w){
     (i<2?\`<div class="conn \${w.hops[i+1].present?"":"off"}"></div>\`:"")).join("")+\`</div>\`;
 }
 
+// WHAT BREAKS IF I CHANGE THIS. The model carries a blast radius for every file, not
+// only for files carrying a defect — the question is asked BEFORE the change, when
+// nothing is red yet — and none of it was reaching this panel.
+function blastCard(n){
+  const rows=(n.files||[]).map(f=>[f.path,(M.blastRadius||{})[f.path]]).filter(([,b])=>b);
+  if(!rows.length) return "";
+  const worst=rows.slice().sort((a,b)=>
+    (b[1].directDependents.length+b[1].transitiveDependents.length)-
+    (a[1].directDependents.length+a[1].transitiveDependents.length));
+  return \`<h2>Blast radius</h2>\`+worst.slice(0,6).map(([path,b])=>{
+    const dep=b.directDependents.length+b.transitiveDependents.length;
+    const all=[...b.directDependents,...b.transitiveDependents];
+    return \`<div class="card \${dep>10?"warn":""}"><b>\${esc(path.split("/").pop())}</b>
+      <span class="prose">\${dep} dependant\${dep===1?"":"s"}\${b.transitiveTruncated?"+":""}
+        · imports \${b.directDependencies.length}
+        · \${esc(b.reach)} · \${esc(b.packaged)}</span>
+      \${b.affectedWires.length?\`<p>wires: \${b.affectedWires.slice(0,6).map(esc).join(", ")}\${b.affectedWires.length>6?" …":""}</p>\`:""}
+      \${b.affectedLoops.length?\`<p>loops: \${b.affectedLoops.map(esc).join(", ")}</p>\`:""}
+      \${dep?\`<pre>\${all.slice(0,8).map(esc).join("\\n")}\${dep>8?\`\\n…\${dep-8} more\`:""}</pre>\`:""}</div>\`;
+  }).join("");
+}
+
 function select(id){
   sel=id;const n=byId[id];
   document.querySelectorAll(".item").forEach(b=>b.classList.toggle("on",b.dataset.id===id));
@@ -412,6 +436,7 @@ function select(id){
     <h2>Files</h2>
     \${n.files.map(f=>\`<div class="row"><b>\${esc(f.path.split("/").pop())}</b>
        <span>\${f.kb} KB\${f.dml?\` · \${f.dml} DML\`:""}\${f.spawns?\` · \${f.spawns} spawn\`:""}\${f.writes?\` · \${f.writes} write\`:""}</span></div>\`).join("")}
+    \${blastCard(n)}
     \${myWires.length?\`<h2>Channels (\${myWires.length})</h2>\`+myWires.slice(0,40).map(w=>
       \`<div class="row"><b>\${esc(w.channel)}</b><span style="color:\${WIRE[w.status]}">\${w.status}</span></div>\`).join(""):""}\`;
 }
@@ -449,12 +474,39 @@ function selectLife(mod){
 const rail=document.getElementById("rail");
 function renderRail(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
-  if(tab==="loops"){
-    rail.innerHTML=M.loops.map(L=>{
-      const dot=L.health==="ok"?"#6fe3a8":L.health==="broken"?"#ff8a75":"#f2c260";
-      return \`<div class="grp">\${esc(L.name)}<b style="color:\${dot}">\${L.health==="ok"?"ok":L.brokenCount+"/"+L.total}</b></div>\`+
-        L.members.map(x=>\`<button class="item \${x.status==="live"||x.status==="reaped"?"":x.status==="unused"?"warn":"alert"}" data-id="\${esc(x.channel)}" data-act="\${L.lifetime?"life":"wire"}">\${esc(x.channel)}<span class="k">\${esc(x.status)}</span></button>\`).join("");
+  if(tab==="north"){
+    // The 11 ratified loops with FOUR evidence tiers shown apart. The old rail printed
+    // one health colour per loop, and a green one read as "this feature works" when it
+    // only ever meant the plumbing was connected. The badge encodes the tiers rather
+    // than averaging them: S static, G gate, R runtime, F founder.
+    rail.innerHTML=(M.northStar||[]).map(L=>{
+      const st=L.evidence.static.state;
+      const dot=st==="connected"?"#6fe3a8":st==="broken"?"#ff8a75":"#f2c260";
+      const tier=(k,ch)=>{const s=L.evidence[k].state;
+        const ok=s==="connected"||s==="covered"||s==="proven";
+        return \`<span class="k" title="\${esc(k)}: \${esc(s)}\${L.evidence[k].detail?" — "+esc(L.evidence[k].detail):""}" style="opacity:\${ok?1:.28}">\${ch}</span>\`;};
+      return \`<div class="grp">\${esc(L.name)}<b style="color:\${dot}">\${tier("static","S")}\${tier("gate","G")}\${tier("runtime","R")}\${tier("founder","F")}</b></div>\`+
+        L.members.map(x=>\`<button class="item \${x.status==="live"?"":x.status==="unused"?"warn":"alert"}" data-id="\${esc(x.channel)}" data-act="wire">\${esc(x.channel)}<span class="k">\${esc(x.status)}</span></button>\`).join("");
     }).join("");
+  } else if(tab==="own"){
+    // Responsibility ownership. 'strong' is structural: the file mutates the
+    // responsibility's table or owns its channel family. 'weak' is a name match only,
+    // and never enough on its own to call something a confirmed defect.
+    rail.innerHTML=(M.ownership||[]).map(o=>{
+      const dot=o.confidence==="high"?"#ff8a75":o.status==="unclaimed"?"#8b8b95":"#f2c260";
+      return \`<div class="grp" title="\${esc(o.why||"")}">\${esc(o.name)}<b style="color:\${dot}">\${o.status==="unclaimed"?"none":o.ownerCount+"/"+o.strongOwnerCount}</b></div>\`+
+        (o.owners||[]).map(c=>\`<button class="item \${c.weight==="strong"?"alert":"warn"}" data-id="\${esc(c.file)}" data-act="file">\${esc(c.file.split("/").pop())}<span class="k">\${c.weight}</span></button>\`).join("");
+    }).join("");
+  } else if(tab==="cover"){
+    // Per-analyzer coverage. GRAY IS NOT SAFE — gray is unmeasured, and every
+    // non-clean cell carries a named reason so silence can never read as clean.
+    const T=M.analyzerTally||{};
+    rail.innerHTML=Object.entries(T).map(([an,states])=>{
+      const bad=(states.partial||0)+(states.unsupported||0)+(states.dynamic||0);
+      return \`<div class="grp">\${esc(an)}<b style="color:\${bad?"#f2c260":"#6fe3a8"}">\${states.indexed||0}/\${Object.values(states).reduce((a,b)=>a+b,0)}</b></div>\`+
+        Object.entries(states).filter(([s])=>s!=="indexed"&&s!=="not-applicable")
+          .map(([s,n])=>\`<div class="item warn" style="cursor:default">\${esc(s)}<span class="k">\${n}</span></div>\`).join("");
+    }).join("")+\`<div class="grp">unexplained<b style="color:\${(M.unexplainedCoverage||[]).length?"#ff8a75":"#6fe3a8"}">\${(M.unexplainedCoverage||[]).length}</b></div>\`;
   } else if(tab==="map"){
     rail.innerHTML=M.layers.map(L=>{
       const ns=M.nodes.filter(n=>n.layer===L.id).sort((a,b)=>b.kb-a.kb);
@@ -472,10 +524,23 @@ function renderRail(tab){
   } else {
     const g={dead:[],unreached:[],unused:[],live:[]};
     for(const w of M.wires) g[w.status].push(w);
-    rail.innerHTML=["dead","unreached","unused","live"].filter(k=>g[k].length).map(k=>
-      \`<div class="grp">\${k}<b>\${g[k].length}</b></div>\`+
-      g[k].map(w=>\`<button class="item \${k==="live"?"":k==="unused"?"warn":"alert"}"
-        data-id="\${esc(w.channel)}" data-act="wire">\${esc(w.channel)}</button>\`).join("")).join("");
+    // BOTH DIRECTIONS. The rail used to show only renderer -> main. The push surface was
+    // half the event traffic and entirely absent, so a dead listener and a working one
+    // looked identical here.
+    const pg={};
+    for(const r of (M.push||[])) (pg[r.status]||=[]).push(r);
+    const pushOrder=["no-sender","no-listener","dynamic-sender","tunnel","renderer-originated","renderer-terminated","live"];
+    rail.innerHTML=
+      \`<div class="grp" style="color:var(--ice)">renderer &rarr; main<b>\${M.wires.length}</b></div>\`+
+      ["dead","unreached","unused","live"].filter(k=>g[k].length).map(k=>
+        \`<div class="grp">\${k}<b>\${g[k].length}</b></div>\`+
+        g[k].map(w=>\`<button class="item \${k==="live"?"":k==="unused"?"warn":"alert"}"
+          data-id="\${esc(w.channel)}" data-act="wire">\${esc(w.channel)}</button>\`).join("")).join("")
+      +\`<div class="grp" style="color:var(--ice)">main &rarr; renderer<b>\${(M.push||[]).length}</b></div>\`
+      +pushOrder.filter(k=>pg[k]&&pg[k].length).map(k=>
+        \`<div class="grp">\${esc(k)}<b>\${pg[k].length}</b></div>\`+
+        pg[k].map(r=>\`<div class="item \${k==="live"||k.startsWith("renderer")||k==="tunnel"?"":k==="dynamic-sender"?"warn":"alert"}"
+          style="cursor:default" title="\${esc(r.why||"")}">\${esc(r.channel)}<span class="k">\${r.confidence}</span></div>\`).join("")).join("");
   }
 }
 rail.addEventListener("click",e=>{
@@ -496,7 +561,7 @@ document.getElementById("broken").onclick=e=>{brokenOnly=!brokenOnly;e.target.cl
 addEventListener("resize",()=>{resize();if(!focus)fitView()});
 window.enter=enter;window.isolateLayer=isolateLayer;
 
-resize();fitView();renderRail("loops");showHomePanel();
+resize();fitView();renderRail("north");showHomePanel();
 draw();
 </script>
 `;

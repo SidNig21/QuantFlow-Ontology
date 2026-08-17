@@ -1154,6 +1154,44 @@ record(66, "adding an analyzer file does not make the map stale", ...(() => {
   });
 })());
 
+// ── OUTPUT PARITY — contract section 8 ─────────────────────────────────────
+
+// 67 · Every `M.<field>` the HTML reads must exist in the canonical model. Renaming
+// `loops` to `legacyLoops` left `M.loops.map(...)` in the renderer: the file still
+// generated at 964KB with zero "undefined" in it, and the Loops tab threw the moment
+// anyone clicked it. A silently broken view is worse than a missing one.
+record(67, "the HTML reads no model field that does not exist", ...(() => {
+  const html = readFileSync(join(REPO, "qf-atlas", "atlas.html"), "utf8");
+  const referenced = new Set([...html.matchAll(/\bM\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]));
+  const missing = [...referenced].filter((k) => !(k in before));
+  return [missing.length === 0,
+    missing.length ? `HTML reads M.${missing.join(", M.")} which the model does not carry`
+      : `${referenced.size} model fields read by the HTML, all present`];
+})());
+
+// 68 · The canonical dimensions must reach all three outputs. atlas.json is canonical;
+// ATLAS.md and atlas.html are projections of the SAME semantics, and a dimension that
+// exists only in the JSON is invisible to the two surfaces people actually read.
+record(68, "every canonical dimension reaches Markdown and HTML", ...(() => {
+  const md = readFileSync(join(REPO, "qf-atlas", "ATLAS.md"), "utf8");
+  const html = readFileSync(join(REPO, "qf-atlas", "atlas.html"), "utf8");
+  // dimension -> [a phrase the Markdown must contain, the model field the HTML must read]
+  const DIMS = [
+    ["north star loops", "The product loop", "northStar"],
+    ["responsibility ownership", "Who owns what", "ownership"],
+    ["per-analyzer coverage", "could not read", "analyzerTally"],
+    ["push direction", "push direction", "push"],
+    ["blast radius", "Blast-radius coverage", "blastRadius"],
+  ];
+  const gaps = [];
+  for (const [name, mdPhrase, htmlField] of DIMS) {
+    if (!md.includes(mdPhrase)) gaps.push(`${name}: absent from ATLAS.md`);
+    if (!html.includes(`M.${htmlField}`)) gaps.push(`${name}: HTML never reads M.${htmlField}`);
+  }
+  return [gaps.length === 0,
+    gaps.length ? gaps.join("; ") : `${DIMS.length} dimensions present in JSON, Markdown and HTML`];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 
