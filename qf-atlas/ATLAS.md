@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 4aa02d1` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 7b5557d` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**39 of 44 findings have not been looked at.**
+**41 of 46 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 39 |
+| `undecided` | 41 |
 | `repair` | 3 |
 | `remove` | 0 |
 | `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 39 findings still need a decision.
+**Not all clear.** 41 findings still need a decision.
 
 ## The four hops
 
@@ -111,17 +111,45 @@ method. Removing the call site is only correct if the feature is genuinely gone.
 Almost all are `on*`/`off*` event subscribers, and they are unpaired for a structural
 reason, not a parsing one — see the next paragraph.
 
-#### The push direction is not modelled
+### The push direction — main → renderer (47 channels)
 
-Everything above traces **renderer → main**: `invoke`/`send` going out, a handler
-answering. The main process also pushes the other way — `webContents.send` out, an
-`ipcRenderer.on` subscriber receiving — and **this analyzer has no pattern for that
-direction at all.** Those channels are not wires here, cannot be reported live, unused
-or dead, and do not appear in any count on this page.
+Everything above traces **renderer → main**. The main process also pushes the other
+way, and that direction runs on two layers — the second is a tunnel:
 
-So: a push channel whose subscriber was deleted looks exactly like a push channel that
-works. Do not read a green loop as covering event delivery. This is a **known hole**,
-recorded here because the rule of this map is that silence may never read as clean.
+```
+direct     main --webContents.send(ch)--------------> ipcRenderer.on(ch)   in a preload
+tunnelled  main --send("shell:forward", target, inner)--> shell preload
+                --> shell renderer dispatcher --> <webview>.send(inner)
+                --> ipcRenderer.on(inner)         in universal.ts
+```
+
+| Status | Count | Meaning |
+|---|---:|---|
+| `live` | 34 | a send site and a preload listener |
+| `renderer-terminated` | 2 | consumed by the shell dispatcher; no preload listener expected |
+| `renderer-originated` | 5 | sent by the shell renderer into a webview, not by main |
+| `dynamic-sender` | 3 | a template-literal channel shares this prefix — **coverage boundary, not debt** |
+| `tunnel` | 1 | `shell:forward` itself, the transport |
+| **`no-sender`** | **2** | **a preload subscribes and nothing sends it** |
+| **`no-listener`** | **0** | **main pushes it and nothing receives** |
+
+14 channels travel inside the tunnel. Resolving it matters: a regex that
+matches only `webContents.send("literal")` sees `"shell:forward"` and misses every
+inner name — and those inner names are exactly the ones that then look like orphan
+listeners. That single mistake would have produced 14 false deletes.
+
+#### `no-sender` (2)
+
+- `cd-to` — `collab-electron/src/preload/universal.ts:98` · **INVESTIGATE**
+  - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
+- `shell:loading-status` — `collab-electron/src/preload/shell.ts:172` · **INVESTIGATE**
+  - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
+
+**Confidence is `medium` on every row here, and the disposition is `INVESTIGATE`, never
+`REMOVE`.** These patterns are textual, and text may not create a high-confidence
+architectural red on its own — promoting any of this to a confirmed defect requires the
+AST pass. 7 send sites build their channel or target
+dynamically and are recorded as explicit coverage boundaries rather than omitted.
 
 ## The jobs an operator actually does
 

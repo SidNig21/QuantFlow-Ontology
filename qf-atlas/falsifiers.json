@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 42,
-  "total": 43,
+  "passed": 47,
+  "total": 47,
   "results": [
     {
       "n": 1,
@@ -179,9 +179,9 @@
     },
     {
       "n": 30,
-      "name": "confirmed findings carry a blast radius",
-      "passed": false,
-      "detail": "no dependants computed for packages/qf-kernel/src/governed-review.ts"
+      "name": "every file carries a complete blast radius",
+      "passed": true,
+      "detail": "232 entries, all 7 fields present; e.g. governed-review.ts has 3 direct dependants"
     },
     {
       "n": 31,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 39 -> 38"
+      "detail": "verdict=remove undecided 41 -> 40"
     },
     {
       "n": 33,
@@ -260,6 +260,30 @@
       "name": "a filename in a QA assertion does not confer process-entry",
       "passed": true,
       "detail": "reach=unreachable"
+    },
+    {
+      "n": 44,
+      "name": "a live main -> renderer push channel is detected",
+      "passed": true,
+      "detail": "34 live of 47, e.g. pty:data (3 send sites, 1 listeners)"
+    },
+    {
+      "n": 45,
+      "name": "a push listener with no sender is detected",
+      "passed": true,
+      "detail": "status=no-sender disposition=INVESTIGATE inLedger=true"
+    },
+    {
+      "n": 46,
+      "name": "tunnelled push channels are resolved, not reported orphan",
+      "passed": true,
+      "detail": "14 tunnelled channels, none orphaned; shell:forward itself classified as tunnel"
+    },
+    {
+      "n": 47,
+      "name": "a fixed-channel helper's payload strings are not channels",
+      "passed": true,
+      "detail": "0 payload strings as channels; canvas:rpc-request present as live"
     }
   ]
 }

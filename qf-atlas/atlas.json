@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "4aa02d1",
+    "commit": "7b5557d",
     "generatedAt": "2026-08-17",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "f54a06561ae63f66"
+    "fingerprint": "1fc414165691941f"
   },
   "stats": {
     "live": 105,
@@ -22,6 +22,15 @@
     "bridgeMethodsUsed": 113,
     "brokenBridgeCalls": 1,
     "bridgeBlindSpots": 43,
+    "pushChannels": {
+      "channels": 47,
+      "tunnelled": 14,
+      "live": 34,
+      "rendererTerminated": 2,
+      "noListener": 0,
+      "noSender": 2,
+      "dynamicSites": 7
+    },
     "stripCandidates": 13,
     "violations": 15,
     "governanceUnknown": 3,
@@ -31,11 +40,11 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 39,
+    "undecided": 41,
     "allClear": false,
     "decisions": {
-      "total": 44,
-      "undecided": 39,
+      "total": 46,
+      "undecided": 41,
       "keep": 2,
       "repair": 3,
       "remove": 0,
@@ -25175,6 +25184,1381 @@
       }
     }
   ],
+  "push": [
+    {
+      "id": "push:agent:exit",
+      "channel": "agent:exit",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 250,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 407,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 755,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:file-touched",
+      "channel": "agent:file-touched",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 109,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:prompt-complete",
+      "channel": "agent:prompt-complete",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 340,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 389,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 725,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:prompt-error",
+      "channel": "agent:prompt-error",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "2 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 99,
+          "kind": "helper"
+        },
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 348,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 398,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 741,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:session-ended",
+      "channel": "agent:session-ended",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 112,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:session-failed",
+      "channel": "agent:session-failed",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 295,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 423,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 781,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:session-ready",
+      "channel": "agent:session-ready",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 289,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 414,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 767,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:session-started",
+      "channel": "agent:session-started",
+      "status": "dynamic-sender",
+      "disposition": "INVESTIGATE",
+      "why": "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 106,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:agent:update",
+      "channel": "agent:update",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/acp-agent.ts",
+          "line": 93,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 380,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 710,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:browser-tile:focus-url",
+      "channel": "browser-tile:focus-url",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 406,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 200,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:canvas-opacity",
+      "channel": "canvas-opacity",
+      "status": "renderer-originated",
+      "disposition": "KEEP",
+      "why": "sent by the shell renderer into a webview guest rather than by main — a real sender, just not in the main process",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 128,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:canvas:pinch",
+      "channel": "canvas:pinch",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-canvas.ts",
+          "line": 35,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 274,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:canvas:rpc-request",
+      "channel": "canvas:rpc-request",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/canvas-rpc.ts",
+          "line": 34,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 285,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:cd-to",
+      "channel": "cd-to",
+      "status": "no-sender",
+      "disposition": "INVESTIGATE",
+      "why": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 98,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:create-graph-tile",
+      "channel": "create-graph-tile",
+      "status": "renderer-terminated",
+      "disposition": "KEEP",
+      "why": "no preload listener, but the shell renderer consumes this channel name directly — the dispatcher is the endpoint",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-knowledge.ts",
+          "line": 110,
+          "kind": "tunnel",
+          "target": "canvas",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:file-renamed",
+      "channel": "file-renamed",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "4 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 134,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 140,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 203,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 209,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 505,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:file-selected",
+      "channel": "file-selected",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "2 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-knowledge.ts",
+          "line": 71,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-knowledge.ts",
+          "line": 72,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 484,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:files-deleted",
+      "channel": "files-deleted",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "2 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc.ts",
+          "line": 91,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc.ts",
+          "line": 92,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 514,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:focus-search",
+      "channel": "focus-search",
+      "status": "renderer-originated",
+      "disposition": "KEEP",
+      "why": "sent by the shell renderer into a webview guest rather than by main — a real sender, just not in the main process",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 475,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:focus-tab",
+      "channel": "focus-tab",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-misc.ts",
+          "line": 219,
+          "kind": "tunnel",
+          "target": "terminal",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 115,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:folder-selected",
+      "channel": "folder-selected",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-knowledge.ts",
+          "line": 79,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 493,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:fs-changed",
+      "channel": "fs-changed",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "6 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 103,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 104,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 191,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 192,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc.ts",
+          "line": 66,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc.ts",
+          "line": 67,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 533,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:nav-drag-active",
+      "channel": "nav-drag-active",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "2 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-canvas.ts",
+          "line": 44,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-canvas.ts",
+          "line": 54,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 439,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:nav-visibility",
+      "channel": "nav-visibility",
+      "status": "renderer-originated",
+      "disposition": "KEEP",
+      "why": "sent by the shell renderer into a webview guest rather than by main — a real sender, just not in the main process",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 143,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 574,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:open-terminal",
+      "channel": "open-terminal",
+      "status": "renderer-terminated",
+      "disposition": "KEEP",
+      "why": "no preload listener, but the shell renderer consumes this channel name directly — the dispatcher is the endpoint",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-knowledge.ts",
+          "line": 91,
+          "kind": "tunnel",
+          "target": "canvas",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:pref:changed",
+      "channel": "pref:changed",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 718,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 208,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:pty:data",
+      "channel": "pty:data",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "3 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 134,
+          "kind": "helper"
+        },
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 168,
+          "kind": "helper"
+        },
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 181,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 78,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:pty:exit",
+      "channel": "pty:exit",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "3 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 261,
+          "kind": "helper"
+        },
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 446,
+          "kind": "helper"
+        },
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 440,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 344,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 91,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:pty:status-changed",
+      "channel": "pty:status-changed",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/pty.ts",
+          "line": 1317,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 332,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:qf:dock:invalidate",
+      "channel": "qf:dock:invalidate",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "6 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 1028,
+          "kind": "direct"
+        },
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 1192,
+          "kind": "direct"
+        },
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 1255,
+          "kind": "direct"
+        },
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 1295,
+          "kind": "direct"
+        },
+        {
+          "file": "collab-electron/src/main/ipc-kernel.ts",
+          "line": 90,
+          "kind": "helper"
+        },
+        {
+          "file": "collab-electron/src/main/session-canvas-projector.ts",
+          "line": 11,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 132,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:qf:events:invalidate",
+      "channel": "qf:events:invalidate",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "2 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 1296,
+          "kind": "direct"
+        },
+        {
+          "file": "collab-electron/src/main/ipc-kernel.ts",
+          "line": 841,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 127,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:qf:session:chunk",
+      "channel": "qf:session:chunk",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-kernel.ts",
+          "line": 201,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 208,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:qf:session:done",
+      "channel": "qf:session:done",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-kernel.ts",
+          "line": 204,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 232,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:qf:session:permission",
+      "channel": "qf:session:permission",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/host-acp-permission.ts",
+          "line": 133,
+          "kind": "helper"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 197,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:replay:data",
+      "channel": "replay:data",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-misc.ts",
+          "line": 159,
+          "kind": "tunnel",
+          "target": "viewer:${msg.workspacePath}",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 122,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:run-in-terminal",
+      "channel": "run-in-terminal",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-misc.ts",
+          "line": 232,
+          "kind": "tunnel",
+          "target": "terminal",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 102,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:scope-changed",
+      "channel": "scope-changed",
+      "status": "renderer-originated",
+      "disposition": "KEEP",
+      "why": "sent by the shell renderer into a webview guest rather than by main — a real sender, just not in the main process",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 584,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:shell-blur",
+      "channel": "shell-blur",
+      "status": "renderer-originated",
+      "disposition": "KEEP",
+      "why": "sent by the shell renderer into a webview guest rather than by main — a real sender, just not in the main process",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 118,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:shell:forward",
+      "channel": "shell:forward",
+      "status": "tunnel",
+      "disposition": "KEEP",
+      "why": "the forwarding transport itself, not a product channel: it carries an inner channel name in its payload",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 41,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 159,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:shell:loading-done",
+      "channel": "shell:loading-done",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 880,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 34,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 186,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:shell:loading-status",
+      "channel": "shell:loading-status",
+      "status": "no-sender",
+      "disposition": "INVESTIGATE",
+      "why": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 172,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:shell:settings",
+      "channel": "shell:settings",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 855,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 166,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:shell:shortcut",
+      "channel": "shell:shortcut",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 310,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 193,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:update:status",
+      "channel": "update:status",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": false,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/updater/update-manager.ts",
+          "line": 257,
+          "kind": "direct"
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 240,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 601,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:wikilinks-updated",
+      "channel": "wikilinks-updated",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 1 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-filesystem.ts",
+          "line": 148,
+          "kind": "tunnel",
+          "target": "viewer",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 560,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": true
+    },
+    {
+      "id": "push:workspace-added",
+      "channel": "workspace-added",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "1 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-workspace.ts",
+          "line": 315,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 261,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 542,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    },
+    {
+      "id": "push:workspace-removed",
+      "channel": "workspace-removed",
+      "status": "live",
+      "disposition": "KEEP",
+      "why": "2 send site(s), 2 listener(s)",
+      "confidence": "medium",
+      "evidenceLevel": "S",
+      "tunnelled": true,
+      "senders": [
+        {
+          "file": "collab-electron/src/main/ipc-workspace.ts",
+          "line": 333,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        },
+        {
+          "file": "collab-electron/src/main/ipc-workspace.ts",
+          "line": 356,
+          "kind": "tunnel",
+          "target": "nav",
+          "targetResolved": true
+        }
+      ],
+      "listeners": [
+        {
+          "file": "collab-electron/src/preload/shell.ts",
+          "line": 267,
+          "mode": "on"
+        },
+        {
+          "file": "collab-electron/src/preload/universal.ts",
+          "line": 551,
+          "mode": "on"
+        }
+      ],
+      "rendererConsumed": false
+    }
+  ],
+  "pushDynamic": [
+    {
+      "file": "collab-electron/src/main/acp-agent.ts",
+      "line": 84,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    },
+    {
+      "file": "collab-electron/src/main/host-acp-permission.ts",
+      "line": 39,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    },
+    {
+      "file": "collab-electron/src/main/ipc-kernel.ts",
+      "line": 75,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    },
+    {
+      "file": "collab-electron/src/main/ipc-kernel.ts",
+      "line": 84,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    },
+    {
+      "file": "collab-electron/src/main/ipc-misc.ts",
+      "line": 159,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    },
+    {
+      "file": "collab-electron/src/main/pty.ts",
+      "line": 120,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    },
+    {
+      "file": "collab-electron/src/main/pty.ts",
+      "line": 1292,
+      "why": "push channel name is a variable or template literal, not resolvable from text",
+      "coverage": "dynamic"
+    }
+  ],
   "duplicates": [],
   "protocolVariants": [
     {
@@ -27314,6 +28698,22 @@
       "verdict": "repair",
       "why": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
       "owner": "founder"
+    },
+    {
+      "id": "push:cd-to",
+      "kind": "push-no-sender",
+      "what": "cd-to",
+      "where": "collab-electron/src/preload/universal.ts:98",
+      "reason": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
+      "verdict": "undecided"
+    },
+    {
+      "id": "push:shell:loading-status",
+      "kind": "push-no-sender",
+      "what": "shell:loading-status",
+      "where": "collab-electron/src/preload/shell.ts:172",
+      "reason": "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing",
+      "verdict": "undecided"
     }
   ],
   "decisionOrphans": []

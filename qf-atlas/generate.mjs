@@ -10,7 +10,7 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { walk, fileFacts, extractWires, stripCandidates, violations, gitMeta, REPO, rel, read, IS_TEST } from "./extract.mjs";
+import { walk, fileFacts, extractWires, pushWires, stripCandidates, violations, gitMeta, REPO, rel, read, IS_TEST } from "./extract.mjs";
 import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
@@ -69,6 +69,11 @@ const lifetime = lifetimeWires({
   bootFile: join(REPO, "collab-electron/src/main/index.ts"),
   read, relOf: rel, decomment, bodyOf,
 });
+// The OTHER direction — main -> preload/renderer push. Contract section E. This was
+// entirely unmodelled: ~47 channels, half the event surface, with no pattern for
+// webContents.send or ipcRenderer.on anywhere in the analyzer.
+const push = pushWires(mainFiles, preloadFiles, rendererFiles);
+
 const strip = stripCandidates(wires, facts);
 const breaches = violations(facts);
 
@@ -398,6 +403,7 @@ const model = {
     bridges, bridgeMethods: bridgeMethodCount, bridgeMethodsUsed: usedMethodCount,
     brokenBridgeCalls: brokenBridgeCalls.length,
     bridgeBlindSpots: bridgeBlindSpots.length,
+    pushChannels: push.stats,
     stripCandidates: strip.length,
     // Canonical: confirmed governance violations from the semantic classifier.
     violations: persistence.filter((p) => p.governance === "violation").length,
@@ -425,6 +431,8 @@ const model = {
   unbuiltWindows,
   blastRadius: blastFor,
   wires,
+  push: push.rows,
+  pushDynamic: push.dynamicSites,
   duplicates,
   protocolVariants,
   brokenBridgeCalls,

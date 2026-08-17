@@ -59,6 +59,18 @@ export function currentFindings(model) {
   for (const b of model.brokenBridgeCalls ?? [])
     out.push({ id: `broken-bridge-call:${b.method}`, kind: "broken-bridge-call",
       what: b.method, where: b.callers?.[0] ?? "no call site recorded" });
+  // Push-direction findings. Only rows the analyzer proposes acting on become
+  // decisions: `live`, `renderer-terminated`, `renderer-originated` and the tunnel
+  // itself are KEEP by evidence and need no ruling. `dynamic-sender` carries a named
+  // reason and is reported as a coverage boundary rather than as debt, which is the
+  // difference the contract draws between "unknown with a reason" and "undecided".
+  for (const r of model.push ?? [])
+    if (r.disposition === "INVESTIGATE" && r.status !== "dynamic-sender")
+      out.push({ id: r.id, kind: `push-${r.status}`, what: r.channel,
+        where: (r.senders?.[0] ?? r.listeners?.[0])
+          ? `${(r.senders?.[0] ?? r.listeners[0]).file}:${(r.senders?.[0] ?? r.listeners[0]).line}`
+          : "no site recorded",
+        reason: r.why });
   return out;
 }
 

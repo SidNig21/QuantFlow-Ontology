@@ -472,13 +472,32 @@ record(29, "spawned workers are process entries, not dead", ...(() => {
 })());
 
 // 30 · blast radius is populated for files carrying confirmed findings
-record(30, "confirmed findings carry a blast radius", ...(() => {
-  const files = [...new Set(before.persistence.filter((p) => p.governance === "violation")
+// Blast radius is now an OBJECT per file carrying the contract's full field set, not
+// a bare array of dependants. This check read `.length` on it and reported "no
+// dependants computed" for a file that had eight — the assertion was measuring the
+// old shape. Widened to the v1 contract: every reachable file must carry a blast
+// radius, and every entry must expose all seven fields, because a half-populated
+// blast radius is what makes an agent think it has checked.
+record(30, "every file carries a complete blast radius", ...(() => {
+  const FIELDS = ["reach", "directDependents", "transitiveDependents",
+    "directDependencies", "affectedWires", "affectedLoops", "packaged"];
+  const blast = before.blastRadius ?? {};
+  const entries = Object.entries(blast);
+  if (entries.length < 100)
+    return [false, `only ${entries.length} blast-radius entries — this must cover the repo, not just defects`];
+  const incomplete = entries.filter(([, b]) => FIELDS.some((k) => b[k] === undefined));
+  if (incomplete.length)
+    return [false, `${incomplete.length} entry(ies) missing fields, e.g. ${incomplete[0][0]}`];
+  // A file with dependents must actually list them.
+  const violators = [...new Set(before.persistence.filter((p) => p.governance === "violation")
     .map((p) => p.evidence[0].file))];
-  const missing = files.filter((f) => !(before.blastRadius?.[f]?.length));
-  return [files.length > 0 && missing.length === 0,
-    missing.length ? `no dependants computed for ${missing.join(", ")}`
-      : `${files.length} file(s), e.g. ${files[0].split("/").pop()} has ${before.blastRadius[files[0]].length} dependants`];
+  const empty = violators.filter((f) => {
+    const b = blast[f];
+    return !b || (b.directDependents.length + b.transitiveDependents.length) === 0;
+  });
+  return [violators.length > 0 && empty.length === 0,
+    empty.length ? `no dependants computed for ${empty.join(", ")}`
+      : `${entries.length} entries, all ${FIELDS.length} fields present; e.g. ${violators[0].split("/").pop()} has ${blast[violators[0]].directDependents.length} direct dependants`];
 })());
 
 // ── DECISIONS ──────────────────────────────────────────────────────────────
@@ -708,6 +727,69 @@ record(43, "a filename in a QA assertion does not confer process-entry", ...(() 
   const row = before.reach.find((r) => r.path.endsWith("main/a2a-bus.ts"));
   return [!!row && row.reach !== "process-entry",
     row ? `reach=${row.reach}` : "row absent"];
+})());
+
+// ── PUSH DIRECTION — contract items 22, 23, 24 ─────────────────────────────
+const PRELOAD = "collab-electron/src/preload";
+
+// 44 · contract 22 — a live main -> renderer push channel is detected at all. Before
+// this analyzer existed the whole direction was invisible: ~47 channels, no pattern
+// for webContents.send or ipcRenderer.on anywhere.
+record(44, "a live main -> renderer push channel is detected", ...(() => {
+  const rows = before.push ?? [];
+  if (!rows.length) return [false, "no push channels modelled at all"];
+  const live = rows.filter((r) => r.status === "live");
+  const known = live.find((r) => r.channel === "pty:data" || r.channel === "shell:shortcut");
+  return [live.length > 0 && !!known,
+    known ? `${live.length} live of ${rows.length}, e.g. ${known.channel} (${known.senders.length} send sites, ${known.listeners.length} listeners)`
+      : `${live.length} live but neither pty:data nor shell:shortcut among them`];
+})());
+
+// 45 · contract 23 — a listener nothing sends to is caught. This is the finding class
+// that lets a dead event path be found; without it a push channel whose sender was
+// deleted looks exactly like one that works.
+record(45, "a push listener with no sender is detected",
+  ...withFile(`${PRELOAD}/zz-falsify-45.ts`,
+    `import { ipcRenderer } from "electron";\n` +
+    `export const sub = (cb: () => void) => ipcRenderer.on("qf:falsify:nobodysends", cb);\n`,
+    (m) => {
+      const r = (m.push ?? []).find((x) => x.channel === "qf:falsify:nobodysends");
+      const finding = (m.decisions ?? []).find((d) => d.id === "push:qf:falsify:nobodysends");
+      return [r?.status === "no-sender" && r?.disposition === "INVESTIGATE" && !!finding,
+        r ? `status=${r.status} disposition=${r.disposition} inLedger=${!!finding}` : "channel not seen"];
+    }));
+
+// 46 · contract 24 — a channel carried inside the shell:forward tunnel must be
+// resolved to its listener, NOT reported as an orphan. 14 channels travel that way.
+// A regex matching only `webContents.send("literal")` sees "shell:forward" and misses
+// every inner name, so all 14 would have read as dead listeners: the single largest
+// false-delete source in this analysis.
+record(46, "tunnelled push channels are resolved, not reported orphan", ...(() => {
+  const rows = before.push ?? [];
+  const tunnelled = rows.filter((r) => r.tunnelled);
+  if (tunnelled.length < 5) return [false, `only ${tunnelled.length} tunnelled channels found — the tunnel parse is not working`];
+  const orphaned = tunnelled.filter((r) => r.status === "no-sender");
+  const tunnelRow = rows.find((r) => r.status === "tunnel");
+  return [orphaned.length === 0 && !!tunnelRow,
+    orphaned.length ? `${orphaned.length} tunnelled channel(s) wrongly reported senderless, e.g. ${orphaned[0].channel}`
+      : `${tunnelled.length} tunnelled channels, none orphaned; shell:forward itself classified as ${tunnelRow?.status}`];
+})());
+
+// 47 · A fixed-channel helper's arguments are PAYLOAD, not channels. canvas-rpc.ts
+// defines its own `sendToShell(method, …)` which sends the constant
+// "canvas:rpc-request" and puts the method name in the payload. Matching helpers by
+// NAME reported all 19 RPC method names — canvas.tileList, canvas.viewportGet … — as
+// push channels with no listener: nineteen fabricated findings against healthy code.
+record(47, "a fixed-channel helper's payload strings are not channels", ...(() => {
+  const src = readFileSync(join(REPO, `${MAIN}/canvas-rpc.ts`), "utf8");
+  if (!/sendToShell/.test(src) || !/["']canvas:rpc-request["']/.test(src))
+    return [false, "canvas-rpc.ts no longer matches this probe's premise"];
+  const rows = before.push ?? [];
+  const bogus = rows.filter((r) => r.channel.startsWith("canvas."));
+  const real = rows.find((r) => r.channel === "canvas:rpc-request");
+  return [bogus.length === 0 && !!real,
+    bogus.length ? `${bogus.length} payload string(s) reported as channels, e.g. ${bogus[0].channel}`
+      : `0 payload strings as channels; canvas:rpc-request present as ${real?.status}`];
 })());
 
 // restore the committed model

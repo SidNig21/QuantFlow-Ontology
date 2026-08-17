@@ -294,6 +294,211 @@ export function extractWires(mainFiles, preloadFiles, rendererFiles) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 1b · THE PUSH DIRECTION.  main -> preload/renderer.
+//
+// Contract section E. This direction was not modelled AT ALL: no pattern for
+// `webContents.send` or `ipcRenderer.on` existed anywhere, across ~48 channels. A
+// push channel whose listener was deleted looked exactly like one that works, so
+// half the event surface was invisible and 43 `on*`/`off*` bridge methods could not
+// be matched to anything.
+//
+// TWO LAYERS, and the second is a tunnel:
+//   direct     main --webContents.send(ch)--> ipcRenderer.on(ch) in a preload
+//   tunnelled  main --send("shell:forward", target, inner)--> shell preload
+//              --> shell renderer dispatcher --> <webview>.send(inner)
+//              --> ipcRenderer.on(inner) in universal.ts
+// A regex that only matches `webContents.send("literal")` sees `"shell:forward"` and
+// misses every inner name — and those inner names are exactly the ones that then look
+// like orphan listeners. Resolving the tunnel is what stops this analysis being a
+// false-positive generator.
+//
+// CONFIDENCE. These patterns are textual, and the contract forbids regex from
+// creating a high-confidence architectural red on its own. Every finding here is
+// therefore emitted at `medium` confidence with disposition INVESTIGATE, and channels
+// whose name is built dynamically are reported as an explicit coverage boundary
+// rather than omitted. Promotion to red requires the AST pass.
+const PUSH = {
+  // webContents.send / win.webContents.send / wc.send — the literal-channel case.
+  direct: /\.send\(\s*["'`]([^"'`$]+)["'`]/g,
+  // Wrappers that take the channel as their first argument. Their own bodies call
+  // `.send(channel)` with a variable, so the literal only exists at the call site.
+  helper: /\b(?:sendToShell|sendToRenderer|sendToMainWindow|broadcast)\(\s*["'`]([^"'`$]+)["'`]/g,
+  // sendToSender(webContentsId, channel, …)
+  helperSecond: /\bsendToSender\(\s*[^,()]+,\s*["'`]([^"'`$]+)["'`]/g,
+  // The tunnel: forwardToWebview(target, innerChannel, …)
+  tunnel: /\bforwardToWebview\(\s*(?:["'`]([^"'`]*)["'`]|([A-Za-z_$][\w$.]*|`[^`]*`))\s*,\s*["'`]([^"'`$]+)["'`]/g,
+  // Anything where the channel itself is not a literal — a variable or a template.
+  dynamic: /(?:\.send|forwardToWebview)\(\s*(?:[^"'`,()]*,\s*)?(?:`[^`]*\$\{|[A-Za-z_$][\w$.]*\s*[,)])/g,
+  listener: /ipcRenderer\.(on|once)\(\s*["'`]([^"'`$]+)["'`]/g,
+};
+
+/** The tunnel's outer channel. Not a product channel in its own right. */
+const TUNNEL_CHANNEL = "shell:forward";
+
+export function pushWires(mainFiles, preloadFiles, rendererFiles) {
+  const senders = new Map();       // channel -> [{file,line,kind,target}]
+  const dynamicSites = [];         // explicit coverage boundary, never silence
+  const add = (ch, site) => {
+    if (!senders.has(ch)) senders.set(ch, []);
+    senders.get(ch).push(site);
+  };
+
+  for (const f of mainFiles) {
+    const t = stripComments(read(f));
+    const at = (i) => t.slice(0, i).split("\n").length;
+    // Helper names COLLIDE across files with different signatures. `sendToShell` in
+    // ipc-kernel.ts takes (channel, …); `sendToShell` in canvas-rpc.ts takes
+    // (method, …) and sends the fixed channel "canvas:rpc-request" with the method in
+    // the payload. Matching on the name alone reported all 19 RPC method names —
+    // canvas.tileList, canvas.viewportGet … — as push channels with no listener: ten
+    // fabricated findings pointing at healthy code.
+    //
+    // So verify per file: does this helper actually forward its FIRST parameter to
+    // `.send(`? That is a file-local static fact, not a name guess and not an
+    // allowlist.
+    // The distinction is not "which parameter is the channel" — parsing parameter
+    // lists by regex breaks on multi-line signatures and on types containing parens,
+    // which is why pty.ts's sendToSender/sendToMainWindow and ipc-kernel.ts's
+    // broadcast were all being skipped and their channels reported senderless.
+    //
+    // The real question is simpler: does this helper's own `.send(` take a VARIABLE
+    // or a STRING LITERAL as its channel?
+    //   variable  -> the channel comes from the caller, so the call-site literal IS
+    //                a channel name        (ipc-kernel broadcast, pty sendToSender)
+    //   literal   -> the channel is fixed and the caller's literal is payload, not a
+    //                channel              (canvas-rpc sendToShell -> "canvas:rpc-request")
+    const forwardsAChannel = (name) => {
+      const def = new RegExp(
+        `(?:function\\s+${name}\\s*\\(|(?:const|let|var)\\s+${name}\\s*=)`).exec(t);
+      // Not defined in this file: it is an injected dependency such as the
+      // forwardToWebview passed into each IPC domain context. Those do forward.
+      if (!def) return true;
+      const send = /\.send\(\s*(["'`])?/.exec(t.slice(def.index, def.index + 1600));
+      if (!send) return false;
+      return send[1] === undefined;
+    };
+    for (const m of t.matchAll(PUSH.direct))
+      if (m[1] !== TUNNEL_CHANNEL) add(m[1], { file: rel(f), line: at(m.index), kind: "direct" });
+    for (const re of [PUSH.helper, PUSH.helperSecond]) {
+      for (const m of t.matchAll(re)) {
+        if (m[1] === TUNNEL_CHANNEL) continue;
+        const helperName = /^\s*([A-Za-z_$][\w$]*)/.exec(m[0])?.[1];
+        if (helperName && !forwardsAChannel(helperName)) continue;
+        add(m[1], { file: rel(f), line: at(m.index), kind: "helper" });
+      }
+    }
+    for (const m of t.matchAll(PUSH.tunnel)) {
+      const target = m[1] ?? m[2] ?? "?";
+      const literalTarget = m[1] !== undefined;
+      add(m[3], { file: rel(f), line: at(m.index), kind: "tunnel", target,
+        targetResolved: literalTarget });
+      if (!literalTarget)
+        dynamicSites.push({ file: rel(f), line: at(m.index),
+          why: `forwardToWebview target is not a literal (${target}) — the routed destination cannot be resolved statically`,
+          coverage: "dynamic" });
+    }
+    for (const m of t.matchAll(PUSH.dynamic))
+      dynamicSites.push({ file: rel(f), line: at(m.index),
+        why: "push channel name is a variable or template literal, not resolvable from text",
+        coverage: "dynamic" });
+  }
+
+  // Subscribers. `ipcRenderer.on` in a preload is the receiving end.
+  const listeners = new Map();
+  for (const f of preloadFiles) {
+    const t = stripComments(read(f));
+    for (const m of t.matchAll(PUSH.listener)) {
+      const ch = m[2];
+      if (!listeners.has(ch)) listeners.set(ch, []);
+      listeners.get(ch).push({ file: rel(f), line: t.slice(0, m.index).split("\n").length, mode: m[1] });
+    }
+  }
+
+  // A tunnelled inner channel may terminate in the shell renderer instead of a
+  // preload — the dispatcher handles it directly and no listener is expected. Without
+  // this, ten live channels would read as dead push. This is the single largest
+  // false-positive source in this analysis.
+  const rendererText = rendererFiles.map(read).join("\n");
+  const consumedInRenderer = (ch) =>
+    new RegExp(`["'\`]${ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'\`]`).test(rendererText);
+
+  // The shell RENDERER also originates pushes into <webview> guests, so "no send site
+  // in main" is not "no sender". canvas-opacity, nav-visibility, focus-search,
+  // shell-blur and scope-changed are all sent from renderer.js / tile-manager.js.
+  // Reporting those as dead listeners would delete live wiring.
+  const rendererSends = new Set();
+  for (const f of rendererFiles)
+    for (const m of stripComments(read(f)).matchAll(PUSH.direct)) rendererSends.add(m[1]);
+
+  // Dynamic channel names that resolve to a family: `agent:${event.kind}` at
+  // ipc-misc.ts produces agent:session-started / file-touched / session-ended. The
+  // literal never appears, so those three listeners look senderless. Capture the
+  // resolvable prefix so they are reported as dynamically sent, not dead.
+  const dynamicPrefixes = [];
+  for (const f of mainFiles)
+    for (const m of stripComments(read(f)).matchAll(/["'`]([a-z][\w:-]*?:)\$\{/gi))
+      dynamicPrefixes.push(m[1]);
+  const dynamicallySent = (ch) => dynamicPrefixes.some((p) => ch.startsWith(p));
+
+  const channels = [...new Set([...senders.keys(), ...listeners.keys()])].sort();
+  const rows = channels.map((channel) => {
+    const sends = senders.get(channel) ?? [];
+    const subs = listeners.get(channel) ?? [];
+    const tunnelled = sends.some((s) => s.kind === "tunnel");
+    const rendererEnd = consumedInRenderer(channel);
+    let status, why, disposition;
+    if (channel === TUNNEL_CHANNEL) {
+      status = "tunnel"; disposition = "KEEP";
+      why = "the forwarding transport itself, not a product channel: it carries an inner channel name in its payload";
+    } else if (sends.length && subs.length) {
+      status = "live"; disposition = "KEEP";
+      why = `${sends.length} send site(s), ${subs.length} listener(s)`;
+    } else if (sends.length && rendererEnd) {
+      status = "renderer-terminated"; disposition = "KEEP";
+      why = "no preload listener, but the shell renderer consumes this channel name directly — the dispatcher is the endpoint";
+    } else if (sends.length) {
+      status = "no-listener"; disposition = "INVESTIGATE";
+      why = "main pushes this channel and no preload listener or renderer consumer was found; if the target is routed dynamically the receiver may exist";
+    } else if (rendererSends.has(channel)) {
+      status = "renderer-originated"; disposition = "KEEP";
+      why = "sent by the shell renderer into a webview guest rather than by main — a real sender, just not in the main process";
+    } else if (dynamicallySent(channel)) {
+      status = "dynamic-sender"; disposition = "INVESTIGATE";
+      why = "no literal send site, but a template-literal channel in main shares this prefix, so the sender is probably this listener's — unresolvable from text";
+    } else {
+      status = "no-sender"; disposition = "INVESTIGATE";
+      why = "a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing";
+    }
+    return {
+      // Stable, semantic id. The channel name is the identity; line numbers are
+      // evidence (contract J).
+      id: `push:${channel}`,
+      channel, status, disposition, why,
+      confidence: "medium",
+      evidenceLevel: "S",
+      tunnelled,
+      senders: sends.slice(0, 6),
+      listeners: subs.slice(0, 6),
+      rendererConsumed: rendererEnd,
+    };
+  });
+
+  return {
+    rows,
+    dynamicSites,
+    stats: {
+      channels: rows.length,
+      tunnelled: rows.filter((r) => r.tunnelled).length,
+      live: rows.filter((r) => r.status === "live").length,
+      rendererTerminated: rows.filter((r) => r.status === "renderer-terminated").length,
+      noListener: rows.filter((r) => r.status === "no-listener").length,
+      noSender: rows.filter((r) => r.status === "no-sender").length,
+      dynamicSites: dynamicSites.length,
+    },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 2 · PER-FILE FACTS.  Size and the three signals that decide One Rule severity.
 // ─────────────────────────────────────────────────────────────────────────────
 

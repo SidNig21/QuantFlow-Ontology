@@ -115,17 +115,54 @@ export function renderMarkdown(m) {
     p(`reason, not a parsing one — see the next paragraph.`);
     p();
   }
-  p(`#### The push direction is not modelled`);
+  // ── the other direction ───────────────────────────────────────────────────
+  const push = m.push ?? [];
+  const ps = m.stats?.pushChannels ?? {};
+  const byStatus = (s) => push.filter((r) => r.status === s);
+  p(`### The push direction — main → renderer (${push.length} channels)`);
   p();
-  p(`Everything above traces **renderer → main**: \`invoke\`/\`send\` going out, a handler`);
-  p(`answering. The main process also pushes the other way — \`webContents.send\` out, an`);
-  p(`\`ipcRenderer.on\` subscriber receiving — and **this analyzer has no pattern for that`);
-  p(`direction at all.** Those channels are not wires here, cannot be reported live, unused`);
-  p(`or dead, and do not appear in any count on this page.`);
+  p(`Everything above traces **renderer → main**. The main process also pushes the other`);
+  p(`way, and that direction runs on two layers — the second is a tunnel:`);
   p();
-  p(`So: a push channel whose subscriber was deleted looks exactly like a push channel that`);
-  p(`works. Do not read a green loop as covering event delivery. This is a **known hole**,`);
-  p(`recorded here because the rule of this map is that silence may never read as clean.`);
+  p("```");
+  p("direct     main --webContents.send(ch)--------------> ipcRenderer.on(ch)   in a preload");
+  p("tunnelled  main --send(\"shell:forward\", target, inner)--> shell preload");
+  p("                --> shell renderer dispatcher --> <webview>.send(inner)");
+  p("                --> ipcRenderer.on(inner)         in universal.ts");
+  p("```");
+  p();
+  p(`| Status | Count | Meaning |`);
+  p(`|---|---:|---|`);
+  p(`| \`live\` | ${ps.live ?? 0} | a send site and a preload listener |`);
+  p(`| \`renderer-terminated\` | ${ps.rendererTerminated ?? 0} | consumed by the shell dispatcher; no preload listener expected |`);
+  p(`| \`renderer-originated\` | ${byStatus("renderer-originated").length} | sent by the shell renderer into a webview, not by main |`);
+  p(`| \`dynamic-sender\` | ${byStatus("dynamic-sender").length} | a template-literal channel shares this prefix — **coverage boundary, not debt** |`);
+  p(`| \`tunnel\` | ${byStatus("tunnel").length} | \`shell:forward\` itself, the transport |`);
+  p(`| **\`no-sender\`** | **${ps.noSender ?? 0}** | **a preload subscribes and nothing sends it** |`);
+  p(`| **\`no-listener\`** | **${ps.noListener ?? 0}** | **main pushes it and nothing receives** |`);
+  p();
+  p(`${ps.tunnelled ?? 0} channels travel inside the tunnel. Resolving it matters: a regex that`);
+  p(`matches only \`webContents.send("literal")\` sees \`"shell:forward"\` and misses every`);
+  p(`inner name — and those inner names are exactly the ones that then look like orphan`);
+  p(`listeners. That single mistake would have produced ${ps.tunnelled ?? 0} false deletes.`);
+  p();
+  for (const s of ["no-sender", "no-listener"]) {
+    const rows = byStatus(s);
+    if (!rows.length) continue;
+    p(`#### \`${s}\` (${rows.length})`);
+    p();
+    for (const r of rows) {
+      const site = r.senders?.[0] ?? r.listeners?.[0];
+      p(`- \`${r.channel}\` — ${site ? `\`${site.file}:${site.line}\`` : "no site"} · **${r.disposition}**`);
+      p(`  - ${r.why}`);
+    }
+    p();
+  }
+  p(`**Confidence is \`medium\` on every row here, and the disposition is \`INVESTIGATE\`, never`);
+  p(`\`REMOVE\`.** These patterns are textual, and text may not create a high-confidence`);
+  p(`architectural red on its own — promoting any of this to a confirmed defect requires the`);
+  p(`AST pass. ${(m.pushDynamic ?? []).length} send sites build their channel or target`);
+  p(`dynamically and are recorded as explicit coverage boundaries rather than omitted.`);
   p();
 
   // ── 2. the loops ──────────────────────────────────────────────────────────
