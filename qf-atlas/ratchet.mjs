@@ -84,6 +84,14 @@ if (!seeded) {
 // ── 3. unexplained coverage gaps ───────────────────────────────────────────
 // The invariant is UNEXPLAINED UNDECIDED = 0, never UNKNOWN = 0. An unknown that names
 // its blocker is honest; one that does not is a hole in the map pretending to be clean.
+// TWO different invariants, and only one was being checked. Coverage cells are not
+// findings: the contract's target is UNEXPLAINED UNDECIDED = 0, and reporting a green
+// coverage number in its place answered a question nobody asked.
+const unexplainedUndecided = model.unexplainedUndecided ?? [];
+if (unexplainedUndecided.length)
+  fail.push(`UNDECIDED WITH NO BLOCKER (${unexplainedUndecided.length}): `
+    + unexplainedUndecided.slice(0, 4).map((u) => u.id).join(", ")
+    + " — every unresolved finding must name why it is unresolved.");
 const unexplained = model.unexplainedCoverage ?? [];
 if (unexplained.length)
   fail.push(`UNEXPLAINED COVERAGE (${unexplained.length}): `
@@ -151,6 +159,7 @@ console.log("");
 console.log(`  baseline: ${seeded ? `${Object.keys(baseline.findings ?? {}).length} entries` : "not seeded"}`
   + ` · confirmed red now: ${Object.keys(current).length}`
   + ` · unexplained coverage: ${unexplained.length}`
+  + ` · undecided w/o blocker: ${unexplainedUndecided.length}`
   + ` · undecided: ${model.stats?.decisions?.undecided ?? "?"}`);
 
 if (ms > 60_000)

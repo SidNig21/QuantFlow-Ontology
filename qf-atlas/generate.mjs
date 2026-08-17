@@ -11,7 +11,7 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { walk, fileFacts, extractWires, pushWires, stripCandidates, violations, gitMeta, REPO, rel, read, IS_TEST, WRITE_DOOR } from "./extract.mjs";
-import { addFourthHop, decomment, bodyOf } from "./hop4.mjs";
+import { addFourthHop, decomment, bodyOf, setHop4Door } from "./hop4.mjs";
 import { lifetimeWires } from "./lifetime.mjs";
 import { buildLoops } from "./loops.mjs";
 import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage, setWriteDoor } from "./classify.mjs";
@@ -78,29 +78,6 @@ const preloadFiles  = files.filter((f) => f.startsWith("collab-electron/src/prel
 const rendererFiles = files.filter((f) => f.startsWith("collab-electron/src/windows/") || f.startsWith("collab-electron/packages/")).map((f) => join(REPO, f));
 
 const { wires, duplicates, protocolVariants, bridges, bridgeMethodCount, usedMethodCount, bridgeBlindSpots, brokenBridgeCalls } = extractWires(mainFiles, preloadFiles, rendererFiles);
-// hop 4 — main -> Kernel. Runs before strip/status so "cheats" is visible everywhere.
-const indexFiles = files
-  .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
-  .map((f) => join(REPO, f));
-const hop4Stats = addFourthHop(wires, mainFiles, indexFiles, read, rel);
-
-// Lifetime wires: spawn -> reap. Close-kill can never look like a missing invoke.
-const spawners = facts
-  .filter((f) => f.path.startsWith("collab-electron/src/main/") && f.spawnsLive > 0)
-  .map((f) => ({ path: f.path, spawns: f.spawnsLive }));
-const lifetime = lifetimeWires({
-  spawners,
-  bootFile: join(REPO, "collab-electron/src/main/index.ts"),
-  read, relOf: rel, decomment, bodyOf,
-});
-// The OTHER direction — main -> preload/renderer push. Contract section E. This was
-// entirely unmodelled: ~47 channels, half the event surface, with no pattern for
-// webContents.send or ipcRenderer.on anywhere in the analyzer.
-const push = pushWires(mainFiles, preloadFiles, rendererFiles);
-
-const strip = stripCandidates(wires, facts);
-const breaches = violations(facts);
-
 // ─── THE GOVERNED WRITE DOOR, DERIVED (contract section D) ───────────────────
 // `WRITE_DOOR` is six filenames typed by hand, and membership short-circuits
 // classification to `compliant / high` for every SQL site in the file. That is
@@ -134,6 +111,31 @@ writeDoor.divergence = {
 // fallback to the allowlist, because a silent fallback is the drift being removed.
 const door = makeDoor(writeDoor);
 setWriteDoor(door);
+setHop4Door(door);
+
+// hop 4 — main -> Kernel. Runs before strip/status so "cheats" is visible everywhere.
+const indexFiles = files
+  .filter((f) => f.startsWith("collab-electron/src/main/") || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/"))
+  .map((f) => join(REPO, f));
+const hop4Stats = addFourthHop(wires, mainFiles, indexFiles, read, rel);
+
+// Lifetime wires: spawn -> reap. Close-kill can never look like a missing invoke.
+const spawners = facts
+  .filter((f) => f.path.startsWith("collab-electron/src/main/") && f.spawnsLive > 0)
+  .map((f) => ({ path: f.path, spawns: f.spawnsLive }));
+const lifetime = lifetimeWires({
+  spawners,
+  bootFile: join(REPO, "collab-electron/src/main/index.ts"),
+  read, relOf: rel, decomment, bodyOf,
+});
+// The OTHER direction — main -> preload/renderer push. Contract section E. This was
+// entirely unmodelled: ~47 channels, half the event surface, with no pattern for
+// webContents.send or ipcRenderer.on anywhere in the analyzer.
+const push = pushWires(mainFiles, preloadFiles, rendererFiles);
+
+const strip = stripCandidates(wires, facts);
+const breaches = violations(facts);
+
 
 // Semantic persistence classification replaces the old "SQL outside an allowlist
 // is a violation" rule, which called transport bookkeeping a domain breach.
@@ -151,6 +153,44 @@ const persistence = classifyPersistence({
   appReach,
   relOf: rel,
 });
+
+// ─── RECONCILE HOP 4 AGAINST THE SEMANTIC CLASSIFIER ─────────────────────────
+// hop4 walks a 5-deep NAME-based call closure and stamped `cheats` whenever that walk
+// touched any SQL-bearing function — DML unconditionally outranking a proven door. So
+// `qf:tasks:create`, which calls kernelExecute("create_task", …) at ipc-kernel.ts:483,
+// was recorded with `viaDoor: kernelExecute` AND labelled a governance breach, because
+// the same walk also reached `ensureGovernedReviewSchema` — an idempotent CREATE TABLE
+// on review bookkeeping tables that the persistence classifier already calls compliant.
+//
+// That made PLAN, ASSIGN and REVIEW read `broken`, and the brief routed them to "raw SQL,
+// never enters a governed action". An agent told the Kernel's own task-creation path
+// bypasses execute() would go and "repair" working governed code.
+//
+// The contract is explicit that regex may not create a high-confidence red on its own, so
+// the regex walk no longer gets the last word: a wire is `cheats` only when the SQL it
+// reaches is a CONFIRMED VIOLATION in the semantic classifier. Everything else falls back
+// to what the walk actually proved — a door, a disk write, or nothing.
+{
+  const violatingFn = new Set(persistence.filter((p) => p.governance === "violation").map((p) => p.fn));
+  const violatingFile = new Set(persistence.filter((p) => p.governance === "violation")
+    .map((p) => p.evidence[0].file));
+  const unknownFn = new Set(persistence.filter((p) => p.governance === "unknown").map((p) => p.fn));
+  let downgraded = 0;
+  for (const w of wires) {
+    if (w.hop4?.kind !== "cheats") continue;
+    const fn = w.hop4.viaDml, file = w.hop4.dmlFile;
+    if (violatingFn.has(fn) || violatingFile.has(file)) continue;   // a real breach: stays
+    downgraded++;
+    w.hop4.kind = w.hop4.viaDoor ? "write-door" : w.hop4.viaDisk ? "writes-disk" : "read-only";
+    w.hop4.downgradedFrom = "cheats";
+    w.hop4.why = unknownFn.has(fn)
+      ? `reaches ${fn}, whose governance the classifier could not resolve — gray, not a breach`
+      : `reaches ${fn}, which the persistence classifier adjudicates as compliant`;
+    // The wire's own status must follow, or the loop matrix keeps reading `broken`.
+    if (w.status === "cheats") w.status = "live";
+  }
+  hop4Stats.downgradedFromCheats = downgraded;
+}
 
 // Coverage: absence of a finding must never be indistinguishable from clean.
 const inScope = (p) => p.startsWith("collab-electron/src/main/")
@@ -505,6 +545,7 @@ const model = {
     brokenBridgeCalls: brokenBridgeCalls.length,
     bridgeBlindSpots: bridgeBlindSpots.length,
     pushChannels: push.stats,
+    hop4: hop4Stats,
     ast: { available: tsAvailable(), version: tsVersion, files: astOf.size },
     coverageFiles: matrix.files,
     ownership: ownership.stats,
@@ -599,6 +640,15 @@ model.decisionOrphans = decided.orphans;
 model.stats.undecided = decided.summary.undecided;
 model.stats.allClear = decided.summary.allClear;
 model.stats.decisions = decided.summary;
+// THE CONTRACT'S INVARIANT, and it is not the coverage one. `unexplainedCoverage`
+// counts analyzer CELLS; this counts undecided FINDINGS with no named blocker. The two
+// were being conflated, so a green 0 was reported against a target 38 short of met.
+model.unexplainedUndecided = decided.rows
+  .filter((r) => r.verdict === "undecided" && !(r.blocker && r.reason))
+  .map((r) => ({ id: r.id, kind: r.kind }));
+model.stats.unexplainedUndecided = model.unexplainedUndecided.length;
+model.stats.blockers = decided.rows.filter((r) => r.verdict === "undecided")
+  .reduce((a, r) => (a[r.blocker || "none"] = (a[r.blocker || "none"] ?? 0) + 1, a), {});
 
 mkdirSync(OUT, { recursive: true });
 const json = JSON.stringify(model, null, 2);

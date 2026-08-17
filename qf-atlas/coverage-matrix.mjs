@@ -21,7 +21,10 @@
 // is UNEXPLAINED UNDECIDED = 0, never UNKNOWN = 0 — forcing unknowns to zero would
 // only buy fake certainty.
 
-const ANALYZERS = ["imports", "ipcRequest", "ipcPush", "persistence", "lifetime", "packaging", "ownership"];
+// reach BELONGS HERE. It was written into the same cell object but left out of this
+// list, so `worst` was computed without it and 59 files reported `indexed` while their
+// reachability had never been evaluated. A file absent from an analysis cannot look green.
+const ANALYZERS = ["imports", "ipcRequest", "ipcPush", "persistence", "lifetime", "packaging", "ownership", "reach"];
 
 /** Which analyzers even apply to a file, from its location in the tree. */
 function applicability(path) {
@@ -84,7 +87,18 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
         ? `${unresolvedIpc.length} channel name(s) built from a variable or template (line ${unresolvedIpc.map((u) => u.line).join(", ")})`
         : null;
       set("ipcRequest", state, why);
-      set("ipcPush", state, why);
+      // The push direction is a DIFFERENT measurement. This used to assign the identical
+      // state and reason to both cells, so the model reported two dimensions and had made
+      // one. A file with no push traffic is not "indexed" for push — it is not-applicable.
+      const pushSites = (a?.ipc ?? []).filter((x) =>
+        x.surface === "webContents" || (x.surface === "ipcRenderer" && (x.method === "on" || x.method === "once")));
+      const pushDynamic = (a?.unresolved ?? []).filter((u) => /webContents|ipcRenderer.on/i.test(u.what));
+      if (!pushSites.length && !pushDynamic.length)
+        set("ipcPush", "not-applicable", "no webContents.send and no ipcRenderer.on in this file");
+      else if (pushDynamic.length)
+        set("ipcPush", "dynamic",
+          `${pushDynamic.length} push channel name(s) built from a variable or template`);
+      else set("ipcPush", "indexed");
     }
 
     // ── persistence / governance ───────────────────────────────────────────

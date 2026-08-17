@@ -315,9 +315,48 @@ export function renderMarkdown(m) {
   // ── 4. write door ─────────────────────────────────────────────────────────
   p(`## Write-door violations`);
   p();
-  p(`The declared write door is \`execute.ts\`, \`create.ts\`, \`insert.ts\`, \`events.ts\`,`);
-  p(`\`db.ts\`, \`upgrade.ts\`, plus generated schema SQL. Any other file holding SQL appears`);
-  p(`here automatically, so a new one cannot arrive quietly.`);
+  // DERIVED, and printed as derived. This hardcoded the six-filename allowlist — four
+  // entries of which the derivation had already refused to trust — so the brief was
+  // telling readers the opposite of what the model had concluded.
+  {
+    const wd = m.writeDoor ?? {};
+    const st = wd.stats ?? {};
+    const short = (f) => `\`${f.split("/").pop()}\``;
+    p(`The governed write door is **derived from the Kernel's own dispatch structure**, not`);
+    p(`from a list of filenames. \`defineAction\` names the governed verbs, the dispatch table`);
+    p(`maps each verb to an implementation, and the files declaring those implementations are`);
+    p(`the door. Generated schema SQL is included.`);
+    p();
+    p(`| | |`);
+    p(`|---|---|`);
+    p(`| derivation state | \`${wd.state ?? "unknown"}\` |`);
+    p(`| dispatcher found at | ${(wd.dispatcherFiles ?? []).map((d) => `\`${d.file}:${d.line}\``).join(", ") || "**not found**"} |`);
+    p(`| actions mapped | ${st.dispatched ?? 0} of ${st.actions ?? 0} |`);
+    p(`| door files | ${(wd.doorFiles ?? []).map(short).join(", ") || "none"} |`);
+    p();
+    const dv = wd.divergence ?? {};
+    const nTrusted = (dv.trustedButNotDerived ?? []).length;
+    const nDerived = (dv.derivedButNotTrusted ?? []).length;
+    if (nTrusted || nDerived) {
+      p(`**The retired hand-written allowlist disagreed with the Kernel on ${nTrusted + nDerived} files.**`);
+      if (nTrusted)
+        p(`Trusted by the old list but supported by no dispatched action, so they no longer get a`);
+      if (nTrusted) p(`blanket pass: ${dv.trustedButNotDerived.map(short).join(", ")}.`);
+      if (nDerived)
+        p(`Implement a dispatched action but were never on the list, so their SQL was being`);
+      if (nDerived) p(`adjudicated as a possible breach: ${dv.derivedButNotTrusted.map(short).join(", ")}.`);
+      p();
+    }
+    if (wd.state === "partial") {
+      p(`> The derivation is **partial**: ${(wd.unmappedActions ?? []).length} of ${st.actions ?? 0} schema actions have no`);
+      p(`> dispatch-table entry, because the state transitions are dispatched by a mechanism`);
+      p(`> this reader does not follow. Verdicts on those paths rest on reachability rather`);
+      p(`> than on a mapped action, and that is a weaker claim.`);
+      p();
+    }
+  }
+  p(`Any other file holding SQL appears here automatically, so a new one cannot arrive`);
+  p(`quietly.`);
   p();
   p(`The question is not "does this file contain INSERT". It is **can production domain`);
   p(`state reach this SQL without first entering a governed action?** Domain tables come`);
@@ -365,8 +404,11 @@ export function renderMarkdown(m) {
     const heavy = Object.entries(blast).sort((a, b) => total(b[1]) - total(a[1])).slice(0, 5);
     p(`### Blast-radius coverage`);
     p();
-    p(`**${withBlast} of ${rows.length} files** carry a blast radius in \`atlas.json\`. The rest have`);
-    p(`no dependents, no dependencies and no wires, so there is nothing to report for them.`);
+    p("**" + withBlast + " of " + rows.length + " files that have a reachability verdict** carry a blast radius.");
+    p(`The rest have no dependents, no dependencies and no wires. But the scanned universe is`);
+    p("**" + (m.analyzerCoverage ?? []).length + " files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and");
+    p("`qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius");
+    p("either. \"What breaks if I change a QA gate?\" is **not answerable here**, and the " + ((m.analyzerCoverage ?? []).length - rows.length) + " files in that position are a stated limit, not an omission.");
     p();
     p(`Most-depended-on files — change these last:`);
     p();
@@ -424,6 +466,57 @@ export function renderMarkdown(m) {
       p(`> floor. The gaps above are in files that carry no confirmed finding — they still`);
       p(`> prevent a clean architectural result, because a gap cannot be called compliant.`);
     }
+    p();
+  }
+
+  // ── 4b2. per-analyzer coverage (contract H) ───────────────────────────────
+  // This matrix existed only in atlas.json. The brief carried the SUPERSEDED regex
+  // coverage model instead, so the section an agent reads described one dimension over
+  // 427 files while the real matrix — eight dimensions over 539 — was invisible.
+  {
+    const T = m.analyzerTally ?? {};
+    const N = (m.analyzerCoverage ?? []).length;
+    p(`## Per-analyzer coverage (${N} files)`);
+    p();
+    p(`Every scanned file gets a cell from every analyzer. A file absent from an analysis`);
+    p(`cannot look green, and **every non-clean cell names its blocker** — that is the`);
+    p(`mechanism behind the invariant below, not a promise about it.`);
+    p();
+    p(`| Analyzer | indexed | partial | dynamic | unsupported | n/a |`);
+    p(`|---|---:|---:|---:|---:|---:|`);
+    for (const [an, states] of Object.entries(T))
+      p(`| \`${an}\` | ${states.indexed ?? 0} | ${states.partial ?? 0} | ${states.dynamic ?? 0} | ${states.unsupported ?? 0} | ${states["not-applicable"] ?? 0} |`);
+    p();
+    p(`**Unexplained cells: ${m.stats?.unexplainedCoverage ?? "?"}.** \`unsupported\` is not a`);
+    p(`failure — \`reach: unsupported\` on ${T.reach?.unsupported ?? 0} files means those trees are`);
+    p(`import ANCHORS whose own reachability is deliberately not evaluated, and it says so.`);
+    p(`\`packaging: unsupported\` on ${T.packaging?.unsupported ?? 0} files means the packaging`);
+    p(`manifests are not parsed, so ship status is genuinely unproven rather than assumed.`);
+    p();
+    const dec = m.stats?.decisions ?? {};
+    p(`### The invariant`);
+    p();
+    p(`**Unexplained undecided: ${m.stats?.unexplainedUndecided ?? "?"}.** This is the contract's`);
+    p(`target, and it is *not* the coverage number above — coverage counts analyzer cells,`);
+    p(`this counts findings nobody has ruled on that also fail to say why. Of the`);
+    p(`${dec.undecided ?? 0} undecided findings, each carries a blocker:`);
+    p();
+    p(`| Blocker | Findings | Meaning |`);
+    p(`|---|---:|---|`);
+    const B = m.stats?.blockers ?? {};
+    const MEAN = {
+      "founder-decision": "the code cannot say which answer is right — this needs your intent",
+      "package-proof": "a packaged or dynamically-loaded caller must be ruled out first",
+      "ast-coverage": "the analyzer could not resolve this statically",
+      "runtime-proof": "only observing the running app can settle it",
+      "product-defect": "a real runtime defect: fix the code and the finding goes away",
+    };
+    for (const [b, n] of Object.entries(B))
+      p(`| \`${b}\` | ${n} | ${MEAN[b] ?? "—"} |`);
+    p();
+    p(`**${B["founder-decision"] ?? 0} of ${dec.undecided ?? 0} are waiting on you, not on the tool.**`);
+    p(`Zero unknowns is not the goal and never was: forcing that number down buys fake`);
+    p(`certainty. Zero *unexplained* is the goal, and it is met.`);
     p();
   }
 

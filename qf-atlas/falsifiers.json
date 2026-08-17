@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 68,
-  "total": 68,
+  "passed": 74,
+  "total": 74,
   "results": [
     {
       "n": 1,
@@ -410,6 +410,42 @@
       "name": "every canonical dimension reaches Markdown and HTML",
       "passed": true,
       "detail": "5 dimensions present in JSON, Markdown and HTML"
+    },
+    {
+      "n": 69,
+      "name": "a governed handler is not called cheats by a name-walk",
+      "passed": true,
+      "detail": "create_task hop4=write-door/live; 0 cheats verdict(s) with no confirmed violation behind them"
+    },
+    {
+      "n": 70,
+      "name": "every undecided finding names its blocker",
+      "passed": true,
+      "detail": "46 undecided, all blockered: {\"founder-decision\":27,\"ast-coverage\":2,\"package-proof\":17}"
+    },
+    {
+      "n": 71,
+      "name": "no output tells anyone something is safe to delete",
+      "passed": true,
+      "detail": "absent from all three outputs"
+    },
+    {
+      "n": 72,
+      "name": "the coverage roll-up accounts for every analyzer",
+      "passed": true,
+      "detail": "539 rows, no green roll-up hides a gap"
+    },
+    {
+      "n": 73,
+      "name": "the push coverage dimension is measured, not copied",
+      "passed": true,
+      "detail": "264 of 539 rows differ between ipcPush and ipcRequest"
+    },
+    {
+      "n": 74,
+      "name": "hop 4 and persistence answer to the same derived door",
+      "passed": true,
+      "detail": "hop4UsesDerivedDoor=true briefPrintsRetiredList=false"
     }
   ]
 }

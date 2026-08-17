@@ -51,10 +51,13 @@ it stops, an `×` marks the break. That is where work dies.
 
 Two separate lists, because they call for different actions:
 
-- **Strip candidates** — dead, unreached and unused wires. Safe to delete.
+- **Strip candidates** — dead, unreached and unused wires. **Removal candidates, not permission.** Static non-reachability never authorizes a cut on its own: rule out a packaged or dynamically-loaded caller first, and record a verdict in decisions.json.
 - **Write-door violations** — files holding SQL outside the declared write door
-  (`execute.ts`, `create.ts`, `insert.ts`, `events.ts`, `db.ts`, `upgrade.ts`,
-  plus generated schema SQL). These are governance findings, not cleanup: a
+  (DERIVED from the Kernel's own dispatch structure — see `writeDoor` in atlas.json —
+  plus generated schema SQL). The hand-typed six-file list this README used to print
+  was retired: the derivation disagreed with it on eight of ten files, and four of its
+  six entries implement no dispatched action at all. These are governance findings,
+  not cleanup: a
   violation is code that works but breaks `START_HERE §1`. Scoped `product` vs
   `qa` so a gate seeding fixture SQL cannot inflate the real number.
 

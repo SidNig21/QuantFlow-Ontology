@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 06741de` on 2026-08-17 by
+> Generated from `atlas-strip-1 @ 4bf7e1f` on 2026-08-17 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -33,16 +33,16 @@ and it can die or cheat at any one of them:
 flowchart TD
   R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
   P["<b>2 · preload</b><br/>3 bridges · 127 methods<br/>113 of them called"]
-  M["<b>3 · main</b><br/>123 IPC channels<br/>105 live · 13 unused · 0 dead"]
+  M["<b>3 · main</b><br/>123 IPC channels<br/>106 live · 13 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
 
   R --> P --> M --> H
-  H -->|"write-door 14"| E
+  H -->|"write-door 15"| E
   E --> DB
   X["<b>raw SQL</b><br/>never enters a<br/>governed action"]
-  H -->|"cheats 6"| X
+  H -->|"cheats 5"| X
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 9"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
@@ -82,8 +82,8 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 14 |
-| `cheats` | reaches SQL that never passes through `execute()` | 6 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
+| `cheats` | reaches SQL that never passes through `execute()` | 5 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
 | `read-only` | no mutation seen | 94 |
@@ -165,12 +165,12 @@ badge is not a score:
 | `R` runtime | the loop was observed executing |
 | `F` founder | the founder has confirmed it does its job |
 
-**`S` alone is not `SGRF`.** 7 of 11 loops are statically connected; 0 carry all four tiers.
+**`S` alone is not `SGRF`.** 8 of 11 loops are statically connected; 0 carry all four tiers.
 
 | Loop | Badge | Static | Gate | Runtime | Founder |
 |---|---|---|---|---|---|
 | **ASK** | `SG` | connected | covered | unproven | unproven |
-| **PLAN** | `G` | broken | covered | unproven | unproven |
+| **PLAN** | `SG` | connected | covered | unproven | unproven |
 | **RECRUIT** | `SG` | connected | covered | unproven | unproven |
 | **ASSIGN** | `G` | broken | covered | unproven | unproven |
 | **WATCH** | `SG` | connected | covered | unproven | unproven |
@@ -184,12 +184,6 @@ badge is not a score:
 Runtime and founder read `unproven` on every loop, and that is the honest state: no
 runtime trace and no founder-confirmation record exist in this repo. **Unproven with a
 stated reason is not a gap** — it is the difference between an unknown and a lie.
-
-### PLAN — broken
-
-The question is decomposed into Tasks the Kernel records.
-
-- `qf:tasks:create` — **cheats**: reaches SQL the hop-4 walker places outside execute()
 
 ### ASSIGN — broken
 
@@ -304,9 +298,31 @@ _works end to end, but nothing calls it yet_
 
 ## Write-door violations
 
-The declared write door is `execute.ts`, `create.ts`, `insert.ts`, `events.ts`,
-`db.ts`, `upgrade.ts`, plus generated schema SQL. Any other file holding SQL appears
-here automatically, so a new one cannot arrive quietly.
+The governed write door is **derived from the Kernel's own dispatch structure**, not
+from a list of filenames. `defineAction` names the governed verbs, the dispatch table
+maps each verb to an implementation, and the files declaring those implementations are
+the door. Generated schema SQL is included.
+
+| | |
+|---|---|
+| derivation state | `partial` |
+| dispatcher found at | `packages/qf-kernel/src/execute.ts:459` |
+| actions mapped | 17 of 41 |
+| door files | `create.ts`, `deterministic-execution.ts`, `execute.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts` |
+
+**The retired hand-written allowlist disagreed with the Kernel on 8 files.**
+Trusted by the old list but supported by no dispatched action, so they no longer get a
+blanket pass: `insert.ts`, `events.ts`, `db.ts`, `upgrade.ts`.
+Implement a dispatched action but were never on the list, so their SQL was being
+adjudicated as a possible breach: `deterministic-execution.ts`, `market-context.ts`, `market-ingest.ts`, `pipeline.ts`.
+
+> The derivation is **partial**: 24 of 41 schema actions have no
+> dispatch-table entry, because the state transitions are dispatched by a mechanism
+> this reader does not follow. Verdicts on those paths rest on reachability rather
+> than on a mapped action, and that is a weaker claim.
+
+Any other file holding SQL appears here automatically, so a new one cannot arrive
+quietly.
 
 The question is not "does this file contain INSERT". It is **can production domain
 state reach this SQL without first entering a governed action?** Domain tables come
@@ -357,8 +373,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**232 of 234 files** carry a blast radius in `atlas.json`. The rest have
-no dependents, no dependencies and no wires, so there is nothing to report for them.
+**232 of 234 files that have a reachability verdict** carry a blast radius.
+The rest have no dependents, no dependencies and no wires. But the scanned universe is
+**539 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+`qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 305 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -405,6 +424,46 @@ prevent a clean architectural result.
 > confirmed finding was fully read, so the violation count is a total rather than a
 > floor. The gaps above are in files that carry no confirmed finding — they still
 > prevent a clean architectural result, because a gap cannot be called compliant.
+
+## Per-analyzer coverage (539 files)
+
+Every scanned file gets a cell from every analyzer. A file absent from an analysis
+cannot look green, and **every non-clean cell names its blocker** — that is the
+mechanism behind the invariant below, not a promise about it.
+
+| Analyzer | indexed | partial | dynamic | unsupported | n/a |
+|---|---:|---:|---:|---:|---:|
+| `imports` | 535 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 271 | 0 | 4 | 0 | 264 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 528 |
+| `persistence` | 23 | 24 | 0 | 0 | 492 |
+| `lifetime` | 6 | 60 | 0 | 0 | 473 |
+| `packaging` | 226 | 0 | 0 | 123 | 190 |
+| `ownership` | 20 | 0 | 0 | 347 | 172 |
+| `reach` | 234 | 0 | 0 | 305 | 0 |
+
+**Unexplained cells: 0.** `unsupported` is not a
+failure — `reach: unsupported` on 305 files means those trees are
+import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
+`packaging: unsupported` on 123 files means the packaging
+manifests are not parsed, so ship status is genuinely unproven rather than assumed.
+
+### The invariant
+
+**Unexplained undecided: 0.** This is the contract's
+target, and it is *not* the coverage number above — coverage counts analyzer cells,
+this counts findings nobody has ruled on that also fail to say why. Of the
+46 undecided findings, each carries a blocker:
+
+| Blocker | Findings | Meaning |
+|---|---:|---|
+| `founder-decision` | 27 | the code cannot say which answer is right — this needs your intent |
+| `ast-coverage` | 2 | the analyzer could not resolve this statically |
+| `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
+
+**27 of 46 are waiting on you, not on the tool.**
+Zero unknowns is not the goal and never was: forcing that number down buys fake
+certainty. Zero *unexplained* is the goal, and it is met.
 
 ## Protocol variants (2)
 

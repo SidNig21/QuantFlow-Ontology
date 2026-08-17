@@ -12,7 +12,18 @@
 //   qf:research:submitQuestion → kernelExecute → execute(getKernelDb(), …)
 //   qf:review:*               → kernelRequestGovernedReview → raw DML
 
-import { insideWriteDoor } from "./extract.mjs";
+// The DERIVED door, injected. This module used to import `insideWriteDoor`, the
+// predicate over the hand-typed allowlist, so hop 4 and the persistence classifier were
+// answering to two different authorities — and the brief printed the one the derivation
+// had already rejected. There is no fallback: an unset door throws.
+let DERIVED_DOOR = null;
+export function setHop4Door(d) { DERIVED_DOOR = d; }
+const insideWriteDoor = (p) => {
+  if (!DERIVED_DOOR) throw new Error(
+    "qf-atlas/hop4.mjs: no derived write door was set. Refusing to classify hop 4 "
+    + "against a hand-typed filename allowlist — call setHop4Door() first.");
+  return DERIVED_DOOR.isDoor(p);
+};
 import { sqlSites } from "./classify.mjs";
 
 const DOOR = new Set(["execute", "executeCommand"]);

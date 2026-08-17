@@ -176,29 +176,3 @@ export function makeDoor(derivation) {
     files: [...files],
   };
 }
-
-/**
- * Is a bare `execute(` call the governed door, or an unrelated method that happens to
- * be named execute? The old check matched the identifier anywhere, so ANY `x.execute()`
- * earned write-door credit. It was correct only by luck: the one match in the app is
- * an injected `deps.execute`, which really is the Kernel's. A `db.execute()` or
- * `queue.execute()` would have been credited identically.
- *
- * Uses AST call facts: a call earns credit when it is a bare `execute(...)` in a file
- * that imports the dispatcher, or a property call whose receiver is a known injected
- * dependency name.
- */
-export function executeCallIsGoverned({ ast, path, dispatcherFiles, injectedNames = ["deps", "kernel", "ctx"] }) {
-  const importsDispatcher = (ast.imports ?? []).some((i) =>
-    dispatcherFiles.some((d) => i.spec.includes(d.file.replace(/^.*\//, "").replace(/\.ts$/, ""))));
-  const hits = [];
-  for (const c of ast.calls ?? []) {
-    if (c.name !== "execute" && c.name !== "executeCommand") continue;
-    hits.push({ line: c.line, enclosing: c.enclosing,
-      credited: importsDispatcher || injectedNames.length > 0,
-      why: importsDispatcher
-        ? "this file imports the Kernel dispatcher"
-        : "receiver is an injected dependency; credited but not proven without type resolution" });
-  }
-  return { path, importsDispatcher, hits };
-}

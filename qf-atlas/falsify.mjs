@@ -1179,7 +1179,10 @@ record(68, "every canonical dimension reaches Markdown and HTML", ...(() => {
   const DIMS = [
     ["north star loops", "The product loop", "northStar"],
     ["responsibility ownership", "Who owns what", "ownership"],
-    ["per-analyzer coverage", "could not read", "analyzerTally"],
+    // This asserted `md.includes("could not read")` — the header of the SUPERSEDED regex
+    // coverage model — so it passed while the real matrix was absent from the brief. A
+    // parity check that matches the wrong artifact is worse than no parity check.
+    ["per-analyzer coverage", "## Per-analyzer coverage", "analyzerTally"],
     ["push direction", "push direction", "push"],
     ["blast radius", "Blast-radius coverage", "blastRadius"],
   ];
@@ -1190,6 +1193,92 @@ record(68, "every canonical dimension reaches Markdown and HTML", ...(() => {
   }
   return [gaps.length === 0,
     gaps.length ? gaps.join("; ") : `${DIMS.length} dimensions present in JSON, Markdown and HTML`];
+})());
+
+// ── FROM THE INDEPENDENT READER ────────────────────────────────────────────
+// Each of these exists because a fresh Reader found the defect it guards, and in every
+// case a green falsifier was already claiming the opposite.
+
+// 69 · Reader #1. A handler that reaches the governed door is not a breach merely because
+// a 5-deep NAME walk also touched some compliant SQL. `qf:tasks:create` calls
+// kernelExecute("create_task") at ipc-kernel.ts:483 and was stamped `cheats` — with
+// `viaDoor: kernelExecute` recorded alongside — because the walk reached an idempotent
+// schema-ensure. That made PLAN, ASSIGN and REVIEW read broken and would have sent an
+// agent to "repair" the Kernel's own task-creation path. Falsifier 5 could not see it: it
+// only inspects persistence rows and never touches hop 4.
+record(69, "a governed handler is not called cheats by a name-walk", ...(() => {
+  const w = before.wires.find((x) => x.channel === "qf:tasks:create");
+  if (!w) return [false, "qf:tasks:create is not in the model"];
+  const backed = (kind, viaDml, dmlFile) => kind !== "cheats" || (before.persistence ?? [])
+    .some((p) => p.governance === "violation" && (p.fn === viaDml || p.evidence[0].file === dmlFile));
+  const unbacked = before.wires.filter((x) => !backed(x.hop4?.kind, x.hop4?.viaDml, x.hop4?.dmlFile));
+  return [w.hop4.kind === "write-door" && w.status === "live" && unbacked.length === 0,
+    `create_task hop4=${w.hop4.kind}/${w.status}; ${unbacked.length} cheats verdict(s) with no confirmed violation behind them`];
+})());
+
+// 70 · Reader #3. THE CONTRACT'S INVARIANT, and it is not the coverage one. Only push and
+// ownership findings carried a reason, so 38 of 46 undecided rows said nothing — while
+// the ratchet printed `unexplained coverage: 0`, which counts analyzer CELLS. A green
+// number was answering a different question from the one the contract asks.
+record(70, "every undecided finding names its blocker", ...(() => {
+  const u = (before.decisions ?? []).filter((d) => d.verdict === "undecided");
+  if (!u.length) return [false, "no undecided findings to check"];
+  const silent = u.filter((d) => !d.blocker || !d.reason);
+  return [silent.length === 0 && (before.stats?.unexplainedUndecided ?? -1) === 0,
+    silent.length ? `${silent.length} of ${u.length} undecided have no blocker, e.g. ${silent[0].id}`
+      : `${u.length} undecided, all blockered: ${JSON.stringify(before.stats.blockers)}`];
+})());
+
+// 71 · Reader #5. "Safe to delete" may not survive anywhere. It sat in README.md — the
+// tool's front door — and in the canonical model's own `advice` string, directly
+// contradicting the brief's "do NOT delete on sight". Falsifier 20 passed by grepping
+// ATLAS.md for one literal that nothing emits.
+record(71, "no output tells anyone something is safe to delete", ...(() => {
+  const hay = [
+    ["atlas.json", JSON.stringify(before)],
+    ["ATLAS.md", readFileSync(join(REPO, "qf-atlas", "ATLAS.md"), "utf8")],
+    ["README.md", readFileSync(join(REPO, "qf-atlas", "README.md"), "utf8")],
+  ];
+  const hits = hay.filter(([, t]) => /safe to delete/i.test(t)).map(([n]) => n);
+  return [hits.length === 0,
+    hits.length ? `"safe to delete" appears in ${hits.join(", ")}` : "absent from all three outputs"];
+})());
+
+// 72 · Reader #6. `worst` omitted `reach`, so 59 files reported `indexed` while their
+// reachability had never been evaluated. A roll-up that ignores a dimension is a green
+// light over an unmeasured one.
+record(72, "the coverage roll-up accounts for every analyzer", ...(() => {
+  const CELLS = ["imports", "ipcRequest", "ipcPush", "persistence", "lifetime", "packaging", "ownership", "reach"];
+  const bad = (before.analyzerCoverage ?? []).filter((r) =>
+    (r.worst === "indexed" || r.worst === "not-applicable")
+    && CELLS.some((k) => r[k] === "partial" || r[k] === "unsupported" || r[k] === "dynamic"));
+  return [bad.length === 0,
+    bad.length ? `${bad.length} row(s) roll up to green over a non-clean cell, e.g. ${bad[0].path}`
+      : `${(before.analyzerCoverage ?? []).length} rows, no green roll-up hides a gap`];
+})());
+
+// 73 · Reader #12. `ipcPush` was assigned the identical state and reason as `ipcRequest`:
+// two reported dimensions, one measurement. Falsifier 49 counted cells and could not see
+// that one of them was a copy.
+record(73, "the push coverage dimension is measured, not copied", ...(() => {
+  const rows = before.analyzerCoverage ?? [];
+  const differ = rows.filter((r) => r.ipcPush !== r.ipcRequest).length;
+  return [differ > 0,
+    differ ? `${differ} of ${rows.length} rows differ between ipcPush and ipcRequest`
+      : "ipcPush is identical to ipcRequest on every row — it is a copy, not a measurement"];
+})());
+
+// 74 · Reader #2. Two competing write doors were live at once: classify.mjs used the
+// derived one while hop4.mjs still imported the hand-typed allowlist, and the brief
+// printed the list the derivation had already rejected.
+record(74, "hop 4 and persistence answer to the same derived door", ...(() => {
+  const h = readFileSync(join(REPO, "qf-atlas", "hop4.mjs"), "utf8");
+  const md = readFileSync(join(REPO, "qf-atlas", "ATLAS.md"), "utf8");
+  const injected = h.includes("setHop4Door") && !h.includes('insideWriteDoor } from "./extract.mjs"');
+  // The retired allowlist must not be presented as the door anywhere in the brief.
+  const printsRetired = /declared write door is `execute\.ts`, `create\.ts`, `insert\.ts`/.test(md);
+  return [injected && !printsRetired,
+    `hop4UsesDerivedDoor=${injected} briefPrintsRetiredList=${printsRetired}`];
 })());
 
 // restore the committed model

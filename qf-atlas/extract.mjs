@@ -531,7 +531,7 @@ export function stripCandidates(wires, facts) {
     strip.push({
       kind: "unreached-ipc",
       bucket: "safe-leftover",
-      advice: "Safe to delete. Nothing can reach it today.",
+      advice: "REMOVAL-CANDIDATE. Nothing can reach it today, but static non-reachability is not permission: rule out a packaged or dynamically-loaded caller first.",
       what: w.channel,
       where: `${w.registeredAt.file}:${w.registeredAt.line}`,
       why: "Registered in main; nothing in preload calls it. The renderer cannot reach this handler.",
