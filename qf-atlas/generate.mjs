@@ -17,6 +17,8 @@ import { buildLoops } from "./loops.mjs";
 import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 import { reachability, blastRadius } from "./reach.mjs";
+import { analyzeFile, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
+import { coverageMatrix } from "./coverage-matrix.mjs";
 import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
 import { readdirSync } from "node:fs";
 
@@ -347,6 +349,40 @@ const reachOf = new Map(reach.rows.map((r) => [r.path, r.reach]));
 // so "what breaks if I change this?" was answerable for 1 of 234 files while the
 // data for all 234 sat in memory. Withholding it because a file is not red is
 // backwards: the question is asked BEFORE the change, when nothing is red yet.
+// ─── AST — syntax facts from the TypeScript compiler (contract section H) ────
+// Regex may be supplementary evidence and may never create a high-confidence red on
+// its own. Two immediate proofs the parser fixes real damage: kernel.ts reports 0
+// process spawns where the regex claimed 15, and governed-review.ts — the file whose
+// coverage gap made the violation count a FLOOR rather than a total — resolves all 28
+// of its SQL sites to an enclosing symbol where the regex indexer managed 16 of 27.
+const astOf = new Map();
+for (const p of walk(REPO, [], true).map((f) => rel(f)))
+  astOf.set(p, analyzeFile(p, read(join(REPO, p))));
+if (!tsAvailable())
+  console.warn(`qf-atlas: WARNING — TypeScript unavailable (${tsUnavailableReason()}). `
+    + "Every AST-backed fact degrades to `unsupported` with that reason attached; "
+    + "nothing silently falls back to regex confidence.");
+
+// PER-ANALYZER COVERAGE for every scanned file (contract section H). The previous
+// coverage model answered one question — could the SQL indexer read this file — for
+// 164 of 427 files and called the other 263 `out-of-scope`. Nothing recorded whether
+// a file's imports resolved, whether its IPC was read, whether its process lifetime
+// was examined, or whether anyone had asked who owns it. Silence was identical to
+// clean. Every non-clean cell now carries a named reason, which is the mechanism
+// behind "unexplained undecided = 0" rather than "unknown = 0".
+const reachSet = new Map(reach.rows.map((r) => [r.path, r.reach]));
+const lifetimeSet = new Map(lifetime.map((l) => [l.module, l]));
+const buildIncluded = new Set([
+  ...codeEntries, ...htmlEntries,
+  ...reach.rows.filter((r) => r.reach !== "unreachable" && r.reach !== "test-only").map((r) => r.path),
+]);
+const matrix = coverageMatrix({
+  files: walk(REPO, [], true).map((f) => rel(f)).filter((f) => layerOf(f) !== null),
+  astOf, reachOf: reachSet, lifetimeOf: lifetimeSet, buildIncluded,
+  ownershipOf: null,   // section F not implemented yet — every product file reports
+                       // `ownership: unsupported` with that stated as the reason.
+});
+
 const loops = buildLoops(wires, lifetime);
 
 const wiresTouching = (p) => wires.filter((w) =>
@@ -404,6 +440,9 @@ const model = {
     brokenBridgeCalls: brokenBridgeCalls.length,
     bridgeBlindSpots: bridgeBlindSpots.length,
     pushChannels: push.stats,
+    ast: { available: tsAvailable(), version: tsVersion, files: astOf.size },
+    coverageFiles: matrix.files,
+    unexplainedCoverage: matrix.unexplained.length,
     stripCandidates: strip.length,
     // Canonical: confirmed governance violations from the semantic classifier.
     violations: persistence.filter((p) => p.governance === "violation").length,
@@ -426,6 +465,9 @@ const model = {
   })),
   loops,
   coverage: coverageRows,
+  analyzerCoverage: matrix.rows,
+  analyzerTally: matrix.tally,
+  unexplainedCoverage: matrix.unexplained,
   reach: reach.rows,
   entrypoints: reach.entries,
   unbuiltWindows,

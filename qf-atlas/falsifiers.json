@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-17",
-  "passed": 47,
-  "total": 47,
+  "passed": 50,
+  "total": 50,
   "results": [
     {
       "n": 1,
@@ -284,6 +284,24 @@
       "name": "a fixed-channel helper's payload strings are not channels",
       "passed": true,
       "detail": "0 payload strings as channels; canvas:rpc-request present as live"
+    },
+    {
+      "n": 48,
+      "name": "AST resolves the facts regex got wrong",
+      "passed": true,
+      "detail": "ts=5.9.3 kernel.ts lifetime=not-applicable governed-review persistence=indexed"
+    },
+    {
+      "n": 49,
+      "name": "every scanned file has a cell for every analyzer",
+      "passed": true,
+      "detail": "539 files × 8 analyzers, no empty cells"
+    },
+    {
+      "n": 50,
+      "name": "every non-clean coverage cell carries a named reason",
+      "passed": true,
+      "detail": "unexplained=0; every partial/unsupported/dynamic cell names its blocker"
     }
   ]
 }

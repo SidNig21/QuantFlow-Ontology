@@ -792,6 +792,61 @@ record(47, "a fixed-channel helper's payload strings are not channels", ...(() =
       : `0 payload strings as channels; canvas:rpc-request present as ${real?.status}`];
 })());
 
+// ── AST + COVERAGE — contract section H ────────────────────────────────────
+
+// 48 · Red-critical facts come from the parser, not from text. Two facts the regex
+// got demonstrably wrong: bare `exec` matched `regex.exec(text)` and reported 15
+// process spawns in kernel.ts, which starts none; and the brace-matching function
+// indexer resolved 16 of 27 SQL sites in governed-review.ts, which is why the
+// confirmed-violation count was a FLOOR rather than a total.
+record(48, "AST resolves the facts regex got wrong", ...(() => {
+  const st = before.stats?.ast;
+  if (!st?.available) return [false, `TypeScript unavailable: ${JSON.stringify(st)}`];
+  const cov = new Map((before.analyzerCoverage ?? []).map((r) => [r.path, r]));
+  const kernel = cov.get("collab-electron/src/main/kernel.ts");
+  const gr = cov.get("packages/qf-kernel/src/governed-review.ts");
+  if (!kernel || !gr) return [false, "probe files absent from the coverage matrix"];
+  // kernel.ts starts no long-lived child, so lifetime must be not-applicable.
+  const kernelClean = kernel.lifetime === "not-applicable";
+  // governed-review.ts holds real SQL, so persistence must be adjudicated — indexed
+  // or partial with a reason — never absent.
+  const grSeen = gr.persistence === "indexed" || gr.persistence === "partial";
+  return [kernelClean && grSeen,
+    `ts=${st.version} kernel.ts lifetime=${kernel.lifetime} governed-review persistence=${gr.persistence}`];
+})());
+
+// 49 · No file may silently disappear. Every scanned file gets a cell for every
+// analyzer; a file absent from an analysis cannot look green.
+record(49, "every scanned file has a cell for every analyzer", ...(() => {
+  const rows = before.analyzerCoverage ?? [];
+  const analyzers = ["imports", "ipcRequest", "ipcPush", "persistence", "lifetime", "packaging", "ownership", "reach"];
+  if (rows.length < 400) return [false, `only ${rows.length} files in the coverage matrix`];
+  const holes = rows.filter((r) => analyzers.some((k) => !r[k]));
+  return [holes.length === 0,
+    holes.length ? `${holes.length} file(s) missing a cell, e.g. ${holes[0].path}`
+      : `${rows.length} files × ${analyzers.length} analyzers, no empty cells`];
+})());
+
+// 50 · THE INVARIANT: unexplained undecided = 0, NOT unknown = 0. Forcing unknowns to
+// zero buys fake certainty; the honest requirement is that every unknown states why
+// it is unknown. A `partial` or `unsupported` cell with no reason is a bug.
+record(50, "every non-clean coverage cell carries a named reason", ...(() => {
+  const rows = before.analyzerCoverage ?? [];
+  // Only real analyzer cells. `worst` is a derived roll-up of the cells below it and
+  // carries no reason of its own — including it made this check report 480 failures
+  // against data that was in fact fully explained.
+  const CELLS = ["imports", "ipcRequest", "ipcPush", "persistence", "lifetime",
+    "packaging", "ownership", "reach"];
+  const bad = [];
+  for (const r of rows)
+    for (const k of CELLS)
+      if ((r[k] === "partial" || r[k] === "unsupported" || r[k] === "dynamic") && !r.reasons?.[k])
+        bad.push(`${r.path}:${k}`);
+  return [bad.length === 0 && (before.stats?.unexplainedCoverage ?? -1) === 0,
+    bad.length ? `${bad.length} unexplained cell(s), e.g. ${bad[0]}`
+      : `unexplained=${before.stats.unexplainedCoverage}; every partial/unsupported/dynamic cell names its blocker`];
+})());
+
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
 
