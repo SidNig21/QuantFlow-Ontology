@@ -355,6 +355,16 @@ export function addFourthHop(wires, handlerFiles, indexFiles, read, relOf) {
     const seed = seeds.get(w.channel);
     if (!seed) { w.hop4 = { kind: "unknown" }; continue; }
     w.hop4 = classify(seed.calls, index, 5, seed);
+    // WIRE DISCOVERY ONLY. `handlerFile` and `seedCalls` are the regex walk's honest
+    // contribution: which file registers this channel and which identifiers its body
+    // calls. generate.mjs re-resolves those names against the AST index under a module
+    // edge and REPLACES `dmlAll` with the result. Text may find the handler; it may not
+    // decide which SQL function the handler reaches, because that decides what the wire
+    // cites as a breach.
+    w.hop4.handlerFile = seed.file;
+    w.hop4.seedCalls = [...seed.calls].sort();
+    w.hop4.inlineDml = Boolean(seed.dml);
+    w.hop4.attribution = "regex-provisional";
     w.hops.push({
       layer: "kernel",
       present: w.hop4.kind !== "cheats",

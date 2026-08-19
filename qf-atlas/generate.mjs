@@ -17,7 +17,7 @@ import { buildLoops } from "./loops.mjs";
 import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage, setWriteDoor } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 import { reachability, blastRadius } from "./reach.mjs";
-import { analyzeFile, astReachProof, astFunctionIndex, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
+import { analyzeFile, astReachProof, astFunctionIndex, astCallClosure, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
 import { coverageMatrix } from "./coverage-matrix.mjs";
 import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
 import { detectOwnership } from "./ownership.mjs";
@@ -174,31 +174,32 @@ const persistence = classifyPersistence({
   isAppOrigin: (f) => f.startsWith("collab-electron/src/"),
 });
 
-// ─── RECONCILE HOP 4 AGAINST HARD-RED AUTHORITY ──────────────────────────────
-// hop4 walks a 5-deep NAME-based call closure and stamps `cheats` whenever that walk
-// touches any SQL-bearing function. It cannot grade severity, and the label it produces
-// is the loudest thing in the whole report: ATLAS.md draws it as "raw SQL — never enters
-// a governed action", the diagram runs a dotted edge to Kernel truth captioned
-// "ungoverned — this is the breach", and northstar.mjs breaks the loop on it outright.
+// ─── RE-DERIVE HOP 4 FROM THE AST, THEN GRADE IT AGAINST HARD-RED AUTHORITY ──
 //
-// Reconciling against `governance === "violation"` was not enough. That predicate is true
-// of 16 rows and 13 of them are MEDIUM: `CREATE TABLE IF NOT EXISTS qf_review_*`, review
-// bookkeeping that is a real observation — "this store is not in the golden schema" — and
-// emphatically not "domain truth was mutated outside a governed action". Three of the five
-// cheats wires rested entirely on those, reaching `ensureGovernedReviewSchema`, an
-// idempotent schema guard, while carrying the report's strongest language and breaking
-// three loops. An agent reading that would go and "repair" a working schema guard.
+// Two independent Verifier defects with one root: hop 4 decided function identity by
+// TEXT while the persistence classifier decided it by PARSE, and the previous commit
+// wired the label to the parse-side verdict without fixing the text-side lookup.
 //
-// THE RULE: a wire keeps `cheats` only when a function it actually reaches is backed by a
-// CURRENT HARD RED — the same class-specific predicate the ratchet blocks on (domain-truth
-// + violation + high + a corroborated AST reach proof). Matching is on the exact
-// (file, function) pair, never on file membership: governed-review.ts holds both real
-// bypasses and compliant helpers, so a compliant function must not inherit a breach
-// verdict by living next door.
+//   FALSE RED   `indexFunctions` keys by name across the whole repo with no module
+//               edge. An SQL-free helper named `createReviewTask` in main/ resolved to
+//               the KERNEL's `createReviewTask`, so its wire was stamped `cheats`,
+//               `present:false`, and cited two real hard-red ids — for a file
+//               containing no SQL at all. Falsifiers 77 and 83 passed throughout:
+//               they assert the cited id is red, never that the wire reaches it.
+//   RED HIDES   `RE_FN` matches `function NAME(` and `const NAME =` and nothing else,
+//               so a class method never entered the index. A proven, corroborated,
+//               ratchet-blocking `UPDATE task` on a live wire rendered as
+//               `read-only — mutates nothing`.
 //
-// Medium evidence does not disappear. It moves to `hop4.ungoverned` carrying its finding
-// ids, confidence and persistence class, stays in the ledger, stays decidable, and simply
-// stops being the thing that stops the world.
+// So the SQL reach is re-derived here over `fnIndex` (the same AST index persistence
+// uses, which resolves class and object-literal methods) with the same module edge the
+// reach proof uses. The regex walk keeps `viaDoor` and `viaDisk` — neither confers
+// hard-red authority — and supplies the handler file and its called identifiers, which
+// is wire discovery, not adjudication.
+//
+// EVERY wire is re-graded, not only the ones the regex walk called `cheats`. Scanning
+// only the provisional cheats set is precisely why the class-method red stayed
+// invisible: it was never in the set to begin with.
 {
   const byId = new Map(persistence.map((p) => [p.id, p]));
   const key = (file, fn) => file + "::" + fn;
@@ -217,65 +218,121 @@ const persistence = classifyPersistence({
     if (!amberAt.has(k)) amberAt.set(k, []);
     amberAt.get(k).push(p);
   }
-  const unknownFn = new Set(persistence.filter((p) => p.governance === "unknown").map((p) => p.fn));
+  const unknownAt = new Map();
+  for (const p of persistence) {
+    if (p.governance !== "unknown") continue;
+    const k = key(p.evidence[0].file, p.fn);
+    if (!unknownAt.has(k)) unknownAt.set(k, []);
+    unknownAt.get(k).push(p);
+  }
+  // Inline SQL in a handler body, attributed by the PARSER rather than recorded as the
+  // unciteable literal `(inline)`. The regex walk says which handler bodies contain SQL;
+  // the AST says which named symbol holds it, which is the only form that can be matched
+  // against a finding.
+  const sqlBearingIn = new Map();
+  for (const rec of fnIndex.values()) {
+    if (!rec.dml || !rec.sqlSites?.length) continue;
+    if (!sqlBearingIn.has(rec.file)) sqlBearingIn.set(rec.file, []);
+    sqlBearingIn.get(rec.file).push(rec);
+  }
 
-  let downgraded = 0;
+  let downgraded = 0, promoted = 0, falseAttribution = 0;
   const audit = [];
   for (const w of wires) {
-    if (w.hop4?.kind !== "cheats") continue;
-    // Every SQL function the walk reached, not the arbitrary first one it recorded.
-    const reached = w.hop4.dmlAll?.length ? w.hop4.dmlAll
-      : w.hop4.viaDml ? [{ fn: w.hop4.viaDml, file: w.hop4.dmlFile }] : [];
+    if (!w.hop4 || w.hop4.kind === "unknown" || !w.hop4.handlerFile) continue;
+    const closure = astCallClosure({
+      astOf, index: fnIndex, originFile: w.hop4.handlerFile,
+      seedNames: w.hop4.seedCalls ?? [],
+    });
+    const reached = [...closure.sql];
+    if (w.hop4.inlineDml)
+      for (const rec of sqlBearingIn.get(w.hop4.handlerFile) ?? [])
+        if (!reached.some((r) => r.file === rec.file && r.fn === rec.name))
+          reached.push({ fn: rec.name, file: rec.file, hops: 0, path: [], inline: true,
+            sqlSites: rec.sqlSites.map((x) => ({ table: x.table, verb: x.verb, line: x.line })) });
+    reached.sort((a, b) => (a.file + a.fn).localeCompare(b.file + b.fn));
+
+    const wasCheats = w.hop4.kind === "cheats";
+    const regexClaimed = (w.hop4.dmlAll ?? []).map((d) => key(d.file, d.fn));
+    const astProved = new Set(reached.map((r) => key(r.file, r.fn)));
+    // A name the regex walk attributed to a module the handler cannot import.
+    const phantom = regexClaimed.filter((k) => !astProved.has(k) && k !== key(w.hop4.handlerFile, "(inline)"));
+    if (wasCheats && !reached.length) falseAttribution++;
+
     const red = reached.filter((r) => redAt.has(key(r.file, r.fn)));
     const amber = reached.filter((r) => amberAt.has(key(r.file, r.fn)));
-    const row = { channel: w.channel, reached: reached.map((r) => r.fn + " (" + r.file + ")") };
+    const gray = reached.filter((r) => unknownAt.has(key(r.file, r.fn)));
+
+    w.hop4.dmlAll = reached.map((r) => ({ fn: r.fn, file: r.file, hops: r.hops, inline: Boolean(r.inline) }));
+    w.hop4.attribution = "ast-module-edge";
+    if (phantom.length) w.hop4.regexPhantoms = phantom;
+    if (closure.unresolvedNames.length) w.hop4.unresolvedCallees = closure.unresolvedNames;
+
+    const prior = w.hop4.kind;
+    const hop = w.hops.find((h) => h.layer === "kernel");
 
     if (red.length) {
-      // Cite the function that actually earns the label, not whichever one the frontier
-      // happened to reach first.
       const ids = red.flatMap((r) => redAt.get(key(r.file, r.fn)));
+      w.hop4.kind = "cheats";
       w.hop4.viaDml = red[0].fn;
       w.hop4.dmlFile = red[0].file;
       w.hop4.backedBy = ids;
-      w.hop4.why = "reaches " + red[0].fn + "(), a confirmed hard red: " + ids.join(", ");
-      const hop = w.hops.find((h) => h.layer === "kernel");
-      if (hop) hop.detail = "raw SQL via " + red[0].fn + " (" + red[0].file + ") — hard red " + ids[0];
-      audit.push({ ...row, backing: ids, hardRed: true, hop4: "cheats", status: w.status });
+      w.hop4.reachPath = red[0].path;
+      w.hop4.why = "reaches " + red[0].fn + "() in " + red[0].file + " over " + red[0].hops
+        + " AST call hop(s), a confirmed hard red: " + ids.join(", ");
+      if (hop) { hop.present = false; hop.detail = "raw SQL via " + red[0].fn + " (" + red[0].file + ") — hard red " + ids[0]; }
+      if (w.status === "live") { w.status = "cheats"; w.breakAt = "kernel"; }
+      if (prior !== "cheats") promoted++;
+      audit.push({ channel: w.channel, handler: w.hop4.handlerFile,
+        reached: reached.map((r) => r.fn + " (" + r.file + ")"), backing: ids,
+        hardRed: true, from: prior, hop4: "cheats", status: w.status });
       continue;
     }
 
-    downgraded++;
-    // NOT `read-only`. That kind asserts "no mutation seen", and these wires
-    // demonstrably reach an INSERT — falsifiers 21 and 26 exist precisely to stop SQL
-    // from being narrated as clean. Removing the breach label may not also remove the
-    // mutation. `reaches-sql` is the honest middle: it mutates outside the write door,
-    // every finding on the path is amber, and it is not a governance breach.
-    w.hop4.kind = w.hop4.viaDoor ? "write-door" : w.hop4.viaDisk ? "writes-disk" : "reaches-sql";
-    w.hop4.downgradedFrom = "cheats";
+    // Not a breach. Say what IS true, in descending strength of evidence.
     w.hop4.backedBy = null;
+    w.hop4.reachPath = null;
     w.hop4.ungoverned = amber.map((r) => {
       const rows = amberAt.get(key(r.file, r.fn));
       return { fn: r.fn, file: r.file, findings: rows.map((p) => p.id),
         confidence: rows[0].confidence, persistence: rows[0].persistence };
     });
-    w.hop4.why = amber.length
-      ? "reaches " + amber.map((r) => r.fn + "()").join(", ") + " — persistence findings exist and stay "
-        + "visible, but none is a hard red (" + w.hop4.ungoverned[0].confidence + " confidence, "
-        + w.hop4.ungoverned[0].persistence + "), so this is not a governance breach"
-      : reached.some((r) => unknownFn.has(r.fn))
-        ? "reaches " + reached.map((r) => r.fn + "()").join(", ") + ", whose governance the classifier could not resolve — gray, not a breach"
-        : "reaches " + reached.map((r) => r.fn + "()").join(", ") + ", which the persistence classifier adjudicates as compliant";
-    // The kernel hop carried "raw SQL via …" and `present: false` regardless of this
-    // reconciliation, so the wire diagram kept drawing a break the model no longer claims.
-    const hop = w.hops.find((h) => h.layer === "kernel");
-    if (hop) { hop.present = true; hop.detail = w.hop4.why; }
-    // The wire's own status must follow, or the loop matrix keeps reading `broken`.
+    w.hop4.kind = w.hop4.viaDoor ? "write-door"
+      : w.hop4.viaDisk ? "writes-disk"
+      : reached.length ? "reaches-sql"
+      : "read-only";
+    if (prior === "cheats") { downgraded++; w.hop4.downgradedFrom = "cheats"; }
+
+    const names = reached.map((r) => r.fn + "()").join(", ");
+    w.hop4.why = !reached.length
+      ? (wasCheats
+          ? "the name-based walk attributed SQL to " + (phantom.join(", ") || "another module")
+            + ", which this handler has no import path to — no AST-backed call reaches any SQL"
+          : "no AST-backed call path from this handler reaches SQL outside the write door")
+      : amber.length
+        ? "reaches " + names + " — persistence findings exist and stay visible, but none is a "
+          + "hard red (" + w.hop4.ungoverned[0].confidence + " confidence, "
+          + w.hop4.ungoverned[0].persistence + "), so this is not a governance breach"
+        : gray.length
+          ? "reaches " + names + ", whose governance the classifier could not resolve — gray, not a breach"
+          : "reaches " + names + ", for which no governance finding was raised";
+    if (hop) {
+      hop.present = true;
+      hop.detail = w.hop4.kind === "write-door" ? "execute() via " + w.hop4.viaDoor
+        : w.hop4.kind === "writes-disk" ? "writes a file via " + w.hop4.viaDisk + " — never reaches the Kernel"
+        : w.hop4.kind === "reaches-sql" ? w.hop4.why
+        : "read-only — mutates nothing";
+    }
     if (w.status === "cheats") { w.status = "live"; w.breakAt = null; }
-    audit.push({ ...row, backing: w.hop4.ungoverned.flatMap((u) => u.findings), hardRed: false,
-      hop4: w.hop4.kind, status: w.status });
+    audit.push({ channel: w.channel, handler: w.hop4.handlerFile,
+      reached: reached.map((r) => r.fn + " (" + r.file + ")"),
+      backing: w.hop4.ungoverned.flatMap((u) => u.findings), hardRed: false,
+      from: prior, hop4: w.hop4.kind, status: w.status });
   }
   hop4Stats.downgradedFromCheats = downgraded;
-  hop4Stats.cheatsAudit = audit;
+  hop4Stats.promotedToCheats = promoted;
+  hop4Stats.regexOnlyAttributions = falseAttribution;
+  hop4Stats.cheatsAudit = audit.filter((a) => a.hardRed || a.from === "cheats" || a.hop4 === "reaches-sql");
 }
 
 // Coverage: absence of a finding must never be indistinguishable from clean.

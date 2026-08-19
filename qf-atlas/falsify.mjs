@@ -21,7 +21,7 @@
 // effect of someone looking.
 
 import { writeFileSync, unlinkSync, existsSync, readFileSync, renameSync, readdirSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { REPO, rel, walk, IS_TEST } from "./extract.mjs";
 
@@ -82,6 +82,7 @@ function writeAtomic(abs, contents) {
 // ─── TREE NEUTRALITY (D5) ────────────────────────────────────────────────────
 // Everything below is generated. The suite must be able to rewrite these freely and
 // still hand the checkout back exactly as it found it.
+const NL_ = String.fromCharCode(10);
 const RECEIPT_MODE = process.argv.includes("--receipt");
 const ARTIFACTS = ["qf-atlas/atlas.json", "qf-atlas/atlas.html", "qf-atlas/ATLAS.md",
                    "qf-atlas/atlas-diff.json", "qf-atlas/falsifiers.json"];
@@ -101,7 +102,26 @@ const SNAPSHOT = new Map(ARTIFACTS.map((p) => {
 const INITIAL_STATUS = porcelain();
 let restored = false;
 
+// IN-FLIGHT FIXTURES. `withFile` restores in a `finally`, which does not run when the
+// process is signalled. A Ctrl-C mid-suite therefore left a synthetic
+// `INSERT INTO mission` fixture sitting in collab-electron/src/main/ — product code,
+// untracked, ready to be committed by accident or to be read by the next Atlas run as a
+// real governance violation. Ctrl-C is the most likely way anyone stops an 86-fixture
+// run, so the fixture state has to live somewhere a handler can reach it.
+const INFLIGHT = new Map();   // abs -> { existed, original }
+
+function restoreInflight() {
+  for (const [abs, prior] of INFLIGHT) {
+    try {
+      if (prior.existed) writeAtomic(abs, prior.original);
+      else if (existsSync(abs)) unlinkSync(abs);
+    } catch { /* surfaced by the neutrality check, not swallowed */ }
+  }
+  INFLIGHT.clear();
+}
+
 function restoreArtifacts() {
+  restoreInflight();
   for (const [p, bytes] of SNAPSHOT) {
     // --receipt is the one deliberate write this run is allowed to leave behind.
     if (RECEIPT_MODE && p.endsWith("falsifiers.json")) continue;
@@ -121,6 +141,16 @@ function restoreArtifacts() {
 
 // A falsifier that throws must not leave the map rewritten either.
 process.on("exit", () => { if (!restored) restoreArtifacts(); });
+// `exit` does not fire for a signal, and neither does `finally`. Handling SIGINT and
+// SIGTERM covers Ctrl-C, an IDE stop button, a CI cancel and `kill <pid>` — every
+// ordinary way a run is interrupted. SIGKILL and power loss remain uncatchable by
+// construction; that boundary is acknowledged, not papered over with a lockfile scheme.
+for (const sig of ["SIGINT", "SIGTERM"])
+  process.on(sig, () => {
+    console.error(`${NL_}qf-atlas/falsify: ${sig} — restoring the working tree before exit.`);
+    restoreArtifacts();
+    process.exit(130);
+  });
 
 /** Write a temp file and assert WITHOUT regenerating — for the staleness test,
  *  where calling model() first makes the artefact current and the check can
@@ -129,10 +159,49 @@ function withFileRaw(path, contents, assertFn) {
   const abs = join(REPO, path);
   const existed = existsSync(abs);
   const original = existed ? readFileSync(abs, "utf8") : null;
+  INFLIGHT.set(abs, { existed, original });
   try { writeAtomic(abs, contents); return assertFn(); }
   finally {
     if (existed) writeAtomic(abs, original);
     else if (existsSync(abs)) unlinkSync(abs);
+    INFLIGHT.delete(abs);
+  }
+}
+
+// TEST SEAM for the signal handler, and the only way to exercise it end to end: the
+// fixture must be ON DISK when the signal arrives, which means raising it from inside a
+// live run. On POSIX this is a genuine OS-delivered signal to self. On Windows there is
+// no way to deliver a catchable SIGINT to another process at all — `child.kill()` maps to
+// TerminateProcess and `taskkill` without /F refuses outright — so the listener is
+// invoked directly, which exercises everything except the kernel's delivery path. A real
+// console Ctrl-C does reach Node on Windows and runs the same listener.
+function raiseIfAsked() {
+  const sig = process.env.QF_ATLAS_RAISE_SIGNAL;
+  if (!sig) return;
+  if (process.platform === "win32") process.emit(sig);
+  else process.kill(process.pid, sig);
+}
+
+/** Several fixtures at once, all registered so a signal restores every one. */
+function withFiles(files, assertFn) {
+  const wrote = [];
+  try {
+    for (const [path, contents] of Object.entries(files)) {
+      const abs = join(REPO, path);
+      const existed = existsSync(abs);
+      INFLIGHT.set(abs, { existed, original: existed ? readFileSync(abs, "utf8") : null });
+      wrote.push(abs);
+      writeAtomic(abs, contents);
+    }
+    raiseIfAsked();
+    return assertFn(model());
+  } finally {
+    for (const abs of wrote) {
+      const prior = INFLIGHT.get(abs);
+      if (prior?.existed) writeAtomic(abs, prior.original);
+      else if (existsSync(abs)) unlinkSync(abs);
+      INFLIGHT.delete(abs);
+    }
   }
 }
 
@@ -141,12 +210,15 @@ function withFile(path, contents, assertFn) {
   const abs = join(REPO, path);
   const existed = existsSync(abs);
   const original = existed ? readFileSync(abs, "utf8") : null;
+  INFLIGHT.set(abs, { existed, original });
   try {
     writeAtomic(abs, contents);
+    raiseIfAsked();
     return assertFn(model());
   } finally {
     if (existed) writeAtomic(abs, original);
     else if (existsSync(abs)) unlinkSync(abs);
+    INFLIGHT.delete(abs);
   }
 }
 
@@ -157,6 +229,7 @@ const MAIN = "collab-electron/src/main";
 // await keeps the rest of the harness synchronous.
 const { atlasDiff } = await import("./diff.mjs");
 const { hardRed: hardRedFn, advance: advanceFn } = await import("./baseline.mjs");
+const { missingKeys: missingKeysFn, applyDecisions: applyDecisionsFn } = await import("./decisions.mjs");
 
 console.log("qf-atlas falsifiers — each injects a real defect, then restores\n");
 if (!gitClean()) {
@@ -1502,6 +1575,7 @@ record(83, "medium bookkeeping DDL cannot make a wire cheats or break a loop", .
     // A NON-DOMAIN store, written outside the write door: a real finding, medium
     // confidence, and nothing the Kernel owns. Exactly the shape that was being
     // promoted to a governance breach.
+    INFLIGHT.set(habs, { existed: existsSync(habs), original: existsSync(habs) ? readFileSync(habs, "utf8") : null });
     writeAtomic(habs,
       [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
         'import { zzvEnsureBookkeeping } from ' + Q + './zz-falsify-83-helper' + Q + ';',
@@ -1532,7 +1606,7 @@ record(83, "medium bookkeeping DDL cannot make a wire cheats or break a loop", .
           + `promotedToHardRed=${promoted.length} unbackedCheatsWires=${unbacked.length} `
           + `loopsBrokenWithoutAHardRed=${loopBreaks.length}${loopBreaks.length ? ' -> ' + loopBreaks.join(', ') : ''}`];
       });
-  } finally { if (existsSync(habs)) unlinkSync(habs); }
+  } finally { if (existsSync(habs)) unlinkSync(habs); INFLIGHT.delete(habs); }
 })());
 
 // 84 · D6 — ONE DECISION SCHEMA. Five of eight entries carried `why` where the gate
@@ -1578,6 +1652,188 @@ record(85, "a computed callee becomes a named coverage blocker, never silent cle
         `worst=${row.worst} cellsNamingTheGap=${cells.map(([k]) => k).join(',') || 'NONE'} `
         + `blockeredAsAstCoverage=${blockered.length} unexplained=${unexplained}`];
     }));
+
+// ── FROM THE SECOND INDEPENDENT VERIFIER ───────────────────────────────────
+// Six numbered defects, four of them authority-blocking. Each falsifier below guards
+// one, and each was written from the Verifier's own fixture rather than from a
+// paraphrase of it.
+
+// 86 · Verifier defect 1 — hop 4 resolved callees by NAME across the whole repo with no
+// module edge, so an SQL-free helper sharing a name with a hard-red kernel function
+// inherited that function's FILE, was stamped `cheats`, and cited two real hard-red ids.
+// The file contained no SQL. Falsifiers 77 and 83 both passed throughout: they assert
+// the cited id is red, never that the wire reaches it.
+record(86, "a same-named SQL-free helper cannot inherit another module's hard red",
+  ...withFile(`${MAIN}/zz-vfy86.ts`,
+    [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+      '// Same name as the kernel function behind two hard reds. No SQL anywhere.',
+      'export function createReviewTask(label: string){ return ' + Q + 'review: ' + Q + ' + label; }',
+      'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:decoy' + Q + ', async (_e, l) => createReviewTask(l)); }',
+      '' ].join(String.fromCharCode(10)),
+    (m) => {
+      const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:decoy');
+      if (!w) return [false, 'the decoy channel never reached the model'];
+      const red = hardRedFn(m);
+      // Every cheats wire must cite a function its own reach set contains.
+      const uncited = (m.wires ?? []).filter((x) => x.hop4?.kind === 'cheats')
+        .filter((x) => !(x.hop4.dmlAll ?? []).some((d) => d.fn === x.hop4.viaDml && d.file === x.hop4.dmlFile)
+          || !(x.hop4.backedBy ?? []).length || x.hop4.backedBy.some((id) => !red[id]));
+      const realCheats = (m.wires ?? []).filter((x) => x.hop4?.kind === 'cheats').length;
+      return [w.hop4?.kind !== 'cheats' && !w.hop4?.backedBy && !uncited.length && realCheats === 3,
+        `decoy hop4=${w.hop4?.kind} cites=${w.hop4?.backedBy ? w.hop4.backedBy.length : 0} `
+        + `cheatsWiresNotReachingWhatTheyCite=${uncited.length} realCheatsWires=${realCheats} (expect 3, i.e. not suppressed)`];
+    }));
+
+// 87 · Verifier defect 2 — hop 4's regex index matches `function NAME(` and
+// `const NAME =` and nothing else, while persistence uses the AST index that resolves
+// class methods. A proven, corroborated, ratchet-blocking domain write inside a class
+// method was therefore absent from hop 4 entirely, and its LIVE wire rendered as
+// `read-only — mutates nothing`. Falsifier 80 guards the shape but its fixture lands at
+// unknown/low, so it never exercised the hard-red combination.
+record(87, "a class-method hard red cannot render as read-only at hop 4",
+  ...withFiles({
+    [`${MAIN}/zz-vfy87-store.ts`]:
+      [ 'export class VfyStore {',
+        '  constructor(private db: any) {}',
+        '  vfyPersistTaskRow(id: string){',
+        '    this.db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'cancelled' + Q + ', id);',
+        '  }',
+        '}',
+        'export function vfyEntry(db: any, id: string){ return new VfyStore(db).vfyPersistTaskRow(id); }',
+        '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy87.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { vfyEntry } from ' + Q + './zz-vfy87-store' + Q + ';',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:cls' + Q + ', async (_e, id) => vfyEntry(null, id)); }',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const row = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy87-store.ts'));
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:cls');
+    if (!row) return [false, 'the class-method write produced NO persistence finding'];
+    if (!w) return [false, 'the fixture channel never reached the model'];
+    const red = hardRedFn(m);
+    const isRed = Boolean(red[row.id]);
+    const reaches = (w.hop4?.dmlAll ?? []).some((d) => d.fn === 'vfyPersistTaskRow');
+    return [isRed && w.hop4?.kind === 'cheats' && reaches && w.hop4.kind !== 'read-only',
+      `fn=${row.fn} ${row.persistence}/${row.confidence} hardRed=${isRed} hop4=${w.hop4?.kind} `
+      + `hop4ReachesTheMethod=${reaches}`];
+  }));
+
+// 88 · Verifier defect 3 — the R1 proof block lived inside the final `else`, so the
+// branch for app code writing a Kernel-owned domain table set confidence HIGH and never
+// computed a proof; `hardRed()` then refused it for lacking one. The most obvious breach
+// in the system was structurally incapable of blocking, and after the D4 change its wire
+// stopped breaking a loop as well. The second half of this check is the founder's
+// boundary: unreachable dead code may NOT be hard-redded merely for containing SQL.
+record(88, "an app-code domain write is hard red; the same write unreached is not",
+  ...withFiles({
+    [`${MAIN}/zz-vfy88.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        'export function vfyStealTask(id: string){',
+        '  getKernelDb().query(' + Q + 'INSERT INTO task (id) VALUES (?)' + Q + ').run(id);',
+        '}',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:appwrite' + Q + ', async (_e, id) => vfyStealTask(id)); }',
+        '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy88-dead.ts`]:
+      [ 'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        '// Nothing calls this. Same SQL, no production reach.',
+        'export function vfyDeadWrite(id: string){',
+        '  getKernelDb().query(' + Q + 'INSERT INTO task (id) VALUES (?)' + Q + ').run(id);',
+        '}',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const live = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy88.ts'));
+    const dead = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy88-dead.ts'));
+    if (!live || !dead) return [false, `live=${Boolean(live)} dead=${Boolean(dead)} — a fixture produced no finding at all`];
+    const red = hardRedFn(m);
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:appwrite');
+    return [Boolean(red[live.id]) && !red[dead.id] && dead.confidence === 'medium'
+      && dead.blocker === 'ast-coverage' && w?.hop4?.kind === 'cheats',
+      `reached: ${live.confidence}/proof=${Boolean(live.reachProof?.corroborated)} hardRed=${Boolean(red[live.id])} hop4=${w?.hop4?.kind} · `
+      + `unreached: ${dead.confidence}/blocker=${dead.blocker} hardRed=${Boolean(red[dead.id])}`];
+  }));
+
+// 89 · Verifier defect 4 — the finding id omitted the FUNCTION, so two functions in one
+// file writing the same table with the same verb collapsed into one finding and the
+// dedupe dropped the second at equal severity. That second bypass had no finding, was
+// invisible to the ratchet, and hop 4 reported its wire as `adjudicated as compliant`.
+// The classifier had never adjudicated it. The converse also matters: one function with
+// two identical sites is ONE finding that keeps BOTH lines.
+record(89, "same table+verb in two functions is two findings; twice in one is one with both lines",
+  ...withFile(`packages/qf-kernel/src/zz-vfy89.ts`,
+    [ 'export function vfyAlphaBypass(db: any, id: string){',
+      '  db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'a' + Q + ', id);',
+      '}',
+      'export function vfyBetaBypass(db: any, id: string){',
+      '  db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'b' + Q + ', id);',
+      '}',
+      'export function vfyTwiceBypass(db: any, id: string){',
+      '  db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'c' + Q + ', id);',
+      '  db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'd' + Q + ', id);',
+      '}', '' ].join(String.fromCharCode(10)),
+    (m) => {
+      const rows = (m.persistence ?? []).filter((p) => p.evidence[0].file.endsWith('zz-vfy89.ts'));
+      const fns = new Set(rows.map((p) => p.fn));
+      const twice = rows.find((p) => p.fn === 'vfyTwiceBypass');
+      const lines = twice?.evidence[0].lines ?? [];
+      return [rows.length === 3 && fns.size === 3 && lines.length === 2,
+        `findings=${rows.length} distinctFunctions=${fns.size} (expect 3/3) `
+        + `vfyTwiceBypass evidence lines=${JSON.stringify(lines)} (expect 2)`];
+    }));
+
+// 90 · Verifier defect 5 — restoration fires on clean exit, on a throw and on
+// process.exit(), but NOT on a signal, and `withFile`'s finally does not either. A run
+// killed at 14s left a synthetic `INSERT INTO mission` fixture inside
+// collab-electron/src/main/ — product code, untracked, and readable by the next Atlas
+// run as a real governance violation.
+record(90, "an interrupted run restores the tree, fixtures included", ...(() => {
+  if (process.env.QF_ATLAS_RAISE_SIGNAL)
+    return [true, 'skipped inside the child run that this check spawns'];
+  const before = porcelain();
+  const r = spawnSync(node, [GEN.replace('generate.mjs', 'falsify.mjs')], {
+    cwd: REPO, encoding: 'utf8',
+    env: { ...process.env, QF_ATLAS_RAISE_SIGNAL: 'SIGINT' },
+    timeout: 120000,
+  });
+  const after = porcelain();
+  const leaked = after.split(String.fromCharCode(10)).filter(Boolean)
+    .filter((l) => !before.split(String.fromCharCode(10)).filter(Boolean).includes(l));
+  const handled = (r.stderr ?? '').includes('restoring the working tree');
+  // Windows cannot deliver a catchable signal to another process, so the child raises it
+  // on itself. That is the honest limit and it is reported, not hidden.
+  const mode = process.platform === 'win32' ? 'listener-invoked (win32: no deliverable signal)' : 'OS-delivered SIGINT';
+  return [handled && after === before && !leaked.length && r.status === 130,
+    `${mode} · childExit=${r.status} handlerRan=${handled} treeIdentical=${after === before}`
+    + `${leaked.length ? ' LEAKED: ' + leaked.join(' | ') : ''}`];
+})());
+
+// 91 · Verifier defect 6 — `missingKeys` checked truthiness and `applyDecisions`
+// compared `new Date(v) <= new Date()`, which is FALSE for Invalid Date. So
+// `review_or_expiry: "when we get to it"` was complete AND never expired, while a real
+// 2020 date read undecided in the ledger and seeded into the baseline anyway, because
+// advance() checked no date at all. Three consumers, three answers, one field.
+record(91, "one date authority: free text and past dates are refused everywhere", ...(() => {
+  const red = hardRedFn(before);
+  const id = Object.keys(red)[0];
+  if (!id) return [false, 'no hard red to adjudicate against'];
+  const base = { verdict: 'accepted', owner: 'founder', reason: 'r', remediation_trigger: 't' };
+  const rows = [];
+  for (const [label, v] of [['absent', undefined], ['free text', 'when we get to it'],
+                            ['past', '2020-01-01'], ['unparseable', '2026-13-45'], ['future', '2099-12-31']]) {
+    const d = v === undefined ? { ...base } : { ...base, review_or_expiry: v };
+    const complete = missingKeysFn(d).length === 0;
+    const ledger = applyDecisionsFn([{ id, kind: 'persistence' }], { decisions: { [id]: d } }).rows[0].verdict;
+    const seeded = Boolean(advanceFn({ version: 1, findings: {}, exceptions: {} }, red, 'sha', { [id]: d })
+      .baseline.findings[id]);
+    rows.push({ label, complete, ledger, seeded });
+  }
+  const future = rows.find((r) => r.label === 'future');
+  const rest = rows.filter((r) => r.label !== 'future');
+  const ok = future.complete && future.ledger === 'accepted' && future.seeded
+    && rest.every((r) => !r.complete && r.ledger === 'undecided' && !r.seeded);
+  return [ok, rows.map((r) => `${r.label}:${r.complete ? 'complete' : 'incomplete'}/${r.ledger}/${r.seeded ? 'SEEDED' : 'refused'}`).join(' · ')];
+})());
 
 // Restore every generated artefact to the bytes this run started with. This replaces
 // a final regenerate, which could only ever get CLOSE: `generatedAt` moves on every

@@ -402,32 +402,56 @@ export function classifyPersistence({ index, names, domain, transport, governed,
           ? `Writes the domain table \`${site.table}\` and is reachable from outside the write door (${reach.callers.join(", ")}).`
           : `Writes \`${site.table}\`, a table absent from the generated schema, reachable from outside the write door.`;
 
-        // R1 — HIGH REQUIRES AN AST-BACKED REACH PROOF.
-        //
-        // Corroborating the SQL site and its enclosing symbol proves the WRITE exists. It
-        // says nothing about whether anyone outside the write door can reach it — and that
-        // second half is what the `bypass` verdict, and therefore the HIGH confidence,
-        // actually turns on. Until now that half rested entirely on the regex call graph,
-        // whose call set is "every identifier followed by an open paren".
-        //
-        // Regex may still PROPOSE the candidate. It may not supply an uncorroborated edge
-        // to a HIGH finding. If no complete app-to-function path can be walked over parsed
-        // call expressions, the row drops to medium and says why.
-        if (confidence === "high" && astOf && astReachProof) {
-          reachProof = astReachProof({
-            astOf, targetFile: rec.file, targetFn: fnName,
-            isAppOrigin: isAppOrigin ?? (() => false),
-          });
-          if (!reachProof.corroborated) {
-            confidence = "medium";
-            blocker = "ast-coverage";
-            why += ` Confidence capped at medium: ${reachProof.why}.`;
-          }
+      }
+
+      // R1, APPLIED TO EVERY HIGH VIOLATION — not to one branch of the chain.
+      //
+      // This block used to live inside the final `else`, so the branch above it — app
+      // code writing a Kernel-owned domain table outside the write door, which is the
+      // most obvious breach the system can contain — set `confidence = "high"` and never
+      // computed a proof. `hardRed()` then rejected it on `!reachProof?.corroborated`,
+      // making that class STRUCTURALLY INCAPABLE of being hard red, and the hop-4
+      // reconciliation went on to downgrade its wire out of `cheats` so it stopped
+      // breaking a loop too. The row printed "high confidence, domain-truth" and was
+      // denied for lacking the one thing nobody had asked it for.
+      //
+      // Founder ruling: a product write to Kernel-owned domain truth outside the door IS
+      // eligible hard red, on the same evidence as any other — domain-truth + violation +
+      // AST-confirmed SQL + a complete AST-backed production reach proof. Without a
+      // corroborated path it drops to medium/ast-coverage, which is also what keeps
+      // unreachable dead code from being hard-redded merely for containing SQL.
+      // Every violation is asked for a proof, not only the ones that arrived HIGH. A row
+      // that reaches MEDIUM by another route — app code whose reachability was never
+      // `bypass`, i.e. dead code containing a domain write — is exactly the case the
+      // founder ruled must read `medium / ast-coverage` rather than merely `medium`.
+      // Without this it was correctly non-blocking and silently unexplained, which is the
+      // half of the rule that is easy to miss.
+      if (governance === "violation" && astOf && astReachProof) {
+        reachProof = astReachProof({
+          astOf, targetFile: rec.file, targetFn: fnName,
+          isAppOrigin: isAppOrigin ?? (() => false),
+        });
+        if (!reachProof.corroborated) {
+          if (confidence === "high") why += ` Confidence capped at medium: ${reachProof.why}.`;
+          else why += ` No corroborated production reach: ${reachProof.why}.`;
+          confidence = "medium";
+          blocker = "ast-coverage";
         }
       }
 
       findings.push({
-        id: `persistence:${rec.file}:${site.table}:${site.verb.toLowerCase().replace(/ /g, "-")}`,
+        // DEFECT 4 — SEMANTIC IDENTITY INCLUDES THE FUNCTION.
+        //
+        // The id was `persistence:<file>:<table>:<verb>`, so two functions in one file
+        // writing the same table with the same verb produced ONE finding — and the
+        // dedupe below kept the first at equal severity, so the second bypass had no
+        // finding at all. It was invisible to the ratchet, and hop 4 then reported its
+        // wire as "the persistence classifier adjudicates as compliant". The classifier
+        // had never adjudicated it.
+        //
+        // Renaming a function retires the old id and raises a fresh undecided one. That
+        // is correct and always has been: code that moved deserves another look.
+        id: `persistence:${rec.file}:${fnName}:${site.table}:${site.verb.toLowerCase().replace(/ /g, "-")}`,
         classification: governance === "violation" ? "governance-violation"
           : governance === "unknown" ? "needs-verification" : "persistence-ok",
         disposition: governance === "violation" ? "repair"
@@ -448,11 +472,21 @@ export function classifyPersistence({ index, names, domain, transport, governed,
     }
   }
 
+  // With the function in the id, a collision now means exactly one thing: the SAME
+  // function writes the SAME table with the SAME verb at more than one line. That is one
+  // semantic finding with several sites — so the LINES ARE MERGED rather than the loser
+  // being dropped. Silently discarding a site is how evidence disappears from a finding
+  // that survives.
   const best = new Map();
   const sev = { violation: 3, unknown: 2, "approved-exception": 1, compliant: 0 };
   for (const f of findings) {
     const prev = best.get(f.id);
-    if (!prev || sev[f.governance] > sev[prev.governance]) best.set(f.id, f);
+    if (!prev) { best.set(f.id, f); continue; }
+    const winner = sev[f.governance] > sev[prev.governance] ? f : prev;
+    const lines = [...new Set([...(prev.evidence[0].lines ?? []), ...(f.evidence[0].lines ?? [])])]
+      .sort((a, b) => a - b);
+    winner.evidence = [{ ...winner.evidence[0], lines }];
+    best.set(f.id, winner);
   }
   return [...best.values()].sort((a, b) =>
     (sev[b.governance] - sev[a.governance]) || a.id.localeCompare(b.id));

@@ -15,7 +15,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 // ONE schema, defined once in decisions.mjs. This file used to keep its own copy of
 // the required-key list and its own spelling of the review date (`expires ?? review`),
 // which is how a record could satisfy the ledger and still be refused by the gate.
-import { DECISION_SCHEMA, missingKeys } from "./decisions.mjs";
+import { DECISION_SCHEMA, missingKeys, reviewDate } from "./decisions.mjs";
 
 export const EMPTY = { version: 1, updated: null, findings: {}, exceptions: {} };
 
@@ -166,8 +166,14 @@ export function advance(baseline, current, commit, decisions = {}) {
       continue;
     }
     if (!ELIGIBLE.has(d.verdict)) { refused.push({ id, why: `verdict "${d.verdict}" is not eligible for the baseline` }); continue; }
+    // `missingKeys` now validates the review date, so advance() and the ledger agree.
+    // They did not: a 2020 date read `undecided` in applyDecisions and seeded here anyway.
     const missing = missingKeys(d);
     if (missing.length) { refused.push({ id, why: `missing ${missing.join(", ")}` }); continue; }
+    if (d.review_or_expiry !== undefined && !reviewDate(d.review_or_expiry).valid) {
+      refused.push({ id, why: `review_or_expiry ${reviewDate(d.review_or_expiry).why}` });
+      continue;
+    }
 
     next.findings[id] = {
       ...info,
@@ -197,8 +203,17 @@ export function incompleteFindings(baseline) {
     .filter(([, f]) => f.state !== "resolved")
     .map(([id, f]) => {
       const missing = REQUIRED.filter((k) => !f[k]);
-      if (f.verdict === "accepted" && !f.review_or_expiry) missing.push("review_or_expiry");
       if (!f.verdict) missing.push("verdict");
+      // `expiredExceptions` covers baseline.exceptions only. A baseline FINDING carrying
+      // an expired or unparseable review date was carried forever, silently, by the same
+      // Invalid-Date comparison. Findings are checked here, on the one authority.
+      if (f.verdict === "accepted") {
+        const r = reviewDate(f.review_or_expiry);
+        if (!r.valid) missing.push(`review_or_expiry (${r.why})`);
+      } else if (f.review_or_expiry !== undefined && f.review_or_expiry !== null) {
+        const r = reviewDate(f.review_or_expiry);
+        if (!r.valid) missing.push(`review_or_expiry (${r.why})`);
+      }
       return missing.length ? { id, missing } : null;
     })
     .filter(Boolean);

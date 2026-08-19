@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-19",
-  "passed": 85,
-  "total": 85,
+  "passed": 91,
+  "total": 91,
   "results": [
     {
       "n": 1,
@@ -49,7 +49,7 @@
       "n": 8,
       "name": "coverage ledger is complete, unique and well-formed",
       "passed": true,
-      "detail": "427 rows, all unique and legal; 58 findings all carry sourceClass"
+      "detail": "427 rows, all unique and legal; 66 findings all carry sourceClass"
     },
     {
       "n": 9,
@@ -85,7 +85,7 @@
       "n": 14,
       "name": "active app bypass to domain SQL is high-confidence red",
       "passed": true,
-      "detail": "domain-truth/high, wire=live, hop4=reaches-sql"
+      "detail": "domain-truth/high, wire=cheats, hop4=cheats"
     },
     {
       "n": 15,
@@ -97,7 +97,7 @@
       "n": 16,
       "name": "headline counts equal the canonical model",
       "passed": true,
-      "detail": "stats.violations=16 vs persistence=16; gray 3 vs 3"
+      "detail": "stats.violations=17 vs persistence=17; gray 3 vs 3"
     },
     {
       "n": 17,
@@ -127,7 +127,7 @@
       "n": 21,
       "name": "INSERT OR IGNORE is caught, not read as clean",
       "passed": true,
-      "detail": "violation=true hop4=reaches-sql coverage=indexed"
+      "detail": "violation=true hop4=cheats coverage=indexed"
     },
     {
       "n": 22,
@@ -157,7 +157,7 @@
       "n": 26,
       "name": "typed-brace SQL does not leave hop 4 read-only",
       "passed": true,
-      "detail": "hop4=reaches-sql coverage=indexed violation=true"
+      "detail": "hop4=cheats coverage=indexed violation=true"
     },
     {
       "n": 27,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 45 -> 44"
+      "detail": "verdict=remove undecided 46 -> 45"
     },
     {
       "n": 33,
@@ -319,13 +319,13 @@
       "n": 53,
       "name": "the filename allowlist no longer confers compliance",
       "passed": true,
-      "detail": "24 trusted site(s), every one in a derived door file"
+      "detail": "27 trusted site(s), every one in a derived door file"
     },
     {
       "n": 54,
       "name": "the authority swap loses no confirmed violation",
       "passed": true,
-      "detail": "16 confirmed violation(s) across 2 file(s); governed-review.ts red=true"
+      "detail": "17 confirmed violation(s) across 2 file(s); governed-review.ts red=true"
     },
     {
       "n": 55,
@@ -367,7 +367,7 @@
       "n": 61,
       "name": "moving a finding to another line preserves its id",
       "passed": true,
-      "detail": "21 ids identical, evidence lines shifted"
+      "detail": "26 ids identical, evidence lines shifted"
     },
     {
       "n": 62,
@@ -421,7 +421,7 @@
       "n": 70,
       "name": "every undecided finding names its blocker",
       "passed": true,
-      "detail": "45 undecided, all blockered: {\"founder-decision\":25,\"ast-coverage\":3,\"package-proof\":17}"
+      "detail": "46 undecided, all blockered: {\"founder-decision\":26,\"ast-coverage\":3,\"package-proof\":17}"
     },
     {
       "n": 71,
@@ -508,10 +508,46 @@
       "detail": "worst=unsupported cellsNamingTheGap=reach blockeredAsAstCoverage=1 unexplained=false"
     },
     {
+      "n": 86,
+      "name": "a same-named SQL-free helper cannot inherit another module's hard red",
+      "passed": true,
+      "detail": "decoy hop4=read-only cites=0 cheatsWiresNotReachingWhatTheyCite=0 realCheatsWires=3 (expect 3, i.e. not suppressed)"
+    },
+    {
+      "n": 87,
+      "name": "a class-method hard red cannot render as read-only at hop 4",
+      "passed": true,
+      "detail": "fn=vfyPersistTaskRow domain-truth/high hardRed=true hop4=cheats hop4ReachesTheMethod=true"
+    },
+    {
+      "n": 88,
+      "name": "an app-code domain write is hard red; the same write unreached is not",
+      "passed": true,
+      "detail": "reached: high/proof=true hardRed=true hop4=cheats · unreached: medium/blocker=ast-coverage hardRed=false"
+    },
+    {
+      "n": 89,
+      "name": "same table+verb in two functions is two findings; twice in one is one with both lines",
+      "passed": true,
+      "detail": "findings=3 distinctFunctions=3 (expect 3/3) vfyTwiceBypass evidence lines=[8,9] (expect 2)"
+    },
+    {
+      "n": 90,
+      "name": "an interrupted run restores the tree, fixtures included",
+      "passed": true,
+      "detail": "listener-invoked (win32: no deliverable signal) · childExit=130 handlerRan=true treeIdentical=true"
+    },
+    {
+      "n": 91,
+      "name": "one date authority: free text and past dates are refused everywhere",
+      "passed": true,
+      "detail": "absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED"
+    },
+    {
       "n": 82,
       "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
       "passed": true,
-      "detail": "git status --porcelain identical before and after (13 pre-existing entries)"
+      "detail": "git status --porcelain identical before and after (11 pre-existing entries)"
     }
   ]
 }

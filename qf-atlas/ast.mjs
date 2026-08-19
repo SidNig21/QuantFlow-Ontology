@@ -337,6 +337,143 @@ function emptyFacts(path, state, reason) {
 }
 
 /**
+ * MODULE EDGE — can `from` plausibly resolve a symbol that lives in `to`?
+ *
+ * A call expression alone is not a path: an unrelated file can define its own function
+ * with the same name. This was proved twice by independent Verifiers. Once against the
+ * reach proof (a renderer badge helper with a local `createReviewTask` REPLACED the
+ * genuine two-hop kernel proof with a one-hop path through a string formatter). Once
+ * against hop 4, which had no equivalent guard at all: an SQL-free helper sharing a name
+ * with a hard-red kernel function made its wire cite that function's real finding ids,
+ * and the wire contained no SQL whatsoever.
+ *
+ * The fix was written twice and lived in one place, so half the analyzer was defended.
+ * It is now built once and shared: every authority-bearing name resolution in this
+ * analyzer — backwards from a SQL site, or forwards from an IPC handler — goes through
+ * this predicate.
+ *
+ * A caller either lives in the callee's file, or imports something that resolves into
+ * the callee's package or directory subtree. Still not type resolution, and recorded as
+ * such — but a file with no import path toward the target can no longer certify
+ * reaching it.
+ */
+export function buildModuleEdge(astOf) {
+  const importsOf = new Map();
+  for (const [file, a] of astOf) {
+    const roots = new Set([file.slice(0, file.lastIndexOf("/"))]);
+    for (const i of a.imports ?? []) {
+      const spec = i.spec;
+      if (spec.startsWith(".")) {
+        const dir = file.slice(0, file.lastIndexOf("/"));
+        const parts = (dir + "/" + spec).split("/");
+        const out = [];
+        for (const seg of parts) {
+          if (seg === "." || seg === "") continue;
+          if (seg === "..") out.pop();
+          else out.push(seg);
+        }
+        out.pop();
+        roots.add(out.join("/"));
+      } else {
+        // Bare specifier: map the package name onto any directory that ends with it, so
+        // `qf-kernel/portable` admits packages/qf-kernel/**.
+        roots.add(spec.split("/")[0]);
+      }
+    }
+    // The file OWN DIRECTORY is kept apart from its import roots. Folded in with them it
+    // was subtree-matched, so every file in collab-electron/src/main/ could resolve every
+    // file under main/** with no import whatsoever — and `error()`, one of the commonest
+    // identifiers in the tree, bound to update-manager.ts from unrelated pty handlers.
+    // That is the same false attribution this predicate exists to stop, arriving through
+    // a common name instead of a deliberate decoy. Siblings resolve; nephews need an
+    // import.
+    roots.delete(file.slice(0, file.lastIndexOf("/")));
+    importsOf.set(file, { own: file.slice(0, file.lastIndexOf("/")), roots });
+  }
+  return (from, to) => {
+    if (from === to) return true;
+    const e = importsOf.get(from);
+    if (!e) return false;
+    if (e.own === to.slice(0, to.lastIndexOf("/"))) return true;   // same directory only
+    for (const r of e.roots) {
+      if (!r) continue;
+      if (to.startsWith(r + "/") || to === r) return true;
+      if (to.includes("/" + r + "/")) return true;   // bare package name inside the path
+    }
+    return false;
+  };
+}
+
+/**
+ * AST-BACKED FORWARD CALL CLOSURE — which SQL-bearing functions can this handler reach?
+ *
+ * hop4.mjs answered this with a name-keyed regex index and no module edge, which failed
+ * in BOTH directions at once:
+ *
+ *   FALSE RED   a local, SQL-free helper sharing a name with a hard-red kernel function
+ *               inherited that function's file, so its wire was stamped `cheats` and
+ *               cited real finding ids it could not reach. Falsifiers 77 and 83 passed:
+ *               they check the cited id IS red, never that the wire reaches it.
+ *   RED HIDES   the regex index matches only `function NAME(` and `const NAME =`, so a
+ *               proven, ratchet-blocking domain write inside a CLASS METHOD was absent
+ *               from the index entirely and its live wire read `read-only — mutates
+ *               nothing`.
+ *
+ * Both are the same root: hop 4 was deciding function identity by text while the
+ * persistence classifier decided it by parse. Identity and traversal now come from the
+ * AST index and this module edge. Regex still finds the handler and the names it calls —
+ * that is wire DISCOVERY — but it no longer decides which function a wire reaches, and
+ * therefore no longer decides what a wire cites.
+ *
+ * `seedNames` are identifiers called in the handler body. Resolution is by name against
+ * the AST index, filtered by module edge FROM THE CALLING FILE, hop by hop.
+ */
+export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth = 5 }) {
+  const moduleEdge = buildModuleEdge(astOf);
+  const byName = new Map();
+  for (const rec of index.values()) {
+    if (!byName.has(rec.name)) byName.set(rec.name, []);
+    byName.get(rec.name).push(rec);
+  }
+  const seen = new Set();
+  const sql = new Map();
+  const unresolvedNames = [];
+  // Sorted at every level: the closure a repo yields must not depend on Set or Map
+  // insertion order, or the evidence a human reads changes between runs.
+  let frontier = [...seedNames].sort().map((name) => ({ name, from: originFile, path: [] }));
+  for (let d = 0; d < maxDepth && frontier.length; d++) {
+    const next = [];
+    for (const node of frontier) {
+      const all = byName.get(node.name) ?? [];
+      const reachable = all.filter((rec) => moduleEdge(node.from, rec.file))
+        .sort((a, b) => a.file.localeCompare(b.file));
+      // A name that resolves ONLY to modules this file cannot import is recorded, not
+      // silently dropped: it is the difference between 'no such call' and 'a call this
+      // analyzer refused to follow'.
+      if (all.length && !reachable.length)
+        unresolvedNames.push({ name: node.name, from: node.from,
+          candidates: all.map((r) => r.file).sort(),
+          why: "every definition of this name is in a module the caller has no import path to" });
+      for (const rec of reachable) {
+        const key = rec.file + "::" + rec.name;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const path = [...node.path, { file: rec.file, fn: rec.name }];
+        if (rec.dml && rec.sqlSites?.length)
+          sql.set(key, { fn: rec.name, file: rec.file, hops: path.length, path,
+            sqlSites: rec.sqlSites.map((x) => ({ table: x.table, verb: x.verb, line: x.line })) });
+        for (const c of rec.calls) next.push({ name: c, from: rec.file, path });
+      }
+    }
+    frontier = next;
+  }
+  return {
+    sql: [...sql.values()].sort((a, b) => (a.file + a.fn).localeCompare(b.file + b.fn)),
+    unresolvedNames, visited: seen.size,
+  };
+}
+
+/**
  * AST REACH PROOF — can an app caller actually get to this function?
  *
  * The `bypass` verdict is what turns a SQL site into a HIGH-confidence governance
@@ -369,40 +506,7 @@ export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, maxHop
   // callee's file, or imports something that resolves into the callee's package or
   // directory subtree. That is still not type resolution — it is recorded as such — but a
   // file with no import path toward the target can no longer certify reaching it.
-  const importsOf = new Map();
-  for (const [file, a] of astOf) {
-    const roots = new Set([file.slice(0, file.lastIndexOf("/"))]);
-    for (const i of a.imports ?? []) {
-      const spec = i.spec;
-      if (spec.startsWith(".")) {
-        const dir = file.slice(0, file.lastIndexOf("/"));
-        const parts = (dir + "/" + spec).split("/");
-        const out = [];
-        for (const seg of parts) {
-          if (seg === "." || seg === "") continue;
-          if (seg === "..") out.pop();
-          else out.push(seg);
-        }
-        out.pop();
-        roots.add(out.join("/"));
-      } else {
-        // Bare specifier: map the package name onto any directory that ends with it, so
-        // `qf-kernel/portable` admits packages/qf-kernel/**.
-        roots.add(spec.split("/")[0]);
-      }
-    }
-    importsOf.set(file, roots);
-  }
-  const moduleEdge = (from, to) => {
-    if (from === to) return true;
-    const roots = importsOf.get(from) ?? new Set();
-    for (const r of roots) {
-      if (!r) continue;
-      if (to.startsWith(r + "/") || to === r) return true;
-      if (to.includes("/" + r + "/")) return true;   // bare package name inside the path
-    }
-    return false;
-  };
+  const moduleEdge = buildModuleEdge(astOf);
 
   const callersOf = new Map();
   for (const [file, a] of astOf)

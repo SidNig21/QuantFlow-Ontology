@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ cafdd16` on 2026-08-19 by
+> Generated from `atlas-strip-1 @ 95bdbed` on 2026-08-19 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**45 of 53 findings have not been looked at.**
+**46 of 54 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 45 |
+| `undecided` | 46 |
 | `repair` | 6 |
 | `remove` | 0 |
 | `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 45 findings still need a decision.
+**Not all clear.** 46 findings still need a decision.
 
 ## The four hops
 
@@ -44,11 +44,11 @@ flowchart TD
   X["<b>raw SQL</b><br/>never enters a<br/>governed action"]
   H -->|"cheats 3"| X
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
-  H -->|"reaches-sql 2"| A
+  H -->|"reaches-sql 13"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 9"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 94"| RO
+  H -->|"read-only 83"| RO
   X -.->|"ungoverned — this is the breach"| DB
 
   QA["<b>QA · governance</b><br/>13 subsystems<br/>asserts the rules above"]
@@ -86,10 +86,10 @@ handler that mutates state without `execute()` is cheating even when it works.
 |---|---|---:|
 | `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 3 |
-| `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
+| `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 13 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 94 |
+| `read-only` | no mutation seen | 83 |
 
 #### Reaches ungoverned SQL, but not a hard red (3)
 
@@ -207,10 +207,10 @@ stated reason is not a gap** — it is the difference between an unknown and a l
 
 The governed critic path. R15 shipped on this, and R16 renders it.
 
-- `qf:review:request` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update
+- `qf:review:request` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update
 - `qf:review:projection` — **unused**: breaks at renderer
-- `qf:review:revision` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into
-- `qf:review:secondCritic` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update
+- `qf:review:revision` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into
+- `qf:review:secondCritic` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update
 
 ### CLOSE — degraded
 
@@ -340,7 +340,7 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**3 confirmed at `high` confidence**, 13 more at `medium`,
+**3 confirmed at `high` confidence**, 14 more at `medium`,
 3 unknown (gray — not counted as debt).
 
 The split matters. A `high` row is a domain-truth write reached from outside a governed
@@ -355,21 +355,22 @@ weaker claim, and it should not be read as the same kind of defect.
 | File | Table | Verb | Kind | Reach | Confidence |
 |---|---|---|---|---|---|
 | `collab-electron/src/main/updater/update-manager.ts` | `check` | UPDATE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `links` | INSERT INTO | domain-truth | bypass | high |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `task` | INSERT INTO | domain-truth | bypass | high |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | UPDATE | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `task` | INSERT INTO | domain-truth | bypass | high |
 | `packages/qf-kernel/src/governed-review.ts` | `task` | UPDATE | domain-truth | bypass | high |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | INSERT INTO | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | INSERT INTO | non-domain-store | bypass | medium |
 
 ### Before you edit these
 
@@ -484,15 +485,15 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-45 undecided findings, each carries a blocker:
+46 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 25 | the code cannot say which answer is right — this needs your intent |
+| `founder-decision` | 26 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 3 | the analyzer could not resolve this statically |
 | `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
 
-**25 of 45 are waiting on you, not on the tool.**
+**26 of 46 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 

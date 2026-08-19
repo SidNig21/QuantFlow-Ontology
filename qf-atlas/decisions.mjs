@@ -39,10 +39,42 @@ export const DECISION_SCHEMA = {
   accepted: ["verdict", "owner", "reason", "remediation_trigger", "review_or_expiry"],
 };
 
+/**
+ * THE ONE DATE AUTHORITY.
+ *
+ * `review_or_expiry` was validated for TRUTHINESS in one place and compared with
+ * `new Date(v) <= new Date()` in another. Both pass a string like
+ * "when we get to it": it is truthy, and `Invalid Date <= now` is `false`, so an
+ * ACCEPTED verdict counted as complete AND could never expire. Meanwhile a real past
+ * date read `undecided` in the ledger and STILL seeded into the baseline, because
+ * `advance()` performed no date check at all. Three consumers, three answers about the
+ * same field.
+ *
+ * One parser now, used by applyDecisions, advance, incompleteFindings and the ratchet.
+ * A date must be ISO-shaped AND parseable AND in the future. Free text is refused
+ * rather than silently accepted forever.
+ */
+export function reviewDate(v) {
+  if (v === undefined || v === null || v === "") return { valid: false, why: "absent" };
+  if (typeof v !== "string" || !/^\d{4}-\d{2}-\d{2}([T ].*)?$/.test(v))
+    return { valid: false, why: `"${v}" is not an ISO date (YYYY-MM-DD)` };
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return { valid: false, why: `"${v}" does not parse as a date` };
+  if (d <= new Date()) return { valid: false, expired: true, date: d, why: `expired on ${v}` };
+  return { valid: true, expired: false, date: d };
+}
+
 /** Which required keys a record is missing. Empty array == schema-complete. */
 export function missingKeys(d) {
   if (!d || !VERDICTS.has(d.verdict)) return ["verdict"];
-  return DECISION_SCHEMA[d.verdict].filter((k) => k === "verdict" ? false : !d[k]);
+  const missing = DECISION_SCHEMA[d.verdict].filter((k) => k === "verdict" ? false : !d[k]);
+  // Present-but-unusable is not complete. An ACCEPTED whose review date is free text or
+  // already past is exactly the record this schema exists to prevent.
+  if (d.verdict === "accepted" && !missing.includes("review_or_expiry")) {
+    const r = reviewDate(d.review_or_expiry);
+    if (!r.valid) missing.push(`review_or_expiry (${r.why})`);
+  }
+  return missing;
 }
 
 export const TEMPLATE = {
@@ -158,8 +190,10 @@ export function applyDecisions(findings, ledger) {
     // normalising a schema may not silently re-adjudicate anything.
     if (d.verdict === "accepted" && missing.length)
       return { ...f, verdict: "undecided", note: `accepted is missing ${missing.join(", ")} — it does not count as a decision` };
-    if (d.review_or_expiry && new Date(d.review_or_expiry) <= new Date())
-      return { ...f, verdict: "undecided", note: `the ${d.verdict} decision expired on ${d.review_or_expiry}` };
+    // Any verdict may carry a review date; if it is present it must be usable.
+    if (d.review_or_expiry !== undefined && !reviewDate(d.review_or_expiry).valid)
+      return { ...f, verdict: "undecided",
+        note: `the ${d.verdict} decision's review_or_expiry is unusable: ${reviewDate(d.review_or_expiry).why}` };
     // NESTED, not spread. `reason` on a finding is the analyzer explaining why the
     // finding is unresolved; `reason` on a decision is a human explaining a verdict.
     // Spreading one over the other would have destroyed the blocker explanation that
