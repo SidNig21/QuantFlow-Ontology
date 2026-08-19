@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ f1298fd` on 2026-08-19 by
+> Generated from `atlas-strip-1 @ 27f76f6` on 2026-08-19 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.

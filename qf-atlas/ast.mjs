@@ -302,3 +302,65 @@ function emptyFacts(path, state, reason) {
     },
   };
 }
+
+/**
+ * AST REACH PROOF — can an app caller actually get to this function?
+ *
+ * The `bypass` verdict is what turns a SQL site into a HIGH-confidence governance
+ * violation, and until now that verdict rested entirely on the regex call graph in
+ * hop4.indexFunctions, whose call set is "every identifier followed by an open paren".
+ * Corroborating only the SQL site and its enclosing symbol proves the write exists; it
+ * does not prove anyone outside the write door can reach it. That second half is the
+ * part the verdict actually turns on.
+ *
+ * This walks CALL EXPRESSIONS parsed by the compiler, backwards from the SQL-bearing
+ * function, until it reaches a caller in an app file. Each hop is a real
+ * `CallExpression` with a real enclosing symbol — not a token match.
+ *
+ * HONEST LIMIT, recorded in the proof rather than hidden: cross-file resolution is by
+ * callee NAME against AST call records. A type checker would bind the symbol; this does
+ * not. So a proof means "the compiler saw a call with this name inside this function",
+ * which is strictly stronger than the regex graph and strictly weaker than type
+ * resolution. Two same-named exports in different modules could still be conflated, so
+ * the proof records every hop for a human to read.
+ */
+export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, maxHops = 5 }) {
+  // callee name -> [{ file, fn, line }]  from parsed call expressions only
+  const callersOf = new Map();
+  for (const [file, a] of astOf)
+    for (const c of a.calls ?? []) {
+      if (!c.name || !c.enclosing) continue;
+      if (!callersOf.has(c.name)) callersOf.set(c.name, []);
+      callersOf.get(c.name).push({ file, fn: c.enclosing, line: c.line });
+    }
+
+  const seen = new Set([`${targetFile}::${targetFn}`]);
+  let frontier = [{ file: targetFile, fn: targetFn, path: [] }];
+  for (let hop = 0; hop < maxHops; hop++) {
+    const next = [];
+    for (const node of frontier)
+      for (const c of callersOf.get(node.fn) ?? []) {
+        const key = `${c.file}::${c.fn}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const step = { from: `${c.file}:${c.line}`, fn: c.fn, calls: node.fn };
+        const path = [...node.path, step];
+        if (isAppOrigin(c.file))
+          return {
+            corroborated: true,
+            hops: path.length,
+            path,
+            resolution: "AST call expressions; cross-file edges matched by callee name, not type-resolved",
+          };
+        next.push({ file: c.file, fn: c.fn, path });
+      }
+    if (!next.length) break;
+    frontier = next;
+  }
+  return {
+    corroborated: false,
+    hops: 0,
+    path: [],
+    why: `no AST call path from an app file reaches ${targetFn} within ${maxHops} hops`,
+  };
+}

@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-19",
-  "passed": 74,
-  "total": 74,
+  "passed": 79,
+  "total": 79,
   "results": [
     {
       "n": 1,
@@ -446,6 +446,36 @@
       "name": "hop 4 and persistence answer to the same derived door",
       "passed": true,
       "detail": "hop4UsesDerivedDoor=true briefPrintsRetiredList=false"
+    },
+    {
+      "n": 75,
+      "name": "every HIGH persistence red carries an AST reach proof",
+      "passed": true,
+      "detail": "3 HIGH row(s), all with an AST path (hops: 2,2,1)"
+    },
+    {
+      "n": 76,
+      "name": "breaking the reach edge downgrades the row out of HIGH",
+      "passed": true,
+      "detail": "confidence=low governance=unknown; unproven HIGH rows anywhere = 0"
+    },
+    {
+      "n": 77,
+      "name": "a compliant function does not inherit cheats from its file",
+      "passed": true,
+      "detail": "every cheats verdict names a confirmed violating function"
+    },
+    {
+      "n": 78,
+      "name": "hard red excludes medium and non-AST classes",
+      "passed": true,
+      "detail": "hardRed=7 medium=0 lifetime=0 bridge=0 unproven=0"
+    },
+    {
+      "n": 79,
+      "name": "seeding refuses unadjudicated or KEEP hard reds",
+      "passed": true,
+      "detail": "unadjudicated seeded=0 keep seeded=0 adjudicated seeded=7/7"
     }
   ]
 }

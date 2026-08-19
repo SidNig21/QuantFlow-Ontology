@@ -20,20 +20,68 @@ export function load(path) {
   try { return JSON.parse(readFileSync(path, "utf8")); } catch { return structuredClone(EMPTY); }
 }
 
-/** Every finding the model currently considers red, keyed by stable ID. */
-export function redFindings(model) {
+/**
+ * HARD RED — what the ratchet is allowed to BLOCK on.
+ *
+ * This used to be "governance === violation", which swept in 12 medium-confidence
+ * qf_review_* bookkeeping rows: real observations, but "this store is not in the golden
+ * schema", not "domain truth was mutated outside a governed action". Blocking a repo on
+ * those spends the ratchet's credibility on the weakest evidence it has.
+ *
+ * The rule is CLASS-SPECIFIC, not a generic confidence threshold. Each class states the
+ * evidence it needs, and a class whose analyzer is not AST-backed stays AMBER rather than
+ * being promoted on the strength of a regex.
+ *
+ *   persistence   domain-truth + violation + high + a CORROBORATED AST reach proof
+ *   ownership     multiple claimants + high + structural (AST) evidence
+ *   lifetime      AMBER for v1 — the spawn is an AST fact but the REAP analysis is
+ *                 regex, so "unreaped" is half-proven and may not block
+ *   bridge calls  AMBER for v1 — detection is textual preload-key matching, not AST
+ *
+ * AMBER findings stay visible, stay decidable, and stay in the ledger. They simply do
+ * not stop the world.
+ */
+export function hardRed(model) {
   const red = {};
-  for (const p of model.persistence ?? [])
-    if (p.governance === "violation")
-      red[p.id] = { kind: "governance-violation", file: p.evidence[0].file, table: p.table, confidence: p.confidence };
-  for (const s of model.strip ?? [])
-    if (s.bucket === "broken-now")
-      red[`dead-wire:${s.what}`] = { kind: "dead-wire", file: s.where };
-  for (const l of model.lifetime ?? [])
-    if (l.status === "unreaped" || l.status === "conditional")
-      red[`lifetime:${l.module}`] = { kind: "unreaped-worker", file: l.module, status: l.status };
+  for (const p of model.persistence ?? []) {
+    if (p.governance !== "violation") continue;
+    if (p.persistence !== "domain-truth") continue;
+    if (p.confidence !== "high") continue;
+    if (!p.reachProof?.corroborated) continue;
+    red[p.id] = { kind: "governance-violation", file: p.evidence[0].file, table: p.table,
+      confidence: p.confidence, reachHops: p.reachProof.hops };
+  }
+  for (const o of model.ownership ?? []) {
+    if (o.status !== "multiple-claimants" || o.confidence !== "high") continue;
+    if (!(o.strongOwnerCount > 1)) continue;
+    red[o.id] = { kind: "duplicate-ownership", file: o.owners?.[0]?.file ?? null,
+      confidence: o.confidence, claimants: o.ownerCount, structural: o.strongOwnerCount };
+  }
   return red;
 }
+
+/** AMBER — visible and decidable, never blocking. Kept explicit so nothing is silent. */
+export function amberFindings(model) {
+  const amber = {};
+  for (const p of model.persistence ?? [])
+    if (p.governance === "violation" && !(p.persistence === "domain-truth"
+        && p.confidence === "high" && p.reachProof?.corroborated))
+      amber[p.id] = { kind: "governance-violation", confidence: p.confidence,
+        why: p.confidence === "high" ? "no corroborated AST reach proof" : "medium confidence" };
+  for (const l of model.lifetime ?? [])
+    if (l.status === "unreaped" || l.status === "conditional")
+      amber[`lifetime:${l.module}`] = { kind: "unreaped-worker", status: l.status,
+        why: "spawn is an AST fact but the reap analysis is regex — half-proven, so it does not block" };
+  for (const b of model.brokenBridgeCalls ?? [])
+    amber[`broken-bridge-call:${b.method}`] = { kind: "broken-bridge-call",
+      why: "detected by preload-key text matching, not AST — a repair candidate, not a blocker" };
+  for (const s of model.strip ?? [])
+    if (s.bucket === "broken-now") amber[`dead-wire:${s.what}`] = { kind: "dead-wire" };
+  return amber;
+}
+
+/** Back-compat alias. `redFindings` now means HARD red. */
+export const redFindings = hardRed;
 
 /**
  * Compare current reds against the baseline.
@@ -65,19 +113,79 @@ export function expiredExceptions(baseline) {
     .map(([id, ex]) => ({ id, ...ex }));
 }
 
-/** Write the baseline forward: carried debt stays, resolved debt is tombstoned.
- *  `updated` is the SHA of the map snapshot whose reds were recorded, not the
- *  later commit that stored this file on disk. */
-export function advance(baseline, current, commit) {
+/**
+ * THE BASELINE IS ADJUDICATED HARD DEBT — never a snapshot of everything red.
+ *
+ * `advance()` used to write every current red with {kind, file, state, first_seen,
+ * last_seen} and nothing else: no owner, no reason, no remediation trigger, no review
+ * date. Seeding it would have grandfathered 22 findings nobody had ruled on, which is
+ * precisely the "dump of everything unknown" the contract forbids.
+ *
+ * Two rules now hold:
+ *
+ *   1. Only HARD RED findings the founder has adjudicated REPAIR / REMOVE / ACCEPTED
+ *      may enter. KEEP is not eligible — KEEP means "intentional, not debt", and a hard
+ *      red that is genuinely intentional is an ACCEPTED exception carrying its metadata,
+ *      not a silent keep.
+ *   2. Every entry must carry owner, reason and a remediation trigger. ACCEPTED
+ *      additionally needs a review/expiry date, because an exception without one is
+ *      permanent by accident.
+ *
+ * Anything failing those rules is REFUSED, and the refusal names the finding.
+ */
+const REQUIRED = ["owner", "reason", "remediation_trigger"];
+const ELIGIBLE = new Set(["repair", "remove", "accepted"]);
+
+export function advance(baseline, current, commit, decisions = {}) {
   const next = { version: 1, updated: commit, findings: {}, exceptions: baseline.exceptions ?? {} };
   const known = baseline.findings ?? {};
-  for (const [id, info] of Object.entries(current))
-    next.findings[id] = { ...info, state: "open", first_seen: known[id]?.first_seen ?? commit, last_seen: commit };
+  const refused = [];
+
+  for (const [id, info] of Object.entries(current)) {
+    const d = decisions[id];
+    if (!d) { refused.push({ id, why: "no founder verdict recorded" }); continue; }
+    if (d.verdict === "keep") {
+      refused.push({ id, why: "verdict is KEEP — a hard red that is intentional must be ACCEPTED with exception metadata, or its classification is wrong" });
+      continue;
+    }
+    if (!ELIGIBLE.has(d.verdict)) { refused.push({ id, why: `verdict "${d.verdict}" is not eligible for the baseline` }); continue; }
+    const missing = REQUIRED.filter((k) => !d[k]);
+    if (d.verdict === "accepted" && !(d.expires || d.review)) missing.push("review_or_expiry");
+    if (missing.length) { refused.push({ id, why: `missing ${missing.join(", ")}` }); continue; }
+
+    next.findings[id] = {
+      ...info,
+      classification: info.kind,
+      verdict: d.verdict,
+      owner: d.owner,
+      reason: d.reason,
+      remediation_trigger: d.remediation_trigger,
+      review_or_expiry: d.expires ?? d.review ?? null,
+      state: "open",
+      first_seen: known[id]?.first_seen ?? commit,
+      last_seen: commit,
+    };
+  }
+
   // Tombstone anything that was open and is now gone, so it cannot come back quietly.
   for (const [id, info] of Object.entries(known))
     if (!(id in current) && info.state !== "resolved")
       next.findings[id] = { ...info, state: "resolved", resolved_at: commit };
-  return next;
+
+  return { baseline: next, refused };
+}
+
+/** Validate an EXISTING baseline: ordinary findings, not only exceptions. */
+export function incompleteFindings(baseline) {
+  return Object.entries(baseline.findings ?? {})
+    .filter(([, f]) => f.state !== "resolved")
+    .map(([id, f]) => {
+      const missing = REQUIRED.filter((k) => !f[k]);
+      if (f.verdict === "accepted" && !f.review_or_expiry) missing.push("review_or_expiry");
+      if (!f.verdict) missing.push("verdict");
+      return missing.length ? { id, missing } : null;
+    })
+    .filter(Boolean);
 }
 
 export function save(path, baseline) {

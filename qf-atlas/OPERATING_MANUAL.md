@@ -54,13 +54,21 @@ Long-term, this may be Atlas's highest-value use.
 
 | Concept | Meaning |
 |---------|---------|
-| **Atlas tool** | The accepted analyzer/generator in `qf-atlas/` |
-| **Accepted baseline snapshot** | The independently attacked baseline recorded in `baseline.json` (historical ratchet floor) |
+| **Atlas tool** | The analyzer/generator in `qf-atlas/`. Capability work closed; independent acceptance pending |
+| **Baseline** | **Not yet seeded.** Gated on independent acceptance; `baseline.json` is absent by design |
 | **Current map snapshot** | Read `ATLAS.md` header or `atlas.json` meta — this is what you use for the next decision |
 
 After every health pass, the current map may advance (e.g. `health-pass-001 @ abc1234`). **Establish freshness** on every session; never assume an old SHA is still current.
 
-**Accepted Atlas tool provenance:** `atlas-strip-1`, implementation `698b000`, provenance head `2b6f268`. If `qf-atlas/` is missing on a product branch, bring the accepted tool — do not rebuild Atlas from scratch.
+**Tool provenance:** branch `atlas-strip-1`. If `qf-atlas/` is missing on a product branch,
+bring the tooling as-is — do not rebuild Atlas from scratch.
+
+**Authority status.** Capability work is CLOSED; independent acceptance is PENDING. The
+earlier acceptance claim was withdrawn at `7e8598d`, which removed a self-certified
+Verifier PASS and the baseline seeded from it. Until a completed Verifier receipt exists:
+
+- Atlas IS authority for **diagnosis** and **blast radius before editing**.
+- Atlas is NOT authority for **deletion or repair** of product code.
 
 ---
 

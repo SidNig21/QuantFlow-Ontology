@@ -17,7 +17,7 @@ import { buildLoops } from "./loops.mjs";
 import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage, setWriteDoor } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 import { reachability, blastRadius } from "./reach.mjs";
-import { analyzeFile, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
+import { analyzeFile, astReachProof, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
 import { coverageMatrix } from "./coverage-matrix.mjs";
 import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
 import { detectOwnership } from "./ownership.mjs";
@@ -152,6 +152,11 @@ const persistence = classifyPersistence({
   governed: governedFns,
   appReach,
   relOf: rel,
+  // R1 — HIGH confidence now requires a complete app-to-function path walked over
+  // PARSED call expressions. Regex may propose the candidate; it may not supply an
+  // uncorroborated edge to a HIGH finding.
+  astOf, astReachProof,
+  isAppOrigin: (f) => f.startsWith("collab-electron/src/"),
 });
 
 // ─── RECONCILE HOP 4 AGAINST THE SEMANTIC CLASSIFIER ─────────────────────────
@@ -172,14 +177,16 @@ const persistence = classifyPersistence({
 // to what the walk actually proved — a door, a disk write, or nothing.
 {
   const violatingFn = new Set(persistence.filter((p) => p.governance === "violation").map((p) => p.fn));
-  const violatingFile = new Set(persistence.filter((p) => p.governance === "violation")
-    .map((p) => p.evidence[0].file));
+  // NO FILE-MEMBERSHIP FALLBACK. Matching on file meant a violation anywhere in a file
+  // kept every OTHER function in that file stamped `cheats`. governed-review.ts holds
+  // both real bypasses and compliant helpers, so a compliant function was inheriting a
+  // breach verdict purely by living next door. Reconcile on exact function identity.
   const unknownFn = new Set(persistence.filter((p) => p.governance === "unknown").map((p) => p.fn));
   let downgraded = 0;
   for (const w of wires) {
     if (w.hop4?.kind !== "cheats") continue;
     const fn = w.hop4.viaDml, file = w.hop4.dmlFile;
-    if (violatingFn.has(fn) || violatingFile.has(file)) continue;   // a real breach: stays
+    if (violatingFn.has(fn)) continue;   // this exact function is a confirmed breach: stays
     downgraded++;
     w.hop4.kind = w.hop4.viaDoor ? "write-door" : w.hop4.viaDisk ? "writes-disk" : "read-only";
     w.hop4.downgradedFrom = "cheats";

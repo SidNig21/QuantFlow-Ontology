@@ -27,7 +27,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { REPO } from "./extract.mjs";
-import { load, redFindings, diff, expiredExceptions, advance, save } from "./baseline.mjs";
+import { load, hardRed, amberFindings, diff, expiredExceptions, advance, save, incompleteFindings } from "./baseline.mjs";
 
 const BASELINE = join(REPO, "qf-atlas", "baseline.json");
 const ATLAS = join(REPO, "qf-atlas", "atlas.json");
@@ -55,14 +55,8 @@ const baseline = load(BASELINE);
 const seeded = existsSync(BASELINE);
 
 // ── 2. confirmed reds against the baseline ─────────────────────────────────
-const current = redFindings(model);
-// Ownership is a red class baseline.mjs predates, so it is added here rather than
-// silently omitted: a second architectural owner appearing is one of the contract's
-// named failure conditions.
-for (const o of model.ownership ?? [])
-  if (o.status === "multiple-claimants" && o.confidence === "high")
-    current[o.id] = { kind: "duplicate-ownership", file: o.owners?.[0]?.file ?? null,
-      claimants: o.ownerCount };
+const current = hardRed(model);
+const amber = amberFindings(model);
 
 const d = diff(baseline, current);
 
@@ -109,6 +103,13 @@ if (expired.length)
 // carrying reason, owner and expiry, so "make it green" can never be achieved by
 // quietly widening an allowlist.
 if (seeded) {
+  // ORDINARY FINDINGS TOO. Only exceptions were validated, so a baseline of 22 entries
+  // with zero owners and zero reasons would have seeded and passed.
+  const incomplete = incompleteFindings(baseline);
+  if (incomplete.length)
+    fail.push(`INCOMPLETE BASELINE FINDINGS (${incomplete.length}): `
+      + incomplete.slice(0, 4).map((f) => `${f.id} missing ${f.missing.join("/")}`).join("; ")
+      + " — every baseline entry needs owner, reason and a remediation trigger.");
   const bad = Object.entries(baseline.exceptions ?? {})
     .filter(([, ex]) => !(ex.reason && ex.owner && ex.expires))
     .map(([id]) => id);
@@ -141,7 +142,14 @@ if (process.argv.includes("--seed")) {
     console.error("qf-atlas/ratchet: refusing to seed from a stale map.");
     process.exit(2);
   }
-  const next = advance(baseline, current, model.meta.commit);
+  const ledger = JSON.parse(readFileSync(join(REPO, "qf-atlas/decisions.json"), "utf8")).decisions ?? {};
+  const { baseline: next, refused } = advance(baseline, current, model.meta.commit, ledger);
+  if (refused.length) {
+    console.error(`qf-atlas/ratchet: REFUSING to seed — ${refused.length} hard red(s) are not adjudicated:`);
+    for (const r of refused) console.error(`  ${r.id}
+    ${r.why}`);
+    process.exit(2);
+  }
   save(BASELINE, next);
   console.log(`qf-atlas/ratchet: baseline seeded at ${model.meta.commit} with `
     + `${Object.keys(next.findings).length} entries.`);
@@ -157,9 +165,10 @@ for (const w of warn) console.log(`  WARN  ${w}`);
 for (const n of note) console.log(`  note  ${n}`);
 console.log("");
 console.log(`  baseline: ${seeded ? `${Object.keys(baseline.findings ?? {}).length} entries` : "not seeded"}`
-  + ` · confirmed red now: ${Object.keys(current).length}`
+  + ` · HARD RED: ${Object.keys(current).length}`
   + ` · unexplained coverage: ${unexplained.length}`
   + ` · undecided w/o blocker: ${unexplainedUndecided.length}`
+  + ` · AMBER (visible, non-blocking): ${Object.keys(amber).length}`
   + ` · undecided: ${model.stats?.decisions?.undecided ?? "?"}`);
 
 if (ms > 60_000)

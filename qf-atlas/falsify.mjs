@@ -102,6 +102,7 @@ const MAIN = "collab-electron/src/main";
 // checks can build synthetic "before" models the CLI could never produce. Top-level
 // await keeps the rest of the harness synchronous.
 const { atlasDiff } = await import("./diff.mjs");
+const { hardRed: hardRedFn, advance: advanceFn } = await import("./baseline.mjs");
 
 console.log("qf-atlas falsifiers — each injects a real defect, then restores\n");
 if (!gitClean()) {
@@ -1279,6 +1280,95 @@ record(74, "hop 4 and persistence answer to the same derived door", ...(() => {
   const printsRetired = /declared write door is `execute\.ts`, `create\.ts`, `insert\.ts`/.test(md);
   return [injected && !printsRetired,
     `hop4UsesDerivedDoor=${injected} briefPrintsRetiredList=${printsRetired}`];
+})());
+
+// ── R1/R2/R3 — AUTHORITY SEMANTICS ────────────────────────────────────────
+
+// 75 · R1 — a HIGH persistence red must carry a CORROBORATED AST reach proof. The
+// bypass verdict is what makes a SQL site a governance violation, and it used to rest
+// entirely on the regex call graph whose call set is "every identifier before a paren".
+record(75, "every HIGH persistence red carries an AST reach proof", ...(() => {
+  const hi = (before.persistence ?? []).filter((p) => p.governance === "violation" && p.confidence === "high");
+  if (!hi.length) return [false, "no high-confidence persistence violations to check"];
+  const unproven = hi.filter((p) => !p.reachProof?.corroborated || !(p.reachProof.path || []).length);
+  return [unproven.length === 0,
+    unproven.length ? unproven.length + " HIGH row(s) with no corroborated path, e.g. " + unproven[0].id
+      : hi.length + " HIGH row(s), all with an AST path (hops: " + hi.map((p) => p.reachProof.hops).join(",") + ")"];
+})());
+
+// 76 · R1 — breaking the reach edge must DOWNGRADE the row. Renaming the app-side
+// caller removes the only parsed call expression reaching the function.
+//
+// HONEST LIMIT of this fixture, stated rather than glossed: renaming the call removes
+// the edge from BOTH the AST and the regex graph, so this proves the row cannot stay
+// HIGH once the path is gone — it does not prove AST and regex disagreeing. A fixture
+// that keeps a regex-visible token while removing the parsed CallExpression would be
+// the stronger test, and is left to the independent Verifier to invent.
+record(76, "breaking the reach edge downgrades the row out of HIGH", ...(() => {
+  const K = "collab-electron/src/main/kernel.ts";
+  const abs = join(REPO, K);
+  const original = readFileSync(abs, "utf8");
+  if (!original.includes("markGovernedDelivery("))
+    return [false, "kernel.ts no longer calls markGovernedDelivery — this probe needs a new subject"];
+  try {
+    writeAtomic(abs, original.split("markGovernedDelivery(").join("zzNoSuchCallee("));
+    const m = model();
+    const row = (m.persistence ?? []).find((p) => p.fn === "markGovernedDelivery" && p.table === "task");
+    if (!row) return [false, "the markGovernedDelivery row vanished entirely"];
+    const downgraded = row.confidence !== "high";
+    const hiUnproven = (m.persistence ?? []).filter((p) =>
+      p.governance === "violation" && p.confidence === "high" && !p.reachProof?.corroborated);
+    return [downgraded && hiUnproven.length === 0,
+      "confidence=" + row.confidence + " governance=" + row.governance
+      + "; unproven HIGH rows anywhere = " + hiUnproven.length];
+  } finally { writeAtomic(abs, original); }
+})());
+
+// 77 · R1 — file membership may not confer `cheats`. The reconciliation matched on
+// violatingFile, so a compliant function inherited a breach verdict purely by living in
+// the same file as a real one. governed-review.ts holds both.
+record(77, "a compliant function does not inherit cheats from its file", ...(() => {
+  const violFn = new Set((before.persistence ?? []).filter((p) => p.governance === "violation").map((p) => p.fn));
+  const bad = (before.wires ?? []).filter((w) => w.hop4?.kind === "cheats" && !violFn.has(w.hop4.viaDml));
+  return [bad.length === 0,
+    bad.length ? bad.length + " cheats verdict(s) not backed by the exact violating function, e.g. " + bad[0].channel
+      : "every cheats verdict names a confirmed violating function"];
+})());
+
+// 78 · R2 — hard red is class-specific. Medium qf_review_* bookkeeping may not block,
+// and a class whose analyzer is not AST-backed stays amber rather than being promoted
+// on the strength of a regex.
+record(78, "hard red excludes medium and non-AST classes", ...(() => {
+  const red = hardRedFn(before);
+  const ids = Object.keys(red);
+  const medium = ids.filter((id) => (before.persistence ?? [])
+    .some((p) => p.id === id && p.confidence !== "high"));
+  const lifetime = ids.filter((id) => id.startsWith("lifetime:"));
+  const bridge = ids.filter((id) => id.startsWith("broken-bridge-call:"));
+  const noProof = ids.filter((id) => (before.persistence ?? [])
+    .some((p) => p.id === id && !p.reachProof?.corroborated));
+  return [medium.length === 0 && lifetime.length === 0 && bridge.length === 0 && noProof.length === 0,
+    "hardRed=" + ids.length + " medium=" + medium.length + " lifetime=" + lifetime.length
+    + " bridge=" + bridge.length + " unproven=" + noProof.length];
+})());
+
+// 79 · R3 — the baseline may only carry adjudicated hard debt. KEEP is not eligible:
+// KEEP means intentional, and a hard red that is genuinely intentional is an ACCEPTED
+// exception carrying its metadata, not a silent keep.
+record(79, "seeding refuses unadjudicated or KEEP hard reds", ...(() => {
+  const red = hardRedFn(before);
+  const empty = { version: 1, updated: null, findings: {}, exceptions: {} };
+  const none = advanceFn(empty, red, "test", {});
+  const keepAll = advanceFn(empty, red, "test",
+    Object.fromEntries(Object.keys(red).map((id) => [id, { verdict: "keep", owner: "f", reason: "r", remediation_trigger: "t" }])));
+  const good = advanceFn(empty, red, "test",
+    Object.fromEntries(Object.keys(red).map((id) => [id, { verdict: "repair", owner: "founder", reason: "r", remediation_trigger: "t" }])));
+  return [Object.keys(none.baseline.findings).length === 0
+      && Object.keys(keepAll.baseline.findings).length === 0
+      && Object.keys(good.baseline.findings).length === Object.keys(red).length,
+    "unadjudicated seeded=" + Object.keys(none.baseline.findings).length
+    + " keep seeded=" + Object.keys(keepAll.baseline.findings).length
+    + " adjudicated seeded=" + Object.keys(good.baseline.findings).length + "/" + Object.keys(red).length];
 })());
 
 // restore the committed model

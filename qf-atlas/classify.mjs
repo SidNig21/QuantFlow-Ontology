@@ -347,7 +347,7 @@ export function callerIndex(index) {
  * Returns one finding per SQL-bearing function, carrying every dimension the
  * brief requires. Nothing collapses into a single red/green.
  */
-export function classifyPersistence({ index, names, domain, transport, governed, appReach, relOf }) {
+export function classifyPersistence({ index, names, domain, transport, governed, appReach, relOf, astOf, astReachProof, isAppOrigin }) {
   const findings = [];
   const nameIndex = names ?? byRecName(index);
 
@@ -369,7 +369,7 @@ export function classifyPersistence({ index, names, domain, transport, governed,
         : isDomain ? "domain-truth"
         : "non-domain-store";
 
-      let governance, confidence, why;
+      let governance, confidence, why, reachProof = null, blocker = null;
       if (persistence !== "domain-truth" && persistence !== "non-domain-store") {
         governance = "compliant";
         confidence = "high";
@@ -401,6 +401,29 @@ export function classifyPersistence({ index, names, domain, transport, governed,
         why = persistence === "domain-truth"
           ? `Writes the domain table \`${site.table}\` and is reachable from outside the write door (${reach.callers.join(", ")}).`
           : `Writes \`${site.table}\`, a table absent from the generated schema, reachable from outside the write door.`;
+
+        // R1 — HIGH REQUIRES AN AST-BACKED REACH PROOF.
+        //
+        // Corroborating the SQL site and its enclosing symbol proves the WRITE exists. It
+        // says nothing about whether anyone outside the write door can reach it — and that
+        // second half is what the `bypass` verdict, and therefore the HIGH confidence,
+        // actually turns on. Until now that half rested entirely on the regex call graph,
+        // whose call set is "every identifier followed by an open paren".
+        //
+        // Regex may still PROPOSE the candidate. It may not supply an uncorroborated edge
+        // to a HIGH finding. If no complete app-to-function path can be walked over parsed
+        // call expressions, the row drops to medium and says why.
+        if (confidence === "high" && astOf && astReachProof) {
+          reachProof = astReachProof({
+            astOf, targetFile: rec.file, targetFn: fnName,
+            isAppOrigin: isAppOrigin ?? (() => false),
+          });
+          if (!reachProof.corroborated) {
+            confidence = "medium";
+            blocker = "ast-coverage";
+            why += ` Confidence capped at medium: ${reachProof.why}.`;
+          }
+        }
       }
 
       findings.push({
@@ -417,6 +440,8 @@ export function classifyPersistence({ index, names, domain, transport, governed,
         reachability: reach.value,
         governance,
         confidence,
+        reachProof,
+        blocker,
         why,
         evidence: [{ type: "static", file: rec.file, lines: [site.line] }],
       });

@@ -7,7 +7,14 @@ Read this before touching QuantFlow architecture or cleanup.
 1. Read `START_HERE.md` and identify current work authority (`docs/orders/NEXT.md` or founder health-pass authorization).
 2. Read `qf-atlas/OPERATING_MANUAL.md`.
 
-Atlas v1 is **closed**. Do not redesign, extend, or improve Atlas.
+**STATUS**
+
+- Capability work: **CLOSED**. Do not redesign, extend or add analyzers.
+- Independent acceptance: **PENDING**. No completed Verifier receipt exists;
+  `qf-atlas/verification.json` and `qf-atlas/baseline.json` are absent by design.
+
+Atlas is authoritative for **diagnosis and blast radius today**. It is **not yet**
+authority for deletion or repair — that waits on independent acceptance.
 
 ## Establish snapshot
 
@@ -17,7 +24,7 @@ git branch --show-current
 git rev-parse HEAD
 ```
 
-Ensure this checkout contains the accepted `qf-atlas/` v1 tooling. If missing, bring it from `atlas-strip-1` (provenance `698b000` / `2b6f268`) — do not rebuild.
+Ensure this checkout contains the `qf-atlas/` v1 tooling. If missing, bring it from `atlas-strip-1` — use it as-is, do not rebuild.
 
 ## Refresh
 

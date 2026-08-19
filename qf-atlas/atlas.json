@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "f1298fd",
+    "commit": "27f76f6",
     "generatedAt": "2026-08-19",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "74f57fa91013fc62"
+    "fingerprint": "309a9eb5aa4c03fd"
   },
   "stats": {
     "live": 106,
@@ -41190,6 +41190,24 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "high",
+      "reachProof": {
+        "corroborated": true,
+        "hops": 2,
+        "path": [
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:296",
+            "fn": "requestGovernedReview",
+            "calls": "createReviewTask"
+          },
+          {
+            "from": "collab-electron/src/main/kernel.ts:513",
+            "fn": "kernelRequestGovernedReview",
+            "calls": "requestGovernedReview"
+          }
+        ],
+        "resolution": "AST call expressions; cross-file edges matched by callee name, not type-resolved"
+      },
+      "blocker": null,
       "why": "Writes the domain table `links` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
       "evidence": [
         {
@@ -41213,6 +41231,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_attempt`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41236,6 +41256,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_attempt`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41259,6 +41281,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_invocation`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41282,6 +41306,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_invocation`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41305,6 +41331,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_publication`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41328,6 +41356,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_receipt`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41351,6 +41381,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_receipt`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41374,6 +41406,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_source_work`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41397,6 +41431,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_source_work`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41420,6 +41456,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41443,6 +41481,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41466,6 +41506,8 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
       "evidence": [
         {
@@ -41489,6 +41531,24 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "high",
+      "reachProof": {
+        "corroborated": true,
+        "hops": 2,
+        "path": [
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:296",
+            "fn": "requestGovernedReview",
+            "calls": "createReviewTask"
+          },
+          {
+            "from": "collab-electron/src/main/kernel.ts:513",
+            "fn": "kernelRequestGovernedReview",
+            "calls": "requestGovernedReview"
+          }
+        ],
+        "resolution": "AST call expressions; cross-file edges matched by callee name, not type-resolved"
+      },
+      "blocker": null,
       "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
       "evidence": [
         {
@@ -41512,6 +41572,19 @@
       "reachability": "bypass",
       "governance": "violation",
       "confidence": "high",
+      "reachProof": {
+        "corroborated": true,
+        "hops": 1,
+        "path": [
+          {
+            "from": "collab-electron/src/main/kernel.ts:517",
+            "fn": "kernelMarkGovernedDelivery",
+            "calls": "markGovernedDelivery"
+          }
+        ],
+        "resolution": "AST call expressions; cross-file edges matched by callee name, not type-resolved"
+      },
+      "blocker": null,
       "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
       "evidence": [
         {
@@ -41535,6 +41608,8 @@
       "reachability": "kernel-internal",
       "governance": "unknown",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Called only from inside packages/qf-kernel (packages/qf-kernel/src/governed-review.ts, packages/qf-kernel/src/insert.ts). Kernel internals, not a path production reaches on its own. Needs verification.",
       "evidence": [
         {
@@ -41558,6 +41633,8 @@
       "reachability": "unknown",
       "governance": "unknown",
       "confidence": "low",
+      "reachProof": null,
+      "blocker": null,
       "why": "No caller of insertRun() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
       "evidence": [
         {
@@ -41581,6 +41658,8 @@
       "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "transport-bookkeeping — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -41604,6 +41683,8 @@
       "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "transport-bookkeeping — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -41627,6 +41708,8 @@
       "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "transport-bookkeeping — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -41650,6 +41733,8 @@
       "reachability": "unknown",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "transport-bookkeeping — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -41673,6 +41758,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41696,6 +41783,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41719,6 +41808,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41742,6 +41833,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41765,6 +41858,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41788,6 +41883,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41811,6 +41908,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41834,6 +41933,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41857,6 +41958,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41880,6 +41983,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41903,6 +42008,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41926,6 +42033,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41949,6 +42058,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41972,6 +42083,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -41995,6 +42108,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42018,6 +42133,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42041,6 +42158,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42064,6 +42183,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42087,6 +42208,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42110,6 +42233,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42133,6 +42258,8 @@
       "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "qa-fixture — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -42156,6 +42283,8 @@
       "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "qa-fixture — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -42179,6 +42308,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of insertArtifact() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42202,6 +42333,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42225,6 +42358,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42248,6 +42383,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42271,6 +42408,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42294,6 +42433,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42317,6 +42458,8 @@
       "reachability": "governed",
       "governance": "compliant",
       "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
       "why": "Internal implementation: every caller of writeLinks() is inside the write door, so production reaches this SQL only through a governed action.",
       "evidence": [
         {
@@ -42340,6 +42483,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42363,6 +42508,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42386,6 +42533,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42409,6 +42558,8 @@
       "reachability": "inside-write-door",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "Inside the declared write door.",
       "evidence": [
         {
@@ -42432,6 +42583,8 @@
       "reachability": "kernel-internal",
       "governance": "compliant",
       "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
       "why": "schema-migration — outside the domain the Kernel owns.",
       "evidence": [
         {
@@ -42767,12 +42920,12 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "7e8598d",
-      "generatedAt": "2026-08-17"
+      "commit": "f1298fd",
+      "generatedAt": "2026-08-19"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "f1298fd",
+      "commit": "27f76f6",
       "generatedAt": "2026-08-19"
     },
     "verdict": "better",
