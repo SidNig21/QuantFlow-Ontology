@@ -265,7 +265,11 @@ export function analyzeFile(relPath, text) {
         f.sql.push({
           verb: m[1].replace(/\s+/g, " ").toUpperCase(),
           table: m[2],
-          line: lineOf(node),
+          // FILE-RELATIVE, PER STATEMENT. A multi-statement DDL block lives in ONE
+          // string literal, so reporting the literal start line stamped six different
+          // tables with line 98 — and line 98 mentions none of them. Offset by the
+          // newlines preceding this match inside the literal.
+          line: lineOf(node) + raw.slice(0, m.index).split(String.fromCharCode(10)).length - 1,
           enclosing: enc?.name ?? null,
           enclosingKind: enc?.kind ?? null,
           className: enc?.className ?? null,
@@ -325,7 +329,52 @@ function emptyFacts(path, state, reason) {
  * the proof records every hop for a human to read.
  */
 export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, maxHops = 5 }) {
-  // callee name -> [{ file, fn, line }]  from parsed call expressions only
+  // MODULE EDGE. A call expression alone is not a path: an unrelated file can define its
+  // own function with the same name. An independent Verifier proved this by adding a
+  // renderer badge helper with a local `createReviewTask` and watching the genuine
+  // two-hop kernel proof be REPLACED by a one-hop path through a string formatter that
+  // cannot reach Kernel code at all. The red survived, but the evidence shown to a human
+  // became fiction, and `hops` feeds the baseline.
+  //
+  // So every hop must also carry a plausible module edge: the caller either lives in the
+  // callee's file, or imports something that resolves into the callee's package or
+  // directory subtree. That is still not type resolution — it is recorded as such — but a
+  // file with no import path toward the target can no longer certify reaching it.
+  const importsOf = new Map();
+  for (const [file, a] of astOf) {
+    const roots = new Set([file.slice(0, file.lastIndexOf("/"))]);
+    for (const i of a.imports ?? []) {
+      const spec = i.spec;
+      if (spec.startsWith(".")) {
+        const dir = file.slice(0, file.lastIndexOf("/"));
+        const parts = (dir + "/" + spec).split("/");
+        const out = [];
+        for (const seg of parts) {
+          if (seg === "." || seg === "") continue;
+          if (seg === "..") out.pop();
+          else out.push(seg);
+        }
+        out.pop();
+        roots.add(out.join("/"));
+      } else {
+        // Bare specifier: map the package name onto any directory that ends with it, so
+        // `qf-kernel/portable` admits packages/qf-kernel/**.
+        roots.add(spec.split("/")[0]);
+      }
+    }
+    importsOf.set(file, roots);
+  }
+  const moduleEdge = (from, to) => {
+    if (from === to) return true;
+    const roots = importsOf.get(from) ?? new Set();
+    for (const r of roots) {
+      if (!r) continue;
+      if (to.startsWith(r + "/") || to === r) return true;
+      if (to.includes("/" + r + "/")) return true;   // bare package name inside the path
+    }
+    return false;
+  };
+
   const callersOf = new Map();
   for (const [file, a] of astOf)
     for (const c of a.calls ?? []) {
@@ -336,31 +385,123 @@ export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, maxHop
 
   const seen = new Set([`${targetFile}::${targetFn}`]);
   let frontier = [{ file: targetFile, fn: targetFn, path: [] }];
+  const found = [];
   for (let hop = 0; hop < maxHops; hop++) {
     const next = [];
     for (const node of frontier)
-      for (const c of callersOf.get(node.fn) ?? []) {
+      for (const c of (callersOf.get(node.fn) ?? []).slice().sort((a, b) =>
+          a.file.localeCompare(b.file) || a.line - b.line)) {
+        // DETERMINISTIC: candidates are sorted, so proof selection no longer depends on
+        // Map insertion order — the same repo always yields the same proof.
+        if (!moduleEdge(c.file, node.file)) continue;
         const key = `${c.file}::${c.fn}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        const step = { from: `${c.file}:${c.line}`, fn: c.fn, calls: node.fn };
-        const path = [...node.path, step];
-        if (isAppOrigin(c.file))
-          return {
-            corroborated: true,
-            hops: path.length,
-            path,
-            resolution: "AST call expressions; cross-file edges matched by callee name, not type-resolved",
-          };
-        next.push({ file: c.file, fn: c.fn, path });
+        const path = [...node.path, { from: `${c.file}:${c.line}`, fn: c.fn, calls: node.fn }];
+        if (isAppOrigin(c.file)) found.push(path);
+        else next.push({ file: c.file, fn: c.fn, path });
       }
+    if (found.length) break;
     if (!next.length) break;
     frontier = next;
   }
+  if (found.length) {
+    found.sort((a, b) => a.length - b.length || JSON.stringify(a).localeCompare(JSON.stringify(b)));
+    return {
+      corroborated: true, hops: found[0].length, path: found[0],
+      alternatives: found.length - 1,
+      resolution: "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved",
+    };
+  }
   return {
-    corroborated: false,
-    hops: 0,
-    path: [],
-    why: `no AST call path from an app file reaches ${targetFn} within ${maxHops} hops`,
+    corroborated: false, hops: 0, path: [],
+    why: `no AST call path with a supporting module edge reaches ${targetFn} from an app file within ${maxHops} hops`,
   };
+}
+
+
+/**
+ * AST REACH PROOF — can an app caller actually get to this function?
+ *
+ * The `bypass` verdict is what turns a SQL site into a HIGH-confidence governance
+ * violation, and until now that verdict rested entirely on the regex call graph in
+ * hop4.indexFunctions, whose call set is "every identifier followed by an open paren".
+ * Corroborating only the SQL site and its enclosing symbol proves the write exists; it
+ * does not prove anyone outside the write door can reach it. That second half is the
+ * part the verdict actually turns on.
+ *
+ * This walks CALL EXPRESSIONS parsed by the compiler, backwards from the SQL-bearing
+ * function, until it reaches a caller in an app file. Each hop is a real
+ * `CallExpression` with a real enclosing symbol — not a token match.
+ *
+ * HONEST LIMIT, recorded in the proof rather than hidden: cross-file resolution is by
+ * callee NAME against AST call records. A type checker would bind the symbol; this does
+ * not. So a proof means "the compiler saw a call with this name inside this function",
+ * which is strictly stronger than the regex graph and strictly weaker than type
+ * resolution. Two same-named exports in different modules could still be conflated, so
+ * the proof records every hop for a human to read.
+ */
+
+/**
+ * The function index, built from PARSED declarations instead of regex.
+ *
+ * This is the fix for the Verifier's most severe finding. `classifyPersistence` was fed
+ * by `hop4.indexFunctions`, whose declaration patterns are:
+ *
+ *   /(?:export\s+)?(?:async\s+)?function\s+NAME\s*[<(]/
+ *   /(?:export\s+)?const\s+NAME\s*(?::[^=]+)?=\s*(?:async\s*)?(?:function\s*)?[<(]/
+ *
+ * A CLASS METHOD matches neither. A domain write inside `class Store { persist() { … } }`
+ * produced no finding at all — and the per-analyzer matrix still reported that file
+ * `persistence: "indexed"`, so `unexplainedCoverage` stayed empty and the ratchet, which
+ * reads exactly that field, was structurally blind to the gap. The AST had the fact
+ * right the whole time (`enclosing: "persist", enclosingKind: "method"`); the result was
+ * being discarded.
+ *
+ * Same record shape as before — { name, file, door, dml, sqlSites, disk, calls } — so
+ * classify.mjs consumes it unchanged. What differs is that the enclosing symbol comes
+ * from the parser, which resolves function declarations, arrow assignments, object
+ * literal methods and CLASS METHODS alike.
+ *
+ * `unresolved` returns the SQL the parser saw but could not attribute to any named
+ * symbol, so that loss becomes a coverage gap rather than silence.
+ */
+export function astFunctionIndex({ astOf, doorNames, insideDoor }) {
+  const index = new Map();
+  const unresolved = [];
+
+  for (const [file, a] of astOf) {
+    const byFn = new Map();
+    const touch = (fn) => {
+      const key = `${file}::${fn}`;
+      if (!index.has(key))
+        index.set(key, { name: fn, file, door: false, dml: false, sqlSites: [], disk: false, calls: new Set() });
+      byFn.set(fn, index.get(key));
+      return index.get(key);
+    };
+
+    for (const c of a.calls ?? []) {
+      if (!c.enclosing) continue;
+      const rec = touch(c.enclosing);
+      if (c.name) rec.calls.add(c.name);
+      else unresolved.push({ file, line: c.line, what: "call with a computed callee name",
+        why: "the callee is an expression, not an identifier — it cannot be followed" });
+    }
+    for (const s of a.sql ?? []) {
+      if (!s.enclosing) {
+        unresolved.push({ file, line: s.line, what: `${s.verb} ${s.table} at top level`,
+          why: "SQL is not inside any named symbol, so no call path can be traced to it" });
+        continue;
+      }
+      const rec = touch(s.enclosing);
+      rec.sqlSites.push({ table: s.table, verb: s.verb, line: s.line });
+    }
+    for (const fn of a.functions ?? []) touch(fn.name);
+  }
+
+  for (const rec of index.values()) {
+    rec.door = doorNames.has(rec.name) || [...rec.calls].some((c) => doorNames.has(c));
+    rec.dml = rec.sqlSites.length > 0 && !insideDoor(rec.file);
+  }
+  return { index, unresolved };
 }

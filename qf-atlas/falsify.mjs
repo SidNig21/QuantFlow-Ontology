@@ -267,14 +267,24 @@ record(12, "two handle registrations is a duplicate owner",
     }));
 
 // 13 · SQL the indexer cannot resolve must surface as a coverage gap, never silence
-record(13, "unresolvable SQL becomes a coverage gap, not silence",
+// 13 · SQL the analyzer cannot attribute to a named symbol must become a visible gap,
+// never silence. The fixture used to be a CLASS METHOD, which the regex indexer could
+// not resolve — the AST resolves those now (falsifier 80), so the premise moved. The
+// genuinely unattributable shape is SQL at module top level, inside no symbol at all:
+// nothing can be said about who reaches it, and that must show as a gap.
+record(13, "SQL attributable to no symbol becomes a coverage gap, not silence",
   ...withFile(`${MAIN}/zz-falsify-13.ts`,
-    // a class method — a shape the function indexer does not resolve
-    `export class Repo {\n  save(db){ db.query("INSERT INTO mission (id) VALUES (?)").run("x"); }\n}\n`,
+    [ "declare const db: any;",
+      "db.query('INSERT INTO mission (id) VALUES (?)').run('x');", "" ].join(String.fromCharCode(10)),
     (m) => {
       const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-13.ts"));
+      const finding = (m.persistence ?? []).some((x) => x.evidence[0].file.endsWith("zz-falsify-13.ts"));
       const gap = cov && (cov.status === "partial" || cov.status === "unindexed");
-      return [gap, cov ? `coverage=${cov.status} sqlInText=${cov.sqlInText} sqlIndexed=${cov.sqlIndexed}` : "file not covered at all"];
+      // Either it is adjudicated as a finding, or it is a stated gap. What it may never
+      // be is absent from both.
+      return [Boolean(gap || finding),
+        cov ? `coverage=${cov.status} sqlInText=${cov.sqlInText} sqlIndexed=${cov.sqlIndexed} finding=${finding}`
+          : `file absent from coverage; finding=${finding}`];
     }));
 
 // 14 · a live app bypass: preload -> main -> exported helper -> domain SQL, no execute()
@@ -1372,6 +1382,46 @@ record(79, "seeding refuses unadjudicated or KEEP hard reds", ...(() => {
     + " keep seeded=" + Object.keys(keepAll.baseline.findings).length
     + " adjudicated seeded=" + Object.keys(good.baseline.findings).length + "/" + Object.keys(red).length];
 })());
+
+// ── FROM THE INDEPENDENT VERIFIER ─────────────────────────────────────────
+
+// 80 · Verifier defect 1 — a domain write inside a CLASS METHOD must be adjudicated.
+// The findings pipeline ran on regex declaration patterns that match neither a class
+// method nor an object-literal method, so such a write produced NO finding at all while
+// the per-analyzer matrix still reported the file `persistence: indexed` — a silent hole
+// the ratchet was structurally blind to. The AST had the fact right and it was discarded.
+record(80, "a domain write in a class method is adjudicated, not invisible",
+  ...withFile("packages/qf-kernel/src/zzv-widget-store.ts",
+    [ "export class WidgetStore {",
+      "  persistWidgetRow(db, id) {",
+      "    db.query('INSERT INTO task (id) VALUES (?)').run(id);",
+      "  }", "}", "" ].join(String.fromCharCode(10)),
+    (m) => {
+      const row = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith("zzv-widget-store.ts"));
+      if (!row) return [false, "the class-method write produced NO finding — the silent hole is back"];
+      return [row.fn === "persistWidgetRow" && row.persistence === "domain-truth",
+        "fn=" + row.fn + " persistence=" + row.persistence + " governance=" + row.governance + "/" + row.confidence];
+    }));
+
+// 81 · Verifier defect 2 — a reach proof may not be forged by an unrelated same-named
+// function. A renderer helper defining its own `createReviewTask` REPLACED the genuine
+// two-hop kernel proof with a one-hop path through a string formatter that cannot reach
+// Kernel code, and `hops` feeds the baseline. Every hop now needs a module-import edge,
+// and candidates are sorted so proof selection is deterministic rather than
+// Map-insertion-order dependent.
+record(81, "a same-named decoy cannot forge or suppress a reach proof",
+  ...withFile("collab-electron/src/windows/shared/zzv-badge.ts",
+    [ "function createReviewTask(label) { return label; }",
+      "export function renderBadge(label) { return createReviewTask(label); }", "" ]
+      .join(String.fromCharCode(10)),
+    (m) => {
+      const hi = (m.persistence ?? []).filter((p) =>
+        p.governance === "violation" && p.persistence === "domain-truth" && p.confidence === "high");
+      const forged = hi.filter((p) => (p.reachProof?.path ?? []).some((s) => s.from.includes("zzv-badge")));
+      // Forgery blocked AND the real reds not suppressed: both directions matter.
+      return [forged.length === 0 && hi.length === 3,
+        "highs=" + hi.length + " (expect 3, i.e. not suppressed) forgedProofs=" + forged.length];
+    }));
 
 // restore the committed model
 execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });

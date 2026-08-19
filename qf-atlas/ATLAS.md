@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ dcc5693` on 2026-08-19 by
+> Generated from `atlas-strip-1 @ 674656c` on 2026-08-19 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**43 of 51 findings have not been looked at.**
+**45 of 53 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 43 |
+| `undecided` | 45 |
 | `repair` | 6 |
 | `remove` | 0 |
 | `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 43 findings still need a decision.
+**Not all clear.** 45 findings still need a decision.
 
 ## The four hops
 
@@ -328,8 +328,8 @@ The question is not "does this file contain INSERT". It is **can production doma
 state reach this SQL without first entering a governed action?** Domain tables come
 from the generated schema; reachability follows call sites and the Kernel command table.
 
-**3 confirmed at `high` confidence**, 12 more at `medium`,
-2 unknown (gray — not counted as debt).
+**3 confirmed at `high` confidence**, 13 more at `medium`,
+3 unknown (gray — not counted as debt).
 
 The split matters. A `high` row is a domain-truth write reached from outside a governed
 action. A `medium` row is usually a store that is not in the golden schema — real, but a
@@ -342,17 +342,18 @@ weaker claim, and it should not be read as the same kind of defect.
 
 | File | Table | Verb | Kind | Reach | Confidence |
 |---|---|---|---|---|---|
+| `collab-electron/src/main/updater/update-manager.ts` | `check` | UPDATE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `links` | INSERT INTO | domain-truth | bypass | high |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_attempt` | INSERT INTO | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_invocation` | INSERT INTO | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_publication` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_receipt` | INSERT INTO | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_source_work` | INSERT INTO | non-domain-store | bypass | medium |
-| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | CREATE TABLE | non-domain-store | bypass | medium |
+| `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | CREATE TABLE IF NOT EXISTS | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | INSERT INTO | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `qf_review_task` | UPDATE | non-domain-store | bypass | medium |
 | `packages/qf-kernel/src/governed-review.ts` | `task` | INSERT INTO | domain-truth | bypass | high |
@@ -364,6 +365,14 @@ Everything that imports the file, directly or transitively. This is what breaks 
 change is wrong. **`atlas.json` carries this for every file** — 232 of
 234 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
+
+`collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
+  · wires: `update:check`, `update:download`, `update:getStatus`, `update:install`
+
+```
+  collab-electron/src/main/updater/index.ts
+  collab-electron/src/main/index.ts
+```
 
 `packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 5
 
@@ -405,7 +414,7 @@ which are not in the golden schema),
 Kernel command implementations dispatched by `execute()`, schema migrations,
 generated SQL, and QA fixture seeding.
 
-## What the analyzer could not read (27)
+## What the analyzer could not read (22)
 
 **Absence of a finding is not proof of compliance.** These files hold SQL the function
 indexer could not resolve, so governance analysis never saw it. They are gray, and they
@@ -413,22 +422,22 @@ prevent a clean architectural result.
 
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
-| `packages/qf-kernel/src/upgrade.ts` | partial | 1 | 3 |
-| `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | partial | 1 | 0 |
+| `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 2 |
 | `collab-electron/src/main/kernel.ts` | partial | 7 | 6 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
 | `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/host-acp-bridge.ts` | unindexed | 0 | 0 |
-| `collab-electron/src/main/peer-role-registry.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/qf-execute-allowlist.ts` | unindexed | 0 | 0 |
-| `collab-electron/src/main/sidecar/client.ts` | unindexed | 0 | 0 |
-| `collab-electron/src/main/sidecar/ring-buffer.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/updater/index.ts` | unindexed | 0 | 0 |
 | `collab-electron/src/main/vite-raw.d.ts` | unindexed | 0 | 0 |
-| `packages/qf-kernel/src/errors.ts` | unindexed | 0 | 0 |
 | `packages/qf-kernel/src/index.ts` | unindexed | 0 | 0 |
 | `packages/qf-kernel/src/portable.ts` | unindexed | 0 | 0 |
-| …12 more | | | see `atlas.json` |
+| `packages/qf-kernel/src/results.ts` | unindexed | 0 | 0 |
+| `packages/qf-kernel/src/task-governance.ts` | unindexed | 0 | 0 |
+| `tools/qf-bovada-football/src/constants.ts` | unindexed | 0 | 0 |
+| `tools/qf-bovada-football/src/index.ts` | unindexed | 0 | 0 |
+| …7 more | | | see `atlas.json` |
 
 > **No file carrying a confirmed violation is in this table.** Every file with a
 > confirmed finding was fully read, so the violation count is a total rather than a
@@ -463,15 +472,15 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-43 undecided findings, each carries a blocker:
+45 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 24 | the code cannot say which answer is right — this needs your intent |
-| `ast-coverage` | 2 | the analyzer could not resolve this statically |
+| `founder-decision` | 25 | the code cannot say which answer is right — this needs your intent |
+| `ast-coverage` | 3 | the analyzer could not resolve this statically |
 | `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
 
-**24 of 43 are waiting on you, not on the tool.**
+**25 of 45 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 

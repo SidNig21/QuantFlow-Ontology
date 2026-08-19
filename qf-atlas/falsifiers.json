@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-19",
-  "passed": 79,
-  "total": 79,
+  "passed": 81,
+  "total": 81,
   "results": [
     {
       "n": 1,
@@ -49,7 +49,7 @@
       "n": 8,
       "name": "coverage ledger is complete, unique and well-formed",
       "passed": true,
-      "detail": "427 rows, all unique and legal; 55 findings all carry sourceClass"
+      "detail": "427 rows, all unique and legal; 58 findings all carry sourceClass"
     },
     {
       "n": 9,
@@ -77,9 +77,9 @@
     },
     {
       "n": 13,
-      "name": "unresolvable SQL becomes a coverage gap, not silence",
+      "name": "SQL attributable to no symbol becomes a coverage gap, not silence",
       "passed": true,
-      "detail": "coverage=partial sqlInText=1 sqlIndexed=0"
+      "detail": "coverage=partial sqlInText=1 sqlIndexed=0 finding=false"
     },
     {
       "n": 14,
@@ -97,7 +97,7 @@
       "n": 16,
       "name": "headline counts equal the canonical model",
       "passed": true,
-      "detail": "stats.violations=15 vs persistence=15; gray 2 vs 2"
+      "detail": "stats.violations=16 vs persistence=16; gray 3 vs 3"
     },
     {
       "n": 17,
@@ -109,7 +109,7 @@
       "n": 18,
       "name": "coverage gaps appear in the agent brief",
       "passed": true,
-      "detail": "27 gaps in model; brief shows section=true"
+      "detail": "22 gaps in model; brief shows section=true"
     },
     {
       "n": 19,
@@ -181,7 +181,7 @@
       "n": 30,
       "name": "every file carries a complete blast radius",
       "passed": true,
-      "detail": "232 entries, all 7 fields present; e.g. governed-review.ts has 3 direct dependants"
+      "detail": "232 entries, all 7 fields present; e.g. update-manager.ts has 1 direct dependants"
     },
     {
       "n": 31,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 43 -> 42"
+      "detail": "verdict=remove undecided 45 -> 44"
     },
     {
       "n": 33,
@@ -325,7 +325,7 @@
       "n": 54,
       "name": "the authority swap loses no confirmed violation",
       "passed": true,
-      "detail": "15 confirmed violation(s) across 1 file(s); governed-review.ts red=true"
+      "detail": "16 confirmed violation(s) across 2 file(s); governed-review.ts red=true"
     },
     {
       "n": 55,
@@ -421,7 +421,7 @@
       "n": 70,
       "name": "every undecided finding names its blocker",
       "passed": true,
-      "detail": "43 undecided, all blockered: {\"founder-decision\":24,\"ast-coverage\":2,\"package-proof\":17}"
+      "detail": "45 undecided, all blockered: {\"founder-decision\":25,\"ast-coverage\":3,\"package-proof\":17}"
     },
     {
       "n": 71,
@@ -476,6 +476,18 @@
       "name": "seeding refuses unadjudicated or KEEP hard reds",
       "passed": true,
       "detail": "unadjudicated seeded=0 keep seeded=0 adjudicated seeded=3/3"
+    },
+    {
+      "n": 80,
+      "name": "a domain write in a class method is adjudicated, not invisible",
+      "passed": true,
+      "detail": "fn=persistWidgetRow persistence=domain-truth governance=unknown/low"
+    },
+    {
+      "n": 81,
+      "name": "a same-named decoy cannot forge or suppress a reach proof",
+      "passed": true,
+      "detail": "highs=3 (expect 3, i.e. not suppressed) forgedProofs=0"
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "dcc5693",
+    "commit": "674656c",
     "generatedAt": "2026-08-19",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "309a9eb5aa4c03fd"
+    "fingerprint": "74125da119d78d30"
   },
   "stats": {
     "live": 106,
@@ -72,19 +72,19 @@
     },
     "unexplainedCoverage": 0,
     "stripCandidates": 13,
-    "violations": 15,
-    "governanceUnknown": 2,
+    "violations": 16,
+    "governanceUnknown": 3,
     "legacyLeads": 9,
     "nodes": 106,
     "loopsBroken": 3,
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 43,
+    "undecided": 45,
     "allClear": false,
     "decisions": {
-      "total": 51,
-      "undecided": 43,
+      "total": 53,
+      "undecided": 45,
       "keep": 2,
       "repair": 6,
       "remove": 0,
@@ -93,8 +93,8 @@
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 24,
-      "ast-coverage": 2,
+      "founder-decision": 25,
+      "ast-coverage": 3,
       "package-proof": 17
     }
   },
@@ -828,7 +828,7 @@
       "kb": 34.7,
       "x": 0.45,
       "z": 2.6,
-      "status": "ok",
+      "status": "gray",
       "spawns": 0,
       "writes": 1,
       "dml": 0,
@@ -1612,7 +1612,7 @@
       "kb": 9.9,
       "x": -3.42,
       "z": -2,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 0,
       "dml": 2,
@@ -1789,7 +1789,7 @@
       "kb": 35.3,
       "x": 1.24,
       "z": -0.45,
-      "status": "gray",
+      "status": "ok",
       "spawns": 4,
       "writes": 2,
       "dml": 0,
@@ -1943,7 +1943,7 @@
       "kb": 8.1,
       "x": 3.83,
       "z": -1,
-      "status": "gray",
+      "status": "alert",
       "spawns": 0,
       "writes": 0,
       "dml": 0,
@@ -2848,7 +2848,7 @@
       "kb": 11.2,
       "x": 2.6,
       "z": -0.45,
-      "status": "gray",
+      "status": "ok",
       "spawns": 0,
       "writes": 0,
       "dml": 0,
@@ -8288,7 +8288,7 @@
     {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
-      "indexedFns": 56,
+      "indexedFns": 64,
       "sqlInText": 7,
       "sqlIndexed": 6,
       "sqlUnrecognised": 0,
@@ -8308,18 +8308,18 @@
       "status": "partial",
       "indexedFns": 49,
       "sqlInText": 1,
-      "sqlIndexed": 3,
+      "sqlIndexed": 0,
       "sqlUnrecognised": 1,
       "why": "2 SQL verb(s) present, 1 in a shape this analyzer parses. 1 unrecognised — governance analysis cannot see them, so this file cannot be called clean."
     },
     {
       "path": "tools/qf-peer-bus/src/bus.ts",
       "status": "partial",
-      "indexedFns": 0,
+      "indexedFns": 5,
       "sqlInText": 4,
-      "sqlIndexed": 0,
+      "sqlIndexed": 2,
       "sqlUnrecognised": 0,
-      "why": "4 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "why": "4 SQL site(s) in the text, 2 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "collab-electron/src/main/env.d.ts",
@@ -8338,31 +8338,7 @@
       "sqlUnrecognised": 0
     },
     {
-      "path": "collab-electron/src/main/peer-role-registry.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
       "path": "collab-electron/src/main/qf-execute-allowlist.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/sidecar/client.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/sidecar/ring-buffer.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
@@ -8379,14 +8355,6 @@
     },
     {
       "path": "collab-electron/src/main/vite-raw.d.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "packages/qf-kernel/src/errors.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
@@ -8427,14 +8395,6 @@
     },
     {
       "path": "tools/qf-bovada-football/src/constants.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "tools/qf-bovada-football/src/errors.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
@@ -8508,7 +8468,7 @@
     {
       "path": "collab-electron/src/main/a2a-artifact-store.ts",
       "status": "indexed",
-      "indexedFns": 1,
+      "indexedFns": 2,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8516,7 +8476,7 @@
     {
       "path": "collab-electron/src/main/a2a-bus.ts",
       "status": "indexed",
-      "indexedFns": 6,
+      "indexedFns": 8,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8524,7 +8484,7 @@
     {
       "path": "collab-electron/src/main/a2a-orchestra.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 6,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8532,7 +8492,7 @@
     {
       "path": "collab-electron/src/main/acp-agent.ts",
       "status": "indexed",
-      "indexedFns": 17,
+      "indexedFns": 21,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8564,9 +8524,9 @@
     {
       "path": "collab-electron/src/main/agent-host.ts",
       "status": "indexed",
-      "indexedFns": 28,
+      "indexedFns": 37,
       "sqlInText": 0,
-      "sqlIndexed": 0,
+      "sqlIndexed": 1,
       "sqlUnrecognised": 0
     },
     {
@@ -8580,7 +8540,7 @@
     {
       "path": "collab-electron/src/main/app-migration.ts",
       "status": "indexed",
-      "indexedFns": 10,
+      "indexedFns": 13,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8604,7 +8564,7 @@
     {
       "path": "collab-electron/src/main/bovada-capture-rpc.ts",
       "status": "indexed",
-      "indexedFns": 17,
+      "indexedFns": 20,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8644,7 +8604,7 @@
     {
       "path": "collab-electron/src/main/collaboration-gateway.ts",
       "status": "indexed",
-      "indexedFns": 12,
+      "indexedFns": 14,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8684,7 +8644,7 @@
     {
       "path": "collab-electron/src/main/dock-profiles.ts",
       "status": "indexed",
-      "indexedFns": 14,
+      "indexedFns": 15,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8692,7 +8652,7 @@
     {
       "path": "collab-electron/src/main/file-filter.ts",
       "status": "indexed",
-      "indexedFns": 5,
+      "indexedFns": 8,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8748,7 +8708,7 @@
     {
       "path": "collab-electron/src/main/host-native-tui.ts",
       "status": "indexed",
-      "indexedFns": 6,
+      "indexedFns": 16,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8780,7 +8740,7 @@
     {
       "path": "collab-electron/src/main/index.ts",
       "status": "indexed",
-      "indexedFns": 32,
+      "indexedFns": 38,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8828,7 +8788,7 @@
     {
       "path": "collab-electron/src/main/ipc-kernel.ts",
       "status": "indexed",
-      "indexedFns": 15,
+      "indexedFns": 16,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8844,7 +8804,7 @@
     {
       "path": "collab-electron/src/main/ipc-misc.ts",
       "status": "indexed",
-      "indexedFns": 1,
+      "indexedFns": 3,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8876,7 +8836,7 @@
     {
       "path": "collab-electron/src/main/launcher-readiness.ts",
       "status": "indexed",
-      "indexedFns": 4,
+      "indexedFns": 6,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8900,7 +8860,7 @@
     {
       "path": "collab-electron/src/main/logger-policy.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 1,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -8994,6 +8954,14 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/peer-role-registry.ts",
+      "status": "indexed",
+      "indexedFns": 5,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/precreated-native-tui.ts",
       "status": "indexed",
       "indexedFns": 1,
@@ -9028,7 +8996,7 @@
     {
       "path": "collab-electron/src/main/runtime-adapter.ts",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 14,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9058,6 +9026,14 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/sidecar/client.ts",
+      "status": "indexed",
+      "indexedFns": 19,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/sidecar/entry.ts",
       "status": "indexed",
       "indexedFns": 1,
@@ -9082,9 +9058,17 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "collab-electron/src/main/sidecar/ring-buffer.ts",
+      "status": "indexed",
+      "indexedFns": 4,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "collab-electron/src/main/sidecar/server.ts",
       "status": "indexed",
-      "indexedFns": 1,
+      "indexedFns": 28,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9148,9 +9132,9 @@
     {
       "path": "collab-electron/src/main/updater/update-manager.ts",
       "status": "indexed",
-      "indexedFns": 4,
+      "indexedFns": 20,
       "sqlInText": 0,
-      "sqlIndexed": 0,
+      "sqlIndexed": 1,
       "sqlUnrecognised": 0
     },
     {
@@ -9188,7 +9172,7 @@
     {
       "path": "collab-electron/src/main/workspace-graph-python.ts",
       "status": "indexed",
-      "indexedFns": 23,
+      "indexedFns": 24,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9204,7 +9188,7 @@
     {
       "path": "packages/qf-kernel/src/create.ts",
       "status": "indexed",
-      "indexedFns": 24,
+      "indexedFns": 25,
       "sqlInText": 13,
       "sqlIndexed": 13,
       "sqlUnrecognised": 0
@@ -9220,7 +9204,7 @@
     {
       "path": "packages/qf-kernel/src/db-bun.ts",
       "status": "indexed",
-      "indexedFns": 2,
+      "indexedFns": 3,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9231,6 +9215,14 @@
       "indexedFns": 19,
       "sqlInText": 4,
       "sqlIndexed": 4,
+      "sqlUnrecognised": 0
+    },
+    {
+      "path": "packages/qf-kernel/src/errors.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
       "sqlUnrecognised": 0
     },
     {
@@ -9292,7 +9284,7 @@
     {
       "path": "packages/qf-kernel/src/market-context.ts",
       "status": "indexed",
-      "indexedFns": 11,
+      "indexedFns": 12,
       "sqlInText": 2,
       "sqlIndexed": 2,
       "sqlUnrecognised": 0
@@ -9386,6 +9378,14 @@
       "sqlUnrecognised": 0
     },
     {
+      "path": "tools/qf-bovada-football/src/errors.ts",
+      "status": "indexed",
+      "indexedFns": 1,
+      "sqlInText": 0,
+      "sqlIndexed": 0,
+      "sqlUnrecognised": 0
+    },
+    {
       "path": "tools/qf-bovada-football/src/gate.ts",
       "status": "indexed",
       "indexedFns": 4,
@@ -9404,7 +9404,7 @@
     {
       "path": "tools/qf-bovada-football/src/runner.ts",
       "status": "indexed",
-      "indexedFns": 21,
+      "indexedFns": 22,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9436,7 +9436,7 @@
     {
       "path": "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 27,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9444,7 +9444,7 @@
     {
       "path": "tools/qf-proof-agent/src/qf-proof-agent.mjs",
       "status": "indexed",
-      "indexedFns": 13,
+      "indexedFns": 27,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9572,7 +9572,7 @@
     {
       "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
       "status": "indexed",
-      "indexedFns": 4,
+      "indexedFns": 13,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -9596,7 +9596,7 @@
     {
       "path": "tools/runtime-proof/src/proof.ts",
       "status": "indexed",
-      "indexedFns": 10,
+      "indexedFns": 13,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -41179,6 +41179,31 @@
   ],
   "persistence": [
     {
+      "id": "persistence:collab-electron/src/main/updater/update-manager.ts:check:update",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "error",
+      "table": "check",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Writes `check`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/updater/update-manager.ts",
+          "lines": [
+            85
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
       "classification": "governance-violation",
       "disposition": "repair",
@@ -41205,7 +41230,8 @@
             "calls": "requestGovernedReview"
           }
         ],
-        "resolution": "AST call expressions; cross-file edges matched by callee name, not type-resolved"
+        "alternatives": 2,
+        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
       "why": "Writes the domain table `links` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
@@ -41220,12 +41246,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
       "fn": "ensureGovernedReviewSchema",
       "table": "qf_review_attempt",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "bypass",
@@ -41270,12 +41296,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
       "fn": "ensureGovernedReviewSchema",
       "table": "qf_review_invocation",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "bypass",
@@ -41320,12 +41346,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
       "fn": "ensureGovernedReviewSchema",
       "table": "qf_review_publication",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "bypass",
@@ -41345,12 +41371,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
       "fn": "ensureGovernedReviewSchema",
       "table": "qf_review_receipt",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "bypass",
@@ -41395,12 +41421,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
       "fn": "ensureGovernedReviewSchema",
       "table": "qf_review_source_work",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "bypass",
@@ -41445,12 +41471,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists",
       "classification": "governance-violation",
       "disposition": "repair",
       "fn": "ensureGovernedReviewSchema",
       "table": "qf_review_task",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "non-domain-store",
       "sourceClass": "product",
       "reachability": "bypass",
@@ -41546,7 +41572,8 @@
             "calls": "requestGovernedReview"
           }
         ],
-        "resolution": "AST call expressions; cross-file edges matched by callee name, not type-resolved"
+        "alternatives": 2,
+        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
       "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
@@ -41582,7 +41609,8 @@
             "calls": "markGovernedDelivery"
           }
         ],
-        "resolution": "AST call expressions; cross-file edges matched by callee name, not type-resolved"
+        "alternatives": 0,
+        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
       "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
@@ -41592,6 +41620,31 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
             311
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:collab-electron/src/main/agent-host.ts:notification:update",
+      "classification": "needs-verification",
+      "disposition": "needs-verification",
+      "fn": "runAgentHostSmoke",
+      "table": "notification",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "unknown",
+      "governance": "unknown",
+      "confidence": "low",
+      "reachProof": null,
+      "blocker": null,
+      "why": "No caller of runAgentHostSmoke() was found, so it can be shown neither to sit behind execute() nor to bypass it. Needs verification.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/agent-host.ts",
+          "lines": [
+            410
           ]
         }
       ]
@@ -41705,7 +41758,7 @@
       "verb": "UPDATE",
       "persistence": "transport-bookkeeping",
       "sourceClass": "product",
-      "reachability": "bypass",
+      "reachability": "unknown",
       "governance": "compliant",
       "confidence": "high",
       "reachProof": null,
@@ -41750,7 +41803,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:agent_definition:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "registerAgentDefinition",
+      "fn": "insert",
       "table": "agent_definition",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41775,7 +41828,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:agent_session:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "createAgentSession",
+      "fn": "insert",
       "table": "agent_session",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41800,7 +41853,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:artifact:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "publishArtifact",
+      "fn": "insert",
       "table": "artifact",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41850,7 +41903,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:connection:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "createConnection",
+      "fn": "insert",
       "table": "connection",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41875,7 +41928,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:dataset:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "registerDatasetVersion",
+      "fn": "insert",
       "table": "dataset",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41925,7 +41978,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:hypothesis:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "createHypothesis",
+      "fn": "insert",
       "table": "hypothesis",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41950,7 +42003,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:mission:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "createMission",
+      "fn": "insert",
       "table": "mission",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -41975,7 +42028,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:run:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "createRun",
+      "fn": "insert",
       "table": "run",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -42000,7 +42053,7 @@
       "id": "persistence:packages/qf-kernel/src/create.ts:task:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "createTask",
+      "fn": "insert",
       "table": "task",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -42247,12 +42300,12 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/fixtures.ts:experimental:create-table",
+      "id": "persistence:packages/qf-kernel/src/fixtures.ts:experimental:create-table-if-not-exists",
       "classification": "persistence-ok",
       "disposition": "keep",
       "fn": "seedExperimentalFixtureTable",
       "table": "experimental",
-      "verb": "CREATE TABLE",
+      "verb": "CREATE TABLE IF NOT EXISTS",
       "persistence": "qa-fixture",
       "sourceClass": "QA",
       "reachability": "bypass",
@@ -42475,7 +42528,7 @@
       "id": "persistence:packages/qf-kernel/src/market-context.ts:market_event:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "scheduleMarketEvent",
+      "fn": "insert",
       "table": "market_event",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -42500,7 +42553,7 @@
       "id": "persistence:packages/qf-kernel/src/market-context.ts:venue:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "registerVenue",
+      "fn": "insert",
       "table": "venue",
       "verb": "INSERT INTO",
       "persistence": "domain-truth",
@@ -42572,26 +42625,51 @@
       ]
     },
     {
-      "id": "persistence:packages/qf-kernel/src/upgrade.ts:schema_meta:insert-into",
+      "id": "persistence:tools/qf-peer-bus/src/bus.ts:messages:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
-      "fn": "normalizeSql",
-      "table": "schema_meta",
+      "fn": "send",
+      "table": "messages",
       "verb": "INSERT INTO",
-      "persistence": "schema-migration",
-      "sourceClass": "migration",
-      "reachability": "kernel-internal",
+      "persistence": "transport-bookkeeping",
+      "sourceClass": "transport",
+      "reachability": "bypass",
       "governance": "compliant",
       "confidence": "high",
       "reachProof": null,
       "blocker": null,
-      "why": "schema-migration — outside the domain the Kernel owns.",
+      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
       "evidence": [
         {
           "type": "static",
-          "file": "packages/qf-kernel/src/upgrade.ts",
+          "file": "tools/qf-peer-bus/src/bus.ts",
           "lines": [
-            195
+            143
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:tools/qf-peer-bus/src/bus.ts:messages:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "readInbox",
+      "table": "messages",
+      "verb": "UPDATE",
+      "persistence": "transport-bookkeeping",
+      "sourceClass": "transport",
+      "reachability": "unknown",
+      "governance": "compliant",
+      "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
+      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "tools/qf-peer-bus/src/bus.ts",
+          "lines": [
+            164
           ]
         }
       ]
@@ -42920,16 +42998,16 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "27f76f6",
+      "commit": "dcc5693",
       "generatedAt": "2026-08-19"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "dcc5693",
+      "commit": "674656c",
       "generatedAt": "2026-08-19"
     },
     "verdict": "better",
-    "why": "46 improvement(s), nothing added or hidden",
+    "why": "43 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -42938,7 +43016,7 @@
         "kind": "persistence",
         "what": "links insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
+        "note": "was repair"
       },
       {
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
@@ -43029,14 +43107,14 @@
         "kind": "persistence",
         "what": "task insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
+        "note": "was repair"
       },
       {
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:update",
         "kind": "persistence",
         "what": "task update",
         "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
+        "note": "was repair"
       },
       {
         "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
@@ -43304,11 +43382,20 @@
       "changedOwner": 0,
       "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 46,
+      "undecidedFrom": 43,
       "undecidedTo": null
     }
   },
   "decisions": [
+    {
+      "id": "persistence:collab-electron/src/main/updater/update-manager.ts:check:update",
+      "kind": "persistence",
+      "what": "check update",
+      "where": "collab-electron/src/main/updater/update-manager.ts",
+      "blocker": "founder-decision",
+      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
+      "verdict": "undecided"
+    },
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
       "kind": "persistence",
@@ -43320,9 +43407,9 @@
       "owner": "founder"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
       "kind": "persistence",
-      "what": "qf_review_attempt create table",
+      "what": "qf_review_attempt create table if not exists",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
@@ -43338,9 +43425,9 @@
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
       "kind": "persistence",
-      "what": "qf_review_invocation create table",
+      "what": "qf_review_invocation create table if not exists",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
@@ -43356,18 +43443,18 @@
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
       "kind": "persistence",
-      "what": "qf_review_publication create table",
+      "what": "qf_review_publication create table if not exists",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
       "kind": "persistence",
-      "what": "qf_review_receipt create table",
+      "what": "qf_review_receipt create table if not exists",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
@@ -43383,9 +43470,9 @@
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
       "kind": "persistence",
-      "what": "qf_review_source_work create table",
+      "what": "qf_review_source_work create table if not exists",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
@@ -43401,9 +43488,9 @@
       "verdict": "undecided"
     },
     {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists",
       "kind": "persistence",
-      "what": "qf_review_task create table",
+      "what": "qf_review_task create table if not exists",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
@@ -43446,6 +43533,15 @@
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "repair",
       "owner": "founder"
+    },
+    {
+      "id": "persistence:collab-electron/src/main/agent-host.ts:notification:update",
+      "kind": "persistence",
+      "what": "notification update",
+      "where": "collab-electron/src/main/agent-host.ts",
+      "blocker": "ast-coverage",
+      "reason": "governance could not be resolved (unknown) — gray, and gray may not be called clean",
+      "verdict": "undecided"
     },
     {
       "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",

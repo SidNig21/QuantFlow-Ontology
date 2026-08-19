@@ -17,7 +17,7 @@ import { buildLoops } from "./loops.mjs";
 import { domainTables, transportTables, classifyPersistence, byRecName, commandRoots, governedClosure, appReachableKeys, coverage, setWriteDoor } from "./classify.mjs";
 import { indexFunctions } from "./hop4.mjs";
 import { reachability, blastRadius } from "./reach.mjs";
-import { analyzeFile, astReachProof, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
+import { analyzeFile, astReachProof, astFunctionIndex, tsAvailable, tsVersion, tsUnavailableReason } from "./ast.mjs";
 import { coverageMatrix } from "./coverage-matrix.mjs";
 import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
 import { detectOwnership } from "./ownership.mjs";
@@ -139,7 +139,18 @@ const breaches = violations(facts);
 
 // Semantic persistence classification replaces the old "SQL outside an allowlist
 // is a violation" rule, which called transport bookkeeping a domain breach.
-const fnIndex = indexFunctions(indexFiles, read, rel);
+// AST-BACKED. This was `indexFunctions(...)` — regex declaration patterns that match
+// neither a class method nor an object-literal method, so a domain write inside a class
+// produced no finding at all while the coverage matrix still called the file "indexed".
+// The parser resolved those correctly all along; the result was being thrown away.
+const inScopeForIndex = (f) => f.startsWith("collab-electron/src/main/")
+  || f.startsWith("packages/qf-kernel/") || f.startsWith("tools/");
+const scopedAst = new Map([...astOf].filter(([f]) => inScopeForIndex(f) && !IS_TEST.test(f)));
+const { index: fnIndex, unresolved: fnUnresolved } = astFunctionIndex({
+  astOf: scopedAst,
+  doorNames: new Set(["execute", "executeCommand"]),
+  insideDoor: (f) => door.isDoor(f),
+});
 const fnNames = byRecName(fnIndex);
 const domain = domainTables(REPO);
 const governedFns = governedClosure(fnIndex, fnNames, commandRoots(fnIndex, read, REPO, rel));
