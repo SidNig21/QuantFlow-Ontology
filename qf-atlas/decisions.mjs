@@ -19,14 +19,41 @@ import { readFileSync, existsSync } from "node:fs";
 
 export const VERDICTS = new Set(["keep", "repair", "remove", "accepted"]);
 
+/**
+ * ONE DECISION SCHEMA.
+ *
+ * The human field is `reason`. It used to be `why` in some records and `reason` in
+ * others, for the same job — and `why` also collides with the ANALYZER's `reason`,
+ * which explains why a finding is unresolved rather than what a human decided about
+ * it. Two spellings for one field is how five of eight entries drifted out of the
+ * shape baseline.mjs reads, so a hand-written record could look complete to a person
+ * and be invisible to the gate.
+ *
+ * Required keys per verdict. `remediation_trigger` answers "what makes this finding
+ * go away", and an ACCEPTED without a review date is permanent by accident.
+ */
+export const DECISION_SCHEMA = {
+  keep:     ["verdict", "owner", "reason"],
+  repair:   ["verdict", "owner", "reason", "remediation_trigger"],
+  remove:   ["verdict", "owner", "reason", "remediation_trigger"],
+  accepted: ["verdict", "owner", "reason", "remediation_trigger", "review_or_expiry"],
+};
+
+/** Which required keys a record is missing. Empty array == schema-complete. */
+export function missingKeys(d) {
+  if (!d || !VERDICTS.has(d.verdict)) return ["verdict"];
+  return DECISION_SCHEMA[d.verdict].filter((k) => k === "verdict" ? false : !d[k]);
+}
+
 export const TEMPLATE = {
   $comment: "Hand-edited. Maps a finding id to what you decided about it. Anything absent is 'undecided'.",
   decisions: {
     "example:some-finding-id": {
       verdict: "accepted",
-      why: "Known debt; the gate carries an explicit exception.",
       owner: "founder",
-      expires: "2026-12-31",
+      reason: "Known debt; the gate carries an explicit exception.",
+      remediation_trigger: "Resolved when the gate no longer needs the exception.",
+      review_or_expiry: "2026-12-31",
     },
   },
 };
@@ -124,11 +151,24 @@ export function applyDecisions(findings, ledger) {
   const rows = findings.map((f) => {
     const d = decided[f.id];
     if (!d || !VERDICTS.has(d.verdict)) return { ...f, verdict: "undecided" };
-    if (d.verdict === "accepted" && !(d.why && d.owner && d.expires))
-      return { ...f, verdict: "undecided", note: "accepted without owner, reason and expiry does not count as a decision" };
-    if (d.expires && new Date(d.expires) <= new Date())
-      return { ...f, verdict: "undecided", note: `the ${d.verdict} decision expired on ${d.expires}` };
-    return { ...f, verdict: d.verdict, why: d.why, owner: d.owner, expires: d.expires };
+    const missing = missingKeys(d);
+    // ACCEPTED is the one verdict whose incompleteness has always demoted it: an
+    // exception nobody owns and nobody reviews is how debt goes quiet. That rule is
+    // unchanged. The others report `complete: false` and keep their verdict —
+    // normalising a schema may not silently re-adjudicate anything.
+    if (d.verdict === "accepted" && missing.length)
+      return { ...f, verdict: "undecided", note: `accepted is missing ${missing.join(", ")} — it does not count as a decision` };
+    if (d.review_or_expiry && new Date(d.review_or_expiry) <= new Date())
+      return { ...f, verdict: "undecided", note: `the ${d.verdict} decision expired on ${d.review_or_expiry}` };
+    // NESTED, not spread. `reason` on a finding is the analyzer explaining why the
+    // finding is unresolved; `reason` on a decision is a human explaining a verdict.
+    // Spreading one over the other would have destroyed the blocker explanation that
+    // `unexplainedUndecided` is computed from.
+    return { ...f, verdict: d.verdict, owner: d.owner,
+      decision: { owner: d.owner ?? null, reason: d.reason ?? null,
+        remediation_trigger: d.remediation_trigger ?? null,
+        review_or_expiry: d.review_or_expiry ?? null,
+        complete: missing.length === 0, missing } };
   });
 
   // decisions whose finding is gone — the code moved or was fixed
@@ -146,6 +186,7 @@ export function applyDecisions(findings, ledger) {
       repair: count("repair"),
       remove: count("remove"),
       accepted: count("accepted"),
+      incomplete: rows.filter((r) => r.decision && !r.decision.complete).length,
       allClear: count("undecided") === 0,
     },
   };

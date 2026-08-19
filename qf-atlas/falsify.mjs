@@ -1,6 +1,7 @@
 // qf-atlas / falsify.mjs — prove the Atlas actually catches what it claims.
 //
-//   node qf-atlas/falsify.mjs
+//   node qf-atlas/falsify.mjs              run the suite, leave the tree untouched
+//   node qf-atlas/falsify.mjs --receipt    also write qf-atlas/falsifiers.json
 //
 // Each falsifier injects a real defect into the working tree, regenerates the
 // model, asserts the Atlas notices, then restores the tree and asserts the Atlas
@@ -8,8 +9,18 @@
 //
 // The tree is restored in a finally block; the run refuses to start dirty so a
 // crash can never be mistaken for your own edits.
+//
+// TREE NEUTRALITY. Fixtures were always restored, but the run regenerated the model
+// 80-odd times and left atlas.json / atlas.html / ATLAS.md rewritten with a fresh
+// `generatedAt`, plus a receipt — so merely CHECKING the suite dirtied five tracked
+// files. That teaches everyone to ignore a dirty qf-atlas/, which is exactly the
+// signal that is supposed to mean the map drifted. The generated artefacts are now
+// snapshotted as BYTES up front and written back at the end and on crash, so an
+// ordinary run is a no-op on the checkout. The receipt is opt-in behind --receipt,
+// because a committed receipt must represent a real run rather than appear as a side
+// effect of someone looking.
 
-import { writeFileSync, unlinkSync, existsSync, readFileSync, renameSync } from "node:fs";
+import { writeFileSync, unlinkSync, existsSync, readFileSync, renameSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { REPO, rel, walk, IS_TEST } from "./extract.mjs";
@@ -67,6 +78,49 @@ function writeAtomic(abs, contents) {
     }
   }
 }
+
+// ─── TREE NEUTRALITY (D5) ────────────────────────────────────────────────────
+// Everything below is generated. The suite must be able to rewrite these freely and
+// still hand the checkout back exactly as it found it.
+const RECEIPT_MODE = process.argv.includes("--receipt");
+const ARTIFACTS = ["qf-atlas/atlas.json", "qf-atlas/atlas.html", "qf-atlas/ATLAS.md",
+                   "qf-atlas/atlas-diff.json", "qf-atlas/falsifiers.json"];
+
+/** Sorted so an unrelated ordering change cannot read as a leak. */
+function porcelain() {
+  return execFileSync("git", ["status", "--porcelain"], { cwd: REPO, encoding: "utf8" })
+    .split(String.fromCharCode(10)).map((l) => l.trimEnd()).filter(Boolean).sort().join(String.fromCharCode(10));
+}
+
+// Bytes, not text: a byte-for-byte restore cannot introduce a line-ending or
+// trailing-newline difference of its own while claiming to be neutral.
+const SNAPSHOT = new Map(ARTIFACTS.map((p) => {
+  const abs = join(REPO, p);
+  return [p, existsSync(abs) ? readFileSync(abs) : null];
+}));
+const INITIAL_STATUS = porcelain();
+let restored = false;
+
+function restoreArtifacts() {
+  for (const [p, bytes] of SNAPSHOT) {
+    // --receipt is the one deliberate write this run is allowed to leave behind.
+    if (RECEIPT_MODE && p.endsWith("falsifiers.json")) continue;
+    const abs = join(REPO, p);
+    try {
+      if (bytes === null) { if (existsSync(abs)) unlinkSync(abs); }
+      else if (!existsSync(abs) || Buffer.compare(readFileSync(abs), bytes) !== 0) writeAtomic(abs, bytes);
+    } catch { /* reported by the neutrality check below, not swallowed silently */ }
+  }
+  // A crash mid-write can strand a sibling temp file, which shows up as untracked.
+  try {
+    for (const f of readdirSync(join(REPO, "qf-atlas")))
+      if (f.includes(".tmp-")) try { unlinkSync(join(REPO, "qf-atlas", f)); } catch { /* locked */ }
+  } catch { /* directory unreadable; the check below will say so */ }
+  restored = true;
+}
+
+// A falsifier that throws must not leave the map rewritten either.
+process.on("exit", () => { if (!restored) restoreArtifacts(); });
 
 /** Write a temp file and assert WITHOUT regenerating — for the staleness test,
  *  where calling model() first makes the artefact current and the check can
@@ -388,8 +442,12 @@ record(21, "INSERT OR IGNORE is caught, not read as clean",
       const v = m.persistence.find((p) => p.evidence[0].file.endsWith("zz-falsify-21.ts") && p.governance === "violation");
       const w = m.wires.find((x) => x.channel === "qf:falsify:orignore");
       const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-21.ts"));
-      // Caught outright, or at minimum gray. Never clean-and-silent.
-      const ok = (!!v && w?.hop4?.kind === "cheats") || cov?.status === "partial";
+      // Caught outright, or at minimum gray. Never clean-and-silent. `cheats` is no
+      // longer the right instrument: it now means "a hard red backs this path", and a
+      // fixture with no importer cannot earn a corroborated reach proof. What must never
+      // happen is hop 4 calling a wire that reaches an INSERT `read-only`.
+      const ok = (!!v && (w?.hop4?.kind === "cheats" || w?.hop4?.kind === "reaches-sql"))
+        || cov?.status === "partial";
       return [ok, `violation=${!!v} hop4=${w?.hop4?.kind} coverage=${cov?.status}`];
     }));
 
@@ -450,7 +508,10 @@ record(26, "typed-brace SQL does not leave hop 4 read-only",
       const cov = m.coverage.find((c) => c.path.endsWith("zz-falsify-26.ts"));
       const v = m.persistence.find((p) => p.evidence[0].file.endsWith("zz-falsify-26.ts") && p.governance === "violation");
       const hop = w?.hop4?.kind;
-      const ok = hop === "cheats" || (cov?.status === "partial" && hop && hop !== "read-only");
+      // Same re-premise as 21: the assertion is that hop 4 does not narrate this as
+      // mutation-free, not that it brands it a breach.
+      const ok = hop === "cheats" || hop === "reaches-sql"
+        || (cov?.status === "partial" && hop && hop !== "read-only");
       return [!!ok, `hop4=${hop} coverage=${cov?.status} violation=${!!v}`];
     }));
 
@@ -1423,8 +1484,120 @@ record(81, "a same-named decoy cannot forge or suppress a reach proof",
         "highs=" + hi.length + " (expect 3, i.e. not suppressed) forgedProofs=" + forged.length];
     }));
 
-// restore the committed model
-execFileSync(node, [GEN], { cwd: REPO, stdio: "pipe" });
+// Fixture sources contain TypeScript imports, so they need double quotes inside a
+// JS string. Building them through a named constant keeps this file free of the
+// escaping that has corrupted it before.
+const Q = String.fromCharCode(34);
+
+// 83 · D4 — MEDIUM BOOKKEEPING IS NOT A BREACH. `cheats` is the loudest label the
+// report has: ATLAS.md draws it as raw SQL reaching Kernel truth ungoverned, and
+// northstar.mjs breaks the loop on it. Three of five cheats wires rested entirely on
+// `CREATE TABLE IF NOT EXISTS qf_review_*` — an idempotent schema guard — and ASSIGN
+// read `broken` because of it. The evidence must stay visible; the label must not.
+record(83, "medium bookkeeping DDL cannot make a wire cheats or break a loop", ...(() => {
+  const helper = `${MAIN}/zz-falsify-83-helper.ts`;
+  const handler = `${MAIN}/zz-falsify-83.ts`;
+  const habs = join(REPO, handler);
+  try {
+    // A NON-DOMAIN store, written outside the write door: a real finding, medium
+    // confidence, and nothing the Kernel owns. Exactly the shape that was being
+    // promoted to a governance breach.
+    writeAtomic(habs,
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { zzvEnsureBookkeeping } from ' + Q + './zz-falsify-83-helper' + Q + ';',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:bookkeeping' + Q + ', async () => zzvEnsureBookkeeping()); }',
+        '' ].join(String.fromCharCode(10)));
+    return withFile(helper,
+      [ 'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        'export function zzvEnsureBookkeeping(){',
+        '  getKernelDb().query(' + Q + 'CREATE TABLE IF NOT EXISTS zzv_bookkeeping (id TEXT PRIMARY KEY)' + Q + ').run();',
+        '}', '' ].join(String.fromCharCode(10)),
+      (m) => {
+        const rows = (m.persistence ?? []).filter((p) => p.evidence[0].file.endsWith('zz-falsify-83-helper.ts'));
+        const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:bookkeeping');
+        if (!w) return [false, 'the fixture channel never reached the model'];
+        if (!rows.length) return [false, 'the bookkeeping write produced NO finding — it must stay VISIBLE, not vanish'];
+        const red = hardRedFn(m);
+        const promoted = rows.filter((p) => red[p.id]);
+        // Every north-star member that breaks on `cheats` must name a current hard red.
+        const loopBreaks = (m.northStar ?? []).flatMap((l) => (l.members ?? [])
+          .filter((x) => x.status === 'cheats')
+          .filter((x) => !(x.backedBy ?? []).length || (x.backedBy ?? []).some((id) => !red[id]))
+          .map((x) => l.name + '/' + x.channel));
+        // And every cheats WIRE must too — the label and the authority are one rule.
+        const unbacked = (m.wires ?? []).filter((x) => x.hop4?.kind === 'cheats'
+          && (!(x.hop4.backedBy ?? []).length || x.hop4.backedBy.some((id) => !red[id])));
+        return [w.hop4?.kind !== 'cheats' && !promoted.length && !loopBreaks.length && !unbacked.length,
+          `fixture hop4=${w.hop4?.kind} findings=${rows.length} (${rows[0].confidence}/${rows[0].persistence}) `
+          + `promotedToHardRed=${promoted.length} unbackedCheatsWires=${unbacked.length} `
+          + `loopsBrokenWithoutAHardRed=${loopBreaks.length}${loopBreaks.length ? ' -> ' + loopBreaks.join(', ') : ''}`];
+      });
+  } finally { if (existsSync(habs)) unlinkSync(habs); }
+})());
+
+// 84 · D6 — ONE DECISION SCHEMA. Five of eight entries carried `why` where the gate
+// reads `reason`, so a record could look complete to a person and be invisible to the
+// thing that grants authority. Completeness is not enforced everywhere — demoting a
+// standing verdict would be re-adjudication — but it IS enforced where it confers
+// authority, and the baseline is that place.
+record(84, "legacy or incomplete decision metadata cannot seed the baseline", ...(() => {
+  const red = hardRedFn(before);
+  const ids = Object.keys(red);
+  if (!ids.length) return [false, 'no hard reds to adjudicate — this check has nothing to prove against'];
+  const id = ids[0];
+  const legacy = { [id]: { verdict: 'repair', owner: 'founder', why: 'legacy field name' } };
+  const partial = { [id]: { verdict: 'repair', owner: 'founder', reason: 'canonical field, no trigger' } };
+  const complete = { [id]: { verdict: 'repair', owner: 'founder', reason: 'canonical',
+    remediation_trigger: 'resolved when the write moves behind the governed action path' } };
+  const seeded = (led) => advanceFn({ version: 1, findings: {}, exceptions: {} }, red, 'testsha', led);
+  const a = seeded(legacy), b = seeded(partial), c = seeded(complete);
+  const inA = Boolean(a.baseline.findings[id]), inB = Boolean(b.baseline.findings[id]), inC = Boolean(c.baseline.findings[id]);
+  // And the ledger on disk must carry no legacy field at all.
+  const led = JSON.parse(readFileSync(join(REPO, 'qf-atlas/decisions.json'), 'utf8')).decisions ?? {};
+  const stragglers = Object.entries(led).filter(([, d]) => d.why !== undefined || d.expires !== undefined).map(([k]) => k);
+  return [!inA && !inB && inC && stragglers.length === 0,
+    `legacy(why)=${inA ? 'SEEDED' : 'refused'} partial(no trigger)=${inB ? 'SEEDED' : 'refused'} `
+    + `canonical=${inC ? 'seeded' : 'REFUSED'} legacyFieldsOnDisk=${stragglers.length}`];
+})());
+
+// 85 · D7 — A COMPUTED CALLEE IS A HOLE, NOT A CLEAN READ. `map.get(k)()` calls a
+// value; without a type checker it names no symbol, and guessing is forbidden. It used
+// to be pushed as `name: null` and dropped, so a file with an unfollowable call edge
+// reported `indexed` — byte-identical to a file with none.
+record(85, "a computed callee becomes a named coverage blocker, never silent clean",
+  ...withFile(`${MAIN}/zz-falsify-85.ts`,
+    [ 'declare const registry: any;',
+      'export function zzvDispatch(k: string){ return registry.get(k)(); }', '' ].join(String.fromCharCode(10)),
+    (m) => {
+      const row = (m.analyzerCoverage ?? []).find((c) => c.path.endsWith('zz-falsify-85.ts'));
+      if (!row) return [false, 'the file vanished from the coverage matrix entirely'];
+      const cells = Object.entries(row.reasons ?? {}).filter(([, why]) => String(why).includes('computed callee'));
+      const blockered = cells.filter(([k]) => row.blockers?.[k] === 'ast-coverage');
+      const unexplained = (m.unexplainedCoverage ?? []).some((u) => u.path.endsWith('zz-falsify-85.ts'));
+      return [cells.length > 0 && blockered.length === cells.length && row.worst !== 'indexed' && !unexplained,
+        `worst=${row.worst} cellsNamingTheGap=${cells.map(([k]) => k).join(',') || 'NONE'} `
+        + `blockeredAsAstCoverage=${blockered.length} unexplained=${unexplained}`];
+    }));
+
+// Restore every generated artefact to the bytes this run started with. This replaces
+// a final regenerate, which could only ever get CLOSE: `generatedAt` moves on every
+// run, so regenerating left three tracked files modified no matter how clean the
+// fixtures were.
+restoreArtifacts();
+
+// 82 · D5 — the suite must be able to check itself. A harness that dirties the
+// checkout it is auditing trains people to ignore a dirty checkout.
+record(82, "an ordinary falsifier run leaves the tracked tree byte-identical",
+  ...(() => {
+    const now = porcelain();
+    const before = new Set(INITIAL_STATUS.split(String.fromCharCode(10)).filter(Boolean));
+    const after = new Set(now.split(String.fromCharCode(10)).filter(Boolean));
+    const leaked = [...after].filter((x) => !before.has(x));
+    const vanished = [...before].filter((x) => !after.has(x));
+    if (!leaked.length && !vanished.length)
+      return [true, `git status --porcelain identical before and after (${before.size} pre-existing entr${before.size === 1 ? "y" : "ies"})`];
+    return [false, `leaked: ${leaked.join(" | ") || "none"} · vanished: ${vanished.join(" | ") || "none"}`];
+  })());
 
 const passed = results.filter((r) => r.passed).length;
 console.log(`\n${passed}/${results.length} falsifiers pass`);
@@ -1434,6 +1607,12 @@ console.log(`\n${passed}/${results.length} falsifiers pass`);
 // could pass 26 tests, fail to write the receipt, exit non-zero, and leave the
 // PREVIOUS run's receipt on disk looking current. A stale green receipt is the
 // precise failure this harness exists to prevent, so it writes the same way.
+// OPT-IN. Without --receipt the run reports to stdout and leaves no trace; the
+// committed receipt therefore always corresponds to a deliberate Builder run.
+if (!RECEIPT_MODE) {
+  console.log("tree neutral — no files written. Re-run with --receipt to update qf-atlas/falsifiers.json.");
+  process.exit(passed === results.length ? 0 : 1);
+}
 const receiptPath = join(REPO, "qf-atlas", "falsifiers.json");
 const receipt = JSON.stringify(
   { ran: new Date().toISOString().slice(0, 10), passed, total: results.length, results }, null, 2) + "\n";

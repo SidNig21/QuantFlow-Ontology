@@ -4,7 +4,12 @@
 // or cheats at execute(). For every handler this answers one question:
 //
 //   write-door   it reaches execute(), the sole sanctioned mutation path
-//   cheats       it reaches SQL that never passes through execute()
+//   cheats       it reaches SQL that never passes through execute(), AND a function on
+//                that path carries a current hard red. Assigned here provisionally on
+//                reachability alone; generate.mjs re-grades it against that rule.
+//   reaches-sql  same reachability, but every persistence finding on the path is amber:
+//                medium confidence, or a store outside the domain the Kernel owns. Real,
+//                visible, decidable — and not a breach.
 //   read-only    no mutation seen (not proof of none when coverage is partial)
 //
 // Resolution is by function name across the repo, followed transitively, because
@@ -277,6 +282,15 @@ export function classify(seedCalls, index, maxDepth = 5, own = {}, names = null)
     dml: own.dml ? ["(inline)", own.file] : null,
     disk: own.disk ? ["(inline)", own.file] : null,
   };
+  // EVERY SQL-bearing function the walk reaches, not just the first one found.
+  // `via.dml` is first-wins, and severity is decided per (file, function) downstream —
+  // so a wire that reaches both an idempotent bookkeeping CREATE TABLE and a genuine
+  // domain-truth bypass could record the harmless one and have the breach reconciled
+  // away. Frontier order is not evidence. Keeping the full set means the downstream rule
+  // can ask "is ANY function on this path a hard red" instead of "was the arbitrary one".
+  const dmlAll = new Map();
+  const noteDml = (fn, file) => { const k = fn + "::" + file; if (!dmlAll.has(k)) dmlAll.set(k, { fn, file }); };
+  if (own.dml) noteDml("(inline)", own.file);
   // Signals get different reach on purpose. `execute` and raw SQL are specific
   // enough to follow a long way. A disk write is not: at depth 5 a name-based
   // index makes every handler a writer, because fs:trash → trackEvent →
@@ -294,7 +308,7 @@ export function classify(seedCalls, index, maxDepth = 5, own = {}, names = null)
       // path can cheat. Picking one arbitrarily is what hid the collision.
       for (const rec of candidates.get(name) ?? []) {
         if (rec.door && !via.door) via.door = [name];
-        if (rec.dml && !via.dml) via.dml = [name, rec.file];
+        if (rec.dml) { if (!via.dml) via.dml = [name, rec.file]; noteDml(name, rec.file); }
         if (rec.disk && !via.disk && d < DISK_DEPTH) via.disk = [name, rec.file];
         for (const c of rec.calls) if (!seen.has(c)) next.push(c);
       }
@@ -302,11 +316,15 @@ export function classify(seedCalls, index, maxDepth = 5, own = {}, names = null)
     frontier = next;
   }
   // Cheating outranks the write door: a handler that reaches both is the finding.
-  // This is reachability only — any SQL-flagged function counts, including idempotent
-  // CREATE TABLE on bookkeeping tables the persistence classifier treats as compliant.
+  // This is REACHABILITY ONLY, and it is PROVISIONAL. Any SQL-flagged function counts,
+  // including an idempotent CREATE TABLE on a bookkeeping table. This walk cannot tell a
+  // domain-truth bypass from review scaffolding, so `cheats` here means "reaches SQL",
+  // never "is a breach". generate.mjs re-grades it against the semantic classifier and
+  // only a finding that is currently HARD RED may keep the label.
   const kind = via.dml ? "cheats" : via.door ? "write-door" : via.disk ? "writes-disk" : "read-only";
   return { kind, viaDoor: via.door?.[0] ?? null, viaDml: via.dml?.[0] ?? null,
-           dmlFile: via.dml?.[1] ?? null, viaDisk: via.disk?.[0] ?? null, diskFile: via.disk?.[1] ?? null };
+           dmlFile: via.dml?.[1] ?? null, viaDisk: via.disk?.[0] ?? null, diskFile: via.disk?.[1] ?? null,
+           dmlAll: [...dmlAll.values()].sort((a, b) => (a.file + a.fn).localeCompare(b.file + b.fn)) };
 }
 
 /** Attach hop 4 to every wire whose handler we can locate. */

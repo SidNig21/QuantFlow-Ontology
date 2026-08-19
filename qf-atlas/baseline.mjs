@@ -12,6 +12,10 @@
 // achieved by quietly widening an allowlist.
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+// ONE schema, defined once in decisions.mjs. This file used to keep its own copy of
+// the required-key list and its own spelling of the review date (`expires ?? review`),
+// which is how a record could satisfy the ledger and still be refused by the gate.
+import { DECISION_SCHEMA, missingKeys } from "./decisions.mjs";
 
 export const EMPTY = { version: 1, updated: null, findings: {}, exceptions: {} };
 
@@ -141,8 +145,13 @@ export function expiredExceptions(baseline) {
  *
  * Anything failing those rules is REFUSED, and the refusal names the finding.
  */
-const REQUIRED = ["owner", "reason", "remediation_trigger"];
 const ELIGIBLE = new Set(["repair", "remove", "accepted"]);
+/** Required keys for a BASELINE entry, derived from the one decision schema. A hard
+ *  red may only enter as repair/remove/accepted, and every one of those demands a
+ *  remediation trigger — so this is DECISION_SCHEMA with `verdict` dropped, never a
+ *  second hand-maintained list that can drift away from it. */
+const REQUIRED = [...new Set(["repair", "remove"].flatMap((v) => DECISION_SCHEMA[v]))]
+  .filter((k) => k !== "verdict");
 
 export function advance(baseline, current, commit, decisions = {}) {
   const next = { version: 1, updated: commit, findings: {}, exceptions: baseline.exceptions ?? {} };
@@ -157,8 +166,7 @@ export function advance(baseline, current, commit, decisions = {}) {
       continue;
     }
     if (!ELIGIBLE.has(d.verdict)) { refused.push({ id, why: `verdict "${d.verdict}" is not eligible for the baseline` }); continue; }
-    const missing = REQUIRED.filter((k) => !d[k]);
-    if (d.verdict === "accepted" && !(d.expires || d.review)) missing.push("review_or_expiry");
+    const missing = missingKeys(d);
     if (missing.length) { refused.push({ id, why: `missing ${missing.join(", ")}` }); continue; }
 
     next.findings[id] = {
@@ -168,7 +176,7 @@ export function advance(baseline, current, commit, decisions = {}) {
       owner: d.owner,
       reason: d.reason,
       remediation_trigger: d.remediation_trigger,
-      review_or_expiry: d.expires ?? d.review ?? null,
+      review_or_expiry: d.review_or_expiry ?? null,
       state: "open",
       first_seen: known[id]?.first_seen ?? commit,
       last_seen: commit,

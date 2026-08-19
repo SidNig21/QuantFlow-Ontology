@@ -73,6 +73,21 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
         `${dyn.length} import specifier(s) computed at runtime (line ${dyn.map((d) => d.line).join(", ")})`, "runtime-proof");
       else set("imports", "indexed");
     }
+    // D7 — A COMPUTED CALLEE IS A HOLE IN THE CALL GRAPH, and reach and persistence are
+    // both call-graph reasoning. `db.transaction(() => { … })()` calls a VALUE: the parser
+    // can see the shape and can never name the target, and without a type checker no
+    // amount of care will change that. It used to be pushed as `name: null` and dropped,
+    // so a file with an unfollowable edge reported `indexed` — identical to a file with
+    // none. governed-review.ts, the file carrying every hard red in the model, is one of
+    // them (line 308, inside `markGovernedDelivery`).
+    //
+    // Scoped deliberately. `import(…)`, `super(…)` and IIFEs are also non-identifier
+    // callees and are NOT gaps — treating them as gaps would gray 56 files to describe 4.
+    const computed = (a?.unresolved ?? []).filter((u) => u.what === "computed callee");
+    const computedWhy = () => `${computed.length} call(s) with a computed callee `
+      + `(line ${computed.map((c) => c.line + (c.enclosing ? ` in ${c.enclosing}` : " at top level")).join(", ")})`
+      + ` — the callee is a value, so this edge cannot be followed`;
+
     // Reachability is a separate claim from parsing: a file can be parsed and still
     // have no reach verdict if it sits outside the product row scope.
     if (!reachOf.has(path))
@@ -82,6 +97,8 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
           ? "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated"
           : "no reach row was produced for this path",
         "scope-boundary");
+    else if (computed.length)
+      set("reach", "partial", `${computedWhy()}, so calls out of this file are incompletely traced`, "ast-coverage");
     else set("reach", "indexed");
 
     // ── IPC, both directions ───────────────────────────────────────────────
@@ -122,6 +139,10 @@ export function coverageMatrix({ files, astOf, reachOf, lifetimeOf, buildInclude
       else if (interpolated.length)
         set("persistence", "partial",
           `${interpolated.length} of ${sql.length} SQL site(s) are template literals; the table name may be computed`, "ast-coverage");
+      else if (computed.length)
+        set("persistence", "partial",
+          `every SQL site resolves to a named symbol, but ${computedWhy()} — the governance verdict `
+          + `for this file rests on a call graph with a hole in it`, "ast-coverage");
       else set("persistence", "indexed");
     }
 

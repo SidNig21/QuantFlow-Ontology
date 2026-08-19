@@ -23,6 +23,10 @@ import { deriveWriteDoor, schemaActionNames, makeDoor } from "./writedoor.mjs";
 import { detectOwnership } from "./ownership.mjs";
 import { buildNorthStar, northStarStats } from "./northstar.mjs";
 import { loadDecisions, currentFindings, applyDecisions } from "./decisions.mjs";
+// The hop-4 severity rule and the ratchet must read the SAME definition of hard red.
+// Two definitions is how ATLAS.md ended up giving its strongest language to findings
+// the ratchet would not block on.
+import { hardRed } from "./baseline.mjs";
 import { readdirSync } from "node:fs";
 
 const OUT = join(REPO, "qf-atlas");
@@ -170,44 +174,108 @@ const persistence = classifyPersistence({
   isAppOrigin: (f) => f.startsWith("collab-electron/src/"),
 });
 
-// ─── RECONCILE HOP 4 AGAINST THE SEMANTIC CLASSIFIER ─────────────────────────
-// hop4 walks a 5-deep NAME-based call closure and stamped `cheats` whenever that walk
-// touched any SQL-bearing function — DML unconditionally outranking a proven door. So
-// `qf:tasks:create`, which calls kernelExecute("create_task", …) at ipc-kernel.ts:483,
-// was recorded with `viaDoor: kernelExecute` AND labelled a governance breach, because
-// the same walk also reached `ensureGovernedReviewSchema` — an idempotent CREATE TABLE
-// on review bookkeeping tables that the persistence classifier already calls compliant.
+// ─── RECONCILE HOP 4 AGAINST HARD-RED AUTHORITY ──────────────────────────────
+// hop4 walks a 5-deep NAME-based call closure and stamps `cheats` whenever that walk
+// touches any SQL-bearing function. It cannot grade severity, and the label it produces
+// is the loudest thing in the whole report: ATLAS.md draws it as "raw SQL — never enters
+// a governed action", the diagram runs a dotted edge to Kernel truth captioned
+// "ungoverned — this is the breach", and northstar.mjs breaks the loop on it outright.
 //
-// That made PLAN, ASSIGN and REVIEW read `broken`, and the brief routed them to "raw SQL,
-// never enters a governed action". An agent told the Kernel's own task-creation path
-// bypasses execute() would go and "repair" working governed code.
+// Reconciling against `governance === "violation"` was not enough. That predicate is true
+// of 16 rows and 13 of them are MEDIUM: `CREATE TABLE IF NOT EXISTS qf_review_*`, review
+// bookkeeping that is a real observation — "this store is not in the golden schema" — and
+// emphatically not "domain truth was mutated outside a governed action". Three of the five
+// cheats wires rested entirely on those, reaching `ensureGovernedReviewSchema`, an
+// idempotent schema guard, while carrying the report's strongest language and breaking
+// three loops. An agent reading that would go and "repair" a working schema guard.
 //
-// The contract is explicit that regex may not create a high-confidence red on its own, so
-// the regex walk no longer gets the last word: a wire is `cheats` only when the SQL it
-// reaches is a CONFIRMED VIOLATION in the semantic classifier. Everything else falls back
-// to what the walk actually proved — a door, a disk write, or nothing.
+// THE RULE: a wire keeps `cheats` only when a function it actually reaches is backed by a
+// CURRENT HARD RED — the same class-specific predicate the ratchet blocks on (domain-truth
+// + violation + high + a corroborated AST reach proof). Matching is on the exact
+// (file, function) pair, never on file membership: governed-review.ts holds both real
+// bypasses and compliant helpers, so a compliant function must not inherit a breach
+// verdict by living next door.
+//
+// Medium evidence does not disappear. It moves to `hop4.ungoverned` carrying its finding
+// ids, confidence and persistence class, stays in the ledger, stays decidable, and simply
+// stops being the thing that stops the world.
 {
-  const violatingFn = new Set(persistence.filter((p) => p.governance === "violation").map((p) => p.fn));
-  // NO FILE-MEMBERSHIP FALLBACK. Matching on file meant a violation anywhere in a file
-  // kept every OTHER function in that file stamped `cheats`. governed-review.ts holds
-  // both real bypasses and compliant helpers, so a compliant function was inheriting a
-  // breach verdict purely by living next door. Reconcile on exact function identity.
+  const byId = new Map(persistence.map((p) => [p.id, p]));
+  const key = (file, fn) => file + "::" + fn;
+  const redAt = new Map();
+  for (const id of Object.keys(hardRed({ persistence }))) {
+    const p = byId.get(id);
+    const k = key(p.evidence[0].file, p.fn);
+    if (!redAt.has(k)) redAt.set(k, []);
+    redAt.get(k).push(id);
+  }
+  const amberAt = new Map();
+  for (const p of persistence) {
+    if (p.governance !== "violation") continue;
+    const k = key(p.evidence[0].file, p.fn);
+    if (redAt.has(k)) continue;
+    if (!amberAt.has(k)) amberAt.set(k, []);
+    amberAt.get(k).push(p);
+  }
   const unknownFn = new Set(persistence.filter((p) => p.governance === "unknown").map((p) => p.fn));
+
   let downgraded = 0;
+  const audit = [];
   for (const w of wires) {
     if (w.hop4?.kind !== "cheats") continue;
-    const fn = w.hop4.viaDml, file = w.hop4.dmlFile;
-    if (violatingFn.has(fn)) continue;   // this exact function is a confirmed breach: stays
+    // Every SQL function the walk reached, not the arbitrary first one it recorded.
+    const reached = w.hop4.dmlAll?.length ? w.hop4.dmlAll
+      : w.hop4.viaDml ? [{ fn: w.hop4.viaDml, file: w.hop4.dmlFile }] : [];
+    const red = reached.filter((r) => redAt.has(key(r.file, r.fn)));
+    const amber = reached.filter((r) => amberAt.has(key(r.file, r.fn)));
+    const row = { channel: w.channel, reached: reached.map((r) => r.fn + " (" + r.file + ")") };
+
+    if (red.length) {
+      // Cite the function that actually earns the label, not whichever one the frontier
+      // happened to reach first.
+      const ids = red.flatMap((r) => redAt.get(key(r.file, r.fn)));
+      w.hop4.viaDml = red[0].fn;
+      w.hop4.dmlFile = red[0].file;
+      w.hop4.backedBy = ids;
+      w.hop4.why = "reaches " + red[0].fn + "(), a confirmed hard red: " + ids.join(", ");
+      const hop = w.hops.find((h) => h.layer === "kernel");
+      if (hop) hop.detail = "raw SQL via " + red[0].fn + " (" + red[0].file + ") — hard red " + ids[0];
+      audit.push({ ...row, backing: ids, hardRed: true, hop4: "cheats", status: w.status });
+      continue;
+    }
+
     downgraded++;
-    w.hop4.kind = w.hop4.viaDoor ? "write-door" : w.hop4.viaDisk ? "writes-disk" : "read-only";
+    // NOT `read-only`. That kind asserts "no mutation seen", and these wires
+    // demonstrably reach an INSERT — falsifiers 21 and 26 exist precisely to stop SQL
+    // from being narrated as clean. Removing the breach label may not also remove the
+    // mutation. `reaches-sql` is the honest middle: it mutates outside the write door,
+    // every finding on the path is amber, and it is not a governance breach.
+    w.hop4.kind = w.hop4.viaDoor ? "write-door" : w.hop4.viaDisk ? "writes-disk" : "reaches-sql";
     w.hop4.downgradedFrom = "cheats";
-    w.hop4.why = unknownFn.has(fn)
-      ? `reaches ${fn}, whose governance the classifier could not resolve — gray, not a breach`
-      : `reaches ${fn}, which the persistence classifier adjudicates as compliant`;
+    w.hop4.backedBy = null;
+    w.hop4.ungoverned = amber.map((r) => {
+      const rows = amberAt.get(key(r.file, r.fn));
+      return { fn: r.fn, file: r.file, findings: rows.map((p) => p.id),
+        confidence: rows[0].confidence, persistence: rows[0].persistence };
+    });
+    w.hop4.why = amber.length
+      ? "reaches " + amber.map((r) => r.fn + "()").join(", ") + " — persistence findings exist and stay "
+        + "visible, but none is a hard red (" + w.hop4.ungoverned[0].confidence + " confidence, "
+        + w.hop4.ungoverned[0].persistence + "), so this is not a governance breach"
+      : reached.some((r) => unknownFn.has(r.fn))
+        ? "reaches " + reached.map((r) => r.fn + "()").join(", ") + ", whose governance the classifier could not resolve — gray, not a breach"
+        : "reaches " + reached.map((r) => r.fn + "()").join(", ") + ", which the persistence classifier adjudicates as compliant";
+    // The kernel hop carried "raw SQL via …" and `present: false` regardless of this
+    // reconciliation, so the wire diagram kept drawing a break the model no longer claims.
+    const hop = w.hops.find((h) => h.layer === "kernel");
+    if (hop) { hop.present = true; hop.detail = w.hop4.why; }
     // The wire's own status must follow, or the loop matrix keeps reading `broken`.
-    if (w.status === "cheats") w.status = "live";
+    if (w.status === "cheats") { w.status = "live"; w.breakAt = null; }
+    audit.push({ ...row, backing: w.hop4.ungoverned.flatMap((u) => u.findings), hardRed: false,
+      hop4: w.hop4.kind, status: w.status });
   }
   hop4Stats.downgradedFromCheats = downgraded;
+  hop4Stats.cheatsAudit = audit;
 }
 
 // Coverage: absence of a finding must never be indistinguishable from clean.

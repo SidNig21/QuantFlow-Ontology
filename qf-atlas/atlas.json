@@ -1,14 +1,14 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "674656c",
+    "commit": "cafdd16",
     "generatedAt": "2026-08-19",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "74125da119d78d30"
+    "fingerprint": "435954ec7b546bf4"
   },
   "stats": {
-    "live": 106,
+    "live": 107,
     "unreached": 0,
     "unused": 13,
     "dead": 0,
@@ -34,7 +34,256 @@
     "hop4": {
       "handlers": 123,
       "indexed": 1105,
-      "downgradedFromCheats": 15
+      "downgradedFromCheats": 17,
+      "cheatsAudit": [
+        {
+          "channel": "qf:connections:create",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:connections:delete",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:connections:deleteForTile",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "unused"
+        },
+        {
+          "channel": "qf:execute",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:research:loadSampleDataset",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:research:submitQuestion",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:review:projection",
+          "reached": [
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+          ],
+          "backing": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists"
+          ],
+          "hardRed": false,
+          "hop4": "reaches-sql",
+          "status": "unused"
+        },
+        {
+          "channel": "qf:review:request",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)",
+            "createReviewTask (packages/qf-kernel/src/governed-review.ts)",
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)",
+            "persistAttempt (packages/qf-kernel/src/governed-review.ts)",
+            "persistRefusal (packages/qf-kernel/src/governed-review.ts)"
+          ],
+          "backing": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:update"
+          ],
+          "hardRed": true,
+          "hop4": "cheats",
+          "status": "cheats"
+        },
+        {
+          "channel": "qf:review:revision",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)",
+            "createReviewTask (packages/qf-kernel/src/governed-review.ts)",
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "persistAttempt (packages/qf-kernel/src/governed-review.ts)",
+            "persistRefusal (packages/qf-kernel/src/governed-review.ts)"
+          ],
+          "backing": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into"
+          ],
+          "hardRed": true,
+          "hop4": "cheats",
+          "status": "cheats"
+        },
+        {
+          "channel": "qf:review:secondCritic",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)",
+            "createReviewTask (packages/qf-kernel/src/governed-review.ts)",
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)",
+            "persistAttempt (packages/qf-kernel/src/governed-review.ts)",
+            "persistRefusal (packages/qf-kernel/src/governed-review.ts)"
+          ],
+          "backing": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:update"
+          ],
+          "hardRed": true,
+          "hop4": "cheats",
+          "status": "cheats"
+        },
+        {
+          "channel": "qf:sessions:cancel",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:sessions:close",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:sessions:runTurn",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:sessions:spawn",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:tasks:cancel",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:tasks:create",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)",
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+          ],
+          "backing": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists"
+          ],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:tasks:reassign",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:tasks:secondOpinion",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:tasks:steer",
+          "reached": [
+            "appendEvent (packages/qf-kernel/src/events.ts)"
+          ],
+          "backing": [],
+          "hardRed": false,
+          "hop4": "write-door",
+          "status": "live"
+        },
+        {
+          "channel": "qf:tasks:surface",
+          "reached": [
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+          ],
+          "backing": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists"
+          ],
+          "hardRed": false,
+          "hop4": "reaches-sql",
+          "status": "live"
+        }
+      ]
     },
     "ast": {
       "available": true,
@@ -50,9 +299,9 @@
     },
     "northStar": {
       "loops": 11,
-      "staticConnected": 8,
+      "staticConnected": 9,
       "staticDegraded": 1,
-      "staticBroken": 2,
+      "staticBroken": 1,
       "gateCovered": 11,
       "gatePartial": 0,
       "gateUncovered": 0,
@@ -76,7 +325,7 @@
     "governanceUnknown": 3,
     "legacyLeads": 9,
     "nodes": 106,
-    "loopsBroken": 3,
+    "loopsBroken": 2,
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
@@ -89,6 +338,7 @@
       "repair": 6,
       "remove": 0,
       "accepted": 0,
+      "incomplete": 3,
       "allClear": false
     },
     "unexplainedUndecided": 0,
@@ -6950,6 +7200,7 @@
           "channel": "qf:research:submitQuestion",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -6986,12 +7237,14 @@
           "channel": "qf:tasks:create",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:execute",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7028,6 +7281,7 @@
           "channel": "qf:definitions:list",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7064,32 +7318,29 @@
           "channel": "qf:tasks:reassign",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:tasks:surface",
-          "status": "cheats",
-          "hop4": "cheats",
-          "why": "reaches SQL the hop-4 walker places outside execute()"
+          "status": "live",
+          "hop4": "reaches-sql",
+          "backedBy": null,
+          "why": null
         },
         {
           "channel": "qf:handoffs:list",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         }
       ],
       "evidence": {
         "static": {
-          "state": "broken",
-          "detail": "2/3 channels live",
-          "broken": [
-            {
-              "channel": "qf:tasks:surface",
-              "status": "cheats",
-              "why": "reaches SQL the hop-4 walker places outside execute()"
-            }
-          ]
+          "state": "connected",
+          "detail": "3/3 channels live",
+          "broken": []
         },
         "gate": {
           "state": "covered",
@@ -7106,7 +7357,7 @@
           "detail": "no founder confirmation is recorded for this loop"
         }
       },
-      "badge": "G",
+      "badge": "SG",
       "unreaped": []
     },
     {
@@ -7118,30 +7369,35 @@
           "channel": "pty:create",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "agent:spawn",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:sessions:spawn",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:sessions:runTurn",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:sessions:list",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7178,24 +7434,28 @@
           "channel": "qf:tasks:steer",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:tasks:cancel",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "agent:cancel",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:sessions:cancel",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7232,6 +7492,7 @@
           "channel": "qf:artifacts:list",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7268,25 +7529,40 @@
           "channel": "qf:review:request",
           "status": "cheats",
           "hop4": "cheats",
-          "why": "reaches SQL the hop-4 walker places outside execute()"
+          "backedBy": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:update"
+          ],
+          "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update"
         },
         {
           "channel": "qf:review:projection",
-          "status": "cheats",
-          "hop4": "cheats",
-          "why": "reaches SQL the hop-4 walker places outside execute()"
+          "status": "unused",
+          "hop4": "reaches-sql",
+          "backedBy": null,
+          "why": "breaks at renderer"
         },
         {
           "channel": "qf:review:revision",
           "status": "cheats",
           "hop4": "cheats",
-          "why": "reaches SQL the hop-4 walker places outside execute()"
+          "backedBy": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into"
+          ],
+          "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into"
         },
         {
           "channel": "qf:review:secondCritic",
           "status": "cheats",
           "hop4": "cheats",
-          "why": "reaches SQL the hop-4 walker places outside execute()"
+          "backedBy": [
+            "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+            "persistence:packages/qf-kernel/src/governed-review.ts:task:update"
+          ],
+          "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update"
         }
       ],
       "evidence": {
@@ -7297,22 +7573,22 @@
             {
               "channel": "qf:review:request",
               "status": "cheats",
-              "why": "reaches SQL the hop-4 walker places outside execute()"
+              "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update"
             },
             {
               "channel": "qf:review:projection",
-              "status": "cheats",
-              "why": "reaches SQL the hop-4 walker places outside execute()"
+              "status": "unused",
+              "why": "breaks at renderer"
             },
             {
               "channel": "qf:review:revision",
               "status": "cheats",
-              "why": "reaches SQL the hop-4 walker places outside execute()"
+              "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into"
             },
             {
               "channel": "qf:review:secondCritic",
               "status": "cheats",
-              "why": "reaches SQL the hop-4 walker places outside execute()"
+              "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update"
             }
           ]
         },
@@ -7343,6 +7619,7 @@
           "channel": "qf:tasks:secondOpinion",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7379,12 +7656,14 @@
           "channel": "qf:events:list",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:research:ledger",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         }
       ],
@@ -7421,18 +7700,21 @@
           "channel": "qf:sessions:close",
           "status": "live",
           "hop4": "write-door",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "pty:kill",
           "status": "live",
           "hop4": "read-only",
+          "backedBy": null,
           "why": null
         },
         {
           "channel": "agent:kill",
           "status": "unused",
           "hop4": "read-only",
+          "backedBy": null,
           "why": "breaks at renderer"
         }
       ],
@@ -7515,11 +7797,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         }
       ],
       "worst": "live",
@@ -7557,11 +7839,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         }
       ],
       "worst": "live",
@@ -7600,11 +7882,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:tasks:secondOpinion",
@@ -7628,11 +7910,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         }
       ],
       "worst": "live",
@@ -7728,11 +8010,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         }
       ],
       "worst": "live",
@@ -7772,11 +8054,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:tasks:cancel",
@@ -7800,11 +8082,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:sessions:cancel",
@@ -7828,11 +8110,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+              "present": true,
+              "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         }
       ],
       "worst": "live",
@@ -7874,7 +8156,7 @@
             {
               "layer": "kernel",
               "present": false,
-              "detail": "raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)"
+              "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into"
             }
           ],
           "breakAt": "kernel"
@@ -7902,7 +8184,7 @@
             {
               "layer": "kernel",
               "present": false,
-              "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+              "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into"
             }
           ],
           "breakAt": "kernel"
@@ -7930,7 +8212,7 @@
             {
               "layer": "kernel",
               "present": false,
-              "detail": "raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)"
+              "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into"
             }
           ],
           "breakAt": "kernel"
@@ -7938,7 +8220,7 @@
         {
           "channel": "qf:review:projection",
           "status": "unused",
-          "hop4": "cheats",
+          "hop4": "reaches-sql",
           "hops": [
             {
               "layer": "renderer",
@@ -7957,8 +8239,8 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+              "present": true,
+              "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
             }
           ],
           "breakAt": "renderer"
@@ -8012,8 +8294,8 @@
         },
         {
           "channel": "qf:tasks:surface",
-          "status": "cheats",
-          "hop4": "cheats",
+          "status": "live",
+          "hop4": "reaches-sql",
           "hops": [
             {
               "layer": "renderer",
@@ -8032,11 +8314,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+              "present": true,
+              "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:artifacts:list",
@@ -8151,9 +8433,9 @@
           "breakAt": null
         }
       ],
-      "worst": "cheats",
-      "health": "degraded",
-      "brokenCount": 1,
+      "worst": "live",
+      "health": "ok",
+      "brokenCount": 0,
       "total": 6
     },
     {
@@ -14164,17 +14446,19 @@
       "path": "collab-electron/src/main/atomic-result-commit.ts",
       "worst": "unsupported",
       "imports": "indexed",
-      "reach": "indexed",
+      "reach": "partial",
+      "blockers": {
+        "reach": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
       "ipcRequest": "indexed",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "unsupported",
-      "blockers": {
-        "ownership": "scope-boundary"
-      },
       "reasons": {
+        "reach": "1 call(s) with a computed callee (line 6 in runAtomicResultCommit) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -18836,18 +19120,24 @@
     },
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
-      "worst": "indexed",
+      "worst": "partial",
       "imports": "indexed",
-      "reach": "indexed",
+      "reach": "partial",
+      "blockers": {
+        "reach": "ast-coverage",
+        "persistence": "ast-coverage"
+      },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "indexed",
+      "persistence": "partial",
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "indexed",
       "reasons": {
+        "reach": "1 call(s) with a computed callee (line 308 in markGovernedDelivery) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
+        "persistence": "every SQL site resolves to a named symbol, but 1 call(s) with a computed callee (line 308 in markGovernedDelivery) — the callee is a value, so this edge cannot be followed — the governance verdict for this file rests on a call graph with a hole in it",
         "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
@@ -20092,11 +20382,12 @@
       "imports": "indexed",
       "reach": "unsupported",
       "blockers": {
-        "reach": "scope-boundary"
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "indexed",
+      "persistence": "partial",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
@@ -20104,6 +20395,7 @@
         "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
+        "persistence": "every SQL site resolves to a named symbol, but 3 call(s) with a computed callee (line 100 in rebuildLinks, 529 in clonePreD1Db, 858 in main) — the callee is a value, so this edge cannot be followed — the governance verdict for this file rests on a call graph with a hole in it",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
@@ -24394,8 +24686,8 @@
     },
     "persistence": {
       "not-applicable": 492,
-      "partial": 24,
-      "indexed": 23
+      "partial": 26,
+      "indexed": 21
     },
     "lifetime": {
       "not-applicable": 473,
@@ -24414,7 +24706,8 @@
     },
     "reach": {
       "unsupported": 305,
-      "indexed": 234
+      "indexed": 232,
+      "partial": 2
     }
   },
   "unexplainedCoverage": [],
@@ -33922,7 +34215,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -33968,7 +34262,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34014,7 +34309,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34060,7 +34356,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34106,7 +34403,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "saveCachedMessages",
-        "diskFile": "collab-electron/src/main/acp-agent.ts"
+        "diskFile": "collab-electron/src/main/acp-agent.ts",
+        "dmlAll": []
       }
     },
     {
@@ -34152,7 +34450,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34198,7 +34497,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "getDeviceId",
-        "diskFile": "collab-electron/src/main/analytics.ts"
+        "diskFile": "collab-electron/src/main/analytics.ts",
+        "dmlAll": []
       }
     },
     {
@@ -34244,7 +34544,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34290,7 +34591,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34336,7 +34638,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34382,7 +34685,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34428,7 +34732,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34474,7 +34779,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34520,7 +34826,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34566,7 +34873,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34612,7 +34920,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34658,7 +34967,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34704,7 +35014,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34750,7 +35061,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34796,7 +35108,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34842,7 +35155,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34888,7 +35202,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -34934,7 +35249,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "saveState",
-        "diskFile": "collab-electron/src/main/canvas-persistence.ts"
+        "diskFile": "collab-electron/src/main/canvas-persistence.ts",
+        "dmlAll": []
       }
     },
     {
@@ -34980,7 +35296,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35026,7 +35343,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35072,7 +35390,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35118,7 +35437,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35164,7 +35484,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35210,7 +35531,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35256,7 +35578,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35302,7 +35625,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35348,7 +35672,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35394,7 +35719,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35440,7 +35766,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35486,7 +35813,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35532,7 +35860,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35578,7 +35907,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35624,7 +35954,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35670,7 +36001,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35716,7 +36048,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "handleRename",
-        "diskFile": "collab-electron/src/main/wikilink-index.ts"
+        "diskFile": "collab-electron/src/main/wikilink-index.ts",
+        "dmlAll": []
       }
     },
     {
@@ -35762,7 +36095,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35808,7 +36142,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35854,7 +36189,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "fsWriteFile",
-        "diskFile": "collab-electron/src/main/files.ts"
+        "diskFile": "collab-electron/src/main/files.ts",
+        "dmlAll": []
       }
     },
     {
@@ -35900,7 +36236,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35946,7 +36283,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -35992,7 +36330,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36038,7 +36377,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "saveDroppedImage",
-        "diskFile": "collab-electron/src/main/image-service.ts"
+        "diskFile": "collab-electron/src/main/image-service.ts",
+        "dmlAll": []
       }
     },
     {
@@ -36084,7 +36424,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36130,7 +36471,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36176,7 +36518,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36222,7 +36565,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "installSkill",
-        "diskFile": "collab-electron/src/main/integrations.ts"
+        "diskFile": "collab-electron/src/main/integrations.ts",
+        "dmlAll": []
       }
     },
     {
@@ -36268,7 +36612,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36314,7 +36659,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36360,7 +36706,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36406,7 +36753,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36452,7 +36800,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36498,7 +36847,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36544,7 +36894,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36590,7 +36941,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36636,7 +36988,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36682,7 +37035,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36728,7 +37082,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36774,7 +37129,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36820,7 +37176,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36866,7 +37223,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36912,7 +37270,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -36958,7 +37317,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -37004,7 +37364,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -37050,14 +37411,15 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
       "channel": "qf:connections:create",
       "method": "createConnection",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37076,8 +37438,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37097,15 +37459,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:connections:delete",
       "method": "deleteConnection",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37124,8 +37494,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37145,8 +37515,16 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
@@ -37172,8 +37550,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37193,8 +37571,16 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
@@ -37240,7 +37626,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -37286,7 +37673,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -37332,14 +37720,15 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
       "channel": "qf:execute",
       "method": "execute",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37358,8 +37747,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37379,8 +37768,16 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
@@ -37426,7 +37823,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -37472,14 +37870,15 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
       "channel": "qf:research:loadSampleDataset",
       "method": "loadSampleResearchDataset",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37498,8 +37897,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37519,15 +37918,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": "kernelEnsureSampleResearchDataset",
         "diskFile": "collab-electron/src/main/kernel.ts",
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:research:submitQuestion",
       "method": "submitResearchQuestion",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37546,8 +37953,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37567,8 +37974,16 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
@@ -37594,8 +38009,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+          "present": true,
+          "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
         }
       ],
       "registeredAt": {
@@ -37609,12 +38024,37 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "cheats",
+        "kind": "reaches-sql",
         "viaDoor": null,
         "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          }
+        ],
+        "downgradedFrom": "cheats",
+        "backedBy": null,
+        "ungoverned": [
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
+          }
+        ],
+        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -37641,7 +38081,7 @@
         {
           "layer": "kernel",
           "present": false,
-          "detail": "raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)"
+          "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into"
         }
       ],
       "registeredAt": {
@@ -37657,10 +38097,42 @@
       "hop4": {
         "kind": "cheats",
         "viaDoor": "orchestrateNativeTuiAdmission",
-        "viaDml": "markGovernedDelivery",
+        "viaDml": "createReviewTask",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          },
+          {
+            "fn": "createReviewTask",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "markGovernedDelivery",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "persistAttempt",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "persistRefusal",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          }
+        ],
+        "backedBy": [
+          "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+          "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+          "persistence:packages/qf-kernel/src/governed-review.ts:task:update"
+        ],
+        "why": "reaches createReviewTask(), a confirmed hard red: persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update"
       }
     },
     {
@@ -37687,7 +38159,7 @@
         {
           "layer": "kernel",
           "present": false,
-          "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+          "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into"
         }
       ],
       "registeredAt": {
@@ -37703,10 +38175,37 @@
       "hop4": {
         "kind": "cheats",
         "viaDoor": null,
-        "viaDml": "ensureGovernedReviewSchema",
+        "viaDml": "createReviewTask",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          },
+          {
+            "fn": "createReviewTask",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "persistAttempt",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "persistRefusal",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          }
+        ],
+        "backedBy": [
+          "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+          "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into"
+        ],
+        "why": "reaches createReviewTask(), a confirmed hard red: persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into"
       }
     },
     {
@@ -37733,7 +38232,7 @@
         {
           "layer": "kernel",
           "present": false,
-          "detail": "raw SQL via markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)"
+          "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into"
         }
       ],
       "registeredAt": {
@@ -37749,17 +38248,49 @@
       "hop4": {
         "kind": "cheats",
         "viaDoor": "orchestrateNativeTuiAdmission",
-        "viaDml": "markGovernedDelivery",
+        "viaDml": "createReviewTask",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          },
+          {
+            "fn": "createReviewTask",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "markGovernedDelivery",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "persistAttempt",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          },
+          {
+            "fn": "persistRefusal",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          }
+        ],
+        "backedBy": [
+          "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
+          "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+          "persistence:packages/qf-kernel/src/governed-review.ts:task:update"
+        ],
+        "why": "reaches createReviewTask(), a confirmed hard red: persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update"
       }
     },
     {
       "channel": "qf:sessions:cancel",
       "method": "cancelSession",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37778,8 +38309,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37799,15 +38330,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:sessions:close",
       "method": "closeSession",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37826,8 +38365,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37847,8 +38386,16 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
@@ -37894,7 +38441,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -37940,14 +38488,15 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
       "channel": "qf:sessions:runTurn",
       "method": "runTurn",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -37966,8 +38515,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -37987,15 +38536,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:sessions:spawn",
       "method": "spawnSession",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38014,8 +38571,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -38035,15 +38592,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:tasks:cancel",
       "method": "cancelTask",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38062,8 +38627,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -38083,15 +38648,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:tasks:create",
       "method": "createTask",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38110,8 +38683,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
         }
       ],
       "registeredAt": {
@@ -38131,15 +38704,42 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          },
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
+          }
+        ],
+        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
       "channel": "qf:tasks:reassign",
       "method": "reassignTask",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38158,8 +38758,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -38179,15 +38779,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:tasks:secondOpinion",
       "method": "requestSecondOpinion",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38206,8 +38814,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -38227,15 +38835,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:tasks:steer",
       "method": "steerTask",
       "status": "live",
-      "breakAt": "kernel",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38254,8 +38870,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via appendEvent (packages/qf-kernel/src/events.ts)"
+          "present": true,
+          "detail": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
         }
       ],
       "registeredAt": {
@@ -38275,15 +38891,23 @@
         "dmlFile": "packages/qf-kernel/src/events.ts",
         "viaDisk": null,
         "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "appendEvent",
+            "file": "packages/qf-kernel/src/events.ts"
+          }
+        ],
         "downgradedFrom": "cheats",
-        "why": "reaches appendEvent, whose governance the classifier could not resolve — gray, not a breach"
+        "backedBy": null,
+        "ungoverned": [],
+        "why": "reaches appendEvent(), whose governance the classifier could not resolve — gray, not a breach"
       }
     },
     {
       "channel": "qf:tasks:surface",
       "method": "listTaskSurface",
-      "status": "cheats",
-      "breakAt": "kernel",
+      "status": "live",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -38302,8 +38926,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+          "present": true,
+          "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
         }
       ],
       "registeredAt": {
@@ -38317,12 +38941,37 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "cheats",
+        "kind": "reaches-sql",
         "viaDoor": null,
         "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": [
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts"
+          }
+        ],
+        "downgradedFrom": "cheats",
+        "backedBy": null,
+        "ungoverned": [
+          {
+            "fn": "ensureGovernedReviewSchema",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
+          }
+        ],
+        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -38368,7 +39017,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38414,7 +39064,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38460,7 +39111,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38506,7 +39158,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38552,7 +39205,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38598,7 +39252,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38644,7 +39299,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38690,7 +39346,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38736,7 +39393,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38782,7 +39440,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38828,7 +39487,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38874,7 +39534,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38920,7 +39581,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -38966,7 +39628,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39012,7 +39675,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39058,7 +39722,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39104,7 +39769,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39150,7 +39816,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39196,7 +39863,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39242,7 +39910,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39288,7 +39957,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "ensureGitignoreEntry",
-        "diskFile": "collab-electron/src/main/ipc-workspace.ts"
+        "diskFile": "collab-electron/src/main/ipc-workspace.ts",
+        "dmlAll": []
       }
     },
     {
@@ -39334,7 +40004,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39380,7 +40051,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39426,7 +40098,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39472,7 +40145,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39518,7 +40192,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": null,
-        "diskFile": null
+        "diskFile": null,
+        "dmlAll": []
       }
     },
     {
@@ -39564,7 +40239,8 @@
         "viaDml": null,
         "dmlFile": null,
         "viaDisk": "fsWriteFile",
-        "diskFile": "collab-electron/src/main/files.ts"
+        "diskFile": "collab-electron/src/main/files.ts",
+        "dmlAll": []
       }
     }
   ],
@@ -42998,19 +43674,26 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "dcc5693",
+      "commit": "674656c",
       "generatedAt": "2026-08-19"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "674656c",
+      "commit": "cafdd16",
       "generatedAt": "2026-08-19"
     },
-    "verdict": "better",
-    "why": "43 improvement(s), nothing added or hidden",
+    "verdict": "worse",
+    "why": "4 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
+      {
+        "id": "persistence:collab-electron/src/main/updater/update-manager.ts:check:update",
+        "kind": "persistence",
+        "what": "check update",
+        "where": "collab-electron/src/main/updater/update-manager.ts",
+        "note": "was undecided"
+      },
       {
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
         "kind": "persistence",
@@ -43019,9 +43702,9 @@
         "note": "was repair"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
         "kind": "persistence",
-        "what": "qf_review_attempt create table",
+        "what": "qf_review_attempt create table if not exists",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -43033,9 +43716,9 @@
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
         "kind": "persistence",
-        "what": "qf_review_invocation create table",
+        "what": "qf_review_invocation create table if not exists",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -43047,16 +43730,16 @@
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
         "kind": "persistence",
-        "what": "qf_review_publication create table",
+        "what": "qf_review_publication create table if not exists",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
         "kind": "persistence",
-        "what": "qf_review_receipt create table",
+        "what": "qf_review_receipt create table if not exists",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -43068,9 +43751,9 @@
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
         "kind": "persistence",
-        "what": "qf_review_source_work create table",
+        "what": "qf_review_source_work create table if not exists",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -43082,9 +43765,9 @@
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists",
         "kind": "persistence",
-        "what": "qf_review_task create table",
+        "what": "qf_review_task create table if not exists",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -43115,6 +43798,13 @@
         "what": "task update",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was repair"
+      },
+      {
+        "id": "persistence:collab-electron/src/main/agent-host.ts:notification:update",
+        "kind": "persistence",
+        "what": "notification update",
+        "where": "collab-electron/src/main/agent-host.ts",
+        "note": "was undecided"
       },
       {
         "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
@@ -43372,17 +44062,50 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "collab-electron/src/main/atomic-result-commit.ts",
+        "analyzer": "reach",
+        "from": "indexed",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 call(s) with a computed callee (line 6 in runAtomicResultCommit) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced"
+      },
+      {
+        "path": "packages/qf-kernel/src/governed-review.ts",
+        "analyzer": "persistence",
+        "from": "indexed",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "every SQL site resolves to a named symbol, but 1 call(s) with a computed callee (line 308 in markGovernedDelivery) — the callee is a value, so this edge cannot be followed — the governance verdict for this file rests on a call graph with a hole in it"
+      },
+      {
+        "path": "packages/qf-kernel/src/governed-review.ts",
+        "analyzer": "reach",
+        "from": "indexed",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 call(s) with a computed callee (line 308 in markGovernedDelivery) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced"
+      },
+      {
+        "path": "qa/gates/dock-profile-identity/run.ts",
+        "analyzer": "persistence",
+        "from": "indexed",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "every SQL site resolves to a named symbol, but 3 call(s) with a computed callee (line 100 in rebuildLinks, 529 in clonePreD1Db, 858 in main) — the callee is a value, so this edge cannot be followed — the governance verdict for this file rests on a call graph with a hole in it"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 51,
+      "resolved": 53,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 4,
       "coverageBetter": 0,
-      "undecidedFrom": 43,
+      "undecidedFrom": 45,
       "undecidedTo": null
     }
   },
@@ -43404,7 +44127,15 @@
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "repair",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
+        "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
+        "review_or_expiry": null,
+        "complete": true,
+        "missing": []
+      }
     },
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
@@ -43522,7 +44253,15 @@
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "repair",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
+        "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
+        "review_or_expiry": null,
+        "complete": true,
+        "missing": []
+      }
     },
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:update",
@@ -43532,7 +44271,15 @@
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "repair",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
+        "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
+        "review_or_expiry": null,
+        "complete": true,
+        "missing": []
+      }
     },
     {
       "id": "persistence:collab-electron/src/main/agent-host.ts:notification:update",
@@ -43740,8 +44487,15 @@
       "blocker": "founder-decision",
       "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
       "verdict": "keep",
-      "why": "GATE-ANCHORED. qa/gates/artifact-root/run.ts:350 reads this exact path, and :359/:362 assert it imports AND calls the production A2A artifact store. Deleting it turns a gate red, which is the one thing this work may never do to make the map greener.",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "GATE-ANCHORED. qa/gates/artifact-root/run.ts:350 reads this exact path, and :359/:362 assert it imports AND calls the production A2A artifact store. Deleting it turns a gate red, which is the one thing this work may never do to make the map greener.",
+        "remediation_trigger": null,
+        "review_or_expiry": null,
+        "complete": true,
+        "missing": []
+      }
     },
     {
       "id": "unreachable:collab-electron/src/main/a2a-orchestra.ts",
@@ -43760,8 +44514,17 @@
       "blocker": "founder-decision",
       "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
       "verdict": "repair",
-      "why": "ORPHANED, NOT DEAD. Nothing imports it, but collab-electron/scripts/package-lib/shared-paths.test.ts:38 reads its source and asserts it contains './package-resource-paths', and WO-008c documents its launch-precedence chain as live behaviour. A module that a test pins and no code imports is a wiring defect, not a deletion candidate.",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "ORPHANED, NOT DEAD. Nothing imports it, but collab-electron/scripts/package-lib/shared-paths.test.ts:38 reads its source and asserts it contains './package-resource-paths', and WO-008c documents its launch-precedence chain as live behaviour. A module that a test pins and no code imports is a wiring defect, not a deletion candidate.",
+        "remediation_trigger": null,
+        "review_or_expiry": null,
+        "complete": false,
+        "missing": [
+          "remediation_trigger"
+        ]
+      }
     },
     {
       "id": "unreachable:collab-electron/src/main/species-surface.ts",
@@ -43780,8 +44543,17 @@
       "blocker": "founder-decision",
       "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
       "verdict": "repair",
-      "why": "Same shape as species-launch.ts: shared-paths.test.ts:42 pins its content, nothing imports it. WO-008a also uses it as the ACP sole-writer perimeter bait target.",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "Same shape as species-launch.ts: shared-paths.test.ts:42 pins its content, nothing imports it. WO-008a also uses it as the ACP sole-writer perimeter bait target.",
+        "remediation_trigger": null,
+        "review_or_expiry": null,
+        "complete": false,
+        "missing": [
+          "remediation_trigger"
+        ]
+      }
     },
     {
       "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
@@ -43791,8 +44563,15 @@
       "blocker": "founder-decision",
       "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
       "verdict": "keep",
-      "why": "Founder-authored brand engine. qa/gates/one-skin.ts:21 allowlists this exact path as one of two justified palette exceptions, and WO-007 describes it as imported verbatim as founder input. flow-cube-watermark.js does not import it (the apparent import at line 16 is a usage comment), so 'unimported' is accurate and irrelevant: it is an asset, not dead wiring.",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "Founder-authored brand engine. qa/gates/one-skin.ts:21 allowlists this exact path as one of two justified palette exceptions, and WO-007 describes it as imported verbatim as founder input. flow-cube-watermark.js does not import it (the apparent import at line 16 is a usage comment), so 'unimported' is accurate and irrelevant: it is an asset, not dead wiring.",
+        "remediation_trigger": null,
+        "review_or_expiry": null,
+        "complete": true,
+        "missing": []
+      }
     },
     {
       "id": "broken-bridge-call:ptyForegroundProcess",
@@ -43802,8 +44581,17 @@
       "blocker": "product-defect",
       "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
       "verdict": "repair",
-      "why": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
-      "owner": "founder"
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
+        "remediation_trigger": null,
+        "review_or_expiry": null,
+        "complete": false,
+        "missing": [
+          "remediation_trigger"
+        ]
+      }
     },
     {
       "id": "push:cd-to",

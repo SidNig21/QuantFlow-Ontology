@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-19",
-  "passed": 81,
-  "total": 81,
+  "passed": 85,
+  "total": 85,
   "results": [
     {
       "n": 1,
@@ -85,7 +85,7 @@
       "n": 14,
       "name": "active app bypass to domain SQL is high-confidence red",
       "passed": true,
-      "detail": "domain-truth/high, wire=cheats, hop4=cheats"
+      "detail": "domain-truth/high, wire=live, hop4=reaches-sql"
     },
     {
       "n": 15,
@@ -127,7 +127,7 @@
       "n": 21,
       "name": "INSERT OR IGNORE is caught, not read as clean",
       "passed": true,
-      "detail": "violation=true hop4=cheats coverage=indexed"
+      "detail": "violation=true hop4=reaches-sql coverage=indexed"
     },
     {
       "n": 22,
@@ -157,7 +157,7 @@
       "n": 26,
       "name": "typed-brace SQL does not leave hop 4 read-only",
       "passed": true,
-      "detail": "hop4=cheats coverage=indexed violation=true"
+      "detail": "hop4=reaches-sql coverage=indexed violation=true"
     },
     {
       "n": 27,
@@ -199,7 +199,7 @@
       "n": 33,
       "name": "bare 'accepted' cannot hide a finding",
       "passed": true,
-      "detail": "verdict=undecided (accepted without owner, reason and expiry does not count as a decision)"
+      "detail": "verdict=undecided (accepted is missing owner, reason, remediation_trigger, review_or_expiry — it does not count as a decision)"
     },
     {
       "n": 34,
@@ -289,7 +289,7 @@
       "n": 48,
       "name": "AST resolves the facts regex got wrong",
       "passed": true,
-      "detail": "ts=5.9.3 kernel.ts lifetime=not-applicable governed-review persistence=indexed"
+      "detail": "ts=5.9.3 kernel.ts lifetime=not-applicable governed-review persistence=partial"
     },
     {
       "n": 49,
@@ -488,6 +488,30 @@
       "name": "a same-named decoy cannot forge or suppress a reach proof",
       "passed": true,
       "detail": "highs=3 (expect 3, i.e. not suppressed) forgedProofs=0"
+    },
+    {
+      "n": 83,
+      "name": "medium bookkeeping DDL cannot make a wire cheats or break a loop",
+      "passed": true,
+      "detail": "fixture hop4=reaches-sql findings=1 (medium/non-domain-store) promotedToHardRed=0 unbackedCheatsWires=0 loopsBrokenWithoutAHardRed=0"
+    },
+    {
+      "n": 84,
+      "name": "legacy or incomplete decision metadata cannot seed the baseline",
+      "passed": true,
+      "detail": "legacy(why)=refused partial(no trigger)=refused canonical=seeded legacyFieldsOnDisk=0"
+    },
+    {
+      "n": 85,
+      "name": "a computed callee becomes a named coverage blocker, never silent clean",
+      "passed": true,
+      "detail": "worst=unsupported cellsNamingTheGap=reach blockeredAsAstCoverage=1 unexplained=false"
+    },
+    {
+      "n": 82,
+      "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
+      "passed": true,
+      "detail": "git status --porcelain identical before and after (13 pre-existing entries)"
     }
   ]
 }

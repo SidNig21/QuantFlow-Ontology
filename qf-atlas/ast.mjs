@@ -202,6 +202,35 @@ export function analyzeFile(relPath, text) {
       const name = ts.isIdentifier(callee) ? callee.text
         : ts.isPropertyAccessExpression(callee) ? callee.name.text : null;
 
+      // D7 — EVERY callee gets a named FORM. `name: null` was pushed for six different
+      // syntactic shapes at once, so a genuinely unfollowable edge and a fully resolved
+      // `await import("./gates/x.ts")` were the same value downstream: absent. Four of
+      // these forms are not gaps at all, and calling them gaps would have grayed 56 files
+      // to describe 13 real holes.
+      //
+      //   named            an identifier or a property access — followable
+      //   dynamic-import   `import(spec)`; the specifier is already recorded as an import
+      //                    edge above, or as an `unresolved` entry when it is computed
+      //   super            the base constructor, named by the heritage clause the parser
+      //                    already records in `classes` — an unfollowed edge, not an
+      //                    unknown one
+      //   iife             `(() => {…})()`; the body is inline and this walker already
+      //                    attributes its calls to the same enclosing symbol
+      //   computed         everything else — `map.get(k)()`, `f()()`, `entry[1]()`. The
+      //                    callee is a VALUE. Without a type checker it cannot be named,
+      //                    and guessing is forbidden. This one is a coverage boundary.
+      const calleeForm =
+        name !== null ? "named"
+        : callee.kind === ts.SyntaxKind.ImportKeyword ? "dynamic-import"
+        : callee.kind === ts.SyntaxKind.SuperKeyword ? "super"
+        : (ts.isParenthesizedExpression(callee) || ts.isFunctionExpression(callee)
+           || ts.isArrowFunction(callee)) ? "iife"
+        : "computed";
+      if (calleeForm === "computed")
+        f.unresolved.push({ what: "computed callee", line, enclosing: enc?.name ?? null,
+          why: "the callee is a computed expression, not an identifier or property access — "
+             + "it names no symbol this parser can follow, and resolving it needs a type checker" });
+
       if (name === "require") {
         const spec = literalArg(node.arguments[0]);
         if (spec !== null) f.imports.push({ spec, line, kind: "require", dynamic: false });
@@ -245,7 +274,7 @@ export function analyzeFile(relPath, text) {
             optionsName = literalArg(prop.initializer);
             break;
           }
-      f.calls.push({ name, line, enclosing: enc?.name ?? null, optionsName,
+      f.calls.push({ name, calleeForm, line, enclosing: enc?.name ?? null, optionsName,
         args: node.arguments.map(literalArg).filter((a) => a !== null).slice(0, 3) });
     }
     // `new Worker(path)` is a long-lived child too.
@@ -481,11 +510,16 @@ export function astFunctionIndex({ astOf, doorNames, insideDoor }) {
     };
 
     for (const c of a.calls ?? []) {
+      // A computed callee is a hole in the call graph WHEREVER it sits. Skipping the
+      // ones outside a named symbol dropped them silently, which is the shape of gap
+      // this index exists to make visible.
+      if (c.calleeForm === "computed")
+        unresolved.push({ file, line: c.line, enclosing: c.enclosing ?? null,
+          what: "call with a computed callee name",
+          why: "the callee is an expression, not an identifier — it cannot be followed" });
       if (!c.enclosing) continue;
       const rec = touch(c.enclosing);
       if (c.name) rec.calls.add(c.name);
-      else unresolved.push({ file, line: c.line, what: "call with a computed callee name",
-        why: "the callee is an expression, not an identifier — it cannot be followed" });
     }
     for (const s of a.sql ?? []) {
       if (!s.enclosing) {

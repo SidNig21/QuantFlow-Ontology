@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 674656c` on 2026-08-19 by
+> Generated from `atlas-strip-1 @ cafdd16` on 2026-08-19 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -33,7 +33,7 @@ and it can die or cheat at any one of them:
 flowchart TD
   R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
   P["<b>2 · preload</b><br/>3 bridges · 127 methods<br/>113 of them called"]
-  M["<b>3 · main</b><br/>123 IPC channels<br/>106 live · 13 unused · 0 dead"]
+  M["<b>3 · main</b><br/>123 IPC channels<br/>107 live · 13 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
@@ -42,7 +42,9 @@ flowchart TD
   H -->|"write-door 15"| E
   E --> DB
   X["<b>raw SQL</b><br/>never enters a<br/>governed action"]
-  H -->|"cheats 5"| X
+  H -->|"cheats 3"| X
+  A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
+  H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 9"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
@@ -62,7 +64,7 @@ flowchart TD
   classDef truth fill:#10243d,stroke:#3b82f6,color:#e6f0ff
   class E,RO good
   class X,FS bad
-  class QA,SP,SC gray
+  class A,QA,SP,SC gray
   class DB,R,P,M,H truth
 ```
 
@@ -83,10 +85,26 @@ handler that mutates state without `execute()` is cheating even when it works.
 | At hop 4 the handler… | | Count |
 |---|---|---:|
 | `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
-| `cheats` | reaches SQL that never passes through `execute()` | 5 |
+| `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 3 |
+| `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
 | `read-only` | no mutation seen | 94 |
+
+#### Reaches ungoverned SQL, but not a hard red (3)
+
+The hop-4 walk is reachability only: it cannot tell a domain-truth bypass from
+review scaffolding. These wires reach SQL outside the write door where **every**
+finding on the path is amber — medium confidence, or a store outside the golden
+schema rather than domain truth the Kernel owns. The evidence is below and the
+findings stay in the ledger; what they do not get is the breach label or a broken
+loop.
+
+| Channel | Reaches | Findings | Confidence · class |
+|---|---|---:|---|
+| `qf:review:projection` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:tasks:create` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
+| `qf:tasks:surface` | `ensureGovernedReviewSchema()` | 6 | medium · `non-domain-store` |
 
 ### Broken at hop 1 (1)
 
@@ -165,14 +183,14 @@ badge is not a score:
 | `R` runtime | the loop was observed executing |
 | `F` founder | the founder has confirmed it does its job |
 
-**`S` alone is not `SGRF`.** 8 of 11 loops are statically connected; 0 carry all four tiers.
+**`S` alone is not `SGRF`.** 9 of 11 loops are statically connected; 0 carry all four tiers.
 
 | Loop | Badge | Static | Gate | Runtime | Founder |
 |---|---|---|---|---|---|
 | **ASK** | `SG` | connected | covered | unproven | unproven |
 | **PLAN** | `SG` | connected | covered | unproven | unproven |
 | **RECRUIT** | `SG` | connected | covered | unproven | unproven |
-| **ASSIGN** | `G` | broken | covered | unproven | unproven |
+| **ASSIGN** | `SG` | connected | covered | unproven | unproven |
 | **WATCH** | `SG` | connected | covered | unproven | unproven |
 | **STEER** | `SG` | connected | covered | unproven | unproven |
 | **PUBLISH** | `SG` | connected | covered | unproven | unproven |
@@ -185,20 +203,14 @@ Runtime and founder read `unproven` on every loop, and that is the honest state:
 runtime trace and no founder-confirmation record exist in this repo. **Unproven with a
 stated reason is not a gap** — it is the difference between an unknown and a lie.
 
-### ASSIGN — broken
-
-A Task moves to a seat. The agent path notifies the seat; the human path is where delivery has failed before.
-
-- `qf:tasks:surface` — **cheats**: reaches SQL the hop-4 walker places outside execute()
-
 ### REVIEW — broken
 
 The governed critic path. R15 shipped on this, and R16 renders it.
 
-- `qf:review:request` — **cheats**: reaches SQL the hop-4 walker places outside execute()
-- `qf:review:projection` — **cheats**: reaches SQL the hop-4 walker places outside execute()
-- `qf:review:revision` — **cheats**: reaches SQL the hop-4 walker places outside execute()
-- `qf:review:secondCritic` — **cheats**: reaches SQL the hop-4 walker places outside execute()
+- `qf:review:request` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update
+- `qf:review:projection` — **unused**: breaks at renderer
+- `qf:review:revision` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into
+- `qf:review:secondCritic` — **cheats**: reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:task:update
 
 ### CLOSE — degraded
 
@@ -455,11 +467,11 @@ mechanism behind the invariant below, not a promise about it.
 | `imports` | 535 | 0 | 4 | 0 | 0 |
 | `ipcRequest` | 271 | 0 | 4 | 0 | 264 |
 | `ipcPush` | 7 | 0 | 4 | 0 | 528 |
-| `persistence` | 23 | 24 | 0 | 0 | 492 |
+| `persistence` | 21 | 26 | 0 | 0 | 492 |
 | `lifetime` | 6 | 60 | 0 | 0 | 473 |
 | `packaging` | 226 | 0 | 0 | 123 | 190 |
 | `ownership` | 20 | 0 | 0 | 347 | 172 |
-| `reach` | 234 | 0 | 0 | 305 | 0 |
+| `reach` | 232 | 2 | 0 | 305 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
 failure — `reach: unsupported` on 305 files means those trees are

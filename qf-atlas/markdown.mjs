@@ -73,11 +73,37 @@ export function renderMarkdown(m) {
   p(`| At hop 4 the handler… | | Count |`);
   p(`|---|---|---:|`);
   p(`| \`write-door\` | reaches \`execute()\`, the sole sanctioned mutation path | ${m.wires.filter((w) => w.hop4?.kind === "write-door").length} |`);
-  p(`| \`cheats\` | reaches SQL that never passes through \`execute()\` | ${m.wires.filter((w) => w.hop4?.kind === "cheats").length} |`);
+  p(`| \`cheats\` | reaches SQL outside \`execute()\` **and** a function on that path carries a current hard red | ${m.wires.filter((w) => w.hop4?.kind === "cheats").length} |`);
+  p(`| \`reaches-sql\` | mutates outside \`execute()\`, but every finding on the path is amber | ${m.wires.filter((w) => w.hop4?.kind === "reaches-sql").length} |`);
   p(`| \`writes-disk\` | writes a file; never reaches the Kernel at all | ${m.wires.filter((w) => w.hop4?.kind === "writes-disk").length} |`);
   p(`| \`unknown\` | handler file not fully read; not claimed read-only | ${m.wires.filter((w) => w.hop4?.kind === "unknown").length} |`);
   p(`| \`read-only\` | no mutation seen | ${m.wires.filter((w) => w.hop4?.kind === "read-only").length} |`);
   p();
+
+  // Reaching ungoverned SQL that is NOT a hard red is a real observation and must stay
+  // readable — it simply may not wear the breach label or break a loop. Before this
+  // split, three of five `cheats` wires rested entirely on idempotent
+  // `CREATE TABLE IF NOT EXISTS qf_review_*` bookkeeping while carrying the strongest
+  // language in the report.
+  const amberWires = (m.wires ?? []).filter((w) => w.hop4?.downgradedFrom === "cheats"
+    && (w.hop4.ungoverned ?? []).length);
+  if (amberWires.length) {
+    p(`#### Reaches ungoverned SQL, but not a hard red (${amberWires.length})`);
+    p();
+    p(`The hop-4 walk is reachability only: it cannot tell a domain-truth bypass from`);
+    p(`review scaffolding. These wires reach SQL outside the write door where **every**`);
+    p(`finding on the path is amber — medium confidence, or a store outside the golden`);
+    p(`schema rather than domain truth the Kernel owns. The evidence is below and the`);
+    p(`findings stay in the ledger; what they do not get is the breach label or a broken`);
+    p(`loop.`);
+    p();
+    p(`| Channel | Reaches | Findings | Confidence · class |`);
+    p(`|---|---|---:|---|`);
+    for (const w of amberWires)
+      for (const u of w.hop4.ungoverned)
+        p(`| \`${w.channel}\` | \`${u.fn}()\` | ${u.findings.length} | ${u.confidence} · \`${u.persistence}\` |`);
+    p();
+  }
 
   // ── 1b. hop 1, checked in the other direction ─────────────────────────────
   // Hop 1 was only ever asked "is this declared method used?". The reverse
@@ -668,6 +694,9 @@ function diagram(m) {
   d.push(`  H -->|"write-door ${hop4("write-door")}"| E`);
   d.push(`  E --> DB`);
   outcome(cheats, "X", `["<b>raw SQL</b><br/>never enters a<br/>governed action"]`, "cheats", bad);
+  // Amber gets its own box rather than being folded into `read-only`, which would state
+  // that nothing was written, or into `cheats`, which would state that a breach was proven.
+  outcome(hop4("reaches-sql"), "A", `["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]`, "reaches-sql", gray);
   outcome(hop4("writes-disk"), "FS", `["<b>filesystem</b><br/>never reaches<br/>the Kernel"]`, "writes-disk", bad);
   outcome(hop4("read-only"), "RO", `["<b>read-only</b><br/>no mutation seen"]`, "read-only", good);
   outcome(unknown, "U", `["<b>unknown</b><br/>handler not fully read"]`, "unknown", gray);

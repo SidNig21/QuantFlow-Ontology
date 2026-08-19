@@ -99,13 +99,22 @@ export function buildNorthStar({ wires, lifetime, gateExists, runtimeEvidence, f
         return { channel, status: "missing", hop4: null,
           why: "this channel is not registered anywhere in main — the loop names a wire that does not exist" };
       }
+      // `cheats` is read AFTER generate.mjs has reconciled hop 4 against hard-red
+      // authority, so reaching it here means a function on this path carries a current
+      // hard red. It used to mean only that a 5-deep name walk touched some SQL, which
+      // is how ASSIGN read `broken` on the strength of six idempotent
+      // `CREATE TABLE IF NOT EXISTS qf_review_*` statements. Cite the finding, not the
+      // walker: a loop that breaks must be able to say which adjudicated red broke it.
       const cheats = w.hop4?.kind === "cheats";
+      const backing = w.hop4?.backedBy ?? [];
       return {
         channel,
         status: cheats ? "cheats" : w.status,
         hop4: w.hop4?.kind ?? null,
+        backedBy: cheats ? backing : null,
         why: cheats
-          ? "reaches SQL the hop-4 walker places outside execute()"
+          ? `reaches ${w.hop4.viaDml}(), outside the governed write door — hard red `
+            + (backing.join(", ") || "unbacked, which should be impossible after reconciliation")
           : w.status !== "live" ? `breaks at ${w.breakAt}` : null,
       };
     });
