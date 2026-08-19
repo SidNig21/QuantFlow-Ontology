@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "27f76f6",
+    "commit": "dcc5693",
     "generatedAt": "2026-08-19",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -80,20 +80,20 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 46,
+    "undecided": 43,
     "allClear": false,
     "decisions": {
       "total": 51,
-      "undecided": 46,
+      "undecided": 43,
       "keep": 2,
-      "repair": 3,
+      "repair": 6,
       "remove": 0,
       "accepted": 0,
       "allClear": false
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 27,
+      "founder-decision": 24,
       "ast-coverage": 2,
       "package-proof": 17
     }
@@ -42920,12 +42920,12 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "f1298fd",
+      "commit": "27f76f6",
       "generatedAt": "2026-08-19"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "27f76f6",
+      "commit": "dcc5693",
       "generatedAt": "2026-08-19"
     },
     "verdict": "better",
@@ -43316,7 +43316,8 @@
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "owner": "founder"
     },
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table",
@@ -43433,7 +43434,8 @@
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "owner": "founder"
     },
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:update",
@@ -43442,7 +43444,8 @@
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "owner": "founder"
     },
     {
       "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",

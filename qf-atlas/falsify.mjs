@@ -1345,11 +1345,13 @@ record(78, "hard red excludes medium and non-AST classes", ...(() => {
     .some((p) => p.id === id && p.confidence !== "high"));
   const lifetime = ids.filter((id) => id.startsWith("lifetime:"));
   const bridge = ids.filter((id) => id.startsWith("broken-bridge-call:"));
+  const ownership = ids.filter((id) => id.startsWith("ownership:"));
   const noProof = ids.filter((id) => (before.persistence ?? [])
     .some((p) => p.id === id && !p.reachProof?.corroborated));
-  return [medium.length === 0 && lifetime.length === 0 && bridge.length === 0 && noProof.length === 0,
+  return [medium.length === 0 && lifetime.length === 0 && bridge.length === 0
+      && noProof.length === 0 && ownership.length === 0,
     "hardRed=" + ids.length + " medium=" + medium.length + " lifetime=" + lifetime.length
-    + " bridge=" + bridge.length + " unproven=" + noProof.length];
+    + " bridge=" + bridge.length + " unproven=" + noProof.length + " ownership=" + ownership.length];
 })());
 
 // 79 · R3 — the baseline may only carry adjudicated hard debt. KEEP is not eligible:

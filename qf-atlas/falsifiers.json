@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 46 -> 45"
+      "detail": "verdict=remove undecided 43 -> 42"
     },
     {
       "n": 33,
@@ -421,7 +421,7 @@
       "n": 70,
       "name": "every undecided finding names its blocker",
       "passed": true,
-      "detail": "46 undecided, all blockered: {\"founder-decision\":27,\"ast-coverage\":2,\"package-proof\":17}"
+      "detail": "43 undecided, all blockered: {\"founder-decision\":24,\"ast-coverage\":2,\"package-proof\":17}"
     },
     {
       "n": 71,
@@ -469,13 +469,13 @@
       "n": 78,
       "name": "hard red excludes medium and non-AST classes",
       "passed": true,
-      "detail": "hardRed=7 medium=0 lifetime=0 bridge=0 unproven=0"
+      "detail": "hardRed=3 medium=0 lifetime=0 bridge=0 unproven=0 ownership=0"
     },
     {
       "n": 79,
       "name": "seeding refuses unadjudicated or KEEP hard reds",
       "passed": true,
-      "detail": "unadjudicated seeded=0 keep seeded=0 adjudicated seeded=7/7"
+      "detail": "unadjudicated seeded=0 keep seeded=0 adjudicated seeded=3/3"
     }
   ]
 }

@@ -33,7 +33,16 @@ export function load(path) {
  * being promoted on the strength of a regex.
  *
  *   persistence   domain-truth + violation + high + a CORROBORATED AST reach proof
- *   ownership     multiple claimants + high + structural (AST) evidence
+ *   ownership     AMBER for v1 — "more than one structural claimant" is NOT the same
+ *                 claim as "competing architectural owner". A strong signal is either
+ *                 writing a responsibility's table or owning its channel family, so
+ *                 create.ts + deterministic-execution.ts + governed-review.ts all
+ *                 writing `artifact` scores three owners — when that is three
+ *                 implementations behind ONE sanctioned mutation plane. Likewise
+ *                 host-acp-permission.ts (a permission surface) and create.ts (a Kernel
+ *                 mutation) are different jobs under one broad umbrella, not rivals.
+ *                 ownership.mjs says its responsibility list is POLICY, not truth, and
+ *                 policy may not be the thing that blocks a commit.
  *   lifetime      AMBER for v1 — the spawn is an AST fact but the REAP analysis is
  *                 regex, so "unreaped" is half-proven and may not block
  *   bridge calls  AMBER for v1 — detection is textual preload-key matching, not AST
@@ -50,12 +59,6 @@ export function hardRed(model) {
     if (!p.reachProof?.corroborated) continue;
     red[p.id] = { kind: "governance-violation", file: p.evidence[0].file, table: p.table,
       confidence: p.confidence, reachHops: p.reachProof.hops };
-  }
-  for (const o of model.ownership ?? []) {
-    if (o.status !== "multiple-claimants" || o.confidence !== "high") continue;
-    if (!(o.strongOwnerCount > 1)) continue;
-    red[o.id] = { kind: "duplicate-ownership", file: o.owners?.[0]?.file ?? null,
-      confidence: o.confidence, claimants: o.ownerCount, structural: o.strongOwnerCount };
   }
   return red;
 }
@@ -75,6 +78,11 @@ export function amberFindings(model) {
   for (const b of model.brokenBridgeCalls ?? [])
     amber[`broken-bridge-call:${b.method}`] = { kind: "broken-bridge-call",
       why: "detected by preload-key text matching, not AST — a repair candidate, not a blocker" };
+  for (const o of model.ownership ?? [])
+    if (o.status === "multiple-claimants")
+      amber[o.id] = { kind: "duplicate-ownership", confidence: o.confidence,
+        claimants: o.ownerCount, structural: o.strongOwnerCount,
+        why: "multiple structural claimants is not proof of competing ownership; needs human adjudication before it can block" };
   for (const s of model.strip ?? [])
     if (s.bucket === "broken-now") amber[`dead-wire:${s.what}`] = { kind: "dead-wire" };
   return amber;

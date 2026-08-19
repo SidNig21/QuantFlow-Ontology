@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 27f76f6` on 2026-08-19 by
+> Generated from `atlas-strip-1 @ dcc5693` on 2026-08-19 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**46 of 51 findings have not been looked at.**
+**43 of 51 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 46 |
-| `repair` | 3 |
+| `undecided` | 43 |
+| `repair` | 6 |
 | `remove` | 0 |
 | `keep` | 2 |
 | `accepted` | 0 |
 
-**Not all clear.** 46 findings still need a decision.
+**Not all clear.** 43 findings still need a decision.
 
 ## The four hops
 
@@ -463,15 +463,15 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-46 undecided findings, each carries a blocker:
+43 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 27 | the code cannot say which answer is right — this needs your intent |
+| `founder-decision` | 24 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 2 | the analyzer could not resolve this statically |
 | `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
 
-**27 of 46 are waiting on you, not on the tool.**
+**24 of 43 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 

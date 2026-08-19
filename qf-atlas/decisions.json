@@ -23,7 +23,9 @@
     "undecided on purpose: they need per-item verification or founder intent, and a",
     "guessed verdict is worse than an honest blank.",
     "",
-    "2026-08-17 expunge: the four remove verdicts were executed and their findings no longer exist, so their entries were pruned. The reasoning lives in the commit that deleted them."
+    "2026-08-17 expunge: the four remove verdicts were executed and their findings no longer exist, so their entries were pruned. The reasoning lives in the commit that deleted them.",
+    "",
+    "2026-08-19 — the three governed-review hard reds are adjudicated REPAIR. No expiry: they are being repaired, not accepted. Ownership findings are deliberately NOT here: multiple structural claimants is not proof of competing ownership, so they stay amber until independently adjudicated."
   ],
   "decisions": {
     "unreachable:collab-electron/src/main/a2a-bus.ts": {
@@ -50,6 +52,24 @@
       "verdict": "repair",
       "why": "Same shape as species-launch.ts: shared-paths.test.ts:42 pins its content, nothing imports it. WO-008a also uses it as the ACP sole-writer perimeter bait target.",
       "owner": "founder"
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into": {
+      "verdict": "repair",
+      "owner": "founder",
+      "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
+      "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved."
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into": {
+      "verdict": "repair",
+      "owner": "founder",
+      "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
+      "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved."
+    },
+    "persistence:packages/qf-kernel/src/governed-review.ts:task:update": {
+      "verdict": "repair",
+      "owner": "founder",
+      "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
+      "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved."
     }
   }
 }
