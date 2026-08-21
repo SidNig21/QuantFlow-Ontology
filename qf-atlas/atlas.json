@@ -1,8 +1,8 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "95bdbed",
-    "generatedAt": "2026-08-19",
+    "commit": "b7899be",
+    "generatedAt": "2026-08-21",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
     "fingerprint": "0bb8a7e19662f451"
@@ -55410,147 +55410,154 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "cafdd16",
+      "commit": "95bdbed",
       "generatedAt": "2026-08-19"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "95bdbed",
-      "generatedAt": "2026-08-19"
+      "commit": "b7899be",
+      "generatedAt": "2026-08-21"
     },
     "verdict": "better",
-    "why": "45 improvement(s), nothing added or hidden",
+    "why": "46 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
       {
-        "id": "persistence:collab-electron/src/main/updater/update-manager.ts:check:update",
+        "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
         "kind": "persistence",
         "what": "check update",
         "where": "collab-electron/src/main/updater/update-manager.ts",
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:links:insert-into",
-        "kind": "persistence",
-        "what": "links insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was repair"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:create-table-if-not-exists",
-        "kind": "persistence",
-        "what": "qf_review_attempt create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_attempt:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_attempt insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:create-table-if-not-exists",
-        "kind": "persistence",
-        "what": "qf_review_invocation create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_invocation:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_invocation insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_publication:create-table-if-not-exists",
-        "kind": "persistence",
-        "what": "qf_review_publication create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:create-table-if-not-exists",
-        "kind": "persistence",
-        "what": "qf_review_receipt create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_receipt:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_receipt insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:create-table-if-not-exists",
-        "kind": "persistence",
-        "what": "qf_review_source_work create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_source_work:insert-into",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:bindSourceWork:qf_review_source_work:insert-into",
         "kind": "persistence",
         "what": "qf_review_source_work insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:create-table-if-not-exists",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
         "kind": "persistence",
-        "what": "qf_review_task create table if not exists",
+        "what": "links insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
+        "note": "was repair"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:insert-into",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:qf_review_task:insert-into",
         "kind": "persistence",
         "what": "qf_review_task insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:qf_review_task:update",
-        "kind": "persistence",
-        "what": "qf_review_task update",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:insert-into",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
         "kind": "persistence",
         "what": "task insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was repair"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:task:update",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+        "kind": "persistence",
+        "what": "qf_review_attempt create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+        "kind": "persistence",
+        "what": "qf_review_invocation create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+        "kind": "persistence",
+        "what": "qf_review_publication create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+        "kind": "persistence",
+        "what": "qf_review_receipt create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+        "kind": "persistence",
+        "what": "qf_review_source_work create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
+        "kind": "persistence",
+        "what": "qf_review_task create table if not exists",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_receipt:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_receipt insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_task:update",
+        "kind": "persistence",
+        "what": "qf_review_task update",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update",
         "kind": "persistence",
         "what": "task update",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was repair"
       },
       {
-        "id": "persistence:collab-electron/src/main/agent-host.ts:notification:update",
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistAttempt:qf_review_attempt:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_attempt insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistRefusal:qf_review_receipt:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_receipt insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:packages/qf-kernel/src/governed-review.ts:recordGovernedToolReceipt:qf_review_invocation:insert-into",
+        "kind": "persistence",
+        "what": "qf_review_invocation insert into",
+        "where": "packages/qf-kernel/src/governed-review.ts",
+        "note": "was undecided"
+      },
+      {
+        "id": "persistence:collab-electron/src/main/agent-host.ts:runAgentHostSmoke:notification:update",
         "kind": "persistence",
         "what": "notification update",
         "where": "collab-electron/src/main/agent-host.ts",
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/events.ts:events:insert-into",
+        "id": "persistence:packages/qf-kernel/src/events.ts:appendEvent:events:insert-into",
         "kind": "persistence",
         "what": "events insert into",
         "where": "packages/qf-kernel/src/events.ts",
         "note": "was undecided"
       },
       {
-        "id": "persistence:packages/qf-kernel/src/insert.ts:run:insert-into",
+        "id": "persistence:packages/qf-kernel/src/insert.ts:insertRun:run:insert-into",
         "kind": "persistence",
         "what": "run insert into",
         "where": "packages/qf-kernel/src/insert.ts",
@@ -55802,13 +55809,13 @@
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 53,
+      "resolved": 54,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
       "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 45,
+      "undecidedFrom": 46,
       "undecidedTo": null
     }
   },
