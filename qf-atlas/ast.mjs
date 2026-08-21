@@ -494,7 +494,18 @@ export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth =
  * resolution. Two same-named exports in different modules could still be conflated, so
  * the proof records every hop for a human to read.
  */
-export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, maxHops = 5 }) {
+// `excludeCaller` keeps NON-PRODUCTION callers out of the graph entirely. A third
+// independent Verifier found that `astOf` is built with keepTests=true and `isAppOrigin`
+// was `f.startsWith("collab-electron/src/")` — which a `.test.ts` under that prefix
+// satisfies. A domain write whose ONLY caller was a test therefore reported
+// `corroborated: true` with a test file as its production reach path, and cleared the
+// `ast-coverage` blocker that had correctly marked it unproven. It did not become hard
+// red, but only because an unrelated second gate held confidence at medium — the
+// evidence a human reads was already fiction, and one rule change away from blocking.
+//
+// Excluded at the CALLER level, not just at the origin: a production path may not route
+// through test code at any hop.
+export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, excludeCaller, maxHops = 5 }) {
   // MODULE EDGE. A call expression alone is not a path: an unrelated file can define its
   // own function with the same name. An independent Verifier proved this by adding a
   // renderer badge helper with a local `createReviewTask` and watching the genuine
@@ -509,12 +520,14 @@ export function astReachProof({ astOf, targetFile, targetFn, isAppOrigin, maxHop
   const moduleEdge = buildModuleEdge(astOf);
 
   const callersOf = new Map();
-  for (const [file, a] of astOf)
+  for (const [file, a] of astOf) {
+    if (excludeCaller && excludeCaller(file)) continue;
     for (const c of a.calls ?? []) {
       if (!c.name || !c.enclosing) continue;
       if (!callersOf.has(c.name)) callersOf.set(c.name, []);
       callersOf.get(c.name).push({ file, fn: c.enclosing, line: c.line });
     }
+  }
 
   const seen = new Set([`${targetFile}::${targetFn}`]);
   let frontier = [{ file: targetFile, fn: targetFn, path: [] }];

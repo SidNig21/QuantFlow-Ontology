@@ -1835,6 +1835,51 @@ record(91, "one date authority: free text and past dates are refused everywhere"
   return [ok, rows.map((r) => `${r.label}:${r.complete ? 'complete' : 'incomplete'}/${r.ledger}/${r.seeded ? 'SEEDED' : 'refused'}`).join(' · ')];
 })());
 
+// ── FROM THE THIRD INDEPENDENT VERIFIER ────────────────────────────────────
+
+// 92 · Verifier defect 7 — A TEST MAY NOT CORROBORATE A PRODUCTION REACH PROOF.
+//
+// `astOf` is built with keepTests=true and `isAppOrigin` was
+// `f.startsWith("collab-electron/src/")`, which a `.test.ts` under that prefix
+// satisfies. A domain write whose ONLY caller was a test reported
+// `corroborated: true` with the test file as its production reach path, and that
+// cleared the `ast-coverage` blocker which had correctly marked the row unproven.
+//
+// It did not become hard red — but only because `reachability()` runs over a
+// test-excluded index and independently held confidence at medium. Two unrelated
+// mechanisms, one of them accidental, were the only thing between a test fixture and a
+// blocking architectural verdict. The founder's rule is a complete AST-backed
+// PRODUCTION reach proof; a path through test code is not one.
+record(92, "a test-only caller cannot corroborate a production reach proof",
+  ...withFiles({
+    [`${MAIN}/zz-vfy92-store.ts`]:
+      [ 'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        'export function zzVfy92Steal(id: string){',
+        '  getKernelDb().query(' + Q + 'INSERT INTO task (id) VALUES (?)' + Q + ').run(id);',
+        '}', '' ].join(String.fromCharCode(10)),
+    // The only caller, and it is a test. Named, so it DOES produce a call edge with an
+    // enclosing symbol — an anonymous `it(() => …)` body would not, and a check that
+    // passes because the fixture was unresolvable proves nothing.
+    [`${MAIN}/zz-vfy92-store.test.ts`]:
+      [ 'import { zzVfy92Steal } from ' + Q + './zz-vfy92-store' + Q + ';',
+        'export function zzVfy92Helper(){ zzVfy92Steal(' + Q + 't1' + Q + '); }',
+        'it(' + Q + 'writes' + Q + ', () => { zzVfy92Helper(); });', '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const row = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy92-store.ts'));
+    if (!row) return [false, 'the fixture write produced NO finding at all'];
+    const red = hardRedFn(m);
+    // Global invariant, not just the fixture: no corroborated proof anywhere may route
+    // through test code at ANY hop, origin or intermediate.
+    const viaTest = (m.persistence ?? []).filter((p) => p.reachProof?.corroborated)
+      .filter((p) => (p.reachProof.path ?? []).some((h) => IS_TEST.test(String(h.from).split(':')[0])));
+    const realReds = Object.keys(red).length;
+    return [row.reachProof?.corroborated === false && row.blocker === 'ast-coverage'
+      && !red[row.id] && !viaTest.length && realReds === 3,
+      `testOnlyRow: corroborated=${row.reachProof?.corroborated} blocker=${row.blocker} `
+      + `hardRed=${Boolean(red[row.id])} · proofsRoutedThroughTests=${viaTest.length}`
+      + `${viaTest.length ? ' -> ' + viaTest[0].id : ''} · hardRedTotal=${realReds} (expect 3, i.e. not suppressed)`];
+  }));
+
 // Restore every generated artefact to the bytes this run started with. This replaces
 // a final regenerate, which could only ever get CLOSE: `generatedAt` moves on every
 // run, so regenerating left three tracked files modified no matter how clean the

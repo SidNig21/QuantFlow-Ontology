@@ -1,7 +1,7 @@
 {
-  "ran": "2026-08-19",
-  "passed": 91,
-  "total": 91,
+  "ran": "2026-08-21",
+  "passed": 92,
+  "total": 92,
   "results": [
     {
       "n": 1,
@@ -544,10 +544,16 @@
       "detail": "absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED"
     },
     {
+      "n": 92,
+      "name": "a test-only caller cannot corroborate a production reach proof",
+      "passed": true,
+      "detail": "testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · hardRedTotal=3 (expect 3, i.e. not suppressed)"
+    },
+    {
       "n": 82,
       "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
       "passed": true,
-      "detail": "git status --porcelain identical before and after (11 pre-existing entries)"
+      "detail": "git status --porcelain identical before and after (3 pre-existing entries)"
     }
   ]
 }

@@ -171,7 +171,11 @@ const persistence = classifyPersistence({
   // PARSED call expressions. Regex may propose the candidate; it may not supply an
   // uncorroborated edge to a HIGH finding.
   astOf, astReachProof,
-  isAppOrigin: (f) => f.startsWith("collab-electron/src/"),
+  // PRODUCTION origin. `collab-electron/src/**/*.test.ts` starts with the same prefix,
+  // and astOf is built with keepTests=true, so a test was a valid terminus for a proof
+  // the model labels production reach.
+  isAppOrigin: (f) => f.startsWith("collab-electron/src/") && !IS_TEST.test(f),
+  excludeCaller: (f) => IS_TEST.test(f),
 });
 
 // ─── RE-DERIVE HOP 4 FROM THE AST, THEN GRADE IT AGAINST HARD-RED AUTHORITY ──
