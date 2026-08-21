@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "receipt": "atlas-v1-independent-pass-and-founder-acceptance",
+  "recorded_at": "2026-08-21",
+  "recorded_by": "fresh clerical Builder",
+  "candidate": {
+    "repo": "C:\\Users\\rybow\\QuantFlow-Ontology",
+    "branch": "atlas-strip-1",
+    "sha": "7889074f10e089d450e307a2c6af0f827e8f06dd",
+    "origin_ref": "origin/atlas-strip-1",
+    "origin_sha": "7889074f10e089d450e307a2c6af0f827e8f06dd",
+    "working_tree_before_receipt": "clean"
+  },
+  "independent_verifier": {
+    "source": "C:\\Users\\rybow\\tmp\\ATLAS-TECHNICAL-PASS-2026-08-21.md",
+    "verdict": "PASS",
+    "candidate_integrity": "local HEAD and origin/atlas-strip-1 exactly match the frozen candidate; the working tree was clean before and after the independent matrix",
+    "adversarial_receipts": [
+      {
+        "command": "bun C:\\Users\\rybow\\tmp\\qf-atlas-independent-adversarial.mjs",
+        "result": "The unimported same-named sibling is not reached or cited; same-named class methods remain distinct; exit 2 is by design when both old defects no longer reproduce."
+      },
+      {
+        "command": "bun C:\\Users\\rybow\\tmp\\qf-atlas-verifier-round2.mjs",
+        "result": "A genuine named barrel import records a non-blocking coverage boundary; importing a different symbol from the same barrel records no boundary; exit 0."
+      },
+      {
+        "command": "bun C:\\Users\\rybow\\tmp\\qf-atlas-domain-frontier-audit.mjs",
+        "result": "54 refusal records and 47 unique cases point toward domain-truth SQL candidates; independently detected unrepresented direct named barrels: 0; exit 0."
+      },
+      {
+        "name": "TypeScript alias audit",
+        "result": "Configured @collab/shared, @collab/components, and @collab/theme aliases resolve into Electron shared/component/theme packages, not the Kernel domain-write files in the 54-record frontier; full alias resolution remains a documented v1 limit with no current hard-red exposure."
+      }
+    ],
+    "matrix": {
+      "falsify": "98/98 PASS; tree neutral",
+      "generate_check": "exit 0; 427 files, 123 channels, 13 strip candidates",
+      "ratchet": "exit 0 in 3.6 seconds",
+      "ratchet_state": "hard red 3; amber 24; unexplained coverage 0; undecided without blocker 0; undecided 46",
+      "doc_links": "PASS; 69 live documents",
+      "rung_ladder": "PASS; 22 rungs, R16 active, 17 complete",
+      "git_diff_check": "exit 0"
+    },
+    "preserved_hard_reds": [
+      "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
+      "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
+      "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+    ],
+    "hard_red_disposition": "The three findings remain founder-owned REPAIR findings and must be seeded before repair so their eventual disappearance produces durable resolved tombstones.",
+    "accepted_v1_limits": [
+      "No general TypeScript type checker, tsconfig path-alias resolver, package-exports resolver, or arbitrary barrel traversal.",
+      "A concrete direct named-import to local barrel to named re-export witness is reported as unknown with no mutation proven; it remains non-blocking and does not attribute target SQL as reached.",
+      "Correctly rejected same-name coincidences remain read-only.",
+      "Atlas proves source architecture at the evidence tier shown; it does not prove runtime behavior, founder-visible product behavior, or safe deletion."
+    ]
+  },
+  "founder_acceptance": {
+    "decision": "ACCEPT ATLAS V1 7889074f",
+    "accepted": true,
+    "accepted_candidate_sha": "7889074f10e089d450e307a2c6af0f827e8f06dd",
+    "authority": "Founder acceptance authorizes this receipt and baseline seeding only; it does not authorize product edits, repair execution, deletion, merge, or branch switching."
+  }
+}
