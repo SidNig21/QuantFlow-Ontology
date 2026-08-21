@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "e68be73",
+    "commit": "718816a",
     "generatedAt": "2026-08-21",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "22b0087f29139677"
+    "fingerprint": "f8e5a06c30b8bfdb"
   },
   "stats": {
     "live": 110,
@@ -19544,11 +19544,12 @@
       "reach": "unsupported",
       "blockers": {
         "reach": "scope-boundary",
+        "persistence": "ast-coverage",
         "ownership": "scope-boundary"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
+      "persistence": "partial",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "unsupported",
@@ -19556,7 +19557,7 @@
         "reach": "no reach row was produced for this path",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
+        "persistence": "1 of 1 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -24663,8 +24664,8 @@
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 492,
-      "partial": 25,
+      "not-applicable": 491,
+      "partial": 26,
       "indexed": 22
     },
     "lifetime": {
@@ -57466,17 +57467,17 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "atlas-strip-1",
-      "commit": "4fa7dc4",
-      "generatedAt": "2026-08-21"
-    },
-    "to": {
       "branch": "wo-R16",
       "commit": "e68be73",
       "generatedAt": "2026-08-21"
     },
-    "verdict": "better",
-    "why": "48 improvement(s), nothing added or hidden",
+    "to": {
+      "branch": "wo-R16",
+      "commit": "718816a",
+      "generatedAt": "2026-08-21"
+    },
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -57493,27 +57494,6 @@
         "what": "qf_review_source_work insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-        "kind": "persistence",
-        "what": "links insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was repair"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:qf_review_task:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_task insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-        "kind": "persistence",
-        "what": "task insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was repair"
       },
       {
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -57554,41 +57534,6 @@
         "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
         "kind": "persistence",
         "what": "qf_review_task create table if not exists",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_receipt:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_receipt insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_task:update",
-        "kind": "persistence",
-        "what": "qf_review_task update",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update",
-        "kind": "persistence",
-        "what": "task update",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was repair"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistAttempt:qf_review_attempt:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_attempt insert into",
-        "where": "packages/qf-kernel/src/governed-review.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistRefusal:qf_review_receipt:insert-into",
-        "kind": "persistence",
-        "what": "qf_review_receipt insert into",
         "where": "packages/qf-kernel/src/governed-review.ts",
         "note": "was undecided"
       },
@@ -57864,32 +57809,24 @@
     "changedOwner": [],
     "changedCoverage": [
       {
-        "path": "packages/qf-kernel/src/governed-review.ts",
+        "path": "packages/qf-kernel/src/r15-governed-review.test.ts",
         "analyzer": "persistence",
-        "from": "partial",
-        "to": "indexed",
-        "direction": "better",
-        "reason": null
-      },
-      {
-        "path": "packages/qf-kernel/src/governed-review.ts",
-        "analyzer": "reach",
-        "from": "partial",
-        "to": "indexed",
-        "direction": "better",
-        "reason": null
+        "from": "not-applicable",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 of 1 SQL site(s) are not inside a named function, so no call path can be traced"
       }
     ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 54,
+      "resolved": 46,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
-      "coverageBetter": 2,
-      "undecidedFrom": 46,
+      "coverageWorse": 1,
+      "coverageBetter": 0,
+      "undecidedFrom": 41,
       "undecidedTo": null
     }
   },

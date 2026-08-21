@@ -36,7 +36,7 @@ function session(id: string, definitionId: string, role: string, groups: string[
   execute(db!, "start_agent_session", { session_id: id }, trace);
 }
 
-function fixture(deliver = true) {
+function fixture(deliver = true, admit = true) {
   root = mkdtempSync(join(tmpdir(), "qf-r15-"));
   process.env.QF_ARTIFACT_ROOT = root;
   db = openKernel(":memory:");
@@ -52,10 +52,12 @@ function fixture(deliver = true) {
   const run = execute(db, "execute_deterministic_run", { run_id: "r15-run", dataset_id: dataset.object_id, strategy_spec: { contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge" }, params: { limit: 1 } }, { ...trace, actor_session_id: "executor" });
   const task = execute(db, "create_task", { task_id: "source-task", title: "Reviewable research", description: "Review the exact completed research.", assignee_session_id: "executor" }, { ...trace, actor_session_id: "director" });
   const work = bindSourceWork(db, { source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id, result_artifact_id: String(run.state.result_artifact_id), executor_session_id: "executor" }, trace);
-  const admission = requestGovernedReview(db, "source-task", "attempt-1", "critic", trace);
-  expect(admission.kind).toBe("admitted");
-  if (deliver) markGovernedDelivery(db, String(admission.review_task_id), "delivered", trace);
-  return { work, taskId: String(admission.review_task_id), hypothesisId: hypothesis.object_id, runId: run.object_id, artifactId: String(run.state.result_artifact_id) };
+  const admission = admit ? requestGovernedReview(db, "source-task", "attempt-1", "critic", trace) : null;
+  if (admission) {
+    expect(admission.kind).toBe("admitted");
+    if (deliver) markGovernedDelivery(db, String(admission.review_task_id), "delivered", trace);
+  }
+  return { work, taskId: admission ? String(admission.review_task_id) : "", hypothesisId: hypothesis.object_id, runId: run.object_id, artifactId: String(run.state.result_artifact_id) };
 }
 
 function sessionFromExistingDefinition(id: string): void {
@@ -187,6 +189,37 @@ describe("R15 governed review", () => {
     expect(first.receipt?.reason_code).toBe("INVALID_SOURCE_WORK");
     expect(second.kind).toBe("replayed");
     expect((db.query("SELECT COUNT(*) AS n FROM qf_review_task").get() as { n: number }).n).toBe(0);
+  });
+
+  test("malformed source delegated_by refuses with only one replayable refusal receipt, attempt, and event", () => {
+    const f = fixture(false, false);
+    db!.query("DELETE FROM links WHERE from_id = 'source-task' AND kind = 'delegated_by'").run();
+    const counts = () => ({
+      tasks: (db!.query("SELECT COUNT(*) AS n FROM task WHERE id LIKE 'review-task-%'").get() as { n: number }).n,
+      links: (db!.query("SELECT COUNT(*) AS n FROM links WHERE from_id LIKE 'review-task-%'").get() as { n: number }).n,
+      review: (db!.query("SELECT COUNT(*) AS n FROM qf_review_task").get() as { n: number }).n,
+      created: (db!.query("SELECT COUNT(*) AS n FROM events WHERE type = 'task.created' AND object_id LIKE 'review-task-%'").get() as { n: number }).n,
+      attempts: (db!.query("SELECT COUNT(*) AS n FROM qf_review_attempt WHERE action_kind = 'request_review' AND source_task_id = 'source-task' AND attempt_id = 'malformed-delegated-by'").get() as { n: number }).n,
+      receipts: (db!.query("SELECT COUNT(*) AS n FROM qf_review_receipt WHERE kind = 'action_refusal_receipt'").get() as { n: number }).n,
+      refusalEvents: (db!.query("SELECT COUNT(*) AS n FROM events WHERE type = 'action_refusal_receipt' AND object_id = 'source-task'").get() as { n: number }).n,
+    });
+    const before = counts();
+    const first = requestGovernedReview(db!, "source-task", "malformed-delegated-by", "critic", trace);
+    const afterFirst = counts();
+    const replay = requestGovernedReview(db!, "source-task", "malformed-delegated-by", "critic", trace);
+    const afterReplay = counts();
+    expect(first.kind).toBe("refused");
+    expect(first.receipt?.reason_code).toBe("INVALID_SOURCE_WORK");
+    expect(replay.kind).toBe("replayed");
+    expect(afterFirst.tasks).toBe(before.tasks);
+    expect(afterFirst.links).toBe(before.links);
+    expect(afterFirst.review).toBe(before.review);
+    expect(afterFirst.created).toBe(before.created);
+    expect(afterFirst.attempts - before.attempts).toBe(1);
+    expect(afterFirst.receipts - before.receipts).toBe(1);
+    expect(afterFirst.refusalEvents - before.refusalEvents).toBe(1);
+    expect(afterReplay).toEqual(afterFirst);
+    expect(f.work.source_task_id).toBe("source-task");
   });
 
   test("strict rubric thresholds and findings references reject atomically", () => {

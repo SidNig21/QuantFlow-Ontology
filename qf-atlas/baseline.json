@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "e68be73",
+  "updated": "718816a",
   "findings": {
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into": {
       "kind": "governance-violation",
@@ -17,7 +17,7 @@
       "state": "resolved",
       "first_seen": "4fa7dc4",
       "last_seen": "4fa7dc4",
-      "resolved_at": "e68be73"
+      "resolved_at": "718816a"
     },
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into": {
       "kind": "governance-violation",
@@ -34,7 +34,7 @@
       "state": "resolved",
       "first_seen": "4fa7dc4",
       "last_seen": "4fa7dc4",
-      "resolved_at": "e68be73"
+      "resolved_at": "718816a"
     },
     "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update": {
       "kind": "governance-violation",
@@ -51,7 +51,7 @@
       "state": "resolved",
       "first_seen": "4fa7dc4",
       "last_seen": "4fa7dc4",
-      "resolved_at": "e68be73"
+      "resolved_at": "718816a"
     }
   },
   "exceptions": {}
