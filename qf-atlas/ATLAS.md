@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ b7899be` on 2026-08-21 by
+> Generated from `atlas-strip-1 @ 95acc32` on 2026-08-21 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -44,11 +44,11 @@ flowchart TD
   X["<b>raw SQL</b><br/>never enters a<br/>governed action"]
   H -->|"cheats 3"| X
   A["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]
-  H -->|"reaches-sql 13"| A
+  H -->|"reaches-sql 2"| A
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 9"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 83"| RO
+  H -->|"read-only 94"| RO
   X -.->|"ungoverned — this is the breach"| DB
 
   QA["<b>QA · governance</b><br/>13 subsystems<br/>asserts the rules above"]
@@ -86,10 +86,10 @@ handler that mutates state without `execute()` is cheating even when it works.
 |---|---|---:|
 | `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 3 |
-| `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 13 |
+| `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler file not fully read; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 83 |
+| `read-only` | no mutation seen | 94 |
 
 #### Reaches ungoverned SQL, but not a hard red (3)
 

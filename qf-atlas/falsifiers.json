@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-21",
-  "passed": 92,
-  "total": 92,
+  "passed": 94,
+  "total": 94,
   "results": [
     {
       "n": 1,
@@ -481,7 +481,7 @@
       "n": 80,
       "name": "a domain write in a class method is adjudicated, not invisible",
       "passed": true,
-      "detail": "fn=persistWidgetRow persistence=domain-truth governance=unknown/low"
+      "detail": "fn=WidgetStore.persistWidgetRow persistence=domain-truth governance=unknown/low"
     },
     {
       "n": 81,
@@ -517,7 +517,7 @@
       "n": 87,
       "name": "a class-method hard red cannot render as read-only at hop 4",
       "passed": true,
-      "detail": "fn=vfyPersistTaskRow domain-truth/high hardRed=true hop4=cheats hop4ReachesTheMethod=true"
+      "detail": "fn=VfyStore.vfyPersistTaskRow domain-truth/high hardRed=true hop4=cheats hop4ReachesTheMethod=true"
     },
     {
       "n": 88,
@@ -550,10 +550,22 @@
       "detail": "testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · hardRedTotal=3 (expect 3, i.e. not suppressed)"
     },
     {
+      "n": 93,
+      "name": "an unimported same-named sibling cannot be reached or cited",
+      "passed": true,
+      "detail": "handlerReachedUnimportedSibling=false hop4=read-only dangerStillSeen=true dangerHardRed=false hardRedTotal=3 (expect 3)"
+    },
+    {
+      "n": 94,
+      "name": "same-named class methods stay distinct and neither forges a proof",
+      "passed": true,
+      "detail": "rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+    },
+    {
       "n": 82,
       "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
       "passed": true,
-      "detail": "git status --porcelain identical before and after (3 pre-existing entries)"
+      "detail": "git status --porcelain identical before and after (6 pre-existing entries)"
     }
   ]
 }

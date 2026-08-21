@@ -274,7 +274,11 @@ export function analyzeFile(relPath, text) {
             optionsName = literalArg(prop.initializer);
             break;
           }
-      f.calls.push({ name, calleeForm, line, enclosing: enc?.name ?? null, optionsName,
+      // `enclosingClass` is carried because the parser already resolved it at
+      // `enclosingSymbol`. Dropping it here is what let two same-named methods in one
+      // file collapse into a single record downstream.
+      f.calls.push({ name, calleeForm, line, enclosing: enc?.name ?? null,
+        enclosingClass: enc?.className ?? null, optionsName,
         args: node.arguments.map(literalArg).filter((a) => a !== null).slice(0, 3) });
     }
     // `new Worker(path)` is a long-lived child too.
@@ -292,6 +296,7 @@ export function analyzeFile(relPath, text) {
       while ((m = SQL_DML.exec(raw))) {
         const enc = enclosingSymbol(node);
         f.sql.push({
+          enclosingClass: enc?.className ?? null,
           verb: m[1].replace(/\s+/g, " ").toUpperCase(),
           table: m[2],
           // FILE-RELATIVE, PER STATEMENT. A multi-statement DDL block lives in ONE
@@ -352,15 +357,26 @@ function emptyFacts(path, state, reason) {
  * analyzer — backwards from a SQL site, or forwards from an IPC handler — goes through
  * this predicate.
  *
- * A caller either lives in the callee's file, or imports something that resolves into
- * the callee's package or directory subtree. Still not type resolution, and recorded as
- * such — but a file with no import path toward the target can no longer certify
- * reaching it.
+ * A caller either lives in the callee's file, or carries an import that resolves to it:
+ * a relative specifier resolved to an exact module path, or a bare package name matched
+ * against the path. Still not type resolution, and recorded as such — but a file with no
+ * import toward the target can no longer certify reaching it.
+ *
+ * THE OWN-DIRECTORY ALLOWANCE IS GONE, and so is the directory-level resolution that
+ * made it necessary. A third independent Verifier showed a caller importing `persist`
+ * from `fixture-safe.ts` earning a corroborated one-hop proof to an unrelated `persist`
+ * in `fixture-danger.ts` next door. Two causes, one symptom: relative specifiers were
+ * resolved by dropping the module basename, so `./kernel` admitted the whole directory,
+ * and a separate clause admitted every sibling outright. TypeScript has no ambient
+ * same-directory scope — a sibling call needs an import like any other — so both are
+ * removed rather than narrowed again.
  */
 export function buildModuleEdge(astOf) {
+  const EXT = /\.(tsx?|jsx?|mts|cts|mjs|cjs)$/;
   const importsOf = new Map();
   for (const [file, a] of astOf) {
-    const roots = new Set([file.slice(0, file.lastIndexOf("/"))]);
+    const roots = new Set();     // bare package names, matched loosely
+    const modules = new Set();   // relative imports, resolved to an exact module path
     for (const i of a.imports ?? []) {
       const spec = i.spec;
       if (spec.startsWith(".")) {
@@ -372,29 +388,25 @@ export function buildModuleEdge(astOf) {
           if (seg === "..") out.pop();
           else out.push(seg);
         }
-        out.pop();
-        roots.add(out.join("/"));
+        // NO out.pop(). Dropping the module basename resolved `./kernel` to the
+        // DIRECTORY `collab-electron/src/main`, which then admitted every sibling in it.
+        // The specifier names a module; resolve it to that module.
+        modules.add(out.join("/"));
       } else {
         // Bare specifier: map the package name onto any directory that ends with it, so
         // `qf-kernel/portable` admits packages/qf-kernel/**.
         roots.add(spec.split("/")[0]);
       }
     }
-    // The file OWN DIRECTORY is kept apart from its import roots. Folded in with them it
-    // was subtree-matched, so every file in collab-electron/src/main/ could resolve every
-    // file under main/** with no import whatsoever — and `error()`, one of the commonest
-    // identifiers in the tree, bound to update-manager.ts from unrelated pty handlers.
-    // That is the same false attribution this predicate exists to stop, arriving through
-    // a common name instead of a deliberate decoy. Siblings resolve; nephews need an
-    // import.
-    roots.delete(file.slice(0, file.lastIndexOf("/")));
-    importsOf.set(file, { own: file.slice(0, file.lastIndexOf("/")), roots });
+    importsOf.set(file, { roots, modules });
   }
   return (from, to) => {
     if (from === to) return true;
     const e = importsOf.get(from);
     if (!e) return false;
-    if (e.own === to.slice(0, to.lastIndexOf("/"))) return true;   // same directory only
+    const t = to.replace(EXT, "");
+    if (e.modules.has(t)) return true;                             // ./kernel -> kernel.ts
+    if (e.modules.has(t.replace(/\/index$/, ""))) return true;      // ./widgets -> widgets/index.ts
     for (const r of e.roots) {
       if (!r) continue;
       if (to.startsWith(r + "/") || to === r) return true;
@@ -455,12 +467,13 @@ export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth =
           candidates: all.map((r) => r.file).sort(),
           why: "every definition of this name is in a module the caller has no import path to" });
       for (const rec of reachable) {
-        const key = rec.file + "::" + rec.name;
+        const key = rec.file + "::" + (rec.id ?? rec.name);
         if (seen.has(key)) continue;
         seen.add(key);
-        const path = [...node.path, { file: rec.file, fn: rec.name }];
+        const path = [...node.path, { file: rec.file, fn: rec.id ?? rec.name }];
         if (rec.dml && rec.sqlSites?.length)
-          sql.set(key, { fn: rec.name, file: rec.file, hops: path.length, path,
+          sql.set(key, { fn: rec.id ?? rec.name, file: rec.file, hops: path.length, path,
+            ambiguous: Boolean(rec.ambiguousName),
             sqlSites: rec.sqlSites.map((x) => ({ table: x.table, verb: x.verb, line: x.line })) });
         for (const c of rec.calls) next.push({ name: c, from: rec.file, path });
       }
@@ -618,11 +631,25 @@ export function astFunctionIndex({ astOf, doorNames, insideDoor }) {
 
   for (const [file, a] of astOf) {
     const byFn = new Map();
-    const touch = (fn) => {
-      const key = `${file}::${fn}`;
+    // IDENTITY IS CLASS-QUALIFIED; RESOLUTION IS NOT.
+    //
+    // The key was `file::methodName`, so `SafeStore.persist` and `DangerousStore.persist`
+    // in one file became ONE record — a third independent Verifier reproduced it. Both
+    // directions were wrong at once: a safe method inherited the other class's SQL, and
+    // two distinct violations collapsed into a single finding.
+    //
+    // So `id` carries the class and is what findings are named by, while `name` stays the
+    // bare method name, because that is all a CALL SITE gives us. `this.persist()` and
+    // `store.persist()` name a method, not a class, and binding the receiver needs a type
+    // checker. Where the bare name is ambiguous inside its own file, `ambiguousName` says
+    // so and callers refuse to build a corroborated proof through it.
+    const touch = (fn, cls) => {
+      const id = cls ? `${cls}.${fn}` : fn;
+      const key = `${file}::${id}`;
       if (!index.has(key))
-        index.set(key, { name: fn, file, door: false, dml: false, sqlSites: [], disk: false, calls: new Set() });
-      byFn.set(fn, index.get(key));
+        index.set(key, { name: fn, id, className: cls ?? null, file, door: false,
+          dml: false, sqlSites: [], disk: false, calls: new Set(), ambiguousName: false });
+      byFn.set(id, index.get(key));
       return index.get(key);
     };
 
@@ -635,7 +662,7 @@ export function astFunctionIndex({ astOf, doorNames, insideDoor }) {
           what: "call with a computed callee name",
           why: "the callee is an expression, not an identifier — it cannot be followed" });
       if (!c.enclosing) continue;
-      const rec = touch(c.enclosing);
+      const rec = touch(c.enclosing, c.enclosingClass);
       if (c.name) rec.calls.add(c.name);
     }
     for (const s of a.sql ?? []) {
@@ -644,11 +671,30 @@ export function astFunctionIndex({ astOf, doorNames, insideDoor }) {
           why: "SQL is not inside any named symbol, so no call path can be traced to it" });
         continue;
       }
-      const rec = touch(s.enclosing);
+      const rec = touch(s.enclosing, s.enclosingClass);
       rec.sqlSites.push({ table: s.table, verb: s.verb, line: s.line });
     }
-    for (const fn of a.functions ?? []) touch(fn.name);
+    for (const fn of a.functions ?? []) touch(fn.name, fn.className ?? null);
   }
+
+  // A bare method name that resolves to more than one record IN THE SAME FILE cannot be
+  // bound from a call site without types. Mark both, so nothing downstream treats either
+  // as a proven target.
+  const perFile = new Map();
+  for (const rec of index.values()) {
+    const k = rec.file + "::" + rec.name;
+    if (!perFile.has(k)) perFile.set(k, []);
+    perFile.get(k).push(rec);
+  }
+  for (const [k, recs] of perFile)
+    if (recs.length > 1) {
+      for (const rec of recs) rec.ambiguousName = true;
+      unresolved.push({ file: recs[0].file, line: recs[0].sqlSites?.[0]?.line ?? null,
+        enclosing: recs[0].name, what: "ambiguous method name",
+        why: `${recs.length} symbols named ${recs[0].name} in this file `
+          + `(${recs.map((r) => r.id).join(", ")}) — a call site names the method, not the `
+          + `class, so binding it needs a type checker` });
+    }
 
   for (const rec of index.values()) {
     rec.door = doorNames.has(rec.name) || [...rec.calls].some((c) => doorNames.has(c));

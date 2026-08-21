@@ -54,8 +54,9 @@ export function stripCodeComments(text) {
     .replace(/(^|[^:"'`\\])\/\/[^\n]*/g, (m, p) => p + " ".repeat(m.length - p.length));
 }
 
+/** Identity, class-qualified. `name` remains the bare method name for call matching. */
 export function recKey(rec) {
-  return `${rec.file}::${rec.name}`;
+  return `${rec.file}::${rec.id ?? rec.name}`;
 }
 
 export function byRecName(index) {
@@ -352,7 +353,8 @@ export function classifyPersistence({ index, names, domain, transport, governed,
   const nameIndex = names ?? byRecName(index);
 
   for (const rec of index.values()) {
-    const fnName = rec.name;
+    // The QUALIFIED identity names the finding; the bare name is only for call matching.
+    const fnName = rec.id ?? rec.name;
     if (!rec.sqlSites?.length) continue;
     const cls = sourceClass(rec.file);
     const reach = reachability(rec, index, nameIndex, governed, appReach);
@@ -427,10 +429,20 @@ export function classifyPersistence({ index, names, domain, transport, governed,
       // Without this it was correctly non-blocking and silently unexplained, which is the
       // half of the rule that is easy to miss.
       if (governance === "violation" && astOf && astReachProof) {
-        reachProof = astReachProof({
-          astOf, targetFile: rec.file, targetFn: fnName,
-          isAppOrigin: isAppOrigin ?? (() => false),
-        });
+        // An ambiguous bare name cannot carry a corroborated proof. `astReachProof` walks
+        // callers by the name a CALL SITE records, which is the method name alone — so for
+        // two same-named methods in one file it would return the same path for both and
+        // certify at least one of them falsely. Refuse rather than guess; the finding
+        // stays visible at medium with a named blocker.
+        reachProof = rec.ambiguousName
+          ? { corroborated: false, hops: 0, path: [],
+              why: `the enclosing method name \`${rec.name}\` is ambiguous inside `
+                + `${rec.file} — a call site names the method, not the class, and binding `
+                + `it needs a type checker` }
+          : astReachProof({
+              astOf, targetFile: rec.file, targetFn: rec.name,
+              isAppOrigin: isAppOrigin ?? (() => false),
+            });
         if (!reachProof.corroborated) {
           if (confidence === "high") why += ` Confidence capped at medium: ${reachProof.why}.`;
           else why += ` No corroborated production reach: ${reachProof.why}.`;

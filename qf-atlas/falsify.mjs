@@ -1533,7 +1533,9 @@ record(80, "a domain write in a class method is adjudicated, not invisible",
     (m) => {
       const row = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith("zzv-widget-store.ts"));
       if (!row) return [false, "the class-method write produced NO finding — the silent hole is back"];
-      return [row.fn === "persistWidgetRow" && row.persistence === "domain-truth",
+      // Identity is class-qualified since the fourth Verifier: `WidgetStore.persistWidgetRow`,
+      // not `persistWidgetRow`. Asserting the qualified form is what pins the fix.
+      return [row.fn === "WidgetStore.persistWidgetRow" && row.persistence === "domain-truth",
         "fn=" + row.fn + " persistence=" + row.persistence + " governance=" + row.governance + "/" + row.confidence];
     }));
 
@@ -1713,7 +1715,7 @@ record(87, "a class-method hard red cannot render as read-only at hop 4",
     if (!w) return [false, 'the fixture channel never reached the model'];
     const red = hardRedFn(m);
     const isRed = Boolean(red[row.id]);
-    const reaches = (w.hop4?.dmlAll ?? []).some((d) => d.fn === 'vfyPersistTaskRow');
+    const reaches = (w.hop4?.dmlAll ?? []).some((d) => d.fn === 'VfyStore.vfyPersistTaskRow');
     return [isRed && w.hop4?.kind === 'cheats' && reaches && w.hop4.kind !== 'read-only',
       `fn=${row.fn} ${row.persistence}/${row.confidence} hardRed=${isRed} hop4=${w.hop4?.kind} `
       + `hop4ReachesTheMethod=${reaches}`];
@@ -1879,6 +1881,79 @@ record(92, "a test-only caller cannot corroborate a production reach proof",
       + `hardRed=${Boolean(red[row.id])} · proofsRoutedThroughTests=${viaTest.length}`
       + `${viaTest.length ? ' -> ' + viaTest[0].id : ''} · hardRedTotal=${realReds} (expect 3, i.e. not suppressed)`];
   }));
+
+// ── FROM THE FOURTH INDEPENDENT VERIFIER (Codex) ───────────────────────────
+
+// 93 · Verifier defect 1 — AN UNIMPORTED SIBLING IS NOT REACHABLE. `buildModuleEdge`
+// admitted every file in the caller's own directory, and resolved relative specifiers by
+// dropping the module basename so `./kernel` admitted the whole directory anyway. A
+// caller importing `persist` from one file earned a corroborated one-hop proof to an
+// unrelated `persist` next door. TypeScript has no ambient same-directory scope.
+record(93, "an unimported same-named sibling cannot be reached or cited",
+  ...withFiles({
+    [`${MAIN}/zz-vfy93-safe.ts`]:
+      [ 'export function zzVfy93Persist(id: string){ return ' + Q + 'noop:' + Q + ' + id; }', '' ].join(String.fromCharCode(10)),
+    // Same directory, same exported name, real domain SQL, and NOBODY imports it.
+    [`${MAIN}/zz-vfy93-danger.ts`]:
+      [ 'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        'export function zzVfy93Persist(id: string){',
+        '  getKernelDb().query(' + Q + 'INSERT INTO task (id) VALUES (?)' + Q + ').run(id);',
+        '}', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy93.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { zzVfy93Persist } from ' + Q + './zz-vfy93-safe' + Q + ';',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:sibling' + Q + ', async (_e, id) => zzVfy93Persist(id)); }',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:sibling');
+    if (!w) return [false, 'the fixture channel never reached the model'];
+    const red = hardRedFn(m);
+    const reachedDanger = (w.hop4?.dmlAll ?? []).some((d) => d.file.endsWith('zz-vfy93-danger.ts'));
+    const dangerRow = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy93-danger.ts'));
+    // The write is still SEEN — it must not vanish. What it may not do is be reachable
+    // from a handler that never imported it, or become hard red on that basis.
+    const seen = Boolean(dangerRow);
+    const falselyRed = dangerRow ? Boolean(red[dangerRow.id]) : false;
+    return [!reachedDanger && w.hop4?.kind !== 'cheats' && seen && !falselyRed
+      && Object.keys(red).length === 3,
+      `handlerReachedUnimportedSibling=${reachedDanger} hop4=${w.hop4?.kind} `
+      + `dangerStillSeen=${seen} dangerHardRed=${falselyRed} hardRedTotal=${Object.keys(red).length} (expect 3)`];
+  }));
+
+// 94 · Verifier defect 2 — TWO SAME-NAMED CLASS METHODS ARE TWO FUNCTIONS. The index
+// keyed on `file::methodName`, so `SafeStore.persist` and `DangerousStore.persist`
+// became one DML-bearing record: a safe method inherited the other class's SQL, and two
+// distinct violations collapsed into one finding. The parser had `className` all along.
+//
+// The second half matters as much as the first: a call site names the METHOD, not the
+// class, so neither may carry a corroborated reach proof. Identity is class-qualified;
+// resolution stays honest about what it cannot bind.
+record(94, "same-named class methods stay distinct and neither forges a proof",
+  ...withFile(`${MAIN}/zz-vfy94.ts`,
+    [ 'export class ZzSafeStore {',
+      '  constructor(private db: any) {}',
+      '  zzPersist94(id: string){ return this.db.note(id); }',
+      '}',
+      'export class ZzDangerStore {',
+      '  constructor(private db: any) {}',
+      '  zzPersist94(id: string){',
+      '    this.db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'cancelled' + Q + ', id);',
+      '  }',
+      '}', '' ].join(String.fromCharCode(10)),
+    (m) => {
+      const rows = (m.persistence ?? []).filter((p) => p.evidence[0].file.endsWith('zz-vfy94.ts'));
+      const red = hardRedFn(m);
+      const danger = rows.find((p) => String(p.fn).includes('ZzDangerStore'));
+      const safeCollapsed = rows.some((p) => String(p.fn).includes('ZzSafeStore'));
+      // Exactly one row, and it names the DANGEROUS class. The safe method has no SQL, so
+      // it must produce no persistence finding at all — if it does, it inherited one.
+      const proofRefused = danger ? danger.reachProof?.corroborated === false : false;
+      return [rows.length === 1 && Boolean(danger) && !safeCollapsed && proofRefused
+        && !red[danger.id] && danger.blocker === 'ast-coverage' && Object.keys(red).length === 3,
+        `rows=${rows.length} fn=${danger?.fn ?? 'NONE'} safeInheritedSql=${safeCollapsed} `
+        + `proofCorroborated=${danger?.reachProof?.corroborated} blocker=${danger?.blocker} `
+        + `hardRed=${danger ? Boolean(red[danger.id]) : 'n/a'} hardRedTotal=${Object.keys(red).length} (expect 3)`];
+    }));
 
 // Restore every generated artefact to the bytes this run started with. This replaces
 // a final regenerate, which could only ever get CLOSE: `generatedAt` moves on every
