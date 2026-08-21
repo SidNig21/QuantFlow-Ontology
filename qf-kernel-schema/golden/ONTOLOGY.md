@@ -785,6 +785,23 @@ Create exactly one open review Task assigned to a captured production Critic ses
 - `task_id` — Original open Task id to review.
 - `critic_session_id` — Running production hermes-critic session captured by the host.
 
+### `governed_review_task`
+
+Own the governed review Task lifecycle mutation for Kernel-internal admission and delivery.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `operation` — Internal governed review Task operation.
+- `action_kind` — Governed admission mode; required for admission.
+- `source_task_id` — Immutable source Task id for governed admission.
+- `source_work` — Kernel-frozen source-work tuple supplied by the public adapter.
+- `attempt_id` — Idempotency key for one governed admission attempt.
+- `critic_session_id` — Captured production critic session for review admission.
+- `triggering_evaluation_id` — Exact non-supporting Evaluation that authorizes a follow-up.
+- `review_task_id` — Governed review Task id for delivery.
+- `outcome` — Host delivery outcome for the governed review Task.
+
 ### `publish_artifact`
 
 Publish an immutable content-addressed artifact (must land before sandbox death).

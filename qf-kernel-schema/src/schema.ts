@@ -94,6 +94,7 @@ import {
   record_task_steering_refusal,
   record_task_cancel_outcome,
   request_second_opinion,
+  governed_review_task,
 } from "./ontology/agent.ts";
 import { transitions } from "./transitions.ts";
 
@@ -187,6 +188,7 @@ export const schema: Schema = {
     record_task_steering_refusal,
     record_task_cancel_outcome,
     request_second_opinion,
+    governed_review_task,
     publish_artifact,
     record_evaluation,
     resolve_hypothesis,

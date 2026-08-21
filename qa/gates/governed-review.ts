@@ -1,5 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { schema } from "../../qf-kernel-schema/src/schema.ts";
+import { generateMcp } from "../../qf-kernel-schema/src/generate/mcp.ts";
 
 const ROOT = join(import.meta.dir, "..", "..");
 export const GOVERNED_REVIEW_TIMEOUT_MS = 180_000;
@@ -48,6 +50,22 @@ export async function runGovernedReviewGate(): Promise<{ ok: boolean }> {
       return { ok: false };
     }
   }
+  const governedReviewAction = schema.actions.find((action) => action.name === "governed_review_task");
+  const tools = JSON.parse(generateMcp(schema)) as Array<{ name: string }>;
+  const actionChecks = [
+    governedReviewAction?.internalOnly === true,
+    governedReviewAction !== undefined,
+    !tools.some((tool) => tool.name === "qf_governed_review_task"),
+  ];
+  const actionSource = source.slice(source.indexOf("function exactSourceTaskDelegator"), source.indexOf("export function recordGovernedToolReceipt"));
+  const directTaskDml = [
+    /INSERT\s+INTO\s+task/i,
+    /INSERT\s+INTO\s+links/i,
+    /UPDATE\s+task/i,
+  ];
+  const dmlCheck = directTaskDml.every((pattern) => !pattern.test(actionSource));
+  console.log(`governed-review: internal action/MCP boundary=${actionChecks.filter(Boolean).length}/${actionChecks.length}; governed-review admission/delivery task/links DML absent=${dmlCheck}`);
+  if (actionChecks.some((value) => !value) || !dmlCheck) return { ok: false };
   const code = await run(["bun", "test", "packages/qf-kernel/src/r15-governed-review.test.ts", "collab-electron/src/main/governed-review.test.ts"]);
   console.log(`governed-review: focused production/kernel proof exit=${code}`);
   return { ok: code === 0 };

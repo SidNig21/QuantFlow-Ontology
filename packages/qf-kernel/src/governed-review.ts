@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { KernelDb } from "./db.ts";
+import { cancelTaskInTransaction, writeTaskInTransaction } from "./create.ts";
+import { execute } from "./execute.ts";
 import { appendEvent } from "./events.ts";
 import { KernelError } from "./errors.ts";
 import { contentHash } from "./hash.ts";
@@ -262,57 +264,158 @@ function persistAttempt(db: KernelDb, action: GovernedActionKind, sourceTaskId: 
   db.query("INSERT INTO qf_review_attempt (action_kind, source_task_id, source_work, triggering_evaluation_id, attempt_id, outcome, result, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(action, sourceTaskId, result.source_work ? json(result.source_work) : null, result.receipt?.triggering_evaluation_id ?? null, attemptId, result.kind === "refused" ? "refused" : "admitted", json(result), new Date().toISOString());
 }
 
-function createReviewTask(db: KernelDb, kind: "review" | "revision" | "second_critic", work: SourceWork, assigneeSessionId: string, attemptId: string, triggeringEvaluationId: string | null, trace: GovernedReviewTrace): string {
-  const taskId = `review-task-${crypto.randomUUID()}`;
-  const now = new Date().toISOString();
-  const title = kind === "review" ? "Independent research review" : kind === "revision" ? "Revise research after critic review" : "Second independent research review";
-  const description = `Review the immutable source work ${work.source_task_id} using the governed critic contract.`;
-  db.query("INSERT INTO task (id, created_at, title, description, status) VALUES (?, ?, ?, ?, 'open')").run(taskId, now, title, description);
-  db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'assigned_to', ?, ?, ?)").run(crypto.randomUUID(), taskId, assigneeSessionId, now);
-  db.query("INSERT INTO qf_review_task (task_id, kind, source_task_id, source_work, critic_session_id, assignee_session_id, attempt_id, triggering_evaluation_id, lifecycle, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)").run(taskId, kind, work.source_task_id, json(work), kind === "revision" ? null : assigneeSessionId, assigneeSessionId, attemptId, triggeringEvaluationId, now);
-  appendEvent(db, { type: "task.created", object_type: "task", object_id: taskId, payload: { task_id: taskId, kind, status: "pending", source_work: work, assignee_session_id: assigneeSessionId, attempt_id: attemptId, triggering_evaluation_id: triggeringEvaluationId }, trace_id: trace.trace_id });
-  return taskId;
+function exactSourceTaskDelegator(db: KernelDb, sourceTaskId: string): string {
+  const rows = db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'delegated_by' ORDER BY created_at ASC, id ASC").all(sourceTaskId) as Array<{ to_id: string }>;
+  if (rows.length !== 1 || !rows[0]!.to_id) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  return rows[0]!.to_id;
 }
 
-export function requestGovernedReview(db: KernelDb, sourceTaskId: string, attemptId: string, criticSessionId: string | null, trace: GovernedReviewTrace): GovernedReviewAdmission {
-  ensureGovernedReviewSchema(db);
-  if (!attemptId) throw new KernelError("attempt_id is required");
-  const prior = existingAttempt(db, "request_review", sourceTaskId, attemptId);
-  if (prior) return prior;
+function freezeSourceWorkInTransaction(db: KernelDb, sourceTaskId: string): SourceWork {
+  const work = readSourceWork(db, sourceTaskId);
+  if (!work) throw new KernelError(INVALID_SOURCE_WORK_MESSAGE);
+  validateStoredSourceWork(db, work);
+  exactSourceTaskDelegator(db, sourceTaskId);
+  return work;
+}
+
+type GovernedReviewTaskInput = {
+  operation: "admit" | "deliver";
+  action_kind?: GovernedActionKind;
+  source_task_id?: string;
+  source_work?: unknown;
+  attempt_id?: string;
+  critic_session_id?: string | null;
+  triggering_evaluation_id?: string | null;
+  review_task_id?: string;
+  outcome?: "delivered" | "failed";
+};
+
+function reviewTaskTitle(kind: "review" | "revision" | "second_critic"): string {
+  return kind === "review" ? "Independent research review" : kind === "revision" ? "Revise research after critic review" : "Second independent research review";
+}
+
+function admitGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, trace: GovernedReviewTrace): GovernedReviewAdmission {
+  const action = input.action_kind;
+  const sourceTaskId = input.source_task_id ?? "";
+  const attemptId = input.attempt_id ?? "";
+  if (!action || !sourceTaskId || !attemptId) throw new KernelError("governed_review_task admission requires action_kind, source_task_id, and attempt_id");
+
   const tx = db.transaction(() => {
-    let work: SourceWork | null = null;
-    try { work = freezeSourceWork(db, sourceTaskId); } catch {
-      const refusal: GovernedRefusal = { action_kind: "request_review", selected_source_task_id: sourceTaskId, source_work: null, triggering_evaluation_id: null, attempt_id: attemptId, reason_code: "INVALID_SOURCE_WORK", message: INVALID_SOURCE_WORK_MESSAGE, task_id: null };
+    const prior = existingAttempt(db, action, sourceTaskId, attemptId);
+    if (prior) return prior;
+
+    let work: SourceWork;
+    try {
+      work = freezeSourceWorkInTransaction(db, sourceTaskId);
+    } catch {
+      const refusal = refusalFor(action, sourceTaskId, null, input.triggering_evaluation_id ?? null, attemptId, "INVALID_SOURCE_WORK", INVALID_SOURCE_WORK_MESSAGE);
       const result = persistRefusal(db, refusal, trace);
-      persistAttempt(db, "request_review", sourceTaskId, attemptId, result);
+      persistAttempt(db, action, sourceTaskId, attemptId, result);
       return result;
     }
-    if (!criticSessionId || !criticIsAdmitted(db, criticSessionId)) {
-      const refusal: GovernedRefusal = { action_kind: "request_review", selected_source_task_id: sourceTaskId, source_work: work, triggering_evaluation_id: null, attempt_id: attemptId, reason_code: "CRITIC_ADMISSION_FAILED", message: "The exact production Hermes critic could not be admitted.", task_id: null };
+
+    if (action === "request_review" && (!input.critic_session_id || !criticIsAdmitted(db, input.critic_session_id))) {
+      const refusal = refusalFor(action, sourceTaskId, work, null, attemptId, "CRITIC_ADMISSION_FAILED", "The exact production Hermes critic could not be admitted.");
       const result = persistRefusal(db, refusal, trace);
-      persistAttempt(db, "request_review", sourceTaskId, attemptId, result);
+      persistAttempt(db, action, sourceTaskId, attemptId, result);
       return result;
     }
-    const reviewTaskId = createReviewTask(db, "review", work, criticSessionId, attemptId, null, trace);
-    const result: GovernedReviewAdmission = { kind: "admitted", attempt_id: attemptId, source_work: work, review_task_id: reviewTaskId, critic_session_id: criticSessionId };
-    persistAttempt(db, "request_review", sourceTaskId, attemptId, result);
+
+    const evaluationId = input.triggering_evaluation_id ?? null;
+    const evaluation = action === "request_review" ? null : db.query("SELECT verdict, source_work FROM evaluation WHERE id = ?").get(evaluationId) as { verdict: string; source_work: string | null } | null;
+    if (action !== "request_review" && (!evaluation || evaluation.verdict === "supports" || !evaluation.source_work || !sameJson(JSON.parse(evaluation.source_work), work))) {
+      const message = action === "request_revision" ? "Revision requires the exact non-supporting Evaluation for this source work." : "Second critic requires the exact non-supporting Evaluation for this source work.";
+      const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "INVALID_TRIGGERING_EVALUATION", message);
+      const result = persistRefusal(db, refusal, trace);
+      persistAttempt(db, action, sourceTaskId, attemptId, result);
+      return result;
+    }
+
+    const assigneeSessionId = action === "request_revision" ? work.executor_session_id : input.critic_session_id ?? "";
+    if (action === "request_revision") {
+      const executor = db.query("SELECT status FROM agent_session WHERE id = ?").get(work.executor_session_id) as { status: string } | null;
+      if (!executor || executor.status !== "running") {
+        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "ORIGINAL_EXECUTOR_NOT_RUNNING", REVISION_EXECUTOR_NOT_RUNNING_MESSAGE);
+        const result = persistRefusal(db, refusal, trace);
+        persistAttempt(db, action, sourceTaskId, attemptId, result);
+        return result;
+      }
+    } else {
+      if (!input.critic_session_id || !criticIsAdmitted(db, input.critic_session_id) || (action === "second_critic" && input.critic_session_id === work.executor_session_id)) {
+        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "CRITIC_ADMISSION_FAILED", action === "second_critic" ? "The second independent Hermes critic could not be admitted." : "The exact production Hermes critic could not be admitted.");
+        const result = persistRefusal(db, refusal, trace);
+        persistAttempt(db, action, sourceTaskId, attemptId, result);
+        return result;
+      }
+    }
+
+    if (action === "second_critic") {
+      const priorCritics = db.query("SELECT to_id FROM links WHERE kind = 'performed_by' AND from_id IN (SELECT id FROM evaluation WHERE source_work IS NOT NULL)").all() as Array<{ to_id: string }>;
+      if (priorCritics.some((row) => row.to_id === input.critic_session_id)) {
+        const refusal = refusalFor(action, sourceTaskId, work, evaluationId, attemptId, "CRITIC_ALREADY_REVIEWED", "A second critic must be a new independent production session.");
+        const result = persistRefusal(db, refusal, trace);
+        persistAttempt(db, action, sourceTaskId, attemptId, result);
+        return result;
+      }
+    }
+
+    const delegatorSessionId = exactSourceTaskDelegator(db, sourceTaskId);
+    const kind = action === "request_review" ? "review" : action === "request_revision" ? "revision" : "second_critic";
+    const taskId = `review-task-${crypto.randomUUID()}`;
+    const taskDescription = `Review the immutable source work ${work.source_task_id} using the governed critic contract.`;
+    writeTaskInTransaction(db, {
+      task_id: taskId,
+      title: reviewTaskTitle(kind),
+      description: taskDescription,
+      assignee_session_id: assigneeSessionId,
+      delegator_session_id: delegatorSessionId,
+    }, trace, "governed_review_task");
+    const now = new Date().toISOString();
+    db.query("INSERT INTO qf_review_task (task_id, kind, source_task_id, source_work, critic_session_id, assignee_session_id, attempt_id, triggering_evaluation_id, lifecycle, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)").run(taskId, kind, sourceTaskId, json(work), kind === "revision" ? null : assigneeSessionId, assigneeSessionId, attemptId, evaluationId, now);
+    const result: GovernedReviewAdmission = { kind: "admitted", attempt_id: attemptId, source_work: work, review_task_id: taskId, critic_session_id: assigneeSessionId };
+    persistAttempt(db, action, sourceTaskId, attemptId, result);
     return result;
   });
   return tx();
 }
 
-export function markGovernedDelivery(db: KernelDb, reviewTaskId: string, outcome: "delivered" | "failed", trace: GovernedReviewTrace): void {
+function deliverGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, trace: GovernedReviewTrace): Record<string, unknown> {
+  const taskId = input.review_task_id ?? "";
+  const outcome = input.outcome;
+  if (!taskId || !outcome) throw new KernelError("governed_review_task delivery requires review_task_id and outcome");
+  const tx = db.transaction(() => {
+    const row = db.query("SELECT source_task_id, lifecycle FROM qf_review_task WHERE task_id = ?").get(taskId) as { source_task_id: string; lifecycle: string } | null;
+    if (!row) throw new KernelError("review Task not found");
+    const prior = db.query("SELECT id, payload FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt' ORDER BY created_at ASC, id ASC LIMIT 1").get(taskId) as { id: string; payload: string } | null;
+    if (prior) return { kind: "replayed", task_id: taskId, receipt_id: prior.id, outcome: JSON.parse(prior.payload).outcome };
+    if (row.lifecycle !== "pending") throw new KernelError("review Task delivery is no longer pending");
+    const lifecycle = outcome === "delivered" ? "running" : "refused";
+    db.query("UPDATE qf_review_task SET lifecycle = ?, terminal_receipt_kind = ? WHERE task_id = ?").run(lifecycle, outcome === "failed" ? "delivery_receipt" : null, taskId);
+    if (outcome === "failed") cancelTaskInTransaction(db, taskId, trace, { source_task_id: row.source_task_id, outcome });
+    const payload = { task_id: taskId, outcome, source_task_id: row.source_task_id };
+    const receiptId = crypto.randomUUID();
+    db.query("INSERT INTO qf_review_receipt (id, kind, task_id, payload, created_at) VALUES (?, 'delivery_receipt', ?, ?, ?)").run(receiptId, taskId, json(payload), new Date().toISOString());
+    const eventId = appendEvent(db, { type: "delivery_receipt", object_type: "task", object_id: taskId, payload, trace_id: trace.trace_id });
+    return { kind: outcome, task_id: taskId, receipt_id: receiptId, event_id: eventId, source_task_id: row.source_task_id };
+  });
+  return tx();
+}
+
+/** Execute-owned governed review Task lifecycle action. The caller owns no surrounding transaction. */
+export function executeGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, trace: GovernedReviewTrace): GovernedReviewAdmission | Record<string, unknown> {
   ensureGovernedReviewSchema(db);
-  const row = db.query("SELECT source_task_id, lifecycle FROM qf_review_task WHERE task_id = ?").get(reviewTaskId) as { source_task_id: string; lifecycle: string } | null;
-  if (!row) throw new KernelError("review Task not found");
-  db.transaction(() => {
-    const lifecycle = outcome === "delivered" ? "running" : "failed";
-    db.query("UPDATE qf_review_task SET lifecycle = ?, terminal_receipt_kind = ? WHERE task_id = ?").run(lifecycle === "failed" ? "refused" : lifecycle, outcome === "delivered" ? null : "delivery_receipt", reviewTaskId);
-    if (outcome === "failed") db.query("UPDATE task SET status = 'cancelled' WHERE id = ?").run(reviewTaskId);
-    const payload = { task_id: reviewTaskId, outcome, source_task_id: row.source_task_id };
-    db.query("INSERT INTO qf_review_receipt (id, kind, task_id, payload, created_at) VALUES (?, 'delivery_receipt', ?, ?, ?)").run(crypto.randomUUID(), reviewTaskId, json(payload), new Date().toISOString());
-    appendEvent(db, { type: "delivery_receipt", object_type: "task", object_id: reviewTaskId, payload, trace_id: trace.trace_id });
-  })();
+  if (input.operation === "admit") return admitGovernedReviewTask(db, input, trace);
+  if (input.operation === "deliver") return deliverGovernedReviewTask(db, input, trace);
+  throw new KernelError("governed_review_task operation is invalid");
+}
+
+export function requestGovernedReview(db: KernelDb, sourceTaskId: string, attemptId: string, criticSessionId: string | null, trace: GovernedReviewTrace): GovernedReviewAdmission {
+  if (!attemptId) throw new KernelError("attempt_id is required");
+  return execute(db, "governed_review_task", { operation: "admit", action_kind: "request_review", source_task_id: sourceTaskId, attempt_id: attemptId, critic_session_id: criticSessionId }, trace) as unknown as GovernedReviewAdmission;
+}
+
+export function markGovernedDelivery(db: KernelDb, reviewTaskId: string, outcome: "delivered" | "failed", trace: GovernedReviewTrace): void {
+  execute(db, "governed_review_task", { operation: "deliver", review_task_id: reviewTaskId, outcome }, trace);
 }
 
 export function recordGovernedToolReceipt(db: KernelDb, args: { invocation_id: string; session_id: string; task_id: string; tool_name: string; arguments: JsonRecord; result: unknown; success?: boolean; broker_sequence: number }, trace: GovernedReviewTrace): void {
@@ -502,50 +605,16 @@ export function requestRevision(db: KernelDb, work: SourceWork, evaluationId: st
   ensureGovernedReviewSchema(db);
   const prior = existingAttempt(db, "request_revision", work.source_task_id, attemptId);
   if (prior) return prior;
-  work = freezeSourceWork(db, work.source_task_id);
-  const evaluation = db.query("SELECT verdict, source_work FROM evaluation WHERE id = ?").get(evaluationId) as { verdict: string; source_work: string | null } | null;
-  const executor = db.query("SELECT status FROM agent_session WHERE id = ?").get(work.executor_session_id) as { status: string } | null;
-  const tx = db.transaction(() => {
-    if (!evaluation || evaluation.verdict === "supports" || !evaluation.source_work || !sameJson(JSON.parse(evaluation.source_work), work)) {
-      const refusal = refusalFor("request_revision", work.source_task_id, work, evaluationId, attemptId, "INVALID_TRIGGERING_EVALUATION", "Revision requires the exact non-supporting Evaluation for this source work.");
-      const result = persistRefusal(db, refusal, trace); persistAttempt(db, "request_revision", work.source_task_id, attemptId, result); return result;
-    }
-    if (!executor || executor.status !== "running") {
-      const refusal = refusalFor("request_revision", work.source_task_id, work, evaluationId, attemptId, "ORIGINAL_EXECUTOR_NOT_RUNNING", REVISION_EXECUTOR_NOT_RUNNING_MESSAGE);
-      const result = persistRefusal(db, refusal, trace); persistAttempt(db, "request_revision", work.source_task_id, attemptId, result); return result;
-    }
-    const taskId = createReviewTask(db, "revision", work, work.executor_session_id, attemptId, evaluationId, trace);
-    const result: GovernedReviewAdmission = { kind: "admitted", attempt_id: attemptId, source_work: work, review_task_id: taskId, critic_session_id: work.executor_session_id };
-    persistAttempt(db, "request_revision", work.source_task_id, attemptId, result); return result;
-  });
-  return tx();
+  freezeSourceWork(db, work.source_task_id);
+  return execute(db, "governed_review_task", { operation: "admit", action_kind: "request_revision", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId }, trace) as unknown as GovernedReviewAdmission;
 }
 
 export function requestSecondCritic(db: KernelDb, work: SourceWork, evaluationId: string, attemptId: string, criticSessionId: string | null, trace: GovernedReviewTrace): GovernedReviewAdmission {
   ensureGovernedReviewSchema(db);
   const prior = existingAttempt(db, "second_critic", work.source_task_id, attemptId);
   if (prior) return prior;
-  work = freezeSourceWork(db, work.source_task_id);
-  const evaluation = db.query("SELECT verdict, source_work FROM evaluation WHERE id = ?").get(evaluationId) as { verdict: string; source_work: string | null } | null;
-  const tx = db.transaction(() => {
-    if (!evaluation || evaluation.verdict === "supports" || !evaluation.source_work || !sameJson(JSON.parse(evaluation.source_work), work)) {
-      const refusal = refusalFor("second_critic", work.source_task_id, work, evaluationId, attemptId, "INVALID_TRIGGERING_EVALUATION", "Second critic requires the exact non-supporting Evaluation for this source work.");
-      const result = persistRefusal(db, refusal, trace); persistAttempt(db, "second_critic", work.source_task_id, attemptId, result); return result;
-    }
-    if (!criticSessionId || !criticIsAdmitted(db, criticSessionId) || criticSessionId === work.executor_session_id) {
-      const refusal = refusalFor("second_critic", work.source_task_id, work, evaluationId, attemptId, "CRITIC_ADMISSION_FAILED", "The second independent Hermes critic could not be admitted.");
-      const result = persistRefusal(db, refusal, trace); persistAttempt(db, "second_critic", work.source_task_id, attemptId, result); return result;
-    }
-    const priorCritics = db.query("SELECT to_id FROM links WHERE kind = 'performed_by' AND from_id IN (SELECT id FROM evaluation WHERE source_work IS NOT NULL)").all() as Array<{ to_id: string }>;
-    if (priorCritics.some((row) => row.to_id === criticSessionId)) {
-      const refusal = refusalFor("second_critic", work.source_task_id, work, evaluationId, attemptId, "CRITIC_ALREADY_REVIEWED", "A second critic must be a new independent production session.");
-      const result = persistRefusal(db, refusal, trace); persistAttempt(db, "second_critic", work.source_task_id, attemptId, result); return result;
-    }
-    const taskId = createReviewTask(db, "second_critic", work, criticSessionId, attemptId, evaluationId, trace);
-    const result: GovernedReviewAdmission = { kind: "admitted", attempt_id: attemptId, source_work: work, review_task_id: taskId, critic_session_id: criticSessionId };
-    persistAttempt(db, "second_critic", work.source_task_id, attemptId, result); return result;
-  });
-  return tx();
+  freezeSourceWork(db, work.source_task_id);
+  return execute(db, "governed_review_task", { operation: "admit", action_kind: "second_critic", source_task_id: work.source_task_id, source_work: work, triggering_evaluation_id: evaluationId, attempt_id: attemptId, critic_session_id: criticSessionId }, trace) as unknown as GovernedReviewAdmission;
 }
 
 export function governedReviewProjection(db: KernelDb, sourceTaskId: string): Record<string, unknown> | null {

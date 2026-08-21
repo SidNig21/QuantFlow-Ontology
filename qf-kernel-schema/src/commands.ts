@@ -305,6 +305,7 @@ export const internalCommands: readonly { action: string }[] = [
   { action: "record_task_steering_refusal" },
   { action: "record_task_cancel_outcome" },
   { action: "request_second_opinion" },
+  { action: "governed_review_task" },
 ] as const;
 
 /** All legal (type, from, to) edges from the transition tables. */

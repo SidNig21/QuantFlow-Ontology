@@ -23,6 +23,7 @@ import { executePipeline } from "./pipeline.ts";
 import type { ExecuteResultFor, ObjectExecuteResult } from "./results.ts";
 import { requireTrace, type TrustedExecutionContext } from "./trace.ts";
 import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
+import { executeGovernedReviewTask } from "./governed-review.ts";
 
 
 const CONTROL_BYTES = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/u;
@@ -266,6 +267,7 @@ export function executeInternalTaskAction(db: KernelDb, command: string, input: 
     case "record_task_steering_refusal": return executeTaskSteeringRefusal(db, input, trace);
     case "record_task_cancel_outcome": return executeTaskCancelOutcome(db, input, trace);
     case "request_second_opinion": return executeSecondOpinion(db, input, trace);
+    case "governed_review_task": return executeGovernedReviewTask(db, input as Parameters<typeof executeGovernedReviewTask>[1], trace) as unknown as TaskGovernanceResult;
     default: throw new KernelError(`Unknown internal command "${command}"`);
   }
 }
@@ -278,6 +280,7 @@ const INTERNAL_TASK_ACTIONS = new Set([
   "record_task_steering_refusal",
   "record_task_cancel_outcome",
   "request_second_opinion",
+  "governed_review_task",
 ]);
 
 function objectId(cmd: TransitionCommand, input: Record<string, unknown>): string {

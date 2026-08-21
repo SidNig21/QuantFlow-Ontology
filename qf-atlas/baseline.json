@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "4fa7dc4",
+  "updated": "e68be73",
   "findings": {
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into": {
       "kind": "governance-violation",
@@ -14,9 +14,10 @@
       "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
       "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
       "review_or_expiry": null,
-      "state": "open",
+      "state": "resolved",
       "first_seen": "4fa7dc4",
-      "last_seen": "4fa7dc4"
+      "last_seen": "4fa7dc4",
+      "resolved_at": "e68be73"
     },
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into": {
       "kind": "governance-violation",
@@ -30,9 +31,10 @@
       "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
       "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
       "review_or_expiry": null,
-      "state": "open",
+      "state": "resolved",
       "first_seen": "4fa7dc4",
-      "last_seen": "4fa7dc4"
+      "last_seen": "4fa7dc4",
+      "resolved_at": "e68be73"
     },
     "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update": {
       "kind": "governance-violation",
@@ -46,9 +48,10 @@
       "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
       "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
       "review_or_expiry": null,
-      "state": "open",
+      "state": "resolved",
       "first_seen": "4fa7dc4",
-      "last_seen": "4fa7dc4"
+      "last_seen": "4fa7dc4",
+      "resolved_at": "e68be73"
     }
   },
   "exceptions": {}

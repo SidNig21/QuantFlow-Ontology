@@ -576,6 +576,83 @@ function createAgentSession(
   return creationResult(cmd, session_id, cmd.event, state, "starting");
 }
 
+export type TaskWrite = {
+  task_id: string;
+  title: string;
+  description: string;
+  assignee_session_id: string;
+  delegator_session_id: string;
+};
+
+/** Shared create_task identity validation for every transaction-scoped Task writer. */
+export function validateTaskIdentity(db: KernelDb, fields: Pick<TaskWrite, "assignee_session_id" | "delegator_session_id">): void {
+  const assignee = db.query(`SELECT id, status FROM agent_session WHERE id = ?`).get(fields.assignee_session_id) as { id: string; status: string } | null;
+  if (!assignee) throw new UnknownAssigneeSessionError(fields.assignee_session_id);
+  if (assignee.status !== "running") throw new KernelError(`create_task assignee_session_id must name a running session: ${fields.assignee_session_id}`);
+
+  const delegator = db.query(`SELECT id, status FROM agent_session WHERE id = ?`).get(fields.delegator_session_id) as { id: string; status: string } | null;
+  if (!delegator) throw new KernelError(`unknown trusted actor_session_id: ${fields.delegator_session_id}`);
+  if (delegator.status !== "running") throw new KernelError(`create_task trusted actor_session_id must name a running session: ${fields.delegator_session_id}`);
+}
+
+/** Shared create_task validation for every transaction-scoped Task writer. */
+export function validateTaskWrite(db: KernelDb, fields: TaskWrite): void {
+  if (!fields.task_id) throw new KernelError('create_task requires non-empty "task_id" (guest-minted, adopted)');
+  if (!fields.title) throw new KernelError('create_task requires non-empty "title"');
+  if (!fields.description) throw new KernelError('create_task requires non-empty "description"');
+  if (!fields.assignee_session_id) throw new KernelError('create_task requires non-empty "assignee_session_id"');
+  if (!fields.delegator_session_id) throw new KernelError("create_task requires trusted actor_session_id context");
+  validateTaskIdentity(db, fields);
+}
+
+/**
+ * Write one Task and its canonical identity links inside the caller's transaction.
+ * This deliberately does not start a transaction of its own.
+ */
+export function writeTaskInTransaction(db: KernelDb, fields: TaskWrite, trace: TrustedExecutionContext, command = "create_task"): { state: Record<string, unknown>; event_id: string } {
+  validateTaskWrite(db, fields);
+  const created_at = new Date().toISOString();
+  db.query(
+    `INSERT INTO task (id, created_at, title, description, status)
+     VALUES (?, ?, ?, ?, ?)`
+  ).run(fields.task_id, created_at, fields.title, fields.description, "open");
+  writeLinks(db, "task", fields.task_id, [
+    { kind: "delegated_by", to_id: fields.delegator_session_id },
+    { kind: "assigned_to", to_id: fields.assignee_session_id },
+  ]);
+  const event_id = appendEvent(db, {
+    type: "task.created",
+    object_type: "task",
+    object_id: fields.task_id,
+    payload: {
+      command,
+      status: "open",
+      title: fields.title,
+      description: fields.description,
+      delegator_session_id: fields.delegator_session_id,
+      assignee_session_id: fields.assignee_session_id,
+    },
+    trace_id: trace.trace_id,
+  });
+  const state = db.query(`SELECT * FROM task WHERE id = ?`).get(fields.task_id) as Record<string, unknown>;
+  return { state, event_id };
+}
+
+/** Cancel one matching open Task inside the caller's transaction and receipt the mutation. */
+export function cancelTaskInTransaction(db: KernelDb, taskId: string, trace: TrustedExecutionContext, payload: Record<string, unknown>): string {
+  const row = db.query(`SELECT status FROM task WHERE id = ?`).get(taskId) as { status: string } | null;
+  if (!row) throw new KernelError("review Task not found");
+  if (row.status !== "open") throw new KernelError("review Task is no longer open");
+  db.query(`UPDATE task SET status = 'cancelled' WHERE id = ?`).run(taskId);
+  return appendEvent(db, {
+    type: "task.cancelled",
+    object_type: "task",
+    object_id: taskId,
+    payload: { command: "governed_review_task", task_id: taskId, ...payload },
+    trace_id: trace.trace_id,
+  });
+}
+
 function createTask(
   db: KernelDb,
   cmd: CreationCommand,
@@ -611,61 +688,16 @@ function createTask(
   }
 
   const delegator_session_id = trace.actor_session_id;
-  if (!delegator_session_id) {
-    throw new KernelError("create_task requires trusted actor_session_id context");
-  }
+  if (!delegator_session_id) throw new KernelError("create_task requires trusted actor_session_id context");
+  validateTaskIdentity(db, { assignee_session_id, delegator_session_id });
 
-  const session = db
-    .query(`SELECT id, status FROM agent_session WHERE id = ?`)
-    .get(assignee_session_id) as { id: string; status: string } | null;
-  if (!session) {
-    throw new UnknownAssigneeSessionError(assignee_session_id);
-  }
-  if (session.status !== "running") {
-    throw new KernelError(
-      `create_task assignee_session_id must name a running session: ${assignee_session_id}`,
-    );
-  }
-  const delegator = db
-    .query(`SELECT id, status FROM agent_session WHERE id = ?`)
-    .get(delegator_session_id) as { id: string; status: string } | null;
-  if (!delegator) {
-    throw new KernelError(`unknown trusted actor_session_id: ${delegator_session_id}`);
-  }
-  if (delegator.status !== "running") {
-    throw new KernelError(
-      `create_task trusted actor_session_id must name a running session: ${delegator_session_id}`,
-    );
-  }
-
-  const identityLinks: LinkSpec[] = [
-    { kind: "delegated_by", to_id: delegator_session_id },
-    { kind: "assigned_to", to_id: assignee_session_id },
-  ];
-
-  const state = commitCreation(db, {
-    object_type: cmd.object_type,
-    object_id: task_id,
-    event: cmd.event,
+  const tx = db.transaction(() => writeTaskInTransaction(
+    db,
+    { task_id, title, description, assignee_session_id, delegator_session_id },
     trace,
-    links: identityLinks,
-    payload: {
-      command: cmd.action,
-      status: "open",
-      title,
-      description,
-      delegator_session_id,
-      assignee_session_id,
-    },
-    insert: () => {
-      const created_at = new Date().toISOString();
-      db.query(
-        `INSERT INTO task (id, created_at, title, description, status)
-         VALUES (?, ?, ?, ?, ?)`,
-      ).run(task_id, created_at, title, description, "open");
-    },
-  });
-  return creationResult(cmd, task_id, cmd.event, state, "open");
+    cmd.action,
+  ).state);
+  return creationResult(cmd, task_id, cmd.event, tx(), "open");
 }
 
 const CONNECTION_KINDS = new Set(["data", "control", "view"]);

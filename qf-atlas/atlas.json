@@ -1,14 +1,14 @@
 {
   "meta": {
-    "branch": "atlas-strip-1",
-    "commit": "4fa7dc4",
+    "branch": "wo-R16",
+    "commit": "e68be73",
     "generatedAt": "2026-08-21",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "cfbc977fd986d359"
+    "fingerprint": "22b0087f29139677"
   },
   "stats": {
-    "live": 107,
+    "live": 110,
     "unreached": 0,
     "unused": 13,
     "dead": 0,
@@ -33,8 +33,8 @@
     },
     "hop4": {
       "handlers": 123,
-      "indexed": 1105,
-      "downgradedFromCheats": 17,
+      "indexed": 1114,
+      "downgradedFromCheats": 20,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 14,
       "cheatsAudit": [
@@ -121,59 +121,58 @@
           "channel": "qf:review:request",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "createReviewTask (packages/qf-kernel/src/governed-review.ts)",
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
-            "markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)",
-            "persistAttempt (packages/qf-kernel/src/governed-review.ts)",
-            "persistRefusal (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
           ],
-          "hardRed": true,
+          "hardRed": false,
           "from": "cheats",
-          "hop4": "cheats",
-          "status": "cheats"
+          "hop4": "write-door",
+          "status": "live"
         },
         {
           "channel": "qf:review:revision",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "createReviewTask (packages/qf-kernel/src/governed-review.ts)",
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
-            "persistAttempt (packages/qf-kernel/src/governed-review.ts)",
-            "persistRefusal (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
           ],
-          "hardRed": true,
+          "hardRed": false,
           "from": "cheats",
-          "hop4": "cheats",
-          "status": "cheats"
+          "hop4": "write-door",
+          "status": "live"
         },
         {
           "channel": "qf:review:secondCritic",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "createReviewTask (packages/qf-kernel/src/governed-review.ts)",
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
-            "markGovernedDelivery (packages/qf-kernel/src/governed-review.ts)",
-            "persistAttempt (packages/qf-kernel/src/governed-review.ts)",
-            "persistRefusal (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
           ],
-          "hardRed": true,
+          "hardRed": false,
           "from": "cheats",
-          "hop4": "cheats",
-          "status": "cheats"
+          "hop4": "write-door",
+          "status": "live"
         },
         {
           "channel": "qf:sessions:cancel",
@@ -310,8 +309,8 @@
     "northStar": {
       "loops": 11,
       "staticConnected": 9,
-      "staticDegraded": 1,
-      "staticBroken": 1,
+      "staticDegraded": 2,
+      "staticBroken": 0,
       "gateCovered": 11,
       "gatePartial": 0,
       "gateUncovered": 0,
@@ -321,17 +320,17 @@
     },
     "writeDoor": {
       "state": "partial",
-      "actions": 41,
+      "actions": 42,
       "dispatched": 17,
       "implementations": 17,
       "doorFiles": 6,
-      "unmapped": 24,
+      "unmapped": 25,
       "unresolved": 0,
       "divergent": 8
     },
     "unexplainedCoverage": 0,
     "stripCandidates": 13,
-    "violations": 17,
+    "violations": 9,
     "governanceUnknown": 3,
     "legacyLeads": 9,
     "nodes": 106,
@@ -339,13 +338,13 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 46,
+    "undecided": 41,
     "allClear": false,
     "decisions": {
-      "total": 54,
-      "undecided": 46,
+      "total": 46,
+      "undecided": 41,
       "keep": 2,
-      "repair": 6,
+      "repair": 3,
       "remove": 0,
       "accepted": 0,
       "incomplete": 3,
@@ -353,7 +352,7 @@
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 26,
+      "founder-decision": 21,
       "ast-coverage": 3,
       "package-proof": 17
     }
@@ -2983,29 +2982,29 @@
       "id": "0:packages/qf-kernel/src::create",
       "layer": 0,
       "name": "create.ts",
-      "kb": 49.2,
+      "kb": 51.8,
       "x": 1.01,
       "z": 0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
-      "dml": 13,
+      "dml": 14,
       "executes": 0,
       "files": [
         {
           "path": "packages/qf-kernel/src/create.ts",
-          "kb": 49.2,
+          "kb": 51.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 13,
+          "dml": 14,
           "dmlLines": [
             357,
             475,
             571,
-            663,
-            742,
-            772
+            616,
+            646,
+            774
           ],
           "executes": 0
         }
@@ -3133,7 +3132,7 @@
       "id": "0:packages/qf-kernel/src::execute",
       "layer": 0,
       "name": "execute.ts",
-      "kb": 30.9,
+      "kb": 31.2,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -3144,18 +3143,18 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/execute.ts",
-          "kb": 30.9,
+          "kb": 31.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
           "dml": 7,
           "dmlLines": [
-            119,
-            154,
+            120,
             155,
-            157,
-            246,
-            247
+            156,
+            158,
+            247,
+            248
           ],
           "executes": 0
         }
@@ -3168,31 +3167,31 @@
       "id": "0:packages/qf-kernel/src::governed",
       "layer": 0,
       "name": "governed-review.ts",
-      "kb": 37.8,
+      "kb": 40,
       "x": -0.23,
       "z": 1.3,
       "status": "alert",
       "spawns": 0,
       "writes": 1,
-      "dml": 28,
-      "executes": 0,
+      "dml": 25,
+      "executes": 4,
       "files": [
         {
           "path": "packages/qf-kernel/src/governed-review.ts",
-          "kb": 37.8,
+          "kb": 40,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 28,
+          "dml": 25,
           "dmlLines": [
-            99,
-            104,
-            119,
-            132,
-            143,
-            150
+            101,
+            106,
+            121,
+            134,
+            145,
+            152
           ],
-          "executes": 0
+          "executes": 4
         }
       ],
       "strip": [],
@@ -3200,15 +3199,15 @@
         {
           "kind": "outside-write-door",
           "scope": "product",
-          "what": "28 SQL statements outside execute()",
+          "what": "25 SQL statements outside execute()",
           "where": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            99,
-            104,
-            119,
-            132,
-            143,
-            150
+            101,
+            106,
+            121,
+            134,
+            145,
+            152
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -3356,7 +3355,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 513.8,
+      "kb": 514.9,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3665,6 +3664,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/governed-review.ts",
+          "kb": 4.3,
+          "spawns": 1,
+          "spawnsLive": 1,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/no-canvas-domain-writes.ts",
           "kb": 4.3,
           "spawns": 0,
@@ -3730,16 +3739,6 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 3,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/governed-review.ts",
-          "kb": 3.2,
-          "spawns": 1,
-          "spawnsLive": 1,
-          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -4673,7 +4672,7 @@
       "id": "1:qf-kernel-schema/src/ontology",
       "layer": 1,
       "name": "ontology/",
-      "kb": 59.2,
+      "kb": 60.5,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -4694,7 +4693,7 @@
         },
         {
           "path": "qf-kernel-schema/src/ontology/agent.ts",
-          "kb": 20,
+          "kb": 21.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -7537,14 +7536,10 @@
       "members": [
         {
           "channel": "qf:review:request",
-          "status": "cheats",
-          "hop4": "cheats",
-          "backedBy": [
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
-          ],
-          "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+          "status": "live",
+          "hop4": "write-door",
+          "backedBy": null,
+          "why": null
         },
         {
           "channel": "qf:review:projection",
@@ -7555,50 +7550,28 @@
         },
         {
           "channel": "qf:review:revision",
-          "status": "cheats",
-          "hop4": "cheats",
-          "backedBy": [
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into"
-          ],
-          "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into"
+          "status": "live",
+          "hop4": "write-door",
+          "backedBy": null,
+          "why": null
         },
         {
           "channel": "qf:review:secondCritic",
-          "status": "cheats",
-          "hop4": "cheats",
-          "backedBy": [
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-            "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
-          ],
-          "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+          "status": "live",
+          "hop4": "write-door",
+          "backedBy": null,
+          "why": null
         }
       ],
       "evidence": {
         "static": {
-          "state": "broken",
-          "detail": "0/4 channels live",
+          "state": "degraded",
+          "detail": "3/4 channels live",
           "broken": [
-            {
-              "channel": "qf:review:request",
-              "status": "cheats",
-              "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
-            },
             {
               "channel": "qf:review:projection",
               "status": "unused",
               "why": "breaks at renderer"
-            },
-            {
-              "channel": "qf:review:revision",
-              "status": "cheats",
-              "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into"
-            },
-            {
-              "channel": "qf:review:secondCritic",
-              "status": "cheats",
-              "why": "reaches createReviewTask(), outside the governed write door — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
             }
           ]
         },
@@ -8145,8 +8118,8 @@
       "members": [
         {
           "channel": "qf:review:request",
-          "status": "cheats",
-          "hop4": "cheats",
+          "status": "live",
+          "hop4": "write-door",
           "hops": [
             {
               "layer": "renderer",
@@ -8165,16 +8138,16 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into"
+              "present": true,
+              "detail": "execute() via requestGovernedReview"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:review:revision",
-          "status": "cheats",
-          "hop4": "cheats",
+          "status": "live",
+          "hop4": "write-door",
           "hops": [
             {
               "layer": "renderer",
@@ -8193,16 +8166,16 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into"
+              "present": true,
+              "detail": "execute() via requestRevision"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:review:secondCritic",
-          "status": "cheats",
-          "hop4": "cheats",
+          "status": "live",
+          "hop4": "write-door",
           "hops": [
             {
               "layer": "renderer",
@@ -8221,11 +8194,11 @@
             },
             {
               "layer": "kernel",
-              "present": false,
-              "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into"
+              "present": true,
+              "detail": "execute() via requestSecondCritic"
             }
           ],
-          "breakAt": "kernel"
+          "breakAt": null
         },
         {
           "channel": "qf:review:projection",
@@ -8256,9 +8229,9 @@
           "breakAt": "renderer"
         }
       ],
-      "worst": "cheats",
-      "health": "broken",
-      "brokenCount": 4,
+      "worst": "unused",
+      "health": "degraded",
+      "brokenCount": 1,
       "total": 4
     },
     {
@@ -9480,9 +9453,9 @@
     {
       "path": "packages/qf-kernel/src/create.ts",
       "status": "indexed",
-      "indexedFns": 25,
-      "sqlInText": 13,
-      "sqlIndexed": 13,
+      "indexedFns": 29,
+      "sqlInText": 14,
+      "sqlIndexed": 14,
       "sqlUnrecognised": 0
     },
     {
@@ -9544,9 +9517,9 @@
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
       "status": "indexed",
-      "indexedFns": 31,
-      "sqlInText": 28,
-      "sqlIndexed": 28,
+      "indexedFns": 36,
+      "sqlInText": 25,
+      "sqlIndexed": 25,
       "sqlUnrecognised": 0
     },
     {
@@ -10948,7 +10921,7 @@
   ],
   "writeDoor": {
     "state": "partial",
-    "reason": "24 of 41 schema actions have no dispatch entry, so the table read is incomplete",
+    "reason": "25 of 42 schema actions have no dispatch entry, so the table read is incomplete",
     "actions": [
       "block_agent_session",
       "cancel_agent_session",
@@ -10969,6 +10942,7 @@
       "execute_deterministic_run",
       "fail_agent_session",
       "fail_run",
+      "governed_review_task",
       "grade_ticket",
       "ingest_market_batch",
       "observe_ticket",
@@ -10997,112 +10971,112 @@
         {
           "impl": "publishArtifact",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1510
+          "line": 1542
         }
       ],
       "create_agent_session": [
         {
           "impl": "createAgentSession",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1511
+          "line": 1543
         }
       ],
       "create_task": [
         {
           "impl": "createTask",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1512
+          "line": 1544
         }
       ],
       "create_connection": [
         {
           "impl": "createConnection",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1513
+          "line": 1545
         }
       ],
       "delete_connection": [
         {
           "impl": "deleteConnection",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1514
+          "line": 1546
         }
       ],
       "register_agent_definition": [
         {
           "impl": "registerAgentDefinition",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1515
+          "line": 1547
         }
       ],
       "create_hypothesis": [
         {
           "impl": "createHypothesis",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1516
+          "line": 1548
         }
       ],
       "register_dataset_version": [
         {
           "impl": "registerDatasetVersion",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1517
+          "line": 1549
         }
       ],
       "create_run": [
         {
           "impl": "createRun",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1518
+          "line": 1550
         }
       ],
       "execute_deterministic_run": [
         {
           "impl": "executeDeterministicRun",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1519
+          "line": 1551
         }
       ],
       "record_evaluation": [
         {
           "impl": "recordEvaluation",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1520
+          "line": 1552
         }
       ],
       "create_mission": [
         {
           "impl": "createMission",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1521
+          "line": 1553
         }
       ],
       "create_ticket": [
         {
           "impl": "createTicket",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1522
+          "line": 1554
         }
       ],
       "observe_ticket": [
         {
           "impl": "observeTicket",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1523
+          "line": 1555
         }
       ],
       "register_venue": [
         {
           "impl": "registerVenue",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1524
+          "line": 1556
         }
       ],
       "schedule_market_event": [
         {
           "impl": "scheduleMarketEvent",
           "file": "packages/qf-kernel/src/create.ts",
-          "line": 1525
+          "line": 1557
         }
       ],
       "ingest_market_batch": [
@@ -11116,7 +11090,7 @@
     "dispatcherFiles": [
       {
         "file": "packages/qf-kernel/src/execute.ts",
-        "line": 459
+        "line": 462
       }
     ],
     "implementations": {
@@ -11137,52 +11111,52 @@
       },
       "createTask": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 579,
+        "line": 656,
         "kind": "function"
       },
       "createConnection": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 679,
+        "line": 711,
         "kind": "function"
       },
       "deleteConnection": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 750,
+        "line": 782,
         "kind": "function"
       },
       "createHypothesis": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 800,
+        "line": 832,
         "kind": "function"
       },
       "registerDatasetVersion": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 843,
+        "line": 875,
         "kind": "function"
       },
       "createRun": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1006,
+        "line": 1038,
         "kind": "function"
       },
       "recordEvaluation": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1069,
+        "line": 1101,
         "kind": "function"
       },
       "createMission": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1300,
+        "line": 1332,
         "kind": "function"
       },
       "createTicket": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1443,
+        "line": 1475,
         "kind": "function"
       },
       "observeTicket": {
         "file": "packages/qf-kernel/src/create.ts",
-        "line": 1475,
+        "line": 1507,
         "kind": "function"
       },
       "executeDeterministicRun": {
@@ -11225,6 +11199,7 @@
       "complete_task",
       "fail_agent_session",
       "fail_run",
+      "governed_review_task",
       "grade_ticket",
       "reassign_task",
       "record_task_cancel_outcome",
@@ -11242,11 +11217,11 @@
     ],
     "unresolvedImplementations": [],
     "stats": {
-      "actions": 41,
+      "actions": 42,
       "dispatched": 17,
       "implementations": 17,
       "doorFiles": 6,
-      "unmapped": 24,
+      "unmapped": 25,
       "unresolved": 0
     },
     "declaredAllowlist": [
@@ -11381,24 +11356,14 @@
         {
           "file": "packages/qf-kernel/src/execute.ts",
           "weak": [
-            "exports executeTaskSteering() at line 111",
-            "exports executeTaskSteeringDelivery() at line 173",
-            "exports executeTaskSteeringRefusal() at line 196"
+            "exports executeTaskSteering() at line 112",
+            "exports executeTaskSteeringDelivery() at line 174",
+            "exports executeTaskSteeringRefusal() at line 197"
           ],
           "strong": [
-            "UPDATE task at line 119",
-            "UPDATE task at line 157",
-            "INSERT INTO task at line 246"
-          ],
-          "weight": "strong"
-        },
-        {
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "weak": [],
-          "strong": [
-            "INSERT INTO task at line 270",
-            "UPDATE task at line 311",
-            "UPDATE task at line 488"
+            "UPDATE task at line 120",
+            "UPDATE task at line 158",
+            "INSERT INTO task at line 247"
           ],
           "weight": "strong"
         },
@@ -11406,7 +11371,16 @@
           "file": "packages/qf-kernel/src/create.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO task at line 663"
+            "INSERT INTO task at line 616",
+            "UPDATE task at line 646"
+          ],
+          "weight": "strong"
+        },
+        {
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "weak": [],
+          "strong": [
+            "UPDATE task at line 591"
           ],
           "weight": "strong"
         },
@@ -11504,13 +11478,13 @@
         {
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [
-            "exports ensureGovernedReviewSchema() at line 97",
-            "exports requestGovernedReview() at line 277",
-            "exports governedReviewProjection() at line 551"
+            "exports ensureGovernedReviewSchema() at line 99",
+            "exports executeGovernedReviewTask() at line 405",
+            "exports requestGovernedReview() at line 412"
           ],
           "strong": [
-            "INSERT INTO evaluation at line 471",
-            "UPDATE evaluation at line 483"
+            "INSERT INTO evaluation at line 574",
+            "UPDATE evaluation at line 586"
           ],
           "weight": "strong"
         },
@@ -11518,7 +11492,7 @@
           "file": "packages/qf-kernel/src/create.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO evaluation at line 1259"
+            "INSERT INTO evaluation at line 1291"
           ],
           "weight": "strong"
         },
@@ -11551,7 +11525,7 @@
         {
           "file": "packages/qf-kernel/src/execute.ts",
           "weak": [
-            "exports executeSecondOpinion() at line 226"
+            "exports executeSecondOpinion() at line 227"
           ],
           "strong": [],
           "weight": "weak"
@@ -11576,7 +11550,7 @@
           "weak": [],
           "strong": [
             "INSERT INTO artifact at line 357",
-            "INSERT INTO artifact at line 1220"
+            "INSERT INTO artifact at line 1252"
           ],
           "weight": "strong"
         },
@@ -11592,7 +11566,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 407"
+            "INSERT INTO artifact at line 510"
           ],
           "weight": "strong"
         },
@@ -19130,24 +19104,18 @@
     },
     {
       "path": "packages/qf-kernel/src/governed-review.ts",
-      "worst": "partial",
+      "worst": "indexed",
       "imports": "indexed",
-      "reach": "partial",
-      "blockers": {
-        "reach": "ast-coverage",
-        "persistence": "ast-coverage"
-      },
+      "reach": "indexed",
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "partial",
+      "persistence": "indexed",
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "indexed",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 308 in markGovernedDelivery) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "persistence": "every SQL site resolves to a named symbol, but 1 call(s) with a computed callee (line 308 in markGovernedDelivery) — the callee is a value, so this edge cannot be followed — the governance verdict for this file rests on a call graph with a hole in it",
         "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
@@ -24696,8 +24664,8 @@
     },
     "persistence": {
       "not-applicable": 492,
-      "partial": 26,
-      "indexed": 21
+      "partial": 25,
+      "indexed": 22
     },
     "lifetime": {
       "not-applicable": 473,
@@ -24716,8 +24684,8 @@
     },
     "reach": {
       "unsupported": 305,
-      "indexed": 232,
-      "partial": 2
+      "indexed": 233,
+      "partial": 1
     }
   },
   "unexplainedCoverage": [],
@@ -27456,9 +27424,10 @@
       "importers": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
-      "importerCount": 3,
+      "importerCount": 4,
       "imports": [
         "qf-kernel-schema/src/commands.ts",
         "packages/qf-kernel/src/db.ts",
@@ -27576,9 +27545,10 @@
       "reach": "reachable",
       "importers": [
         "packages/qf-kernel/src/index.ts",
-        "packages/qf-kernel/src/portable.ts"
+        "packages/qf-kernel/src/portable.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
-      "importerCount": 2,
+      "importerCount": 3,
       "imports": [
         "qf-kernel-schema/src/schema.ts",
         "qf-kernel-schema/src/commands.ts",
@@ -27593,7 +27563,7 @@
         "packages/qf-kernel/src/results.ts",
         "packages/qf-kernel/src/trace.ts"
       ],
-      "importCount": 13
+      "importCount": 14
     },
     {
       "path": "packages/qf-kernel/src/fixtures.ts",
@@ -27613,17 +27583,20 @@
       "importers": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
-        "packages/qf-kernel/src/create.ts"
+        "packages/qf-kernel/src/create.ts",
+        "packages/qf-kernel/src/execute.ts"
       ],
-      "importerCount": 3,
+      "importerCount": 4,
       "imports": [
         "packages/qf-kernel/src/db.ts",
+        "packages/qf-kernel/src/create.ts",
+        "packages/qf-kernel/src/execute.ts",
         "packages/qf-kernel/src/events.ts",
         "packages/qf-kernel/src/errors.ts",
         "packages/qf-kernel/src/hash.ts",
         "packages/qf-kernel/src/resolve-artifact-root.ts"
       ],
-      "importCount": 5
+      "importCount": 7
     },
     {
       "path": "packages/qf-kernel/src/hash.ts",
@@ -32545,7 +32518,8 @@
       "directDependents": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveDependents": [
         "qa/gates/agent-path/run.ts",
@@ -32583,8 +32557,7 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts"
+        "packages/qf-kernel/src/create.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32617,6 +32590,7 @@
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts",
         "qa/gates/agent-path/run.ts",
         "qa/gates/artifact-root/run.ts",
         "qa/gates/boot-reconcile/run.ts",
@@ -32651,8 +32625,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32789,6 +32762,7 @@
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts",
         "qa/gates/agent-path/run.ts",
         "qa/gates/artifact-root/run.ts",
         "qa/gates/boot-reconcile/run.ts",
@@ -32823,8 +32797,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -32964,7 +32937,8 @@
       "reach": "reachable",
       "directDependents": [
         "packages/qf-kernel/src/index.ts",
-        "packages/qf-kernel/src/portable.ts"
+        "packages/qf-kernel/src/portable.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveDependents": [
         "qa/gates/agent-path/run.ts",
@@ -33002,9 +32976,8 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "packages/qf-kernel/src/create.ts",
+        "packages/qf-kernel/src/execute.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33020,7 +32993,8 @@
         "packages/qf-kernel/src/pipeline.ts",
         "packages/qf-kernel/src/results.ts",
         "packages/qf-kernel/src/trace.ts",
-        "packages/qf-kernel/src/ontology-read-receipt.ts"
+        "packages/qf-kernel/src/ontology-read-receipt.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "affectedWires": [],
       "affectedLoops": [],
@@ -33082,7 +33056,8 @@
       "directDependents": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
-        "packages/qf-kernel/src/create.ts"
+        "packages/qf-kernel/src/create.ts",
+        "packages/qf-kernel/src/execute.ts"
       ],
       "transitiveDependents": [
         "qa/gates/agent-path/run.ts",
@@ -33120,12 +33095,13 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/execute.ts",
-        "qa/run.ts"
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
         "packages/qf-kernel/src/db.ts",
+        "packages/qf-kernel/src/create.ts",
+        "packages/qf-kernel/src/execute.ts",
         "packages/qf-kernel/src/events.ts",
         "packages/qf-kernel/src/errors.ts",
         "packages/qf-kernel/src/hash.ts",
@@ -33286,7 +33262,61 @@
       "transitiveDependents": [
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
+        "packages/qf-kernel/src/governed-review.ts",
         "packages/qf-kernel/src/pipeline.ts",
+        "qa/gates/agent-path/run.ts",
+        "qa/gates/artifact-root/run.ts",
+        "qa/gates/boot-reconcile/run.ts",
+        "qa/gates/bovada-football/run.ts",
+        "qa/gates/dock-definition-launch/run.ts",
+        "qa/gates/dock-profile-identity/run.ts",
+        "qa/gates/dock-registry/run.ts",
+        "qa/gates/kernel-drift/run.ts",
+        "qa/gates/kernel-market-lineage.ts",
+        "qa/gates/kernel-task-delegation.ts",
+        "qa/gates/market-ingest/run.ts",
+        "qa/gates/team-composition.ts",
+        "qa/gates/windows-golden-seed.ts",
+        "species/critic-mock/register.ts",
+        "species/hermes/a2a-4tile-smoke.ts",
+        "species/hermes/host-admit-kernel.ts",
+        "species/hermes/register.ts",
+        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
+        "tools/qf-peer-bus/src/bus.ts",
+        "tools/qf-peer-bus/src/harness.ts",
+        "tools/qf-read-tools/src/artifact-root.ts",
+        "tools/qf-read-tools/src/gates/action-transport.ts",
+        "tools/qf-read-tools/src/gates/kernel-one-world.ts",
+        "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
+        "tools/qf-read-tools/src/gates/tool-discovery.ts",
+        "tools/qf-read-tools/src/harness.ts",
+        "tools/qf-read-tools/src/register.ts",
+        "tools/qf-read-tools/src/server.ts",
+        "tools/qf-vault-projection/src/cli.ts",
+        "tools/qf-vault-projection/src/gate.ts",
+        "tools/qf-vault-projection/src/project.ts"
+      ],
+      "transitiveTruncated": true,
+      "directDependencies": [
+        "qf-kernel-schema/src/link-endpoints.ts",
+        "packages/qf-kernel/src/db.ts",
+        "packages/qf-kernel/src/errors.ts"
+      ],
+      "affectedWires": [],
+      "affectedLoops": [],
+      "affectedProcesses": [],
+      "packaged": "bundled-via-import"
+    },
+    "packages/qf-kernel/src/market-context.ts": {
+      "reach": "reachable",
+      "directDependents": [
+        "packages/qf-kernel/src/create.ts"
+      ],
+      "transitiveDependents": [
+        "packages/qf-kernel/src/index.ts",
+        "packages/qf-kernel/src/portable.ts",
+        "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts",
         "qa/gates/agent-path/run.ts",
         "qa/gates/artifact-root/run.ts",
         "qa/gates/boot-reconcile/run.ts",
@@ -33322,63 +33352,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts"
-      ],
-      "transitiveTruncated": true,
-      "directDependencies": [
-        "qf-kernel-schema/src/link-endpoints.ts",
-        "packages/qf-kernel/src/db.ts",
-        "packages/qf-kernel/src/errors.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "packages/qf-kernel/src/market-context.ts": {
-      "reach": "reachable",
-      "directDependents": [
-        "packages/qf-kernel/src/create.ts"
-      ],
-      "transitiveDependents": [
-        "packages/qf-kernel/src/index.ts",
-        "packages/qf-kernel/src/portable.ts",
-        "packages/qf-kernel/src/execute.ts",
-        "qa/gates/agent-path/run.ts",
-        "qa/gates/artifact-root/run.ts",
-        "qa/gates/boot-reconcile/run.ts",
-        "qa/gates/bovada-football/run.ts",
-        "qa/gates/dock-definition-launch/run.ts",
-        "qa/gates/dock-profile-identity/run.ts",
-        "qa/gates/dock-registry/run.ts",
-        "qa/gates/kernel-drift/run.ts",
-        "qa/gates/kernel-market-lineage.ts",
-        "qa/gates/kernel-task-delegation.ts",
-        "qa/gates/market-ingest/run.ts",
-        "qa/gates/team-composition.ts",
-        "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
-        "species/hermes/a2a-4tile-smoke.ts",
-        "species/hermes/host-admit-kernel.ts",
-        "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
-        "tools/qf-read-tools/src/artifact-root.ts",
-        "tools/qf-read-tools/src/gates/action-transport.ts",
-        "tools/qf-read-tools/src/gates/kernel-one-world.ts",
-        "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
-        "tools/qf-read-tools/src/gates/tool-discovery.ts",
-        "tools/qf-read-tools/src/harness.ts",
-        "tools/qf-read-tools/src/register.ts",
-        "tools/qf-read-tools/src/server.ts",
-        "tools/qf-vault-projection/src/cli.ts",
-        "tools/qf-vault-projection/src/gate.ts",
-        "tools/qf-vault-projection/src/project.ts",
-        "collab-electron/scripts/package-lib/package-inspect.ts",
-        "tools/qf-bovada-football/src/artifact-store.ts",
-        "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33440,7 +33413,7 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33502,7 +33475,7 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33559,8 +33532,8 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts"
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/run.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34058,6 +34031,7 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/index.ts",
+        "packages/qf-kernel/src/governed-review.ts",
         "collab-electron/scripts/package-verify.ts",
         "qa/gates/bovada-football/run.ts",
         "qa/gates/package-closure/lazy-loader.ts",
@@ -40641,6 +40615,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -40885,6 +40867,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -41169,6 +41159,14 @@
             "candidates": [
               "collab-electron/src/main/kernel.ts",
               "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -41663,7 +41661,10 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
         ],
         "unresolvedCallees": [
           {
@@ -41744,6 +41745,14 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -42047,7 +42056,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -42413,6 +42422,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -42580,7 +42597,10 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
         ],
         "unresolvedCallees": [
           {
@@ -43075,6 +43095,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -43575,7 +43603,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -43703,8 +43731,8 @@
     {
       "channel": "qf:review:request",
       "method": "requestReview",
-      "status": "cheats",
-      "breakAt": "kernel",
+      "status": "live",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -43723,8 +43751,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into"
+          "present": true,
+          "detail": "execute() via requestGovernedReview"
         }
       ],
       "registeredAt": {
@@ -43738,39 +43766,15 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "cheats",
-        "viaDoor": "orchestrateNativeTuiAdmission",
-        "viaDml": "createReviewTask",
+        "kind": "write-door",
+        "viaDoor": "requestGovernedReview",
+        "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [
           {
-            "fn": "createReviewTask",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
             "fn": "ensureGovernedReviewSchema",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
-            "fn": "markGovernedDelivery",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 2,
-            "inline": false
-          },
-          {
-            "fn": "persistAttempt",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
-            "fn": "persistRefusal",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
             "inline": false
@@ -43905,51 +43909,22 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "get",
+            "name": "execute",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
+              "collab-electron/src/main/index.ts",
+              "packages/qf-kernel/src/execute.ts",
+              "tools/runtime-proof/agent-package/src/acp-main.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "query",
+            "name": "execute",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
+              "collab-electron/src/main/index.ts",
+              "packages/qf-kernel/src/execute.ts",
+              "tools/runtime-proof/agent-package/src/acp-main.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44287,120 +44262,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "parse",
             "from": "collab-electron/src/main/runtime-adapter.ts",
             "candidates": [
@@ -44601,33 +44462,33 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
-        "backedBy": [
-          "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-          "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-          "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
-        ],
-        "reachPath": [
+        "backedBy": null,
+        "reachPath": null,
+        "ungoverned": [
           {
-            "file": "collab-electron/src/main/kernel.ts",
-            "fn": "kernelRequestGovernedReview"
-          },
-          {
+            "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
-            "fn": "requestGovernedReview"
-          },
-          {
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "fn": "createReviewTask"
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
-        "why": "reaches createReviewTask() in packages/qf-kernel/src/governed-review.ts over 3 AST call hop(s), a confirmed hard red: persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+        "downgradedFrom": "cheats",
+        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
       "channel": "qf:review:revision",
       "method": "requestRevision",
-      "status": "cheats",
-      "breakAt": "kernel",
+      "status": "live",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -44646,8 +44507,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into"
+          "present": true,
+          "detail": "execute() via requestRevision"
         }
       ],
       "registeredAt": {
@@ -44661,33 +44522,15 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "cheats",
-        "viaDoor": null,
-        "viaDml": "createReviewTask",
+        "kind": "write-door",
+        "viaDoor": "requestRevision",
+        "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [
           {
-            "fn": "createReviewTask",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
             "fn": "ensureGovernedReviewSchema",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
-            "fn": "persistAttempt",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
-            "fn": "persistRefusal",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
             "inline": false
@@ -44737,35 +44580,12 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "get",
+            "name": "execute",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
+              "collab-electron/src/main/index.ts",
+              "packages/qf-kernel/src/execute.ts",
+              "tools/runtime-proof/agent-package/src/acp-main.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44853,70 +44673,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "parse",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
@@ -44925,32 +44681,33 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
-        "backedBy": [
-          "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-          "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into"
-        ],
-        "reachPath": [
+        "backedBy": null,
+        "reachPath": null,
+        "ungoverned": [
           {
-            "file": "collab-electron/src/main/kernel.ts",
-            "fn": "kernelRequestRevision"
-          },
-          {
+            "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
-            "fn": "requestRevision"
-          },
-          {
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "fn": "createReviewTask"
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
-        "why": "reaches createReviewTask() in packages/qf-kernel/src/governed-review.ts over 3 AST call hop(s), a confirmed hard red: persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into"
+        "downgradedFrom": "cheats",
+        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
       "channel": "qf:review:secondCritic",
       "method": "requestSecondCritic",
-      "status": "cheats",
-      "breakAt": "kernel",
+      "status": "live",
+      "breakAt": null,
       "hops": [
         {
           "layer": "renderer",
@@ -44969,8 +44726,8 @@
         },
         {
           "layer": "kernel",
-          "present": false,
-          "detail": "raw SQL via createReviewTask (packages/qf-kernel/src/governed-review.ts) — hard red persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into"
+          "present": true,
+          "detail": "execute() via requestSecondCritic"
         }
       ],
       "registeredAt": {
@@ -44984,39 +44741,15 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "cheats",
-        "viaDoor": "orchestrateNativeTuiAdmission",
-        "viaDml": "createReviewTask",
+        "kind": "write-door",
+        "viaDoor": "requestSecondCritic",
+        "viaDml": "ensureGovernedReviewSchema",
         "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [
           {
-            "fn": "createReviewTask",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
             "fn": "ensureGovernedReviewSchema",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
-            "fn": "markGovernedDelivery",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 2,
-            "inline": false
-          },
-          {
-            "fn": "persistAttempt",
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "hops": 3,
-            "inline": false
-          },
-          {
-            "fn": "persistRefusal",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
             "inline": false
@@ -45148,84 +44881,22 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "get",
+            "name": "execute",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
+              "collab-electron/src/main/index.ts",
+              "packages/qf-kernel/src/execute.ts",
+              "tools/runtime-proof/agent-package/src/acp-main.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "query",
+            "name": "execute",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "transaction",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "all",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
+              "collab-electron/src/main/index.ts",
+              "packages/qf-kernel/src/execute.ts",
+              "tools/runtime-proof/agent-package/src/acp-main.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -45588,95 +45259,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "parse",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "run",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "query",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "appendEvent",
-            "from": "packages/qf-kernel/src/governed-review.ts",
-            "candidates": [
-              "packages/qf-kernel/src/events.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "parse",
             "from": "collab-electron/src/main/runtime-adapter.ts",
             "candidates": [
@@ -45877,26 +45459,26 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
-        "backedBy": [
-          "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-          "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-          "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
-        ],
-        "reachPath": [
+        "backedBy": null,
+        "reachPath": null,
+        "ungoverned": [
           {
-            "file": "collab-electron/src/main/kernel.ts",
-            "fn": "kernelRequestSecondCritic"
-          },
-          {
+            "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
-            "fn": "requestSecondCritic"
-          },
-          {
-            "file": "packages/qf-kernel/src/governed-review.ts",
-            "fn": "createReviewTask"
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_invocation:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
+              "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
-        "why": "reaches createReviewTask() in packages/qf-kernel/src/governed-review.ts over 3 AST call hop(s), a confirmed hard red: persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into, persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+        "downgradedFrom": "cheats",
+        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -46183,6 +45765,14 @@
             "from": "collab-electron/src/main/pty.ts",
             "candidates": [
               "collab-electron/src/main/bovada-capture-rpc.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -46590,6 +46180,14 @@
             "from": "collab-electron/src/main/host-mounts.ts",
             "candidates": [
               "collab-electron/src/main/index.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -47373,6 +46971,14 @@
             "from": "collab-electron/src/main/host-mounts.ts",
             "candidates": [
               "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -48234,7 +47840,10 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
         ],
         "unresolvedCallees": [
           {
@@ -48453,6 +48062,14 @@
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -48887,7 +48504,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -48960,7 +48577,9 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask"
         ],
         "unresolvedCallees": [
           {
@@ -49073,6 +48692,14 @@
             "from": "collab-electron/src/main/kernel.ts",
             "candidates": [
               "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -49606,7 +49233,10 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
         ],
         "unresolvedCallees": [
           {
@@ -49737,6 +49367,14 @@
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -50040,7 +49678,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -50122,7 +49760,10 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
         ],
         "unresolvedCallees": [
           {
@@ -50644,6 +50285,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "get",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -51134,7 +50783,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -51202,7 +50851,10 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
-          "packages/qf-kernel/src/events.ts::appendEvent"
+          "packages/qf-kernel/src/events.ts::appendEvent",
+          "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
         ],
         "unresolvedCallees": [
           {
@@ -51333,6 +50985,14 @@
             "from": "packages/qf-kernel/src/read.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "executeGovernedReviewTask",
+            "from": "packages/qf-kernel/src/execute.ts",
+            "candidates": [
+              "packages/qf-kernel/src/governed-review.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -51636,7 +51296,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -55807,133 +55467,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            214
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "createReviewTask",
-      "table": "links",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "high",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 2,
-        "path": [
-          {
-            "from": "packages/qf-kernel/src/governed-review.ts:296",
-            "fn": "requestGovernedReview",
-            "calls": "createReviewTask"
-          },
-          {
-            "from": "collab-electron/src/main/kernel.ts:513",
-            "fn": "kernelRequestGovernedReview",
-            "calls": "requestGovernedReview"
-          }
-        ],
-        "alternatives": 2,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes the domain table `links` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            271
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:qf_review_task:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "createReviewTask",
-      "table": "qf_review_task",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 2,
-        "path": [
-          {
-            "from": "packages/qf-kernel/src/governed-review.ts:296",
-            "fn": "requestGovernedReview",
-            "calls": "createReviewTask"
-          },
-          {
-            "from": "collab-electron/src/main/kernel.ts:513",
-            "fn": "kernelRequestGovernedReview",
-            "calls": "requestGovernedReview"
-          }
-        ],
-        "alternatives": 2,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            272
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "createReviewTask",
-      "table": "task",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "high",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 2,
-        "path": [
-          {
-            "from": "packages/qf-kernel/src/governed-review.ts:296",
-            "fn": "requestGovernedReview",
-            "calls": "createReviewTask"
-          },
-          {
-            "from": "collab-electron/src/main/kernel.ts:513",
-            "fn": "kernelRequestGovernedReview",
-            "calls": "requestGovernedReview"
-          }
-        ],
-        "alternatives": 2,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            270
+            216
           ]
         }
       ]
@@ -55955,7 +55489,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:207",
+            "from": "packages/qf-kernel/src/governed-review.ts:209",
             "fn": "bindSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -55965,7 +55499,7 @@
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 7,
+        "alternatives": 5,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -55975,7 +55509,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            132
+            134
           ]
         }
       ]
@@ -55997,7 +55531,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:207",
+            "from": "packages/qf-kernel/src/governed-review.ts:209",
             "fn": "bindSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -56007,7 +55541,7 @@
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 7,
+        "alternatives": 5,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56017,7 +55551,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            119
+            121
           ]
         }
       ]
@@ -56039,7 +55573,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:207",
+            "from": "packages/qf-kernel/src/governed-review.ts:209",
             "fn": "bindSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -56049,7 +55583,7 @@
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 7,
+        "alternatives": 5,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56059,7 +55593,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            150
+            152
           ]
         }
       ]
@@ -56081,7 +55615,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:207",
+            "from": "packages/qf-kernel/src/governed-review.ts:209",
             "fn": "bindSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -56091,7 +55625,7 @@
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 7,
+        "alternatives": 5,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56101,7 +55635,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            143
+            145
           ]
         }
       ]
@@ -56123,7 +55657,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:207",
+            "from": "packages/qf-kernel/src/governed-review.ts:209",
             "fn": "bindSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -56133,7 +55667,7 @@
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 7,
+        "alternatives": 5,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56143,7 +55677,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            99
+            101
           ]
         }
       ]
@@ -56165,7 +55699,7 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:207",
+            "from": "packages/qf-kernel/src/governed-review.ts:209",
             "fn": "bindSourceWork",
             "calls": "ensureGovernedReviewSchema"
           },
@@ -56175,7 +55709,7 @@
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 7,
+        "alternatives": 5,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56185,202 +55719,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            104
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_receipt:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "markGovernedDelivery",
-      "table": "qf_review_receipt",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 1,
-        "path": [
-          {
-            "from": "collab-electron/src/main/kernel.ts:517",
-            "fn": "kernelMarkGovernedDelivery",
-            "calls": "markGovernedDelivery"
-          }
-        ],
-        "alternatives": 0,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_receipt`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            313
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_task:update",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "markGovernedDelivery",
-      "table": "qf_review_task",
-      "verb": "UPDATE",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 1,
-        "path": [
-          {
-            "from": "collab-electron/src/main/kernel.ts:517",
-            "fn": "kernelMarkGovernedDelivery",
-            "calls": "markGovernedDelivery"
-          }
-        ],
-        "alternatives": 0,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_task`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            310
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "markGovernedDelivery",
-      "table": "task",
-      "verb": "UPDATE",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "high",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 1,
-        "path": [
-          {
-            "from": "collab-electron/src/main/kernel.ts:517",
-            "fn": "kernelMarkGovernedDelivery",
-            "calls": "markGovernedDelivery"
-          }
-        ],
-        "alternatives": 0,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes the domain table `task` and is reachable from outside the write door (collab-electron/src/main/kernel.ts).",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            311
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistAttempt:qf_review_attempt:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "persistAttempt",
-      "table": "qf_review_attempt",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 2,
-        "path": [
-          {
-            "from": "packages/qf-kernel/src/governed-review.ts:287",
-            "fn": "requestGovernedReview",
-            "calls": "persistAttempt"
-          },
-          {
-            "from": "collab-electron/src/main/kernel.ts:513",
-            "fn": "kernelRequestGovernedReview",
-            "calls": "requestGovernedReview"
-          }
-        ],
-        "alternatives": 2,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_attempt`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            262
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistRefusal:qf_review_receipt:insert-into",
-      "classification": "governance-violation",
-      "disposition": "repair",
-      "fn": "persistRefusal",
-      "table": "qf_review_receipt",
-      "verb": "INSERT INTO",
-      "persistence": "non-domain-store",
-      "sourceClass": "product",
-      "reachability": "bypass",
-      "governance": "violation",
-      "confidence": "medium",
-      "reachProof": {
-        "corroborated": true,
-        "hops": 2,
-        "path": [
-          {
-            "from": "packages/qf-kernel/src/governed-review.ts:286",
-            "fn": "requestGovernedReview",
-            "calls": "persistRefusal"
-          },
-          {
-            "from": "collab-electron/src/main/kernel.ts:513",
-            "fn": "kernelRequestGovernedReview",
-            "calls": "requestGovernedReview"
-          }
-        ],
-        "alternatives": 2,
-        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
-      },
-      "blocker": null,
-      "why": "Writes `qf_review_receipt`, a table absent from the generated schema, reachable from outside the write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/governed-review.ts",
-          "lines": [
-            256
+            106
           ]
         }
       ]
@@ -56417,7 +55756,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            325
+            428
           ]
         }
       ]
@@ -56602,6 +55941,31 @@
       ]
     },
     {
+      "id": "persistence:packages/qf-kernel/src/create.ts:cancelTaskInTransaction:task:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "cancelTaskInTransaction",
+      "table": "task",
+      "verb": "UPDATE",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            646
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/create.ts:deleteConnection:connection:delete-from",
       "classification": "persistence-ok",
       "disposition": "keep",
@@ -56621,7 +55985,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            772
+            804
           ]
         }
       ]
@@ -56721,7 +56085,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            742
+            774
           ]
         }
       ]
@@ -56746,7 +56110,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            998
+            1030
           ]
         }
       ]
@@ -56771,7 +56135,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            835
+            867
           ]
         }
       ]
@@ -56796,7 +56160,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1336
+            1368
           ]
         }
       ]
@@ -56821,32 +56185,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1061
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/create.ts:insert:task:insert-into",
-      "classification": "persistence-ok",
-      "disposition": "keep",
-      "fn": "insert",
-      "table": "task",
-      "verb": "INSERT INTO",
-      "persistence": "domain-truth",
-      "sourceClass": "product",
-      "reachability": "inside-write-door",
-      "governance": "compliant",
-      "confidence": "high",
-      "reachProof": null,
-      "blocker": null,
-      "why": "Inside the declared write door.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "packages/qf-kernel/src/create.ts",
-          "lines": [
-            663
+            1093
           ]
         }
       ]
@@ -56871,7 +56210,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1425
+            1457
           ]
         }
       ]
@@ -56896,7 +56235,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1220
+            1252
           ]
         }
       ]
@@ -56921,7 +56260,32 @@
           "type": "static",
           "file": "packages/qf-kernel/src/create.ts",
           "lines": [
-            1259
+            1291
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/create.ts:writeTaskInTransaction:task:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "writeTaskInTransaction",
+      "table": "task",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "inside-write-door",
+      "governance": "compliant",
+      "confidence": "high",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Inside the declared write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/create.ts",
+          "lines": [
+            616
           ]
         }
       ]
@@ -57046,8 +56410,8 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            247,
-            248
+            248,
+            249
           ]
         }
       ]
@@ -57072,7 +56436,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            246
+            247
           ]
         }
       ]
@@ -57097,7 +56461,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            154
+            155
           ]
         }
       ]
@@ -57122,7 +56486,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            155
+            156
           ]
         }
       ]
@@ -57147,7 +56511,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            157
+            158
           ]
         }
       ]
@@ -57172,7 +56536,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/execute.ts",
           "lines": [
-            119
+            120
           ]
         }
       ]
@@ -57228,6 +56592,81 @@
       ]
     },
     {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:admitGovernedReviewTask:qf_review_task:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "admitGovernedReviewTask",
+      "table": "qf_review_task",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of admitGovernedReviewTask() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            374
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:deliverGovernedReviewTask:qf_review_receipt:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "deliverGovernedReviewTask",
+      "table": "qf_review_receipt",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of deliverGovernedReviewTask() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            397
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:deliverGovernedReviewTask:qf_review_task:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "deliverGovernedReviewTask",
+      "table": "qf_review_task",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of deliverGovernedReviewTask() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            393
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:insertArtifact:artifact:insert-into",
       "classification": "persistence-ok",
       "disposition": "keep",
@@ -57247,7 +56686,57 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            407
+            510
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistAttempt:qf_review_attempt:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "persistAttempt",
+      "table": "qf_review_attempt",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of persistAttempt() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            264
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistRefusal:qf_review_receipt:insert-into",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "persistRefusal",
+      "table": "qf_review_receipt",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of persistRefusal() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            258
           ]
         }
       ]
@@ -57272,7 +56761,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            471
+            574
           ]
         }
       ]
@@ -57297,7 +56786,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            483
+            586
           ]
         }
       ]
@@ -57322,9 +56811,9 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            473,
-            474,
-            481
+            576,
+            577,
+            584
           ]
         }
       ]
@@ -57349,7 +56838,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            467
+            570
           ]
         }
       ]
@@ -57374,7 +56863,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            485
+            588
           ]
         }
       ]
@@ -57399,7 +56888,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            480
+            583
           ]
         }
       ]
@@ -57424,7 +56913,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            490
+            593
           ]
         }
       ]
@@ -57449,7 +56938,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            487
+            590
           ]
         }
       ]
@@ -57474,7 +56963,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            488
+            591
           ]
         }
       ]
@@ -57780,15 +57269,15 @@
     {
       "kind": "outside-write-door",
       "scope": "product",
-      "what": "28 SQL statements outside execute()",
+      "what": "25 SQL statements outside execute()",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "lines": [
-        99,
-        104,
-        119,
-        132,
-        143,
-        150
+        101,
+        106,
+        121,
+        134,
+        145,
+        152
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -57978,16 +57467,16 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "15f5c87",
-      "generatedAt": "2026-08-21"
-    },
-    "to": {
-      "branch": "atlas-strip-1",
       "commit": "4fa7dc4",
       "generatedAt": "2026-08-21"
     },
+    "to": {
+      "branch": "wo-R16",
+      "commit": "e68be73",
+      "generatedAt": "2026-08-21"
+    },
     "verdict": "better",
-    "why": "46 improvement(s), nothing added or hidden",
+    "why": "48 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -58373,7 +57862,24 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "packages/qf-kernel/src/governed-review.ts",
+        "analyzer": "persistence",
+        "from": "partial",
+        "to": "indexed",
+        "direction": "better",
+        "reason": null
+      },
+      {
+        "path": "packages/qf-kernel/src/governed-review.ts",
+        "analyzer": "reach",
+        "from": "partial",
+        "to": "indexed",
+        "direction": "better",
+        "reason": null
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -58382,7 +57888,7 @@
       "changedConfidence": 0,
       "changedOwner": 0,
       "coverageWorse": 0,
-      "coverageBetter": 0,
+      "coverageBetter": 2,
       "undecidedFrom": 46,
       "undecidedTo": null
     }
@@ -58405,51 +57911,6 @@
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
       "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-      "kind": "persistence",
-      "what": "links insert into",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
-        "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
-        "review_or_expiry": null,
-        "complete": true,
-        "missing": []
-      }
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:qf_review_task:insert-into",
-      "kind": "persistence",
-      "what": "qf_review_task insert into",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-      "kind": "persistence",
-      "what": "task insert into",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
-        "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
-        "review_or_expiry": null,
-        "complete": true,
-        "missing": []
-      }
     },
     {
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -58500,60 +57961,6 @@
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
       "kind": "persistence",
       "what": "qf_review_task create table if not exists",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_receipt:insert-into",
-      "kind": "persistence",
-      "what": "qf_review_receipt insert into",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:qf_review_task:update",
-      "kind": "persistence",
-      "what": "qf_review_task update",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update",
-      "kind": "persistence",
-      "what": "task update",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "governed-review directly mutates Kernel-owned domain truth outside the declared governed write door. Preserve review behaviour and surface APIs; move the mutation behind the canonical governed action path.",
-        "remediation_trigger": "Resolved when no app-reachable governed-review path directly INSERTs or UPDATEs task/links outside the governed action path, affected focused gates pass, Atlas regenerates without these hard-red IDs, and the ratchet records them resolved.",
-        "review_or_expiry": null,
-        "complete": true,
-        "missing": []
-      }
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistAttempt:qf_review_attempt:insert-into",
-      "kind": "persistence",
-      "what": "qf_review_attempt insert into",
-      "where": "packages/qf-kernel/src/governed-review.ts",
-      "blocker": "founder-decision",
-      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
-      "verdict": "undecided"
-    },
-    {
-      "id": "persistence:packages/qf-kernel/src/governed-review.ts:persistRefusal:qf_review_receipt:insert-into",
-      "kind": "persistence",
-      "what": "qf_review_receipt insert into",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
@@ -58953,6 +58360,10 @@
       "verdict": "undecided"
     }
   ],
-  "decisionOrphans": [],
+  "decisionOrphans": [
+    "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
+    "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
+    "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+  ],
   "unexplainedUndecided": []
 }
