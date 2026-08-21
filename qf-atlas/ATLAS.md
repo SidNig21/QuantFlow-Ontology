@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `atlas-strip-1 @ 95acc32` on 2026-08-21 by
+> Generated from `atlas-strip-1 @ 83e6e5b` on 2026-08-21 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -39,7 +39,7 @@ flowchart TD
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
 
   R --> P --> M --> H
-  H -->|"write-door 15"| E
+  H -->|"write-door 8"| E
   E --> DB
   X["<b>raw SQL</b><br/>never enters a<br/>governed action"]
   H -->|"cheats 3"| X
@@ -48,7 +48,9 @@ flowchart TD
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 9"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 94"| RO
+  H -->|"read-only 92"| RO
+  U["<b>unknown</b><br/>module or handler coverage incomplete"]
+  H -->|"unknown 9"| U
   X -.->|"ungoverned — this is the breach"| DB
 
   QA["<b>QA · governance</b><br/>13 subsystems<br/>asserts the rules above"]
@@ -64,7 +66,7 @@ flowchart TD
   classDef truth fill:#10243d,stroke:#3b82f6,color:#e6f0ff
   class E,RO good
   class X,FS bad
-  class A,QA,SP,SC gray
+  class A,U,QA,SP,SC gray
   class DB,R,P,M,H truth
 ```
 
@@ -84,12 +86,46 @@ handler that mutates state without `execute()` is cheating even when it works.
 
 | At hop 4 the handler… | | Count |
 |---|---|---:|
-| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 15 |
+| `write-door` | reaches `execute()`, the sole sanctioned mutation path | 8 |
 | `cheats` | reaches SQL outside `execute()` **and** a function on that path carries a current hard red | 3 |
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
-| `unknown` | handler file not fully read; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 94 |
+| `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 9 |
+| `read-only` | no mutation seen | 92 |
+
+#### Module-resolution coverage boundaries (9)
+
+These wires are connected and non-blocking, but they are **not read-only**: no mutation
+proven; module resolution coverage is incomplete. Atlas records the concrete one-barrel
+re-export witness without attributing the target SQL as reached.
+
+| Channel | Witness | Evidence |
+|---|---|---|
+| `qf:definitions:list` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:research:submitQuestion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:research:submitQuestion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:research:submitQuestion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:research:submitQuestion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:cancel` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:cancel` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:close` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:close` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:permissionDecision` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:permissionDecision` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:runTurn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:runTurn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:runTurn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:runTurn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:spawn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:spawn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:spawn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:sessions:spawn` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:tasks:cancel` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:tasks:cancel` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:tasks:secondOpinion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:tasks:secondOpinion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:tasks:secondOpinion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
+| `qf:tasks:secondOpinion` | `collab-electron/src/main/host-acp-bridge.ts` → `species/hermes/host-acp-client.ts` | no mutation proven; module resolution coverage is incomplete |
 
 #### Reaches ungoverned SQL, but not a hard red (3)
 

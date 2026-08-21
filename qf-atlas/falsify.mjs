@@ -1955,6 +1955,85 @@ record(94, "same-named class methods stay distinct and neither forges a proof",
         + `hardRed=${danger ? Boolean(red[danger.id]) : 'n/a'} hardRedTotal=${Object.keys(red).length} (expect 3)`];
     }));
 
+// 95 · Bounded final honesty repair — a handler imports a local barrel which directly
+// re-exports a SQL-bearing implementation. The witness is concrete, but this analyzer
+// deliberately does not claim the target was reached: the wire is unknown/non-blocking,
+// and the medium ast-coverage finding remains visible.
+record(95, "a direct barrel re-export is coverage-limited, not read-only or hard red",
+  ...withFiles({
+    [`${MAIN}/zz-vfy95-impl.ts`]:
+      [ 'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        'export function zzVfy95Persist(id: string){',
+        '  getKernelDb().query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'cancelled' + Q + ', id);',
+        '}', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy95-barrel.ts`]:
+      [ 'export { zzVfy95Persist } from ' + Q + './zz-vfy95-impl' + Q + ';', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy95-handler.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { zzVfy95Persist } from ' + Q + './zz-vfy95-barrel' + Q + ';',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:barrel' + Q + ', async (_e, id) => zzVfy95Persist(id)); }',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:barrel');
+    const row = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy95-impl.ts'));
+    const red = hardRedFn(m);
+    const boundary = w?.hop4?.moduleResolutionBoundary?.find((x) => x.kind === 'direct-barrel-re-export');
+    const kernelHop = w?.hops?.find((h) => h.layer === 'kernel');
+    const brief = readFileSync(join(REPO, 'qf-atlas', 'ATLAS.md'), 'utf8');
+    const html = readFileSync(join(REPO, 'qf-atlas', 'atlas.html'), 'utf8');
+    const ok = Boolean(w && row && boundary)
+      && w.status !== 'cheats' && w.breakAt !== 'kernel' && w.hop4.kind === 'unknown'
+      && !(w.hop4.dmlAll ?? []).length && w.hop4.viaDml == null
+      && row.confidence === 'medium' && row.blocker === 'ast-coverage'
+      && row.governance === 'violation' && !red[row.id]
+      && boundary.barrel.endsWith('zz-vfy95-barrel.ts')
+      && boundary.target.endsWith('zz-vfy95-impl.ts')
+      && boundary.reason === 'no mutation proven; module resolution coverage is incomplete'
+      && kernelHop?.detail?.startsWith('no mutation proven; module resolution coverage is incomplete')
+      && kernelHop.detail.includes('direct one-barrel re-export witness')
+      && brief.includes('Module-resolution coverage boundaries')
+      && brief.includes('no mutation proven; module resolution coverage is incomplete')
+      && html.includes('module or handler resolution is incomplete')
+      && html.includes('direct one-barrel re-export witness')
+      && Object.keys(red).length === 3;
+    return [ok,
+      `hop4=${w?.hop4?.kind} status=${w?.status} hardRed=${Boolean(row && red[row.id])} `
+      + `finding=${row?.confidence}/${row?.blocker} boundary=${boundary?.kind ?? 'NONE'} `
+      + `targetAttributed=${(w?.hop4?.dmlAll ?? []).length > 0} hardRedTotal=${Object.keys(red).length} (expect 3)`];
+  }));
+
+// 96 · The control: a same-named SQL-bearing binding with no import/re-export witness
+// remains read-only. The repair must not turn name coincidence into uncertainty globally.
+record(96, "a coincidental same-named rejected binding remains read-only",
+  ...withFiles({
+    [`${MAIN}/zz-vfy96-safe.ts`]:
+      [ 'export function zzVfy96Persist(id: string){ return ' + Q + 'safe:' + Q + ' + id; }', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy96-danger.ts`]:
+      [ 'import { getKernelDb } from ' + Q + './kernel' + Q + ';',
+        'export function zzVfy96Persist(id: string){',
+        '  getKernelDb().query(' + Q + 'INSERT INTO task (id) VALUES (?)' + Q + ').run(id);',
+        '}', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy96-handler.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { zzVfy96Persist } from ' + Q + './zz-vfy96-safe' + Q + ';',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:name-coincidence' + Q + ', async (_e, id) => zzVfy96Persist(id)); }',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:name-coincidence');
+    const danger = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy96-danger.ts'));
+    const red = hardRedFn(m);
+    const reachedDanger = (w?.hop4?.dmlAll ?? []).some((d) => d.file.endsWith('zz-vfy96-danger.ts'));
+    const ok = Boolean(w && danger) && w.hop4.kind === 'read-only'
+      && !w.hop4.moduleResolutionBoundary && !reachedDanger
+      && danger.confidence === 'medium' && danger.blocker === 'ast-coverage'
+      && !red[danger.id] && Object.keys(red).length === 3;
+    return [ok,
+      `hop4=${w?.hop4?.kind} reachedUnwitnessedDanger=${reachedDanger} `
+      + `boundary=${w?.hop4?.moduleResolutionBoundary ? 'present' : 'absent'} `
+      + `danger=${danger?.confidence}/${danger?.blocker} hardRed=${Boolean(danger && red[danger.id])} `
+      + `hardRedTotal=${Object.keys(red).length} (expect 3)`];
+  }));
+
 // Restore every generated artefact to the bytes this run started with. This replaces
 // a final regenerate, which could only ever get CLOSE: `generatedAt` moves on every
 // run, so regenerating left three tracked files modified no matter how clean the

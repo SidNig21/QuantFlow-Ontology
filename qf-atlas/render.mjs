@@ -447,7 +447,8 @@ function selectWire(ch){
   document.getElementById("panel").innerHTML=\`
     <span class="tag \${w.status==="live"?"ice":w.status==="unused"?"warn":"alert"}">\${w.status}</span>
     <h1>\${esc(w.channel)}</h1>
-    <p class="sub">\${w.status==="live"?"This flow completes end to end."
+    <p class="sub">\${w.hop4?.kind==="unknown"?"The wire is connected, but module or handler resolution is incomplete; it is not claimed read-only."
+       :w.status==="live"?"This flow completes end to end."
       :w.status==="unused"?"Reaches main, but no renderer file ever calls it."
       :w.status==="unreached"?"Registered in main. Nothing calls it — the renderer cannot reach it."
       :w.status==="cheats"?"Reaches main and completes, but mutates state without going through execute(). The work happens; it is not governed."

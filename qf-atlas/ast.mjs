@@ -147,7 +147,8 @@ export function analyzeFile(relPath, text) {
       // Named re-exports are the edge that made db-bun.ts and fixtures.ts look dead.
       if (node.exportClause && ts.isNamedExports(node.exportClause))
         for (const el of node.exportClause.elements)
-          f.exports.push({ name: el.name.text, from: spec ?? null, line: lineOf(el), kind: "re-export" });
+          f.exports.push({ name: el.name.text, localName: el.propertyName?.text ?? el.name.text,
+            from: spec ?? null, line: lineOf(el), kind: "re-export" });
       else if (spec) f.exports.push({ name: "*", from: spec, line: lineOf(node), kind: "star-re-export" });
     } else if (ts.isImportEqualsDeclaration(node)) {
       const ref = node.moduleReference;
@@ -416,6 +417,61 @@ export function buildModuleEdge(astOf) {
   };
 }
 
+// Resolve only the concrete module forms needed for the bounded barrel witness below.
+// This is intentionally not a TypeScript module resolver: no path aliases, package
+// exports, tsconfig, or general barrel traversal belong in this repair.
+const MODULE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs"];
+function moduleCandidates(from, spec) {
+  const dir = from.slice(0, from.lastIndexOf("/"));
+  const parts = (dir + "/" + spec).split("/");
+  const out = [];
+  for (const seg of parts) {
+    if (seg === "." || seg === "") continue;
+    if (seg === "..") out.pop();
+    else out.push(seg);
+  }
+  const exact = out.join("/");
+  const stem = exact.replace(/\.(tsx?|jsx?|mts|cts|mjs|cjs)$/, "");
+  return [exact, stem, ...MODULE_EXTENSIONS.map((x) => stem + x),
+    ...MODULE_EXTENSIONS.map((x) => stem + "/index" + x)];
+}
+
+function resolveDirectModule(astOf, from, spec) {
+  if (!spec?.startsWith(".")) return null;
+  return moduleCandidates(from, spec).find((p) => astOf.has(p)) ?? null;
+}
+
+/**
+ * One bounded honesty witness: the caller imports a local barrel, and that barrel
+ * directly re-exports the called name from one concrete implementation module.
+ * We record the witness but deliberately do not claim the implementation was reached.
+ */
+function directBarrelWitness(astOf, from, name) {
+  const caller = astOf.get(from);
+  for (const imp of caller?.imports ?? []) {
+    if (imp.kind !== "import" || !imp.spec?.startsWith(".")) continue;
+    const barrelFile = resolveDirectModule(astOf, from, imp.spec);
+    const barrel = barrelFile ? astOf.get(barrelFile) : null;
+    if (!barrel) continue;
+    for (const exp of barrel.exports ?? []) {
+      if (!exp.from || exp.name !== name || !exp.from.startsWith(".")) continue;
+      const targetFile = resolveDirectModule(astOf, barrelFile, exp.from);
+      if (!targetFile) continue;
+      return {
+        kind: "direct-barrel-re-export",
+        from,
+        name,
+        barrel: barrelFile,
+        barrelLine: exp.line,
+        target: targetFile,
+        targetName: exp.localName ?? exp.name,
+        reason: "no mutation proven; module resolution coverage is incomplete",
+      };
+    }
+  }
+  return null;
+}
+
 /**
  * AST-BACKED FORWARD CALL CLOSURE — which SQL-bearing functions can this handler reach?
  *
@@ -450,6 +506,7 @@ export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth =
   const seen = new Set();
   const sql = new Map();
   const unresolvedNames = [];
+  const moduleResolutionGaps = [];
   // Sorted at every level: the closure a repo yields must not depend on Set or Map
   // insertion order, or the evidence a human reads changes between runs.
   let frontier = [...seedNames].sort().map((name) => ({ name, from: originFile, path: [] }));
@@ -459,6 +516,11 @@ export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth =
       const all = byName.get(node.name) ?? [];
       const reachable = all.filter((rec) => moduleEdge(node.from, rec.file))
         .sort((a, b) => a.file.localeCompare(b.file));
+      const barrel = directBarrelWitness(astOf, node.from, node.name);
+      if (barrel && !moduleResolutionGaps.some((x) =>
+          x.from === barrel.from && x.barrel === barrel.barrel && x.target === barrel.target
+          && x.name === barrel.name))
+        moduleResolutionGaps.push(barrel);
       // A name that resolves ONLY to modules this file cannot import is recorded, not
       // silently dropped: it is the difference between 'no such call' and 'a call this
       // analyzer refused to follow'.
@@ -482,7 +544,7 @@ export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth =
   }
   return {
     sql: [...sql.values()].sort((a, b) => (a.file + a.fn).localeCompare(b.file + b.fn)),
-    unresolvedNames, visited: seen.size,
+    unresolvedNames, moduleResolutionGaps, visited: seen.size,
   };
 }
 

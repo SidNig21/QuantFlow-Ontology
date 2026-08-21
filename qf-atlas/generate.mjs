@@ -266,11 +266,14 @@ const persistence = classifyPersistence({
     const red = reached.filter((r) => redAt.has(key(r.file, r.fn)));
     const amber = reached.filter((r) => amberAt.has(key(r.file, r.fn)));
     const gray = reached.filter((r) => unknownAt.has(key(r.file, r.fn)));
+    const coverageLimited = !reached.length && (closure.moduleResolutionGaps ?? []).length > 0;
 
     w.hop4.dmlAll = reached.map((r) => ({ fn: r.fn, file: r.file, hops: r.hops, inline: Boolean(r.inline) }));
     w.hop4.attribution = "ast-module-edge";
     if (phantom.length) w.hop4.regexPhantoms = phantom;
     if (closure.unresolvedNames.length) w.hop4.unresolvedCallees = closure.unresolvedNames;
+    if (coverageLimited)
+      w.hop4.moduleResolutionBoundary = closure.moduleResolutionGaps;
 
     const prior = w.hop4.kind;
     const hop = w.hops.find((h) => h.layer === "kernel");
@@ -301,14 +304,25 @@ const persistence = classifyPersistence({
       return { fn: r.fn, file: r.file, findings: rows.map((p) => p.id),
         confidence: rows[0].confidence, persistence: rows[0].persistence };
     });
-    w.hop4.kind = w.hop4.viaDoor ? "write-door"
+    if (coverageLimited) {
+      // The direct barrel witness is evidence of an unsupported path, not evidence that
+      // the target implementation was reached. Keep the wire live/non-blocking, clear the
+      // provisional regex attribution, and refuse to call it read-only.
+      w.hop4.kind = "unknown";
+      w.hop4.viaDml = null;
+      w.hop4.dmlFile = null;
+      w.hop4.why = closure.moduleResolutionGaps[0].reason
+        + " — direct one-barrel re-export witness from "
+        + closure.moduleResolutionGaps[0].barrel + " to "
+        + closure.moduleResolutionGaps[0].target;
+    } else w.hop4.kind = w.hop4.viaDoor ? "write-door"
       : w.hop4.viaDisk ? "writes-disk"
       : reached.length ? "reaches-sql"
       : "read-only";
     if (prior === "cheats") { downgraded++; w.hop4.downgradedFrom = "cheats"; }
 
     const names = reached.map((r) => r.fn + "()").join(", ");
-    w.hop4.why = !reached.length
+    w.hop4.why = coverageLimited ? w.hop4.why : !reached.length
       ? (wasCheats
           ? "the name-based walk attributed SQL to " + (phantom.join(", ") || "another module")
             + ", which this handler has no import path to — no AST-backed call reaches any SQL"
@@ -325,6 +339,7 @@ const persistence = classifyPersistence({
       hop.detail = w.hop4.kind === "write-door" ? "execute() via " + w.hop4.viaDoor
         : w.hop4.kind === "writes-disk" ? "writes a file via " + w.hop4.viaDisk + " — never reaches the Kernel"
         : w.hop4.kind === "reaches-sql" ? w.hop4.why
+        : w.hop4.kind === "unknown" && coverageLimited ? w.hop4.why
         : "read-only — mutates nothing";
     }
     if (w.status === "cheats") { w.status = "live"; w.breakAt = null; }

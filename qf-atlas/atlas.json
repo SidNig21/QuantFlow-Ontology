@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "95acc32",
+    "commit": "83e6e5b",
     "generatedAt": "2026-08-21",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "cfbc977fd986d359"
+    "fingerprint": "0ce846a0ceb77494"
   },
   "stats": {
     "live": 107,
@@ -95,7 +95,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -182,7 +182,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -192,7 +192,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -202,7 +202,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -212,7 +212,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -222,7 +222,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -261,7 +261,7 @@
           "backing": [],
           "hardRed": false,
           "from": "cheats",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "status": "live"
         },
         {
@@ -7209,7 +7209,7 @@
         {
           "channel": "qf:research:submitQuestion",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         }
@@ -7290,7 +7290,7 @@
         {
           "channel": "qf:definitions:list",
           "status": "live",
-          "hop4": "read-only",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         }
@@ -7392,14 +7392,14 @@
         {
           "channel": "qf:sessions:spawn",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         },
         {
           "channel": "qf:sessions:runTurn",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         },
@@ -7450,7 +7450,7 @@
         {
           "channel": "qf:tasks:cancel",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         },
@@ -7464,7 +7464,7 @@
         {
           "channel": "qf:sessions:cancel",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         }
@@ -7628,7 +7628,7 @@
         {
           "channel": "qf:tasks:secondOpinion",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         }
@@ -7709,7 +7709,7 @@
         {
           "channel": "qf:sessions:close",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "backedBy": null,
           "why": null
         },
@@ -7788,7 +7788,7 @@
         {
           "channel": "qf:research:submitQuestion",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "hops": [
             {
               "layer": "renderer",
@@ -7808,7 +7808,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via kernelExecute"
+              "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
             }
           ],
           "breakAt": null
@@ -7901,7 +7901,7 @@
         {
           "channel": "qf:tasks:secondOpinion",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "hops": [
             {
               "layer": "renderer",
@@ -7921,7 +7921,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via kernelExecute"
+              "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
             }
           ],
           "breakAt": null
@@ -8001,7 +8001,7 @@
         {
           "channel": "qf:sessions:runTurn",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "hops": [
             {
               "layer": "renderer",
@@ -8021,7 +8021,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via kernelExecute"
+              "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
             }
           ],
           "breakAt": null
@@ -8073,7 +8073,7 @@
         {
           "channel": "qf:tasks:cancel",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "hops": [
             {
               "layer": "renderer",
@@ -8093,7 +8093,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via kernelExecute"
+              "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
             }
           ],
           "breakAt": null
@@ -8101,7 +8101,7 @@
         {
           "channel": "qf:sessions:cancel",
           "status": "live",
-          "hop4": "write-door",
+          "hop4": "unknown",
           "hops": [
             {
               "layer": "renderer",
@@ -8121,7 +8121,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "execute() via kernelExecute"
+              "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
             }
           ],
           "breakAt": null
@@ -41391,7 +41391,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -41405,7 +41405,7 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
+        "kind": "unknown",
         "viaDoor": null,
         "viaDml": null,
         "dmlFile": null,
@@ -41540,10 +41540,22 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
       }
     },
     {
@@ -42536,7 +42548,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via kernelExecute"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -42550,10 +42562,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -43571,11 +43583,53 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-native-tui.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "admitHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 7,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "admitHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -45923,7 +45977,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via kernelExecute"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -45937,10 +45991,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -46359,11 +46413,33 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "cancelHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 8,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "cancelHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -46390,7 +46466,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via kernelExecute"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -46404,10 +46480,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -46808,11 +46884,33 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "tearDownHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 16,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "tearDownHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -46936,7 +47034,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "read-only — mutates nothing"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -46950,7 +47048,7 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "read-only",
+        "kind": "unknown",
         "viaDoor": null,
         "viaDml": null,
         "dmlFile": null,
@@ -47003,10 +47101,32 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "permissionResponseForDecision",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 13,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "permissionResponseForDecision",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "why": "no AST-backed call path from this handler reaches SQL outside the write door"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
       }
     },
     {
@@ -47033,7 +47153,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via kernelExecute"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -47047,10 +47167,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -47469,11 +47589,53 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-turn.ts",
+            "name": "promptHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 14,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "promptHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-turn.ts",
+            "name": "cancelHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 8,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "cancelHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-turn.ts",
+            "name": "tearDownHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 16,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "tearDownHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -47500,7 +47662,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via orchestrateNativeTuiAdmission"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -47514,10 +47676,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "orchestrateNativeTuiAdmission",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -48159,11 +48321,53 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-native-tui.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "admitHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 7,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "admitHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -48190,7 +48394,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via kernelExecute"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -48204,10 +48408,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -48883,11 +49087,33 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "cancelHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 8,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "cancelHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -50067,7 +50293,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "execute() via kernelExecute"
+          "detail": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts"
         }
       ],
       "registeredAt": {
@@ -50081,10 +50307,10 @@
         "kind": "invoke"
       },
       "hop4": {
-        "kind": "write-door",
+        "kind": "unknown",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": null,
+        "dmlFile": null,
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -51130,11 +51356,53 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
+        "moduleResolutionBoundary": [
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-native-tui.ts",
+            "name": "resolveHostAcpCommand",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 15,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "resolveHostAcpCommand",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/agent-host.ts",
+            "name": "admitHostAcp",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 7,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "admitHostAcp",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          },
+          {
+            "kind": "direct-barrel-re-export",
+            "from": "collab-electron/src/main/host-acp-permission.ts",
+            "name": "denyPermissionResponse",
+            "barrel": "collab-electron/src/main/host-acp-bridge.ts",
+            "barrelLine": 9,
+            "target": "species/hermes/host-acp-client.ts",
+            "targetName": "denyPermissionResponse",
+            "reason": "no mutation proven; module resolution coverage is incomplete"
+          }
+        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
-        "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "no mutation proven; module resolution coverage is incomplete — direct one-barrel re-export witness from collab-electron/src/main/host-acp-bridge.ts to species/hermes/host-acp-client.ts",
+        "downgradedFrom": "cheats"
       }
     },
     {
@@ -57978,12 +58246,12 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "b7899be",
+      "commit": "95acc32",
       "generatedAt": "2026-08-21"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "95acc32",
+      "commit": "83e6e5b",
       "generatedAt": "2026-08-21"
     },
     "verdict": "better",

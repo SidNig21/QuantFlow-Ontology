@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-21",
-  "passed": 94,
-  "total": 94,
+  "passed": 96,
+  "total": 96,
   "results": [
     {
       "n": 1,
@@ -562,10 +562,22 @@
       "detail": "rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
     },
     {
+      "n": 95,
+      "name": "a direct barrel re-export is coverage-limited, not read-only or hard red",
+      "passed": true,
+      "detail": "hop4=unknown status=unreached hardRed=false finding=medium/ast-coverage boundary=direct-barrel-re-export targetAttributed=false hardRedTotal=3 (expect 3)"
+    },
+    {
+      "n": 96,
+      "name": "a coincidental same-named rejected binding remains read-only",
+      "passed": true,
+      "detail": "hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+    },
+    {
       "n": 82,
       "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
       "passed": true,
-      "detail": "git status --porcelain identical before and after (6 pre-existing entries)"
+      "detail": "git status --porcelain identical before and after (9 pre-existing entries)"
     }
   ]
 }

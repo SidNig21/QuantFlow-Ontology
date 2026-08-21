@@ -76,9 +76,25 @@ export function renderMarkdown(m) {
   p(`| \`cheats\` | reaches SQL outside \`execute()\` **and** a function on that path carries a current hard red | ${m.wires.filter((w) => w.hop4?.kind === "cheats").length} |`);
   p(`| \`reaches-sql\` | mutates outside \`execute()\`, but every finding on the path is amber | ${m.wires.filter((w) => w.hop4?.kind === "reaches-sql").length} |`);
   p(`| \`writes-disk\` | writes a file; never reaches the Kernel at all | ${m.wires.filter((w) => w.hop4?.kind === "writes-disk").length} |`);
-  p(`| \`unknown\` | handler file not fully read; not claimed read-only | ${m.wires.filter((w) => w.hop4?.kind === "unknown").length} |`);
+  p(`| \`unknown\` | handler or module resolution coverage is incomplete; not claimed read-only | ${m.wires.filter((w) => w.hop4?.kind === "unknown").length} |`);
   p(`| \`read-only\` | no mutation seen | ${m.wires.filter((w) => w.hop4?.kind === "read-only").length} |`);
   p();
+
+  const moduleBoundaries = (m.wires ?? []).filter((w) => w.hop4?.moduleResolutionBoundary?.length);
+  if (moduleBoundaries.length) {
+    p(`#### Module-resolution coverage boundaries (${moduleBoundaries.length})`);
+    p();
+    p(`These wires are connected and non-blocking, but they are **not read-only**: no mutation`);
+    p(`proven; module resolution coverage is incomplete. Atlas records the concrete one-barrel`);
+    p(`re-export witness without attributing the target SQL as reached.`);
+    p();
+    p(`| Channel | Witness | Evidence |`);
+    p(`|---|---|---|`);
+    for (const w of moduleBoundaries)
+      for (const b of w.hop4.moduleResolutionBoundary)
+        p(`| \`${w.channel}\` | \`${b.barrel}\` → \`${b.target}\` | ${b.reason} |`);
+    p();
+  }
 
   // Reaching ungoverned SQL that is NOT a hard red is a real observation and must stay
   // readable — it simply may not wear the breach label or break a loop. Before this
@@ -699,7 +715,7 @@ function diagram(m) {
   outcome(hop4("reaches-sql"), "A", `["<b>ungoverned SQL</b><br/>amber evidence only<br/>not a proven breach"]`, "reaches-sql", gray);
   outcome(hop4("writes-disk"), "FS", `["<b>filesystem</b><br/>never reaches<br/>the Kernel"]`, "writes-disk", bad);
   outcome(hop4("read-only"), "RO", `["<b>read-only</b><br/>no mutation seen"]`, "read-only", good);
-  outcome(unknown, "U", `["<b>unknown</b><br/>handler not fully read"]`, "unknown", gray);
+  outcome(unknown, "U", `["<b>unknown</b><br/>module or handler coverage incomplete"]`, "unknown", gray);
   d.push(...spine);
   if (cheats) d.push(`  X -.->|"ungoverned — this is the breach"| DB`);
   d.push("");
