@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "atlas-strip-1",
-    "commit": "83e6e5b",
+    "commit": "306a471",
     "generatedAt": "2026-08-21",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -58246,12 +58246,12 @@
   "diffVsHead": {
     "from": {
       "branch": "atlas-strip-1",
-      "commit": "95acc32",
+      "commit": "83e6e5b",
       "generatedAt": "2026-08-21"
     },
     "to": {
       "branch": "atlas-strip-1",
-      "commit": "83e6e5b",
+      "commit": "306a471",
       "generatedAt": "2026-08-21"
     },
     "verdict": "better",
