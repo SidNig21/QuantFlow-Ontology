@@ -2034,6 +2034,77 @@ record(96, "a coincidental same-named rejected binding remains read-only",
       + `hardRedTotal=${Object.keys(red).length} (expect 3)`];
   }));
 
+// 97 · The exact imported-binding mismatch control: the handler imports only an unrelated
+// symbol from the barrel, calls a local safe persist(), and must not inherit the barrel's
+// SQL-bearing persist() or manufacture a coverage boundary from the unrelated call.
+record(97, "an imported-binding mismatch stays read-only with no barrel boundary",
+  ...withFiles({
+    [`${MAIN}/zz-vfy97-impl.ts`]:
+      [ 'export function zzVfy97Persist(db: any){',
+        '  db.query(' + Q + 'UPDATE task SET status = ?' + Q + ').run(' + Q + 'wrong' + Q + ');',
+        '}',
+        'export function zzVfy97Unrelated(){ return ' + Q + 'ok' + Q + '; }', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy97-barrel.ts`]:
+      [ 'export { zzVfy97Persist, zzVfy97Unrelated } from ' + Q + './zz-vfy97-impl' + Q + ';', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy97-handler.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { zzVfy97Unrelated } from ' + Q + './zz-vfy97-barrel' + Q + ';',
+        'function zzVfy97Persist(){ return ' + Q + 'safe-local' + Q + '; }',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:binding-mismatch' + Q + ', async () => zzVfy97Persist() + zzVfy97Unrelated()); }',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:binding-mismatch');
+    const danger = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy97-impl.ts'));
+    const red = hardRedFn(m);
+    const reachedDanger = (w?.hop4?.dmlAll ?? []).some((d) => d.file.endsWith('zz-vfy97-impl.ts'));
+    const persistBoundary = (w?.hop4?.moduleResolutionBoundary ?? []).some((x) => x.name === 'zzVfy97Persist');
+    const ok = Boolean(w && danger) && w.hop4.kind === 'read-only'
+      && !w.hop4.moduleResolutionBoundary && !reachedDanger && !persistBoundary
+      && danger.confidence === 'medium' && danger.blocker === 'ast-coverage'
+      && !red[danger.id] && Object.keys(red).length === 3;
+    return [ok,
+      `hop4=${w?.hop4?.kind} boundary=${w?.hop4?.moduleResolutionBoundary ? 'present' : 'absent'} `
+      + `persistBoundary=${persistBoundary} reachedDanger=${reachedDanger} `
+      + `danger=${danger?.confidence}/${danger?.blocker} hardRed=${Boolean(danger && red[danger.id])} `
+      + `hardRedTotal=${Object.keys(red).length} (expect 3)`];
+  }));
+
+// 98 · Named import aliases are still a concrete positive witness: local `p` maps to the
+// barrel's exported `persist`, but the SQL-bearing implementation remains un-attributed
+// and the wire stays non-blocking/unknown.
+record(98, "a named-import alias preserves the bounded barrel boundary",
+  ...withFiles({
+    [`${MAIN}/zz-vfy98-impl.ts`]:
+      [ 'export function zzVfy98Persist(db: any){',
+        '  db.query(' + Q + 'INSERT INTO task (id) VALUES (?)' + Q + ').run(' + Q + 'x' + Q + ');',
+        '}', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy98-barrel.ts`]:
+      [ 'export { zzVfy98Persist } from ' + Q + './zz-vfy98-impl' + Q + ';', '' ].join(String.fromCharCode(10)),
+    [`${MAIN}/zz-vfy98-handler.ts`]:
+      [ 'import { ipcMain } from ' + Q + 'electron' + Q + ';',
+        'import { zzVfy98Persist as p } from ' + Q + './zz-vfy98-barrel' + Q + ';',
+        'export function r(){ ipcMain.handle(' + Q + 'qf:falsify:barrel-alias' + Q + ', async (_e, db) => p(db)); }',
+        '' ].join(String.fromCharCode(10)),
+  }, (m) => {
+    const w = (m.wires ?? []).find((x) => x.channel === 'qf:falsify:barrel-alias');
+    const row = (m.persistence ?? []).find((p) => p.evidence[0].file.endsWith('zz-vfy98-impl.ts'));
+    const red = hardRedFn(m);
+    const boundary = w?.hop4?.moduleResolutionBoundary?.find((x) => x.name === 'p');
+    const ok = Boolean(w && row && boundary) && w.hop4.kind === 'unknown'
+      && w.status !== 'cheats' && w.breakAt !== 'kernel'
+      && !(w.hop4.dmlAll ?? []).length && w.hop4.viaDml == null
+      && row.confidence === 'medium' && row.blocker === 'ast-coverage'
+      && !red[row.id] && boundary.importedName === 'zzVfy98Persist'
+      && boundary.targetName === 'zzVfy98Persist'
+      && boundary.reason === 'no mutation proven; module resolution coverage is incomplete'
+      && Object.keys(red).length === 3;
+    return [ok,
+      `hop4=${w?.hop4?.kind} status=${w?.status} boundary=${boundary?.kind ?? 'NONE'} `
+      + `local=${boundary?.name ?? 'NONE'} imported=${boundary?.importedName ?? 'NONE'} `
+      + `targetAttributed=${(w?.hop4?.dmlAll ?? []).length > 0} finding=${row?.confidence}/${row?.blocker} `
+      + `hardRed=${Boolean(row && red[row.id])} hardRedTotal=${Object.keys(red).length} (expect 3)`];
+  }));
+
 // Restore every generated artefact to the bytes this run started with. This replaces
 // a final regenerate, which could only ever get CLOSE: `generatedAt` moves on every
 // run, so regenerating left three tracked files modified no matter how clean the

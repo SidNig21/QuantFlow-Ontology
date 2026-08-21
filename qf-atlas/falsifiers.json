@@ -1,7 +1,7 @@
 {
   "ran": "2026-08-21",
-  "passed": 96,
-  "total": 96,
+  "passed": 98,
+  "total": 98,
   "results": [
     {
       "n": 1,
@@ -574,10 +574,22 @@
       "detail": "hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
     },
     {
+      "n": 97,
+      "name": "an imported-binding mismatch stays read-only with no barrel boundary",
+      "passed": true,
+      "detail": "hop4=read-only boundary=absent persistBoundary=false reachedDanger=false danger=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+    },
+    {
+      "n": 98,
+      "name": "a named-import alias preserves the bounded barrel boundary",
+      "passed": true,
+      "detail": "hop4=unknown status=unreached boundary=direct-barrel-re-export local=p imported=zzVfy98Persist targetAttributed=false finding=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+    },
+    {
       "n": 82,
       "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
       "passed": true,
-      "detail": "git status --porcelain identical before and after (9 pre-existing entries)"
+      "detail": "git status --porcelain identical before and after (5 pre-existing entries)"
     }
   ]
 }

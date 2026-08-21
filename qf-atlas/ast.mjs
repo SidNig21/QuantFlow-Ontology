@@ -139,7 +139,13 @@ export function analyzeFile(relPath, text) {
     // ── imports / re-exports ────────────────────────────────────────────────
     if (ts.isImportDeclaration(node)) {
       const spec = literalArg(node.moduleSpecifier);
-      if (spec !== null) f.imports.push({ spec, line: lineOf(node), kind: "import", dynamic: false });
+      if (spec !== null) {
+        const named = node.importClause?.namedBindings;
+        const bindings = named && ts.isNamedImports(named)
+          ? named.elements.map((el) => ({ local: el.name.text, imported: el.propertyName?.text ?? el.name.text }))
+          : [];
+        f.imports.push({ spec, line: lineOf(node), kind: "import", dynamic: false, bindings });
+      }
       else f.unresolved.push({ what: "import specifier", line: lineOf(node), why: "module specifier is not a literal" });
     } else if (ts.isExportDeclaration(node)) {
       const spec = literalArg(node.moduleSpecifier);
@@ -443,28 +449,35 @@ function resolveDirectModule(astOf, from, spec) {
 
 /**
  * One bounded honesty witness: the caller imports a local barrel, and that barrel
- * directly re-exports the called name from one concrete implementation module.
+ * directly re-exports the called name from one concrete SQL-bearing implementation module.
  * We record the witness but deliberately do not claim the implementation was reached.
  */
-function directBarrelWitness(astOf, from, name) {
+function directBarrelWitness(astOf, index, from, name) {
   const caller = astOf.get(from);
   for (const imp of caller?.imports ?? []) {
     if (imp.kind !== "import" || !imp.spec?.startsWith(".")) continue;
+    const binding = (imp.bindings ?? []).find((x) => x.local === name);
+    if (!binding) continue;
     const barrelFile = resolveDirectModule(astOf, from, imp.spec);
     const barrel = barrelFile ? astOf.get(barrelFile) : null;
     if (!barrel) continue;
     for (const exp of barrel.exports ?? []) {
-      if (!exp.from || exp.name !== name || !exp.from.startsWith(".")) continue;
+      if (!exp.from || exp.name !== binding.imported || !exp.from.startsWith(".")) continue;
       const targetFile = resolveDirectModule(astOf, barrelFile, exp.from);
       if (!targetFile) continue;
+      const targetName = exp.localName ?? exp.name;
+      const sqlTarget = [...index.values()].some((rec) => rec.file === targetFile
+        && rec.name === targetName && rec.dml && rec.sqlSites?.length);
+      if (!sqlTarget) continue;
       return {
         kind: "direct-barrel-re-export",
         from,
         name,
+        importedName: binding.imported,
         barrel: barrelFile,
         barrelLine: exp.line,
         target: targetFile,
-        targetName: exp.localName ?? exp.name,
+        targetName,
         reason: "no mutation proven; module resolution coverage is incomplete",
       };
     }
@@ -516,7 +529,7 @@ export function astCallClosure({ astOf, index, originFile, seedNames, maxDepth =
       const all = byName.get(node.name) ?? [];
       const reachable = all.filter((rec) => moduleEdge(node.from, rec.file))
         .sort((a, b) => a.file.localeCompare(b.file));
-      const barrel = directBarrelWitness(astOf, node.from, node.name);
+      const barrel = directBarrelWitness(astOf, index, node.from, node.name);
       if (barrel && !moduleResolutionGaps.some((x) =>
           x.from === barrel.from && x.barrel === barrel.barrel && x.target === barrel.target
           && x.name === barrel.name))
