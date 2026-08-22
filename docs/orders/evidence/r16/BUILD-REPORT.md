@@ -1579,3 +1579,243 @@ The Atlas diff is the existing analyzer coverage classification for direct
 support-table SQL in the repository; currentness is green and HARD RED is zero.
 No Atlas baseline or semantic code was changed. No build, launch, Computer Use,
 founder-state change, package/release work, or R17 work occurred in this Builder turn.
+
+## NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes — Builder closure
+
+Plain meaning: a governed critic now receives the same hash-verified result evidence that the Kernel records, without receiving a filesystem path.
+
+### Immutable candidate and scope
+
+| Field | Receipt |
+|---|---|
+| Starting WIP SHA | `c023f747e4a5451e8c1d0a5bad8adb792a86ca41` |
+| Atlas comparison base | `fef713c06f091dc8df13f7bde07be859d3b04930` |
+| Product candidate SHA | `99188c6b3e039821c5c615c621a45d5c3f484ab9` |
+| Branch / remote | `wo-R16` / `origin/wo-R16` |
+| Candidate commit | `fix(r16): expose verified Artifact receipt to governed critics` |
+| Builder result | **PASS** |
+| Build / app / R17 | not run / not launched / not started |
+
+The candidate changed exactly these six allowed paths:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/ontology-gateway.ts
+collab-electron/src/main/ontology-gateway.test.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.json
+qf-atlas/atlas.html
+```
+
+`artifactReceipt()` is exported and reused by the governed Artifact gateway
+read. An admitted governed `qf_artifact_get` returns only `id`, `created_at`,
+`kind`, `content_hash`, and that shared receipt; the same enriched object is
+persisted in `qf_review_invocation`. The five existing gateway test blocks are
+unchanged and the test file appends exactly the named sixth test.
+
+### Exact Builder matrix — rows 1–9
+
+Rows 1–9 ran once before the Router’s out-of-scope consumer-receipt correction.
+Their native outputs were:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\ontology-gateway.test.ts:
+(pass) only ontology reads receive the Kernel read marker
+(pass) production read dispatch marks market reads but not desk orchestration reads
+(pass) generic ontology actions expose deterministic execution but not task bypasses
+(pass) native research roles receive a focused generated ontology surface
+kernel: path=:memory: provenance=env journal=memory sync=2 schema_meta=84
+(pass) production list_tools serves action and read schemas for admitted seats [47.00ms]
+(pass) an admitted governed critic receives and records the verified Artifact receipt [125.00ms]
+
+ 6 pass
+ 0 fail
+ 67 expect() calls
+Ran 6 tests across 1 file. [333.00ms]
+native exit=0
+
+bun test collab-electron/src/main/research-world.test.ts
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\research-world.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=84
+(pass) Main research-world projection > returns exact root errors and honest empty-world facts
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=84
+(pass) Main research-world projection > returns a frozen value snapshot with no filesystem path in Artifact receipts [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=84
+(pass) Main research-world projection > projects the complete normal governed world as 13 objects and 15 links [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=84
+(pass) Main research-world projection > isolates two Missions that share Dataset and result Artifact in both root directions [47.00ms]
+
+ 4 pass
+ 0 fail
+ 52 expect() calls
+Ran 4 tests across 1 file. [234.00ms]
+native exit=0
+
+bun test collab-electron/src/main/governed-review.test.ts
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\governed-review.test.ts:
+(pass) R15 production governed-review seams > critic policy is exact and least privilege
+(pass) R15 production governed-review seams > request review crosses preload and Main IPC, and block literals are order-owned
+(pass) R15 production governed-review seams > sidecar shutdown exit preserves the durable Task/session/link snapshot
+kernel: path=:memory: provenance=env journal=memory sync=2 schema_meta=84
+(pass) R15 production governed-review seams > normal continuation binds worker lineage, admits one review, delivers once, and publishes supports [1078.00ms]
+
+ 4 pass
+ 0 fail
+ 51 expect() calls
+Ran 4 tests across 1 file. [1159.00ms]
+native exit=0
+
+bun qa/run.ts kernel-sole-writer-app
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+native exit=0
+
+bun qf-atlas/generate.mjs
+qf-atlas: wrote atlas.json + atlas.html + ATLAS.md
+  432 files · 109 subsystems · 124 IPC channels
+  wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+  legacy loops: 6/8 healthy · Review and publish, Close the app
+  decisions: 42 undecided of 47
+  13 strip candidates · 10 confirmed violations · 3 gray · 22 coverage gaps
+native exit=0
+
+bun qf-atlas/generate.mjs --check
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+native exit=0
+
+bun qf-atlas/ratchet.mjs
+qf-atlas ratchet — 3.5s (budget 60s)
+
+  baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · undecided w/o blocker: 0 · AMBER (visible, non-blocking): 20 · undecided: 42
+native exit=0
+
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+Atlas diff  c59ebfa -> 36235b3
+VERDICT: WORSE — 1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix
+
+  added 1 · newly-detected 0 · resolved 0 · regressed 0
+  confidence changed 0 · owners changed 0
+  coverage worse 1 · better 0
+  undecided 41 -> 42
+
+ADDED (code got worse):
+  persistence links insert into
+
+COVERAGE REGRESSED:
+  packages/qf-kernel/src/attach-kernel-drift.test.ts persistence: not-applicable -> partial (6 of 6 SQL site(s) are not inside a named function, so no call path can be traced)
+
+wrote qf-atlas/atlas-diff.json
+native exit=0; Atlas verdict is the pre-existing transparent `WORSE` classification with HARD RED 0
+
+git diff --check
+native exit=0; no output
+```
+
+### Row-10 continuation
+
+The first row-10 attempt at the starting WIP was red only because the existing
+consumer receipt contained seven Markdown hard-break spaces. The Router fixed
+those seven spaces and recorded the continuation in pushed commit
+`c023f747e4a5451e8c1d0a5bad8adb792a86ca41`; the product and generated-Atlas WIP
+was not staged or altered by that correction. The authorized continuation ran
+row 10 exactly once, after that correction and before the candidate commit:
+
+```text
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+native exit=0; no output
+```
+
+All ten required commands therefore have native exit zero across the original
+rows 1–9 and the authorized row-10 continuation. No row 1–9 was rerun after
+the Router correction.
+
+### Exact four-file falsifier and restoration
+
+Before mutation, the candidate SHA-256 hashes were recorded for exactly the
+four required product/test paths:
+
+```text
+collab-electron/src/main/research-world-projection.ts  51ABB6D8EA34FAC6466BB3F81E7507A2FF2211CB51B0B79181F912FDB2D9C77A
+collab-electron/src/main/ontology-gateway.ts            08CE2F507538E08AD30994B5D7CFBDDF217FB4839E58BFEA60B11819808E3C8A
+collab-electron/src/main/ontology-gateway.test.ts       48189153395479484B323C4E2407409271A65D37921ACF743074B55C06A2CBF0
+collab-electron/src/main/governed-review.test.ts        ECE7A1DBE2F384CA6CB6CE36F7F0DDB527F758D8928198DD34F3F2C0CC4F66F9
+```
+
+Only `collab-electron/src/main/ontology-gateway.ts` was replaced, with its
+exact bytes from base candidate
+`7dda122435dce47adbc650e5d5b9d933db249263`. The other three paths and all
+generated Atlas bytes remained unchanged. The required focused command was:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+native exit=1
+```
+
+The mutation was red because the old gateway returned the raw Artifact row:
+the assertion named the missing `receipt` and showed leaked `storage_ref` where
+the new test requires the shared verified receipt:
+
+```text
+  {
+    "content_hash": "ad2b4752d6a4f24a35d0d354608c239d04129b4f95ef8d91969ec110d2fe229e",
+    "created_at": "2026-08-22T12:54:07.410Z",
+    "id": "ad2b4752d6a4f24a35d0d354608c239d04129b4f95ef8d91969ec110d2fe229e",
+    "kind": "result_set",
+-   "receipt": {
+-     "artifact_id": "ad2b4752d6a4f24a35d0d354608c239d04129b4f95ef8d91969ec110d2fe229e",
+-     "content_hash": "ad2b4752d6a4f24a35d0d354608c239d04129b4f95ef8d91969ec110d2fe229e",
+-     "durable_bytes_available": true,
+-     "kind": "result_set",
+-     "preview": "{\"metrics\":{\"roi\":\"1.000000\",\"net_profit\":\"100.000000\"}}",
+-   },
++   "storage_ref": "C:\\Users\\rybow\\AppData\\Local\\Temp\\qf-r16-gateway-artifact-XG9POR\\valid.json",
+  }
+```
+
+The candidate gateway bytes were restored from immutable candidate
+`99188c6b3e039821c5c615c621a45d5c3f484ab9`. Restoration proof:
+
+```text
+collab-electron/src/main/research-world-projection.ts  51ABB6D8EA34FAC6466BB3F81E7507A2FF2211CB51B0B79181F912FDB2D9C77A
+collab-electron/src/main/ontology-gateway.ts            08CE2F507538E08AD30994B5D7CFBDDF217FB4839E58BFEA60B11819808E3C8A
+collab-electron/src/main/ontology-gateway.test.ts       48189153395479484B323C4E2407409271A65D37921ACF743074B55C06A2CBF0
+collab-electron/src/main/governed-review.test.ts        ECE7A1DBE2F384CA6CB6CE36F7F0DDB527F758D8928198DD34F3F2C0CC4F66F9
+diff_exit=0
+```
+
+The restored focused command returned:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\ontology-gateway.test.ts:
+(pass) only ontology reads receive the Kernel read marker
+(pass) production read dispatch marks market reads but not desk orchestration reads
+(pass) generic ontology actions expose deterministic execution but not task bypasses
+(pass) native research roles receive a focused generated ontology surface
+kernel: path=:memory: provenance=env journal=memory sync=2 schema_meta=84
+(pass) production list_tools serves action and read schemas for admitted seats [47.00ms]
+(pass) an admitted governed critic receives and records the verified Artifact receipt [125.00ms]
+
+ 6 pass
+ 0 fail
+ 67 expect() calls
+Ran 6 tests across 1 file. [349.00ms]
+native exit=0
+```
+
+### Final status
+
+The product candidate is immutable at `99188c6b3e039821c5c615c621a45d5c3f484ab9`.
+The report append is the separate evidence commit requested by the order. No
+Electron build, normal application launch, Computer Use, founder-state access,
+package/release work, consumer receipt edit, order/NEXT edit, or R17 work was
+performed in this Builder turn.
