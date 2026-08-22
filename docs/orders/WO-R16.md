@@ -1473,3 +1473,67 @@ bounded product repair. No repair may skip or omit a real focus target.
 
 Plain meaning: identify the exact element that steals Tab focus, then fix only
 what the evidence names.
+
+## TERMINAL TAB-ORDER REPAIR - keep guest webviews out of shell traversal
+
+Diagnostic WIP SHA `49e9fd529a4dae8f70681e26478719ecdca7fc09` is
+evidence, not a candidate. Its focused contract passes 14/14. Its single live
+run removed all roots and processes with no cleanup failure and produced this
+standalone product receipt:
+
+```text
+tab_focus_failure={"step":9,"expected":{"type":"artifact","id":"<nonce-specific artifact id>","control":"button","accessible_name":"Inspect artifact <same id>"},"actual":{"tag":"webview","id":"","class":"","input_type":"","world_type":"agent_session","world_id":"<live Hermes session id>","control":"other","accessible_name":""}}
+```
+
+The active element was a real terminal guest webview inside an agent-session
+tile. It interleaved with the shell's research-object Tab sequence. The gate's
+planned target and active-element serializer were correct, so no gate or
+assertion change is authorized.
+
+### Exact product repair
+
+Change only:
+
+- `collab-electron/src/windows/shell/src/tile-manager.js`;
+- `collab-electron/src/windows/shell/src/tile-manager-layout.test.ts`;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections required by normal change control.
+
+In `spawnTerminalWebview`, immediately after
+`document.createElement("webview")` and before setting source/preload or
+appending it, set that guest element's DOM `tabIndex` property to exactly `-1`.
+This removes a terminal guest from sequential shell Tab traversal. It does not
+make the webview inert, disable pointer input, or remove programmatic focus.
+The existing `focusCanvasTile` call to `dom.webview.focus()` remains
+byte-unchanged, so clicking a terminal tile and the existing focused-tile
+shortcut can still enter the terminal.
+
+Add exactly one focused test to `tile-manager-layout.test.ts` named
+`keeps terminal guests out of Tab order without removing programmatic focus`.
+It extracts the `spawnTerminalWebview` body and fails unless the create call is
+followed by `wv.tabIndex = -1` before `setAttribute("src"` and before
+`dom.contentArea.appendChild(wv)`. It extracts `focusCanvasTile` and fails
+unless that body still contains `dom.webview.focus()`. The two existing tests
+remain byte-identical. The file must report exactly 3 pass and 0 fail. The
+unchanged R16 focused contract must remain exactly 14 pass and 0 fail.
+
+### Builder and acceptance authority
+
+A fresh Builder starts only from clean local and remote
+`49e9fd529a4dae8f70681e26478719ecdca7fc09` plus the Router's pushed Reader-fix
+and Atlas-refresh commits. It runs Atlas preflight, the 3-test tile-manager
+file, and the 14-test R16 contract, then exactly one live
+`bun qa/run.ts research-world-visible`. Any red stops with its exact
+`tab_focus_failure` when present, `roots_created`, `primary_failure`, and
+`cleanup_failures` receipts. A green proceeds through only the already-
+authorized short matrix, BUILD-REPORT, Atlas regeneration, immutable candidate
+commit, and push.
+
+No other webview constructor, renderer, fixture, expected focus target,
+assertion, timeout, schedule, Kernel behavior, package, installer, release,
+worktree, wrapper, or cleanup path changes. A fresh different-model Verifier
+records the candidate SHA before and after and reruns the same focused tests,
+live gate, falsifier sample, and short matrix before writing VERIFICATION.
+
+Plain meaning: Tab stays on QuantFlow's shell controls; a click or explicit
+focus still enters the real Hermes terminal.
