@@ -4049,10 +4049,11 @@ other parent commands. The unchanged required command
 
 All four imports predate the write-status correction and exist only to build
 isolated focused Kernel/Electron fixtures. None is an application runtime
-writer. The gate's `KERNEL_ALLOWED` already exempts three focused test files
-for this exact reason, but its enumeration was not synchronized when these
-four tests landed. This is a stale finite gate inventory, not authority to
-move a runtime write or exempt a directory or pattern.
+writer. The gate's `KERNEL_ALLOWED` already exempts two focused test files
+(`research-world.test.ts` and `task-steering.test.ts`) for this exact reason,
+but its enumeration was not synchronized when these four tests landed. This
+is a stale finite gate inventory, not authority to move a runtime write or
+exempt a directory or pattern.
 
 The only authorized correction is to add those four exact file strings to the
 existing `KERNEL_ALLOWED` set in
@@ -4074,3 +4075,66 @@ A fresh Reader must return YES/YES before this one gate-only correction. A
 fresh independent Verifier then owns the complete bounded matrix against
 product candidate `e824ae10` plus the exact gate commit. No Electron rebuild,
 consumer launch, founder-state change, or R17 work is authorized before PASS.
+
+### WRITE-STATUS MATRIX READER CLOSURE — exact gate-only handoff
+
+The preceding matrix had one factual defect and two underspecified receipts.
+The factual defect was the claim that three focused test files were already
+allowlisted; the live gate source has two. The underspecified receipts were
+“existing R16 evidence,” “the unchanged parent short matrix,” and “both diff
+checks.” A Builder could otherwise choose a different evidence path or command
+set and still claim compliance.
+
+The exact deliverables are now:
+
+1. In `qa/gates/kernel-sole-writer-app.ts`, add exactly these four literal
+   strings to `KERNEL_ALLOWED`, alongside the two existing focused-test
+   entries:
+
+   ```text
+   collab-electron/src/main/governed-review.test.ts
+   collab-electron/src/main/native-tui-orchestration.test.ts
+   collab-electron/src/main/ontology-gateway.test.ts
+   collab-electron/src/main/precreated-native-tui.test.ts
+   ```
+
+   Use one adjacent comment with exactly this meaning: these are isolated
+   fixture/oracle tests and add no application runtime writer. No wildcard,
+   suffix rule, directory exception, SQL-pattern change, scan-root change, or
+   other allowlist entry is permitted.
+2. In `docs/orders/evidence/r16/BUILD-REPORT.md`, record the gate-only
+   command, its falsifier, restoration hash/zero-diff receipt, and restored
+   green command. No other evidence file is in scope.
+
+The gate-only Builder's acceptance sequence is exact:
+
+1. Run `bun qa/run.ts kernel-sole-writer-app`; native exit `0` is required.
+2. Remove only the new `governed-review.test.ts` literal from the candidate
+   gate file. Run the same command; native nonzero is required and its output
+   must name exactly
+   `collab-electron/src/main/governed-review.test.ts (node:sqlite)`.
+3. Restore the candidate gate bytes exactly, prove the restored file hash
+   equals the pre-falsifier candidate hash, and run the same command to native
+   exit `0`.
+4. Run the unchanged parent short matrix in this order: the commands at
+   lines 504–519 of this file, including its own `kernel-sole-writer-app`
+   invocation. Its three `bun test` commands require native `N pass / 0 fail`
+   with `N > 0`; each `qa/run.ts` gate must print `PASS`; both `git diff
+   --check` commands must exit `0`. Retain unedited output for each command.
+5. Run the exact Atlas currentness/ratchet pair
+   `bun qf-atlas/generate.mjs --check` and `bun qf-atlas/ratchet.mjs`, then the
+   two exact diff checks `git diff --check` and
+   `git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD`; every
+   command must exit `0`.
+
+Every acceptance gate can fail: the allowlist gate has the governed-review
+entry-removal falsifier; the inherited test/gate commands fail on a red test,
+missing `PASS`, or nonzero exit; Atlas fails on stale or regressed projections;
+and either diff check fails on whitespace errors. Every deliverable has one
+meaning: one finite four-file allowlist correction and one named R16 evidence
+file, with no product, test, generated-Atlas, consumer, or R17 change.
+
+Fresh adversarial Reader result for this exact closure: **YES/YES**. The
+gate-only Builder is authorized for the two deliverables and acceptance
+sequence above. No product edit, test edit, build, launch, founder-state
+change, or R17 work is authorized.

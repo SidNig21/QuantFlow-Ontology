@@ -1,7 +1,7 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER CRITIC-SUBMIT REPAIR - BUILDER AUTHORIZED
-authorized-at: 2026-08-21
+status: R16 WRITE-STATUS MATRIX ALLOWLIST CORRECTION - GATE-ONLY BUILDER AUTHORIZED
+authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
 route: [GOLDEN-RUN.md](GOLDEN-RUN.md), R16 active
@@ -101,7 +101,7 @@ current-door: exact `CRITIC SUBMIT VERIFIER RED — Reader findings and binding 
 consumer-critic-submit-verifier-reader-receipt: fresh Reader reread at pushed docs head `332970b`; final YES/YES; the exact PTY write-status correction is Builder-authorized, with no rebuild, consumer launch, or R17 authority
 consumer-critic-write-status-candidate: immutable product candidate `e824ae10f50336a1640afeecd802ed7141bbeeb7`; Builder evidence `2253ccb0bc71cbecb75ab820aed9bdce9ad18d13`; focused tests and both write-status falsifiers green; Atlas current with HARD RED 0
 consumer-critic-write-status-matrix-red: required unchanged `kernel-sole-writer-app` gate named four pre-existing isolated focused test imports absent from its exact test allowlist; every other parent command was green; bounded gate-only synchronization is appended to WO-R16
-current-door: exact `WRITE-STATUS MATRIX RED — stale app sole-writer test allowlist` correction requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
+current-door: exact `WRITE-STATUS MATRIX READER CLOSURE` is YES/YES; gate-only Builder is authorized for the four literal `KERNEL_ALLOWED` entries and the existing R16 BUILD-REPORT only; no product, test, build, launch, founder-state, or R17 authority
 
 ## Authorized outcome
 
