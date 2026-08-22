@@ -2199,3 +2199,42 @@ exit=0; no output
 ```
 
 The product candidate was committed before this evidence append at immutable SHA `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`. No build, app launch, normal consumer attempt, founder-state access, credential/model change, order/NEXT edit, or R17 work occurred in this Builder lap. This report append is the separate evidence commit.
+
+## Final consumer-layout repair
+
+The normal completed Mission exposed one additional product defect after the
+critic path succeeded: its reused Dataset and result Artifact retained distant
+saved coordinates, so viewport fitting compressed the whole research world.
+Candidate `ca59628a334cc3da0060204b7685017fa381dc44` changes only the malformed
+layout detector minimum (`4` existing research tiles to the meaningful minimum
+`2`), adds the exact two-shared-member regression, and regenerates Atlas's
+normal projections.
+
+```text
+bun test collab-electron/src/windows/shell/src/research-world.test.ts
+8 pass / 0 fail / 37 expect
+
+bun qa/run.ts research-world-visible
+pointer_tiles=10 inspect=10 collapse=10
+oracle_tiles=13 oracle_cables=15 dom_tiles=13 dom_cables=15
+roots_remaining=0 leaked=[]
+PASS research-world-visible
+
+bun qf-atlas/generate.mjs --check
+current — 433 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+HARD RED: 0
+
+bun qa/run.ts kernel-sole-writer-app
+PASS
+
+bun qa/run.ts doc-links
+PASS — 69 live documents
+
+git diff --check
+exit 0
+```
+
+The immutable candidate was pushed cleanly to `origin/wo-R16`. A fresh
+independent Verifier then repeated the non-generating matrix and returned PASS.

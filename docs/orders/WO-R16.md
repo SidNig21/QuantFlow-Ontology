@@ -1,7 +1,7 @@
 # WO-R16 - Visible research world
 
-status: sixteenth-cable candidate independently verified - normal consumer Attempt 4 authorized
-assignee: Router for Computer Use consumer check
+status: COMPLETE — independently verified and founder-consumer accepted at `ca59628a334cc3da0060204b7685017fa381dc44`
+assignee: complete
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
@@ -5425,3 +5425,27 @@ green; the two changed file hashes and HEAD remained unchanged. One
 identity-bound build and one normal consumer attempt are authorized on this
 candidate under the existing one-terminal/no-retry bar. Any red remains an R16
 stop; no R17 work begins.
+
+## Final acceptance — 2026-08-22
+
+The governed critic completion repair produced immutable candidate
+`fff63ad4429cd50a855750e2171ca93506fe8fbf` and fresh independent PASS. A normal
+Computer Use Mission then completed Director, worker, deterministic Run,
+independent critic, numeric Evaluation, and gated Report, but exposed one
+founder-visible layout defect: two reused shared research objects retained stale
+distant coordinates and compressed the 13-object world into an unreadable
+vertical strip.
+
+The exact bounded layout repair is accepted candidate
+`ca59628a334cc3da0060204b7685017fa381dc44`. Fresh Luna Verifier
+`r16_layout_repack_verifier` returned PASS with focused `8/0`, pointer
+`10/10/10`, exact oracle/DOM `13/15`, Atlas `HARD RED: 0`, writer gate green,
+both diff checks green, and candidate bytes unchanged. Computer Use opened the
+identity-bound build at timestamp `2026-08-22T15:38:39.9891161Z`, inspected the
+real Dataset by pointer, closed and reopened the same completed Mission/world,
+and confirmed the readable three-lane projection persisted. Final ordinary
+shutdown left `owned_processes_remaining=0`.
+
+The complete receipt is
+[`evidence/r16/FINAL-ACCEPTANCE.md`](evidence/r16/FINAL-ACCEPTANCE.md). R16 is
+complete. No R17 product implementation was performed by this acceptance tail.

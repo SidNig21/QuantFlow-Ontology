@@ -295,6 +295,31 @@ exit=0 for both
 
 `verdict: PASS`
 
+## Final layout-repair verification
+
+Fresh Luna Verifier `r16_layout_repack_verifier` independently verified exact
+candidate `ca59628a334cc3da0060204b7685017fa381dc44` and returned PASS.
+
+```text
+research-world renderer                    8 pass / 0 fail / 37 expect
+research-world-visible                     PASS
+pointer tiles / inspect / collapse         10 / 10 / 10
+oracle objects / cables                    13 / 15
+DOM objects / cables                       13 / 15
+roots remaining / leaked                   0 / []
+Atlas current                              433 files / 124 channels
+Atlas ratchet                              HARD RED 0
+kernel-sole-writer-app                     PASS
+git diff --check                           exit 0
+```
+
+The Verifier recorded unchanged HEAD, clean tree, and unchanged hashes for all
+five candidate/generated paths. Its adversarial check confirmed that one saved
+research tile remains untouched and two distant reused members now trigger only
+layout repacking; ontology, cable, and inspector assertions are unchanged.
+
+`verdict: PASS`
+
 ## R16 independent verification — shared Artifact world isolation
 
 **Result: PASS** — immutable product candidate

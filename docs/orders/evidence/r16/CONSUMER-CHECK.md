@@ -446,3 +446,33 @@ Mission activation, ontology gateway, governed review, Hermes launch policy,
 Atlas currentness/ratchet, and both diff checks independently PASS. The app
 closed through its ordinary visible Close control with zero repo product and
 Hermes processes.
+
+## Final consumer acceptance — PASS
+
+Date: 2026-08-22
+
+Accepted candidate: `ca59628a334cc3da0060204b7685017fa381dc44`
+
+Build timestamp: `2026-08-22T15:38:39.9891161Z`
+
+The final normal consumer Mission is
+`mission-b69ba872-fd46-4a2b-a8fd-557c64aa2a4d`. It completed the real Research
+Director, worker, deterministic Run/result, sole independent critic,
+`supports` Evaluation `01636718-c243-4142-878e-0f1a0977a7e3`, and gated Report
+`07cd1de85128e56e07eb73851c54619c07c32a00fa7844406aeb4e3d47925a4b`.
+The critic recorded the exact three governed reads followed by one successful
+`qf_record_evaluation` call.
+
+Computer Use opened the identity-bound normal app and confirmed the saved
+Mission now renders as a readable three-lane world rather than the tiny
+single-column projection from the red screenshot. A real Dataset inspector
+opened by pointer and exposed its durable contents. The independent production
+gate opened and collapsed all ten inspectors by pointer and measured exact
+oracle/DOM `13 objects / 15 cables`.
+
+The app closed normally, reopened against the same Kernel, and displayed the
+same Mission, Evaluation, Report, and readable world with an exact SHA/timestamp
+masthead. Final visible Close left `owned_processes_remaining=0`.
+
+Verdict: **PASS. R16 is founder-consumer accepted.** Full receipt:
+[`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md).
