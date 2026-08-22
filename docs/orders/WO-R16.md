@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer governed-world and shutdown repair - final Computer consumer check required
+status: normal consumer critic-submit repair - fresh Reader required
 assignee: one fresh Builder session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -3691,4 +3691,83 @@ The first Router invocation after Verification used the spent, invalid syntax
 usage/help and did not invoke Electron Vite or change the output products. That
 is an order-command falsifier receipt, not a build attempt or passing gate. The
 corrected command and output/timestamp assertions above are now the only build
-authority; exactly one actual build remains authorized.
+authority. That one actual build then completed at candidate `34c4bd2` with the
+receipt recorded below and is spent. After a repair candidate passes fresh
+independent verification, this final subsection authorizes exactly one new
+actual build for its two-launch normal consumer check; no other build is
+authorized.
+
+## FINAL COMPUTER RED — delivered text was never submitted to Hermes
+
+The first ordinary normal-app launch of the built immutable product candidate
+`34c4bd254165901b8e2d8df72e717c76a171c341` displayed that exact masthead SHA
+and packaged timestamp `2026-08-22T09:53:50.3974172Z`. Computer Use clicked
+`TRY GUIDED RESEARCH` once. Production created Mission
+`mission-0ecd27fd-a454-478d-94ab-b223bc20c3d3`, Director
+`4fdbb9b1-111a-438a-86cd-bf7043228017`, executor
+`7c9e2a14-3f6b-4a8d-b1e5-9d2c4f6a8e01`, source Task
+`task-a1d5590c-918b-49b0-a33c-481651c31803`, deterministic Run
+`run-fba0063c-f840-4c8d-8089-eb964d93b481`, critic
+`critic-78b29468-e803-4152-8c1c-53c225cc7518`, frozen
+`qf_review_source_work`, review Task
+`review-task-c772cafe-b2b8-4617-99a0-8cff5af4cda0`, one admitted review
+attempt, and one initial `delivery_receipt` whose outcome was `delivered`.
+
+That delivered receipt was false in the product sense. The normal continuation
+called `deliverToAgentSession(criticSessionId, criticInstruction)` once. That
+function writes bytes to the PTY and returns; unlike the existing Hermes
+`activateMission` boundary, it does not wait and send the separate carriage
+return that submits the input. After fourteen minutes the critic and Director
+were still `running`, `qf_review_invocation` had zero rows, Evaluation count was
+unchanged, `qf_review_publication` had zero rows, and the review Task remained
+`running` with no terminal receipt. Ordinary window Close then produced
+`consumer_windows_processes_remaining=0` and
+`consumer_wsl_processes_remaining=0`. This is an exact normal-product delivery
+defect, not a provider-speed assumption and not authority to synthesize a
+critic result.
+
+The same launch proved the exact unsubmitted candidate canary on the Director
+and critic terminals, but Computer Use reached the executor only after its
+one-shot process had closed. The missing executor receipt is a measurement-
+ordering red, not evidence of a terminal product defect. On the next consumer
+attempt, click `TIDY` as soon as the executor tile appears and complete that
+terminal's canary before waiting for its result. Then do the Director and
+critic canaries while each is live. Do not type into a terminal until its
+activation/task instruction has visibly left the input line.
+
+### Authorized narrow repair
+
+1. Preserve the already-proven order: create and start the critic to `running`,
+   admit the governed review, freeze source work, and record exactly one
+   delivery attempt. Do not start the critic with an instruction and do not
+   move admission back onto a `starting` critic.
+2. Make that one delivery attempt perform one semantic Hermes submission:
+   write the exact critic instruction once, wait the existing bounded 400 ms
+   input-settle interval, then write exactly one `\r`. Both PTY writes belong
+   to the same delivery attempt. If either write cannot target the same live
+   critic, reject that attempt and let the existing `finally` record `failed`.
+   Do not retry, synthesize an Evaluation, or weaken the source-work/read/
+   evaluation/publication ordering.
+3. Prefer one narrow production helper in `agent-host.ts`, used by the normal
+   continuation in `index.ts`, so the meaning is explicit: submitting an
+   app-authored Hermes instruction is not the same operation as writing raw
+   terminal bytes. Do not change unrelated peer delivery or the existing
+   founder-Submit activation path.
+4. Extend the existing normal-continuation runtime test to capture the real
+   production delivery seam and assert instruction-write, 400 ms settle,
+   one-carriage-return submission, one initial delivery receipt, then the
+   unchanged four governed tool receipts, Evaluation, and publication. No
+   direct Kernel shortcut or copied helper is allowed.
+5. Falsify by suppressing the carriage-return write while keeping the
+   instruction write successful. The focused test must go red because no
+   critic action can follow an unsubmitted instruction; restoration must return
+   green with byte-zero diff. Retain the full previously verified short matrix,
+   Atlas hard-red zero, and clean diff.
+
+A fresh Reader answers the standard two questions on this subsection before
+one Builder implements it. A fresh independent Verifier repeats the bounded
+matrix at the immutable repair candidate. Only then may the Router perform a
+fresh one-build/two-launch normal Computer consumer check. The failed launch
+above is a recorded diagnostic attempt and does not waive any three-terminal,
+13-object/15-cable, ten-inspector, reopen-equality, or cleanup assertion. R17
+remains closed.

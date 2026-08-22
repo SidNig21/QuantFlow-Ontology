@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - FINAL COMPUTER CONSUMER CHECK
+status: R16 NORMAL CONSUMER CRITIC-SUBMIT REPAIR - FRESH READER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -88,7 +88,10 @@ defects, then returned final `YES/YES` at pushed docs SHA
 governed-world-builder-receipt: immutable product candidate `34c4bd254165901b8e2d8df72e717c76a171c341`; evidence commit `0fc82c3547391af8c4b79b85093ef09901e2908f`; exact 14-command matrix green; F1-F7 each red then restored green; Atlas current/ratchet green with HARD RED 0 and one transparently recorded non-blocking diff finding; tree clean and pushed
 governed-world-verifier-receipt: fresh Terra task `01a028e0-4d92-78a0-b26b-9c9f63a4abc9`; PASS at immutable product candidate `34c4bd254165901b8e2d8df72e717c76a171c341`; exact 14-command matrix green; product/test/Atlas bytes unchanged; durable receipt `docs/orders/evidence/r16/GOVERNED-WORLD-VERIFICATION.md`
 consumer-build-command-red: `bun --cwd collab-electron run build` exited 0 with Bun usage/help, never invoked Electron Vite, and changed no output product; WO-R16 now binds the valid `bun run --cwd collab-electron build` syntax plus real output/timestamp assertions; the one actual build allowance remains unused
-current-door: exactly one build and two ordinary normal-app launches for the final Computer consumer contract; no R17 authority until full consumer PASS and R16 closure
+consumer-build-receipt: one actual `bun run --cwd collab-electron build` completed Main/preload/renderer at `34c4bd254165901b8e2d8df72e717c76a171c341`; output products postdate `2026-08-22T09:53:50.3974172Z` and the Main bundle contains that exact candidate SHA/timestamp
+consumer-critic-submit-red: normal candidate `34c4bd2` created Mission `mission-0ecd27fd-a454-478d-94ab-b223bc20c3d3`, executor Run `run-fba0063c-f840-4c8d-8089-eb964d93b481`, frozen source work, admitted review Task `review-task-c772cafe-b2b8-4617-99a0-8cff5af4cda0`, and one delivered receipt; the normal continuation wrote critic instruction text without the separate Hermes submit carriage return, leaving zero governed invocations/evaluations/publications after 14 minutes; ordinary close left zero Windows and WSL product processes
+consumer-terminal-measurement-red: exact Director and critic canaries were accepted/erased without submission; executor completed before its exact canary was captured; next consumer attempt must TIDY and check the executor while live, before waiting for its result
+current-door: fresh two-question Reader on the exact critic-submit repair; no Builder, new consumer launch, or R17 authority until Reader YES/YES
 
 ## Authorized outcome
 
