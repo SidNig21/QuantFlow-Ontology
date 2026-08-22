@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NATIVE TAB DIAGNOSTIC - AWAITING FRESH READER
+status: R16 NATIVE TAB DIAGNOSTIC - BUILD AUTHORIZED, READER YES/YES
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -20,6 +20,7 @@ session-reader-receipt: fresh Luna Reader task `01a0277a-3674-7141-9da3-1a1be304
 cleanup-budget-wip-receipt: session receipt focused tests 6/6 and gate contracts 11/11; live gate reached process cleanup with owned_processes_remaining=0 but exhausted the hard deadline before any root-removal attempt, leaving three roots and masking the primary receipt; WIP preserved at `eb2300631385673794a59110b6fba19a508b7703`
 budget-reader-receipt: fresh Luna Reader task `01a02783-882b-7af3-93e4-4660433b203f`; final YES/YES at `de89f8646e2f4c9114e56027317dc797af8bf8eb`
 budget-repair-wip-receipt: focused contract 13/13; live roots and processes clean; primary red `tab-focus-step` lacked the failing target and active-element identity; WIP preserved at `c8c7094a56d4be5c23abf40ea8e4d8f496d21fcc`
+tab-diagnostic-reader-receipt: fresh Luna Reader task `01a0278e-e71d-7922-a96b-8573fab923b8`; final YES/YES at `b91628a8918a22fc565a70ed447c48db2c8f1ef4`
 
 ## Authorized outcome
 
@@ -53,8 +54,8 @@ preserved at `eb23006` and exposed the one-minute cleanup-budget defect appended
 to `WO-R16.md`. A fresh two-question Reader returned final YES/YES at `de89f86`;
 the bounded budget repair is preserved at `c8c7094`. It made the live red honest
 and exposed the native-Tab diagnostic gap appended to `WO-R16.md`. A fresh
-two-question Reader must answer YES/YES before that diagnostic Builder door
-opens.
+two-question Reader returned final YES/YES at `b91628a`; that diagnostic
+Builder door is open.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 
