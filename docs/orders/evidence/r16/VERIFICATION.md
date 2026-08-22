@@ -408,3 +408,100 @@ consumer check, package/release gate, founder-state access, or R17 work ran.
 Product and test bytes remained unchanged throughout normal verification.
 
 `verdict: PASS`
+
+## R16 independent verification — governed Artifact read closure
+
+**Result: PASS** — immutable product candidate
+`99188c6b3e039821c5c615c621a45d5c3f484ab9` passed the exact independent
+governed-critic Artifact-read repair. Plain meaning: an admitted critic can
+inspect the verified result payload, and the durable broker record contains
+the same evidence.
+
+### Freeze and seam inspection
+
+- Verification started at clean pushed docs head `3aebb25d912103e3b32691b08dc56cb5dc028cec`
+  on `wo-R16`; candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9` was
+  immutable and Builder evidence was `404b7274a03be3189d5360ae55948bbf783fd8b8`.
+- The gateway imports and reuses the single exported R16 `artifactReceipt()`.
+  Only an admitted governed `qf_artifact_get` receives the safe metadata plus
+  verified receipt; `storage_ref` is omitted. The same enriched value is sent
+  to `qf_review_invocation`. Non-governed Artifact, Hypothesis, and Run reads
+  retain their prior shapes. The candidate test preserves the five existing
+  blocks and appends one literal-oracle contract test.
+- Frozen SHA-256 values before mutation, after restoration, and at handoff:
+
+```text
+51abb6d8ea34fac6466bb3f81e7507a2ff2211cb51b0b79181f912fdb2d9c77a  collab-electron/src/main/research-world-projection.ts
+08ce2f507538e08ad30994b5d7cfbddf217fb4839e58bfea60b11819808e3c8a  collab-electron/src/main/ontology-gateway.ts
+48189153395479484b323c4e2407409271a65d37921acf743074b55c06a2cbf0  collab-electron/src/main/ontology-gateway.test.ts
+ece7a1dbe2f384ca6cb6ce36f7f0ddb527f758d8928198dd34f3f2c0cc4f66f9  collab-electron/src/main/governed-review.test.ts
+87df5c7f0506bb966008611a0f592e942fd6e08a8dd1512d17dd90a0f71cf8b4  qf-atlas/ATLAS.md
+9687a849734f6215605b46391ae3a258af320d96487e175f55ae9ebebf800156  qf-atlas/atlas.json
+87df5c7f0506bb966008611a0f592e942fd6e08a8dd1512d17dd90a0f71cf8b4  qf-atlas/atlas.md
+a459c1bc9e1c8ac8b4ef33a5b15c056f91241674b554866510a564e740b70206  qf-atlas/atlas.html
+```
+
+All frozen product/test/generated-Atlas paths had zero diff against the
+candidate before this evidence append and after restoration.
+
+### Exact nine-row immutable Verifier matrix
+
+Each row ran once, in order, with native exit 0:
+
+```text
+1  bun test collab-electron/src/main/ontology-gateway.test.ts
+   6 pass / 0 fail / 67 expect
+2  bun test collab-electron/src/main/research-world.test.ts
+   4 pass / 0 fail / 52 expect
+3  bun test collab-electron/src/main/governed-review.test.ts
+   4 pass / 0 fail / 51 expect
+4  bun qa/run.ts kernel-sole-writer-app
+   PASS kernel-sole-writer-app
+5  bun qf-atlas/generate.mjs --check
+   current — 432 files, 124 channels, 13 strip candidates
+6  bun qf-atlas/ratchet.mjs
+   HARD RED: 0; unexplained coverage: 0; undecided without blocker: 0;
+   AMBER: 20; undecided: 42
+7  bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+   VERDICT: WORSE; 1 visible explained coverage classification, native exit 0
+8  git diff --check
+   exit=0
+9  git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+   exit=0
+```
+
+The Atlas diff's visible classification was retained unedited: the analyzer
+reported `packages/qf-kernel/src/attach-kernel-drift.test.ts` persistence as
+`not-applicable -> partial` because six SQL sites are outside named functions;
+ratchet HARD RED and unexplained coverage remained zero.
+
+### Exact gateway falsifier and restoration
+
+Only `collab-electron/src/main/ontology-gateway.ts` was temporarily replaced
+with its exact bytes from base
+`7dda122435dce47adbc650e5d5b9d933db249263`. The only command run against the
+mutation was:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+exit=1; 5 pass / 1 fail / 36 expect() calls
+```
+
+The native failure named the absent `receipt`: the governed Artifact result
+returned the old `storage_ref` metadata instead of the verified receipt.
+The candidate file was restored exactly; all four product/test paths had zero
+diff against the candidate, and the restored command returned:
+
+```text
+6 pass
+0 fail
+67 expect() calls
+```
+
+No Electron build, normal application launch, founder-state access,
+package/release gate, order/NEXT change, or R17 work ran. Product, test, and
+generated-Atlas bytes remained frozen.
+
+### Verdict
+
+`verdict: PASS`
