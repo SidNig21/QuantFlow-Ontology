@@ -19,6 +19,11 @@ const KERNEL_ALLOWED = new Set([
   // Focused Kernel-dispatch regression tests import the public Kernel surface
   // directly; they do not add an app runtime writer.
   "collab-electron/src/main/task-steering.test.ts",
+  // These are isolated fixture/oracle tests and add no application runtime writer.
+  "collab-electron/src/main/governed-review.test.ts",
+  "collab-electron/src/main/native-tui-orchestration.test.ts",
+  "collab-electron/src/main/ontology-gateway.test.ts",
+  "collab-electron/src/main/precreated-native-tui.test.ts",
 ]);
 /**
  * peer-delivery.ts reads the TRANSPORT db (peer-bus.db) via node:sqlite to push

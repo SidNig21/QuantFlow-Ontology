@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "61243c3",
+    "commit": "c79d9ed",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "39c6d7528bb4e9d2"
+    "fingerprint": "9f03856a7d06a3b7"
   },
   "stats": {
     "live": 111,
@@ -3463,7 +3463,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 573.8,
+      "kb": 574.1,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3723,7 +3723,7 @@
         },
         {
           "path": "qa/gates/kernel-sole-writer-app.ts",
-          "kb": 6.1,
+          "kb": 6.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -58447,12 +58447,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "e08dce5",
+      "commit": "61243c3",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "61243c3",
+      "commit": "c79d9ed",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
