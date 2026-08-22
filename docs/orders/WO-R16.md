@@ -3910,3 +3910,106 @@ timings, payloads, assertions, peer delivery, founder Submit, and all other
 files are frozen. A fresh Reader must return YES/YES on this subsection before
 one fresh Builder rework. No rebuild, consumer launch, or R17 work is
 authorized before fresh independent PASS.
+
+### CRITIC SUBMIT VERIFIER RED — Reader findings and binding closure
+
+The fresh adversarial Reader checked the preceding red against the immediately
+preceding binding closure and the current candidate code. The result is
+**NO/NO**. Four finite proof defects remain:
+
+1. **The requested falsifier cannot reach the named production return.**
+   `governed-review.test.ts` mocks `./pty` before importing the production
+   helper, so a temporary change to the real `pty.ts` `writeToSession()` body
+   is bypassed by the focused command. The order does not name a mutation in
+   the production helper or a controlled dependency seam that makes the
+   imported production call return `false`. Plain meaning: the test can stay
+   green while the real write-status check is broken.
+2. **A false result has no exact rejection meaning.** Item 2 says the helper
+   rejects, but names neither the first-write error nor the carriage-return
+   error. Item 4 therefore cannot require a native red receipt that identifies
+   which write was rejected. Plain meaning: two different failures could look
+   like the same successful handoff or an uncheckable generic error.
+3. **The two missing-PTY cases are not bound to the governed continuation.**
+   Item 3 asks for a helper rejection, but does not require each case to run
+   `kernelContinueGovernedResearchResult` and assert the exact failed delivery
+   receipt, zero delivered receipts, and zero downstream invocation,
+   Evaluation, or publication rows. A direct helper call could pass while the
+   real continuation still records or permits downstream work. Plain meaning:
+   the small test could pass even if the normal app still says the work was
+   delivered.
+4. **The test seam and restoration target have two meanings.** “Missing
+   underlying PTY,” “restore the real write target,” and “the existing exact
+   two-write green assertion” do not say whether the mocked hook returns
+   `false`, whether the live entry must remain byte-identical, or which write
+   count/payload is expected in each case. The current hook is typed as
+   returning nothing, so the new boolean contract is otherwise untestable.
+   Plain meaning: two competent Builders could build different red tests and
+   both claim compliance.
+
+This closure supersedes only the mechanics of the preceding verifier-red
+subsection. Before a Builder door opens, the correction is bound exactly as
+follows:
+
+1. In `collab-electron/src/main/pty.ts`, `writeToSession(sessionId, data)`
+   returns `boolean`. If `dataSockets.get(sessionId)` exists and is not
+   destroyed, it calls `dataSock.write(data)` exactly as before and returns
+   `true`, ignoring that socket API's backpressure boolean. Otherwise, if
+   `sessions.get(sessionId)` exists, it calls `session.pty.write(data)` exactly
+   as before and returns `true`. If neither target exists, it returns `false`.
+   A write exception propagates; it is not converted into a success or a
+   missing-target result. No routing, caller, or raw-terminal behavior changes.
+2. In `submitAgentSessionInstruction()` only, capture the boolean from the
+   first `writeToSession(capturedPtySessionId, text)` call and from the second
+   `writeToSession(capturedPtySessionId, "\r")` call. Preserve the existing
+   pre-write and post-write live-target checks, exact text payload, one
+   400-ms wait, captured PTY id, and no-retry rule. After the post-write check,
+   a false first result rejects with exactly
+   `governed review critic instruction write was not accepted`; a false second
+   result rejects with exactly
+   `governed review critic submit write was not accepted`. A true result is
+   required from both writes. These are delivery attempt errors, not new
+   receipt kinds.
+3. Make the existing `governed-review.test.ts` PTY mock an explicit boolean
+   observation seam: its hook type returns `boolean`, the mock
+   `writeToSession()` returns that hook result, and the ordinary green hook
+   returns `true`. The test must retain the production import of
+   `submitAgentSessionInstruction`; it may control only this write
+   observation/wait seam. A retained unchanged live entry is used in both red
+   cases. “Missing underlying PTY” means the seam returns `false` while the
+   exact live entry, `sessionId`, `kind`, and `ptySessionId` remain unchanged;
+   the test must not delete or replace that entry for either case.
+4. The same test must exercise each red case through a real production
+   `kernelContinueGovernedResearchResult` continuation with only its delivery
+   callback supplied. In the first case the text-write observation returns
+   `false`; the second carriage-return write is not attempted. In the second
+   case the text write returns `true` and the carriage-return observation
+   returns `false`. Each continuation must reject with the exact error from
+   item 2, produce exactly one `failed` initial delivery receipt and zero
+   `delivered` initial delivery receipts, and leave
+   `qf_review_invocation`, Evaluation, findings Artifact, and publication counts
+   at zero for that review Task. The test records the attempted payloads and
+   proves the green path still has exactly two writes: the instruction with
+   its one terminal `\r` removed, then exactly `"\r"` after the bounded wait.
+   No test path may insert governed receipts, Evaluation, publication, or a
+   fake PTY result directly as proof of submission. The existing changed-target
+   and missing-live-entry red cases remain required.
+5. The temporary boolean falsifier is exact and executable despite the PTY
+   mock: in `agent-host.ts`, on the first green-path assignment only, change
+   the production result expression from
+   `const textAccepted = writeToSession(capturedPtySessionId, text)` to
+   `const textAccepted = writeToSession(capturedPtySessionId, text) && false`.
+   Run exactly `bun test collab-electron/src/main/governed-review.test.ts` and
+   require a native nonzero exit whose output names
+   `governed review critic instruction write was not accepted`. Restore the
+   exact original expression, require zero diff for `agent-host.ts`, and rerun
+   the same command to its native green count. This is one additional
+   write-status falsifier; the preceding missing-carriage-return falsifier and
+   the full bounded matrix remain binding. No `pty.ts` mutation is substituted
+   for this falsifier, because the focused test mocks that module.
+
+The allowed paths, parent matrix, Atlas controls, source-work/review/delivery
+ordering, three-terminal consumer check, 13-object/15-cable bar,
+reopen-equality, cleanup requirements, no-rebuild rule, and R17 closure remain
+unchanged. A fresh Reader must reread this closure and return YES/YES before
+one fresh Builder rework; no Builder, consumer launch, or R17 work is
+authorized before that receipt.
