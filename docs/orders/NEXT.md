@@ -39,7 +39,7 @@ sequential-closure-reader-receipt: fresh Luna Reader task `01a027eb-d1cf-7f41-b2
 sequential-status-red-receipt: focused R16 13/0; forced launch cleanup, pointer 10/10, and final process/root cleanup green; first-world comparison stopped on one agent_session displayed-field delta; WIP preserved at `330fbc8e757b32441f384f1d742a7189952f2c9c`
 volatile-status-reader-receipt: fresh Luna Reader task `01a027fd-6604-7bf1-bcc3-e8598c5ce51c`; first pass NO/NO with seven defects; exact defect closure landed; final YES/YES at `89939f2933cb76bbeb17442de47ecdb56f1cb3c4`
 session-receipt-diagnostic: focused R16 13/0; live exact receipt showed the Research Director tile retained ontology identity but actual displayed fields were `{}` while the independent Oracle held id/label/status; all cleanup zero; WIP preserved at `521a83b1b8db19a7aa23a65f9cd2ad6b80964396`
-session-composition-reader-receipt: pending fresh two-question Reader over `SESSION RECEIPT COMPOSITION REPAIR`; no Builder opens before YES/YES
+session-composition-reader-receipt: fresh Luna Reader task `01a02808-6c4d-7d50-8a8c-8115306c2c7b`; first pass NO/NO with eight finite proof defects; exact two-path defect closure landed; final reread pending, so no Builder opens before YES/YES
 
 ## Authorized outcome
 

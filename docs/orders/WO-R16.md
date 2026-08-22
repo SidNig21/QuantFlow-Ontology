@@ -2537,3 +2537,61 @@ package/installer/release, wrapper/helper, worktree, or R17 is authorized.
 A fresh Reader answers the same two questions over this section before a fresh
 Builder opens. This section supersedes only the status-only assumption; all
 strict field, world, reopen, cleanup, and mouse-first assertions remain active.
+
+### Session-composition Reader-defect closure - exact two-path product proof
+
+The first fresh Reader returned NO/NO with eight finite defects. These clauses
+replace the ambiguous phrases in `SESSION RECEIPT COMPOSITION REPAIR`:
+
+1. A qualifying receipt is a direct `taskFoot` child whose
+   `classList.length === 1` and whose sole class is exactly
+   `qf-world-session-receipt`. Retain the first qualifying child, remove later
+   qualifying direct children, and do not qualify a nested node or a child with
+   any additional class. After the existing task projection finishes rendering,
+   append the retained original node object exactly once as the final direct
+   child, after task facts, history, controls, restored form, and restored error.
+2. The one new third test in `task-composition.test.ts` contains two independent
+   subcases without mutating either DOM between a real `renderTaskFoot` call and
+   its assertions:
+   - Receipt subcase: seed one qualifying direct receipt with exactly three row
+     objects keyed `id`, `status`, and `label`; each contains one
+     `.qf-world-field-value` with distinct text. Also seed one later qualifying
+     direct duplicate, one nested receipt, and one direct node with the receipt
+     class plus an extra class. Reuse the same `foot` and session tile for two
+     renders whose assigned task titles are exactly `task-a` and `task-b`.
+     Require the first receipt node and its exact three row/value node identities
+     and texts to survive; exactly one qualifying direct receipt remains as the
+     final direct child; the later qualifying duplicate is gone; neither
+     distractor is treated as the retained receipt; and the visible task title
+     changes from `task-a` to `task-b`.
+   - No-receipt subcase: use a fresh foot with no qualifying receipt and the
+     same real renderer. Require no `.qf-world-session-receipt`,
+     `[data-qf-world-field]`, or `.qf-world-field-value` node to be created.
+     For identical inputs, assert the WIP `521a83b` output exactly: direct-child
+     order, element names, classes, text, attributes, dataset values, control
+     state, form values, history, and error text. The test also source-checks
+     that `task-composition.js` contains no receipt-field construction or
+     rendering path; it may only retain/reappend an opaque existing node.
+3. Pre-live proof is exactly these native commands and counts, with full output
+   and exit recorded; any nonzero exit or other count stops:
+   - `bun test collab-electron/src/windows/shell/src/task-composition.test.ts`
+     => 3 pass, 0 fail;
+   - `bun test collab-electron/src/windows/shell/src/research-world.test.ts`
+     => 6 pass, 0 fail;
+   - `bun test qa/gates/research-world-visible.test.ts`
+     => 13 pass, 0 fail.
+4. If and only if the sole live primary failure is the exact status-only delta
+   authorized above, apply that bounded status repair, rerun the focused R16
+   test and require 13/0, then run exactly one final live gate. Any other delta
+   stops without repair or rerun.
+5. Reopen comparison is exact: every non-session field and every session
+   `id`/`label`, accessible name, cable, position, and inspector state are
+   byte-equal. A session status is equal or follows one direct edge in
+   `transitions.agent_session[first]`; enum validity alone, a reverse edge, or a
+   transitive-only path is red.
+
+No-receipt behavior is therefore measured, opaque-node preservation is the
+only new product behavior, the receipt remains solely owned by
+`research-world.js`, and the existing task projection remains measurable rather
+than covered by the live gate alone. The same Reader rereads this closure with
+the parent section; only final YES/YES opens the Builder.
