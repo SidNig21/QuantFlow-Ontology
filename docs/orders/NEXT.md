@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 CONSUMER ATTEMPT 5 CONTRACT RED - FRESH READER REQUIRED
+status: R16 CRITIC CONTRACT BUILDER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -146,7 +146,8 @@ consumer-attempt-4-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73
 current-door: Router is authorized for one unchanged-output normal two-launch Computer Use Attempt 5; right-side live-session rows are prohibited; any red keeps R16 open; no R17 authority
 consumer-attempt-5-external-runtime-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` completed Director recruitment, deterministic worker execution, and the sole critic's three governed reads; the critic independently computed a numeric supporting Evaluation, but `qf_record_evaluation` recorded `success=0`/`{"status":"pending"}` while its live terminal displayed external `403 {"model":"kimi-k3"}`; no Evaluation/Report/world/reopen PASS exists; Director/critic canaries and ordinary zero-process cleanup passed
 consumer-attempt-5-diagnostic-correction: the critic's saved Hermes session and error log prove QuantFlow first instructed the critic to hire a worker it was forbidden to hire, then the sequence-4 call returned deterministic product error `findings must be a non-empty ordered array` because production Mission text requested `plain-text findings` and generated tool authority still advertised legacy string-or-array; only the subsequent model turn returned external `403 {"model":"kimi-k3"}` before correction
-current-door: exact `CONSUMER ATTEMPT 5 CONTRACT RED — governed critic findings authority contradicts runtime` requires one fresh Reader YES/YES; no Builder, rebuild, consumer Attempt 6, or R17 authority before that receipt
+critic-contract-reader-receipt: fresh Luna Reader task `01a029dc-b08b-7730-8af4-2722c78a747a`; immutable docs SHA `151a629a324dcbe368e689260a6cfe4a105b1cf2`; final YES/YES with no edits
+current-door: exact critic-contract Builder is authorized on Reader-approved docs head; no rebuild, consumer Attempt 6, or R17 authority before immutable candidate and fresh independent PASS
 
 ## Authorized outcome
 

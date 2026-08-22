@@ -5342,3 +5342,8 @@ manual Evaluation, verdict override, or model retry is allowed. It must produce
 the successful Evaluation/Report, exact 13-object/15-cable pointer world, ten
 pointer inspectors, terminal typing receipts, ordinary close/reopen equality,
 and zero owned processes. Any red keeps R16 open. No R17 authority is created.
+
+Fresh adversarial Reader receipt: Luna task
+`01a029dc-b08b-7730-8af4-2722c78a747a` inspected immutable docs SHA
+`151a629a324dcbe368e689260a6cfe4a105b1cf2` and answered YES/YES with no edits.
+The bounded Builder door above is open.
