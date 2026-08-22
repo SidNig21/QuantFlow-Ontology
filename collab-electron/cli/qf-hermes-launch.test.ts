@@ -134,6 +134,11 @@ describe("Hermes packaged launch wrapper", () => {
     const root = mkdtempSync(join(tmpdir(), "qf-hermes-critic-oneshot-"));
     try {
       const wrapperPath = resolve(import.meta.dir, "qf-hermes-launch.sh");
+      const wrapper = readFileSync(wrapperPath, "utf8");
+      expect(wrapper).toContain("a non-empty ordered findings array");
+      expect(wrapper).toContain("Every finding must contain exactly code, severity, message, and evidence_refs");
+      expect(wrapper).toContain("review is incomplete until qf_record_evaluation succeeds");
+      expect(wrapper).not.toContain("non-empty plain-text findings");
       const isolatedRoot = join(root, "isolated-hermes");
       const args = process.platform === "win32"
         ? [
