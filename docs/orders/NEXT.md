@@ -98,6 +98,8 @@ consumer-critic-submit-verifier-red: fresh independent Verifier task `01a02907-1
 current-door: exact `CRITIC SUBMIT VERIFIER RED — silent PTY write still reports delivery` correction requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
 consumer-critic-submit-verifier-reader-findings: fresh adversarial Reader at docs head `e7cdae2` returned NO/NO; the PTY mock bypass, missing exact rejection meanings, unbound governed-continuation red cases, and ambiguous boolean test seam were appended to `WO-R16.md`; fresh reread required
 current-door: exact `CRITIC SUBMIT VERIFIER RED — Reader findings and binding closure` requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
+consumer-critic-submit-verifier-reader-receipt: fresh Reader reread at pushed docs head `332970b`; final YES/YES; the exact PTY write-status correction is Builder-authorized, with no rebuild, consumer launch, or R17 authority
+current-door: exact `CRITIC SUBMIT VERIFIER RED — Reader findings and binding closure` Builder authorized only; no rebuild, consumer launch, or R17 authority
 
 ## Authorized outcome
 

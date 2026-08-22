@@ -1,7 +1,7 @@
 # WO-R16 - Visible research world
 
-status: normal consumer critic-submit write-status rework - fresh Reader required
-assignee: one fresh Reader session
+status: normal consumer critic-submit write-status rework - Builder authorized
+assignee: one fresh Builder session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
@@ -4018,3 +4018,8 @@ reopen-equality, cleanup requirements, no-rebuild rule, and R17 closure remain
 unchanged. A fresh Reader must reread this closure and return YES/YES before
 one fresh Builder rework; no Builder, consumer launch, or R17 work is
 authorized before that receipt.
+
+Fresh Reader reread receipt: at pushed docs head `332970b0d8c04b41dad23adc64231c0b7f0a95fc`,
+the appended binding closure is **YES/YES**. The Builder is authorized only
+for the exact critic-submit write-status correction above; no rebuild, consumer
+launch, or R17 work is authorized by this receipt.
