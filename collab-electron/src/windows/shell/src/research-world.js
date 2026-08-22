@@ -13,6 +13,18 @@ const FIELD_ORDER = {
 
 function tileId(type, id) { return `ontology:${type}:${id}`; }
 
+export function resolveResearchWorldEndpointTileId(objects, canvasTiles, endpointId) {
+	const matchingObjects = (Array.isArray(objects) ? objects : []).filter((object) => object?.id === endpointId);
+	if (matchingObjects.length !== 1) return null;
+
+	const object = matchingObjects[0];
+	const matchingTiles = (Array.isArray(canvasTiles) ? canvasTiles : []).filter((tile) => {
+		if (object.type === "agent_session") return tile?.type !== "research" && tile?.sessionId === object.id;
+		return tile?.type === "research" && tile?.ontologyType === object.type && tile?.ontologyId === object.id;
+	});
+	return matchingTiles.length === 1 ? matchingTiles[0].id : null;
+}
+
 function displayValue(value, exists = true) {
 	if (!exists || value === null || value === undefined) return "Not recorded";
 	if (typeof value === "object") return JSON.stringify(value);
@@ -155,19 +167,20 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			if (!tile) { const pos = positionFor(index, object, rootTile); tile = tileManager.createResearchTile(pos.x, pos.y, object); }
 			else renderTile(getTileDOMs().get(tile.id), tile, object);
 		}
-		const keyFor = (id) => {
-			const tile = tiles.find((entry) => entry.id === tileId("agent_session", id)) || tiles.find((entry) => entry.sessionId === id);
-			return tile?.id;
-		};
-		const cables = result.world.links.map((link) => ({
-			id: `research-view:${link.kind}:${link.from_id}:${link.to_id}`,
-			kind: "view",
-			from_ref: `${keyFor(link.from_id) || tileId("unknown", link.from_id)}:e`,
-			to_ref: `${keyFor(link.to_id) || tileId("unknown", link.to_id)}:w`,
-			qfWorldCableKind: link.kind,
-			qfWorldCableFrom: link.from_id,
-			qfWorldCableTo: link.to_id,
-		})).filter((cable) => !cable.from_ref.startsWith("ontology:unknown:") && !cable.to_ref.startsWith("ontology:unknown:"));
+		const cables = result.world.links.map((link) => {
+			const fromTileId = resolveResearchWorldEndpointTileId(result.world.objects, tiles, link.from_id);
+			const toTileId = resolveResearchWorldEndpointTileId(result.world.objects, tiles, link.to_id);
+			if (!fromTileId || !toTileId) return null;
+			return {
+				id: `research-view:${link.kind}:${link.from_id}:${link.to_id}`,
+				kind: "view",
+				from_ref: `${fromTileId}:e`,
+				to_ref: `${toTileId}:w`,
+				qfWorldCableKind: link.kind,
+				qfWorldCableFrom: link.from_id,
+				qfWorldCableTo: link.to_id,
+			};
+		}).filter(Boolean);
 		onCables?.(cables);
 		return result;
 	}
