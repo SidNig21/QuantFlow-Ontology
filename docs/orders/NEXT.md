@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 VOLATILE SESSION-STATUS CLOSURE - BUILD AUTHORIZED
+status: R16 SESSION RECEIPT COMPOSITION REPAIR - READER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -38,6 +38,8 @@ early-concurrency-failure-receipt: the authorized experiment started forced laun
 sequential-closure-reader-receipt: fresh Luna Reader task `01a027eb-d1cf-7f41-b2be-ee6fcc2de38b`; final YES/YES at `a2d9a3ed40d5fc82da55e50c189ed79d6f23ae2b`
 sequential-status-red-receipt: focused R16 13/0; forced launch cleanup, pointer 10/10, and final process/root cleanup green; first-world comparison stopped on one agent_session displayed-field delta; WIP preserved at `330fbc8e757b32441f384f1d742a7189952f2c9c`
 volatile-status-reader-receipt: fresh Luna Reader task `01a027fd-6604-7bf1-bcc3-e8598c5ce51c`; first pass NO/NO with seven defects; exact defect closure landed; final YES/YES at `89939f2933cb76bbeb17442de47ecdb56f1cb3c4`
+session-receipt-diagnostic: focused R16 13/0; live exact receipt showed the Research Director tile retained ontology identity but actual displayed fields were `{}` while the independent Oracle held id/label/status; all cleanup zero; WIP preserved at `521a83b1b8db19a7aa23a65f9cd2ad6b80964396`
+session-composition-reader-receipt: pending fresh two-question Reader over `SESSION RECEIPT COMPOSITION REPAIR`; no Builder opens before YES/YES
 
 ## Authorized outcome
 

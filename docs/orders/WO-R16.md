@@ -2474,3 +2474,66 @@ close those defects and supersede only the ambiguous wording above:
 
 The Reader rereads this closure together with `VOLATILE SESSION-STATUS CLOSURE`
 and answers the same two questions again. Only final YES/YES opens the Builder.
+
+## SESSION RECEIPT COMPOSITION REPAIR - task refresh must not erase ontology
+
+Diagnostic WIP `521a83b1b8db19a7aa23a65f9cd2ad6b80964396` is
+evidence, not a candidate. Its focused contract passed 13/0. Its one live run
+printed the exact runtime-derived receipt:
+
+`displayed_fields_mismatch={"type":"agent_session","id":"762afa79-bcf0-44d5-9e92-1266a097ffa5","expected":{"id":"762afa79-bcf0-44d5-9e92-1266a097ffa5","label":"hermes-research-director","status":"running"},"actual":{},"differing_fields":["id","label","status"]}`
+
+The source seam names the defect. `research-world.js` appends one
+`.qf-world-session-receipt` to a live session tile's `taskFoot`.
+`task-composition.js::renderTaskFoot` later calls `foot.replaceChildren()` on
+that same projection surface during normal task refresh, erasing the ontology
+receipt. The tile identity remains, so the DOM reports the agent session while
+all three inspectable fields are gone. This is a product composition defect;
+the gate stays strict.
+
+The repair is finite:
+
+1. In `task-composition.js::renderTaskFoot`, before its existing
+   `replaceChildren`, inspect only the current direct children and retain the
+   first child whose class list contains exactly
+   `qf-world-session-receipt`. Pass that same node object into
+   `replaceChildren`; discard any duplicate receipt children. Then render the
+   existing task facts, history, controls, preserved form, and error behavior
+   unchanged. When no receipt exists, output is byte-equivalent to the current
+   behavior. Never create, clone, rewrite, or source receipt fields here;
+   `research-world.js` remains their sole renderer.
+2. Extend `task-composition.test.ts` with one focused test. Seed one direct
+   receipt node containing distinct id/status/label child facts plus one
+   duplicate receipt, call the real `renderTaskFoot` twice with two different
+   task projections, and require: the original receipt object survives exactly
+   once; the duplicate is gone; its three child object identities and text are
+   unchanged; and the task fact changes on the second refresh. Run this test
+   red against `521a83b` before product repair and green afterward.
+3. Preserve the exact diagnostic receipt and its 13/0 falsifiers from
+   `521a83b`. Run `task-composition.test.ts`, `research-world.test.ts`, and
+   `research-world-visible.test.ts` before live proof. Then run exactly one live
+   `bun qa/run.ts research-world-visible`.
+4. A green live run must include one pointer 10/10 receipt, exact 13/15 Oracle
+   and DOM counts, four launch attempts/two ready/maximum one, reopen equality,
+   zero owned processes, zero roots, and no cleanup failure. If the only red is
+   the previously Reader-approved exact `["status"]` temporal delta, the same
+   Builder may implement the bounded volatile-status comparison and run one
+   final live gate. Any missing/extra field, id/label delta, invalid status, or
+   other red stops without another repair or run.
+5. Full green continues with the existing short matrix, pointer falsifier,
+   Atlas generate/check/ratchet, BUILD-REPORT, candidate commit, and push. A
+   fresh different-model Verifier measures the immutable candidate once; then
+   the Router performs the normal-app Computer Use consumer check and stops
+   before R17.
+
+Allowed product paths are only
+`collab-electron/src/windows/shell/src/task-composition.js` and
+`collab-electron/src/windows/shell/src/task-composition.test.ts`. Existing gate
+paths, BUILD-REPORT, and three Atlas projections remain allowed evidence paths.
+No change to `research-world.js`, the Kernel/projection, fixture, ontology,
+timeout/reserve, launch scheduling, pointer behavior, keyboard behavior,
+package/installer/release, wrapper/helper, worktree, or R17 is authorized.
+
+A fresh Reader answers the same two questions over this section before a fresh
+Builder opens. This section supersedes only the status-only assumption; all
+strict field, world, reopen, cleanup, and mouse-first assertions remain active.
