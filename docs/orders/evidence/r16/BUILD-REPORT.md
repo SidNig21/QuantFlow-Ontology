@@ -457,3 +457,221 @@ No product file changed after `94c4ee61e9b64fca56d0101557eeb64cb5f4c534`.
 The following evidence-only commit contains this appended report section and
 will be pushed separately. The real founder database and backup were not
 accessed, the app was not launched, and no live R16 gate was run.
+
+## NORMAL CONSUMER HYPOTHESIS BINDING REPAIR — Builder closure
+
+Plain meaning: both question entry points now remember which Hypothesis belongs
+to the Director they start, so the completed worker result can continue into
+the deterministic and independent-review pipeline.
+
+| Field | Receipt |
+|---|---|
+| Starting WIP SHA | `f728487b964e2e06c508e6f8c3100e85495868e5` |
+| Product candidate SHA | `f8f085b3e87639f598e6973dca92ebfb2a781b57` |
+| Branch | `wo-R16` |
+| Candidate result | **PASS** for the exact short matrix, both falsifiers, and authorized Atlas refresh |
+| Live model/proof R16 gate | not run, per order |
+
+### Changed paths
+
+The product candidate changed exactly these paths:
+
+```text
+collab-electron/src/main/index.ts
+collab-electron/src/main/ipc-kernel.ts
+collab-electron/src/main/research-context.ts
+collab-electron/src/main/research-context.test.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+```
+
+The Router-owned `docs/orders/NEXT.md` and `docs/orders/WO-R16.md` edits were
+preserved unstaged. The context module is process-local only: it writes no file
+and no database, and exports only bind, read, clear-one, and clear-all.
+
+### Required Builder matrix — unedited receipts
+
+```text
+bun test collab-electron/src/main/research-context.test.ts
+native_exit=0
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\research-context.test.ts:
+(pass) binds one session and leaves an unbound session absent
+(pass) clearing one session does not clear another
+(pass) rejects empty ids before mutating existing bindings
+(pass) clear-all leaves every session unaddressable
+
+ 4 pass
+ 0 fail
+ 10 expect() calls
+Ran 4 tests across 1 file. [54.00ms]
+
+bun test collab-electron/src/main/mission-activation.test.ts
+native_exit=0
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\mission-activation.test.ts:
+(pass) mission activation is one bounded JSON-safe PTY instruction
+(pass) mission activation rejects oversize and invalid ids before bytes exist
+
+ 2 pass
+ 0 fail
+ 23 expect() calls
+Ran 2 tests across 1 file. [55.00ms]
+
+bun test collab-electron/src/main/native-tui-orchestration.test.ts
+native_exit=0
+bun test v1.3.12 (700fc117)
+
+collab-electron\src\main\native-tui-orchestration.test.ts:
+(pass) orchestrateNativeTuiAdmission > create failure leaves no process-local or Kernel compensation residue
+(pass) orchestrateNativeTuiAdmission > start failure records fail and close, cleans maps, then permits same role
+(pass) orchestrateNativeTuiAdmission > late peer failure unregisters only its PTY and same-role relaunch succeeds
+(pass) orchestrateNativeTuiAdmission > duplicate role preflight rejects before process start
+(pass) orchestrateNativeTuiAdmission > duplicate-role preflight revokes a minted capability without starting a process
+(pass) orchestrateNativeTuiAdmission > precreated admission preserves the exact id and registers delivery before running
+(pass) orchestrateNativeTuiAdmission > failed admission revokes its in-memory seat capability during owned cleanup
+(pass) orchestrateNativeTuiAdmission > readiness rejection writes no start and cleans every owned runtime seam
+
+ 8 pass
+ 0 fail
+ 40 expect() calls
+Ran 8 tests across 1 file. [59.00ms]
+
+bun qa/run.ts kernel-sole-writer
+native_exit=0
+PASS  kernel-sole-writer
+
+bun qf-atlas/generate.mjs --check
+native_exit=0
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+native_exit=0
+qf-atlas ratchet — 3.3s (budget 60s)
+
+
+  baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · undecided w/o blocker: 0 · AMBER (visible, non-blocking): 20 · undecided: 42
+
+git diff --check
+native_exit=0
+```
+
+The first post-edit Atlas check and ratchet were intentionally stale until the
+order-authorized generation step:
+
+```text
+bun qf-atlas/generate.mjs --check
+native_exit=1
+qf-atlas: STALE — atlas.json fingerprint 5d7c121939e697e8 != 0f3729344ed46ba0
+The map is a projection. Run: bun qf-atlas/generate.mjs
+
+bun qf-atlas/ratchet.mjs
+native_exit=1
+qf-atlas ratchet — 3.3s (budget 60s)
+
+  FAIL  STALE: the committed Atlas does not match the code. Run `bun qf-atlas/generate.mjs`.
+
+  baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · undecided w/o blocker: 0 · AMBER (visible, non-blocking): 20 · undecided: 42
+```
+
+### Bind and clear falsifiers
+
+The test file was unchanged for both mutations. The bind operation was first
+made a no-op; it exited nonzero and named the missing binding:
+
+```text
+bun test collab-electron/src/main/research-context.test.ts
+native_exit=1
+
+Expected: "hypothesis-a"
+Received: undefined
+(fail) binds one session and leaves an unbound session absent
+Expected: "hypothesis-b"
+Received: undefined
+(fail) clearing one session does not clear another
+Expected: "hypothesis-a"
+Received: undefined
+(fail) rejects empty ids before mutating existing bindings
+(pass) clear-all leaves every session unaddressable
+
+ 1 pass
+ 3 fail
+ 8 expect() calls
+Ran 4 tests across 1 file. [66.00ms]
+```
+
+The clear-one operation was then made a no-op; it exited nonzero and named the
+uncleared session:
+
+```text
+bun test collab-electron/src/main/research-context.test.ts
+native_exit=1
+
+(pass) binds one session and leaves an unbound session absent
+Received: "hypothesis-a"
+(fail) clearing one session does not clear another
+(pass) rejects empty ids before mutating existing bindings
+(pass) clear-all leaves every session unaddressable
+
+ 3 pass
+ 1 fail
+ 9 expect() calls
+Ran 4 tests across 1 file. [53.00ms]
+```
+
+The exact candidate bytes were restored after each mutation. The final restored
+focused run is the `4 pass / 0 fail` receipt above, and `git diff HEAD --` for
+the seven candidate paths was empty before this report was appended.
+
+### Authorized Atlas refresh and final receipts
+
+```text
+bun qf-atlas/generate.mjs
+native_exit=0
+qf-atlas: wrote atlas.json + atlas.html + ATLAS.md
+  432 files · 109 subsystems · 124 IPC channels
+  wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+  legacy loops: 6/8 healthy · Review and publish, Close the app
+  decisions: 42 undecided of 47
+  13 strip candidates · 10 confirmed violations · 3 gray · 22 coverage gaps
+
+bun qf-atlas/generate.mjs --check
+native_exit=0
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+native_exit=0
+qf-atlas ratchet — 3.3s (budget 60s)
+
+
+  baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · undecided w/o blocker: 0 · AMBER (visible, non-blocking): 20 · undecided: 42
+
+bun qf-atlas/generate.mjs --diff 94c4ee61e9b64fca56d0101557eeb64cb5f4c534
+native_exit=0
+Atlas diff  21b8c0b -> f728487
+VERDICT: UNCHANGED — no architectural change
+
+  added 0 · newly-detected 0 · resolved 0 · regressed 0
+  confidence changed 0 · owners changed 0
+  coverage worse 0 · better 0
+  undecided 42 -> 42
+
+wrote qf-atlas/atlas-diff.json
+
+git diff --check
+native_exit=0
+```
+
+The product candidate was committed before this report section:
+
+```text
+f8f085b3e87639f598e6973dca92ebfb2a781b57 fix(r16): bind research hypotheses across front doors
+```
+
+No live model, proof-mode R16 gate, installer, release matrix, typecheck
+rebuild, founder database, or R17 path was touched. The candidate commit
+contains only the seven paths listed above; the report is the subsequent
+evidence commit.
