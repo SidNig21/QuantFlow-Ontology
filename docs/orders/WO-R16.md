@@ -1238,23 +1238,31 @@ correctly expects those three fields, with `Not recorded` for an absent label.
 ### Exact repair
 
 1. Export one pure function named `researchSessionReceiptFields(object)`. It
-   returns exactly three entries in this literal order: `id`, `status`, `label`.
-   Each entry contains the field name and the same display string produced by
-   `displayValue`: missing/null/undefined is `Not recorded`, empty string is
-   `[empty string]`, and all other values use `String(value)`.
+   returns an array of exactly three objects in this literal shape and order:
+   `[{ field: "id", value: "<display>" }, { field: "status", value:
+   "<display>" }, { field: "label", value: "<display>" }]`. Each `value` is the
+   same display string produced by `displayValue`: missing/null/undefined is
+   `Not recorded`, empty string is `[empty string]`, and all other values use
+   `String(value)`. No third property or alternative container complies.
 2. `decorateSession` keeps the existing unique non-research session tile and
    its native terminal/CLI body. It must not call `renderObject`, replace or
    clear `dom.contentArea`, change the tile type/id/session identity, or create
    a research tile.
-3. Under that tile's existing `dom.taskFoot`, create or reuse exactly one direct
-   child `.qf-world-session-receipt`. On every projection refresh, replace only
-   that receipt's children with the three rows returned above, rendered through
-   the existing `makeField` seam so each row exposes `data-qf-world-field` and
-   `.qf-world-field-value`. Do not replace or remove any other task-foot child.
-4. The second reveal and reopen reuse the same receipt node and leave exactly
-   one copy. The existing `data-qf-world-type`, `data-qf-world-id`, and full
-   accessible name remain on the terminal tile. Session receipt fields are a
-   transient projection and add nothing to saved canvas state.
+3. Under that tile's existing `dom.taskFoot`, inspect only direct children with
+   class `.qf-world-session-receipt`. Zero matches creates one and appends it as
+   the final direct child. One match reuses it. More than one keeps the first in
+   DOM order and removes only the later matching receipt nodes. On every
+   projection refresh, replace only the retained receipt's children with the
+   three rows returned above, rendered through the existing `makeField` seam so
+   each row exposes `data-qf-world-field` and `.qf-world-field-value`. Never
+   replace, reorder, or remove any non-receipt task-foot child.
+4. A second reveal in the same window reuses the same receipt DOM node and
+   leaves exactly one copy. A full close/reopen creates a new DOM tree and
+   therefore a new receipt node, but it again leaves exactly one copy with the
+   same three field/value rows. The existing `data-qf-world-type`,
+   `data-qf-world-id`, and full accessible name remain on the terminal tile.
+   Session receipt fields are a transient projection and add nothing to saved
+   canvas state.
 
 The focused renderer test proves the pure field order and every display-value
 case. Its source seam also fails unless `decorateSession` targets
