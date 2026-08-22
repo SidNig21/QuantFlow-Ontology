@@ -892,3 +892,43 @@ same assertion repeated after one repair attempt, any primary failure other
 than the corrected count during the first live run, or any need outside these
 four path classes stops R16 for founder decision. No further implementation lap
 is authorized.
+
+## DIAGNOSTIC RULING - expose the renderer exception
+
+WIP SHA `471650c99a8638b878c0a8a1eb9bee16ae4bf604` proves the final
+reconciliation harness itself: focused tests 5/5; initial cases overlapped
+within 134 ms; both deliberate failure markers passed; every owned process and
+all three roots reached zero; `cleanup_failures=[]`. The normal case still
+failed, but Electron's `executeJavaScript()` boundary replaced the renderer
+exception with the generic `Script failed to execute` message. The gate cannot
+classify or repair a failure it deliberately discards.
+
+This ruling authorizes one diagnostic-only change to
+`qa/gates/research-world-visible.ts` and its focused test. Add one gate-local
+renderer-evaluation helper used by every `app.ui.evaluate` call. It JSON-encodes
+the inner expression, evaluates it inside a stable renderer-side `try/catch`,
+and returns exactly one of:
+
+```text
+{ "ok": true, "value": <JSON-serializable result> }
+{ "ok": false, "message": "<Error message>", "stack": "<stack or empty>" }
+```
+
+The helper throws in the gate on `ok:false` with exact
+`renderer_error={"label":"<call label>","message":"<message>","stack":"<stack>"}`.
+The focused test must prove quotes, backslashes, newlines, and a deliberately
+throwing inner expression survive encoding and return the exact error shape.
+No selector, expected value, count, product code, timeout, launch schedule, or
+cleanup behavior may change for diagnosis.
+
+Run the unchanged live gate once. If the exact renderer error identifies a
+mistake solely in the gate's observation expression, this same Builder may
+repair only that expression, add a focused red/green test for the mistake, and
+run the live gate one final time. If it identifies product behavior, an
+assertion change, or any other file, stop with the exact receipt. A green final
+run resumes the already-required falsifiers, Builder matrix, evidence,
+candidate commit, and independent verification. No further diagnostic or
+implementation run is authorized.
+
+Plain meaning: make Electron tell us the real one-line UI error, fix it only if
+the measuring script is wrong, and stop guessing.
