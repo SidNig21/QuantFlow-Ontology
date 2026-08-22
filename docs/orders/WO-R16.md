@@ -2086,3 +2086,64 @@ projections. Router-only authority/debt/consumer evidence and Verifier-only
 verification evidence remain separate. No product change, keyboard repair,
 timeout change, fixture change, assertion weakening, R17 work, or broader
 accessibility claim is authorized.
+
+### Pointer-first Reader-defect closure - machine clicks versus real mouse
+
+The first Reader correctly found that DOM `.click()` is not a physical pointer
+event and that the consumer check was underspecified. Close those defects as
+follows:
+
+1. The machine gate's ten-object loop is named the **DOM click-handler proof**.
+   It proves the production renderer's ten exact Inspect/Collapse handlers
+   against the independent manifest, but it does not claim real pointer input.
+   The post-Verifier Computer Use check below is the real-mouse proof. No new
+   Main/preload pointer bridge or synthetic native-input method is added.
+2. The live gate contains exactly one literal
+   `console.log("pointer_tiles=10 inspect=10 collapse=10")`, after the ten-loop
+   count assertions and nowhere else. The focused contract requires exactly one
+   occurrence in gate source. Builder and Verifier each require the live
+   transcript to contain exactly one exact receipt line; zero, two, a partial
+   count, or a receipt printed before all assertions is red. The BUILD-REPORT
+   and VERIFICATION record the transcript line and occurrence count.
+3. The normal-app Computer Use check uses real mouse input on **all ten**
+   research-object tiles, in independent-manifest order. For each exact visible
+   type/id it clicks Inspect once, captures the opened inspector with that same
+   type/id and its displayed fields, clicks Collapse once, and observes it
+   closed. Missing or duplicated tiles, an unreachable/off-screen control that
+   cannot be reached by ordinary pan/scroll/Tidy, a click affecting the wrong
+   tile, or any failed open/close is red. The three `agent_session` tiles remain
+   visible but are tested as terminals, not as research inspectors.
+4. The terminal consumer proof covers the Director, executor, and critic—three
+   terminals, not a sample. For each one, Computer Use:
+   - clicks the visible terminal input area with the real mouse;
+   - types exactly `qf-r16-typing-check-<candidate7>` with no Enter, submit,
+     newline, paste, or command execution;
+   - captures the visible exact canary in that same terminal;
+   - erases it using ordinary terminal editing (`Ctrl+U`, or `Ctrl+A` then
+     Backspace only if the first is visibly ineffective) and captures the empty
+     input line;
+   - clicks the canvas background and then one named research tile, and observes
+     terminal focus styling depart / canvas tile focus styling return.
+   Any absent echo, wrong terminal, required submit, failed erase, or inability
+   to return by mouse is red. Never type a character after leaving the terminal
+   merely to test where it would land.
+5. The normal app must display a build-identity/masthead SHA whose full value is
+   the immutable measured candidate, or an existing documented production
+   identity receipt that maps exactly to it; capture that receipt before any
+   interaction. A stale/unknown build is red. The check uses normal founder
+   state and existing authentication only. It must not request, enter, reveal,
+   copy, inspect, refresh, or alter any credential, token, auth file, or sign-in
+   state. Encountering an auth prompt is red and stops the check; existing
+   authenticated behavior is not credential handling.
+6. `CONSUMER-CHECK.md` records: measured candidate SHA and visible identity;
+   normal non-proof launch command/mode; before/after screenshots; ten exact
+   research type/id pointer receipts; three exact session-role typing/erase/
+   return receipts; visible 13-object/15-cable count observation; no-submit and
+   no-credential attestation; and final app/process state. Screenshots may show
+   only product UI and the harmless canary—no terminal history, prompt content,
+   secret, or unrelated desktop content. A screenshot is evidence of the named
+   observation, not a substitute for the exact receipt list.
+
+R16 closes only when the independent machine Verifier PASS and this real-mouse
+normal-app consumer PASS both exist. The Router then records the final evidence
+HEAD, updates the authority/status surfaces, and stops before R17.
