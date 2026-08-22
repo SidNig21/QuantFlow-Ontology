@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - READER REQUIRED
+status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - CORRECTED REREAD REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -77,10 +77,12 @@ consumer-governed-world-red: normal `f8f085b3` Computer run completed a real Dir
 consumer-shutdown-red: ordinary Close removed all Windows/Hermes/collaboration processes but left one app-owned WSL `qf-ontology-mcp.mjs` child at PID 1198 for more than eight minutes; exact orphan was terminated after recording; source race is an untracked async native-TUI teardown removed from the live map before shutdown can await it
 reader-receipt: fresh Reader at pushed head `3d1578e` returned `NO/NO`; the
 missing exact matrix, falsifiers, and deliverable meanings were corrected in
-`WO-R16.md`. The corrected reread at docs commit `052a13d` returned `YES/YES`.
-current-door: `NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR` Builder
-authorized from `052a13d`; independent Verifier and final normal consumer PASS
-are still required; no R17 authority exists.
+`WO-R16.md`. Its reread at docs commit `052a13d` returned `YES/YES`, but Router
+inspection found its new delivery-timing sentence contradicted the existing R15
+boundary: delivery is the critic instruction attempt, not the later verdict or
+publication. The sentence is corrected without changing product scope.
+current-door: one fresh reread of the corrected delivery lifecycle; no Builder,
+Verifier, final consumer rerun, or R17 work until final `YES/YES`.
 
 ## Authorized outcome
 

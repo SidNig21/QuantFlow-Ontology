@@ -3411,9 +3411,13 @@ ambiguous phrases without changing the product objective.
    `(source Task id, Hypothesis id, deterministic Run id, result Artifact id,
    worker session id)`. `kernelRequestGovernedReview()` receives that source
    Task and the already-created critic session, returns the one governed review
-   Task id, and the critic is started with that review Task plus the same source
-   work. Delivery is recorded only after the critic result and existing
-   publication checks pass. No renderer-owned row creation, second review Task,
+   Task id. The critic is started with that review Task plus the same source
+   work, and the existing delivery boundary is called immediately after that
+   one delivery attempt with exactly `delivered` when the live critic accepted
+   the instruction or `failed` when it did not. Delivery is not a verdict or
+   publication receipt: the critic result, Evaluation, and publication checks
+   remain later unchanged boundaries. A failed delivery cannot proceed to a
+   passing Evaluation. No renderer-owned row creation, second review Task,
    second source-work record, or alternate failure vocabulary is allowed.
 2. **Executor identity.** The source-work `executor_session_id`, Run executor,
    and `assigned_to` executor link are all the worker session id. The Director
