@@ -16,9 +16,10 @@ latest-observation-receipt: focused tests 8/8; live run stopped on a dead concur
 ## Authorized outcome
 
 Ryan opens one Mission or source Task and reveals the real research world on the
-canvas: Mission, Task, Hypothesis, Dataset, Run, result and findings Artifacts,
-Evaluation, and Report. Each object is inspectable, exact durable lineage is
-visible as honest cables, and close/reopen preserves the same world.
+canvas: Mission, source Task, governed review Task, Hypothesis, Dataset, Run,
+result and findings Artifacts, Evaluation, Report, Director, executor, and
+critic. Each of the 13 objects is inspectable, all 15 exact durable lineage
+cables are visible, and close/reopen preserves the same world.
 
 ## Reader instructions
 

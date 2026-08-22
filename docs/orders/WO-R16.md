@@ -86,24 +86,27 @@ returns that Artifact receipt with no bytes and exact
 The complete supporting fixture projects these unique tiles:
 
 1. **Mission**: id, name, full objective.
-2. **Task**: id, title, description, lifecycle, assignee identity, delegator
-   identity, and steering/review state.
-3. **Hypothesis**: id, full claim, success criteria, source citations, status.
-4. **Dataset**: id, kind, `as_of`, content hash, coverage, and source Artifact
+2. **Source Task**: id, title, description, lifecycle, assignee identity,
+   delegator identity, steering/review state, and Mission identity.
+3. **Review Task**: the same exact Task fields as item 2, using the Evaluation's
+   durable `review_task_id`; it is a second Task tile, never folded into the
+   source Task or Evaluation.
+4. **Hypothesis**: id, full claim, success criteria, source citations, status.
+5. **Dataset**: id, kind, `as_of`, content hash, coverage, and source Artifact
    receipt.
-5. **Run**: id, kind, lifecycle, trace id, parameters, exact Dataset and
+6. **Run**: id, kind, lifecycle, trace id, parameters, exact Dataset and
    Hypothesis identities, executor identity, and result Artifact identity.
-6. **Result Artifact**: id, kind, content hash, durable-byte availability, and
+7. **Result Artifact**: id, kind, content hash, durable-byte availability, and
    bounded preview.
-7. **Evaluation**: id, critic identity, four Ragas scores, overall, verdict,
+8. **Evaluation**: id, critic identity, four Ragas scores, overall, verdict,
    confidence, rationale, block reason when present, findings Artifact identity,
    and review Task identity.
-8. **Findings Artifact**: id, kind, content hash, and bounded canonical findings
+9. **Findings Artifact**: id, kind, content hash, and bounded canonical findings
    preview.
-9. **Report Artifact** when publication exists: id, `report` kind, content hash,
+10. **Report Artifact** when publication exists: id, `report` kind, content hash,
    publication Evaluation identity, and bounded canonical report preview.
 
-For a rejecting or inconclusive Evaluation, tile 9 does not exist. The
+For a rejecting or inconclusive Evaluation, tile 10 does not exist. The
 Evaluation tile instead shows exact `PUBLICATION BLOCKED`, the exact R15 code and
 message, plus the already-governed `Request revision` and `Second critic`
 controls. The separate positive supporting fixture shows exactly one Report
@@ -199,14 +202,16 @@ and endpoints are exactly:
 8. Hypothesis, Run, and result Artifact each `evaluated_by` the Evaluation;
 9. Evaluation `performed_by` critic session;
 10. critic session `produces` findings Artifact; and
-11. Evaluation `gates` Report.
+11. Evaluation `gates` Report;
+12. review Task `assigned_to` critic session; and
+13. review Task `delegated_by` Director session.
 
-These are 13 cables total. The three agent-session endpoints reuse their
-existing exact session tiles and are not counted among the nine research tiles.
-The positive fixture manifest therefore contains exactly 12 world-member tiles:
-nine research-object tiles plus the Director, executor, and critic session
-tiles. Gate tile counts and deduplication include all 12; the phrase "nine
-research tiles" never excludes the three session endpoints from the manifest.
+These are 15 cables total because item 8 names three distinct cables. The three
+agent-session endpoints reuse their existing exact session tiles and are not
+counted among the ten research-object tiles. The positive fixture manifest
+therefore contains exactly 13 world-member tiles: ten research-object tiles
+plus the Director, executor, and critic session tiles. Gate tile counts and
+deduplication include all 13.
 The Dataset's `derived_from` source Artifact remains an Artifact receipt inside
 the Dataset inspector because that source Artifact is not a world tile in this
 rung; therefore it draws no cable. A missing required link shows
@@ -257,6 +262,12 @@ expanded inspector modes do not resize that footprint; the expanded detail body
 scrolls inside it. Initial positions snap to the existing 20-pixel baseline.
 Persist only the final app-local top-left under the existing tile key
 `ontology:<type>:<id>`; do not add another layout store or persist lane facts.
+Placement collision is computed in canvas logical coordinates. Tile rectangles
+are `x,y,420,280`; Dock and protected-cube client rectangles convert once as
+`canvasX = (clientX - panX) / zoom` and `canvasY = (clientY - panY) / zoom` at
+the reveal's current pan/zoom. The live DOM check uses each element's
+`getBoundingClientRect()` at that same pan/zoom and rejects every positive-area
+intersection. Touching edges are not an overlap.
 
 Tab reaches every research tile and its visible controls. Enter expands or
 collapses. Escape collapses. Existing cable keyboard parity remains green.
@@ -282,20 +293,35 @@ do not comply.
 ### B - Mission membership
 
 Add `belongs_to` and bind it to the production R14 Director Task creation path
-exactly as specified. Generated schema/docs/migration and focused Kernel tests
-remain byte-consistent. No guessed backfill.
+exactly as specified. The generated set is exactly
+`qf-kernel-schema/golden/migration.sql`,
+`qf-kernel-schema/golden/tools.json`,
+`qf-kernel-schema/golden/ONTOLOGY.md`,
+`qf-kernel-schema/golden/conformance.test.ts`, and every file under
+`qf-kernel-schema/golden/upgrades/` from `0001` through `0012`, written by
+`bun --cwd qf-kernel-schema run generate`; `bun test
+qf-kernel-schema/src/generate.test.ts` must compare that entire set byte-for-
+byte to the generators. No guessed backfill.
 
 ### C - Research tiles and inline inspectors
 
-Add the nine exact projections above with deduplication, compact state, inline
-inspection, keyboard parity, honest missing values, and no direct database or
-filesystem access from the renderer.
+Add the ten exact research-object projections above, including distinct source
+and review Task tiles with the same Task field contract. Sort both Tasks by id
+with the other objects and place both through the one collision algorithm. Add
+deduplication, compact state, inline inspection, keyboard parity, honest missing
+values, and no direct database or filesystem access from the renderer.
 
 ### D - Semantic view cables
 
 Project exact durable link kinds/endpoints into the existing dashed view-cable
 surface. Never persist duplicate domain lineage in canvas state. Never render
 data/control styling or a cable for a field-only reference.
+
+For a persisted research tile, the complete allowed key set is `id`, `type`,
+`x`, `y`, `width`, `height`, `zIndex`, `ontologyType`, and `ontologyId`.
+Persisted viewport keys remain `centerX`, `centerY`, and `zoom`. No object field,
+status, title, description, cable id/kind/endpoint, world snapshot, or inspector
+value may appear anywhere in saved canvas state; all are re-projected.
 
 ### E - Fast product proof
 
@@ -311,8 +337,8 @@ The gate implementation is `qa/gates/research-world-visible.ts`; its focused
 test is `qa/gates/research-world-visible.test.ts`; `qa/run.ts` registers that
 exact file/name. It creates one random run nonce and derives every fixture id
 from it. Before Electron starts, the gate uses a separate read-only
-`bun:sqlite` connection over the isolated Kernel to build and freeze the 12-tile,
-13-cable expected manifest; it never calls the production projection to produce
+`bun:sqlite` connection over the isolated Kernel to build and freeze the 13-tile,
+15-cable expected manifest; it never calls the production projection to produce
 expected values. The renderer contract exposes `data-qf-world-type`,
 `data-qf-world-id`, `data-qf-world-field`, and `data-qf-world-cable-kind/from/to`
 attributes for observation; those are inspection attributes, not truth stores.
@@ -324,10 +350,11 @@ it does not allow any renderer, preload, or product writer.
 
 Before the first launch, construct the supporting fixture only through Kernel
 commands and exact R14/R15 production helpers. The fixture contains one Mission,
-one source Task, one Hypothesis, one Dataset plus source Artifact, one succeeded
-Run, one result Artifact, one supporting Evaluation, one findings Artifact, and
-one Report, plus the exact Director, executor, and critic session tiles. It
-contains the 13 literal projected links above. Other durable links may exist,
+one source Task, one governed review Task, one Hypothesis, one Dataset plus
+source Artifact, one succeeded Run, one result Artifact, one supporting
+Evaluation, one findings Artifact, and one Report, plus the exact Director,
+executor, and critic session tiles. It contains the 15 literal projected links
+above. Other durable links may exist,
 but the projection excludes kinds not named in `World traversal and cables`.
 Freeze an independent expected manifest before Electron starts.
 
@@ -339,20 +366,36 @@ id or import `bun:sqlite`, `node:sqlite`, `better-sqlite3`, `node:fs`, or
 preload exposes no raw database path, storage path, filesystem method, or
 fixture/manifest value.
 
+The independent Oracle is the corrected 13-tile/15-cable manifest. It contains
+ten research-object tiles, including both Task tiles, and three session tiles.
+
 The gate must prove:
 
 1. visible Mission-root and Task-root clicks each reveal the same exact world,
    with exactly one tile per expected object id/type;
 2. every collapsed and expanded field equals the independent manifest;
-3. full ids/hashes are accessible and no value came from fixture constants in
-   renderer code;
+3. full ids/hashes are accessible. The source scan rejects every full runtime
+   id or hash, every nonce-bearing non-id manifest string, and the exact JSON
+   encodings of the fixture's citations, Run parameters, Evaluation rubric and
+   score tuple when any appears in changed renderer source. Together with item
+   2's comparison of every DOM field to the read-only Oracle, this is the exact
+   finite anti-constant claim; it does not claim to prove an unbounded negative;
 4. every expected durable cable has exact kind/endpoints and dashed `view`
    honesty, with no extra cable;
-5. click and keyboard inspection reach the same facts and restore focus;
+5. click Inspect expands and click Collapse collapses; then focus the same
+   Mission tile, dispatch Enter to expand, dispatch Escape to collapse, and
+   prove focus remains on that tile after both keys. Every research tile has
+   `tabIndex=0`; every visible research control is enabled and has
+   `tabIndex>=0`. Arrow-key tile navigation remains owned by its existing
+   focused tests and is not redefined by this live receipt;
 6. a second reveal focuses existing tiles and creates zero duplicates;
 7. no tile overlaps another, the Dock, or the cube's protected bounds;
 8. a full close/reopen returns the identical object, field, position, inspector,
-   and cable manifest;
+   and cable manifest. After first close and again after reopen, the gate reads
+   the isolated app's saved canvas JSON and proves every research tile has
+   exactly the allowed key set in Deliverable D. `ontologyType` and
+   `ontologyId` are the only allowed domain references; no additional key may
+   hold a projected field or cable id/kind/endpoint;
 9. direct read-only SQLite Oracle and DOM facts agree while the renderer has no
    SQLite or filesystem access; and
 10. all owned processes and allocated roots are gone after success, failure, and
@@ -377,7 +420,7 @@ Each mutation changes production code or fixture truth, never the gate,
 assertions, expected manifest, timeout, or selector. The unchanged gate/test must
 go red, then exact restoration must return green:
 
-1a-l. omit each one of the 12 manifest tiles: the nine required research-object
+1a-m. omit each one of the 13 manifest tiles: the ten required research-object
 tiles and the Director, executor, and critic session tiles;
 2. replace one object id with a renderer literal;
 3. render stale Artifact bytes whose hash does not match;
@@ -389,8 +432,16 @@ tiles and the Director, executor, and critic session tiles;
 9. show a Report for a non-supporting Evaluation;
 10. hide the exact R15 blocking code or message;
 11. break Enter inspection while pointer inspection remains;
-12. persist a domain fact or cable label in canvas state;
-13. infer Mission membership from matching Task description; and
+12. in the temporary production mutation, add exactly `domainFact` containing
+the source Task title and `cableKind` containing `belongs_to` to the serialized
+research tile. The unchanged gate reads saved canvas state after reopen and
+must go red because its research-tile key set is not the exact allowlist above;
+13. add a decoy Task whose description exactly equals the source Task's
+description but which has no `belongs_to` link to the selected Mission. The
+correct projection remains 13/15. Temporarily replace the production Mission
+membership lookup with description equality; the unchanged gate must go red on
+the extra/wrong Task and restore green only after the durable-link lookup is
+restored; and
 14. remove the `belongs_to` write from the R14 Director path.
 
 Every entry gets its own red and restored-green receipt. Add focused tests for
@@ -533,7 +584,7 @@ Repair `qa/gates/research-world-visible.ts` into the one production-Electron
 gate already specified by this order, under the unchanged 60-second total
 deadline. Keep the current independent Oracle/source checks as supplemental
 preflight inside that gate. Use the production preload/Main/renderer, visible
-Mission-root and Task-root activation, exact 12-tile/13-cable DOM manifest,
+Mission-root and Task-root activation, exact 13-tile/15-cable DOM manifest,
 pointer/keyboard inspection, duplicate reveal, close/reopen equality, and the
 forced failure/500 ms timeout zero-residue cases. Do not add a second gate,
 fixture truth store, wrapper, package build, or weaker assertion.
@@ -549,7 +600,7 @@ native red exit, restoration-zero-diff, and restored-green exit, so the Verifier
 cannot inspect or rerun a sample.
 
 After defect 1 is green, add exactly
-`docs/orders/evidence/r16/BUILD-REPORT.md` with all 12 tile-omission receipts and
+`docs/orders/evidence/r16/BUILD-REPORT.md` with all 13 tile-omission receipts and
 falsifiers 2-14 in the receipt shape already specified above. The unchanged live
 gate must go red for each production/fixture mutation and green after exact
 restoration. This file records command evidence only; do not add receipt tooling
@@ -605,7 +656,7 @@ contract. After the first visible launch matches those facts, freeze the
 observed logical tile positions and inspector expanded/collapsed state before
 closing. Then perform an actual second launch against the same Kernel, Artifact
 root, and app-local geometry, without reseeding. Activate the same root through
-the renderer and compare all 12 ids/types, every displayed field/value, all 13
+the renderer and compare all 13 ids/types, every displayed field/value, all 15
 cables, accessible names, first-launch positions, and first-launch inspector
 state. Any difference is red. Only after the second owned process set is zero
 may that case's root be removed.
