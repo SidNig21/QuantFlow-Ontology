@@ -1107,3 +1107,140 @@ baseline or semantic code was altered. No product file changed after
 `e824ae10f50336a1640afeecd802ed7141bbeeb7`; this report is a separate
 evidence-only commit. No Electron build/launch, Computer Use, packaged/release
 gate, founder-state change, or R17 work occurred.
+
+## WRITE-STATUS MATRIX GATE-ONLY BUILDER RECEIPT
+
+Immutable product candidate: `e824ae10f50336a1640afeecd802ed7141bbeeb7`.
+Gate candidate commit: `ed9de40fc801340aa5a299821c3b322183a547f3`.
+Only `qa/gates/kernel-sole-writer-app.ts` and generated Atlas projections changed
+in the gate candidate; product paths remain byte-identical to the immutable
+candidate. Evidence is committed separately from the gate candidate.
+
+### Gate correction and falsifier
+
+```text
+Changed gate path:
+qa/gates/kernel-sole-writer-app.ts
+
+Added exactly four KERNEL_ALLOWED literals:
+collab-electron/src/main/governed-review.test.ts
+collab-electron/src/main/native-tui-orchestration.test.ts
+collab-electron/src/main/ontology-gateway.test.ts
+collab-electron/src/main/precreated-native-tui.test.ts
+
+Comment:
+These are isolated fixture/oracle tests and add no application runtime writer.
+
+bun qa/run.ts kernel-sole-writer-app
+exit=0
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+
+Falsifier: removed only the new governed-review.test.ts literal.
+bun qa/run.ts kernel-sole-writer-app
+exit=1
+kernel-sole-writer-app FAIL — offenders:
+  collab-electron/src/main/governed-review.test.ts (node:sqlite)
+FAIL  kernel-sole-writer-app
+
+Pre-falsifier gate SHA-256:
+B18BF6EE5D19A5F00048B232C3FF08BE4066A15EB6AC3274EAAEE3C34B2AE03C
+Restored gate SHA-256:
+B18BF6EE5D19A5F00048B232C3FF08BE4066A15EB6AC3274EAAEE3C34B2AE03C
+restoration_zero_diff=0
+
+Restored command:
+bun qa/run.ts kernel-sole-writer-app
+exit=0
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app
+```
+
+### Unchanged parent short matrix
+
+Each command ran once, in the exact WO-R16 order, after restoration:
+
+```text
+bun test collab-electron/src/main/research-world.test.ts collab-electron/src/windows/shell/src/research-world.test.ts collab-electron/src/windows/shell/src/task-composition.test.ts
+exit=0; 12 pass / 0 fail
+
+bun test packages/qf-kernel/src/r16-visible-world.test.ts qf-kernel-schema/src/generate.test.ts
+exit=0; 26 pass / 0 fail
+
+bun test qa/gates/research-world-visible.test.ts
+exit=0; 13 pass / 0 fail
+
+bun qa/run.ts governed-review
+exit=0; 11 pass / 0 fail; PASS  governed-review
+
+bun qa/run.ts kernel-sole-writer
+exit=0; PASS  kernel-sole-writer
+
+bun qa/run.ts kernel-sole-writer-app
+exit=0; PASS  kernel-sole-writer-app
+
+bun qa/run.ts lockfile-committed
+exit=0; PASS  lockfile-committed
+
+bun qa/run.ts no-canvas-domain-writes
+exit=0; PASS  no-canvas-domain-writes
+
+bun qa/run.ts doc-action-surface
+exit=0; PASS  doc-action-surface
+
+bun qa/run.ts repo-shape
+exit=0; PASS  repo-shape
+
+bun qa/run.ts one-skin
+exit=0; PASS  one-skin
+
+bun qa/run.ts doc-links
+exit=0; PASS  doc-links
+
+bun qa/run.ts rung-ladder
+exit=0; PASS  rung-ladder
+
+git diff --check
+exit=0
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0
+```
+
+### Atlas and final diff receipts
+
+The gate edit required generated projections; no semantic product or Atlas
+baseline change was made.
+
+```text
+bun qf-atlas/generate.mjs
+exit=0
+432 files · 109 subsystems · 124 IPC channels
+wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+
+bun qf-atlas/generate.mjs --check
+exit=0
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0
+baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · undecided w/o blocker: 0 · AMBER (visible, non-blocking): 20 · undecided: 42
+
+git diff --check
+exit=0
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0
+```
+
+Final gate-candidate changed paths:
+
+```text
+qa/gates/kernel-sole-writer-app.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+```
+
+No product candidate file changed. No build, launch, Computer Use,
+founder-state, or R17 work occurred.
