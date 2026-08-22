@@ -31,8 +31,9 @@ export type CollaborationDependencies = {
   execute: (
     command: string,
     input: Record<string, unknown>,
-    context: { trace_id: string; span_id: string; actor_session_id: string },
+    context: { trace_id: string; span_id: string; actor_session_id: string; mission_id?: string },
   ) => unknown;
+  missionForSession?: (sessionId: string) => string | undefined;
   marketObjectExists: (id: string) => boolean;
   readMarketTrajectoryResult: (artifactId: string, workerSessionId: string) => unknown;
   commitResult: (input: {
@@ -200,6 +201,10 @@ export function createCollaborationService(deps: CollaborationDependencies) {
       const task = boundedString(input.task, "task", TASK_MAX_BYTES);
       const toRole = boundedString(input.toRole, "to_role", ID_MAX_BYTES);
       const recipient = deps.liveRecipientForRole(toRole);
+      const missionId = deps.missionForSession?.(identity.sessionId);
+      if (deps.missionForSession && !missionId) {
+        throw new Error("Reopen the Mission and ask the Research Director to delegate this work again.");
+      }
       const taskId = deps.mintTaskId?.() ?? `task-${crypto.randomUUID()}`;
       deps.execute(
         "create_task",
@@ -213,6 +218,7 @@ export function createCollaborationService(deps: CollaborationDependencies) {
           trace_id: crypto.randomUUID(),
           span_id: crypto.randomUUID(),
           actor_session_id: identity.sessionId,
+          ...(missionId ? { mission_id: missionId } : {}),
         },
       );
       const notification = bestEffortNotification(() => deps.notify({

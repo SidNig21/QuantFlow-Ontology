@@ -52,6 +52,8 @@ export {
   KernelRegistryDriftError,
   KernelUpgradeShapeError,
   MarketContextConflictError,
+  MissionContextConflictError,
+  MissionContextRequiredError,
   MarketIngestConflictError,
   MarketIngestValidationError,
   MissingTraceError,

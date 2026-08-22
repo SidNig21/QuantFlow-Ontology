@@ -21,7 +21,7 @@ function projectLedgerRows(rows) {
  * @param {HTMLElement} rootEl
  * @param {object} opts
  */
-export function createKernelLedger(rootEl, { listEvents, onSubscribe }) {
+export function createKernelLedger(rootEl, { listEvents, onSubscribe, onReveal }) {
 	if (!rootEl) {
 		return { refresh: async () => {}, dispose() {}, renderedIds: () => [] };
 	}
@@ -60,6 +60,18 @@ export function createKernelLedger(rootEl, { listEvents, onSubscribe }) {
 			row.appendChild(type);
 			row.appendChild(obj);
 			row.appendChild(when);
+			if (entry.stage === "question" && onReveal) {
+				const reveal = document.createElement("button");
+				reveal.type = "button";
+				reveal.className = "kl-reveal";
+				reveal.textContent = "Show research world";
+				reveal.setAttribute("aria-label", `Show research world mission ${entry.id}`);
+				reveal.addEventListener("click", (event) => {
+					event.stopPropagation();
+					onReveal("mission", entry.id);
+				});
+				row.appendChild(reveal);
+			}
 			listEl.appendChild(row);
 		}
 	}

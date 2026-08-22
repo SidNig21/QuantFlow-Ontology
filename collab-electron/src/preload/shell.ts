@@ -61,6 +61,8 @@ contextBridge.exposeInMainWorld("shellApi", {
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
     listResearchLedger: () => ipcRenderer.invoke("qf:research:ledger"),
+    getResearchWorldProjection: (args: { root_type: "mission" | "task"; root_id: string }) =>
+      ipcRenderer.invoke("qf:research-world:projection", args),
     loadSampleResearchDataset: () => ipcRenderer.invoke("qf:research:loadSampleDataset"),
     listHandoffs: () => ipcRenderer.invoke("qf:handoffs:list"),
     listTaskSurface: () => ipcRenderer.invoke("qf:tasks:surface"),

@@ -2211,6 +2211,10 @@
           "type": "string",
           "description": "Existing immutable Dataset registered through register_dataset_version."
         },
+        "hypothesis_id": {
+          "type": "string",
+          "description": "Exact existing Hypothesis tested by this deterministic research run."
+        },
         "strategy_spec": {
           "type": "object",
           "propertyNames": {

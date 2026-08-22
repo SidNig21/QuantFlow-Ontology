@@ -4,7 +4,9 @@ import { sqlString } from "./sql.ts";
 
 /** R12 data-preserving upgrade: add independent critic lineage and action policy. */
 export function generateUpgradeIndependentCritic(): string {
-  const linkKinds = schema.links.map((link) => sqlString(link.name)).join(", ");
+  const linkKinds = schema.links
+    .filter((link) => link.name !== "belongs_to")
+    .map((link) => sqlString(link.name)).join(", ");
   return [
     "-- qf-kernel-schema generated upgrade: independent-critic",
     "-- DO NOT EDIT — regenerate with `bun run generate`.",

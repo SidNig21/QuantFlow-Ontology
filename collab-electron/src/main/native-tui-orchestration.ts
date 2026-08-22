@@ -43,6 +43,7 @@ export type NativeTuiOrchestrationDependencies = {
   awaitLauncherReady?: (ptySessionId: string) => Promise<void>;
   cancelLauncherReadiness?: () => void;
   activateMission?: (ptySessionId: string) => Promise<void>;
+  beforeActivation?: (sessionId: string) => void | Promise<void>;
 };
 
 export type NativeTuiOrchestrationOptions = {
@@ -62,6 +63,7 @@ export type NativeTuiOrchestrationOptions = {
     definitionId: string,
     info: { surface: "native_tui"; ptySessionId: string; role?: string },
   ) => void;
+  beforeActivation?: (sessionId: string) => void | Promise<void>;
 };
 
 export type NativeTuiOrchestrationResult = {
@@ -150,6 +152,7 @@ export async function orchestrateNativeTuiAdmission(
       { session_id: sessionId },
       { ...trace, span_id: deps.newTrace().span_id },
     );
+    await deps.beforeActivation?.(sessionId);
     await deps.activateMission?.(pty.sessionId);
 
     opts.onStarted?.(sessionId, opts.definitionId, {

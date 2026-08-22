@@ -536,6 +536,10 @@ export function executeDeterministicRun(
   if (typeof datasetId !== "string" || datasetId.length === 0) {
     throw new KernelError("execute_deterministic_run requires non-empty dataset_id");
   }
+  const hypothesisId = input.hypothesis_id;
+  if (hypothesisId !== undefined && (typeof hypothesisId !== "string" || hypothesisId.length === 0)) {
+    throw new KernelError("execute_deterministic_run hypothesis_id must be a non-empty string when supplied");
+  }
   if (db.query(`SELECT 1 AS ok FROM run WHERE id = ?`).get(runId)) {
     throw new KernelError(`run "${runId}" already exists`);
   }
@@ -548,6 +552,9 @@ export function executeDeterministicRun(
   const strategy = parseStrategy(input.strategy_spec);
   const params = parseParams(input.params);
   const dataset = loadDataset(db, datasetId);
+  if (typeof hypothesisId === "string" && !db.query(`SELECT 1 AS ok FROM hypothesis WHERE id = ?`).get(hypothesisId)) {
+    throw new KernelError(`execute_deterministic_run Hypothesis not found: ${hypothesisId}`);
+  }
   const strategyId = `strategy:${strategy.hash}:v${strategy.version}`;
   const manifest = {
     contract: "qf.execution.manifest.v1",
@@ -605,6 +612,7 @@ export function executeDeterministicRun(
     dataset_artifact_id: dataset.artifactId,
     dataset_content_hash: dataset.contentHash,
     result_artifact_id: result.hash,
+    ...(typeof hypothesisId === "string" ? { hypothesis_id: hypothesisId } : {}),
     ...(trace.actor_session_id
       ? { executor_session_id: trace.actor_session_id }
       : {}),
@@ -706,6 +714,7 @@ export function executeDeterministicRun(
       { kind: "uses", to_id: strategyId },
       { kind: "executes_in", to_id: EXECUTION_ENVIRONMENT_ID },
       { kind: "produces", to_id: result.hash },
+      ...(typeof hypothesisId === "string" ? [{ kind: "tests", to_id: hypothesisId }] : []),
     ]);
     for (const event of ["run.created", "run.started", "run.succeeded"]) {
       appendEvent(db, {

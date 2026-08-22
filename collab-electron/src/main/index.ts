@@ -112,8 +112,14 @@ import {
   runAgentHostSmoke,
 } from "./agent-host";
 import { createKernelAgentSession } from "./runtime-kernel-admission";
+import { bindMissionToDirectorSession, clearMissionForDirectorSession, missionForDirectorSession } from "./mission-context";
 
 const researchHypothesisBySession = new Map<string, string>();
+
+function closeAdmittedSession(sessionId: string): void {
+  closeAgentSessionRow(sessionId);
+  clearMissionForDirectorSession(sessionId);
+}
 
 function getKernelAgentDefinitionIds(): string[] {
   return kernelListAgentDefinitions()
@@ -1174,6 +1180,7 @@ app.whenReady().then(async () => {
       getObject: kernelGetObject,
       getLinks: kernelGetLinks,
       execute: kernelExecute,
+      missionForSession: missionForDirectorSession,
       marketObjectExists: kernelMarketObjectExists,
       readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
       commitResult: commitCollaborationResult,
@@ -1200,8 +1207,8 @@ app.whenReady().then(async () => {
         // Only evidence workers advance the research pipeline. A critic owns
         // Evaluation truth, not another worker-result cycle.
         if (peerIdentityForSession(change.workerSessionId).role !== "worker") {
-          closeAgentSessionRow(change.workerSessionId);
-          closeAgentSessionRow(change.delegatorSessionId);
+          closeAdmittedSession(change.workerSessionId);
+          closeAdmittedSession(change.delegatorSessionId);
           return;
         }
         // When a settled Dataset is available, continue through deterministic
@@ -1210,12 +1217,12 @@ app.whenReady().then(async () => {
         setTimeout(() => {
           void (async () => {
             try {
-              closeAgentSessionRow(change.workerSessionId);
+              closeAdmittedSession(change.workerSessionId);
               const hypothesisId = researchHypothesisBySession.get(change.delegatorSessionId);
               if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
               const run = kernelRunGuidedResearch(change.delegatorSessionId, hypothesisId, change.artifactId);
               if (!run) {
-                closeAgentSessionRow(change.delegatorSessionId);
+                closeAdmittedSession(change.delegatorSessionId);
                 return;
               }
               const criticSessionId = `critic-${crypto.randomUUID()}`;
@@ -1256,7 +1263,7 @@ app.whenReady().then(async () => {
               mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
             } catch (error) {
               console.error("research continuation failed", error);
-              closeAgentSessionRow(change.delegatorSessionId);
+              closeAdmittedSession(change.delegatorSessionId);
             }
           })();
         }, 250);
@@ -1304,8 +1311,8 @@ app.whenReady().then(async () => {
         const delegatorId = kernelGetLinks(criticId, { kind: "delegates_to" })
           .find((link) => link.to_id === criticId)?.from_id;
         setTimeout(() => {
-          closeAgentSessionRow(criticId);
-          if (delegatorId) closeAgentSessionRow(delegatorId);
+          closeAdmittedSession(criticId);
+          if (delegatorId) closeAdmittedSession(delegatorId);
         }, 2_000);
       }
     },
@@ -1379,6 +1386,7 @@ app.whenReady().then(async () => {
       );
       const result = await admitAndStartSession(definitionId, {
         missionActivation: activationInstruction,
+        beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
         onStarted: projectStartedSession,
       });
       researchHypothesisBySession.set(result.sessionId, hypothesisId);

@@ -13,6 +13,8 @@ export type TraceContext = {
  */
 export type TrustedExecutionContext = TraceContext & {
   actor_session_id?: string;
+  /** App-bound Mission context for Research Director delegation. */
+  mission_id?: string;
   /** App-internal marker set only after a token-bound generated ontology read. */
   ontology_read_tool?: string;
 };
@@ -25,6 +27,9 @@ export function requireTrace(
   if (ctx.actor_session_id !== undefined && ctx.actor_session_id.length === 0) {
     throw new MissingTraceError("actor_session_id");
   }
+  if (ctx.mission_id !== undefined && ctx.mission_id.length === 0) {
+    throw new MissingTraceError("mission_id");
+  }
   if (ctx.ontology_read_tool !== undefined && ctx.ontology_read_tool.length === 0) {
     throw new MissingTraceError("ontology_read_tool");
   }
@@ -32,6 +37,7 @@ export function requireTrace(
     trace_id: ctx.trace_id,
     span_id: ctx.span_id,
     ...(ctx.actor_session_id ? { actor_session_id: ctx.actor_session_id } : {}),
+    ...(ctx.mission_id ? { mission_id: ctx.mission_id } : {}),
     ...(ctx.ontology_read_tool ? { ontology_read_tool: ctx.ontology_read_tool } : {}),
   };
 }

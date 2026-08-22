@@ -274,6 +274,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "research-world-visible",
+    description: "R16: independent visible research-world contract and bounded product-proof entrypoint",
+    run: async () => {
+      const { runResearchWorldVisibleGate } = await import("./gates/research-world-visible.ts");
+      const { ok } = await runResearchWorldVisibleGate();
+      return ok;
+    },
+  },
+  {
     name: "founder-steering",
     description: "R14: visible Task steering, reassignment delivery, second opinion, cancellation, and durable history",
     run: async () => {

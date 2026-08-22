@@ -441,6 +441,11 @@ export function getTileLabel(tile) {
     const short = id.length <= 12 ? id : `${id.slice(0, 8)}…`;
     return { parent: "Artifact", name: short || "Artifact" };
   }
+  if (tile.type === "research") {
+    const id = tile.ontologyId || tile.id;
+    const short = id.length <= 12 ? id : `${id.slice(0, 8)}…`;
+    return { parent: tile.ontologyType || "Research", name: short };
+  }
   if (tile.filePath) return splitFilepath(tile.filePath);
   return { parent: "", name: tile.type };
 }

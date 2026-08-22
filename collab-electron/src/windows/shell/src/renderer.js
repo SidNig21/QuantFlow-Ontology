@@ -29,6 +29,7 @@ import { createCableInspector } from "./cable-inspector.js";
 import { createKernelLedger } from "./kernel-ledger.js";
 import { fitViewportToTiles } from "./glacier-feel.js";
 import { renderTaskFoot } from "./task-composition.js";
+import { createResearchWorldController } from "./research-world.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -476,6 +477,7 @@ async function init() {
 	let cableController = null;
 	/** @type {Array<{id:string,kind:string,from_ref:string,to_ref:string,created_at?:string}>} */
 	let liveConnections = [];
+	let researchWorldController = null;
 	const tileManager = createTileManager({
 		tileLayer, viewportState, configs,
 		getAllWebviews,
@@ -531,6 +533,18 @@ async function init() {
 		onTileClosed() {
 			void cableController?.refresh();
 		},
+		onResearchTile(dom, tile, object) {
+			researchWorldController?.renderTile(dom, tile, object);
+		},
+	});
+	researchWorldController = createResearchWorldController({
+		tileManager,
+		getTileDOMs: () => tileManager.getTileDOMs(),
+		onCables: (cables) => {
+			liveConnections = cables;
+			cableOverlay?.redraw();
+		},
+		showStatus: (message) => showCanvasToast(message),
 	});
 
 	// -- Edge indicators --
@@ -677,6 +691,7 @@ async function init() {
 			return Array.isArray(res.entries) ? res.entries : [];
 		},
 		onSubscribe: (cb) => window.shellApi.qf.onEventsInvalidate(cb),
+		onReveal: (type, id) => researchWorldController?.reveal(type, id),
 	});
 
 	edgeIndicators.update();
@@ -1925,6 +1940,7 @@ async function init() {
 			: 0;
 		viewport.updateCanvas();
 		tileManager.restoreCanvasState(savedTiles);
+		researchWorldController?.hydrateSaved();
 		viewport.redrawGrid();
 		minimap.update();
 

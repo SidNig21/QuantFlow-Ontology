@@ -9,6 +9,8 @@ import {
   ContentHashMismatchError,
   DelegatesToLinkRejectedError,
   KernelError,
+  MissionContextConflictError,
+  MissionContextRequiredError,
   SpawnedFromLinkRejectedError,
   TaskCreationEnvelopeRejectedError,
   UnknownAgentDefinitionError,
@@ -584,6 +586,27 @@ export type TaskWrite = {
   delegator_session_id: string;
 };
 
+function validateMissionContext(db: KernelDb, taskId: string, missionId: string | undefined): void {
+  if (!missionId) return;
+  const mission = db.query(`SELECT id FROM mission WHERE id = ?`).get(missionId) as { id: string } | null;
+  if (!mission) throw new MissionContextRequiredError();
+  const existing = db.query(
+    `SELECT to_id FROM links WHERE from_id = ? AND kind = 'belongs_to' ORDER BY created_at ASC, id ASC`,
+  ).all(taskId) as Array<{ to_id: string }>;
+  if (existing.length > 1 || (existing.length === 1 && existing[0]!.to_id !== missionId)) {
+    throw new MissionContextConflictError(taskId, existing[0]?.to_id ?? "multiple missions", missionId);
+  }
+}
+
+function writeMissionBinding(db: KernelDb, taskId: string, missionId: string | undefined): void {
+  if (!missionId) return;
+  validateMissionContext(db, taskId, missionId);
+  const existing = db.query(
+    `SELECT 1 AS ok FROM links WHERE from_id = ? AND kind = 'belongs_to' AND to_id = ?`,
+  ).get(taskId, missionId);
+  if (!existing) writeLinks(db, "task", taskId, [{ kind: "belongs_to", to_id: missionId }]);
+}
+
 /** Shared create_task identity validation for every transaction-scoped Task writer. */
 export function validateTaskIdentity(db: KernelDb, fields: Pick<TaskWrite, "assignee_session_id" | "delegator_session_id">): void {
   const assignee = db.query(`SELECT id, status FROM agent_session WHERE id = ?`).get(fields.assignee_session_id) as { id: string; status: string } | null;
@@ -603,6 +626,7 @@ export function validateTaskWrite(db: KernelDb, fields: TaskWrite): void {
   if (!fields.assignee_session_id) throw new KernelError('create_task requires non-empty "assignee_session_id"');
   if (!fields.delegator_session_id) throw new KernelError("create_task requires trusted actor_session_id context");
   validateTaskIdentity(db, fields);
+  validateMissionContext(db, fields.task_id, undefined);
 }
 
 /**
@@ -620,6 +644,7 @@ export function writeTaskInTransaction(db: KernelDb, fields: TaskWrite, trace: T
     { kind: "delegated_by", to_id: fields.delegator_session_id },
     { kind: "assigned_to", to_id: fields.assignee_session_id },
   ]);
+  writeMissionBinding(db, fields.task_id, trace.mission_id);
   const event_id = appendEvent(db, {
     type: "task.created",
     object_type: "task",
@@ -631,6 +656,7 @@ export function writeTaskInTransaction(db: KernelDb, fields: TaskWrite, trace: T
       description: fields.description,
       delegator_session_id: fields.delegator_session_id,
       assignee_session_id: fields.assignee_session_id,
+      ...(trace.mission_id ? { mission_id: trace.mission_id } : {}),
     },
     trace_id: trace.trace_id,
   });
@@ -689,6 +715,7 @@ function createTask(
 
   const delegator_session_id = trace.actor_session_id;
   if (!delegator_session_id) throw new KernelError("create_task requires trusted actor_session_id context");
+  validateMissionContext(db, task_id, trace.mission_id);
   validateTaskIdentity(db, { assignee_session_id, delegator_session_id });
 
   const tx = db.transaction(() => writeTaskInTransaction(

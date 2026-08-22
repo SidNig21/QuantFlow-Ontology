@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineAction, defineLink, defineObject } from "../define.ts";
-import { agent_session, execution_environment, tool } from "./agent.ts";
+import { agent_session, execution_environment, task, tool } from "./agent.ts";
 import { instrument } from "./market.ts";
 
 const jsonObject = z.record(z.string(), z.unknown());
@@ -396,6 +396,14 @@ export const gates = defineLink({
   to: artifact,
 });
 
+export const belongs_to = defineLink({
+  name: "belongs_to",
+  description: "Mission context: which standing Mission owns a delegated Task.",
+  lifecycle: "experimental",
+  from: task,
+  to: mission,
+});
+
 export const create_hypothesis = defineAction({
   name: "create_hypothesis",
   description:
@@ -459,6 +467,10 @@ export const execute_deterministic_run = defineAction({
     dataset_id: z
       .string()
       .describe("Existing immutable Dataset registered through register_dataset_version."),
+    hypothesis_id: z
+      .string()
+      .describe("Exact existing Hypothesis tested by this deterministic research run.")
+      .optional(),
     strategy_spec: jsonObject.describe(
       "Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.",
     ),

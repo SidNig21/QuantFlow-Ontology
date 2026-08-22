@@ -16,7 +16,7 @@ export class IllegalTransitionError extends Error {
 /** Command rejected because trace context is missing. */
 export class MissingTraceError extends Error {
   constructor(
-    missing: "trace_id" | "span_id" | "actor_session_id" | "ontology_read_tool",
+    missing: "trace_id" | "span_id" | "actor_session_id" | "mission_id" | "ontology_read_tool",
   ) {
     super(`Command rejected: ctx.${missing} is required`);
     this.name = "MissingTraceError";
@@ -333,6 +333,24 @@ export class UnknownAssigneeSessionError extends Error {
     super(`unknown assignee_session_id: ${sessionId}`);
     this.name = "UnknownAssigneeSessionError";
     this.sessionId = sessionId;
+  }
+}
+
+/** A Task cannot be rebound to a different durable Mission. */
+export class MissionContextConflictError extends KernelError {
+  readonly code = "MISSION_CONTEXT_CONFLICT" as const;
+  constructor(taskId: string, existingMissionId: string, requestedMissionId: string) {
+    super(`MISSION_CONTEXT_CONFLICT: Task ${taskId} already belongs to Mission ${existingMissionId}, not ${requestedMissionId}`);
+    this.name = "MissionContextConflictError";
+  }
+}
+
+/** Research Director delegation lost its trusted Mission admission context. */
+export class MissionContextRequiredError extends KernelError {
+  readonly code = "MISSION_CONTEXT_REQUIRED" as const;
+  constructor() {
+    super("Reopen the Mission and ask the Research Director to delegate this work again.");
+    this.name = "MissionContextRequiredError";
   }
 }
 

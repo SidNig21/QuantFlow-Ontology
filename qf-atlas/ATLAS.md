@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ c59ebfa` on 2026-08-22 by
+> Generated from `wo-R16 @ b9e37d5` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -31,9 +31,9 @@ and it can die or cheat at any one of them:
 
 ```mermaid
 flowchart TD
-  R["<b>1 · renderer</b><br/>29 surface subsystems<br/>calls a bridge method"]
-  P["<b>2 · preload</b><br/>3 bridges · 127 methods<br/>113 of them called"]
-  M["<b>3 · main</b><br/>123 IPC channels<br/>110 live · 13 unused · 0 dead"]
+  R["<b>1 · renderer</b><br/>30 surface subsystems<br/>calls a bridge method"]
+  P["<b>2 · preload</b><br/>3 bridges · 128 methods<br/>114 of them called"]
+  M["<b>3 · main</b><br/>124 IPC channels<br/>111 live · 13 unused · 0 dead"]
   H{"<b>4 · is it governed?</b>"}
   E["<b>execute&#40;&#41;</b><br/>the only sanctioned write"]
   DB[("<b>Kernel truth</b><br/>domain tables<br/>golden schema")]
@@ -46,7 +46,7 @@ flowchart TD
   FS["<b>filesystem</b><br/>never reaches<br/>the Kernel"]
   H -->|"writes-disk 9"| FS
   RO["<b>read-only</b><br/>no mutation seen"]
-  H -->|"read-only 94"| RO
+  H -->|"read-only 95"| RO
 
   QA["<b>QA · governance</b><br/>13 subsystems<br/>asserts the rules above"]
   SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
@@ -86,7 +86,7 @@ handler that mutates state without `execute()` is cheating even when it works.
 | `reaches-sql` | mutates outside `execute()`, but every finding on the path is amber | 2 |
 | `writes-disk` | writes a file; never reaches the Kernel at all | 9 |
 | `unknown` | handler or module resolution coverage is incomplete; not claimed read-only | 0 |
-| `read-only` | no mutation seen | 94 |
+| `read-only` | no mutation seen | 95 |
 
 #### Reaches ungoverned SQL, but not a hard red (6)
 
@@ -160,7 +160,7 @@ listeners. That single mistake would have produced 14 false deletes.
 
 - `cd-to` — `collab-electron/src/preload/universal.ts:98` · **INVESTIGATE**
   - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
-- `shell:loading-status` — `collab-electron/src/preload/shell.ts:172` · **INVESTIGATE**
+- `shell:loading-status` — `collab-electron/src/preload/shell.ts:174` · **INVESTIGATE**
   - a preload subscribes and no send site was found in main or the renderer; verify no dynamic producer before removing
 
 **Confidence is `medium` on every row here, and the disposition is `INVESTIGATE`, never
@@ -228,7 +228,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 206 | imported from an entrypoint |
+| `reachable` | 209 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -295,14 +295,14 @@ _works end to end, but nothing calls it yet_
 - `openFolder() → dialog:open-folder` — collab-electron/src/preload/universal.ts:454
 - `openImageDialog() → dialog:open-image` — collab-electron/src/preload/universal.ts:317
 - `countFiles() → fs:count-files` — collab-electron/src/preload/universal.ts:270
-- `getHomePath() → get-home-path` — collab-electron/src/preload/shell.ts:311
-- `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:122
-- `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:85
+- `getHomePath() → get-home-path` — collab-electron/src/preload/shell.ts:313
+- `deleteConnectionsForTile() → qf:connections:deleteForTile` — collab-electron/src/preload/shell.ts:124
+- `getGovernedReviewProjection() → qf:review:projection` — collab-electron/src/preload/shell.ts:87
 - `permissionDecision() → qf:sessions:permissionDecision` — collab-electron/src/preload/universal.ts:167
-- `openSettings() → settings:open` — collab-electron/src/preload/shell.ts:212
-- `openExternal() → shell:open-external` — collab-electron/src/preload/shell.ts:305
+- `openSettings() → settings:open` — collab-electron/src/preload/shell.ts:214
+- `openExternal() → shell:open-external` — collab-electron/src/preload/shell.ts:307
 - `runInTerminal() → viewer:run-in-terminal` — collab-electron/src/preload/universal.ts:290
-- `workspaceRemove() → workspace:remove` — collab-electron/src/preload/shell.ts:256
+- `workspaceRemove() → workspace:remove` — collab-electron/src/preload/shell.ts:258
 - `updateFrontmatter() → workspace:update-frontmatter` — collab-electron/src/preload/universal.ts:326
 
 ## Write-door violations
@@ -364,8 +364,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 232 of
-234 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 235 of
+237 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/updater/update-manager.ts` — **2 files depend on it**, it imports 1
@@ -394,11 +394,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**232 of 234 files that have a reachability verdict** carry a blast radius.
+**235 of 237 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**539 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**547 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 305 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 310 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -446,7 +446,7 @@ prevent a clean architectural result.
 > floor. The gaps above are in files that carry no confirmed finding — they still
 > prevent a clean architectural result, because a gap cannot be called compliant.
 
-## Per-analyzer coverage (539 files)
+## Per-analyzer coverage (547 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -454,17 +454,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 535 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 271 | 0 | 4 | 0 | 264 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 528 |
-| `persistence` | 22 | 26 | 0 | 0 | 491 |
-| `lifetime` | 6 | 60 | 0 | 0 | 473 |
-| `packaging` | 226 | 0 | 0 | 123 | 190 |
-| `ownership` | 20 | 0 | 0 | 347 | 172 |
-| `reach` | 233 | 1 | 0 | 305 | 0 |
+| `imports` | 543 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 276 | 0 | 4 | 0 | 267 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 536 |
+| `persistence` | 22 | 26 | 0 | 0 | 499 |
+| `lifetime` | 6 | 60 | 0 | 0 | 481 |
+| `packaging` | 229 | 0 | 0 | 123 | 195 |
+| `ownership` | 20 | 0 | 0 | 353 | 174 |
+| `reach` | 234 | 3 | 0 | 310 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 305 files means those trees are
+failure — `reach: unsupported` on 310 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 123 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
@@ -526,19 +526,19 @@ discovered from the AST.
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
-- **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 571
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 546
-- `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 392
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 479
+- **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 549
+- `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 489
 
 ### Exact task delivery
 
 3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 120
-- **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 616
+- **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 640
 - **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 591
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 389
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 399
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
 
 ### Research review / publication
@@ -546,8 +546,8 @@ discovered from the AST.
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 574
-- **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1291
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 512
+- **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 522
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 227
@@ -556,12 +556,12 @@ discovered from the AST.
 
 3 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 357
+- **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 359
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 500
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 510
 - `collab-electron/src/main/a2a-artifact-store.ts` — exports createA2aArtifactStore() at line 26
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentReportArtifact() at line 30
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 113
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 118
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its

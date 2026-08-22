@@ -50,6 +50,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('deriv
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evaluated_by', 'link', 'experimental', 'Verdict attachment: which evaluation judged an artifact or run.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('performed_by', 'link', 'experimental', 'Independent review provenance: which admitted critic session authored an Evaluation.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('belongs_to', 'link', 'experimental', 'Mission context: which standing Mission owns a delegated Task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assigned_to', 'link', 'experimental', 'Work routing: which agent session owns a task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegated_by', 'link', 'experimental', 'Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.');
@@ -481,7 +482,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.

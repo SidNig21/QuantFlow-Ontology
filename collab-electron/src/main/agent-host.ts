@@ -488,6 +488,8 @@ export async function admitAndStartSession(
     existingSessionId?: string;
     /** Founder Submit's one bounded post-launch instruction. */
     missionActivation?: string;
+    /** Bind trusted app context after admission and before any Mission prompt. */
+    beforeActivation?: (sessionId: string) => void | Promise<void>;
     onStarted?: (
       sessionId: string,
       definitionId: string,
@@ -519,6 +521,7 @@ export async function admitAndStartSession(
       corruptId: opts?.corruptId,
       existingSessionId: opts?.existingSessionId,
       missionActivation: opts?.missionActivation,
+      beforeActivation: opts?.beforeActivation,
       newTrace,
       liveSet: (sessionId, entry) => {
         live.set(sessionId, entry);
@@ -597,6 +600,7 @@ async function admitHostAcpDefinition(
   opts?: {
     env?: Record<string, string>;
     corruptId?: string;
+    beforeActivation?: (sessionId: string) => void | Promise<void>;
     onStarted?: (
       sessionId: string,
       definitionId: string,
@@ -671,6 +675,7 @@ async function admitHostAcpDefinition(
       tearDownRuntime: () => tearDownHostAcp(handle),
     },
   );
+  await opts?.beforeActivation?.(sessionId);
   opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
   console.log(
     `agent-host: admitted host_acp session=${sessionId}`
@@ -684,6 +689,7 @@ async function admitAgentOsDefinition(
   opts?: {
     env?: Record<string, string>;
     corruptId?: string;
+    beforeActivation?: (sessionId: string) => void | Promise<void>;
     onStarted?: (
       sessionId: string,
       definitionId: string,
@@ -738,6 +744,7 @@ async function admitAgentOsDefinition(
       tearDownRuntime: () => host.destroySession(guestId),
     },
   );
+  await opts?.beforeActivation?.(sessionId);
   opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
   console.log(
     `agent-host: admitted agentos session=${sessionId}`

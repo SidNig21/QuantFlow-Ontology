@@ -107,6 +107,9 @@ export function createCableOverlay(svgEl, {
 			}
 			path.dataset.connectionId = conn.id;
 			path.dataset.cableState = honoured ? "honoured" : "declared";
+			if (conn.qfWorldCableKind) path.dataset.qfWorldCableKind = conn.qfWorldCableKind;
+			if (conn.qfWorldCableFrom) path.dataset.qfWorldCableFrom = conn.qfWorldCableFrom;
+			if (conn.qfWorldCableTo) path.dataset.qfWorldCableTo = conn.qfWorldCableTo;
 			if (conn.id === selectedId) {
 				path.classList.add("cable-path--selected");
 			}

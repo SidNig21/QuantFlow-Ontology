@@ -35,6 +35,7 @@ const DEFAULT_TILE_SIZES = {
 	pdf: { width: 600, height: 800 },
 	artifact: { width: 420, height: 220 },
 	session: { width: 420, height: 280 },
+	research: { width: 420, height: 280 },
 };
 
 /** @param {TileType} type */

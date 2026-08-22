@@ -43,6 +43,11 @@ import {
   type TaskHistoryFact,
 } from "./task-delegation-projection";
 import { runAtomicResultCommit } from "./atomic-result-commit";
+import {
+  getResearchWorldProjection,
+  type ResearchWorldProjectionResult,
+  type ResearchWorldRequest,
+} from "./research-world-projection";
 
 /** Node DatabaseSync adapter with savepoints for Kernel commands inside app transactions. */
 export function wrapDatabaseSync(raw: DatabaseSync): KernelDb {
@@ -122,6 +127,11 @@ export function getKernelDb(): KernelDb {
 export function getKernelPath(): string {
   if (!kernelPath) throw new Error("kernel not opened");
   return kernelPath;
+}
+
+/** Main-owned immutable research-world read; renderer and preload never open SQLite. */
+export function kernelGetResearchWorldProjection(request: ResearchWorldRequest): ResearchWorldProjectionResult {
+  return getResearchWorldProjection(getKernelDb(), request);
 }
 
 const PEER_BUS_DDL = `
@@ -816,6 +826,7 @@ export function kernelRunGuidedResearch(
   const run = kernelExecute("execute_deterministic_run", {
     run_id: `run-${crypto.randomUUID()}`,
     dataset_id: String(dataset.id),
+    hypothesis_id: hypothesisId,
     strategy_spec: {
       contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: scoreField,
     },

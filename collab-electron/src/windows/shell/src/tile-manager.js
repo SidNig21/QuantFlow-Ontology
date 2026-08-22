@@ -30,7 +30,8 @@ export function createTileManager({
 	onTileFocused,
 	onTileDblClick,
 	onReposition,
-	onTileClosed,
+  onTileClosed,
+  onResearchTile,
 }) {
 	/** @type {Map<string, {container: HTMLElement, contentArea: HTMLElement, titleText: HTMLElement, webview?: HTMLElement}>} */
 	const tileDOMs = new Map();
@@ -66,6 +67,8 @@ export function createTileManager({
 				folderPath: t.folderPath,
 				workspacePath: t.workspacePath,
 				artifactId: t.artifactId,
+				ontologyType: t.type === "research" ? t.ontologyType : undefined,
+				ontologyId: t.type === "research" ? t.ontologyId : undefined,
 				sessionId: t.sessionId,
 				ptySessionId: t.ptySessionId,
 				definitionId: t.definitionId,
@@ -160,6 +163,7 @@ export function createTileManager({
 		webview.sendInputEvent({
 			type: "mouseDown", x, y, button: "left", clickCount: 1,
 		});
+		if (tile.type === "research") onResearchTile?.(dom, tile);
 		webview.sendInputEvent({
 			type: "mouseUp", x, y, button: "left", clickCount: 1,
 		});
@@ -872,6 +876,16 @@ export function createTileManager({
 		return tile;
 	}
 
+	function createResearchTile(cx, cy, object) {
+		const tile = createCanvasTile("research", cx, cy, {
+			id: `ontology:${object.type}:${object.id}`,
+			ontologyType: object.type,
+			ontologyId: object.id,
+		});
+		onResearchTile?.(tileDOMs.get(tile.id), tile, object);
+		return tile;
+	}
+
 	function clearCanvas(viewportObj) {
 		const tileIds = tiles.map((t) => t.id);
 		for (const id of tileIds) {
@@ -958,6 +972,15 @@ export function createTileManager({
 					},
 				);
 				spawnSessionWebview(tile);
+			} else if (saved.type === "research" && saved.ontologyType && saved.ontologyId) {
+				createCanvasTile("research", cx, cy, {
+					id: saved.id || `ontology:${saved.ontologyType}:${saved.ontologyId}`,
+					width: saved.width,
+					height: saved.height,
+					zIndex: saved.zIndex,
+					ontologyType: saved.ontologyType,
+					ontologyId: saved.ontologyId,
+				});
 			} else if (saved.type === "browser") {
 				const tile = createCanvasTile(
 					"browser", cx, cy, {
@@ -1087,6 +1110,7 @@ export function createTileManager({
 		createGraphTile,
 		createArtifactTile,
 		createSessionTile,
+		createResearchTile,
 		clearCanvas,
 		getCanvasStateForSave,
 		restoreCanvasState,

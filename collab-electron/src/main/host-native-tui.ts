@@ -103,6 +103,8 @@ export async function admitNativeTuiDefinition(opts: {
   existingSessionId?: string;
   /** One bounded post-launch instruction for founder Submit only. */
   missionActivation?: string;
+  /** Bind trusted app context before the Mission instruction is delivered. */
+  beforeActivation?: (sessionId: string) => void | Promise<void>;
   newTrace: () => TraceContext;
   liveSet: (sessionId: string, entry: NativeTuiLive) => void;
   /** Root admission owner supplies this when wiring the D2 live map. */
@@ -364,6 +366,7 @@ export async function admitNativeTuiDefinition(opts: {
           writeToSession(ptySessionId, "\r");
         }
       : undefined,
+    beforeActivation: opts.beforeActivation,
   };
   const result = await orchestrateNativeTuiAdmission(
     {

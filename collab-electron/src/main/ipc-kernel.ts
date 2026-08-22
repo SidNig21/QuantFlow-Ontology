@@ -38,6 +38,7 @@ import {
   kernelRequestSecondCritic,
   kernelGovernedReviewProjection,
   kernelGovernedAttemptExists,
+  kernelGetResearchWorldProjection,
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
@@ -49,6 +50,7 @@ import { parseDefinitionLaunchRequest } from "./definition-runtime";
 import { buildMissionActivationInstruction } from "./mission-activation";
 import { loadState as loadCanvasState } from "./canvas-persistence";
 import { resolveSecondOpinionAdmission } from "./second-opinion-admission";
+import { bindMissionToDirectorSession } from "./mission-context";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -283,6 +285,7 @@ export function registerKernelHandlers(): void {
         const hypothesisId = kernelOpenHypothesisForQuestion(text, args?.datasetId);
         const result = await admitAndStartSession(definitionId, {
           missionActivation: activationInstruction,
+          beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
           onStarted: (sessionId, sp, info) => {
             invalidateDock();
             sendToShell("shell:forward", "canvas", "sessions-changed");
@@ -334,6 +337,26 @@ export function registerKernelHandlers(): void {
       return { ok: true as const, entries: kernelListResearchLedger() };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
+    }
+  });
+
+  ipcMain.handle("qf:research-world:projection", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) {
+        return { ok: false as const, code: "WORLD_ROOT_INELIGIBLE" as const, message: "Research world root must be an object." };
+      }
+      const input = args as Record<string, unknown>;
+      const unexpected = Object.keys(input).filter((key) => key !== "root_type" && key !== "root_id");
+      if (unexpected.length > 0 || (input.root_type !== "mission" && input.root_type !== "task") || typeof input.root_id !== "string") {
+        return { ok: false as const, code: "WORLD_ROOT_INELIGIBLE" as const, message: "Research world root must contain exactly root_type and root_id." };
+      }
+      return kernelGetResearchWorldProjection({
+        root_type: input.root_type,
+        root_id: input.root_id,
+      });
+    } catch (err) {
+      return { ok: false as const, code: "WORLD_ROOT_INELIGIBLE" as const, message: serializeError(err).message };
     }
   });
 

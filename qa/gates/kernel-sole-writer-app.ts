@@ -15,6 +15,7 @@ const APP_SRC = join(REPO_ROOT, "collab-electron/src");
 
 const KERNEL_ALLOWED = new Set([
   "collab-electron/src/main/kernel.ts",
+  "collab-electron/src/main/research-world.test.ts",
   // Focused Kernel-dispatch regression tests import the public Kernel surface
   // directly; they do not add an app runtime writer.
   "collab-electron/src/main/task-steering.test.ts",
