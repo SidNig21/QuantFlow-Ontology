@@ -1291,9 +1291,9 @@ app.whenReady().then(async () => {
                       `source_work=${JSON.stringify(sourceWork)}`,
                       `metrics=${JSON.stringify(run.metrics)}`,
                       "Read exactly those Hypothesis, Run, and Artifact objects with generated QuantFlow ontology tools; do not query unrelated objects.",
-                      "Then call qf_record_evaluation exactly once with those exact ids, a verdict of supports|rejects|inconclusive, numeric confidence from 0 through 1, a non-empty rationale, and non-empty plain-text findings.",
+                      "Then call qf_record_evaluation exactly once with those exact ids, a verdict of supports|rejects|inconclusive, numeric confidence from 0 through 1, a non-empty rationale, and a non-empty ordered findings array. Every finding must contain exactly code, severity, message, and evidence_refs; severity must be info|warning|error; every evidence_refs value must be drawn only from the exact Hypothesis, Run, result Artifact, source Task, or executor ids in frozen source_work.",
                     ].join("\n"),
-                    "orchestrator",
+                    "critic",
                   );
                   await submitAgentSessionInstruction(criticSessionId, criticInstruction);
                 },

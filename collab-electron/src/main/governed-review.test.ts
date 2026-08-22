@@ -122,6 +122,15 @@ describe("R15 production governed-review seams", () => {
     expect(gateway).toContain("qf_record_evaluation");
   });
 
+  test("production critic Mission uses the exact ordered findings contract", () => {
+    const index = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+    expect(index).toContain("non-empty ordered findings array");
+    expect(index).toContain("Every finding must contain exactly code, severity, message, and evidence_refs");
+    expect(index).toContain("every evidence_refs value must be drawn only from the exact Hypothesis, Run, result Artifact, source Task, or executor ids in frozen source_work");
+    expect(index).toContain('"critic",');
+    expect(index).not.toContain("plain-text findings");
+  });
+
   test("sidecar shutdown exit preserves the durable Task/session/link snapshot", () => {
     const before = {
       task: { id: "task-1", status: "cancelled" },

@@ -633,15 +633,12 @@ export const record_evaluation = defineAction({
       .describe("Verdict relative to the hypothesis."),
     confidence: z.number().describe("Confidence in the verdict (0–1)."),
     rationale: z.string().describe("Rationale text."),
-    findings: z.union([
-      z.string(),
-      z.array(z.object({
-        code: z.string(),
-        severity: z.enum(["info", "warning", "error"]),
-        message: z.string(),
-        evidence_refs: z.array(z.string()),
-      })),
-    ]).describe("Durable critic findings: R15 uses an ordered strict finding array; legacy critics may send text."),
+    findings: z.array(z.object({
+      code: z.string(),
+      severity: z.enum(["info", "warning", "error"]),
+      message: z.string(),
+      evidence_refs: z.array(z.string()),
+    }).strict()).min(1).describe("Durable critic findings must be a non-empty ordered array whose items contain exactly code, severity, message, and evidence_refs."),
     hypothesis_id: z
       .string()
       .describe("Hypothesis this evaluation answers."),

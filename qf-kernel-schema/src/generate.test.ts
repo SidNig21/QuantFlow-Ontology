@@ -239,3 +239,28 @@ test("record_evaluation publishes an exact numeric rubric object", () => {
     description: "Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.",
   });
 });
+
+test("record_evaluation publishes an exact ordered findings array", () => {
+  const tools = JSON.parse(generateMcp(schema)) as Array<{
+    name: string;
+    inputSchema: { properties?: Record<string, any> };
+  }>;
+  const recordEvaluation = tools.find((tool) => tool.name === "qf_record_evaluation");
+  expect(recordEvaluation).toBeDefined();
+  expect(recordEvaluation?.inputSchema.properties?.findings).toEqual({
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        code: { type: "string" },
+        severity: { type: "string", enum: ["info", "warning", "error"] },
+        message: { type: "string" },
+        evidence_refs: { type: "array", items: { type: "string" } },
+      },
+      required: ["code", "severity", "message", "evidence_refs"],
+      additionalProperties: false,
+    },
+    minItems: 1,
+    description: "Durable critic findings must be a non-empty ordered array whose items contain exactly code, severity, message, and evidence_refs.",
+  });
+});

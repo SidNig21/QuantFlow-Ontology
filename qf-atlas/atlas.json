@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "e3039e6",
+    "commit": "4b0020a",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "1219812e1dea8dc4"
+    "fingerprint": "2dd3c1fa6896f389"
   },
   "stats": {
     "live": 111,
@@ -1440,7 +1440,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 53.3,
+      "kb": 53.5,
       "x": -0.23,
       "z": 1.3,
       "status": "warn",
@@ -1451,7 +1451,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 53.3,
+          "kb": 53.5,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
@@ -1811,7 +1811,7 @@
       "id": "2:collab-electron/src/main::mission",
       "layer": 2,
       "name": "mission*",
-      "kb": 3.4,
+      "kb": 3.9,
       "x": 3.02,
       "z": 2.56,
       "status": "ok",
@@ -1822,7 +1822,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/mission-activation.ts",
-          "kb": 2.5,
+          "kb": 3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -58442,12 +58442,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "7a6faa1",
+      "commit": "e3039e6",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "e3039e6",
+      "commit": "4b0020a",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",

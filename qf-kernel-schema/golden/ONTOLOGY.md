@@ -832,7 +832,7 @@ Record an independent critic verdict over a succeeded deterministic Run. The Ker
 - `verdict` — Verdict relative to the hypothesis.
 - `confidence` — Confidence in the verdict (0–1).
 - `rationale` — Rationale text.
-- `findings` — Durable critic findings: R15 uses an ordered strict finding array; legacy critics may send text.
+- `findings` — Durable critic findings must be a non-empty ordered array whose items contain exactly code, severity, message, and evidence_refs.
 - `hypothesis_id` — Hypothesis this evaluation answers.
 - `run_id` — Succeeded deterministic Run evaluated.
 - `artifact_id` — Exact result Artifact produced by the Run.

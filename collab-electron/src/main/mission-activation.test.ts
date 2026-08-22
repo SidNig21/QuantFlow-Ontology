@@ -41,3 +41,21 @@ test("mission activation rejects oversize and invalid ids before bytes exist", (
     /id is invalid/,
   );
 });
+
+test("critic activation is read-only, exact-tool, and evaluation-bound", () => {
+  const instruction = buildMissionActivationInstruction(
+    "review-task",
+    "Review the completed deterministic run.",
+    "critic",
+  );
+  expect(instruction).toContain("qf_hypothesis_get");
+  expect(instruction).toContain("qf_run_get");
+  expect(instruction).toContain("qf_artifact_get");
+  expect(instruction).toContain("qf_record_evaluation");
+  expect(instruction).toContain("exact review question");
+  expect(instruction).toContain("never recruit");
+  expect(instruction).toContain("never call any other tool");
+  expect(instruction.match(/Call qf_record_evaluation exactly once/g)).toHaveLength(1);
+  expect(instruction).not.toContain("Hire the named worker");
+  expect(instruction).not.toContain("delegate this mission");
+});

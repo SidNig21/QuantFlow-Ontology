@@ -3200,46 +3200,41 @@
           "description": "Rationale text."
         },
         "findings": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "code": {
-                    "type": "string"
-                  },
-                  "severity": {
-                    "type": "string",
-                    "enum": [
-                      "info",
-                      "warning",
-                      "error"
-                    ]
-                  },
-                  "message": {
-                    "type": "string"
-                  },
-                  "evidence_refs": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "required": [
-                  "code",
-                  "severity",
-                  "message",
-                  "evidence_refs"
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "info",
+                  "warning",
+                  "error"
                 ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
-            }
-          ],
-          "description": "Durable critic findings: R15 uses an ordered strict finding array; legacy critics may send text."
+            },
+            "required": [
+              "code",
+              "severity",
+              "message",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          },
+          "description": "Durable critic findings must be a non-empty ordered array whose items contain exactly code, severity, message, and evidence_refs."
         },
         "hypothesis_id": {
           "type": "string",
