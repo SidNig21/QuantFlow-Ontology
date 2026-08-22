@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 CLEANUP PREFLIGHT CLOCK - BUILD AUTHORIZED
+status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - READER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -73,7 +73,9 @@ consumer-hypothesis-binding-red: normal `94c4ee61` Computer run at 2026-08-22T08
 hypothesis-binding-reader-receipt: fresh Luna Reader task `01a028a5-bc02-7160-a82f-7bd64eca62a3`; first pass NO/NO with finite test-seam defects; every defect landed in WO-R16; reread final YES/YES
 hypothesis-binding-builder-receipt: product candidate `f8f085b3e87639f598e6973dca92ebfb2a781b57`; evidence commit `184dffa41b760e736be4f513dc34f8cac968139f`; exact short matrix green; independent bind and clear-one falsifiers red then restored `4 pass / 0 fail`; Atlas verdict unchanged
 hypothesis-binding-verifier-receipt: fresh Terra Verifier task `01a028b0-9f3b-7093-a903-2bfb87328f1c`; PASS at immutable product candidate `f8f085b3e87639f598e6973dca92ebfb2a781b57`; evidence `docs/orders/evidence/r16/HYPOTHESIS-BINDING-VERIFICATION.md`; runtime tests `4/0`, `2/0`, `8/0`; kernel-sole-writer PASS; Atlas current/ratchet green; Atlas diff UNCHANGED; Router docs byte-identical before/after
-current-door: rebuild `f8f085b3` once and repeat the exact normal-app Computer consumer contract; no R17 authority
+consumer-governed-world-red: normal `f8f085b3` Computer run completed a real Director, worker, deterministic Run, independent Hermes critic, `supports` Evaluation, and published report; pointer `Show research world` retained only the Mission because the normal continuation bypassed the existing R15 source-work/review-task boundary used by the synthetic 13/15 fixture
+consumer-shutdown-red: ordinary Close removed all Windows/Hermes/collaboration processes but left one app-owned WSL `qf-ontology-mcp.mjs` child at PID 1198 for more than eight minutes; exact orphan was terminated after recording; source race is an untracked async native-TUI teardown removed from the live map before shutdown can await it
+current-door: fresh two-question Reader on the appended governed-world/shutdown repair; no Builder and no R17 authority until final YES/YES
 
 ## Authorized outcome
 

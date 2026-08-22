@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer action-schema repair - Computer consumer check required
+status: normal consumer governed-world and shutdown repair - Reader required
 assignee: one fresh Builder session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -3288,3 +3288,106 @@ receipt is `docs/orders/evidence/r16/HYPOTHESIS-BINDING-VERIFICATION.md`.
 Current door: rebuild `f8f085b3` once and repeat the normal-app Computer
 consumer contract. No R17 authority exists until that consumer bar passes and
 R16 is closed in the repository.
+
+## NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR — exact R16 founder red
+
+The normal Computer consumer run at product candidate
+`f8f085b3e87639f598e6973dca92ebfb2a781b57` proved the preceding repair and
+advanced through the whole real-model chain. It created Mission
+`mission-ddbf1b6a-f76f-486b-ba82-05781d422e9a`, Research Director
+`e2506576-c6fe-4026-a641-3b43794ff2c8`, worker
+`acp-9c4e2f7a-1b3d-4e5f-8a6c-2d7e9f1b4c8a`, source Task
+`task-53b85fd9-afee-44a9-9817-c32fc36ce773`, deterministic Run
+`run-fe590303-de63-4882-a1fe-4c232914e487`, critic
+`critic-022171f8-49f5-4c10-ae60-f1ad4fdac934`, Evaluation
+`888950fe-11ac-43f3-81b2-bab216790ca7` with verdict `supports` and confidence
+`0.9`, and published Report Artifact
+`4e55875cdea6299e7d6b912d87ead4b6ccdd7b0d1058e0af5aa264987b7af25b`.
+That is a real Director, worker, critic, Evaluation, and governed publication
+receipt, not a synthetic fixture.
+
+Two later product assertions were red.
+
+1. Computer Use clicked the completed Mission's visible `Show research world`
+   control by pointer. The normal app retained only the Mission tile: no exact
+   13-object/15-cable world appeared. Read-only Kernel inspection found no
+   `qf_review_source_work` table or source-work row and no governed review Task.
+   Source inspection confirms that the normal collaboration-result continuation
+   calls `kernelRunGuidedResearch()` and manually creates the critic, but never
+   calls the already-shipped `kernelBindSourceWork()`,
+   `kernelRequestGovernedReview()`, or `kernelMarkGovernedDelivery()` boundary.
+   The R16 synthetic fixture does call those boundaries, which is why its
+   13/15 proof could pass while the founder path stayed incomplete.
+2. The normal app closed through its ordinary Close control. All Windows app,
+   Electron, Hermes, and collaboration MCP processes exited, but one WSL
+   ontology MCP child remained for more than eight minutes:
+   `node .../qf-ontology-mcp.mjs`, WSL PID `1198`, parent `/init` PID 1. It was
+   terminated only after this red was recorded. Source inspection identifies
+   the lifecycle race: `closeAgentSessionRow()` removes a native-TUI entry from
+   the live map and starts `tearDownNativeTui()` without awaiting or retaining
+   its Promise; shutdown later cannot await that already-detached teardown.
+
+Repair only these two exact normal-consumer defects:
+
+1. The completed worker result must enter the existing R15 governed-review
+   boundary before the critic starts. Bind exactly one immutable source-work
+   record for the existing source Task, exact Hypothesis, deterministic Run,
+   result Artifact, and actual worker/executor session; request exactly one
+   governed review for that source Task and precreated critic; start the critic
+   with the exact governed review Task/source work; then record delivery through
+   the existing boundary. Do not create a second truth store, duplicate the R15
+   tables, synthesize a review Task in renderer code, or change the critic's
+   verdict/publication rules. A failure before delivery must retain the existing
+   failure vocabulary and must not leave a falsely delivered review.
+2. The normal founder path must use the worker session as the executor identity
+   for the deterministic Run/source-work chain. The Director remains the
+   delegator and the critic remains independent. The completed world therefore
+   has exactly the required three session objects: Director, worker/executor,
+   and critic.
+3. Native-TUI teardown started by `closeAgentSessionRow()` must remain owned
+   until it settles. App shutdown must await every such in-flight teardown as
+   well as entries still in the live map. Each teardown runs at most once;
+   a settled Promise is removed from tracking; errors remain bounded to the
+   existing cleanup policy. Do not scan or kill unrelated WSL processes and do
+   not add a broad `wsl --shutdown` fallback.
+4. Add focused runtime tests that can fail independently for: missing normal
+   source-work binding; missing governed review Task/delivery; wrong executor
+   identity; missing 13-object/15-cable projection after the normal sequence;
+   shutdown returning before an already-detached native-TUI teardown settles;
+   and duplicate teardown. Tests must exercise production functions, not search
+   source text or inject product rows directly. Retain the existing R16
+   `13 pass / 0 fail` contract and Atlas ratchet unchanged.
+5. Builder verification is the smallest focused matrix covering those new
+   runtime tests, existing governed-review tests, existing research-world tests,
+   existing native-TUI lifecycle tests, `bun qa/run.ts kernel-sole-writer`,
+   `bun qf-atlas/generate.mjs --check`, `bun qf-atlas/ratchet.mjs`, and
+   `git diff --check`. No live model run, proof-mode R16 gate, installer,
+   release suite, typecheck rebuild, timeout increase, helper framework,
+   worktree, or R17 work is authorized. The Builder records exact commands,
+   counts, changed paths, and one immutable candidate in the existing R16
+   BUILD-REPORT, regenerating Atlas projections only when required by product
+   changes.
+6. A fresh different-model Verifier reruns the exact short matrix at the
+   immutable candidate and records SHA before/after. It does not edit. Only an
+   independent PASS reopens the final normal Computer consumer check.
+7. The Router then rebuilds once and runs one normal guided Mission. PASS still
+   requires real Director/worker/critic completion, `supports`, published
+   Report, pointer-visible exact 13 objects/15 cables, all ten inspectors
+   open/collapse, all three Hermes terminal canaries accepted and erased
+   without submission, exact ordinary close/reopen inventory equality, and
+   final `consumer_processes_remaining=0` across Windows and WSL. Any missing
+   world object/cable, direct non-governed review, orphaned MCP process, or
+   changed assertion is red.
+
+Allowed Builder product paths are only the existing normal continuation and
+governed-review adapter surfaces in `collab-electron/src/main/index.ts` and
+`collab-electron/src/main/kernel.ts`, native-TUI ownership in
+`collab-electron/src/main/agent-host.ts`, their nearest existing focused tests
+plus at most one new focused test file per defect, the existing R16
+BUILD-REPORT, and generated Atlas projections. A fresh Reader must answer the
+protocol's exact two questions before construction. Every Reader defect lands
+in this order; chat-only guidance is not authority.
+
+Plain meaning: the founder path must use the same governed review truth that
+the verified fixture used, and closing QuantFlow must actually close every
+process QuantFlow started.
