@@ -1961,3 +1961,165 @@ The product candidate was committed before this evidence append. The only
 post-candidate change is this report section. The candidate and evidence will
 be pushed to `origin/wo-R16` as required; no build, app launch, consumer check,
 founder-state change, order/NEXT change, or R17 work occurred.
+
+## NORMAL CONSUMER ATTEMPT 3 RED — sixteenth-cable repair Builder closure
+
+Plain meaning: the research world now shows the fifteen intended cables even
+when a real Director-to-critic relationship also exists in the Kernel.
+
+| Field | Receipt |
+|---|---|
+| Starting docs / Reader-approved HEAD | `e3039e688ff51733d14d7dcd80badff4553f123a` |
+| Product base for falsifier | `e94e544b1275958d22b3826dfec43bbfcae71c3f` |
+| Atlas comparison base | `fef713c06f091dc8df13f7bde07be859d3b04930` |
+| Immutable product candidate SHA | `1b329e7c5d1825848b2d13345aef949136cfe73f` |
+| Candidate commit | `fix R16 research world semantic cables` |
+| Branch / remote | `wo-R16` / `origin/wo-R16` |
+| Builder result | **PASS** |
+| Normal replacement build / Computer Use | not run; authorized only after independent Verifier PASS |
+
+The candidate changed exactly these five product/test/generated-Atlas paths:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/research-world.test.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+```
+
+The projection now admits only the exact fifteen selected semantic relationship
+tuples: source Task membership/assignment/delegation, Director-to-executor
+delegation, Run lineage, three Evaluation edges, Evaluation-to-critic/report
+edges, critic findings production, and review-Task assignment/delegation. The
+existing complete-world test creates a real durable Director-to-critic
+`delegates_to` link through Kernel session creation, proves that link exists,
+and still requires the exact fifteen projected links. The underlying Kernel
+link is untouched.
+
+### Exact Builder matrix
+
+The exact Builder matrix ran in order after the immutable candidate commit;
+every native exit was zero:
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+exit=0; 4 pass / 0 fail / 53 expect calls
+
+bun qa/run.ts research-world-visible
+exit=0; PASS  research-world-visible
+
+bun qa/run.ts kernel-sole-writer-app
+exit=0; kernel-sole-writer-app OK; PASS  kernel-sole-writer-app
+
+bun qf-atlas/generate.mjs --check
+exit=0; qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0; HARD RED: 0; unexplained coverage: 0; undecided w/o blocker: 0
+
+git diff --check
+exit=0; no output
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0; no output
+```
+
+The one mandated isolated QA gate emitted these runtime receipts:
+
+```text
+build_once_ms=55654 build_exit=0
+forced_failure_marker=r16-forced-failure-661d91b4-015a-4e6b-8d86-8462f59a5fa5
+forced_failure_phase=spawned_not_ready
+forced-failure shutdown_requested=false owned_processes_remaining=0
+forced_timeout_phase=spawned_not_ready
+forced_timeout_marker=r16-forced-timeout-661d91b4-015a-4e6b-8d86-8462f59a5fa5 elapsed_ms=503
+forced-timeout shutdown_requested=false owned_processes_remaining=0
+cleanup_preflight_ms=12633 forced_roots_remaining=0
+pointer_tiles=10 inspect=10 collapse=10
+nonce=661d91b4-015a-4e6b-8d86-8462f59a5fa5 oracle_tiles=13 oracle_cables=15 dom_tiles=13 dom_cables=15
+first-launch shutdown_requested=true owned_processes_remaining=0
+first_world_stage_ms=26855
+roots_created=3 roots_remaining=0 retried=0 leaked=[]
+primary_failure=null
+cleanup_failures=[]
+launch_attempts=3 ready_launches=1 active_launches=0 max_concurrent_launches=1
+PASS  research-world-visible
+```
+
+The gate's isolated proof build/launch is the order-mandated Builder matrix
+row; no normal replacement build or normal application launch was performed.
+
+### Candidate SHA-256 freeze
+
+These hashes were recorded before the source-only falsifier:
+
+```text
+collab-electron/src/main/research-world-projection.ts 74A3213124EEC532ED1A377E4335FE5BB8225B469A6C3410BD607432F457F5FC
+collab-electron/src/main/research-world.test.ts EA0F160788CEB19113ACD73409A69AF1C631637B4633ED014BF9FFE26F529B88
+qf-atlas/ATLAS.md E1A6749B768FFA44884E0733467D7BDA4D05BCAD57EF6D9D763F36E7F64F0C6F
+qf-atlas/atlas.json 185C32C7B8B831E07B86EA18B065108A939FC5ADBCF2AA8AE6DB076886D8F9AE
+qf-atlas/atlas.html 87851E9C773E01A2974E28430305DA023542756A6FC08F911ECA4616E8D901A3
+```
+
+### Symmetric projection falsifier and exact restoration
+
+Only `collab-electron/src/main/research-world-projection.ts` was temporarily
+replaced with its exact bytes from base
+`e94e544b1275958d22b3826dfec43bbfcae71c3f`. The test, generated Atlas, and
+every other path remained byte-identical.
+
+```text
+base replacement: git diff --quiet e94e544b1275958d22b3826dfec43bbfcae71c3f -- collab-electron/src/main/research-world-projection.ts
+base-match exit=0
+mutation SHA-256=51ABB6D8EA34FAC6466BB3F81E7507A2FF2211CB51B0B79181F912FDB2D9C77A
+
+command: bun test collab-electron/src/main/research-world.test.ts
+native exit=1
+result: 3 pass / 1 fail
+named failure: expected length 15, received length 16 at the complete-world link assertion
+```
+
+The red is the deliberate extra durable Director-to-critic cable leaking
+through the old selected-endpoint filter. The candidate source was restored;
+the restored projection hash exactly matched the frozen candidate hash, the
+candidate product/test/generated-Atlas diff was zero, and the focused command
+returned green:
+
+```text
+restored_projection_sha256=74A3213124EEC532ED1A377E4335FE5BB8225B469A6C3410BD607432F457F5FC
+candidate_diff_exit=0
+
+bun test collab-electron/src/main/research-world.test.ts
+exit=0
+4 pass
+0 fail
+53 expect() calls
+```
+
+### Final Atlas and candidate status
+
+The required final Atlas classification was measured after the candidate
+commit:
+
+```text
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+exit=0
+Atlas diff  c59ebfa -> 1b329e7
+VERDICT: WORSE — 1 analyzer cell(s) got worse
+added 1 · newly-detected 0 · resolved 0 · regressed 0
+coverage worse 1 · better 0
+ADDED: persistence links insert into
+COVERAGE REGRESSED: packages/qf-kernel/src/attach-kernel-drift.test.ts persistence: not-applicable -> partial
+```
+
+This is a transparent, non-blocking Atlas classification: the added finding
+and coverage regression are outside this candidate's five changed paths; this
+repair adds no SQL and does not touch `attach-kernel-drift.test.ts`. Atlas
+currentness is green, ratchet `HARD RED: 0`, and unexplained coverage is `0`.
+
+The product candidate was committed before this report append. No product,
+test, or generated-Atlas file changed after candidate SHA
+`1b329e7c5d1825848b2d13345aef949136cfe73f`; this report is the separate
+evidence commit. No founder state, consumer evidence, normal replacement
+build, normal application launch, Computer Use check, or R17 work occurred.
