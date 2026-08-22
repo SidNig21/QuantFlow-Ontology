@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - FRESH READER REQUIRED
+status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - BUILDER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -116,6 +116,8 @@ consumer-artifact-read-red: normal Computer Use run created one real Mission, de
 current-door: exact `NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes` requires fresh Reader YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority before the bounded repair receives independent PASS
 consumer-artifact-read-reader-findings: fresh Luna Reader task `01a02976-5b02-7961-9329-bd3d8b151fb6` inspected pushed docs head `62160083480ad494f1335b654713b628f21970e7` and returned NO/NO; six finite matrix, falsifier, oracle, build-identity, and consumer-receipt defects landed in the final WO-R16 closure
 current-door: exact `GOVERNED ARTIFACT READ READER DEFECT CLOSURE — immutable verification and exact consumer evidence` requires the same fresh Reader's corrected reread YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority
+consumer-artifact-read-reader-receipt: fresh Luna Reader task `01a02976-5b02-7961-9329-bd3d8b151fb6`; initial NO/NO defects all landed; corrected reread at pushed docs head `e8b7ad3459be7c3928d630fa14eef8b3ecf532e6` returned final YES/YES
+current-door: exact `NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes` bounded Builder repair is authorized; no replacement build, consumer relaunch, or R17 authority before a fresh independent PASS
 
 ## Authorized outcome
 
