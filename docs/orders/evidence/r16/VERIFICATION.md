@@ -294,3 +294,117 @@ exit=0 for both
 ### Verdict
 
 `verdict: PASS`
+
+## R16 independent verification — shared Artifact world isolation
+
+**Result: PASS** — immutable product candidate
+`7dda122435dce47adbc650e5d5b9d933db249263` passed the final independent
+cross-Mission closure. Plain meaning: two real Missions may reuse the same
+Dataset and result Artifact without exposing each other's history.
+
+### Freeze, scope, and seam inspection
+
+- Verification began and ended with evidence head
+  `d9f112993e68dbf2b7efbfa743c5e6cfe76d7a14` on `wo-R16`; it was also the
+  pushed `origin/wo-R16` head at measurement start. The only committed change
+  from candidate to evidence head was `BUILD-REPORT.md`.
+- Candidate product/test SHA-256 before verification:
+  `research-world-projection.ts`
+  `ECD64A563E53FE73BE8BDDEED59A49904284E12C789C5446A3B55FCBDBBDD279` and
+  `research-world.test.ts`
+  `155F75CE5204679DDF0DB68BC5FCE8D25C09FED585A2DB39451DFE46AE0EE64C`.
+  The restored hashes matched exactly; both files had zero diff against the
+  immutable candidate before this evidence append.
+- Inspection of the named regression confirms each complete Mission is made
+  with real Kernel actions: `execute(create_mission)`,
+  `execute(create_hypothesis)`, `execute(create_task)`,
+  `execute(execute_deterministic_run)`, the existing source-work binding,
+  `requestGovernedReview`, delivery/receipt helpers, and
+  `execute(record_evaluation)`. No direct ontology/link insertion is used.
+  The two worlds have equal Dataset and result-Artifact IDs; their other named
+  Mission, Task, Hypothesis, Run, review Task, Evaluation, findings/Report
+  Artifacts, Director, executor, and critic IDs are distinct. For each root,
+  the test compares the exact local 13 object and 15 link triples and asserts
+  every other-world-only ID absent.
+
+### Focused acceptance
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+exit=0; 4 pass / 0 fail; 52 expect() calls
+```
+
+The fourth test is named `isolates two Missions that share Dataset and result
+Artifact in both root directions`.
+
+### Ordered 15-command parent matrix
+
+Each row ran exactly once in this order and exited 0:
+
+```text
+1  bun test collab-electron/src/main/governed-review.test.ts
+   4 pass / 0 fail / 51 expect
+2  bun test collab-electron/src/main/research-world.test.ts
+   4 pass / 0 fail / 52 expect
+3  bun test collab-electron/src/windows/shell/src/research-world.test.ts
+   6 pass / 0 fail / 32 expect
+4  bun test collab-electron/src/windows/shell/src/task-composition.test.ts
+   3 pass / 0 fail / 55 expect
+5  bun test collab-electron/src/main/native-tui-orchestration.test.ts
+   9 pass / 0 fail / 42 expect
+6  bun test collab-electron/src/main/precreated-native-tui.test.ts
+   2 pass / 0 fail / 5 expect
+7  bun test packages/qf-kernel/src/r15-governed-review.test.ts
+   7 pass / 0 fail / 55 expect
+8  bun test packages/qf-kernel/src/r16-visible-world.test.ts
+   3 pass / 0 fail / 5 expect
+9  bun test qa/gates/governed-review.test.ts
+   nested production/kernel 11 pass / 0 fail; live contract 7 pass / 0 fail;
+   gate 3 pass / 0 fail
+10 bun test qa/gates/research-world-visible.test.ts
+   13 pass / 0 fail / 192 expect
+11 bun qa/run.ts kernel-sole-writer
+   PASS kernel-sole-writer
+12 bun qf-atlas/generate.mjs --check
+   current — 432 files, 124 channels, 13 strip candidates
+13 bun qf-atlas/ratchet.mjs
+   HARD RED: 0; unexplained coverage: 0; undecided without blocker: 0;
+   AMBER: 20; undecided: 42
+14 git diff --check
+   exit=0
+15 git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+   exit=0
+```
+
+### Executable projection-from-base falsifier and restoration
+
+Only `collab-electron/src/main/research-world-projection.ts` was temporarily
+changed, to its exact bytes from base
+`5445578508e3b76f107e5c3ed40eafefd0e18319`; the test and every other path
+remained unchanged.
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+exit=1; 3 pass / 1 fail
+```
+
+The native assertion output named decoy-only IDs including
+`agent_session:decoy-critic`, `mission:decoy-shared-mission`,
+`run:decoy-shared-run`, and `task:decoy-shared-source-task`; it reported 11
+unexpected objects. This proves the broad base traversal leaks through the
+shared Artifact.
+
+Candidate projection bytes were restored exactly. Restoration SHA-256 values
+were the two frozen values above, and both candidate comparison commands
+(`git diff --exit-code <candidate> -- <projection>` and `-- <test>`) exited 0.
+The restored focused command exited 0 with exactly `4 pass / 0 fail` and 52
+expect calls.
+
+### Verdict
+
+Atlas is current and its ratchet verdict is PASS (`HARD RED: 0`, unexplained
+coverage `0`); both prescribed diff rows passed. No Electron build/launch,
+consumer check, package/release gate, founder-state access, or R17 work ran.
+Product and test bytes remained unchanged throughout normal verification.
+
+`verdict: PASS`
