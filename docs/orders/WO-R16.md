@@ -831,9 +831,11 @@ observable without increasing the outer deadline:
    `primary_failure=null` or
    `primary_failure={"case":"<case>","message":"<string>"}` using
    `JSON.stringify`, and print all cleanup failures exactly as
-   `cleanup_failures=<JSON array sorted by case then message>`. Always run
-   cleanup and print process/root receipts. A non-empty cleanup array makes the
-   gate red but never replaces or hides the primary failure.
+   `cleanup_failures=<JSON array>` where every element is exactly
+   `{"case":"normal|forced-failure|forced-timeout","message":"<string>"}`
+   and the array is sorted by `case`, then `message`. Always run cleanup and
+   print process/root receipts. A non-empty cleanup array makes the gate red
+   but never replaces or hides the primary failure.
 4. Start the normal first launch, forced-failure launch, and forced-timeout
    launch through one exported scheduling helper against three isolated roots.
    The helper invokes all three case callbacks before awaiting any result. A
