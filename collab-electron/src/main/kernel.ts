@@ -33,7 +33,11 @@ import {
   type SourceWork,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
-import { readToolsForObject, type McpToolDefinition } from "qf-kernel-schema/mcp";
+import {
+  actionToolForAction,
+  readToolsForObject,
+  type McpToolDefinition,
+} from "qf-kernel-schema/mcp";
 import { QF_APP_DIR } from "./paths";
 import {
   projectTaskDelegations,
@@ -937,11 +941,7 @@ export function kernelListOntologyReadTools(): McpToolDefinition[] {
   }
   for (const action of schema.actions) {
     if (action.capabilityGroup) {
-      tools.push({
-        name: `qf_${action.name}`,
-        description: action.description,
-        inputSchema: { type: "object", properties: {}, additionalProperties: true },
-      });
+      tools.push(actionToolForAction(action));
     }
   }
   return tools;

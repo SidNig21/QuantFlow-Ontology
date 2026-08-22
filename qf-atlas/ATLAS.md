@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ c5a759e` on 2026-08-22 by
+> Generated from `wo-R16 @ 21b8c0b` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -542,7 +542,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
 - `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 549
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 489
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 493
 
 ### Exact task delivery
 
@@ -551,7 +551,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 120
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 640
 - **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 591
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 399
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 403
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
 
 ### Research review / publication
@@ -560,7 +560,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 574
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 522
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 526
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 227
@@ -574,7 +574,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 510
 - `collab-electron/src/main/a2a-artifact-store.ts` — exports createA2aArtifactStore() at line 26
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentReportArtifact() at line 30
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 118
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 122
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its

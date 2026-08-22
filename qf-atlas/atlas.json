@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "c5a759e",
+    "commit": "21b8c0b",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "78eb2e4f4e1b2cdb"
+    "fingerprint": "5d7c121939e697e8"
   },
   "stats": {
     "live": 111,
@@ -1684,7 +1684,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 43.7,
+      "kb": 43.6,
       "x": -1.24,
       "z": 0.45,
       "status": "alert",
@@ -1695,18 +1695,18 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 43.7,
+          "kb": 43.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 4,
           "dml": 8,
           "dmlLines": [
-            138,
-            173,
-            174,
-            175,
-            176,
-            213
+            142,
+            177,
+            178,
+            179,
+            180,
+            217
           ],
           "executes": 3
         }
@@ -1719,12 +1719,12 @@
           "what": "8 SQL statements outside execute()",
           "where": "collab-electron/src/main/kernel.ts",
           "lines": [
-            138,
-            173,
-            174,
-            175,
-            176,
-            213
+            142,
+            177,
+            178,
+            179,
+            180,
+            217
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -11416,7 +11416,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelAssertSessionMayClose() at line 489"
+            "exports kernelAssertSessionMayClose() at line 493"
           ],
           "strong": [],
           "weight": "weak"
@@ -11509,7 +11509,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelListTaskAssignments() at line 399"
+            "exports kernelListTaskAssignments() at line 403"
           ],
           "strong": [],
           "weight": "weak"
@@ -11621,9 +11621,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 522",
-            "exports kernelGovernedReviewContextForSession() at line 534",
-            "exports kernelGovernedReviewNextSequence() at line 544"
+            "exports kernelRequestGovernedReview() at line 526",
+            "exports kernelGovernedReviewContextForSession() at line 538",
+            "exports kernelGovernedReviewNextSequence() at line 548"
           ],
           "strong": [],
           "weight": "weak"
@@ -11711,7 +11711,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports getArtifactRoot() at line 118"
+            "exports getArtifactRoot() at line 122"
           ],
           "strong": [],
           "weight": "weak"
@@ -56674,10 +56674,10 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            173,
-            174,
-            175,
-            176
+            177,
+            178,
+            179,
+            180
           ]
         }
       ]
@@ -56702,7 +56702,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            213
+            217
           ]
         }
       ]
@@ -56727,7 +56727,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            248
+            252
           ]
         }
       ]
@@ -58200,12 +58200,12 @@
       "what": "8 SQL statements outside execute()",
       "where": "collab-electron/src/main/kernel.ts",
       "lines": [
-        138,
-        173,
-        174,
-        175,
-        176,
-        213
+        142,
+        177,
+        178,
+        179,
+        180,
+        217
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -58410,12 +58410,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "e16dfd7",
+      "commit": "c5a759e",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "c5a759e",
+      "commit": "21b8c0b",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
