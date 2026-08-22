@@ -1129,3 +1129,82 @@ only on full PASS. Any edit during verification voids the run.
 Plain meaning: let QuantFlow finish building and showing the real research
 team before starting the three cheap shutdown checks that were crowding it off
 the machine.
+
+## CABLE ENDPOINT REPAIR - resolve every projected object tile, not only sessions
+
+Post-first WIP SHA `04b2596acf84668b8405304c1a2f886f87c9e23f` is evidence,
+not a candidate. It implements the Reader-approved schedule, bounded native-key
+bridge, saved-state boundary, and 11/11 focused contract tests. Its one live run
+proved the real canvas contained all 13 expected objects but only one cable:
+
+```text
+world_timeout={"object_count":13,"link_count":1,
+"missing_objects":[],"extra_objects":[],
+"missing_links":[14 exact research-object lineage links],"extra_links":[]}
+```
+
+The one rendered cable was Director `delegates_to` executor. Cleanup was fully
+green: the normal owned process set and all three roots reached zero, and
+`cleanup_failures=[]`.
+
+The measured product defect is in
+`collab-electron/src/windows/shell/src/research-world.js`. Its cable endpoint
+lookup asks only for `ontology:agent_session:<id>` or a tile whose `sessionId`
+matches. Therefore session-to-session endpoints resolve while Mission, Task,
+Hypothesis, Dataset, Run, Artifact, and Evaluation endpoints are labeled
+unknown and filtered out even though their exact ontology tiles exist.
+
+### Exact repair
+
+Export one pure endpoint resolver from `research-world.js`. It receives the
+current projection's `objects`, the current canvas `tiles`, and one endpoint id.
+It behaves exactly:
+
+1. Find projection objects whose full `id` equals the endpoint id. Zero matches
+   returns `null`; more than one match also returns `null` rather than choosing
+   an arbitrary type.
+2. For the single matching non-session object, resolve only a research tile
+   whose `type === "research"`, `ontologyType === object.type`, and
+   `ontologyId === object.id`; return that tile's exact `id`.
+3. For the single matching `agent_session`, resolve only an existing tile whose
+   `sessionId === object.id`; return that tile's exact `id`. A research-style
+   `ontology:agent_session:*` tile is not invented.
+4. Cable projection calls this resolver independently for `from_id` and
+   `to_id`. It emits the unchanged dashed `view` cable only when both resolve;
+   it never guesses, reverses, persists, or relabels an endpoint.
+
+The focused renderer test constructs all ten research-object tiles and three
+session tiles, then supplies the exact 15-link manifest. It must prove every
+link resolves to the expected two tile ids. Separate cases prove unknown ids
+and a duplicate id across two object types return `null`. The old session-only
+lookup makes the positive case red because 14 links have a null endpoint.
+
+### Builder and acceptance authority
+
+A fresh Builder starts only from clean local and remote
+`04b2596acf84668b8405304c1a2f886f87c9e23f` plus the Router's pushed Reader-fix
+commit. It may change only:
+
+- `collab-electron/src/windows/shell/src/research-world.js`;
+- `collab-electron/src/windows/shell/src/research-world.test.ts`;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections required by normal change control.
+
+It runs Atlas preflight, the focused renderer test, and the unchanged 11-test
+`research-world-visible` contract test. Only then may it run exactly one live
+`bun qa/run.ts research-world-visible`. A red stops with its exact receipt. A
+green proceeds through the already-specified falsifiers, short matrix,
+BUILD-REPORT, Atlas regeneration, immutable candidate commit, and push. The
+gate, expected 13/15 manifest, schedule, timeout, fixture, selectors, Main,
+preload, Kernel, persistence, and every other product file remain byte-
+unchanged from `04b2596`.
+
+A fresh different-model Verifier records the candidate SHA before and after,
+reruns both focused tests, the live gate, the named falsifier sample and short
+matrix, and writes `docs/orders/evidence/r16/VERIFICATION.md` only on full PASS.
+No package, installer, release, worktree, wrapper, or helper framework is part
+of this repair.
+
+Plain meaning: QuantFlow already has every research object on screen; make the
+cable renderer connect those real tiles instead of recognizing only agent
+sessions.

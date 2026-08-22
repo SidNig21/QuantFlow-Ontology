@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "0457d97",
+    "commit": "04b2596",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c87b4e941fd4af8d"
+    "fingerprint": "33baf91e336d23e3"
   },
   "stats": {
     "live": 111,
@@ -1440,7 +1440,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 51.6,
+      "kb": 52.6,
       "x": -0.23,
       "z": 1.3,
       "status": "warn",
@@ -1451,7 +1451,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 51.6,
+          "kb": 52.6,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
@@ -3450,7 +3450,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 558.1,
+      "kb": 570.6,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3470,21 +3470,21 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/research-director-front-door.ts",
-          "kb": 43.5,
-          "spawns": 3,
-          "spawnsLive": 2,
-          "writes": 4,
+          "path": "qa/gates/research-world-visible.ts",
+          "kb": 53.3,
+          "spawns": 1,
+          "spawnsLive": 1,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/research-world-visible.ts",
-          "kb": 40.8,
-          "spawns": 1,
-          "spawnsLive": 1,
-          "writes": 0,
+          "path": "qa/gates/research-director-front-door.ts",
+          "kb": 43.5,
+          "spawns": 3,
+          "spawnsLive": 2,
+          "writes": 4,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -55425,17 +55425,17 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1200,
+          "line": 1222,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1263,
+          "line": 1285,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1303,
+          "line": 1325,
           "kind": "direct"
         },
         {
@@ -55470,12 +55470,12 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1304,
+          "line": 1326,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1363,
+          "line": 1385,
           "kind": "direct"
         },
         {
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "17b9e3b",
+      "commit": "0457d97",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "0457d97",
+      "commit": "04b2596",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
