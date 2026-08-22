@@ -1819,3 +1819,145 @@ The report append is the separate evidence commit requested by the order. No
 Electron build, normal application launch, Computer Use, founder-state access,
 package/release work, consumer receipt edit, order/NEXT edit, or R17 work was
 performed in this Builder turn.
+
+## NORMAL CONSUMER ATTEMPT 2 RED — numeric rubric discovery Builder closure
+
+Plain meaning: the critic now receives four actual numeric scores, so it can
+record an evaluation instead of sending text that the Kernel must reject.
+
+### Immutable candidate and bounded scope
+
+| Field | Receipt |
+|---|---|
+| Starting docs head | `7a6faa18e8e0c6fd00975330d424052b9e240807` |
+| Atlas comparison base | `fef713c06f091dc8df13f7bde07be859d3b04930` |
+| Base schema for falsifier | `99188c6b3e039821c5c615c621a45d5c3f484ab9` |
+| Product candidate SHA | `e94e544` (`fix(r16): publish numeric evaluation rubric authority`) |
+| Branch / remote | `wo-R16` / `origin/wo-R16` |
+| Builder result | **PASS** |
+| Build / app / consumer / R17 | not run / not launched / not run / not started |
+
+The candidate changed exactly these seven allowed paths:
+
+```text
+qf-kernel-schema/src/ontology/research.ts
+qf-kernel-schema/src/generate.test.ts
+qf-kernel-schema/golden/tools.json
+collab-electron/src/main/ontology-gateway.test.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+```
+
+`record_evaluation.rubric` is now one named strict Zod object with exactly
+`faithfulness`, `answer_relevancy`, `context_precision`, and `context_recall`;
+each is a number bounded from `0` through `1`. The shared action property stays
+optional. No Kernel validation, verdict derivation, coercion, retry, renderer,
+gateway implementation, fixture, order, consumer receipt, package,
+credential, founder-state, or R17 path changed. `golden/ONTOLOGY.md` and
+`golden/migration.sql` remained byte-identical.
+
+### Exact Builder matrix
+
+The required commands ran in the order below before the candidate commit; all
+native exits were zero:
+
+```text
+bun run --cwd qf-kernel-schema generate
+exit=0; wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, and upgrades 0001 through 0012
+
+bun test --cwd qf-kernel-schema
+exit=0; 178 pass / 0 fail / 613 expect calls; exactly 178 tests across 3 files
+
+bun test collab-electron/src/main/ontology-gateway.test.ts
+exit=0; 6 pass / 0 fail / 70 expect calls
+
+bun test collab-electron/src/main/governed-review.test.ts
+exit=0; 4 pass / 0 fail / 51 expect calls
+
+bun qa/run.ts governed-review
+exit=0; focused production/kernel proof 11 pass / 0 fail; PASS governed-review
+
+bun qa/run.ts kernel-sole-writer-app
+exit=0; kernel-sole-writer-app OK; PASS kernel-sole-writer-app
+
+bun qf-atlas/generate.mjs
+exit=0; 432 files; 109 subsystems; 124 IPC channels; 111 live wires; HARD RED not reported
+
+bun qf-atlas/generate.mjs --check
+exit=0; qf-atlas current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0; HARD RED: 0; unexplained coverage: 0; undecided without blocker: 0
+
+git diff --check
+exit=0; no output
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0; no output
+```
+
+The appended schema test is named exactly
+`record_evaluation publishes an exact numeric rubric object`; the schema suite
+reported exactly `178 pass / 0 fail`. The existing five gateway test blocks and
+all their assertions remain present; the focused gateway suite reported exactly
+`6 pass / 0 fail`. The extended production `list_tools` test independently
+asserts the four literal property names, numeric types, `0`/`1` bounds, required
+list, closed object, and equality with the generated action authority.
+
+### Candidate SHA-256 freeze
+
+The seven changed product/test/generated files were hashed after candidate
+commit and before falsification:
+
+```text
+collab-electron/src/main/ontology-gateway.test.ts 31B9D45B062E56AEF7B8FCFC90BD11EE599C628BE326C3F60F3EFE829EFA89A4
+qf-atlas/ATLAS.md FB46A8C93047D8BDF6919227863870F5B75D4CA1E8B698C775FC54A96D4B2D3B
+qf-atlas/atlas.html A789746D3FC974F3267B66C84C1E6B90CD25531FC20EA288B7025E599A0E5516
+qf-atlas/atlas.json 0C90C090DBE0FAA49702CB8F3EBBEAD4F66013C528AFD20FB98E2FF37A42FE82
+qf-kernel-schema/golden/tools.json 09E2A2B57B515736B23E951EA2D90E69D37317EF3ED9852203660613AB05DBCD
+qf-kernel-schema/src/generate.test.ts D56D2A58D817EF97C65B183FB0390282F3D044CD2FC8EB4FF379C867D624BC4D
+qf-kernel-schema/src/ontology/research.ts D84DE3362D842A3C192EB6314B12757C62B6C1356C9CA9D854FB7E10CBCBD942
+```
+
+### Source-only falsifier and exact restoration
+
+Only `qf-kernel-schema/src/ontology/research.ts` was restored from the exact
+base bytes at `99188c6b3e039821c5c615c621a45d5c3f484ab9`. The base schema was
+regenerated, then both focused commands were run:
+
+```text
+git restore --source=99188c6b3e039821c5c615c621a45d5c3f484ab9 -- qf-kernel-schema/src/ontology/research.ts
+bun run --cwd qf-kernel-schema generate
+exit=0
+
+bun test --cwd qf-kernel-schema
+native exit=1; 177 pass / 1 fail / 613 expect calls
+named failure: record_evaluation publishes an exact numeric rubric object
+named defect: received generic object shape with propertyNames={type:string} and additionalProperties={}; missing the four numeric properties, required list, bounds, and closed object
+
+bun test collab-electron/src/main/ontology-gateway.test.ts
+native exit=0; 6 pass / 0 fail / 70 expect calls
+```
+
+The required falsifier was red on the missing/generic numeric rubric shape.
+Every candidate file was then restored from immutable candidate `e94e544`.
+The exact seven hashes above were reproduced, `git diff --exit-code` against
+those candidate paths returned `0`, and the working tree had no product diff.
+
+The focused restoration commands were rerun green:
+
+```text
+bun test --cwd qf-kernel-schema
+exit=0; 178 pass / 0 fail / 613 expect calls
+
+bun test collab-electron/src/main/ontology-gateway.test.ts
+exit=0; 6 pass / 0 fail / 70 expect calls
+```
+
+### Final status
+
+The product candidate was committed before this evidence append. The only
+post-candidate change is this report section. The candidate and evidence will
+be pushed to `origin/wo-R16` as required; no build, app launch, consumer check,
+founder-state change, order/NEXT change, or R17 work occurred.
