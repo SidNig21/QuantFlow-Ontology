@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 SIXTEENTH CABLE REPAIR VERIFIED - NORMAL CONSUMER ATTEMPT 4 AUTHORIZED
+status: R16 CONSUMER ATTEMPT 4 OPERATOR RED - UNCHANGED ATTEMPT 5 AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -142,6 +142,8 @@ sixteenth-cable-builder-receipt: immutable product candidate `1b329e7c5d1825848b
 current-door: fresh independent Verifier must freeze candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`, run the exact bounded matrix and falsifier/restoration, and write PASS or stop on RED; no rebuild, consumer Attempt 4, or R17 authority before PASS
 sixteenth-cable-verifier-receipt: fresh independent Terra Verifier task `01a029c3-dede-7192-b898-20781ffe5720`; PASS at immutable candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`; evidence `82ecfda163c177a56e9caca799460b8d05d77159`; exact `4/0`, isolated `13/15` plus pointer `10/10`, falsifier red/restoration exact, Atlas HARD RED 0, frozen bytes unchanged
 current-door: Router is authorized for one identity-bound build and one exact normal two-launch Computer Use Attempt 4; any red keeps R16 open; no R17 authority
+consumer-attempt-4-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` and bound build opened normally and Director canary passed; Router then clicked the worker's right-side cancel control while trying to select it, with durable admission/cancel/exit ordering; ordinary cleanup was zero and no product red is claimed
+current-door: Router is authorized for one unchanged-output normal two-launch Computer Use Attempt 5; right-side live-session rows are prohibited; any red keeps R16 open; no R17 authority
 
 ## Authorized outcome
 

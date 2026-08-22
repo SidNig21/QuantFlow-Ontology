@@ -246,3 +246,44 @@ red. The application closed through its ordinary visible Close control. The
 launch root, repo Electron processes, and WSL Hermes/collaboration/ontology
 processes were all exactly zero. No second Mission, replacement critic,
 alternate Evaluation, verdict override, product edit, or R17 work occurred.
+
+## Attempt 4 — RED: Router cancelled the live worker
+
+Date: 2026-08-22
+Candidate: `1b329e7c5d1825848b2d13345aef949136cfe73f`
+Independent verification: `82ecfda163c177a56e9caca799460b8d05d77159`
+Build timestamp: `2026-08-22T14:06:29.6630346Z`
+Build command: exact identity-bound `bun run --cwd collab-electron build`
+Application command: from `collab-electron`,
+`node ./scripts/run-local-bin.mjs electron-vite preview --skipBuild`
+
+Verdict: **RED by disclosed Router interference. R16 remains open.**
+
+The exact build exited zero, all three outputs were fresh, and the Main bundle
+contained the full candidate SHA and timestamp. One visible guided action
+created Mission `mission-8565c9c7-6975-4749-bb4c-26ef05e9d689` and Director
+`b20fac9d-551f-46bd-b3f1-9c8b311e850f`. The Director terminal visibly
+accepted exact canary `qf-r16-typing-check-1b329e7`; it was erased with
+`Ctrl+U`, and pointer focus returned to the canvas without submission.
+
+The Director then created and launched worker
+`8b3f2a1e-7c4d-4e9a-b5f6-2d8c1a0e9f47`. The Router attempted to select that
+worker by clicking its right-side live-session row. That surface is a cancel
+control, not a tile-selection control. The durable launch log proves the
+ordering:
+
+```text
+07:08:52.695 agent-host: admitted native_tui session=8b3f2a1e-7c4d-4e9a-b5f6-2d8c1a0e9f47 definition=hermes-worker
+07:08:55.476 agent-host: native_tui cancel 8b3f2a1e-7c4d-4e9a-b5f6-2d8c1a0e9f47
+07:08:57.649 pty session.exited exitCode=1
+```
+
+The Director's subsequent delivery returned `403 {"model":"kimi-k3"}` because
+the Router had removed its assignee. The Kernel records that worker as
+`cancelled`; no source Task was created for this Mission. This is not evidence
+of a product or external-model defect. No replacement worker, second Mission,
+manual Task, alternate Evaluation, or verdict override was used.
+
+The application closed through its ordinary visible Close control. The launch
+root, repo Electron processes, and WSL Hermes/collaboration/ontology processes
+were all exactly zero. No world, inspector, or reopen PASS is claimed.

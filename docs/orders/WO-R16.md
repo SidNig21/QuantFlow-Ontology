@@ -5190,3 +5190,24 @@ launch equality without a Mission on reopen, and zero owned Windows/WSL
 processes after each ordinary close. Any extra or missing cable, canary,
 inspector, object, reopen item, or cleanup receipt is red. No R17 authority is
 created by this section.
+
+### CONSUMER ATTEMPT 4 OPERATOR RED — live-session row is cancel, not select
+
+Attempt 4 used the independently verified candidate and exact build, and
+captured the Director canary. The Router then clicked the new worker's
+right-side live-session row while trying to select its terminal. That control
+cancels the session. Durable timestamps prove admission, Router cancellation,
+and exit in that order. The Director's later handoff failure is therefore an
+effect of disclosed Router interference, not a product red. Exact identities,
+logs, cleanup, and non-claims are append-only in consumer evidence Attempt 4.
+
+One replacement consumer Attempt 5 is authorized against the unchanged
+candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` and the already-built exact
+output timestamped `2026-08-22T14:06:29.6630346Z`. It does not rebuild, edit
+product/test/generated Atlas, rerun the independent matrix, or create a new
+Reader/Builder/Verifier lap. It uses the same complete Attempt 4 consumer bar
+and appends exactly one Attempt 5 section. During Attempt 5, Computer Use must
+never click a right-side live-session row; Director, worker, and critic
+terminals may be selected only through their canvas tiles or left tile
+inventory. Any additional Router interference, missing receipt, product red,
+or external-runtime red stops R16. No R17 authority is created here.
