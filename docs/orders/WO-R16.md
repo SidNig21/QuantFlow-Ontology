@@ -1936,3 +1936,47 @@ close its defects and are part of the same repair:
 The Reader rereads this closure and the preceding repair together. Every other
 bound, allowed path, one-live-invocation rule, matrix, falsifier, report, and
 Verifier requirement remains unchanged.
+
+### Second Reader-defect closure - sender ownership, hard read timeout, cleanup proof
+
+The second Reader found three remaining escape hatches. Close them as follows;
+this subsection overrides only the corresponding helper/test mechanics above:
+
+1. One exported `exerciseKeyTransition` helper owns the complete lifecycle for
+   one Enter or Escape transition: install probe, capture/validate `before`, call
+   its supplied `send` callback exactly once, settle, return or throw the exact
+   receipt, and remove the probe in `finally`. The per-tile loop calls this
+   helper once for Enter with `() => pressNativeKey(endpoint, "Enter")` and once
+   for Escape with `() => pressNativeKey(endpoint, "Escape")`; it has no other
+   transport or input call. The focused contract extracts the loop and requires
+   exactly two total `pressNativeKey` occurrences, each equal to one of those
+   two literal callbacks. It rejects any additional occurrence or any
+   `rpcCall`, `app.ui.pressKey`, `sendInputEvent`, `executeJavaScript`,
+   `postMessage`, `.send(`, `.emit(`, `.dispatch`, `.bind(`, `.call(`,
+   `.apply(`, or assignment/alias of `pressNativeKey` in that loop. The helper's
+   behavioral fixtures count the supplied `send` calls and require exactly one
+   on delayed success, timeout, and focus-loss failure. `pressNativeKey` itself
+   retains the separate exact-one-`rpcCall` source check.
+2. Supplying a remaining-time value to `observe` is not the timeout. Every
+   observation is independently wrapped in `Promise.race` against a gate-owned
+   timer for the positive remaining settle milliseconds. The timer is cleared
+   in `finally`; the losing observation promise is ignored and cannot trigger a
+   second send or a second receipt. The never-resolving fixture supplies an
+   observation promise that never settles and must still return the exact
+   `observation_error` failure by the 250-millisecond outer bound. This fixture
+   uses the real monotonic clock for that case; it may not rely on the callback
+   honoring a timeout parameter.
+3. Probe cleanup is behavioral, not source-only. The transition helper receives
+   `installProbe` and `removeProbe` seams used by the real renderer expressions.
+   In each delayed-success, never-success, never-resolving, send-rejection, and
+   latched-focus-loss fixture, the existing native-key test requires: install
+   once, remove once in `finally`, listener count zero, temporary probe state
+   absent, and send count either exactly one or, for a `before`-state rejection,
+   exactly zero. The real cleanup expression removes the named `focusout`
+   listener from the exact target and deletes the one gate-owned probe key. The
+   focused contract evaluates install/cleanup against a minimal fake target and
+   fails unless both the listener and probe key are absent afterward.
+
+No new test is added: all of these fixtures remain inside the one existing
+native-key contract test, keeping the file at 13/0. The diff-freeze rule and all
+other acceptance requirements remain unchanged.
