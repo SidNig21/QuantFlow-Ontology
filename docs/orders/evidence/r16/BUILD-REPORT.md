@@ -2123,3 +2123,79 @@ test, or generated-Atlas file changed after candidate SHA
 `1b329e7c5d1825848b2d13345aef949136cfe73f`; this report is the separate
 evidence commit. No founder state, consumer evidence, normal replacement
 build, normal application launch, Computer Use check, or R17 work occurred.
+
+## CONSUMER ATTEMPT 5 CONTRACT REPAIR — governed critic findings Builder closure
+
+Plain meaning: the critic now receives one strict ordered list of four-key findings and a matching no-recruit instruction, so it can review the completed run without guessing what the Kernel accepts or trying to hire another worker.
+
+| Field | Receipt |
+|---|---|
+| Starting docs head | `4b0020a17eb35c3481d05b9cca381de6bde6895e` |
+| Atlas comparison base | `fef713c06f091dc8df13f7bde07be859d3b04930` |
+| Immutable product candidate SHA | `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa` |
+| Candidate timestamp | `2026-08-22T14:31:07.8913233Z` |
+| Branch / remote | `wo-R16` / `origin/wo-R16` |
+| Builder result | **PASS** |
+| Build / app / consumer / R17 | not run / not launched / not run / not started |
+
+The candidate changed exactly these eleven allowed product, test, and generated paths:
+
+```text
+collab-electron/src/main/governed-review.test.ts
+collab-electron/src/main/index.ts
+collab-electron/src/main/mission-activation.test.ts
+collab-electron/src/main/mission-activation.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+qf-kernel-schema/golden/ONTOLOGY.md
+qf-kernel-schema/golden/tools.json
+qf-kernel-schema/src/generate.test.ts
+qf-kernel-schema/src/ontology/research.ts
+```
+
+The source authority now publishes `record_evaluation.findings` as one non-empty strict ordered array. Each item has exactly `code`, `severity`, `message`, and `evidence_refs`; severity remains `info|warning|error`, and evidence references remain object ids. The production critic receives the four-tool, no-recruit/no-delegate activation and the Mission requires the same ordered array with evidence references drawn only from the frozen source-work ids. The Kernel's direct legacy text acceptance, governed runtime, verdict derivation, publication semantics, credentials, runtime profile, and R17 state were not changed.
+
+### Exact Builder matrix
+
+The required commands ran in order after the isolated `.strict()` repair; every native exit was zero:
+
+```text
+bun run --cwd qf-kernel-schema generate
+exit=0; Wrote golden/migration.sql, golden/tools.json, golden/ONTOLOGY.md, golden/conformance.test.ts, and upgrades 0001 through 0012
+
+bun test --cwd qf-kernel-schema
+exit=0; 179 pass / 0 fail / 615 expect calls; Ran 179 tests across 3 files
+
+bun test collab-electron/src/main/mission-activation.test.ts
+exit=0; 3 pass / 0 fail / 33 expect calls; Ran 3 tests across 1 file
+
+bun test collab-electron/src/main/ontology-gateway.test.ts
+exit=0; 6 pass / 0 fail / 70 expect calls; Ran 6 tests across 1 file
+
+bun test collab-electron/src/main/governed-review.test.ts
+exit=0; 5 pass / 0 fail / 56 expect calls; Ran 5 tests across 1 file
+
+bun qa/run.ts governed-review
+exit=0; internal action/MCP boundary=3/3; governed-review admission/delivery task/links DML absent=true; focused production/kernel proof 12 pass / 0 fail; PASS  governed-review
+
+bun qa/run.ts kernel-sole-writer-app
+exit=0; kernel-sole-writer-app OK; PASS  kernel-sole-writer-app
+
+bun qf-atlas/generate.mjs
+exit=0; qf-atlas: wrote atlas.json + atlas.html + ATLAS.md; 432 files · 109 subsystems · 124 IPC channels; wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+
+bun qf-atlas/generate.mjs --check
+exit=0; qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0; baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · undecided w/o blocker: 0
+
+git diff --check
+exit=0; no output
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0; no output
+```
+
+The product candidate was committed before this evidence append at immutable SHA `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`. No build, app launch, normal consumer attempt, founder-state access, credential/model change, order/NEXT edit, or R17 work occurred in this Builder lap. This report append is the separate evidence commit.
