@@ -52,7 +52,9 @@ import {
   kernelOpenHypothesisForQuestion,
   kernelRunGuidedResearch,
   kernelContinueGovernedResearchResult,
+  kernelFailGovernedCriticCompletion,
   kernelFinalizeResearchEvaluation,
+  kernelGovernedCriticProgress,
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
   peerBusReadInbox,
@@ -106,6 +108,7 @@ import { registerAgentIpc } from "./acp-agent";
 import {
   bootstrapPackagedDockProfiles,
   closeAgentSessionRow,
+  captureAgentSessionOutput,
   disposeAgentOs,
   submitAgentSessionInstruction,
   admitAndStartSession,
@@ -114,6 +117,10 @@ import {
   reconcileStaleSessions,
   runAgentHostSmoke,
 } from "./agent-host";
+import {
+  buildGovernedCriticCompletionInstruction,
+  ensureGovernedCriticCompletion,
+} from "./governed-critic-completion";
 import { createKernelAgentSession } from "./runtime-kernel-admission";
 import { bindMissionToDirectorSession, clearMissionForDirectorSession, missionForDirectorSession } from "./mission-context";
 import {
@@ -1274,7 +1281,7 @@ app.whenReady().then(async () => {
                 { sessionId: change.delegatorSessionId, role: "orchestrator" },
                 criticSessionId,
               );
-              await kernelContinueGovernedResearchResult({
+              const continuation = await kernelContinueGovernedResearchResult({
                 source_task_id: change.taskId,
                 hypothesis_id: run.hypothesisId,
                 run_id: run.runId,
@@ -1297,6 +1304,36 @@ app.whenReady().then(async () => {
                   );
                   await submitAgentSessionInstruction(criticSessionId, criticInstruction);
                 },
+              });
+              const completionInstruction = buildGovernedCriticCompletionInstruction(
+                continuation.review_task_id,
+                continuation.source_work,
+              );
+              void ensureGovernedCriticCompletion(completionInstruction, {
+                progress: () => kernelGovernedCriticProgress(
+                  criticSessionId,
+                  continuation.review_task_id,
+                ),
+                capture: () => captureAgentSessionOutput(criticSessionId),
+                submit: (instruction) => submitAgentSessionInstruction(
+                  criticSessionId,
+                  instruction,
+                ),
+                fail: (reasonCode, message) => {
+                  kernelFailGovernedCriticCompletion(
+                    continuation.review_task_id,
+                    reasonCode,
+                    message,
+                  );
+                },
+              }).then((result) => {
+                if (result !== "failed") return;
+                closeAdmittedSession(criticSessionId);
+                closeAdmittedSession(change.delegatorSessionId);
+                mainWindow?.webContents.send("qf:dock:invalidate");
+                mainWindow?.webContents.send("qf:events:invalidate");
+              }).catch((error) => {
+                console.error("governed critic completion monitor failed", error);
               });
               mainWindow?.webContents.send("qf:dock:invalidate");
               mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");

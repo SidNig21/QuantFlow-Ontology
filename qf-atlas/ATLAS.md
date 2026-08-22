@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ 4b0020a` on 2026-08-22 by
+> Generated from `wo-R16 @ 1dc2298` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -228,7 +228,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 210 | imported from an entrypoint |
+| `reachable` | 211 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -365,8 +365,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 236 of
-238 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 237 of
+239 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
@@ -408,11 +408,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**236 of 238 files that have a reachability verdict** carry a blast radius.
+**237 of 239 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**549 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**551 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 311 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 312 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -459,7 +459,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (549 files)
+## Per-analyzer coverage (551 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -467,17 +467,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 545 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 278 | 0 | 4 | 0 | 267 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 538 |
-| `persistence` | 23 | 27 | 0 | 0 | 499 |
-| `lifetime` | 6 | 61 | 0 | 0 | 482 |
-| `packaging` | 230 | 0 | 0 | 123 | 196 |
-| `ownership` | 20 | 0 | 0 | 355 | 174 |
-| `reach` | 235 | 3 | 0 | 311 | 0 |
+| `imports` | 547 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 280 | 0 | 4 | 0 | 267 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 540 |
+| `persistence` | 23 | 27 | 0 | 0 | 501 |
+| `lifetime` | 6 | 61 | 0 | 0 | 484 |
+| `packaging` | 231 | 0 | 0 | 123 | 197 |
+| `ownership` | 20 | 0 | 0 | 357 | 174 |
+| `reach` | 236 | 3 | 0 | 312 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 311 files means those trees are
+failure — `reach: unsupported` on 312 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 123 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
@@ -540,9 +540,9 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 626
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 638
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 493
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 494
 
 ### Exact task delivery
 
@@ -550,17 +550,17 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 120
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 640
-- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 591
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 403
+- **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 646
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 404
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
 
 ### Research review / publication
 
 2 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper
 
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 574
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 629
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 526
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 527
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 227
@@ -571,10 +571,10 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/create.ts** — INSERT INTO artifact at line 359
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 500
-- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 510
+- **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 565
 - `collab-electron/src/main/a2a-artifact-store.ts` — exports createA2aArtifactStore() at line 26
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentReportArtifact() at line 30
-- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 122
+- `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 123
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 
 **`strong` is structural** — the file mutates the responsibility's table or owns its

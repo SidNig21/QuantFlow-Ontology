@@ -810,6 +810,8 @@ Own the governed review Task lifecycle mutation for Kernel-internal admission an
 - `triggering_evaluation_id` — Exact non-supporting Evaluation that authorizes a follow-up.
 - `review_task_id` — Governed review Task id for delivery.
 - `outcome` — Host delivery outcome for the governed review Task.
+- `reason_code` — Stable failure code when a running critic cannot complete its Evaluation.
+- `message` — Non-secret operator-readable completion failure message.
 
 ### `publish_artifact`
 

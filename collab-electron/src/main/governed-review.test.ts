@@ -22,6 +22,7 @@ let testLiveDelete: ((sessionId: string) => void) | null = null;
 let testPtyWriteHook: ((sessionId: string, data: string) => boolean) | null = null;
 
 mock.module("./pty", () => ({
+  captureSession: async () => "ready | test\n❯",
   writeToSession: (sessionId: string, data: string) => {
     return testPtyWriteHook?.(sessionId, data) ?? true;
   },

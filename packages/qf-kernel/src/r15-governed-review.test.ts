@@ -6,6 +6,7 @@ import {
   bindSourceWork,
   closeKernel,
   execute,
+  markGovernedCompletionFailed,
   markGovernedDelivery,
   openKernel,
   recordGovernedToolReceipt,
@@ -143,6 +144,31 @@ describe("R15 governed review", () => {
     markGovernedDelivery(db!, failed.taskId, "failed", trace);
     expect((db!.query("SELECT COUNT(*) AS n FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt'").get(failed.taskId) as { n: number }).n).toBe(1);
     expect((db!.query("SELECT COUNT(*) AS n FROM events WHERE object_id = ? AND type = 'task.cancelled'").get(failed.taskId) as { n: number }).n).toBe(1);
+  });
+
+  test("a critic that returns twice without an Evaluation fails only the review Task with a durable reason", () => {
+    const f = fixture();
+    markGovernedCompletionFailed(
+      db!,
+      f.taskId,
+      "CRITIC_RETURNED_WITHOUT_EVALUATION",
+      "critic returned without recording an Evaluation",
+      trace,
+    );
+    expect(db!.query("SELECT lifecycle, terminal_receipt_kind FROM qf_review_task WHERE task_id = ?").get(f.taskId)).toEqual({
+      lifecycle: "failed",
+      terminal_receipt_kind: "delivery_receipt",
+    });
+    expect((db!.query("SELECT status FROM task WHERE id = ?").get(f.taskId) as { status: string }).status).toBe("cancelled");
+    expect((db!.query("SELECT status FROM task WHERE id = 'source-task'").get() as { status: string }).status).toBe("open");
+    const receipt = db!.query("SELECT payload FROM qf_review_receipt WHERE task_id = ? ORDER BY created_at DESC, id DESC LIMIT 1").get(f.taskId) as { payload: string };
+    expect(JSON.parse(receipt.payload)).toMatchObject({
+      outcome: "failed",
+      phase: "completion",
+      reason_code: "CRITIC_RETURNED_WITHOUT_EVALUATION",
+    });
+    markGovernedCompletionFailed(db!, f.taskId, "CRITIC_RETURNED_WITHOUT_EVALUATION", "same", trace);
+    expect((db!.query("SELECT COUNT(*) AS n FROM events WHERE object_id = ? AND type = 'review.completion_failed'").get(f.taskId) as { n: number }).n).toBe(1);
   });
 
   test("admission boundary failure rolls back Task, links, review row, attempt, receipt, and event residue", () => {

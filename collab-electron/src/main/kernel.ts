@@ -25,6 +25,7 @@ import {
   bindSourceWork,
   freezeSourceWork,
   governedReviewProjection,
+  markGovernedCompletionFailed,
   markGovernedDelivery,
   recordGovernedToolReceipt,
   requestGovernedReview,
@@ -630,6 +631,49 @@ export function kernelGovernedReviewNextSequence(sessionId: string): number {
   } catch {
     return 1;
   }
+}
+
+export function kernelGovernedCriticProgress(
+  sessionId: string,
+  reviewTaskId: string,
+): { lifecycle: string; qualifyingReadsComplete: boolean } | null {
+  try {
+    const row = getKernelDb().query(
+      "SELECT lifecycle, source_work FROM qf_review_task WHERE task_id = ? AND critic_session_id = ?",
+    ).get(reviewTaskId, sessionId) as { lifecycle: string; source_work: string } | null;
+    if (!row) return null;
+    const work = JSON.parse(row.source_work) as SourceWork;
+    const receipts = getKernelDb().query(
+      "SELECT tool_name, arguments FROM qf_review_invocation WHERE task_id = ? AND session_id = ? AND success = 1",
+    ).all(reviewTaskId, sessionId) as Array<{ tool_name: string; arguments: string }>;
+    const expected = [
+      ["qf_hypothesis_get", JSON.stringify({ id: work.hypothesis_id })],
+      ["qf_run_get", JSON.stringify({ id: work.run_id })],
+      ["qf_artifact_get", JSON.stringify({ id: work.result_artifact_id })],
+    ];
+    return {
+      lifecycle: row.lifecycle,
+      qualifyingReadsComplete: expected.every(([tool, args]) =>
+        receipts.some((receipt) => receipt.tool_name === tool && receipt.arguments === args)
+      ),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function kernelFailGovernedCriticCompletion(
+  reviewTaskId: string,
+  reasonCode: string,
+  message: string,
+): void {
+  markGovernedCompletionFailed(
+    getKernelDb(),
+    reviewTaskId,
+    reasonCode,
+    message,
+    { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() },
+  );
 }
 
 export function kernelRecordGovernedEvaluation(input: Record<string, unknown>, actorSessionId: string): Record<string, unknown> {

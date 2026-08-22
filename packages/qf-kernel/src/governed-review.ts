@@ -279,7 +279,7 @@ function freezeSourceWorkInTransaction(db: KernelDb, sourceTaskId: string): Sour
 }
 
 type GovernedReviewTaskInput = {
-  operation: "admit" | "deliver";
+  operation: "admit" | "deliver" | "fail_completion";
   action_kind?: GovernedActionKind;
   source_task_id?: string;
   source_work?: unknown;
@@ -288,6 +288,8 @@ type GovernedReviewTaskInput = {
   triggering_evaluation_id?: string | null;
   review_task_id?: string;
   outcome?: "delivered" | "failed";
+  reason_code?: string;
+  message?: string;
 };
 
 function reviewTaskTitle(kind: "review" | "revision" | "second_critic"): string {
@@ -401,11 +403,49 @@ function deliverGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput,
   return tx();
 }
 
+function failGovernedReviewCompletion(db: KernelDb, input: GovernedReviewTaskInput, trace: GovernedReviewTrace): Record<string, unknown> {
+  const taskId = input.review_task_id ?? "";
+  const reasonCode = input.reason_code ?? "";
+  const message = input.message ?? "";
+  if (!taskId || !reasonCode || !message) {
+    throw new KernelError("governed review completion failure requires review_task_id, reason_code, and message");
+  }
+  const tx = db.transaction(() => {
+    const row = db.query("SELECT source_task_id, lifecycle FROM qf_review_task WHERE task_id = ?").get(taskId) as { source_task_id: string; lifecycle: string } | null;
+    if (!row) throw new KernelError("review Task not found");
+    if (row.lifecycle === "failed") {
+      return { kind: "replayed", task_id: taskId, outcome: "failed", reason_code: reasonCode };
+    }
+    if (row.lifecycle !== "running") throw new KernelError("only a running governed review may fail completion");
+    db.query("UPDATE qf_review_task SET lifecycle = 'failed', terminal_receipt_kind = 'delivery_receipt' WHERE task_id = ?").run(taskId);
+    cancelTaskInTransaction(db, taskId, trace, {
+      source_task_id: row.source_task_id,
+      outcome: "failed",
+      phase: "completion",
+      reason_code: reasonCode,
+    });
+    const payload = {
+      task_id: taskId,
+      source_task_id: row.source_task_id,
+      outcome: "failed",
+      phase: "completion",
+      reason_code: reasonCode,
+      message,
+    };
+    const receiptId = crypto.randomUUID();
+    db.query("INSERT INTO qf_review_receipt (id, kind, task_id, payload, created_at) VALUES (?, 'delivery_receipt', ?, ?, ?)").run(receiptId, taskId, json(payload), new Date().toISOString());
+    const eventId = appendEvent(db, { type: "review.completion_failed", object_type: "task", object_id: taskId, payload, trace_id: trace.trace_id });
+    return { kind: "failed", task_id: taskId, receipt_id: receiptId, event_id: eventId, reason_code: reasonCode };
+  });
+  return tx();
+}
+
 /** Execute-owned governed review Task lifecycle action. The caller owns no surrounding transaction. */
 export function executeGovernedReviewTask(db: KernelDb, input: GovernedReviewTaskInput, trace: GovernedReviewTrace): GovernedReviewAdmission | Record<string, unknown> {
   ensureGovernedReviewSchema(db);
   if (input.operation === "admit") return admitGovernedReviewTask(db, input, trace);
   if (input.operation === "deliver") return deliverGovernedReviewTask(db, input, trace);
+  if (input.operation === "fail_completion") return failGovernedReviewCompletion(db, input, trace);
   throw new KernelError("governed_review_task operation is invalid");
 }
 
@@ -416,6 +456,21 @@ export function requestGovernedReview(db: KernelDb, sourceTaskId: string, attemp
 
 export function markGovernedDelivery(db: KernelDb, reviewTaskId: string, outcome: "delivered" | "failed", trace: GovernedReviewTrace): void {
   execute(db, "governed_review_task", { operation: "deliver", review_task_id: reviewTaskId, outcome }, trace);
+}
+
+export function markGovernedCompletionFailed(
+  db: KernelDb,
+  reviewTaskId: string,
+  reasonCode: string,
+  message: string,
+  trace: GovernedReviewTrace,
+): void {
+  execute(db, "governed_review_task", {
+    operation: "fail_completion",
+    review_task_id: reviewTaskId,
+    reason_code: reasonCode,
+    message,
+  }, trace);
 }
 
 export function recordGovernedToolReceipt(db: KernelDb, args: { invocation_id: string; session_id: string; task_id: string; tool_name: string; arguments: JsonRecord; result: unknown; success?: boolean; broker_sequence: number }, trace: GovernedReviewTrace): void {

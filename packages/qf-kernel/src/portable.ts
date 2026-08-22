@@ -86,6 +86,7 @@ export {
   ensureGovernedReviewSchema,
   freezeSourceWork,
   governedReviewProjection,
+  markGovernedCompletionFailed,
   markGovernedDelivery,
   recordGovernedEvaluation,
   recordGovernedToolReceipt,

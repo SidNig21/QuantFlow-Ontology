@@ -68,7 +68,7 @@ import {
   getDefaultWslDistro,
 } from "./terminal-target";
 import { resolveCollaborationResourcePath } from "./package-resource-paths";
-import { writeToSession } from "./pty";
+import { captureSession, writeToSession } from "./pty";
 import { assertPrecreatedNativeTuiRoute } from "./precreated-native-tui";
 import { assertPrecreatedStartOwnership } from "./precreated-start-ownership";
 
@@ -223,6 +223,18 @@ export async function submitAgentSessionInstruction(
   if (!submitAccepted) {
     throw new Error("governed review critic submit write was not accepted");
   }
+}
+
+/** Capture only the PTY owned by this exact admitted native-TUI session. */
+export async function captureAgentSessionOutput(
+  sessionId: string,
+  lines = 200,
+): Promise<string> {
+  const entry = live.get(sessionId);
+  if (!entry || entry.kind !== "native_tui" || !entry.ptySessionId) {
+    throw new Error("governed review critic target is not a live native-TUI session");
+  }
+  return captureSession(entry.ptySessionId, lines);
 }
 
 function newTrace(): TraceContext {

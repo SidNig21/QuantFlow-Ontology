@@ -483,7 +483,7 @@ export const governed_review_task = defineAction({
   lifecycle: "experimental",
   internalOnly: true,
   input: z.object({
-    operation: z.enum(["admit", "deliver"]).describe("Internal governed review Task operation."),
+    operation: z.enum(["admit", "deliver", "fail_completion"]).describe("Internal governed review Task operation."),
     action_kind: z.enum(["request_review", "request_revision", "second_critic"]).optional().describe("Governed admission mode; required for admission."),
     source_task_id: z.string().optional().describe("Immutable source Task id for governed admission."),
     source_work: z.unknown().optional().describe("Kernel-frozen source-work tuple supplied by the public adapter."),
@@ -492,6 +492,8 @@ export const governed_review_task = defineAction({
     triggering_evaluation_id: z.string().nullable().optional().describe("Exact non-supporting Evaluation that authorizes a follow-up."),
     review_task_id: z.string().optional().describe("Governed review Task id for delivery."),
     outcome: z.enum(["delivered", "failed"]).optional().describe("Host delivery outcome for the governed review Task."),
+    reason_code: z.string().optional().describe("Stable failure code when a running critic cannot complete its Evaluation."),
+    message: z.string().optional().describe("Non-secret operator-readable completion failure message."),
   }),
 });
 
