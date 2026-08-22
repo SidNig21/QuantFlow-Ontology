@@ -145,3 +145,67 @@ Independent Verifier measurement and the normal non-proof application’s
 Computer Use consumer close/reopen check were not run in this Builder turn,
 per the current delegated instruction. No second live gate, timeout increase,
 product change, package change, or R17 action occurred.
+
+## R16 founder-kernel upgrade compatibility — bounded Builder closure
+
+| Field | Receipt |
+|---|---|
+| Base WIP SHA | `c5a759efafc2a967dea959d5ad6c74ffcc6c2881` |
+| Immutable candidate SHA | `b8e7d57c04288e1315bbe658a4665a57b4d5f3e7` |
+| Branch | `wo-R16` |
+| Live R16 gate | not run, per authority |
+| Real founder DB | read-only source; copy-only upgrade proof |
+| Stale dependency backup | preserved at `packages/qf-kernel/node_modules/qf-kernel-schema.stale-r16` |
+
+The final compatibility repair keeps current authority exact, derives every
+historical predecessor with the correct later-addition removals, materializes
+the two R16 schema additions from current migration authority inside the
+existing transaction, and preserves exact partial-shape rejection. The pinned
+regression is independent of classifier snapshots and proves
+`task_steering` → writable `attachKernel()` → `current`, nondecreasing
+artifact/task/link/event counts, and preserved representative data, links,
+events, and hashes.
+
+## Green matrix
+
+```text
+bun test packages/qf-kernel/src/r11a-deterministic-execution.test.ts -t "pinned post-composition|extra or missing"  exit=0  2 pass / 0 fail / 16 expect
+bunx tsc --noEmit                                                                                                  exit=0
+bun qa/run.ts dock-profile-identity                                                                              exit=0  PASS
+bun qa/run.ts kernel-drift                                                                                        exit=0  G1/G2/G3/G6 PASS
+bun qa/run.ts kernel-sole-writer                                                                                  exit=0  PASS
+bun test qa/gates/research-world-visible.test.ts                                                                  exit=0  13 pass / 0 fail / 192 expect
+bun qf-atlas/generate.mjs --check                                                                                exit=0
+bun qf-atlas/ratchet.mjs                                                                                          exit=0  HARD RED=0
+git diff --check                                                                                                  exit=0
+```
+
+Atlas was refreshed and verified at `431 files · 109 subsystems · 124 IPC
+channels`, with `111 live` wires, `0 unreached`, `0 DEAD`, and `HARD RED: 0`.
+
+## Isolated founder-copy proof
+
+The real source `C:\Users\rybow\.quantflow\kernel.db` was opened read-only
+only. Its source shape was `task_steering`; only `kernel.db` was copied to an
+isolated temporary path and upgraded. The copy reached `current`.
+
+```text
+sourceHashBefore = c29fd79a328d1006eedfc425a5f55ca5a60fdc5a07b89db861a7cad128369bdf
+sourceHashAfter  = c29fd79a328d1006eedfc425a5f55ca5a60fdc5a07b89db861a7cad128369bdf
+before counts    = artifacts 8, tasks 1, links 25, events 58
+after counts     = artifacts 8, tasks 1, links 25, events 58
+copy shape       = current
+```
+
+Representative preservation included artifact
+`41382a3f664128ac1c297c98c2b4cd8244b06c3e2b1b743bb70169be5d2713eb` with the
+same content hash, task
+`task-32dcfa3d-2365-4ece-885b-ee3b5bbaa469`, link
+`02f22077-d82b-41e0-9f9b-ab341a7ce513` (`derived_from`), and event
+`0165976f-68cf-462e-a0c0-bda73fbb7e0f` with identical payload and trace ID.
+
+The source hash was identical before and after; the real founder DB was never
+opened writable, the app was not launched, and no live gate was run. The
+Router-owned `NEXT.md` and `WO-R16.md` edits, including the named defect
+receipts, remain preserved and unstaged. This report is the evidence commit
+following immutable candidate `b8e7d57c04288e1315bbe658a4665a57b4d5f3e7`.
