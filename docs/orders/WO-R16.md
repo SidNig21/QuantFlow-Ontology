@@ -2147,3 +2147,81 @@ follows:
 R16 closes only when the independent machine Verifier PASS and this real-mouse
 normal-app consumer PASS both exist. The Router then records the final evidence
 HEAD, updates the authority/status surfaces, and stops before R17.
+
+## POINTER REOPEN SCHEDULING - keep four launches inside sixty seconds
+
+Pointer-first WIP `fac9b8d89abbae14d6d883cb1fbad1fdf236d126`
+is evidence, not a candidate. Its pre-live checks passed tile-manager 2/0 and
+focused R16 13/0. Its only live invocation proved:
+
+- exactly one `pointer_tiles=10 inspect=10 collapse=10`;
+- `oracle_tiles=13 oracle_cables=15 dom_tiles=13 dom_cables=15`;
+- first-launch, forced-failure, and forced-timeout owned processes all zero;
+- `roots_created=3 roots_remaining=0` and `cleanup_failures=[]`.
+
+The first world used 31,931 ms. Only then did the gate start the normal reopen,
+forced-failure, and forced-timeout Electron launches together. Both forced cases
+became ready and completed, while the production reopen lost the shared
+functional deadline with `production Electron readiness timed out`. This is a
+gate scheduling defect: three cold launches contend during the only window in
+which one must restore and compare the full world.
+
+The repair changes scheduling only. It does not change a timeout, launch count,
+product file, fixture, pointer proof, world assertion, or cleanup assertion:
+
+1. Rename the generic `schedulePostFirstCases` helper to
+   `scheduleAfterBarrierCases`; its semantics remain: await one supplied barrier,
+   invoke every supplied callback before awaiting any result, report each
+   post-spawn start, and return results in callback order. Its two existing
+   focused tests change only the helper name/wording and still prove concurrent
+   start plus zero callback invocation when the barrier rejects.
+2. `runFirstWorldStage` receives one `onFirstLaunchReady` callback and invokes
+   it exactly once immediately after the first production Electron launch has
+   passed readiness, before fixture construction, specialist spawn, or pointer
+   proof. If the first stage fails before that callback, its same failure rejects
+   the readiness barrier so no early callback waits forever.
+3. At that first-launch-ready barrier, start only the forced-failure and
+   forced-timeout launches through `scheduleAfterBarrierCases`. Require their
+   post-spawn start spread at most 2,000 ms. They may run concurrently with the
+   first world's fixture, model-session, projection, and pointer work because
+   they use separate registered roots and perform no world mutation.
+4. The normal reopen remains forbidden until all three facts are true: the first
+   world is fully proved and its first launch is shut down with zero owned
+   processes; the forced-failure case is complete and clean; and the
+   forced-timeout case is complete and clean. Then start the normal reopen as
+   the only live Electron launch, restore the same app root, and run the
+   unchanged exact world/reopen/saved-state comparison. Emit exactly
+   `forced_cases_clean_before_reopen=true` immediately before its spawn and
+   retain `reopen_equal=true pointer=true duplicate_reveal=false` after PASS.
+5. All four real launches remain: first world, forced failure, forced timeout,
+   normal reopen. `RESEARCH_WORLD_VISIBLE_DEADLINE_MS=60000` and
+   `CLEANUP_RESERVE_MS=8000` remain byte-identical. Every case keeps its existing
+   functional deadline, hard cleanup deadline, process ownership tracker, root,
+   failure vocabulary, and primary/cleanup precedence. No case is skipped,
+   syntheticized, merged, or allowed to borrow cleanup reserve.
+6. The focused R16 file remains exactly 13 tests. Only imports, the two existing
+   scheduling tests, and the pointer-first contract test may differ from WIP
+   `fac9b8d8`; all other ten test bodies are byte-identical. The contract test
+   requires the two exact scheduling receipts, four launch functions, unchanged
+   60,000/8,000 constants, early forced callbacks only, and the normal reopen
+   after both early results. In the gate, only the scheduling helper,
+   first-world ready seam, and `runResearchWorldVisibleGate` orchestration may
+   differ from WIP; all product/pointer/world/reopen/cleanup bodies are
+   byte-identical. Builder and Verifier inspect and record
+   `git diff fac9b8d8 --`; any broader change is red.
+
+A fresh Reader must return YES/YES before a fresh Builder starts. That Builder
+runs Atlas preflight, tile-manager 2/0, focused R16 13/0, and exactly one live
+`bun qa/run.ts research-world-visible`. Any red stops with scheduling,
+pointer/world, primary, root, and cleanup receipts. Green continues with the
+already-authorized short matrix, pointer falsifier, BUILD-REPORT, Atlas refresh,
+candidate commit, and push. The fresh different-model Verifier later receives
+the same matrix and one-live budget. The post-Verifier normal-app Computer Use
+check and stop-before-R17 rule remain unchanged.
+
+Allowed Builder paths are only `qa/gates/research-world-visible.ts`,
+`qa/gates/research-world-visible.test.ts`,
+`docs/orders/evidence/r16/BUILD-REPORT.md`, and the three generated Atlas
+projections. No product change, timeout/reserve change, assertion weakening,
+extra launch, second live run, package/installer/release gate, worktree, wrapper,
+helper framework, keyboard work, or R17 work is authorized.
