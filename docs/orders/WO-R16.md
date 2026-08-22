@@ -3531,10 +3531,14 @@ acceptance failure, not permission to weaken the assertion. The Verifier reruns
 the unchanged matrix and may inspect these rows but does not repeat mutations.
 
 The Router’s single post-Verification rebuild means exactly one
-`bun --cwd collab-electron run build`, followed by one ordinary non-proof launch
+`bun run --cwd collab-electron build`, followed by one ordinary non-proof launch
 and one guided Mission; no second build, fixture launch, retry, or proof-mode
 run is part of this acceptance. The Router records that exact command and its
-native exit. For each of the ten research-object tiles it clicks Inspect once,
+native exit. Exit zero alone is insufficient: stdout must include the invoked
+`electron-vite build` script and successful Main, preload, and renderer build
+completions, and the three corresponding `collab-electron/out` products must
+have modification times at or after the recorded build start. Bun usage/help
+text or unchanged output products are red. For each of the ten research-object tiles it clicks Inspect once,
 then Collapse once, and records `inspect=10 collapse=10`; a duplicate, skipped,
 or wrong tile is red. Any failure in the seven consumer evidence fields above
 is red, and only the exact governed source-work/review/delivery receipts can
@@ -3681,3 +3685,10 @@ ordinary non-proof app launches using the same candidate identity: the first
 launch runs one guided Mission and the second launch is the same-root reopen.
 There is no second build, second guided Mission, proof-mode launch, fixture
 launch, or retry. The final process/root receipt covers both launches.
+
+The first Router invocation after Verification used the spent, invalid syntax
+`bun --cwd collab-electron run build`. Installed Bun exited `0` after printing
+usage/help and did not invoke Electron Vite or change the output products. That
+is an order-command falsifier receipt, not a build attempt or passing gate. The
+corrected command and output/timestamp assertions above are now the only build
+authority; exactly one actual build remains authorized.

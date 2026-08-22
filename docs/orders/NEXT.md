@@ -87,6 +87,7 @@ defects, then returned final `YES/YES` at pushed docs SHA
 `e237ef79fbdad56b0b430baff838878fd7a91bf2`.
 governed-world-builder-receipt: immutable product candidate `34c4bd254165901b8e2d8df72e717c76a171c341`; evidence commit `0fc82c3547391af8c4b79b85093ef09901e2908f`; exact 14-command matrix green; F1-F7 each red then restored green; Atlas current/ratchet green with HARD RED 0 and one transparently recorded non-blocking diff finding; tree clean and pushed
 governed-world-verifier-receipt: fresh Terra task `01a028e0-4d92-78a0-b26b-9c9f63a4abc9`; PASS at immutable product candidate `34c4bd254165901b8e2d8df72e717c76a171c341`; exact 14-command matrix green; product/test/Atlas bytes unchanged; durable receipt `docs/orders/evidence/r16/GOVERNED-WORLD-VERIFICATION.md`
+consumer-build-command-red: `bun --cwd collab-electron run build` exited 0 with Bun usage/help, never invoked Electron Vite, and changed no output product; WO-R16 now binds the valid `bun run --cwd collab-electron build` syntax plus real output/timestamp assertions; the one actual build allowance remains unused
 current-door: exactly one build and two ordinary normal-app launches for the final Computer consumer contract; no R17 authority until full consumer PASS and R16 closure
 
 ## Authorized outcome
