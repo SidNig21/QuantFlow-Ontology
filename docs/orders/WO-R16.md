@@ -5347,3 +5347,41 @@ Fresh adversarial Reader receipt: Luna task
 `01a029dc-b08b-7730-8af4-2722c78a747a` inspected immutable docs SHA
 `151a629a324dcbe368e689260a6cfe4a105b1cf2` and answered YES/YES with no edits.
 The bounded Builder door above is open.
+
+Builder receipt: Luna task `01a029de-8747-7153-818a-1f3276fc16a1`
+produced immutable product candidate
+`417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa` and separate evidence commit
+`0702850f658b8ffa490656d16a7cd9c289f60905`. The exact matrix is green,
+including schema `179/0`, Mission activation `3/0`, gateway `6/0`, governed
+review `5/0`, both named gates, Atlas current/ratchet with HARD RED 0, and both
+diff checks. No build, launch, founder-state access, or R17 work occurred.
+
+### FOUNDER MOUSE-FIRST CORRECTION — one live terminal receipt
+
+Founder authority on 2026-08-22 supersedes every earlier R16 requirement for
+separate Director, worker, and critic typing canaries. Do not create standalone
+smoke-test seats. Do not delay, replace, or interact with ephemeral seats merely
+to collect per-role typing parity. One naturally occurring live Hermes terminal
+is sufficient: select it by its canvas tile, type one harmless visible canary,
+erase it without submission, and return to the canvas by pointer. This proves
+the mouse-first product's terminal focus plus normal keyboard text input.
+
+After independent PASS, the final normal-app consumer attempt has one exact
+bar:
+
+1. One Guided Research Mission completes Director to worker to deterministic
+   Run/result Artifact to independent critic to Evaluation to gated Report.
+2. `Show research world` yields exactly 13 Mission-local objects and the exact
+   15 semantic cables; all ten research-object inspectors open and close by
+   pointer.
+3. One live Hermes terminal passes the mouse-focus/type/erase/mouse-return
+   receipt above. No other terminal canary is required.
+4. Ordinary close/reopen preserves the same Mission/world without creating a
+   second Mission, and final shutdown leaves zero owned product processes.
+
+If an external provider returns 403 after QuantFlow has supplied a valid first
+request, record an external-runtime failure. It creates no new R16 product work
+unless QuantFlow instructed an invalid request, mishandled the provider failure,
+or left incorrect durable state. No new R16 work is permitted outside a defect
+that directly prevents the four outcomes above. Atlas delivery-loop expansion
+is after R16, not part of this closure. No R17 authority is created here.
