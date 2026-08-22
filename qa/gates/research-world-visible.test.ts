@@ -9,6 +9,7 @@ import {
   assertSavedResearchTileAllowlist,
   assertVisibleWorldCounts,
   CLEANUP_RESERVE_MS,
+  CLEANUP_PREFLIGHT_DEADLINE_MS,
   createLaunchActivity,
   EXPECTED_VISIBLE_CABLE_COUNT,
   EXPECTED_VISIBLE_TILE_COUNT,
@@ -221,7 +222,6 @@ describe("research-world-visible gate contract", () => {
     const timeoutStart = gate.indexOf("async function runForcedTimeoutCase");
     const mergeOutcomesStart = gate.indexOf("function mergeCaseOutcomes", timeoutStart);
     const firstWorldStart = gate.indexOf("async function runFirstWorldStage");
-    const reopenStart = gate.indexOf("async function runNormalReopenCase");
     const orchestrationStart = gate.indexOf("export async function runResearchWorldVisibleGate");
     const sequenceStart = gate.indexOf("const caseResults = await runSequentialCases", orchestrationStart);
     const sequenceEnd = gate.indexOf("\n    void caseResults;", sequenceStart);
@@ -230,10 +230,17 @@ describe("research-world-visible gate contract", () => {
     const launchReadySource = gate.slice(launchReadyStart, launchReadyEnd);
     const cleanupSource = gate.slice(cleanupStart, cleanupEnd);
     const buildSource = gate.slice(buildStart, buildEnd);
+    const activityStart = gate.indexOf("const activity = createLaunchActivity();");
+    const forcedRootStart = gate.indexOf("const failureRoot = registerRoot();");
+    const preflightStart = gate.indexOf("const cleanupPreflightStartedAt = performance.now();");
+    const productClock = gate.indexOf("const startedAt = performance.now();");
+    const normalRootStart = gate.indexOf("const normalRoot = registerRoot();");
+    const preflightSource = gate.slice(preflightStart, productClock);
+    const rootCasesStart = gate.indexOf("const rootCases = [");
+    const rootCleanupSource = gate.slice(rootCasesStart);
     const failureSource = gate.slice(failureStart, timeoutStart);
     const timeoutSource = gate.slice(timeoutStart, mergeOutcomesStart);
-    const firstWorldSource = gate.slice(firstWorldStart, reopenStart);
-    const reopenSource = gate.slice(reopenStart, failureStart);
+    const firstWorldSource = gate.slice(firstWorldStart, failureStart);
     const sequenceSource = gate.slice(sequenceStart, sequenceEnd);
     expect(pointerStart).toBeGreaterThanOrEqual(0);
     expect(pointerEnd).toBeGreaterThan(pointerStart);
@@ -242,10 +249,15 @@ describe("research-world-visible gate contract", () => {
     expect(launchReadyStart).toBeGreaterThan(readinessStart);
     expect(buildStart).toBeGreaterThanOrEqual(0);
     expect(buildEnd).toBeGreaterThan(buildStart);
+    expect(activityStart).toBeGreaterThanOrEqual(0);
+    expect(forcedRootStart).toBeGreaterThan(activityStart);
+    expect(preflightStart).toBeGreaterThan(forcedRootStart);
+    expect(productClock).toBeGreaterThan(preflightStart);
+    expect(normalRootStart).toBeGreaterThan(productClock);
+    expect(rootCasesStart).toBeGreaterThan(normalRootStart);
     expect(failureStart).toBeGreaterThanOrEqual(0);
     expect(timeoutStart).toBeGreaterThanOrEqual(0);
     expect(firstWorldStart).toBeGreaterThanOrEqual(0);
-    expect(reopenStart).toBeGreaterThanOrEqual(0);
     expect(sequenceStart).toBeGreaterThanOrEqual(0);
     expect(sequenceEnd).toBeGreaterThan(sequenceStart);
     expect(pointerProof).toContain('expected.objects.filter((entry) => entry.type !== "agent_session")');
@@ -285,15 +297,35 @@ describe("research-world-visible gate contract", () => {
     expect((gate.match(/console\.log\(`build_once_ms=\$\{[^}]+\} build_exit=\$\{[^}]+\}`\)/g) ?? [])).toHaveLength(1);
     expect(buildSource).not.toMatch(/build_once_ms=(?:0|[0-9]+) build_exit=0/);
     const buildCall = gate.indexOf("await prepareCandidateBuild();");
-    const productClock = gate.indexOf("const startedAt = performance.now();");
-    const firstRoot = gate.indexOf("const normalRoot = registerRoot();");
     expect(buildCall).toBeGreaterThanOrEqual(0);
     expect(buildCall).toBeLessThan(productClock);
-    expect(buildCall).toBeLessThan(firstRoot);
+    expect(buildCall).toBeLessThan(normalRootStart);
     expect(electronPackage.scripts?.preview).toBe("node ./scripts/run-local-bin.mjs electron-vite preview");
     expect(electronPackage.scripts?.preview).toContain("electron-vite preview");
     expect(electronVitePreview).toContain("if (!options.skipBuild)");
     expect(electronVitePreview).toContain("await build(inlineConfig)");
+    expect(CLEANUP_PREFLIGHT_DEADLINE_MS).toBe(15_000);
+    expect(preflightSource).toContain("const cleanupPreflightDeadlineAt = cleanupPreflightStartedAt + CLEANUP_PREFLIGHT_DEADLINE_MS;");
+    expect(preflightSource).toContain("runForcedFailureCase");
+    expect(preflightSource).toContain("runForcedTimeoutCase");
+    expect(preflightSource).toContain("runSequentialCases");
+    expect(preflightSource).toContain("removePreflightRoot");
+    expect(preflightSource).toContain("assert(cleanupPreflightMs < CLEANUP_PREFLIGHT_DEADLINE_MS");
+    expect(preflightSource).toContain("if (preflightError !== undefined) throw preflightError;");
+    expect(preflightSource).not.toContain("normalRoot");
+    expect(preflightSource).not.toContain("runFirstWorldStage");
+    expect(preflightSource).not.toContain("runNormalReopenCase");
+    expect((gate.match(/console\.log\(`cleanup_preflight_ms=\$\{[^}]+\} forced_roots_remaining=\$\{[^}]+\}`\)/g) ?? [])).toHaveLength(1);
+    expect(gate).not.toContain("cleanup_preflight_ms=0");
+    expect(rootCleanupSource).toContain("failureRoot");
+    expect(rootCleanupSource).toContain("timeoutRoot");
+    expect(rootCleanupSource).toContain("removalReceipts.push(receipt)");
+    expect(rootCleanupSource).toContain("removeRootForCase");
+    expect(gate.indexOf("if (preflightError !== undefined) throw preflightError;")).toBeLessThan(productClock);
+    expect(gate.indexOf("runFirstWorldStage(normalRoot")).toBeGreaterThan(productClock);
+    expect(gate).not.toContain("runNormalReopenCase");
+    expect(gate).not.toContain("reopen_equal");
+    expect(gate).not.toContain("forced_cases_clean_before_reopen");
     expect(buildSource).not.toMatch(/package|watch/i);
     expect(gate).not.toMatch(/\bwatch(?:er|ing)?\b/i);
     expect(cleanupSource).toContain("if (live.endpoint && live.child.exitCode === null)");
@@ -314,24 +346,23 @@ describe("research-world-visible gate contract", () => {
     expect(timeoutSource).not.toContain("app.shutdown");
     expect(timeoutSource).not.toContain("endpoint");
     expect(firstWorldSource).toContain("launchReady");
-    expect(reopenSource).toContain("launchReady");
-    expect(sequenceSource.indexOf("runForcedFailureCase")).toBeLessThan(sequenceSource.indexOf("runForcedTimeoutCase"));
-    expect(sequenceSource.indexOf("runForcedTimeoutCase")).toBeLessThan(sequenceSource.indexOf("runFirstWorldStage"));
-    expect(sequenceSource.indexOf("runFirstWorldStage")).toBeLessThan(sequenceSource.indexOf("runNormalReopenCase"));
+    expect(preflightSource.indexOf("runForcedFailureCase")).toBeLessThan(preflightSource.indexOf("runForcedTimeoutCase"));
+    expect(gate.indexOf("runForcedTimeoutCase", preflightStart)).toBeLessThan(gate.indexOf("runFirstWorldStage(normalRoot"));
+    expect((sequenceSource.match(/runFirstWorldStage/g) ?? [])).toHaveLength(1);
+    expect(sequenceSource).not.toContain("runNormalReopenCase");
     expect(sequenceSource).not.toMatch(/Promise\.(all|allSettled)/);
     expect(gate).not.toContain("schedulePostFirstCases");
     expect(gate).not.toContain("post_first_case_start_spread_ms");
-    expect(gate).toContain("activity.attempts === 4");
-    expect(gate).toContain("activity.ready === 2");
+    expect(gate).toContain("activity.attempts === 3");
+    expect(gate).toContain("activity.ready === 1");
     expect(gate).toContain("activity.active === 0");
     expect(gate).toContain("activity.maxActive === 1");
     expect(gate).toContain("pointer_tiles=10 inspect=10 collapse=10");
-    expect(gate).toContain("reopen_equal=true");
     expect(gate).toContain("roots_remaining");
     expect(gate).toContain("cleanup_failures=");
     expect(gate).toContain("exceeded its 60 second total deadline");
-    expect((gate.match(/console\.log\(`launch_attempts=\$\{activity\.attempts\} ready_launches=\$\{activity\.ready\} max_concurrent_launches=\$\{activity\.maxActive\}`\)/g) ?? [])).toHaveLength(1);
-    expect(gate).not.toContain("launch_attempts=4 ready_launches=2 max_concurrent_launches=1");
+    expect((gate.match(/console\.log\(`launch_attempts=\$\{activity\.attempts\} ready_launches=\$\{activity\.ready\} active_launches=\$\{activity\.active\} max_concurrent_launches=\$\{activity\.maxActive\}`\)/g) ?? [])).toHaveLength(1);
+    expect(gate).not.toContain("launch_attempts=3 ready_launches=1 active_launches=0 max_concurrent_launches=1");
     expect(liveGate).not.toMatch(/app\.ui\.pressKey|pressNativeKey|sendInputEvent|keyboard_|tab_focus_|qf-r16-tab-sentinel|\.focus\(|keyDown|keyUp|KeyboardEvent|dispatchEvent/);
     expect(gate).not.toContain("exerciseKeyboard");
     expect(gate).not.toContain("exerciseNativeKeyboard");

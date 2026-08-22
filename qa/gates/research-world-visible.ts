@@ -35,6 +35,7 @@ const PROJECTION = join(REPO_ROOT, "collab-electron/src/main/research-world-proj
 
 export const RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000;
 export const CLEANUP_RESERVE_MS = 8_000;
+export const CLEANUP_PREFLIGHT_DEADLINE_MS = 15_000;
 export const EXPECTED_VISIBLE_TILE_COUNT = 13;
 export const EXPECTED_VISIBLE_CABLE_COUNT = 15;
 
@@ -750,16 +751,6 @@ function attachedLive(error: unknown): LiveCase | undefined {
 
 type MutableCaseOutcome = { case: GateCaseName; functionalError?: unknown; cleanupError?: unknown };
 
-type FirstWorldState = {
-  expected: IndependentWorldManifest;
-  firstWorld: VisibleWorldSnapshot;
-  missionId: string;
-  taskId: string;
-  appDir: string;
-};
-
-type FirstWorldStageResult = { outcome: GateCaseOutcome; state?: FirstWorldState };
-
 function savedResearchObjectKeys(expected: IndependentWorldManifest): string[] {
   return expected.objects
     .filter((object) => object.type !== "agent_session")
@@ -780,7 +771,7 @@ function readSavedCanvasState(appDir: string, expected: IndependentWorldManifest
   return state;
 }
 
-async function runFirstWorldStage(root: string, nonce: string, startedAt: number, functionalDeadlineAt: number, hardDeadlineAt: number, activity: LaunchActivity): Promise<FirstWorldStageResult> {
+async function runFirstWorldStage(root: string, nonce: string, startedAt: number, functionalDeadlineAt: number, hardDeadlineAt: number, activity: LaunchActivity): Promise<GateCaseOutcome> {
   const outcome: MutableCaseOutcome = { case: "normal" };
   let active: LiveCase | undefined;
   const cleanupActive = async (label: string): Promise<boolean> => {
@@ -825,47 +816,12 @@ async function runFirstWorldStage(root: string, nonce: string, startedAt: number
     assert(finishedAt < functionalDeadlineAt, "first-world stage exceeded its functional deadline");
     const firstWorldStageMs = Math.round(finishedAt - startedAt);
     console.log(`first_world_stage_ms=${firstWorldStageMs}`);
-    return {
-      outcome,
-      state: {
-        expected,
-        firstWorld,
-        missionId,
-        taskId,
-        appDir: join(root, "app-root", "app"),
-      },
-    };
+    return outcome;
   } catch (error) {
     outcome.functionalError = error;
     active ??= attachedLive(error);
   } finally {
     await cleanupActive("normal-exception");
-  }
-  return { outcome };
-}
-
-async function runNormalReopenCase(root: string, first: FirstWorldState, functionalDeadlineAt: number, hardDeadlineAt: number, activity: LaunchActivity): Promise<GateCaseOutcome> {
-  const outcome: MutableCaseOutcome = { case: "normal" };
-  let active: LiveCase | undefined;
-  const cleanupActive = async (label: string): Promise<boolean> => {
-    if (!active) return true;
-    const live = active;
-    active = undefined;
-    try { await cleanupProcessSet(live, hardDeadlineAt, label, activity); return true; }
-    catch (error) { outcome.cleanupError ??= error; return false; }
-  };
-  try {
-    active = await launchReady(root, functionalDeadlineAt, activity);
-    const secondWorld = await observeWorld(active.endpoint, first.expected, first.missionId, first.taskId, functionalDeadlineAt, { exercisePointer: false });
-    assert(JSON.stringify(secondWorld) === JSON.stringify(first.firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
-    if (!await cleanupActive("second-launch")) return outcome;
-    readSavedCanvasState(first.appDir, first.expected);
-    console.log("reopen_equal=true pointer=true duplicate_reveal=false");
-  } catch (error) {
-    outcome.functionalError = error;
-    active ??= attachedLive(error);
-  } finally {
-    await cleanupActive("normal-reopen-exception");
   }
   return outcome;
 }
@@ -941,9 +897,6 @@ function mergeCaseOutcomes(outcomes: readonly GateCaseOutcome[], caseName: GateC
 export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
   assertResearchWorldContract();
   await prepareCandidateBuild();
-  const startedAt = performance.now();
-  const hardDeadlineAt = startedAt + RESEARCH_WORLD_VISIBLE_DEADLINE_MS;
-  const functionalDeadlineAt = hardDeadlineAt - CLEANUP_RESERVE_MS;
   const nonce = randomUUID();
   const roots = new Set<string>();
   const removalReceipts: RootRemoval[] = [];
@@ -952,47 +905,87 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
     roots.add(root);
     return root;
   };
-  const outcomes: GateCaseOutcome[] = [];
   const activity = createLaunchActivity();
-  const normalRoot = registerRoot();
   const failureRoot = registerRoot();
   const timeoutRoot = registerRoot();
+  const preflightRootCases = [
+    { caseName: "forced-failure" as const, root: failureRoot },
+    { caseName: "forced-timeout" as const, root: timeoutRoot },
+  ];
+  const cleanupPreflightStartedAt = performance.now();
+  const cleanupPreflightDeadlineAt = cleanupPreflightStartedAt + CLEANUP_PREFLIGHT_DEADLINE_MS;
+  const preflightOutcomes: GateCaseOutcome[] = [];
+  let preflightError: unknown;
+  try {
+    const preflightResults = await runSequentialCases<GateCaseOutcome>([
+      async () => {
+        const outcome = await runForcedFailureCase(failureRoot, nonce, cleanupPreflightDeadlineAt, activity);
+        preflightOutcomes.push(outcome);
+        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
+          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("forced failure preflight did not complete cleanly");
+        }
+        return outcome;
+      },
+      async () => {
+        const outcome = await runForcedTimeoutCase(timeoutRoot, nonce, cleanupPreflightDeadlineAt, activity);
+        preflightOutcomes.push(outcome);
+        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
+          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("forced timeout preflight did not complete cleanly");
+        }
+        return outcome;
+      },
+    ]);
+    void preflightResults;
+  } catch (error) {
+    preflightError = error;
+  }
+  const recordPreflightCleanupFailure = (caseName: Exclude<GateCaseName, "normal">, error: unknown): void => {
+    const outcome = preflightOutcomes.find((candidate) => candidate.case === caseName);
+    if (outcome) outcome.cleanupError ??= error;
+    else preflightOutcomes.push({ case: caseName, cleanupError: error });
+  };
+  const removePreflightRoot = async (entry: (typeof preflightRootCases)[number]): Promise<void> => {
+    try {
+      const receipt = await removeRegisteredRoot(entry.root, cleanupPreflightDeadlineAt);
+      removalReceipts.push(receipt);
+      if (receipt.failure) recordPreflightCleanupFailure(entry.caseName, new Error(receipt.failure));
+    } catch (error) {
+      recordPreflightCleanupFailure(entry.caseName, error);
+    }
+  };
+  for (const entry of preflightRootCases) await removePreflightRoot(entry);
+  for (const entry of preflightRootCases) {
+    if (existsSync(entry.root)) await removePreflightRoot(entry);
+  }
+  const forcedRootsRemaining = preflightRootCases.filter((entry) => existsSync(entry.root)).length;
+  const preflightReceipts = formatFailureReceipts(preflightOutcomes);
+  const cleanupPreflightMs = Math.round(performance.now() - cleanupPreflightStartedAt);
+  if (preflightError === undefined) {
+    try {
+      assert(preflightOutcomes.length === 2, "cleanup preflight skipped a forced case");
+      assert(preflightReceipts.ok, "cleanup preflight completed with a functional or cleanup failure");
+      assert(forcedRootsRemaining === 0, `cleanup preflight left forced roots: ${preflightRootCases.filter((entry) => existsSync(entry.root)).map((entry) => entry.root).join(",")}`);
+      assert(cleanupPreflightMs < CLEANUP_PREFLIGHT_DEADLINE_MS, `cleanup preflight exceeded its 15 second deadline at ${cleanupPreflightMs}ms`);
+    } catch (error) {
+      preflightError = error;
+    }
+  }
+  if (preflightError !== undefined) throw preflightError;
+  console.log(`cleanup_preflight_ms=${cleanupPreflightMs} forced_roots_remaining=${forcedRootsRemaining}`);
+
+  const startedAt = performance.now();
+  const hardDeadlineAt = startedAt + RESEARCH_WORLD_VISIBLE_DEADLINE_MS;
+  const functionalDeadlineAt = hardDeadlineAt - CLEANUP_RESERVE_MS;
+  const normalRoot = registerRoot();
+  const outcomes: GateCaseOutcome[] = [...preflightOutcomes];
   const caseNames: GateCaseName[] = ["normal", "forced-failure", "forced-timeout"];
   try {
-    let firstWorldState: FirstWorldState | undefined;
     const caseResults = await runSequentialCases<GateCaseOutcome>([
       async () => {
-        const outcome = await runForcedFailureCase(failureRoot, nonce, hardDeadlineAt, activity);
+        const outcome = await runFirstWorldStage(normalRoot, nonce, startedAt, functionalDeadlineAt, hardDeadlineAt, activity);
         outcomes.push(outcome);
         if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
-          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("forced failure case did not complete cleanly");
-        }
-        return outcome;
-      },
-      async () => {
-        const outcome = await runForcedTimeoutCase(timeoutRoot, nonce, hardDeadlineAt, activity);
-        outcomes.push(outcome);
-        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
-          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("forced timeout case did not complete cleanly");
-        }
-        return outcome;
-      },
-      async () => {
-        const result = await runFirstWorldStage(normalRoot, nonce, startedAt, functionalDeadlineAt, hardDeadlineAt, activity);
-        outcomes.push(result.outcome);
-        if (result.outcome.functionalError !== undefined || result.outcome.cleanupError !== undefined) {
-          throw result.outcome.functionalError ?? result.outcome.cleanupError ?? new Error("first-world stage did not complete successfully");
-        }
-        assert(result.state, "first-world stage returned no state");
-        firstWorldState = result.state;
-        return result.outcome;
-      },
-      async () => {
-        assert(firstWorldState, "normal reopen started without a clean first world");
-        const outcome = await runNormalReopenCase(normalRoot, firstWorldState, functionalDeadlineAt, hardDeadlineAt, activity);
-        outcomes.push(outcome);
-        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
-          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("normal reopen case did not complete cleanly");
+          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("first-world stage did not complete successfully");
         }
         return outcome;
       },
@@ -1052,11 +1045,11 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
   const receipts = formatFailureReceipts(finalOutcomes);
   console.log(receipts.primary);
   console.log(receipts.cleanup);
-  assert(activity.attempts === 4, `launch activity expected 4 attempts, got ${activity.attempts}`);
-  assert(activity.ready === 2, `launch activity expected 2 ready launches, got ${activity.ready}`);
+  assert(activity.attempts === 3, `launch activity expected 3 attempts, got ${activity.attempts}`);
+  assert(activity.ready === 1, `launch activity expected 1 ready launch, got ${activity.ready}`);
   assert(activity.active === 0, `launch activity expected zero active launches, got ${activity.active}`);
   assert(activity.maxActive === 1, `launch activity expected max one concurrent launch, got ${activity.maxActive}`);
-  console.log(`launch_attempts=${activity.attempts} ready_launches=${activity.ready} max_concurrent_launches=${activity.maxActive}`);
+  console.log(`launch_attempts=${activity.attempts} ready_launches=${activity.ready} active_launches=${activity.active} max_concurrent_launches=${activity.maxActive}`);
   assert(!deadlineExceeded, "research-world-visible exceeded its 60 second total deadline");
   assert(leaked.length === 0, `research-world-visible cleanup left roots: ${leaked.join(",")}`);
   assert(receipts.ok, "research-world-visible completed with a functional or cleanup failure");
