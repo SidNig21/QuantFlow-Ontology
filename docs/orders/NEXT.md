@@ -151,6 +151,9 @@ critic-contract-builder-receipt: immutable product candidate `417e3178ad9eb9d2bd
 founder-one-terminal-authority: 2026-08-22; no standalone smoke seats and no Director/worker/critic canary parity; one live Hermes terminal mouse-focus/type/erase/mouse-return receipt is sufficient for mouse-first R16
 critic-contract-verifier-receipt: fresh Terra Verifier task `01a029e3-8300-7ae1-87a3-4245241a4235`; PASS at immutable candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`; evidence `f4150422165312f30ddbefd9170f7ad7d572836e`; exact non-generating matrix green and all 11 candidate hashes unchanged
 current-door: Router is authorized for one identity-bound build and one final normal Computer Use consumer attempt under the founder one-terminal correction; any product red stops R16, while a 403 after a valid first request is recorded as external-runtime failure without expanding R16; no R17 authority
+consumer-attempt-6-contract-red: exact candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`; Mission `mission-75987f93-fbf3-4168-9b39-55ae130a0bad`; Director/worker/Run and one-terminal receipt passed; critic completed the exact three governed reads but returned prose without `qf_record_evaluation`; launcher still advertised legacy plain-text findings against the ordered-array tool contract; ordinary cleanup was zero
+critic-launcher-repair-verifier: immutable candidate `52502f54172a30edce9cc2220783e68d883c10b9`; fresh independent Luna PASS with exact launcher, Bash, activation, gateway, governed-review, launch-policy, Atlas, and diff receipts
+current-door: Router is authorized for one identity-bound build of `52502f54172a30edce9cc2220783e68d883c10b9` and one final normal Computer Use consumer attempt under the founder one-terminal/no-retry contract; any red stops R16; no R17 authority
 
 ## Authorized outcome
 

@@ -5392,3 +5392,36 @@ candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`; evidence commit is
 `f4150422165312f30ddbefd9170f7ad7d572836e`. The exact non-generating matrix
 was green and all eleven frozen candidate hashes matched before/after. The one
 identity-bound build and final normal Computer Use attempt above are authorized.
+
+### FINAL CONSUMER RED — live critic launcher retained the legacy findings shape
+
+Computer Use Attempt 6 on the exact independently verified candidate created
+one Mission and completed Director recruitment, worker delivery, deterministic
+Run creation, and the critic's three exact governed reads. The critic produced
+an independent supporting analysis in its terminal but returned to a blank
+prompt without invoking `qf_record_evaluation`; the review remained running and
+no Evaluation or Report existed. The sole live terminal typing receipt and
+ordinary zero-process cleanup passed. No manual intervention, retry,
+replacement critic, second Mission, or publication override occurred.
+
+The direct defect is one stale higher-priority sentence in
+`collab-electron/cli/qf-hermes-launch.sh`: it still advertised `plain-text
+findings` after the generated schema and critic Mission were repaired to the
+strict ordered-array contract. The bounded repair changes only that critic
+system prompt and its exact launcher regression assertions. The prompt must
+name a non-empty ordered array; each finding must contain exactly `code`,
+`severity`, `message`, and `evidence_refs`; and terminal prose cannot substitute
+for the required successful `qf_record_evaluation` receipt. It must not alter
+the four-tool allowlist, independent model review, ontology runtime, rubric,
+timings, provider, credentials, worker/Director prompts, or any other product
+surface.
+
+Immutable repair candidate:
+`52502f54172a30edce9cc2220783e68d883c10b9`. Fresh independent Luna Verifier
+`r16_launcher_contract_verifier` returned PASS: exact delegated-critic launch,
+Bash syntax, Mission activation `3/0`, ontology gateway `6/0`, governed review
+`5/0`, both named gates, Atlas currentness/ratchet, and both diff checks are
+green; the two changed file hashes and HEAD remained unchanged. One
+identity-bound build and one normal consumer attempt are authorized on this
+candidate under the existing one-terminal/no-retry bar. Any red remains an R16
+stop; no R17 work begins.

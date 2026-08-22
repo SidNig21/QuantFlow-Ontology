@@ -401,3 +401,48 @@ model/tool turn is another exact product instruction mismatch, not critic
 misbehavior. The bounded repair therefore also gives the critic a
 least-privilege activation instruction that forbids recruitment/delegation and
 names only its three reads plus one Evaluation.
+
+## Attempt 6 — RED: live critic contract still contradicted the generated tool
+
+Date: 2026-08-22
+Candidate: `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`
+Independent verification: `f4150422165312f30ddbefd9170f7ad7d572836e`
+Build timestamp: `2026-08-22T14:36:47.8881214Z`
+Application command: from `collab-electron`,
+`node ./scripts/run-local-bin.mjs electron-vite preview --skipBuild`
+
+Verdict: **RED by one exact production-launcher contract defect. R16 remains
+open pending one corrected-candidate consumer run.**
+
+One visible guided action created Mission
+`mission-75987f93-fbf3-4168-9b39-55ae130a0bad`, Director
+`d6807dc6-4cda-49ef-85ec-7fe6edc0418a`, source Task
+`task-9ef8ee53-bccf-4cdf-a594-b07fd8f8495b`, worker
+`a7c94e21-5b3d-4f68-9e1a-2c8d6b4f0a37`, Hypothesis
+`104dc840-540f-4ee6-9ef5-d09ace7fe07a`, deterministic Run
+`run-69d01a31-bb86-4b0d-9d47-4807431f2746`, result Artifact
+`cba126f77ef6bf9bc099639dc2b91ee339341e1fba88ccdb511b41327f394a16`,
+review Task `review-task-43ea5516-686d-40e4-9be4-4528f0a1394f`, and critic
+`critic-209554ea-e04d-40d2-85db-61a18cb03cd8`.
+
+The Director terminal visibly accepted `qf-r16-417e317`, the canary was erased
+without submission, and pointer focus returned to the canvas. The worker
+closed with Task `done` and the Run `succeeded`. The critic then made exactly
+three successful governed reads in order: `qf_hypothesis_get`, `qf_run_get`,
+and `qf_artifact_get`. Its terminal displayed an independent supporting review
+and returned to a blank prompt, but no `qf_record_evaluation` invocation
+existed. The review Task remained `running`; no Evaluation or Report existed.
+No manual critic input, retry, replacement critic, second Mission, synthetic
+Evaluation, or verdict override was used.
+
+The exact contradiction was still in the production launcher: the generated
+tool and Mission activation required a non-empty ordered findings array, while
+`qf-hermes-launch.sh`'s higher-priority critic system prompt still required
+`non-empty plain-text findings`. The bounded repair at candidate
+`52502f54172a30edce9cc2220783e68d883c10b9` removes that stale string contract,
+states the exact four finding keys, and says the review is incomplete until
+`qf_record_evaluation` succeeds. Its exact delegated-critic test, Bash syntax,
+Mission activation, ontology gateway, governed review, Hermes launch policy,
+Atlas currentness/ratchet, and both diff checks independently PASS. The app
+closed through its ordinary visible Close control with zero repo product and
+Hermes processes.
