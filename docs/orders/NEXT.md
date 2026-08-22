@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 VOLATILE SESSION-STATUS CLOSURE - READER REQUIRED
+status: R16 VOLATILE SESSION-STATUS CLOSURE - BUILD AUTHORIZED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -37,7 +37,7 @@ reopen-scheduling-reader-receipt: fresh Luna Reader task `01a027e1-db30-7ae0-b8d
 early-concurrency-failure-receipt: the authorized experiment started forced launches alongside first-world fixture work and closed the normal RPC during `qf.dock.spawn`; every root/process still cleaned and no candidate commit was made; exact failed run opened from `fd8e2a2f74dfaa67b5a71273fda6eab4bc8bd02c`
 sequential-closure-reader-receipt: fresh Luna Reader task `01a027eb-d1cf-7f41-b2be-ee6fcc2de38b`; final YES/YES at `a2d9a3ed40d5fc82da55e50c189ed79d6f23ae2b`
 sequential-status-red-receipt: focused R16 13/0; forced launch cleanup, pointer 10/10, and final process/root cleanup green; first-world comparison stopped on one agent_session displayed-field delta; WIP preserved at `330fbc8e757b32441f384f1d742a7189952f2c9c`
-volatile-status-reader-receipt: fresh Luna Reader task `01a027fd-6604-7bf1-bcc3-e8598c5ce51c`; first pass NO/NO with seven defects; exact defect closure landed; final reread pending, so no Builder opens before YES/YES
+volatile-status-reader-receipt: fresh Luna Reader task `01a027fd-6604-7bf1-bcc3-e8598c5ce51c`; first pass NO/NO with seven defects; exact defect closure landed; final YES/YES at `89939f2933cb76bbeb17442de47ecdb56f1cb3c4`
 
 ## Authorized outcome
 
