@@ -927,3 +927,183 @@ Independent verification remains required at immutable product SHA
 matrix, inspect the candidate before and after, and write separate verification
 evidence. The Router's one-build/two-launch normal consumer check remains
 unopened until that independent PASS.
+
+## CRITIC SUBMIT VERIFIER RED — write-status correction Builder closure
+
+Plain meaning: a critic review is no longer called delivered when the terminal
+accepted none of the bytes; both the typed instruction and its separate submit
+key must be accepted by the same live PTY.
+
+### Immutable product candidate
+
+| Field | Receipt |
+|---|---|
+| Builder base | `61243c30f872b9398ffcf8c9ab4a12cfc24d8712` |
+| Product candidate SHA | `e824ae10f50336a1640afeecd802ed7141bbeeb7` |
+| Branch / push | `wo-R16` / `origin/wo-R16` |
+| Product candidate status before evidence | clean |
+| Product paths | `collab-electron/src/main/pty.ts`; `collab-electron/src/main/agent-host.ts`; `collab-electron/src/main/governed-review.test.ts`; generated `qf-atlas/ATLAS.md`, `qf-atlas/atlas.html`, `qf-atlas/atlas.json` |
+
+The product candidate was committed and pushed before this evidence section.
+`index.ts`, Kernel semantics, timings, payloads, peer delivery, founder Submit,
+and all other product files remained unchanged. The candidate file SHA-256
+receipts are:
+
+```text
+pty.ts                 DE3091571AEB96DCE37EBFDA1104941423AA013E2098A2603B0C8A613009BEEB
+agent-host.ts          0542DE9685FAC9FA67A9B9D5069B554EB1A90D97570F3EA27DEA5C5B75E6A7FA
+governed-review.test.ts ECE7A1DBE2F384CA6CB6CE36F7F0DDB527F758D8928198DD34F3F2C0CC4F66F9
+```
+
+### Focused production proof
+
+```text
+bun test collab-electron/src/main/governed-review.test.ts
+exit=0
+4 pass / 0 fail / 51 expect
+```
+
+The green path records exactly two writes through the production helper:
+the instruction returned by `buildMissionActivationInstruction()` with its
+one terminal `\r` removed, then exactly `"\r"` after the bounded 400 ms wait.
+The test also exercises changed-target and missing-live-entry rejection.
+Two fresh isolated delivery fixtures run the real
+`kernelContinueGovernedResearchResult` continuation with only its delivery
+callback supplied. A false first write yields exactly one attempted text write;
+a true text write followed by a false submit write yields exactly the text and
+one `"\r"` attempt. Each case records exactly one failed delivery receipt,
+zero delivered receipts, zero governed invocations, zero Evaluation rows, zero
+findings Artifacts, and zero publication rows.
+
+### Required write-status falsifiers
+
+The focused test file remained unchanged during both production mutations. Its
+candidate SHA-256 before and after each mutation was
+`ECE7A1DBE2F384CA6CB6CE36F7F0DDB527F758D8928198DD34F3F2C0CC4F66F9`.
+
+1. Missing-submit falsifier: only the second production assignment was changed
+   from `writeToSession(capturedPtySessionId, "\r")` to a no-op accepted value.
+
+   ```text
+   command: bun test collab-electron/src/main/governed-review.test.ts
+   native exit=1
+   error: governed review critic submit write was not accepted
+   ```
+
+   The exact assignment was restored. `agent-host.ts` returned to SHA-256
+   `0542DE9685FAC9FA67A9B9D5069B554EB1A90D97570F3EA27DEA5C5B75E6A7FA`,
+   with zero diff from its pre-mutation bytes, and the same command returned
+   native exit 0 with `4 pass / 0 fail / 51 expect`.
+
+2. False-first-result falsifier: only the first production result expression
+   was changed to `writeToSession(capturedPtySessionId, text) && false`.
+
+   ```text
+   command: bun test collab-electron/src/main/governed-review.test.ts
+   native exit=1
+   error: governed review critic instruction write was not accepted
+   ```
+
+   The exact expression was restored. `agent-host.ts` again matched the same
+   pre-mutation SHA-256 with zero diff, and the same command returned native
+   exit 0 with `4 pass / 0 fail / 51 expect`.
+
+### Exact parent short matrix
+
+The exact focused/direct commands were run against immutable candidate
+`e824ae10f50336a1640afeecd802ed7141bbeeb7`:
+
+```text
+bun test collab-electron/src/main/governed-review.test.ts                         exit=0  4 pass / 0 fail / 51 expect
+bun test collab-electron/src/main/research-world.test.ts                           exit=0  3 pass / 0 fail / 13 expect
+bun test collab-electron/src/windows/shell/src/research-world.test.ts              exit=0  6 pass / 0 fail / 32 expect
+bun test collab-electron/src/windows/shell/src/task-composition.test.ts             exit=0  3 pass / 0 fail / 55 expect
+bun test collab-electron/src/main/native-tui-orchestration.test.ts                  exit=0  9 pass / 0 fail / 42 expect
+bun test collab-electron/src/main/precreated-native-tui.test.ts                     exit=0  2 pass / 0 fail / 5 expect
+bun test packages/qf-kernel/src/r15-governed-review.test.ts                         exit=0  7 pass / 0 fail / 55 expect
+bun test packages/qf-kernel/src/r16-visible-world.test.ts                           exit=0  3 pass / 0 fail / 5 expect
+bun test qa/gates/governed-review.test.ts                                           exit=0  nested 11/0; live 7/0; gate 3/0
+bun test qa/gates/research-world-visible.test.ts                                    exit=0  13 pass / 0 fail / 192 expect
+bun qa/run.ts kernel-sole-writer                                                    exit=0  PASS  kernel-sole-writer
+bun qf-atlas/generate.mjs --check                                                   exit=0  current — 432 files, 124 channels, 13 strip candidates
+bun qf-atlas/ratchet.mjs                                                           exit=0  HARD RED: 0; unexplained coverage: 0; AMBER: 20; undecided: 42
+git diff --check                                                                   exit=0
+```
+
+The broader parent command `bun qa/run.ts governed-review` also exited 0 with
+its focused production/kernel proof and governed-review PASS. The remaining
+named static commands were run exactly: `lockfile-committed`,
+`no-canvas-domain-writes`, `doc-action-surface`, `repo-shape`, `one-skin`,
+`doc-links`, and `rung-ladder` all exited 0 with PASS. The one unchanged
+parent static hard red was:
+
+```text
+bun qa/run.ts kernel-sole-writer-app
+exit=1
+kernel-sole-writer-app FAIL — offenders:
+  collab-electron/src/main/governed-review.test.ts (node:sqlite)
+  collab-electron/src/main/native-tui-orchestration.test.ts (node:sqlite)
+  collab-electron/src/main/ontology-gateway.test.ts (qf-kernel)
+  collab-electron/src/main/precreated-native-tui.test.ts (node:sqlite)
+```
+
+This is pre-existing gate debt: the unchanged gate allowlist omits these
+already-existing focused tests, and the allowed WO-R16 correction paths do not
+include that gate or the unrelated tests. No out-of-scope edit was made to
+manufacture green.
+
+The required historical candidate test-path receipt was also captured:
+
+```text
+git diff --name-only fef713c06f091dc8df13f7bde07be859d3b04930 HEAD -- "*.test.ts"
+collab-electron/src/main/dock-profiles.test.ts
+collab-electron/src/main/governed-review.test.ts
+collab-electron/src/main/native-tui-orchestration.test.ts
+collab-electron/src/main/ontology-gateway.test.ts
+collab-electron/src/main/precreated-native-tui.test.ts
+collab-electron/src/main/research-context.test.ts
+collab-electron/src/main/research-world.test.ts
+collab-electron/src/windows/shell/src/research-world.test.ts
+collab-electron/src/windows/shell/src/task-composition.test.ts
+collab-electron/src/windows/shell/src/tile-manager-layout.test.ts
+packages/qf-kernel/src/r11a-deterministic-execution.test.ts
+packages/qf-kernel/src/r16-visible-world.test.ts
+qa/gates/research-world-visible.test.ts
+```
+
+The extra historical paths predate this correction; the candidate itself
+changed only `governed-review.test.ts` among test files.
+
+### Atlas and diff receipts
+
+```text
+bun qf-atlas/generate.mjs
+exit=0
+432 files · 109 subsystems · 124 IPC channels
+wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+13 strip candidates · 10 confirmed violations · 3 gray · 22 coverage gaps
+
+bun qf-atlas/generate.mjs --check
+exit=0
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0
+baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · AMBER: 20 · undecided: 42
+
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+exit=0
+Atlas diff  c59ebfa -> 61243c3
+VERDICT: WORSE — 1 finding(s) added
+ADDED: persistence links insert into
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0
+```
+
+The current Atlas and ratchet are green with HARD RED zero. The explicit base
+diff is recorded as WORSE because Atlas added one persistence finding; no Atlas
+baseline or semantic code was altered. No product file changed after
+`e824ae10f50336a1640afeecd802ed7141bbeeb7`; this report is a separate
+evidence-only commit. No Electron build/launch, Computer Use, packaged/release
+gate, founder-state change, or R17 work occurred.
