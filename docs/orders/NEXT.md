@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - CORRECTED REREAD REQUIRED
+status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - BUILDER AUTHORIZED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -81,11 +81,13 @@ missing exact matrix, falsifiers, and deliverable meanings were corrected in
 inspection found its new delivery-timing sentence contradicted the existing R15
 boundary: delivery is the critic instruction attempt, not the later verdict or
 publication. The sentence was corrected without changing product scope; the
-final lifecycle/mutation-seam closure appended afterward now requires one more
-fresh two-question reread before any Builder.
-current-door: one fresh reread of the final lifecycle, mutation, tool-receipt,
-and consumer-reopen closure; no Builder, Verifier, final consumer rerun, or R17
-work until final `YES/YES`.
+fresh Luna Reader task `01a028c6-bdef-72e2-91bd-6ab7f84235e9` found and landed
+the remaining critic-running/admission ordering and executable mutation-seam
+defects, then returned final `YES/YES` at pushed docs SHA
+`e237ef79fbdad56b0b430baff838878fd7a91bf2`.
+current-door: `NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR` Builder
+authorized from `e237ef7`; independent Verifier and final normal consumer PASS
+remain required; no R17 authority exists.
 
 ## Authorized outcome
 
