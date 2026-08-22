@@ -211,9 +211,15 @@ const SKIP_DIR_NAMES = new Set([
   ".turbo",
 ]);
 
+// Atlas is analysis tooling, not product/runtime code. Its own generated map,
+// ratchet, and falsifier receipts govern the tooling tree; Law E must continue
+// to scan every product/runtime tree without a per-file Atlas allowlist.
+const NON_RUNTIME_ROOTS = ["qf-atlas/"];
+
 const FALSIFY_DIR = join(REPO_ROOT, "tools", "_qf-k2-sole-writer-bait");
 const FALSIFY_OPEN_ENV = "QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN";
 const FALSIFY_WRITE_ENV = "QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE";
+const REGRESSION_ENV = "QF_KERNEL_SOLE_WRITER_REGRESSION";
 
 function onAllowlist(rel: string, prefixes: string[]): boolean {
   if (rel.startsWith("packages/qf-kernel/")) return true;
@@ -349,6 +355,10 @@ export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
       // documentation artifact. Stated limit: if executable code is ever placed
       // under docs/ and actually invoked, this gate will not see it.
       if (rel.startsWith("docs/")) continue;
+      // qf-atlas is a root-level analysis tool, not product/runtime code. It
+      // contains SQL and execute() examples governed by Atlas's own
+      // generate/check/ratchet/falsifier contract, not Law E's runtime scan.
+      if (NON_RUNTIME_ROOTS.some((root) => rel.startsWith(root))) continue;
       let text: string;
       try {
         text = readFileSync(full, "utf8");
@@ -405,7 +415,41 @@ export function checkKernelSoleWriter(): { ok: boolean; offenders: string[] } {
   }
 }
 
+/**
+ * Focused regression: the existing product bait must still make Law E red,
+ * while the non-runtime Atlas tree must not appear in that result.
+ */
+export function runKernelSoleWriterRegression(): { ok: boolean; detail: string } {
+  const previousOpen = process.env[FALSIFY_OPEN_ENV];
+  const previousWrite = process.env[FALSIFY_WRITE_ENV];
+  try {
+    process.env[FALSIFY_OPEN_ENV] = "1";
+    process.env[FALSIFY_WRITE_ENV] = "1";
+    const falsified = checkKernelSoleWriter();
+    const caughtProductBait =
+      falsified.offenders.some((o) => o.includes("tools/_qf-k2-sole-writer-bait") && o.includes("open")) &&
+      falsified.offenders.some((o) => o.includes("tools/_qf-k2-sole-writer-bait") && o.includes("write"));
+    const ignoredAtlas = falsified.offenders.every((o) => !o.includes("qf-atlas/"));
+    const ok = !falsified.ok && caughtProductBait && ignoredAtlas;
+    return {
+      ok,
+      detail: `product bait caught=${caughtProductBait}; qf-atlas ignored=${ignoredAtlas}`,
+    };
+  } finally {
+    if (previousOpen === undefined) delete process.env[FALSIFY_OPEN_ENV];
+    else process.env[FALSIFY_OPEN_ENV] = previousOpen;
+    if (previousWrite === undefined) delete process.env[FALSIFY_WRITE_ENV];
+    else process.env[FALSIFY_WRITE_ENV] = previousWrite;
+  }
+}
+
 if (import.meta.main) {
-  const { ok } = checkKernelSoleWriter();
+  const result = process.env[REGRESSION_ENV] === "1"
+    ? runKernelSoleWriterRegression()
+    : checkKernelSoleWriter();
+  if (process.env[REGRESSION_ENV] === "1") {
+    console.log(`kernel-sole-writer regression: ${result.detail}`);
+  }
+  const { ok } = result;
   process.exit(ok ? 0 : 1);
 }

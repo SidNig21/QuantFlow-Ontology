@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "718816a",
-    "generatedAt": "2026-08-21",
+    "commit": "c59ebfa",
+    "generatedAt": "2026-08-22",
     "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "f8e5a06c30b8bfdb"
+    "fingerprint": "cee0ab99d3a799a4"
   },
   "stats": {
     "live": 110,
@@ -3355,7 +3355,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 514.9,
+      "kb": 517,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3469,7 +3469,7 @@
         },
         {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 15,
+          "kb": 17.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -57468,16 +57468,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "e68be73",
+      "commit": "718816a",
       "generatedAt": "2026-08-21"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "718816a",
-      "generatedAt": "2026-08-21"
+      "commit": "c59ebfa",
+      "generatedAt": "2026-08-22"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "41 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -57807,16 +57807,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "packages/qf-kernel/src/r15-governed-review.test.ts",
-        "analyzer": "persistence",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "1 of 1 SQL site(s) are not inside a named function, so no call path can be traced"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -57824,7 +57815,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 41,
       "undecidedTo": null

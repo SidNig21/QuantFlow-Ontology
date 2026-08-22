@@ -93,6 +93,8 @@ Research-only: QuantFlow **never places bets or executes trades**. It proposes, 
 
 ## Architecture
 
+Non-authoritative [Product brief](docs/PRODUCT.md); `START_HERE.md` remains the authority.
+
 ```
 ┌───────────────────────────────────────────────────────┐
 │  CANVAS + DOCK (Electron)          the surface        │
