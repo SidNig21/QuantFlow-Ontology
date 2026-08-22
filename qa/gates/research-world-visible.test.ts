@@ -11,6 +11,7 @@ import {
   RESEARCH_WORLD_VISIBLE_DEADLINE_MS,
   rendererEvaluationExpression,
   scheduleInitialCases,
+  worldTimeoutDelta,
   worldObservationExpression,
 } from "./research-world-visible.ts";
 
@@ -60,6 +61,23 @@ describe("research-world-visible gate contract", () => {
     const result = Function(`return ${rendererEvaluationExpression(worldObservationExpression())}`)() as { ok: boolean; message?: string };
     expect(result.ok).toBe(false);
     expect(result.message).toContain("document is not defined");
+  });
+
+  test("reports every sorted delta for a known 12/14 snapshot", () => {
+    const expectedObjects = [
+      ["mission", "m"], ["task", "source"], ["task", "review"], ["hypothesis", "h"], ["dataset", "d"], ["run", "r"],
+      ["artifact", "result"], ["artifact", "findings"], ["artifact", "report"], ["agent_session", "critic"], ["agent_session", "director"], ["agent_session", "executor"], ["artifact", "source"],
+    ].map(([type, id]) => ({ type, id }));
+    const expectedLinks = [
+      ["belongs_to", "source", "m"], ["assigned_to", "source", "executor"], ["delegated_by", "source", "director"], ["delegates_to", "director", "executor"],
+      ["tests", "r", "h"], ["uses", "r", "d"], ["produces", "r", "result"], ["evaluated_by", "h", "e"], ["evaluated_by", "r", "e"], ["evaluated_by", "result", "e"],
+      ["performed_by", "e", "critic"], ["produces", "critic", "findings"], ["gates", "e", "report"], ["assigned_to", "review", "critic"], ["delegated_by", "review", "director"],
+    ].map(([kind, from_id, to_id]) => ({ kind, from_id, to_id }));
+    const actualObjects = expectedObjects.filter((object) => !((object.type === "task" && object.id === "review") || (object.type === "agent_session" && object.id === "executor")));
+    actualObjects.push({ type: "task", id: "stale" });
+    const actualLinks = expectedLinks.filter((link) => !(link.kind === "assigned_to" && link.from_id === "review") && !(link.kind === "delegated_by" && link.from_id === "review"));
+    actualLinks.push({ kind: "uses", from_id: "r", to_id: "source" });
+    expect(worldTimeoutDelta({ objects: actualObjects, links: actualLinks }, { objects: expectedObjects, links: expectedLinks })).toBe('world_timeout={"object_count":12,"link_count":14,"missing_objects":["agent_session:executor","task:review"],"extra_objects":["task:stale"],"missing_links":["assigned_to:review:critic","delegated_by:review:director"],"extra_links":["uses:r:source"]}');
   });
 
   test("starts all initial cases before awaiting any result", async () => {

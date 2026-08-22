@@ -461,6 +461,39 @@ type VisibleObject = {
 };
 type VisibleWorldSnapshot = { objects: VisibleObject[]; links: Array<{ kind: string; from_id: string; to_id: string }> };
 
+export function worldTimeoutDelta(actual: Pick<VisibleWorldSnapshot, "objects" | "links">, expected: Pick<IndependentWorldManifest, "objects" | "links">): string {
+  const objectKey = (value: { type: string; id: string }) => `${value.type}:${value.id}`;
+  const linkKey = (value: { kind: string; from_id: string; to_id: string }) => `${value.kind}:${value.from_id}:${value.to_id}`;
+  const actualObjects = actual.objects.map(objectKey).sort();
+  const expectedObjects = expected.objects.map(objectKey).sort();
+  const actualLinks = actual.links.map(linkKey).sort();
+  const expectedLinks = expected.links.map(linkKey).sort();
+  const difference = (left: string[], right: string[]) => left.filter((value) => !right.includes(value));
+  return `world_timeout=${JSON.stringify({
+    object_count: actual.objects.length,
+    link_count: actual.links.length,
+    missing_objects: difference(expectedObjects, actualObjects),
+    extra_objects: difference(actualObjects, expectedObjects),
+    missing_links: difference(expectedLinks, actualLinks),
+    extra_links: difference(actualLinks, expectedLinks),
+  })}`;
+}
+
+async function waitForVisibleWorld(read: () => Promise<VisibleWorldSnapshot>, expected: IndependentWorldManifest, deadlineAt: number): Promise<VisibleWorldSnapshot> {
+  let lastSnapshot: VisibleWorldSnapshot | undefined;
+  while (remainingMs(deadlineAt) > 0) {
+    try {
+      const value = await read();
+      lastSnapshot = value;
+      if (value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT) return value;
+    } catch {
+      // Keep waiting for the last successfully evaluated renderer snapshot.
+    }
+    await wait(Math.min(100, remainingMs(deadlineAt)));
+  }
+  throw new Error(worldTimeoutDelta(lastSnapshot ?? { objects: [], links: [] }, expected));
+}
+
 function compareVisibleSnapshot(actual: VisibleWorldSnapshot, expected: IndependentWorldManifest): void {
   compareManifest(actual, expected);
   const expectedObjects = new Map(expected.objects.map((object) => [`${object.type}:${object.id}`, object]));
@@ -480,7 +513,7 @@ async function observeWorld(endpoint: string, expected: IndependentWorldManifest
   const clickMission = await evaluateRenderer<boolean>(endpoint, "mission-reveal", `(() => { const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); if (!(button instanceof HTMLElement)) throw new Error('Mission Show research world button is missing'); button.click(); return true; })()`);
   assert(clickMission === true, "Mission root activation did not click");
   const read = async () => await evaluateRenderer<VisibleWorldSnapshot>(endpoint, "world-observation", worldObservationExpression());
-  const world = await waitFor("visible 13-tile/15-cable world", async () => { const value = await read(); return value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT ? value : null; }, deadlineAt);
+  const world = await waitForVisibleWorld(read, expected, deadlineAt);
   assertVisibleWorldCounts(world);
   compareVisibleSnapshot(world, expected);
   const interaction = await evaluateRenderer<{ expanded: boolean; focus_restored: boolean }>(endpoint, "mission-inspection", `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelectorAll('[data-qf-world-field]').length > 0 && !root.querySelector('.qf-world-details')?.hidden; root.focus(); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return { expanded, focus_restored: document.activeElement === root }; })()`);
@@ -489,7 +522,7 @@ async function observeWorld(endpoint: string, expected: IndependentWorldManifest
   assert(second.before === EXPECTED_VISIBLE_TILE_COUNT && second.after === EXPECTED_VISIBLE_TILE_COUNT, "second reveal duplicated research tiles");
   const taskActivation = await evaluateRenderer<boolean>(endpoint, "task-reveal", `(() => { const tile = document.querySelector('.canvas-tile[data-qf-world-type="task"][data-qf-world-id="${taskId}"]'); const button = tile?.querySelector('.qf-world-reveal'); if (!(button instanceof HTMLElement)) throw new Error('Task Show research world button is missing'); button.click(); return true; })()`);
   assert(taskActivation === true, "Task root activation did not click");
-  const taskWorld = await waitFor("Task-root visible world", async () => { const value = await read(); return value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT ? value : null; }, deadlineAt);
+  const taskWorld = await waitForVisibleWorld(read, expected, deadlineAt);
   assertVisibleWorldCounts(taskWorld);
   compareVisibleSnapshot(taskWorld, expected);
   return taskWorld;
