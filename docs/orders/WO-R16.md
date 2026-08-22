@@ -2426,3 +2426,51 @@ inspection. No product, fixture, timeout/reserve, launch scheduling, pointer,
 keyboard, package/installer/release, wrapper, helper framework, worktree, or R17
 change is authorized. Allowed Builder paths remain the two R16 gate files,
 BUILD-REPORT, and the three generated Atlas projections.
+
+### Volatile-status Reader-defect closure - exact runtime receipts and comparisons
+
+The first fresh Reader returned NO/NO because seven clauses above admitted more
+than one implementation or an unfalsifiable receipt. These exact replacements
+close those defects and supersede only the ambiguous wording above:
+
+1. On a displayed-field mismatch, print exactly one line before rejecting:
+   `displayed_fields_mismatch={"type":...,"id":...,"expected":...,"actual":...,"differing_fields":[...]}`.
+   Preserve that top-level key order; lexically sort the keys in both field maps
+   and sort `differing_fields`. The expected map comes from the frozen
+   independent SQLite Oracle and the actual map comes from the live DOM. The
+   existing focused test parses and compares the complete runtime-derived
+   receipt; a literal receipt is red.
+2. Within that same existing focused test, use separate label-only and id-only
+   mismatch cases. Each invokes the real comparison, rejects, reports exactly
+   `["label"]` or `["id"]`, and then restores the input and proves the same
+   comparison green. This does not add a fourteenth test.
+3. The diagnostic may enter the repair path only when `differing_fields` is
+   exactly `["status"]`; both maps contain exactly the three keys `id`, `label`,
+   and `status`; `id` and `label` are byte-equal; and both status values belong
+   to the exact six-value schema enum. Any missing key, extra key, other delta,
+   or invalid value stops without repair or rerun.
+4. For each session on reopen, `first` and `reopen` mean the two displayed DOM
+   status strings. Accept only `first === reopen` or a direct edge where
+   `reopen` is a member of `transitions.agent_session[first]` in
+   `qf-kernel-schema/src/transitions.ts`. Reverse, transitive-only, unknown, and
+   merely enum-valid movements are red.
+5. Across reopen, compare every field of every non-session object byte-exactly.
+   For agent-session objects, compare `id` and `label` byte-exactly; only
+   `status` uses the direct-transition rule in item 4. Object ids, accessible
+   names, cables, positions, and inspector state remain byte-exact. No other
+   value is exempt.
+6. After every status and reopen assertion passes, print exactly once:
+   `agent_session_statuses=[{"id":"...","first":"...","reopen":"..."},...]`.
+   Entries are sorted by session id and all three values come from the two live
+   DOM observations. The focused test rejects a literal/hard-coded receipt and
+   a direct-transition violation.
+7. Against WIP `330fbc8e757b32441f384f1d742a7189952f2c9c`, only the
+   diagnostic receipt, status comparison, derived status receipt, and their
+   assertions inside the existing focused test may differ in the two R16 gate
+   files. All other lines remain byte-identical. Builder and Verifier record and
+   inspect `git diff 330fbc8e757b32441f384f1d742a7189952f2c9c --
+   qa/gates/research-world-visible.ts
+   qa/gates/research-world-visible.test.ts`; any broader change is red.
+
+The Reader rereads this closure together with `VOLATILE SESSION-STATUS CLOSURE`
+and answers the same two questions again. Only final YES/YES opens the Builder.
