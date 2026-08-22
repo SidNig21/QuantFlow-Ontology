@@ -2298,8 +2298,8 @@ failure-only case wait for full product readiness:
    and the existing pointer-first contract test may differ from WIP `fac9b8d8`;
    the other ten test bodies remain byte-identical. The pointer contract also
    source-checks: exact serial case order; forced cases call spawn-only and never
-   readiness/RPC; product cases call readiness; four/2/1 receipt literal exactly
-   once; unchanged 60,000/8,000 constants; no concurrent promise combinator in
+   readiness/RPC; product cases call readiness; runtime-derived four/2/1 receipt
+   print site exactly once; unchanged 60,000/8,000 constants; no concurrent promise combinator in
    orchestration; and the exact pointer receipt once. In the gate, only the
    launch split, serial helper, forced-case launch calls, activity tracking, and
    top-level orchestration may differ from WIP. All pointer/world/reopen/cleanup
@@ -2320,3 +2320,55 @@ Allowed Builder paths remain only the two R16 gate files, BUILD-REPORT, and the
 three generated Atlas projections. No product, fixture, pointer, keyboard,
 timeout/reserve, package/installer/release, worktree, wrapper, helper framework,
 second live run, or R17 change is authorized.
+
+### Sequential Reader-defect closure - derived activity and half-born cleanup
+
+The first Reader correctly found two remaining escape hatches. Close them as
+part of the same sequential repair:
+
+1. Add one exported pure `createLaunchActivity` tracker with runtime fields
+   `attempts`, `ready`, `active`, and `maxActive`. `begin(live)` is called inside
+   `spawnOwnedLaunch` immediately after the child PID, ownership tracker, and
+   `LiveCase` exist; it first asserts `active === 0`, then increments attempts
+   and active, updates max, and marks that exact `LiveCase.activityOpen=true`.
+   `markReady(live)` is called only after socket, ping, canvas readiness, and
+   owned-PID checks pass; it asserts the activity is open and not previously
+   ready, marks that exact live case ready, and increments `ready`.
+   `end(live)` asserts the activity is open, clears the flag, and decrements
+   active exactly once. Negative active, duplicate begin/ready/end, or readiness
+   on an unknown/closed live case is red.
+2. `spawnOwnedLaunch` wraps every step after `spawn` in a catch. Once a child PID
+   exists, it constructs and assigns the `LiveCase` before any activity call. If
+   anything then rejects before normal return, the thrown `LaunchFailure.live`
+   carries that same case with its open activity lease. Every case already
+   recovers `attachedLive(error)` and enters cleanup; no child-bearing rejection
+   may bypass cleanup or the activity decrement.
+3. `cleanupProcessSet` retains the existing exact guard
+   `if (live.endpoint && live.child.exitCode === null)` around `app.shutdown`.
+   Spawn-only forced cases keep `endpoint === ""`; the focused contract extracts
+   this cleanup body and requires the guard, and extracts both forced-case bodies
+   to reject `awaitLaunchReadiness`, `launchReady`, `rpcCall`, `app.shutdown`,
+   or any endpoint assignment/read. They therefore never attempt a product RPC.
+   The unchanged owned-process wait/terminate/poll path still runs. Put
+   `activity.end(live)` in the cleanup function's outer `finally`, so it runs
+   after success or cleanup rejection; a missing or duplicate decrement is red.
+4. The final assertions are runtime-derived:
+   `activity.attempts === 4`, `activity.ready === 2`,
+   `activity.active === 0`, and `activity.maxActive === 1`. Only after those
+   assertions, print using those fields—not a fixed full string:
+   ``console.log(`launch_attempts=${activity.attempts} ready_launches=${activity.ready} max_concurrent_launches=${activity.maxActive}`)``.
+   The focused contract rejects a literal full `4/2/1` log, requires those three
+   interpolations and the four assertions, and requires exactly one print site.
+   The live transcript must still equal the exact `4/2/1` line once.
+5. Without adding a 14th test, the first sequential focused test also exercises
+   the pure activity tracker: four serial begin/end pairs, exactly two
+   `markReady` calls, expected 4/2/0/1 result, plus concrete red cases for overlap,
+   duplicate ready, and duplicate end. The stop-on-rejection test creates an open
+   activity lease, simulates a child-bearing failure, runs the cleanup/finally
+   seam, and proves active returns to zero while the later callback remains
+   uninvoked. This is the falsifier for a hard-coded receipt or missing failure
+   decrement.
+
+The Reader rereads this closure with `SEQUENTIAL COLD-START CLOSURE`. Every
+other scope, proof, deadline, one-live budget, Verifier, Computer Use, and
+stop-before-R17 requirement remains unchanged.
