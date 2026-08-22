@@ -1869,3 +1869,70 @@ candidate commit, and push. The different-model Verifier later receives the
 same one-live-gate budget. No second input send, live-gate invocation, timeout
 increase, product workaround, helper framework, package, installer, release,
 worktree, R17 work, or accessibility claim is authorized.
+
+### Reader-defect closure - exact settle algorithm and frozen proof surface
+
+The first Reader correctly rejected the preceding wording. These requirements
+close its defects and are part of the same repair:
+
+1. Before each Enter send, observe and require the exact target tile present,
+   its details body present and collapsed, and that exact tile focused. Before
+   each Escape send, require the same target present, its details body present
+   and expanded, and that exact tile focused. The transition itself is therefore
+   required; an already-satisfied state cannot make a missing key green.
+2. Before each send, install one gate-owned `focusout` latch on the exact target
+   tile. Every observation reads that latch. Any focus departure, even if focus
+   later returns before a poll, is red. In `finally`, remove the exact listener
+   and all temporary probe state. The gate must leave no DOM attribute, global,
+   listener, or other renderer state behind.
+3. The settle clock is `performance.now()`. Capture `startedAt` immediately
+   before the first observation and `deadlineAt = startedAt + 250`. Observation
+   attempt 1 is immediate. After an unmet observation, check the deadline, then
+   make at most 25 pauses of `min(10, deadlineAt - now())` milliseconds; never
+   start or finish an intentional pause past the deadline. Each pause is
+   followed by at most one observation, so the absolute ceiling is 26 reads.
+   Time spent inside a read counts against the same deadline. Each renderer RPC
+   receives a timeout of the positive remaining settle milliseconds; a rejected
+   or timed-out read becomes the same exact red receipt rather than hanging.
+4. `keyboard_state_failure` has one exact schema:
+   `{ key, expected: { type, id, details_hidden, focused: true }, before,
+   attempts, pauses, elapsed_ms, observation_error, actual }`.
+   Both `before` and `actual` are DOM observations with exactly
+   `{ target_present, target_world_type, target_world_id, details_present,
+   details_hidden, active_tag, active_id, active_class, active_world_type,
+   active_world_id, active_control, active_accessible_name,
+   focus_lost_latched }`. Missing values are empty strings or `null`, never the
+   expected value copied into an actual field. `elapsed_ms` is the clamped
+   monotonic elapsed value at the final observation/error. The target fields
+   come from the selected DOM element's dataset; active fields come from
+   `document.activeElement` and its closest research tile.
+5. `pressNativeKey` remains byte-identical to WIP `6cb2a77`. The focused native
+   contract extracts its body and requires exactly one
+   `rpcCall(endpoint, "app.ui.pressKey", ...)`. It extracts the per-tile loop and
+   requires exactly one `pressNativeKey(endpoint, "Enter")` and one
+   `pressNativeKey(endpoint, "Escape")`. It extracts the settle helper and
+   rejects `pressNativeKey`, `app.ui.pressKey`, `rpcCall`, `sendInputEvent`, or
+   any input sender there. This makes a duplicated idempotent Escape red.
+6. The same existing native-key test, changed to async, exercises the settle
+   helper without increasing the 13-test count. A delayed-success fixture proves
+   the immediate read, ten-millisecond pauses, final DOM-shaped actual, and
+   successful transition. A never-success fixture proves exactly 25 pauses, no
+   more than 26 reads, the 250-millisecond monotonic ceiling, and the final
+   actual. A never-resolving observation must be bounded by its supplied
+   remaining-time timeout and return the exact observation-error result. A
+   focus-lost latch fixture stays red even when later state/focus appear correct.
+7. The candidate diff against WIP `6cb2a77` is itself an acceptance gate. In
+   `research-world-visible.ts`, `pressNativeKey`, all content before it, and all
+   content from `async function observeWorld` onward must be byte-identical to
+   WIP; only new settle types/helpers between those markers and
+   `exerciseNativeKeyboard` may change. In the focused test, only its import list
+   and the existing native-key contract test may differ; the other 12 test
+   bodies remain byte-identical to WIP. Builder and Verifier each record and
+   inspect `git diff 6cb2a77 --` for those exact regions. Any other changed line
+   is red. This freezes the retained ontology, 13-object/15-cable, pointer,
+   reopen, failure/timeout, 60-second, cleanup, receipt-precedence, and Atlas
+   assertions rather than trusting the 13-test count alone.
+
+The Reader rereads this closure and the preceding repair together. Every other
+bound, allowed path, one-live-invocation rule, matrix, falsifier, report, and
+Verifier requirement remains unchanged.
