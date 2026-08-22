@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER ATTEMPT 3 RED - SIXTEENTH CABLE REPAIR - BUILDER AUTHORIZED
+status: R16 SIXTEENTH CABLE REPAIR - FRESH VERIFIER REQUIRED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -138,6 +138,8 @@ consumer-attempt-3-red: exact normal candidate `e94e544b1275958d22b3826dfec43bbf
 current-door: exact `NORMAL CONSUMER ATTEMPT 3 RED — selected endpoints leak a sixteenth cable` requires fresh Reader YES/YES; no Builder, rebuild, consumer Attempt 4, or R17 authority before that receipt
 sixteenth-cable-reader-receipt: fresh Luna Reader task `01a029b8-0e0b-7de1-b4e9-572647d9e8a3`; inspected pushed docs SHA `b38721f0ad020c4ba7c5c02958be64c269ea7a57`; final YES/YES with no edits
 current-door: exact sixteenth-cable bounded Builder is authorized on Reader-approved docs head; no rebuild, consumer Attempt 4, or R17 authority before immutable candidate and fresh independent PASS
+sixteenth-cable-builder-receipt: immutable product candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`; evidence `9cacd5208ca2c392649f423be8afe5f6d8b213a4`; focused `4/0`, isolated gate exact `13/15` plus pointer `10/10`, base-source falsifier `3/1` with expected 16-versus-15 mismatch, restoration exact, Atlas HARD RED 0, pushed clean
+current-door: fresh independent Verifier must freeze candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`, run the exact bounded matrix and falsifier/restoration, and write PASS or stop on RED; no rebuild, consumer Attempt 4, or R17 authority before PASS
 
 ## Authorized outcome
 
