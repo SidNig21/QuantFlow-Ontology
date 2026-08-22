@@ -5385,3 +5385,10 @@ unless QuantFlow instructed an invalid request, mishandled the provider failure,
 or left incorrect durable state. No new R16 work is permitted outside a defect
 that directly prevents the four outcomes above. Atlas delivery-loop expansion
 is after R16, not part of this closure. No R17 authority is created here.
+
+Fresh independent Verifier receipt: Terra task
+`01a029e3-8300-7ae1-87a3-4245241a4235` returned PASS at immutable product
+candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`; evidence commit is
+`f4150422165312f30ddbefd9170f7ad7d572836e`. The exact non-generating matrix
+was green and all eleven frozen candidate hashes matched before/after. The one
+identity-bound build and final normal Computer Use attempt above are authorized.

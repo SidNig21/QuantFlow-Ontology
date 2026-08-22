@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 CRITIC CONTRACT VERIFIER REQUIRED
+status: R16 FINAL NORMAL CONSUMER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -149,7 +149,8 @@ consumer-attempt-5-diagnostic-correction: the critic's saved Hermes session and 
 critic-contract-reader-receipt: fresh Luna Reader task `01a029dc-b08b-7730-8af4-2722c78a747a`; immutable docs SHA `151a629a324dcbe368e689260a6cfe4a105b1cf2`; final YES/YES with no edits
 critic-contract-builder-receipt: immutable product candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`; Builder evidence `0702850f658b8ffa490656d16a7cd9c289f60905`; exact matrix green with schema `179/0`, Mission `3/0`, gateway `6/0`, governed review `5/0`, Atlas HARD RED 0, tree clean and pushed
 founder-one-terminal-authority: 2026-08-22; no standalone smoke seats and no Director/worker/critic canary parity; one live Hermes terminal mouse-focus/type/erase/mouse-return receipt is sufficient for mouse-first R16
-current-door: fresh independent Verifier must freeze candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`, run the exact immutable matrix without generators, and write PASS or stop on RED; no rebuild, consumer Attempt 6, or R17 authority before PASS
+critic-contract-verifier-receipt: fresh Terra Verifier task `01a029e3-8300-7ae1-87a3-4245241a4235`; PASS at immutable candidate `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`; evidence `f4150422165312f30ddbefd9170f7ad7d572836e`; exact non-generating matrix green and all 11 candidate hashes unchanged
+current-door: Router is authorized for one identity-bound build and one final normal Computer Use consumer attempt under the founder one-terminal correction; any product red stops R16, while a 403 after a valid first request is recorded as external-runtime failure without expanding R16; no R17 authority
 
 ## Authorized outcome
 
