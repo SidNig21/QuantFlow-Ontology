@@ -175,27 +175,12 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function remainingMs(deadlineAt: number): number { return Math.max(0, deadlineAt - performance.now()); }
 
-export type PostFirstCaseStarted = () => void;
-export type PostFirstCaseCallback<T> = (reportStarted: PostFirstCaseStarted) => Promise<T>;
+export type SequentialCaseCallback<T> = () => Promise<T>;
 
-/**
- * Wait for the first world before starting any post-first case, then invoke
- * every case before awaiting any result.
- */
-export async function schedulePostFirstCases<T>(
-  firstWorld: Promise<unknown>,
-  callbacks: readonly PostFirstCaseCallback<T>[],
-  onStarted?: (index: number) => void,
-): Promise<T[]> {
-  await firstWorld;
-  const results = callbacks.map((callback, index) => {
-    try {
-      return Promise.resolve(callback(() => onStarted?.(index)));
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  });
-  return Promise.all(results);
+export async function runSequentialCases<T>(callbacks: readonly SequentialCaseCallback<T>[]): Promise<T[]> {
+  const results: T[] = [];
+  for (const callback of callbacks) results.push(await callback());
+  return results;
 }
 
 export function scheduleFirstWorldSpecialists<TExecutor, TCritic>(
@@ -423,37 +408,88 @@ function createOwnershipTracker(baseline: ProcessInfo[], rootPid: number): Owner
   return tracker;
 }
 
-type LiveCase = { root: string; child: ChildProcess; endpoint: string; kernelDb: string; tracker: OwnershipTracker };
-type LaunchFailure = Error & { live?: LiveCase };
+export type LaunchActivityLive = { activityOpen: boolean; activityReady: boolean };
+export type LaunchActivity = {
+  attempts: number;
+  ready: number;
+  active: number;
+  maxActive: number;
+  begin(live: LaunchActivityLive): void;
+  markReady(live: LaunchActivityLive): void;
+  end(live: LaunchActivityLive): void;
+};
 
-async function cleanupProcessSet(live: Pick<LiveCase, "child" | "endpoint" | "tracker">, deadlineAt: number, label: string): Promise<void> {
-  await live.tracker.observe(`${label}:before-shutdown`);
-  let shutdownRequested = false;
-  if (live.endpoint && live.child.exitCode === null) {
-    try {
-      await rpcCall(live.endpoint, "app.shutdown", {}, Math.min(2_000, Math.max(1, remainingMs(deadlineAt))));
-      shutdownRequested = true;
-    } catch {
-      // The common owned-process cleanup below is the authority when the app
-      // is already failing or the RPC boundary has closed.
-    }
-  }
-  if (live.child.exitCode === null) {
-    try {
-      await waitForExit(live.child, Math.min(2_000, Math.max(1, remainingMs(deadlineAt))));
-    } catch {
-      if (live.child.pid !== undefined) await terminateOwnedProcessTree(live.child.pid);
-    }
-  }
-  await live.tracker.observe(`${label}:after-shutdown`);
-  await terminateOwnedProcesses(live.tracker.ownedPids, Math.max(1, remainingMs(deadlineAt)));
-  const fresh = await live.tracker.observe(`${label}:cleanup-poll`);
-  const remaining = ownedProcessRows(fresh, live.tracker.ownedPids);
-  console.log(`${label} shutdown_requested=${shutdownRequested} owned_processes_remaining=${remaining.length}`);
-  assert(remaining.length === 0, `${label} left owned processes: ${remaining.map((row) => row.pid).join(",")}`);
+export function createLaunchActivity(): LaunchActivity {
+  const known = new Set<LaunchActivityLive>();
+  const open = new Set<LaunchActivityLive>();
+  const activity: LaunchActivity = {
+    attempts: 0,
+    ready: 0,
+    active: 0,
+    maxActive: 0,
+    begin(live) {
+      assert(activity.active === 0, "launch activity overlap detected");
+      assert(!known.has(live) && !open.has(live) && !live.activityOpen, "launch activity began twice");
+      activity.attempts += 1;
+      activity.active += 1;
+      activity.maxActive = Math.max(activity.maxActive, activity.active);
+      live.activityOpen = true;
+      live.activityReady = false;
+      known.add(live);
+      open.add(live);
+    },
+    markReady(live) {
+      assert(open.has(live) && live.activityOpen, "launch readiness belongs to an unknown or closed case");
+      assert(!live.activityReady, "launch readiness was recorded twice");
+      live.activityReady = true;
+      activity.ready += 1;
+    },
+    end(live) {
+      assert(open.has(live) && live.activityOpen, "launch activity ended for an unknown or closed case");
+      assert(activity.active > 0, "launch activity became negative");
+      open.delete(live);
+      live.activityOpen = false;
+      activity.active -= 1;
+    },
+  };
+  return activity;
 }
 
-async function launch(root: string, deadlineAt: number, onSpawnStarted?: () => void): Promise<LiveCase> {
+type LiveCase = LaunchActivityLive & { root: string; child: ChildProcess; endpoint: string; kernelDb: string; tracker: OwnershipTracker };
+type LaunchFailure = Error & { live?: LiveCase };
+
+async function cleanupProcessSet(live: LiveCase, deadlineAt: number, label: string, activity: LaunchActivity): Promise<void> {
+  try {
+    await live.tracker.observe(`${label}:before-shutdown`);
+    let shutdownRequested = false;
+    if (live.endpoint && live.child.exitCode === null) {
+      try {
+        await rpcCall(live.endpoint, "app.shutdown", {}, Math.min(2_000, Math.max(1, remainingMs(deadlineAt))));
+        shutdownRequested = true;
+      } catch {
+        // The common owned-process cleanup below is the authority when the app
+        // is already failing or the RPC boundary has closed.
+      }
+    }
+    if (live.child.exitCode === null) {
+      try {
+        await waitForExit(live.child, Math.min(2_000, Math.max(1, remainingMs(deadlineAt))));
+      } catch {
+        if (live.child.pid !== undefined) await terminateOwnedProcessTree(live.child.pid);
+      }
+    }
+    await live.tracker.observe(`${label}:after-shutdown`);
+    await terminateOwnedProcesses(live.tracker.ownedPids, Math.max(1, remainingMs(deadlineAt)));
+    const fresh = await live.tracker.observe(`${label}:cleanup-poll`);
+    const remaining = ownedProcessRows(fresh, live.tracker.ownedPids);
+    console.log(`${label} shutdown_requested=${shutdownRequested} owned_processes_remaining=${remaining.length}`);
+    assert(remaining.length === 0, `${label} left owned processes: ${remaining.map((row) => row.pid).join(",")}`);
+  } finally {
+    activity.end(live);
+  }
+}
+
+async function spawnOwnedLaunch(root: string, activity: LaunchActivity): Promise<LiveCase> {
   const stores = join(root, "stores");
   const kernelDb = join(stores, "kernel.db");
   const artifactRoot = join(stores, "artifacts");
@@ -473,13 +509,26 @@ async function launch(root: string, deadlineAt: number, onSpawnStarted?: () => v
   env.QF_PEER_BUS_DB = join(stores, "peer-bus.db");
   env.QF_DEV_ELECTRON_PID_FILE = join(root, "electron.pid");
   const before = await processSnapshot();
-  const child = spawn("bun", ["run", "dev"], { cwd: COLLAB_ROOT, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
-  assert(child.pid !== undefined, "production Electron did not provide a PID");
-  child.stdout?.resume();
-  child.stderr?.resume();
-  const tracker = createOwnershipTracker(before, child.pid);
-  const live: LiveCase = { root, child, endpoint: "", kernelDb, tracker };
-  onSpawnStarted?.();
+  let live: LiveCase | undefined;
+  try {
+    const child = spawn("bun", ["run", "dev"], { cwd: COLLAB_ROOT, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    assert(child.pid !== undefined, "production Electron did not provide a PID");
+    child.stdout?.resume();
+    child.stderr?.resume();
+    const tracker = createOwnershipTracker(before, child.pid);
+    live = { root, child, endpoint: "", kernelDb, tracker, activityOpen: false, activityReady: false };
+    activity.begin(live);
+    return live;
+  } catch (error) {
+    const failure: LaunchFailure = error instanceof Error ? error : new Error(String(error));
+    if (live) failure.live = live;
+    throw failure;
+  }
+}
+
+async function awaitLaunchReadiness(live: LiveCase, deadlineAt: number, activity: LaunchActivity): Promise<LiveCase> {
+  const { child, tracker, root } = live;
+  const appRoot = join(root, "app-root");
   const endpointFile = join(appRoot, "socket-path");
   let lastReadinessSnapshotAt = 0;
   try {
@@ -501,12 +550,17 @@ async function launch(root: string, deadlineAt: number, onSpawnStarted?: () => v
     live.endpoint = endpoint;
     await tracker.observe("after-ready");
     assert(tracker.ownedPids.size > 0, "no gate-owned process was observed after readiness");
+    activity.markReady(live);
     return live;
   } catch (error) {
     const failure: LaunchFailure = error instanceof Error ? error : new Error(String(error));
     failure.live = live;
     throw failure;
   }
+}
+
+async function launchReady(root: string, deadlineAt: number, activity: LaunchActivity): Promise<LiveCase> {
+  return await awaitLaunchReadiness(await spawnOwnedLaunch(root, activity), deadlineAt, activity);
 }
 
 type VisibleObject = {
@@ -664,18 +718,18 @@ function readSavedCanvasState(appDir: string, expected: IndependentWorldManifest
   return state;
 }
 
-async function runFirstWorldStage(root: string, nonce: string, startedAt: number, functionalDeadlineAt: number, hardDeadlineAt: number): Promise<FirstWorldStageResult> {
+async function runFirstWorldStage(root: string, nonce: string, startedAt: number, functionalDeadlineAt: number, hardDeadlineAt: number, activity: LaunchActivity): Promise<FirstWorldStageResult> {
   const outcome: MutableCaseOutcome = { case: "normal" };
   let active: LiveCase | undefined;
   const cleanupActive = async (label: string): Promise<boolean> => {
     if (!active) return true;
     const live = active;
     active = undefined;
-    try { await cleanupProcessSet(live, hardDeadlineAt, label); return true; }
+    try { await cleanupProcessSet(live, hardDeadlineAt, label, activity); return true; }
     catch (error) { outcome.cleanupError ??= error; return false; }
   };
   try {
-    active = await launch(root, functionalDeadlineAt);
+    active = await launchReady(root, functionalDeadlineAt, activity);
     const first = active;
     const seeded = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", {}) as { object_id?: string; dataset?: { object_id?: string } };
     const datasetId = String(seeded.object_id ?? seeded.dataset?.object_id ?? "");
@@ -728,18 +782,18 @@ async function runFirstWorldStage(root: string, nonce: string, startedAt: number
   return { outcome };
 }
 
-async function runNormalReopenCase(root: string, first: FirstWorldState, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+async function runNormalReopenCase(root: string, first: FirstWorldState, functionalDeadlineAt: number, hardDeadlineAt: number, activity: LaunchActivity): Promise<GateCaseOutcome> {
   const outcome: MutableCaseOutcome = { case: "normal" };
   let active: LiveCase | undefined;
   const cleanupActive = async (label: string): Promise<boolean> => {
     if (!active) return true;
     const live = active;
     active = undefined;
-    try { await cleanupProcessSet(live, hardDeadlineAt, label); return true; }
+    try { await cleanupProcessSet(live, hardDeadlineAt, label, activity); return true; }
     catch (error) { outcome.cleanupError ??= error; return false; }
   };
   try {
-    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
+    active = await launchReady(root, functionalDeadlineAt, activity);
     const secondWorld = await observeWorld(active.endpoint, first.expected, first.missionId, first.taskId, functionalDeadlineAt, { exercisePointer: false });
     assert(JSON.stringify(secondWorld) === JSON.stringify(first.firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
     if (!await cleanupActive("second-launch")) return outcome;
@@ -754,15 +808,17 @@ async function runNormalReopenCase(root: string, first: FirstWorldState, functio
   return outcome;
 }
 
-async function runForcedFailureCase(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+async function runForcedFailureCase(root: string, nonce: string, hardDeadlineAt: number, activity: LaunchActivity): Promise<GateCaseOutcome> {
   const outcome: MutableCaseOutcome = { case: "forced-failure" };
   let active: LiveCase | undefined;
   try {
-    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
+    active = await spawnOwnedLaunch(root, activity);
+    assert(active.child.pid !== undefined, "forced failure launch did not provide a PID");
     const marker = `r16-forced-failure-${nonce}`;
+    console.log(`forced_failure_marker=${marker}`);
+    console.log("forced_failure_phase=spawned_not_ready");
     try { throw new Error(marker); } catch (error) {
       assert(String(error).includes(marker), "forced failure marker was not caught by the gate harness");
-      console.log(`forced_failure_marker=${marker}`);
     }
   } catch (error) {
     outcome.functionalError = error;
@@ -771,19 +827,21 @@ async function runForcedFailureCase(root: string, nonce: string, functionalDeadl
     if (active) {
       const live = active;
       active = undefined;
-      try { await cleanupProcessSet(live, hardDeadlineAt, "forced-failure"); }
+      try { await cleanupProcessSet(live, hardDeadlineAt, "forced-failure", activity); }
       catch (error) { outcome.cleanupError = error; }
     }
   }
   return outcome;
 }
 
-async function runForcedTimeoutCase(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+async function runForcedTimeoutCase(root: string, nonce: string, hardDeadlineAt: number, activity: LaunchActivity): Promise<GateCaseOutcome> {
   const outcome: MutableCaseOutcome = { case: "forced-timeout" };
   let active: LiveCase | undefined;
   try {
-    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
+    active = await spawnOwnedLaunch(root, activity);
+    assert(active.child.pid !== undefined, "forced timeout launch did not provide a PID");
     const marker = `r16-forced-timeout-${nonce}`;
+    console.log("forced_timeout_phase=spawned_not_ready");
     const watchdogStartedAt = performance.now();
     const neverSettling = new Promise<never>(() => {});
     try {
@@ -802,7 +860,7 @@ async function runForcedTimeoutCase(root: string, nonce: string, functionalDeadl
     if (active) {
       const live = active;
       active = undefined;
-      try { await cleanupProcessSet(live, hardDeadlineAt, "forced-timeout"); }
+      try { await cleanupProcessSet(live, hardDeadlineAt, "forced-timeout", activity); }
       catch (error) { outcome.cleanupError = error; }
     }
   }
@@ -832,38 +890,56 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
     return root;
   };
   const outcomes: GateCaseOutcome[] = [];
-  const startedOffsets: number[] = [];
-  const markStarted = (index: number): void => { startedOffsets[index] ??= Math.round(performance.now() - startedAt); };
+  const activity = createLaunchActivity();
   const normalRoot = registerRoot();
   const failureRoot = registerRoot();
   const timeoutRoot = registerRoot();
   const caseNames: GateCaseName[] = ["normal", "forced-failure", "forced-timeout"];
   try {
     let firstWorldState: FirstWorldState | undefined;
-    const callbacks: PostFirstCaseCallback<GateCaseOutcome>[] = [
-      (reportStarted) => {
-        const state = firstWorldState;
-        if (!state) return Promise.reject(new Error("post-first normal case started without a first world"));
-        return runNormalReopenCase(normalRoot, state, functionalDeadlineAt, hardDeadlineAt, reportStarted);
+    const caseResults = await runSequentialCases<GateCaseOutcome>([
+      async () => {
+        const outcome = await runForcedFailureCase(failureRoot, nonce, hardDeadlineAt, activity);
+        outcomes.push(outcome);
+        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
+          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("forced failure case did not complete cleanly");
+        }
+        return outcome;
       },
-      (reportStarted) => runForcedFailureCase(failureRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
-      (reportStarted) => runForcedTimeoutCase(timeoutRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
-    ];
-    const firstWorldReady = runFirstWorldStage(normalRoot, nonce, startedAt, functionalDeadlineAt, hardDeadlineAt).then((result) => {
-      outcomes.push(result.outcome);
-      if (result.state && result.outcome.functionalError === undefined && result.outcome.cleanupError === undefined) {
+      async () => {
+        const outcome = await runForcedTimeoutCase(timeoutRoot, nonce, hardDeadlineAt, activity);
+        outcomes.push(outcome);
+        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
+          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("forced timeout case did not complete cleanly");
+        }
+        return outcome;
+      },
+      async () => {
+        const result = await runFirstWorldStage(normalRoot, nonce, startedAt, functionalDeadlineAt, hardDeadlineAt, activity);
+        outcomes.push(result.outcome);
+        if (result.outcome.functionalError !== undefined || result.outcome.cleanupError !== undefined) {
+          throw result.outcome.functionalError ?? result.outcome.cleanupError ?? new Error("first-world stage did not complete successfully");
+        }
+        assert(result.state, "first-world stage returned no state");
         firstWorldState = result.state;
-        return result.state;
-      }
-      throw result.outcome.functionalError ?? result.outcome.cleanupError ?? new Error("first-world stage did not complete successfully");
-    });
-    outcomes.push(...await schedulePostFirstCases(firstWorldReady, callbacks, markStarted));
-    assert(startedOffsets.length === callbacks.length && startedOffsets.every((value) => value !== undefined), "not every post-first case reported a post-spawn start");
-    const spread = Math.max(...startedOffsets) - Math.min(...startedOffsets);
-    console.log(`post_first_case_start_spread_ms=${spread}`);
-    assert(spread <= 2_000, `post-first case start spread exceeded 2000ms: ${spread}`);
+        return result.outcome;
+      },
+      async () => {
+        assert(firstWorldState, "normal reopen started without a clean first world");
+        const outcome = await runNormalReopenCase(normalRoot, firstWorldState, functionalDeadlineAt, hardDeadlineAt, activity);
+        outcomes.push(outcome);
+        if (outcome.functionalError !== undefined || outcome.cleanupError !== undefined) {
+          throw outcome.functionalError ?? outcome.cleanupError ?? new Error("normal reopen case did not complete cleanly");
+        }
+        return outcome;
+      },
+    ]);
+    void caseResults;
   } catch (error) {
-    if (!outcomes.some((outcome) => outcome.case === "normal" && outcome.functionalError !== undefined)) {
+    const lastOutcome = outcomes.at(-1);
+    if (lastOutcome && lastOutcome.functionalError === undefined) {
+      lastOutcome.functionalError = error;
+    } else if (!lastOutcome) {
       outcomes.push({ case: "normal", functionalError: error });
     }
   }
@@ -913,6 +989,11 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
   const receipts = formatFailureReceipts(finalOutcomes);
   console.log(receipts.primary);
   console.log(receipts.cleanup);
+  assert(activity.attempts === 4, `launch activity expected 4 attempts, got ${activity.attempts}`);
+  assert(activity.ready === 2, `launch activity expected 2 ready launches, got ${activity.ready}`);
+  assert(activity.active === 0, `launch activity expected zero active launches, got ${activity.active}`);
+  assert(activity.maxActive === 1, `launch activity expected max one concurrent launch, got ${activity.maxActive}`);
+  console.log(`launch_attempts=${activity.attempts} ready_launches=${activity.ready} max_concurrent_launches=${activity.maxActive}`);
   assert(!deadlineExceeded, "research-world-visible exceeded its 60 second total deadline");
   assert(leaked.length === 0, `research-world-visible cleanup left roots: ${leaked.join(",")}`);
   assert(receipts.ok, "research-world-visible completed with a functional or cleanup failure");

@@ -8,6 +8,7 @@ import {
   assertSavedResearchTileAllowlist,
   assertVisibleWorldCounts,
   CLEANUP_RESERVE_MS,
+  createLaunchActivity,
   EXPECTED_VISIBLE_CABLE_COUNT,
   EXPECTED_VISIBLE_TILE_COUNT,
   formatFailureReceipts,
@@ -15,8 +16,8 @@ import {
   RESEARCH_WORLD_VISIBLE_DEADLINE_MS,
   rendererEvaluationExpression,
   removeRegisteredRoot,
+  runSequentialCases,
   scheduleFirstWorldSpecialists,
-  schedulePostFirstCases,
   worldTimeoutDelta,
   worldObservationExpression,
 } from "./research-world-visible.ts";
@@ -125,39 +126,72 @@ describe("research-world-visible gate contract", () => {
     expect(() => assertSavedResearchTileAllowlist({ ...state, tiles: [{ ...state.tiles[0], cableKind: "belongs_to" }] }, ["mission:m"])).toThrow();
   });
 
-  test("starts all post-first cases before awaiting any result", async () => {
-    const reported: number[] = [];
-    let release!: () => void;
-    const released = new Promise<void>((resolve) => { release = resolve; });
-    const allStarted = new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("post-first cases serialized")), 250);
-      void schedulePostFirstCases(Promise.resolve(), [0, 1, 2].map(() => async (reportStarted) => {
-        reportStarted();
-        await released;
-        return true;
-      }), (index) => {
-        reported.push(index);
-        if (reported.length === 3) { clearTimeout(timer); resolve(); }
-      }).catch(reject);
-    });
-    await allStarted;
-    expect(reported).toEqual([0, 1, 2]);
-    release();
+  test("runs cases serially and derives one-launch activity with concrete red checks", async () => {
+    const activity = createLaunchActivity();
+    const order: string[] = [];
+    let activeCallbacks = 0;
+    let maxActiveCallbacks = 0;
+    const run = async (name: string, ready: boolean) => {
+      activeCallbacks += 1;
+      maxActiveCallbacks = Math.max(maxActiveCallbacks, activeCallbacks);
+      const live = { activityOpen: false, activityReady: false };
+      activity.begin(live);
+      if (ready) activity.markReady(live);
+      await Promise.resolve();
+      activity.end(live);
+      activeCallbacks -= 1;
+      order.push(name);
+      return name;
+    };
+    const result = await runSequentialCases([
+      () => run("forced-failure", false),
+      () => run("forced-timeout", false),
+      () => run("first-world", true),
+      () => run("normal-reopen", true),
+    ]);
+    expect(result).toEqual(["forced-failure", "forced-timeout", "first-world", "normal-reopen"]);
+    expect(order).toEqual(result);
+    expect(maxActiveCallbacks).toBe(1);
+    expect(activity).toMatchObject({ attempts: 4, ready: 2, active: 0, maxActive: 1 });
+
+    const red = createLaunchActivity();
+    const overlap = { activityOpen: false, activityReady: false };
+    red.begin(overlap);
+    expect(() => red.begin({ activityOpen: false, activityReady: false })).toThrow();
+    red.end(overlap);
+    const duplicateReady = { activityOpen: false, activityReady: false };
+    red.begin(duplicateReady);
+    red.markReady(duplicateReady);
+    expect(() => red.markReady(duplicateReady)).toThrow();
+    red.end(duplicateReady);
+    const duplicateEnd = { activityOpen: false, activityReady: false };
+    red.begin(duplicateEnd);
+    red.end(duplicateEnd);
+    expect(() => red.end(duplicateEnd)).toThrow();
+    expect(red.active).toBe(0);
   });
 
-  test("does not invoke post-first callbacks when the first-world stage rejects", async () => {
+  test("stops on a child-bearing rejection and closes its activity lease in finally", async () => {
+    const activity = createLaunchActivity();
+    const live = { activityOpen: false, activityReady: false };
     let invoked = 0;
-    let rejected = false;
-    try {
-      await schedulePostFirstCases(Promise.reject(new Error("first world rejected")), [0, 1, 2].map(() => async () => {
+    await expect(runSequentialCases([
+      async () => {
+        invoked += 1;
+        activity.begin(live);
+        try {
+          throw Object.assign(new Error("child-bearing failure"), { live });
+        } finally {
+          activity.end(live);
+        }
+      },
+      async () => {
         invoked += 1;
         return true;
-      }));
-    } catch (error) {
-      rejected = error instanceof Error && error.message === "first world rejected";
-    }
-    expect(rejected).toBe(true);
-    expect(invoked).toBe(0);
+      },
+    ])).rejects.toThrow("child-bearing failure");
+    expect(invoked).toBe(1);
+    expect(activity.active).toBe(0);
   });
 
   test("requires the exact pointer-first DOM click-handler proof and no keyboard sender", () => {
@@ -172,8 +206,40 @@ describe("research-world-visible gate contract", () => {
     const liveStart = gate.indexOf("async function observeWorld");
     const liveEnd = gate.indexOf("\nconst TRANSIENT_ROOT_ERRORS", liveStart);
     const liveGate = gate.slice(liveStart, liveEnd);
+    const spawnStart = gate.indexOf("async function spawnOwnedLaunch");
+    const readinessStart = gate.indexOf("async function awaitLaunchReadiness");
+    const launchReadyStart = gate.indexOf("async function launchReady");
+    const launchReadyEnd = gate.indexOf("\n\ntype VisibleObject", launchReadyStart);
+    const cleanupStart = gate.indexOf("async function cleanupProcessSet");
+    const cleanupEnd = gate.indexOf("\n\nasync function spawnOwnedLaunch", cleanupStart);
+    const failureStart = gate.indexOf("async function runForcedFailureCase");
+    const timeoutStart = gate.indexOf("async function runForcedTimeoutCase");
+    const mergeOutcomesStart = gate.indexOf("function mergeCaseOutcomes", timeoutStart);
+    const firstWorldStart = gate.indexOf("async function runFirstWorldStage");
+    const reopenStart = gate.indexOf("async function runNormalReopenCase");
+    const orchestrationStart = gate.indexOf("export async function runResearchWorldVisibleGate");
+    const sequenceStart = gate.indexOf("const caseResults = await runSequentialCases", orchestrationStart);
+    const sequenceEnd = gate.indexOf("\n    void caseResults;", sequenceStart);
+    const spawnSource = gate.slice(spawnStart, readinessStart);
+    const readinessSource = gate.slice(readinessStart, launchReadyStart);
+    const launchReadySource = gate.slice(launchReadyStart, launchReadyEnd);
+    const cleanupSource = gate.slice(cleanupStart, cleanupEnd);
+    const failureSource = gate.slice(failureStart, timeoutStart);
+    const timeoutSource = gate.slice(timeoutStart, mergeOutcomesStart);
+    const firstWorldSource = gate.slice(firstWorldStart, reopenStart);
+    const reopenSource = gate.slice(reopenStart, failureStart);
+    const sequenceSource = gate.slice(sequenceStart, sequenceEnd);
     expect(pointerStart).toBeGreaterThanOrEqual(0);
     expect(pointerEnd).toBeGreaterThan(pointerStart);
+    expect(spawnStart).toBeGreaterThanOrEqual(0);
+    expect(readinessStart).toBeGreaterThan(spawnStart);
+    expect(launchReadyStart).toBeGreaterThan(readinessStart);
+    expect(failureStart).toBeGreaterThanOrEqual(0);
+    expect(timeoutStart).toBeGreaterThanOrEqual(0);
+    expect(firstWorldStart).toBeGreaterThanOrEqual(0);
+    expect(reopenStart).toBeGreaterThanOrEqual(0);
+    expect(sequenceStart).toBeGreaterThanOrEqual(0);
+    expect(sequenceEnd).toBeGreaterThan(sequenceStart);
     expect(pointerProof).toContain('expected.objects.filter((entry) => entry.type !== "agent_session")');
     expect(pointerProof).toContain("pointerObjects.length === 10");
     expect(pointerProof).toContain("querySelectorAll('.qf-world-inspect')");
@@ -185,6 +251,45 @@ describe("research-world-visible gate contract", () => {
     expect(pointerProof.match(/inspect\.click\(\)/g) ?? []).toHaveLength(1);
     expect(pointerProof.match(/collapse\.click\(\)/g) ?? []).toHaveLength(1);
     expect((gate.match(/console\.log\("pointer_tiles=10 inspect=10 collapse=10"\)/g) ?? [])).toHaveLength(1);
+    expect(spawnSource).toContain("activity.begin(live)");
+    expect(spawnSource).toContain("endpoint: \"\"");
+    expect(spawnSource).toContain("failure.live = live");
+    expect(readinessSource).toContain("socket-path");
+    expect(readinessSource).toContain('rpcCall(value, "ping"');
+    expect(readinessSource).toContain('rpcCall(value, "app.readiness"');
+    expect(readinessSource).toContain("activity.markReady(live)");
+    expect(launchReadySource).toContain("return await awaitLaunchReadiness(await spawnOwnedLaunch(root, activity), deadlineAt, activity);");
+    expect(cleanupSource).toContain("if (live.endpoint && live.child.exitCode === null)");
+    expect(cleanupSource).toContain("activity.end(live)");
+    expect(failureSource).toContain("spawnOwnedLaunch");
+    expect(failureSource).toContain('forced_failure_phase=spawned_not_ready');
+    expect(failureSource).not.toContain("awaitLaunchReadiness");
+    expect(failureSource).not.toContain("launchReady");
+    expect(failureSource).not.toContain("rpcCall");
+    expect(failureSource).not.toContain("app.shutdown");
+    expect(failureSource).not.toContain("endpoint");
+    expect(timeoutSource).toContain("spawnOwnedLaunch");
+    expect(timeoutSource).toContain('forced_timeout_phase=spawned_not_ready');
+    expect(timeoutSource).toContain("setTimeout(() => reject(new Error(marker)), 500)");
+    expect(timeoutSource).not.toContain("awaitLaunchReadiness");
+    expect(timeoutSource).not.toContain("launchReady");
+    expect(timeoutSource).not.toContain("rpcCall");
+    expect(timeoutSource).not.toContain("app.shutdown");
+    expect(timeoutSource).not.toContain("endpoint");
+    expect(firstWorldSource).toContain("launchReady");
+    expect(reopenSource).toContain("launchReady");
+    expect(sequenceSource.indexOf("runForcedFailureCase")).toBeLessThan(sequenceSource.indexOf("runForcedTimeoutCase"));
+    expect(sequenceSource.indexOf("runForcedTimeoutCase")).toBeLessThan(sequenceSource.indexOf("runFirstWorldStage"));
+    expect(sequenceSource.indexOf("runFirstWorldStage")).toBeLessThan(sequenceSource.indexOf("runNormalReopenCase"));
+    expect(sequenceSource).not.toMatch(/Promise\.(all|allSettled)/);
+    expect(gate).not.toContain("schedulePostFirstCases");
+    expect(gate).not.toContain("post_first_case_start_spread_ms");
+    expect(gate).toContain("activity.attempts === 4");
+    expect(gate).toContain("activity.ready === 2");
+    expect(gate).toContain("activity.active === 0");
+    expect(gate).toContain("activity.maxActive === 1");
+    expect((gate.match(/console\.log\(`launch_attempts=\$\{activity\.attempts\} ready_launches=\$\{activity\.ready\} max_concurrent_launches=\$\{activity\.maxActive\}`\)/g) ?? [])).toHaveLength(1);
+    expect(gate).not.toContain("launch_attempts=4 ready_launches=2 max_concurrent_launches=1");
     expect(liveGate).not.toMatch(/app\.ui\.pressKey|pressNativeKey|sendInputEvent|keyboard_|tab_focus_|qf-r16-tab-sentinel|\.focus\(|keyDown|keyUp|KeyboardEvent|dispatchEvent/);
     expect(gate).not.toContain("exerciseKeyboard");
     expect(gate).not.toContain("exerciseNativeKeyboard");
