@@ -1425,3 +1425,157 @@ the three generated Atlas projections, and this existing report. No product
 file changed after candidate `5445578`; the final tree was verified clean and
 the branch was pushed to `origin/wo-R16`. No build, launch, Computer Use,
 founder-state change, package/release work, or R17 work occurred.
+
+## NORMAL CONSUMER RED — shared result Artifact isolation Builder closure
+
+Plain meaning: two real Missions can share the same data without showing each
+other's history, and the old leakage is proven to return when the repair is removed.
+
+### Immutable candidate and scope
+
+| Field | Receipt |
+|---|---|
+| Builder base | `a175f45` |
+| Immutable product candidate SHA | `7dda122435dce47adbc650e5d5b9d933db249263` |
+| Branch | `wo-R16` |
+| Product/test SHA-256 | projection `ecd64a563e53fe73be8bddeed59a49904284e12c789c5446a3b55fcbdbbdd279`; test `155f75ce5204679ddf0db68bc5fce8d25c09fed585a2db39451dfe46ae0ee64c` |
+| Candidate status before evidence | clean |
+
+Candidate paths changed exactly:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/research-world.test.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+```
+
+The test appends exactly one named regression and retains the three prior tests
+and their assertions. The fixture uses real Kernel actions for two complete
+Missions, with equal Dataset and result Artifact ids and distinct other named
+world ids; each direction asserts the exact 13 objects and 15 links.
+
+### Focused command
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+exit=0
+4 pass
+0 fail
+52 expect() calls
+```
+
+### Complete bounded R16 parent matrix
+
+Each command ran once, natively, in the exact fenced order:
+
+```text
+bun test collab-electron/src/main/governed-review.test.ts
+exit=0; 4 pass / 0 fail / 51 expect
+
+bun test collab-electron/src/main/research-world.test.ts
+exit=0; 4 pass / 0 fail / 52 expect
+
+bun test collab-electron/src/windows/shell/src/research-world.test.ts
+exit=0; 6 pass / 0 fail / 32 expect
+
+bun test collab-electron/src/windows/shell/src/task-composition.test.ts
+exit=0; 3 pass / 0 fail / 55 expect
+
+bun test collab-electron/src/main/native-tui-orchestration.test.ts
+exit=0; 9 pass / 0 fail / 42 expect
+
+bun test collab-electron/src/main/precreated-native-tui.test.ts
+exit=0; 2 pass / 0 fail / 5 expect
+
+bun test packages/qf-kernel/src/r15-governed-review.test.ts
+exit=0; 7 pass / 0 fail / 55 expect
+
+bun test packages/qf-kernel/src/r16-visible-world.test.ts
+exit=0; 3 pass / 0 fail / 5 expect
+
+bun test qa/gates/governed-review.test.ts
+exit=0; nested production/kernel 11 pass / 0 fail; live contract 7 pass / 0 fail; gate 3 pass / 0 fail
+
+bun test qa/gates/research-world-visible.test.ts
+exit=0; 13 pass / 0 fail / 192 expect
+
+bun qa/run.ts kernel-sole-writer
+exit=0; PASS  kernel-sole-writer
+
+bun qf-atlas/generate.mjs --check
+exit=0; qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0; HARD RED: 0; unexplained coverage: 0; AMBER: 20; undecided: 42
+
+git diff --check
+exit=0; no output
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0; no output
+```
+
+### Executable shared-Artifact falsifier and restoration
+
+Only `collab-electron/src/main/research-world-projection.ts` was temporarily
+replaced with its exact bytes from base `5445578508e3b76f107e5c3ed40eafefd0e18319`.
+The test and every other path remained byte-identical.
+
+```text
+Command: bun test collab-electron/src/main/research-world.test.ts
+Native exit: 1
+Native result: 3 pass / 1 fail
+Named failure: expected target Mission's 13 objects but received 24;
+decoy-only ids included decoy-shared-mission, decoy-shared-run,
+decoy-shared-source-task, decoy-critic, decoy-director, and decoy-worker.
+```
+
+The mutation was red because the old broad closure re-imported the decoy world
+through the shared result Artifact. A green mutation run would have failed acceptance.
+
+Candidate bytes were restored from immutable candidate SHA
+`7dda122435dce47adbc650e5d5b9d933db249263`:
+
+```text
+restored_projection_sha256=ecd64a563e53fe73be8bddeed59a49904284e12c789c5446a3b55fcbdbbdd279
+restored_test_sha256=155f75ce5204679ddf0db68bc5fce8d25c09fed585a2db39451dfe46ae0ee64c
+projection_zero_diff=0
+test_zero_diff=0
+
+bun test collab-electron/src/main/research-world.test.ts
+exit=0
+4 pass
+0 fail
+52 expect() calls
+```
+
+### Atlas receipts and final status
+
+```text
+bun qf-atlas/generate.mjs
+exit=0
+qf-atlas: wrote atlas.json + atlas.html + ATLAS.md
+432 files · 109 subsystems · 124 IPC channels
+wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+
+bun qf-atlas/generate.mjs --check
+exit=0; qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0; HARD RED: 0; unexplained coverage: 0; AMBER: 20; undecided: 42
+
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+exit=0; VERDICT: WORSE; added 1 analyzer cell; coverage worse 1; ADDED: persistence links insert into
+
+git diff --check
+exit=0
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0
+```
+
+The Atlas diff is the existing analyzer coverage classification for direct
+support-table SQL in the repository; currentness is green and HARD RED is zero.
+No Atlas baseline or semantic code was changed. No build, launch, Computer Use,
+founder-state change, package/release work, or R17 work occurred in this Builder turn.
