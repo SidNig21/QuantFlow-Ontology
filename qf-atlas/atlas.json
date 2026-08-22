@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "e0a6b47",
+    "commit": "9f9554d",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "1ac7502",
+      "commit": "e0a6b47",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "e0a6b47",
+      "commit": "9f9554d",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
