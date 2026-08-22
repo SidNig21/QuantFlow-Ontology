@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 SEQUENTIAL COLD-START CLOSURE - BUILD AUTHORIZED
+status: R16 VOLATILE SESSION-STATUS CLOSURE - READER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -36,6 +36,8 @@ pointer-first-wip-receipt: tile-manager 2/0 and focused R16 13/0; single live ga
 reopen-scheduling-reader-receipt: fresh Luna Reader task `01a027e1-db30-7ae0-b8d6-7ddc8101b24e`; final YES/YES at `af18595086b960c26e9728ebdbe756adb6caa32b`
 early-concurrency-failure-receipt: the authorized experiment started forced launches alongside first-world fixture work and closed the normal RPC during `qf.dock.spawn`; every root/process still cleaned and no candidate commit was made; exact failed run opened from `fd8e2a2f74dfaa67b5a71273fda6eab4bc8bd02c`
 sequential-closure-reader-receipt: fresh Luna Reader task `01a027eb-d1cf-7f41-b2be-ee6fcc2de38b`; final YES/YES at `a2d9a3ed40d5fc82da55e50c189ed79d6f23ae2b`
+sequential-status-red-receipt: focused R16 13/0; forced launch cleanup, pointer 10/10, and final process/root cleanup green; first-world comparison stopped on one agent_session displayed-field delta; WIP preserved at `330fbc8e757b32441f384f1d742a7189952f2c9c`
+volatile-status-reader-receipt: pending fresh two-question Reader over the final `VOLATILE SESSION-STATUS CLOSURE`; no Builder opens before YES/YES
 
 ## Authorized outcome
 
@@ -78,7 +80,12 @@ fresh Reader YES/YES. That Reader returned final YES/YES at `7d7466d`; its WIP
 is preserved at `90672d9`. The founder superseded only global Tab-order parity
 with the mouse-first correction appended to `WO-R16.md`; a fresh two-question
 Reader returned final YES/YES at `f91b25f`; its Builder door is open only for
-the final founder mouse-first correction.
+the final founder mouse-first correction. The sequential launch repair then
+received fresh Reader YES/YES at `a2d9a3e` and produced the bounded live red at
+`330fbc8`: pointer/world construction and cleanup advanced, while one
+agent-session displayed-field comparison changed between independent sampling
+and renderer reveal. The final volatile-status diagnostic appended to
+`WO-R16.md` now requires fresh Reader YES/YES; no Builder is authorized yet.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 

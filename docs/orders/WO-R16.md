@@ -2372,3 +2372,57 @@ part of the same sequential repair:
 The Reader rereads this closure with `SEQUENTIAL COLD-START CLOSURE`. Every
 other scope, proof, deadline, one-live budget, Verifier, Computer Use, and
 stop-before-R17 requirement remains unchanged.
+
+## VOLATILE SESSION-STATUS CLOSURE - diagnose before changing comparison
+
+Sequential WIP `330fbc8e757b32441f384f1d742a7189952f2c9c` is evidence,
+not a candidate. Its focused contract passed 13/0. Its single live run proved
+both spawn-only cases and the normal first launch cleaned to zero processes,
+all three roots cleaned to zero, all ten research inspectors opened and closed
+by pointer, and the full world reached the DOM. The first-world comparison then
+reported only `displayed fields differ for agent_session:<id>`. Because the
+independent SQLite manifest is sampled before the renderer requests its world,
+an `agent_session.status` lifecycle transition can make exact whole-record
+equality compare two legitimate observations from different instants.
+
+This authority diagnoses that named red before changing its meaning:
+
+1. In the two existing R16 gate files only, make the displayed-field comparison
+   emit one deterministic JSON receipt on mismatch containing the object type,
+   object id, expected field map, actual field map, and sorted differing field
+   names. Preserve the existing assertion immediately after the receipt. Add a
+   focused falsifier that proves a label or id mismatch remains visible and red.
+   Run the focused 13-test file and exactly one live diagnostic gate.
+2. If any mismatch is outside `agent_session`, changes `id` or `label`, omits a
+   displayed field, contains more than the single field `status`, or uses a
+   status outside the schema enum `starting|running|blocked|cancelled|failed|closed`,
+   stop. Do not repair or rerun. Report the exact receipt for Router decision.
+3. Only if the diagnostic proves a status-only temporal delta, correct the gate
+   to test the product's actual contract:
+   - every agent-session tile still exposes exactly `id`, `status`, and `label`;
+   - `id` and `label` remain exact against the independent Oracle;
+   - the displayed status and independently sampled status are each members of
+     the exact schema enum;
+   - first-launch to reopen status movement must be either identical or a valid
+     transition from `qf-kernel-schema/src/transitions.ts`; the same object ids,
+     labels, remaining object fields, cables, positions, and inspector state
+     remain byte-exact across reopen.
+   Emit one derived receipt listing the three session ids and their first/reopen
+   statuses. No status value may be hard-coded as the expected happy path.
+4. The focused file stays exactly 13 tests by extending the existing pointer
+   contract test. It must falsify: missing session field, invalid status, id or
+   label drift, invalid reopen transition, and a non-session field mismatch.
+   All prior scheduling, activity, pointer, 13/15, failure precedence, timeout,
+   saved-state, and cleanup assertions remain present and unchanged.
+5. After the status-only repair, run focused 13/0 and exactly one live gate. Any
+   red stops. Full green continues with the already-authorized short matrix,
+   pointer falsifier, Atlas refresh/ratchet, BUILD-REPORT, candidate commit, and
+   push. A fresh different-model Verifier then measures the immutable candidate
+   once. The Router performs the normal-app real-mouse Computer Use check after
+   Verifier PASS and stops before R17.
+
+This is a temporal-consistency correction, not permission to weaken world
+inspection. No product, fixture, timeout/reserve, launch scheduling, pointer,
+keyboard, package/installer/release, wrapper, helper framework, worktree, or R17
+change is authorized. Allowed Builder paths remain the two R16 gate files,
+BUILD-REPORT, and the three generated Atlas projections.
