@@ -59,9 +59,12 @@ const PRODUCTION_UPGRADE_FILES = [
   "0007-task-delegation.sql",
   "0008-deterministic-execution.sql",
   "0009-independent-critic.sql",
+  "0010-task-composition.sql",
+  "0011-task-steering.sql",
+  "0012-governed-review.sql",
 ] as const;
 const PRE_D1_REQUIRED_UPGRADES =
-  "agent-profile-identity,market-ingest,market-context,capability-grants,task-status,connection-actions,task-delegation,deterministic-execution,independent-critic";
+  "agent-profile-identity,market-ingest,market-context,capability-grants,task-status,connection-actions,task-delegation,deterministic-execution,independent-critic,task-composition,task-steering,governed-review";
 const QF_TOOLLOOP_PACKAGE = join(REPO, "tools/runtime-proof/agent-package");
 const ELECTRON_MAIN = join(REPO, "collab-electron/src/main");
 const KERNEL_ATTACH_SOURCE = join(REPO, "packages/qf-kernel/src/db.ts");
@@ -552,24 +555,36 @@ function snapshotCounts(db: KernelDb): Record<string, number> {
   };
 }
 
-function snapshotLegacyData(db: KernelDb): string {
-  // These columns are added by later upgrades in the same attach chain. The
-  // legacy-byte proof compares only columns that existed in the pre-D1 input.
-  const upgradeAddedColumns = new Set(["runtime_profile", "capability_groups", "status"]);
-  const tables = (
+function snapshotLegacyTableNames(db: KernelDb): string[] {
+  return (
     db
       .query(
         "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name <> 'schema_meta' ORDER BY name",
       )
       .all() as Array<{ name: string }>
   ).map((row) => row.name);
+}
+
+type LegacyProjection = {
+  table: string;
+  columns: string[];
+};
+
+function snapshotLegacyProjection(db: KernelDb): LegacyProjection[] {
+  return snapshotLegacyTableNames(db).map((table) => ({
+    table,
+    columns: (
+      db.query(`PRAGMA table_info("${table}")`).all() as Array<{ name: string }>
+    ).map((column) => column.name),
+  }));
+}
+
+function snapshotLegacyData(
+  db: KernelDb,
+  projection: readonly LegacyProjection[],
+): string {
   return JSON.stringify(
-    tables.map((table) => {
-      const columns = (
-        db.query(`PRAGMA table_info("${table}")`).all() as Array<{ name: string }>
-      )
-        .map((column) => column.name)
-        .filter((name) => !upgradeAddedColumns.has(name));
+    projection.map(({ table, columns }) => {
       const projection = columns.map((name) => `"${name}"`).join(", ");
       return {
         table,
@@ -892,7 +907,8 @@ async function main(): Promise<number> {
   const preRaw = new Database(prePath);
   const preDb = wrapBunDatabase(preRaw);
   const beforeUpgrade = snapshotCounts(preDb);
-  const legacyDataBefore = snapshotLegacyData(preDb);
+  const legacyProjectionBefore = snapshotLegacyProjection(preDb);
+  const legacyDataBefore = snapshotLegacyData(preDb, legacyProjectionBefore);
   const legacyUnlinked = (
     preDb
       .query(
@@ -911,7 +927,7 @@ async function main(): Promise<number> {
     return 1;
   }
   const afterUpgrade = snapshotCounts(upgradedDb);
-  if (snapshotLegacyData(upgradedDb) !== legacyDataBefore) {
+  if (snapshotLegacyData(upgradedDb, legacyProjectionBefore) !== legacyDataBefore) {
     console.error("dock-profile-identity FAIL: upgrade changed legacy row bytes");
     return 1;
   }

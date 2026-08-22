@@ -347,10 +347,46 @@ function tablesWithoutIndependentCritic(
   return next;
 }
 
+function tablesWithoutBelongsTo(tables: Map<string, string>): Map<string, string> {
+  const next = new Map(tables);
+  const linksSql = next.get("links");
+  if (linksSql) {
+    next.set(
+      "links",
+      linksSql
+        .replace(/,'belongs_to'/gi, "")
+        .replace(/'belongs_to',/gi, ""),
+    );
+  }
+  return next;
+}
+
+const TASK_STEERING_ACTIONS = new Set([
+  "clarify_task",
+  "redirect_task",
+  "record_task_steering_delivery",
+  "record_task_steering_refusal",
+  "record_task_cancel_outcome",
+  "request_second_opinion",
+]);
+
+function schemaMetaWithoutR16Additions(
+  rows: Array<[string, string, string, string]>,
+): Array<[string, string, string, string]> {
+  return rows.filter(
+    ([typeName]) =>
+      typeName !== "belongs_to" &&
+      typeName !== "governed_review_task" &&
+      !TASK_STEERING_ACTIONS.has(typeName),
+  );
+}
+
 function schemaMetaWithoutTaskComposition(
   rows: Array<[string, string, string, string]>,
 ): Array<[string, string, string, string]> {
-  return rows.filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
+  return schemaMetaWithoutR16Additions(
+    rows.filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task"),
+  );
 }
 
 function schemaMetaWithoutTaskActions(
@@ -400,7 +436,12 @@ function schemaMetaWithoutTaskDelegation(
           : undefined);
       return description ? [row[0], row[1], row[2], description] as [string, string, string, string] : row;
     })
-    .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
+    .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task")
+    .filter(([typeName]) =>
+      typeName !== "belongs_to" &&
+      typeName !== "governed_review_task" &&
+      !TASK_STEERING_ACTIONS.has(typeName),
+    );
 }
 
 function schemaMetaWithoutDeterministicExecution(
@@ -412,7 +453,8 @@ function schemaMetaWithoutDeterministicExecution(
 function schemaMetaWithoutIndependentCritic(
   rows: Array<[string, string, string, string]>,
 ): Array<[string, string, string, string]> {
-  return rows
+  return schemaMetaWithoutR16Additions(
+    rows
     .filter(([typeName]) => typeName !== "performed_by")
     .map((row) =>
       row[0] === "record_evaluation"
@@ -424,17 +466,25 @@ function schemaMetaWithoutIndependentCritic(
         ] as [string, string, string, string]
         : row,
     )
-    .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task");
+    .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task"),
+  );
 }
 
 function linkKindsWithoutTaskDelegation(linkKinds: readonly string[]): string[] {
   return linkKinds.filter(
-    (kind) => kind !== "delegated_by" && kind !== "performed_by",
+    (kind) =>
+      kind !== "delegated_by" &&
+      kind !== "performed_by" &&
+      kind !== "belongs_to",
   );
 }
 
 function linkKindsWithoutIndependentCritic(linkKinds: readonly string[]): string[] {
-  return linkKinds.filter((kind) => kind !== "performed_by");
+  return linkKinds.filter((kind) => kind !== "performed_by" && kind !== "belongs_to");
+}
+
+function linkKindsWithoutBelongsTo(linkKinds: readonly string[]): string[] {
+  return linkKinds.filter((kind) => kind !== "belongs_to");
 }
 
 function schemaMetaWithoutConnectionActions(
@@ -448,11 +498,11 @@ function schemaMetaWithoutConnectionActions(
 }
 
 function predecessorTables(tables: Map<string, string>): Map<string, string> {
-  return tablesWithoutGovernedReview(tablesWithoutTaskComposition(
+  return tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(
     tablesWithoutTaskDelegation(
       tablesWithoutCapabilityGroups(tablesWithoutTaskStatus(tables)),
     ),
-  ));
+  )));
 }
 
 /** 0001/0002 precede the context actions; derive both historical metadata shapes from current authority. */
@@ -517,9 +567,9 @@ function expectedCapabilityGrants(): StructureSnapshot {
   if (!capabilityGrantsSnapshot) {
     const current = expectedCurrent();
     capabilityGrantsSnapshot = {
-      tables: tablesWithoutTaskComposition(
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(
         tablesWithoutTaskDelegation(tablesWithoutTaskStatus(current.tables)),
-      ),
+      ))),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskActions(current.schemaMeta),
     };
@@ -534,7 +584,7 @@ function expectedTaskStatus(): StructureSnapshot {
   if (!taskStatusSnapshot) {
     const current = expectedCurrent();
     taskStatusSnapshot = {
-      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))),
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)))),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutConnectionActions(
         schemaMetaWithoutTaskDelegation(current.schemaMeta),
@@ -551,7 +601,7 @@ function expectedConnectionActions(): StructureSnapshot {
   if (!connectionActionsSnapshot) {
     const current = expectedCurrent();
     connectionActionsSnapshot = {
-      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables))),
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutTaskDelegation(current.tables)))),
       linkKinds: linkKindsWithoutTaskDelegation(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskDelegation(current.schemaMeta),
     };
@@ -566,7 +616,7 @@ function expectedTaskDelegation(): StructureSnapshot {
   if (!taskDelegationSnapshot) {
     const current = expectedCurrent();
     taskDelegationSnapshot = {
-      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))),
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)))),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
       schemaMeta: schemaMetaWithoutDeterministicExecution(
         schemaMetaWithoutIndependentCritic(current.schemaMeta),
@@ -583,7 +633,7 @@ function expectedDeterministicExecution(): StructureSnapshot {
   if (!deterministicExecutionSnapshot) {
     const current = expectedCurrent();
     deterministicExecutionSnapshot = {
-      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))),
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)))),
       linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
       schemaMeta: schemaMetaWithoutIndependentCritic(current.schemaMeta),
     };
@@ -598,8 +648,8 @@ function expectedTaskComposition(): StructureSnapshot {
   if (!taskCompositionSnapshot) {
     const current = expectedCurrent();
     taskCompositionSnapshot = {
-      tables: tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)),
-      linkKinds: current.linkKinds,
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables))),
+      linkKinds: linkKindsWithoutBelongsTo(current.linkKinds),
       schemaMeta: schemaMetaWithoutTaskComposition(current.schemaMeta),
     };
   }
@@ -610,14 +660,10 @@ let taskSteeringSnapshot: StructureSnapshot | null = null;
 function expectedTaskSteering(): StructureSnapshot {
   if (!taskSteeringSnapshot) {
     const current = expectedCurrent();
-    const steeringNames = new Set([
-      "clarify_task", "redirect_task", "record_task_steering_delivery",
-      "record_task_steering_refusal", "record_task_cancel_outcome", "request_second_opinion",
-    ]);
     taskSteeringSnapshot = {
-      tables: tablesWithoutGovernedReview(current.tables),
-      linkKinds: current.linkKinds,
-      schemaMeta: current.schemaMeta.filter(([name]) => !steeringNames.has(name)),
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(current.tables)),
+      linkKinds: linkKindsWithoutBelongsTo(current.linkKinds),
+      schemaMeta: schemaMetaWithoutR16Additions(current.schemaMeta),
     };
   }
   return taskSteeringSnapshot;
@@ -642,6 +688,43 @@ function snapshotsEqual(a: StructureSnapshot, b: StructureSnapshot): boolean {
     }
   }
   return true;
+}
+
+/** R16 schema additions were added after the generated 0012 upgrade authority. */
+function applyCurrentR16SchemaAdditions(db: KernelDb): void {
+  const currentLinksSql = expectedCurrent().tables.get("links");
+  const liveLinksSql = readTableSql(db, "links");
+  if (currentLinksSql && liveLinksSql !== currentLinksSql) {
+    const upgradeLinksSql = currentLinksSql.replace(
+      /^CREATE TABLE links\b/i,
+      "CREATE TABLE links__r16_upgrade",
+    );
+    db.exec(`${upgradeLinksSql};`);
+    db.exec(`
+      INSERT INTO links__r16_upgrade (id, kind, from_id, to_id, created_at)
+        SELECT id, kind, from_id, to_id, created_at FROM links;
+      DROP TABLE links;
+      ALTER TABLE links__r16_upgrade RENAME TO links;
+    `);
+  }
+
+  const currentMeta = new Map(
+    expectedCurrent().schemaMeta.map((row) => [row[0], row] as const),
+  );
+  for (const name of ["belongs_to", "governed_review_task"] as const) {
+    const row = currentMeta.get(name);
+    if (!row) continue;
+    const present = db
+      .query("SELECT 1 AS ok FROM schema_meta WHERE type_name = ?")
+      .get(name);
+    if (!present) {
+      db
+        .query(
+          "INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES (?, ?, ?, ?)",
+        )
+        .run(...row);
+    }
+  }
 }
 
 function objectMetaCount(db: KernelDb): number {
@@ -858,6 +941,7 @@ export function applyKernelUpgradeChain(
     }
     db.exec(upgrades.taskSteeringSql);
     db.exec(upgrades.governedReviewSql);
+    applyCurrentR16SchemaAdditions(db);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(
         TASK_COMPOSITION_UPGRADE,

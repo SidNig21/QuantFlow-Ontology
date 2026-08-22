@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ e16dfd7` on 2026-08-22 by
+> Generated from `wo-R16 @ c5a759e` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -438,7 +438,7 @@ prevent a clean architectural result.
 
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
-| `packages/qf-kernel/src/upgrade.ts` | partial | 1 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | partial | 7 | 5 |
 | `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 2 |
 | `collab-electron/src/main/kernel.ts` | partial | 8 | 7 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
@@ -470,7 +470,7 @@ mechanism behind the invariant below, not a promise about it.
 | `imports` | 543 | 0 | 4 | 0 | 0 |
 | `ipcRequest` | 276 | 0 | 4 | 0 | 267 |
 | `ipcPush` | 7 | 0 | 4 | 0 | 536 |
-| `persistence` | 22 | 26 | 0 | 0 | 499 |
+| `persistence` | 23 | 26 | 0 | 0 | 498 |
 | `lifetime` | 6 | 61 | 0 | 0 | 480 |
 | `packaging` | 229 | 0 | 0 | 123 | 195 |
 | `ownership` | 20 | 0 | 0 | 353 | 174 |

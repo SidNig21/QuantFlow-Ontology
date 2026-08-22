@@ -1,8 +1,15 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { EVENTS_DDL } from "./db.ts";
 import {
   closeKernel,
   attachKernel,
@@ -16,6 +23,23 @@ import {
 
 const trace = { trace_id: "r11a-trace", span_id: "r11a-span" };
 const priorArtifactRoot = process.env.QF_ARTIFACT_ROOT;
+const REPO_ROOT = join(import.meta.dir, "../../..");
+const PRE_D1_SQL = join(
+  REPO_ROOT,
+  "qf-kernel-schema/compat/pre-d1-profile-identity.sql",
+);
+const POST_COMPOSITION_UPGRADES = [
+  "0001-agent-profile-identity.sql",
+  "0002-market-ingest.sql",
+  "0003-market-context.sql",
+  "0004-capability-grants.sql",
+  "0005-task-status.sql",
+  "0006-connection-actions.sql",
+  "0007-task-delegation.sql",
+  "0008-deterministic-execution.sql",
+  "0009-independent-critic.sql",
+  "0010-task-composition.sql",
+] as const;
 let db: KernelDb | undefined;
 let artifactRoot: string | undefined;
 
@@ -151,6 +175,32 @@ function createR10FixtureWithOnly0010Shape(
     );
   }
   return raw;
+}
+
+function createPinnedPostCompositionPredecessor(): Database {
+  const raw = new Database(":memory:");
+  raw.exec(readFileSync(PRE_D1_SQL, "utf8"));
+  for (const upgrade of POST_COMPOSITION_UPGRADES) {
+    raw.exec(
+      readFileSync(join(REPO_ROOT, "qf-kernel-schema/golden/upgrades", upgrade), "utf8"),
+    );
+  }
+  raw.exec(EVENTS_DDL);
+  raw.exec(`
+    INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref)
+    VALUES ('upgrade-artifact', '2026-08-22T00:00:00.000Z', 'result_set', 'upgrade-hash', 'memory://upgrade-artifact');
+    INSERT INTO task (id, created_at, title, description, status)
+    VALUES ('upgrade-task', '2026-08-22T00:00:00.000Z', 'Upgrade task', 'Preserve this task', 'open');
+    INSERT INTO links (id, kind, from_id, to_id, created_at)
+    VALUES ('upgrade-link', 'produces', 'upgrade-run', 'upgrade-artifact', '2026-08-22T00:00:00.000Z');
+    INSERT INTO events (id, type, object_type, object_id, payload, trace_id, created_at)
+    VALUES ('upgrade-event', 'artifact.published', 'artifact', 'upgrade-artifact', '{"preserve":true}', 'upgrade-trace', '2026-08-22T00:00:00.000Z');
+  `);
+  return raw;
+}
+
+function fileSha256(path: string): string {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
 describe("R11a deterministic local execution", () => {
@@ -323,6 +373,89 @@ describe("R11a deterministic local execution", () => {
       upgraded.query(`SELECT kind FROM schema_meta WHERE type_name = ?`).get("performed_by"),
     ).toEqual({ kind: "link" });
     raw.close();
+  });
+
+  test("upgrades the pinned post-composition predecessor and preserves receipts", () => {
+    const raw = createPinnedPostCompositionPredecessor();
+    try {
+      expect(classifyKernelShape(raw as unknown as KernelDb)).toBe("task_steering");
+      const before = {
+        artifacts: (raw.query("SELECT COUNT(*) AS n FROM artifact").get() as { n: number }).n,
+        tasks: (raw.query("SELECT COUNT(*) AS n FROM task").get() as { n: number }).n,
+        links: (raw.query("SELECT COUNT(*) AS n FROM links").get() as { n: number }).n,
+        events: eventCount(raw as unknown as KernelDb),
+      };
+
+      const upgraded = attachKernel(raw as unknown as KernelDb);
+
+      expect(classifyKernelShape(upgraded)).toBe("current");
+      expect((upgraded.query("SELECT COUNT(*) AS n FROM artifact").get() as { n: number }).n).toBeGreaterThanOrEqual(before.artifacts);
+      expect((upgraded.query("SELECT COUNT(*) AS n FROM task").get() as { n: number }).n).toBeGreaterThanOrEqual(before.tasks);
+      expect((upgraded.query("SELECT COUNT(*) AS n FROM links").get() as { n: number }).n).toBeGreaterThanOrEqual(before.links);
+      expect(eventCount(upgraded)).toBeGreaterThanOrEqual(before.events);
+      expect(
+        upgraded.query("SELECT id, content_hash FROM artifact WHERE id = 'upgrade-artifact'").get(),
+      ).toEqual({ id: "upgrade-artifact", content_hash: "upgrade-hash" });
+      expect(
+        upgraded.query("SELECT id, title, description, status FROM task WHERE id = 'upgrade-task'").get(),
+      ).toEqual({ id: "upgrade-task", title: "Upgrade task", description: "Preserve this task", status: "open" });
+      expect(
+        upgraded.query("SELECT id, kind, from_id, to_id FROM links WHERE id = 'upgrade-link'").get(),
+      ).toEqual({ id: "upgrade-link", kind: "produces", from_id: "upgrade-run", to_id: "upgrade-artifact" });
+      expect(
+        upgraded.query("SELECT id, payload, trace_id FROM events WHERE id = 'upgrade-event'").get(),
+      ).toEqual({ id: "upgrade-event", payload: '{"preserve":true}', trace_id: "upgrade-trace" });
+    } finally {
+      raw.close();
+    }
+  });
+
+  test("rejects one extra or missing governed predecessor shape without mutation", () => {
+    const cases = [
+      {
+        name: "extra",
+        mutate: (raw: Database) => raw.exec(
+          "INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('belongs_to', 'link', 'experimental', 'extra');",
+        ),
+      },
+      {
+        name: "missing",
+        mutate: (raw: Database) => raw.exec(
+          "DELETE FROM schema_meta WHERE type_name = 'delegated_by';",
+        ),
+      },
+    ] as const;
+
+    for (const { name, mutate } of cases) {
+      const dir = mkdtempSync(join(tmpdir(), `qf-r16-${name}-`));
+      const path = join(dir, "kernel.db");
+      const seeded = new Database(path);
+      try {
+        seeded.exec(readFileSync(PRE_D1_SQL, "utf8"));
+        for (const upgrade of POST_COMPOSITION_UPGRADES) {
+          seeded.exec(
+            readFileSync(join(REPO_ROOT, "qf-kernel-schema/golden/upgrades", upgrade), "utf8"),
+          );
+        }
+        seeded.exec(EVENTS_DDL);
+        mutate(seeded);
+      } finally {
+        seeded.close();
+      }
+
+      const before = fileSha256(path);
+      const rejected = new Database(path);
+      try {
+        expect(classifyKernelShape(rejected as unknown as KernelDb)).toBe("partial");
+        expect(() => attachKernel(rejected as unknown as KernelDb)).toThrow(
+          /database shape is not an exact supported predecessor or current authority/,
+        );
+      } finally {
+        rejected.close();
+      }
+      expect(fileSha256(path), `${name} partial rejection mutated the database`).toBe(before);
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   test("classifies a fixture retaining only the 0010 display_name shape as partial", () => {

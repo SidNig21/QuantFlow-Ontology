@@ -10,6 +10,7 @@
  *   QF_K3_COLD_INSTALL_FALSIFY=kernel-drift bun qa/gates/kernel-drift.ts
  */
 import { join } from "node:path";
+import { runFrozenPackageInstall } from "../package-install.ts";
 
 const GATE_DIR = join(import.meta.dir, "kernel-drift");
 const REPO_ROOT = join(import.meta.dir, "../..");
@@ -81,16 +82,7 @@ async function executeInstallPlan(
   entries: ColdInstallPlanEntry[],
 ): Promise<number> {
   for (const entry of entries) {
-    const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-      cwd: entry.cwd,
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    const code = await install.exited;
-    if (code !== 0) {
-      console.error(`kernel-drift: ${entry.name} bun install exited ${code}`);
-      return 1;
-    }
+    if (!(await runFrozenPackageInstall(`kernel-drift:${entry.name}`, entry.cwd))) return 1;
   }
   return 0;
 }

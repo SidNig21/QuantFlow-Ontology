@@ -24,6 +24,7 @@ import {
   INDEPENDENT_CRITIC_UPGRADE,
   TASK_COMPOSITION_UPGRADE,
   TASK_STEERING_UPGRADE,
+  GOVERNED_REVIEW_UPGRADE,
 } from "./upgrade.ts";
 import {
   detectObjectTypeRegistryDrift,
@@ -370,6 +371,7 @@ export function attachKernel(
       INDEPENDENT_CRITIC_UPGRADE,
       TASK_COMPOSITION_UPGRADE,
       TASK_STEERING_UPGRADE,
+      GOVERNED_REVIEW_UPGRADE,
     ];
     const completedByShape = {
       pre_d1: 0,

@@ -204,7 +204,9 @@ function gateG1(workDir: string, falsify: boolean): string | null {
   const canaryDb = new Database(canaryPath);
   canaryDb.exec(readFileSync(CANARY_SQL, "utf8"));
   canaryDb.close();
-  const canarySets = readRegistrySets(new Database(canaryPath, { readonly: true }));
+  const canaryReadOnlyDb = new Database(canaryPath, { readonly: true });
+  const canarySets = readRegistrySets(canaryReadOnlyDb);
+  canaryReadOnlyDb.close();
   const canaryReport = detectObjectTypeRegistryDrift({
     declared: PRIOR_DECLARED,
     metaObjects: canarySets.metaObjects,
@@ -279,16 +281,20 @@ function gateG2(workDir: string, enforceOff: boolean): string | null {
   closeKernel(roDb);
 
   process.env[FIXTURE_ENV] = "1";
-  const mem = openKernel(":memory:");
-  const bytes = new TextEncoder().encode("k3-gate-control-publish");
-  execute(
-    mem,
-    "publish_artifact",
-    { kind: "report", bytes, storage_ref: "gate://control" },
-    TRACE,
-  );
-  closeKernel(mem);
-  delete process.env[FIXTURE_ENV];
+  let mem: KernelDb | undefined;
+  try {
+    mem = openKernel(":memory:");
+    const bytes = new TextEncoder().encode("k3-gate-control-publish");
+    execute(
+      mem,
+      "publish_artifact",
+      { kind: "result_set", bytes, storage_ref: "gate://control" },
+      TRACE,
+    );
+  } finally {
+    if (mem) closeKernel(mem);
+    delete process.env[FIXTURE_ENV];
+  }
 
   console.log("kernel-drift G2: PASS");
   return null;
