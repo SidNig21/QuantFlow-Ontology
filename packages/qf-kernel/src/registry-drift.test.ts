@@ -2,6 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { detectObjectTypeRegistryDrift } from "./registry-drift.ts";
 
 const DECLARED = ["artifact", "agent_session", "run"] as const;
+const GOVERNED_REVIEW_SUPPORT_TABLES = [
+  "qf_review_source_work",
+  "qf_review_task",
+  "qf_review_invocation",
+  "qf_review_attempt",
+  "qf_review_receipt",
+  "qf_review_publication",
+] as const;
 
 describe("detectObjectTypeRegistryDrift", () => {
   test("clean: declared, meta, and tables agree → ok", () => {
@@ -65,5 +73,27 @@ describe("detectObjectTypeRegistryDrift", () => {
       tables: [...DECLARED, "events", "links", "schema_meta", "sqlite_sequence"],
     });
     expect(r).toEqual({ ok: true });
+  });
+
+  test("ignores exactly six governed-review support tables but rejects a seventh orphan", () => {
+    const r = detectObjectTypeRegistryDrift({
+      declared: DECLARED,
+      metaObjects: [...DECLARED],
+      tables: [
+        ...DECLARED,
+        ...GOVERNED_REVIEW_SUPPORT_TABLES,
+        "qf_review_orphan",
+        "events",
+        "links",
+        "schema_meta",
+        "sqlite_sequence",
+      ],
+    });
+    expect(r).toEqual({
+      ok: false,
+      missing: [],
+      retired: [],
+      inconsistent: ["qf_review_orphan"],
+    });
   });
 });

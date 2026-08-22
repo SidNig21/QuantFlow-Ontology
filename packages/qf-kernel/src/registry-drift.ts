@@ -22,6 +22,13 @@ const INFRA_TABLES = new Set([
   "links",
   "schema_meta",
   "sqlite_sequence",
+  // R15 durable governed-review support tables, not ontology object types.
+  "qf_review_source_work",
+  "qf_review_task",
+  "qf_review_invocation",
+  "qf_review_attempt",
+  "qf_review_receipt",
+  "qf_review_publication",
 ]);
 
 function sortedUnique(names: Iterable<string>): string[] {
