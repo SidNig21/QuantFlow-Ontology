@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { performance } from "node:perf_hooks";
 import {
   assertResearchWorldContract,
+  compareVisibleSnapshot,
   assertSavedResearchTileAllowlist,
   assertVisibleWorldCounts,
   CLEANUP_RESERVE_MS,
@@ -311,6 +312,72 @@ describe("research-world-visible gate contract", () => {
     const focusEnd = tileManager.indexOf("\n\tlet fullscreenTileId = null;", focusStart);
     expect(tileManager.slice(focusStart, focusEnd < 0 ? tileManager.length : focusEnd)).toContain("dom.webview.focus()");
     expect(preload).not.toContain("app.ui.pressKey");
+
+    const expectedFields = { id: "session", label: "Director", status: "running" };
+    const expected = {
+      root_id: "mission",
+      objects: [{ type: "agent_session", id: "session", fields: expectedFields, accessible_name: "agent_session session" }],
+      links: [],
+    };
+    const actual = {
+      objects: [{
+        type: expected.objects[0].type,
+        id: expected.objects[0].id,
+        accessible_name: expected.objects[0].accessible_name,
+        fields: { ...expectedFields },
+        position: { left: "0px", top: "0px", width: "1px", height: "1px", zIndex: "0" },
+        inspector_expanded: false,
+      }],
+      links: [],
+    };
+    const captureDisplayedFieldsMismatch = () => {
+      const lines: string[] = [];
+      const originalLog = console.log;
+      console.log = (...args: unknown[]) => { lines.push(args.map(String).join(" ")); };
+      try {
+        expect(() => compareVisibleSnapshot(actual, expected)).toThrow("displayed fields differ");
+      } finally {
+        console.log = originalLog;
+      }
+      expect(lines).toHaveLength(1);
+      const prefix = "displayed_fields_mismatch=";
+      expect(lines[0].startsWith(prefix)).toBe(true);
+      const receipt = JSON.parse(lines[0].slice(prefix.length)) as {
+        type: string;
+        id: string;
+        expected: Record<string, string>;
+        actual: Record<string, string>;
+        differing_fields: string[];
+      };
+      const sortFields = (fields: Record<string, string>) => Object.fromEntries(Object.entries(fields).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0));
+      const expectedMap = sortFields(expected.objects[0].fields!);
+      const actualMap = sortFields(actual.objects[0].fields);
+      const differingFields = [...new Set([...Object.keys(expectedMap), ...Object.keys(actualMap)])]
+        .sort((left, right) => left < right ? -1 : left > right ? 1 : 0)
+        .filter((field) => !Object.prototype.hasOwnProperty.call(expectedMap, field)
+          || !Object.prototype.hasOwnProperty.call(actualMap, field)
+          || expectedMap[field] !== actualMap[field]);
+      const expectedReceipt = {
+        type: actual.objects[0].type,
+        id: actual.objects[0].id,
+        expected: expectedMap,
+        actual: actualMap,
+        differing_fields: differingFields,
+      };
+      expect(receipt).toEqual(expectedReceipt);
+      expect(lines[0]).toBe(`${prefix}${JSON.stringify(expectedReceipt)}`);
+      return receipt;
+    };
+
+    actual.objects[0].fields.label = "Changed label";
+    expect(captureDisplayedFieldsMismatch().differing_fields).toEqual(["label"]);
+    actual.objects[0].fields.label = expectedFields.label;
+    expect(() => compareVisibleSnapshot(actual, expected)).not.toThrow();
+
+    actual.objects[0].fields.id = "changed-session";
+    expect(captureDisplayedFieldsMismatch().differing_fields).toEqual(["id"]);
+    actual.objects[0].fields.id = expectedFields.id;
+    expect(() => compareVisibleSnapshot(actual, expected)).not.toThrow();
   });
 
   test("keeps fixture truth out of the renderer and exposes inspection attributes", () => {

@@ -606,14 +606,37 @@ async function waitForVisibleWorld(read: () => Promise<VisibleWorldSnapshot>, ex
   throw new Error(worldTimeoutDelta(lastSnapshot ?? { objects: [], links: [] }, expected));
 }
 
-function compareVisibleSnapshot(actual: VisibleWorldSnapshot, expected: IndependentWorldManifest): void {
+function sortedDisplayedFields(fields: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(fields).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0));
+}
+
+export function compareVisibleSnapshot(actual: VisibleWorldSnapshot, expected: IndependentWorldManifest): void {
   compareManifest(actual, expected);
   const expectedObjects = new Map(expected.objects.map((object) => [`${object.type}:${object.id}`, object]));
   for (const object of actual.objects) {
     const expectedObject = expectedObjects.get(`${object.type}:${object.id}`);
     assert(expectedObject, `visible object missing from Oracle: ${object.type}:${object.id}`);
     assert(object.accessible_name === expectedObject.accessible_name, `accessible name differs for ${object.type}:${object.id}`);
-    assert(JSON.stringify(object.fields) === JSON.stringify(expectedObject.fields), `displayed fields differ for ${object.type}:${object.id}`);
+    const expectedFields = expectedObject.fields ?? {};
+    const actualFields = object.fields;
+    const fieldsMatch = JSON.stringify(actualFields) === JSON.stringify(expectedFields);
+    if (!fieldsMatch) {
+      const expectedSorted = sortedDisplayedFields(expectedFields);
+      const actualSorted = sortedDisplayedFields(actualFields);
+      const differingFields = [...new Set([...Object.keys(expectedSorted), ...Object.keys(actualSorted)])]
+        .sort((left, right) => left < right ? -1 : left > right ? 1 : 0)
+        .filter((field) => !Object.prototype.hasOwnProperty.call(expectedSorted, field)
+          || !Object.prototype.hasOwnProperty.call(actualSorted, field)
+          || expectedSorted[field] !== actualSorted[field]);
+      console.log(`displayed_fields_mismatch=${JSON.stringify({
+        type: object.type,
+        id: object.id,
+        expected: expectedSorted,
+        actual: actualSorted,
+        differing_fields: differingFields,
+      })}`);
+    }
+    assert(fieldsMatch, `displayed fields differ for ${object.type}:${object.id}`);
   }
 }
 
