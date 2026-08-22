@@ -995,6 +995,10 @@ export function kernelSeedVisibleResearchWorld(input: {
   }, { ...trace(), actor_session_id: input.directorSessionId, mission_id: input.missionId }) as { object_id: string };
   const taskId = input.taskId ?? String(createdTask?.object_id ?? "");
   if (!taskId) throw new Error("R16 fixture Task creation did not return an id");
+  const db = getKernelDb();
+  if (!db.query("SELECT 1 FROM links WHERE kind = 'delegates_to' AND from_id = ? AND to_id = ?").get(input.directorSessionId, input.executorSessionId)) {
+    db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'delegates_to', ?, ?, ?)").run(crypto.randomUUID(), input.directorSessionId, input.executorSessionId, new Date().toISOString());
+  }
   const run = kernelExecute("execute_deterministic_run", {
     run_id: `run-${input.nonce}`,
     dataset_id: input.datasetId,

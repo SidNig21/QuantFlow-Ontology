@@ -7,7 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import {
   bootstrapDockProfiles,
   discoverDockProfileManifests,
@@ -16,6 +16,7 @@ import {
 } from "./dock-profiles";
 
 const roots: string[] = [];
+const REPO_ROOT = resolve(join(import.meta.dir, "../../.."));
 
 afterEach(() => {
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
@@ -192,6 +193,19 @@ function freshQaRoot(): string {
 }
 
 describe("Dock profile manifests", () => {
+  test("actual repository QA discovery accepts the proof fixture display names", () => {
+    const proof = JSON.parse(readFileSync(join(REPO_ROOT, "tools/qf-proof-agent/dock-profiles.json"), "utf8")) as { profiles: Array<Record<string, unknown>> };
+    const toolloop = JSON.parse(readFileSync(join(REPO_ROOT, "tools/runtime-proof/dock-profiles.json"), "utf8")) as { profiles: Array<Record<string, unknown>> };
+    expect([
+      ...proof.profiles,
+      ...toolloop.profiles,
+    ].map((profile) => ({ id: profile.id, display_name: profile.display_name }))).toEqual([
+      { id: "qf-proof-orchestrator", display_name: "Orchestrator" },
+      { id: "qf-proof-worker", display_name: "Market Researcher" },
+      { id: "qf-toolloop", display_name: "Market Researcher" },
+    ]);
+  });
+
   test("production discovery succeeds without proof packages", () => {
     const manifests = discoverDockProfileManifests(freshRoot());
     const profiles = manifests.flatMap((manifest) => manifest.profiles);

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "b9e37d5",
+    "commit": "221231c",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "55545dd38ac9142d"
+    "fingerprint": "e8a3f466e6267022"
   },
   "stats": {
     "live": 111,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 124,
-      "indexed": 1138,
+      "indexed": 1140,
       "downgradedFromCheats": 20,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 14,
@@ -1440,7 +1440,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 49.7,
+      "kb": 51.5,
       "x": -0.23,
       "z": 1.3,
       "status": "warn",
@@ -1451,7 +1451,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 49.7,
+          "kb": 51.5,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
@@ -1684,7 +1684,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 39.6,
+      "kb": 43.3,
       "x": -1.24,
       "z": 0.45,
       "status": "gray",
@@ -1695,7 +1695,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 39.6,
+          "kb": 43.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 4,
@@ -3450,11 +3450,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 522.3,
+      "kb": 535.4,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 77,
+      "spawns": 78,
       "writes": 30,
       "dml": 6,
       "executes": 49,
@@ -3547,6 +3547,16 @@
           "kb": 18.5,
           "spawns": 2,
           "spawnsLive": 2,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/research-world-visible.ts",
+          "kb": 18.1,
+          "spawns": 1,
+          "spawnsLive": 1,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -3731,16 +3741,6 @@
         {
           "path": "qa/gates/observe-door.ts",
           "kb": 5.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/research-world-visible.ts",
-          "kb": 5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -8028,7 +8028,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/index.ts:743"
+              "detail": "collab-electron/src/main/index.ts:744"
             },
             {
               "layer": "kernel",
@@ -8648,7 +8648,7 @@
     {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
-      "indexedFns": 65,
+      "indexedFns": 67,
       "sqlInText": 7,
       "sqlIndexed": 6,
       "sqlUnrecognised": 0,
@@ -21664,12 +21664,13 @@
       "imports": "indexed",
       "reach": "unsupported",
       "blockers": {
-        "reach": "scope-boundary"
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
-      "lifetime": "not-applicable",
+      "lifetime": "partial",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
       "reasons": {
@@ -21677,7 +21678,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
+        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -24984,8 +24985,8 @@
       "indexed": 22
     },
     "lifetime": {
-      "not-applicable": 481,
-      "partial": 60,
+      "not-applicable": 480,
+      "partial": 61,
       "indexed": 6
     },
     "packaging": {
@@ -29966,14 +29967,14 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/research-world-visible.ts",
         "qa/gates/windows-dock-capability.ts",
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
         "qa/gates/windows-dock-ontology.ts",
         "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
-        "qa/gates/windows-research-question.ts",
-        "qa/gates/package-closure/executors.ts"
+        "qa/gates/windows-research-question.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -30072,6 +30073,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/research-world-visible.ts",
         "qa/gates/windows-dock-capability.ts",
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
@@ -30139,6 +30141,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/research-world-visible.ts",
         "qa/gates/windows-dock-capability.ts",
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
@@ -30199,6 +30202,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/research-world-visible.ts",
         "qa/gates/windows-dock-capability.ts",
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
@@ -31110,6 +31114,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/research-world-visible.ts",
         "qa/gates/windows-dock-capability.ts",
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
@@ -31397,6 +31402,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/research-world-visible.ts",
         "qa/gates/windows-dock-capability.ts",
         "qa/gates/windows-dock-collaboration.ts",
         "qa/gates/windows-dock-hire.ts",
@@ -35110,7 +35116,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:682"
+          "detail": "collab-electron/src/main/index.ts:683"
         },
         {
           "layer": "kernel",
@@ -35120,7 +35126,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 682,
+        "line": 683,
         "kind": "handle"
       },
       "calledAt": {
@@ -35167,7 +35173,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:687"
+          "detail": "collab-electron/src/main/index.ts:688"
         },
         {
           "layer": "kernel",
@@ -35177,7 +35183,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 687,
+        "line": 688,
         "kind": "on"
       },
       "calledAt": {
@@ -37959,7 +37965,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:691"
+          "detail": "collab-electron/src/main/index.ts:692"
         },
         {
           "layer": "kernel",
@@ -37969,7 +37975,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 691,
+        "line": 692,
         "kind": "on"
       },
       "calledAt": {
@@ -39053,7 +39059,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:714"
+          "detail": "collab-electron/src/main/index.ts:715"
         },
         {
           "layer": "kernel",
@@ -39063,7 +39069,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 714,
+        "line": 715,
         "kind": "handle"
       },
       "calledAt": {
@@ -39110,7 +39116,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:719"
+          "detail": "collab-electron/src/main/index.ts:720"
         },
         {
           "layer": "kernel",
@@ -39120,7 +39126,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 719,
+        "line": 720,
         "kind": "handle"
       },
       "calledAt": {
@@ -39180,7 +39186,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:848"
+          "detail": "collab-electron/src/main/index.ts:849"
         },
         {
           "layer": "kernel",
@@ -39190,7 +39196,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 848,
+        "line": 849,
         "kind": "handle"
       },
       "calledAt": {
@@ -39272,7 +39278,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:743"
+          "detail": "collab-electron/src/main/index.ts:744"
         },
         {
           "layer": "kernel",
@@ -39282,7 +39288,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 743,
+        "line": 744,
         "kind": "handle"
       },
       "calledAt": {
@@ -39667,7 +39673,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:838"
+          "detail": "collab-electron/src/main/index.ts:839"
         },
         {
           "layer": "kernel",
@@ -39677,7 +39683,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 838,
+        "line": 839,
         "kind": "handle"
       },
       "calledAt": {
@@ -39867,7 +39873,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:817"
+          "detail": "collab-electron/src/main/index.ts:818"
         },
         {
           "layer": "kernel",
@@ -39877,7 +39883,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 817,
+        "line": 818,
         "kind": "handle"
       },
       "calledAt": {
@@ -40026,7 +40032,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:843"
+          "detail": "collab-electron/src/main/index.ts:844"
         },
         {
           "layer": "kernel",
@@ -40036,7 +40042,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 843,
+        "line": 844,
         "kind": "handle"
       },
       "calledAt": {
@@ -40093,7 +40099,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:823"
+          "detail": "collab-electron/src/main/index.ts:824"
         },
         {
           "layer": "kernel",
@@ -40103,7 +40109,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 823,
+        "line": 824,
         "kind": "handle"
       },
       "calledAt": {
@@ -40441,7 +40447,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:805"
+          "detail": "collab-electron/src/main/index.ts:806"
         },
         {
           "layer": "kernel",
@@ -40451,7 +40457,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 805,
+        "line": 806,
         "kind": "handle"
       },
       "calledAt": {
@@ -40632,7 +40638,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:792"
+          "detail": "collab-electron/src/main/index.ts:793"
         },
         {
           "layer": "kernel",
@@ -40642,7 +40648,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 792,
+        "line": 793,
         "kind": "handle"
       },
       "calledAt": {
@@ -40717,7 +40723,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:772"
+          "detail": "collab-electron/src/main/index.ts:773"
         },
         {
           "layer": "kernel",
@@ -40727,7 +40733,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 772,
+        "line": 773,
         "kind": "handle"
       },
       "calledAt": {
@@ -48548,8 +48554,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": "bindSourceWork",
+        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -48578,8 +48584,10 @@
         "regexPhantoms": [
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
           "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
+          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt"
         ],
         "unresolvedCallees": [
           {
@@ -49240,7 +49248,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -49943,8 +49951,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": "bindSourceWork",
+        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -49971,8 +49979,10 @@
         "regexPhantoms": [
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
           "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
+          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt"
         ],
         "unresolvedCallees": [
           {
@@ -50414,7 +50424,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -50457,8 +50467,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": "bindSourceWork",
+        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -50498,8 +50508,10 @@
         "regexPhantoms": [
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
           "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
+          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt"
         ],
         "unresolvedCallees": [
           {
@@ -51546,7 +51558,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -51589,8 +51601,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "appendEvent",
-        "dmlFile": "packages/qf-kernel/src/events.ts",
+        "viaDml": "bindSourceWork",
+        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -51616,8 +51628,10 @@
         "regexPhantoms": [
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
+          "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
           "packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask",
-          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema"
+          "packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema",
+          "packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt"
         ],
         "unresolvedCallees": [
           {
@@ -52059,7 +52073,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -52489,7 +52503,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:882"
+          "detail": "collab-electron/src/main/index.ts:883"
         },
         {
           "layer": "kernel",
@@ -52499,7 +52513,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 882,
+        "line": 883,
         "kind": "on"
       },
       "calledAt": {
@@ -52556,7 +52570,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:864"
+          "detail": "collab-electron/src/main/index.ts:865"
         },
         {
           "layer": "kernel",
@@ -52566,7 +52580,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 864,
+        "line": 865,
         "kind": "on"
       },
       "calledAt": {
@@ -52623,7 +52637,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:883"
+          "detail": "collab-electron/src/main/index.ts:884"
         },
         {
           "layer": "kernel",
@@ -52633,7 +52647,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 883,
+        "line": 884,
         "kind": "on"
       },
       "calledAt": {
@@ -52690,7 +52704,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:695"
+          "detail": "collab-electron/src/main/index.ts:696"
         },
         {
           "layer": "kernel",
@@ -52700,7 +52714,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 695,
+        "line": 696,
         "kind": "handle"
       },
       "calledAt": {
@@ -52808,7 +52822,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:729"
+          "detail": "collab-electron/src/main/index.ts:730"
         },
         {
           "layer": "kernel",
@@ -52818,7 +52832,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 729,
+        "line": 730,
         "kind": "handle"
       },
       "calledAt": {
@@ -52877,7 +52891,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:734"
+          "detail": "collab-electron/src/main/index.ts:735"
         },
         {
           "layer": "kernel",
@@ -52887,7 +52901,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 734,
+        "line": 735,
         "kind": "handle"
       },
       "calledAt": {
@@ -53309,7 +53323,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/index.ts:873"
+          "detail": "collab-electron/src/main/index.ts:874"
         },
         {
           "layer": "kernel",
@@ -53319,7 +53333,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/index.ts",
-        "line": 873,
+        "line": 874,
         "kind": "on"
       },
       "calledAt": {
@@ -54813,7 +54827,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 412,
+          "line": 413,
           "kind": "direct"
         }
       ],
@@ -55277,7 +55291,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 724,
+          "line": 725,
           "kind": "direct"
         }
       ],
@@ -55402,22 +55416,22 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1034,
+          "line": 1035,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1199,
+          "line": 1200,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1262,
+          "line": 1263,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1302,
+          "line": 1303,
           "kind": "direct"
         },
         {
@@ -55445,14 +55459,19 @@
       "channel": "qf:events:invalidate",
       "status": "live",
       "disposition": "KEEP",
-      "why": "2 send site(s), 1 listener(s)",
+      "why": "3 send site(s), 1 listener(s)",
       "confidence": "medium",
       "evidenceLevel": "S",
       "tunnelled": false,
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1303,
+          "line": 1304,
+          "kind": "direct"
+        },
+        {
+          "file": "collab-electron/src/main/index.ts",
+          "line": 1361,
           "kind": "direct"
         },
         {
@@ -55673,7 +55692,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 886,
+          "line": 887,
           "kind": "direct"
         }
       ],
@@ -55722,7 +55741,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 861,
+          "line": 862,
           "kind": "direct"
         }
       ],
@@ -55747,7 +55766,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 316,
+          "line": 317,
           "kind": "direct"
         }
       ],
@@ -55943,8 +55962,8 @@
         "send"
       ],
       "registrations": [
-        "collab-electron/src/main/index.ts:772 (invoke)",
-        "collab-electron/src/main/index.ts:778 (send)"
+        "collab-electron/src/main/index.ts:773 (invoke)",
+        "collab-electron/src/main/index.ts:779 (send)"
       ],
       "callerModes": [
         "send"
@@ -55964,8 +55983,8 @@
         "send"
       ],
       "registrations": [
-        "collab-electron/src/main/index.ts:792 (invoke)",
-        "collab-electron/src/main/index.ts:798 (send)"
+        "collab-electron/src/main/index.ts:793 (invoke)",
+        "collab-electron/src/main/index.ts:799 (send)"
       ],
       "callerModes": [
         "send"
@@ -56215,12 +56234,12 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 0,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56257,12 +56276,12 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 5,
+        "alternatives": 6,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56299,12 +56318,12 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 5,
+        "alternatives": 6,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56341,12 +56360,12 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 5,
+        "alternatives": 6,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56383,12 +56402,12 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 5,
+        "alternatives": 6,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56425,12 +56444,12 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 5,
+        "alternatives": 6,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56467,12 +56486,12 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:515",
-            "fn": "kernelBindSourceWork",
+            "from": "collab-electron/src/main/kernel.ts:1016",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
         ],
-        "alternatives": 5,
+        "alternatives": 6,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -56504,12 +56523,12 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:531",
-            "fn": "kernelRecordGovernedToolReceipt",
+            "from": "collab-electron/src/main/kernel.ts:1027",
+            "fn": "kernelSeedVisibleResearchWorld",
             "calls": "recordGovernedToolReceipt"
           }
         ],
-        "alternatives": 0,
+        "alternatives": 1,
         "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
       },
       "blocker": null,
@@ -58230,16 +58249,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "c59ebfa",
+      "commit": "b9e37d5",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "b9e37d5",
+      "commit": "221231c",
       "generatedAt": "2026-08-22"
     },
-    "verdict": "better",
-    "why": "41 improvement(s), nothing added or hidden",
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -58359,21 +58378,21 @@
         "id": "unused-bridge:getHomePath() → get-home-path",
         "kind": "unused-bridge",
         "what": "getHomePath() → get-home-path",
-        "where": "collab-electron/src/preload/shell.ts:311",
+        "where": "collab-electron/src/preload/shell.ts:313",
         "note": "was undecided"
       },
       {
         "id": "unused-bridge:deleteConnectionsForTile() → qf:connections:deleteForTile",
         "kind": "unused-bridge",
         "what": "deleteConnectionsForTile() → qf:connections:deleteForTile",
-        "where": "collab-electron/src/preload/shell.ts:122",
+        "where": "collab-electron/src/preload/shell.ts:124",
         "note": "was undecided"
       },
       {
         "id": "unused-bridge:getGovernedReviewProjection() → qf:review:projection",
         "kind": "unused-bridge",
         "what": "getGovernedReviewProjection() → qf:review:projection",
-        "where": "collab-electron/src/preload/shell.ts:85",
+        "where": "collab-electron/src/preload/shell.ts:87",
         "note": "was undecided"
       },
       {
@@ -58387,14 +58406,14 @@
         "id": "unused-bridge:openSettings() → settings:open",
         "kind": "unused-bridge",
         "what": "openSettings() → settings:open",
-        "where": "collab-electron/src/preload/shell.ts:212",
+        "where": "collab-electron/src/preload/shell.ts:214",
         "note": "was undecided"
       },
       {
         "id": "unused-bridge:openExternal() → shell:open-external",
         "kind": "unused-bridge",
         "what": "openExternal() → shell:open-external",
-        "where": "collab-electron/src/preload/shell.ts:305",
+        "where": "collab-electron/src/preload/shell.ts:307",
         "note": "was undecided"
       },
       {
@@ -58408,7 +58427,7 @@
         "id": "unused-bridge:workspaceRemove() → workspace:remove",
         "kind": "unused-bridge",
         "what": "workspaceRemove() → workspace:remove",
-        "where": "collab-electron/src/preload/shell.ts:256",
+        "where": "collab-electron/src/preload/shell.ts:258",
         "note": "was undecided"
       },
       {
@@ -58450,14 +58469,14 @@
         "id": "protocol-variants:pty:write",
         "kind": "protocol-variant",
         "what": "pty:write",
-        "where": "collab-electron/src/main/index.ts:766 (invoke)",
+        "where": "collab-electron/src/main/index.ts:772 (invoke)",
         "note": "was undecided"
       },
       {
         "id": "protocol-variants:pty:send-raw-keys",
         "kind": "protocol-variant",
         "what": "pty:send-raw-keys",
-        "where": "collab-electron/src/main/index.ts:786 (invoke)",
+        "where": "collab-electron/src/main/index.ts:792 (invoke)",
         "note": "was undecided"
       },
       {
@@ -58520,7 +58539,7 @@
         "id": "push:shell:loading-status",
         "kind": "push-no-sender",
         "what": "shell:loading-status",
-        "where": "collab-electron/src/preload/shell.ts:172",
+        "where": "collab-electron/src/preload/shell.ts:174",
         "note": "was undecided"
       },
       {
@@ -58569,7 +58588,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "qa/gates/research-world-visible.ts",
+        "analyzer": "lifetime",
+        "from": "not-applicable",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -58577,7 +58605,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 41,
       "undecidedTo": null
@@ -58849,7 +58877,7 @@
       "id": "protocol-variants:pty:write",
       "kind": "protocol-variant",
       "what": "pty:write",
-      "where": "collab-electron/src/main/index.ts:772 (invoke)",
+      "where": "collab-electron/src/main/index.ts:773 (invoke)",
       "blocker": "package-proof",
       "reason": "one protocol variant has no caller; rule out a packaged or dynamic caller before removing it",
       "verdict": "undecided"
@@ -58858,7 +58886,7 @@
       "id": "protocol-variants:pty:send-raw-keys",
       "kind": "protocol-variant",
       "what": "pty:send-raw-keys",
-      "where": "collab-electron/src/main/index.ts:792 (invoke)",
+      "where": "collab-electron/src/main/index.ts:793 (invoke)",
       "blocker": "package-proof",
       "reason": "one protocol variant has no caller; rule out a packaged or dynamic caller before removing it",
       "verdict": "undecided"

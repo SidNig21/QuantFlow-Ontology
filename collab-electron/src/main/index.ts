@@ -1342,13 +1342,15 @@ app.whenReady().then(async () => {
       const dataset = requestedDataset ?? kernelEnsureSampleResearchDataset({
         includeFutureRow: input.include_future_row === true,
       });
+      const datasetId = String(dataset.object_id ?? dataset.id ?? "");
+      if (!datasetId) throw new Error("fixture dataset did not resolve a Dataset id");
       if (visibleWorld) {
         const world = visibleWorld as Record<string, unknown>;
         const required = ["nonce", "mission_id", "director_session_id", "hypothesis_id", "executor_session_id", "critic_session_id"];
         for (const key of required) if (typeof world[key] !== "string" || String(world[key]).length === 0) throw new Error(`fixture dataset visible_world requires ${key}`);
         const seeded = kernelSeedVisibleResearchWorld({
           nonce: String(world.nonce),
-          datasetId: String(dataset.object_id),
+          datasetId,
           taskId: typeof world.task_id === "string" ? world.task_id : undefined,
           missionId: String(world.mission_id),
           directorSessionId: String(world.director_session_id),

@@ -8,6 +8,7 @@
     {
       "id": "qf-toolloop",
       "role": "toolloop-proof",
+      "display_name": "Market Researcher",
       "runtime_profile": null,
       "system_prompt_ref": null,
       "capability_groups": []
