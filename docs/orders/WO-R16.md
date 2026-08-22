@@ -3539,3 +3539,145 @@ then Collapse once, and records `inspect=10 collapse=10`; a duplicate, skipped,
 or wrong tile is red. Any failure in the seven consumer evidence fields above
 is red, and only the exact governed source-work/review/delivery receipts can
 turn that field green.
+
+### FINAL READER CLOSURE — executable lifecycle seams and consumer restart meaning
+
+The preceding closure still left the named mutations partly non-executable and
+left two consumer phrases with different meanings. This subsection is binding
+and supersedes only those mechanics; it does not weaken any product,
+ontology, receipt, or consumer assertion.
+
+In the parent repair's phrase “start the critic with that review Task plus the
+same source work,” **start** now means the instruction delivery after review
+admission. The runtime start is the no-instruction pre-start required below;
+the parent phrase does not authorize requesting review against a `starting`
+critic or sending the instruction before review admission.
+
+#### One callable normal-continuation seam
+
+The normal result callback must extract its governed sequence into exactly one
+exported production helper in `collab-electron/src/main/kernel.ts` named
+`kernelContinueGovernedResearchResult`. The normal collaboration callback in
+`index.ts` calls that helper; the helper is not a test double and does not write
+any new store. Its input is exactly one record containing
+`source_task_id`, `hypothesis_id`, `run_id`, `result_artifact_id`,
+`executor_session_id`, `critic_session_id`, and one non-empty `attempt_id`,
+plus one non-empty `deliver(review_task_id, source_work)` callback. The
+callback returns `Promise<void>`; resolving is the one accepted delivery
+attempt and rejecting is the one failed delivery attempt. The helper returns
+the admitted `review_task_id`, the frozen `source_work`, and the recorded
+outcome, or rethrows the original delivery error after recording failure.
+
+The helper's exact runtime order is:
+
+1. construct the one source-work tuple from the input;
+2. call `kernelBindSourceWork` once with that tuple;
+3. call `kernelRequestGovernedReview` once with that source Task, the one
+   `attempt_id`, and the already-created, running critic session;
+4. require an admitted result whose review Task and critic ids equal the
+   returned values, then call `deliver` exactly once with the returned review
+   Task id and returned frozen source work;
+5. in a `finally` immediately after that one attempt, call
+   `kernelMarkGovernedDelivery` exactly once with `delivered` when `deliver`
+   resolves or `failed` when it rejects; and
+6. allow no Evaluation, publication, or governed tool receipt before step 5.
+
+The normal callback therefore runs `kernelRunGuidedResearch` with the worker
+session as executor, creates exactly one `hermes-critic` Kernel session row in
+`starting` state, and invokes the existing `startPrecreatedSessionWithTile`
+once **without** an instruction so that the precreated critic becomes
+`running`. Only then does it invoke the helper. Its `deliver` callback calls
+the existing `deliverToAgentSession` once, using the actual returned
+`review_task_id` and the exact returned `source_work` in the critic
+instruction; a false return becomes a rejected delivery attempt. It may not
+derive a review id from the Run id, send an instruction during pre-start, or
+request review against a `starting` critic. A thrown or false instruction
+attempt is still one attempt, is recorded as `failed`, and cannot be retried or
+reach Evaluation.
+
+After a `delivered` receipt, the already-running critic may emit governed tool
+receipts only through the existing `kernelRecordGovernedToolReceipt` gateway
+boundary. Every such receipt names the exact review Task and critic session,
+has a strictly increasing broker sequence beginning at 1, and is ordered after
+the initial delivery event. The required Hypothesis/Run/Artifact read receipts
+must exist before `qf_record_evaluation`; that existing action's own pending
+invocation receipt is updated by its Evaluation transaction. Evaluation is the
+next boundary, and publication is the existing supports-only transition inside
+that Evaluation path. The later existing completion receipt is not the initial
+delivery-attempt receipt and may not substitute for
+`kernelMarkGovernedDelivery`. A failed delivery has no governed tool receipts,
+Evaluation, findings Artifact, or Report.
+
+The normal continuation test in
+`collab-electron/src/main/governed-review.test.ts` must invoke
+`kernelContinueGovernedResearchResult` against a real Kernel fixture and a
+real production Kernel session setup, with only the delivery callback supplied
+by the test. It must assert the source-work row, one review Task, the initial
+delivery outcome, bound broker receipts, Evaluation ordering, and supports
+publication through production functions. This is the concrete runtime seam
+for F1–F4; source-text scans and direct SQL row injection are forbidden.
+
+#### F1–F7 mutation execution
+
+The Builder applies each mutation to the named production seam, leaving the
+focused tests, expected values, and gate files byte-identical. Each mutation
+has a native nonzero red run, exact-path zero-diff restoration, and native zero
+restored-green run:
+
+- **F1:** make the `kernelBindSourceWork` call inside
+  `kernelContinueGovernedResearchResult` a no-op. The governed-review runtime
+  test must fail because review admission cannot produce the required bound
+  source work.
+- **F2:** make that helper's `kernelRequestGovernedReview` result non-admitted
+  or omit its review Task. The same test must fail before delivery because the
+  exact review Task is missing.
+- **F3:** make that helper's `kernelMarkGovernedDelivery` call a no-op. The
+  same test must fail on the pending review Task / absent initial delivery
+  receipt and on the inability to record the subsequent governed receipts.
+- **F4:** pass the Director session as `executor_session_id` in the normal
+  continuation's source-work/Run tuple. The same test must fail the immutable
+  executor and assigned-link contract.
+- **F5:** make two separate temporary mutations to the named
+  `getResearchWorldProjection` production handoff, one omitting one expected
+  object and one omitting one expected link. The Main research-world test uses
+  an independent fixed 13-object/15-link manifest and must fail each red; the
+  shell research-world test then restores and proves the same 13/15 endpoint
+  mapping. Both red/green sub-runs are one BUILD-REPORT F5 row.
+- **F6:** remove retention of a detached teardown from the production
+  `closeAgentSessionRow` path. The native-TUI runtime test must hold the
+  teardown Promise unresolved, invoke the production shutdown/disposal seam,
+  and fail if shutdown resolves before that Promise settles.
+- **F7:** remove the production at-most-once guard and close the same native-TUI
+  session twice. The native-TUI runtime test must observe two teardown calls
+  and fail; the restored run must observe exactly one.
+
+For F6/F7, `agent-host.ts` must use one module-owned
+`createNativeTuiTeardownRegistry` seam with exactly `begin(sessionId, entry)`,
+`awaitAll()`, and settled-entry removal. `begin` returns the existing Promise
+for a repeated session id, retains every detached Promise before the live-map
+entry is removed, and marks it settled exactly once. `disposeAgentOs` awaits
+both live-map teardowns and `awaitAll()` using the existing bounded
+`Promise.allSettled` cleanup policy. The two named native-TUI tests invoke this
+production registry through the same close/dispose path; they do not merely
+test a copied fake and do not insert Kernel rows directly. This is one local
+lifecycle seam, not a new framework or truth store.
+
+#### Consumer restart and inspector state
+
+The earlier sentence in `CONSUMER-OWNED REOPEN` saying that inspector state is
+excluded from persisted-world equality is spent history. For this final
+consumer acceptance, the Router records the ten exact research-tile
+`expanded` booleans after the ten Inspect/Collapse checks and before close,
+records them again after the second normal launch, and requires byte-equal
+`type`, `id`, fields/hashes, cables, positions, and inspector states. The
+canonical receipt prints those ten states; `consumer_reopen_equal=true` is
+runtime-derived from the complete comparison. This compares transient UI state
+for the consumer check and does not authorize persisting inspector state as
+Kernel truth.
+
+The earlier phrase “one ordinary non-proof launch” is also superseded for this
+consumer check. The Router performs exactly one build, then exactly two
+ordinary non-proof app launches using the same candidate identity: the first
+launch runs one guided Mission and the second launch is the same-root reopen.
+There is no second build, second guided Mission, proof-mode launch, fixture
+launch, or retry. The final process/root receipt covers both launches.

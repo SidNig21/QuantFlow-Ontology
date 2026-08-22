@@ -80,9 +80,12 @@ missing exact matrix, falsifiers, and deliverable meanings were corrected in
 `WO-R16.md`. Its reread at docs commit `052a13d` returned `YES/YES`, but Router
 inspection found its new delivery-timing sentence contradicted the existing R15
 boundary: delivery is the critic instruction attempt, not the later verdict or
-publication. The sentence is corrected without changing product scope.
-current-door: one fresh reread of the corrected delivery lifecycle; no Builder,
-Verifier, final consumer rerun, or R17 work until final `YES/YES`.
+publication. The sentence was corrected without changing product scope; the
+final lifecycle/mutation-seam closure appended afterward now requires one more
+fresh two-question reread before any Builder.
+current-door: one fresh reread of the final lifecycle, mutation, tool-receipt,
+and consumer-reopen closure; no Builder, Verifier, final consumer rerun, or R17
+work until final `YES/YES`.
 
 ## Authorized outcome
 
