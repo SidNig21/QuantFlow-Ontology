@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R17",
-    "commit": "7c334b3",
+    "commit": "66c0516",
     "generatedAt": "2026-08-22",
     "filesScanned": 435,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "d44bba84754df677"
+    "fingerprint": "76c0f1f3a4a3ee81"
   },
   "stats": {
     "live": 113,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 619.7,
+      "kb": 619.5,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3551,7 +3551,7 @@
         },
         {
           "path": "qa/gates/technique-outcome-loop.ts",
-          "kb": 45.2,
+          "kb": 45,
           "spawns": 4,
           "spawnsLive": 2,
           "writes": 0,
@@ -59686,12 +59686,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R17",
-      "commit": "d05e8a8",
+      "commit": "7c334b3",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R17",
-      "commit": "7c334b3",
+      "commit": "66c0516",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
