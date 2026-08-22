@@ -550,7 +550,7 @@ async function spawnOwnedLaunch(root: string, activity: LaunchActivity): Promise
   const before = await processSnapshot();
   let live: LiveCase | undefined;
   try {
-    const child = spawn("bun", ["run", "preview"], { cwd: COLLAB_ROOT, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn("bun", ["run", "preview", "--", "--skipBuild"], { cwd: COLLAB_ROOT, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     assert(child.pid !== undefined, "production Electron did not provide a PID");
     child.stdout?.resume();
     child.stderr?.resume();

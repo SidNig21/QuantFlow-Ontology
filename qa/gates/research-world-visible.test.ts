@@ -201,6 +201,7 @@ describe("research-world-visible gate contract", () => {
     const preload = readFileSync(join(REPO_ROOT, "collab-electron/src/preload/shell.ts"), "utf8");
     const renderer = readFileSync(join(REPO_ROOT, "collab-electron/src/windows/shell/src/research-world.js"), "utf8");
     const tileManager = readFileSync(join(REPO_ROOT, "collab-electron/src/windows/shell/src/tile-manager.js"), "utf8");
+    const electronVitePreview = readFileSync(join(REPO_ROOT, "collab-electron/node_modules/electron-vite/dist/chunks/lib-Dvh2Hokw.js"), "utf8");
     const electronPackage = JSON.parse(readFileSync(join(REPO_ROOT, "collab-electron/package.json"), "utf8")) as { scripts?: Record<string, string> };
     const pointerStart = gate.indexOf("const pointerObjects = expected.objects.filter");
     const pointerEnd = gate.indexOf("\n  const second =", pointerStart);
@@ -267,9 +268,13 @@ describe("research-world-visible gate contract", () => {
     expect(readinessSource).toContain("activity.markReady(live)");
     expect(launchReadySource).toContain("return await awaitLaunchReadiness(await spawnOwnedLaunch(root, activity), deadlineAt, activity);");
     expect((gate.match(/spawn\("bun", \["run", "build"\]/g) ?? [])).toHaveLength(1);
-    expect((gate.match(/spawn\("bun", \["run", "preview"\]/g) ?? [])).toHaveLength(1);
-    expect(gate).not.toMatch(/spawn\("bun", \["run", "dev"\]/);
-    expect(gate).not.toMatch(/\["run", "(?:dev|package)"\]/);
+    expect((gate.match(/spawn\("bun", \["run", "preview", "--", "--skipBuild"\]/g) ?? [])).toHaveLength(1);
+    expect((spawnSource.match(/--skipBuild/g) ?? [])).toHaveLength(1);
+    expect(spawnSource).not.toMatch(/\["run", "preview"\]/);
+    expect(spawnSource).not.toMatch(/\["run", "(?:dev|build|package)"/);
+    expect(spawnSource).not.toMatch(/\bwatch(?:er|ing)?\b/i);
+    expect(gate).not.toMatch(/spawn\("bun", \["run", "dev"/);
+    expect(gate).not.toMatch(/spawn\("bun", \["run", "package"/);
     expect(buildSource).toContain("cwd: COLLAB_ROOT");
     expect(buildSource).toContain("env: { ...process.env }");
     expect(buildSource).toContain("windowsHide: true");
@@ -287,6 +292,8 @@ describe("research-world-visible gate contract", () => {
     expect(buildCall).toBeLessThan(firstRoot);
     expect(electronPackage.scripts?.preview).toBe("node ./scripts/run-local-bin.mjs electron-vite preview");
     expect(electronPackage.scripts?.preview).toContain("electron-vite preview");
+    expect(electronVitePreview).toContain("if (!options.skipBuild)");
+    expect(electronVitePreview).toContain("await build(inlineConfig)");
     expect(buildSource).not.toMatch(/package|watch/i);
     expect(gate).not.toMatch(/\bwatch(?:er|ing)?\b/i);
     expect(cleanupSource).toContain("if (live.endpoint && live.child.exitCode === null)");
