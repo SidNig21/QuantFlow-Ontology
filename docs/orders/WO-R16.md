@@ -3971,8 +3971,10 @@ follows:
    receipt kinds.
 3. Make the existing `governed-review.test.ts` PTY mock an explicit boolean
    observation seam: its hook type returns `boolean`, the mock
-   `writeToSession()` returns that hook result, and the ordinary green hook
-   returns `true`. The test must retain the production import of
+   `writeToSession()` returns that hook result, defaulting to `true` when no
+   hook is installed, and every hook that keeps the target stable returns
+   `true` unless it is the named false-result case. The test must retain the
+   production import of
    `submitAgentSessionInstruction`; it may control only this write
    observation/wait seam. A retained unchanged live entry is used in both red
    cases. “Missing underlying PTY” means the seam returns `false` while the
@@ -3987,7 +3989,10 @@ follows:
    item 2, produce exactly one `failed` initial delivery receipt and zero
    `delivered` initial delivery receipts, and leave
    `qf_review_invocation`, Evaluation, findings Artifact, and publication counts
-   at zero for that review Task. The test records the attempted payloads and
+   at zero for that review Task. Each red case uses a fresh isolated Kernel
+   fixture, or records exact pre-case counts for its new review Task, so the
+   earlier green path cannot satisfy a red assertion. The test records the
+   attempted payloads and
    proves the green path still has exactly two writes: the instruction with
    its one terminal `\r` removed, then exactly `"\r"` after the bounded wait.
    No test path may insert governed receipts, Evaluation, publication, or a
