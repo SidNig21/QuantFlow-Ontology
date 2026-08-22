@@ -32,6 +32,14 @@ function displayValue(value, exists = true) {
 	return String(value);
 }
 
+export function researchSessionReceiptFields(object) {
+	const fields = object?.fields || {};
+	return ["id", "status", "label"].map((field) => ({
+		field,
+		value: displayValue(fields[field], Object.prototype.hasOwnProperty.call(fields, field)),
+	}));
+}
+
 function objectPrimary(object) {
 	const fields = object.fields || {};
 	return fields.name || fields.title || fields.claim || fields.verdict || fields.kind || fields.status || object.id;
@@ -143,6 +151,17 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			dom.container.dataset.qfWorldType = object.type;
 			dom.container.dataset.qfWorldId = object.id;
 			dom.container.setAttribute("aria-label", `${object.type} ${object.id}`);
+			const taskFoot = dom.taskFoot;
+			if (taskFoot) {
+				const receipts = [...taskFoot.children].filter((child) => child.classList.contains("qf-world-session-receipt"));
+				const receipt = receipts[0] || document.createElement("div");
+				if (receipts.length === 0) {
+					receipt.className = "qf-world-session-receipt";
+					taskFoot.appendChild(receipt);
+				}
+				for (const duplicate of receipts.slice(1)) duplicate.remove();
+				receipt.replaceChildren(...researchSessionReceiptFields(object).map(({ field, value }) => makeField(field, value)));
+			}
 		}
 		return tile;
 	}
