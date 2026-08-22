@@ -283,6 +283,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "technique-outcome-loop",
+    description: "R17: immutable named Technique selection and operator-settled outcome grade",
+    run: async () => {
+      const { runTechniqueOutcomeLoopGate } = await import("./gates/technique-outcome-loop.ts");
+      const { ok } = await runTechniqueOutcomeLoopGate();
+      return ok;
+    },
+  },
+  {
     name: "founder-steering",
     description: "R14: visible Task steering, reassignment delivery, second opinion, cancellation, and durable history",
     run: async () => {

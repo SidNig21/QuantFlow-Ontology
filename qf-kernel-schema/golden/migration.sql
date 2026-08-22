@@ -51,6 +51,10 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('evalu
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('performed_by', 'link', 'experimental', 'Independent review provenance: which admitted critic session authored an Evaluation.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('gates', 'link', 'experimental', 'Publication authorization: which evaluation approved an artifact for release. Ends evaluation''s sink status so WO-110 can read the gating fact.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('belongs_to', 'link', 'experimental', 'Mission context: which standing Mission owns a delegated Task.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_ticket', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to its operator-supplied Ticket.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_run', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to the succeeded Run it grades.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_strategy', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to the exact Strategy selected by the Run.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('grades_run_result', 'link', 'experimental', 'Outcome-grade lineage from an immutable grade Artifact to the exact Run result Artifact.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('assigned_to', 'link', 'experimental', 'Work routing: which agent session owns a task.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegated_by', 'link', 'experimental', 'Task provenance: which admitted agent session delegated a task. It is written only from trusted execution context so callers cannot forge responsibility.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('delegates_to', 'link', 'experimental', 'Hire provenance: which admitted orchestrator created an agent session. It authorizes worker ownership only; task cables must use task delegated_by and assigned_to links.');
@@ -62,6 +66,7 @@ INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('execu
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_mission', 'action', 'experimental', 'Register a standing research mission with name and objective.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('create_ticket', 'action', 'experimental', 'Record a strategy-proposed ticket starting pending. Does not accept a grade; use observe_ticket for externally observed slips.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('observe_ticket', 'action', 'experimental', 'Ingest an externally observed ticket at its settlement grade. Writes an observation event, never a synthetic transition.');
+INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('record_strategy_outcome', 'action', 'experimental', 'Record one already-settled operator outcome for an exact forward Strategy selection and grade its immutable lineage.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('start_run', 'action', 'experimental', 'Start a queued run (queued → running). Rejectable if the transition is illegal.');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('cancel_run', 'action', 'experimental', 'Cancel a running run (running → cancelled).');
 INSERT INTO schema_meta (type_name, kind, lifecycle, description) VALUES ('complete_run', 'action', 'experimental', 'Mark a running run as succeeded (running → succeeded).');
@@ -482,7 +487,7 @@ CREATE TABLE links (
   -- Primary key for this link instance.
   id TEXT PRIMARY KEY NOT NULL,
   -- Link kind (schema link name), e.g. offered_on.
-  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
+  kind TEXT NOT NULL CHECK (kind IN ('participates_in', 'offered_on', 'quotes', 'lists', 'settles', 'tests', 'has_leg', 'uses', 'executes_in', 'produces', 'derived_from', 'evaluated_by', 'performed_by', 'gates', 'belongs_to', 'grades_ticket', 'grades_run', 'grades_strategy', 'grades_run_result', 'assigned_to', 'delegated_by', 'delegates_to', 'spawned_from')),
   -- Source object id.
   from_id TEXT NOT NULL,
   -- Target object id.

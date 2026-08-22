@@ -112,6 +112,7 @@ const DRIVER_SQL_ALLOW = [
  */
 const OPEN_ALLOW = [
   "collab-electron/",
+  "qa/gates/technique-outcome-loop.ts",
   "tools/qf-read-tools/src/server.ts",
   "tools/qf-read-tools/src/harness.ts",
   "tools/qf-read-tools/src/gates/tool-discovery.ts",
@@ -189,6 +190,8 @@ const WRITE_ALLOW = [
   // Act I packaged fixture seed writes only through execute().
   "qa/gates/windows-golden-run.ts",
   "qa/gates/windows-golden-seed.ts",
+  // WO-R17: focused Kernel receipt gate uses the sanctioned write boundary.
+  "qa/gates/technique-outcome-loop.ts",
   "collab-electron/",
 ];
 

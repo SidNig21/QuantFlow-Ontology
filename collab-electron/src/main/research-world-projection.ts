@@ -49,10 +49,10 @@ export type ResearchWorldProjectionResult =
 
 const TRAVERSAL_KINDS = new Set([
   "belongs_to", "tests", "uses", "produces", "evaluated_by", "performed_by",
-  "gates", "assigned_to", "delegated_by", "delegates_to",
+  "gates", "assigned_to", "delegated_by", "delegates_to", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result",
 ]);
 const OBJECT_TYPES = [
-  "mission", "task", "hypothesis", "dataset", "run", "artifact", "evaluation", "agent_session",
+  "mission", "task", "hypothesis", "dataset", "run", "strategy", "ticket", "artifact", "evaluation", "agent_session",
 ];
 const JSON_FIELDS = new Set([
   "sources", "coverage", "params", "metrics", "rubric", "run_metrics", "source_work", "block_reason",
@@ -83,6 +83,21 @@ function objectType(snapshot: RelationalSnapshot, id: string): string | null {
     if (objectExists(snapshot, type, id)) return type;
   }
   return null;
+}
+
+function isNamedTechnique(snapshot: RelationalSnapshot, id: string | null | undefined): boolean {
+  if (!id) return false;
+  const strategy = snapshot.rows.get("strategy")?.get(id);
+  const specRef = typeof strategy?.spec_ref === "string" ? strategy.spec_ref : "";
+  const artifact = snapshot.rows.get("artifact")?.get(specRef);
+  if (!artifact || typeof artifact.storage_ref !== "string") return false;
+  try {
+    const location = artifact.storage_ref.startsWith("file:") ? new URL(artifact.storage_ref) : artifact.storage_ref;
+    const payload = JSON.parse(new TextDecoder().decode(new Uint8Array(readFileSync(location)))) as Record<string, unknown>;
+    return typeof payload.family === "string" && payload.family.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 function readLinks(db: KernelDb, kinds: readonly string[]): ResearchWorldLink[] {
@@ -201,7 +216,11 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string): 
       fields.source_artifact = artifactReceipt(objectRow(snapshot, "artifact", source.to_id));
     }
   }
-  if (type === "artifact") fields.receipt = artifactReceipt(row);
+  if (type === "artifact") {
+    fields.receipt = artifactReceipt(row);
+    const producedBy = snapshot.links.find((link) => link.kind === "produces" && link.to_id === id);
+    if (producedBy && objectType(snapshot, producedBy.from_id) === "run") fields.run_id = producedBy.from_id;
+  }
   const outgoing = snapshot.links.filter((link) => link.from_id === id);
   if (type === "task") {
     fields.assignee_session_id = outgoing.find((link) => link.kind === "assigned_to")?.to_id ?? null;
@@ -216,6 +235,21 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string): 
     fields.result_artifact_id = outgoing.find((link) => link.kind === "produces")?.to_id ?? null;
     fields.executor_session_id = parseJson(row.params) && typeof parseJson(row.params) === "object"
       ? (parseJson(row.params) as Record<string, unknown>).executor_session_id ?? null : null;
+    const strategyId = outgoing.find((link) => link.kind === "uses" && objectType(snapshot, link.to_id) === "strategy")?.to_id;
+    fields.strategy_id = isNamedTechnique(snapshot, strategyId) ? strategyId : null;
+  }
+  if (type === "strategy") {
+    const specRef = String(row.spec_ref ?? "");
+    const artifact = snapshot.rows.get("artifact")?.get(specRef);
+    if (artifact) {
+      try {
+        const location = String(artifact.storage_ref).startsWith("file:") ? new URL(String(artifact.storage_ref)) : String(artifact.storage_ref);
+        const payload = JSON.parse(new TextDecoder().decode(new Uint8Array(readFileSync(location)))) as Record<string, unknown>;
+        fields.family = payload.family ?? null;
+        fields.probability_field = payload.probability_field ?? null;
+        fields.content_hash = artifact.content_hash;
+      } catch { fields.family = null; fields.probability_field = null; }
+    }
   }
   if (type === "evaluation") {
     fields.critic_session_id = outgoing.find((link) => link.kind === "performed_by")?.to_id ?? null;
@@ -276,6 +310,15 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   }
 
   const sourceIds = new Set([String(source.hypothesis_id), String(source.run_id), String(source.result_artifact_id)]);
+  const strategyId = allLinks.find((link) => link.kind === "uses" && link.from_id === String(source.run_id) && objectType(snapshot, link.to_id) === "strategy")?.to_id;
+  if (isNamedTechnique(snapshot, strategyId)) addId(ids, "strategy", strategyId);
+  const gradeArtifactIds = allLinks.filter((link) => link.kind === "grades_run" && link.to_id === String(source.run_id)).map((link) => link.from_id);
+  for (const gradeId of gradeArtifactIds) {
+    addId(ids, "artifact", gradeId);
+    for (const link of allLinks.filter((candidate) => candidate.from_id === gradeId)) {
+      if (["grades_ticket", "grades_strategy", "grades_run", "grades_run_result"].includes(link.kind)) addId(ids, objectType(snapshot, link.to_id), link.to_id);
+    }
+  }
   const evaluationIds = new Set(
     allLinks
       .filter((link) => link.kind === "evaluated_by" && sourceIds.has(link.from_id))
@@ -319,7 +362,13 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   addSelectedLink("delegates_to", directorId, executorId);
   addSelectedLink("tests", source.run_id, source.hypothesis_id);
   addSelectedLink("uses", source.run_id, runFields.dataset_id);
+  addSelectedLink("uses", source.run_id, strategyId);
   addSelectedLink("produces", source.run_id, source.result_artifact_id);
+  for (const gradeId of gradeArtifactIds) {
+    for (const link of allLinks.filter((candidate) => candidate.from_id === gradeId && ["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(candidate.kind))) {
+      addSelectedLink(link.kind, link.from_id, link.to_id);
+    }
+  }
   for (const evaluationId of evaluationIds) {
     const evaluation = objectRow(snapshot, "evaluation", evaluationId);
     if (!sourceWorkMatches(evaluation, source)) continue;

@@ -6,6 +6,8 @@ const FIELD_ORDER = {
 	hypothesis: ["id", "claim", "success_criteria", "sources", "status"],
 	dataset: ["id", "kind", "as_of", "content_hash", "coverage", "source_artifact"],
 	run: ["id", "kind", "status", "trace_id", "params", "dataset_id", "hypothesis_id", "executor_session_id", "result_artifact_id"],
+	strategy: ["id", "family", "version", "spec_ref", "content_hash", "stake_model", "score_field", "probability_field"],
+	ticket: ["id", "origin", "external_ref", "grade", "placed_at", "stake", "payout"],
 	artifact: ["id", "kind", "receipt"],
 	evaluation: ["id", "critic_session_id", "rubric", "overall", "verdict", "confidence", "rationale", "block_reason", "findings_artifact_id", "review_task_id", "report_artifact_id"],
 	agent_session: ["id", "status", "label"],
@@ -21,12 +23,13 @@ const WORLD_COLLISION_STEP = 20;
 const WORLD_TYPE_ORDER = new Map([
 	["mission", 0], ["task", 1], ["hypothesis", 2], ["dataset", 3],
 	["run", 4], ["artifact", 5], ["evaluation", 6],
+	["strategy", 5], ["ticket", 6],
 ]);
 
 function laneFor(object) {
 	if (object?.type === "evaluation") return 2;
 	if (object?.type === "artifact" && object?.fields?.kind === "report") return 2;
-	if (["dataset", "run", "artifact"].includes(object?.type)) return 1;
+	if (["dataset", "run", "strategy", "artifact"].includes(object?.type)) return 1;
 	return 0;
 }
 
@@ -131,6 +134,42 @@ function renderObject(dom, tile, object, onReveal) {
 	for (const field of FIELD_ORDER[object.type] || Object.keys(object.fields || {})) {
 		const exists = Object.prototype.hasOwnProperty.call(object.fields || {}, field);
 		details.appendChild(makeField(field, object.fields?.[field], exists));
+	}
+	if (object.type === "artifact" && object.fields?.receipt?.preview) {
+		try {
+			const payload = JSON.parse(object.fields.receipt.preview);
+			if (payload?.contract === "qf.execution.result.v1" && Array.isArray(payload.selected)) {
+				for (const selection of payload.selected) {
+					const row = document.createElement("div");
+					row.className = "qf-outcome-row";
+					row.dataset.selectionRef = String(selection?.id ?? "");
+					const state = document.createElement("span");
+					state.className = "qf-outcome-state";
+					state.textContent = "PENDING OUTCOME";
+					const button = document.createElement("button");
+					button.type = "button";
+					button.textContent = "Record settled outcome";
+					button.setAttribute("aria-label", `Record settled outcome ${row.dataset.selectionRef}`);
+					button.addEventListener("click", () => {
+						const form = document.createElement("form");
+						form.className = "qf-outcome-form";
+						for (const name of ["external_ref", "settled_at", "decimal_odds", "closing_decimal_odds", "stake", "payout"]) {
+							const input = document.createElement("input"); input.name = name; input.placeholder = name; form.appendChild(input);
+						}
+						const outcome = document.createElement("select"); outcome.name = "outcome"; for (const value of ["win", "loss", "push", "void"]) { const option = document.createElement("option"); option.value = value; option.textContent = value; outcome.appendChild(option); } form.appendChild(outcome);
+						const submit = document.createElement("button"); submit.type = "submit"; submit.textContent = "Save outcome"; form.appendChild(submit);
+						const message = document.createElement("span"); message.className = "qf-outcome-message"; form.appendChild(message);
+						form.addEventListener("submit", async (event) => {
+							event.preventDefault();
+							const input = Object.fromEntries([...form.elements].filter((entry) => entry.name).map((entry) => [entry.name, entry.value]));
+							try { const result = await window.shellApi.qf.recordStrategyOutcome({ run_id: object.fields?.run_id ?? "", selection_ref: row.dataset.selectionRef, ...input, payout: input.payout === "" ? null : input.payout }); if (!result?.ok) throw new Error(result?.error?.message ?? "Outcome refused"); message.textContent = "Recorded"; state.textContent = String(input.outcome).toUpperCase(); } catch (error) { message.textContent = error?.message ?? String(error); }
+						});
+						row.appendChild(form); button.remove();
+					});
+					row.append(state, button); details.appendChild(row);
+				}
+			}
+		} catch { /* unavailable or truncated previews remain inspectable through receipt */ }
 	}
 	if ((object.type === "mission" || object.type === "task") && onReveal) {
 		const reveal = document.createElement("button");

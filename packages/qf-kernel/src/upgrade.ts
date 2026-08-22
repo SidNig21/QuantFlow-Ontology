@@ -331,6 +331,21 @@ function tablesWithoutTaskDelegation(
   return next;
 }
 
+function tablesWithoutR17(tables: Map<string, string>): Map<string, string> {
+  const next = new Map(tables);
+  const links = next.get("links");
+  if (links) next.set("links", links.replace(/,'grades_ticket'/gi, "").replace(/,'grades_run'/gi, "").replace(/,'grades_strategy'/gi, "").replace(/,'grades_run_result'/gi, ""));
+  return next;
+}
+
+function linkKindsWithoutR17(linkKinds: readonly string[]): string[] {
+  return linkKinds.filter((kind) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(kind));
+}
+
+function schemaMetaWithoutR17(rows: Array<[string, string, string, string]>): Array<[string, string, string, string]> {
+  return rows.filter(([name]) => !["grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome"].includes(name));
+}
+
 function tablesWithoutIndependentCritic(
   tables: Map<string, string>,
 ): Map<string, string> {
@@ -610,6 +625,7 @@ function expectedConnectionActions(): StructureSnapshot {
 }
 
 let taskDelegationSnapshot: StructureSnapshot | null = null;
+let taskDelegationRetainedR16Snapshot: StructureSnapshot | null = null;
 
 /** Post-0007 / pre-0008 — durable task delegation exists, execution does not. */
 function expectedTaskDelegation(): StructureSnapshot {
@@ -626,34 +642,145 @@ function expectedTaskDelegation(): StructureSnapshot {
   return taskDelegationSnapshot;
 }
 
+/** Task-delegation fixture produced from a current migration while retaining R16/R17 metadata. */
+function expectedTaskDelegationRetainedR16(): StructureSnapshot {
+  if (!taskDelegationRetainedR16Snapshot) {
+    const current = expectedCurrent();
+    taskDelegationRetainedR16Snapshot = {
+      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
+      linkKinds: current.linkKinds.filter((kind) => kind !== "performed_by"),
+      schemaMeta: current.schemaMeta
+        .filter(([typeName]) => typeName !== "execute_deterministic_run" && typeName !== "performed_by" && typeName !== "reassign_task" && typeName !== "cancel_task")
+        .map((row) => row[0] === "record_evaluation"
+          ? [row[0], row[1], row[2], PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION] as [string, string, string, string]
+          : row),
+    };
+  }
+  return taskDelegationRetainedR16Snapshot;
+}
+
 let deterministicExecutionSnapshot: StructureSnapshot | null = null;
+let deterministicExecutionR17Snapshot: StructureSnapshot | null = null;
+let deterministicExecutionR10Snapshot: StructureSnapshot | null = null;
+let deterministicExecutionR10RetainedR16Snapshot: StructureSnapshot | null = null;
 
 /** Post-0008 / pre-0009 — deterministic results exist, independent critic lineage does not. */
 function expectedDeterministicExecution(): StructureSnapshot {
   if (!deterministicExecutionSnapshot) {
     const current = expectedCurrent();
     deterministicExecutionSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)))),
-      linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
-      schemaMeta: schemaMetaWithoutIndependentCritic(current.schemaMeta),
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables))))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutIndependentCritic(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutIndependentCritic(current.schemaMeta)),
     };
   }
   return deterministicExecutionSnapshot;
 }
 
+function expectedDeterministicExecutionWithR17(): StructureSnapshot {
+  if (!deterministicExecutionR17Snapshot) {
+    const current = expectedCurrent();
+    deterministicExecutionR17Snapshot = {
+      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)))),
+      linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
+      schemaMeta: schemaMetaWithoutIndependentCritic(current.schemaMeta),
+    };
+  }
+  return deterministicExecutionR17Snapshot;
+}
+
+function expectedDeterministicExecutionR10(): StructureSnapshot {
+  if (!deterministicExecutionR10Snapshot) {
+    const current = expectedCurrent();
+    deterministicExecutionR10Snapshot = {
+      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
+      linkKinds: linkKindsWithoutIndependentCritic(current.linkKinds),
+      schemaMeta: schemaMetaWithoutIndependentCritic(current.schemaMeta),
+    };
+  }
+  return deterministicExecutionR10Snapshot;
+}
+
+/** R10 fixture shape produced from a current migration while retaining R16 metadata. */
+function expectedDeterministicExecutionR10RetainedR16(): StructureSnapshot {
+  if (!deterministicExecutionR10RetainedR16Snapshot) {
+    const current = expectedCurrent();
+    deterministicExecutionR10RetainedR16Snapshot = {
+      tables: tablesWithoutTaskComposition(tablesWithoutIndependentCritic(current.tables)),
+      linkKinds: current.linkKinds.filter((kind) => kind !== "performed_by"),
+      schemaMeta: current.schemaMeta
+        .filter(([typeName]) => typeName !== "performed_by" && typeName !== "reassign_task" && typeName !== "cancel_task")
+        .map((row) => row[0] === "record_evaluation"
+          ? [row[0], row[1], row[2], PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION] as [string, string, string, string]
+          : row),
+    };
+  }
+  return deterministicExecutionR10RetainedR16Snapshot;
+}
+
 let taskCompositionSnapshot: StructureSnapshot | null = null;
+let taskCompositionRetainedR17Snapshot: StructureSnapshot | null = null;
+let taskCompositionRetainedMetadataSnapshot: StructureSnapshot | null = null;
+let taskCompositionHistoricalSnapshot: StructureSnapshot | null = null;
 
 /** Post-0009 / pre-0010 — task delegation exists without V2-3 composition state. */
 function expectedTaskComposition(): StructureSnapshot {
   if (!taskCompositionSnapshot) {
     const current = expectedCurrent();
     taskCompositionSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables))),
-      linkKinds: linkKindsWithoutBelongsTo(current.linkKinds),
-      schemaMeta: schemaMetaWithoutTaskComposition(current.schemaMeta),
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutTaskComposition(current.schemaMeta)),
     };
   }
   return taskCompositionSnapshot;
+}
+
+function expectedTaskCompositionRetainedR17(): StructureSnapshot {
+  if (!taskCompositionRetainedR17Snapshot) {
+    const current = expectedCurrent();
+    taskCompositionRetainedR17Snapshot = {
+      tables: tablesWithoutTaskComposition(current.tables),
+      linkKinds: current.linkKinds,
+      schemaMeta: current.schemaMeta
+        .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task")
+        .map((row) => row[0] === "record_evaluation"
+          ? [row[0], row[1], row[2], PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION] as [string, string, string, string]
+          : row),
+    };
+  }
+  return taskCompositionRetainedR17Snapshot;
+}
+
+/** 0009 historical SQL may rebuild links before current R17 metadata is applied. */
+function expectedTaskCompositionRetainedMetadata(): StructureSnapshot {
+  if (!taskCompositionRetainedMetadataSnapshot) {
+    const current = expectedCurrent();
+    taskCompositionRetainedMetadataSnapshot = {
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
+      schemaMeta: current.schemaMeta
+        .filter(([typeName]) => typeName !== "reassign_task" && typeName !== "cancel_task")
+        .map((row) => row[0] === "record_evaluation"
+          ? [row[0], row[1], row[2], PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION] as [string, string, string, string]
+          : row),
+    };
+  }
+  return taskCompositionRetainedMetadataSnapshot;
+}
+
+function expectedTaskCompositionHistorical(): StructureSnapshot {
+  if (!taskCompositionHistoricalSnapshot) {
+    const current = expectedCurrent();
+    taskCompositionHistoricalSnapshot = {
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(tablesWithoutTaskComposition(current.tables)))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutR16Additions(current.schemaMeta)).map((row) => row[0] === "record_evaluation"
+        ? [row[0], row[1], row[2], PRE_INDEPENDENT_CRITIC_EVALUATION_DESCRIPTION] as [string, string, string, string]
+        : row),
+    };
+  }
+  return taskCompositionHistoricalSnapshot;
 }
 
 let taskSteeringSnapshot: StructureSnapshot | null = null;
@@ -661,9 +788,9 @@ function expectedTaskSteering(): StructureSnapshot {
   if (!taskSteeringSnapshot) {
     const current = expectedCurrent();
     taskSteeringSnapshot = {
-      tables: tablesWithoutBelongsTo(tablesWithoutGovernedReview(current.tables)),
-      linkKinds: linkKindsWithoutBelongsTo(current.linkKinds),
-      schemaMeta: schemaMetaWithoutR16Additions(current.schemaMeta),
+      tables: tablesWithoutR17(tablesWithoutBelongsTo(tablesWithoutGovernedReview(current.tables))),
+      linkKinds: linkKindsWithoutR17(linkKindsWithoutBelongsTo(current.linkKinds)),
+      schemaMeta: schemaMetaWithoutR17(schemaMetaWithoutR16Additions(current.schemaMeta)),
     };
   }
   return taskSteeringSnapshot;
@@ -711,7 +838,7 @@ function applyCurrentR16SchemaAdditions(db: KernelDb): void {
   const currentMeta = new Map(
     expectedCurrent().schemaMeta.map((row) => [row[0], row] as const),
   );
-  for (const name of ["belongs_to", "governed_review_task"] as const) {
+  for (const name of ["belongs_to", "governed_review_task", "grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome"] as const) {
     const row = currentMeta.get(name);
     if (!row) continue;
     const present = db
@@ -745,6 +872,15 @@ export function isCompletedKernelInitialization(db: KernelDb): boolean {
   return objectMetaCount(db) >= 1;
 }
 
+function isR17HistoricalTaskComposition(db: KernelDb): boolean {
+  const required = ["grades_ticket", "grades_run", "grades_strategy", "grades_run_result", "record_strategy_outcome"];
+  const names = new Set(readSchemaMetaRows(db).map((row) => row[0]));
+  if (!required.every((name) => names.has(name))) return false;
+  const taskSql = readTableSql(db, "task") ?? "";
+  const agentSql = readTableSql(db, "agent_definition") ?? "";
+  return !/display_name TEXT NOT NULL/i.test(agentSql) && !/cancelled/i.test(taskSql);
+}
+
 /**
  * Exact structural classification before any persistent pragma (WO-D1 R4).
  * Compares governed tables, link-kind set, and schema_meta rows against the
@@ -771,12 +907,29 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   if (snapshotsEqual(live, expectedTaskStatus())) return "task_status";
   if (snapshotsEqual(live, expectedConnectionActions())) return "connection_actions";
   if (snapshotsEqual(live, expectedTaskDelegation())) return "task_delegation";
+  if (snapshotsEqual(live, expectedTaskDelegationRetainedR16())) return "task_delegation";
   if (snapshotsEqual(live, expectedDeterministicExecution())) {
+    return "deterministic_execution";
+  }
+  if (snapshotsEqual(live, expectedDeterministicExecutionWithR17())) {
+    return "deterministic_execution";
+  }
+  if (snapshotsEqual(live, expectedDeterministicExecutionR10())) {
+    return "deterministic_execution";
+  }
+  if (snapshotsEqual(live, expectedDeterministicExecutionR10RetainedR16())) {
     return "deterministic_execution";
   }
   if (snapshotsEqual(live, expectedTaskComposition())) {
     return "task_composition";
   }
+  if (snapshotsEqual(live, expectedTaskCompositionRetainedR17())) {
+    return "task_composition";
+  }
+  if (snapshotsEqual(live, expectedTaskCompositionRetainedMetadata())) {
+    return "task_composition";
+  }
+  if (snapshotsEqual(live, expectedTaskCompositionHistorical())) return "task_composition";
   if (snapshotsEqual(live, expectedTaskSteering())) return "task_steering";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
@@ -931,16 +1084,22 @@ export function applyKernelUpgradeChain(
       db.exec(upgrades.independentCriticSql);
     }
     if (state !== "task_steering") {
-      if (classifyKernelShape(db) !== "task_composition") {
+      const historicalR17 = isR17HistoricalTaskComposition(db);
+      const postIndependent = classifyKernelShape(db);
+      if (postIndependent !== "task_composition" && !historicalR17) {
         throw new KernelUpgradeShapeError(
           INDEPENDENT_CRITIC_UPGRADE,
           "0009 did not produce the exact post-0009 shape",
         );
       }
       db.exec(upgrades.taskCompositionSql);
+      if (!historicalR17) {
+        db.exec(upgrades.governedReviewSql);
+      }
+    } else {
+      db.exec(upgrades.governedReviewSql);
     }
     db.exec(upgrades.taskSteeringSql);
-    db.exec(upgrades.governedReviewSql);
     applyCurrentR16SchemaAdditions(db);
     if (classifyKernelShape(db) !== "current") {
       throw new KernelUpgradeShapeError(

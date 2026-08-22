@@ -139,6 +139,22 @@ export function kernelGetResearchWorldProjection(request: ResearchWorldRequest):
   return getResearchWorldProjection(getKernelDb(), request);
 }
 
+export function kernelListStrategyVersions(): Array<Record<string, unknown>> {
+  const db = getKernelDb();
+  const rows = db.query("SELECT id, spec_ref, version, stake_model FROM strategy ORDER BY version ASC, id ASC").all() as Array<Record<string, unknown>>;
+  const result: Array<Record<string, unknown>> = [];
+  for (const row of rows) {
+    const artifact = db.query("SELECT storage_ref, content_hash FROM artifact WHERE id = ?").get(row.spec_ref) as { storage_ref: string; content_hash: string } | null;
+    if (!artifact) continue;
+    try {
+      const spec = JSON.parse(readFileSync(artifact.storage_ref, "utf8")) as Record<string, unknown>;
+      if (typeof spec.family !== "string" || typeof spec.probability_field !== "string") continue;
+      result.push({ strategy_id: row.id, family: spec.family, version: row.version, content_hash: artifact.content_hash, stake_model: row.stake_model, score_field: spec.score_field, probability_field: spec.probability_field, label: `${spec.family} v${row.version} · ${String(row.id).slice(-8)}` });
+    } catch { /* unavailable specs are intentionally not selectable */ }
+  }
+  return result.sort((a, b) => String(a.family).localeCompare(String(b.family)) || Number(a.version) - Number(b.version));
+}
+
 const PEER_BUS_DDL = `
 CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,
@@ -932,6 +948,7 @@ export function kernelRunGuidedResearch(
   executorSessionId: string,
   hypothesisId: string,
   evidenceArtifactId: string,
+  strategyId?: string,
 ): {
   hypothesisId: string;
   runId: string;
@@ -953,9 +970,9 @@ export function kernelRunGuidedResearch(
     run_id: `run-${crypto.randomUUID()}`,
     dataset_id: String(dataset.id),
     hypothesis_id: hypothesisId,
-    strategy_spec: {
+    ...(strategyId ? { strategy_id: strategyId } : { strategy_spec: {
       contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: scoreField,
-    },
+    } }),
     params: { limit: 1 },
   }, {
     trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId,
@@ -1062,7 +1079,7 @@ export function kernelListOntologyReadTools(): McpToolDefinition[] {
     tools.push(...readToolsForObject(object));
   }
   for (const action of schema.actions) {
-    if (action.capabilityGroup) {
+    if (action.capabilityGroup && action.internalOnly !== true && action.operatorOnly !== true) {
       tools.push(actionToolForAction(action));
     }
   }

@@ -24,6 +24,7 @@ import type { ExecuteResultFor, ObjectExecuteResult } from "./results.ts";
 import { requireTrace, type TrustedExecutionContext } from "./trace.ts";
 import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 import { executeGovernedReviewTask } from "./governed-review.ts";
+import { recordStrategyOutcome } from "./strategy-outcome.ts";
 
 
 const CONTROL_BYTES = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/u;
@@ -282,6 +283,7 @@ const INTERNAL_TASK_ACTIONS = new Set([
   "request_second_opinion",
   "governed_review_task",
 ]);
+const INTERNAL_APP_ACTIONS = new Set(["record_strategy_outcome"]);
 
 function objectId(cmd: TransitionCommand, input: Record<string, unknown>): string {
   const key = transitionIdFields[cmd.type];
@@ -475,10 +477,11 @@ export function execute<C extends string>(
     ? undefined
     : pipelineCommands.find((candidate) => candidate.action === command);
   const internalTaskAction = INTERNAL_TASK_ACTIONS.has(command);
-  const transitionSample = creation || pipeline || internalTaskAction
+  const internalAppAction = INTERNAL_APP_ACTIONS.has(command);
+  const transitionSample = creation || pipeline || internalTaskAction || internalAppAction
     ? undefined
     : commands.find((candidate) => candidate.action === command);
-  if (!creation && !pipeline && !transitionSample && !internalTaskAction) {
+  if (!creation && !pipeline && !transitionSample && !internalTaskAction && !internalAppAction) {
     throw new KernelError(`Unknown command "${command}"`);
   }
 
@@ -522,6 +525,9 @@ export function execute<C extends string>(
 
   if (INTERNAL_TASK_ACTIONS.has(command)) {
     return executeInternalTaskAction(db, command, validatedInput, trace) as unknown as ExecuteResultFor<C>;
+  }
+  if (INTERNAL_APP_ACTIONS.has(command)) {
+    return recordStrategyOutcome(db, { action: command, object_type: "artifact", event: "ticket.observed" }, validatedInput, trace) as ExecuteResultFor<C>;
   }
 
   if (command === "reassign_task" || command === "cancel_task") {

@@ -383,6 +383,22 @@ export function initDock(panelEl, options = {}) {
 	const questionInput = panelEl.querySelector("#dock-question-input");
 	const questionStatus = panelEl.querySelector("#dock-question-status");
 	let selectedResearchDatasetId = null;
+	let selectedStrategyId = null;
+	const techniqueSelect = document.createElement("select");
+	techniqueSelect.className = "dock-technique-version";
+	techniqueSelect.setAttribute("aria-label", "Technique version");
+	const techniquePlaceholder = document.createElement("option");
+	techniquePlaceholder.value = "";
+	techniquePlaceholder.textContent = "Technique version";
+	techniqueSelect.appendChild(techniquePlaceholder);
+	questionForm?.insertBefore(techniqueSelect, questionForm.querySelector("button[type=submit]") || null);
+	void window.shellApi.qf.listStrategyVersions().then((response) => {
+		for (const strategy of (response?.strategies || [])) { const option = document.createElement("option"); option.value = String(strategy.strategy_id); option.textContent = String(strategy.label); option.dataset.family = String(strategy.family); option.dataset.version = String(strategy.version); techniqueSelect.appendChild(option); }
+	}).catch(() => {});
+	techniqueSelect.addEventListener("change", () => { selectedStrategyId = techniqueSelect.value || null; });
+	const questionSubmit = questionForm?.querySelector("button[type=submit]");
+	if (questionSubmit) questionSubmit.disabled = true;
+	techniqueSelect.addEventListener("change", () => { if (questionSubmit) questionSubmit.disabled = !selectedStrategyId; });
 	const setQuestionStatus = (message, tone = "") => {
 		if (!questionStatus) return;
 		questionStatus.textContent = message;
@@ -401,7 +417,7 @@ export function initDock(panelEl, options = {}) {
 			setQuestionStatus("Starting durable research…");
 			const datasetId = selectedResearchDatasetId;
 			selectedResearchDatasetId = null;
-			void window.shellApi.qf.submitResearchQuestion(question, datasetId ?? undefined).then((res) => {
+			void window.shellApi.qf.submitResearchQuestion(question, datasetId ?? undefined, undefined, selectedStrategyId ?? undefined).then((res) => {
 				if (!res?.ok) throw new Error(res?.error?.message ?? "research launch failed");
 				setQuestionStatus(researchDirectorRunningStatus(res.missionId), "ok");
 				void refresh();

@@ -2223,6 +2223,10 @@
           "additionalProperties": {},
           "description": "Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field."
         },
+        "strategy_id": {
+          "type": "string",
+          "description": "Exact existing immutable Strategy selected for an R17 forward run."
+        },
         "params": {
           "type": "object",
           "propertyNames": {
@@ -2239,7 +2243,6 @@
       "required": [
         "run_id",
         "dataset_id",
-        "strategy_spec",
         "params"
       ]
     }

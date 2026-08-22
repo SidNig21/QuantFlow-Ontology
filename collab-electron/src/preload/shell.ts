@@ -61,8 +61,11 @@ contextBridge.exposeInMainWorld("shellApi", {
     ) => ipcRenderer.invoke("qf:execute", { command, input, trace }),
     listArtifacts: () => ipcRenderer.invoke("qf:artifacts:list"),
     listResearchLedger: () => ipcRenderer.invoke("qf:research:ledger"),
+    listStrategyVersions: () => ipcRenderer.invoke("qf:research:strategies"),
     getResearchWorldProjection: (args: { root_type: "mission" | "task"; root_id: string }) =>
       ipcRenderer.invoke("qf:research-world:projection", args),
+    recordStrategyOutcome: (args: Record<string, unknown>) =>
+      ipcRenderer.invoke("qf:research:recordStrategyOutcome", args),
     loadSampleResearchDataset: () => ipcRenderer.invoke("qf:research:loadSampleDataset"),
     listHandoffs: () => ipcRenderer.invoke("qf:handoffs:list"),
     listTaskSurface: () => ipcRenderer.invoke("qf:tasks:surface"),
@@ -93,12 +96,13 @@ contextBridge.exposeInMainWorld("shellApi", {
       ipcRenderer.invoke("qf:review:secondCritic", args),
     listDefinitions: () => ipcRenderer.invoke("qf:definitions:list"),
     listSessions: () => ipcRenderer.invoke("qf:sessions:list"),
-    submitResearchQuestion: (question: string, datasetId?: string, definitionId?: string) => {
+    submitResearchQuestion: (question: string, datasetId?: string, definitionId?: string, strategyId?: string) => {
       if (UI_PROOF) console.info("qf-ui-proof preload_ipc=qf:research:submitQuestion");
       return ipcRenderer.invoke("qf:research:submitQuestion", {
         question,
         ...(datasetId ? { datasetId } : {}),
         ...(definitionId ? { definitionId } : {}),
+        ...(strategyId ? { strategyId } : {}),
       });
     },
     spawnSession: (args: { definitionId: string }) =>

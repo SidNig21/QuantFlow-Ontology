@@ -127,6 +127,7 @@ import {
   bindResearchHypothesis,
   clearResearchHypothesis,
   researchHypothesisForSession,
+  researchStrategyForSession,
 } from "./research-context";
 
 function closeAdmittedSession(sessionId: string): void {
@@ -1255,7 +1256,7 @@ app.whenReady().then(async () => {
             try {
               const hypothesisId = researchHypothesisForSession(change.delegatorSessionId);
               if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
-              const run = kernelRunGuidedResearch(change.workerSessionId, hypothesisId, change.artifactId);
+              const run = kernelRunGuidedResearch(change.workerSessionId, hypothesisId, change.artifactId, researchStrategyForSession(change.delegatorSessionId));
               closeAdmittedSession(change.workerSessionId);
               if (!run) {
                 closeAdmittedSession(change.delegatorSessionId);
@@ -1491,7 +1492,7 @@ app.whenReady().then(async () => {
         beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
         onStarted: projectStartedSession,
       });
-      bindResearchHypothesis(result.sessionId, hypothesisId);
+        bindResearchHypothesis(result.sessionId, hypothesisId, typeof input.strategy_id === "string" ? input.strategy_id : undefined);
       return {
         missionId,
         hypothesisId,

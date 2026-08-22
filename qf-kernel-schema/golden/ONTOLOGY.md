@@ -374,6 +374,38 @@ Mission context: which standing Mission owns a delegated Task.
 - **from:** `task`
 - **to:** `mission`
 
+### `grades_ticket`
+
+Outcome-grade lineage from an immutable grade Artifact to its operator-supplied Ticket.
+
+- **lifecycle:** `experimental`
+- **from:** `artifact`
+- **to:** `ticket`
+
+### `grades_run`
+
+Outcome-grade lineage from an immutable grade Artifact to the succeeded Run it grades.
+
+- **lifecycle:** `experimental`
+- **from:** `artifact`
+- **to:** `run`
+
+### `grades_strategy`
+
+Outcome-grade lineage from an immutable grade Artifact to the exact Strategy selected by the Run.
+
+- **lifecycle:** `experimental`
+- **from:** `artifact`
+- **to:** `strategy`
+
+### `grades_run_result`
+
+Outcome-grade lineage from an immutable grade Artifact to the exact Run result Artifact.
+
+- **lifecycle:** `experimental`
+- **from:** `artifact`
+- **to:** `artifact`
+
 ### `assigned_to`
 
 Work routing: which agent session owns a task.
@@ -451,6 +483,7 @@ Execute one canonical strategy specification against one immutable Dataset. The 
 - `dataset_id` — Existing immutable Dataset registered through register_dataset_version.
 - `hypothesis_id` — Exact existing Hypothesis tested by this deterministic research run.
 - `strategy_spec` — Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.
+- `strategy_id` — Exact existing immutable Strategy selected for an R17 forward run.
 - `params` — Exact execution parameters. R11a supports limit and optional minimum_score.
 - `repeat_of_run_id` — Optional succeeded run claimed as an identical replay. The Kernel rejects any manifest or result mismatch.
 
@@ -495,6 +528,23 @@ Ingest an externally observed ticket at its settlement grade. Writes an observat
 - `payout` — Realized return when settled.
 - `correlation_note` — Declared leg dependence assumptions.
 - `grade` — Observed settlement grade at ingestion; terminal grades allowed.
+
+### `record_strategy_outcome`
+
+Record one already-settled operator outcome for an exact forward Strategy selection and grade its immutable lineage.
+
+- **lifecycle:** `experimental`
+- **internal-only:** `true`
+- **input:**
+- `run_id` — Succeeded deterministic Run containing the selected observation.
+- `selection_ref` — Stable selected-observation id from the Run result.
+- `external_ref` — Case-sensitive external settlement reference used for idempotency.
+- `settled_at` — Settlement timestamp in UTC with literal Z and at most six fractional digits.
+- `outcome` — Already-settled outcome.
+- `decimal_odds` — Selection decimal odds as a non-negative decimal string greater than 1.
+- `closing_decimal_odds` — Optional closing decimal odds as a decimal string greater than 1.
+- `stake` — Stake as a non-negative decimal string.
+- `payout` — Settled payout as a non-negative decimal string or null.
 
 ### `start_run`
 

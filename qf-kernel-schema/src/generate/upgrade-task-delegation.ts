@@ -13,7 +13,7 @@ import { sqlString } from "./sql.ts";
  */
 export function generateUpgradeTaskDelegation(): string {
   const linkKinds = schema.links
-    .filter((link) => link.name !== "performed_by" && link.name !== "belongs_to")
+    .filter((link) => link.name !== "performed_by" && link.name !== "belongs_to" && !link.name.startsWith("grades_"))
     .map((link) => sqlString(link.name))
     .join(", ");
   const lines: string[] = [];

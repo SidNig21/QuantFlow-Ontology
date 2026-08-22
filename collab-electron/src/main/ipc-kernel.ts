@@ -39,6 +39,7 @@ import {
   kernelGovernedReviewProjection,
   kernelGovernedAttemptExists,
   kernelGetResearchWorldProjection,
+  kernelListStrategyVersions,
 } from "./kernel";
 import {
   getDockDefinitionAvailability,
@@ -248,7 +249,7 @@ export function registerKernelHandlers(): void {
 
   ipcMain.handle(
     "qf:research:submitQuestion",
-    async (event, args?: { question?: string; definitionId?: string; datasetId?: string }) => {
+    async (event, args?: { question?: string; definitionId?: string; datasetId?: string; strategyId?: string }) => {
       try {
         assertTrustedSender(event);
         if (process.env.QF_UI_PROOF === "1") {
@@ -309,7 +310,7 @@ export function registerKernelHandlers(): void {
             }
           },
         });
-        bindResearchHypothesis(result.sessionId, hypothesisId);
+        bindResearchHypothesis(result.sessionId, hypothesisId, args?.strategyId);
         invalidateDock();
         return {
           ok: true as const,
@@ -331,6 +332,11 @@ export function registerKernelHandlers(): void {
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }
+  });
+
+  ipcMain.handle("qf:research:strategies", (event) => {
+    try { assertTrustedSender(event); return { ok: true as const, strategies: kernelListStrategyVersions() }; }
+    catch (err) { return { ok: false as const, error: serializeError(err) }; }
   });
 
   ipcMain.handle("qf:research:ledger", (event) => {
@@ -359,6 +365,16 @@ export function registerKernelHandlers(): void {
       });
     } catch (err) {
       return { ok: false as const, code: "WORLD_ROOT_INELIGIBLE" as const, message: serializeError(err).message };
+    }
+  });
+
+  ipcMain.handle("qf:research:recordStrategyOutcome", (event, args?: unknown) => {
+    try {
+      assertTrustedSender(event);
+      if (!args || typeof args !== "object" || Array.isArray(args)) throw new Error("recordStrategyOutcome requires an object");
+      return { ok: true as const, result: kernelExecute("record_strategy_outcome", args as Record<string, unknown>, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) };
+    } catch (err) {
+      return { ok: false as const, error: serializeError(err) };
     }
   });
 

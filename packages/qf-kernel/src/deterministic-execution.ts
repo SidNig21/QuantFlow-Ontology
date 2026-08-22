@@ -18,6 +18,7 @@ import {
 import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
 import type { ObjectExecuteResult } from "./results.ts";
 import type { TraceContext, TrustedExecutionContext } from "./trace.ts";
+import { readStrategySpec } from "./strategy-outcome.ts";
 
 export const DETERMINISTIC_EXECUTION_VERSION = "qf-deterministic-v1";
 const EXECUTION_ENVIRONMENT_ID =
@@ -56,6 +57,21 @@ function canonicalJson(value: unknown): string {
   throw new KernelError("deterministic execution accepts JSON values only");
 }
 
+function orderedJson(value: unknown): string {
+  if (value === null) return "null";
+  if (typeof value === "string" || typeof value === "boolean") return JSON.stringify(value);
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new KernelError("deterministic execution refuses non-finite numbers");
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) return `[${value.map(orderedJson).join(",")}]`;
+  if (typeof value === "object") {
+    const row = value as JsonRecord;
+    return `{${Object.keys(row).map((key) => `${JSON.stringify(key)}:${orderedJson(row[key])}`).join(",")}}`;
+  }
+  throw new KernelError("deterministic execution accepts JSON values only");
+}
+
 function exactKeys(record: JsonRecord, allowed: readonly string[], label: string): void {
   const extras = Object.keys(record).filter((key) => !allowed.includes(key));
   if (extras.length > 0) {
@@ -77,11 +93,13 @@ function parseStrategy(input: unknown): {
   version: number;
   stakeModel: "flat" | "fractional_kelly" | "custom";
   scoreField: string;
+  family?: string;
+  probabilityField?: string;
 } {
   const spec = objectValue(input, "strategy_spec");
   exactKeys(
     spec,
-    ["contract", "version", "stake_model", "score_field"],
+    ["contract", "family", "version", "stake_model", "score_field", "probability_field"],
     "strategy_spec",
   );
   if (spec.contract !== "qf.strategy.v1") {
@@ -102,7 +120,18 @@ function parseStrategy(input: unknown): {
   if (typeof spec.score_field !== "string" || spec.score_field.length === 0) {
     throw new KernelError("strategy_spec score_field must be non-empty");
   }
-  const bytes = new TextEncoder().encode(`${canonicalJson(spec)}\n`);
+  const family = typeof spec.family === "string" ? spec.family : undefined;
+  if (Object.prototype.hasOwnProperty.call(spec, "family") && (!family || family.length === 0)) {
+    throw new KernelError("strategy_spec family must be non-empty when supplied");
+  }
+  const probabilityField = typeof spec.probability_field === "string" ? spec.probability_field : undefined;
+  if (Object.prototype.hasOwnProperty.call(spec, "probability_field") && (!probabilityField || probabilityField.length === 0)) {
+    throw new KernelError("strategy_spec probability_field must be non-empty when supplied");
+  }
+  const orderedSpec = family
+    ? { contract: spec.contract, family, version: spec.version, stake_model: spec.stake_model, score_field: spec.score_field, ...(probabilityField ? { probability_field: probabilityField } : {}) }
+    : spec;
+  const bytes = new TextEncoder().encode(family ? orderedJson(orderedSpec) : `${canonicalJson(spec)}\n`);
   return {
     spec,
     bytes,
@@ -110,6 +139,8 @@ function parseStrategy(input: unknown): {
     version: spec.version as number,
     stakeModel: spec.stake_model,
     scoreField: spec.score_field,
+    family,
+    probabilityField,
   };
 }
 
@@ -549,13 +580,22 @@ export function executeDeterministicRun(
     throw new KernelError("repeat_of_run_id must be a non-empty string");
   }
 
-  const strategy = parseStrategy(input.strategy_spec);
+  const selectedStrategyId = typeof input.strategy_id === "string" && input.strategy_id.length > 0
+    ? input.strategy_id
+    : undefined;
+  const selectedSpec = selectedStrategyId ? readStrategySpec(db, selectedStrategyId) : input.strategy_spec;
+  const strategy = parseStrategy(selectedSpec);
+  if (selectedStrategyId && !strategy.family) {
+    throw new KernelError(`TECHNIQUE COVERAGE REFUSED: legacy Strategy cannot be selected for R17 forward research: ${selectedStrategyId}`);
+  }
   const params = parseParams(input.params);
   const dataset = loadDataset(db, datasetId);
   if (typeof hypothesisId === "string" && !db.query(`SELECT 1 AS ok FROM hypothesis WHERE id = ?`).get(hypothesisId)) {
     throw new KernelError(`execute_deterministic_run Hypothesis not found: ${hypothesisId}`);
   }
-  const strategyId = `strategy:${strategy.hash}:v${strategy.version}`;
+  const strategyId = selectedStrategyId ?? (strategy.family
+    ? `strategy:${strategy.family}:v${strategy.version}:${strategy.hash.slice(0, 16)}`
+    : `strategy:${strategy.hash}:v${strategy.version}`);
   const manifest = {
     contract: "qf.execution.manifest.v1",
     execution_version: DETERMINISTIC_EXECUTION_VERSION,
@@ -631,6 +671,32 @@ export function executeDeterministicRun(
         stake_model: string;
       } | null;
     if (!priorStrategy) {
+      let predecessorStrategyId: string | undefined;
+      if (strategy.family) {
+        const family = strategy.family;
+        const familyRows = db.query("SELECT id, spec_ref, version FROM strategy").all() as Array<{ id: string; spec_ref: string; version: number }>;
+        for (const row of familyRows) {
+          let priorSpec: JsonRecord | null = null;
+          try {
+            const artifact = db.query("SELECT id, kind, content_hash, storage_ref FROM artifact WHERE id = ?").get(row.spec_ref) as { id: string; kind: string; content_hash: string; storage_ref: string } | null;
+            if (artifact?.kind === "strategy_spec") priorSpec = objectValue(JSON.parse(new TextDecoder().decode(readVerifiedArtifact(artifact, "strategy_spec"))), "strategy_spec");
+          } catch { /* malformed legacy specs remain readable only through their legacy path */ }
+          if (priorSpec?.family === family && priorSpec.version === strategy.version) throw new KernelError(`duplicate Strategy family/version: ${family} v${strategy.version}`);
+          if (priorSpec?.family === family && priorSpec.version === strategy.version - 1) {
+            predecessorStrategyId = row.id;
+          }
+        }
+        if (strategy.version > 1) {
+          const predecessor = familyRows.filter((row) => {
+            try {
+              const artifact = db.query("SELECT id, kind, content_hash, storage_ref FROM artifact WHERE id = ?").get(row.spec_ref) as { id: string; kind: string; content_hash: string; storage_ref: string } | null;
+              const priorSpec = artifact?.kind === "strategy_spec" ? objectValue(JSON.parse(new TextDecoder().decode(readVerifiedArtifact(artifact, "strategy_spec"))), "strategy_spec") : null;
+              return priorSpec?.family === family && priorSpec.version === strategy.version - 1;
+            } catch { return false; }
+          });
+          if (predecessor.length !== 1) throw new KernelError(`Strategy version ${family} v${strategy.version} requires exactly one immediate predecessor`);
+        }
+      }
       db.query(
         `INSERT INTO strategy (id, created_at, spec_ref, version, stake_model)
          VALUES (?, ?, ?, ?, ?)`,
@@ -641,9 +707,8 @@ export function executeDeterministicRun(
         strategy.version,
         strategy.stakeModel,
       );
-      writeLinks(db, "strategy", strategyId, [
-        { kind: "derived_from", to_id: strategy.hash },
-      ]);
+      if (!strategy.family) writeLinks(db, "strategy", strategyId, [{ kind: "derived_from", to_id: strategy.hash }]);
+      else if (predecessorStrategyId) writeLinks(db, "strategy", strategyId, [{ kind: "derived_from", to_id: predecessorStrategyId }]);
       appendEvent(db, {
         type: "strategy.registered",
         object_type: "strategy",

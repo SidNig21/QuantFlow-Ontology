@@ -410,6 +410,38 @@ export const belongs_to = defineLink({
   to: mission,
 });
 
+export const grades_ticket = defineLink({
+  name: "grades_ticket",
+  description: "Outcome-grade lineage from an immutable grade Artifact to its operator-supplied Ticket.",
+  lifecycle: "experimental",
+  from: artifact,
+  to: ticket,
+});
+
+export const grades_run = defineLink({
+  name: "grades_run",
+  description: "Outcome-grade lineage from an immutable grade Artifact to the succeeded Run it grades.",
+  lifecycle: "experimental",
+  from: artifact,
+  to: run,
+});
+
+export const grades_strategy = defineLink({
+  name: "grades_strategy",
+  description: "Outcome-grade lineage from an immutable grade Artifact to the exact Strategy selected by the Run.",
+  lifecycle: "experimental",
+  from: artifact,
+  to: strategy,
+});
+
+export const grades_run_result = defineLink({
+  name: "grades_run_result",
+  description: "Outcome-grade lineage from an immutable grade Artifact to the exact Run result Artifact.",
+  lifecycle: "experimental",
+  from: artifact,
+  to: artifact,
+});
+
 export const create_hypothesis = defineAction({
   name: "create_hypothesis",
   description:
@@ -479,7 +511,8 @@ export const execute_deterministic_run = defineAction({
       .optional(),
     strategy_spec: jsonObject.describe(
       "Declarative qf.strategy.v1 specification. R11a supports deterministic descending ranking by one numeric observation field.",
-    ),
+    ).optional(),
+    strategy_id: z.string().describe("Exact existing immutable Strategy selected for an R17 forward run.").optional(),
     params: jsonObject.describe(
       "Exact execution parameters. R11a supports limit and optional minimum_score.",
     ),
@@ -541,6 +574,25 @@ export const observe_ticket = defineAction({
     grade: z
       .enum(["pending", "win", "loss", "push", "void"])
       .describe("Observed settlement grade at ingestion; terminal grades allowed."),
+  }),
+});
+
+export const record_strategy_outcome = defineAction({
+  name: "record_strategy_outcome",
+  description:
+    "Record one already-settled operator outcome for an exact forward Strategy selection and grade its immutable lineage.",
+  lifecycle: "experimental",
+  internalOnly: true,
+  input: z.object({
+    run_id: z.string().describe("Succeeded deterministic Run containing the selected observation."),
+    selection_ref: z.string().describe("Stable selected-observation id from the Run result."),
+    external_ref: z.string().describe("Case-sensitive external settlement reference used for idempotency."),
+    settled_at: z.string().describe("Settlement timestamp in UTC with literal Z and at most six fractional digits."),
+    outcome: z.enum(["win", "loss", "push", "void"]).describe("Already-settled outcome."),
+    decimal_odds: z.string().describe("Selection decimal odds as a non-negative decimal string greater than 1."),
+    closing_decimal_odds: z.string().describe("Optional closing decimal odds as a decimal string greater than 1.").optional(),
+    stake: z.string().describe("Stake as a non-negative decimal string."),
+    payout: z.string().nullable().describe("Settled payout as a non-negative decimal string or null."),
   }),
 });
 
