@@ -114,6 +114,8 @@ consumer-shared-world-candidate: immutable product candidate `7dda122435dce47adb
 consumer-shared-world-build: exact `bun run --cwd collab-electron build` completed Main/preload/renderer; build timestamp `2026-08-22T11:50:40.8281398Z`; normal app visibly matched full candidate identity
 consumer-artifact-read-red: normal Computer Use run created one real Mission, deterministic Run, result Artifact with ROI `1.000000`, and independent governed critic; `qf_artifact_get` exposed metadata but not the existing hash-verified result receipt, so the critic honestly rejected for absent evidence, publication stayed blocked, and the source Task projected 12 objects/14 links; three terminal canaries and ordinary Windows/WSL cleanup were green; exact RED receipt is `evidence/r16/CONSUMER-CHECK.md`
 current-door: exact `NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes` requires fresh Reader YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority before the bounded repair receives independent PASS
+consumer-artifact-read-reader-findings: fresh Luna Reader task `01a02976-5b02-7961-9329-bd3d8b151fb6` inspected pushed docs head `62160083480ad494f1335b654713b628f21970e7` and returned NO/NO; six finite matrix, falsifier, oracle, build-identity, and consumer-receipt defects landed in the final WO-R16 closure
+current-door: exact `GOVERNED ARTIFACT READ READER DEFECT CLOSURE — immutable verification and exact consumer evidence` requires the same fresh Reader's corrected reread YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority
 
 ## Authorized outcome
 

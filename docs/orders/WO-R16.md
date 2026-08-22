@@ -4647,8 +4647,9 @@ Repair only the governed Artifact read boundary:
    `collab-electron/src/main/research-world-projection.ts`. Do not create a
    second byte reader or a second receipt meaning.
 2. For an admitted governed critic's exact `qf_artifact_get` call,
-   `callOntologyReadTool()` must return the normal Artifact row plus a
-   `receipt` produced by that shared implementation. The same enriched result
+   `callOntologyReadTool()` must return the safe Artifact metadata (`id`,
+   `created_at`, `kind`, and `content_hash`) plus a `receipt` produced by that
+   shared implementation; it must omit `storage_ref`. The same enriched result
    must be recorded in `qf_review_invocation`; the critic's review trajectory
    and the later audit must observe identical evidence.
 3. The receipt retains the already-accepted R16 meanings: it verifies the
@@ -4754,3 +4755,146 @@ falsifier/restoration, one independent PASS, and one replacement consumer PASS.
 A fresh Reader must answer exactly: can each acceptance gate actually fail,
 and does each deliverable have exactly one meaning. Only final YES/YES opens
 this bounded Builder door.
+
+### GOVERNED ARTIFACT READ READER DEFECT CLOSURE — immutable verification and exact consumer evidence
+
+The fresh adversarial Reader task
+`01a02976-5b02-7961-9329-bd3d8b151fb6` answered `NO/NO` at inspected docs
+head `62160083480ad494f1335b654713b628f21970e7`. It found six finite order
+defects: the Builder's mutating Atlas generation was also assigned to the
+immutable Verifier; the required Atlas base diff was absent; the falsifier
+counted three product/test files although the optional test makes four; the
+focused test could replace existing assertions or derive its expected result
+from the production helper; build identity was not finite; and the replacement
+consumer proof did not bind a durable receipt, exact evidence equality, or the
+single real critic verdict. This closure supersedes only those mechanics.
+
+#### Preserved tests and independent expected values
+
+The five existing test blocks and every assertion inside them in
+`collab-electron/src/main/ontology-gateway.test.ts` remain textually unchanged;
+the file changes only by appending exactly one test named:
+
+```text
+an admitted governed critic receives and records the verified Artifact receipt
+```
+
+The focused command must report exactly `6 pass / 0 fail`. The new test invokes
+the production gateway and real governed-review persistence. It must not import
+or call `artifactReceipt()` to compute its oracle. Its expected values are
+literal fixture values independently fixed in the test: exact Artifact id,
+kind, content hash, `durable_bytes_available`, and JSON preview; exact
+unavailable meanings for missing, tampered, oversized, and invalid-UTF-8
+fixtures. It deep-compares the governed Artifact gateway result and the parsed
+`qf_review_invocation.result` to the same literal expected enriched result.
+It separately proves the Hypothesis/Run reads and a non-governed Artifact read
+retain their pre-repair exact shapes. No returned or recorded result may expose
+`storage_ref`, a filesystem path, credential, or unverified payload bytes; this
+last prohibition applies to the governed Artifact result, while the separately
+asserted non-governed result remains unchanged.
+
+#### Exact Builder and Verifier matrices
+
+The Builder runs exactly these ten commands in order:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test collab-electron/src/main/research-world.test.ts
+bun test collab-electron/src/main/governed-review.test.ts
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+The Builder records the Atlas base-diff classification in `BUILD-REPORT.md`.
+Any HARD RED, unexplained coverage, undecided finding without blocker, stale
+generated Atlas, or native nonzero exit is red.
+
+The immutable Verifier runs exactly these nine commands in order:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test collab-electron/src/main/research-world.test.ts
+bun test collab-electron/src/main/governed-review.test.ts
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+The Verifier never runs mutating `bun qf-atlas/generate.mjs`, edits the
+candidate, or commits product/generated-Atlas bytes. Its only permitted write
+after every measurement and restoration check is green is the R16 verification
+evidence append.
+
+Before mutation, both Builder and Verifier record SHA-256 hashes for exactly
+these four paths, whether changed or unchanged:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/ontology-gateway.ts
+collab-electron/src/main/ontology-gateway.test.ts
+collab-electron/src/main/governed-review.test.ts
+```
+
+The falsifier still replaces only `ontology-gateway.ts` with its exact
+`7dda122435dce47adbc650e5d5b9d933db249263` bytes and requires the focused
+gateway test to fail. After restoration, all four hashes must exactly equal
+their frozen candidate hashes, all four paths must have zero diff against the
+candidate, and the focused command must return exactly `6 pass / 0 fail`.
+
+#### Exact replacement build and consumer receipt
+
+The replacement build receipt records the full immutable candidate SHA, build
+start time, native exit, the invoked `electron-vite build` output, successful
+Main/preload/renderer completion, post-start mtimes for their corresponding
+`collab-electron/out` products, and the full candidate SHA in the Main bundle.
+Bun usage/help, missing phase output, unchanged/pre-start products, or a stale
+bundle identity is red.
+
+The Router appends exactly one `Attempt 2` section to
+`docs/orders/evidence/r16/CONSUMER-CHECK.md`; it preserves Attempt 1 byte for
+byte. Attempt 2 records:
+
+1. candidate/build identity and the exact normal two-launch commands;
+2. the exact `qf_hypothesis_get`, `qf_run_get`, and `qf_artifact_get` results
+   returned to the sole admitted critic, plus the corresponding three
+   `qf_review_invocation.result` values; each returned/recorded pair must be
+   structurally identical;
+3. independently parsed result-receipt JSON with
+   `metrics.roi === "1.000000"`,
+   `metrics.net_profit === "100.000000"`,
+   `metrics.hit_rate === "1.000000"`, and
+   `metrics.selected_count === 1`; the persisted Evaluation's `metrics` must
+   deep-equal that parsed result's `metrics`, its `source_work` must name the
+   exact reviewed Hypothesis/Run/result Artifact/source Task/executor, and its
+   rationale must be nonempty;
+4. the exact 13 visible `(type,id)` members and all 15 visible
+   `(kind,from_id,to_id)` cable triples, each equal to the selected Kernel
+   projection, plus the ten pointer inspector receipts and three terminal
+   canary receipts;
+5. exact first/second-launch equality of objects, links, positions, and
+   inspector booleans; and
+6. zero owned Windows and WSL product processes after each ordinary close.
+
+There is exactly one admitted critic and one governed Evaluation for this
+source work in Attempt 2. If that sole verdict is not the existing positive
+`supports` verdict, the Router records the exact verdict and reason and the
+consumer gate is RED; it creates no alternate Evaluation or Report. If the
+verdict is `supports`, that same Evaluation is the supporting Evaluation and
+must publish through the unchanged gate. No retry critic, verdict override,
+manual Report, or second Mission is allowed.
+
+The six deliverables now have one meaning each: one shared receipt
+implementation; one six-test independent-oracle gateway contract; one
+ten-row Builder/nine-row immutable-Verifier matrix; one four-file
+falsifier/restoration; one exact fresh build identity; and one append-only
+Attempt 2 consumer receipt from a sole critic and Mission. Every gate has a
+named red. The same fresh Reader must reread this closure and answer the exact
+two protocol questions before the Builder door opens.
