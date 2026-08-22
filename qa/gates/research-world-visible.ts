@@ -1,10 +1,9 @@
 /**
  * WO-R16 — independent research-world Oracle and product-proof contract.
  *
- * The launch portion is owned by the fresh Verifier. This module keeps the
- * independent SQLite Oracle and the non-launching contract checks in one
- * named gate so the Builder can test the surface without manufacturing a
- * second fixture or truth store.
+ * The independent SQLite Oracle and the production-Electron proof live in one
+ * named gate. The Oracle is frozen before launch; the renderer is observed
+ * only through the bounded production UI proof surface.
  */
 import { createHash, randomUUID } from "node:crypto";
 import { spawn, type ChildProcess } from "node:child_process";
@@ -31,6 +30,7 @@ const COLLAB_ROOT = join(REPO_ROOT, "collab-electron");
 const RENDERER_ROOT = join(REPO_ROOT, "collab-electron/src/windows/shell/src");
 const PRELOAD = join(REPO_ROOT, "collab-electron/src/preload/shell.ts");
 const MAIN_IPC = join(REPO_ROOT, "collab-electron/src/main/ipc-kernel.ts");
+const MAIN_INDEX = join(REPO_ROOT, "collab-electron/src/main/index.ts");
 const PROJECTION = join(REPO_ROOT, "collab-electron/src/main/research-world-projection.ts");
 
 export const RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000;
@@ -137,6 +137,7 @@ export function assertResearchWorldContract(): void {
   const manager = source(join(RENDERER_ROOT, "tile-manager.js"));
   const preload = source(PRELOAD);
   const mainIpc = source(MAIN_IPC);
+  const mainIndex = source(MAIN_INDEX);
   const projection = source(PROJECTION);
   const forbiddenRenderer = /bun:sqlite|node:sqlite|better-sqlite3|node:fs(?:\/promises)?/;
   if (forbiddenRenderer.test(renderer)) throw new Error("renderer research world imports a database or filesystem boundary");
@@ -152,6 +153,12 @@ export function assertResearchWorldContract(): void {
     throw new Error("research preload transport contract is missing");
   }
   if (!mainIpc.includes('ipcMain.handle("qf:research-world:projection"')) throw new Error("research Main IPC handler is missing");
+  if (!mainIndex.includes('registerMethod("app.ui.pressKey"')) throw new Error("native UI key proof method is missing");
+  if (!mainIndex.includes('process.env.QF_UI_PROOF !== "1"')) throw new Error("native UI key proof is not environment restricted");
+  if (!mainIndex.includes('sendInputEvent({ type: "keyDown", keyCode: key })') || !mainIndex.includes('sendInputEvent({ type: "keyUp", keyCode: key })')) {
+    throw new Error("native UI key proof does not send matching key events");
+  }
+  if (!mainIndex.includes('["Tab", "Enter", "Escape"]')) throw new Error("native UI key proof key allowlist is missing");
   for (const exact of [
     "Artifact unavailable: hash mismatch",
     "Preview unavailable: artifact exceeds 65536 bytes",
@@ -167,11 +174,19 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function remainingMs(deadlineAt: number): number { return Math.max(0, deadlineAt - performance.now()); }
 
-export type InitialCaseStarted = () => void;
-export type InitialCaseCallback<T> = (reportStarted: InitialCaseStarted) => Promise<T>;
+export type PostFirstCaseStarted = () => void;
+export type PostFirstCaseCallback<T> = (reportStarted: PostFirstCaseStarted) => Promise<T>;
 
-/** Start every initial case before awaiting any case result. */
-export function scheduleInitialCases<T>(callbacks: readonly InitialCaseCallback<T>[], onStarted?: (index: number) => void): Promise<T[]> {
+/**
+ * Wait for the first world before starting any post-first case, then invoke
+ * every case before awaiting any result.
+ */
+export async function schedulePostFirstCases<T>(
+  firstWorld: Promise<unknown>,
+  callbacks: readonly PostFirstCaseCallback<T>[],
+  onStarted?: (index: number) => void,
+): Promise<T[]> {
+  await firstWorld;
   const results = callbacks.map((callback, index) => {
     try {
       return Promise.resolve(callback(() => onStarted?.(index)));
@@ -180,6 +195,29 @@ export function scheduleInitialCases<T>(callbacks: readonly InitialCaseCallback<
     }
   });
   return Promise.all(results);
+}
+
+export const RESEARCH_TILE_STORAGE_KEYS = [
+  "height", "id", "ontologyId", "ontologyType", "type", "width", "x", "y", "zIndex",
+] as const;
+
+const SAVED_CANVAS_KEYS = ["tiles", "version", "viewport"];
+const SAVED_VIEWPORT_KEYS = ["centerX", "centerY", "zoom"];
+
+export function assertSavedResearchTileAllowlist(state: unknown, expectedObjectKeys: readonly string[]): void {
+  assert(state && typeof state === "object", "saved canvas state is not an object");
+  const saved = state as Record<string, unknown>;
+  assert(JSON.stringify(Object.keys(saved).sort()) === JSON.stringify([...SAVED_CANVAS_KEYS].sort()), "saved canvas top-level key set differs");
+  assert(Array.isArray(saved.tiles), "saved canvas tiles are missing");
+  assert(saved.viewport && typeof saved.viewport === "object", "saved canvas viewport is missing");
+  assert(JSON.stringify(Object.keys(saved.viewport as Record<string, unknown>).sort()) === JSON.stringify([...SAVED_VIEWPORT_KEYS].sort()), "saved canvas viewport key set differs");
+  const researchTiles = (saved.tiles as unknown[]).filter((tile): tile is Record<string, unknown> => Boolean(tile && typeof tile === "object" && (tile as Record<string, unknown>).type === "research"));
+  const actualObjectKeys = researchTiles.map((tile) => `${String(tile.ontologyType)}:${String(tile.ontologyId)}`).sort();
+  assert(JSON.stringify(actualObjectKeys) === JSON.stringify([...expectedObjectKeys].sort()), "saved canvas research tile identities differ");
+  for (const tile of researchTiles) {
+    assert(JSON.stringify(Object.keys(tile).sort()) === JSON.stringify([...RESEARCH_TILE_STORAGE_KEYS].sort()), "saved canvas research tile contains non-layout truth");
+    assert(tile.id === `ontology:${String(tile.ontologyType)}:${String(tile.ontologyId)}`, "saved canvas research tile identity is not ontology keyed");
+  }
 }
 
 export function assertVisibleWorldCounts(value: { objects: readonly unknown[]; links: readonly unknown[] }): void {
@@ -509,15 +547,115 @@ export function worldObservationExpression(): string {
   return `(() => ({ objects: [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].map((node) => ({ type: node.dataset.qfWorldType, id: node.dataset.qfWorldId, accessible_name: node.getAttribute('aria-label') || '', fields: Object.fromEntries([...node.querySelectorAll('[data-qf-world-field]')].map((field) => [field.dataset.qfWorldField, field.querySelector('.qf-world-field-value')?.textContent || ''])), position: { left: node.style.left, top: node.style.top, width: node.style.width, height: node.style.height, zIndex: node.style.zIndex }, inspector_expanded: node.querySelector('.qf-world-details')?.hidden === false })), links: [...document.querySelectorAll('.cable-path[data-qf-world-cable-kind]')].map((node) => ({ kind: node.dataset.qfWorldCableKind, from_id: node.dataset.qfWorldCableFrom, to_id: node.dataset.qfWorldCableTo })) }))()`;
 }
 
-async function observeWorld(endpoint: string, expected: IndependentWorldManifest, missionId: string, taskId: string, deadlineAt: number): Promise<VisibleWorldSnapshot> {
+type KeyboardFocusReceipt = { type: string; id: string; control: "tile" | "button"; accessible_name: string };
+
+function buttonAccessibleName(button: Element): string {
+  return button.getAttribute("aria-label") || button.getAttribute("title") || button.textContent?.trim() || "";
+}
+
+async function pressNativeKey(endpoint: string, key: "Tab" | "Enter" | "Escape"): Promise<void> {
+  const result = await rpcCall(endpoint, "app.ui.pressKey", { key }) as { key?: unknown; sent?: unknown };
+  assert(result?.key === key && result.sent === true, `native ${key} input was not acknowledged`);
+}
+
+function tabFocusPlanExpression(): string {
+  return `(() => {
+    const isVisible = (node) => {
+      const style = getComputedStyle(node);
+      return style.display !== 'none' && style.visibility !== 'hidden' && node.getClientRects().length > 0;
+    };
+    const tiles = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')]
+      .filter((node) => node.dataset.qfWorldType !== 'agent_session');
+    if (tiles.length !== 10) throw new Error('native Tab proof expected ten research-object tiles');
+    const sentinel = document.createElement('button');
+    const sentinelId = 'qf-r16-tab-sentinel-' + Date.now();
+    sentinel.id = sentinelId;
+    sentinel.type = 'button';
+    sentinel.tabIndex = 0;
+    sentinel.setAttribute('aria-label', 'R16 temporary focus sentinel');
+    sentinel.style.position = 'absolute';
+    sentinel.style.width = '1px';
+    sentinel.style.height = '1px';
+    sentinel.style.opacity = '0';
+    tiles[0].parentElement.insertBefore(sentinel, tiles[0]);
+    sentinel.focus();
+    const targets = [];
+    for (const tile of tiles) {
+      const base = { type: tile.dataset.qfWorldType, id: tile.dataset.qfWorldId, control: 'tile', accessible_name: tile.getAttribute('aria-label') || '' };
+      targets.push(base);
+      for (const button of tile.querySelectorAll('button:not([disabled])')) {
+        if (!isVisible(button)) continue;
+        targets.push({ type: tile.dataset.qfWorldType, id: tile.dataset.qfWorldId, control: 'button', accessible_name: button.getAttribute('aria-label') || button.getAttribute('title') || button.textContent?.trim() || '' });
+      }
+    }
+    return { sentinelId, targets };
+  })()`;
+}
+
+function focusedWorldTargetExpression(): string {
+  return `(() => {
+    const active = document.activeElement;
+    const tile = active?.closest?.('.canvas-tile[data-qf-world-type]');
+    if (!(tile instanceof HTMLElement)) throw new Error('native Tab focus left the research world');
+    const control = active === tile ? 'tile' : active instanceof HTMLButtonElement ? 'button' : null;
+    if (!control) throw new Error('native Tab focus landed on an unexpected research descendant');
+    return { type: tile.dataset.qfWorldType, id: tile.dataset.qfWorldId, control, accessible_name: control === 'tile' ? tile.getAttribute('aria-label') || '' : active.getAttribute('aria-label') || active.getAttribute('title') || active.textContent?.trim() || '' };
+  })()`;
+}
+
+async function exerciseNativeKeyboard(endpoint: string, expected: IndependentWorldManifest): Promise<void> {
+  const plan = await evaluateRenderer<{ sentinelId: string; targets: KeyboardFocusReceipt[] }>(endpoint, "tab-focus-plan", tabFocusPlanExpression());
+  const expectedObjectKeys = expected.objects.filter((object) => object.type !== "agent_session").map((object) => `${object.type}:${object.id}`).sort();
+  const plannedObjectKeys = plan.targets.filter((target) => target.control === "tile").map((target) => `${target.type}:${target.id}`).sort();
+  assert(JSON.stringify(plannedObjectKeys) === JSON.stringify(expectedObjectKeys), "native Tab proof found the wrong research-object tiles");
+  const receipts: KeyboardFocusReceipt[] = [];
+  try {
+    for (const target of plan.targets) {
+      await pressNativeKey(endpoint, "Tab");
+      const actual = await evaluateRenderer<KeyboardFocusReceipt>(endpoint, "tab-focus-step", focusedWorldTargetExpression());
+      assert(JSON.stringify(actual) === JSON.stringify(target), `native Tab focus order differs at ${target.type}:${target.id}:${target.control}`);
+      receipts.push(actual);
+    }
+  } finally {
+    await evaluateRenderer<boolean>(endpoint, "tab-sentinel-remove", `(() => { const sentinel = document.getElementById(${JSON.stringify(plan.sentinelId)}); sentinel?.remove(); return !document.getElementById(${JSON.stringify(plan.sentinelId)}); })()`);
+  }
+  console.log(`tab_focus_receipts=${JSON.stringify(receipts)}`);
+
+  let enter = 0;
+  let escape = 0;
+  let focusRetained = 0;
+  for (const object of expected.objects.filter((entry) => entry.type !== "agent_session")) {
+    const type = JSON.stringify(object.type);
+    const id = JSON.stringify(object.id);
+    const focused = await evaluateRenderer<boolean>(endpoint, "keyboard-focus-tile", `(() => { const tile = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].find((node) => node.dataset.qfWorldType === ${type} && node.dataset.qfWorldId === ${id}); if (!(tile instanceof HTMLElement)) throw new Error('keyboard tile is missing'); tile.focus(); return document.activeElement === tile; })()`);
+    assert(focused, `could not focus ${object.type}:${object.id} for native keyboard proof`);
+    await pressNativeKey(endpoint, "Enter");
+    enter += 1;
+    const expanded = await evaluateRenderer<{ expanded: boolean; retained: boolean }>(endpoint, "keyboard-enter-state", `(() => { const tile = document.activeElement; const details = tile?.querySelector('.qf-world-details'); return { expanded: details?.hidden === false, retained: document.activeElement === tile }; })()`);
+    assert(expanded.expanded && expanded.retained, `native Enter did not expand ${object.type}:${object.id} with focus retained`);
+    if (expanded.retained) focusRetained += 1;
+    await pressNativeKey(endpoint, "Escape");
+    escape += 1;
+    const collapsed = await evaluateRenderer<{ collapsed: boolean; retained: boolean }>(endpoint, "keyboard-escape-state", `(() => { const tile = document.activeElement; const details = tile?.querySelector('.qf-world-details'); return { collapsed: details?.hidden === true, retained: document.activeElement === tile }; })()`);
+    assert(collapsed.collapsed && collapsed.retained, `native Escape did not collapse ${object.type}:${object.id} with focus retained`);
+    if (collapsed.retained) focusRetained += 1;
+  }
+  assert(enter === 10 && escape === 10 && focusRetained === 20, "native keyboard proof receipt counts differ");
+  console.log("keyboard_tiles=10 enter=10 escape=10 focus_retained=20");
+}
+
+async function observeWorld(endpoint: string, expected: IndependentWorldManifest, missionId: string, taskId: string, deadlineAt: number, options: { exerciseKeyboard?: boolean } = {}): Promise<VisibleWorldSnapshot> {
   const clickMission = await evaluateRenderer<boolean>(endpoint, "mission-reveal", `(() => { const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); if (!(button instanceof HTMLElement)) throw new Error('Mission Show research world button is missing'); button.click(); return true; })()`);
   assert(clickMission === true, "Mission root activation did not click");
   const read = async () => await evaluateRenderer<VisibleWorldSnapshot>(endpoint, "world-observation", worldObservationExpression());
   const world = await waitForVisibleWorld(read, expected, deadlineAt);
   assertVisibleWorldCounts(world);
   compareVisibleSnapshot(world, expected);
-  const interaction = await evaluateRenderer<{ expanded: boolean; focus_restored: boolean }>(endpoint, "mission-inspection", `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelectorAll('[data-qf-world-field]').length > 0 && !root.querySelector('.qf-world-details')?.hidden; root.focus(); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return { expanded, focus_restored: document.activeElement === root }; })()`);
-  assert(interaction.expanded === true && interaction.focus_restored === true, "pointer/keyboard inspection parity failed");
+  if (options.exerciseKeyboard !== false) {
+    const interaction = await evaluateRenderer<{ expanded: boolean; collapsed: boolean }>(endpoint, "mission-pointer-inspection", `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelector('.qf-world-details')?.hidden === false; inspect.click(); const collapsed = root.querySelector('.qf-world-details')?.hidden === true; return { expanded, collapsed }; })()`);
+    assert(interaction.expanded === true && interaction.collapsed === true, "pointer inspection parity failed");
+    await exerciseNativeKeyboard(endpoint, expected);
+  }
   const second = await evaluateRenderer<{ before: number; after: number }>(endpoint, "duplicate-reveal", `(() => { const before = document.querySelectorAll('.canvas-tile[data-qf-world-type]').length; const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); button?.click(); return { before, after: document.querySelectorAll('.canvas-tile[data-qf-world-type]').length }; })()`);
   assert(second.before === EXPECTED_VISIBLE_TILE_COUNT && second.after === EXPECTED_VISIBLE_TILE_COUNT, "second reveal duplicated research tiles");
   const taskActivation = await evaluateRenderer<boolean>(endpoint, "task-reveal", `(() => { const tile = document.querySelector('.canvas-tile[data-qf-world-type="task"][data-qf-world-id="${taskId}"]'); const button = tile?.querySelector('.qf-world-reveal'); if (!(button instanceof HTMLElement)) throw new Error('Task Show research world button is missing'); button.click(); return true; })()`);
@@ -560,7 +698,37 @@ function attachedLive(error: unknown): LiveCase | undefined {
 
 type MutableCaseOutcome = { case: GateCaseName; functionalError?: unknown; cleanupError?: unknown };
 
-async function runNormalCase(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+type FirstWorldState = {
+  expected: IndependentWorldManifest;
+  firstWorld: VisibleWorldSnapshot;
+  missionId: string;
+  taskId: string;
+  appDir: string;
+};
+
+type FirstWorldStageResult = { outcome: GateCaseOutcome; state?: FirstWorldState };
+
+function savedResearchObjectKeys(expected: IndependentWorldManifest): string[] {
+  return expected.objects
+    .filter((object) => object.type !== "agent_session")
+    .map((object) => `${object.type}:${object.id}`)
+    .sort();
+}
+
+function readSavedCanvasState(appDir: string, expected: IndependentWorldManifest): unknown {
+  const statePath = join(appDir, "canvas-state.json");
+  assert(existsSync(statePath), `saved canvas state is missing: ${statePath}`);
+  let state: unknown;
+  try {
+    state = JSON.parse(readFileSync(statePath, "utf8"));
+  } catch (error) {
+    throw new Error(`saved canvas state is not valid JSON: ${errorMessage(error)}`);
+  }
+  assertSavedResearchTileAllowlist(state, savedResearchObjectKeys(expected));
+  return state;
+}
+
+async function runFirstWorldStage(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number): Promise<FirstWorldStageResult> {
   const outcome: MutableCaseOutcome = { case: "normal" };
   let active: LiveCase | undefined;
   const cleanupActive = async (label: string): Promise<boolean> => {
@@ -571,7 +739,7 @@ async function runNormalCase(root: string, nonce: string, functionalDeadlineAt: 
     catch (error) { outcome.cleanupError ??= error; return false; }
   };
   try {
-    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
+    active = await launch(root, functionalDeadlineAt);
     const first = active;
     const seeded = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", {}) as { object_id?: string; dataset?: { object_id?: string } };
     const datasetId = String(seeded.object_id ?? seeded.dataset?.object_id ?? "");
@@ -597,17 +765,49 @@ async function runNormalCase(root: string, nonce: string, functionalDeadlineAt: 
     assertVisibleWorldCounts(expected);
     const firstWorld = await observeWorld(first.endpoint, expected, missionId, taskId, functionalDeadlineAt);
     console.log(`nonce=${nonce} oracle_tiles=${expected.objects.length} oracle_cables=${expected.links.length} dom_tiles=${firstWorld.objects.length} dom_cables=${firstWorld.links.length}`);
-    if (!await cleanupActive("first-launch")) return outcome;
-    active = await launch(root, functionalDeadlineAt);
-    const secondWorld = await observeWorld(active.endpoint, expected, missionId, taskId, functionalDeadlineAt);
-    assert(JSON.stringify(secondWorld) === JSON.stringify(firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
-    console.log("reopen_equal=true pointer=true keyboard=true duplicate_reveal=false");
-    await cleanupActive("second-launch");
+    if (!await cleanupActive("first-launch")) return { outcome };
+    readSavedCanvasState(join(root, "app-root", "app"), expected);
+    return {
+      outcome,
+      state: {
+        expected,
+        firstWorld,
+        missionId,
+        taskId,
+        appDir: join(root, "app-root", "app"),
+      },
+    };
   } catch (error) {
     outcome.functionalError = error;
     active ??= attachedLive(error);
   } finally {
     await cleanupActive("normal-exception");
+  }
+  return { outcome };
+}
+
+async function runNormalReopenCase(root: string, first: FirstWorldState, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+  const outcome: MutableCaseOutcome = { case: "normal" };
+  let active: LiveCase | undefined;
+  const cleanupActive = async (label: string): Promise<boolean> => {
+    if (!active) return true;
+    const live = active;
+    active = undefined;
+    try { await cleanupProcessSet(live, hardDeadlineAt, label); return true; }
+    catch (error) { outcome.cleanupError ??= error; return false; }
+  };
+  try {
+    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
+    const secondWorld = await observeWorld(active.endpoint, first.expected, first.missionId, first.taskId, functionalDeadlineAt, { exerciseKeyboard: false });
+    assert(JSON.stringify(secondWorld) === JSON.stringify(first.firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
+    if (!await cleanupActive("second-launch")) return outcome;
+    readSavedCanvasState(first.appDir, first.expected);
+    console.log("reopen_equal=true pointer=true keyboard=true duplicate_reveal=false");
+  } catch (error) {
+    outcome.functionalError = error;
+    active ??= attachedLive(error);
+  } finally {
+    await cleanupActive("normal-reopen-exception");
   }
   return outcome;
 }
@@ -667,6 +867,15 @@ async function runForcedTimeoutCase(root: string, nonce: string, functionalDeadl
   return outcome;
 }
 
+function mergeCaseOutcomes(outcomes: readonly GateCaseOutcome[], caseName: GateCaseName): GateCaseOutcome {
+  const matching = outcomes.filter((outcome) => outcome.case === caseName);
+  return {
+    case: caseName,
+    functionalError: matching.find((outcome) => outcome.functionalError !== undefined)?.functionalError,
+    cleanupError: matching.find((outcome) => outcome.cleanupError !== undefined)?.cleanupError,
+  };
+}
+
 export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
   const startedAt = performance.now();
   const hardDeadlineAt = startedAt + RESEARCH_WORLD_VISIBLE_DEADLINE_MS;
@@ -688,20 +897,40 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
   const timeoutRoot = registerRoot();
   const caseNames: GateCaseName[] = ["normal", "forced-failure", "forced-timeout"];
   try {
-    const callbacks: InitialCaseCallback<GateCaseOutcome>[] = [
-      (reportStarted) => runNormalCase(normalRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
+    let firstWorldState: FirstWorldState | undefined;
+    const callbacks: PostFirstCaseCallback<GateCaseOutcome>[] = [
+      (reportStarted) => {
+        const state = firstWorldState;
+        if (!state) return Promise.reject(new Error("post-first normal case started without a first world"));
+        return runNormalReopenCase(normalRoot, state, functionalDeadlineAt, hardDeadlineAt, reportStarted);
+      },
       (reportStarted) => runForcedFailureCase(failureRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
       (reportStarted) => runForcedTimeoutCase(timeoutRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
     ];
-    outcomes.push(...await scheduleInitialCases(callbacks, markStarted));
-    assert(startedOffsets.length === callbacks.length && startedOffsets.every((value) => value !== undefined), "not every initial case reported a post-spawn start");
+    const firstWorldReady = runFirstWorldStage(normalRoot, nonce, functionalDeadlineAt, hardDeadlineAt).then((result) => {
+      outcomes.push(result.outcome);
+      if (result.state && result.outcome.functionalError === undefined && result.outcome.cleanupError === undefined) {
+        firstWorldState = result.state;
+        return result.state;
+      }
+      throw result.outcome.functionalError ?? result.outcome.cleanupError ?? new Error("first-world stage did not complete successfully");
+    });
+    outcomes.push(...await schedulePostFirstCases(firstWorldReady, callbacks, markStarted));
+    assert(startedOffsets.length === callbacks.length && startedOffsets.every((value) => value !== undefined), "not every post-first case reported a post-spawn start");
     const spread = Math.max(...startedOffsets) - Math.min(...startedOffsets);
-    console.log(`initial_case_start_spread_ms=${spread}`);
-    assert(spread <= 2_000, `initial case start spread exceeded 2000ms: ${spread}`);
+    console.log(`post_first_case_start_spread_ms=${spread}`);
+    assert(spread <= 2_000, `post-first case start spread exceeded 2000ms: ${spread}`);
   } catch (error) {
-    outcomes.push({ case: "normal", functionalError: error });
+    if (!outcomes.some((outcome) => outcome.case === "normal" && outcome.functionalError !== undefined)) {
+      outcomes.push({ case: "normal", functionalError: error });
+    }
   }
-  const finalOutcomes: GateCaseOutcome[] = caseNames.map((caseName) => outcomes.find((outcome) => outcome.case === caseName) ?? { case: caseName, functionalError: new Error(`${caseName} case returned no result`) });
+  const finalOutcomes: GateCaseOutcome[] = caseNames.map((caseName) => {
+    const merged = mergeCaseOutcomes(outcomes, caseName);
+    return merged.functionalError !== undefined || merged.cleanupError !== undefined || outcomes.some((outcome) => outcome.case === caseName)
+      ? merged
+      : { case: caseName, functionalError: new Error(`${caseName} case returned no result`) };
+  });
   try {
     for (const [index, root] of [normalRoot, failureRoot, timeoutRoot].entries()) {
       const receipt = await removeRegisteredRoot(root, hardDeadlineAt);

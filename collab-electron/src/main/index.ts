@@ -1111,6 +1111,28 @@ app.whenReady().then(async () => {
     description: "Bounded production UI proof bridge for the live shell renderer",
     params: { expression: "JavaScript evaluated in the production shell renderer" },
   });
+  registerMethod("app.ui.pressKey", async (params) => {
+    if (process.env.QF_UI_PROOF !== "1") {
+      throw new Error("app.ui.pressKey is disabled outside the bounded UI proof");
+    }
+    const key = (params as Record<string, unknown> | null)?.key;
+    if (typeof key !== "string" || !["Tab", "Enter", "Escape"].includes(key)) {
+      throw new Error("app.ui.pressKey accepts only Tab, Enter, or Escape");
+    }
+    if (
+      !mainWindow ||
+      mainWindow.isDestroyed() ||
+      !mainWindow.webContents.getURL().includes("/shell")
+    ) {
+      throw new Error("production shell window is not available");
+    }
+    mainWindow.webContents.sendInputEvent({ type: "keyDown", keyCode: key });
+    mainWindow.webContents.sendInputEvent({ type: "keyUp", keyCode: key });
+    return { key, sent: true };
+  }, {
+    description: "Bounded native keyboard input for the production UI proof",
+    params: { key: "One of Tab, Enter, or Escape" },
+  });
   registerMethod("app.build-identity", () => ({
     commitSha: __GIT_COMMIT_SHA__,
     packagedAt: __QF_BUILD_TIMESTAMP__,

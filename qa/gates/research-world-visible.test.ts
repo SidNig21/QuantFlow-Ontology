@@ -3,14 +3,16 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   assertResearchWorldContract,
+  assertSavedResearchTileAllowlist,
   assertVisibleWorldCounts,
   CLEANUP_RESERVE_MS,
   EXPECTED_VISIBLE_CABLE_COUNT,
   EXPECTED_VISIBLE_TILE_COUNT,
   formatFailureReceipts,
+  RESEARCH_TILE_STORAGE_KEYS,
   RESEARCH_WORLD_VISIBLE_DEADLINE_MS,
   rendererEvaluationExpression,
-  scheduleInitialCases,
+  schedulePostFirstCases,
   worldTimeoutDelta,
   worldObservationExpression,
 } from "./research-world-visible.ts";
@@ -80,22 +82,65 @@ describe("research-world-visible gate contract", () => {
     expect(worldTimeoutDelta({ objects: actualObjects, links: actualLinks }, { objects: expectedObjects, links: expectedLinks })).toBe('world_timeout={"object_count":12,"link_count":14,"missing_objects":["agent_session:executor","task:review"],"extra_objects":["task:stale"],"missing_links":["assigned_to:review:critic","delegated_by:review:director"],"extra_links":["uses:r:source"]}');
   });
 
-  test("starts all initial cases before awaiting any result", async () => {
-    let started = 0;
+  test("enforces the exact saved research-tile storage allowlist", () => {
+    expect(RESEARCH_TILE_STORAGE_KEYS).toEqual(["height", "id", "ontologyId", "ontologyType", "type", "width", "x", "y", "zIndex"]);
+    const state = {
+      version: 1,
+      tiles: [{ id: "ontology:mission:m", type: "research", x: 0, y: 0, width: 420, height: 280, zIndex: 1, ontologyType: "mission", ontologyId: "m" }],
+      viewport: { centerX: 0, centerY: 0, zoom: 1 },
+    };
+    expect(() => assertSavedResearchTileAllowlist(state, ["mission:m"])).not.toThrow();
+    expect(() => assertSavedResearchTileAllowlist({ ...state, tiles: [{ ...state.tiles[0], domainFact: "source title" }] }, ["mission:m"])).toThrow();
+    expect(() => assertSavedResearchTileAllowlist({ ...state, tiles: [{ ...state.tiles[0], cableKind: "belongs_to" }] }, ["mission:m"])).toThrow();
+  });
+
+  test("starts all post-first cases before awaiting any result", async () => {
+    const reported: number[] = [];
     let release!: () => void;
     const released = new Promise<void>((resolve) => { release = resolve; });
     const allStarted = new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("initial cases serialized")), 250);
-      void scheduleInitialCases([0, 1, 2].map(() => async (reportStarted) => {
+      const timer = setTimeout(() => reject(new Error("post-first cases serialized")), 250);
+      void schedulePostFirstCases(Promise.resolve(), [0, 1, 2].map(() => async (reportStarted) => {
         reportStarted();
-        started += 1;
-        if (started === 3) { clearTimeout(timer); resolve(); }
         await released;
-        return started;
-      }));
+        return true;
+      }), (index) => {
+        reported.push(index);
+        if (reported.length === 3) { clearTimeout(timer); resolve(); }
+      }).catch(reject);
     });
     await allStarted;
+    expect(reported).toEqual([0, 1, 2]);
     release();
+  });
+
+  test("does not invoke post-first callbacks when the first-world stage rejects", async () => {
+    let invoked = 0;
+    let rejected = false;
+    try {
+      await schedulePostFirstCases(Promise.reject(new Error("first world rejected")), [0, 1, 2].map(() => async () => {
+        invoked += 1;
+        return true;
+      }));
+    } catch (error) {
+      rejected = error instanceof Error && error.message === "first world rejected";
+    }
+    expect(rejected).toBe(true);
+    expect(invoked).toBe(0);
+  });
+
+  test("requires native keyboard receipts and the restricted Main key method", () => {
+    const gate = readFileSync(join(import.meta.dir, "research-world-visible.ts"), "utf8");
+    const main = readFileSync(join(REPO_ROOT, "collab-electron/src/main/index.ts"), "utf8");
+    const preload = readFileSync(join(REPO_ROOT, "collab-electron/src/preload/shell.ts"), "utf8");
+    expect(gate).toContain("app.ui.pressKey");
+    expect(gate).toContain("tab_focus_receipts=");
+    expect(gate).toContain("keyboard_tiles=10 enter=10 escape=10 focus_retained=20");
+    expect(main).toContain('registerMethod("app.ui.pressKey"');
+    expect(main).toContain('["Tab", "Enter", "Escape"]');
+    expect(main).toContain('sendInputEvent({ type: "keyDown", keyCode: key })');
+    expect(main).toContain('sendInputEvent({ type: "keyUp", keyCode: key })');
+    expect(preload).not.toContain("app.ui.pressKey");
   });
 
   test("keeps fixture truth out of the renderer and exposes inspection attributes", () => {
