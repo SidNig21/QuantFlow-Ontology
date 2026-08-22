@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - BUILDER AUTHORIZED
+status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - FRESH VERIFIER REQUIRED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -120,6 +120,8 @@ consumer-artifact-read-reader-receipt: fresh Luna Reader task `01a02976-5b02-796
 current-door: exact `NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes` bounded Builder repair is authorized; no replacement build, consumer relaunch, or R17 authority before a fresh independent PASS
 consumer-artifact-read-builder-matrix-red: focused gateway contract exactly `6 pass / 0 fail` and Builder matrix rows 1–9 green; row 10 stopped on seven Router-authored trailing spaces in committed `evidence/r16/CONSUMER-CHECK.md`; no candidate/report/falsifier/build/app launch exists yet
 current-door: docs-only whitespace correction committed without staging Builder product bytes; the same Builder may continue at row 10, then run the exact falsifier/restoration and finish its report/candidate; no row 1–9 retry, replacement build, consumer relaunch, or R17 authority
+consumer-artifact-read-builder-receipt: immutable product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`; Builder evidence `404b7274a03be3189d5360ae55948bbf783fd8b8`; rows 1–9 and corrected row 10 green; metadata-only base mutation red; four-file restoration exact; focused contract restored `6 pass / 0 fail`; tree clean and pushed
+current-door: fresh independent Verifier must freeze candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`, run the exact immutable nine-row matrix and falsifier/restoration, and write PASS or stop on RED; no replacement build, consumer relaunch, or R17 authority before PASS
 
 ## Authorized outcome
 
