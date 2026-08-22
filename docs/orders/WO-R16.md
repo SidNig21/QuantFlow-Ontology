@@ -3990,7 +3990,8 @@ follows:
    `delivered` initial delivery receipts, and leave
    `qf_review_invocation`, Evaluation, findings Artifact, and publication counts
    at zero for that review Task. Each red case uses one fresh isolated Kernel
-   fixture, so the earlier green path cannot satisfy a red assertion. The test records the
+   fixture, so the earlier green path cannot satisfy a red assertion. The test
+   records the
    attempted payloads and
    proves the green path still has exactly two writes: the instruction with
    its one terminal `\r` removed, then exactly `"\r"` after the bounded wait.
@@ -4027,3 +4028,8 @@ Fresh Reader final reread receipt: at pushed docs head `3b8b9bb63762315234dff464
 the corrected binding closure remains **YES/YES**. The Builder is authorized
 only for the exact critic-submit write-status correction; no rebuild, consumer
 launch, or R17 work is authorized.
+
+Final Reader reread receipt: at pushed docs head
+`a368eb5139784d66b82cbb12b0c72c3673362eb8`, the exact closure is **YES/YES**.
+Builder authorization remains limited to the critic-submit write-status repair;
+no rebuild, consumer launch, or R17 work is authorized.
