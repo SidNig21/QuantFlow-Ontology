@@ -592,3 +592,120 @@ the matrix ratchet remained `HARD RED: 0`.
 ### Verdict
 
 `verdict: PASS`
+
+## R16 independent verification — sixteenth-cable repair
+
+**Result: PASS** — immutable product candidate
+`1b329e7c5d1825848b2d13345aef949136cfe73f` independently passed the
+sixteenth-cable repair. Plain meaning: the research world retains its fifteen
+intended cables even when the Kernel also holds the real Director-to-critic
+relationship.
+
+### Freeze and evidence identity
+
+- Verification began at clean pushed docs head
+  `4fcf12a5cb24fa3d94fc83be64d4e5b497456096` on `wo-R16`.
+- Immutable product candidate:
+  `1b329e7c5d1825848b2d13345aef949136cfe73f`
+  (`fix R16 research world semantic cables`).
+- Separate Builder evidence:
+  `9cacd5208ca2c392649f423be8afe5f6d8b213a4`
+  (`docs: record R16 sixteenth cable proof`).
+- Source-only falsifier base:
+  `e94e544b1275958d22b3826dfec43bbfcae71c3f`.
+
+The following candidate bytes were frozen before the matrix, confirmed again
+immediately before mutation, and reproduced exactly after restoration:
+
+```text
+74A3213124EEC532ED1A377E4335FE5BB8225B469A6C3410BD607432F457F5FC  collab-electron/src/main/research-world-projection.ts
+EA0F160788CEB19113ACD73409A69AF1C631637B4633ED014BF9FFE26F529B88  collab-electron/src/main/research-world.test.ts
+E1A6749B768FFA44884E0733467D7BDA4D05BCAD57EF6D9D763F36E7F64F0C6F  qf-atlas/ATLAS.md
+185C32C7B8B831E07B86EA18B065108A939FC5ADBCF2AA8AE6DB076886D8F9AE  qf-atlas/atlas.json
+87851E9C773E01A2974E28430305DA023542756A6FC08F911ECA4616E8D901A3  qf-atlas/atlas.html
+```
+
+### Exact immutable Verifier matrix
+
+The final-section commands completed in the required order with native exit
+zero. The first isolated-gate console detached before returning its receipt;
+its child process completed, and one retained repeat of that same row supplied
+the receipt below. No product, test, or generated-Atlas byte changed.
+
+```text
+1  bun test collab-electron/src/main/research-world.test.ts
+   4 pass / 0 fail / 53 expect() calls
+2  bun qa/run.ts research-world-visible
+   PASS research-world-visible
+3  bun qa/run.ts kernel-sole-writer-app
+   PASS kernel-sole-writer-app
+4  bun qf-atlas/generate.mjs --check
+   current — 432 files, 124 channels, 13 strip candidates
+5  bun qf-atlas/ratchet.mjs
+   HARD RED: 0; unexplained coverage: 0; undecided w/o blocker: 0
+6  git diff --check
+   exit=0
+7  git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+   exit=0
+```
+
+The retained isolated-gate receipt is exact:
+
+```text
+build_once_ms=58874 build_exit=0
+forced_failure_phase=spawned_not_ready
+forced-failure shutdown_requested=false owned_processes_remaining=0
+forced_timeout_phase=spawned_not_ready elapsed_ms=513
+forced-timeout shutdown_requested=false owned_processes_remaining=0
+cleanup_preflight_ms=12611 forced_roots_remaining=0
+pointer_tiles=10 inspect=10 collapse=10
+oracle_tiles=13 oracle_cables=15 dom_tiles=13 dom_cables=15
+first-launch shutdown_requested=true owned_processes_remaining=0
+first_world_stage_ms=26655
+roots_created=3 roots_remaining=0 retried=0 leaked=[]
+primary_failure=null
+cleanup_failures=[]
+launch_attempts=3 ready_launches=1 active_launches=0 max_concurrent_launches=1
+PASS  research-world-visible
+```
+
+The frozen candidate's recorded Atlas base-diff classification is
+`VERDICT: WORSE — 1 analyzer cell(s) got worse`: one pre-existing added
+`persistence links insert into` finding and the pre-existing
+`packages/qf-kernel/src/attach-kernel-drift.test.ts` persistence coverage
+classification `not-applicable -> partial`. It is outside this repair's five
+paths; the independent currentness check and ratchet both remained green with
+`HARD RED: 0`.
+
+### Exact source-only falsifier and restoration
+
+Only `collab-electron/src/main/research-world-projection.ts` was replaced with
+its exact base bytes from `e94e544b1275958d22b3826dfec43bbfcae71c3f`.
+The mutation SHA-256 was:
+
+```text
+51ABB6D8EA34FAC6466BB3F81E7507A2FF2211CB51B0B79181F912FDB2D9C77A
+```
+
+The focused command returned the required native red:
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+exit=1; 3 pass / 1 fail / 52 expect() calls
+expected length: 15
+received length: 16
+at the complete-world link assertion
+```
+
+The candidate projection was restored from
+`1b329e7c5d1825848b2d13345aef949136cfe73f`; its restoration SHA-256 was
+`74A3213124EEC532ED1A377E4335FE5BB8225B469A6C3410BD607432F457F5FC`.
+All five frozen paths above then had zero diff against the candidate. The
+restored focused command returned `4 pass / 0 fail / 53 expect() calls`, and
+the five-path candidate diff exited `0`.
+
+No normal Electron build or application launch, consumer-evidence edit,
+founder-state access, product/test/generated-Atlas commit, assertion change,
+or R17 action occurred in this verification.
+
+`verdict: PASS`
