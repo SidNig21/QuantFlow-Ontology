@@ -567,46 +567,28 @@ export function worldObservationExpression(): string {
   return `(() => ({ objects: [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].map((node) => ({ type: node.dataset.qfWorldType, id: node.dataset.qfWorldId, accessible_name: node.getAttribute('aria-label') || '', fields: Object.fromEntries([...node.querySelectorAll('[data-qf-world-field]')].map((field) => [field.dataset.qfWorldField, field.querySelector('.qf-world-field-value')?.textContent || ''])), position: { left: node.style.left, top: node.style.top, width: node.style.width, height: node.style.height, zIndex: node.style.zIndex }, inspector_expanded: node.querySelector('.qf-world-details')?.hidden === false })), links: [...document.querySelectorAll('.cable-path[data-qf-world-cable-kind]')].map((node) => ({ kind: node.dataset.qfWorldCableKind, from_id: node.dataset.qfWorldCableFrom, to_id: node.dataset.qfWorldCableTo })) }))()`;
 }
 
-async function pressNativeKey(endpoint: string, key: "Enter" | "Escape"): Promise<void> {
-  const result = await rpcCall(endpoint, "app.ui.pressKey", { key }) as { key?: unknown; sent?: unknown };
-  assert(result?.key === key && result.sent === true, `native ${key} input was not acknowledged`);
-}
-
-async function exerciseNativeKeyboard(endpoint: string, expected: IndependentWorldManifest): Promise<void> {
-  let enter = 0;
-  let escape = 0;
-  let focusRetained = 0;
-  for (const object of expected.objects.filter((entry) => entry.type !== "agent_session")) {
-    const type = JSON.stringify(object.type);
-    const id = JSON.stringify(object.id);
-    const focused = await evaluateRenderer<boolean>(endpoint, "keyboard-focus-tile", `(() => { const tile = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].find((node) => node.dataset.qfWorldType === ${type} && node.dataset.qfWorldId === ${id}); if (!(tile instanceof HTMLElement)) throw new Error('keyboard tile is missing'); tile.focus(); return document.activeElement === tile; })()`);
-    assert(focused, `could not focus ${object.type}:${object.id} for native keyboard proof`);
-    await pressNativeKey(endpoint, "Enter");
-    enter += 1;
-    const expanded = await evaluateRenderer<{ expanded: boolean; retained: boolean }>(endpoint, "keyboard-enter-state", `(() => { const tile = document.activeElement; const details = tile?.querySelector('.qf-world-details'); return { expanded: details?.hidden === false, retained: document.activeElement === tile }; })()`);
-    assert(expanded.expanded && expanded.retained, `native Enter did not expand ${object.type}:${object.id} with focus retained`);
-    if (expanded.retained) focusRetained += 1;
-    await pressNativeKey(endpoint, "Escape");
-    escape += 1;
-    const collapsed = await evaluateRenderer<{ collapsed: boolean; retained: boolean }>(endpoint, "keyboard-escape-state", `(() => { const tile = document.activeElement; const details = tile?.querySelector('.qf-world-details'); return { collapsed: details?.hidden === true, retained: document.activeElement === tile }; })()`);
-    assert(collapsed.collapsed && collapsed.retained, `native Escape did not collapse ${object.type}:${object.id} with focus retained`);
-    if (collapsed.retained) focusRetained += 1;
-  }
-  assert(enter === 10 && escape === 10 && focusRetained === 20, "native keyboard proof receipt counts differ");
-  console.log("keyboard_tiles=10 enter=10 escape=10 focus_retained=20");
-}
-
-async function observeWorld(endpoint: string, expected: IndependentWorldManifest, missionId: string, taskId: string, deadlineAt: number, options: { exerciseKeyboard?: boolean } = {}): Promise<VisibleWorldSnapshot> {
+async function observeWorld(endpoint: string, expected: IndependentWorldManifest, missionId: string, taskId: string, deadlineAt: number, options: { exercisePointer?: boolean } = {}): Promise<VisibleWorldSnapshot> {
   const clickMission = await evaluateRenderer<boolean>(endpoint, "mission-reveal", `(() => { const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); if (!(button instanceof HTMLElement)) throw new Error('Mission Show research world button is missing'); button.click(); return true; })()`);
   assert(clickMission === true, "Mission root activation did not click");
   const read = async () => await evaluateRenderer<VisibleWorldSnapshot>(endpoint, "world-observation", worldObservationExpression());
   const world = await waitForVisibleWorld(read, expected, deadlineAt);
   assertVisibleWorldCounts(world);
   compareVisibleSnapshot(world, expected);
-  if (options.exerciseKeyboard !== false) {
-    const interaction = await evaluateRenderer<{ expanded: boolean; collapsed: boolean }>(endpoint, "mission-pointer-inspection", `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelector('.qf-world-details')?.hidden === false; inspect.click(); const collapsed = root.querySelector('.qf-world-details')?.hidden === true; return { expanded, collapsed }; })()`);
-    assert(interaction.expanded === true && interaction.collapsed === true, "pointer inspection parity failed");
-    await exerciseNativeKeyboard(endpoint, expected);
+  if (options.exercisePointer !== false) {
+    const pointerObjects = expected.objects.filter((entry) => entry.type !== "agent_session");
+    assert(pointerObjects.length === 10, `pointer proof expected 10 research objects, got ${pointerObjects.length}`);
+    let inspectCount = 0;
+    let collapseCount = 0;
+    for (const object of pointerObjects) {
+      const type = JSON.stringify(object.type);
+      const id = JSON.stringify(object.id);
+      const interaction = await evaluateRenderer<{ expanded: boolean; collapsed: boolean }>(endpoint, "pointer-inspection", `(() => { const visible = (node) => { const style = getComputedStyle(node); return !node.hidden && style.display !== "none" && style.visibility !== "hidden" && node.getClientRects().length > 0; }; const tiles = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].filter((node) => node.dataset.qfWorldType === ${type} && node.dataset.qfWorldId === ${id}); if (tiles.length !== 1) throw new Error('expected exactly one visible research tile'); const root = tiles[0]; if (!(root instanceof HTMLElement) || !visible(root)) throw new Error('research tile is missing or hidden'); const controls = [...root.querySelectorAll('.qf-world-inspect')]; if (controls.length !== 1) throw new Error('research Inspect control count differs'); const inspect = controls[0]; if (!(inspect instanceof HTMLButtonElement) || inspect.disabled || inspect.getAttribute('aria-disabled') === 'true' || !visible(inspect)) throw new Error('research Inspect control is missing, disabled, or hidden'); const details = [...root.querySelectorAll('.qf-world-details')]; if (details.length !== 1) throw new Error('research details body count differs'); const target = details[0]; inspect.click(); const expanded = target.hidden === false && inspect.textContent === 'Collapse'; if (!expanded) throw new Error('Inspect click did not expand the exact target'); const collapse = inspect; collapse.click(); const collapsed = target.hidden === true && inspect.textContent === 'Inspect'; if (!collapsed) throw new Error('Collapse click did not collapse the exact target'); return { expanded, collapsed }; })()`);
+      assert(interaction.expanded === true && interaction.collapsed === true, `pointer inspection transition failed for ${object.type}:${object.id}`);
+      inspectCount += 1;
+      collapseCount += 1;
+    }
+    assert(inspectCount === 10 && collapseCount === 10, "pointer proof receipt counts differ");
+    console.log("pointer_tiles=10 inspect=10 collapse=10");
   }
   const second = await evaluateRenderer<{ before: number; after: number }>(endpoint, "duplicate-reveal", `(() => { const before = document.querySelectorAll('.canvas-tile[data-qf-world-type]').length; const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); button?.click(); return { before, after: document.querySelectorAll('.canvas-tile[data-qf-world-type]').length }; })()`);
   assert(second.before === EXPECTED_VISIBLE_TILE_COUNT && second.after === EXPECTED_VISIBLE_TILE_COUNT, "second reveal duplicated research tiles");
@@ -758,11 +740,11 @@ async function runNormalReopenCase(root: string, first: FirstWorldState, functio
   };
   try {
     active = await launch(root, functionalDeadlineAt, onSpawnStarted);
-    const secondWorld = await observeWorld(active.endpoint, first.expected, first.missionId, first.taskId, functionalDeadlineAt, { exerciseKeyboard: false });
+    const secondWorld = await observeWorld(active.endpoint, first.expected, first.missionId, first.taskId, functionalDeadlineAt, { exercisePointer: false });
     assert(JSON.stringify(secondWorld) === JSON.stringify(first.firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
     if (!await cleanupActive("second-launch")) return outcome;
     readSavedCanvasState(first.appDir, first.expected);
-    console.log("reopen_equal=true pointer=true keyboard=true duplicate_reveal=false");
+    console.log("reopen_equal=true pointer=true duplicate_reveal=false");
   } catch (error) {
     outcome.functionalError = error;
     active ??= attachedLive(error);

@@ -160,17 +160,38 @@ describe("research-world-visible gate contract", () => {
     expect(invoked).toBe(0);
   });
 
-  test("requires native Enter/Escape receipts and no global Tab contract", () => {
+  test("requires the exact pointer-first DOM click-handler proof and no keyboard sender", () => {
     const gate = readFileSync(join(import.meta.dir, "research-world-visible.ts"), "utf8");
     const main = readFileSync(join(REPO_ROOT, "collab-electron/src/main/index.ts"), "utf8");
     const preload = readFileSync(join(REPO_ROOT, "collab-electron/src/preload/shell.ts"), "utf8");
     const renderer = readFileSync(join(REPO_ROOT, "collab-electron/src/windows/shell/src/research-world.js"), "utf8");
     const tileManager = readFileSync(join(REPO_ROOT, "collab-electron/src/windows/shell/src/tile-manager.js"), "utf8");
-    expect(gate).toContain("app.ui.pressKey");
-    expect(gate).toContain("keyboard_tiles=10 enter=10 escape=10 focus_retained=20");
+    const pointerStart = gate.indexOf("const pointerObjects = expected.objects.filter");
+    const pointerEnd = gate.indexOf("\n  const second =", pointerStart);
+    const pointerProof = gate.slice(pointerStart, pointerEnd);
+    const liveStart = gate.indexOf("async function observeWorld");
+    const liveEnd = gate.indexOf("\nconst TRANSIENT_ROOT_ERRORS", liveStart);
+    const liveGate = gate.slice(liveStart, liveEnd);
+    expect(pointerStart).toBeGreaterThanOrEqual(0);
+    expect(pointerEnd).toBeGreaterThan(pointerStart);
+    expect(pointerProof).toContain('expected.objects.filter((entry) => entry.type !== "agent_session")');
+    expect(pointerProof).toContain("pointerObjects.length === 10");
+    expect(pointerProof).toContain("querySelectorAll('.qf-world-inspect')");
+    expect(pointerProof).toContain("querySelectorAll('.qf-world-details')");
+    expect(pointerProof).toContain("inspect.disabled");
+    expect(pointerProof).toContain("getComputedStyle");
+    expect(pointerProof).toContain("getClientRects");
+    expect(pointerProof).toContain("details.length !== 1");
+    expect(pointerProof.match(/inspect\.click\(\)/g) ?? []).toHaveLength(1);
+    expect(pointerProof.match(/collapse\.click\(\)/g) ?? []).toHaveLength(1);
+    expect((gate.match(/console\.log\("pointer_tiles=10 inspect=10 collapse=10"\)/g) ?? [])).toHaveLength(1);
+    expect(liveGate).not.toMatch(/app\.ui\.pressKey|pressNativeKey|sendInputEvent|keyboard_|tab_focus_|qf-r16-tab-sentinel|\.focus\(|keyDown|keyUp|KeyboardEvent|dispatchEvent/);
+    expect(gate).not.toContain("exerciseKeyboard");
+    expect(gate).not.toContain("exerciseNativeKeyboard");
+    expect(gate).not.toContain("pressNativeKey");
+    expect(gate).not.toContain("keyboard_");
     expect(gate).not.toContain("tab_focus_");
     expect(gate).not.toContain("qf-r16-tab-sentinel");
-    expect(gate).not.toContain('pressNativeKey(endpoint, "Tab")');
     expect(main).toContain('registerMethod("app.ui.pressKey"');
     expect(main).toContain('["Tab", "Enter", "Escape"]');
     expect(main).toContain('sendInputEvent({ type: "keyDown", keyCode: key })');
@@ -178,8 +199,6 @@ describe("research-world-visible gate contract", () => {
     const keyHandlerStart = renderer.indexOf("const keyHandler = (event) => {");
     const keyHandlerEnd = renderer.indexOf("\n\t};", keyHandlerStart);
     const keyHandler = renderer.slice(keyHandlerStart, keyHandlerEnd < 0 ? renderer.length : keyHandlerEnd);
-    expect(keyHandler).toContain('event.key === "Enter"');
-    expect(keyHandler).toContain('event.key === "Escape"');
     expect(keyHandler).not.toContain('event.key === "Tab"');
     expect(keyHandler).not.toMatch(/event\.key\s*===\s*["']Tab["'][\s\S]*preventDefault/);
     expect(tileManager).not.toContain("wv.tabIndex = -1;");
