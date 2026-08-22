@@ -1331,9 +1331,12 @@ receipt-safe cleanup behavior.
    synchronously before awaiting either promise, then returns
    `Promise.all([executor, critic])` in that fixed order. A focused fake-runner
    holds both promises unresolved and fails within 250 ms unless both callbacks
-   have started. The first normal stage calls this helper immediately after the
-   Director question returns, using the unchanged production `qf.dock.spawn`
-   calls for `hermes-worker` and `hermes-critic`.
+   have started. It resolves the critic promise first and the executor promise
+   second, then must still receive exactly `["executor-result",
+   "critic-result"]`; a reversed return array is red. The first normal stage
+   calls this helper immediately after the Director question returns, using the
+   unchanged production `qf.dock.spawn` calls for `hermes-worker` and
+   `hermes-critic`.
 2. Keep `RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000` and
    `CLEANUP_RESERVE_MS = 8_000`. Print `first_world_stage_ms=<n>` after the first
    13/15 world has passed, its app has closed, its process set is zero, and its
@@ -1348,14 +1351,19 @@ receipt-safe cleanup behavior.
    that root absent. The test owns and removes only its exact temp root.
 4. Root cleanup never throws before receipts. Associate each normal/failure/
    timeout root with its existing case. A root-removal failure or surviving root
-   becomes that case's `cleanupError`. If the hard deadline is exceeded and no
-   earlier functional error exists, record the exact normal functional error
-   `research-world-visible exceeded its 60 second total deadline`.
-5. After every process and root cleanup attempt, always print in this fixed
-   order: the existing `roots_created=...` line, `primary_failure=...`, then
-   `cleanup_failures=...`. Only after all three lines exist may the gate assert
-   the hard deadline, zero roots, and `receipts.ok`. Thus a cleanup defect can
-   make the gate red but cannot replace or suppress the primary receipt.
+   becomes that case's `cleanupError`. “An earlier functional error exists”
+   means any final case outcome has `functionalError !== undefined` after fixed
+   normal/failure/timeout merging. If none does and the hard deadline is
+   exceeded, set the normal case's functional error to exactly
+   `research-world-visible exceeded its 60 second total deadline`. A cleanup
+   error is never a functional error and never becomes `primary_failure`.
+5. After all process and root cleanup attempts have finished, print exactly one
+   final receipt block in this fixed order: the existing `roots_created=...`
+   line, `primary_failure=...`, then `cleanup_failures=...`. Do not print those
+   three lines per attempt. Only after the one complete block exists may the
+   gate assert the hard deadline, zero roots, and `receipts.ok`. Thus a cleanup
+   defect can make the gate red but cannot replace or suppress the primary
+   receipt.
 
 ### Builder and acceptance authority
 
