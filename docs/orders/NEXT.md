@@ -144,6 +144,8 @@ sixteenth-cable-verifier-receipt: fresh independent Terra Verifier task `01a029c
 current-door: Router is authorized for one identity-bound build and one exact normal two-launch Computer Use Attempt 4; any red keeps R16 open; no R17 authority
 consumer-attempt-4-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` and bound build opened normally and Director canary passed; Router then clicked the worker's right-side cancel control while trying to select it, with durable admission/cancel/exit ordering; ordinary cleanup was zero and no product red is claimed
 current-door: Router is authorized for one unchanged-output normal two-launch Computer Use Attempt 5; right-side live-session rows are prohibited; any red keeps R16 open; no R17 authority
+consumer-attempt-5-external-runtime-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` completed Director recruitment, deterministic worker execution, and the sole critic's three governed reads; the critic independently computed a numeric supporting Evaluation, but `qf_record_evaluation` recorded `success=0`/`{"status":"pending"}` while its live terminal displayed external `403 {"model":"kimi-k3"}`; no Evaluation/Report/world/reopen PASS exists; Director/critic canaries and ordinary zero-process cleanup passed
+current-door: R16 is stopped on the exact Attempt 5 external-runtime red for founder decision; no retry, repair lap, consumer Attempt 6, or R17 authority
 
 ## Authorized outcome
 

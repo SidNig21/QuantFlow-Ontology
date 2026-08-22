@@ -5211,3 +5211,24 @@ never click a right-side live-session row; Director, worker, and critic
 terminals may be selected only through their canvas tiles or left tile
 inventory. Any additional Router interference, missing receipt, product red,
 or external-runtime red stops R16. No R17 authority is created here.
+
+### CONSUMER ATTEMPT 5 EXTERNAL-RUNTIME RED — critic Evaluation hit Kimi 403
+
+Attempt 5 used the unchanged independently verified candidate and exact build
+without right-side session-row clicks or other Router interference. One real
+Mission completed Director recruitment, deterministic worker execution, and
+the critic's three required governed reads. The sole critic independently
+recomputed the positive result and submitted an exact numeric Evaluation bound
+to the correct source work. Its sequence-4 broker row recorded `success=0`,
+result `{"status":"pending"}`, while the live terminal displayed
+`Error code: 403 - {"model":"kimi-k3"}` at `qf_record_evaluation`.
+
+No Evaluation or Report was created, so the world stopped at 8 objects and 7
+links. Director and critic typing receipts and ordinary zero-process cleanup
+were green; the worker completed before its canary could be captured. Exact
+identities, arguments, non-claims, and cleanup are append-only in
+`docs/orders/evidence/r16/CONSUMER-CHECK.md` Attempt 5.
+
+This is the exact external-runtime red named by the Attempt 5 stop condition.
+R16 remains open. No additional consumer attempt, model retry, product repair,
+Builder/Verifier lap, or R17 work is authorized by this receipt.

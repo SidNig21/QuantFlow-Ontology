@@ -287,3 +287,78 @@ manual Task, alternate Evaluation, or verdict override was used.
 The application closed through its ordinary visible Close control. The launch
 root, repo Electron processes, and WSL Hermes/collaboration/ontology processes
 were all exactly zero. No world, inspector, or reopen PASS is claimed.
+
+## Attempt 5 — RED: external Kimi 403 stopped the sole critic Evaluation
+
+Date: 2026-08-22
+Candidate: `1b329e7c5d1825848b2d13345aef949136cfe73f`
+Builder evidence: `9cacd5208ca2c392649f423be8afe5f6d8b213a4`
+Independent verification: `82ecfda163c177a56e9caca799460b8d05d77159`
+Build timestamp: `2026-08-22T14:06:29.6630346Z`
+Application command: from `collab-electron`,
+`node ./scripts/run-local-bin.mjs electron-vite preview --skipBuild`
+Mode: unchanged exact Attempt 4 output in the normal founder application; no
+proof bridge, SQLite seed, credential access, synthetic responder, rebuild,
+replacement critic, or second Mission
+
+Verdict: **RED by the order's external-runtime stop condition. R16 remains
+open.**
+
+### Exact live governed chain
+
+One visible guided action created Mission
+`mission-a4af6636-3a45-4589-9fe3-f154a2ced2ba`, Research Director
+`a285956d-cf86-4c7e-83bb-dddd21631ca3`, source Task
+`task-81af3abd-3338-483e-81ae-b3c706149baf`, executor
+`session-a4af6636-3a45-4589-9fe3-f154a2ced2ba`, Hypothesis
+`e8590150-c0c8-4a3e-a355-8a5cfeeec9f3`, Run
+`run-9b4c4dba-c275-4cfb-83cd-b46b3384883d`, result Artifact
+`cba126f77ef6bf9bc099639dc2b91ee339341e1fba88ccdb511b41327f394a16`,
+review Task `review-task-9511c7aa-da23-4784-9f4d-a02af0b40f16`, and sole critic
+`critic-4fe0cc48-8c29-4ddd-828d-7c2d6bb384a8`.
+
+The worker completed the deterministic Run and returned its handoff. The sole
+critic then completed the required governed reads in exact broker order:
+
+1. `qf_hypothesis_get`, sequence 1, success 1;
+2. `qf_run_get`, sequence 2, success 1;
+3. `qf_artifact_get`, sequence 3, success 1, including the hash-verified
+   result receipt.
+
+The critic independently recomputed net profit `100.000000`, ROI `1.000000`,
+hit rate `1.000000`, and average CLV `0.111111`; it chose `supports` at
+confidence `0.9` with numeric rubric
+`{faithfulness:1, answer_relevancy:1, context_precision:0.9,
+context_recall:0.9}`. Its exact sequence-4 `qf_record_evaluation` arguments are
+durably recorded and correctly bind this Hypothesis, Run, Artifact, source
+work, critic, and review Task.
+
+### Exact external-runtime red
+
+The sequence-4 broker row is `success=0` with result `{"status":"pending"}`.
+At the same action boundary, the live critic terminal displayed:
+
+```text
+Mcp QuantFlow Ontology Qf Record Evaluation (0.0s)
+Error: Error code: 403 - {"model":"kimi-k3"}
+```
+
+No Evaluation row was created, the governed review Task remained `running`,
+and no publication row or Report was created. The read-only Mission projection
+therefore stopped at 8 objects and 7 links with `missing_lineage=[]`; the
+Evaluation, findings Artifact, Report, governed-review completion lineage, and
+their remaining world members were absent. The exact 13-object/15-cable,
+ten-inspector, and reopen receipts cannot be claimed.
+
+This attempt did not click any right-side live-session row and introduced no
+Router cancellation or other consumer interference. The worker completed
+before its terminal could be selected, so no worker canary is claimed. The
+Director and critic terminals each visibly accepted exact canary
+`qf-r16-typing-check-1b329e7` after mouse focus; each canary was erased with
+`Ctrl+U` and focus returned to the canvas by pointer without submission.
+
+The app closed through its ordinary visible Close control. Launch root PID
+`7744`, repo Electron processes, and WSL Hermes/collaboration/ontology
+processes were all exactly zero afterward. No retry of the Evaluation, second
+Mission, replacement critic, alternate verdict, manual publication, second
+launch, product edit, or R17 work occurred.
