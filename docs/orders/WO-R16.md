@@ -1214,3 +1214,81 @@ of this repair.
 Plain meaning: QuantFlow already has every research object on screen; make the
 cable renderer connect those real tiles instead of recognizing only agent
 sessions.
+
+## SESSION RECEIPT REPAIR - expose projected identity without replacing the live seat
+
+Cable-resolution WIP SHA `4548736a8d216f140a483cbd9d3685d2166acc57` is
+evidence, not a candidate. Its focused resolver tests pass 3/3 and the unchanged
+gate contract passes 11/11. The live gate advanced through the exact 13-object,
+15-cable count and cable manifest, then stopped at the first session comparison:
+
+```text
+primary_failure={"case":"normal","message":"displayed fields differ for agent_session:9b21bf90-70b9-4df5-882b-8b33e2bf677c"}
+```
+
+Cleanup remained fully green: normal owned processes and all three roots reached
+zero, with `cleanup_failures=[]`.
+
+The measured product defect is the existing `decorateSession(object)` path in
+`collab-electron/src/windows/shell/src/research-world.js`. It marks the live
+terminal seat with research-world type/id and accessible name but emits none of
+the projection's exact `id`, `status`, and `label` fields. The independent Oracle
+correctly expects those three fields, with `Not recorded` for an absent label.
+
+### Exact repair
+
+1. Export one pure function named `researchSessionReceiptFields(object)`. It
+   returns exactly three entries in this literal order: `id`, `status`, `label`.
+   Each entry contains the field name and the same display string produced by
+   `displayValue`: missing/null/undefined is `Not recorded`, empty string is
+   `[empty string]`, and all other values use `String(value)`.
+2. `decorateSession` keeps the existing unique non-research session tile and
+   its native terminal/CLI body. It must not call `renderObject`, replace or
+   clear `dom.contentArea`, change the tile type/id/session identity, or create
+   a research tile.
+3. Under that tile's existing `dom.taskFoot`, create or reuse exactly one direct
+   child `.qf-world-session-receipt`. On every projection refresh, replace only
+   that receipt's children with the three rows returned above, rendered through
+   the existing `makeField` seam so each row exposes `data-qf-world-field` and
+   `.qf-world-field-value`. Do not replace or remove any other task-foot child.
+4. The second reveal and reopen reuse the same receipt node and leave exactly
+   one copy. The existing `data-qf-world-type`, `data-qf-world-id`, and full
+   accessible name remain on the terminal tile. Session receipt fields are a
+   transient projection and add nothing to saved canvas state.
+
+The focused renderer test proves the pure field order and every display-value
+case. Its source seam also fails unless `decorateSession` targets
+`dom.taskFoot`, names `.qf-world-session-receipt`, and contains no
+`contentArea.replaceChildren` or `renderObject` call. The unchanged live gate is
+the integration proof: all three session tiles must match their independent
+fields on first reveal and reopen while the 13/15 manifest, terminal seats,
+native-key receipts, saved-state allowlist, and cleanup remain green.
+
+### Builder and acceptance authority
+
+A fresh Builder starts only from clean local and remote
+`4548736a8d216f140a483cbd9d3685d2166acc57` plus the Router's pushed Reader-fix
+commit. It may change only:
+
+- `collab-electron/src/windows/shell/src/research-world.js`;
+- `collab-electron/src/windows/shell/src/research-world.test.ts`;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections required by normal change control.
+
+It runs Atlas preflight, the focused renderer test, and the unchanged 11-test
+gate contract before exactly one live `bun qa/run.ts research-world-visible`.
+A red stops with its exact receipt. A green proceeds through the already-
+specified falsifiers, short matrix, BUILD-REPORT, Atlas regeneration, immutable
+candidate commit, and push. The gate, expected manifest, schedule, timeout,
+fixture, Main, preload, Kernel, canvas persistence, terminal body, and all other
+product files remain byte-unchanged from `4548736`.
+
+A fresh different-model Verifier records the candidate SHA before and after,
+reruns both focused tests, the live gate, the named falsifier sample and short
+matrix, and writes `docs/orders/evidence/r16/VERIFICATION.md` only on full PASS.
+No package, installer, release, worktree, wrapper, or helper framework is part
+of this repair.
+
+Plain meaning: keep each real Hermes terminal intact, but add the three small
+Kernel-backed identity facts that let Ryan inspect who that seat is in the
+research world.

@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "04b2596",
+    "commit": "4548736",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "33baf91e336d23e3"
+    "fingerprint": "c32e36ece2c40a19"
   },
   "stats": {
     "live": 111,
@@ -2917,7 +2917,7 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 8.3,
+      "kb": 8.8,
       "x": 3.89,
       "z": -0.73,
       "status": "ok",
@@ -2928,7 +2928,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 8.3,
+          "kb": 8.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -18585,7 +18585,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 93 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 105 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "0457d97",
+      "commit": "04b2596",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "04b2596",
+      "commit": "4548736",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
