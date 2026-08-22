@@ -5053,25 +5053,56 @@ missing numeric rubric shape. Restore every changed file to the candidate
 hashes, require zero candidate diff, and rerun both focused commands green.
 The mutation may not touch product/founder state.
 
-A fresh independent Verifier freezes the candidate, runs the same matrix except
-the mutating Atlas generation row, repeats the falsifier/restoration, and writes
-PASS only with exact restoration and Atlas HARD RED 0. No build or app launch
-occurs before PASS.
+A fresh independent Verifier freezes the candidate and runs exactly these nine
+non-mutating rows in order; it omits both generator rows from the Builder block
+(`bun run --cwd qf-kernel-schema generate` and
+`bun qf-atlas/generate.mjs`):
+
+```text
+bun test --cwd qf-kernel-schema
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test collab-electron/src/main/governed-review.test.ts
+bun qa/run.ts governed-review
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+The Verifier repeats the falsifier/restoration only after that matrix, writes
+exactly one PASS section for this repair to
+`docs/orders/evidence/r16/VERIFICATION.md`, and records the exact restoration
+hashes and Atlas `HARD RED: 0`. It never regenerates, edits, or commits the
+candidate during the normal matrix. No build or app launch occurs before this
+PASS.
 
 After PASS, the Router makes one exact identity-bound build and one new normal
-Computer Use consumer attempt. The worker canary is performed immediately
-after its tile appears, before waiting for completion. The sole critic must
-receive the exact numeric rubric schema, complete one successful Evaluation,
-and publish through the unchanged gate. All existing exact 13-object/15-cable,
-ten pointer inspector, three terminal canary, no-submission, reopen-equality,
-and zero-process requirements remain unchanged. No second Mission or alternate
-critic is allowed.
+Computer Use consumer attempt. Because Attempt 2 is already the recorded red
+attempt, the Router appends exactly one `Attempt 3` section to
+`docs/orders/evidence/r16/CONSUMER-CHECK.md` and preserves Attempt 1 and Attempt
+2 byte-for-byte. Attempt 3 records the immutable candidate/build identity, the
+exact two-launch commands, the exact numeric rubric schema received by the
+sole critic, the successful Evaluation and unchanged publication receipt, the
+exact 13-object/15-cable world, ten pointer inspector receipts, three terminal
+canary receipts, first/second-launch equality, and zero owned Windows/WSL
+processes after each ordinary close. Immediately after the executor (worker)
+tile appears, its existing type/erase/mouse-return canary is recorded before
+waiting for completion; the Director and critic canaries remain required.
+The sole critic must complete one successful Evaluation and publish through the
+unchanged gate. No second Mission, retry critic, alternate Evaluation, or
+verdict override is allowed.
 
 Every gate has a native red: stale generation, generic rubric shape, production
 tool mismatch, governed-review regression, writer/Atlas regression, base-schema
-mutation staying green, live critic failure, missing Report/world, pointer or
-reopen mismatch, or cleanup residue. Every deliverable has exactly one meaning:
-one strict rubric input authority, its generated/served MCP projection, one
-focused regression, one falsifier/restoration, one independent PASS, and one
-normal consumer PASS. A fresh Reader must answer exactly whether every gate can
-fail and whether every deliverable has exactly one meaning before Builder work.
+mutation staying green, missing or duplicated Attempt 3 evidence, live critic
+or Evaluation failure, missing Report/world, pointer or reopen mismatch, or
+cleanup residue. The deliverables are six named outcomes with one meaning
+each: (1) one strict `record_evaluation` rubric authority; (2) one generated
+MCP projection identical to that authority; (3) one six-test focused contract,
+made of the appended schema test plus the extended existing gateway discovery
+test; (4) one source-only falsifier/restoration; (5) one independent Verifier
+PASS in the named verification receipt; and (6) one append-only Attempt 3
+normal-consumer PASS from the sole critic and Mission. A fresh Reader must
+answer exactly whether every gate can fail and whether every deliverable has
+exactly one meaning before Builder work.
