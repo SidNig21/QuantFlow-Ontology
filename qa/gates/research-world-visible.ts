@@ -567,10 +567,16 @@ export function worldObservationExpression(): string {
 }
 
 type KeyboardFocusReceipt = { type: string; id: string; control: "tile" | "button"; accessible_name: string };
-
-function buttonAccessibleName(button: Element): string {
-  return button.getAttribute("aria-label") || button.getAttribute("title") || button.textContent?.trim() || "";
-}
+export type FocusedElementReceipt = {
+  tag: string;
+  id: string;
+  class: string;
+  input_type: string;
+  world_type: string;
+  world_id: string;
+  control: "tile" | "button" | "other";
+  accessible_name: string;
+};
 
 async function pressNativeKey(endpoint: string, key: "Tab" | "Enter" | "Escape"): Promise<void> {
   const result = await rpcCall(endpoint, "app.ui.pressKey", { key }) as { key?: unknown; sent?: unknown };
@@ -611,15 +617,32 @@ function tabFocusPlanExpression(): string {
   })()`;
 }
 
-function focusedWorldTargetExpression(): string {
+export function tabFocusObservationExpression(): string {
   return `(() => {
     const active = document.activeElement;
-    const tile = active?.closest?.('.canvas-tile[data-qf-world-type]');
-    if (!(tile instanceof HTMLElement)) throw new Error('native Tab focus left the research world');
-    const control = active === tile ? 'tile' : active instanceof HTMLButtonElement ? 'button' : null;
-    if (!control) throw new Error('native Tab focus landed on an unexpected research descendant');
-    return { type: tile.dataset.qfWorldType, id: tile.dataset.qfWorldId, control, accessible_name: control === 'tile' ? tile.getAttribute('aria-label') || '' : active.getAttribute('aria-label') || active.getAttribute('title') || active.textContent?.trim() || '' };
+    const element = active instanceof Element ? active : null;
+    const tile = element?.closest('.canvas-tile[data-qf-world-type]');
+    const accessible_name = [element?.getAttribute('aria-label'), element?.getAttribute('title'), element?.textContent]
+      .map((value) => typeof value === 'string' ? value.trim() : '')
+      .find((value) => value.length > 0) ?? '';
+    return {
+      tag: element ? element.tagName.toLowerCase() : 'none',
+      id: element && typeof element.id === 'string' ? element.id : '',
+      class: element && typeof element.className === 'string' ? element.className : '',
+      input_type: element?.getAttribute('type') ?? '',
+      world_type: tile?.getAttribute('data-qf-world-type') ?? '',
+      world_id: tile?.getAttribute('data-qf-world-id') ?? '',
+      control: tile && element === tile ? 'tile' : tile && element instanceof HTMLButtonElement ? 'button' : 'other',
+      accessible_name,
+    };
   })()`;
+}
+
+function matchesKeyboardFocusTarget(actual: FocusedElementReceipt, expected: KeyboardFocusReceipt): boolean {
+  return actual.world_type === expected.type
+    && actual.world_id === expected.id
+    && actual.control === expected.control
+    && actual.accessible_name === expected.accessible_name;
 }
 
 async function exerciseNativeKeyboard(endpoint: string, expected: IndependentWorldManifest): Promise<void> {
@@ -631,9 +654,13 @@ async function exerciseNativeKeyboard(endpoint: string, expected: IndependentWor
   try {
     for (const target of plan.targets) {
       await pressNativeKey(endpoint, "Tab");
-      const actual = await evaluateRenderer<KeyboardFocusReceipt>(endpoint, "tab-focus-step", focusedWorldTargetExpression());
-      assert(JSON.stringify(actual) === JSON.stringify(target), `native Tab focus order differs at ${target.type}:${target.id}:${target.control}`);
-      receipts.push(actual);
+      const actual = await evaluateRenderer<FocusedElementReceipt>(endpoint, "tab-focus-step", tabFocusObservationExpression());
+      if (!matchesKeyboardFocusTarget(actual, target)) {
+        const failure = `tab_focus_failure=${JSON.stringify({ step: receipts.length, expected: target, actual })}`;
+        console.log(failure);
+        throw new Error(failure);
+      }
+      receipts.push(target);
     }
   } finally {
     await evaluateRenderer<boolean>(endpoint, "tab-sentinel-remove", `(() => { const sentinel = document.getElementById(${JSON.stringify(plan.sentinelId)}); sentinel?.remove(); return !document.getElementById(${JSON.stringify(plan.sentinelId)}); })()`);

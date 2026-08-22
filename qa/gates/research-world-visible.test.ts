@@ -17,6 +17,7 @@ import {
   removeRegisteredRoot,
   scheduleFirstWorldSpecialists,
   schedulePostFirstCases,
+  tabFocusObservationExpression,
   worldTimeoutDelta,
   worldObservationExpression,
 } from "./research-world-visible.ts";
@@ -186,5 +187,105 @@ describe("research-world-visible gate contract", () => {
     expect(renderer).toContain("qfWorldType");
     expect(renderer).toContain("qfWorldId");
     expect(renderer).toContain("qfWorldField");
+  });
+
+  test("describes exact Tab focus targets and an outside focus thief", () => {
+    class MockElement {
+      readonly tagName: string;
+      readonly id: string;
+      readonly className: string;
+      readonly textContent: string;
+      private readonly attributes: Record<string, string>;
+      private readonly closestTile: MockElement | null;
+
+      constructor(tagName: string, id: string, className: string, attributes: Record<string, string>, textContent: string, closestTile: MockElement | null = null) {
+        this.tagName = tagName;
+        this.id = id;
+        this.className = className;
+        this.attributes = attributes;
+        this.textContent = textContent;
+        this.closestTile = closestTile;
+      }
+
+      getAttribute(name: string): string | null {
+        return this.attributes[name] ?? null;
+      }
+
+      closest(): MockElement | null {
+        return this.closestTile ?? (this.attributes["data-qf-world-type"] ? this : null);
+      }
+    }
+
+    class MockButton extends MockElement {}
+    const globals = globalThis as unknown as Record<string, unknown>;
+    const previousDocument = globals.document;
+    const previousElement = globals.Element;
+    const previousButton = globals.HTMLButtonElement;
+    const expression = tabFocusObservationExpression();
+    const evaluate = (activeElement: MockElement): unknown => {
+      globals.document = { activeElement };
+      globals.Element = MockElement;
+      globals.HTMLButtonElement = MockButton;
+      return Function(`return ${expression}`)();
+    };
+    const tile = new MockElement(
+      "DIV",
+      "ontology:mission:m1",
+      "canvas-tile research-tile",
+      { "data-qf-world-type": "mission", "data-qf-world-id": "m1", "aria-label": "Mission m1" },
+      "Mission body",
+    );
+    const button = new MockButton(
+      "BUTTON",
+      "inspect-m1",
+      "qf-world-inspect",
+      { type: "button", title: "  Inspect mission  " },
+      "ignored button text",
+      tile,
+    );
+    const outside = new MockElement(
+      "INPUT",
+      "search-box",
+      "search-control",
+      { type: "text", "aria-label": "  ", title: "Outside input" },
+      "ignored input text",
+    );
+
+    try {
+      expect(evaluate(tile)).toEqual({
+        tag: "div",
+        id: "ontology:mission:m1",
+        class: "canvas-tile research-tile",
+        input_type: "",
+        world_type: "mission",
+        world_id: "m1",
+        control: "tile",
+        accessible_name: "Mission m1",
+      });
+      expect(evaluate(button)).toEqual({
+        tag: "button",
+        id: "inspect-m1",
+        class: "qf-world-inspect",
+        input_type: "button",
+        world_type: "mission",
+        world_id: "m1",
+        control: "button",
+        accessible_name: "Inspect mission",
+      });
+      expect(evaluate(outside)).toEqual({
+        tag: "input",
+        id: "search-box",
+        class: "search-control",
+        input_type: "text",
+        world_type: "",
+        world_id: "",
+        control: "other",
+        accessible_name: "Outside input",
+      });
+    } finally {
+      globals.document = previousDocument;
+      globals.Element = previousElement;
+      globals.HTMLButtonElement = previousButton;
+    }
   });
 });
