@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "5445578",
+    "commit": "a175f45",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "d770980b61d234a3"
+    "fingerprint": "67393dcb29a0f69b"
   },
   "stats": {
     "live": 111,
@@ -927,8 +927,8 @@
       "layer": 2,
       "name": "scripts/package*",
       "kb": 15.4,
-      "x": -0.45,
-      "z": -2.6,
+      "x": 0.91,
+      "z": -2.48,
       "status": "ok",
       "spawns": 5,
       "writes": 2,
@@ -2046,9 +2046,9 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 15.1,
-      "x": 0.91,
-      "z": -2.48,
+      "kb": 15.5,
+      "x": -0.45,
+      "z": -2.6,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2057,7 +2057,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 14.4,
+          "kb": 14.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -42821,6 +42821,14 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "parse",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "push",
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
@@ -42848,14 +42856,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "parse",
-            "from": "collab-electron/src/main/research-world-projection.ts",
-            "candidates": [
-              "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "all",
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
@@ -42868,15 +42868,6 @@
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "get",
-            "from": "collab-electron/src/main/research-world-projection.ts",
-            "candidates": [
-              "collab-electron/src/main/kernel.ts",
-              "collab-electron/src/main/peer-role-registry.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -58448,16 +58439,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "c79d9ed",
+      "commit": "5445578",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "5445578",
+      "commit": "a175f45",
       "generatedAt": "2026-08-22"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "42 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -58794,16 +58785,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "packages/qf-kernel/src/attach-kernel-drift.test.ts",
-        "analyzer": "persistence",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "6 of 6 SQL site(s) are not inside a named function, so no call path can be traced"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -58811,7 +58793,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null

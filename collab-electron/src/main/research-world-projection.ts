@@ -184,31 +184,12 @@ function idsContain(ids: Map<string, Set<string>>, id: string): boolean {
   return [...ids.values()].some((set) => set.has(id));
 }
 
-function addFieldReferences(snapshot: RelationalSnapshot, ids: Map<string, Set<string>>): boolean {
-  let changed = false;
-  for (const type of ["run", "evaluation"]) {
-    for (const id of ids.get(type) ?? []) {
-      const row = objectRow(snapshot, type, id);
-      const params = type === "run" ? parseJson(row.params) : parseJson(row.source_work);
-      const record = params && typeof params === "object" && !Array.isArray(params) ? params as Record<string, unknown> : {};
-      if (type === "run") {
-        changed ||= addId(ids, "dataset", record.dataset_id);
-        changed ||= addId(ids, "hypothesis", record.hypothesis_id);
-        changed ||= addId(ids, "artifact", record.result_artifact_id);
-        changed ||= addId(ids, "agent_session", record.executor_session_id);
-      } else {
-        changed ||= addId(ids, "artifact", row.findings_artifact_id);
-        changed ||= addId(ids, "task", row.review_task_id);
-        changed ||= addId(ids, "artifact", row.publication_report_id);
-        changed ||= addId(ids, "task", record.source_task_id);
-        changed ||= addId(ids, "hypothesis", record.hypothesis_id);
-        changed ||= addId(ids, "run", record.run_id);
-        changed ||= addId(ids, "artifact", record.result_artifact_id);
-        changed ||= addId(ids, "agent_session", record.executor_session_id);
-      }
-    }
-  }
-  return changed;
+function sourceWorkMatches(row: Record<string, unknown>, source: Record<string, unknown>): boolean {
+  const value = parseJson(row.source_work);
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  return ["source_task_id", "hypothesis_id", "run_id", "result_artifact_id", "executor_session_id"]
+    .every((key) => candidate[key] === source[key]);
 }
 
 function projectObject(snapshot: RelationalSnapshot, type: string, id: string): ResearchWorldObject {
@@ -280,13 +261,46 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   for (const [type, key] of [["hypothesis", "hypothesis_id"], ["run", "run_id"], ["artifact", "result_artifact_id"], ["agent_session", "executor_session_id"]] as const) {
     addId(ids, type, source[key]);
   }
-  let changed = true;
-  while (changed) {
-    changed = addFieldReferences(snapshot, ids);
+
+  const run = objectRow(snapshot, "run", String(source.run_id));
+  const runParams = parseJson(run.params);
+  const runFields = runParams && typeof runParams === "object" && !Array.isArray(runParams)
+    ? runParams as Record<string, unknown> : {};
+  addId(ids, "dataset", runFields.dataset_id);
+
+  for (const link of allLinks) {
+    if (link.from_id !== selectedTaskId) continue;
+    if (link.kind === "belongs_to" || link.kind === "assigned_to" || link.kind === "delegated_by") {
+      addId(ids, objectType(snapshot, link.to_id), link.to_id);
+    }
+  }
+
+  const sourceIds = new Set([String(source.hypothesis_id), String(source.run_id), String(source.result_artifact_id)]);
+  const evaluationIds = new Set(
+    allLinks
+      .filter((link) => link.kind === "evaluated_by" && sourceIds.has(link.from_id))
+      .map((link) => link.to_id),
+  );
+  for (const evaluationId of evaluationIds) {
+    const evaluation = objectRow(snapshot, "evaluation", evaluationId);
+    if (!sourceWorkMatches(evaluation, source)) continue;
+    addId(ids, "evaluation", evaluationId);
+    addId(ids, "task", evaluation.review_task_id);
+    addId(ids, "artifact", evaluation.findings_artifact_id);
+    addId(ids, "artifact", evaluation.publication_report_id);
     for (const link of allLinks) {
-      if (!TRAVERSAL_KINDS.has(link.kind)) continue;
-      if (idsContain(ids, link.from_id)) changed ||= addId(ids, objectType(snapshot, link.to_id), link.to_id);
-      if (idsContain(ids, link.to_id)) changed ||= addId(ids, objectType(snapshot, link.from_id), link.from_id);
+      if (link.from_id !== evaluationId) continue;
+      if (link.kind === "performed_by") addId(ids, objectType(snapshot, link.to_id), link.to_id);
+    }
+  }
+
+  for (const reviewTaskId of ids.get("task") ?? []) {
+    if (reviewTaskId === selectedTaskId) continue;
+    for (const link of allLinks) {
+      if (link.from_id !== reviewTaskId) continue;
+      if (link.kind === "assigned_to" || link.kind === "delegated_by") {
+        addId(ids, objectType(snapshot, link.to_id), link.to_id);
+      }
     }
   }
   const worldLinks = allLinks
