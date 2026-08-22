@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 SENTINEL SETTLE REPAIR - BUILD AUTHORIZED, READER YES/YES
+status: R16 FOUNDER MOUSE-FIRST CORRECTION - AWAITING FRESH READER
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -25,6 +25,8 @@ tab-diagnostic-wip-receipt: focused contract 14/14; live step 9 expected an Arti
 terminal-tab-reader-receipt: fresh Luna Reader task `01a02799-c81c-7480-b890-035aba5fce26`; final YES/YES at `fd580be72e86aa2e9a7d54c40b5bb50bfa304132`
 terminal-tab-wip-receipt: terminal guest tab-order focused tests 3/3 and R16 contract 14/14; live step 0 sampled the gate-owned sentinel before native Tab departure became observable; roots/processes clean and cleanup failures empty; WIP preserved at `808e5382aa685655e00021382709a28d40ef475c`
 sentinel-reader-receipt: fresh Luna Reader task `01a027a2-bea9-7c73-9e22-2342b3429153`; final YES/YES at `7d7466da4c8f8ce86813f6d60535e1829bb055bf`
+sentinel-wip-receipt: focused R16 contract 17/17 and tile-manager 3/3; live native Tab still entered a real Hermes agent-session webview at step 0; roots removed; WIP preserved at `90672d93e6bb0bdb6d4aa95eaada4dc3599cf51a`
+founder-mouse-first-authority: 2026-08-21; global Tab parity removed from R16 only; normal text/terminal keyboard input and no product-created focus trap retained; full keyboard parity recorded as Debt #38 before broader release
 
 ## Authorized outcome
 
@@ -63,8 +65,10 @@ Builder produced the exact product receipt at `49e9fd5`. The bounded terminal
 Tab-order repair appended to `WO-R16.md` received fresh Reader YES/YES at
 `fd580be`; its product fix is preserved at `808e538`. The live run exposed the
 gate-owned sentinel settle case appended to `WO-R16.md`, which now requires
-fresh Reader YES/YES. That Reader returned final YES/YES at `7d7466d`; the
-bounded sentinel-settle Builder door is open.
+fresh Reader YES/YES. That Reader returned final YES/YES at `7d7466d`; its WIP
+is preserved at `90672d9`. The founder superseded only global Tab-order parity
+with the mouse-first correction appended to `WO-R16.md`; a fresh two-question
+Reader must return YES/YES before its Builder door opens.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 

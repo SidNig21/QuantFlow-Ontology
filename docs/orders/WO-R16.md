@@ -1670,3 +1670,93 @@ or untracked path, added key-send symbol, second Tab call in the source scan,
 missing receipt, or evidence written before green is red. Plain meaning: give
 the one native Tab up to a quarter-second to become observable; never send it
 twice and never call a wrong destination correct.
+
+## FOUNDER MOUSE-FIRST CORRECTION - remove invalid global Tab parity
+
+Founder authorization, 2026-08-21:
+
+> QuantFlow is currently a founder-operated desktop product where canvas
+> navigation and controls may be mouse-first; keyboard is required for normal
+> text/terminal input and must not become trapped. Remove global Tab-order
+> parity as an R16 acceptance requirement and record full keyboard-accessibility
+> parity as later product debt before any broader release. Preserve every
+> ontology, 13-object/15-cable, interaction, reopen, and cleanup assertion.
+
+WIP `90672d93e6bb0bdb6d4aa95eaada4dc3599cf51a` is evidence, not a
+candidate. Its focused contracts pass, but its single live run still focused a
+real Hermes agent-session `<webview>` at step 0. All three reported PIDs were
+absent on the Router's post-run process check. The global sentinel/Tab
+assertion is superseded by this founder ruling; no other R16 assertion is
+removed.
+
+### Exact correction
+
+1. In `collab-electron/src/windows/shell/src/tile-manager.js`, remove only the
+   ineffective `wv.tabIndex = -1` line. Preserve the existing click path and
+   `focusCanvasTile` call to `dom.webview.focus()` byte-for-byte. In
+   `tile-manager-layout.test.ts`, remove only the superseded third test and
+   retain the two original layout tests byte-identically; the file reports
+   exactly 2 pass / 0 fail.
+2. In `qa/gates/research-world-visible.ts`, delete the gate-owned Tab sentinel,
+   global Tab plan/observation/comparison, `waitForSentinelDeparture`, all
+   `tab_focus_*` receipts, and every native Tab send. Retain direct shell focus
+   of each of the ten research-object tiles followed by the unchanged native
+   Enter-expand and Escape-collapse assertions. Retain exactly
+   `keyboard_tiles=10 enter=10 escape=10 focus_retained=20`.
+3. In the focused gate contract, delete only the diagnostic Tab-observation
+   test and the three sentinel-settle tests. Update the existing native-key
+   contract test to require the Enter/Escape receipt, reject `tab_focus_`,
+   reject sentinel creation, reject any `pressNativeKey(endpoint, "Tab")`, and
+   confirm the product renderer's research-world key handler contains no
+   `event.key === "Tab"` and no Tab `preventDefault`. It also confirms terminal
+   `focusCanvasTile` still contains `dom.webview.focus()`. The file reports
+   exactly 13 pass / 0 fail.
+4. [Debt #38](../DEBT.md) is the durable release-precondition receipt. No R16
+   report may claim full keyboard accessibility. It may claim only mouse-first
+   canvas interaction; pointer Inspect/Collapse; tile Enter/Escape parity when
+   focused; normal text/terminal keyboard paths unchanged; and no
+   product-created Tab trap.
+
+Every ontology assertion, independent Oracle, exact 13 objects and 15 cables,
+all displayed fields, pointer Inspect/Collapse, Enter/Escape, duplicate reveal,
+layout collision, Mission/Task activation, close/reopen equality, four real
+Electron launches, failure/timeout cases, 60-second ceiling, process cleanup,
+root cleanup, primary/cleanup receipt precedence, and Atlas control remains
+unchanged.
+
+### Builder and verification
+
+Allowed changes only:
+
+- `collab-electron/src/windows/shell/src/tile-manager.js`;
+- `collab-electron/src/windows/shell/src/tile-manager-layout.test.ts`;
+- `qa/gates/research-world-visible.ts`;
+- `qa/gates/research-world-visible.test.ts`;
+- Router-owned authority documents named above;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections.
+
+A fresh Builder starts from the exact clean local/remote SHA supplied after a
+fresh Reader returns YES/YES. It runs Atlas preflight, the 2-test tile-manager
+file, and the 13-test R16 contract, then exactly one live
+`bun qa/run.ts research-world-visible`. Any red stops with exact root/primary/
+cleanup receipts. Green runs the exact short matrix already specified by
+TERMINAL TAB-ORDER REPAIR. Its cheap falsifier is replaced by: temporarily
+delete the `keyboard_tiles=10 enter=10 escape=10 focus_retained=20` contract
+string, require the 13-test contract to go red, restore to zero diff, and
+require 13/0 green. No second live app is launched.
+
+BUILD-REPORT retains every previously required field except `tab_focus_*` and
+records instead: founder mouse-first authorization; Debt #38; pointer receipt;
+exact Enter/Escape receipt; normal terminal focus seam unchanged; no Tab handler
+or Tab preventDefault in research-world product code; all live world/reopen/
+cleanup receipts; matrix exits; falsifier red/restored-green; Atlas summary;
+and immutable product SHA. A fresh different-model Verifier records the
+candidate SHA before/after, reruns the same bounded matrix and one live gate,
+and writes `docs/orders/evidence/r16/VERIFICATION.md` only on full PASS.
+
+No composite focus widget, custom Tab router, focus trap, Main/preload/key
+allowlist change, Kernel/fixture change, timeout increase, package, installer,
+release, worktree, wrapper, or helper framework. Plain meaning: prove the
+founder-visible research world with mouse plus retained tile activation keys,
+leave terminal typing alone, and defer honest full keyboard parity to Debt #38.
