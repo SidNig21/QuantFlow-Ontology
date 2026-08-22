@@ -1769,6 +1769,7 @@ Allowed changes only:
 - `docs/orders/WO-R16.md`, `docs/orders/NEXT.md`, and `docs/DEBT.md`, Router
   edits only;
 - `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- `docs/orders/evidence/r16/VERIFICATION.md`, Verifier only; and
 - generated `qf-atlas/ATLAS.md`, `qf-atlas/atlas.html`, and
   `qf-atlas/atlas.json` only.
 
