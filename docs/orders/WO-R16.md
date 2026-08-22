@@ -4488,3 +4488,123 @@ one two-direction collision regression, one executable regression falsifier,
 one independent PASS, and one normal consumer PASS. A fresh Reader must answer
 exactly: can each gate actually fail, and does each deliverable have exactly
 one meaning. Only final YES/YES opens the Builder door.
+
+### NORMAL CONSUMER READER DEFECT CLOSURE — executable collision falsifier and exact consumer receipt
+
+The preceding subsection had finite Reader defects: `candidate7` was not
+defined; the shared-Artifact falsifier did not bind a source mutation, command,
+or restoration proof; the decoy fixture did not require the two shared
+identities or an exact Kernel-action construction; “parent matrix” and “both
+diff checks” could refer to multiple earlier lists; the replacement build had
+no exact command; the normal consumer check had no named receipt or exact
+13-object/15-link manifest; and the focused test did not protect its three
+existing assertions from deletion or replacement. This closure supersedes only
+those mechanics. It does not widen product scope, alter the ontology, permit a
+durable fixture, or authorize a consumer launch before independent PASS.
+
+Plain meaning: the repair must isolate two real Missions that share data, prove
+the old leakage comes back when the repair is removed, and leave a receipt that
+shows the exact world Ryan saw after reopening it.
+
+#### Exact Builder and test contract
+
+The Builder starts from clean product base
+`5445578508e3b76f107e5c3ed40eafefd0e18319` plus this docs-only Reader closure.
+The in-memory relational fixture below is allowed; no durable seed, founder
+database, proof bridge, or product fixture is allowed.
+
+1. Append exactly one test to
+   `collab-electron/src/main/research-world.test.ts`, named
+   `isolates two Missions that share Dataset and result Artifact in both root directions`.
+   The three existing tests and all their assertions remain present and
+   unchanged. The new test uses the real Kernel actions and existing governed
+   helpers, not direct ontology/link insertion: create an older decoy Mission
+   and a complete decoy source Task/Hypothesis/Run/review Task/Evaluation/
+   findings Artifact/Report/Director/executor/critic, then a complete target
+   Mission with its own corresponding objects. Use the same Dataset and the
+   same deterministic strategy and parameters so both Runs produce the exact
+   same result Artifact. Bind each source Task through the real R15 source-work
+   path and complete each governed review through the existing admission,
+   delivery, receipt, and evaluation paths.
+2. The test must assert the target and decoy Dataset ids are equal and their
+   result Artifact ids are equal, while every other named object id is
+   distinct. It must project each root in turn, require exactly 13 objects and
+   exactly 15 links, require the exact 15 expected `(kind, from_id, to_id)`
+   triples for that root, and require every decoy-only id absent from the
+   target projection and every target-only id absent from the decoy projection.
+   Existing missing-lineage, duplicate-binding, ineligible-publication,
+   Task-root, receipt, displayed-field, and isolated 13/15 assertions remain
+   covered by the unchanged parent tests.
+3. The focused command is exactly:
+
+   ```text
+   bun test collab-electron/src/main/research-world.test.ts
+   ```
+
+   It must report exactly `4 pass / 0 fail`: the three existing tests plus the
+   one two-direction shared-identity test. Any other count or native nonzero
+   exit is red.
+
+#### Exact matrix and falsifier
+
+“The unchanged R16 parent matrix” means only the 15-command fenced block under
+`NORMAL REOPEN READER DEFECT CLOSURE — exact lifecycle fixture and matrix`,
+starting with `bun test collab-electron/src/main/governed-review.test.ts` and
+ending with `git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD`.
+The Builder and Verifier each run those 15 rows once, in that order, with no
+wrapper, retry, substitution, or omission. The Atlas current/ratchet checks and
+the two `git diff --check` rows are already those matrix rows; “both diff
+checks” means exactly those two rows, not an earlier matrix or a second run.
+
+The executable falsifier is exact. After the candidate commit, record the
+candidate SHA and the SHA-256 of both allowed product/test files. Temporarily
+replace only
+`collab-electron/src/main/research-world-projection.ts` with that file's bytes
+from candidate base `5445578508e3b76f107e5c3ed40eafefd0e18319`; leave the new
+test and every other path byte-identical. Run the focused command above. The
+native exit must be nonzero and its output must name a decoy-only id or a wrong
+object/link count. A green mutation run is an acceptance failure. Restore the
+candidate's exact projection bytes, require zero diff for the projection and
+zero diff for the test, rerun the focused command to exactly `4 pass / 0 fail`,
+and retain the mutation exit, restoration hashes, and restored-green output in
+`docs/orders/evidence/r16/BUILD-REPORT.md`. The Verifier repeats this same
+mutation and restoration against the frozen candidate; product and test bytes
+are unchanged during its normal matrix.
+
+#### Exact build, consumer gate, and meanings
+
+After independent PASS, the Router runs exactly one replacement build with:
+
+```text
+bun run --cwd collab-electron build
+```
+
+The receipt records the build start time and native exit; stdout must include
+the invoked `electron-vite build` plus successful Main, preload, and renderer
+completion. The three corresponding `collab-electron/out` products must
+postdate the start, and the Main bundle must contain the full immutable
+candidate SHA. Bun usage/help or unchanged outputs is red. Define
+`candidate7` as the first seven lowercase hexadecimal characters of that full
+candidate SHA, so the only terminal canary is exactly
+`qf-r16-typing-check-<candidate7>`.
+
+The Router writes exactly one normal consumer receipt to
+`docs/orders/evidence/r16/CONSUMER-CHECK.md`. It records the measured candidate
+and visible identity, the exact build command and output, the normal non-proof
+two-launch mode, the exact 13 visible `(type, id)` members, all 15 visible
+`(kind, from_id, to_id)` cables, ten real-mouse Inspect/Collapse receipts, the
+three Director/executor/critic canary type/erase/mouse-return receipts with no
+Enter or submission, first/second-launch equality of objects, links, positions,
+and inspector booleans, and zero owned Windows and WSL product processes after
+close. The visible manifest must equal the Kernel projection's exact 13/15
+manifest; counts alone do not pass. The check uses normal founder state without
+reading or changing credentials, seeding SQLite, calling the proof bridge, or
+creating a Mission on reopen. Any extra or wrong member/cable, wrong canary,
+submission, reopen delta, stale build, or cleanup residue is red.
+
+The deliverables therefore have one meaning each: one Mission-local selector,
+one two-direction shared-identity regression, one exact executable falsifier,
+one immutable independent-verification receipt, and one exact normal-consumer
+receipt. A fresh Reader must reread the final subsection and this closure and
+answer exactly the two protocol questions. Only final YES/YES opens the
+bounded Builder door.

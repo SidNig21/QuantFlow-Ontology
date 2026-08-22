@@ -108,7 +108,7 @@ current-door: exact `NORMAL REOPEN RED — governed-review support tables miscla
 normal-reopen-reader-closure: binding `NORMAL REOPEN READER DEFECT CLOSURE — exact lifecycle fixture and matrix` appended to `WO-R16.md`; fresh Reader must re-answer YES/YES before the bounded Builder door opens
 normal-reopen-verifier-receipt: product candidate `5445578508e3b76f107e5c3ed40eafefd0e18319`; fresh Terra Verifier PASS at evidence `f9af4728356cdf4246628787c5a61c28b45c926b`; complete governed-review reopen matrix/falsifier/Atlas/diffs green
 consumer-cross-mission-red: normal app Mission `mission-235c12f6-459d-4f45-9094-8adba252e839` completed Director/executor/critic review and published Report, but its exact Show research world pointer followed a reused result Artifact into historical Missions and left a 52-tile canvas instead of one 13-object/15-cable Mission-local world
-current-door: exact `NORMAL CONSUMER RED — shared result Artifact leaks historical Missions` correction requires fresh Reader YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority until then
+current-door: exact `NORMAL CONSUMER READER DEFECT CLOSURE — executable collision falsifier and exact consumer receipt` requires fresh Reader YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority until then
 
 ## Authorized outcome
 
