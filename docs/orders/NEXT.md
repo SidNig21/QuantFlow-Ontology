@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 POINTER REOPEN SCHEDULING - AWAITING FRESH READER
+status: R16 POINTER REOPEN SCHEDULING - BUILD AUTHORIZED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -33,6 +33,7 @@ native-key-settle-reader-receipt: fresh Luna Reader task `01a027c7-3540-7ca1-b62
 pointer-first-founder-authority: 2026-08-21; global keyboard navigation and research-tile Enter/Escape parity deferred to Debt #38; R16 closes on pointer-visible 13-object/15-cable world, normal-app terminal typing, reopen, and clean cleanup after independent verification
 pointer-first-reader-receipt: fresh Luna Reader task `01a027d4-a498-77a1-b590-8f7210d9f266`; final YES/YES at `c17fcc0d84f7e56664b7e44d0101951150b95755`
 pointer-first-wip-receipt: tile-manager 2/0 and focused R16 13/0; single live gate emitted exact pointer receipt once and exact 13/15 world, then normal reopen readiness timed out after the first world used 31931ms and all three post-first launches competed; all processes/roots cleaned; WIP preserved at `fac9b8d89abbae14d6d883cb1fbad1fdf236d126`
+reopen-scheduling-reader-receipt: fresh Luna Reader task `01a027e1-db30-7ae0-b8d6-7ddc8101b24e`; final YES/YES at `af18595086b960c26e9728ebdbe756adb6caa32b`
 
 ## Authorized outcome
 
