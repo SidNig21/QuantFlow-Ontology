@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R17",
-    "commit": "ebf2b17",
+    "commit": "0683187",
     "generatedAt": "2026-08-22",
     "filesScanned": 435,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "44681c98da8e5e21"
+    "fingerprint": "7f7da9949912579a"
   },
   "stats": {
     "live": 113,
@@ -1450,7 +1450,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 56.4,
+      "kb": 56.5,
       "x": -0.23,
       "z": 1.3,
       "status": "warn",
@@ -1461,7 +1461,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 56.4,
+          "kb": 56.5,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
@@ -1696,7 +1696,7 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 54.4,
+      "kb": 54.7,
       "x": -1.24,
       "z": 0.45,
       "status": "alert",
@@ -1707,7 +1707,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 54.4,
+          "kb": 54.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 7,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 613.4,
+      "kb": 617.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3561,7 +3561,7 @@
         },
         {
           "path": "qa/gates/technique-outcome-loop.ts",
-          "kb": 39.1,
+          "kb": 43.2,
           "spawns": 4,
           "spawnsLive": 2,
           "writes": 0,
@@ -3643,18 +3643,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/dev-dock-readiness.ts",
-          "kb": 17.5,
-          "spawns": 4,
-          "spawnsLive": 2,
-          "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 17.5,
+          "kb": 17.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -3664,6 +3654,16 @@
             42,
             44
           ],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/dev-dock-readiness.ts",
+          "kb": 17.5,
+          "spawns": 4,
+          "spawnsLive": 2,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
           "executes": 0
         },
         {
@@ -56561,27 +56561,27 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1247,
+          "line": 1248,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1347,
+          "line": 1348,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1352,
+          "line": 1353,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1392,
+          "line": 1393,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1432,
+          "line": 1433,
           "kind": "direct"
         }
       ],
@@ -56606,17 +56606,17 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1348,
+          "line": 1349,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1393,
+          "line": 1394,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1459,
+          "line": 1460,
           "kind": "direct"
         },
         {
@@ -57357,7 +57357,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            1203
+            1207
           ]
         }
       ]
@@ -57409,7 +57409,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57451,7 +57451,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57493,7 +57493,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57535,7 +57535,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57577,7 +57577,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57619,7 +57619,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57661,7 +57661,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1227",
+            "from": "collab-electron/src/main/kernel.ts:1231",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57698,7 +57698,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1238",
+            "from": "collab-electron/src/main/kernel.ts:1242",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "recordGovernedToolReceipt"
           }
@@ -59686,16 +59686,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R17",
-      "commit": "7f2005f",
+      "commit": "ebf2b17",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R17",
-      "commit": "ebf2b17",
+      "commit": "0683187",
       "generatedAt": "2026-08-22"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "42 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -59913,14 +59913,14 @@
         "id": "protocol-variants:pty:write",
         "kind": "protocol-variant",
         "what": "pty:write",
-        "where": "collab-electron/src/main/index.ts:787 (invoke)",
+        "where": "collab-electron/src/main/index.ts:790 (invoke)",
         "note": "was undecided"
       },
       {
         "id": "protocol-variants:pty:send-raw-keys",
         "kind": "protocol-variant",
         "what": "pty:send-raw-keys",
-        "where": "collab-electron/src/main/index.ts:807 (invoke)",
+        "where": "collab-electron/src/main/index.ts:810 (invoke)",
         "note": "was undecided"
       },
       {
@@ -60032,16 +60032,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "qa/gates/technique-outcome-loop.ts",
-        "analyzer": "lifetime",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -60049,7 +60040,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null

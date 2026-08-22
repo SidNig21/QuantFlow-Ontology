@@ -338,6 +338,7 @@ describe("Main research-world projection", () => {
         if (!projection.ok) return;
         expect(projection.world.objects.map((object) => `${object.type}:${object.id}`).sort()).toEqual(expectedObjects(world));
         expect(projection.world.objects).toHaveLength(13);
+        expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === world.resultArtifact)?.fields.run_id).toBe(world.run);
         expect(projection.world.links.map(({ kind, from_id, to_id }) => `${kind}:${from_id}:${to_id}`).sort()).toEqual(expectedLinks(world));
         expect(projection.world.links).toHaveLength(15);
         expect(projection.world.missing_lineage).toEqual([]);

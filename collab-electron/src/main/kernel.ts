@@ -902,6 +902,7 @@ export function kernelEnsureSampleResearchDataset(
 
 /** Synthetic R17 fixture: one point-in-time observation and two named techniques. */
 export function kernelEnsureR17TechniqueFixture(): { dataset: Record<string, unknown>; strategies: Array<Record<string, unknown>>; missing_close_run_id: string } {
+  kernelEnsureSyntheticMarketFixture();
   const bytes = new TextEncoder().encode(JSON.stringify({
     contract: "qf.dataset.v1",
     observations: [{ id: "selection-r17", observed_at: "2026-08-21T00:00:00.000Z", edge: 0.8, predicted_probability: 0.8 }],
@@ -1181,7 +1182,10 @@ export function kernelSeedVisibleResearchWorld(input: {
   runId?: string;
 }): Record<string, unknown> {
   const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
-  for (const [sessionId, definitionId, label] of [[input.directorSessionId, "hermes-research-director", "R17 fixture director"], [input.executorSessionId, "hermes-worker", "R17 fixture executor"], [input.criticSessionId, "hermes-critic", "R17 fixture critic"]] as const) {
+  const persistedRun = input.runId ? kernelGetObject("run", input.runId) : null;
+  const persistedRunParams = persistedRun ? jsonRecord(persistedRun.params) : {};
+  const executorSessionId = String(persistedRunParams.executor_session_id ?? input.executorSessionId);
+  for (const [sessionId, definitionId, label] of [[input.directorSessionId, "hermes-research-director", "R17 fixture director"], [executorSessionId, "hermes-worker", "R17 fixture executor"], [input.criticSessionId, "hermes-critic", "R17 fixture critic"]] as const) {
     if (!kernelGetObject("agent_session", sessionId)) {
       kernelExecute("create_agent_session", { session_id: sessionId, agent_definition_id: definitionId, label }, trace());
       kernelExecute("start_agent_session", { session_id: sessionId }, trace());
@@ -1191,7 +1195,7 @@ export function kernelSeedVisibleResearchWorld(input: {
     task_id: `task-${input.nonce}`,
     title: input.taskTitle,
     description: input.taskDescription,
-    assignee_session_id: input.executorSessionId,
+    assignee_session_id: executorSessionId,
   }, { ...trace(), actor_session_id: input.directorSessionId, mission_id: input.missionId }) as { object_id: string };
   const taskId = input.taskId ?? String(createdTask?.object_id ?? "");
   if (!taskId) throw new Error("R16 fixture Task creation did not return an id");
@@ -1199,8 +1203,8 @@ export function kernelSeedVisibleResearchWorld(input: {
     ? String(kernelListStrategyVersions().find((row) => Number(row.version) === 1)?.strategy_id ?? "")
     : input.strategyId;
   const db = getKernelDb();
-  if (!db.query("SELECT 1 FROM links WHERE kind = 'delegates_to' AND from_id = ? AND to_id = ?").get(input.directorSessionId, input.executorSessionId)) {
-    db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'delegates_to', ?, ?, ?)").run(crypto.randomUUID(), input.directorSessionId, input.executorSessionId, new Date().toISOString());
+  if (!db.query("SELECT 1 FROM links WHERE kind = 'delegates_to' AND from_id = ? AND to_id = ?").get(input.directorSessionId, executorSessionId)) {
+    db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'delegates_to', ?, ?, ?)").run(crypto.randomUUID(), input.directorSessionId, executorSessionId, new Date().toISOString());
   }
   const existingRun = input.runId ? kernelGetObject("run", input.runId) : null;
   const existingParams = existingRun ? jsonRecord(existingRun.params) : {};
@@ -1214,7 +1218,7 @@ export function kernelSeedVisibleResearchWorld(input: {
         contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge",
       } }),
       params: { limit: 2 },
-    }, { ...trace(), actor_session_id: input.executorSessionId }) as { object_id: string; state: Record<string, unknown> };
+    }, { ...trace(), actor_session_id: executorSessionId }) as { object_id: string; state: Record<string, unknown> };
   const resultArtifactId = String(run.state.result_artifact_id ?? "");
   if (!resultArtifactId) throw new Error("R16 fixture deterministic Run did not produce a result Artifact");
   const work: SourceWork = {
@@ -1222,7 +1226,7 @@ export function kernelSeedVisibleResearchWorld(input: {
     hypothesis_id: input.hypothesisId,
     run_id: run.object_id,
     result_artifact_id: resultArtifactId,
-    executor_session_id: input.executorSessionId,
+    executor_session_id: executorSessionId,
   };
   bindSourceWork(getKernelDb(), work, trace());
   const attemptId = `r16-review-${input.nonce}`;

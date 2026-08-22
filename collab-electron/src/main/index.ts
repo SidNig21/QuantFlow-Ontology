@@ -1232,6 +1232,7 @@ app.whenReady().then(async () => {
       marketObjectExists: kernelMarketObjectExists,
       readMarketTrajectoryResult: kernelReadMarketTrajectoryResult,
       commitResult: commitCollaborationResult,
+      ...(process.env.QF_R17_GATE === "1" ? { mintTaskId: () => "task-r17-gate" } : {}),
       notify: (input) => {
         const busDb = process.env.QF_PEER_BUS_DB;
         if (!busDb) throw new Error("app-owned peer bus is unavailable");

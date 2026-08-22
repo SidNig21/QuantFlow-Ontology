@@ -218,8 +218,6 @@ function projectObject(snapshot: RelationalSnapshot, type: string, id: string): 
   }
   if (type === "artifact") {
     fields.receipt = artifactReceipt(row);
-    const producedBy = snapshot.links.find((link) => link.kind === "produces" && link.to_id === id);
-    if (producedBy && objectType(snapshot, producedBy.from_id) === "run") fields.run_id = producedBy.from_id;
   }
   const outgoing = snapshot.links.filter((link) => link.from_id === id);
   if (type === "task") {
@@ -396,6 +394,8 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
   requireLink("run", String(source.run_id), "produces", (link) => link.kind === "produces" && link.from_id === source.run_id && link.to_id === source.result_artifact_id);
   const objects: ResearchWorldObject[] = [];
   for (const type of OBJECT_TYPES) for (const id of ids.get(type) ?? []) objects.push(projectObject(snapshot, type, id));
+  const resultArtifact = objects.find((object) => object.type === "artifact" && object.id === String(source.result_artifact_id));
+  if (resultArtifact) resultArtifact.fields.run_id = String(source.run_id);
   objects.sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
   missing.sort((a, b) => a.owning_type.localeCompare(b.owning_type) || a.owning_id.localeCompare(b.owning_id) || a.kind.localeCompare(b.kind));
   return { ok: true, world: freezeDeep({ root: { type: request.root_type, id: request.root_id }, objects, links: worldLinks, missing_lineage: missing }) };

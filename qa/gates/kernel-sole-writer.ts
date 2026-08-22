@@ -57,6 +57,9 @@ const DRIVER_SQL_ALLOW = [
   "qf-kernel-schema/",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
+  // WO-R17: independent read-only oracle reads the isolated UI-proof Kernel
+  // with Database(..., { readonly: true }); it does not write domain state.
+  "qa/gates/technique-outcome-loop.ts",
   // WO-PEER-BUS: transport inbox SQLite only — never Kernel DDL/DML.
   "tools/qf-peer-bus/src/bus.ts",
   "collab-electron/",

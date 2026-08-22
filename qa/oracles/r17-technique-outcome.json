@@ -15,14 +15,14 @@
       "id": "task-r17-gate",
       "fields": {
         "id": "task-r17-gate",
-        "title": "R17 outcome Task",
+        "title": "R17 live technique outcome",
         "description": "R17 live technique outcome",
-        "status": "open",
+        "status": "done",
         "assignee_session_id": "r17-executor",
         "delegator_session_id": "${field:task:delegator_session_id}",
         "mission_id": "mission-r17-gate",
-        "steering_state": "open",
-        "review_state": "open"
+        "steering_state": "done",
+        "review_state": "done"
       }
     },
     {
@@ -47,7 +47,7 @@
         "id": "hypothesis-r17-gate",
         "claim": "R17 live technique outcome",
         "success_criteria": "Kernel-held evidence and, when a settled Dataset exists, deterministic metrics independently reviewed by a critic.",
-        "sources": [],
+        "sources": ["${dataset_id}"],
         "status": "open"
       }
     },
@@ -191,7 +191,7 @@
       "id": "r17-executor",
       "fields": {
         "id": "r17-executor",
-        "status": "running",
+        "status": "closed",
         "label": "R17 fixture executor"
       }
     },
