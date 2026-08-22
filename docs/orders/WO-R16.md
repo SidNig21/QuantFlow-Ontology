@@ -1,11 +1,11 @@
 # WO-R16 - Visible research world
 
-status: build authorized - fresh Reader YES/YES at `e7b7142`
+status: rework 1 of 1 - independent Verifier defects below
 assignee: fresh Builder session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
-rework-cycle: 0 of 1 used
+rework-cycle: 1 of 1 used
 R16_BUILD_BASE_SHA: `fef713c06f091dc8df13f7bde07be859d3b04930`
 
 ## In plain terms
@@ -511,3 +511,49 @@ falsifier red/restored-green receipts, command exits, and zero residue.
 Stop only if an acceptance criterion must change, repair crosses this exact
 scope, or the same assertion is red twice after a repair. In-scope defects do
 not require a founder prompt. No R17 implementation begins from this order.
+
+## Rework 1 - independent Verifier at `388d8f25`
+
+Preserve the complete candidate product implementation and every green focused,
+static, Atlas, and legacy launch receipt. Repair exactly these numbered defects;
+this is the order's only rework cycle.
+
+### 1. `research-world-visible` does not launch or observe the product
+
+Measured command output is
+`research-world-visible contract=green oracle=independent launch=verifier-owned`.
+The gate source names itself a non-launching contract check and contains no
+Electron launch/click/reopen/failure/timeout path. A sub-second static PASS cannot
+prove the visible R16 outcome required by Deliverable E and Product gate items
+1-10.
+
+Repair `qa/gates/research-world-visible.ts` into the one production-Electron
+gate already specified by this order, under the unchanged 60-second total
+deadline. Keep the current independent Oracle/source checks as supplemental
+preflight inside that gate. Use the production preload/Main/renderer, visible
+Mission-root and Task-root activation, exact 12-tile/13-cable DOM manifest,
+pointer/keyboard inspection, duplicate reveal, close/reopen equality, and the
+forced failure/500 ms timeout zero-residue cases. Do not add a second gate,
+fixture truth store, wrapper, package build, or weaker assertion.
+
+Plain meaning: the check must actually open QuantFlow and click the research
+world; reading source code and saying the button exists is not proof.
+
+### 2. Required falsifier receipts are absent from the immutable candidate
+
+At candidate `388d8f25`, the only tracked R16 document is this order. No Builder
+report contains the required per-mutation candidate SHA, unchanged gate hashes,
+native red exit, restoration-zero-diff, and restored-green exit, so the Verifier
+cannot inspect or rerun a sample.
+
+After defect 1 is green, add exactly
+`docs/orders/evidence/r16/BUILD-REPORT.md` with all 12 tile-omission receipts and
+falsifiers 2-14 in the receipt shape already specified above. The unchanged live
+gate must go red for each production/fixture mutation and green after exact
+restoration. This file records command evidence only; do not add receipt tooling
+or alter a gate/assertion to manufacture it. Commit it with the repaired
+candidate so the fresh Verifier can validate hashes and independently rerun a
+sample.
+
+Plain meaning: the candidate must carry the proof that its new visible check can
+catch each promised break, not leave that proof in a vanished chat transcript.
