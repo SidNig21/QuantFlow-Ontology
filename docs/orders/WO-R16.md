@@ -740,6 +740,31 @@ capability, package, discovery rule, display-name allowlist, R16 assertion,
 deadline, or other file may change. After this prerequisite is green, resume
 the existing W1-W4 rewrite and acceptance exactly where it stopped.
 
-Plain meaning: a stale checked-in QA seat definition currently prevents the
-real app from opening, so migrate those two labels and permanently test the
-file QuantFlow actually launches.
+Plain meaning: stale checked-in QA seat definitions violate the current Dock
+contract, so migrate those three labels and permanently test the real files.
+
+### Windows pack ruling - production Director path
+
+The authorized runtime-proof pack invocation failed twice before Electron
+launch: first because the AgentOS toolchain selected extensionless `npm`, then
+because Node `spawnSync` cannot execute `npm.cmd` directly on Windows. R16 does
+not use `qf-toolloop`, and repairing an obsolete AgentOS packaging path is not
+an R16 prerequisite.
+
+This ruling supersedes only the pack paragraph above. Keep the three manifest
+label repairs and their direct-file regression test because they repair the
+measured checked-in contract mismatch. Remove the runtime-proof pack call and
+do not generate or require `qf-toolloop.aospkg` in this gate.
+
+For `research-world-visible`, leave `QF_DOCK_QA_MODE` unset so startup loads
+only production Dock inventory. Submit the Mission through the default
+`hermes-research-director` definition, not `qf-proof-orchestrator`, while
+retaining the existing `QF_HERMES_SYNTHETIC_TEST=1` provider replacement. Set
+the existing `QF_HERMES_SYNTHETIC_OLD_NO_RECRUIT=1` isolation flag for this
+gate so that the production Director path records the Mission, Hypothesis, and
+Director session without asynchronously creating a second R14 Task inside the
+fixed R16 world. This changes no production behavior or visible-world
+assertion; ordinary product launches receive neither flag.
+
+Plain meaning: prove the real Research Director front door with its existing
+credential-free responder, and do not revive AgentOS merely to open R16.
