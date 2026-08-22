@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER ATTEMPT 2 RED - NUMERIC RUBRIC REPAIR - BUILDER AUTHORIZED
+status: R16 NORMAL CONSUMER ATTEMPT 3 RED - SIXTEENTH CABLE REPAIR - READER REQUIRED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -134,6 +134,8 @@ numeric-rubric-builder-receipt: immutable product candidate `e94e544b1275958d22b
 current-door: fresh independent Verifier must freeze candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`, run the exact nine-row immutable matrix and falsifier/restoration, and write PASS or stop on RED; no rebuild, consumer Attempt 3, or R17 authority before PASS
 numeric-rubric-verifier-receipt: fresh independent Luna Verifier task `01a029a7-e38c-7321-bdf5-882bb9ab43e5`; PASS at immutable candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`; evidence `4e6d849297a5cca089a0239216d58e9406fa5c16`; exact nine-row matrix green, source-schema falsifier red, restoration exact, Atlas HARD RED 0, product/test/generated Atlas bytes frozen
 current-door: Router is authorized for one identity-bound build and one exact normal Computer Use Attempt 3; any red keeps R16 open; no R17 authority
+consumer-attempt-3-red: exact normal candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f` completed the governed Mission, numeric Evaluation, and gated Report; the Mission projection returned the correct 13 objects but 16 cables because a real Director-to-critic `delegates_to` relation leaked through endpoint-only filtering; worker/critic canaries and ordinary zero-process cleanup passed, Director canary was not visibly captured, and no reopen PASS is claimed
+current-door: exact `NORMAL CONSUMER ATTEMPT 3 RED — selected endpoints leak a sixteenth cable` requires fresh Reader YES/YES; no Builder, rebuild, consumer Attempt 4, or R17 authority before that receipt
 
 ## Authorized outcome
 

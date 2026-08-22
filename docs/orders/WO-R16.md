@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer governed Artifact read repair - replacement build and consumer authorized
+status: normal consumer Attempt 3 red - sixteenth-cable repair awaiting fresh Reader
 assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -5106,3 +5106,87 @@ PASS in the named verification receipt; and (6) one append-only Attempt 3
 normal-consumer PASS from the sole critic and Mission. A fresh Reader must
 answer exactly whether every gate can fail and whether every deliverable has
 exactly one meaning before Builder work.
+
+### NORMAL CONSUMER ATTEMPT 3 RED — selected endpoints leak a sixteenth cable
+
+The independently verified numeric-rubric candidate
+`e94e544b1275958d22b3826dfec43bbfcae71c3f` was built once with exact identity
+and used through the normal application. One real Mission completed Director,
+executor, independent critic, numeric Evaluation, and gated Report publication.
+The exact immutable identities and live receipts are append-only in
+`docs/orders/evidence/r16/CONSUMER-CHECK.md` Attempt 3.
+
+The Mission-local read-only projection had the correct 13 objects and
+`missing_lineage=[]`, but emitted 16 links. The extra link was the real
+Director-to-critic `delegates_to` relation. It is not one of R16's exact 15
+semantic world cables. `research-world-projection.ts` currently emits every
+allowed-kind link whose endpoints happen to be selected, so an unrelated
+relationship between two legitimate world members becomes an extra canvas
+cable. This is a bounded projection defect, not an ontology-write defect and
+not grounds to change the 13/15 contract.
+
+Attempt 3 also lacks one required measurement receipt: the worker and critic
+terminal canaries were visibly captured, erased, and returned by pointer, but
+the Director terminal moved while the canary was typed and closed before the
+exact text became visible. No Director receipt is claimed. That is an operator
+sequencing red, not a product-code defect. The next consumer check measures the
+Director immediately after Mission creation, the worker immediately after its
+tile appears, and the critic immediately after its tile appears.
+
+#### Authorized bounded repair
+
+One fresh Reader must answer the protocol's exact two questions on this section
+before one fresh Builder. The Builder may change only:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/research-world.test.ts
+docs/orders/evidence/r16/BUILD-REPORT.md
+qf-atlas/atlas.json
+qf-atlas/atlas.md
+qf-atlas/atlas.html
+```
+
+Construct `world.links` from the exact 15 selected semantic relationships
+already named by this order, rather than by retaining every allowed-kind link
+between selected endpoints. Preserve all object selection, missing-lineage,
+ineligibility, shared-Artifact isolation, field display, Artifact integrity,
+and pointer behavior. Do not delete or alter the underlying Director-to-critic
+link in the Kernel.
+
+Extend the existing complete-world relational test with the additional durable
+Director-to-critic `delegates_to` link before projection. The test must remain
+exactly 13 objects and the exact existing 15-link list, proving the sixteenth
+link is excluded. Add the symmetric falsifier: temporarily restore only the
+projection source from base `e94e544b1275958d22b3826dfec43bbfcae71c3f`, run
+that focused test and require nonzero with the 16-versus-15 mismatch, then
+restore the candidate hashes and require green with zero diff.
+
+Builder and fresh independent Verifier each run:
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+bun qa/run.ts research-world-visible
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+All native exits must be zero, the focused unit case must prove the deliberate
+extra durable relationship is absent from the projection, the existing live
+gate retains every 13/15, ten-pointer, reopen, and cleanup assertion, and Atlas
+must remain `HARD RED: 0`. The Verifier freezes product/test/generated-Atlas
+bytes and independently repeats the falsifier/restoration before writing PASS.
+
+After that PASS, the Router makes one exact identity-bound build and exactly
+one normal Computer Use `Attempt 4`. It creates one new Mission and no retry
+Mission or replacement critic. Attempt 4 appends to the existing consumer file,
+records the three terminal canaries in Director/worker/critic appearance order,
+the sole successful governed Evaluation and Report, exact 13 objects and the
+exact 15 cable tuples, ten pointer Inspect/Collapse receipts, first/second
+launch equality without a Mission on reopen, and zero owned Windows/WSL
+processes after each ordinary close. Any extra or missing cable, canary,
+inspector, object, reopen item, or cleanup receipt is red. No R17 authority is
+created by this section.

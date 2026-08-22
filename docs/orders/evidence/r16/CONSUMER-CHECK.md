@@ -183,3 +183,66 @@ review Task and was not used as an alternate critic.
 
 No second Mission, retry critic, manual Evaluation, Report override, product
 edit, or R17 work occurred.
+
+## Attempt 3 — RED: Mission-local projection emits one extra cable
+
+Date: 2026-08-22
+Candidate: `e94e544b1275958d22b3826dfec43bbfcae71c3f`
+Builder evidence: `c8c686997849c6df080f50cea24c5ce0f7b81b8c`
+Independent verification: `4e6d849297a5cca089a0239216d58e9406fa5c16`
+Build command: `QF_BUILD_COMMIT_SHA=e94e544b1275958d22b3826dfec43bbfcae71c3f`
+and `QF_BUILD_TIMESTAMP=2026-08-22T13:31:47.9769367Z` in the same
+PowerShell process as `bun run --cwd collab-electron build`
+Application command: from `collab-electron`,
+`node ./scripts/run-local-bin.mjs electron-vite preview --skipBuild`
+Mode: normal founder application; no proof bridge, SQLite seed, credential
+access, synthetic responder, packaged gate, or release gate
+
+Verdict: **RED. R16 remains open.**
+
+### Exact build and live governed result
+
+- Main, preload, and renderer all built successfully after the bound timestamp;
+  the Main bundle and visible masthead carried the exact product candidate and
+  timestamp.
+- One visible `TRY GUIDED RESEARCH` action created Mission
+  `mission-8645ad71-73e1-4c01-b963-804f07db5775`, Director
+  `d600ce84-3992-4f2c-8a64-7741d955fe17`, source Task
+  `task-77ecd1a1-3371-4d65-8d78-b2b9ae3d7c13`, executor
+  `worker-8645ad71-73e1-4c01-b963-804f07db5775`, Hypothesis
+  `e057d2ca-b859-4943-92e9-853a9d90bbdb`, Run
+  `run-aa324212-3db5-42ed-9c0f-266f887ea7a4`, result Artifact
+  `cba126f77ef6bf9bc099639dc2b91ee339341e1fba88ccdb511b41327f394a16`,
+  review Task `review-task-cc286de2-20b7-4988-ae70-4d228b7906e4`, and sole
+  critic `critic-ecbebbdd-21af-4fdb-a364-9f091b81a318`.
+- The critic completed successful governed Hypothesis, Run, and hash-verified
+  Artifact reads. Its first Evaluation write was correctly rejected because
+  `findings` was plain text. The same critic corrected the argument without a
+  replacement seat and recorded Evaluation
+  `37555c0b-3a11-4bf3-aab9-e314ae58a63a` with numeric rubric
+  `{faithfulness:1, answer_relevancy:1, context_precision:0.95,
+  context_recall:0.9}`, verdict `supports`, confidence `0.9`, and overall
+  `0.9625`. The unchanged publication gate emitted Report
+  `771a54d2a4738c4ff7e0263e66c8099488f86d9b4e5b2a7fe719d34f4e3ee017`.
+- The executor and critic terminals visibly accepted and erased exact canary
+  `qf-r16-typing-check-e94e544`, then returned to the canvas by pointer without
+  submission. The Director canary was attempted while its terminal was moving,
+  but the exact text was not visibly captured before that session closed; it
+  is therefore not claimed as a receipt.
+
+### Exact product defect
+
+The read-only Mission projection returned the correct 13 object identities and
+`missing_lineage=[]`, but returned 16 cables. The additional cable was
+`delegates_to:d600ce84-3992-4f2c-8a64-7741d955fe17:critic-ecbebbdd-21af-4fdb-a364-9f091b81a318`.
+The exact R16 manifest permits the Director-to-executor `delegates_to` cable and
+the review Task's `delegated_by`/`assigned_to` cables, but not a second
+Director-to-critic `delegates_to` cable. The current projection selects every
+allowed-kind link whose two endpoints happen to be in the world, so this real
+but non-manifest relationship leaks into the canvas.
+
+No ten-inspector or reopen PASS is claimed after the exact 13/15 assertion went
+red. The application closed through its ordinary visible Close control. The
+launch root, repo Electron processes, and WSL Hermes/collaboration/ontology
+processes were all exactly zero. No second Mission, replacement critic,
+alternate Evaluation, verdict override, product edit, or R17 work occurred.
