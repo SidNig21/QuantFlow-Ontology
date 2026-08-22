@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER ATTEMPT 2 RED - NUMERIC RUBRIC REPAIR - READER REQUIRED
+status: R16 NORMAL CONSUMER ATTEMPT 2 RED - NUMERIC RUBRIC REPAIR - BUILDER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -128,7 +128,8 @@ consumer-artifact-read-build-identity-red: native build from docs head `6d117ce8
 current-door: one corrected build using existing `QF_BUILD_COMMIT_SHA` and `QF_BUILD_TIMESTAMP` inputs is Router-authorized; any red stops R16; no app launch or R17 authority before exact identity passes
 consumer-artifact-read-build-receipt: corrected build at product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9` and timestamp `2026-08-22T13:05:28.3041800Z` exited 0; Main/preload/renderer outputs were fresh; Main bundle and visible masthead contained the exact identity
 consumer-rubric-schema-red: normal Computer Use Attempt 2 created one Mission, completed the exact three governed reads with the repaired Artifact receipt, and the sole critic reasoned toward `supports`; five Evaluation writes failed because the generated MCP rubric schema exposed an untyped generic object and the live tool supplied comma/numeric strings; Evaluation/Report remained zero; Director/critic canaries passed, executor canary was missed, no reopen was attempted, and all Windows/WSL product processes closed to zero
-current-door: exact `NORMAL CONSUMER ATTEMPT 2 RED — exact numeric rubric discovery` requires a fresh adversarial Reader to inspect its repair and answer the two protocol questions; no Builder, rebuild, consumer retry, or R17 authority before final YES/YES
+numeric-rubric-reader-receipt: fresh Luna Reader task `01a029a0-833d-71b1-9003-7df3e79f28e9`; finite order defects landed in docs commit `ee9c6cd8110055c7bb52994bc75097b0294947a9`; corrected reread final YES/YES with doc-links, rung-ladder, and git diff --check green
+current-door: exact numeric-rubric Builder is authorized on Reader-approved docs head; no rebuild, consumer retry, or R17 authority before immutable candidate and fresh independent PASS
 
 ## Authorized outcome
 
