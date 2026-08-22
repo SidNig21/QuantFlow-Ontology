@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "52697c5",
+    "commit": "c4764ad",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "18e35df4a934fc59"
+    "fingerprint": "809ff9d9fa96177b"
   },
   "stats": {
     "live": 111,
@@ -3450,7 +3450,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 572.6,
+      "kb": 573.3,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3471,7 +3471,7 @@
         },
         {
           "path": "qa/gates/research-world-visible.ts",
-          "kb": 55.3,
+          "kb": 56,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "eb23006",
+      "commit": "52697c5",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "52697c5",
+      "commit": "c4764ad",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
