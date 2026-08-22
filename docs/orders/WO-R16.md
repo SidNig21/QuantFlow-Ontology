@@ -2595,3 +2595,65 @@ only new product behavior, the receipt remains solely owned by
 `research-world.js`, and the existing task projection remains measurable rather
 than covered by the live gate alone. The same Reader rereads this closure with
 the parent section; only final YES/YES opens the Builder.
+
+## BUILD-ONCE PREVIEW CLOSURE - stop recompiling on every launch
+
+Product WIP `6e3e502c7eecd5411a6a2927fab56918568ed2e3` is evidence,
+not a candidate. Its exact pre-live gates passed 3/0, 6/0, and 13/0. Its one
+live run proved the product repair: all ten pointer inspectors opened/closed and
+the DOM matched the independent 13-object/15-cable Oracle. Both forced cases and
+the first ready app cleaned to zero, and all roots cleaned to zero. The first
+world consumed 43,858 ms; the second `bun run dev` invocation then had too
+little of the unchanged functional window to rebuild Electron and reach reopen
+readiness. The red was `production Electron readiness timed out`, with no
+product, field, pointer, root, or cleanup mismatch.
+
+The gate is paying build cost four times. Compile the candidate once and launch
+that same compiled output for every isolated case:
+
+1. Add one small `prepareCandidateBuild` seam in
+   `qa/gates/research-world-visible.ts`. Before starting the existing 60,000 ms
+   product/cleanup clock or allocating any roots, run exactly one
+   `bun run build` with cwd `collab-electron`, inherited non-proof build
+   environment, hidden window, and captured native exit. Nonzero exit, signal,
+   spawn error, or missing `collab-electron/out/main/index.js` is red and creates
+   no root or launch. Print once from runtime values:
+   `build_once_ms=<integer> build_exit=0`.
+2. In `spawnOwnedLaunch`, change only the child command from
+   `bun run dev` to `bun run preview`. Preserve cwd, isolated runtime
+   environment, QF proof variables, stdio handling, PID ownership snapshot and
+   tracker, activity lease, readiness RPC, and cleanup byte-exact in substance.
+   `preview` must consume the output made by item 1; it may not compile, watch,
+   package, install, or use a stale/alternate tree.
+3. Keep all four serial launch attempts and their exact semantics: forced
+   failure spawn-only, forced timeout spawn-only with 500 ms watchdog, first
+   world ready with pointer 10/10 and exact 13/15, then same-root normal reopen
+   ready with exact saved-world comparison. Keep the 60,000/8,000 product and
+   cleanup clock unchanged; build time is reported separately because it is the
+   one candidate compilation, not a product launch. No case may start before a
+   successful build or run concurrently.
+4. Without adding a fourteenth focused R16 test, extend its existing launch
+   contract to require: exactly one build invocation; build appears before the
+   product clock and root allocation in source order; exactly one runtime-derived
+   build receipt; every launch uses preview and no launch uses dev; the preview
+   package script still resolves to `electron-vite preview`; and the existing
+   four/2/1, pointer, 13/15, reopen, root, cleanup, timeout, and failure
+   assertions remain present. It rejects a hard-coded build receipt, a second
+   build call, `dev`, `package`, or a watcher.
+5. Builder pre-live is exactly task-composition 3/0, research-world 6/0, and
+   R16 focused 13/0, plus Atlas preflight. Then exactly one live gate. Green
+   requires build exit 0, four/2/1, both forced phases/markers, pointer 10/10,
+   exact 13/15, `reopen_equal=true`, zero processes, zero roots, and empty
+   cleanup failures. Any red stops; no timeout increase or second live run.
+   Full green continues with the existing short matrix, pointer falsifier,
+   Atlas refresh/ratchet, BUILD-REPORT, candidate commit, and push.
+
+Allowed implementation paths are only the two R16 gate files. The two preserved
+task-composition product files, BUILD-REPORT, and three Atlas projections remain
+allowed candidate/evidence paths. No change to product behavior, fixture,
+Kernel/projection, research-world.js, package scripts, timeout/reserve, launch
+count/order, pointer, keyboard, installer/release, wrapper/helper framework,
+worktree, Computer Use, or R17 is authorized. A fresh Reader answers the two
+questions before a fresh Builder. After independent Verifier PASS, the Router
+uses the normal app through Computer Use and closes R16 only on that consumer
+PASS.

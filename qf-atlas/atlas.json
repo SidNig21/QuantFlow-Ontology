@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "d880ed5",
+    "commit": "6e3e502",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "6954d0c74eebb2b8"
+    "fingerprint": "9653424b801c4bad"
   },
   "stats": {
     "live": 111,
@@ -2945,7 +2945,7 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 13.6,
+      "kb": 13.9,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -2956,7 +2956,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 13.6,
+          "kb": 13.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "2a59987",
+      "commit": "d880ed5",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "d880ed5",
+      "commit": "6e3e502",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
