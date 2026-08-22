@@ -1,12 +1,13 @@
 # NEXT — R17 named Technique and settled outcome loop
 
-status: R17 PRE-BUILD READER REQUIRED
+status: R17 BUILDER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R17](WO-R17.md)
 route: [GOLDEN-RUN.md](GOLDEN-RUN.md), R17 active
 depends-receipt: [R16 final acceptance](evidence/r16/FINAL-ACCEPTANCE.md), product candidate `ca59628a334cc3da0060204b7685017fa381dc44`
 standing-authority: execute the remaining R17–R20 ladder; diagnose and repair named in-scope delivery defects without founder interruption
+reader-receipt: fresh Luna `r17_prebuild_reader`; final YES/YES after every numbered defect landed in `WO-R17.md`
 
 ## Current door
 
@@ -14,15 +15,14 @@ R16 is complete. Its readable 13-object/15-cable research world passed the
 focused production gate, a fresh independent Verifier, and a normal founder
 Kernel close/reopen check. Final shutdown left zero product processes.
 
-R17 is the one authorized order. Before any product build, a fresh Reader must
-read only `PROTOCOL.md` and `WO-R17.md` and answer exactly:
+R17 is the one authorized order. A fresh Reader read only `PROTOCOL.md` and
+`WO-R17.md` and answered exactly:
 
 1. Can each acceptance gate actually fail? Name the break that makes it red.
 2. Does each deliverable have exactly one meaning?
 
-Every Reader defect lands as an edit to `WO-R17.md`; chat-only guidance does
-not repair the order. Builder authority opens only after an explicit YES/YES
-receipt is recorded here.
+Every Reader defect landed as an edit to `WO-R17.md`; chat-only guidance was not
+accepted. The final verdict is YES/YES, so the fresh Builder door is open.
 
 ## Authorized outcome
 
