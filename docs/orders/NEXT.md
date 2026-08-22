@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - BUILDER AUTHORIZED
+status: R16 NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR - VERIFIER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -85,9 +85,8 @@ fresh Luna Reader task `01a028c6-bdef-72e2-91bd-6ab7f84235e9` found and landed
 the remaining critic-running/admission ordering and executable mutation-seam
 defects, then returned final `YES/YES` at pushed docs SHA
 `e237ef79fbdad56b0b430baff838878fd7a91bf2`.
-current-door: `NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR` Builder
-authorized from `e237ef7`; independent Verifier and final normal consumer PASS
-remain required; no R17 authority exists.
+governed-world-builder-receipt: immutable product candidate `34c4bd254165901b8e2d8df72e717c76a171c341`; evidence commit `0fc82c3547391af8c4b79b85093ef09901e2908f`; exact 14-command matrix green; F1-F7 each red then restored green; Atlas current/ratchet green with HARD RED 0 and one transparently recorded non-blocking diff finding; tree clean and pushed
+current-door: fresh different-model Verifier at immutable candidate `34c4bd2`; no final consumer rebuild/rerun and no R17 authority until independent PASS
 
 ## Authorized outcome
 
