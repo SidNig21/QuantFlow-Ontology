@@ -2225,3 +2225,98 @@ Allowed Builder paths are only `qa/gates/research-world-visible.ts`,
 projections. No product change, timeout/reserve change, assertion weakening,
 extra launch, second live run, package/installer/release gate, worktree, wrapper,
 helper framework, keyboard work, or R17 work is authorized.
+
+## SEQUENTIAL COLD-START CLOSURE - no concurrent dev launches
+
+The preceding early-concurrency repair was implemented only in the working tree
+opened at `fd8e2a2f74dfaa67b5a71273fda6eab4bc8bd02c`; it was not committed and
+has been removed. Its one live run proved the approach invalid: starting the two
+forced Electron dev launches while the first world recruited specialists closed
+the normal app's RPC during `qf.dock.spawn`. Cleanup still returned every process
+and root to zero. Together with WIP `fac9b8d8`—where three post-first ready
+launches contended and only reopen timed out—the measurement is decisive:
+concurrent `bun run dev` launches interfere even with isolated product roots.
+
+This final scheduling authority forbids concurrent launches. It retains the
+founder pointer-first product bar and proves cleanup cheaply without making a
+failure-only case wait for full product readiness:
+
+1. Split the existing launch seam, without changing its environment or process
+   ownership logic:
+   - `spawnOwnedLaunch` creates the isolated directories/environment, snapshots
+     processes, spawns the existing `bun run dev`, creates the same ownership
+     tracker, and returns the same `LiveCase` with an empty endpoint immediately
+     after a child PID exists.
+   - `awaitLaunchReadiness` performs the current socket-path, ping,
+     `app.readiness.canvas`, tracker, and owned-PID checks against a supplied
+     spawned `LiveCase`, fills its endpoint, and returns it.
+   - `launchReady` is only `awaitLaunchReadiness(await spawnOwnedLaunch(...))`.
+     The environment variables, spawn command, readiness predicate, functional
+     deadline, tracker, and cleanup code remain byte-identical in substance.
+2. Replace `schedulePostFirstCases` with a tiny exported
+   `runSequentialCases`. It awaits each callback before invoking the next,
+   returns results in callback order, and stops without invoking later callbacks
+   if one rejects. Its two existing focused tests are replaced in place and
+   prove exact order, maximum active callback count one, result order, and stop
+   on rejection. No `Promise.all`, `Promise.allSettled`, unawaited callback, or
+   background launch promise may appear in the live orchestration.
+3. Run four launch attempts in this exact serial order:
+   - forced failure: `spawnOwnedLaunch`, require a tracked child PID, emit the
+     existing marker plus `forced_failure_phase=spawned_not_ready`, then use the
+     unchanged cleanup path; never call readiness or a product RPC;
+   - forced timeout: `spawnOwnedLaunch`, require a tracked child PID, run the
+     unchanged 500 ms never-settling watchdog, emit the existing marker plus
+     `forced_timeout_phase=spawned_not_ready`, then use unchanged cleanup; never
+     call readiness or a product RPC;
+   - first world: `launchReady`, then the unchanged fixture, specialist,
+     independent Oracle, exact 13/15 projection, all-ten pointer proof, saved
+     state, and clean first shutdown from WIP `fac9b8d8`;
+   - normal reopen: only after the first world is complete and clean,
+     `launchReady` on the same normal app root, then the unchanged exact
+     world/reopen/saved-state comparison and clean shutdown.
+4. Track launch activity at runtime. Increment only after
+   `spawnOwnedLaunch` returns a child PID and decrement in the exact cleanup
+   `finally` for that launch. A new spawn asserts active count zero first. The
+   final receipt is exactly `launch_attempts=4 ready_launches=2
+   max_concurrent_launches=1`; any count mismatch, overlap, missing cleanup
+   decrement, or launch without owned PIDs is red. The two ready launches are
+   the complete product first-world and reopen cases. The two half-born launch
+   attempts are deliberately cleanup cases, not product-behavior substitutes.
+5. The exact two failure/timeout cases still have separate roots, owned process
+   snapshots, markers, 500 ms timeout floor, cleanup errors, and primary/cleanup
+   precedence. Testing them before readiness is stronger for half-born cleanup
+   and removes no ready-app cleanup proof: both successful ready product launches
+   also shut down and require zero owned processes. All three allocated roots
+   are still removed and rechecked. No product truth or founder state is used.
+6. `RESEARCH_WORLD_VISIBLE_DEADLINE_MS=60000` and
+   `CLEANUP_RESERVE_MS=8000` remain exact. Every functional step must finish
+   before the existing functional deadline and every cleanup before the hard
+   deadline. No launch or case may borrow the cleanup reserve. If the two
+   uncontested ready launches cannot complete in that budget, the gate is red
+   and R16 stops; no timeout increase is authorized.
+7. The focused file remains 13 tests. Only imports, the two scheduling tests,
+   and the existing pointer-first contract test may differ from WIP `fac9b8d8`;
+   the other ten test bodies remain byte-identical. The pointer contract also
+   source-checks: exact serial case order; forced cases call spawn-only and never
+   readiness/RPC; product cases call readiness; four/2/1 receipt literal exactly
+   once; unchanged 60,000/8,000 constants; no concurrent promise combinator in
+   orchestration; and the exact pointer receipt once. In the gate, only the
+   launch split, serial helper, forced-case launch calls, activity tracking, and
+   top-level orchestration may differ from WIP. All pointer/world/reopen/cleanup
+   assertions and all product files are frozen. Builder and Verifier inspect
+   and record `git diff fac9b8d8 --`; any broader code/test change is red.
+
+A fresh Reader must return YES/YES before a fresh Builder starts. The Builder
+runs Atlas preflight, tile-manager 2/0, focused R16 13/0, and exactly one live
+gate. Green requires the exact four/2/1 launch receipt, both forced markers and
+phases, pointer receipt once, exact 13/15 world, reopen equality, zero processes,
+zero roots, and no cleanup failure. Only then run the existing short matrix,
+pointer falsifier, BUILD-REPORT, Atlas refresh, candidate commit, and push. A
+fresh different-model Verifier gets the same bounded matrix and one live gate;
+then the Router performs the already-specified normal-app Computer Use check and
+stops before R17.
+
+Allowed Builder paths remain only the two R16 gate files, BUILD-REPORT, and the
+three generated Atlas projections. No product, fixture, pointer, keyboard,
+timeout/reserve, package/installer/release, worktree, wrapper, helper framework,
+second live run, or R17 change is authorized.
