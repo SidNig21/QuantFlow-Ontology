@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "221231c",
+    "commit": "17b9e3b",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "e8a3f466e6267022"
+    "fingerprint": "a6c0911751060ae8"
   },
   "stats": {
     "live": 111,
@@ -330,7 +330,7 @@
     },
     "unexplainedCoverage": 0,
     "stripCandidates": 13,
-    "violations": 9,
+    "violations": 10,
     "governanceUnknown": 3,
     "legacyLeads": 9,
     "nodes": 109,
@@ -338,11 +338,11 @@
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 41,
+    "undecided": 42,
     "allClear": false,
     "decisions": {
-      "total": 46,
-      "undecided": 41,
+      "total": 47,
+      "undecided": 42,
       "keep": 2,
       "repair": 3,
       "remove": 0,
@@ -352,7 +352,7 @@
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 21,
+      "founder-decision": 22,
       "ast-coverage": 3,
       "package-proof": 17
     }
@@ -1440,7 +1440,7 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 51.5,
+      "kb": 51.6,
       "x": -0.23,
       "z": 1.3,
       "status": "warn",
@@ -1451,7 +1451,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 51.5,
+          "kb": 51.6,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 0,
@@ -1684,22 +1684,22 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 43.3,
+      "kb": 43.7,
       "x": -1.24,
       "z": 0.45,
-      "status": "gray",
+      "status": "alert",
       "spawns": 0,
       "writes": 4,
-      "dml": 7,
+      "dml": 8,
       "executes": 3,
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 43.3,
+          "kb": 43.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 4,
-          "dml": 7,
+          "dml": 8,
           "dmlLines": [
             138,
             173,
@@ -1716,7 +1716,7 @@
         {
           "kind": "outside-write-door",
           "scope": "product",
-          "what": "7 SQL statements outside execute()",
+          "what": "8 SQL statements outside execute()",
           "where": "collab-electron/src/main/kernel.ts",
           "lines": [
             138,
@@ -3450,7 +3450,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 535.4,
+      "kb": 549.5,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3475,6 +3475,16 @@
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 4,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/research-world-visible.ts",
+          "kb": 32.2,
+          "spawns": 1,
+          "spawnsLive": 1,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3547,16 +3557,6 @@
           "kb": 18.5,
           "spawns": 2,
           "spawnsLive": 2,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/research-world-visible.ts",
-          "kb": 18.1,
-          "spawns": 1,
-          "spawnsLive": 1,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -8649,10 +8649,10 @@
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
       "indexedFns": 67,
-      "sqlInText": 7,
-      "sqlIndexed": 6,
+      "sqlInText": 8,
+      "sqlIndexed": 7,
       "sqlUnrecognised": 0,
-      "why": "7 SQL site(s) in the text, 6 resolved into a function. The unresolved ones are invisible to governance analysis."
+      "why": "8 SQL site(s) in the text, 7 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/db.ts",
@@ -15593,7 +15593,7 @@
       "ownership": "indexed",
       "reasons": {
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "1 of 7 SQL site(s) are not inside a named function, so no call path can be traced",
+        "persistence": "1 of 8 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
@@ -48554,8 +48554,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "bindSourceWork",
-        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
+        "viaDml": "trace",
+        "dmlFile": "collab-electron/src/main/kernel.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -48582,6 +48582,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
+          "collab-electron/src/main/kernel.ts::trace",
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
           "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
@@ -49248,7 +49249,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -49951,8 +49952,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "bindSourceWork",
-        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
+        "viaDml": "trace",
+        "dmlFile": "collab-electron/src/main/kernel.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -49977,6 +49978,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
+          "collab-electron/src/main/kernel.ts::trace",
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
           "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
@@ -50424,7 +50426,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -50467,8 +50469,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "bindSourceWork",
-        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
+        "viaDml": "trace",
+        "dmlFile": "collab-electron/src/main/kernel.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -50506,6 +50508,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
+          "collab-electron/src/main/kernel.ts::trace",
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
           "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
@@ -51558,7 +51561,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -51601,8 +51604,8 @@
       "hop4": {
         "kind": "write-door",
         "viaDoor": "kernelExecute",
-        "viaDml": "bindSourceWork",
-        "dmlFile": "packages/qf-kernel/src/governed-review.ts",
+        "viaDml": "trace",
+        "dmlFile": "collab-electron/src/main/kernel.ts",
         "viaDisk": null,
         "diskFile": null,
         "dmlAll": [],
@@ -51626,6 +51629,7 @@
         "inlineDml": false,
         "attribution": "ast-module-edge",
         "regexPhantoms": [
+          "collab-electron/src/main/kernel.ts::trace",
           "packages/qf-kernel/src/events.ts::appendEvent",
           "packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask",
           "packages/qf-kernel/src/governed-review.ts::bindSourceWork",
@@ -52073,7 +52077,7 @@
         "reachPath": null,
         "ungoverned": [],
         "downgradedFrom": "cheats",
-        "why": "the name-based walk attributed SQL to packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
+        "why": "the name-based walk attributed SQL to collab-electron/src/main/kernel.ts::trace, packages/qf-kernel/src/events.ts::appendEvent, packages/qf-kernel/src/governed-review.ts::admitGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::bindSourceWork, packages/qf-kernel/src/governed-review.ts::deliverGovernedReviewTask, packages/qf-kernel/src/governed-review.ts::ensureGovernedReviewSchema, packages/qf-kernel/src/governed-review.ts::recordGovernedToolReceipt, which this handler has no import path to — no AST-backed call reaches any SQL"
       }
     },
     {
@@ -55471,7 +55475,7 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1361,
+          "line": 1363,
           "kind": "direct"
         },
         {
@@ -56188,6 +56192,36 @@
   ],
   "persistence": [
     {
+      "id": "persistence:collab-electron/src/main/kernel.ts:kernelSeedVisibleResearchWorld:links:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "kernelSeedVisibleResearchWorld",
+      "table": "links",
+      "verb": "INSERT INTO",
+      "persistence": "domain-truth",
+      "sourceClass": "product",
+      "reachability": "unknown",
+      "governance": "violation",
+      "confidence": "medium",
+      "reachProof": {
+        "corroborated": false,
+        "hops": 0,
+        "path": [],
+        "why": "no AST call path with a supporting module edge reaches kernelSeedVisibleResearchWorld from an app file within 5 hops"
+      },
+      "blocker": "ast-coverage",
+      "why": "App code writes the domain table `links` directly. The Kernel is the sole writer; this SQL sits outside the Kernel package entirely. No corroborated production reach: no AST call path with a supporting module edge reaches kernelSeedVisibleResearchWorld from an app file within 5 hops.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "collab-electron/src/main/kernel.ts",
+          "lines": [
+            1000
+          ]
+        }
+      ]
+    },
+    {
       "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
       "classification": "governance-violation",
       "disposition": "repair",
@@ -56234,7 +56268,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56276,7 +56310,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56318,7 +56352,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56360,7 +56394,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56402,7 +56436,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56444,7 +56478,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56486,7 +56520,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1016",
+            "from": "collab-electron/src/main/kernel.ts:1020",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -56523,7 +56557,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1027",
+            "from": "collab-electron/src/main/kernel.ts:1031",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "recordGovernedToolReceipt"
           }
@@ -58036,7 +58070,7 @@
     {
       "kind": "outside-write-door",
       "scope": "product",
-      "what": "7 SQL statements outside execute()",
+      "what": "8 SQL statements outside execute()",
       "where": "collab-electron/src/main/kernel.ts",
       "lines": [
         138,
@@ -58249,16 +58283,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "b9e37d5",
+      "commit": "221231c",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "221231c",
+      "commit": "17b9e3b",
       "generatedAt": "2026-08-22"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "41 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -58469,14 +58503,14 @@
         "id": "protocol-variants:pty:write",
         "kind": "protocol-variant",
         "what": "pty:write",
-        "where": "collab-electron/src/main/index.ts:772 (invoke)",
+        "where": "collab-electron/src/main/index.ts:773 (invoke)",
         "note": "was undecided"
       },
       {
         "id": "protocol-variants:pty:send-raw-keys",
         "kind": "protocol-variant",
         "what": "pty:send-raw-keys",
-        "where": "collab-electron/src/main/index.ts:792 (invoke)",
+        "where": "collab-electron/src/main/index.ts:793 (invoke)",
         "note": "was undecided"
       },
       {
@@ -58588,16 +58622,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "qa/gates/research-world-visible.ts",
-        "analyzer": "lifetime",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -58605,13 +58630,22 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 41,
       "undecidedTo": null
     }
   },
   "decisions": [
+    {
+      "id": "persistence:collab-electron/src/main/kernel.ts:kernelSeedVisibleResearchWorld:links:insert-into",
+      "kind": "persistence",
+      "what": "links insert into",
+      "where": "collab-electron/src/main/kernel.ts",
+      "blocker": "founder-decision",
+      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
+      "verdict": "undecided"
+    },
     {
       "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
       "kind": "persistence",

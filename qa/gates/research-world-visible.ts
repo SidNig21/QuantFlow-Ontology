@@ -11,6 +11,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { performance } from "node:perf_hooks";
 import { Database } from "bun:sqlite";
 import {
   collectOwnedPids,
@@ -33,6 +34,9 @@ const MAIN_IPC = join(REPO_ROOT, "collab-electron/src/main/ipc-kernel.ts");
 const PROJECTION = join(REPO_ROOT, "collab-electron/src/main/research-world-projection.ts");
 
 export const RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000;
+export const CLEANUP_RESERVE_MS = 8_000;
+export const EXPECTED_VISIBLE_TILE_COUNT = 13;
+export const EXPECTED_VISIBLE_CABLE_COUNT = 15;
 
 export type IndependentWorldManifest = {
   root_id: string;
@@ -161,7 +165,52 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-function remainingMs(deadlineAt: number): number { return Math.max(0, deadlineAt - Date.now()); }
+function remainingMs(deadlineAt: number): number { return Math.max(0, deadlineAt - performance.now()); }
+
+export type InitialCaseStarted = () => void;
+export type InitialCaseCallback<T> = (reportStarted: InitialCaseStarted) => Promise<T>;
+
+/** Start every initial case before awaiting any case result. */
+export function scheduleInitialCases<T>(callbacks: readonly InitialCaseCallback<T>[], onStarted?: (index: number) => void): Promise<T[]> {
+  const results = callbacks.map((callback, index) => {
+    try {
+      return Promise.resolve(callback(() => onStarted?.(index)));
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  });
+  return Promise.all(results);
+}
+
+export function assertVisibleWorldCounts(value: { objects: readonly unknown[]; links: readonly unknown[] }): void {
+  assert(value.objects.length === EXPECTED_VISIBLE_TILE_COUNT, `visible world expected ${EXPECTED_VISIBLE_TILE_COUNT} tiles, got ${value.objects.length}`);
+  assert(value.links.length === EXPECTED_VISIBLE_CABLE_COUNT, `visible world expected ${EXPECTED_VISIBLE_CABLE_COUNT} cables, got ${value.links.length}`);
+}
+
+export type GateCaseName = "normal" | "forced-failure" | "forced-timeout";
+export type GateCaseOutcome = {
+  case: GateCaseName;
+  functionalError?: unknown;
+  cleanupError?: unknown;
+};
+
+function errorMessage(error: unknown): string { return error instanceof Error ? error.message : String(error); }
+
+export function formatFailureReceipts(outcomes: readonly GateCaseOutcome[]): { primary: string; cleanup: string; ok: boolean } {
+  const priority: GateCaseName[] = ["normal", "forced-failure", "forced-timeout"];
+  const functional = priority
+    .map((caseName) => outcomes.find((outcome) => outcome.case === caseName && outcome.functionalError !== undefined))
+    .find((outcome) => outcome !== undefined);
+  const cleanup = outcomes
+    .filter((outcome) => outcome.cleanupError !== undefined)
+    .map((outcome) => ({ case: outcome.case, message: errorMessage(outcome.cleanupError) }))
+    .sort((left, right) => left.case.localeCompare(right.case) || left.message.localeCompare(right.message));
+  return {
+    primary: `primary_failure=${functional ? JSON.stringify({ case: functional.case, message: errorMessage(functional.functionalError) }) : "null"}`,
+    cleanup: `cleanup_failures=${JSON.stringify(cleanup)}`,
+    ok: functional === undefined && cleanup.length === 0,
+  };
+}
 
 async function waitFor<T>(label: string, action: () => Promise<T | null>, deadlineAt: number): Promise<T> {
   let lastError = "";
@@ -175,11 +224,11 @@ async function waitFor<T>(label: string, action: () => Promise<T | null>, deadli
   throw new Error(`${label} timed out${lastError ? `: ${lastError}` : ""}`);
 }
 
-function manifestForWorld(dbPath: string, ids: { mission: string; task: string; hypothesis: string; dataset: string; run: string; resultArtifact: string; evaluation: string; findings: string; report: string; director: string; executor: string; critic: string }): IndependentWorldManifest {
+function manifestForWorld(dbPath: string, ids: { mission: string; task: string; reviewTask: string; hypothesis: string; dataset: string; run: string; resultArtifact: string; evaluation: string; findings: string; report: string; director: string; executor: string; critic: string }): IndependentWorldManifest {
   const db = new Database(dbPath, { readonly: true });
   try {
     const wanted = new Set([
-      `mission:${ids.mission}`, `task:${ids.task}`, `hypothesis:${ids.hypothesis}`, `dataset:${ids.dataset}`,
+      `mission:${ids.mission}`, `task:${ids.task}`, `task:${ids.reviewTask}`, `hypothesis:${ids.hypothesis}`, `dataset:${ids.dataset}`,
       `run:${ids.run}`, `artifact:${ids.resultArtifact}`, `evaluation:${ids.evaluation}`, `artifact:${ids.findings}`,
       `artifact:${ids.report}`, `agent_session:${ids.director}`, `agent_session:${ids.executor}`, `agent_session:${ids.critic}`,
     ]);
@@ -299,6 +348,7 @@ function createOwnershipTracker(baseline: ProcessInfo[], rootPid: number): Owner
 }
 
 type LiveCase = { root: string; child: ChildProcess; endpoint: string; kernelDb: string; tracker: OwnershipTracker };
+type LaunchFailure = Error & { live?: LiveCase };
 
 async function cleanupProcessSet(live: Pick<LiveCase, "child" | "endpoint" | "tracker">, deadlineAt: number, label: string): Promise<void> {
   await live.tracker.observe(`${label}:before-shutdown`);
@@ -327,7 +377,7 @@ async function cleanupProcessSet(live: Pick<LiveCase, "child" | "endpoint" | "tr
   assert(remaining.length === 0, `${label} left owned processes: ${remaining.map((row) => row.pid).join(",")}`);
 }
 
-async function launch(root: string, deadlineAt: number): Promise<LiveCase> {
+async function launch(root: string, deadlineAt: number, onSpawnStarted?: () => void): Promise<LiveCase> {
   const stores = join(root, "stores");
   const kernelDb = join(stores, "kernel.db");
   const artifactRoot = join(stores, "artifacts");
@@ -353,6 +403,7 @@ async function launch(root: string, deadlineAt: number): Promise<LiveCase> {
   child.stderr?.resume();
   const tracker = createOwnershipTracker(before, child.pid);
   const live: LiveCase = { root, child, endpoint: "", kernelDb, tracker };
+  onSpawnStarted?.();
   const endpointFile = join(appRoot, "socket-path");
   let lastReadinessSnapshotAt = 0;
   try {
@@ -376,8 +427,9 @@ async function launch(root: string, deadlineAt: number): Promise<LiveCase> {
     assert(tracker.ownedPids.size > 0, "no gate-owned process was observed after readiness");
     return live;
   } catch (error) {
-    await cleanupProcessSet(live, deadlineAt, "launch-exception");
-    throw error;
+    const failure: LaunchFailure = error instanceof Error ? error : new Error(String(error));
+    failure.live = live;
+    throw failure;
   }
 }
 
@@ -406,21 +458,23 @@ async function observeWorld(endpoint: string, expected: IndependentWorldManifest
   const clickMission = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); if (!(button instanceof HTMLElement)) throw new Error('Mission Show research world button is missing'); button.click(); return true; })()` });
   assert(clickMission === true, "Mission root activation did not click");
   const read = async () => await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => ({ objects: [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].map((node) => ({ type: node.dataset.qfWorldType, id: node.dataset.qfWorldId, accessible_name: node.getAttribute('aria-label') || '', fields: Object.fromEntries([...node.querySelectorAll('[data-qf-world-field]')].map((field) => [field.dataset.qfWorldField, field.querySelector('.qf-world-field-value')?.textContent || '']), position: { left: node.style.left, top: node.style.top, width: node.style.width, height: node.style.height, zIndex: node.style.zIndex }, inspector_expanded: node.querySelector('.qf-world-details')?.hidden === false })), links: [...document.querySelectorAll('.cable-path[data-qf-world-cable-kind]')].map((node) => ({ kind: node.dataset.qfWorldCableKind, from_id: node.dataset.qfWorldCableFrom, to_id: node.dataset.qfWorldCableTo })) }))()` }) as VisibleWorldSnapshot;
-  const world = await waitFor("visible 12-tile/13-cable world", async () => { const value = await read(); return value.objects.length === 12 && value.links.length === 13 ? value : null; }, deadlineAt);
+  const world = await waitFor("visible 13-tile/15-cable world", async () => { const value = await read(); return value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT ? value : null; }, deadlineAt);
+  assertVisibleWorldCounts(world);
   compareVisibleSnapshot(world, expected);
   const interaction = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelectorAll('[data-qf-world-field]').length > 0 && !root.querySelector('.qf-world-details')?.hidden; root.focus(); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return { expanded, focus_restored: document.activeElement === root }; })()` });
   assert(interaction.expanded === true && interaction.focus_restored === true, "pointer/keyboard inspection parity failed");
   const second = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const before = document.querySelectorAll('.canvas-tile[data-qf-world-type]').length; const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); button?.click(); return { before, after: document.querySelectorAll('.canvas-tile[data-qf-world-type]').length }; })()` }) as { before: number; after: number };
-  assert(second.before === 12 && second.after === 12, "second reveal duplicated research tiles");
+  assert(second.before === EXPECTED_VISIBLE_TILE_COUNT && second.after === EXPECTED_VISIBLE_TILE_COUNT, "second reveal duplicated research tiles");
   const taskActivation = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const tile = document.querySelector('.canvas-tile[data-qf-world-type="task"][data-qf-world-id="${taskId}"]'); const button = tile?.querySelector('.qf-world-reveal'); if (!(button instanceof HTMLElement)) throw new Error('Task Show research world button is missing'); button.click(); return true; })()` });
   assert(taskActivation === true, "Task root activation did not click");
-  const taskWorld = await waitFor("Task-root visible world", async () => { const value = await read(); return value.objects.length === 12 && value.links.length === 13 ? value : null; }, deadlineAt);
+  const taskWorld = await waitFor("Task-root visible world", async () => { const value = await read(); return value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT ? value : null; }, deadlineAt);
+  assertVisibleWorldCounts(taskWorld);
   compareVisibleSnapshot(taskWorld, expected);
   return taskWorld;
 }
 
 const TRANSIENT_ROOT_ERRORS = new Set(["EBUSY", "EPERM", "ENOTEMPTY"]);
-type RootRemoval = { path: string; attempts: number; retried: number; errors: string[] };
+type RootRemoval = { path: string; attempts: number; retried: number; errors: string[]; failure?: string };
 
 async function removeRegisteredRoot(root: string, deadlineAt: number): Promise<RootRemoval> {
   const path = resolve(root);
@@ -434,7 +488,10 @@ async function removeRegisteredRoot(root: string, deadlineAt: number): Promise<R
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code ?? "UNKNOWN";
       receipt.errors.push(`${code}@${receipt.attempts}`);
-      if (!TRANSIENT_ROOT_ERRORS.has(code)) throw new Error(`root removal failed path=${path} code=${code} attempts=${receipt.attempts}`);
+      if (!TRANSIENT_ROOT_ERRORS.has(code)) {
+        receipt.failure = `root removal failed path=${path} code=${code} attempts=${receipt.attempts}`;
+        break;
+      }
       receipt.retried += 1;
       await wait(Math.min(100, Math.max(1, remainingMs(deadlineAt))));
     }
@@ -442,42 +499,123 @@ async function removeRegisteredRoot(root: string, deadlineAt: number): Promise<R
   return receipt;
 }
 
-async function runForcedFailureCase(root: string, nonce: string, deadlineAt: number): Promise<void> {
-  const live = await launch(root, deadlineAt);
+function attachedLive(error: unknown): LiveCase | undefined {
+  return error && typeof error === "object" && "live" in error ? (error as LaunchFailure).live : undefined;
+}
+
+type MutableCaseOutcome = { case: GateCaseName; functionalError?: unknown; cleanupError?: unknown };
+
+async function runNormalCase(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+  const outcome: MutableCaseOutcome = { case: "normal" };
+  let active: LiveCase | undefined;
+  const cleanupActive = async (label: string): Promise<boolean> => {
+    if (!active) return true;
+    const live = active;
+    active = undefined;
+    try { await cleanupProcessSet(live, hardDeadlineAt, label); return true; }
+    catch (error) { outcome.cleanupError ??= error; return false; }
+  };
   try {
+    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
+    const first = active;
+    const seeded = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", {}) as { object_id?: string; dataset?: { object_id?: string } };
+    const datasetId = String(seeded.object_id ?? seeded.dataset?.object_id ?? "");
+    assert(datasetId, "supporting Dataset was not seeded");
+    const missionId = `mission-${nonce}`;
+    const question = `R16 visible world ${nonce}`;
+    const submitted = await rpcCall(first.endpoint, "qf.research.submit_question", { mission_id: missionId, question, dataset_id: datasetId }) as { hypothesisId: string; sessionId: string };
+    const executor = await rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker" }) as { sessionId: string };
+    const critic = await rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-critic" }) as { sessionId: string };
+    const complete = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", { dataset_id: datasetId, visible_world: { nonce, mission_id: missionId, director_session_id: submitted.sessionId, task_title: `Visible Task ${nonce}`, task_description: question, hypothesis_id: submitted.hypothesisId, executor_session_id: executor.sessionId, critic_session_id: critic.sessionId } });
+    assert(complete && typeof complete === "object", "visible fixture completion failed");
+    const taskId = String((complete as { visible_world?: { task_id?: string } }).visible_world?.task_id ?? "");
+    assert(taskId, "production Task id missing");
+    const worldIds = { mission: missionId, task: taskId, reviewTask: "", hypothesis: submitted.hypothesisId, dataset: datasetId, run: `run-${nonce}`, resultArtifact: "", evaluation: "", findings: "", report: "", director: submitted.sessionId, executor: executor.sessionId, critic: critic.sessionId };
+    const db = new Database(first.kernelDb, { readonly: true });
+    try {
+      const row = db.query("SELECT id, publication_report_id, findings_artifact_id, review_task_id FROM evaluation ORDER BY created_at DESC, id DESC LIMIT 1").get() as { id: string; publication_report_id: string; findings_artifact_id: string; review_task_id: string };
+      const result = db.query("SELECT json_extract(params, '$.result_artifact_id') AS id FROM run WHERE id = ?").get(worldIds.run) as { id: string };
+      worldIds.resultArtifact = String(result.id); worldIds.evaluation = row.id; worldIds.findings = row.findings_artifact_id; worldIds.report = row.publication_report_id; worldIds.reviewTask = String(row.review_task_id);
+    } finally { db.close(); }
+    assert(worldIds.reviewTask, "governed Evaluation review Task is missing");
+    const expected = manifestForWorld(first.kernelDb, worldIds);
+    assertVisibleWorldCounts(expected);
+    const firstWorld = await observeWorld(first.endpoint, expected, missionId, taskId, functionalDeadlineAt);
+    console.log(`nonce=${nonce} oracle_tiles=${expected.objects.length} oracle_cables=${expected.links.length} dom_tiles=${firstWorld.objects.length} dom_cables=${firstWorld.links.length}`);
+    if (!await cleanupActive("first-launch")) return outcome;
+    active = await launch(root, functionalDeadlineAt);
+    const secondWorld = await observeWorld(active.endpoint, expected, missionId, taskId, functionalDeadlineAt);
+    assert(JSON.stringify(secondWorld) === JSON.stringify(firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
+    console.log("reopen_equal=true pointer=true keyboard=true duplicate_reveal=false");
+    await cleanupActive("second-launch");
+  } catch (error) {
+    outcome.functionalError = error;
+    active ??= attachedLive(error);
+  } finally {
+    await cleanupActive("normal-exception");
+  }
+  return outcome;
+}
+
+async function runForcedFailureCase(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+  const outcome: MutableCaseOutcome = { case: "forced-failure" };
+  let active: LiveCase | undefined;
+  try {
+    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
     const marker = `r16-forced-failure-${nonce}`;
     try { throw new Error(marker); } catch (error) {
       assert(String(error).includes(marker), "forced failure marker was not caught by the gate harness");
       console.log(`forced_failure_marker=${marker}`);
     }
+  } catch (error) {
+    outcome.functionalError = error;
+    active ??= attachedLive(error);
   } finally {
-    await cleanupProcessSet(live, deadlineAt, "forced-failure");
+    if (active) {
+      const live = active;
+      active = undefined;
+      try { await cleanupProcessSet(live, hardDeadlineAt, "forced-failure"); }
+      catch (error) { outcome.cleanupError = error; }
+    }
   }
+  return outcome;
 }
 
-async function runForcedTimeoutCase(root: string, nonce: string, deadlineAt: number): Promise<void> {
-  const live = await launch(root, deadlineAt);
+async function runForcedTimeoutCase(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number, onSpawnStarted: () => void): Promise<GateCaseOutcome> {
+  const outcome: MutableCaseOutcome = { case: "forced-timeout" };
+  let active: LiveCase | undefined;
   try {
+    active = await launch(root, functionalDeadlineAt, onSpawnStarted);
     const marker = `r16-forced-timeout-${nonce}`;
-    const startedAt = Date.now();
+    const watchdogStartedAt = performance.now();
     const neverSettling = new Promise<never>(() => {});
     try {
       await Promise.race([neverSettling, new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error(marker)), 500))]);
       throw new Error("forced timeout watchdog unexpectedly lost the race");
     } catch (error) {
-      const elapsedMs = Date.now() - startedAt;
+      const elapsedMs = Math.round(performance.now() - watchdogStartedAt);
       assert(String(error).includes(marker), "forced timeout marker was not produced by the watchdog");
       assert(elapsedMs >= 500, `forced timeout watchdog fired early at ${elapsedMs}ms`);
       console.log(`forced_timeout_marker=${marker} elapsed_ms=${elapsedMs}`);
     }
+  } catch (error) {
+    outcome.functionalError = error;
+    active ??= attachedLive(error);
   } finally {
-    await cleanupProcessSet(live, deadlineAt, "forced-timeout");
+    if (active) {
+      const live = active;
+      active = undefined;
+      try { await cleanupProcessSet(live, hardDeadlineAt, "forced-timeout"); }
+      catch (error) { outcome.cleanupError = error; }
+    }
   }
+  return outcome;
 }
 
 export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
-  const startedAt = Date.now();
-  const deadlineAt = startedAt + RESEARCH_WORLD_VISIBLE_DEADLINE_MS;
+  const startedAt = performance.now();
+  const hardDeadlineAt = startedAt + RESEARCH_WORLD_VISIBLE_DEADLINE_MS;
+  const functionalDeadlineAt = hardDeadlineAt - CLEANUP_RESERVE_MS;
   assertResearchWorldContract();
   const nonce = randomUUID();
   const roots = new Set<string>();
@@ -487,73 +625,49 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
     roots.add(root);
     return root;
   };
-  const removeRoot = async (root: string): Promise<void> => {
-    removalReceipts.push(await removeRegisteredRoot(root, deadlineAt));
-    assert(!existsSync(root), `registered root remained after measured removal: ${root}`);
-  };
+  const outcomes: GateCaseOutcome[] = [];
+  const startedOffsets: number[] = [];
+  const markStarted = (index: number): void => { startedOffsets[index] ??= Math.round(performance.now() - startedAt); };
+  const normalRoot = registerRoot();
+  const failureRoot = registerRoot();
+  const timeoutRoot = registerRoot();
+  const caseNames: GateCaseName[] = ["normal", "forced-failure", "forced-timeout"];
   try {
-    const normalRoot = registerRoot();
-    let first: LiveCase | undefined;
-    let second: LiveCase | undefined;
-    try {
-      first = await launch(normalRoot, deadlineAt);
-      const seeded = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", {}) as { object_id?: string; dataset?: { object_id?: string } };
-      const datasetId = String(seeded.object_id ?? seeded.dataset?.object_id ?? "");
-      assert(datasetId, "supporting Dataset was not seeded");
-      const missionId = `mission-${nonce}`;
-      const question = `R16 visible world ${nonce}`;
-      const submitted = await rpcCall(first.endpoint, "qf.research.submit_question", { mission_id: missionId, question, dataset_id: datasetId }) as { hypothesisId: string; sessionId: string };
-      const executor = await rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker" }) as { sessionId: string };
-      const critic = await rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-critic" }) as { sessionId: string };
-      const complete = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", { dataset_id: datasetId, visible_world: { nonce, mission_id: missionId, director_session_id: submitted.sessionId, task_title: `Visible Task ${nonce}`, task_description: question, hypothesis_id: submitted.hypothesisId, executor_session_id: executor.sessionId, critic_session_id: critic.sessionId } });
-      assert(complete && typeof complete === "object", "visible fixture completion failed");
-      const taskId = String((complete as { visible_world?: { task_id?: string } }).visible_world?.task_id ?? "");
-      assert(taskId, "production Task id missing");
-      const worldIds = { mission: missionId, task: taskId, hypothesis: submitted.hypothesisId, dataset: datasetId, run: `run-${nonce}`, resultArtifact: "", evaluation: "", findings: "", report: "", director: submitted.sessionId, executor: executor.sessionId, critic: critic.sessionId };
-      const db = new Database(first.kernelDb, { readonly: true });
-      try {
-        const row = db.query("SELECT id, publication_report_id, findings_artifact_id FROM evaluation ORDER BY created_at DESC, id DESC LIMIT 1").get() as { id: string; publication_report_id: string; findings_artifact_id: string };
-        const result = db.query("SELECT json_extract(params, '$.result_artifact_id') AS id FROM run WHERE id = ?").get(worldIds.run) as { id: string };
-        worldIds.resultArtifact = String(result.id); worldIds.evaluation = row.id; worldIds.findings = row.findings_artifact_id; worldIds.report = row.publication_report_id;
-      } finally { db.close(); }
-      const expected = manifestForWorld(first.kernelDb, worldIds);
-      assert(expected.objects.length === 12 && expected.links.length === 13, `independent Oracle expected ${expected.objects.length} tiles and ${expected.links.length} cables`);
-      const firstWorld = await observeWorld(first.endpoint, expected, missionId, taskId, deadlineAt);
-      console.log(`nonce=${nonce} oracle_tiles=${expected.objects.length} oracle_cables=${expected.links.length} dom_tiles=${firstWorld.objects.length} dom_cables=${firstWorld.links.length}`);
-      await cleanupProcessSet(first, deadlineAt, "first-launch");
-      first = undefined;
-      second = await launch(normalRoot, deadlineAt);
-      const secondWorld = await observeWorld(second.endpoint, expected, missionId, taskId, deadlineAt);
-      assert(JSON.stringify(secondWorld) === JSON.stringify(firstWorld), "reopen visible world changed ids, fields, cables, positions, or inspector state");
-      console.log("reopen_equal=true pointer=true keyboard=true duplicate_reveal=false");
-      await cleanupProcessSet(second, deadlineAt, "second-launch");
-      second = undefined;
-    } finally {
-      if (first) await cleanupProcessSet(first, deadlineAt, "first-launch-exception").catch(() => {});
-      if (second) await cleanupProcessSet(second, deadlineAt, "second-launch-exception").catch(() => {});
+    const callbacks: InitialCaseCallback<GateCaseOutcome>[] = [
+      (reportStarted) => runNormalCase(normalRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
+      (reportStarted) => runForcedFailureCase(failureRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
+      (reportStarted) => runForcedTimeoutCase(timeoutRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
+    ];
+    outcomes.push(...await scheduleInitialCases(callbacks, markStarted));
+    assert(startedOffsets.length === callbacks.length && startedOffsets.every((value) => value !== undefined), "not every initial case reported a post-spawn start");
+    const spread = Math.max(...startedOffsets) - Math.min(...startedOffsets);
+    console.log(`initial_case_start_spread_ms=${spread}`);
+    assert(spread <= 2_000, `initial case start spread exceeded 2000ms: ${spread}`);
+  } catch (error) {
+    outcomes.push({ case: "normal", functionalError: error });
+  }
+  const finalOutcomes: GateCaseOutcome[] = caseNames.map((caseName) => outcomes.find((outcome) => outcome.case === caseName) ?? { case: caseName, functionalError: new Error(`${caseName} case returned no result`) });
+  try {
+    for (const [index, root] of [normalRoot, failureRoot, timeoutRoot].entries()) {
+      const receipt = await removeRegisteredRoot(root, hardDeadlineAt);
+      removalReceipts.push(receipt);
+      if (receipt.failure) finalOutcomes[index].cleanupError ??= new Error(receipt.failure);
     }
-    await removeRoot(normalRoot);
-
-    const failureRoot = registerRoot();
-    await runForcedFailureCase(failureRoot, nonce, deadlineAt);
-    console.log("forced_failure_cleanup=green");
-    await removeRoot(failureRoot);
-
-    const timeoutRoot = registerRoot();
-    await runForcedTimeoutCase(timeoutRoot, nonce, deadlineAt);
-    console.log("forced_timeout_cleanup=green");
-    await removeRoot(timeoutRoot);
-    return { ok: true };
   } finally {
     for (const root of roots) {
-      if (existsSync(root)) removalReceipts.push(await removeRegisteredRoot(root, deadlineAt));
+      if (existsSync(root)) removalReceipts.push(await removeRegisteredRoot(root, hardDeadlineAt));
     }
     const leaked = [...roots].filter((root) => existsSync(root)).sort();
     const retried = removalReceipts.reduce((sum, receipt) => sum + receipt.retried, 0);
     console.log(`roots_created=${roots.size} roots_remaining=${leaked.length} retried=${retried} leaked=${JSON.stringify(leaked)}`);
     assert(leaked.length === 0, `research-world-visible cleanup left roots: ${leaked.join(",")}`);
-    if (Date.now() - startedAt >= RESEARCH_WORLD_VISIBLE_DEADLINE_MS) throw new Error("research-world-visible exceeded its 60 second total deadline");
   }
+  const receipts = formatFailureReceipts(finalOutcomes);
+  console.log(receipts.primary);
+  console.log(receipts.cleanup);
+  assert(performance.now() < hardDeadlineAt, "research-world-visible exceeded its 60 second total deadline");
+  assert(receipts.ok, "research-world-visible completed with a functional or cleanup failure");
+  return { ok: true };
 }
 
 if (import.meta.main) process.exit((await runResearchWorldVisibleGate()).ok ? 0 : 1);
