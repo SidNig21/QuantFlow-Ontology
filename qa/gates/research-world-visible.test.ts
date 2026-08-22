@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { performance } from "node:perf_hooks";
 import {
   assertResearchWorldContract,
   assertSavedResearchTileAllowlist,
@@ -12,6 +14,8 @@ import {
   RESEARCH_TILE_STORAGE_KEYS,
   RESEARCH_WORLD_VISIBLE_DEADLINE_MS,
   rendererEvaluationExpression,
+  removeRegisteredRoot,
+  scheduleFirstWorldSpecialists,
   schedulePostFirstCases,
   worldTimeoutDelta,
   worldObservationExpression,
@@ -43,6 +47,33 @@ describe("research-world-visible gate contract", () => {
     expect(receipts.primary).toBe('primary_failure={"case":"normal","message":"world count"}');
     expect(receipts.cleanup).toBe('cleanup_failures=[{"case":"forced-failure","message":"forced cleanup"},{"case":"normal","message":"normal cleanup"}]');
     expect(receipts.ok).toBe(false);
+  });
+
+  test("returns specialist results in executor/critic order after critic resolves first", async () => {
+    let resolveExecutor!: (value: string) => void;
+    let resolveCritic!: (value: string) => void;
+    const executor = new Promise<string>((resolve) => { resolveExecutor = resolve; });
+    const critic = new Promise<string>((resolve) => { resolveCritic = resolve; });
+    const started: string[] = [];
+    const result = scheduleFirstWorldSpecialists(
+      () => { started.push("executor"); return executor; },
+      () => { started.push("critic"); return critic; },
+    );
+    expect(started).toEqual(["executor", "critic"]);
+    resolveCritic("critic-result");
+    resolveExecutor("executor-result");
+    await expect(result).resolves.toEqual(["executor-result", "critic-result"]);
+  });
+
+  test("removes an existing expired-deadline root with one immediate attempt", async () => {
+    const root = mkdtempSync(join(tmpdir(), "qf-r16-focused-root-"));
+    try {
+      const receipt = await removeRegisteredRoot(root, performance.now() - 1);
+      expect(receipt.attempts).toBe(1);
+      expect(existsSync(root)).toBe(false);
+    } finally {
+      if (existsSync(root)) rmSync(root, { recursive: true, force: true });
+    }
   });
 
   test("JSON-encodes renderer expressions and returns the exact error shape", () => {

@@ -197,6 +197,25 @@ export async function schedulePostFirstCases<T>(
   return Promise.all(results);
 }
 
+export function scheduleFirstWorldSpecialists<TExecutor, TCritic>(
+  executorSpawn: () => Promise<TExecutor>,
+  criticSpawn: () => Promise<TCritic>,
+): Promise<[TExecutor, TCritic]> {
+  let executor: Promise<TExecutor>;
+  let critic: Promise<TCritic>;
+  try {
+    executor = Promise.resolve(executorSpawn());
+  } catch (error) {
+    executor = Promise.reject(error);
+  }
+  try {
+    critic = Promise.resolve(criticSpawn());
+  } catch (error) {
+    critic = Promise.reject(error);
+  }
+  return Promise.all([executor, critic]);
+}
+
 export const RESEARCH_TILE_STORAGE_KEYS = [
   "height", "id", "ontologyId", "ontologyType", "type", "width", "x", "y", "zIndex",
 ] as const;
@@ -669,13 +688,14 @@ async function observeWorld(endpoint: string, expected: IndependentWorldManifest
 const TRANSIENT_ROOT_ERRORS = new Set(["EBUSY", "EPERM", "ENOTEMPTY"]);
 type RootRemoval = { path: string; attempts: number; retried: number; errors: string[]; failure?: string };
 
-async function removeRegisteredRoot(root: string, deadlineAt: number): Promise<RootRemoval> {
+export async function removeRegisteredRoot(root: string, deadlineAt: number): Promise<RootRemoval> {
   const path = resolve(root);
   const receipt: RootRemoval = { path, attempts: 0, retried: 0, errors: [] };
-  while (existsSync(path) && remainingMs(deadlineAt) > 0) {
-    const measuredBeforeAttempt = existsSync(path);
-    if (!measuredBeforeAttempt) break;
+  let firstAttempt = true;
+  while (existsSync(path) && (firstAttempt || remainingMs(deadlineAt) > 0)) {
+    firstAttempt = false;
     receipt.attempts += 1;
+    if (receipt.attempts > 1) receipt.retried += 1;
     try {
       rmSync(path, { recursive: true, force: false });
     } catch (error) {
@@ -685,8 +705,9 @@ async function removeRegisteredRoot(root: string, deadlineAt: number): Promise<R
         receipt.failure = `root removal failed path=${path} code=${code} attempts=${receipt.attempts}`;
         break;
       }
-      receipt.retried += 1;
-      await wait(Math.min(100, Math.max(1, remainingMs(deadlineAt))));
+      const delayMs = Math.min(100, remainingMs(deadlineAt));
+      if (delayMs <= 0) break;
+      await wait(delayMs);
     }
   }
   return receipt;
@@ -728,7 +749,7 @@ function readSavedCanvasState(appDir: string, expected: IndependentWorldManifest
   return state;
 }
 
-async function runFirstWorldStage(root: string, nonce: string, functionalDeadlineAt: number, hardDeadlineAt: number): Promise<FirstWorldStageResult> {
+async function runFirstWorldStage(root: string, nonce: string, startedAt: number, functionalDeadlineAt: number, hardDeadlineAt: number): Promise<FirstWorldStageResult> {
   const outcome: MutableCaseOutcome = { case: "normal" };
   let active: LiveCase | undefined;
   const cleanupActive = async (label: string): Promise<boolean> => {
@@ -747,8 +768,10 @@ async function runFirstWorldStage(root: string, nonce: string, functionalDeadlin
     const missionId = `mission-${nonce}`;
     const question = `R16 visible world ${nonce}`;
     const submitted = await rpcCall(first.endpoint, "qf.research.submit_question", { mission_id: missionId, question, dataset_id: datasetId }) as { hypothesisId: string; sessionId: string };
-    const executor = await rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker" }) as { sessionId: string };
-    const critic = await rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-critic" }) as { sessionId: string };
+    const [executor, critic] = await scheduleFirstWorldSpecialists(
+      () => rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker" }) as Promise<{ sessionId: string }>,
+      () => rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-critic" }) as Promise<{ sessionId: string }>,
+    );
     const complete = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", { dataset_id: datasetId, visible_world: { nonce, mission_id: missionId, director_session_id: submitted.sessionId, task_title: `Visible Task ${nonce}`, task_description: question, hypothesis_id: submitted.hypothesisId, executor_session_id: executor.sessionId, critic_session_id: critic.sessionId } });
     assert(complete && typeof complete === "object", "visible fixture completion failed");
     const taskId = String((complete as { visible_world?: { task_id?: string } }).visible_world?.task_id ?? "");
@@ -767,6 +790,10 @@ async function runFirstWorldStage(root: string, nonce: string, functionalDeadlin
     console.log(`nonce=${nonce} oracle_tiles=${expected.objects.length} oracle_cables=${expected.links.length} dom_tiles=${firstWorld.objects.length} dom_cables=${firstWorld.links.length}`);
     if (!await cleanupActive("first-launch")) return { outcome };
     readSavedCanvasState(join(root, "app-root", "app"), expected);
+    const finishedAt = performance.now();
+    assert(finishedAt < functionalDeadlineAt, "first-world stage exceeded its functional deadline");
+    const firstWorldStageMs = Math.round(finishedAt - startedAt);
+    console.log(`first_world_stage_ms=${firstWorldStageMs}`);
     return {
       outcome,
       state: {
@@ -907,7 +934,7 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
       (reportStarted) => runForcedFailureCase(failureRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
       (reportStarted) => runForcedTimeoutCase(timeoutRoot, nonce, functionalDeadlineAt, hardDeadlineAt, reportStarted),
     ];
-    const firstWorldReady = runFirstWorldStage(normalRoot, nonce, functionalDeadlineAt, hardDeadlineAt).then((result) => {
+    const firstWorldReady = runFirstWorldStage(normalRoot, nonce, startedAt, functionalDeadlineAt, hardDeadlineAt).then((result) => {
       outcomes.push(result.outcome);
       if (result.state && result.outcome.functionalError === undefined && result.outcome.cleanupError === undefined) {
         firstWorldState = result.state;
@@ -931,25 +958,48 @@ export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
       ? merged
       : { case: caseName, functionalError: new Error(`${caseName} case returned no result`) };
   });
-  try {
-    for (const [index, root] of [normalRoot, failureRoot, timeoutRoot].entries()) {
-      const receipt = await removeRegisteredRoot(root, hardDeadlineAt);
+  const rootCases = [
+    { index: 0, caseName: "normal" as const, root: normalRoot },
+    { index: 1, caseName: "forced-failure" as const, root: failureRoot },
+    { index: 2, caseName: "forced-timeout" as const, root: timeoutRoot },
+  ];
+  const recordRootCleanupFailure = (index: number, error: unknown): void => {
+    finalOutcomes[index].cleanupError ??= error;
+  };
+  const removeRootForCase = async (entry: (typeof rootCases)[number]): Promise<void> => {
+    try {
+      const receipt = await removeRegisteredRoot(entry.root, hardDeadlineAt);
       removalReceipts.push(receipt);
-      if (receipt.failure) finalOutcomes[index].cleanupError ??= new Error(receipt.failure);
+      if (receipt.failure) recordRootCleanupFailure(entry.index, new Error(receipt.failure));
+    } catch (error) {
+      recordRootCleanupFailure(entry.index, error);
     }
-  } finally {
-    for (const root of roots) {
-      if (existsSync(root)) removalReceipts.push(await removeRegisteredRoot(root, hardDeadlineAt));
+  };
+  for (const entry of rootCases) await removeRootForCase(entry);
+  for (const entry of rootCases) {
+    let present = false;
+    try {
+      present = existsSync(entry.root);
+    } catch (error) {
+      recordRootCleanupFailure(entry.index, error);
     }
-    const leaked = [...roots].filter((root) => existsSync(root)).sort();
-    const retried = removalReceipts.reduce((sum, receipt) => sum + receipt.retried, 0);
-    console.log(`roots_created=${roots.size} roots_remaining=${leaked.length} retried=${retried} leaked=${JSON.stringify(leaked)}`);
-    assert(leaked.length === 0, `research-world-visible cleanup left roots: ${leaked.join(",")}`);
+    if (present) await removeRootForCase(entry);
+  }
+  const leaked = [...roots].filter((root) => existsSync(root)).sort();
+  for (const entry of rootCases) {
+    if (leaked.includes(entry.root)) recordRootCleanupFailure(entry.index, new Error(`root remained path=${entry.root}`));
+  }
+  const retried = removalReceipts.reduce((sum, receipt) => sum + receipt.retried, 0);
+  console.log(`roots_created=${roots.size} roots_remaining=${leaked.length} retried=${retried} leaked=${JSON.stringify(leaked)}`);
+  const deadlineExceeded = performance.now() >= hardDeadlineAt;
+  if (!finalOutcomes.some((outcome) => outcome.functionalError !== undefined) && deadlineExceeded) {
+    finalOutcomes[0].functionalError = new Error("research-world-visible exceeded its 60 second total deadline");
   }
   const receipts = formatFailureReceipts(finalOutcomes);
   console.log(receipts.primary);
   console.log(receipts.cleanup);
-  assert(performance.now() < hardDeadlineAt, "research-world-visible exceeded its 60 second total deadline");
+  assert(!deadlineExceeded, "research-world-visible exceeded its 60 second total deadline");
+  assert(leaked.length === 0, `research-world-visible cleanup left roots: ${leaked.join(",")}`);
   assert(receipts.ok, "research-world-visible completed with a functional or cleanup failure");
   return { ok: true };
 }
