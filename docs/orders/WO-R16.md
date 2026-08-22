@@ -972,3 +972,92 @@ candidate, and fresh verification. No further diagnostic lap is authorized.
 
 Plain meaning: when the canvas count is wrong, print exactly what is missing or
 extra instead of waiting a minute and throwing the evidence away.
+
+## SCHEDULING CORRECTION - prove the first world without cold-launch interference
+
+Observation WIP SHA `3b86d140d06a86665b87a082d2a85a31bfebb2fe` is evidence,
+not a candidate. Its focused contract tests pass 8/8 and preserve the exact
+renderer error and `world_timeout` receipts. Its one live run stopped before
+world observation because the normal fixture tried to assign its source Task
+to a Hermes worker session that was no longer running:
+
+```text
+create_task assignee_session_id must name a running session:
+75847055-12bf-4056-bb06-e85dacdcf40b
+```
+
+That run also left two owned processes in the simultaneously launched forced-
+timeout case until final root cleanup. The product Kernel correctly rejected
+the dead assignee. The gate created the race by cold-launching the production
+Director, worker, critic, forced-failure app, and forced-timeout app at once.
+
+This section supersedes only FINAL RECONCILIATION item 4's initial scheduling
+and its `initial_case_start_spread_ms` receipt. It also supersedes the two
+later diagnostic sections' prohibition on a further lap. Every product
+assertion, exact 13-tile/15-cable Oracle, selector, fixture command, four real
+Electron launches, 60-second hard deadline, one 8-second cleanup reserve,
+failure vocabulary, cleanup ownership rule, falsifier, and matrix command
+remains unchanged.
+
+### Exact schedule
+
+1. Register the same three isolated roots. Launch only the normal first app.
+   Use the production `hermes-research-director`, spawn the worker and critic,
+   create the durable research world, reveal it from the Mission, compare the
+   exact 13 tiles and 15 cables, exercise inspection and duplicate-reveal
+   behavior, then close that app and prove its owned process set is zero.
+   Neither forced case may spawn before this first app has closed.
+2. Preserve the first world's independent manifest, rendered snapshot, Mission
+   id, source Task id, Kernel, Artifact root, and app-local geometry. Do not
+   rebuild, synthesize, or copy them for reopen.
+3. After item 1 succeeds, invoke exactly three callbacks through one exported
+   post-first scheduling helper, each against its already registered root:
+   the real normal reopen, the real forced-failure launch, and the real forced-
+   timeout launch. The helper invokes all three callbacks before awaiting any
+   result. Each callback reports started only after its pre-spawn snapshot and
+   successful spawn return a root PID.
+4. Record those three monotonic offsets against the original gate `startedAt`,
+   print exactly `post_first_case_start_spread_ms=<n>`, and fail when their
+   maximum-minus-minimum exceeds 2,000 ms. The previous
+   `initial_case_start_spread_ms` receipt no longer exists.
+5. The normal reopen must observe the same 13-tile/15-cable world and compare
+   byte-for-byte equal ids, fields, cables, positions, and inspection state to
+   the first rendered snapshot. The other two callbacks must produce the
+   unchanged forced marker and 500 ms timeout receipts. Await all three, clean
+   all owned processes and roots, and emit the unchanged primary and cleanup
+   receipts before deciding PASS or red.
+
+The focused fake-runner test is renamed to the post-first helper and remains
+bounded to 250 ms. It must prove all three callbacks have reported started
+before any callback is released; a serial helper makes the test red. Add one
+focused scheduling test proving no post-first callback is invoked when the
+first-world stage rejects. Existing 13/15, cleanup-reserve, primary-error,
+renderer-encoding, observation-expression, timeout-delta, and projection-
+independence tests remain unchanged.
+
+### Builder and acceptance authority
+
+A fresh Builder starts only from clean local and remote
+`3b86d140d06a86665b87a082d2a85a31bfebb2fe` plus the Router's Reader-fix
+commit. It may change only:
+
+- `qa/gates/research-world-visible.ts`;
+- `qa/gates/research-world-visible.test.ts`;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections required by normal change control.
+
+It first runs the focused test. It then runs exactly one live
+`bun qa/run.ts research-world-visible`. A red live receipt stops this lap; it
+does not authorize another diagnostic. A green live receipt opens the already
+specified falsifiers, short static/Atlas matrix, BUILD-REPORT, immutable
+candidate commit, and push. No package, installer, release, AgentOS, second
+checkout, wrapper, or helper framework is authorized.
+
+A fresh different-model Verifier records the immutable candidate SHA before
+and after, reruns the focused test, the live gate, the named falsifiers and
+short matrix from this order, and writes `docs/orders/evidence/r16/VERIFICATION.md`
+only on full PASS. Any edit during verification voids the run.
+
+Plain meaning: let QuantFlow finish building and showing the real research
+team before starting the three cheap shutdown checks that were crowding it off
+the machine.

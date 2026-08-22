@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: REWRITE BUILD AUTHORIZED - READER YES/YES
+status: R16 SCHEDULING CORRECTION - AWAITING FRESH READER
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -11,6 +11,7 @@ standing-authority: diagnose and repair in-scope delivery defects without furthe
 reader-receipt: fresh Luna Reader task `01a026f2-c77f-7070-af3c-cdb6898d8bda`; final YES/YES at `e7b7142bce31314d4955677f3e9e5104343f59eb`
 rewrite-receipt: original candidate `388d8f25f3b6e1c378ec1bb80c1015e698b11b3a` independently FAIL; rework exhausted on repeated cleanup residue; exact non-candidate prototype preserved at `a9420ec0697fe587e619fd88c3839ee3a88da6ad`
 rewrite-reader-receipt: fresh Luna Reader task `01a02720-0fd6-7982-88e5-533616d042e6`; final YES/YES at `0700b778a27cc1149fd6fdcdd4a89b2ac78062d8`
+latest-observation-receipt: focused tests 8/8; live run stopped on a dead concurrent Hermes assignee and forced-timeout process residue; exact WIP preserved at `3b86d140d06a86665b87a082d2a85a31bfebb2fe`
 
 ## Authorized outcome
 
@@ -30,7 +31,10 @@ A fresh Reader read `START_HERE.md`, `docs/orders/PROTOCOL.md`, this file, and
 Every original-order defect landed in `WO-R16.md`; chat-only guidance was not
 accepted. The YES/YES at `e7b7142` opened the original Builder door. That lap is
 exhausted and does not authorize the appended rewrite. The fresh rewrite Reader
-answered YES/YES at `0700b77`, so the bounded fresh Builder door is open.
+answered YES/YES at `0700b77`; that lap produced the observation receipt at
+`3b86d14` and is now spent. The final scheduling correction appended to
+`WO-R16.md` must receive a fresh two-question Reader YES/YES before a Builder
+door opens.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 
