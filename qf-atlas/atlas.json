@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "c84f9e9",
+    "commit": "e08dce5",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "123c0dac81fd4d28"
+    "fingerprint": "d9f6b1cf8284a0b2"
   },
   "stats": {
     "live": 111,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 124,
-      "indexed": 1152,
+      "indexed": 1154,
       "downgradedFromCheats": 20,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 14,
@@ -429,8 +429,8 @@
       "layer": 2,
       "name": "qf*",
       "kb": 36.2,
-      "x": 0.23,
-      "z": -1.3,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ok",
       "spawns": 1,
       "writes": 0,
@@ -1084,9 +1084,9 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 36.1,
-      "x": 1.24,
-      "z": -0.45,
+      "kb": 37.5,
+      "x": -1.01,
+      "z": -0.85,
       "status": "gray",
       "spawns": 0,
       "writes": 1,
@@ -1095,7 +1095,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 31.8,
+          "kb": 33.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2009,8 +2009,8 @@
       "layer": 2,
       "name": "pty*",
       "kb": 36.5,
-      "x": -1.01,
-      "z": -0.85,
+      "x": 0.23,
+      "z": -1.3,
       "status": "ok",
       "spawns": 2,
       "writes": 4,
@@ -8897,7 +8897,7 @@
     {
       "path": "collab-electron/src/main/agent-host.ts",
       "status": "indexed",
-      "indexedFns": 40,
+      "indexedFns": 42,
       "sqlInText": 0,
       "sqlIndexed": 1,
       "sqlUnrecognised": 0
@@ -11416,9 +11416,9 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports startPrecreatedNativeTuiSession() at line 578",
-            "exports cancelAgentSession() at line 961",
-            "exports closeAgentSessionRow() at line 1010"
+            "exports startPrecreatedNativeTuiSession() at line 620",
+            "exports cancelAgentSession() at line 1003",
+            "exports closeAgentSessionRow() at line 1052"
           ],
           "strong": [],
           "weight": "weak"
@@ -11457,7 +11457,7 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports admitAndStartSession() at line 509"
+            "exports admitAndStartSession() at line 551"
           ],
           "strong": [],
           "weight": "weak"
@@ -55469,12 +55469,12 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1303,
+          "line": 1301,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1343,
+          "line": 1341,
           "kind": "direct"
         },
         {
@@ -55509,12 +55509,12 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1344,
+          "line": 1342,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1403,
+          "line": 1401,
           "kind": "direct"
         },
         {
@@ -56636,7 +56636,7 @@
           "type": "static",
           "file": "collab-electron/src/main/agent-host.ts",
           "lines": [
-            439
+            481
           ]
         }
       ]
@@ -58447,12 +58447,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "f728487",
+      "commit": "c84f9e9",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "c84f9e9",
+      "commit": "e08dce5",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
@@ -58674,14 +58674,14 @@
         "id": "protocol-variants:pty:write",
         "kind": "protocol-variant",
         "what": "pty:write",
-        "where": "collab-electron/src/main/index.ts:777 (invoke)",
+        "where": "collab-electron/src/main/index.ts:779 (invoke)",
         "note": "was undecided"
       },
       {
         "id": "protocol-variants:pty:send-raw-keys",
         "kind": "protocol-variant",
         "what": "pty:send-raw-keys",
-        "where": "collab-electron/src/main/index.ts:797 (invoke)",
+        "where": "collab-electron/src/main/index.ts:799 (invoke)",
         "note": "was undecided"
       },
       {

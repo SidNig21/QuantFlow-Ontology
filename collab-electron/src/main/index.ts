@@ -107,7 +107,7 @@ import {
   bootstrapPackagedDockProfiles,
   closeAgentSessionRow,
   disposeAgentOs,
-  deliverToAgentSession,
+  submitAgentSessionInstruction,
   admitAndStartSession,
   startPrecreatedNativeTuiSession,
   isAgentOsBootSupported,
@@ -1295,9 +1295,7 @@ app.whenReady().then(async () => {
                     ].join("\n"),
                     "orchestrator",
                   );
-                  if (!deliverToAgentSession(criticSessionId, criticInstruction)) {
-                    throw new Error("governed review instruction delivery failed");
-                  }
+                  await submitAgentSessionInstruction(criticSessionId, criticInstruction);
                 },
               });
               mainWindow?.webContents.send("qf:dock:invalidate");

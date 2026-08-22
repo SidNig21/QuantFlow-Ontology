@@ -177,6 +177,48 @@ export function deliverToAgentSession(sessionId: string, data: string): boolean 
   return true;
 }
 
+const HERMES_INPUT_SETTLE_MS = 400;
+
+function requireLiveNativeTuiTarget(
+  sessionId: string,
+  ptySessionId: string,
+): void {
+  const entry = live.get(sessionId);
+  if (
+    !entry ||
+    entry.kind !== "native_tui" ||
+    entry.ptySessionId !== ptySessionId
+  ) {
+    throw new Error("governed review critic target changed or is no longer live");
+  }
+}
+
+/** Submit one app-authored Hermes instruction to one retained native-TUI seat. */
+export async function submitAgentSessionInstruction(
+  sessionId: string,
+  instruction: string,
+): Promise<void> {
+  if (!instruction.endsWith("\r") || instruction.slice(0, -1).includes("\r")) {
+    throw new Error("governed review instruction must have exactly one terminal carriage return");
+  }
+  const entry = live.get(sessionId);
+  if (!entry || entry.kind !== "native_tui" || !entry.ptySessionId) {
+    throw new Error("governed review critic target is not a live native-TUI session");
+  }
+  const capturedPtySessionId = entry.ptySessionId;
+  const text = instruction.slice(0, -1);
+
+  requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
+  writeToSession(capturedPtySessionId, text);
+  requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
+
+  await new Promise((resolve) => setTimeout(resolve, HERMES_INPUT_SETTLE_MS));
+
+  requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
+  writeToSession(capturedPtySessionId, "\r");
+  requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
+}
+
 function newTrace(): TraceContext {
   return {
     trace_id: crypto.randomUUID(),

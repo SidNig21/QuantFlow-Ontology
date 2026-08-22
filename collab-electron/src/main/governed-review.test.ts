@@ -6,6 +6,78 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { ontologyToolsForRole } from "./ontology-role-tools.ts";
 import { setShuttingDown, shouldEmitPtySessionExit } from "./pty.ts";
+import { buildMissionActivationInstruction } from "./mission-activation.ts";
+
+type TestLiveEntry = {
+  cancelled: boolean;
+  definitionId: string;
+  guestId: string;
+  kind: "native_tui";
+  ptySessionId: string;
+  turnInFlight: boolean;
+};
+
+let testLiveSet: ((sessionId: string, entry: TestLiveEntry) => void) | null = null;
+let testLiveDelete: ((sessionId: string) => void) | null = null;
+let testPtyWriteHook: ((sessionId: string, data: string) => void) | null = null;
+
+mock.module("./pty", () => ({
+  writeToSession: (sessionId: string, data: string) => {
+    testPtyWriteHook?.(sessionId, data);
+  },
+}));
+
+mock.module("./host-native-tui", () => ({
+  admitNativeTuiDefinition: async (opts: {
+    definitionId: string;
+    existingSessionId?: string;
+    liveSet: (sessionId: string, entry: TestLiveEntry) => void;
+    liveDelete: (sessionId: string) => void;
+  }) => {
+    const sessionId = opts.existingSessionId ?? "test-native-tui";
+    const ptySessionId = `pty-${sessionId}`;
+    testLiveSet = opts.liveSet;
+    testLiveDelete = opts.liveDelete;
+    opts.liveSet(sessionId, {
+      cancelled: false,
+      definitionId: opts.definitionId,
+      guestId: ptySessionId,
+      kind: "native_tui",
+      ptySessionId,
+      turnInFlight: false,
+    });
+    return {
+      sessionId,
+      guestId: ptySessionId,
+      definitionId: opts.definitionId,
+      surface: "native_tui" as const,
+      ptySessionId,
+    };
+  },
+  cancelNativeTuiSession: async () => {},
+  installNativeTuiPtyExitHook: () => {},
+  tearDownNativeTui: async () => {},
+}));
+
+mock.module("./host-acp-bridge", () => ({
+  admitHostAcp: async () => { throw new Error("test does not admit host ACP"); },
+  cancelHostAcp: async () => {},
+  resolveHostAcpCommand: () => null,
+  tearDownHostAcp: async () => {},
+}));
+
+mock.module("./host-acp-permission", () => ({
+  cancelPendingPermissions: () => {},
+  requestFounderPermission: async () => false,
+}));
+
+mock.module("./host-acp-turn", () => ({
+  runHostAcpTurn: async () => { throw new Error("test does not run host ACP"); },
+}));
+
+mock.module("electron", () => ({
+  app: { isPackaged: false },
+}));
 
 class BunDatabaseSync {
   private readonly database: Database;
@@ -84,6 +156,10 @@ describe("R15 production governed-review seams", () => {
       kernelRunGuidedResearch,
       openAppKernel,
     } = await import("./kernel");
+    const {
+      admitAndStartSession,
+      submitAgentSessionInstruction,
+    } = await import("./agent-host");
     const artifactRoot = mkdtempSync(join(tmpdir(), "qf-r16-governed-review-"));
     const previousKernelDb = process.env.QF_KERNEL_DB;
     const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
@@ -111,6 +187,7 @@ describe("R15 production governed-review seams", () => {
       session("director-continuation", "director-continuation-definition", "orchestrator", ["desk.orchestrate"]);
       session("worker-continuation", "worker-continuation-definition", "worker", ["desk.orchestrate"]);
       session("critic-continuation", "hermes-critic", "critic", ["research.evaluate"], "director-continuation");
+      await admitAndStartSession("hermes-critic", { existingSessionId: "critic-continuation" });
       const mission = kernelExecute("create_mission", {
         mission_id: "mission-continuation",
         name: "Continuation mission",
@@ -143,6 +220,11 @@ describe("R15 production governed-review seams", () => {
       if (!run) return;
 
       const deliveries: Array<{ reviewTaskId: string; sourceWork: Record<string, string> }> = [];
+      const writes: Array<{ sessionId: string; data: string; at: number }> = [];
+      let deliveredInstruction = "";
+      testPtyWriteHook = (sessionId, data) => {
+        writes.push({ sessionId, data, at: performance.now() });
+      };
       const continuation = await kernelContinueGovernedResearchResult({
         source_task_id: task.object_id,
         hypothesis_id: run.hypothesisId,
@@ -152,9 +234,22 @@ describe("R15 production governed-review seams", () => {
         critic_session_id: "critic-continuation",
         attempt_id: "continuation-attempt",
         deliver: async (reviewTaskId, sourceWork) => {
+          const instruction = buildMissionActivationInstruction(
+            reviewTaskId,
+            "Independently review this completed deterministic QuantFlow research run.",
+            "orchestrator",
+          );
+          deliveredInstruction = instruction;
+          await submitAgentSessionInstruction("critic-continuation", instruction);
           deliveries.push({ reviewTaskId, sourceWork });
         },
       });
+      expect(writes.map(({ sessionId, data }) => ({ sessionId, data }))).toEqual([
+        { sessionId: "pty-critic-continuation", data: deliveredInstruction.slice(0, -1) },
+        { sessionId: "pty-critic-continuation", data: "\r" },
+      ]);
+      expect(writes[0]!.data.endsWith("\r")).toBe(false);
+      expect(writes[1]!.at - writes[0]!.at).toBeGreaterThanOrEqual(350);
       expect(deliveries).toHaveLength(1);
       expect(deliveries[0]).toEqual({ reviewTaskId: continuation.review_task_id, sourceWork: continuation.source_work });
       expect(continuation.outcome).toBe("delivered");
@@ -196,7 +291,39 @@ describe("R15 production governed-review seams", () => {
       expect(evaluation.verdict).toBe("supports");
       expect(evaluation.report_artifact_id).toBeString();
       expect(db.query("SELECT COUNT(*) AS n FROM qf_review_invocation WHERE task_id = ?").get(continuation.review_task_id)).toEqual({ n: 4 });
+
+      const submitInstruction = buildMissionActivationInstruction(
+        continuation.review_task_id,
+        "changed-target proof",
+        "orchestrator",
+      );
+      testPtyWriteHook = (_sessionId, data) => {
+        if (data !== "\r") {
+          testLiveSet?.("critic-continuation", {
+            cancelled: false,
+            definitionId: "hermes-critic",
+            guestId: "pty-critic-changed",
+            kind: "native_tui",
+            ptySessionId: "pty-critic-changed",
+            turnInFlight: false,
+          });
+        }
+      };
+      await expect(
+        submitAgentSessionInstruction("critic-continuation", submitInstruction),
+      ).rejects.toThrow("target changed");
+
+      await admitAndStartSession("hermes-critic", { existingSessionId: "critic-continuation" });
+      testPtyWriteHook = (_sessionId, data) => {
+        if (data !== "\r") testLiveDelete?.("critic-continuation");
+      };
+      await expect(
+        submitAgentSessionInstruction("critic-continuation", submitInstruction),
+      ).rejects.toThrow("no longer live");
     } finally {
+      testPtyWriteHook = null;
+      testLiveSet = null;
+      testLiveDelete = null;
       if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
       else process.env.QF_KERNEL_DB = previousKernelDb;
       if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
