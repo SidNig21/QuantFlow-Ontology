@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 SIXTEENTH CABLE REPAIR - FRESH VERIFIER REQUIRED
+status: R16 SIXTEENTH CABLE REPAIR VERIFIED - NORMAL CONSUMER ATTEMPT 4 AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -140,6 +140,8 @@ sixteenth-cable-reader-receipt: fresh Luna Reader task `01a029b8-0e0b-7de1-b4e9-
 current-door: exact sixteenth-cable bounded Builder is authorized on Reader-approved docs head; no rebuild, consumer Attempt 4, or R17 authority before immutable candidate and fresh independent PASS
 sixteenth-cable-builder-receipt: immutable product candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`; evidence `9cacd5208ca2c392649f423be8afe5f6d8b213a4`; focused `4/0`, isolated gate exact `13/15` plus pointer `10/10`, base-source falsifier `3/1` with expected 16-versus-15 mismatch, restoration exact, Atlas HARD RED 0, pushed clean
 current-door: fresh independent Verifier must freeze candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`, run the exact bounded matrix and falsifier/restoration, and write PASS or stop on RED; no rebuild, consumer Attempt 4, or R17 authority before PASS
+sixteenth-cable-verifier-receipt: fresh independent Terra Verifier task `01a029c3-dede-7192-b898-20781ffe5720`; PASS at immutable candidate `1b329e7c5d1825848b2d13345aef949136cfe73f`; evidence `82ecfda163c177a56e9caca799460b8d05d77159`; exact `4/0`, isolated `13/15` plus pointer `10/10`, falsifier red/restoration exact, Atlas HARD RED 0, frozen bytes unchanged
+current-door: Router is authorized for one identity-bound build and one exact normal two-launch Computer Use Attempt 4; any red keeps R16 open; no R17 authority
 
 ## Authorized outcome
 
