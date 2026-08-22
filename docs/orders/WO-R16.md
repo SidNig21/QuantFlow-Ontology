@@ -2691,3 +2691,62 @@ short matrix, evidence, candidate, independent Verifier, Computer Use consumer
 check, and stop-before-R17 path. Allowed files and every prohibition in the
 parent closure remain unchanged. The same fresh Reader rereads this exact
 defect closure; final YES/YES reopens the Builder.
+
+## CLEANUP PREFLIGHT CLOCK - reserve product window for product work
+
+Skip-build WIP `b4cd054a7900b5525955b3ae606d9dcfaceefdc8` is
+evidence, not a candidate. Its build passed once in 79,517 ms. Both forced
+spawn-only cases cleaned to zero. The compiled first world then passed pointer
+10/10, exact independent 13/15, and clean shutdown. Its
+`first_world_stage_ms=50717` still included the two already-completed forced
+cleanup cases, leaving roughly one second of the 52-second functional window
+for compiled reopen readiness. Reopen timed out; all roots/processes remained
+clean. The product clock currently begins before failure-only preflight work.
+
+Keep all proof and make the clocks describe what they measure:
+
+1. Keep `prepareCandidateBuild` and exact preview `-- --skipBuild` unchanged.
+   After build, create the activity tracker and the two forced roots. Run forced
+   failure and forced timeout serially under a new exact named
+   `CLEANUP_PREFLIGHT_DEADLINE_MS=15000`, measured from immediately before their
+   first spawn. They retain their markers, spawn-only behavior, 500 ms watchdog,
+   ownership tracker, primary/cleanup precedence, and zero-process assertions.
+2. Remove and recheck both forced roots inside that same preflight deadline.
+   Any functional error, cleanup error, remaining process, remaining root, or
+   elapsed preflight at/over 15,000 ms is red and no product root/clock/launch is
+   created. Print once from runtime values after every preflight assertion:
+   `cleanup_preflight_ms=<integer> forced_roots_remaining=0`.
+3. Only after the forced preflight is fully green, set `startedAt`,
+   `hardDeadlineAt=startedAt+60000`, and
+   `functionalDeadlineAt=hardDeadlineAt-8000`, then allocate the one normal root.
+   Run first world and same-root reopen serially and unchanged. Their product
+   timing, pointer 10/10, exact 13/15, saved state, reopen equality, and two
+   ready-launch cleanup assertions remain inside the existing 60,000/8,000
+   clock. This is not a timeout increase: failure-only cleanup has its own
+   smaller preflight deadline and product behavior keeps its exact clock.
+4. Final accounting still derives exactly four launch attempts, two ready
+   launches, zero active, and maximum one. It still reports three roots created,
+   zero remaining, and no cleanup failure. Forced roots removed during preflight
+   remain registered in the final leak set and removal receipts; final cleanup
+   must recheck them without recreating them.
+5. Without a fourteenth R16 test, extend the existing launch contract to require
+   the exact 15,000 constant, build -> forced preflight -> product-clock -> normal
+   root -> first world -> reopen source order, the runtime-derived preflight
+   receipt exactly once, and stop-before-product behavior on every preflight red.
+   Reject any relocation of first-world/reopen outside the 60,000/8,000 clock,
+   any concurrency, timeout increase, hard-coded receipt, skipped case, or root
+   removed from final leak accounting.
+
+Run exact pre-live task-composition 3/0, research-world 6/0, R16 focused 13/0,
+and Atlas, then exactly one live gate. Green requires build exit 0, preflight
+under 15 seconds and clean, four/2/1, pointer 10/10, exact 13/15, reopen equal,
+all processes/roots zero, and empty cleanup failures. Any red stops; full green
+continues to the existing short matrix, falsifier, Atlas/report, candidate,
+independent Verifier, Computer Use consumer check, and stop-before-R17.
+
+Allowed implementation paths remain the two R16 gate files; preserved product,
+report, and Atlas paths remain candidate/evidence paths. No product, fixture,
+Kernel/projection, package script, build/preview command, 60,000/8,000 clock,
+pointer, keyboard, installer/release, wrapper/helper, worktree, Computer Use, or
+R17 change is authorized. A fresh Reader answers the two questions before the
+Builder resumes.

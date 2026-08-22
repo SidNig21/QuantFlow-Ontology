@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 PREVIEW SKIP-BUILD CLOSURE - BUILD AUTHORIZED
+status: R16 CLEANUP PREFLIGHT CLOCK - READER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -44,6 +44,8 @@ session-composition-wip-receipt: product unit 3/0, research-world 6/0, focused R
 build-once-reader-receipt: fresh Luna Reader task `01a02819-452f-7fc1-a6c3-fbdf9e1bdb4b`; final YES/YES at `42d35a527a5cd8a4f59ce04ab0264ace63eba9f8`
 preview-rebuild-red-receipt: one build succeeded in 72720ms and forced cases cleaned, but plain electron-vite preview implicitly rebuilt and first normal launch timed out before readiness; WIP preserved at `88cdaaf3d6f5bba04f060fa941e1ca253e1e2eaf`
 preview-skip-build-reader-receipt: fresh build-once Reader task `01a02819-452f-7fc1-a6c3-fbdf9e1bdb4b`; final YES/YES at `2c8427aef183b51c453a54fb732023ee59cfa890`
+skip-build-product-red-receipt: build once passed in 79517ms; forced cases, pointer 10/10, exact 13/15, first shutdown, and final cleanup green; first_world_stage_ms=50717 included forced preflight and left no credible reopen window; WIP preserved at `b4cd054a7900b5525955b3ae606d9dcfaceefdc8`
+cleanup-preflight-reader-receipt: pending fresh two-question Reader over `CLEANUP PREFLIGHT CLOCK`; no Builder before final YES/YES
 
 ## Authorized outcome
 
