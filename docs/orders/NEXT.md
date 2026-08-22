@@ -1,6 +1,6 @@
 # NEXT — R17 named Technique and settled outcome loop
 
-status: R17 REWORK READER REQUIRED
+status: R17 BOUNDED REWORK BUILDER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R17](WO-R17.md)
@@ -9,6 +9,7 @@ depends-receipt: [R16 final acceptance](evidence/r16/FINAL-ACCEPTANCE.md), produ
 standing-authority: execute the remaining R17–R20 ladder; diagnose and repair named in-scope delivery defects without founder interruption
 reader-receipt: fresh Luna `r17_prebuild_reader`; final YES/YES after every numbered defect landed in `WO-R17.md`
 candidate-round-1: `8ef44e60aa54f510aa6c86875ac0091803a70243`; unit/static/Atlas green; independent REWORK on absent literal oracle, direct-Kernel gate, legacy Strategy fallback, missing falsifiers, and broken outcome form
+rework-reader-receipt: fresh Luna `r17_rework_reader`; every rework defect landed; final YES/YES on 2026-08-22
 
 ## Current door
 
@@ -24,8 +25,8 @@ R17 is the one authorized order. A fresh Reader read only `PROTOCOL.md` and
 
 Every Reader defect landed as an edit to `WO-R17.md`; chat-only guidance was not
 accepted. The original verdict was YES/YES. Candidate round 1 was independently
-rejected, and the five finite repair defects now appended to `WO-R17.md` require
-a fresh two-question Reader before the single rework Builder door opens.
+rejected. The five finite repair defects now appended to `WO-R17.md` received
+fresh Reader YES/YES, so the single bounded rework Builder door is open.
 
 ## Authorized outcome
 

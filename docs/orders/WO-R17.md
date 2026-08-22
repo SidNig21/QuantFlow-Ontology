@@ -1,13 +1,14 @@
 # WO-R17 — Named Technique and settled outcome loop
 
-status: REWORK — candidate `8ef44e60` independently rejected; bounded repair Reader required
-assignee: none until rework Reader YES/YES
+status: REWORK — bounded repair Reader YES/YES; fresh Builder authorized
+assignee: fresh rework Builder
 depends: R16 independently verified and founder-consumer accepted at `ca59628a334cc3da0060204b7685017fa381dc44`; receipt `evidence/r16/FINAL-ACCEPTANCE.md`
 rung: R17 — Technique and outcome loop
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
 rework-cycle: 1 of 1 used — exhausted after this bounded repair
 R17_BUILD_BASE_SHA: `7ed2757cfe24d1771117e61cc4a0388aaa332ec5`
 reader-receipt: fresh Luna `r17_prebuild_reader`; four finite defect rounds landed; final YES/YES on 2026-08-22
+rework-reader-receipt: fresh Luna `r17_rework_reader`; one finite defect round landed; final YES/YES on 2026-08-22
 
 ## In plain terms
 
@@ -411,7 +412,11 @@ only repair authority. All earlier deliverables and acceptance criteria remain.
 data file with the explicit expected records and no import or generated copy of
 the production projection. The Electron gate reads it independently and
 compares every identity/type/field and cable kind/direction/endpoint, not counts
-alone.
+alone. Commit it before any falsifier, record its SHA-256 in the report, and bind
+that hash as the gate's `R17_ORACLE_SHA256`; the gate hashes the file before
+reading and refuses any mismatch. During every falsifier, the oracle, gate
+source, fixture, hash constant, and expected receipt are read-only. Only the
+named production behavior may change.
 
 ### Defect 2 — the registered gate is a direct-Kernel receipt printer
 
@@ -428,18 +433,27 @@ assertion is red. The direct-Kernel test remains only supporting unit coverage.
 
 `collab-electron/src/main/kernel.ts` falls back to an inline legacy Strategy v1
 when `strategyId` is absent, and Main accepts omission. For the R17 Director
-journey, Strategy identity is mandatory before Mission/worker/Run creation.
+journey, Main binds literal context `journey: "r17-director"`; Strategy identity
+is mandatory before Mission/worker/Run creation.
 Missing, malformed, stale, or unavailable selection returns exact
 `TECHNIQUE COVERAGE REFUSED` with a zero durable-row delta. Keep the legacy
-fallback only for explicitly non-R17 internal/R11 callers; no renderer, preload,
-IPC, Director, or agent route may reach it accidentally.
+fallback only in a private non-renderer/non-preload/non-IPC R11-internal
+function. No renderer, preload, IPC, Director, or agent request may select that
+internal context or reach the fallback accidentally.
 
 ### Defect 4 — seven falsifiers have no red/green proof
 
 Only falsifier 4 was shown red then green. Execute and preserve unedited receipts
-for falsifiers 1–3 and 5–8 exactly as written above, then rerun the unchanged
-green gate. Do not convert any falsifier to source-string self-inspection or
-weaken an assertion. All eight receipts are required before candidate submission.
+for falsifiers 1–3 and 5–8 exactly as written above. Each falsifier starts from
+the immutable candidate and a fresh temporary Kernel/root with exactly one named
+production mutation. Preserve two unedited command transcripts: red, then
+restored green from the original candidate SHA and another fresh Kernel/root.
+The gate, oracle, fixture, and assertions remain byte-identical. Do not convert
+any falsifier to source-string self-inspection or weaken an assertion. All eight
+receipts are required before candidate submission. Falsifier 3 requires exact
+error `ontology action not exposed through gateway: qf_record_strategy_outcome`
+and zero durable-row delta. Falsifier 8 requires both the finite static scan and
+the execution spy to go red; `or` is not sufficient.
 
 ### Defect 5 — the real outcome form cannot submit an outcome
 
@@ -449,7 +463,9 @@ stake, and payout but no `outcome` control; it nevertheless submits
 void`. On success, do not set `Recorded`, state, calibration, or CLV from input
 or the action acknowledgement. Re-fetch the production world projection and
 render only the persisted Ticket/grade Artifact fields and cables. On refusal,
-keep every entered value and show the exact Kernel error in the same form.
+keep the raw value of every form control and show byte-for-byte the error string
+returned by that same Kernel call in the same form. The gate captures the IPC
+refusal response and asserts exact equality with the visible error.
 
 ### Rework acceptance
 
