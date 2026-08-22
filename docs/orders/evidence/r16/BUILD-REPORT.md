@@ -1244,3 +1244,184 @@ qf-atlas/atlas.json
 
 No product candidate file changed. No build, launch, Computer Use,
 founder-state, or R17 work occurred.
+
+## NORMAL REOPEN RED — governed-review support tables
+
+Plain meaning: governed-review support records now survive a real close and
+reopen, while an unrelated review-named table still fails closed as drift.
+
+### Immutable candidate and scope
+
+| Field | Receipt |
+|---|---|
+| Builder base | `c3b2b8fb8eb0b6eefd886ffed47e3b8ac397e3f4` |
+| Immutable product candidate | `5445578508e3b76f107e5c3ed40eafefd0e18319` |
+| Atlas projection commit | `790186b5057f70d916f1eb1a72cc81a318a5e9e8` |
+| Branch / push | `wo-R16` / `origin/wo-R16` |
+| Evidence scope | this existing `BUILD-REPORT.md` only |
+| Founder DB / build / launch | not accessed / not run / not run |
+
+The immutable product candidate changed exactly:
+
+```text
+packages/qf-kernel/src/registry-drift.ts
+packages/qf-kernel/src/registry-drift.test.ts
+packages/qf-kernel/src/attach-kernel-drift.test.ts
+```
+
+The separate generated projection commit changed exactly:
+
+```text
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+```
+
+### Focused commands
+
+Each command ran natively in the required order:
+
+```text
+bun test packages/qf-kernel/src/registry-drift.test.ts
+exit=0; 7 pass / 0 fail / 12 expect
+
+bun test packages/qf-kernel/src/attach-kernel-drift.test.ts
+exit=0; 6 pass / 0 fail / 16 expect
+
+bun test packages/qf-kernel/src/r15-governed-review.test.ts
+exit=0; 7 pass / 0 fail / 55 expect
+```
+
+The lifecycle test creates one isolated file-backed writable Kernel with
+`openKernel(path, { create: true })`, calls the real
+`ensureGovernedReviewSchema(db)` once, inserts the six exact deterministic
+support rows, snapshots each literal table with `SELECT * ... ORDER BY rowid`,
+closes the handle, reopens the same path through writable `openKernel(path)`,
+requires `getKernelDrift` to be null, and proves the snapshots are byte-equal.
+No founder database or hand-inserted `schema_meta`/ontology row was used.
+
+### Exact qf_review_task falsifier
+
+The only temporary source mutation removed the literal `qf_review_task` entry
+from `INFRA_TABLES`. The test and all other files remained unchanged.
+
+```text
+Command: bun test packages/qf-kernel/src/attach-kernel-drift.test.ts
+Native exit: 1
+KernelRegistryDriftError: Kernel object-type registry drift: missing=[] retired=[] inconsistent=[qf_review_task]
+Result: 5 pass / 1 fail; the failure was
+`reopens governed-review schema with support rows intact`.
+```
+
+Candidate `registry-drift.ts` SHA-256 before mutation:
+`AD5F06C5F7A09B817A7978B99AC48C57595A249284A97C2BB47E92C89EF026B7`.
+The exact literal was restored. The restored SHA-256 was the same
+`AD5F06C5F7A09B817A7978B99AC48C57595A249284A97C2BB47E92C89EF026B7`,
+`restoration_zero_diff=0`, and the unchanged command returned:
+
+```text
+bun test packages/qf-kernel/src/attach-kernel-drift.test.ts
+exit=0; 6 pass / 0 fail / 16 expect
+```
+
+### Complete bounded R16 parent matrix
+
+The exact commands ran without wrappers, substitutions, or omissions:
+
+```text
+bun test collab-electron/src/main/governed-review.test.ts
+exit=0; 4 pass / 0 fail / 51 expect
+
+bun test collab-electron/src/main/research-world.test.ts
+exit=0; 3 pass / 0 fail / 13 expect
+
+bun test collab-electron/src/windows/shell/src/research-world.test.ts
+exit=0; 6 pass / 0 fail / 32 expect
+
+bun test collab-electron/src/windows/shell/src/task-composition.test.ts
+exit=0; 3 pass / 0 fail / 55 expect
+
+bun test collab-electron/src/main/native-tui-orchestration.test.ts
+exit=0; 9 pass / 0 fail / 42 expect
+
+bun test collab-electron/src/main/precreated-native-tui.test.ts
+exit=0; 2 pass / 0 fail / 5 expect
+
+bun test packages/qf-kernel/src/r15-governed-review.test.ts
+exit=0; 7 pass / 0 fail / 55 expect
+
+bun test packages/qf-kernel/src/r16-visible-world.test.ts
+exit=0; 3 pass / 0 fail / 5 expect
+
+bun test qa/gates/governed-review.test.ts
+exit=0; nested production/kernel 11 pass / 0 fail; live contract 7 pass / 0 fail; gate 3 pass / 0 fail
+
+bun test qa/gates/research-world-visible.test.ts
+exit=0; 13 pass / 0 fail / 192 expect
+
+bun qa/run.ts kernel-sole-writer
+exit=0; PASS  kernel-sole-writer
+
+bun qf-atlas/generate.mjs --check
+exit=0; qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0; HARD RED: 0; unexplained coverage: 0; AMBER: 20; undecided: 42
+
+git diff --check
+exit=0; no output
+
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+exit=0; no output
+```
+
+An initial currentness check before the required Atlas regeneration reported
+the expected stale fingerprint (`9f03856a7d06a3b7 != d770980b61d234a3`); it
+was not accepted as a matrix result. The allowed generator then wrote only the
+three Atlas projections above, after which the currentness/ratchet and both
+diff checks were green.
+
+### Atlas receipts
+
+```text
+bun qf-atlas/generate.mjs
+exit=0
+qf-atlas: wrote atlas.json + atlas.html + ATLAS.md
+  432 files · 109 subsystems · 124 IPC channels
+  wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+  legacy loops: 6/8 healthy · Review and publish, Close the app
+  decisions: 42 undecided of 47
+  13 strip candidates · 10 confirmed violations · 3 gray · 22 coverage gaps
+
+bun qf-atlas/generate.mjs --check
+exit=0
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0
+baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 ·
+AMBER (visible, non-blocking): 20 · undecided: 42
+
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+exit=0
+VERDICT: WORSE — 1 analyzer cell(s) got worse
+added 1 · newly-detected 0 · resolved 0 · regressed 0
+coverage worse 1 · better 0 · undecided 41 -> 42
+ADDED: persistence links insert into
+COVERAGE REGRESSED: attach-kernel-drift.test.ts persistence
+not-applicable -> partial
+```
+
+The Atlas diff is explicitly `WORSE` because the new lifecycle test contains
+six direct support-table SQL sites that the analyzer classifies as partial
+coverage; currentness remains green and `HARD RED: 0`. No Atlas baseline or
+semantic code was changed. `atlas-diff.json` is ignored and was not staged.
+
+### Final state
+
+The product candidate was committed before the Atlas projection commit and
+this evidence commit. Final allowed paths are the three product/test files,
+the three generated Atlas projections, and this existing report. No product
+file changed after candidate `5445578`; the final tree was verified clean and
+the branch was pushed to `origin/wo-R16`. No build, launch, Computer Use,
+founder-state change, package/release work, or R17 work occurred.
