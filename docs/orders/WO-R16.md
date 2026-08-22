@@ -794,12 +794,16 @@ The corrected positive manifest is exact:
 - the original 13 cables plus review Task `assigned_to` critic and review Task
   `delegated_by` Director.
 
-Every earlier positive-fixture occurrence of `12 tiles`, `12-tile`,
-`nine research-object tiles`, or `13 cables` is superseded by 13 tiles, ten
-research-object tiles, and 15 cables respectively. Required falsifier 1 is now
+Every earlier positive-fixture numeric requirement is superseded, including
+W2's `all 12 ids/types`, its `all 13 cables`, every `12 tiles`/`12-tile`
+phrase, `nine research-object tiles`, and `13 cables`: the positive manifest is
+13 tiles, ten research-object tiles, and 15 cables. Required falsifier 1 is now
 1a-m: omit each of the 13 manifest tiles independently. The Builder report must
 contain all 13 omission receipts. No production projection, durable link, or
-review Task may be removed to recover the old count.
+review Task may be removed to recover the old count. The only exception is a
+temporary falsifier mutation that omits the review Task for 1m, observes the
+unchanged gate red, and restores the exact candidate bytes with zero diff
+before the restored-green run.
 
 ### Deadline and cleanup honesty
 
@@ -810,22 +814,45 @@ visible-world timeout. The next gate must make both failures independently
 observable without increasing the outer deadline:
 
 1. Keep `RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000` as the hard deadline.
-2. Define a named 8,000 ms cleanup reserve. All launch readiness, fixture,
-   renderer, reopen, failure-injection, and timeout-injection work uses the
-   functional deadline `hardDeadlineAt - cleanupReserveMs`. Process termination
-   and registered-root removal may use the reserved interval up to the hard
-   deadline.
-3. Preserve the first non-cleanup exception and print it as
-   `primary_failure=<JSON string or null>`. Always run cleanup and print the
-   process/root receipts. A cleanup failure is a separate failure; it never
-   replaces or hides the primary failure.
+2. Define one global named `CLEANUP_RESERVE_MS = 8_000`. The invocation has one
+   `hardDeadlineAt = startedAt + 60_000` and one shared
+   `functionalDeadlineAt = hardDeadlineAt - CLEANUP_RESERVE_MS`; there is no
+   per-case reserve. All launch readiness, fixture, renderer, reopen,
+   failure-injection, and timeout-injection work uses the functional deadline.
+   Shutdown RPC waits, owned-process termination/polling, and registered-root
+   removal use the hard deadline and therefore consume the one shared reserve
+   when functional time is exhausted. Cleanup may begin earlier.
+3. Every case returns an unexpected functional exception separately from its
+   cleanup exception. The deliberately raised forced-failure marker and the
+   deliberately won 500 ms watchdog are expected receipts after their exact
+   marker/elapsed assertions and are not primary failures. Sort unexpected
+   functional exceptions by fixed case priority `normal`, `forced-failure`,
+   `forced-timeout`; print the first as exactly
+   `primary_failure=null` or
+   `primary_failure={"case":"<case>","message":"<string>"}` using
+   `JSON.stringify`, and print all cleanup failures exactly as
+   `cleanup_failures=<JSON array sorted by case then message>`. Always run
+   cleanup and print process/root receipts. A non-empty cleanup array makes the
+   gate red but never replaces or hides the primary failure.
 4. Start the normal first launch, forced-failure launch, and forced-timeout
-   launch concurrently against three isolated roots. Each captures its own
-   pre-spawn baseline and owns only descendants of its own root PID. The normal
-   case still closes and performs its real second launch sequentially against
-   the same Kernel, Artifact root, and app-local geometry. Await all three case
-   results before the final receipt. This changes wall-clock scheduling only;
-   it removes no launch, assertion, marker, cleanup, or measurement.
+   launch through one exported scheduling helper against three isolated roots.
+   The helper invokes all three case callbacks before awaiting any result. A
+   focused fake-runner test holds every callback unresolved until all three
+   have reported `started`; it fails within 250 ms if the helper serializes
+   them. In the live gate, a callback reports `started` only after its own
+   pre-spawn snapshot and successful spawn have returned a root PID. Record
+   that instant's monotonic offset from the same `startedAt`, print
+   `initial_case_start_spread_ms=<n>`, and fail when the maximum-minus-minimum
+   offset exceeds 2,000 ms. The normal case still
+   closes and performs its real second launch sequentially against the same
+   Kernel, Artifact root, and app-local geometry. Await all three case results
+   before the final receipt. This changes wall-clock scheduling only; it
+   removes no launch, assertion, marker, cleanup, or measurement.
+   Each case captures its own pre-spawn snapshot. Its owned set is exactly the
+   earlier W1 contract: its root PID plus every descendant first observed at
+   any required snapshot, including newly observed descendants of an already
+   owned PID and descendants later reparented. A concurrent case's processes
+   never become owned without that ancestry.
 5. The gate remains red unless all four real launches, 13-tile/15-cable
    comparisons, real reopen, both injected reds, zero owned processes, and
    `roots_remaining=0` complete before the hard deadline.
@@ -843,9 +870,12 @@ A fresh Builder may change only:
 - `docs/orders/evidence/r16/BUILD-REPORT.md`; and
 - generated Atlas projections required by the normal change-control rule.
 
-It begins from clean local and remote `wo-R16` at `5a92a255`. It first freezes
-an independent expected 13-tile/15-cable manifest including the review Task and
-its two links, then implements the deadline/primary-error scheduling above.
+It begins from clean local `HEAD == origin/wo-R16` at the Router's pushed
+Reader-defect-fix commit that immediately follows `a6ee712`; that exact SHA is
+supplied in the Builder task. Preservation SHA `5a92a255` must be an ancestor
+and remains the immutable WIP comparison base, not the checkout HEAD. It first
+freezes an independent expected 13-tile/15-cable manifest including the review
+Task and its two links, then implements the deadline/primary-error scheduling above.
 Focused tests must falsify the 13/15 count, cleanup reserve, primary-error
 preservation, and concurrent three-root scheduling without launching Electron.
 The Builder may then run the one live gate and required falsifiers under the
