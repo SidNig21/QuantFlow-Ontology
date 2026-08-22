@@ -132,6 +132,8 @@ numeric-rubric-reader-receipt: fresh Luna Reader task `01a029a0-833d-71b1-9003-7
 current-door: exact numeric-rubric Builder is authorized on Reader-approved docs head; no rebuild, consumer retry, or R17 authority before immutable candidate and fresh independent PASS
 numeric-rubric-builder-receipt: immutable product candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`; Builder evidence `c8c686997849c6df080f50cea24c5ce0f7b81b8c`; exact matrix green (`178/0` schema, `6/0` gateway, `4/0` governed-review), generic-schema falsifier red, restoration exact, Atlas HARD RED 0, tree clean and pushed
 current-door: fresh independent Verifier must freeze candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`, run the exact nine-row immutable matrix and falsifier/restoration, and write PASS or stop on RED; no rebuild, consumer Attempt 3, or R17 authority before PASS
+numeric-rubric-verifier-receipt: fresh independent Luna Verifier task `01a029a7-e38c-7321-bdf5-882bb9ab43e5`; PASS at immutable candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`; evidence `4e6d849297a5cca089a0239216d58e9406fa5c16`; exact nine-row matrix green, source-schema falsifier red, restoration exact, Atlas HARD RED 0, product/test/generated Atlas bytes frozen
+current-door: Router is authorized for one identity-bound build and one exact normal Computer Use Attempt 3; any red keeps R16 open; no R17 authority
 
 ## Authorized outcome
 
