@@ -768,3 +768,95 @@ assertion; ordinary product launches receive neither flag.
 
 Plain meaning: prove the real Research Director front door with its existing
 credential-free responder, and do not revive AgentOS merely to open R16.
+
+## FINAL RECONCILIATION - correct the false world count
+
+Preservation SHA `5a92a25536c70e3131e5642670e41960aa541d3d` is WIP, not a
+candidate. The preceding rewrite stopped correctly after the same final
+cleanup assertion appeared twice. No earlier Builder or rewrite paragraph
+authorizes another run. This section resolves the measured order contradiction
+and authorizes one fresh final Builder lap.
+
+The preserved Kernel contains the complete supporting world. It also proves
+why the gate waited until its deadline: the Evaluation's governed
+`review_task_id` names a real review Task. The production projection follows
+that field exactly as `World traversal and cables` requires, so the visible
+world has 13 tiles, not 12. Because that review Task is durably assigned to the
+critic and delegated by the Director, it also has two named cables. The world
+therefore has 15 cables, not 13. The earlier count excluded the review Task
+while simultaneously requiring Evaluation field references to admit it.
+
+The corrected positive manifest is exact:
+
+- ten research-object tiles: Mission, source Task, review Task, Hypothesis,
+  Dataset, Run, result Artifact, Evaluation, findings Artifact, and Report;
+- three session tiles: Director, executor, and critic;
+- the original 13 cables plus review Task `assigned_to` critic and review Task
+  `delegated_by` Director.
+
+Every earlier positive-fixture occurrence of `12 tiles`, `12-tile`,
+`nine research-object tiles`, or `13 cables` is superseded by 13 tiles, ten
+research-object tiles, and 15 cables respectively. Required falsifier 1 is now
+1a-m: omit each of the 13 manifest tiles independently. The Builder report must
+contain all 13 omission receipts. No production projection, durable link, or
+review Task may be removed to recover the old count.
+
+### Deadline and cleanup honesty
+
+The failed run's only root was created at 19:10:24 and last written at
+19:11:25. `removeRegisteredRoot()` recorded zero attempts because the 60-second
+deadline had already expired. Its cleanup error then replaced the primary
+visible-world timeout. The next gate must make both failures independently
+observable without increasing the outer deadline:
+
+1. Keep `RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000` as the hard deadline.
+2. Define a named 8,000 ms cleanup reserve. All launch readiness, fixture,
+   renderer, reopen, failure-injection, and timeout-injection work uses the
+   functional deadline `hardDeadlineAt - cleanupReserveMs`. Process termination
+   and registered-root removal may use the reserved interval up to the hard
+   deadline.
+3. Preserve the first non-cleanup exception and print it as
+   `primary_failure=<JSON string or null>`. Always run cleanup and print the
+   process/root receipts. A cleanup failure is a separate failure; it never
+   replaces or hides the primary failure.
+4. Start the normal first launch, forced-failure launch, and forced-timeout
+   launch concurrently against three isolated roots. Each captures its own
+   pre-spawn baseline and owns only descendants of its own root PID. The normal
+   case still closes and performs its real second launch sequentially against
+   the same Kernel, Artifact root, and app-local geometry. Await all three case
+   results before the final receipt. This changes wall-clock scheduling only;
+   it removes no launch, assertion, marker, cleanup, or measurement.
+5. The gate remains red unless all four real launches, 13-tile/15-cable
+   comparisons, real reopen, both injected reds, zero owned processes, and
+   `roots_remaining=0` complete before the hard deadline.
+
+Plain meaning: the gate must look for the world QuantFlow actually and
+correctly renders, while reserving enough of its same one-minute budget to tell
+the truth and clean up when something fails.
+
+### Final Builder authority
+
+A fresh Builder may change only:
+
+- `qa/gates/research-world-visible.ts`;
+- `qa/gates/research-world-visible.test.ts`;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections required by the normal change-control rule.
+
+It begins from clean local and remote `wo-R16` at `5a92a255`. It first freezes
+an independent expected 13-tile/15-cable manifest including the review Task and
+its two links, then implements the deadline/primary-error scheduling above.
+Focused tests must falsify the 13/15 count, cleanup reserve, primary-error
+preservation, and concurrent three-root scheduling without launching Electron.
+The Builder may then run the one live gate and required falsifiers under the
+same exception already granted above, execute the unchanged short Builder
+matrix and Atlas sequence, write the complete BUILD-REPORT, and push one
+immutable candidate.
+
+No product semantics, projection traversal, Main/Kernel fixture seam, manifest,
+display name, timeout value, assertion strength, package path, AgentOS path, or
+other file may change. A fresh different-model Verifier owns acceptance. Any
+same assertion repeated after one repair attempt, any primary failure other
+than the corrected count during the first live run, or any need outside these
+four path classes stops R16 for founder decision. No further implementation lap
+is authorized.
