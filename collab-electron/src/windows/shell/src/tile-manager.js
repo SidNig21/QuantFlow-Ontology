@@ -235,6 +235,7 @@ export function createTileManager({
 		if (!dom) return;
 
 		const wv = document.createElement("webview");
+		wv.tabIndex = -1;
 		const termConfig = configs.terminalTile;
 		const params = new URLSearchParams();
 		params.set("tileId", tile.id);
