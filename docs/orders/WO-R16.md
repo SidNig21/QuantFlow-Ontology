@@ -1,12 +1,14 @@
 # WO-R16 - Visible research world
 
-status: rework 1 of 1 - independent Verifier defects below
-assignee: fresh Builder session
+status: rewritten after exhausted rework - fresh Reader required
+assignee: none until rewrite Reader YES/YES
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
 rework-cycle: 1 of 1 used
+rewrite-cycle: 0 of 1 used
 R16_BUILD_BASE_SHA: `fef713c06f091dc8df13f7bde07be859d3b04930`
+R16_REWRITE_WIP_SHA: `a9420ec0697fe587e619fd88c3839ee3a88da6ad` (preservation only; not a candidate or PASS)
 
 ## In plain terms
 
@@ -557,3 +559,106 @@ sample.
 
 Plain meaning: the candidate must carry the proof that its new visible check can
 catch each promised break, not leave that proof in a vanished chat transcript.
+
+## REWRITE - authorized after exhausted Rework 1
+
+The original deliverables, product contracts, 60-second ceiling, acceptance
+assertions, and Builder/Verifier separation above remain binding. The original
+Builder/rework instructions are history and authorize nothing further. This
+section authorizes one fresh Builder lap from preservation SHA `a9420ec` to
+finish the existing live proof; it does not reopen R16 product scope.
+
+The preserved prototype is useful but not a candidate. It launches production
+Electron and reaches fixture seeding. It still has four measured defects that a
+fresh Builder must repair before collecting any falsifier receipt.
+
+### W1 - Process ownership is captured too late
+
+Current `launch()` takes its process baseline after spawning and then discards
+the collected PID set. On success it sets the active child to null after only
+the Bun parent closes, without proving Electron descendants are gone. A stale
+GPU/cache handle can therefore outlive the parent long enough to keep the app
+root undeletable.
+
+Take `processSnapshot()` before every spawn. After readiness, freeze the exact
+owned PID set with `collectOwnedPids(before, after, rootPid)`. Every normal,
+failure, timeout, and exceptional exit must request shutdown when possible,
+terminate the root tree when necessary, call the existing
+`terminateOwnedProcesses(ownedPids, remainingBudget)`, and assert
+`owned_processes_remaining=0` from a fresh snapshot before attempting root
+deletion. Never infer ownership by process name and never touch an ambient PID.
+
+Plain meaning: QuantFlow must fully close everything this check opened before
+the check says cleanup passed.
+
+### W2 - Reopen is printed, not executed
+
+The prototype prints `reopen_equal=true` immediately after the first shutdown.
+It never launches the app a second time. Replace that literal with an actual
+second launch against the same Kernel, Artifact root, and app-local geometry,
+without reseeding. Activate the same root through the renderer and compare the
+complete independently frozen DOM manifest: all 12 ids/types; every displayed
+field/value; all 13 cable kinds/endpoints; logical tile positions; inspector
+expanded/collapsed state; and accessible names. Any difference is red. Only
+after the second owned process set is zero may that case's root be removed.
+
+Plain meaning: close and reopen must really preserve the same visible research
+desk; a printed sentence is not a restart.
+
+### W3 - Forced failure and timeout are printed, not executed
+
+The prototype prints `forced_failure_cleanup=green` and
+`forced_timeout_cleanup=green` without running either case. Replace those
+literals with two actual gate-harness cases, each using its own registered root
+and pre-spawn process baseline:
+
+1. launch to Electron ready, deliberately raise the gate-owned failure, then
+   run the common cleanup path and prove zero owned PIDs and zero owned roots;
+2. launch to Electron ready, wait on a gate-owned never-settling operation under
+   an exact 500 ms watchdog, observe the watchdog red, then run the same cleanup
+   path and prove zero owned PIDs and zero owned roots.
+
+These injections never change production code, assertions, selectors, or the
+overall 60-second deadline. The gate passes only after it has observed both
+intended internal reds and their cleanup greens.
+
+Plain meaning: error and timeout cleanup must happen, not be claimed.
+
+### W4 - Root removal is ad hoc and hides the failed path
+
+The prototype performs repeated direct `rmSync` calls but emits only a final
+count. Use one gate-local removal function for every registered root. It retries
+only `EBUSY`, `EPERM`, and `ENOTEMPTY` with a named bounded attempt/delay policy
+inside the existing deadline; records path, error code, and attempts; and never
+deletes before measuring residue. The final receipt is exactly
+`roots_created=<n> roots_remaining=0 retried=<n> leaked=[]`. A non-transient
+error or remaining root is red. Pre-existing roots are informational and are
+never deleted or counted as this run's success.
+
+The two roots left by the exhausted attempt were measured after all owned
+Electron/Bun/Node processes had exited. They are historical residue, not inputs
+to this rewrite and not permission to clean between a red assertion and its
+receipt.
+
+Plain meaning: Windows may release files late, but the check must show exactly
+what it retried and may never sweep evidence before counting it.
+
+### Rewrite acceptance
+
+Before any new falsifier run, the unchanged live gate must complete all four
+real cases above under 60 seconds and print only measured receipts. The focused
+test must make each printed success false when its corresponding call is
+removed; source-token checks alone are supplemental, not proof.
+
+Then execute the existing Builder matrix, Atlas sequence, and every falsifier
+receipt already required by this order. The complete evidence file remains
+`docs/orders/evidence/r16/BUILD-REPORT.md`. A fresh different-model Verifier
+reruns the complete matrix and independently chooses at least one tile omission,
+one cable mutation, one renderer-access mutation, and both cleanup injections.
+
+The fresh Builder may change only the four files in `a9420ec` plus
+`docs/orders/evidence/r16/BUILD-REPORT.md`, unless the same live assertion proves
+an exact production defect outside them. In that case it stops with the receipt;
+it does not widen scope. Any assertion change, deadline increase, cleanup before
+measurement, simulated reopen, or simulated failure/timeout is an immediate
+stop. No third implementation lap follows a failed rewrite.
