@@ -130,14 +130,44 @@ source record and confers no route or build authority.
 |---|---|
 | **R18** | Recall: prior evaluated work is retrieved with lineage and never becomes truth merely because it was retrieved |
 | **R19** | Market learning: an RL worker runs a PufferLib Environment, publishes a Policy Artifact, and held-out Evaluation gates founder-controlled promotion/rollback |
-| **R20** | Harness learning: Evaluation history may improve versioned playbooks first and owned-model weights second without creating a second truth store |
+| **R20** | Trace-driven harness learning: production trajectories, tool-call traces, Evaluations, and settled outcomes expand the eval set and produce versioned prompt/playbook and harness-improvement candidates. Held-out Evaluation gates founder-controlled promotion, rejection, and rollback; owned-model weight updates may follow later. No trace, prompt, harness, or model becomes a second truth store. |
 
 R18 depends on the independent Evaluation history established by R15–R17. R19 is the first-class
 market-learning destination: its RL worker is a governed Dock seat and PufferLib is workload inside
 the governed RL worker Run, not the application chassis. R19 depends on fenced Datasets, validated
 research outcomes, the Windows product floor, and durable governed work; held-out Evaluation gates
-founder-controlled promotion or rollback. R20 is secondary harness learning and may improve
-versioned playbooks before owned-model weights, while the Kernel remains the sole truth store.
+founder-controlled promotion or rollback. R20 is trace-driven harness learning, while the Kernel
+remains the sole truth store.
+
+**R20 makes production traces a first-class learning input.** QuantFlow already
+preserves structured trajectory and tool-call evidence. R20 turns repeated
+production failure modes into governed improvement candidates rather than
+treating traces as disposable logs.
+
+Its loop is:
+
+`production traces → failure clustering → new eval cases → prompt/playbook or harness candidate → held-out Evaluation → founder-controlled promote / reject / rollback`
+
+The three initial improvement paths are:
+
+1. **Eval expansion:** recurring failures from real Missions become new
+   regression and evaluation cases.
+2. **Prompt/playbook tuning:** repeated model failure modes produce versioned
+   instruction and playbook candidates instead of guessed prompt edits.
+3. **Harness optimization:** traces expose unnecessary tool calls, retrieval
+   failures, loops, redundant recruitment, excessive context, and trajectories
+   that take substantially more steps than necessary.
+
+**Trace is evidence, never truth.** A production trajectory may propose an
+improvement but may never directly rewrite a prompt, playbook, routing policy,
+harness, or model weight. Every proposed change is a versioned candidate
+evaluated against held-out cases before promotion. Rejected candidates and
+rollback history remain durable evidence.
+
+R18 supplies evaluated recall and retrieval of relevant prior work. R19 learns
+market policies from validated research outcomes. R20 learns how the research
+system itself should operate better from accumulated trajectories and
+Evaluations while the Kernel remains the sole governed truth store.
 
 ---
 
