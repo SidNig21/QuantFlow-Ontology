@@ -89,9 +89,12 @@ The complete supporting fixture projects these unique tiles:
 1. **Mission**: id, name, full objective.
 2. **Source Task**: id, title, description, lifecycle, assignee identity,
    delegator identity, steering/review state, and Mission identity.
-3. **Review Task**: the same exact Task fields as item 2, using the Evaluation's
+3. **Review Task**: the same Task field order as item 2, using the Evaluation's
    durable `review_task_id`; it is a second Task tile, never folded into the
-   source Task or Evaluation.
+   source Task or Evaluation. It has no `belongs_to` Mission link in R16, so its
+   `mission_id` field renders exactly `Not recorded`. Evaluation membership
+   admits it to this world; that field reference does not invent a cable or
+   Mission ownership.
 4. **Hypothesis**: id, full claim, success criteria, source citations, status.
 5. **Dataset**: id, kind, `as_of`, content hash, coverage, and source Artifact
    receipt.
