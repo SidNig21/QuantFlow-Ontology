@@ -46,6 +46,9 @@ preview-rebuild-red-receipt: one build succeeded in 72720ms and forced cases cle
 preview-skip-build-reader-receipt: fresh build-once Reader task `01a02819-452f-7fc1-a6c3-fbdf9e1bdb4b`; final YES/YES at `2c8427aef183b51c453a54fb732023ee59cfa890`
 skip-build-product-red-receipt: build once passed in 79517ms; forced cases, pointer 10/10, exact 13/15, first shutdown, and final cleanup green; first_world_stage_ms=50717 included forced preflight and left no credible reopen window; WIP preserved at `b4cd054a7900b5525955b3ae606d9dcfaceefdc8`
 cleanup-preflight-reader-receipt: fresh Luna Reader task `01a0282b-556a-7830-b335-8354ffc77d98`; final YES/YES at `90a6ae5cb17a3a6c434b2c3fda0b598b793f741d`
+cleanup-preflight-red-receipt: one build passed in 61085ms; forced cleanup passed in 12179ms with zero roots; first-world pointer 10/10, exact 13/15, and shutdown were green; only the duplicate proof-preview reopen timed out; all final cleanup was clean
+consumer-reopen-reader-receipt: fresh Luna Reader task `01a02835-6305-71c3-970b-ef3d5e0b8682`; initial NO/NO defects all landed; corrected reread final YES/YES
+current-door: corrected `CONSUMER-OWNED REOPEN` Builder authorized on the preserved WIP; no R17 authority
 
 ## Authorized outcome
 

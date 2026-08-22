@@ -2750,3 +2750,82 @@ Kernel/projection, package script, build/preview command, 60,000/8,000 clock,
 pointer, keyboard, installer/release, wrapper/helper, worktree, Computer Use, or
 R17 change is authorized. A fresh Reader answers the two questions before the
 Builder resumes.
+
+## CONSUMER-OWNED REOPEN - prove restart in the normal product
+
+The cleanup-preflight WIP at base `63ffb8049535eca7deb6e1d8cc704d5a44dcd1a5`
+is evidence, not a candidate. Its one live run built once in 61,085 ms, passed
+both forced cleanup cases in 12,179 ms with zero forced roots, opened the first
+compiled research world, passed pointer 10/10 and exact independent 13/15, and
+shut down cleanly. The second proof-only preview did not become ready inside the
+unchanged product clock. Final cleanup again left zero processes and zero roots.
+
+The founder's mouse-first ruling already makes the normal application consumer
+check the authority for close/reopen. Stop asking a second proof-mode preview to
+stand in for that consumer behavior. Keep the restart requirement; move its one
+and only proof to Computer Use against the immutable normal application:
+
+This section supersedes every earlier R16 requirement for
+`runNormalReopenCase`, `reopen_equal`, `forced_cases_clean_before_reopen`, a
+fourth launch, two ready launches, or the four/2/1 activity receipt. Those are
+history and authorize nothing. It does not supersede any first-world, ontology,
+pointer, displayed-field, forced-case, deadline, root, process, or cleanup
+assertion.
+
+1. Preserve build-once, exact preview `-- --skipBuild`, the 15,000 ms forced
+   cleanup preflight, both forced markers, the unchanged 60,000/8,000 product
+   clock, first-world pointer 10/10, exact 13 objects/15 cables including every
+   displayed field, and all process/root/cleanup assertions.
+2. The live machine gate performs exactly three serial launch attempts: forced
+   failure, forced timeout, then one ready first-world launch. It requires
+   `launch_attempts=3 ready_launches=1 active_launches=0 max_concurrent_launches=1`.
+   It allocates and accounts for exactly three roots and leaves zero. Remove the
+   proof-mode normal-reopen launch, its helper if now unused, and only the
+   assertions/receipts that claimed that second preview was the restart proof.
+3. Extend the existing 13th contract test; do not add a fourteenth. It must fail
+   if a second normal preview returns, if first-world pointer/world/field checks
+   move outside the unchanged product clock, if any forced case or cleanup check
+   disappears, or if the three/1/1 activity receipt is hard-coded.
+4. Pre-live remains exact task-composition 3/0, research-world 6/0, R16 focused
+   13/0, and Atlas green. Run exactly one live gate. Any red stops. Full green
+   continues through the existing short matrix, pointer falsifier, Atlas,
+   BUILD-REPORT, immutable candidate commit, and push.
+5. A fresh different-model Verifier independently repeats the same bounded
+   matrix at the immutable candidate SHA. It does not use Computer Use and does
+   not write product code. Any red stops R16.
+6. Only after independent PASS, the router launches the normal non-proof
+   QuantFlow application at that exact candidate and uses Computer Use as a
+   consumer. Real pointer interaction must expose the full 13-object/15-cable
+   world and open/close all ten research-object inspectors. Each of the three
+   Hermes terminals receives only a bounded smoke check: after mouse focus it
+   must accept and erase a harmless candidate-bound typing canary without
+   submission, and mouse interaction must return focus to the canvas. This is
+   not global keyboard or accessibility proof; full parity remains Debt #38.
+   Before closing, record a canonical visible inventory containing all 13 exact
+   object identities, types, labels, displayed fields, and positions plus all 15
+   exact cable identities/endpoints. Inspector expanded/collapsed state is a
+   transient UI choice and is not part of persisted-world equality. Close the
+   normal app through its ordinary window control, reopen it with the same exact
+   normal launch command and candidate identity, record the same canonical
+   inventory again, and require exact equality with
+   `consumer_reopen_equal=true`. A missing, additional, or changed item is red.
+   Track the launched normal app and descendants by Windows PID ancestry before
+   interaction; after final ordinary shutdown require and record
+   `consumer_processes_remaining=0`. These receipts land in
+   `docs/orders/evidence/r16/CONSUMER-CHECK.md`; safe screenshots may accompany
+   them. Any mismatch is red and R16 remains open.
+
+The user's explicit 2026-08-21 Computer Use instruction makes a complete green
+consumer check the founder-visible R16 acceptance act. After its PASS and the
+evidence/status commit, the Router may close R16 without another human prompt
+and must stop before R17. Any Computer red or inability to make the finite
+comparison stops for the founder instead.
+
+Allowed Builder implementation remains only the two R16 gate files plus the
+preserved product/report/Atlas candidate paths. This correction changes neither
+product semantics nor the restart requirement; it assigns restart to the
+founder-authorized real consumer surface. No timeout increase, assertion
+weakening outside the removed proof-mode duplicate, fixture/Kernel/package
+change, helper framework, worktree, installer/release work, or R17 work is
+authorized. A fresh Reader answers the two protocol questions before the
+Builder resumes from the preserved clean-base WIP.
