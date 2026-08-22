@@ -3838,18 +3838,20 @@ any Builder door opens, the repair must bind all four points as follows:
    captured PTY target. The focused test must cover the changed-target and
    missing-target red paths without changing Kernel receipts.
 4. The exact falsifier is a temporary no-op of only the second
-   `writeToSession(capturedPtySessionId, "\\r")` in
+   `writeToSession(capturedPtySessionId, "\r")` in
    `submitAgentSessionInstruction`. Run exactly
    `bun test collab-electron/src/main/governed-review.test.ts`; the unchanged
    test must exit nonzero naming the missing submit write, restore the exact
    helper bytes, require zero diff for that path, and rerun the same command to
-   its native green count. The test's green path asserts the two-write sequence
-   and delivery outcome only; later governed receipts are produced by the
-   existing production boundary in the consumer proof, never by a direct test
-   shortcut used to claim that the carriage return submitted Hermes work.
+   its native green count. The test retains the parent matrix's source-work,
+   review, four governed-receipt, Evaluation, and supports-publication
+   assertions. Those later assertions are not evidence that the carriage
+   return was submitted: the CR-specific red/green proof is the production
+   helper's two-write sequence and delivery outcome, while the existing parent
+   production-boundary assertions remain independently required.
 
 The existing parent matrix, Atlas controls, source-work/review/delivery
 ordering, three-terminal consumer check, 13-object/15-cable bar,
 reopen-equality, and cleanup requirements remain binding. A fresh Reader must
- reread this closure and return YES/YES before a Builder is authorized; no
- Builder, rebuild, consumer launch, or R17 work is authorized now.
+reread this closure and return YES/YES before a Builder is authorized; no
+Builder, rebuild, consumer launch, or R17 work is authorized now.
