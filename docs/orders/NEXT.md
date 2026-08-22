@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 CABLE ENDPOINT REPAIR - AWAITING FRESH READER
+status: R16 CABLE ENDPOINT REPAIR - BUILD AUTHORIZED, READER YES/YES
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -14,6 +14,7 @@ rewrite-reader-receipt: fresh Luna Reader task `01a02720-0fd6-7982-88e5-533616d0
 latest-observation-receipt: focused tests 8/8; live run stopped on a dead concurrent Hermes assignee and forced-timeout process residue; exact WIP preserved at `3b86d140d06a86665b87a082d2a85a31bfebb2fe`
 scheduling-reader-receipt: fresh Luna Reader task `01a02755-bf52-7a50-b02f-a9bf51deb5df`; final YES/YES at `f4b3d1e0e8562889fe7cf3f3c5554a15f6c9764a`
 post-first-wip-receipt: corrected harness focused tests 11/11; live renderer showed all 13 objects but only the one session-to-session cable, with all 14 research-object cables named missing; cleanup zero; WIP preserved at `04b2596acf84668b8405304c1a2f886f87c9e23f`
+cable-reader-receipt: fresh Luna Reader task `01a02771-b447-7bc2-84b4-60479938fec1`; final YES/YES at `b8e29cfdc3a864e4ad5076a9ad953e062c5fdc60`
 
 ## Authorized outcome
 
@@ -39,7 +40,9 @@ answered YES/YES at `0700b77`; that lap produced the observation receipt at
 `WO-R16.md` received final fresh Reader YES/YES at `f4b3d1e`; that scheduling
 implementation is preserved at `04b2596`. Its live proof exposed the product
 cable endpoint defect appended to the order. A fresh two-question Reader must
-answer YES/YES on that repair before another Builder door opens.
+answer YES/YES on that repair before another Builder door opens. That Reader
+returned final YES/YES at `b8e29cf`; the one bounded cable endpoint Builder
+door is open.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 
