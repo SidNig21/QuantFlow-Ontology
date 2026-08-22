@@ -546,6 +546,12 @@ async function init() {
 		},
 		showStatus: (message) => showCanvasToast(message),
 	});
+	tileManager.onResearchWorldReady = (worldTiles) => {
+		edgeIndicators.update();
+		minimap.update();
+		cableOverlay?.redraw();
+		void animateViewportFit(worldTiles);
+	};
 
 	// -- Edge indicators --
 

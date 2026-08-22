@@ -13,6 +13,53 @@ const FIELD_ORDER = {
 
 function tileId(type, id) { return `ontology:${type}:${id}`; }
 
+const WORLD_TILE_WIDTH = 420;
+const WORLD_TILE_HEIGHT = 280;
+const WORLD_LANE_GAP = 24;
+const WORLD_ROW_GAP = 24;
+const WORLD_COLLISION_STEP = 20;
+const WORLD_TYPE_ORDER = new Map([
+	["mission", 0], ["task", 1], ["hypothesis", 2], ["dataset", 3],
+	["run", 4], ["artifact", 5], ["evaluation", 6],
+]);
+
+function laneFor(object) {
+	if (object?.type === "evaluation") return 2;
+	if (object?.type === "artifact" && object?.fields?.kind === "report") return 2;
+	if (["dataset", "run", "artifact"].includes(object?.type)) return 1;
+	return 0;
+}
+
+function overlaps(a, b) {
+	return a.x < b.x + b.width && a.x + a.width > b.x &&
+		a.y < b.y + b.height && a.y + a.height > b.y;
+}
+
+function rectFor(tile) {
+	return {
+		x: Number(tile?.x) || 0,
+		y: Number(tile?.y) || 0,
+		width: Number(tile?.width) || WORLD_TILE_WIDTH,
+		height: Number(tile?.height) || WORLD_TILE_HEIGHT,
+	};
+}
+
+export function latestSavedWorldRoot(canvasTiles) {
+	return [...(Array.isArray(canvasTiles) ? canvasTiles : [])].reverse().find((tile) =>
+		tile?.type === "research" && (tile.ontologyType === "mission" || tile.ontologyType === "task")
+	) || null;
+}
+
+export function researchWorldLayoutIsMalformed(worldTiles) {
+	const memberTiles = (Array.isArray(worldTiles) ? worldTiles : []).filter((tile) => tile?.type === "research");
+	if (memberTiles.length < 4) return false;
+	const xs = memberTiles.map((tile) => Number(tile.x) || 0);
+	const ys = memberTiles.map((tile) => Number(tile.y) || 0);
+	const horizontalSpan = Math.max(...xs) - Math.min(...xs);
+	const verticalSpan = Math.max(...ys) - Math.min(...ys);
+	return horizontalSpan < WORLD_TILE_WIDTH || verticalSpan > 2_500;
+}
+
 export function resolveResearchWorldEndpointTileId(objects, canvasTiles, endpointId) {
 	const matchingObjects = (Array.isArray(objects) ? objects : []).filter((object) => object?.id === endpointId);
 	if (matchingObjects.length !== 1) return null;
@@ -166,10 +213,18 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		return tile;
 	}
 
-	function positionFor(index, object, rootTile) {
-		const lane = { mission: 0, task: 0, hypothesis: 0, dataset: 1, run: 1, artifact: 1, evaluation: 2 }[object.type] ?? 0;
-		const order = ["mission", "task", "hypothesis", "dataset", "run", "artifact", "evaluation"].indexOf(object.type);
-		return { x: rootTile.x + lane * 444, y: rootTile.y + Math.max(0, order + index) * 304 };
+	function positionFor(nextY, object, rootTile, occupied) {
+		const lane = laneFor(object);
+		const candidate = {
+			x: rootTile.x + lane * (WORLD_TILE_WIDTH + WORLD_LANE_GAP),
+			y: nextY[lane],
+			width: WORLD_TILE_WIDTH,
+			height: WORLD_TILE_HEIGHT,
+		};
+		while (occupied.some((other) => overlaps(candidate, other))) candidate.y += WORLD_COLLISION_STEP;
+		nextY[lane] = candidate.y + WORLD_TILE_HEIGHT + WORLD_ROW_GAP;
+		occupied.push(candidate);
+		return { x: candidate.x, y: candidate.y };
 	}
 
 	async function reveal(rootType, rootId) {
@@ -177,15 +232,70 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		if (!result?.ok) { showStatus?.(result?.message || "Research world unavailable"); return result; }
 		lastRoot = { type: rootType, id: rootId };
 		lastWorld = result.world;
+		const worldResearchIds = new Set(result.world.objects
+			.filter((object) => object.type !== "agent_session")
+			.map((object) => tileId(object.type, object.id)));
+		const worldSessionIds = new Set(result.world.objects
+			.filter((object) => object.type === "agent_session")
+			.map((object) => object.id));
+		const staleProjectionIds = tiles.filter((tile) =>
+			(tile.type === "research" && !worldResearchIds.has(tile.id)) ||
+			(tile.type === "term" && tile.sessionId && !tile.ptySessionId && !worldSessionIds.has(tile.sessionId))
+		).map((tile) => tile.id);
+		if (staleProjectionIds.length > 0) tileManager.removeProjectionTiles?.(staleProjectionIds);
 		let rootTile = existing(rootType, rootId);
-		if (!rootTile) rootTile = tileManager.createResearchTile(80, 80, result.world.objects.find((object) => object.type === rootType && object.id === rootId));
-		const ordered = [...result.world.objects].sort((a, b) => a.type.localeCompare(b.type) || a.id.localeCompare(b.id));
-		for (const [index, object] of ordered.entries()) {
+		if (!rootTile) {
+			const rootObject = result.world.objects.find((object) => object.type === rootType && object.id === rootId);
+			const occupied = tiles.map(rectFor);
+			const candidate = { x: 80, y: 80, width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT };
+			while (occupied.some((other) => overlaps(candidate, other))) candidate.y += WORLD_COLLISION_STEP;
+			rootTile = tileManager.createResearchTile(candidate.x, candidate.y, rootObject);
+		}
+		const existingWorldResearch = tiles.filter((tile) => worldResearchIds.has(tile.id));
+		const repairMalformedLayout = researchWorldLayoutIsMalformed(existingWorldResearch);
+		const layoutIds = new Set(existingWorldResearch.map((tile) => tile.id));
+		const occupied = tiles.filter((tile) => !layoutIds.has(tile.id) && !worldSessionIds.has(tile.sessionId)).map(rectFor);
+		occupied.push(rectFor(rootTile));
+		const nextY = [
+			rootTile.y + WORLD_TILE_HEIGHT + WORLD_ROW_GAP,
+			rootTile.y,
+			rootTile.y,
+		];
+		const ordered = [...result.world.objects].sort((a, b) =>
+			laneFor(a) - laneFor(b) ||
+			(WORLD_TYPE_ORDER.get(a.type) ?? 99) - (WORLD_TYPE_ORDER.get(b.type) ?? 99) ||
+			a.id.localeCompare(b.id));
+		const projectedLayout = [];
+		if (repairMalformedLayout) {
+			const sessionTiles = result.world.objects
+				.filter((object) => object.type === "agent_session")
+				.map((object) => tiles.find((tile) => tile.sessionId === object.id))
+				.filter(Boolean);
+			for (const [index, tile] of sessionTiles.entries()) {
+				const candidate = {
+					x: rootTile.x + index * (WORLD_TILE_WIDTH + WORLD_LANE_GAP),
+					y: rootTile.y - 520,
+					width: Number(tile.width) || 400,
+					height: Number(tile.height) || 500,
+				};
+				while (occupied.some((other) => overlaps(candidate, other))) candidate.y -= WORLD_COLLISION_STEP;
+				occupied.push(candidate);
+				projectedLayout.push({ ...tile, x: candidate.x, y: candidate.y });
+			}
+		}
+		for (const object of ordered) {
 			if (object.type === "agent_session") { decorateSession(object); continue; }
 			let tile = existing(object.type, object.id);
-			if (!tile) { const pos = positionFor(index, object, rootTile); tile = tileManager.createResearchTile(pos.x, pos.y, object); }
-			else renderTile(getTileDOMs().get(tile.id), tile, object);
+			if (tile?.id === rootTile.id) { renderTile(getTileDOMs().get(tile.id), tile, object); continue; }
+			const pos = positionFor(nextY, object, rootTile, occupied);
+			if (!tile) tile = tileManager.createResearchTile(pos.x, pos.y, object);
+			else {
+				renderTile(getTileDOMs().get(tile.id), tile, object);
+				if (repairMalformedLayout) projectedLayout.push({ ...tile, ...pos });
+			}
 		}
+		if (repairMalformedLayout && projectedLayout.length > 0) tileManager.applyTileLayout?.(projectedLayout);
+		if (staleProjectionIds.length > 0 || projectedLayout.length > 0) tileManager.saveCanvasImmediate?.();
 		const cables = result.world.links.map((link) => {
 			const fromTileId = resolveResearchWorldEndpointTileId(result.world.objects, tiles, link.from_id);
 			const toTileId = resolveResearchWorldEndpointTileId(result.world.objects, tiles, link.to_id);
@@ -201,12 +311,14 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			};
 		}).filter(Boolean);
 		onCables?.(cables);
+		const worldMemberTiles = tiles.filter((tile) =>
+			worldResearchIds.has(tile.id) || worldSessionIds.has(tile.sessionId));
+		tileManager.onResearchWorldReady?.(worldMemberTiles);
 		return result;
 	}
 
 	function hydrateSaved() {
-		const roots = tiles.filter((tile) => tile.type === "research" && (tile.ontologyType === "mission" || tile.ontologyType === "task"));
-		const root = roots[0];
+		const root = latestSavedWorldRoot(tiles);
 		if (root) void reveal(root.ontologyType, root.ontologyId);
 	}
 

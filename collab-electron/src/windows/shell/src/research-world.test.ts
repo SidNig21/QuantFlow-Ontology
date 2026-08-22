@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createResearchWorldController, researchSessionReceiptFields, resolveResearchWorldEndpointTileId } from "./research-world.js";
+import { createResearchWorldController, latestSavedWorldRoot, researchSessionReceiptFields, researchWorldLayoutIsMalformed, resolveResearchWorldEndpointTileId } from "./research-world.js";
 import { tiles as canvasTiles } from "./canvas-state.js";
 
 const objects = [
@@ -133,6 +133,25 @@ function makeSessionDOM(): { container: FakeElement; taskFoot: FakeElement } {
 }
 
 describe("research world renderer seam", () => {
+	test("rehydrates the newest persisted world root instead of the oldest", () => {
+		expect(latestSavedWorldRoot([
+			{ id: "old", type: "research", ontologyType: "mission", ontologyId: "mission-old" },
+			{ id: "middle", type: "research", ontologyType: "task", ontologyId: "task-middle" },
+			{ id: "new", type: "research", ontologyType: "mission", ontologyId: "mission-new" },
+		])?.id).toBe("new");
+	});
+
+	test("names the single-column runaway layout from the consumer screenshot", () => {
+		const runaway = Array.from({ length: 10 }, (_, index) => ({
+			type: "research", x: 1780, y: 5000 + index * 800,
+		}));
+		const lanes = Array.from({ length: 10 }, (_, index) => ({
+			type: "research", x: (index % 3) * 444, y: Math.floor(index / 3) * 304,
+		}));
+		expect(researchWorldLayoutIsMalformed(runaway)).toBe(true);
+		expect(researchWorldLayoutIsMalformed(lanes)).toBe(false);
+	});
+
   test("formats the exact session receipt field order and display values", () => {
     expect(researchSessionReceiptFields({ fields: { id: "session-1", status: null } })).toEqual([
       { field: "id", value: "session-1" },

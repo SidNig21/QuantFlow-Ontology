@@ -781,6 +781,33 @@ export function createTileManager({
 		saveCanvasImmediate();
 	}
 
+	/**
+	 * Remove renderer-only projections without killing a runtime, changing a
+	 * Kernel row, or touching user-authored cable records. Research-world
+	 * switching uses this to keep one selected world on the canvas.
+	 */
+	function removeProjectionTiles(ids) {
+		const removing = new Set(Array.isArray(ids) ? ids : []);
+		if (removing.size === 0) return 0;
+		let removed = 0;
+		for (const id of removing) {
+			const dom = tileDOMs.get(id);
+			if (dom) {
+				dom.container.remove();
+				tileDOMs.delete(id);
+			}
+			if (!getTile(id)) continue;
+			deselectTile(id);
+			removeTile(id);
+			removed++;
+		}
+		if (removed > 0) {
+			onReposition?.();
+			saveCanvasImmediate();
+		}
+		return removed;
+	}
+
 	function markTerminalStopped(id) {
 		const tile = getTile(id);
 		const dom = tileDOMs.get(id);
@@ -1095,6 +1122,7 @@ export function createTileManager({
 		createPendingSpawnTile,
 		reconcilePendingSpawnTile,
 		closeCanvasTile,
+		removeProjectionTiles,
 		markTerminalStopped,
 		focusCanvasTile,
 		blurCanvasTileGuest,

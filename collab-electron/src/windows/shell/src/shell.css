@@ -650,6 +650,17 @@ body.platform-win {
 	color: var(--qf-gl-faint);
 }
 
+.srow .own {
+	flex: 0 1 38%;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: var(--qf-mono);
+	font-size: 8.5px;
+	color: var(--qf-gl-muted);
+}
+
 .srow.live .st {
 	color: var(--qf-gl-ice);
 }
