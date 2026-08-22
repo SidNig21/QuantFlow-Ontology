@@ -375,7 +375,8 @@ Each mutation changes production code or fixture truth, never the gate,
 assertions, expected manifest, timeout, or selector. The unchanged gate/test must
 go red, then exact restoration must return green:
 
-1a-i. omit each one of the nine required tile kinds;
+1a-l. omit each one of the 12 manifest tiles: the nine required research-object
+tiles and the Director, executor, and critic session tiles;
 2. replace one object id with a renderer literal;
 3. render stale Artifact bytes whose hash does not match;
 4. draw one cable with no durable link;
@@ -424,9 +425,7 @@ command below once. No package, installer, `verify-release`, soak, full Atlas
 falsifier, or real-model command is authorized.
 
 ```text
-cd collab-electron
-bun test src/main/research-world.test.ts src/windows/shell/src/research-world.test.ts src/windows/shell/src/task-composition.test.ts
-cd ..
+bun test collab-electron/src/main/research-world.test.ts collab-electron/src/windows/shell/src/research-world.test.ts collab-electron/src/windows/shell/src/task-composition.test.ts
 bun test packages/qf-kernel/src/r16-visible-world.test.ts qf-kernel-schema/src/generate.test.ts
 bun test qa/gates/research-world-visible.test.ts
 bun qa/run.ts governed-review
