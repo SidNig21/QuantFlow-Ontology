@@ -24,38 +24,4 @@ describe("Tidy authority boundary", () => {
     expect(body).not.toContain("saveCanvas");
   });
 
-	test("keeps terminal guests out of Tab order without removing programmatic focus", () => {
-		const spawnBody = functionBody(
-			tileManagerSource,
-			"spawnTerminalWebview",
-			"\n\tfunction spawnGraphWebview",
-		);
-		const createIndex = spawnBody.indexOf(
-			'document.createElement("webview")',
-		);
-		const tabIndexAssignment = spawnBody.indexOf(
-			"wv.tabIndex = -1;",
-			createIndex,
-		);
-		const srcAttribute = spawnBody.indexOf(
-			'wv.setAttribute(\n\t\t\t"src"',
-			createIndex,
-		);
-		const append = spawnBody.indexOf(
-			"dom.contentArea.appendChild(wv);",
-			createIndex,
-		);
-
-		expect(createIndex).toBeGreaterThanOrEqual(0);
-		expect(tabIndexAssignment).toBeGreaterThan(createIndex);
-		expect(srcAttribute).toBeGreaterThan(tabIndexAssignment);
-		expect(append).toBeGreaterThan(tabIndexAssignment);
-
-		const focusBody = functionBody(
-			tileManagerSource,
-			"focusCanvasTile",
-			"\n\tlet fullscreenTileId = null;",
-		);
-		expect(focusBody).toContain("dom.webview.focus()");
-	});
 });

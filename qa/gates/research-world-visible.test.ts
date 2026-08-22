@@ -17,9 +17,6 @@ import {
   removeRegisteredRoot,
   scheduleFirstWorldSpecialists,
   schedulePostFirstCases,
-  tabFocusObservationExpression,
-  type FocusedElementReceipt,
-  waitForSentinelDeparture,
   worldTimeoutDelta,
   worldObservationExpression,
 } from "./research-world-visible.ts";
@@ -163,17 +160,32 @@ describe("research-world-visible gate contract", () => {
     expect(invoked).toBe(0);
   });
 
-  test("requires native keyboard receipts and the restricted Main key method", () => {
+  test("requires native Enter/Escape receipts and no global Tab contract", () => {
     const gate = readFileSync(join(import.meta.dir, "research-world-visible.ts"), "utf8");
     const main = readFileSync(join(REPO_ROOT, "collab-electron/src/main/index.ts"), "utf8");
     const preload = readFileSync(join(REPO_ROOT, "collab-electron/src/preload/shell.ts"), "utf8");
+    const renderer = readFileSync(join(REPO_ROOT, "collab-electron/src/windows/shell/src/research-world.js"), "utf8");
+    const tileManager = readFileSync(join(REPO_ROOT, "collab-electron/src/windows/shell/src/tile-manager.js"), "utf8");
     expect(gate).toContain("app.ui.pressKey");
-    expect(gate).toContain("tab_focus_receipts=");
     expect(gate).toContain("keyboard_tiles=10 enter=10 escape=10 focus_retained=20");
+    expect(gate).not.toContain("tab_focus_");
+    expect(gate).not.toContain("qf-r16-tab-sentinel");
+    expect(gate).not.toContain('pressNativeKey(endpoint, "Tab")');
     expect(main).toContain('registerMethod("app.ui.pressKey"');
     expect(main).toContain('["Tab", "Enter", "Escape"]');
     expect(main).toContain('sendInputEvent({ type: "keyDown", keyCode: key })');
     expect(main).toContain('sendInputEvent({ type: "keyUp", keyCode: key })');
+    const keyHandlerStart = renderer.indexOf("const keyHandler = (event) => {");
+    const keyHandlerEnd = renderer.indexOf("\n\t};", keyHandlerStart);
+    const keyHandler = renderer.slice(keyHandlerStart, keyHandlerEnd < 0 ? renderer.length : keyHandlerEnd);
+    expect(keyHandler).toContain('event.key === "Enter"');
+    expect(keyHandler).toContain('event.key === "Escape"');
+    expect(keyHandler).not.toContain('event.key === "Tab"');
+    expect(keyHandler).not.toMatch(/event\.key\s*===\s*["']Tab["'][\s\S]*preventDefault/);
+    expect(tileManager).not.toContain("wv.tabIndex = -1;");
+    const focusStart = tileManager.indexOf("function focusCanvasTile");
+    const focusEnd = tileManager.indexOf("\n\tlet fullscreenTileId = null;", focusStart);
+    expect(tileManager.slice(focusStart, focusEnd < 0 ? tileManager.length : focusEnd)).toContain("dom.webview.focus()");
     expect(preload).not.toContain("app.ui.pressKey");
   });
 
@@ -191,228 +203,4 @@ describe("research-world-visible gate contract", () => {
     expect(renderer).toContain("qfWorldField");
   });
 
-  test("describes exact Tab focus targets and an outside focus thief", () => {
-    class MockElement {
-      readonly tagName: string;
-      readonly id: string;
-      readonly className: string;
-      readonly textContent: string;
-      private readonly attributes: Record<string, string>;
-      private readonly closestTile: MockElement | null;
-
-      constructor(tagName: string, id: string, className: string, attributes: Record<string, string>, textContent: string, closestTile: MockElement | null = null) {
-        this.tagName = tagName;
-        this.id = id;
-        this.className = className;
-        this.attributes = attributes;
-        this.textContent = textContent;
-        this.closestTile = closestTile;
-      }
-
-      getAttribute(name: string): string | null {
-        return this.attributes[name] ?? null;
-      }
-
-      closest(): MockElement | null {
-        return this.closestTile ?? (this.attributes["data-qf-world-type"] ? this : null);
-      }
-    }
-
-    class MockButton extends MockElement {}
-    const globals = globalThis as unknown as Record<string, unknown>;
-    const previousDocument = globals.document;
-    const previousElement = globals.Element;
-    const previousButton = globals.HTMLButtonElement;
-    const expression = tabFocusObservationExpression();
-    const evaluate = (activeElement: MockElement): unknown => {
-      globals.document = { activeElement };
-      globals.Element = MockElement;
-      globals.HTMLButtonElement = MockButton;
-      return Function(`return ${expression}`)();
-    };
-    const tile = new MockElement(
-      "DIV",
-      "ontology:mission:m1",
-      "canvas-tile research-tile",
-      { "data-qf-world-type": "mission", "data-qf-world-id": "m1", "aria-label": "Mission m1" },
-      "Mission body",
-    );
-    const button = new MockButton(
-      "BUTTON",
-      "inspect-m1",
-      "qf-world-inspect",
-      { type: "button", title: "  Inspect mission  " },
-      "ignored button text",
-      tile,
-    );
-    const outside = new MockElement(
-      "INPUT",
-      "search-box",
-      "search-control",
-      { type: "text", "aria-label": "  ", title: "Outside input" },
-      "ignored input text",
-    );
-
-    try {
-      expect(evaluate(tile)).toEqual({
-        tag: "div",
-        id: "ontology:mission:m1",
-        class: "canvas-tile research-tile",
-        input_type: "",
-        world_type: "mission",
-        world_id: "m1",
-        control: "tile",
-        accessible_name: "Mission m1",
-      });
-      expect(evaluate(button)).toEqual({
-        tag: "button",
-        id: "inspect-m1",
-        class: "qf-world-inspect",
-        input_type: "button",
-        world_type: "mission",
-        world_id: "m1",
-        control: "button",
-        accessible_name: "Inspect mission",
-      });
-      expect(evaluate(outside)).toEqual({
-        tag: "input",
-        id: "search-box",
-        class: "search-control",
-        input_type: "text",
-        world_type: "",
-        world_id: "",
-        control: "other",
-        accessible_name: "Outside input",
-      });
-    } finally {
-      globals.document = previousDocument;
-      globals.Element = previousElement;
-      globals.HTMLButtonElement = previousButton;
-    }
-  });
-
-  test("waits for the sentinel to depart and returns the first different receipt", async () => {
-    const sentinelId = "qf-r16-tab-sentinel-test";
-    const sentinel: FocusedElementReceipt = {
-      tag: "button",
-      id: sentinelId,
-      class: "",
-      input_type: "button",
-      world_type: "",
-      world_id: "",
-      control: "other",
-      accessible_name: "R16 temporary focus sentinel",
-    };
-    const departed: FocusedElementReceipt = {
-      tag: "div",
-      id: "ontology:mission:m",
-      class: "canvas-tile",
-      input_type: "",
-      world_type: "mission",
-      world_id: "m",
-      control: "tile",
-      accessible_name: "mission m",
-    };
-    const receipts = [sentinel, sentinel, departed];
-    const pauses: number[] = [];
-    let reads = 0;
-    const actual = await waitForSentinelDeparture(
-      sentinelId,
-      async () => receipts[reads++],
-      async (milliseconds) => { pauses.push(milliseconds); },
-      () => 100,
-    );
-    expect(pauses).toEqual([10, 10]);
-    expect(reads).toBe(3);
-    expect(actual).toEqual(departed);
-  });
-
-  test("binds sentinel waiting to the monotonic deadline and read ceiling", async () => {
-    const sentinelId = "qf-r16-tab-sentinel-clock";
-    const sentinel: FocusedElementReceipt = {
-      tag: "button",
-      id: sentinelId,
-      class: "",
-      input_type: "button",
-      world_type: "",
-      world_id: "",
-      control: "other",
-      accessible_name: "R16 temporary focus sentinel",
-    };
-    let clock = 0;
-    const pauseEnds: number[] = [];
-    const readTimes: number[] = [];
-    const deadlineResult = await waitForSentinelDeparture(
-      sentinelId,
-      async () => { readTimes.push(clock); return sentinel; },
-      async (milliseconds) => { pauseEnds.push(clock + milliseconds); clock += milliseconds; },
-      () => clock,
-    );
-    expect(deadlineResult).toEqual(sentinel);
-    expect(pauseEnds.length).toBeLessThanOrEqual(25);
-    expect(pauseEnds.every((time) => time <= 250)).toBe(true);
-    expect(readTimes.every((time) => time < 250)).toBe(true);
-    expect(clock).toBe(250);
-
-    const readCountPauses: number[] = [];
-    let readCount = 0;
-    const readCountResult = await waitForSentinelDeparture(
-      sentinelId,
-      async () => { readCount += 1; return sentinel; },
-      async (milliseconds) => { readCountPauses.push(milliseconds); },
-      () => 0,
-    );
-    expect(readCountPauses).toEqual(Array(25).fill(10));
-    expect(readCount).toBe(26);
-    expect(readCountResult).toEqual(sentinel);
-  });
-
-  test("returns an outside focus receipt immediately and keeps one Tab sender", async () => {
-    const sentinelId = "qf-r16-tab-sentinel-outside";
-    const sentinel: FocusedElementReceipt = {
-      tag: "button",
-      id: sentinelId,
-      class: "",
-      input_type: "button",
-      world_type: "",
-      world_id: "",
-      control: "other",
-      accessible_name: "R16 temporary focus sentinel",
-    };
-    const outside: FocusedElementReceipt = {
-      tag: "input",
-      id: "outside-input",
-      class: "search-control",
-      input_type: "text",
-      world_type: "",
-      world_id: "",
-      control: "other",
-      accessible_name: "Outside input",
-    };
-    let reads = 0;
-    let pauses = 0;
-    const actual = await waitForSentinelDeparture(
-      sentinelId,
-      async () => { reads += 1; return reads === 1 ? sentinel : outside; },
-      async () => { pauses += 1; },
-      () => 0,
-    );
-    expect(actual).toEqual(outside);
-    expect(reads).toBe(2);
-    expect(pauses).toBe(1);
-
-    const gate = readFileSync(join(import.meta.dir, "research-world-visible.ts"), "utf8");
-    const extract = (source: string, startMarker: string, endMarker: string): string => {
-      const start = source.indexOf(startMarker);
-      const end = source.indexOf(endMarker, start);
-      return source.slice(start, end < 0 ? source.length : end);
-    };
-    const senderName = ["pressNative", "Key"].join("");
-    const exerciseBody = extract(gate, "async function exerciseNativeKeyboard", "async function observeWorld");
-    const waitBody = extract(gate, "export async function waitForSentinelDeparture", "async function pressNativeKey");
-    expect(exerciseBody.split(`${senderName}(endpoint, \"Tab\")`).length - 1).toBe(1);
-    expect(waitBody).not.toContain(senderName);
-    const uiMethodName = ["app", "ui", "pressKey"].join(".");
-    expect(gate.split(`\"${uiMethodName}\"`).length - 1).toBe(1);
-  });
 });
