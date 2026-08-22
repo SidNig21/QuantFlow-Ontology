@@ -1638,8 +1638,13 @@ third returns an outside input on its second read and must return that exact
 wrong receipt after one pause, without further read or pause; it also source-
 checks that `exerciseNativeKeyboard` contains exactly one
 `pressNativeKey(endpoint, "Tab")` call and `waitForSentinelDeparture` contains
-none. The file must report exactly 17 pass and 0 fail. The tile-manager file
-remains exactly 3 pass and 0 fail.
+none. It also checks the complete gate source still contains exactly one
+`"app.ui.pressKey"` string. The candidate diff from the recorded Builder-open
+SHA must contain no added line bearing `pressNativeKey`, `rpcCall`,
+`app.ui.pressKey`, `sendInputEvent`, or an alias assignment to any of them;
+only the pre-existing single Tab call may send input. The file must report
+exactly 17 pass and 0 fail. The tile-manager file remains exactly 3 pass and 0
+fail.
 
 ### Builder and acceptance authority
 
@@ -1656,8 +1661,11 @@ No product, Main, key bridge, fixture, expected target, assertion, timeout,
 schedule, package, installer, release, worktree, wrapper, or helper framework
 change. Builder and Verifier command logs must contain exactly one invocation of
 the live gate; `git diff --name-only` against the recorded Builder-open SHA must
-contain only the allowed gate/test/report/generated-Atlas paths. Any second live
-invocation, other changed path, second Tab call in the source scan, missing
-receipt, or evidence written before green is red. Plain meaning: give the one
-native Tab up to a quarter-second to become observable; never send it twice and
-never call a wrong destination correct.
+contain only the allowed gate/test/report/generated-Atlas paths;
+`git ls-files --others --exclude-standard` must be empty; and final
+`git status --porcelain=v1` must be empty. The Builder report records all three
+outputs and the Verifier reruns them. Any second live invocation, other changed
+or untracked path, added key-send symbol, second Tab call in the source scan,
+missing receipt, or evidence written before green is red. Plain meaning: give
+the one native Tab up to a quarter-second to become observable; never send it
+twice and never call a wrong destination correct.
