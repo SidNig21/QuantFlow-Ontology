@@ -13,11 +13,12 @@ R16_REWRITE_WIP_SHA: `a9420ec0697fe587e619fd88c3839ee3a88da6ad` (preservation on
 ## In plain terms
 
 Ryan opens one Mission or source Task and chooses `Show research world`. The
-canvas reveals the durable Mission, Task, Hypothesis, Dataset, Run, result
-Artifact, Evaluation, findings Artifact, and published Report as inspectable
-Glacier objects connected by honest semantic cables. He can understand the
-question, ownership, inputs, execution, evidence, review, and publication
-without reading a terminal or database.
+canvas reveals the durable Mission, source Task, governed review Task,
+Hypothesis, Dataset, Run, result Artifact, Evaluation, findings Artifact,
+published Report, Director, executor, and critic as 13 inspectable Glacier
+objects connected by 15 honest semantic cables. He can understand the question,
+ownership, inputs, execution, evidence, review, and publication without reading
+a terminal or database.
 
 ## Product scene and register
 
@@ -260,8 +261,10 @@ next candidate.
 Every research tile uses the existing 420 by 280 canvas footprint. Compact and
 expanded inspector modes do not resize that footprint; the expanded detail body
 scrolls inside it. Initial positions snap to the existing 20-pixel baseline.
-Persist only the final app-local top-left under the existing tile key
-`ontology:<type>:<id>`; do not add another layout store or persist lane facts.
+Persist only the existing layout envelope under the tile key
+`ontology:<type>:<id>`: final app-local `x`, `y`, fixed `width=420`, fixed
+`height=280`, and UI stacking `zIndex`. These are projection geometry, not
+domain facts. Do not add another layout store or persist lane facts.
 Placement collision is computed in canvas logical coordinates. Tile rectangles
 are `x,y,420,280`; Dock and protected-cube client rectangles convert once as
 `canvasX = (clientX - panX) / zoom` and `canvasY = (clientY - panY) / zoom` at
@@ -269,8 +272,15 @@ the reveal's current pan/zoom. The live DOM check uses each element's
 `getBoundingClientRect()` at that same pan/zoom and rejects every positive-area
 intersection. Touching edges are not an overlap.
 
-Tab reaches every research tile and its visible controls. Enter expands or
-collapses. Escape collapses. Existing cable keyboard parity remains green.
+Native Tab reaches every research-object tile and its visible controls in DOM
+order. The live gate inserts one temporary focus sentinel immediately before
+the first research-object tile, focuses it, then sends one real Electron Tab
+input per expected focusable. The expected order is the DOM order of each of
+the ten research-object tile containers followed by that tile's enabled visible
+buttons; every step records exact object type/id and control accessible name.
+The sentinel is always removed. On each of the ten tile containers, native
+Enter expands, native Escape collapses, and focus remains on that same tile.
+Existing cable keyboard parity remains green.
 Focus-visible and state contrast use only shared tokens. State is expressed by
 text plus tokenized color, never color alone. Reduced-motion mode removes reveal
 motion without changing final placement.
@@ -346,6 +356,13 @@ The same change adds only this named gate file to
 `kernel-sole-writer`'s read-only Oracle allowance with that reason in its comment;
 it does not allow any renderer, preload, or product writer.
 
+The bounded UI proof may add exactly one Main RPC method in
+`collab-electron/src/main/index.ts`: `app.ui.pressKey`. It is disabled unless
+`QF_UI_PROOF=1`, accepts only `Tab`, `Enter`, or `Escape`, requires the production
+shell window, sends matching Electron `keyDown` and `keyUp` input events to that
+window, and returns `{ key, sent: true }`. Any other key or environment is an
+error. It stores nothing and is not exposed through preload.
+
 ## Product gate
 
 Before the first launch, construct the supporting fixture only through Kernel
@@ -382,12 +399,15 @@ The gate must prove:
    finite anti-constant claim; it does not claim to prove an unbounded negative;
 4. every expected durable cable has exact kind/endpoints and dashed `view`
    honesty, with no extra cable;
-5. click Inspect expands and click Collapse collapses; then focus the same
-   Mission tile, dispatch Enter to expand, dispatch Escape to collapse, and
-   prove focus remains on that tile after both keys. Every research tile has
-   `tabIndex=0`; every visible research control is enabled and has
-   `tabIndex>=0`. Arrow-key tile navigation remains owned by its existing
-   focused tests and is not redefined by this live receipt;
+5. click Inspect expands and click Collapse collapses on the Mission tile. Then
+   execute the exact native-Tab sequence above and emit
+   `tab_focus_receipts=<JSON array>` containing every expected type/id/control
+   in order. For each of the ten research-object tiles, focus it, send native
+   Enter, assert expanded and focus retained, send native Escape, assert
+   collapsed and focus retained. Emit `keyboard_tiles=10 enter=10 escape=10
+   focus_retained=20`. Any missing, extra, reordered, disabled, skipped, or
+   trapped focus target is red. Arrow-key tile navigation remains owned by its
+   existing focused tests and is not redefined by this live receipt;
 6. a second reveal focuses existing tiles and creates zero duplicates;
 7. no tile overlaps another, the Dock, or the cube's protected bounds;
 8. a full close/reopen returns the identical object, field, position, inspector,
@@ -887,21 +907,13 @@ observable without increasing the outer deadline:
    and the array is sorted by `case`, then `message`. Always run cleanup and
    print process/root receipts. A non-empty cleanup array makes the gate red
    but never replaces or hides the primary failure.
-4. Start the normal first launch, forced-failure launch, and forced-timeout
-   launch through one exported scheduling helper against three isolated roots.
-   The helper invokes all three case callbacks before awaiting any result. A
-   focused fake-runner test holds every callback unresolved until all three
-   have reported `started`; it fails within 250 ms if the helper serializes
-   them. In the live gate, a callback reports `started` only after its own
-   pre-spawn snapshot and successful spawn have returned a root PID. Record
-   that instant's monotonic offset from the same `startedAt`, print
-   `initial_case_start_spread_ms=<n>`, and fail when the maximum-minus-minimum
-   offset exceeds 2,000 ms. The normal case still
-   closes and performs its real second launch sequentially against the same
-   Kernel, Artifact root, and app-local geometry. Await all three case results
-   before the final receipt. This changes wall-clock scheduling only; it
-   removes no launch, assertion, marker, cleanup, or measurement.
-   Each case captures its own pre-spawn snapshot. Its owned set is exactly the
+4. **Historical scheduling text - superseded by `SCHEDULING CORRECTION`.** The
+   earlier requirement to start all three cold apps together and print
+   `initial_case_start_spread_ms` authorizes no implementation and no receipt.
+   The active schedule starts the first normal world alone, then overlaps the
+   reopen/failure/timeout cases and prints `post_first_case_start_spread_ms`.
+   The ownership rule from this paragraph remains active: each case captures
+   its own pre-spawn snapshot. Its owned set is exactly the
    earlier W1 contract: its root PID plus every descendant first observed at
    any required snapshot, including newly observed descendants of an already
    owned PID and descendants later reparented. A concurrent case's processes
@@ -920,6 +932,8 @@ A fresh Builder may change only:
 
 - `qa/gates/research-world-visible.ts`;
 - `qa/gates/research-world-visible.test.ts`;
+- `collab-electron/src/main/index.ts`, only for the bounded
+  `app.ui.pressKey` method above;
 - `docs/orders/evidence/r16/BUILD-REPORT.md`; and
 - generated Atlas projections required by the normal change-control rule.
 
