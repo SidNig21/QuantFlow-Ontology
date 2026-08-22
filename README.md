@@ -70,18 +70,18 @@ The ontology has three planes:
 
 ## Status
 
-**As of 2026-08-16 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
+**As of 2026-08-22 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) points to [`docs/orders/WO-R16.md`](docs/orders/WO-R16.md), the one active product order |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) points to [`docs/orders/WO-R17.md`](docs/orders/WO-R17.md), the one active product order; its pre-build Reader is the current door |
 | Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — non-authoritative source record; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
-| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) - R15 is complete and R16 visible research world is active |
-| Product floor | Installable Windows app, one Hermes Research Director, governed specialist Tasks and steering, exact critic review, and evaluation-gated publication |
-| Honest boundary | Research objects are durable but R16 has not yet made the full Mission to Report world inspectable on the canvas. Strategy grading, recall, and governed PufferLib learning remain R17 to R20. |
+| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R16 is complete and R17 named Technique/outcome grading is active |
+| Product floor | Installable Windows app, one Hermes Research Director, governed specialist Tasks and steering, exact critic review, evaluation-gated publication, and a pointer-inspectable 13-object/15-cable Mission-to-Report world that survives reopen |
+| Honest boundary | A forward Run does not yet take a founder-selected immutable Technique version or turn a later operator-supplied settlement into visible calibration/CLV. R17 closes that loop; evaluated recall and governed PufferLib learning remain R18 to R20. |
 
 ```bash
-bun qa/run.ts rung-ladder    # must say active=R16
+bun qa/run.ts rung-ladder    # must say active=R17
 bun qa/run.ts --list         # every registered gate
 ```
 
