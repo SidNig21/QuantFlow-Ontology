@@ -1156,28 +1156,34 @@ unknown and filtered out even though their exact ontology tiles exist.
 
 ### Exact repair
 
-Export one pure endpoint resolver from `research-world.js`. It receives the
+Export exactly one pure endpoint resolver named
+`resolveResearchWorldEndpointTileId` from `research-world.js`. It receives the
 current projection's `objects`, the current canvas `tiles`, and one endpoint id.
 It behaves exactly:
 
 1. Find projection objects whose full `id` equals the endpoint id. Zero matches
    returns `null`; more than one match also returns `null` rather than choosing
    an arbitrary type.
-2. For the single matching non-session object, resolve only a research tile
-   whose `type === "research"`, `ontologyType === object.type`, and
-   `ontologyId === object.id`; return that tile's exact `id`.
-3. For the single matching `agent_session`, resolve only an existing tile whose
-   `sessionId === object.id`; return that tile's exact `id`. A research-style
-   `ontology:agent_session:*` tile is not invented.
+2. For the single matching non-session object, collect research tiles whose
+   `type === "research"`, `ontologyType === object.type`, and
+   `ontologyId === object.id`. Return the exact tile `id` only when exactly one
+   tile matches; zero or multiple matching canvas tiles return `null`.
+3. For the single matching `agent_session`, collect non-research tiles whose
+   `type !== "research"` and `sessionId === object.id`. Return the exact tile
+   `id` only when exactly one matches; zero or multiple matches return `null`.
+   A research-style tile carrying `sessionId`, including
+   `ontology:agent_session:*`, is never a canonical session tile.
 4. Cable projection calls this resolver independently for `from_id` and
    `to_id`. It emits the unchanged dashed `view` cable only when both resolve;
    it never guesses, reverses, persists, or relabels an endpoint.
 
 The focused renderer test constructs all ten research-object tiles and three
 session tiles, then supplies the exact 15-link manifest. It must prove every
-link resolves to the expected two tile ids. Separate cases prove unknown ids
-and a duplicate id across two object types return `null`. The old session-only
-lookup makes the positive case red because 14 links have a null endpoint.
+link resolves to the expected two tile ids. Separate cases prove unknown ids,
+a duplicate id across two projection object types, duplicate matching research
+tiles, duplicate matching non-research session tiles, and a research tile that
+also carries `sessionId` all return `null`. The old session-only lookup makes
+the positive case red because 14 links have a null endpoint.
 
 ### Builder and acceptance authority
 
