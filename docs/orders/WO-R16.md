@@ -580,10 +580,14 @@ the Bun parent closes, without proving Electron descendants are gone. A stale
 GPU/cache handle can therefore outlive the parent long enough to keep the app
 root undeletable.
 
-Take `processSnapshot()` before every spawn. After readiness, freeze the exact
-owned PID set with `collectOwnedPids(before, after, rootPid)`. Every normal,
-failure, timeout, and exceptional exit must request shutdown when possible,
-terminate the root tree when necessary, call the existing
+Take `processSnapshot()` before every spawn. `ownedPids` is the union of the
+root PID and every descendant first observed at any snapshot from spawn through
+teardown: during readiness polling, immediately after readiness, before
+shutdown, after shutdown, and during cleanup polling. Newly observed descendants
+of any already-owned PID join the union even if the original root has exited or
+the child is later reparented. Every normal, failure, timeout, and exceptional
+exit must request shutdown when possible, terminate the root tree when
+necessary, call the existing
 `terminateOwnedProcesses(ownedPids, remainingBudget)`, and assert
 `owned_processes_remaining=0` from a fresh snapshot before attempting root
 deletion. Never infer ownership by process name and never touch an ambient PID.
@@ -594,13 +598,17 @@ the check says cleanup passed.
 ### W2 - Reopen is printed, not executed
 
 The prototype prints `reopen_equal=true` immediately after the first shutdown.
-It never launches the app a second time. Replace that literal with an actual
-second launch against the same Kernel, Artifact root, and app-local geometry,
-without reseeding. Activate the same root through the renderer and compare the
-complete independently frozen DOM manifest: all 12 ids/types; every displayed
-field/value; all 13 cable kinds/endpoints; logical tile positions; inspector
-expanded/collapsed state; and accessible names. Any difference is red. Only
-after the second owned process set is zero may that case's root be removed.
+It never launches the app a second time. Before the first launch, freeze the
+independent expected ids/types, displayed field values, cable
+kinds/endpoints, and accessible-name values from the read-only Oracle/fixture
+contract. After the first visible launch matches those facts, freeze the
+observed logical tile positions and inspector expanded/collapsed state before
+closing. Then perform an actual second launch against the same Kernel, Artifact
+root, and app-local geometry, without reseeding. Activate the same root through
+the renderer and compare all 12 ids/types, every displayed field/value, all 13
+cables, accessible names, first-launch positions, and first-launch inspector
+state. Any difference is red. Only after the second owned process set is zero
+may that case's root be removed.
 
 Plain meaning: close and reopen must really preserve the same visible research
 desk; a printed sentence is not a restart.
@@ -620,7 +628,12 @@ and pre-spawn process baseline:
 
 These injections never change production code, assertions, selectors, or the
 overall 60-second deadline. The gate passes only after it has observed both
-intended internal reds and their cleanup greens.
+intended internal reds and their cleanup greens. Each case mints a unique marker
+from the run nonce. The failure case prints that marker only from the caught
+deliberate exception. The timeout case records monotonic elapsed milliseconds
+and prints its marker only when the 500 ms watchdog actually wins the race
+against the never-settling operation. Cleanup labels without those measured
+marker receipts are red.
 
 Plain meaning: error and timeout cleanup must happen, not be claimed.
 
@@ -634,6 +647,13 @@ deletes before measuring residue. The final receipt is exactly
 `roots_created=<n> roots_remaining=0 retried=<n> leaked=[]`. A non-transient
 error or remaining root is red. Pre-existing roots are informational and are
 never deleted or counted as this run's success.
+
+Receipt counters are exact: `roots_created` is the count of unique absolute
+roots registered by this invocation; `roots_remaining` is how many of those
+paths exist after the final measurement; `retried` is the total number of
+transient removal attempts after each root's first failed attempt; and `leaked`
+is the sorted JSON array of registered absolute paths still present after that
+measurement. The receipt does not include or delete pre-existing paths.
 
 The two roots left by the exhausted attempt were measured after all owned
 Electron/Bun/Node processes had exited. They are historical residue, not inputs
@@ -650,15 +670,34 @@ real cases above under 60 seconds and print only measured receipts. The focused
 test must make each printed success false when its corresponding call is
 removed; source-token checks alone are supplemental, not proof.
 
+For this rewrite only, the Builder is explicitly authorized to run
+`bun qa/run.ts research-world-visible` to establish the repaired final green and
+to run that same gate against temporary falsifier mutations for the required
+red/restored-green receipts. This narrow exception overrides the earlier
+Verifier-only ownership of that one launching command; it does not authorize
+the Builder to run `founder-steering`, `research-director-delegation`, any
+package/release gate, or to self-certify. The fresh Verifier still reruns the
+unaltered live gate independently.
+
 Then execute the existing Builder matrix, Atlas sequence, and every falsifier
 receipt already required by this order. The complete evidence file remains
 `docs/orders/evidence/r16/BUILD-REPORT.md`. A fresh different-model Verifier
 reruns the complete matrix and independently chooses at least one tile omission,
 one cable mutation, one renderer-access mutation, and both cleanup injections.
 
-The fresh Builder may change only the four files in `a9420ec` plus
-`docs/orders/evidence/r16/BUILD-REPORT.md`, unless the same live assertion proves
-an exact production defect outside them. In that case it stops with the receipt;
-it does not widen scope. Any assertion change, deadline increase, cleanup before
+The fresh Builder may change only these files:
+
+- `qa/gates/research-world-visible.ts`;
+- `qa/gates/research-world-visible.test.ts`;
+- `collab-electron/src/main/index.ts`, limited to the preserved
+  `qf.research.seed_fixture_dataset` RPC registration/dispatch seam; and
+- `collab-electron/src/main/kernel.ts`, limited to the preserved R16 fixture
+  seeding helper called only by that QA-mode RPC; plus
+- `docs/orders/evidence/r16/BUILD-REPORT.md`.
+
+No production semantics, public IPC, ordinary app behavior, or other function
+in `index.ts`/`kernel.ts` may change. If the same live assertion proves an exact
+product defect outside these named seams, the Builder stops with the receipt; it
+does not widen scope. Any assertion change, deadline increase, cleanup before
 measurement, simulated reopen, or simulated failure/timeout is an immediate
 stop. No third implementation lap follows a failed rewrite.
