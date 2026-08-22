@@ -4951,3 +4951,127 @@ successful Main/preload/renderer phases; all three output products postdate the
 same bound UTC start; and the Main bundle contains both the full candidate SHA
 and exact timestamp. The docs HEAD may not substitute for the product
 candidate. Any red stops R16; no further build or app launch is authorized.
+
+### NORMAL CONSUMER ATTEMPT 2 RED — exact numeric rubric discovery
+
+The corrected replacement build passed every identity requirement at immutable
+product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`, using build
+timestamp `2026-08-22T13:05:28.3041800Z`. The Router then ran the normal app
+through Computer Use. The append-only exact receipt is
+`docs/orders/evidence/r16/CONSUMER-CHECK.md`, Attempt 2.
+
+The one new guided Mission completed Director delegation, deterministic
+execution, and the exact three governed critic reads. The repaired
+`qf_artifact_get` returned the hash-verified payload receipt and its broker row
+recorded the identical result. The critic correctly reasoned toward `supports`
+at confidence `0.9`, but five `qf_record_evaluation` calls failed: the tool
+interface supplied the four rubric scores as comma strings twice and numeric
+strings three times. No Evaluation or Report exists for that review Task. The
+normal app and all owned Windows/WSL processes then closed cleanly.
+
+The finite defect is in action discovery. The authoritative
+`record_evaluation` Zod action declares `rubric` as generic `jsonObject`, so
+generated MCP JSON advertises an untyped object with
+`additionalProperties: {}`. The production Kernel intentionally requires an
+exact four-key object whose values are finite numbers in `[0,1]`. The live
+Hermes critic was not given that shape.
+
+#### Bounded repair
+
+Replace only the `record_evaluation` action input's generic rubric declaration
+with one strict named Zod object containing exactly these required numeric
+properties, each bounded from 0 through 1:
+
+```text
+faithfulness
+answer_relevancy
+context_precision
+context_recall
+```
+
+Keep the rubric property optional at the shared schema level for the existing
+legacy path. Do not coerce strings, change Kernel validation, change verdict
+derivation, relax the four-key rule, alter findings/source-work/publication
+semantics, or add a runtime retry. The generated MCP schema must expose the
+four named properties as `type: number`, required inside `rubric`, with no
+additional properties. The production critic tool served through
+`qf.ontology.list_tools` must equal that generated authority.
+
+Allowed Builder paths are exactly:
+
+```text
+qf-kernel-schema/src/ontology/research.ts
+qf-kernel-schema/src/generate.test.ts
+qf-kernel-schema/golden/tools.json
+qf-kernel-schema/golden/ONTOLOGY.md
+qf-kernel-schema/golden/migration.sql
+collab-electron/src/main/ontology-gateway.test.ts
+docs/orders/evidence/r16/BUILD-REPORT.md
+qf-atlas/atlas.json
+qf-atlas/atlas.md
+qf-atlas/atlas.html
+```
+
+Generated files may change only as a direct result of `bun run generate` from
+the one source-schema repair; unchanged generated files remain byte-identical.
+No application renderer, gateway implementation, Kernel implementation,
+fixture, order, consumer evidence, package, credential, founder-state, build
+output, or R17 path is in Builder scope.
+
+#### Exact acceptance and falsifier
+
+The Builder runs, in order:
+
+```text
+bun run --cwd qf-kernel-schema generate
+bun test --cwd qf-kernel-schema
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test collab-electron/src/main/governed-review.test.ts
+bun qa/run.ts governed-review
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+All native exits must be zero. Append exactly one schema test named
+`record_evaluation publishes an exact numeric rubric object`; the schema suite
+must report exactly `178 pass / 0 fail`. Extend only the existing production
+tool-discovery test in `ontology-gateway.test.ts` with an independent literal
+oracle for the same four properties, required list, `[0,1]` bounds, and closed
+object shape; that focused suite remains exactly `6 pass / 0 fail`. Every
+pre-existing test and assertion remains textually present.
+
+After committing the candidate and hashing every changed product/test/generated
+file, temporarily restore only
+`qf-kernel-schema/src/ontology/research.ts` from base
+`99188c6b3e039821c5c615c621a45d5c3f484ab9`, regenerate, then run the focused
+schema and gateway tests. At least one must exit nonzero and name the generic or
+missing numeric rubric shape. Restore every changed file to the candidate
+hashes, require zero candidate diff, and rerun both focused commands green.
+The mutation may not touch product/founder state.
+
+A fresh independent Verifier freezes the candidate, runs the same matrix except
+the mutating Atlas generation row, repeats the falsifier/restoration, and writes
+PASS only with exact restoration and Atlas HARD RED 0. No build or app launch
+occurs before PASS.
+
+After PASS, the Router makes one exact identity-bound build and one new normal
+Computer Use consumer attempt. The worker canary is performed immediately
+after its tile appears, before waiting for completion. The sole critic must
+receive the exact numeric rubric schema, complete one successful Evaluation,
+and publish through the unchanged gate. All existing exact 13-object/15-cable,
+ten pointer inspector, three terminal canary, no-submission, reopen-equality,
+and zero-process requirements remain unchanged. No second Mission or alternate
+critic is allowed.
+
+Every gate has a native red: stale generation, generic rubric shape, production
+tool mismatch, governed-review regression, writer/Atlas regression, base-schema
+mutation staying green, live critic failure, missing Report/world, pointer or
+reopen mismatch, or cleanup residue. Every deliverable has exactly one meaning:
+one strict rubric input authority, its generated/served MCP projection, one
+focused regression, one falsifier/restoration, one independent PASS, and one
+normal consumer PASS. A fresh Reader must answer exactly whether every gate can
+fail and whether every deliverable has exactly one meaning before Builder work.

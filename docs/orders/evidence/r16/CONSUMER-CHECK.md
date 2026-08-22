@@ -75,3 +75,111 @@ receipt even apart from the governed Artifact-read defect.
 No reopen acceptance was attempted. No R17 work began. A replacement consumer
 attempt may occur only after the bounded repair receives a fresh independent
 PASS and one fresh exact build.
+
+## Attempt 2 — RED: critic tool schema does not type the governed rubric
+
+Date: 2026-08-22
+Candidate: `99188c6b3e039821c5c615c621a45d5c3f484ab9`
+Builder evidence: `404b7274a03be3189d5360ae55948bbf783fd8b8`
+Independent verification: `7bd7f4bd4baf1ee9636ace6c264e6cb0b7387709`
+Build command: `QF_BUILD_COMMIT_SHA=99188c6b3e039821c5c615c621a45d5c3f484ab9`
+and `QF_BUILD_TIMESTAMP=2026-08-22T13:05:28.3041800Z` in the same
+PowerShell process as `bun run --cwd collab-electron build`
+Application command: `node ./scripts/run-local-bin.mjs electron-vite preview --skipBuild`
+Mode: normal founder application; no proof bridge, SQLite seed, credential
+access, synthetic responder, or packaged/release gate
+
+Verdict: **RED. R16 remains open.**
+
+### Exact build and identity receipt
+
+- The corrected build exited 0 and completed Main, preload, and renderer.
+- All three output products postdated `2026-08-22T13:05:28.3041800Z`.
+- The Main bundle contained the full candidate SHA and exact timestamp.
+- The visible masthead read `BUILD
+  99188C6B3E039821C5C615C621A45D5C3F484AB9 • PACKAGED
+  2026-08-22T13:05:28.3041800Z`.
+
+### Exact normal Mission and governed reads
+
+One visible `TRY GUIDED RESEARCH` action created exactly one new Mission:
+
+- Mission `mission-d7e46902-271b-4a76-81ab-1062f2ac911a`
+- Research Director `a6eaf608-bd46-4a52-90b8-83a10d2ca67d`
+- source Task `task-f3183945-704d-4859-9ef3-e40d17ea67af`
+- executor `acp-session-d7e46902-9f1c-4b7a-a2e3-5c8d1e6f7a9b`
+- Hypothesis `3eb74c85-63cd-4d7e-bf1f-73a43a9ada9b`
+- Run `run-4820bb1f-673a-4b6a-974a-2f9c580a094b`
+- result Artifact
+  `cba126f77ef6bf9bc099639dc2b91ee339341e1fba88ccdb511b41327f394a16`
+- governed review Task `review-task-e36268c4-7287-4b8f-b4a0-b28553f5cc72`
+- sole admitted critic `critic-0ea890ff-64bc-4e3e-a2d1-0e2406ad82cf`
+
+The critic's first three broker rows were successful and ordered exactly:
+
+1. `qf_hypothesis_get`, sequence 1, argument
+   `{"id":"3eb74c85-63cd-4d7e-bf1f-73a43a9ada9b"}`; the returned and recorded
+   result was the exact open Hypothesis row with claim, success criteria, and
+   Dataset source.
+2. `qf_run_get`, sequence 2, argument
+   `{"id":"run-4820bb1f-673a-4b6a-974a-2f9c580a094b"}`; the returned and
+   recorded result was the exact succeeded `qf-deterministic-v1` Run bound to
+   this Hypothesis, executor, Dataset, Strategy, and result Artifact.
+3. `qf_artifact_get`, sequence 3, argument
+   `{"id":"cba126f77ef6bf9bc099639dc2b91ee339341e1fba88ccdb511b41327f394a16"}`;
+   the returned and recorded result was the safe metadata plus the same
+   hash-verified receipt, with no `storage_ref`. Its preview parsed as contract
+   `qf.execution.result.v1`, `eligible_count=3`, edge `0.08`, label
+   `sample-a`, and metrics `roi="1.000000"`,
+   `net_profit="100.000000"`, `hit_rate="1.000000"`, and
+   `selected_count=1`.
+
+The `qf_review_invocation.result` values are the durable exact broker copies of
+the results returned to the critic; the Artifact receipt's id, kind, and
+content hash all equal the selected Artifact. This proves the candidate's
+governed Artifact-read repair in the normal application.
+
+### Exact product defect
+
+The sole critic understood the evidence and repeatedly tried to record a
+positive review. Its nonempty rationale independently recomputed ROI, hit rate,
+and average CLV, named the single-row limitation, and selected `supports` at
+confidence `0.9`. The Kernel correctly rejected every write because the rubric
+values did not arrive as numbers:
+
+- sequences 4 and 5: all four rubric values were the string `","`;
+- sequences 6, 7, and 8: rubric values were the strings `"0.95"`, `"0.9"`,
+  `"0.9"`, and `"0.95"`.
+
+All five `qf_record_evaluation` broker rows remain `success=0` with pending
+results. There is no Evaluation for the review Task and no Report gated by one.
+The critic therefore could not terminate the governed flow even though its
+reasoning and desired rubric were clear.
+
+The live tool contract explains the failure. In
+`qf-kernel-schema/src/ontology/research.ts`, `record_evaluation.rubric` uses the
+generic `jsonObject`. The generated MCP schema consequently advertises
+`additionalProperties: {}` instead of four named numeric fields. The Kernel's
+accepted authority is stricter: it requires exactly `faithfulness`,
+`answer_relevancy`, `context_precision`, and `context_recall`, each a finite
+number in `[0,1]`. The model was shown an untyped object and the Kernel then
+rejected the strings that interface produced. This is an action-discovery
+schema defect; numeric-string coercion in the Kernel would weaken the boundary
+and is not authorized.
+
+### Pointer and cleanup receipt
+
+The exact canary `qf-r16-typing-check-99188c6` visibly passed in the Director
+and critic terminals by mouse focus, keyboard type, erase, and mouse return
+without Enter or submission. The executor completed before it was selected, so
+the executor canary was not captured. No world/reopen acceptance was attempted
+after the mandatory Evaluation red.
+
+The app closed through its normal visible Close button. The launch root,
+QuantFlow Electron processes, and WSL Hermes/collaboration/ontology processes
+were all exactly zero afterward. A historical stale critic row remained in the
+Kernel UI before this Mission, but it did not receive or own this source Task or
+review Task and was not used as an alternate critic.
+
+No second Mission, retry critic, manual Evaluation, Report override, product
+edit, or R17 work occurred.

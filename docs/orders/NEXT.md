@@ -126,6 +126,9 @@ consumer-artifact-read-verifier-receipt: fresh independent Verifier task `01a029
 current-door: Router is authorized for exactly one fresh `bun run --cwd collab-electron build` and the exact normal two-launch Computer Use Attempt 2; any red keeps R16 open; no R17 authority
 consumer-artifact-read-build-identity-red: native build from docs head `6d117ce824c55b162ba4f55db289d254dd1b20e1` completed Main/preload/renderer with fresh outputs, but the bundle embedded that docs head and default `development` instead of immutable product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9` plus bound UTC timestamp; no app launch occurred
 current-door: one corrected build using existing `QF_BUILD_COMMIT_SHA` and `QF_BUILD_TIMESTAMP` inputs is Router-authorized; any red stops R16; no app launch or R17 authority before exact identity passes
+consumer-artifact-read-build-receipt: corrected build at product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9` and timestamp `2026-08-22T13:05:28.3041800Z` exited 0; Main/preload/renderer outputs were fresh; Main bundle and visible masthead contained the exact identity
+consumer-rubric-schema-red: normal Computer Use Attempt 2 created one Mission, completed the exact three governed reads with the repaired Artifact receipt, and the sole critic reasoned toward `supports`; five Evaluation writes failed because the generated MCP rubric schema exposed an untyped generic object and the live tool supplied comma/numeric strings; Evaluation/Report remained zero; Director/critic canaries passed, executor canary was missed, no reopen was attempted, and all Windows/WSL product processes closed to zero
+current-door: fresh adversarial Reader must inspect the exact numeric-rubric repair appended to WO-R16 and answer the two protocol questions; no Builder, rebuild, consumer retry, or R17 authority before final YES/YES
 
 ## Authorized outcome
 
