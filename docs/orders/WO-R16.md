@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer critic-submit gate synchronization - fresh Reader required
+status: normal consumer governed-review reopen compatibility - fresh Reader required
 assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -4138,3 +4138,61 @@ Fresh adversarial Reader result for this exact closure: **YES/YES**. The
 gate-only Builder is authorized for the two deliverables and acceptance
 sequence above. No product edit, test edit, build, launch, founder-state
 change, or R17 work is authorized.
+
+### NORMAL REOPEN RED — governed-review support tables misclassified as objects
+
+Independent verification passed at immutable product candidate
+`e824ae10f50336a1640afeecd802ed7141bbeeb7`, exact gate candidate
+`ed9de40fc801340aa5a299821c3b322183a547f3`, and evidence commit
+`4cde791f5b02d06b030624860da4d85cd590dce5`. The Router then performed the one
+authorized build, starting `2026-08-22T11:02:02.4840960Z`, with exact product
+identity `e824ae10`; Main, preload, and renderer completed, their output
+products postdated the start, and the Main bundle contained that exact identity.
+
+The first ordinary normal launch produced no window. Writable `attachKernel()`
+threw `KernelRegistryDriftError` with `missing=[]`, `retired=[]`, and
+`inconsistent=[qf_review_attempt,qf_review_invocation,qf_review_publication,
+qf_review_receipt,qf_review_source_work,qf_review_task]`. The launched PID tree
+was then cleaned to `launched_processes_remaining=0`. The founder database was
+measured read-only only: `schema_meta=84`; the six exact tables exist; current
+row counts are source-work `1`, review-task `1`, invocation `0`, attempt `1`,
+receipt `1`, publication `0`.
+
+Root cause is bounded. `ensureGovernedReviewSchema()` explicitly creates these
+six durable R15 support tables and states they are Kernel tables, not ontology
+object types. `detectObjectTypeRegistryDrift()` currently exempts only
+`events`, `links`, `schema_meta`, and `sqlite_sequence`, so a fresh process can
+create the support tables after its initial attach and then fail its next
+attach because those non-object tables lack `schema_meta kind='object'` rows.
+The app must preserve them, not register them as ontology objects and not drop
+or recreate founder state.
+
+The only authorized repair is:
+
+1. Add the six exact governed-review table names above to the finite
+   `INFRA_TABLES` set in `packages/qf-kernel/src/registry-drift.ts`, with a
+   comment that they are R15 durable support tables rather than ontology object
+   types. No prefix/wildcard exemption and no other table is allowed.
+2. Extend `packages/qf-kernel/src/registry-drift.test.ts` to prove all six exact
+   names are ignored as infrastructure while a seventh ordinary orphan table
+   remains `inconsistent`.
+3. Extend `packages/qf-kernel/src/attach-kernel-drift.test.ts` with the exact
+   process-lifecycle regression: attach a fresh isolated writable Kernel,
+   create the six tables through real `ensureGovernedReviewSchema()`, close it,
+   reopen the same file through writable `attachKernel()`, and require no drift
+   plus byte-preserved review rows. No direct founder DB, copied detector, or
+   manual `schema_meta` insertion is proof.
+4. Falsify by temporarily removing only `qf_review_task` from `INFRA_TABLES`.
+   The unchanged attach regression must exit nonzero naming
+   `qf_review_task`; restore exact bytes, prove zero diff for the mutated path,
+   and rerun to native green. Then run the existing registry/attach tests,
+   R15 governed-review tests, the complete bounded R16 parent matrix, Atlas
+   currentness/ratchet, and both diff checks. Any other red stops.
+
+Allowed product/test paths are only the three files named above, generated
+Atlas projections, and existing R16 BUILD-REPORT. Upgrade classification,
+schema authority, review semantics, founder data, and every other product/gate
+file are frozen. The spent `e824ae10` build is a recorded diagnostic. After a
+fresh Reader YES/YES, Builder repair, and independent PASS, exactly one new
+actual build is authorized for the still-required two-launch Computer consumer
+check. No consumer launch or R17 work is authorized before that PASS.
