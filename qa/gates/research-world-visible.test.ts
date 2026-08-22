@@ -18,6 +18,8 @@ import {
   scheduleFirstWorldSpecialists,
   schedulePostFirstCases,
   tabFocusObservationExpression,
+  type FocusedElementReceipt,
+  waitForSentinelDeparture,
   worldTimeoutDelta,
   worldObservationExpression,
 } from "./research-world-visible.ts";
@@ -287,5 +289,130 @@ describe("research-world-visible gate contract", () => {
       globals.Element = previousElement;
       globals.HTMLButtonElement = previousButton;
     }
+  });
+
+  test("waits for the sentinel to depart and returns the first different receipt", async () => {
+    const sentinelId = "qf-r16-tab-sentinel-test";
+    const sentinel: FocusedElementReceipt = {
+      tag: "button",
+      id: sentinelId,
+      class: "",
+      input_type: "button",
+      world_type: "",
+      world_id: "",
+      control: "other",
+      accessible_name: "R16 temporary focus sentinel",
+    };
+    const departed: FocusedElementReceipt = {
+      tag: "div",
+      id: "ontology:mission:m",
+      class: "canvas-tile",
+      input_type: "",
+      world_type: "mission",
+      world_id: "m",
+      control: "tile",
+      accessible_name: "mission m",
+    };
+    const receipts = [sentinel, sentinel, departed];
+    const pauses: number[] = [];
+    let reads = 0;
+    const actual = await waitForSentinelDeparture(
+      sentinelId,
+      async () => receipts[reads++],
+      async (milliseconds) => { pauses.push(milliseconds); },
+      () => 100,
+    );
+    expect(pauses).toEqual([10, 10]);
+    expect(reads).toBe(3);
+    expect(actual).toEqual(departed);
+  });
+
+  test("binds sentinel waiting to the monotonic deadline and read ceiling", async () => {
+    const sentinelId = "qf-r16-tab-sentinel-clock";
+    const sentinel: FocusedElementReceipt = {
+      tag: "button",
+      id: sentinelId,
+      class: "",
+      input_type: "button",
+      world_type: "",
+      world_id: "",
+      control: "other",
+      accessible_name: "R16 temporary focus sentinel",
+    };
+    let clock = 0;
+    const pauseEnds: number[] = [];
+    const readTimes: number[] = [];
+    const deadlineResult = await waitForSentinelDeparture(
+      sentinelId,
+      async () => { readTimes.push(clock); return sentinel; },
+      async (milliseconds) => { pauseEnds.push(clock + milliseconds); clock += milliseconds; },
+      () => clock,
+    );
+    expect(deadlineResult).toEqual(sentinel);
+    expect(pauseEnds.length).toBeLessThanOrEqual(25);
+    expect(pauseEnds.every((time) => time <= 250)).toBe(true);
+    expect(readTimes.every((time) => time < 250)).toBe(true);
+    expect(clock).toBe(250);
+
+    const readCountPauses: number[] = [];
+    let readCount = 0;
+    const readCountResult = await waitForSentinelDeparture(
+      sentinelId,
+      async () => { readCount += 1; return sentinel; },
+      async (milliseconds) => { readCountPauses.push(milliseconds); },
+      () => 0,
+    );
+    expect(readCountPauses).toEqual(Array(25).fill(10));
+    expect(readCount).toBe(26);
+    expect(readCountResult).toEqual(sentinel);
+  });
+
+  test("returns an outside focus receipt immediately and keeps one Tab sender", async () => {
+    const sentinelId = "qf-r16-tab-sentinel-outside";
+    const sentinel: FocusedElementReceipt = {
+      tag: "button",
+      id: sentinelId,
+      class: "",
+      input_type: "button",
+      world_type: "",
+      world_id: "",
+      control: "other",
+      accessible_name: "R16 temporary focus sentinel",
+    };
+    const outside: FocusedElementReceipt = {
+      tag: "input",
+      id: "outside-input",
+      class: "search-control",
+      input_type: "text",
+      world_type: "",
+      world_id: "",
+      control: "other",
+      accessible_name: "Outside input",
+    };
+    let reads = 0;
+    let pauses = 0;
+    const actual = await waitForSentinelDeparture(
+      sentinelId,
+      async () => { reads += 1; return reads === 1 ? sentinel : outside; },
+      async () => { pauses += 1; },
+      () => 0,
+    );
+    expect(actual).toEqual(outside);
+    expect(reads).toBe(2);
+    expect(pauses).toBe(1);
+
+    const gate = readFileSync(join(import.meta.dir, "research-world-visible.ts"), "utf8");
+    const extract = (source: string, startMarker: string, endMarker: string): string => {
+      const start = source.indexOf(startMarker);
+      const end = source.indexOf(endMarker, start);
+      return source.slice(start, end < 0 ? source.length : end);
+    };
+    const senderName = ["pressNative", "Key"].join("");
+    const exerciseBody = extract(gate, "async function exerciseNativeKeyboard", "async function observeWorld");
+    const waitBody = extract(gate, "export async function waitForSentinelDeparture", "async function pressNativeKey");
+    expect(exerciseBody.split(`${senderName}(endpoint, \"Tab\")`).length - 1).toBe(1);
+    expect(waitBody).not.toContain(senderName);
+    const uiMethodName = ["app", "ui", "pressKey"].join(".");
+    expect(gate.split(`\"${uiMethodName}\"`).length - 1).toBe(1);
   });
 });

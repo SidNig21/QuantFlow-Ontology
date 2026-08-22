@@ -139,6 +139,7 @@ export function assertResearchWorldContract(): void {
   const mainIpc = source(MAIN_IPC);
   const mainIndex = source(MAIN_INDEX);
   const projection = source(PROJECTION);
+  const nativeUiPressKeyMethod = ["app", "ui", "pressKey"].join(".");
   const forbiddenRenderer = /bun:sqlite|node:sqlite|better-sqlite3|node:fs(?:\/promises)?/;
   if (forbiddenRenderer.test(renderer)) throw new Error("renderer research world imports a database or filesystem boundary");
   if (!renderer.includes("qfWorldField") || !renderer.includes("Show research world")) {
@@ -153,7 +154,7 @@ export function assertResearchWorldContract(): void {
     throw new Error("research preload transport contract is missing");
   }
   if (!mainIpc.includes('ipcMain.handle("qf:research-world:projection"')) throw new Error("research Main IPC handler is missing");
-  if (!mainIndex.includes('registerMethod("app.ui.pressKey"')) throw new Error("native UI key proof method is missing");
+  if (!mainIndex.includes(`registerMethod("${nativeUiPressKeyMethod}"`)) throw new Error("native UI key proof method is missing");
   if (!mainIndex.includes('process.env.QF_UI_PROOF !== "1"')) throw new Error("native UI key proof is not environment restricted");
   if (!mainIndex.includes('sendInputEvent({ type: "keyDown", keyCode: key })') || !mainIndex.includes('sendInputEvent({ type: "keyUp", keyCode: key })')) {
     throw new Error("native UI key proof does not send matching key events");
@@ -578,6 +579,26 @@ export type FocusedElementReceipt = {
   accessible_name: string;
 };
 
+export async function waitForSentinelDeparture(
+  sentinelId: string,
+  observe: () => Promise<FocusedElementReceipt>,
+  pause: (milliseconds: number) => Promise<void>,
+  now: () => number,
+): Promise<FocusedElementReceipt> {
+  const deadlineAt = now() + 250;
+  let actual = await observe();
+  let pauses = 0;
+  while (actual.id === sentinelId && pauses < 25) {
+    const remaining = deadlineAt - now();
+    if (remaining <= 0) break;
+    await pause(Math.min(10, remaining));
+    pauses += 1;
+    if (now() >= deadlineAt) break;
+    actual = await observe();
+  }
+  return actual;
+}
+
 async function pressNativeKey(endpoint: string, key: "Tab" | "Enter" | "Escape"): Promise<void> {
   const result = await rpcCall(endpoint, "app.ui.pressKey", { key }) as { key?: unknown; sent?: unknown };
   assert(result?.key === key && result.sent === true, `native ${key} input was not acknowledged`);
@@ -654,7 +675,14 @@ async function exerciseNativeKeyboard(endpoint: string, expected: IndependentWor
   try {
     for (const target of plan.targets) {
       await pressNativeKey(endpoint, "Tab");
-      const actual = await evaluateRenderer<FocusedElementReceipt>(endpoint, "tab-focus-step", tabFocusObservationExpression());
+      const actual = receipts.length === 0
+        ? await waitForSentinelDeparture(
+          plan.sentinelId,
+          () => evaluateRenderer<FocusedElementReceipt>(endpoint, "tab-focus-step", tabFocusObservationExpression()),
+          (milliseconds) => wait(milliseconds),
+          () => performance.now(),
+        )
+        : await evaluateRenderer<FocusedElementReceipt>(endpoint, "tab-focus-step", tabFocusObservationExpression());
       if (!matchesKeyboardFocusTarget(actual, target)) {
         const failure = `tab_focus_failure=${JSON.stringify({ step: receipts.length, expected: target, actual })}`;
         console.log(failure);
