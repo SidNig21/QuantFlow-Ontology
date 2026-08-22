@@ -51,6 +51,7 @@ import {
   kernelSeedVisibleResearchWorld,
   kernelOpenHypothesisForQuestion,
   kernelRunGuidedResearch,
+  kernelContinueGovernedResearchResult,
   kernelFinalizeResearchEvaluation,
   kernelMarketObjectExists,
   kernelReadMarketTrajectoryResult,
@@ -106,6 +107,7 @@ import {
   bootstrapPackagedDockProfiles,
   closeAgentSessionRow,
   disposeAgentOs,
+  deliverToAgentSession,
   admitAndStartSession,
   startPrecreatedNativeTuiSession,
   isAgentOsBootSupported,
@@ -1244,10 +1246,10 @@ app.whenReady().then(async () => {
         setTimeout(() => {
           void (async () => {
             try {
-              closeAdmittedSession(change.workerSessionId);
               const hypothesisId = researchHypothesisForSession(change.delegatorSessionId);
               if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
-              const run = kernelRunGuidedResearch(change.delegatorSessionId, hypothesisId, change.artifactId);
+              const run = kernelRunGuidedResearch(change.workerSessionId, hypothesisId, change.artifactId);
+              closeAdmittedSession(change.workerSessionId);
               if (!run) {
                 closeAdmittedSession(change.delegatorSessionId);
                 return;
@@ -1268,24 +1270,36 @@ app.whenReady().then(async () => {
                   }),
                 },
               );
-              const criticInstruction = buildMissionActivationInstruction(
-                `review-${run.runId}`,
-                [
-                  "Independently review this completed deterministic QuantFlow research run.",
-                  `hypothesis_id=${run.hypothesisId}`,
-                  `run_id=${run.runId}`,
-                  `artifact_id=${run.artifactId}`,
-                  `metrics=${JSON.stringify(run.metrics)}`,
-                  "Read exactly those Hypothesis, Run, and Artifact objects with generated QuantFlow ontology tools; do not query unrelated objects.",
-                  "Then call qf_record_evaluation exactly once with those exact ids, a verdict of supports|rejects|inconclusive, numeric confidence from 0 through 1, a non-empty rationale, and non-empty plain-text findings.",
-                ].join("\n"),
-                "orchestrator",
-              );
               await startPrecreatedSessionWithTile(
                 { sessionId: change.delegatorSessionId, role: "orchestrator" },
                 criticSessionId,
-                criticInstruction,
               );
+              await kernelContinueGovernedResearchResult({
+                source_task_id: change.taskId,
+                hypothesis_id: run.hypothesisId,
+                run_id: run.runId,
+                result_artifact_id: run.artifactId,
+                executor_session_id: change.workerSessionId,
+                critic_session_id: criticSessionId,
+                attempt_id: `review-${run.runId}`,
+                deliver: async (reviewTaskId, sourceWork) => {
+                  const criticInstruction = buildMissionActivationInstruction(
+                    reviewTaskId,
+                    [
+                      "Independently review this completed deterministic QuantFlow research run.",
+                      `review_task_id=${reviewTaskId}`,
+                      `source_work=${JSON.stringify(sourceWork)}`,
+                      `metrics=${JSON.stringify(run.metrics)}`,
+                      "Read exactly those Hypothesis, Run, and Artifact objects with generated QuantFlow ontology tools; do not query unrelated objects.",
+                      "Then call qf_record_evaluation exactly once with those exact ids, a verdict of supports|rejects|inconclusive, numeric confidence from 0 through 1, a non-empty rationale, and non-empty plain-text findings.",
+                    ].join("\n"),
+                    "orchestrator",
+                  );
+                  if (!deliverToAgentSession(criticSessionId, criticInstruction)) {
+                    throw new Error("governed review instruction delivery failed");
+                  }
+                },
+              });
               mainWindow?.webContents.send("qf:dock:invalidate");
               mainWindow?.webContents.send("shell:forward", "canvas", "handoffs-changed");
             } catch (error) {

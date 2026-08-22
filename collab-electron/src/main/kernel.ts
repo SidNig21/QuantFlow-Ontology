@@ -531,6 +531,84 @@ export function kernelMarkGovernedDelivery(reviewTaskId: string, outcome: "deliv
   markGovernedDelivery(getKernelDb(), reviewTaskId, outcome, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
 }
 
+export type GovernedResearchContinuationInput = {
+  source_task_id: string;
+  hypothesis_id: string;
+  run_id: string;
+  result_artifact_id: string;
+  executor_session_id: string;
+  critic_session_id: string;
+  attempt_id: string;
+  deliver: (reviewTaskId: string, sourceWork: SourceWork) => Promise<void>;
+};
+
+export type GovernedResearchContinuationResult = {
+  review_task_id: string;
+  source_work: SourceWork;
+  outcome: "delivered" | "failed";
+};
+
+/**
+ * The one normal-result continuation seam for the governed research chain.
+ * Delivery is deliberately the only callback: all Kernel boundaries remain
+ * Main-owned and the caller cannot manufacture review truth.
+ */
+export async function kernelContinueGovernedResearchResult(
+  input: GovernedResearchContinuationInput,
+): Promise<GovernedResearchContinuationResult> {
+  const sourceWork: SourceWork = {
+    source_task_id: input.source_task_id,
+    hypothesis_id: input.hypothesis_id,
+    run_id: input.run_id,
+    result_artifact_id: input.result_artifact_id,
+    executor_session_id: input.executor_session_id,
+  };
+  if (
+    Object.values(sourceWork).some((value) => value.length === 0) ||
+    input.critic_session_id.length === 0 ||
+    input.attempt_id.length === 0
+  ) {
+    throw new Error("governed research continuation requires non-empty identities");
+  }
+
+  kernelBindSourceWork(sourceWork);
+  const admission = kernelRequestGovernedReview(
+    sourceWork.source_task_id,
+    input.attempt_id,
+    input.critic_session_id,
+  );
+  if (
+    admission.kind !== "admitted" ||
+    typeof admission.review_task_id !== "string" ||
+    admission.review_task_id.length === 0 ||
+    !admission.source_work ||
+    JSON.stringify(admission.source_work) !== JSON.stringify(sourceWork) ||
+    admission.critic_session_id !== input.critic_session_id
+  ) {
+    throw new Error("governed research review admission did not return the exact review Task and source work");
+  }
+
+  const frozenSourceWork = kernelFreezeSourceWork(sourceWork.source_task_id);
+  let outcome: "delivered" | "failed" = "delivered";
+  let deliveryFailed = false;
+  let deliveryError: unknown;
+  try {
+    await input.deliver(admission.review_task_id, frozenSourceWork);
+  } catch (error) {
+    outcome = "failed";
+    deliveryFailed = true;
+    deliveryError = error;
+  } finally {
+    kernelMarkGovernedDelivery(admission.review_task_id, outcome);
+  }
+  if (deliveryFailed) throw deliveryError;
+  return {
+    review_task_id: admission.review_task_id,
+    source_work: frozenSourceWork,
+    outcome,
+  };
+}
+
 export function kernelRecordGovernedToolReceipt(args: Parameters<typeof recordGovernedToolReceipt>[1]): void {
   recordGovernedToolReceipt(getKernelDb(), args, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
 }

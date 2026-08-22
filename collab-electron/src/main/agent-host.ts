@@ -134,6 +134,35 @@ const live = new Map<string, LiveSession>();
 const chunkListeners = new Set<ChunkListener>();
 const doneListeners = new Set<DoneListener>();
 
+export function createNativeTuiTeardownRegistry(
+  teardown: (entry: NativeTuiLive) => Promise<void> = tearDownNativeTui,
+): {
+  begin: (sessionId: string, entry: NativeTuiLive) => Promise<void>;
+  awaitAll: () => Promise<void>;
+} {
+  const inFlight = new Map<string, Promise<void>>();
+
+  const begin = (sessionId: string, entry: NativeTuiLive): Promise<void> => {
+    const existing = inFlight.get(sessionId);
+    if (existing) return existing;
+    const promise = teardown(entry).finally(() => {
+      if (inFlight.get(sessionId) === promise) inFlight.delete(sessionId);
+    });
+    inFlight.set(sessionId, promise);
+    return promise;
+  };
+
+  const awaitAll = async (): Promise<void> => {
+    while (inFlight.size > 0) {
+      await Promise.allSettled([...inFlight.values()]);
+    }
+  };
+
+  return { begin, awaitAll };
+}
+
+const nativeTuiTeardowns = createNativeTuiTeardownRegistry();
+
 /** Process-local host boundary used by Kernel-captured Task delivery. */
 export function hasLiveAgentSession(sessionId: string): boolean {
   return live.has(sessionId);
@@ -1001,9 +1030,10 @@ export function closeAgentSessionRow(sessionId: string): void {
     return;
   }
   entry.unsub?.();
-  live.delete(sessionId);
   if (entry.kind === "native_tui") {
-    void tearDownNativeTui(entry as NativeTuiLive).catch(() => {});
+    const teardown = nativeTuiTeardowns.begin(sessionId, entry as NativeTuiLive);
+    live.delete(sessionId);
+    void teardown.catch(() => {});
   } else if (entry.kind === "host_acp" && entry.hostAcp) {
     cancelPendingPermissions(sessionId);
     void tearDownHostAcp(entry.hostAcp).catch(() => {});
@@ -1018,12 +1048,13 @@ export function closeAgentSessionRow(sessionId: string): void {
 export async function disposeAgentOs(): Promise<void> {
   for (const [id, entry] of live) {
     if (entry.kind === "native_tui") {
-      await tearDownNativeTui(entry as NativeTuiLive).catch(() => {});
+      await nativeTuiTeardowns.begin(id, entry as NativeTuiLive).catch(() => {});
     } else if (entry.kind === "host_acp" && entry.hostAcp) {
       await tearDownHostAcp(entry.hostAcp).catch(() => {});
     }
     live.delete(id);
   }
+  await nativeTuiTeardowns.awaitAll();
   if (!os) return;
   const current = os;
   os = null;

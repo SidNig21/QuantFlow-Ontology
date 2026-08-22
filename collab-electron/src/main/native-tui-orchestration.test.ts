@@ -1,10 +1,45 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
+import { Database } from "bun:sqlite";
 import {
   orchestrateNativeTuiAdmission,
   type NativeTuiLive,
   type NativeTuiOrchestrationDependencies,
 } from "./native-tui-orchestration";
 import { PeerRoleRegistry } from "./peer-role-registry";
+
+class BunDatabaseSync {
+  private readonly database: Database;
+
+  constructor(path: string) {
+    this.database = new Database(path);
+  }
+
+  prepare(sql: string) {
+    return this.database.prepare(sql);
+  }
+
+  exec(sql: string) {
+    return this.database.exec(sql);
+  }
+}
+
+mock.module("node:sqlite", () => ({ DatabaseSync: BunDatabaseSync }));
+mock.module("electron", () => ({
+  app: { getPath: () => "", isPackaged: false },
+  BrowserWindow: { getAllWindows: () => [] },
+  webContents: { fromId: () => null },
+  ipcMain: { handle: () => {}, on: () => {}, removeHandler: () => {} },
+  utilityProcess: {},
+  powerMonitor: {},
+  shell: {},
+  dialog: {},
+  Menu: {},
+  nativeTheme: {},
+  net: {},
+  protocol: {},
+  screen: {},
+  session: {},
+}));
 
 function harness(opts?: {
   failCommand?: string;
@@ -78,6 +113,27 @@ const admission = {
 };
 
 describe("orchestrateNativeTuiAdmission", () => {
+  test("shutdown awaits a detached native-TUI teardown", async () => {
+    const { createNativeTuiTeardownRegistry } = await import("./agent-host");
+    let release!: () => void;
+    const teardownFinished = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let shutdownFinished = false;
+    const registry = createNativeTuiTeardownRegistry(async () => teardownFinished);
+    const entry = { kind: "native_tui", ptySessionId: "pty-detached" } as NativeTuiLive;
+
+    registry.begin("session-detached", entry);
+    const shutdown = registry.awaitAll().then(() => {
+      shutdownFinished = true;
+    });
+    await Promise.resolve();
+    expect(shutdownFinished).toBe(false);
+    release();
+    await shutdown;
+    expect(shutdownFinished).toBe(true);
+  });
+
   test("create failure leaves no process-local or Kernel compensation residue", async () => {
     const h = harness({ failCommand: "create_agent_session" });
     await expect(
