@@ -118,6 +118,8 @@ consumer-artifact-read-reader-findings: fresh Luna Reader task `01a02976-5b02-79
 current-door: exact `GOVERNED ARTIFACT READ READER DEFECT CLOSURE — immutable verification and exact consumer evidence` requires the same fresh Reader's corrected reread YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority
 consumer-artifact-read-reader-receipt: fresh Luna Reader task `01a02976-5b02-7961-9329-bd3d8b151fb6`; initial NO/NO defects all landed; corrected reread at pushed docs head `e8b7ad3459be7c3928d630fa14eef8b3ecf532e6` returned final YES/YES
 current-door: exact `NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes` bounded Builder repair is authorized; no replacement build, consumer relaunch, or R17 authority before a fresh independent PASS
+consumer-artifact-read-builder-matrix-red: focused gateway contract exactly `6 pass / 0 fail` and Builder matrix rows 1–9 green; row 10 stopped on seven Router-authored trailing spaces in committed `evidence/r16/CONSUMER-CHECK.md`; no candidate/report/falsifier/build/app launch exists yet
+current-door: docs-only whitespace correction committed without staging Builder product bytes; the same Builder may continue at row 10, then run the exact falsifier/restoration and finish its report/candidate; no row 1–9 retry, replacement build, consumer relaunch, or R17 authority
 
 ## Authorized outcome
 

@@ -4898,3 +4898,22 @@ falsifier/restoration; one exact fresh build identity; and one append-only
 Attempt 2 consumer receipt from a sole critic and Mission. Every gate has a
 named red. The same fresh Reader must reread this closure and answer the exact
 two protocol questions before the Builder door opens.
+
+### BUILDER MATRIX RED — Router consumer-receipt whitespace
+
+The authorized Builder reached the exact focused `6 pass / 0 fail` and passed
+matrix rows 1 through 9 unchanged. Row 10,
+`git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD`, correctly stopped on
+seven trailing-space lines in the Router-owned, already committed
+`docs/orders/evidence/r16/CONSUMER-CHECK.md`. Those spaces came from Markdown
+hard-break formatting in Attempt 1; they predate and are outside the Builder's
+product scope. The Router removed only those seven line-ending spaces and
+committed that docs-only correction while leaving every uncommitted Builder
+product/generated-Atlas byte untouched.
+
+This is a prerequisite-receipt correction, not a product rework or assertion
+change. The same Builder is authorized to continue from matrix row 10 only,
+then perform the exact four-file falsifier/restoration, append the complete
+Builder report including rows 1–9 and this row-10 continuation, commit, and
+push. Rows 1–9 are not rerun. Any row-10 red after the Router correction, any
+falsifier/restoration red, or any additional scope change stops the repair.

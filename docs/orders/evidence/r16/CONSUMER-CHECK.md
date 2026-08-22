@@ -2,13 +2,13 @@
 
 ## Attempt 1 — RED: governed critic cannot inspect result Artifact bytes
 
-Date: 2026-08-22  
-Candidate: `7dda122435dce47adbc650e5d5b9d933db249263`  
-Builder evidence: `d9f112993e68dbf2b7efbfa743c5e6cfe76d7a14`  
-Independent verification: `eaa3dee652e30ca27aad555efba88a34a2dc050f`  
-Build command: `bun run --cwd collab-electron build`  
-Build timestamp: `2026-08-22T11:50:40.8281398Z`  
-Visible masthead: exact candidate SHA and build timestamp  
+Date: 2026-08-22
+Candidate: `7dda122435dce47adbc650e5d5b9d933db249263`
+Builder evidence: `d9f112993e68dbf2b7efbfa743c5e6cfe76d7a14`
+Independent verification: `eaa3dee652e30ca27aad555efba88a34a2dc050f`
+Build command: `bun run --cwd collab-electron build`
+Build timestamp: `2026-08-22T11:50:40.8281398Z`
+Visible masthead: exact candidate SHA and build timestamp
 Mode: normal `electron-vite preview --skipBuild`; no proof bridge, SQLite seed,
 credential access, or packaged/release gate
 
