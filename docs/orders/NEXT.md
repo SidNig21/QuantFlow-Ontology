@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER CROSS-MISSION WORLD ISOLATION - FRESH READER REQUIRED
+status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - FRESH READER REQUIRED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -110,6 +110,10 @@ normal-reopen-verifier-receipt: product candidate `5445578508e3b76f107e5c3ed40ea
 consumer-cross-mission-red: normal app Mission `mission-235c12f6-459d-4f45-9094-8adba252e839` completed Director/executor/critic review and published Report, but its exact Show research world pointer followed a reused result Artifact into historical Missions and left a 52-tile canvas instead of one 13-object/15-cable Mission-local world
 consumer-cross-mission-reader-receipt: fresh adversarial Reader reread the final subsection and its closure at pushed docs head `abd9a5b13c4ae4696b77ae6346b607cc9fff0424`; final YES/YES; bounded Builder door opens with no consumer relaunch, replacement build, or R17 authority before independent PASS
 current-door: exact `NORMAL CONSUMER READER DEFECT CLOSURE — executable collision falsifier and exact consumer receipt` is Builder-authorized after final Reader YES/YES; no replacement build, consumer relaunch, or R17 authority until independent PASS
+consumer-shared-world-candidate: immutable product candidate `7dda122435dce47adbc650e5d5b9d933db249263`; Builder evidence `d9f112993e68dbf2b7efbfa743c5e6cfe76d7a14`; fresh independent Verifier PASS/evidence `eaa3dee652e30ca27aad555efba88a34a2dc050f`; exact 15-row matrix and shared-Artifact falsifier/restoration green
+consumer-shared-world-build: exact `bun run --cwd collab-electron build` completed Main/preload/renderer; build timestamp `2026-08-22T11:50:40.8281398Z`; normal app visibly matched full candidate identity
+consumer-artifact-read-red: normal Computer Use run created one real Mission, deterministic Run, result Artifact with ROI `1.000000`, and independent governed critic; `qf_artifact_get` exposed metadata but not the existing hash-verified result receipt, so the critic honestly rejected for absent evidence, publication stayed blocked, and the source Task projected 12 objects/14 links; three terminal canaries and ordinary Windows/WSL cleanup were green; exact RED receipt is `evidence/r16/CONSUMER-CHECK.md`
+current-door: exact `NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes` requires fresh Reader YES/YES; no Builder, replacement build, consumer relaunch, or R17 authority before the bounded repair receives independent PASS
 
 ## Authorized outcome
 

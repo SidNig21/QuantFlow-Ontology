@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer cross-Mission world isolation - fresh Reader required
+status: normal consumer governed Artifact read repair - fresh Reader required
 assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -4608,3 +4608,149 @@ one immutable independent-verification receipt, and one exact normal-consumer
 receipt. A fresh Reader must reread the final subsection and this closure and
 answer exactly the two protocol questions. Only final YES/YES opens the
 bounded Builder door.
+
+## NORMAL CONSUMER RED — governed critic cannot inspect result Artifact bytes
+
+The immutable shared-world candidate
+`7dda122435dce47adbc650e5d5b9d933db249263` passed its fresh independent
+Verifier at evidence commit `eaa3dee652e30ca27aad555efba88a34a2dc050f`.
+The Router built that exact candidate once with the valid command and used the
+normal application through Computer Use. The startup compatibility repair,
+mouse interaction, three normal Hermes terminal canaries, deterministic Run,
+governed review admission, broker read sequence, rejection enforcement, and
+ordinary shutdown all worked. The exact RED receipt is
+`docs/orders/evidence/r16/CONSUMER-CHECK.md`.
+
+The consumer check exposed one later product defect. Governed critic
+`e213c9db-fe51-4b89-8286-b1a2ba468233` called the required
+`qf_hypothesis_get`, `qf_run_get`, and `qf_artifact_get` tools. The Artifact
+read returned only its Kernel row metadata. It did not return the hash-verified
+immutable JSON payload already exposed by R16's existing `artifactReceipt()`
+projection boundary. The stored result Artifact contains ROI `1.000000` and
+net profit `100.000000`, but the critic could not inspect those facts. It
+honestly recorded Evaluation `36fa58e5-6fc5-498a-823a-b19207d1c09e` as
+`rejects`, so publication was correctly blocked. The source Task projection is
+therefore exactly 12 objects/14 links: the intended positive 13/15 world minus
+the Report and its publication link.
+
+This section supersedes only the next repair and replacement-consumer
+mechanics. Every ontology, 13-object/15-cable, pointer interaction, terminal
+typing, reopen, and cleanup assertion remains unchanged. A positive verdict may
+not be manufactured, the critic may not receive filesystem/path access, and
+publication gating may not be weakened.
+
+### Bounded product repair
+
+Repair only the governed Artifact read boundary:
+
+1. Export and reuse the existing R16 `artifactReceipt()` implementation from
+   `collab-electron/src/main/research-world-projection.ts`. Do not create a
+   second byte reader or a second receipt meaning.
+2. For an admitted governed critic's exact `qf_artifact_get` call,
+   `callOntologyReadTool()` must return the normal Artifact row plus a
+   `receipt` produced by that shared implementation. The same enriched result
+   must be recorded in `qf_review_invocation`; the critic's review trajectory
+   and the later audit must observe identical evidence.
+3. The receipt retains the already-accepted R16 meanings: it verifies the
+   content hash before exposing a bounded UTF-8 preview; missing, tampered,
+   oversized, or invalid-UTF-8 content exposes no unverified bytes and retains
+   its exact unavailable/failure receipt. No raw path or credential is exposed.
+4. Non-Artifact reads and non-governed callers retain their current behavior.
+   Task, Evaluation, publication, ontology, and Kernel write semantics do not
+   change.
+
+Allowed Builder paths are exactly:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/ontology-gateway.ts
+collab-electron/src/main/ontology-gateway.test.ts
+collab-electron/src/main/governed-review.test.ts
+docs/orders/evidence/r16/BUILD-REPORT.md
+qf-atlas/atlas.json
+qf-atlas/atlas.md
+qf-atlas/atlas.html
+```
+
+`governed-review.test.ts` may change only if the existing focused gateway seam
+cannot prove that the exact enriched result is durably recorded. No other
+product, test, order, evidence, founder-state, build-output, package, or R17
+path is authorized.
+
+### Exact acceptance and falsifier
+
+Run these commands once each, in order, with native exits:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test collab-electron/src/main/research-world.test.ts
+bun test collab-electron/src/main/governed-review.test.ts
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+All native exits must be zero. The focused gateway test must prove all of the
+following with explicit assertions:
+
+- a hash-valid small JSON Artifact gives an admitted governed critic the exact
+  verified receipt preview;
+- the corresponding `qf_review_invocation.result` is exactly that enriched
+  result, not the old metadata-only row;
+- missing, tampered, oversized, and invalid-UTF-8 Artifact bytes never surface
+  unverified payload content and retain the shared R16 receipt meanings; and
+- the Hypothesis and Run governed reads and a non-governed Artifact read remain
+  unchanged.
+
+The executable falsifier is exact. After committing the candidate and recording
+the SHA-256 hashes of the three allowed product/test files, temporarily replace
+only `collab-electron/src/main/ontology-gateway.ts` with that file's bytes from
+base `7dda122435dce47adbc650e5d5b9d933db249263`. Run only:
+
+```text
+bun test collab-electron/src/main/ontology-gateway.test.ts
+```
+
+It must exit nonzero and name the absent Artifact receipt or unequal recorded
+broker result. Restore the exact candidate file, require zero diff for all
+three product/test paths against the candidate, and rerun the focused gateway
+test green. A green mutation run, a test-count reduction, an assertion change,
+or any unverified payload exposure is red.
+
+A fresh independent Verifier freezes the product candidate, reruns the exact
+nine-command matrix and falsifier/restoration, and writes a PASS only if
+product/test bytes remain unchanged. Atlas must remain current with HARD RED 0.
+No build or normal application launch occurs before that PASS.
+
+### Replacement normal consumer check
+
+After independent PASS, the Router performs exactly one fresh build with
+`bun run --cwd collab-electron build`, verifies the output identity, and runs a
+fresh normal two-launch Computer Use check. The failed `7dda122` build and
+consumer attempt do not count as either launch for the replacement candidate.
+
+The first launch creates exactly one guided Mission total. The real critic must
+use the three governed reads and its Artifact read must visibly contain the
+same verified payload/preview recorded in its broker receipt. For the guided
+settled-results sample, its rationale must be grounded in the actual metrics.
+If that real critic still rejects or is inconclusive after seeing the exact
+payload, stop and record its reason—do not override it. A supporting Evaluation
+must publish through the unchanged gate and reveal the exact Mission-local
+13-object/15-cable world. The existing ten pointer Inspect/Collapse receipts,
+three terminal canaries, no-submission rule, close/reopen equality, and zero
+Windows/WSL cleanup bar remain exact.
+
+Every gate can fail: the focused test fails on absent or dishonest receipt
+content, the base-file falsifier must restore the metadata-only defect, the
+unchanged world/review tests retain their native reds, Atlas/diff checks retain
+their native failure meanings, and the real consumer check fails on an
+unsupported verdict, absent Report, wrong world, reopen delta, or cleanup
+residue. Every deliverable has one meaning: one shared verified Artifact
+receipt, one governed critic response and identical broker record, one bounded
+falsifier/restoration, one independent PASS, and one replacement consumer PASS.
+A fresh Reader must answer exactly: can each acceptance gate actually fail,
+and does each deliverable have exactly one meaning. Only final YES/YES opens
+this bounded Builder door.
