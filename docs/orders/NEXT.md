@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: REWRITE READER REQUIRED - BUILDER DOOR CLOSED
+status: REWRITE BUILD AUTHORIZED - READER YES/YES
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -10,7 +10,7 @@ prerequisite-receipt: Atlas v1 founder-accepted at `7889074f10e089d450e307a2c6af
 standing-authority: diagnose and repair in-scope delivery defects without further founder prompts
 reader-receipt: fresh Luna Reader task `01a026f2-c77f-7070-af3c-cdb6898d8bda`; final YES/YES at `e7b7142bce31314d4955677f3e9e5104343f59eb`
 rewrite-receipt: original candidate `388d8f25f3b6e1c378ec1bb80c1015e698b11b3a` independently FAIL; rework exhausted on repeated cleanup residue; exact non-candidate prototype preserved at `a9420ec0697fe587e619fd88c3839ee3a88da6ad`
-rewrite-reader-receipt: pending
+rewrite-reader-receipt: fresh Luna Reader task `01a02720-0fd6-7982-88e5-533616d042e6`; final YES/YES at `0700b778a27cc1149fd6fdcdd4a89b2ac78062d8`
 
 ## Authorized outcome
 
@@ -29,9 +29,8 @@ A fresh Reader read `START_HERE.md`, `docs/orders/PROTOCOL.md`, this file, and
 
 Every original-order defect landed in `WO-R16.md`; chat-only guidance was not
 accepted. The YES/YES at `e7b7142` opened the original Builder door. That lap is
-now exhausted and does not authorize the appended rewrite. One new fresh Reader
-must answer the same two questions against the rewrite at the end of `WO-R16.md`;
-only its YES/YES opens the fresh Builder door.
+exhausted and does not authorize the appended rewrite. The fresh rewrite Reader
+answered YES/YES at `0700b77`, so the bounded fresh Builder door is open.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 
@@ -53,8 +52,8 @@ completed under the existing [Atlas v1 founder contract](../goals/atlas-delete-a
    now requires a fresh YES/YES Reader.
 
 This is a bounded prerequisite, not a new product rung or a competing ladder.
-R16 remains the one active product rung. Only the bounded rewrite Reader is
-authorized until it returns YES/YES; no Builder or R17 work starts before then.
+R16 remains the one active product rung. Only the bounded rewrite implementation
+is authorized; no R17 work starts from this file.
 
 ## Stop
 
