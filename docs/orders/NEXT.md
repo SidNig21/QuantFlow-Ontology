@@ -130,6 +130,8 @@ consumer-artifact-read-build-receipt: corrected build at product candidate `9918
 consumer-rubric-schema-red: normal Computer Use Attempt 2 created one Mission, completed the exact three governed reads with the repaired Artifact receipt, and the sole critic reasoned toward `supports`; five Evaluation writes failed because the generated MCP rubric schema exposed an untyped generic object and the live tool supplied comma/numeric strings; Evaluation/Report remained zero; Director/critic canaries passed, executor canary was missed, no reopen was attempted, and all Windows/WSL product processes closed to zero
 numeric-rubric-reader-receipt: fresh Luna Reader task `01a029a0-833d-71b1-9003-7df3e79f28e9`; finite order defects landed in docs commit `ee9c6cd8110055c7bb52994bc75097b0294947a9`; corrected reread final YES/YES with doc-links, rung-ladder, and git diff --check green
 current-door: exact numeric-rubric Builder is authorized on Reader-approved docs head; no rebuild, consumer retry, or R17 authority before immutable candidate and fresh independent PASS
+numeric-rubric-builder-receipt: immutable product candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`; Builder evidence `c8c686997849c6df080f50cea24c5ce0f7b81b8c`; exact matrix green (`178/0` schema, `6/0` gateway, `4/0` governed-review), generic-schema falsifier red, restoration exact, Atlas HARD RED 0, tree clean and pushed
+current-door: fresh independent Verifier must freeze candidate `e94e544b1275958d22b3826dfec43bbfcae71c3f`, run the exact nine-row immutable matrix and falsifier/restoration, and write PASS or stop on RED; no rebuild, consumer Attempt 3, or R17 authority before PASS
 
 ## Authorized outcome
 
