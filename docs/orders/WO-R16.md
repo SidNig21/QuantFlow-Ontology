@@ -718,12 +718,24 @@ The same rewrite Builder may additionally change only:
 - `tools/qf-proof-agent/dock-profiles.json`, adding `display_name:
   "Orchestrator"` to `qf-proof-orchestrator` and `display_name:
   "Market Researcher"` to `qf-proof-worker`; and
+- `tools/runtime-proof/dock-profiles.json`, adding `display_name:
+  "Market Researcher"` to `qf-toolloop`; and
 - `collab-electron/src/main/dock-profiles.test.ts`, adding one focused test that
-  calls production discovery against the actual repository root with proof
-  fixtures enabled and asserts those two exact ids/display names are accepted.
+  reads the two actual checked-in QA manifest files and asserts those three
+  exact ids/display names. It does not synthesize a replacement manifest or
+  require an ignored package artifact to exist; full discovery is exercised by
+  the live launch below.
 
-The new focused test must fail against the pre-repair manifest and pass after
-the two fields are added. No manifest id, role, runtime profile, prompt,
+Because `tools/runtime-proof/packed/qf-toolloop.aospkg` is an intentionally
+ignored generated artifact required by QA-mode Dock discovery, the live gate
+may invoke only the existing `tools/runtime-proof` `pack-agent` script once
+before its first Electron launch. The native nonzero exit is red, the generated
+package must exist afterward, and this preparation remains inside the unchanged
+60-second outer deadline. Do not add a packer, wrapper, cache, or committed
+package.
+
+The new focused test must fail against the pre-repair manifests and pass after
+the three fields are added. No manifest id, role, runtime profile, prompt,
 capability, package, discovery rule, display-name allowlist, R16 assertion,
 deadline, or other file may change. After this prerequisite is green, resume
 the existing W1-W4 rewrite and acceptance exactly where it stopped.
