@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "e08dce5",
+    "commit": "61243c3",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "d9f6b1cf8284a0b2"
+    "fingerprint": "39c6d7528bb4e9d2"
   },
   "stats": {
     "live": 111,
@@ -1084,7 +1084,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 37.5,
+      "kb": 37.8,
       "x": -1.01,
       "z": -0.85,
       "status": "gray",
@@ -1095,7 +1095,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 33.2,
+          "kb": 33.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2008,7 +2008,7 @@
       "id": "2:collab-electron/src/main::pty",
       "layer": 2,
       "name": "pty*",
-      "kb": 36.5,
+      "kb": 36.6,
       "x": 0.23,
       "z": -1.3,
       "status": "ok",
@@ -2019,7 +2019,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/pty.ts",
-          "kb": 34.4,
+          "kb": 34.5,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 4,
@@ -11416,9 +11416,9 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports startPrecreatedNativeTuiSession() at line 620",
-            "exports cancelAgentSession() at line 1003",
-            "exports closeAgentSessionRow() at line 1052"
+            "exports startPrecreatedNativeTuiSession() at line 626",
+            "exports cancelAgentSession() at line 1009",
+            "exports closeAgentSessionRow() at line 1058"
           ],
           "strong": [],
           "weight": "weak"
@@ -11457,7 +11457,7 @@
         {
           "file": "collab-electron/src/main/agent-host.ts",
           "weak": [
-            "exports admitAndStartSession() at line 551"
+            "exports admitAndStartSession() at line 557"
           ],
           "strong": [],
           "weight": "weak"
@@ -11585,9 +11585,9 @@
         {
           "file": "collab-electron/src/main/pty.ts",
           "weak": [
-            "exports killSession() at line 1034",
-            "exports killAll() at line 1080",
-            "exports killAllAndWait() at line 1101"
+            "exports killSession() at line 1035",
+            "exports killAll() at line 1081",
+            "exports killAllAndWait() at line 1102"
           ],
           "strong": [],
           "weight": "weak"
@@ -16421,7 +16421,7 @@
       "packaging": "indexed",
       "ownership": "indexed",
       "reasons": {
-        "ipcRequest": "1 channel name(s) built from a variable or template (line 1292)",
+        "ipcRequest": "1 channel name(s) built from a variable or template (line 1293)",
         "ipcPush": "1 push channel name(s) built from a variable or template",
         "persistence": "no SQL DML or DDL in this file"
       },
@@ -55434,7 +55434,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/pty.ts",
-          "line": 1317,
+          "line": 1318,
           "kind": "helper"
         }
       ],
@@ -55990,7 +55990,7 @@
     },
     {
       "file": "collab-electron/src/main/pty.ts",
-      "line": 1292,
+      "line": 1293,
       "why": "push channel name is a variable or template literal, not resolvable from text",
       "coverage": "dynamic"
     }
@@ -56636,7 +56636,7 @@
           "type": "static",
           "file": "collab-electron/src/main/agent-host.ts",
           "lines": [
-            481
+            487
           ]
         }
       ]
@@ -58447,12 +58447,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "c84f9e9",
+      "commit": "e08dce5",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "e08dce5",
+      "commit": "61243c3",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",

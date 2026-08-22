@@ -209,14 +209,20 @@ export async function submitAgentSessionInstruction(
   const text = instruction.slice(0, -1);
 
   requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
-  writeToSession(capturedPtySessionId, text);
+  const textAccepted = writeToSession(capturedPtySessionId, text);
   requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
+  if (!textAccepted) {
+    throw new Error("governed review critic instruction write was not accepted");
+  }
 
   await new Promise((resolve) => setTimeout(resolve, HERMES_INPUT_SETTLE_MS));
 
   requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
-  writeToSession(capturedPtySessionId, "\r");
+  const submitAccepted = writeToSession(capturedPtySessionId, "\r");
   requireLiveNativeTuiTarget(sessionId, capturedPtySessionId);
+  if (!submitAccepted) {
+    throw new Error("governed review critic submit write was not accepted");
+  }
 }
 
 function newTrace(): TraceContext {

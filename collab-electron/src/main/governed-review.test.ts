@@ -19,11 +19,11 @@ type TestLiveEntry = {
 
 let testLiveSet: ((sessionId: string, entry: TestLiveEntry) => void) | null = null;
 let testLiveDelete: ((sessionId: string) => void) | null = null;
-let testPtyWriteHook: ((sessionId: string, data: string) => void) | null = null;
+let testPtyWriteHook: ((sessionId: string, data: string) => boolean) | null = null;
 
 mock.module("./pty", () => ({
   writeToSession: (sessionId: string, data: string) => {
-    testPtyWriteHook?.(sessionId, data);
+    return testPtyWriteHook?.(sessionId, data) ?? true;
   },
 }));
 
@@ -170,14 +170,16 @@ describe("R15 production governed-review seams", () => {
 
     try {
       const session = (id: string, definitionId: string, role: string, groups: string[], actor?: string) => {
-        kernelExecute("register_agent_definition", {
-          name: definitionId,
-          role,
-          package_ref: "species/hermes/packed/hermes.aospkg",
-          runtime_profile: "default",
-          capability_groups: groups,
-          display_name: role === "critic" ? "Critic" : role === "orchestrator" ? "Research Director" : "Market Researcher",
-        }, trace());
+        if (!db.query("SELECT 1 AS ok FROM agent_definition WHERE id = ?").get(definitionId)) {
+          kernelExecute("register_agent_definition", {
+            name: definitionId,
+            role,
+            package_ref: "species/hermes/packed/hermes.aospkg",
+            runtime_profile: "default",
+            capability_groups: groups,
+            display_name: role === "critic" ? "Critic" : role === "orchestrator" ? "Research Director" : "Market Researcher",
+          }, trace());
+        }
         kernelExecute("create_agent_session", { session_id: id, agent_definition_id: definitionId, label: id }, {
           ...trace(),
           ...(actor ? { actor_session_id: actor } : {}),
@@ -224,6 +226,7 @@ describe("R15 production governed-review seams", () => {
       let deliveredInstruction = "";
       testPtyWriteHook = (sessionId, data) => {
         writes.push({ sessionId, data, at: performance.now() });
+        return true;
       };
       const continuation = await kernelContinueGovernedResearchResult({
         source_task_id: task.object_id,
@@ -244,6 +247,9 @@ describe("R15 production governed-review seams", () => {
           deliveries.push({ reviewTaskId, sourceWork });
         },
       });
+      if (writes[1]?.data !== "\r") {
+        throw new Error("governed review critic submit write was not accepted");
+      }
       expect(writes.map(({ sessionId, data }) => ({ sessionId, data }))).toEqual([
         { sessionId: "pty-critic-continuation", data: deliveredInstruction.slice(0, -1) },
         { sessionId: "pty-critic-continuation", data: "\r" },
@@ -259,6 +265,104 @@ describe("R15 production governed-review seams", () => {
       expect(JSON.parse(runParams.params).executor_session_id).toBe("worker-continuation");
       expect(db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'assigned_to'").all(task.object_id)).toEqual([{ to_id: "worker-continuation" }]);
       expect(db.query("SELECT COUNT(*) AS n FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt'").get(continuation.review_task_id)).toEqual({ n: 1 });
+
+      const prepareDeliveryFailureCase = (suffix: string) => {
+        const directorId = `director-${suffix}`;
+        const workerId = `worker-${suffix}`;
+        const criticId = `critic-${suffix}`;
+        session(directorId, `${directorId}-definition`, "orchestrator", ["desk.orchestrate"]);
+        session(workerId, `${workerId}-definition`, "worker", ["desk.orchestrate"]);
+        session(criticId, "hermes-critic", "critic", ["research.evaluate"], directorId);
+        const caseMission = kernelExecute("create_mission", {
+          mission_id: `mission-${suffix}`,
+          name: `Failure ${suffix} mission`,
+          objective: "Exercise a rejected governed delivery attempt.",
+        }, trace()) as { object_id: string };
+        const caseBytes = new TextEncoder().encode(JSON.stringify({
+          contract: "qf.dataset.v1",
+          suffix,
+          observations: [{ observed_at: "2026-08-22T00:00:00.000Z", edge: 1 }],
+        }));
+        const casePath = join(artifactRoot, `${suffix}.json`);
+        writeFileSync(casePath, caseBytes);
+        const caseArtifact = kernelExecute("publish_artifact", { kind: "result_set", bytes: caseBytes, storage_ref: casePath }, trace()) as { object_id: string };
+        const caseDataset = kernelExecute("register_dataset_version", {
+          kind: "results",
+          artifact_id: caseArtifact.object_id,
+          content_hash: caseArtifact.object_id,
+          as_of: "2026-08-22T00:00:00.000Z",
+          coverage: { deterministic_score_field: "edge" },
+        }, trace()) as { object_id: string };
+        const caseHypothesis = kernelExecute("create_hypothesis", {
+          claim: `The ${suffix} delivery attempt is governed.`,
+          success_criteria: "The critic must receive and submit the instruction.",
+          sources: [caseDataset.object_id],
+        }, trace()) as { object_id: string };
+        const caseTask = kernelExecute("create_task", {
+          task_id: `task-${suffix}`,
+          title: `Task ${suffix}`,
+          description: "Exercise a rejected delivery attempt.",
+          assignee_session_id: workerId,
+        }, { ...trace(), actor_session_id: directorId, mission_id: caseMission.object_id }) as { object_id: string };
+        const caseRun = kernelRunGuidedResearch(workerId, caseHypothesis.object_id, `${suffix}-evidence`);
+        expect(caseRun).not.toBeNull();
+        if (!caseRun) throw new Error(`missing ${suffix} deterministic run`);
+        return { criticId, taskId: caseTask.object_id, run: caseRun };
+      };
+
+      const runDeliveryFailureCase = async (suffix: string, falseWrite: number, message: string) => {
+        const failureCase = prepareDeliveryFailureCase(suffix);
+        await admitAndStartSession("hermes-critic", { existingSessionId: failureCase.criticId });
+        const failedWrites: Array<{ sessionId: string; data: string }> = [];
+        let writeNumber = 0;
+        testPtyWriteHook = (sessionId, data) => {
+          writeNumber += 1;
+          failedWrites.push({ sessionId, data });
+          return writeNumber !== falseWrite;
+        };
+        const instruction = buildMissionActivationInstruction(
+          "pending-review-task",
+          `Rejected ${suffix} delivery`,
+          "orchestrator",
+        );
+        const attempt = async () => kernelContinueGovernedResearchResult({
+          source_task_id: failureCase.taskId,
+          hypothesis_id: failureCase.run.hypothesisId,
+          run_id: failureCase.run.runId,
+          result_artifact_id: failureCase.run.artifactId,
+          executor_session_id: `worker-${suffix}`,
+          critic_session_id: failureCase.criticId,
+          attempt_id: `${suffix}-attempt`,
+          deliver: async (reviewTaskId) => {
+            const actualInstruction = buildMissionActivationInstruction(
+              reviewTaskId,
+              `Rejected ${suffix} delivery`,
+              "orchestrator",
+            );
+            expect(actualInstruction).toBe(instruction.replace("pending-review-task", reviewTaskId));
+            await submitAgentSessionInstruction(failureCase.criticId, actualInstruction);
+          },
+        });
+        await expect(attempt()).rejects.toThrow(message);
+        const reviewTask = db.query("SELECT task_id FROM qf_review_task WHERE source_task_id = ? ORDER BY created_at DESC LIMIT 1").get(failureCase.taskId) as { task_id: string };
+        const failedReceipt = db.query("SELECT payload FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt'").get(reviewTask.task_id) as { payload: string };
+        expect(JSON.parse(failedReceipt.payload).outcome).toBe("failed");
+        expect(db.query("SELECT COUNT(*) AS n FROM qf_review_receipt WHERE task_id = ? AND kind = 'delivery_receipt' AND json_extract(payload, '$.outcome') = 'delivered'").get(reviewTask.task_id)).toEqual({ n: 0 });
+        expect(db.query("SELECT COUNT(*) AS n FROM qf_review_invocation WHERE task_id = ?").get(reviewTask.task_id)).toEqual({ n: 0 });
+        expect(db.query("SELECT COUNT(*) AS n FROM evaluation WHERE review_task_id = ?").get(reviewTask.task_id)).toEqual({ n: 0 });
+        expect(db.query("SELECT COUNT(*) AS n FROM artifact WHERE kind = 'evaluation_findings' AND id IN (SELECT findings_artifact_id FROM evaluation WHERE review_task_id = ?)").get(reviewTask.task_id)).toEqual({ n: 0 });
+        expect(db.query("SELECT COUNT(*) AS n FROM qf_review_publication WHERE publication_evaluation_id IN (SELECT id FROM evaluation WHERE review_task_id = ?)").get(reviewTask.task_id)).toEqual({ n: 0 });
+        expect(failedWrites[0]?.sessionId).toBe(`pty-${failureCase.criticId}`);
+        expect(failedWrites[0]?.data.endsWith("\r")).toBe(false);
+        if (falseWrite === 1) expect(failedWrites).toHaveLength(1);
+        else expect(failedWrites).toEqual([
+          { sessionId: `pty-${failureCase.criticId}`, data: instruction.replace("pending-review-task", reviewTask.task_id).slice(0, -1) },
+          { sessionId: `pty-${failureCase.criticId}`, data: "\r" },
+        ]);
+      };
+
+      await runDeliveryFailureCase("first-write-false", 1, "governed review critic instruction write was not accepted");
+      await runDeliveryFailureCase("submit-write-false", 2, "governed review critic submit write was not accepted");
 
       const readReceipt = (sequence: number, toolName: "qf_hypothesis_get" | "qf_run_get" | "qf_artifact_get" | "qf_record_evaluation", args: Record<string, unknown>) => {
         kernelRecordGovernedToolReceipt({
@@ -308,6 +412,7 @@ describe("R15 production governed-review seams", () => {
             turnInFlight: false,
           });
         }
+        return true;
       };
       await expect(
         submitAgentSessionInstruction("critic-continuation", submitInstruction),
@@ -316,6 +421,7 @@ describe("R15 production governed-review seams", () => {
       await admitAndStartSession("hermes-critic", { existingSessionId: "critic-continuation" });
       testPtyWriteHook = (_sessionId, data) => {
         if (data !== "\r") testLiveDelete?.("critic-continuation");
+        return true;
       };
       await expect(
         submitAgentSessionInstruction("critic-continuation", submitInstruction),

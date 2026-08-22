@@ -974,15 +974,16 @@ export async function reconnectSession(
 export function writeToSession(
   sessionId: string,
   data: string,
-): void {
+): boolean {
   const dataSock = dataSockets.get(sessionId);
   if (dataSock && !dataSock.destroyed) {
     dataSock.write(data);
-    return;
+    return true;
   }
   const session = sessions.get(sessionId);
-  if (!session) return;
+  if (!session) return false;
   session.pty.write(data);
+  return true;
 }
 
 export function sendRawKeys(
