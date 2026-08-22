@@ -701,3 +701,33 @@ product defect outside these named seams, the Builder stops with the receipt; it
 does not widen scope. Any assertion change, deadline increase, cleanup before
 measurement, simulated reopen, or simulated failure/timeout is an immediate
 stop. No third implementation lap follows a failed rewrite.
+
+### Launch prerequisite discovered by the rewrite
+
+The rewrite stopped before fixture seeding with the exact production launch
+error
+`DockProfilesContractError: tools/qf-proof-agent/dock-profiles.json.profiles[0]
+missing required display_name`. Measurement shows the Dock manifest contract
+began requiring `display_name` at `97ed718`, while the checked-in proof-agent
+manifest was not migrated. The existing focused test creates synthetic valid
+manifests and therefore cannot catch this repository-file mismatch.
+
+This is one bounded prerequisite repair, not a third R16 implementation lap.
+The same rewrite Builder may additionally change only:
+
+- `tools/qf-proof-agent/dock-profiles.json`, adding `display_name:
+  "Orchestrator"` to `qf-proof-orchestrator` and `display_name:
+  "Market Researcher"` to `qf-proof-worker`; and
+- `collab-electron/src/main/dock-profiles.test.ts`, adding one focused test that
+  calls production discovery against the actual repository root with proof
+  fixtures enabled and asserts those two exact ids/display names are accepted.
+
+The new focused test must fail against the pre-repair manifest and pass after
+the two fields are added. No manifest id, role, runtime profile, prompt,
+capability, package, discovery rule, display-name allowlist, R16 assertion,
+deadline, or other file may change. After this prerequisite is green, resume
+the existing W1-W4 rewrite and acceptance exactly where it stopped.
+
+Plain meaning: a stale checked-in QA seat definition currently prevents the
+real app from opening, so migrate those two labels and permanently test the
+file QuantFlow actually launches.
