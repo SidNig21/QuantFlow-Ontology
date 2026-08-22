@@ -1649,8 +1649,9 @@ fail.
 ### Builder and acceptance authority
 
 A fresh Builder starts only when `808e538` is an ancestor and clean local HEAD
-equals remote `origin/wo-R16` and the exact Builder-open SHA recorded by the
-Router in `NEXT.md` after Reader YES/YES. It runs Atlas preflight, the 3-test
+equals remote `origin/wo-R16` and the exact Builder-open SHA supplied by the
+Router in the task prompt after the final Reader/NEXT/Atlas commits. The Builder
+records that supplied SHA in BUILD-REPORT. It runs Atlas preflight, the 3-test
 tile-manager file, and the 17-test R16 contract, then exactly one live
 `bun qa/run.ts research-world-visible`. Any red stops with exact focus/root/
 primary/cleanup receipts. Green resumes the exact short matrix, cheap
