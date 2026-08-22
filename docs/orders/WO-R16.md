@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer governed-review reopen compatibility - fresh Reader required
+status: normal consumer cross-Mission world isolation - fresh Reader required
 assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -4368,3 +4368,123 @@ A fresh Reader must reread the original subsection and this closure and answer
 the two protocol questions exactly. Only final YES/YES opens the bounded
 Builder door; until then this Reader makes no product/test edit, gate run,
 build, launch, founder-database access, or R17 change.
+
+## NORMAL CONSUMER RED — shared result Artifact leaks historical Missions
+
+### Measured defect
+
+The independently verified candidate and its governed-review reopen repair were
+built once as the normal founder application. The visible masthead was exact
+product SHA `5445578508e3b76f107e5c3ed40eafefd0e18319`. Computer Use started one
+guided Mission, which completed a real Director → executor → independent critic
+flow and published a Report. The exact Mission is
+`mission-235c12f6-459d-4f45-9094-8adba252e839`.
+
+The consumer then clicked that Mission's exact accessible button
+`Show research world mission mission-235c12f6-459d-4f45-9094-8adba252e839`.
+The normal projection did not yield the promised Mission-local 13-object,
+15-cable desk. Because this Run and older guided Runs reuse the same immutable
+result Artifact, the undirected closure in
+`collab-electron/src/main/research-world-projection.ts` crossed the shared
+Artifact's unrelated `produces` and `evaluated_by` edges into earlier Missions,
+Tasks, Runs, Evaluations, Reports, and sessions. The visible canvas/navigator
+contained 52 tiles. Repeated ordinary pointer activation could not isolate the
+current world. This is a product red, not a consumer-tooling red: one Mission
+does not reveal one understandable research world.
+
+The same consumer run proved the repaired critic submission path: review Task
+`review-task-e5eaca15-a692-4e70-8717-12ff79b2538c` completed after six governed
+invocations, Evaluation `b48d228a-f15a-4c1c-ad9f-6bf713595a0e` was recorded,
+and Report `7b546d5f84717b2429e52bfa3151fe249657746c782350e2d9ce50502ab88539`
+was published. Standalone normal Hermes Director, worker, and critic terminals
+also accepted visible harmless text, erased it with `Ctrl+U`, and returned
+focus to the canvas without submission. Those are progress receipts, not a
+consumer PASS. The exact order canary must still be repeated on the final
+candidate as `qf-r16-typing-check-<candidate7>`.
+
+### Authorized correction
+
+This is one bounded R16 product-fix lap. No R17 work, new ontology type, new
+durable table, fixture seed, proof bridge, package gate, installer gate,
+release gate, worktree, clone, or second checkout is authorized.
+
+1. Replace the broad undirected connected-component walk with a Mission/source-
+   Task-local projection. For an eligible Mission or source Task, select only
+   the exact root Mission, source Task, its one R15 source-work Hypothesis, Run,
+   result Artifact, Dataset, executor, the one governed review Task for that
+   source work, its one Evaluation, findings Artifact, published Report,
+   Director, and critic. Emit only the 15 semantic links among those selected
+   objects. Reuse of the same Dataset or result Artifact by any unrelated Run,
+   Evaluation, Task, or Mission must not import that unrelated world.
+2. Preserve every existing missing-lineage and ineligibility meaning. Multiple
+   source Tasks for one Mission, duplicate source-work bindings, absent review
+   completion, rejected/inconclusive publication behavior, Task-root behavior,
+   Artifact receipt integrity, exact displayed fields, and the existing
+   isolated 13/15 case must retain their current assertions.
+3. Add a real relational regression to
+   `collab-electron/src/main/research-world.test.ts`: create an older decoy
+   Mission with its own source Task, Hypothesis, Run, review Task, Evaluation,
+   Report, Director, executor, and critic, but deliberately reuse the target
+   world's exact Dataset and result Artifact. Project the target Mission and
+   require exactly its 13 objects and 15 links; require every decoy-only id
+   absent. Then project the decoy Mission and require its own exact 13/15 world
+   with every target-only id absent. The test is red against the current broad
+   closure and green only when root isolation is real.
+4. Add no heuristic based on timestamps, id prefixes, canvas state, current
+   session state, or object count. The boundary is the selected source-work and
+   governed-review identities already held by the Kernel.
+
+Allowed Builder paths are exactly:
+
+```text
+collab-electron/src/main/research-world-projection.ts
+collab-electron/src/main/research-world.test.ts
+docs/orders/evidence/r16/BUILD-REPORT.md
+qf-atlas/atlas.json
+qf-atlas/atlas.md
+qf-atlas/atlas.html
+```
+
+The focused acceptance command is:
+
+```text
+bun test collab-electron/src/main/research-world.test.ts
+```
+
+It must print native `N pass / 0 fail`, `N > 0`, and include the two-direction
+shared-Artifact isolation regression. The Builder then runs the unchanged R16
+parent matrix already listed in this order, Atlas current/ratchet, and both
+diff checks. One executable falsifier temporarily restores the current broad
+reverse traversal across a selected shared Artifact; the new regression must
+exit nonzero and name a decoy-only id or wrong object/link count. Restore exact
+candidate bytes, require zero diff for the product file, and rerun focused
+green. Every command row and falsifier/restoration receipt is appended to the
+existing `BUILD-REPORT.md`.
+
+A fresh independent Verifier freezes the product SHA, reruns the focused test,
+the complete unchanged parent matrix, the executable shared-Artifact
+falsifier/restoration, Atlas, and both diff checks, and appends its receipt to
+`docs/orders/evidence/r16/VERIFICATION.md` only on full PASS. Product and test
+bytes must remain unchanged during verification.
+
+After independent PASS, the Router performs one replacement exact build and a
+normal two-launch Computer Use check. It runs exactly one guided Mission total
+for that replacement check, clicks the exact Mission-local reveal, observes
+exactly 13 world members and 15 cables with no historical Mission member,
+clicks Inspect then Collapse on all ten research-object tiles, repeats exact
+`qf-r16-typing-check-<candidate7>` typing/erase/mouse-return on normal Hermes
+Director, worker, and critic terminals without Enter, closes normally, reopens
+without creating a Mission, and proves the same Mission-local objects, links,
+positions, and inspector booleans. Ordinary close must leave zero owned Windows
+and WSL product processes. Any extra historical object/cable, missing pointer
+control, wrong canary, submission, reopen delta, or cleanup residue is red.
+
+Every gate can fail: the shared-Artifact regression fails on current bytes in
+both root directions; the falsifier must reintroduce leakage; existing tests
+retain prior lineage and receipt reds; Atlas and diff checks retain their
+native failure meanings; the normal consumer check fails on any visible extra
+world member. Every deliverable has one meaning: root-local identity selection,
+one two-direction collision regression, one executable regression falsifier,
+one independent PASS, and one normal consumer PASS. A fresh Reader must answer
+exactly: can each gate actually fail, and does each deliverable have exactly
+one meaning. Only final YES/YES opens the Builder door.
