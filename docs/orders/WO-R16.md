@@ -1689,6 +1689,29 @@ absent on the Router's post-run process check. The global sentinel/Tab
 assertion is superseded by this founder ruling; no other R16 assertion is
 removed.
 
+### Exact supersession map
+
+This final section is the only live authority for R16 keyboard acceptance. It
+supersedes only these earlier requirements, wherever they appear above:
+
+- `Product scene and register`: remove `Tab` from the list of R16-required
+  canvas interactions. Click, Enter, Escape, arrow-key behavior already owned
+  by focused tests, and ordinary terminal/text input remain unchanged.
+- `Layout and interaction`: lines beginning `Native Tab reaches every
+  research-object tile...` through `The sentinel is always removed.` no longer
+  bind. The immediately following ten-tile native Enter/Escape requirement and
+  existing cable keyboard parity still bind.
+- `Product gate`, item 5: the native-Tab sequence, `tab_focus_receipts`, and the
+  missing/extra/reordered/skipped/trapped Tab-target condition no longer bind.
+  Pointer Inspect/Collapse and the complete ten-tile native Enter/Escape receipt
+  still bind.
+- Every later rewrite instruction that requires a sentinel, a native Tab send,
+  `tab_focus_*`, or exactly one Tab call is spent history and does not bind this
+  correction.
+
+Nothing in this map waives the exact ontology, 13-object/15-cable, pointer,
+Enter/Escape, reopen, failure, timeout, cleanup, receipt, or Atlas assertions.
+
 ### Exact correction
 
 1. In `collab-electron/src/windows/shell/src/tile-manager.js`, remove only the
@@ -1696,11 +1719,16 @@ removed.
    `focusCanvasTile` call to `dom.webview.focus()` byte-for-byte. In
    `tile-manager-layout.test.ts`, remove only the superseded third test and
    retain the two original layout tests byte-identically; the file reports
-   exactly 2 pass / 0 fail.
+   exactly 2 pass / 0 fail. The focused R16 contract must also read
+   `tile-manager.js` and fail while the literal `wv.tabIndex = -1` assignment
+   remains; otherwise this required product deletion is not accepted.
 2. In `qa/gates/research-world-visible.ts`, delete the gate-owned Tab sentinel,
    global Tab plan/observation/comparison, `waitForSentinelDeparture`, all
    `tab_focus_*` receipts, and every native Tab send. Retain direct shell focus
-   of each of the ten research-object tiles followed by the unchanged native
+   of each of the ten research-object tiles: select the exact
+   `.canvas-tile[data-qf-world-type]` by independent expected type/id, call that
+   tile element's native `focus()`, and require `document.activeElement` to be
+   that same tile before and after each key. Follow it with the unchanged native
    Enter-expand and Escape-collapse assertions. Retain exactly
    `keyboard_tiles=10 enter=10 escape=10 focus_retained=20`.
 3. In the focused gate contract, delete only the diagnostic Tab-observation
@@ -1714,8 +1742,14 @@ removed.
 4. [Debt #38](../DEBT.md) is the durable release-precondition receipt. No R16
    report may claim full keyboard accessibility. It may claim only mouse-first
    canvas interaction; pointer Inspect/Collapse; tile Enter/Escape parity when
-   focused; normal text/terminal keyboard paths unchanged; and no
-   product-created Tab trap.
+   focused; and that this correction leaves normal text/terminal keyboard paths
+   unchanged and introduces no Tab interception. Those last two claims mean
+   exactly: `focusCanvasTile` retains its byte-identical
+   `dom.webview.focus()` path, the research-world renderer has no Tab handler or
+   Tab `preventDefault`, and the only product-code diff in this correction is
+   removal of `wv.tabIndex = -1`. R16 does not claim a new positive end-to-end
+   terminal-typing or global no-trap proof; Debt #38 owns that broader release
+   proof.
 
 Every ontology assertion, independent Oracle, exact 13 objects and 15 cables,
 all displayed fields, pointer Inspect/Collapse, Enter/Escape, duplicate reveal,
@@ -1732,9 +1766,11 @@ Allowed changes only:
 - `collab-electron/src/windows/shell/src/tile-manager-layout.test.ts`;
 - `qa/gates/research-world-visible.ts`;
 - `qa/gates/research-world-visible.test.ts`;
-- Router-owned authority documents named above;
+- `docs/orders/WO-R16.md`, `docs/orders/NEXT.md`, and `docs/DEBT.md`, Router
+  edits only;
 - `docs/orders/evidence/r16/BUILD-REPORT.md`; and
-- generated Atlas projections.
+- generated `qf-atlas/ATLAS.md`, `qf-atlas/atlas.html`, and
+  `qf-atlas/atlas.json` only.
 
 A fresh Builder starts from the exact clean local/remote SHA supplied after a
 fresh Reader returns YES/YES. It runs Atlas preflight, the 2-test tile-manager
@@ -1744,16 +1780,25 @@ cleanup receipts. Green runs the exact short matrix already specified by
 TERMINAL TAB-ORDER REPAIR. Its cheap falsifier is replaced by: temporarily
 delete the `keyboard_tiles=10 enter=10 escape=10 focus_retained=20` contract
 string, require the 13-test contract to go red, restore to zero diff, and
-require 13/0 green. No second live app is launched.
+require 13/0 green. No second invocation of
+`bun qa/run.ts research-world-visible` is allowed during that Builder or
+Verifier pass; the one invocation still performs the inherited normal,
+close/reopen, forced-failure, and forced-timeout sequence and therefore retains
+all four real Electron launches.
 
 BUILD-REPORT retains every previously required field except `tab_focus_*` and
 records instead: founder mouse-first authorization; Debt #38; pointer receipt;
 exact Enter/Escape receipt; normal terminal focus seam unchanged; no Tab handler
 or Tab preventDefault in research-world product code; all live world/reopen/
 cleanup receipts; matrix exits; falsifier red/restored-green; Atlas summary;
-and immutable product SHA. A fresh different-model Verifier records the
-candidate SHA before/after, reruns the same bounded matrix and one live gate,
-and writes `docs/orders/evidence/r16/VERIFICATION.md` only on full PASS.
+and immutable measured candidate SHA. That SHA means the Builder commit supplied
+to the Verifier containing the complete product, gate, focused-test,
+BUILD-REPORT, and generated-Atlas changes. The Verifier records that candidate
+SHA before and after measurement. Any later verification-evidence/Atlas commit
+is a distinct final evidence HEAD and must record both itself and the unchanged
+measured candidate; it must never be described as the product SHA. The fresh
+different-model Verifier reruns the same bounded matrix and one live gate, and
+writes `docs/orders/evidence/r16/VERIFICATION.md` only on full PASS.
 
 No composite focus widget, custom Tab router, focus trap, Main/preload/key
 allowlist change, Kernel/fixture change, timeout increase, package, installer,
