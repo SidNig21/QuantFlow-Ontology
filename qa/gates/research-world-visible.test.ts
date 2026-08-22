@@ -9,7 +9,9 @@ import {
   EXPECTED_VISIBLE_TILE_COUNT,
   formatFailureReceipts,
   RESEARCH_WORLD_VISIBLE_DEADLINE_MS,
+  rendererEvaluationExpression,
   scheduleInitialCases,
+  worldObservationExpression,
 } from "./research-world-visible.ts";
 
 const REPO_ROOT = join(import.meta.dir, "../..");
@@ -38,6 +40,26 @@ describe("research-world-visible gate contract", () => {
     expect(receipts.primary).toBe('primary_failure={"case":"normal","message":"world count"}');
     expect(receipts.cleanup).toBe('cleanup_failures=[{"case":"forced-failure","message":"forced cleanup"},{"case":"normal","message":"normal cleanup"}]');
     expect(receipts.ok).toBe(false);
+  });
+
+  test("JSON-encodes renderer expressions and returns the exact error shape", () => {
+    const value = `quote='\" backslash=\\ newline=\n${String.fromCharCode(10)}`;
+    const success = Function(`return ${rendererEvaluationExpression(JSON.stringify(value))}`)() as { ok: boolean; value: string };
+    expect(success).toEqual({ ok: true, value });
+
+    const message = `throw \"quoted\" \\ slash\n${String.fromCharCode(10)}`;
+    const throwingExpression = `(() => { throw new Error(${JSON.stringify(message)}); })()`;
+    const failure = Function(`return ${rendererEvaluationExpression(throwingExpression)}`)() as { ok: boolean; message: string; stack: string };
+    expect(Object.keys(failure).sort()).toEqual(["message", "ok", "stack"]);
+    expect(failure.ok).toBe(false);
+    expect(failure.message).toBe(message);
+    expect(typeof failure.stack).toBe("string");
+  });
+
+  test("world observation expression parses before it reaches the renderer", () => {
+    const result = Function(`return ${rendererEvaluationExpression(worldObservationExpression())}`)() as { ok: boolean; message?: string };
+    expect(result.ok).toBe(false);
+    expect(result.message).toContain("document is not defined");
   });
 
   test("starts all initial cases before awaiting any result", async () => {

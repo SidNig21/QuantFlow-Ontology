@@ -212,6 +212,24 @@ export function formatFailureReceipts(outcomes: readonly GateCaseOutcome[]): { p
   };
 }
 
+export function rendererEvaluationExpression(innerExpression: string): string {
+  return `(() => { try { const value = eval(${JSON.stringify(innerExpression)}); return { ok: true, value }; } catch (error) { const message = error instanceof Error ? error.message : String(error); const stack = error instanceof Error && typeof error.stack === "string" ? error.stack : ""; return { ok: false, message, stack }; } })()`;
+}
+
+type RendererEvaluationResult =
+  | { ok: true; value: unknown }
+  | { ok: false; message: string; stack: string };
+
+async function evaluateRenderer<T>(endpoint: string, label: string, innerExpression: string): Promise<T> {
+  const result = await rpcCall(endpoint, "app.ui.evaluate", { expression: rendererEvaluationExpression(innerExpression) }) as RendererEvaluationResult;
+  if (!result || result.ok !== true) {
+    const message = result && result.ok === false ? result.message : "renderer evaluation returned an invalid result";
+    const stack = result && result.ok === false ? result.stack : "";
+    throw new Error(`renderer_error=${JSON.stringify({ label, message, stack })}`);
+  }
+  return result.value as T;
+}
+
 async function waitFor<T>(label: string, action: () => Promise<T | null>, deadlineAt: number): Promise<T> {
   let lastError = "";
   while (remainingMs(deadlineAt) > 0) {
@@ -454,18 +472,22 @@ function compareVisibleSnapshot(actual: VisibleWorldSnapshot, expected: Independ
   }
 }
 
+export function worldObservationExpression(): string {
+  return `(() => ({ objects: [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].map((node) => ({ type: node.dataset.qfWorldType, id: node.dataset.qfWorldId, accessible_name: node.getAttribute('aria-label') || '', fields: Object.fromEntries([...node.querySelectorAll('[data-qf-world-field]')].map((field) => [field.dataset.qfWorldField, field.querySelector('.qf-world-field-value')?.textContent || ''])), position: { left: node.style.left, top: node.style.top, width: node.style.width, height: node.style.height, zIndex: node.style.zIndex }, inspector_expanded: node.querySelector('.qf-world-details')?.hidden === false })), links: [...document.querySelectorAll('.cable-path[data-qf-world-cable-kind]')].map((node) => ({ kind: node.dataset.qfWorldCableKind, from_id: node.dataset.qfWorldCableFrom, to_id: node.dataset.qfWorldCableTo })) }))()`;
+}
+
 async function observeWorld(endpoint: string, expected: IndependentWorldManifest, missionId: string, taskId: string, deadlineAt: number): Promise<VisibleWorldSnapshot> {
-  const clickMission = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); if (!(button instanceof HTMLElement)) throw new Error('Mission Show research world button is missing'); button.click(); return true; })()` });
+  const clickMission = await evaluateRenderer<boolean>(endpoint, "mission-reveal", `(() => { const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); if (!(button instanceof HTMLElement)) throw new Error('Mission Show research world button is missing'); button.click(); return true; })()`);
   assert(clickMission === true, "Mission root activation did not click");
-  const read = async () => await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => ({ objects: [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].map((node) => ({ type: node.dataset.qfWorldType, id: node.dataset.qfWorldId, accessible_name: node.getAttribute('aria-label') || '', fields: Object.fromEntries([...node.querySelectorAll('[data-qf-world-field]')].map((field) => [field.dataset.qfWorldField, field.querySelector('.qf-world-field-value')?.textContent || '']), position: { left: node.style.left, top: node.style.top, width: node.style.width, height: node.style.height, zIndex: node.style.zIndex }, inspector_expanded: node.querySelector('.qf-world-details')?.hidden === false })), links: [...document.querySelectorAll('.cable-path[data-qf-world-cable-kind]')].map((node) => ({ kind: node.dataset.qfWorldCableKind, from_id: node.dataset.qfWorldCableFrom, to_id: node.dataset.qfWorldCableTo })) }))()` }) as VisibleWorldSnapshot;
+  const read = async () => await evaluateRenderer<VisibleWorldSnapshot>(endpoint, "world-observation", worldObservationExpression());
   const world = await waitFor("visible 13-tile/15-cable world", async () => { const value = await read(); return value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT ? value : null; }, deadlineAt);
   assertVisibleWorldCounts(world);
   compareVisibleSnapshot(world, expected);
-  const interaction = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelectorAll('[data-qf-world-field]').length > 0 && !root.querySelector('.qf-world-details')?.hidden; root.focus(); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return { expanded, focus_restored: document.activeElement === root }; })()` });
+  const interaction = await evaluateRenderer<{ expanded: boolean; focus_restored: boolean }>(endpoint, "mission-inspection", `(() => { const root = document.querySelector('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id="${missionId}"]'); const inspect = root?.querySelector('.qf-world-inspect'); if (!(root instanceof HTMLElement) || !(inspect instanceof HTMLElement)) throw new Error('Mission inspector is missing'); inspect.click(); const expanded = root.querySelectorAll('[data-qf-world-field]').length > 0 && !root.querySelector('.qf-world-details')?.hidden; root.focus(); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return { expanded, focus_restored: document.activeElement === root }; })()`);
   assert(interaction.expanded === true && interaction.focus_restored === true, "pointer/keyboard inspection parity failed");
-  const second = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const before = document.querySelectorAll('.canvas-tile[data-qf-world-type]').length; const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); button?.click(); return { before, after: document.querySelectorAll('.canvas-tile[data-qf-world-type]').length }; })()` }) as { before: number; after: number };
+  const second = await evaluateRenderer<{ before: number; after: number }>(endpoint, "duplicate-reveal", `(() => { const before = document.querySelectorAll('.canvas-tile[data-qf-world-type]').length; const button = [...document.querySelectorAll('.kl-reveal')].find((node) => node.getAttribute('aria-label') === ${JSON.stringify(`Show research world mission ${missionId}`)}); button?.click(); return { before, after: document.querySelectorAll('.canvas-tile[data-qf-world-type]').length }; })()`);
   assert(second.before === EXPECTED_VISIBLE_TILE_COUNT && second.after === EXPECTED_VISIBLE_TILE_COUNT, "second reveal duplicated research tiles");
-  const taskActivation = await rpcCall(endpoint, "app.ui.evaluate", { expression: `(() => { const tile = document.querySelector('.canvas-tile[data-qf-world-type="task"][data-qf-world-id="${taskId}"]'); const button = tile?.querySelector('.qf-world-reveal'); if (!(button instanceof HTMLElement)) throw new Error('Task Show research world button is missing'); button.click(); return true; })()` });
+  const taskActivation = await evaluateRenderer<boolean>(endpoint, "task-reveal", `(() => { const tile = document.querySelector('.canvas-tile[data-qf-world-type="task"][data-qf-world-id="${taskId}"]'); const button = tile?.querySelector('.qf-world-reveal'); if (!(button instanceof HTMLElement)) throw new Error('Task Show research world button is missing'); button.click(); return true; })()`);
   assert(taskActivation === true, "Task root activation did not click");
   const taskWorld = await waitFor("Task-root visible world", async () => { const value = await read(); return value.objects.length === EXPECTED_VISIBLE_TILE_COUNT && value.links.length === EXPECTED_VISIBLE_CABLE_COUNT ? value : null; }, deadlineAt);
   assertVisibleWorldCounts(taskWorld);
