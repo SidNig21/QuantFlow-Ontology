@@ -675,3 +675,158 @@ No live model, proof-mode R16 gate, installer, release matrix, typecheck
 rebuild, founder database, or R17 path was touched. The candidate commit
 contains only the seven paths listed above; the report is the subsequent
 evidence commit.
+
+## NORMAL CONSUMER GOVERNED-WORLD AND SHUTDOWN REPAIR — final Builder closure
+
+Plain meaning: normal research continuation now binds the worker's exact
+lineage, admits and delivers exactly one governed critic review before
+evaluation/publication, and native-TUI shutdown retains detached teardown
+work until it settles. The Reader closure is covered by the named tests and
+the Atlas projection was regenerated once as authorized.
+
+### Immutable candidate and scope
+
+| Field | Receipt |
+|---|---|
+| Router head before build | c84f9e953c51e5b48646fce5aa08d7c44dd068e1 |
+| Required base | fef713c06f091dc8df13f7bde07be859d3b04930 |
+| Base ancestry check | git merge-base --is-ancestor fef713c06f091dc8df13f7bde07be859d3b04930 c84f9e953c51e5b48646fce5aa08d7c44dd068e1 -> exit 0 |
+| Product candidate commit | 34c4bd254165901b8e2d8df72e717c76a171c341 |
+| Branch / push | wo-R16 / pushed to origin/wo-R16 |
+| Product candidate status before evidence | clean |
+
+The product candidate commit changed exactly these ten paths:
+
+~~~
+collab-electron/src/main/agent-host.ts
+collab-electron/src/main/governed-review.test.ts
+collab-electron/src/main/index.ts
+collab-electron/src/main/kernel.ts
+collab-electron/src/main/native-tui-orchestration.test.ts
+collab-electron/src/main/precreated-native-tui.test.ts
+collab-electron/src/main/research-world.test.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+~~~
+
+No product or test path was changed after the immutable product candidate.
+The evidence report is the only subsequent change in this Builder turn.
+
+### Candidate test-path receipt
+
+Command:
+
+~~~
+git diff --name-only fef713c06f091dc8df13f7bde07be859d3b04930 HEAD -- "*.test.ts"
+exit=0
+collab-electron/src/main/dock-profiles.test.ts
+collab-electron/src/main/governed-review.test.ts
+collab-electron/src/main/native-tui-orchestration.test.ts
+collab-electron/src/main/ontology-gateway.test.ts
+collab-electron/src/main/precreated-native-tui.test.ts
+collab-electron/src/main/research-context.test.ts
+collab-electron/src/main/research-world.test.ts
+collab-electron/src/windows/shell/src/research-world.test.ts
+collab-electron/src/windows/shell/src/task-composition.test.ts
+collab-electron/src/windows/shell/src/tile-manager-layout.test.ts
+packages/qf-kernel/src/r11a-deterministic-execution.test.ts
+packages/qf-kernel/src/r16-visible-world.test.ts
+qa/gates/research-world-visible.test.ts
+~~~
+
+This is the full historical test-path receipt from the required base; the
+product commit itself contains only the four named test paths listed in the
+candidate scope above.
+
+### Exact Builder matrix
+
+Each command below was run individually, exactly once against the product
+candidate. Every command exited 0.
+
+| Exact command | Exit / receipt |
+|---|---|
+| bun test collab-electron/src/main/governed-review.test.ts | 0 — 4 pass / 0 fail / 22 expect |
+| bun test collab-electron/src/main/research-world.test.ts | 0 — 3 pass / 0 fail / 13 expect |
+| bun test collab-electron/src/windows/shell/src/research-world.test.ts | 0 — 6 pass / 0 fail / 32 expect |
+| bun test collab-electron/src/windows/shell/src/task-composition.test.ts | 0 — 3 pass / 0 fail / 55 expect |
+| bun test collab-electron/src/main/native-tui-orchestration.test.ts | 0 — 9 pass / 0 fail / 42 expect |
+| bun test collab-electron/src/main/precreated-native-tui.test.ts | 0 — 2 pass / 0 fail / 5 expect |
+| bun test packages/qf-kernel/src/r15-governed-review.test.ts | 0 — 7 pass / 0 fail / 55 expect |
+| bun test packages/qf-kernel/src/r16-visible-world.test.ts | 0 — 3 pass / 0 fail / 5 expect |
+| bun test qa/gates/governed-review.test.ts | 0 — nested focused production/kernel 11 pass / 0 fail / 77 expect; live broker control 7 pass / 0 fail / 55 expect; gate 3 pass / 0 fail / 6 expect |
+| bun test qa/gates/research-world-visible.test.ts | 0 — 13 pass / 0 fail / 192 expect |
+| bun qa/run.ts kernel-sole-writer | 0 — PASS  kernel-sole-writer |
+| bun qf-atlas/generate.mjs --check | 0 — qf-atlas: current — 432 files, 124 channels, 13 strip candidates |
+| bun qf-atlas/ratchet.mjs | 0 — baseline 3 entries; HARD RED 0; unexplained coverage 0; AMBER 20; undecided 42 |
+| git diff --check | 0 — no output |
+
+No live app, real model, proof-mode R16 gate, installer, release suite, or
+typecheck rebuild was launched.
+
+### F1–F7 independent mutation falsifiers
+
+Each mutation was applied temporarily to the named seam, run against its
+owning test/control, then restored byte-for-byte before the next mutation.
+The owning test file SHA was unchanged before and after each mutation.
+
+| Falsifier | Mutation and owning command | Red receipt | Restoration / green receipt |
+|---|---|---|---|
+| F1 | Make kernelBindSourceWork(sourceWork) a no-op; bun test collab-electron/src/main/governed-review.test.ts; test SHA 05E14CC0D117E56C235369B837203A0D6AC61858E23F339F2A767E1F5CD4346B | exit 1; 3 pass / 1 fail; exact-admission error: governed research review admission did not return the exact review Task and source work | git diff --quiet -- collab-electron/src/main/kernel.ts exit 0; restored exit 0, 4 pass / 0 fail / 22 expect |
+| F2 | Force the helper admission condition true; same command/test SHA as F1 | exit 1; 3 pass / 1 fail; exact-admission error: governed research review admission did not return the exact review Task and source work | kernel diff quiet exit 0; restored exit 0, 4 pass / 0 fail / 22 expect |
+| F3 | Remove kernelMarkGovernedDelivery(...) from the helper finally; same command/test SHA as F1 | exit 1; 3 pass / 1 fail; review lifecycle remained pending instead of running | kernel diff quiet exit 0; restored exit 0, 4 pass / 0 fail / 22 expect |
+| F4 | Replace executor_session_id: input.executor_session_id with "director-continuation"; same command/test SHA as F1 | exit 1; 3 pass / 1 fail; KernelError: Review requires one succeeded Run with one exact Hypothesis, result Artifact, executor, and R14 source-Task lineage. | kernel diff quiet exit 0; restored exit 0, 4 pass / 0 fail / 22 expect |
+| F5 | Omit one projected object, then separately omit uses links in research-world-projection.ts; Main world test SHAs before/after D4144604742085523D2A33C6847C951448FBF38BE0C35E7526F845F4D18EA52E and F2B4EBCC4BA7C0269429064B2A68321D8661EB01A580F8AB451C285A6CAD5F7D | object mutation: exit 1, 2 pass / 1 fail, expected 13 objects and received 12; link mutation: exit 1, 2 pass / 1 fail, expected 15 links and received 14 | projection diff quiet exit 0; Main restored exit 0, 3 pass / 0 fail / 13 expect; shell control restored exit 0, 6 pass / 0 fail / 32 expect; both test SHAs unchanged |
+| F6 | Remove inFlight.set(sessionId, promise) from the teardown registry; bun test collab-electron/src/main/native-tui-orchestration.test.ts; test SHA 94E81C369508C02145DE24C3A7D3F298DD91360A86FAC33013A0D869C31F76EB | exit 1; 8 pass / 1 fail; shutdown test expected shutdownFinished=false, received true | agent-host diff quiet exit 0; restored exit 0, 9 pass / 0 fail / 42 expect; test SHA unchanged |
+| F7 | Remove repeated-close promise reuse (if existing return existing); bun test collab-electron/src/main/precreated-native-tui.test.ts; test SHA 9ECDFA52FC1562B5AA3F23AA74F76A100344C34EE65FA7556AF7CF1122C7ED8D | exit 1; 1 pass / 1 fail; repeated close returned two promises instead of the same promise | agent-host diff quiet exit 0; restored exit 0, 2 pass / 0 fail / 5 expect; test SHA unchanged |
+
+F5's shell test is a fixed resolver-manifest control, so the Main-owned
+projection mutation is expected to fail the Main assertion while the shell
+control remains/restores green; no red receipt was fabricated for that
+independent control.
+
+### Atlas receipts and handoff state
+
+Preflight Atlas receipts were both green:
+
+~~~
+bun qf-atlas/generate.mjs --check
+exit=0
+qf-atlas: current — 432 files, 124 channels, 13 strip candidates
+
+bun qf-atlas/ratchet.mjs
+exit=0
+baseline: 3 entries · HARD RED: 0 · unexplained coverage: 0 · AMBER: 20 · undecided: 42
+~~~
+
+The authorized candidate refresh was:
+
+~~~
+bun qf-atlas/generate.mjs
+exit=0
+qf-atlas: wrote atlas.json + atlas.html + ATLAS.md
+432 files · 109 subsystems · 124 IPC channels
+wires: 111 live · 0 unreached · 13 unused · 0 DEAD
+legacy loops: 6/8 healthy · Review and publish, Close the app
+decisions: 42 undecided of 47
+13 strip candidates · 10 confirmed violations · 3 gray · 22 coverage gaps
+
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+exit=0
+Atlas diff c59ebfa -> c84f9e9
+VERDICT: WORSE — 1 finding(s) added
+added 1 · newly-detected 0 · resolved 0 · regressed 0
+coverage worse 0 · better 0
+undecided 41 -> 42
+ADDED: persistence links insert into
+wrote qf-atlas/atlas-diff.json
+~~~
+
+The Atlas verdict is machine-green for currentness and ratchet (HARD RED: 0);
+the explicit diff verdict is WORSE because one persistence-link finding was
+added. atlas-diff.json is ignored and was not included in the candidate.
+
+The final evidence commit will contain only this report. After that commit is
+pushed, git status --porcelain=v1 must be empty and a fresh Verifier may
+begin. The Builder did not claim the unlaunched normal-app consumer check as
+verified; that remains within the fresh Verifier's independent scope.
