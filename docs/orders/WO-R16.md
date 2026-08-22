@@ -3771,3 +3771,85 @@ fresh one-build/two-launch normal Computer consumer check. The failed launch
 above is a recorded diagnostic attempt and does not waive any three-terminal,
 13-object/15-cable, ten-inspector, reopen-equality, or cleanup assertion. R17
 remains closed.
+
+### FINAL COMPUTER RED — Reader findings and binding closure
+
+The fresh adversarial read of the preceding subsection is **NO/NO**. These are
+finite order defects, not permission to improvise:
+
+1. **The production delivery seam is optional and unnamed.** Item 3 says to
+   “prefer” a helper, while item 4 only says to capture a “real production
+   delivery seam.” The existing normal-continuation test supplies its own
+   callback and then manually records the four governed receipts, so a Builder
+   could add a passing helper/test path while the normal `index.ts` callback
+   still calls the old write-only `deliverToAgentSession` path. The gate would
+   not fail on that integration defect. Plain meaning: the normal app could
+   keep using the broken send path while the new test passes beside it.
+2. **The first PTY write has two possible meanings.**
+   `buildMissionActivationInstruction()` returns the critic instruction with
+   one terminal `\r`; “write the exact critic instruction once, then write
+   exactly one `\r`” therefore permits a first write that already submits and a
+   second carriage return. The required protocol is one text write with that
+   one terminal `\r` removed, then one separate `\r` after 400 ms. Plain
+   meaning: the message must be typed first and submitted once afterward, not
+   submitted twice.
+3. **“Same live critic” is not an acceptance contract.** The current
+   `deliverToAgentSession()` resolves one live entry and `writeToSession()` can
+   silently do nothing when its PTY has disappeared, while still returning a
+   successful delivery result. The order does not say which session/PTY
+   identity is captured, when it is rechecked, or what makes either write a
+   failure. Plain meaning: the receipt could say the critic received the work
+   even when one of the two writes went nowhere or went to a changed seat.
+4. **The carriage-return falsifier is not executable proof of the claimed
+   downstream condition.** It names no exact production mutation, command,
+   native red receipt, restoration-zero-diff check, or runtime observation that
+   prevents the current test from manually injecting the four later receipts.
+   “No critic action can follow” is consequently asserted, not measured. Plain
+   meaning: removing the submit key must make the focused check visibly fail at
+   the missing second write, rather than letting a test manufacture a successful
+   critic afterward.
+
+This closure supersedes only the mechanics of the preceding subsection. Before
+any Builder door opens, the repair must bind all four points as follows:
+
+1. Add exactly one exported production helper named
+   `submitAgentSessionInstruction` in `collab-electron/src/main/agent-host.ts`
+   with input `(sessionId, instruction)` and a `Promise<void>` result. The
+   normal continuation's `deliver` callback in `index.ts` must call this helper
+   exactly once; it may not call `deliverToAgentSession` directly. The existing
+   `kernelContinueGovernedResearchResult` ordering and its one delivery receipt
+   remain unchanged. The focused runtime test must exercise this same exported
+   helper through a production-owned write seam; it may control only the PTY
+   observation/wait seam needed to measure the two writes and may not copy the
+   helper or inject the four governed receipts as proof of submission.
+2. The helper must accept the exact string returned by
+   `buildMissionActivationInstruction()` for the critic, remove exactly its one
+   terminal `\r` from the first write, write that text once, await exactly the
+   existing 400 ms bounded interval, and write exactly one separate `\r`.
+   The focused assertion must compare the first write byte-for-byte with the
+   returned instruction minus that one terminal `\r`, and the second write
+   byte-for-byte with `"\r"`; no burst, embedded terminal key, or extra write
+   complies.
+3. At the start of one attempt, the helper must capture the exact live native-
+   TUI `sessionId` and non-empty `ptySessionId` for the critic. Immediately
+   before the second write it must re-read the live entry and require the same
+   session id, native-TUI kind, and identical PTY id. A missing entry, changed
+   kind/id, or failed write rejects the Promise; both writes must use that one
+   captured PTY target. The focused test must cover the changed-target and
+   missing-target red paths without changing Kernel receipts.
+4. The exact falsifier is a temporary no-op of only the second
+   `writeToSession(capturedPtySessionId, "\\r")` in
+   `submitAgentSessionInstruction`. Run exactly
+   `bun test collab-electron/src/main/governed-review.test.ts`; the unchanged
+   test must exit nonzero naming the missing submit write, restore the exact
+   helper bytes, require zero diff for that path, and rerun the same command to
+   its native green count. The test's green path asserts the two-write sequence
+   and delivery outcome only; later governed receipts are produced by the
+   existing production boundary in the consumer proof, never by a direct test
+   shortcut used to claim that the carriage return submitted Hermes work.
+
+The existing parent matrix, Atlas controls, source-work/review/delivery
+ordering, three-terminal consumer check, 13-object/15-cable bar,
+reopen-equality, and cleanup requirements remain binding. A fresh Reader must
+ reread this closure and return YES/YES before a Builder is authorized; no
+ Builder, rebuild, consumer launch, or R17 work is authorized now.
