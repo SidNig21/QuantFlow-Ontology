@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R17 @ 7f2005f` on 2026-08-22 by
+> Generated from `wo-R17 @ ebf2b17` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -418,11 +418,11 @@ Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 57+ | 1 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 56+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 56+ | 3 | 0 |
-| `packages/qf-kernel/src/db.ts` | 51+ | 4 | 0 |
-| `packages/qf-kernel/src/errors.ts` | 51+ | 0 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 56+ | 1 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 55+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 55+ | 3 | 0 |
+| `packages/qf-kernel/src/db.ts` | 50+ | 4 | 0 |
+| `packages/qf-kernel/src/errors.ts` | 50+ | 0 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
@@ -471,7 +471,7 @@ mechanism behind the invariant below, not a promise about it.
 | `ipcRequest` | 280 | 0 | 4 | 0 | 270 |
 | `ipcPush` | 7 | 0 | 4 | 0 | 543 |
 | `persistence` | 24 | 27 | 0 | 0 | 503 |
-| `lifetime` | 6 | 61 | 0 | 0 | 487 |
+| `lifetime` | 6 | 62 | 0 | 0 | 486 |
 | `packaging` | 232 | 0 | 0 | 123 | 199 |
 | `ownership` | 21 | 0 | 0 | 358 | 175 |
 | `reach` | 237 | 3 | 0 | 314 | 0 |
@@ -540,7 +540,7 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 638
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 640
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
 - `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 510
 
@@ -560,7 +560,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 629
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 543
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 548
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228
