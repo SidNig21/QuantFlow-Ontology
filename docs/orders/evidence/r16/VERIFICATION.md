@@ -709,3 +709,56 @@ founder-state access, product/test/generated-Atlas commit, assertion change,
 or R17 action occurred in this verification.
 
 `verdict: PASS`
+
+## Independent Verification — Consumer Attempt 5 critic findings contract
+
+Plain meaning: the critic's instructions and generated tool contract agree on
+one strict finding format, and the frozen product remained unchanged while the
+independent checks passed.
+
+Candidate: `417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa`. Router-docs HEAD and
+`origin/wo-R16` were both
+`6b256e3762af8c8ab531a0e76c8349e6fbd4d6ef` before and after the matrix.
+`git diff --name-status 417e3178ad9eb9d2bdc88cbfab7d9f506c5965fa HEAD`
+listed only `docs/orders/NEXT.md`, `docs/orders/WO-R16.md`, and
+`docs/orders/evidence/r16/BUILD-REPORT.md`; its path-filtered form for the
+eleven candidate product/test/generated paths returned no output before and
+after the matrix.
+
+SHA-256 hashes were recorded before and after (identical values):
+
+```text
+BEFORE                                                            AFTER                                                             PATH
+30D6591255E986F80E7FE6C51DF5480567289A0D1220959F5AAE66F634747F69  30D6591255E986F80E7FE6C51DF5480567289A0D1220959F5AAE66F634747F69  collab-electron/src/main/governed-review.test.ts
+4C1E7518AFC03AA76FEF9303A15AE3DB1B34E2ABBBF384C5C59AB42C03AB02FF  4C1E7518AFC03AA76FEF9303A15AE3DB1B34E2ABBBF384C5C59AB42C03AB02FF  collab-electron/src/main/index.ts
+291F302AFD7D14F3CBB5CC5CC7AC49B38DB965C3051C23C7692FB923641B3789  291F302AFD7D14F3CBB5CC5CC7AC49B38DB965C3051C23C7692FB923641B3789  collab-electron/src/main/mission-activation.test.ts
+A71787041D0396973D2331971EBE74159B609E101AD48BE49024BD75EA09EA7B  A71787041D0396973D2331971EBE74159B609E101AD48BE49024BD75EA09EA7B  collab-electron/src/main/mission-activation.ts
+3CAB4B904FB23C7722C64C0DFD1F885D14209AE192486F6787A07F9F1D8EDC90  3CAB4B904FB23C7722C64C0DFD1F885D14209AE192486F6787A07F9F1D8EDC90  qf-atlas/ATLAS.md
+99E6B7BC0FAC66E83A1AB880B84BA6E982ADF3D716B48864777A621297510090  99E6B7BC0FAC66E83A1AB880B84BA6E982ADF3D716B48864777A621297510090  qf-atlas/atlas.html
+772670DC2A60454BB241B655F4967F2AB50464B1F97C20D1BB4247E0C9DC839C  772670DC2A60454BB241B655F4967F2AB50464B1F97C20D1BB4247E0C9DC839C  qf-atlas/atlas.json
+4592C9D9809C8AE59037CA5B27A0A044DF8442228FB738181E87FF4AC0574DD7  4592C9D9809C8AE59037CA5B27A0A044DF8442228FB738181E87FF4AC0574DD7  qf-kernel-schema/golden/ONTOLOGY.md
+B44EE1897E55C563BF99EA64ADD2AFAE5E649CBE0C27CDD767F76E766C4ABBDB  B44EE1897E55C563BF99EA64ADD2AFAE5E649CBE0C27CDD767F76E766C4ABBDB  qf-kernel-schema/golden/tools.json
+5DAF1F44270AA825C83BADD67AD96165530B39FD0A3735FEA2852590D6AEB7E0  5DAF1F44270AA825C83BADD67AD96165530B39FD0A3735FEA2852590D6AEB7E0  qf-kernel-schema/src/generate.test.ts
+E8B94113A5D47359D9F1D2F82CD32963586CF339596A728B169F5AB85F876A5F  E8B94113A5D47359D9F1D2F82CD32963586CF339596A728B169F5AB85F876A5F  qf-kernel-schema/src/ontology/research.ts
+```
+
+The two generator rows were omitted. Every remaining final Consumer Attempt 5
+matrix row ran once, in order, with native exit `0`:
+
+```text
+1  bun test --cwd qf-kernel-schema                                      179 pass / 0 fail / 615 expect() calls
+2  bun test collab-electron/src/main/mission-activation.test.ts         3 pass / 0 fail / 33 expect() calls
+3  bun test collab-electron/src/main/ontology-gateway.test.ts           6 pass / 0 fail / 70 expect() calls
+4  bun test collab-electron/src/main/governed-review.test.ts            5 pass / 0 fail / 56 expect() calls
+5  bun qa/run.ts governed-review                                        12 pass / 0 fail; PASS governed-review
+6  bun qa/run.ts kernel-sole-writer-app                                 PASS kernel-sole-writer-app
+7  bun qf-atlas/generate.mjs --check                                    current: 432 files, 124 channels, 13 strip candidates
+8  bun qf-atlas/ratchet.mjs                                             HARD RED: 0; unexplained coverage: 0; undecided w/o blocker: 0
+9  git diff --check                                                     exit=0; no output
+10 git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD       exit=0; no output
+```
+
+No generator, build, application launch, consumer attempt, founder-state or
+credential access, product/test/generated edit, or R17 work occurred.
+
+`verdict: PASS`
