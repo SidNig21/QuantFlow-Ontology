@@ -1,11 +1,11 @@
 # WO-R17 — Named Technique and settled outcome loop
 
-status: open — fresh Reader YES/YES; Builder authorized
-assignee: fresh Builder
+status: REWORK — candidate `8ef44e60` independently rejected; bounded repair Reader required
+assignee: none until rework Reader YES/YES
 depends: R16 independently verified and founder-consumer accepted at `ca59628a334cc3da0060204b7685017fa381dc44`; receipt `evidence/r16/FINAL-ACCEPTANCE.md`
 rung: R17 — Technique and outcome loop
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
-rework-cycle: 0 of 1 used
+rework-cycle: 1 of 1 used — exhausted after this bounded repair
 R17_BUILD_BASE_SHA: `7ed2757cfe24d1771117e61cc4a0388aaa332ec5`
 reader-receipt: fresh Luna `r17_prebuild_reader`; four finite defect rounds landed; final YES/YES on 2026-08-22
 
@@ -396,3 +396,64 @@ Return the immutable candidate SHA, exact changed files, unedited gate output,
 all eight red/green falsifier receipts, Atlas result, runtime, cleanup receipt,
 and confirmation that no bet/trade placement surface was added. Commit and push
 the order branch. Do not self-verify and do not start R18.
+
+## Rework round 1 — independent REWORK at `8ef44e60`
+
+Fresh independent Verifier `r17_candidate_verifier` froze exact candidate
+`8ef44e60aa54f510aa6c86875ac0091803a70243`, confirmed its tree/remote, reran
+the unit/static/Atlas checks green, and returned **REWORK**. This section is the
+only repair authority. All earlier deliverables and acceptance criteria remain.
+
+### Defect 1 — the independent literal oracle is absent
+
+`qa/oracles/r17-technique-outcome.json` does not exist. Create the exact literal
+16-object/20-cable oracle specified above. It must be a separately maintained
+data file with the explicit expected records and no import or generated copy of
+the production projection. The Electron gate reads it independently and
+compares every identity/type/field and cable kind/direction/endpoint, not counts
+alone.
+
+### Defect 2 — the registered gate is a direct-Kernel receipt printer
+
+`qa/gates/technique-outcome-loop.ts` opens `:memory:`, calls `execute()`
+directly, and prints constant success/cleanup lines. Replace it with the exact
+production Electron gate in the acceptance contract. It must build once, launch
+one isolated normal app, drive the real Director Technique select and pointer
+outcome form through renderer → preload → Main → Kernel, compare the literal
+16/20 oracle and independent canonical hashes, close/reopen the same on-disk
+Kernel, and compute PID/root cleanup. A printed boolean without its live
+assertion is red. The direct-Kernel test remains only supporting unit coverage.
+
+### Defect 3 — missing Technique still silently becomes legacy v1
+
+`collab-electron/src/main/kernel.ts` falls back to an inline legacy Strategy v1
+when `strategyId` is absent, and Main accepts omission. For the R17 Director
+journey, Strategy identity is mandatory before Mission/worker/Run creation.
+Missing, malformed, stale, or unavailable selection returns exact
+`TECHNIQUE COVERAGE REFUSED` with a zero durable-row delta. Keep the legacy
+fallback only for explicitly non-R17 internal/R11 callers; no renderer, preload,
+IPC, Director, or agent route may reach it accidentally.
+
+### Defect 4 — seven falsifiers have no red/green proof
+
+Only falsifier 4 was shown red then green. Execute and preserve unedited receipts
+for falsifiers 1–3 and 5–8 exactly as written above, then rerun the unchanged
+green gate. Do not convert any falsifier to source-string self-inspection or
+weaken an assertion. All eight receipts are required before candidate submission.
+
+### Defect 5 — the real outcome form cannot submit an outcome
+
+`research-world.js` creates inputs for `external_ref`, `settled_at`, odds,
+stake, and payout but no `outcome` control; it nevertheless submits
+`input.outcome`. Add one required select bound to exact `win | loss | push |
+void`. On success, do not set `Recorded`, state, calibration, or CLV from input
+or the action acknowledgement. Re-fetch the production world projection and
+render only the persisted Ticket/grade Artifact fields and cables. On refusal,
+keep every entered value and show the exact Kernel error in the same form.
+
+### Rework acceptance
+
+Run the unchanged complete matrix and all eight falsifiers from the main order.
+The exact gate must emit the full live receipt block, finish under two minutes,
+and leave zero PIDs/roots. Any red stops R17 for Router decision; there is no
+second rework lap and no R18 authority.
