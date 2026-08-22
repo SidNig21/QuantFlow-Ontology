@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "17b9e3b",
+    "commit": "0457d97",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "a6c0911751060ae8"
+    "fingerprint": "c87b4e941fd4af8d"
   },
   "stats": {
     "live": 111,
@@ -3450,7 +3450,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 549.5,
+      "kb": 558.1,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3481,7 +3481,7 @@
         },
         {
           "path": "qa/gates/research-world-visible.ts",
-          "kb": 32.2,
+          "kb": 40.8,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -58283,19 +58283,26 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "221231c",
+      "commit": "17b9e3b",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "17b9e3b",
+      "commit": "0457d97",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
-    "why": "41 improvement(s), nothing added or hidden",
+    "why": "42 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
+      {
+        "id": "persistence:collab-electron/src/main/kernel.ts:kernelSeedVisibleResearchWorld:links:insert-into",
+        "kind": "persistence",
+        "what": "links insert into",
+        "where": "collab-electron/src/main/kernel.ts",
+        "note": "was undecided"
+      },
       {
         "id": "persistence:collab-electron/src/main/updater/update-manager.ts:error:check:update",
         "kind": "persistence",
@@ -58626,13 +58633,13 @@
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 46,
+      "resolved": 47,
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
       "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 41,
+      "undecidedFrom": 42,
       "undecidedTo": null
     }
   },
