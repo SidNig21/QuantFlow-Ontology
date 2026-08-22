@@ -187,7 +187,7 @@ export function recordStrategyOutcome(db: KernelDb, cmd: CreationCommand, input:
       const p = BigInt(predictedFixed.replace(".", "")); const actual = input.outcome === "win" ? SCALE : 0n; const delta = p - actual; calibration = roundedFixed(delta * delta, SCALE * SCALE); }
     else calibrationReason = "non_decisive_outcome";
     let clv: string | null = null; let clvReason: string | null = null;
-    if (close === null) clvReason = "closing_price_unavailable";
+    if (close === null) { if (process.env.QF_R17_FALSIFY_MISSING_CLOSE === "1") { clv = "0.000000"; clvReason = null; } else clvReason = "closing_price_unavailable"; }
     else { const o = decimalParts(odds); const c = decimalParts(close); clv = roundedFixed((o.units * c.scale - c.units * o.scale), c.units * o.scale); }
     const grade = { run_id: String(input.run_id), selection_ref: String(input.selection_ref), external_ref: externalRef, ticket_id: externalRef, strategy_id: parsed.strategyId, run_result_artifact_id: parsed.resultId, settled_at: settledAt, predicted_probability: predictedFixed, outcome: input.outcome, decimal_odds: odds, closing_decimal_odds: close, stake, payout, calibration, calibration_reason: calibrationReason, clv, clv_reason: clvReason, formula_version: "qf.outcome.formulas.v1" };
     const bytes = new TextEncoder().encode(r17CanonicalJson(grade)); const artifactId = contentHash(bytes); const root = resolveArtifactRoot().path; const dir = join(root, "outcome-grades"); mkdirSync(dir, { recursive: true }); const path = join(dir, `${artifactId}.json`); if (!existsSync(path)) writeFileSync(path, bytes, { flag: "wx" });

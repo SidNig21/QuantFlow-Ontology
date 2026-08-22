@@ -392,9 +392,11 @@ export function initDock(panelEl, options = {}) {
 	techniquePlaceholder.textContent = "Technique version";
 	techniqueSelect.appendChild(techniquePlaceholder);
 	questionForm?.insertBefore(techniqueSelect, questionForm.querySelector("button[type=submit]") || null);
-	void window.shellApi.qf.listStrategyVersions().then((response) => {
+	const populateTechniqueSelect = () => window.shellApi.qf.listStrategyVersions().then((response) => {
+		for (const option of [...techniqueSelect.options].slice(1)) option.remove();
 		for (const strategy of (response?.strategies || [])) { const option = document.createElement("option"); option.value = String(strategy.strategy_id); option.textContent = String(strategy.label); option.dataset.family = String(strategy.family); option.dataset.version = String(strategy.version); techniqueSelect.appendChild(option); }
 	}).catch(() => {});
+	void populateTechniqueSelect();
 	techniqueSelect.addEventListener("change", () => { selectedStrategyId = techniqueSelect.value || null; });
 	const questionSubmit = questionForm?.querySelector("button[type=submit]");
 	if (questionSubmit) questionSubmit.disabled = true;
@@ -415,10 +417,11 @@ export function initDock(panelEl, options = {}) {
 			questionInput.value = "";
 			questionInput.disabled = true;
 			setQuestionStatus("Starting durable research…");
-			const datasetId = selectedResearchDatasetId;
+			const datasetId = selectedResearchDatasetId || questionForm?.dataset.r17DatasetId || null;
 			selectedResearchDatasetId = null;
 			void window.shellApi.qf.submitResearchQuestion(question, datasetId ?? undefined, undefined, selectedStrategyId ?? undefined).then((res) => {
 				if (!res?.ok) throw new Error(res?.error?.message ?? "research launch failed");
+				window.__QF_LAST_RESEARCH_SUBMIT = res;
 				setQuestionStatus(researchDirectorRunningStatus(res.missionId), "ok");
 				void refresh();
 			}).catch((error) => {
@@ -454,6 +457,7 @@ export function initDock(panelEl, options = {}) {
 	}
 
 	window.shellApi.qf.onDockInvalidate(() => {
+		void populateTechniqueSelect();
 		void refresh();
 	});
 	void refresh();

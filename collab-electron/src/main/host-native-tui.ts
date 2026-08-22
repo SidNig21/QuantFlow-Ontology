@@ -389,7 +389,7 @@ export async function admitNativeTuiDefinition(opts: {
     + ` cmd=${command} argv=${JSON.stringify(commandArgs)}`
     + ` target=${commandTarget} pty=${result.ptySessionId}`,
   );
-  return result;
+  return process.env.QF_R17_GATE === "1" ? { ...result, seatCapability } : result;
 }
 
 export async function cancelNativeTuiSession(

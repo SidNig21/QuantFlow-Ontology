@@ -72,6 +72,8 @@ export type NativeTuiOrchestrationResult = {
   definitionId: string;
   surface: "native_tui";
   ptySessionId: string;
+  /** QA-only handoff for the authenticated gateway proof; never persisted. */
+  seatCapability?: string;
 };
 
 function asError(value: unknown): Error {

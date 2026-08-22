@@ -47,10 +47,13 @@ import {
   kernelListAgentSessions,
   kernelListTaskDelegations,
   kernelEnsureSampleResearchDataset,
+  kernelEnsureR17TechniqueFixture,
+  kernelListStrategyVersions,
   kernelEnsureSyntheticMarketFixture,
   kernelSeedVisibleResearchWorld,
   kernelOpenHypothesisForQuestion,
   kernelRunGuidedResearch,
+  kernelRunR17DirectorResearch,
   kernelContinueGovernedResearchResult,
   kernelFailGovernedCriticCompletion,
   kernelFinalizeResearchEvaluation,
@@ -1179,6 +1182,14 @@ app.whenReady().then(async () => {
     { description: "Drive the same definition-backed Dock spawn admission used by the shell." },
   );
   registerMethod(
+    "qf.r17.admission",
+    () => {
+      if (process.env.QF_R17_GATE !== "1") throw new Error("R17 admission proof is unavailable");
+      return (globalThis as Record<string, unknown>).__QF_R17_LAST_ADMISSION ?? null;
+    },
+    { description: "QA-only authenticated R17 gateway admission receipt." },
+  );
+  registerMethod(
     "qf.pty.capture",
     async (params) => {
       if (!params || typeof params !== "object") throw new Error("pty capture requires params");
@@ -1256,7 +1267,9 @@ app.whenReady().then(async () => {
             try {
               const hypothesisId = researchHypothesisForSession(change.delegatorSessionId);
               if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
-              const run = kernelRunGuidedResearch(change.workerSessionId, hypothesisId, change.artifactId, researchStrategyForSession(change.delegatorSessionId));
+              const strategyId = researchStrategyForSession(change.delegatorSessionId);
+              if (!strategyId) throw new Error("TECHNIQUE COVERAGE REFUSED");
+              const run = kernelRunR17DirectorResearch(change.workerSessionId, hypothesisId, change.artifactId, strategyId);
               closeAdmittedSession(change.workerSessionId);
               if (!run) {
                 closeAdmittedSession(change.delegatorSessionId);
@@ -1408,11 +1421,16 @@ app.whenReady().then(async () => {
       if (visibleWorld !== undefined && (!visibleWorld || typeof visibleWorld !== "object" || Array.isArray(visibleWorld))) {
         throw new Error("fixture dataset visible_world must be an object");
       }
-      const allowed = new Set(["include_future_row", "visible_world", "dataset_id"]);
+      const allowed = new Set(["include_future_row", "visible_world", "dataset_id", "r17_technique"]);
       const extra = unexpected.filter((key) => !allowed.has(key));
       if (extra.length > 0) throw new Error(`fixture dataset rejects extra field: ${extra[0]}`);
       if (input.include_future_row !== undefined && typeof input.include_future_row !== "boolean") {
         throw new Error("fixture dataset include_future_row must be boolean");
+      }
+      if (input.r17_technique === true && visibleWorld === undefined) {
+        const fixture = kernelEnsureR17TechniqueFixture();
+        mainWindow?.webContents.send("qf:dock:invalidate");
+        return fixture;
       }
       const requestedDataset = typeof input.dataset_id === "string" ? kernelGetObject("dataset", input.dataset_id) : null;
       const dataset = requestedDataset ?? kernelEnsureSampleResearchDataset({
@@ -1435,6 +1453,8 @@ app.whenReady().then(async () => {
           hypothesisId: String(world.hypothesis_id),
           executorSessionId: String(world.executor_session_id),
           criticSessionId: String(world.critic_session_id),
+          strategyId: typeof world.strategy_id === "string" ? world.strategy_id : undefined,
+          runId: typeof world.run_id === "string" ? world.run_id : undefined,
         });
         mainWindow?.webContents.send("qf:events:invalidate");
         return { dataset, visible_world: seeded };
@@ -1459,6 +1479,10 @@ app.whenReady().then(async () => {
         throw new Error("submit_question requires non-empty question");
       }
       const text = question.trim();
+      const strategyId = input.strategy_id;
+      if (typeof strategyId !== "string" || strategyId.trim() !== strategyId || !kernelListStrategyVersions().some((row) => row.strategy_id === strategyId)) {
+        throw new Error("TECHNIQUE COVERAGE REFUSED");
+      }
       const missionId =
         typeof input.mission_id === "string" && input.mission_id.length > 0
           ? input.mission_id
@@ -1492,7 +1516,7 @@ app.whenReady().then(async () => {
         beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
         onStarted: projectStartedSession,
       });
-        bindResearchHypothesis(result.sessionId, hypothesisId, typeof input.strategy_id === "string" ? input.strategy_id : undefined);
+        bindResearchHypothesis(result.sessionId, hypothesisId, strategyId);
       return {
         missionId,
         hypothesisId,

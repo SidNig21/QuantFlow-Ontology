@@ -880,7 +880,7 @@ function createHypothesis(
             throw new KernelError('create_hypothesis "sources" must be an array of strings');
           })();
 
-  const id = crypto.randomUUID();
+  const id = process.env.QF_R17_GATE === "1" ? "hypothesis-r17-gate" : crypto.randomUUID();
   const state = commitCreation(db, {
     object_type: cmd.object_type,
     object_id: id,

@@ -110,7 +110,7 @@ function makeField(field, value, exists) {
 	return row;
 }
 
-function renderObject(dom, tile, object, onReveal) {
+function renderObject(dom, tile, object, onReveal, world, onOutcomeRecorded) {
 	if (!dom?.contentArea || !object) return;
 	const container = dom.container;
 	if (container._qfWorldKeyHandler) container.removeEventListener("keydown", container._qfWorldKeyHandler);
@@ -145,27 +145,50 @@ function renderObject(dom, tile, object, onReveal) {
 					row.dataset.selectionRef = String(selection?.id ?? "");
 					const state = document.createElement("span");
 					state.className = "qf-outcome-state";
-					state.textContent = "PENDING OUTCOME";
-					const button = document.createElement("button");
-					button.type = "button";
-					button.textContent = "Record settled outcome";
-					button.setAttribute("aria-label", `Record settled outcome ${row.dataset.selectionRef}`);
-					button.addEventListener("click", () => {
+					const persistedGrade = (world?.objects || []).find((candidate) => {
+						if (candidate.type !== "artifact") return false;
+						const preview = candidate.fields?.receipt?.preview;
+						if (typeof preview !== "string") return false;
+						const linkedToRun = (world?.links || []).some((link) => link.kind === "grades_run" && link.from_id === candidate.id && link.to_id === object.fields?.run_id);
+						const linkedToTicket = (world?.links || []).some((link) => link.kind === "grades_ticket" && link.from_id === candidate.id);
+						try { const grade = JSON.parse(preview); const linkedToStrategy = (world?.links || []).some((link) => link.kind === "grades_strategy" && link.from_id === candidate.id && link.to_id === grade.strategy_id); const linkedToResult = (world?.links || []).some((link) => link.kind === "grades_run_result" && link.from_id === candidate.id && link.to_id === grade.run_result_artifact_id); return linkedToRun && linkedToTicket && linkedToStrategy && linkedToResult && grade.run_id === object.fields?.run_id && grade.selection_ref === row.dataset.selectionRef; } catch { return false; }
+					});
+					let persistedPayload = null;
+					if (persistedGrade) { try { persistedPayload = JSON.parse(persistedGrade.fields.receipt.preview); } catch { persistedPayload = null; } }
+					state.textContent = persistedPayload ? String(persistedPayload.outcome).toUpperCase() : "PENDING OUTCOME";
+					const makeOutcomeForm = () => {
 						const form = document.createElement("form");
 						form.className = "qf-outcome-form";
 						for (const name of ["external_ref", "settled_at", "decimal_odds", "closing_decimal_odds", "stake", "payout"]) {
 							const input = document.createElement("input"); input.name = name; input.placeholder = name; form.appendChild(input);
 						}
-						const outcome = document.createElement("select"); outcome.name = "outcome"; for (const value of ["win", "loss", "push", "void"]) { const option = document.createElement("option"); option.value = value; option.textContent = value; outcome.appendChild(option); } form.appendChild(outcome);
+						const outcome = document.createElement("select"); outcome.name = "outcome"; outcome.required = true; for (const value of ["win", "loss", "push", "void"]) { const option = document.createElement("option"); option.value = value; option.textContent = value; outcome.appendChild(option); } form.appendChild(outcome);
 						const submit = document.createElement("button"); submit.type = "submit"; submit.textContent = "Save outcome"; form.appendChild(submit);
 						const message = document.createElement("span"); message.className = "qf-outcome-message"; form.appendChild(message);
 						form.addEventListener("submit", async (event) => {
 							event.preventDefault();
 							const input = Object.fromEntries([...form.elements].filter((entry) => entry.name).map((entry) => [entry.name, entry.value]));
-							try { const result = await window.shellApi.qf.recordStrategyOutcome({ run_id: object.fields?.run_id ?? "", selection_ref: row.dataset.selectionRef, ...input, payout: input.payout === "" ? null : input.payout }); if (!result?.ok) throw new Error(result?.error?.message ?? "Outcome refused"); message.textContent = "Recorded"; state.textContent = String(input.outcome).toUpperCase(); } catch (error) { message.textContent = error?.message ?? String(error); }
+							try {
+								const result = await window.shellApi.qf.recordStrategyOutcome({ run_id: object.fields?.run_id ?? "", selection_ref: row.dataset.selectionRef, ...input, payout: input.payout === "" ? null : input.payout });
+								window.__QF_LAST_OUTCOME_RESULT = result;
+								if (!result?.ok) { message.textContent = String(result?.error?.message ?? ""); return; }
+								await onOutcomeRecorded?.();
+							} catch (error) { message.textContent = error?.message ?? String(error); }
 						});
-						row.appendChild(form); button.remove();
-					});
+						return form;
+					};
+					if (persistedPayload) {
+						const receipt = document.createElement("span"); receipt.className = "qf-outcome-receipt";
+						receipt.textContent = `calibration=${String(persistedPayload.calibration)} clv=${String(persistedPayload.clv)}`;
+						const replay = document.createElement("button"); replay.type = "button"; replay.className = "qf-outcome-replay"; replay.textContent = "Replay settled outcome"; replay.setAttribute("aria-label", `Replay settled outcome ${row.dataset.selectionRef}`);
+						replay.addEventListener("click", () => { replay.remove(); row.appendChild(makeOutcomeForm()); });
+						row.append(state, receipt, replay); details.appendChild(row); continue;
+					}
+					const button = document.createElement("button");
+					button.type = "button";
+					button.textContent = "Record settled outcome";
+					button.setAttribute("aria-label", `Record settled outcome ${row.dataset.selectionRef}`);
+					button.addEventListener("click", () => { row.appendChild(makeOutcomeForm()); button.remove(); });
 					row.append(state, button); details.appendChild(row);
 				}
 			}
@@ -223,11 +246,15 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 
 	function renderTile(dom, tile, object) {
 		const found = object || lastWorld?.objects?.find((entry) => entry.type === tile.ontologyType && entry.id === tile.ontologyId);
-		if (found) renderObject(dom, tile, found, reveal);
+		if (found) renderObject(dom, tile, found, reveal, lastWorld, refreshOutcome);
 	}
 
 	function existing(type, id) {
 		return tiles.find((tile) => tile.id === tileId(type, id));
+	}
+
+	async function refreshOutcome() {
+		if (lastRoot) await reveal(lastRoot.type, lastRoot.id);
 	}
 
 	function decorateSession(object) {

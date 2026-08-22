@@ -527,6 +527,11 @@ export function kernelExecute<C extends string>(
   input: Record<string, unknown>,
   trace: TrustedExecutionContext,
 ): ExecuteResultFor<C> {
+  if (process.env.QF_R17_PLACEMENT_SPY === "1" && /place_wager|submit_wager|place_order|submit_order/i.test(command)) {
+    const marker = process.env.QF_R17_PLACEMENT_SPY_PATH;
+    if (marker) writeFileSync(marker, JSON.stringify({ command, input }), "utf8");
+    throw new Error("R17 placement execution spy intercepted a forbidden action");
+  }
   const result = execute(getKernelDb(), command, input, trace);
   notifyKernelEvents();
   return result;
@@ -895,6 +900,41 @@ export function kernelEnsureSampleResearchDataset(
   }, { ...trace, span_id: crypto.randomUUID() }) as unknown as Record<string, unknown>;
 }
 
+/** Synthetic R17 fixture: one point-in-time observation and two named techniques. */
+export function kernelEnsureR17TechniqueFixture(): { dataset: Record<string, unknown>; strategies: Array<Record<string, unknown>>; missing_close_run_id: string } {
+  const bytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.dataset.v1",
+    observations: [{ id: "selection-r17", observed_at: "2026-08-21T00:00:00.000Z", edge: 0.8, predicted_probability: 0.8 }],
+  }));
+  const hash = createHash("sha256").update(bytes).digest("hex");
+  const directory = join(getArtifactRoot(), "r17-fixture");
+  const path = join(directory, `${hash}.json`);
+  mkdirSync(directory, { recursive: true });
+  if (!existsSync(path)) writeFileSync(path, bytes, { encoding: "utf8", flag: "wx" });
+  const trace = { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() };
+  const source = kernelExecute("publish_artifact", { kind: "result_set", path, storage_ref: path, content_hash: hash }, trace) as { object_id: string };
+  const dataset = kernelExecute("register_dataset_version", {
+    kind: "results", artifact_id: source.object_id, content_hash: source.object_id,
+    as_of: "2026-08-22T00:00:00.000Z", coverage: { deterministic_score_field: "edge" },
+  }, { ...trace, span_id: crypto.randomUUID() }) as unknown as Record<string, unknown>;
+  const strategies: Array<Record<string, unknown>> = [];
+  for (const version of [1, 2]) {
+    const run = kernelExecute("execute_deterministic_run", {
+      run_id: `r17-fixture-v${version}`,
+      dataset_id: String(dataset.object_id),
+      strategy_spec: { contract: "qf.strategy.v1", family: "r17-technique", version, stake_model: "flat", score_field: "edge", probability_field: "/predicted_probability" },
+      params: { limit: 1 },
+    }, { ...trace, span_id: crypto.randomUUID() }) as { state: Record<string, unknown> };
+    const strategyId = kernelGetLinks(`r17-fixture-v${version}`, { kind: "uses" }).find((link) => link.from_id === `r17-fixture-v${version}` && link.to_id.startsWith("strategy:"))?.to_id;
+    if (strategyId) { const spec = getKernelDb().query("SELECT spec_ref FROM strategy WHERE id = ?").get(strategyId) as { spec_ref?: string } | null; const artifact = spec?.spec_ref ? getKernelDb().query("SELECT content_hash FROM artifact WHERE id = ?").get(spec.spec_ref) as { content_hash?: string } | null : null; strategies.push({ strategy_id: strategyId, version, result_artifact_id: run.state.result_artifact_id, content_hash: artifact?.content_hash ?? "" }); }
+  }
+  const strategyId = String(strategies.find((row) => Number(row.version) === 2)?.strategy_id ?? "");
+  const missingClose = kernelExecute("execute_deterministic_run", {
+    run_id: "r17-fixture-missing-close", dataset_id: String(dataset.object_id), strategy_id: strategyId, params: { limit: 1 },
+  }, { ...trace, span_id: crypto.randomUUID() }) as { object_id: string };
+  if (process.env.QF_R17_FALSIFY_STRATEGY_BYTES === "1") { const specRef = String((getKernelDb().query("SELECT spec_ref FROM strategy WHERE id = ?").get(strategyId) as { spec_ref?: string } | null)?.spec_ref ?? ""); const row = getKernelDb().query("SELECT storage_ref FROM artifact WHERE id = ?").get(specRef) as { storage_ref?: string } | null; if (row?.storage_ref) { const corrupted = readFileSync(row.storage_ref); corrupted[0] = corrupted[0] ^ 1; writeFileSync(row.storage_ref, corrupted); } } return { dataset, strategies, missing_close_run_id: missingClose.object_id };
+}
+
 /** Synthetic Hermes fixture: bounded market context for the app-owned read seam. */
 export function kernelEnsureSyntheticMarketFixture(): Record<string, unknown> {
   const marketEventId = "event-hermes-synthetic";
@@ -944,6 +984,19 @@ export function kernelOpenHypothesisForQuestion(question: string, datasetId?: st
 
 const researchEvidenceByRunId = new Map<string, string>();
 
+/** R17 Director path: named Technique is mandatory and legacy strategy synthesis is unreachable. */
+export function kernelRunR17DirectorResearch(
+  executorSessionId: string,
+  hypothesisId: string,
+  evidenceArtifactId: string,
+  strategyId: string,
+): ReturnType<typeof kernelRunGuidedResearch> {
+  if (typeof strategyId !== "string" || strategyId.trim() !== strategyId || strategyId.length === 0) {
+    throw new Error("TECHNIQUE COVERAGE REFUSED");
+  }
+  return kernelRunGuidedResearch(executorSessionId, hypothesisId, evidenceArtifactId, strategyId);
+}
+
 export function kernelRunGuidedResearch(
   executorSessionId: string,
   hypothesisId: string,
@@ -967,7 +1020,7 @@ export function kernelRunGuidedResearch(
   if (!hypothesis || !dataset) return null;
   const scoreField = String(jsonRecord(dataset.coverage).deterministic_score_field);
   const run = kernelExecute("execute_deterministic_run", {
-    run_id: `run-${crypto.randomUUID()}`,
+    run_id: process.env.QF_R17_GATE === "1" ? "run-r17-gate" : `run-${crypto.randomUUID()}`,
     dataset_id: String(dataset.id),
     hypothesis_id: hypothesisId,
     ...(strategyId ? { strategy_id: strategyId } : { strategy_spec: {
@@ -1124,8 +1177,16 @@ export function kernelSeedVisibleResearchWorld(input: {
   hypothesisId: string;
   executorSessionId: string;
   criticSessionId: string;
+  strategyId?: string;
+  runId?: string;
 }): Record<string, unknown> {
   const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  for (const [sessionId, definitionId, label] of [[input.directorSessionId, "hermes-research-director", "R17 fixture director"], [input.executorSessionId, "hermes-worker", "R17 fixture executor"], [input.criticSessionId, "hermes-critic", "R17 fixture critic"]] as const) {
+    if (!kernelGetObject("agent_session", sessionId)) {
+      kernelExecute("create_agent_session", { session_id: sessionId, agent_definition_id: definitionId, label }, trace());
+      kernelExecute("start_agent_session", { session_id: sessionId }, trace());
+    }
+  }
   const createdTask = input.taskId ? null : kernelExecute("create_task", {
     task_id: `task-${input.nonce}`,
     title: input.taskTitle,
@@ -1134,19 +1195,26 @@ export function kernelSeedVisibleResearchWorld(input: {
   }, { ...trace(), actor_session_id: input.directorSessionId, mission_id: input.missionId }) as { object_id: string };
   const taskId = input.taskId ?? String(createdTask?.object_id ?? "");
   if (!taskId) throw new Error("R16 fixture Task creation did not return an id");
+  const selectedStrategyId = process.env.QF_R17_FALSIFY_STRATEGY === "1"
+    ? String(kernelListStrategyVersions().find((row) => Number(row.version) === 1)?.strategy_id ?? "")
+    : input.strategyId;
   const db = getKernelDb();
   if (!db.query("SELECT 1 FROM links WHERE kind = 'delegates_to' AND from_id = ? AND to_id = ?").get(input.directorSessionId, input.executorSessionId)) {
     db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'delegates_to', ?, ?, ?)").run(crypto.randomUUID(), input.directorSessionId, input.executorSessionId, new Date().toISOString());
   }
-  const run = kernelExecute("execute_deterministic_run", {
-    run_id: `run-${input.nonce}`,
-    dataset_id: input.datasetId,
-    hypothesis_id: input.hypothesisId,
-    strategy_spec: {
-      contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge",
-    },
-    params: { limit: 2 },
-  }, { ...trace(), actor_session_id: input.executorSessionId }) as { object_id: string; state: Record<string, unknown> };
+  const existingRun = input.runId ? kernelGetObject("run", input.runId) : null;
+  const existingParams = existingRun ? jsonRecord(existingRun.params) : {};
+  const run = existingRun
+    ? { object_id: input.runId!, state: { ...existingRun, result_artifact_id: existingParams.result_artifact_id } }
+    : kernelExecute("execute_deterministic_run", {
+      run_id: `run-${input.nonce}`,
+      dataset_id: input.datasetId,
+      hypothesis_id: input.hypothesisId,
+      ...(selectedStrategyId ? { strategy_id: selectedStrategyId } : { strategy_spec: {
+        contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge",
+      } }),
+      params: { limit: 2 },
+    }, { ...trace(), actor_session_id: input.executorSessionId }) as { object_id: string; state: Record<string, unknown> };
   const resultArtifactId = String(run.state.result_artifact_id ?? "");
   if (!resultArtifactId) throw new Error("R16 fixture deterministic Run did not produce a result Artifact");
   const work: SourceWork = {

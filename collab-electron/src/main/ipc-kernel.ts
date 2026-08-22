@@ -260,7 +260,14 @@ export function registerKernelHandlers(): void {
           throw new Error("submitQuestion requires non-empty question");
         }
         const text = question.trim();
-        const missionId = `mission-${crypto.randomUUID()}`;
+        const strategyId = args?.strategyId;
+        const technique = typeof strategyId === "string"
+          ? kernelListStrategyVersions().find((row) => row.strategy_id === strategyId)
+          : undefined;
+        if (!technique || typeof strategyId !== "string" || strategyId.trim() !== strategyId) {
+          throw new Error("TECHNIQUE COVERAGE REFUSED");
+        }
+        const missionId = process.env.QF_R17_GATE === "1" ? "mission-r17-gate" : `mission-${crypto.randomUUID()}`;
         const definitionId =
           typeof args?.definitionId === "string" && args.definitionId.length > 0
             ? args.definitionId
@@ -310,7 +317,13 @@ export function registerKernelHandlers(): void {
             }
           },
         });
-        bindResearchHypothesis(result.sessionId, hypothesisId, args?.strategyId);
+        bindResearchHypothesis(result.sessionId, hypothesisId, strategyId);
+        if (process.env.QF_R17_GATE === "1") {
+          (globalThis as Record<string, unknown>).__QF_R17_LAST_ADMISSION = {
+            sessionId: result.sessionId,
+            seatCapability: result.seatCapability ?? "",
+          };
+        }
         invalidateDock();
         return {
           ok: true as const,
@@ -318,6 +331,7 @@ export function registerKernelHandlers(): void {
           hypothesisId,
           sessionId: result.sessionId,
           objective: text,
+          ...(process.env.QF_R17_GATE === "1" && result.seatCapability ? { seatCapability: result.seatCapability } : {}),
         };
       } catch (err) {
         return { ok: false as const, error: serializeError(err) };

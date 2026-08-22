@@ -554,6 +554,8 @@ export type AdmitResult = {
   surface: "acp_session" | "native_tui";
   ptySessionId?: string;
   role?: string;
+  /** QA-only app-bound credential for the authenticated gateway falsifier. */
+  seatCapability?: string;
 };
 
 export type TurnResult = {

@@ -1,0 +1,310 @@
+{
+  "root_id": "mission-r17-gate",
+  "objects": [
+    {
+      "type": "mission",
+      "id": "mission-r17-gate",
+      "fields": {
+        "id": "mission-r17-gate",
+        "name": "Founder question",
+        "objective": "R17 live technique outcome"
+      }
+    },
+    {
+      "type": "task",
+      "id": "task-r17-gate",
+      "fields": {
+        "id": "task-r17-gate",
+        "title": "R17 outcome Task",
+        "description": "R17 live technique outcome",
+        "status": "open",
+        "assignee_session_id": "r17-executor",
+        "delegator_session_id": "${field:task:delegator_session_id}",
+        "mission_id": "mission-r17-gate",
+        "steering_state": "open",
+        "review_state": "open"
+      }
+    },
+    {
+      "type": "task",
+      "id": "${review_task_id}",
+      "fields": {
+        "id": "${review_task_id}",
+        "title": "Independent research review",
+        "description": "Review the immutable source work task-r17-gate using the governed critic contract.",
+        "status": "done",
+        "assignee_session_id": "r17-critic",
+        "delegator_session_id": "${field:review_task:delegator_session_id}",
+        "mission_id": null,
+        "steering_state": "done",
+        "review_state": "done"
+      }
+    },
+    {
+      "type": "hypothesis",
+      "id": "hypothesis-r17-gate",
+      "fields": {
+        "id": "hypothesis-r17-gate",
+        "claim": "R17 live technique outcome",
+        "success_criteria": "Kernel-held evidence and, when a settled Dataset exists, deterministic metrics independently reviewed by a critic.",
+        "sources": [],
+        "status": "open"
+      }
+    },
+    {
+      "type": "dataset",
+      "id": "${dataset_id}",
+      "fields": {
+        "id": "${dataset_id}",
+        "kind": "results",
+        "content_hash": "${field:dataset:content_hash}",
+        "as_of": "2026-08-22T00:00:00.000Z",
+        "coverage": {
+          "deterministic_score_field": "edge",
+          "record_count": 1,
+          "max_observed_at": "2026-08-21T00:00:00.000Z"
+        },
+        "source_artifact": "${field:dataset:source_artifact}"
+      }
+    },
+    {
+      "type": "run",
+      "id": "run-r17-gate",
+      "fields": {
+        "id": "run-r17-gate",
+        "kind": "backtest",
+        "status": "succeeded",
+        "params": "${field:run:params}",
+        "trace_id": "${field:run:trace_id}",
+        "dataset_id": "${dataset_id}",
+        "hypothesis_id": "hypothesis-r17-gate",
+        "result_artifact_id": "${result_artifact_id}",
+        "executor_session_id": "r17-executor",
+        "strategy_id": "${strategy_id}"
+      }
+    },
+    {
+      "type": "strategy",
+      "id": "${strategy_id}",
+      "fields": {
+        "id": "${strategy_id}",
+        "spec_ref": "${field:strategy:spec_ref}",
+        "version": 2,
+        "stake_model": "flat",
+        "family": "r17-technique",
+        "probability_field": "/predicted_probability",
+        "content_hash": "${field:strategy:content_hash}"
+      }
+    },
+    {
+      "type": "ticket",
+      "id": "external-r17",
+      "fields": {
+        "id": "external-r17",
+        "origin": "operator_supplied",
+        "kind": "single",
+        "external_ref": "external-r17",
+        "placed_at": "${field:ticket:placed_at}",
+        "legs": "[{\"id\":\"selection-r17\",\"decimal_odds\":\"2.2\"}]",
+        "combined_price": 2.2,
+        "stake": 1,
+        "payout": 2.2,
+        "correlation_note": "operator settlement for forward research selection",
+        "grade": "win"
+      }
+    },
+    {
+      "type": "artifact",
+      "id": "${result_artifact_id}",
+      "fields": {
+        "id": "${result_artifact_id}",
+        "kind": "result_set",
+        "content_hash": "${field:result_artifact:content_hash}",
+        "receipt": "${field:result_artifact:receipt}",
+        "run_id": "run-r17-gate"
+      }
+    },
+    {
+      "type": "artifact",
+      "id": "${grade_artifact_id}",
+      "fields": {
+        "id": "${grade_artifact_id}",
+        "kind": "result_set",
+        "content_hash": "${field:grade_artifact:content_hash}",
+        "receipt": "${field:grade_artifact:receipt}"
+      }
+    },
+    {
+      "type": "artifact",
+      "id": "${findings_artifact_id}",
+      "fields": {
+        "id": "${findings_artifact_id}",
+        "kind": "evaluation_findings",
+        "content_hash": "${field:findings_artifact:content_hash}",
+        "receipt": "${field:findings_artifact:receipt}"
+      }
+    },
+    {
+      "type": "artifact",
+      "id": "${report_artifact_id}",
+      "fields": {
+        "id": "${report_artifact_id}",
+        "kind": "report",
+        "content_hash": "${field:report_artifact:content_hash}",
+        "receipt": "${field:report_artifact:receipt}"
+      }
+    },
+    {
+      "type": "evaluation",
+      "id": "${evaluation_id}",
+      "fields": {
+        "id": "${evaluation_id}",
+        "metrics": "${field:evaluation:metrics}",
+        "critic_findings_ref": "${field:evaluation:critic_findings_ref}",
+        "verdict": "supports",
+        "confidence": 0.9,
+        "rationale": "The bounded deterministic fixture preserves the complete visible research lineage.",
+        "rubric": "${field:evaluation:rubric}",
+        "overall": "${field:evaluation:overall}",
+        "run_metrics": "${field:evaluation:run_metrics}",
+        "findings_artifact_id": "${field:evaluation:findings_artifact_id}",
+        "broker_invocation_id": null,
+        "review_task_id": "${field:evaluation:review_task_id}",
+        "source_work": "${field:evaluation:source_work}",
+        "publication_report_id": "${field:evaluation:publication_report_id}",
+        "block_reason": null,
+        "critic_session_id": "r17-critic",
+        "report_artifact_id": "${field:evaluation:report_artifact_id}"
+      }
+    },
+    {
+      "type": "agent_session",
+      "id": "${director_session_id}",
+      "fields": {
+        "id": "${director_session_id}",
+        "status": "running",
+        "label": "hermes-research-director"
+      }
+    },
+    {
+      "type": "agent_session",
+      "id": "r17-executor",
+      "fields": {
+        "id": "r17-executor",
+        "status": "running",
+        "label": "R17 fixture executor"
+      }
+    },
+    {
+      "type": "agent_session",
+      "id": "r17-critic",
+      "fields": {
+        "id": "r17-critic",
+        "status": "running",
+        "label": "R17 fixture critic"
+      }
+    }
+  ],
+  "links": [
+    {
+      "kind": "belongs_to",
+      "from_id": "task-r17-gate",
+      "to_id": "mission-r17-gate"
+    },
+    {
+      "kind": "assigned_to",
+      "from_id": "task-r17-gate",
+      "to_id": "r17-executor"
+    },
+    {
+      "kind": "delegated_by",
+      "from_id": "task-r17-gate",
+      "to_id": "${director_session_id}"
+    },
+    {
+      "kind": "delegates_to",
+      "from_id": "${director_session_id}",
+      "to_id": "r17-executor"
+    },
+    {
+      "kind": "tests",
+      "from_id": "run-r17-gate",
+      "to_id": "hypothesis-r17-gate"
+    },
+    {
+      "kind": "uses",
+      "from_id": "run-r17-gate",
+      "to_id": "${dataset_id}"
+    },
+    {
+      "kind": "uses",
+      "from_id": "run-r17-gate",
+      "to_id": "${strategy_id}"
+    },
+    {
+      "kind": "produces",
+      "from_id": "run-r17-gate",
+      "to_id": "${result_artifact_id}"
+    },
+    {
+      "kind": "grades_ticket",
+      "from_id": "${grade_artifact_id}",
+      "to_id": "external-r17"
+    },
+    {
+      "kind": "grades_run",
+      "from_id": "${grade_artifact_id}",
+      "to_id": "run-r17-gate"
+    },
+    {
+      "kind": "grades_strategy",
+      "from_id": "${grade_artifact_id}",
+      "to_id": "${strategy_id}"
+    },
+    {
+      "kind": "grades_run_result",
+      "from_id": "${grade_artifact_id}",
+      "to_id": "${result_artifact_id}"
+    },
+    {
+      "kind": "evaluated_by",
+      "from_id": "hypothesis-r17-gate",
+      "to_id": "${evaluation_id}"
+    },
+    {
+      "kind": "evaluated_by",
+      "from_id": "run-r17-gate",
+      "to_id": "${evaluation_id}"
+    },
+    {
+      "kind": "evaluated_by",
+      "from_id": "${result_artifact_id}",
+      "to_id": "${evaluation_id}"
+    },
+    {
+      "kind": "performed_by",
+      "from_id": "${evaluation_id}",
+      "to_id": "r17-critic"
+    },
+    {
+      "kind": "gates",
+      "from_id": "${evaluation_id}",
+      "to_id": "${report_artifact_id}"
+    },
+    {
+      "kind": "produces",
+      "from_id": "r17-critic",
+      "to_id": "${findings_artifact_id}"
+    },
+    {
+      "kind": "assigned_to",
+      "from_id": "${review_task_id}",
+      "to_id": "r17-critic"
+    },
+    {
+      "kind": "delegated_by",
+      "from_id": "${review_task_id}",
+      "to_id": "${director_session_id}"
+    }
+  ]
+}
