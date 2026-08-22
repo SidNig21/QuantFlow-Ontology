@@ -99,7 +99,9 @@ current-door: exact `CRITIC SUBMIT VERIFIER RED — silent PTY write still repor
 consumer-critic-submit-verifier-reader-findings: fresh adversarial Reader at docs head `e7cdae2` returned NO/NO; the PTY mock bypass, missing exact rejection meanings, unbound governed-continuation red cases, and ambiguous boolean test seam were appended to `WO-R16.md`; fresh reread required
 current-door: exact `CRITIC SUBMIT VERIFIER RED — Reader findings and binding closure` requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
 consumer-critic-submit-verifier-reader-receipt: fresh Reader reread at pushed docs head `332970b`; final YES/YES; the exact PTY write-status correction is Builder-authorized, with no rebuild, consumer launch, or R17 authority
-current-door: exact `CRITIC SUBMIT VERIFIER RED — Reader findings and binding closure` Builder authorized only; no rebuild, consumer launch, or R17 authority
+consumer-critic-write-status-candidate: immutable product candidate `e824ae10f50336a1640afeecd802ed7141bbeeb7`; Builder evidence `2253ccb0bc71cbecb75ab820aed9bdce9ad18d13`; focused tests and both write-status falsifiers green; Atlas current with HARD RED 0
+consumer-critic-write-status-matrix-red: required unchanged `kernel-sole-writer-app` gate named four pre-existing isolated focused test imports absent from its exact test allowlist; every other parent command was green; bounded gate-only synchronization is appended to WO-R16
+current-door: exact `WRITE-STATUS MATRIX RED — stale app sole-writer test allowlist` correction requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
 
 ## Authorized outcome
 

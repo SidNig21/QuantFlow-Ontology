@@ -1,7 +1,7 @@
 # WO-R16 - Visible research world
 
-status: normal consumer critic-submit write-status rework - Builder authorized
-assignee: one fresh Builder session
+status: normal consumer critic-submit gate synchronization - fresh Reader required
+assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
@@ -4033,3 +4033,44 @@ Final Reader reread receipt: at pushed docs head
 `a368eb5139784d66b82cbb12b0c72c3673362eb8`, the exact closure is **YES/YES**.
 Builder authorization remains limited to the critic-submit write-status repair;
 no rebuild, consumer launch, or R17 work is authorized.
+
+### WRITE-STATUS MATRIX RED — stale app sole-writer test allowlist
+
+The write-status candidate `e824ae10f50336a1640afeecd802ed7141bbeeb7`
+passed its focused tests, both write-result falsifiers, the governed-review
+gate, the ordinary Kernel sole-writer gate, Atlas currentness/ratchet, and all
+other parent commands. The unchanged required command
+`bun qa/run.ts kernel-sole-writer-app` exited `1` on four focused test files:
+
+- `collab-electron/src/main/governed-review.test.ts` (`node:sqlite`)
+- `collab-electron/src/main/native-tui-orchestration.test.ts` (`node:sqlite`)
+- `collab-electron/src/main/ontology-gateway.test.ts` (`qf-kernel`)
+- `collab-electron/src/main/precreated-native-tui.test.ts` (`node:sqlite`)
+
+All four imports predate the write-status correction and exist only to build
+isolated focused Kernel/Electron fixtures. None is an application runtime
+writer. The gate's `KERNEL_ALLOWED` already exempts three focused test files
+for this exact reason, but its enumeration was not synchronized when these
+four tests landed. This is a stale finite gate inventory, not authority to
+move a runtime write or exempt a directory or pattern.
+
+The only authorized correction is to add those four exact file strings to the
+existing `KERNEL_ALLOWED` set in
+`qa/gates/kernel-sole-writer-app.ts`, beside the existing focused-test entries,
+with one comment stating they are isolated fixture/oracle tests and add no app
+runtime writer. No wildcard, suffix rule, directory exception, SQL-pattern
+change, scan-root change, or other allowlist entry is permitted.
+
+The gate-only Builder runs `bun qa/run.ts kernel-sole-writer-app` and requires
+native exit `0`. It then temporarily removes only the new
+`governed-review.test.ts` entry, reruns the unchanged command, and requires
+native nonzero naming exactly that file; it restores the gate byte-for-byte,
+proves zero diff for the path, and reruns to native exit `0`. It finally reruns
+the unchanged parent short matrix, Atlas currentness/ratchet, and both diff
+checks. Any other red stops. The immutable product files at `e824ae10` remain
+byte-identical; only this gate and existing R16 evidence may change.
+
+A fresh Reader must return YES/YES before this one gate-only correction. A
+fresh independent Verifier then owns the complete bounded matrix against
+product candidate `e824ae10` plus the exact gate commit. No Electron rebuild,
+consumer launch, founder-state change, or R17 work is authorized before PASS.
