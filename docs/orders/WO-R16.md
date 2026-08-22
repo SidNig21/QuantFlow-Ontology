@@ -1300,3 +1300,87 @@ of this repair.
 Plain meaning: keep each real Hermes terminal intact, but add the three small
 Kernel-backed identity facts that let Ryan inspect who that seat is in the
 research world.
+
+## ONE-MINUTE BUDGET REPAIR - overlap specialists and never mask the red
+
+Session-receipt WIP SHA `eb2300631385673794a59110b6fba19a508b7703` is
+evidence, not a candidate. Its renderer tests pass 6/6 and the unchanged gate
+contract passes 11/11. The live command returned after 61.152 seconds with the
+normal owned process set already at zero, but all three roots still present:
+
+```text
+normal-exception shutdown_requested=true owned_processes_remaining=0
+roots_created=3 roots_remaining=3 retried=0 leaked=[three exact roots]
+error: research-world-visible cleanup left roots
+```
+
+`removeRegisteredRoot()` made zero attempts because the hard deadline had
+already expired. The root assertion then threw before `primary_failure` and
+`cleanup_failures` were printed, violating this order's existing requirement
+that cleanup never hide the functional failure.
+
+The one-minute ceiling and one global eight-second cleanup reserve remain exact.
+No assertion, launch, world interaction, failure case, or cleanup obligation is
+removed. This repair changes only scheduling inside the first normal stage and
+receipt-safe cleanup behavior.
+
+### Exact repair
+
+1. Export exactly one helper named `scheduleFirstWorldSpecialists`. It receives
+   an executor-spawn callback and critic-spawn callback, invokes both callbacks
+   synchronously before awaiting either promise, then returns
+   `Promise.all([executor, critic])` in that fixed order. A focused fake-runner
+   holds both promises unresolved and fails within 250 ms unless both callbacks
+   have started. The first normal stage calls this helper immediately after the
+   Director question returns, using the unchanged production `qf.dock.spawn`
+   calls for `hermes-worker` and `hermes-critic`.
+2. Keep `RESEARCH_WORLD_VISIBLE_DEADLINE_MS = 60_000` and
+   `CLEANUP_RESERVE_MS = 8_000`. Print `first_world_stage_ms=<n>` after the first
+   13/15 world has passed, its app has closed, its process set is zero, and its
+   saved-state check has passed. The value is monotonic milliseconds since the
+   original gate start and must be below the functional deadline.
+3. `removeRegisteredRoot(root, deadlineAt)` makes one immediate removal attempt
+   whenever the resolved root exists, even when `remainingMs(deadlineAt) === 0`.
+   After that first attempt it retries only transient `EBUSY`, `EPERM`, or
+   `ENOTEMPTY` errors while time remains, with the existing bounded delay. It
+   never waits after the deadline. Its focused test creates one isolated temp
+   root, passes an already-expired deadline, and must observe `attempts=1` and
+   that root absent. The test owns and removes only its exact temp root.
+4. Root cleanup never throws before receipts. Associate each normal/failure/
+   timeout root with its existing case. A root-removal failure or surviving root
+   becomes that case's `cleanupError`. If the hard deadline is exceeded and no
+   earlier functional error exists, record the exact normal functional error
+   `research-world-visible exceeded its 60 second total deadline`.
+5. After every process and root cleanup attempt, always print in this fixed
+   order: the existing `roots_created=...` line, `primary_failure=...`, then
+   `cleanup_failures=...`. Only after all three lines exist may the gate assert
+   the hard deadline, zero roots, and `receipts.ok`. Thus a cleanup defect can
+   make the gate red but cannot replace or suppress the primary receipt.
+
+### Builder and acceptance authority
+
+A fresh Builder starts only from clean local and remote
+`eb2300631385673794a59110b6fba19a508b7703` plus the Router's pushed Reader-fix
+commit. It may change only:
+
+- `qa/gates/research-world-visible.ts`;
+- `qa/gates/research-world-visible.test.ts`;
+- `docs/orders/evidence/r16/BUILD-REPORT.md`; and
+- generated Atlas projections required by normal change control.
+
+It runs Atlas preflight and the focused gate contract before exactly one live
+`bun qa/run.ts research-world-visible`. A red stops with all three exact receipt
+lines. A green proceeds through the already-specified falsifiers, short matrix,
+BUILD-REPORT, Atlas regeneration, immutable candidate commit, and push. Every
+product file, expected 13/15 manifest, selector, fixture, Main/preload/Kernel
+behavior, native-key check, saved-state check, four real Electron launches, and
+cleanup ownership rule remains byte-unchanged from `eb23006`.
+
+A fresh different-model Verifier records the candidate SHA before and after,
+reruns the focused test, live gate, named falsifier sample and short matrix, and
+writes `docs/orders/evidence/r16/VERIFICATION.md` only on full PASS. No package,
+installer, release, worktree, wrapper, or helper framework is part of this
+repair.
+
+Plain meaning: start the two specialist seats together, keep the same hard
+one-minute proof, and always clean up and tell the truth even when time runs out.

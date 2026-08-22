@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "4548736",
+    "commit": "eb23006",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c32e36ece2c40a19"
+    "fingerprint": "000e4fb9658d2cde"
   },
   "stats": {
     "live": 111,
@@ -645,8 +645,8 @@
       "layer": 4,
       "name": "useWorkspaceFileTree.ts",
       "kb": 9,
-      "x": 2.88,
-      "z": -2.72,
+      "x": 3.89,
+      "z": -0.73,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2917,9 +2917,9 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 8.8,
-      "x": 3.89,
-      "z": -0.73,
+      "kb": 9.6,
+      "x": 2.88,
+      "z": -2.72,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2928,7 +2928,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 8.8,
+          "kb": 9.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -18585,7 +18585,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 105 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 113 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "04b2596",
+      "commit": "4548736",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "4548736",
+      "commit": "eb23006",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
