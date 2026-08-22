@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 FOUNDER MOUSE-FIRST CORRECTION - BUILD AUTHORIZED
+status: R16 NATIVE KEY SETTLE REPAIR - AWAITING FRESH READER
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -28,6 +28,7 @@ sentinel-reader-receipt: fresh Luna Reader task `01a027a2-bea9-7c73-9e22-2342b34
 sentinel-wip-receipt: focused R16 contract 17/17 and tile-manager 3/3; live native Tab still entered a real Hermes agent-session webview at step 0; roots removed; WIP preserved at `90672d93e6bb0bdb6d4aa95eaada4dc3599cf51a`
 founder-mouse-first-authority: 2026-08-21; global Tab parity removed from R16 only; normal text/terminal keyboard input and no product-created focus trap retained; full keyboard parity recorded as Debt #38 before broader release
 mouse-first-reader-receipt: fresh Luna Reader task `01a027b6-c820-7f63-800c-770b0a5abe63`; final YES/YES at `f91b25f1e9cc2183f2e8040e0110e382b4d71f67`
+mouse-first-wip-receipt: tile-manager 2/2 and focused R16 13/13; the single live gate stopped when immediate post-acknowledgement sampling did not observe Hypothesis Enter expansion; roots and cleanup were green; WIP preserved at `6cb2a7733b582ff10b06eb32ac31b1dbd4f8c403`
 
 ## Authorized outcome
 

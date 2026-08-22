@@ -1806,3 +1806,66 @@ allowlist change, Kernel/fixture change, timeout increase, package, installer,
 release, worktree, wrapper, or helper framework. Plain meaning: prove the
 founder-visible research world with mouse plus retained tile activation keys,
 leave terminal typing alone, and defer honest full keyboard parity to Debt #38.
+
+## NATIVE ENTER/ESCAPE SETTLE REPAIR - distinguish delivery lag from failure
+
+The mouse-first Builder WIP is preserved at
+`6cb2a7733b582ff10b06eb32ac31b1dbd4f8c403`; it is evidence, not a
+candidate. Its tile-manager contract passed 2/2 and its focused R16 contract
+passed 13/13. Its only live invocation reached the exact native keyboard proof
+and stopped on:
+
+`native Enter did not expand hypothesis:<nonce> with focus retained`
+
+Cleanup was fully green: `roots_created=3 roots_remaining=0 retried=0
+leaked=[]` and `cleanup_failures=[]`. The Main proof method queues Electron
+`keyDown` and `keyUp`, then immediately acknowledges `{ key, sent: true }`;
+the gate currently samples renderer state in the next RPC with no settle. That
+sample cannot distinguish a rejected key from queued delivery that completes
+after the sample. The retained assertion must become temporally honest without
+sending the key twice.
+
+This repair inherits the entire `FOUNDER MOUSE-FIRST CORRECTION` above and
+changes only the post-send observation timing and its failure receipt:
+
+1. In `qa/gates/research-world-visible.ts`, each research tile is still selected
+   by independent expected type/id and directly focused exactly once. Send
+   native Enter exactly once, then poll only renderer state for at most 250 ms,
+   in at most 25 ten-millisecond pauses, until the exact target tile is expanded
+   and `document.activeElement` is that same tile. Send native Escape exactly
+   once, then use the same bound until the target is collapsed with focus still
+   on that tile. A poll never calls `app.ui.pressKey` or any input sender.
+2. Each observation reports the target tile's type/id and details-hidden state
+   separately from the active element's tag/id/world type/world id. Exhausting
+   either bound is red and prints one
+   `keyboard_state_failure=<JSON>` containing key, expected type/id and state,
+   attempts, elapsed milliseconds, and the final actual target/focus state. A
+   moved focus, missing tile/details body, wrong expanded/collapsed state, or
+   second send remains red. The success receipt remains exactly
+   `keyboard_tiles=10 enter=10 escape=10 focus_retained=20`.
+3. Keep `qa/gates/research-world-visible.test.ts` at exactly 13 tests. Extend
+   the existing native-key contract test rather than adding a test: exercise
+   the exported bounded settle helper with delayed-success and never-success
+   observations; prove the ten-millisecond pause, 250-millisecond/25-pause
+   ceiling, and final actual receipt; source-check exactly one Enter call and
+   one Escape call in the per-tile loop; and prove the settle helper contains no
+   `pressNativeKey`, `app.ui.pressKey`, or other input sender.
+
+Allowed Builder changes are now only
+`qa/gates/research-world-visible.ts`,
+`qa/gates/research-world-visible.test.ts`,
+`docs/orders/evidence/r16/BUILD-REPORT.md`, and the three generated Atlas
+projections named above. Router-only authority edits and the Verifier-only
+evidence path remain as already named. The product renderer, tile manager,
+Main, preload, Kernel, fixture, timeout, and every assertion are frozen at WIP
+`6cb2a77`.
+
+A fresh Reader must return YES/YES before a fresh Builder starts. That Builder
+runs Atlas preflight, requires tile-manager 2/0 and R16 contract 13/0, then runs
+exactly one `bun qa/run.ts research-world-visible`. Any red stops with the new
+exact keyboard failure plus primary/root/cleanup receipts. Green continues with
+the inherited short matrix, falsifier, report, Atlas refresh, immutable
+candidate commit, and push. The different-model Verifier later receives the
+same one-live-gate budget. No second input send, live-gate invocation, timeout
+increase, product workaround, helper framework, package, installer, release,
+worktree, R17 work, or accessibility claim is authorized.
