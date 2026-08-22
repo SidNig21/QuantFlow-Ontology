@@ -1980,3 +1980,109 @@ this subsection overrides only the corresponding helper/test mechanics above:
 No new test is added: all of these fixtures remain inside the one existing
 native-key contract test, keeping the file at 13/0. The diff-freeze rule and all
 other acceptance requirements remain unchanged.
+
+## FOUNDER POINTER-FIRST CLOSURE - stop keyboard proof cycles
+
+Founder authorization, 2026-08-21:
+
+> R16 is mouse-first. Do not spend further R16 cycles proving Enter/Escape tile
+> parity or global keyboard navigation. Record those as later
+> accessibility/product debt. R16 may close when the production app proves by
+> real pointer interaction that the full 13-object/15-cable research world is
+> visible and inspectable, Hermes terminals remain usable for mouse-focus plus
+> keyboard typing, close/reopen preserves the world, and cleanup is clean. After
+> independent verification, stop before R17 and run the normal application
+> through Computer Use as a consumer working-build check.
+
+This is the final R16 authority. Every `NATIVE ENTER/ESCAPE SETTLE REPAIR`
+section above is spent history and authorizes no implementation. Global Tab
+navigation and research-tile Enter/Escape parity are both deferred to
+[Debt #38](../DEBT.md). Removing them removes no ontology, visibility, field,
+cable, pointer, reopen, failure/timeout, process/root cleanup, 60-second, Atlas,
+or truth-boundary assertion.
+
+### Exact machine proof
+
+Starting from WIP `6cb2a7733b582ff10b06eb32ac31b1dbd4f8c403`:
+
+1. In `qa/gates/research-world-visible.ts`, delete `pressNativeKey`,
+   `exerciseNativeKeyboard`, every native Enter/Escape send, every
+   `keyboard_*` receipt, and the `exerciseKeyboard` option. Do not add a
+   replacement keyboard helper, sender, wait, probe, receipt, or proof bridge.
+   The existing Main proof method is outside scope and remains untouched.
+2. Replace the one-Mission pointer sample with an exact ten-object pointer
+   receipt. For every independent expected object whose type is not
+   `agent_session`, select the exact visible tile by expected type/id, require
+   one enabled visible `.qf-world-inspect` control and one details body, click
+   Inspect once, require that exact target's details visible, click Collapse
+   once, and require that exact target's details hidden. Any missing/extra tile,
+   missing/disabled/hidden control, wrong target, wrong transition, duplicate
+   click, or focus/keyboard substitution is red. Emit exactly
+   `pointer_tiles=10 inspect=10 collapse=10` only after all ten pass.
+3. The live gate still proves the independent exact 13-object manifest,
+   including the Director, executor, and critic Hermes `agent_session` tiles;
+   every displayed field/hash; the exact 15 cable kinds/endpoints with no extra
+   cable; Mission-root and Task-root activation; zero duplicate reveal; exact
+   layout/non-overlap; identical full close/reopen object/field/position/
+   inspector/cable manifest; the isolated saved-state allowlist; renderer/
+   Oracle separation; normal, forced-failure, and forced-timeout cases; all four
+   Electron launches; the existing 60-second outer ceiling; primary/cleanup
+   receipt precedence; and zero owned process/root residue.
+4. Keep `qa/gates/research-world-visible.test.ts` at exactly 13 tests. Replace
+   only the existing native-key contract test with a pointer-first contract that
+   requires the exact pointer receipt, requires iteration over all independent
+   non-session objects by type/id, requires exactly one `.click()` for Inspect
+   and one for Collapse per iteration, and rejects `app.ui.pressKey`,
+   `pressNativeKey`, `sendInputEvent`, `keyboard_`, `tab_focus_`, a sentinel,
+   and any keyboard/input sender in the live gate. The other 12 test bodies are
+   byte-identical to WIP `6cb2a77`.
+5. The candidate diff against WIP `6cb2a77` is an acceptance gate. In the live
+   gate only deletion of the spent keyboard functions/options and replacement
+   of the pointer interaction block may differ. In the focused test only its
+   import list and the one replaced contract test may differ. Every other gate
+   and test line, and every product file, is byte-identical to WIP. Builder and
+   Verifier each inspect and record `git diff 6cb2a77 --`; any broader change is
+   red.
+
+The Builder runs Atlas preflight, tile-manager 2/0, focused R16 13/0, then
+exactly one `bun qa/run.ts research-world-visible`. Any red stops with the exact
+pointer/primary/root/cleanup receipts. Green runs the inherited short matrix.
+The cheap falsifier now temporarily deletes the exact
+`pointer_tiles=10 inspect=10 collapse=10` contract string, requires the focused
+contract red, restores to zero diff, and requires 13/0 green; it never launches
+the app. The BUILD-REPORT records the founder decision, Debt #38, exact pointer
+receipt, 13/15 world/reopen/cleanup receipts, matrix and falsifier exits, Atlas
+summary, WIP diff-freeze receipt, and immutable measured candidate SHA. It makes
+no Tab or Enter/Escape parity claim.
+
+### Independent verification and normal-app consumer check
+
+A fresh different-model Verifier records the immutable candidate SHA before
+and after, independently runs the same bounded matrix and exactly one live gate,
+inspects the WIP diff freeze, and writes
+`docs/orders/evidence/r16/VERIFICATION.md` only on full PASS. No package,
+installer, release gate, second live invocation, worktree, clone, wrapper, or
+helper framework is authorized.
+
+Only after that independent PASS, the Router uses Computer Use against the
+normal founder application—not `QF_UI_PROOF`, not the isolated gate fixture,
+and not a proof-mode build—as a consumer working-build check. With ordinary
+mouse input it opens or focuses the real research world, confirms the visible
+13-object/15-cable desk and opens/closes representative research inspectors.
+It mouse-focuses a real Hermes terminal, types a unique harmless canary without
+submitting it, observes that text in the terminal, and erases it without
+executing a command. It records screenshots and exact observations in
+`docs/orders/evidence/r16/CONSUMER-CHECK.md`; no credential, prompt content, or
+founder state is copied into the report. If the normal app lacks a real complete
+world, any pointer control fails, typing is not visible/erasable, or the app is
+not the measured candidate, R16 remains open with that exact consumer defect.
+The check does not seed SQLite, call the proof bridge, mutate ontology truth, or
+approve R17. After a consumer PASS, the Router closes R16 and stops before R17.
+
+Allowed Builder changes are only `qa/gates/research-world-visible.ts`,
+`qa/gates/research-world-visible.test.ts`,
+`docs/orders/evidence/r16/BUILD-REPORT.md`, and the three generated Atlas
+projections. Router-only authority/debt/consumer evidence and Verifier-only
+verification evidence remain separate. No product change, keyboard repair,
+timeout change, fixture change, assertion weakening, R17 work, or broader
+accessibility claim is authorized.

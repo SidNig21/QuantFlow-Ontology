@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NATIVE KEY SETTLE REPAIR - BUILD AUTHORIZED
+status: R16 FOUNDER POINTER-FIRST CLOSURE - AWAITING FRESH READER
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -30,6 +30,7 @@ founder-mouse-first-authority: 2026-08-21; global Tab parity removed from R16 on
 mouse-first-reader-receipt: fresh Luna Reader task `01a027b6-c820-7f63-800c-770b0a5abe63`; final YES/YES at `f91b25f1e9cc2183f2e8040e0110e382b4d71f67`
 mouse-first-wip-receipt: tile-manager 2/2 and focused R16 13/13; the single live gate stopped when immediate post-acknowledgement sampling did not observe Hypothesis Enter expansion; roots and cleanup were green; WIP preserved at `6cb2a7733b582ff10b06eb32ac31b1dbd4f8c403`
 native-key-settle-reader-receipt: fresh Luna Reader task `01a027c7-3540-7ca1-b620-b6b51a597d67`; final YES/YES at `38f03ec6b975f50caf3ae4ddec956c2efe4f38f3`
+pointer-first-founder-authority: 2026-08-21; global keyboard navigation and research-tile Enter/Escape parity deferred to Debt #38; R16 closes on pointer-visible 13-object/15-cable world, normal-app terminal typing, reopen, and clean cleanup after independent verification
 
 ## Authorized outcome
 
