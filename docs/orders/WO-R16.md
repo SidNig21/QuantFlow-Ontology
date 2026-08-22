@@ -61,6 +61,26 @@ root. Renderer and preload never open SQLite. The projection contains only
 Kernel rows, durable link rows, R15 source-work bindings, and bounded Artifact
 bytes resolved through the existing app-owned Artifact boundary.
 
+The transport contract has one meaning: renderer calls preload method
+`getResearchWorldProjection({ root_type, root_id })`; preload invokes only
+`qf:research-world:projection`; `root_type` is exactly `mission | task` and
+`root_id` is the full Kernel id. Main returns either
+`{ ok: true, world: { root, objects, links, missing_lineage } }` or
+`{ ok: false, code, message }`. The only root errors are
+`WORLD_ROOT_NOT_FOUND` and `WORLD_ROOT_INELIGIBLE`; neither returns a partial
+world. Arrays sort deterministically: objects by type then id, links by kind,
+from id, then to id, and missing-lineage facts by owning type, owning id, then
+kind. The result is a value snapshot with no methods or mutation surface; a
+renderer mutation cannot alter Main or Kernel state.
+
+Main freezes all relational ids and fields in one SQLite read transaction, then
+closes that transaction before reading files. Every Artifact receipt uses the
+Kernel's existing lowercase 64-hex SHA-256 `content_hash`. Main hashes the full
+bytes it actually read and returns a preview only when that hash still equals
+the frozen hash. A file change, disappearance, or read error after the snapshot
+returns that Artifact receipt with no bytes and exact
+`Artifact unavailable: hash mismatch`; it never retries into a mixed snapshot.
+
 The complete supporting fixture projects these unique tiles:
 
 1. **Mission**: id, name, full objective.
@@ -84,7 +104,8 @@ The complete supporting fixture projects these unique tiles:
 For a rejecting or inconclusive Evaluation, tile 9 does not exist. The
 Evaluation tile instead shows exact `PUBLICATION BLOCKED`, the exact R15 code and
 message, plus the already-governed `Request revision` and `Second critic`
-controls. Supporting state shows exactly one Report tile and `PUBLISHED`.
+controls. The separate positive supporting fixture shows exactly one Report
+tile and `PUBLISHED`.
 
 Every scalar above is shown in compact form when collapsed and in full when
 expanded. Long ids may be visually abbreviated only if the full exact id is
@@ -92,9 +113,20 @@ available in the inspector and accessible name. Hashes always expose the full
 value. Missing optional facts render `Not recorded`; zero, empty string, and
 missing are never collapsed into one display state.
 
+Within each inspector, fields appear in the literal order listed for that tile
+above. Stored numeric scores render with `String(value)` and are not rounded;
+citations render in stored order with their full exact value. The compact row is
+`<Type> · <primary label or status> · <full id in accessible name>`; visible id
+abbreviation may change only presentation, never the accessible value. Each
+control's accessible name is `<action> <type> <full id>`.
+
 ## Mission to Task truth
 
 Add one canonical durable link kind, `belongs_to`, from `task` to `mission`.
+Each Task has at most one outgoing `belongs_to` link across the database. An
+exact idempotent replay creates zero additional rows; an attempt to bind the
+same Task to a different Mission refuses before any row/link/event with code
+`MISSION_CONTEXT_CONFLICT`.
 For Research Director delegation, `mission_id` exists only in trusted execution
 context beside `actor_session_id`; it is not an action/tool input and any
 caller-supplied `mission_id` field rejects. Main binds the new Mission id to the
@@ -108,6 +140,13 @@ Manual Tasks created outside the Research Director path remain valid and show
 `Mission not linked`; the renderer never infers membership from equal text,
 timestamps, or proximity.
 
+The Director-session-to-Mission admission binding is intentionally Main-memory
+state, not a new durable table or canvas fact. Close/reopen clears it; reopening
+the exact Mission recreates it only after Main verifies the same admitted
+Director session. The durable `belongs_to` link preserves already-created Task
+membership across restart, while new post-restart delegation refuses until that
+explicit reopen.
+
 The existing R14 flow must therefore produce exactly one `belongs_to` link. No
 historical Task is backfilled by a guess. This is the only new domain relation in
 R16.
@@ -115,8 +154,12 @@ R16.
 The existing `tests` relation must also be written by the deterministic research
 path. `execute_deterministic_run` accepts an exact existing `hypothesis_id` and
 atomically writes one `tests` link from the new Run. The supporting R16 path and
-all new Director research Runs require it. Legacy calls without that field
-remain readable and render `Lineage incomplete: tests`; they are not backfilled.
+the production Research Director orchestration call site require it; the gate
+must prove that call site supplies it. The Kernel action keeps the field optional
+only for pre-R16/manual callers: omission creates the Run under the legacy
+contract, writes no `tests` link, and the projection returns the literal
+missing-lineage fact `Lineage incomplete: tests`. A supplied unknown Hypothesis
+refuses before any Run/Artifact/link/event; no historical row is backfilled.
 
 ## World traversal and cables
 
@@ -129,6 +172,16 @@ Traversal starts from the exact selected root and follows only these facts:
   `assigned_to`, `delegated_by`, and `delegates_to` durable links;
 - Evaluation fields that name findings Artifact, review Task, Report, and source
   work.
+
+Traversal respects stored direction `from_id -> to_id`; it may traverse a named
+link in reverse only to reach the other endpoint, never to relabel or reverse the
+cable. A Task root is eligible only when it has exactly one R15 source-work
+binding. A Mission root is eligible when it has at least one `belongs_to` Task;
+zero produces `No linked research Task yet.`, one selects automatically, and
+more than one requires the chooser described below. A Task with zero binding
+produces `This Task has no completed research lineage yet.`; more than one is
+`WORLD_ROOT_INELIGIBLE` and names the duplicate binding count. No arbitrary
+first row is selected.
 
 Source-work/Evaluation field references admit tiles but do not draw cables unless
 a corresponding durable link exists. Required supporting-fixture cable labels
@@ -148,16 +201,21 @@ and endpoints are exactly:
 
 These are 13 cables total. The three agent-session endpoints reuse their
 existing exact session tiles and are not counted among the nine research tiles.
+The positive fixture manifest therefore contains exactly 12 world-member tiles:
+nine research-object tiles plus the Director, executor, and critic session
+tiles. Gate tile counts and deduplication include all 12; the phrase "nine
+research tiles" never excludes the three session endpoints from the manifest.
 The Dataset's `derived_from` source Artifact remains an Artifact receipt inside
 the Dataset inspector because that source Artifact is not a world tile in this
 rung; therefore it draws no cable. A missing required link shows
 `Lineage incomplete: <kind>` on the nearest owning tile and draws no substitute
 cable.
 
-All semantic cables reuse the existing Glacier cable implementation and
-`connection` write boundary. Their source is the current Kernel projection, not
-canvas state. View positions may persist in app-local canvas state; object facts,
-labels, endpoints, and lineage may not.
+All semantic cables reuse only the existing Glacier cable renderer. They are
+transient view edges derived from the current Kernel projection and never call
+the `connection` write boundary or create `connection` rows. View positions may
+persist in app-local canvas state; object facts, labels, endpoints, and lineage
+may not.
 
 ## Layout and interaction
 
@@ -180,14 +238,23 @@ Existing user-moved positions win on later reveals. New tiles occupy the nearest
 free slots in their lane and never cover the rotating cube, Dock, or another
 tile. `Tidy` remains the operator's explicit global layout control.
 
+All geometry below uses logical canvas coordinates with each rectangle anchored
+at its top-left. The selected root tile's saved top-left is the lane origin
+`(x0, y0)`. Lane columns begin at `x0`, `x0 + 444`, and `x0 + 888`; row candidates
+begin at `y0 + n * 304`. Within each lane, candidates sort by the object type
+order in `Exact visible world`, then full id. The selected root keeps its saved
+position and counts as occupied. Every other existing tile, the live Dock
+rectangle, and the live cube rectangle expanded 24 pixels on every side also
+count as occupied in the same canvas coordinate space. On collision, advance
+the candidate downward by exactly 20 pixels until its 420-by-280 rectangle no
+longer intersects any occupied rectangle, then reserve it before placing the
+next candidate.
+
 Every research tile uses the existing 420 by 280 canvas footprint. Compact and
 expanded inspector modes do not resize that footprint; the expanded detail body
 scrolls inside it. Initial positions snap to the existing 20-pixel baseline.
-Lane columns are separated by the existing 420-pixel column width plus 24-pixel
-gutter; rows use 280 pixels plus 24-pixel gutter. Treat existing tiles, the live
-Dock rectangle, and the live cube rectangle expanded by 24 pixels as occupied.
-For a collision, advance by one 20-pixel baseline step in stable object-id order
-until free. Persist only the final app-local geometry.
+Persist only the final app-local top-left under the existing tile key
+`ontology:<type>:<id>`; do not add another layout store or persist lane facts.
 
 Tab reaches every research tile and its visible controls. Enter expands or
 collapses. Escape collapses. Existing cable keyboard parity remains green.
@@ -205,6 +272,10 @@ receipts, missing-lineage facts, and no mutation capability. It performs one
 Kernel read transaction for relational facts, then reads only Artifact bytes
 whose ids/hashes were frozen by that snapshot. A changed or missing byte hash is
 shown as `Artifact unavailable: hash mismatch`; stale bytes never render.
+The IPC name, preload method, union result, sorting, error codes, SHA-256 format,
+and byte-race behavior are exactly those in `Exact visible world`; alternative
+channels, result shapes, silent empty worlds, or filesystem paths in the result
+do not comply.
 
 ### B - Mission membership
 
@@ -226,12 +297,26 @@ data/control styling or a cable for a field-only reference.
 
 ### E - Fast product proof
 
-Add and register exactly `research-world-visible`. Its total deadline is 90
-seconds, including cleanup. It uses one prebuilt isolated supporting fixture,
+Add and register exactly `research-world-visible`. Its total deadline is 60
+seconds including cleanup; exceeding it is a gate failure, not permission to
+raise the timeout. It uses one prebuilt isolated supporting fixture,
 launches production Electron, uses real preload/Main projection and renderer,
 opens the world by visible click, exercises pointer and keyboard inspection,
 fully closes, reopens the same root, and proves identical visible/domain facts.
 It does not launch a real model, package the app, or run an installer.
+
+The gate implementation is `qa/gates/research-world-visible.ts`; its focused
+test is `qa/gates/research-world-visible.test.ts`; `qa/run.ts` registers that
+exact file/name. It creates one random run nonce and derives every fixture id
+from it. Before Electron starts, the gate uses a separate read-only
+`bun:sqlite` connection over the isolated Kernel to build and freeze the 12-tile,
+13-cable expected manifest; it never calls the production projection to produce
+expected values. The renderer contract exposes `data-qf-world-type`,
+`data-qf-world-id`, `data-qf-world-field`, and `data-qf-world-cable-kind/from/to`
+attributes for observation; those are inspection attributes, not truth stores.
+The same change adds only this named gate file to
+`kernel-sole-writer`'s read-only Oracle allowance with that reason in its comment;
+it does not allow any renderer, preload, or product writer.
 
 ## Product gate
 
@@ -243,6 +328,14 @@ one Report, plus the exact Director, executor, and critic session tiles. It
 contains the 13 literal projected links above. Other durable links may exist,
 but the projection excludes kinds not named in `World traversal and cables`.
 Freeze an independent expected manifest before Electron starts.
+
+Independence is enforced three ways: the Oracle above reads SQLite directly;
+all fixture ids vary with the random run nonce; and the focused gate test scans
+the changed renderer sources and fails if they contain any full runtime fixture
+id or import `bun:sqlite`, `node:sqlite`, `better-sqlite3`, `node:fs`, or
+`node:fs/promises`. In the renderer, `typeof require` must be `undefined`; the
+preload exposes no raw database path, storage path, filesystem method, or
+fixture/manifest value.
 
 The gate must prove:
 
@@ -262,6 +355,15 @@ The gate must prove:
    SQLite or filesystem access; and
 10. all owned processes and allocated roots are gone after success, failure, and
     timeout.
+
+Cleanup item 10 is not inferred from the happy path. Within the same 60-second
+outer deadline, the gate runs: the normal reveal/reopen case; one forced failure
+immediately after Electron ready; and one forced 500 ms gate timeout immediately
+after Electron ready. Each case records process and allocated-root snapshots
+before launch and after cleanup, and fails unless owned-process delta and
+owned-root delta are both zero. The failure/timeout injections live in the gate
+harness, do not alter assertions or production behavior, and cleanup measurement
+happens after termination without deleting residue before the snapshot.
 
 A separate rejecting fixture in the focused renderer/Main tests proves no Report
 tile, exact block code/message, and both R15 actions. It does not require another
@@ -292,10 +394,21 @@ Every entry gets its own red and restored-green receipt. Add focused tests for
 manifest comparison, tile deduplication, traversal, Artifact hash refusal,
 layout collision, keyboard parity, and the rejecting projection.
 
+Each falsifier receipt is one row in the Builder report with: mutation id;
+immutable candidate SHA; SHA-256 of the unchanged gate/test file before and
+after; changed production/fixture path and diff hash; native nonzero red exit;
+restoration command plus zero diff for that path; and native zero green exit.
+The Verifier checks those fields against the committed candidate and reruns a
+sample it chooses. Missing fields or a changed gate hash reject the evidence.
+This is report evidence reviewed by the independent Verifier, not a new receipt
+framework or test runner.
+
 ## Literal Builder and Verifier matrix
 
-Before its first source edit, the Builder records clean local and remote HEAD at
-`R16_BUILD_BASE_SHA`, reads `qf-atlas/ATLAS.md`, and runs this preflight:
+Before its first source edit, the Builder records clean local and remote
+candidate HEAD, verifies `R16_BUILD_BASE_SHA` is its immutable ancestor and uses
+that SHA only as the comparison base, reads `qf-atlas/ATLAS.md`, and runs this
+preflight:
 
 ```text
 bun qf-atlas/generate.mjs --check
@@ -306,9 +419,9 @@ Any stale map, new hard red, or unexplained coverage stops before construction.
 Atlas is a map and regression instrument only; it cannot authorize a semantic
 change, baseline edit, or deletion.
 
-After final repair state, run every product/static command below once. No
-package, installer, `verify-release`, soak, full Atlas falsifier, or real-model
-command is authorized.
+After final repair state, the Builder runs every non-launching focused/static
+command below once. No package, installer, `verify-release`, soak, full Atlas
+falsifier, or real-model command is authorized.
 
 ```text
 cd collab-electron
@@ -316,10 +429,7 @@ bun test src/main/research-world.test.ts src/windows/shell/src/research-world.te
 cd ..
 bun test packages/qf-kernel/src/r16-visible-world.test.ts qf-kernel-schema/src/generate.test.ts
 bun test qa/gates/research-world-visible.test.ts
-bun qa/run.ts research-world-visible
 bun qa/run.ts governed-review
-bun qa/run.ts founder-steering
-bun qa/run.ts research-director-delegation
 bun qa/run.ts kernel-sole-writer
 bun qa/run.ts kernel-sole-writer-app
 bun qa/run.ts lockfile-committed
@@ -345,11 +455,19 @@ bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
 git diff --check
 ```
 
-Every added or modified `*.test.ts` path reported by
-`git diff --name-only fef713c06f091dc8df13f7bde07be859d3b04930 HEAD`
-must appear literally in a `bun test` command. If implementation changes a
-production contract outside files exercised by the listed tests, amend this
-order before that change.
+The Builder then commits and pushes one immutable candidate before collecting
+falsifier receipts. It runs and pastes the exact output of:
+
+```text
+git diff --name-only fef713c06f091dc8df13f7bde07be859d3b04930 HEAD -- "*.test.ts"
+```
+
+Every path in that committed-candidate output must appear literally in a
+Builder `bun test` command above. The Verifier compares the pasted list to the
+unaltered command logs and rejects on any missing path; this evidence therefore
+fails on an uncovered test without adding a meta-test framework. If
+implementation changes a production contract outside files exercised by the
+listed tests, amend this order before that change.
 
 ## Verifier acceptance
 
@@ -358,6 +476,16 @@ branch `wo-R16`. Before and after the matrix, each records local HEAD, remote
 `origin/wo-R16`, empty status, process baseline, and allocated-root baseline.
 All commands use fresh candidate-specific per-command logs with captured native
 exit codes. No whole-matrix wrapper or stale log may establish a result.
+
+The Verifier reruns the complete Builder block above, then owns these launching
+product gates; the order deliberately assigns them to the Verifier so it does
+not conflict with PROTOCOL's Builder/cold-run split:
+
+```text
+bun qa/run.ts research-world-visible
+bun qa/run.ts founder-steering
+bun qa/run.ts research-director-delegation
+```
 
 The Verifier reads `qf-atlas/ATLAS.md` and reruns `generate.mjs --check`, the
 ratchet, and `generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930`
