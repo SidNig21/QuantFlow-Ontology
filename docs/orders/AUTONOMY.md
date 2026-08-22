@@ -2,7 +2,7 @@
 
 status: **BINDING** on any session given the QuantFlow delivery goal
 authored: 2026-08-12
-amended: 2026-08-14 — founder standing override after the V2-2 matrix burned a day
+amended: 2026-08-22 — founder delivery reset: inherit accepted rungs and prove the active delta
 governs: the loop in [`PROTOCOL.md`](PROTOCOL.md), run without the founder present
 
 ## Founder standing override — 2026-08-14
@@ -28,6 +28,54 @@ precedence on 2026-08-15.
 > session drives that loop for hours with nobody watching, and exactly where it
 > must stop. If the two disagree, `PROTOCOL.md` wins except for the founder
 > standing override above, whose named checkout and release-gate rules win.
+
+## Founder delivery posture — 2026-08-22
+
+These rules preserve the quality bar while keeping proof subordinate to shipping
+the founder-visible capability.
+
+### Accepted-baseline inheritance
+
+An accepted rung is inherited. Future rungs do not re-prove its invention. They
+run its cheapest trustworthy regression. The active rung deeply proves only its
+new behavioral delta and any inherited seam it directly changes.
+
+### Active-rung relevance
+
+A defect expands the active rung only when it:
+
+1. directly blocks the rung's named consumer journey;
+2. violates a Kernel or Atlas hard invariant on a path touched by the rung; or
+3. proves the active order's product or acceptance contract wrong.
+
+Everything else becomes debt and cannot block the active rung.
+
+### Reader trigger
+
+A fresh Reader is required when product meaning changes, acceptance meaning
+changes, a gate can no longer prove the claim, or two competent Builders could
+implement the repair differently. A fresh Reader is not required for a path or
+command typo, working-directory correction, timeout-free scheduling correction,
+cleanup of test-owned resources, or a mechanical assertion repair that does not
+change product or gate meaning.
+
+### One proof pipeline
+
+```text
+one semantic Reader
+→ one Builder
+→ one focused live delta gate
+→ all falsifiers batched in one pass
+→ one immutable candidate
+→ one independent Verifier
+→ one normal-app consumer check
+```
+
+### Process alarm
+
+If proof machinery consumes more elapsed time than the product capability it
+protects, the architect must stop and simplify the proof machinery. The quality
+requirement is not weakened.
 
 ## The lead session is a router, not a builder
 
