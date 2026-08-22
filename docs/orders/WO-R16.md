@@ -1,12 +1,12 @@
 # WO-R16 - Visible research world
 
-status: scoped - adversarial Reader required before build
+status: refreshed at accepted prerequisite base - adversarial Reader required before build
 assignee: none until Reader YES/YES PASS
-depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`
+depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
 rework-cycle: 0 of 1 used
-R16_BUILD_BASE_SHA: `38464dd39c0b78c711119ac2f67acb96c77119c5`
+R16_BUILD_BASE_SHA: `fef713c06f091dc8df13f7bde07be859d3b04930`
 
 ## In plain terms
 
@@ -294,8 +294,21 @@ layout collision, keyboard parity, and the rejecting projection.
 
 ## Literal Builder and Verifier matrix
 
-Run every command once after final repair state. No package, installer,
-`verify-release`, soak, or real-model command is authorized.
+Before its first source edit, the Builder records clean local and remote HEAD at
+`R16_BUILD_BASE_SHA`, reads `qf-atlas/ATLAS.md`, and runs this preflight:
+
+```text
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+```
+
+Any stale map, new hard red, or unexplained coverage stops before construction.
+Atlas is a map and regression instrument only; it cannot authorize a semantic
+change, baseline edit, or deletion.
+
+After final repair state, run every product/static command below once. No
+package, installer, `verify-release`, soak, full Atlas falsifier, or real-model
+command is authorized.
 
 ```text
 cd collab-electron
@@ -317,11 +330,23 @@ bun qa/run.ts one-skin
 bun qa/run.ts doc-links
 bun qa/run.ts rung-ladder
 git diff --check
-git diff --check 38464dd39c0b78c711119ac2f67acb96c77119c5 HEAD
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+After those commands are green, the Builder runs and retains these final Atlas
+receipts, commits any changed generated projections with the candidate, and
+reports whether the DIFF is better, worse, or unchanged and why:
+
+```text
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+bun qf-atlas/generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930
+git diff --check
 ```
 
 Every added or modified `*.test.ts` path reported by
-`git diff --name-only 38464dd39c0b78c711119ac2f67acb96c77119c5 HEAD`
+`git diff --name-only fef713c06f091dc8df13f7bde07be859d3b04930 HEAD`
 must appear literally in a `bun test` command. If implementation changes a
 production contract outside files exercised by the listed tests, amend this
 order before that change.
@@ -333,6 +358,12 @@ branch `wo-R16`. Before and after the matrix, each records local HEAD, remote
 `origin/wo-R16`, empty status, process baseline, and allocated-root baseline.
 All commands use fresh candidate-specific per-command logs with captured native
 exit codes. No whole-matrix wrapper or stale log may establish a result.
+
+The Verifier reads `qf-atlas/ATLAS.md` and reruns `generate.mjs --check`, the
+ratchet, and `generate.mjs --diff fef713c06f091dc8df13f7bde07be859d3b04930`
+against the immutable candidate. It does not regenerate, edit, or commit the
+candidate. A new hard red, stale projection, unexplained coverage, or DIFF that
+lost coverage is a numbered defect even when the product gate is green.
 
 Only after all commands pass may the Verifier write and commit
 `docs/orders/evidence/r16/VERIFICATION.md`. Evidence names exact object ids,
