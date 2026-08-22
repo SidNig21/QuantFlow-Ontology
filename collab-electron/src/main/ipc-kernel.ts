@@ -51,6 +51,7 @@ import { buildMissionActivationInstruction } from "./mission-activation";
 import { loadState as loadCanvasState } from "./canvas-persistence";
 import { resolveSecondOpinionAdmission } from "./second-opinion-admission";
 import { bindMissionToDirectorSession } from "./mission-context";
+import { bindResearchHypothesis } from "./research-context";
 
 export { QF_EXECUTE_ALLOWLIST };
 
@@ -308,6 +309,7 @@ export function registerKernelHandlers(): void {
             }
           },
         });
+        bindResearchHypothesis(result.sessionId, hypothesisId);
         invalidateDock();
         return {
           ok: true as const,

@@ -114,12 +114,16 @@ import {
 } from "./agent-host";
 import { createKernelAgentSession } from "./runtime-kernel-admission";
 import { bindMissionToDirectorSession, clearMissionForDirectorSession, missionForDirectorSession } from "./mission-context";
-
-const researchHypothesisBySession = new Map<string, string>();
+import {
+  bindResearchHypothesis,
+  clearResearchHypothesis,
+  researchHypothesisForSession,
+} from "./research-context";
 
 function closeAdmittedSession(sessionId: string): void {
   closeAgentSessionRow(sessionId);
   clearMissionForDirectorSession(sessionId);
+  clearResearchHypothesis(sessionId);
 }
 
 function getKernelAgentDefinitionIds(): string[] {
@@ -1241,7 +1245,7 @@ app.whenReady().then(async () => {
           void (async () => {
             try {
               closeAdmittedSession(change.workerSessionId);
-              const hypothesisId = researchHypothesisBySession.get(change.delegatorSessionId);
+              const hypothesisId = researchHypothesisForSession(change.delegatorSessionId);
               if (!hypothesisId) throw new Error(`research result has no exact Hypothesis binding for ${change.delegatorSessionId}`);
               const run = kernelRunGuidedResearch(change.delegatorSessionId, hypothesisId, change.artifactId);
               if (!run) {
@@ -1438,7 +1442,7 @@ app.whenReady().then(async () => {
         beforeActivation: (sessionId) => bindMissionToDirectorSession(missionId, sessionId),
         onStarted: projectStartedSession,
       });
-      researchHypothesisBySession.set(result.sessionId, hypothesisId);
+      bindResearchHypothesis(result.sessionId, hypothesisId);
       return {
         missionId,
         hypothesisId,

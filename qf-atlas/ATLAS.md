@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ 21b8c0b` on 2026-08-22 by
+> Generated from `wo-R16 @ f728487` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -228,7 +228,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 209 | imported from an entrypoint |
+| `reachable` | 210 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -365,8 +365,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 235 of
-237 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 236 of
+238 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
@@ -408,11 +408,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**235 of 237 files that have a reachability verdict** carry a blast radius.
+**236 of 238 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**547 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**549 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 310 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 311 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -459,7 +459,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (547 files)
+## Per-analyzer coverage (549 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -467,17 +467,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 543 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 276 | 0 | 4 | 0 | 267 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 536 |
-| `persistence` | 23 | 26 | 0 | 0 | 498 |
-| `lifetime` | 6 | 61 | 0 | 0 | 480 |
-| `packaging` | 229 | 0 | 0 | 123 | 195 |
-| `ownership` | 20 | 0 | 0 | 353 | 174 |
-| `reach` | 234 | 3 | 0 | 310 | 0 |
+| `imports` | 545 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 278 | 0 | 4 | 0 | 267 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 538 |
+| `persistence` | 23 | 26 | 0 | 0 | 500 |
+| `lifetime` | 6 | 61 | 0 | 0 | 482 |
+| `packaging` | 230 | 0 | 0 | 123 | 196 |
+| `ownership` | 20 | 0 | 0 | 355 | 174 |
+| `reach` | 235 | 3 | 0 | 311 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 310 files means those trees are
+failure — `reach: unsupported` on 311 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 123 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
