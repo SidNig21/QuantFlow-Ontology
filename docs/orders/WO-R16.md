@@ -1411,27 +1411,47 @@ No product or assertion repair is authorized until that finite evidence exists.
 ### Exact diagnostic
 
 Change only `qa/gates/research-world-visible.ts` and its focused contract test.
-At each native-Tab step, inspect `document.activeElement` before asserting. When
-the actual focus receipt does not exactly equal the planned target, throw one
-JSON message with this exact outer shape and stable key order:
+Export exactly one new renderer-expression helper named
+`tabFocusObservationExpression()`. It reads `document.activeElement` and returns
+this exact `FocusedElementReceipt` shape in this key order:
+
+```text
+{"tag":string,"id":string,"class":string,"input_type":string,"world_type":string,"world_id":string,"control":"tile"|"button"|"other","accessible_name":string}
+```
+
+The existing planned `KeyboardFocusReceipt` means exactly
+`{"type":string,"id":string,"control":"tile"|"button","accessible_name":string}`.
+At each native-Tab step, evaluate the new expression before asserting. The
+actual equals the planned target only when `world_type === type`,
+`world_id === id`, `control` is the same `tile` or `button`, and
+`accessible_name` is byte-equal. When any comparison differs, first print one
+standalone line to stdout, then throw an Error containing that same complete
+line. Its exact outer shape and stable key order are:
 
 ```text
 tab_focus_failure={"step":<zero-based integer>,"expected":<KeyboardFocusReceipt>,"actual":{"tag":<lowercase tag or "none">,"id":<string>,"class":<string>,"input_type":<string>,"world_type":<string>,"world_id":<string>,"control":<"tile"|"button"|"other">,"accessible_name":<string>}}
 ```
 
-`class` is `className` only when it is a string, otherwise empty. `input_type`
-is the element's `type` attribute or empty. World type/id come from the closest
-`.canvas-tile[data-qf-world-type]`, or empty. `control` is `tile` only when the
-active element is that tile, `button` only for an HTML button inside it, and
-`other` otherwise. Accessible name uses aria-label, then title, then trimmed
-text, then empty. The existing exact expected-order assertion remains unchanged
+`tag` is the lowercase `tagName`, or `none` when no Element is active. `id` is
+the active element's id or empty. `class` is its `className` only when that is a
+string, otherwise empty. `input_type` is its exact `type` attribute or empty.
+World type/id are the exact `data-qf-world-type` and `data-qf-world-id` values
+from the closest `.canvas-tile[data-qf-world-type]`, or empty. `control` is
+`tile` only when the active element is that closest tile, `button` only when it
+is an HTML button inside that tile, and `other` otherwise. Accessible name is
+the first non-empty trimmed string among aria-label, title, and textContent, or
+empty. The existing exact expected-order assertion remains unchanged
 in strength; missing, extra, reordered, disabled, skipped, trapped, or external
 focus is still red.
 
-The focused test must evaluate the receipt builder against (a) an exact tile,
-(b) a button within a tile, and (c) an outside input, and must assert the exact
-stable JSON-compatible objects. It must also retain all 13 existing green
-contracts.
+The focused test evaluates `tabFocusObservationExpression()` with mocked DOM
+globals against (a) an exact tile, (b) a button within a tile, and (c) an
+outside input, and asserts all exact fields above. The 13 tests present at
+`c8c7094` remain byte-identical; only the import list may be extended and one
+new test named `describes exact Tab focus targets and an outside focus thief`
+may be appended. `bun test qa/gates/research-world-visible.test.ts` must report
+exactly 14 pass and 0 fail. A diff that deletes, renames, or changes any of the
+13 existing test bodies is red.
 
 Run Atlas preflight, the focused contract, then exactly one live
 `bun qa/run.ts research-world-visible`. On red, preserve and report the exact
@@ -1441,12 +1461,15 @@ path. No package, installer, release, worktree, wrapper, timeout increase,
 fixture change, product change, assertion weakening, or cleanup outside the
 gate.
 
-If the receipt proves a defect solely in the gate's sentinel or focus-plan
-observation, the same Builder may repair that one gate defect, add a focused
-red/green test, and run one final live gate. It may not skip or omit a real
-focus target. If the receipt names a product DOM-order or product focusability
-defect, stop with the receipt; the Router will authorize that exact product
-surface separately.
+The conditional repair boundary is mechanical. A gate-only defect exists only
+when the active element is the exact expected tile/button and the new receipt
+serialized or compared it incorrectly, or when the gate-owned sentinel remains
+active after the acknowledged native Tab. The same Builder may repair only that
+gate defect, add one focused red/green test, and run one final live gate. If the
+actual element is outside the expected research tile, an unplanned focusable is
+interleaved, or an expected tile/button is skipped or reordered, that is a
+product DOM-order/focusability defect: stop with the receipt for a separately
+bounded product repair. No repair may skip or omit a real focus target.
 
 Plain meaning: identify the exact element that steals Tab focus, then fix only
 what the evidence names.
