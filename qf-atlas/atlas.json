@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "42d35a5",
+    "commit": "ae6392b",
     "generatedAt": "2026-08-22",
     "filesScanned": 431,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "9653424b801c4bad"
+    "fingerprint": "2f6816013d405a24"
   },
   "stats": {
     "live": 111,
@@ -3450,11 +3450,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 572.1,
+      "kb": 573.7,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 78,
+      "spawns": 79,
       "writes": 30,
       "dml": 6,
       "executes": 49,
@@ -3471,9 +3471,9 @@
         },
         {
           "path": "qa/gates/research-world-visible.ts",
-          "kb": 54.8,
-          "spawns": 1,
-          "spawnsLive": 1,
+          "kb": 56.4,
+          "spawns": 2,
+          "spawnsLive": 2,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -21678,7 +21678,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -58283,12 +58283,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "6e3e502",
+      "commit": "42d35a5",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "42d35a5",
+      "commit": "ae6392b",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",

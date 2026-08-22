@@ -285,6 +285,45 @@ async function waitFor<T>(label: string, action: () => Promise<T | null>, deadli
   throw new Error(`${label} timed out${lastError ? `: ${lastError}` : ""}`);
 }
 
+type NativeExit = { code: number | null; signal: NodeJS.Signals | null; error?: Error };
+
+function waitForNativeExit(child: ChildProcess): Promise<NativeExit> {
+  return new Promise((resolveExit) => {
+    let settled = false;
+    const settle = (result: NativeExit): void => {
+      if (settled) return;
+      settled = true;
+      resolveExit(result);
+    };
+    child.once("error", (error) => settle({ code: null, signal: null, error }));
+    child.once("exit", (code, signal) => settle({ code, signal }));
+  });
+}
+
+async function prepareCandidateBuild(): Promise<void> {
+  const buildStartedAt = performance.now();
+  let child: ChildProcess;
+  try {
+    child = spawn("bun", ["run", "build"], {
+      cwd: COLLAB_ROOT,
+      env: { ...process.env },
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  } catch (error) {
+    throw new Error(`candidate build spawn failed: ${errorMessage(error)}`);
+  }
+  child.stdout?.resume();
+  child.stderr?.resume();
+  const result = await waitForNativeExit(child);
+  const buildOnceMs = Math.round(performance.now() - buildStartedAt);
+  if (result.error) throw new Error(`candidate build spawn failed: ${errorMessage(result.error)}`);
+  if (result.signal) throw new Error(`candidate build terminated by signal ${result.signal}`);
+  assert(result.code === 0, `candidate build exited ${String(result.code)}`);
+  assert(existsSync(join(COLLAB_ROOT, "out", "main", "index.js")), "candidate build output is missing collab-electron/out/main/index.js");
+  console.log(`build_once_ms=${buildOnceMs} build_exit=${result.code}`);
+}
+
 function manifestForWorld(dbPath: string, ids: { mission: string; task: string; reviewTask: string; hypothesis: string; dataset: string; run: string; resultArtifact: string; evaluation: string; findings: string; report: string; director: string; executor: string; critic: string }): IndependentWorldManifest {
   const db = new Database(dbPath, { readonly: true });
   try {
@@ -511,7 +550,7 @@ async function spawnOwnedLaunch(root: string, activity: LaunchActivity): Promise
   const before = await processSnapshot();
   let live: LiveCase | undefined;
   try {
-    const child = spawn("bun", ["run", "dev"], { cwd: COLLAB_ROOT, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn("bun", ["run", "preview"], { cwd: COLLAB_ROOT, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     assert(child.pid !== undefined, "production Electron did not provide a PID");
     child.stdout?.resume();
     child.stderr?.resume();
@@ -900,10 +939,11 @@ function mergeCaseOutcomes(outcomes: readonly GateCaseOutcome[], caseName: GateC
 }
 
 export async function runResearchWorldVisibleGate(): Promise<{ ok: boolean }> {
+  assertResearchWorldContract();
+  await prepareCandidateBuild();
   const startedAt = performance.now();
   const hardDeadlineAt = startedAt + RESEARCH_WORLD_VISIBLE_DEADLINE_MS;
   const functionalDeadlineAt = hardDeadlineAt - CLEANUP_RESERVE_MS;
-  assertResearchWorldContract();
   const nonce = randomUUID();
   const roots = new Set<string>();
   const removalReceipts: RootRemoval[] = [];
