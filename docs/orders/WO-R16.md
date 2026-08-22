@@ -5232,3 +5232,113 @@ identities, arguments, non-claims, and cleanup are append-only in
 This is the exact external-runtime red named by the Attempt 5 stop condition.
 R16 remains open. No additional consumer attempt, model retry, product repair,
 Builder/Verifier lap, or R17 work is authorized by this receipt.
+
+### CONSUMER ATTEMPT 5 CONTRACT RED — governed critic findings authority contradicts runtime
+
+The preserved Hermes session and error log make the Attempt 5 boundary finite.
+The critic did not submit an exact valid Evaluation and then receive a 403 from
+the ontology tool. It submitted `findings` as one non-empty string. The
+production governed-review boundary returned exactly
+`findings must be a non-empty ordered array`. Hermes then opened the next model
+turn to correct that deterministic validation error; only that later model call
+returned external `403 {"model":"kimi-k3"}` because the sole credential was
+marked exhausted. The pending broker row and absent Evaluation are therefore
+consistent with the product validation failure.
+
+QuantFlow gave the critic contradictory authority. The production Mission in
+`collab-electron/src/main/index.ts` says `non-empty plain-text findings`.
+Generated `qf_record_evaluation` authority advertises `findings` as either a
+string or an ordered finding array, and explicitly says legacy critics may send
+text. The governed R15 runtime accepts only a non-empty ordered array whose
+entries contain exactly `code,severity,message,evidence_refs`. Attempt 3 hit the
+same first-call rejection and happened to recover on a later model turn;
+Attempt 5 did not. R16 must not depend on provider budget for a critic to repair
+an instruction/schema contradiction after a valid-looking first call.
+
+The same saved session exposes one adjacent activation contradiction. The app
+builds the critic instruction with Mission mode `orchestrator`, whose payload
+orders the critic to hire a worker and delegate the Mission. The critic has the
+least-privilege `research.evaluate` grant, not `desk.orchestrate`, so its first
+tool call was predictably denied. A governed critic must receive a critic-mode
+instruction that explicitly forbids recruitment/delegation and directs only
+the three reads plus Evaluation already authorized for that role.
+
+#### Authorized bounded repair
+
+After one fresh Reader answers the protocol's exact two questions YES/YES, one
+fresh Builder may make only these changes:
+
+1. In `qf-kernel-schema/src/ontology/research.ts`, narrow the generated
+   `record_evaluation.findings` input schema to one non-empty ordered array.
+   Every item has exactly `code`, `severity`, `message`, and `evidence_refs`;
+   `severity` remains `info|warning|error`, and `evidence_refs` remains an array
+   of object ids. The description must say this exact governed shape. Keep the
+   Kernel's existing direct legacy text acceptance outside governed review; do
+   not weaken or widen the governed runtime.
+2. In `qf-kernel-schema/src/generate.test.ts`, add one exact generated-schema
+   assertion proving `findings` is the required non-empty array above and has no
+   string/`anyOf` branch. Regenerate only the normal schema golden outputs
+   changed by that source authority.
+3. In `collab-electron/src/main/mission-activation.ts`, add one exact `critic`
+   activation mode. Its instruction says to use only the four granted
+   QuantFlow ontology tools, perform the exact review question, never recruit
+   or delegate, record one Evaluation, and return its receipt. It must not
+   change either existing Research Director or legacy orchestrator mode.
+4. In `collab-electron/src/main/index.ts`, replace `non-empty plain-text
+   findings` in the real critic Mission with one concise exact instruction to
+   submit a non-empty ordered finding array. Name the four required keys and
+   require every `evidence_refs` value to be drawn only from the exact
+   Hypothesis, Run, result Artifact, source Task, or executor ids in the frozen
+   source work, and call `buildMissionActivationInstruction` in the new exact
+   `critic` mode.
+5. In `collab-electron/src/main/mission-activation.test.ts`, prove critic mode
+   contains the four-tool/no-delegation/one-Evaluation contract and does not
+   contain the worker-hiring instruction. In
+   `collab-electron/src/main/governed-review.test.ts`, add one source-bound
+   assertion that the production Mission uses critic mode, contains the
+   ordered-array contract, and no longer contains `plain-text findings`. Keep
+   all existing runtime, publication, strict-rubric, Artifact-read, and cleanup
+   assertions unchanged.
+6. Record exact command receipts in the existing R16 BUILD-REPORT and update
+   generated Atlas projections only if normal generation requires it. No other
+   product, test, evidence, runtime-profile, credential, model, timeout, retry,
+   or R17 path is in scope.
+
+The Builder runs exactly:
+
+```text
+bun run --cwd qf-kernel-schema generate
+bun test --cwd qf-kernel-schema
+bun test collab-electron/src/main/mission-activation.test.ts
+bun test collab-electron/src/main/ontology-gateway.test.ts
+bun test collab-electron/src/main/governed-review.test.ts
+bun qa/run.ts governed-review
+bun qa/run.ts kernel-sole-writer-app
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+Every gate can fail: the generated-schema test fails if the string/`anyOf`
+branch returns, the production-Mission test fails if the old text instruction
+returns, the critic again receives hire/delegate instructions, or the exact
+array keys disappear, existing governed-review tests fail
+on runtime/publication weakening, generated currentness and Atlas fail on stale
+artifacts, the writer gate fails on a new direct database path, and either diff
+check fails on malformed changes. Every deliverable has one meaning: one strict
+generated critic input shape, one least-privilege critic activation, one
+matching production Mission, their exact regressions, normal generated outputs,
+and one existing evidence append.
+
+The immutable candidate then receives a fresh independent Verifier running the
+same matrix without either generator command. The Verifier records HEAD and
+product/test/generated hashes before and after and writes PASS or stops on the
+first red. Only after PASS may the Router build once with exact candidate SHA
+and UTC timestamp and perform one new normal Computer Use consumer attempt.
+That attempt creates one Mission and one sole critic; no replacement critic,
+manual Evaluation, verdict override, or model retry is allowed. It must produce
+the successful Evaluation/Report, exact 13-object/15-cable pointer world, ten
+pointer inspectors, terminal typing receipts, ordinary close/reopen equality,
+and zero owned processes. Any red keeps R16 open. No R17 authority is created.

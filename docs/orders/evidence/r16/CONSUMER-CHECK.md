@@ -362,3 +362,42 @@ The app closed through its ordinary visible Close control. Launch root PID
 processes were all exactly zero afterward. No retry of the Evaluation, second
 Mission, replacement critic, alternate verdict, manual publication, second
 launch, product edit, or R17 work occurred.
+
+### Attempt 5 diagnostic correction — deterministic contract red precedes 403
+
+The preserved critic session and `logs/errors.log` sharpen the preceding
+receipt. The sole `qf_record_evaluation` call carried `findings` as one string,
+not the governed ordered finding array. At `07:15:02.975` Hermes recorded the
+tool result exactly:
+
+```text
+Tool mcp_quantflow_ontology_qf_record_evaluation returned error (0.02s):
+{"error": "findings must be a non-empty ordered array"}
+```
+
+The saved arguments otherwise bind the exact Attempt 5 review Task, source
+work, Hypothesis, Run, result Artifact, `supports` verdict, numeric confidence,
+and four numeric rubric fields. At `07:15:03.070` Hermes opened a subsequent
+model turn to correct the tool error. At `07:15:07.294` that later streaming
+request failed with external `403 {"model":"kimi-k3"}` and the credential pool
+reported no available entries. Thus the 403 did not come from the ontology
+Evaluation action, and no valid sequence-4 Evaluation arguments were durably
+recorded. The earlier statement claiming exact valid sequence-4 arguments is
+superseded by this correction; every other identity, read, world non-claim,
+typing, and cleanup receipt above remains unchanged.
+
+The product contradiction is exact: the real critic Mission requested
+`non-empty plain-text findings`, generated tool authority allowed string or
+array, and governed R15 runtime accepted only the strict ordered array. This is
+the same first-call defect observed in Attempt 3, where a later model turn
+happened to recover. Attempt 5 correctly remains RED until the authority and
+Mission match the unchanged governed runtime and a fresh normal consumer pass
+completes.
+
+The saved session also shows the critic first obeyed the Mission payload's
+instruction to hire/delegate and called `collaboration_send_task`; production
+correctly denied it because the critic lacks `desk.orchestrate`. That wasted
+model/tool turn is another exact product instruction mismatch, not critic
+misbehavior. The bounded repair therefore also gives the critic a
+least-privilege activation instruction that forbids recruitment/delegation and
+names only its three reads plus one Evaluation.

@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 CONSUMER ATTEMPT 4 OPERATOR RED - UNCHANGED ATTEMPT 5 AUTHORIZED
+status: R16 CONSUMER ATTEMPT 5 CONTRACT RED - FRESH READER REQUIRED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -145,7 +145,8 @@ current-door: Router is authorized for one identity-bound build and one exact no
 consumer-attempt-4-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` and bound build opened normally and Director canary passed; Router then clicked the worker's right-side cancel control while trying to select it, with durable admission/cancel/exit ordering; ordinary cleanup was zero and no product red is claimed
 current-door: Router is authorized for one unchanged-output normal two-launch Computer Use Attempt 5; right-side live-session rows are prohibited; any red keeps R16 open; no R17 authority
 consumer-attempt-5-external-runtime-red: exact candidate `1b329e7c5d1825848b2d13345aef949136cfe73f` completed Director recruitment, deterministic worker execution, and the sole critic's three governed reads; the critic independently computed a numeric supporting Evaluation, but `qf_record_evaluation` recorded `success=0`/`{"status":"pending"}` while its live terminal displayed external `403 {"model":"kimi-k3"}`; no Evaluation/Report/world/reopen PASS exists; Director/critic canaries and ordinary zero-process cleanup passed
-current-door: R16 is stopped on the exact Attempt 5 external-runtime red for founder decision; no retry, repair lap, consumer Attempt 6, or R17 authority
+consumer-attempt-5-diagnostic-correction: the critic's saved Hermes session and error log prove QuantFlow first instructed the critic to hire a worker it was forbidden to hire, then the sequence-4 call returned deterministic product error `findings must be a non-empty ordered array` because production Mission text requested `plain-text findings` and generated tool authority still advertised legacy string-or-array; only the subsequent model turn returned external `403 {"model":"kimi-k3"}` before correction
+current-door: exact `CONSUMER ATTEMPT 5 CONTRACT RED — governed critic findings authority contradicts runtime` requires one fresh Reader YES/YES; no Builder, rebuild, consumer Attempt 6, or R17 authority before that receipt
 
 ## Authorized outcome
 
