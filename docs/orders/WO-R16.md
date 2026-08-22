@@ -1602,13 +1602,18 @@ or longer gate deadline is authorized.
 
 Change only `qa/gates/research-world-visible.ts` and its focused contract test.
 Export one helper named `waitForSentinelDeparture`. It receives the sentinel id,
-an async observation callback returning `FocusedElementReceipt`, and an async
-pause callback. It reads immediately. While and only while the actual `id`
-equals the exact sentinel id, it may pause exactly 10 ms and read again, for at
-most 25 pauses / 26 total reads / 250 ms. It returns the first receipt whose id
+an async observation callback returning `FocusedElementReceipt`, an async pause
+callback, and a monotonic `now` callback. It records `deadlineAt = now() + 250`
+once, then reads immediately. While and only while the actual `id` equals the
+exact sentinel id, it may pause `min(10, deadlineAt - now())` milliseconds and
+read again, for at most 25 pauses / 26 total reads and never after `now() >=
+deadlineAt`. Thus both the actual monotonic 250 ms ceiling and the read ceiling
+bind independently even when observation or pause callbacks are slow. It
+returns the first receipt whose id
 differs from the sentinel, including any wrong external element. If all 26 reads
-still name the sentinel, it returns that final sentinel receipt. It never sends
-or retries a key input and never suppresses a receipt.
+still name the sentinel, or the monotonic deadline arrives first, it returns the
+last sentinel receipt. It never sends or retries a key input and never
+suppresses a receipt.
 
 In `exerciseNativeKeyboard`, use this helper only after the first native Tab
 and before the existing exact comparison for step 0. Every later step retains
@@ -1616,18 +1621,32 @@ its immediate observation. A wrong non-sentinel element is compared and fails
 immediately; a stuck sentinel fails through the unchanged
 `tab_focus_failure` after at most 250 ms.
 
-Append exactly two tests to the existing R16 contract file without changing its
-14 current test bodies: one returns the sentinel twice and the expected Mission
-tile on the third read and must observe two 10 ms pauses and three reads; the
-other returns the sentinel for all 26 reads and must observe exactly 25 pauses,
-26 reads, and the final sentinel receipt. The file must report exactly 16 pass
-and 0 fail. The tile-manager file remains exactly 3 pass and 0 fail.
+Append exactly three tests to the existing R16 contract file without changing
+its 14 current test bodies. The first returns the sentinel twice and this exact
+complete third receipt:
+
+```text
+{"tag":"div","id":"ontology:mission:m","class":"canvas-tile","input_type":"","world_type":"mission","world_id":"m","control":"tile","accessible_name":"mission m"}
+```
+
+It must observe two 10 ms pauses, three reads, and that exact return. The second
+uses a fake monotonic clock and returns the sentinel until the 250 ms deadline;
+it must prove no pause crosses the deadline and no read occurs afterward. A
+separate read-count case in that same test keeps `now()` below the deadline and
+must observe exactly 25 pauses, 26 reads, and the final sentinel receipt. The
+third returns an outside input on its second read and must return that exact
+wrong receipt after one pause, without further read or pause; it also source-
+checks that `exerciseNativeKeyboard` contains exactly one
+`pressNativeKey(endpoint, "Tab")` call and `waitForSentinelDeparture` contains
+none. The file must report exactly 17 pass and 0 fail. The tile-manager file
+remains exactly 3 pass and 0 fail.
 
 ### Builder and acceptance authority
 
-A fresh Builder starts from clean local/remote `808e538` plus Router Reader and
-Atlas-refresh commits. It runs Atlas preflight, the 3-test tile-manager file,
-and the 16-test R16 contract, then exactly one live
+A fresh Builder starts only when `808e538` is an ancestor and clean local HEAD
+equals remote `origin/wo-R16` and the exact Builder-open SHA recorded by the
+Router in `NEXT.md` after Reader YES/YES. It runs Atlas preflight, the 3-test
+tile-manager file, and the 17-test R16 contract, then exactly one live
 `bun qa/run.ts research-world-visible`. Any red stops with exact focus/root/
 primary/cleanup receipts. Green resumes the exact short matrix, cheap
 tabIndex falsifier, BUILD-REPORT, candidate sequencing, and fresh different-
@@ -1635,5 +1654,10 @@ model verification specified in TERMINAL TAB-ORDER REPAIR.
 
 No product, Main, key bridge, fixture, expected target, assertion, timeout,
 schedule, package, installer, release, worktree, wrapper, or helper framework
-change. Plain meaning: give the one native Tab up to a quarter-second to become
-observable; never send it twice and never call a wrong destination correct.
+change. Builder and Verifier command logs must contain exactly one invocation of
+the live gate; `git diff --name-only` against the recorded Builder-open SHA must
+contain only the allowed gate/test/report/generated-Atlas paths. Any second live
+invocation, other changed path, second Tab call in the source scan, missing
+receipt, or evidence written before green is red. Plain meaning: give the one
+native Tab up to a quarter-second to become observable; never send it twice and
+never call a wrong destination correct.
