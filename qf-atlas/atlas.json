@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "1dc2298",
+    "commit": "fff63ad",
     "generatedAt": "2026-08-22",
     "filesScanned": 433,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -58593,12 +58593,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "4b0020a",
+      "commit": "1dc2298",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "1dc2298",
+      "commit": "fff63ad",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
@@ -58820,14 +58820,14 @@
         "id": "protocol-variants:pty:write",
         "kind": "protocol-variant",
         "what": "pty:write",
-        "where": "collab-electron/src/main/index.ts:779 (invoke)",
+        "where": "collab-electron/src/main/index.ts:786 (invoke)",
         "note": "was undecided"
       },
       {
         "id": "protocol-variants:pty:send-raw-keys",
         "kind": "protocol-variant",
         "what": "pty:send-raw-keys",
-        "where": "collab-electron/src/main/index.ts:799 (invoke)",
+        "where": "collab-electron/src/main/index.ts:806 (invoke)",
         "note": "was undecided"
       },
       {

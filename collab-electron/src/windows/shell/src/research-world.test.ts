@@ -145,10 +145,16 @@ describe("research world renderer seam", () => {
 		const runaway = Array.from({ length: 10 }, (_, index) => ({
 			type: "research", x: 1780, y: 5000 + index * 800,
 		}));
+		const reusedSharedMembers = [
+			{ type: "research", x: 2220, y: 11760 },
+			{ type: "research", x: 2220, y: 12680 },
+		];
 		const lanes = Array.from({ length: 10 }, (_, index) => ({
 			type: "research", x: (index % 3) * 444, y: Math.floor(index / 3) * 304,
 		}));
 		expect(researchWorldLayoutIsMalformed(runaway)).toBe(true);
+		expect(researchWorldLayoutIsMalformed(reusedSharedMembers)).toBe(true);
+		expect(researchWorldLayoutIsMalformed(reusedSharedMembers.slice(0, 1))).toBe(false);
 		expect(researchWorldLayoutIsMalformed(lanes)).toBe(false);
 	});
 

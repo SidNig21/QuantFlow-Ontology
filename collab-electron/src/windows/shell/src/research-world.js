@@ -52,7 +52,7 @@ export function latestSavedWorldRoot(canvasTiles) {
 
 export function researchWorldLayoutIsMalformed(worldTiles) {
 	const memberTiles = (Array.isArray(worldTiles) ? worldTiles : []).filter((tile) => tile?.type === "research");
-	if (memberTiles.length < 4) return false;
+	if (memberTiles.length < 2) return false;
 	const xs = memberTiles.map((tile) => Number(tile.x) || 0);
 	const ys = memberTiles.map((tile) => Number(tile.y) || 0);
 	const horizontalSpan = Math.max(...xs) - Math.min(...xs);
