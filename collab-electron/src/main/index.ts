@@ -48,6 +48,7 @@ import {
   kernelListTaskDelegations,
   kernelEnsureSampleResearchDataset,
   kernelEnsureSyntheticMarketFixture,
+  kernelSeedVisibleResearchWorld,
   kernelOpenHypothesisForQuestion,
   kernelRunGuidedResearch,
   kernelFinalizeResearchEvaluation,
@@ -1327,15 +1328,39 @@ app.whenReady().then(async () => {
         ? params as Record<string, unknown>
         : {};
       const unexpected = Object.keys(input).filter((key) => key !== "include_future_row");
-      if (unexpected.length > 0) {
-        throw new Error(`fixture dataset rejects extra field: ${unexpected[0]}`);
+      const visibleWorld = input.visible_world;
+      if (visibleWorld !== undefined && (!visibleWorld || typeof visibleWorld !== "object" || Array.isArray(visibleWorld))) {
+        throw new Error("fixture dataset visible_world must be an object");
       }
+      const allowed = new Set(["include_future_row", "visible_world", "dataset_id"]);
+      const extra = unexpected.filter((key) => !allowed.has(key));
+      if (extra.length > 0) throw new Error(`fixture dataset rejects extra field: ${extra[0]}`);
       if (input.include_future_row !== undefined && typeof input.include_future_row !== "boolean") {
         throw new Error("fixture dataset include_future_row must be boolean");
       }
-      const dataset = kernelEnsureSampleResearchDataset({
+      const requestedDataset = typeof input.dataset_id === "string" ? kernelGetObject("dataset", input.dataset_id) : null;
+      const dataset = requestedDataset ?? kernelEnsureSampleResearchDataset({
         includeFutureRow: input.include_future_row === true,
       });
+      if (visibleWorld) {
+        const world = visibleWorld as Record<string, unknown>;
+        const required = ["nonce", "mission_id", "director_session_id", "hypothesis_id", "executor_session_id", "critic_session_id"];
+        for (const key of required) if (typeof world[key] !== "string" || String(world[key]).length === 0) throw new Error(`fixture dataset visible_world requires ${key}`);
+        const seeded = kernelSeedVisibleResearchWorld({
+          nonce: String(world.nonce),
+          datasetId: String(dataset.object_id),
+          taskId: typeof world.task_id === "string" ? world.task_id : undefined,
+          missionId: String(world.mission_id),
+          directorSessionId: String(world.director_session_id),
+          taskTitle: typeof world.task_title === "string" ? world.task_title : "Visible research Task",
+          taskDescription: typeof world.task_description === "string" ? world.task_description : "Inspect the visible research world.",
+          hypothesisId: String(world.hypothesis_id),
+          executorSessionId: String(world.executor_session_id),
+          criticSessionId: String(world.critic_session_id),
+        });
+        mainWindow?.webContents.send("qf:events:invalidate");
+        return { dataset, visible_world: seeded };
+      }
       kernelEnsureSyntheticMarketFixture();
       return dataset;
     },

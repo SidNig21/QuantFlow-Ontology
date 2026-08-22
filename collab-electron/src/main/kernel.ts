@@ -973,6 +973,91 @@ export function kernelListOntologyToolsForGroups(
   });
 }
 
+/** Synthetic-test-only R16 fixture completion through the production Kernel seams. */
+export function kernelSeedVisibleResearchWorld(input: {
+  nonce: string;
+  datasetId: string;
+  taskId?: string;
+  missionId: string;
+  directorSessionId: string;
+  taskTitle: string;
+  taskDescription: string;
+  hypothesisId: string;
+  executorSessionId: string;
+  criticSessionId: string;
+}): Record<string, unknown> {
+  const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  const createdTask = input.taskId ? null : kernelExecute("create_task", {
+    task_id: `task-${input.nonce}`,
+    title: input.taskTitle,
+    description: input.taskDescription,
+    assignee_session_id: input.executorSessionId,
+  }, { ...trace(), actor_session_id: input.directorSessionId, mission_id: input.missionId }) as { object_id: string };
+  const taskId = input.taskId ?? String(createdTask?.object_id ?? "");
+  if (!taskId) throw new Error("R16 fixture Task creation did not return an id");
+  const run = kernelExecute("execute_deterministic_run", {
+    run_id: `run-${input.nonce}`,
+    dataset_id: input.datasetId,
+    hypothesis_id: input.hypothesisId,
+    strategy_spec: {
+      contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge",
+    },
+    params: { limit: 2 },
+  }, { ...trace(), actor_session_id: input.executorSessionId }) as { object_id: string; state: Record<string, unknown> };
+  const resultArtifactId = String(run.state.result_artifact_id ?? "");
+  if (!resultArtifactId) throw new Error("R16 fixture deterministic Run did not produce a result Artifact");
+  const work: SourceWork = {
+    source_task_id: taskId,
+    hypothesis_id: input.hypothesisId,
+    run_id: run.object_id,
+    result_artifact_id: resultArtifactId,
+    executor_session_id: input.executorSessionId,
+  };
+  bindSourceWork(getKernelDb(), work, trace());
+  const attemptId = `r16-review-${input.nonce}`;
+  const admitted = requestGovernedReview(getKernelDb(), taskId, attemptId, input.criticSessionId, trace());
+  if (admitted.kind !== "admitted" || !admitted.review_task_id) throw new Error("R16 fixture review admission did not produce a review Task");
+  markGovernedDelivery(getKernelDb(), admitted.review_task_id, "delivered", trace());
+  const reads = [
+    ["qf_hypothesis_get", { id: input.hypothesisId }, 1],
+    ["qf_run_get", { id: run.object_id }, 2],
+    ["qf_artifact_get", { id: resultArtifactId }, 3],
+  ] as const;
+  for (const [toolName, args, sequence] of reads) {
+    recordGovernedToolReceipt(getKernelDb(), {
+      invocation_id: `r16-${input.nonce}-${sequence}`,
+      session_id: input.criticSessionId,
+      task_id: admitted.review_task_id,
+      tool_name: toolName,
+      arguments: args,
+      result: { id: args.id },
+      broker_sequence: sequence,
+    }, trace());
+  }
+  const evaluation = kernelRecordGovernedEvaluation({
+    review_task_id: admitted.review_task_id,
+    source_work: work,
+    hypothesis_id: input.hypothesisId,
+    run_id: run.object_id,
+    artifact_id: resultArtifactId,
+    verdict: "supports",
+    rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
+    confidence: 0.9,
+    rationale: "The bounded deterministic fixture preserves the complete visible research lineage.",
+    findings: [{ code: "R16-COMPLETE", severity: "info", message: "The fixture lineage is complete.", evidence_refs: [input.hypothesisId, run.object_id, resultArtifactId] }],
+  }, input.criticSessionId);
+  return {
+    nonce: input.nonce,
+    dataset_id: input.datasetId,
+    task_id: taskId,
+    hypothesis_id: input.hypothesisId,
+    run_id: run.object_id,
+    result_artifact_id: resultArtifactId,
+    evaluation_id: String(evaluation.object_id ?? ""),
+    review_task_id: admitted.review_task_id,
+  };
+}
+
 /** Resolve capability_groups JSON from the session's spawned_from definition. */
 export function kernelCapabilityGroupsForSession(
   sessionId: string,
