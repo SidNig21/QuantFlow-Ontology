@@ -217,3 +217,25 @@ describe("conformance counts", () => {
     expect(reject).toBeGreaterThan(0);
   });
 });
+
+test("record_evaluation publishes an exact numeric rubric object", () => {
+  const tools = JSON.parse(generateMcp(schema)) as Array<{
+    name: string;
+    inputSchema: { properties?: Record<string, unknown> };
+  }>;
+  const recordEvaluation = tools.find((tool) => tool.name === "qf_record_evaluation");
+  expect(recordEvaluation).toBeDefined();
+  const rubric = recordEvaluation?.inputSchema.properties?.rubric;
+  expect(rubric).toEqual({
+    type: "object",
+    properties: {
+      faithfulness: { type: "number", minimum: 0, maximum: 1 },
+      answer_relevancy: { type: "number", minimum: 0, maximum: 1 },
+      context_precision: { type: "number", minimum: 0, maximum: 1 },
+      context_recall: { type: "number", minimum: 0, maximum: 1 },
+    },
+    required: ["faithfulness", "answer_relevancy", "context_precision", "context_recall"],
+    additionalProperties: false,
+    description: "Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.",
+  });
+});

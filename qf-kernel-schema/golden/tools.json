@@ -3255,10 +3255,35 @@
         },
         "rubric": {
           "type": "object",
-          "propertyNames": {
-            "type": "string"
+          "properties": {
+            "faithfulness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "answer_relevancy": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "context_precision": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "context_recall": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
           },
-          "additionalProperties": {},
+          "required": [
+            "faithfulness",
+            "answer_relevancy",
+            "context_precision",
+            "context_recall"
+          ],
+          "additionalProperties": false,
           "description": "Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall."
         },
         "overall": {

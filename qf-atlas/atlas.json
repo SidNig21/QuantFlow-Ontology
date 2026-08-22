@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "36235b3",
+    "commit": "7a6faa1",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "f9819cd9f40e309e"
+    "fingerprint": "c3194c0672767000"
   },
   "stats": {
     "live": 111,
@@ -4790,7 +4790,7 @@
       "id": "1:qf-kernel-schema/src/ontology",
       "layer": 1,
       "name": "ontology/",
-      "kb": 60.8,
+      "kb": 61.1,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -4801,7 +4801,7 @@
       "files": [
         {
           "path": "qf-kernel-schema/src/ontology/research.ts",
-          "kb": 25.8,
+          "kb": 26.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -58442,12 +58442,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "a175f45",
+      "commit": "36235b3",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "36235b3",
+      "commit": "7a6faa1",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",

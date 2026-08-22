@@ -5,6 +5,12 @@ import { instrument } from "./market.ts";
 
 const jsonObject = z.record(z.string(), z.unknown());
 const jsonArray = z.array(jsonObject);
+const evaluationRubric = z.object({
+  faithfulness: z.number().min(0).max(1),
+  answer_relevancy: z.number().min(0).max(1),
+  context_precision: z.number().min(0).max(1),
+  context_recall: z.number().min(0).max(1),
+}).strict();
 
 // ── Research plane ──────────────────────────────────────────────────────────
 
@@ -645,7 +651,7 @@ export const record_evaluation = defineAction({
     artifact_id: z
       .string()
       .describe("Exact result Artifact produced by the Run."),
-    rubric: jsonObject.describe("Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.").optional(),
+    rubric: evaluationRubric.describe("Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.").optional(),
     overall: z.number().describe("Rejected when supplied; the Kernel derives the arithmetic mean.").optional(),
     source_work: jsonObject.describe("Frozen source-work tuple copied from the review Task.").optional(),
     review_task_id: z.string().describe("Governed review Task id receiving this evaluation.").optional(),

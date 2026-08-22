@@ -157,6 +157,12 @@ test("production list_tools serves action and read schemas for admitted seats", 
       "market.read",
       "Market Researcher",
     );
+    const criticSessionId = definition(
+      "test-critic",
+      "critic",
+      "research.evaluate",
+      "Critic",
+    );
 
     const capabilities = new Map<string, string>();
     const admittedSeat = (sessionId: string, role: string): string => {
@@ -168,6 +174,7 @@ test("production list_tools serves action and read schemas for admitted seats", 
     };
     admittedSeat(orchestratorSessionId, "orchestrator");
     admittedSeat(marketSessionId, "worker");
+    admittedSeat(criticSessionId, "critic");
     const requireAdmittedSeat = (
       capability: unknown,
       sessionId: unknown,
@@ -226,6 +233,26 @@ test("production list_tools serves action and read schemas for admitted seats", 
     const expectedVenueGet = readToolsForObject(venue).find((tool) => tool.name === "qf_venue_get");
     expect(expectedVenueGet).toBeDefined();
     expect(venueGet).toEqual(expectedVenueGet);
+
+    const criticTools = serve(criticSessionId, "critic").tools;
+    const recordEvaluation = criticTools.find((tool) => tool.name === "qf_record_evaluation");
+    expect(recordEvaluation).toBeDefined();
+    const rubric = (recordEvaluation!.inputSchema.properties as Record<string, unknown>).rubric;
+    expect(rubric).toEqual({
+      type: "object",
+      properties: {
+        faithfulness: { type: "number", minimum: 0, maximum: 1 },
+        answer_relevancy: { type: "number", minimum: 0, maximum: 1 },
+        context_precision: { type: "number", minimum: 0, maximum: 1 },
+        context_recall: { type: "number", minimum: 0, maximum: 1 },
+      },
+      required: ["faithfulness", "answer_relevancy", "context_precision", "context_recall"],
+      additionalProperties: false,
+      description: "Exactly four finite scores: faithfulness, answer_relevancy, context_precision, context_recall.",
+    });
+    const recordEvaluationAction = schema.actions.find((action) => action.name === "record_evaluation");
+    if (!recordEvaluationAction) throw new Error("schema authority is missing record_evaluation");
+    expect(recordEvaluation).toEqual(actionToolForAction(recordEvaluationAction));
   } finally {
     for (const capability of issuedCapabilities) {
       revokeLiveSeatCapability(capability);
