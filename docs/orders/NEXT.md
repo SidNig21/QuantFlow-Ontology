@@ -105,6 +105,7 @@ consumer-critic-final-verifier-receipt: fresh independent Verifier task `01a0291
 consumer-final-build-receipt: exact candidate build started `2026-08-22T11:02:02.4840960Z`; Main/preload/renderer passed, outputs postdated start, and bundle identity was exact `e824ae10`
 consumer-governed-review-reopen-red: first ordinary launch produced no window because all six R15 governed-review support tables were misclassified as orphan ontology objects on reattach; founder database remained preserved, read-only counts were recorded, and launched PID tree cleaned to zero
 current-door: exact `NORMAL REOPEN RED — governed-review support tables misclassified as objects` requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
+normal-reopen-reader-closure: binding `NORMAL REOPEN READER DEFECT CLOSURE — exact lifecycle fixture and matrix` appended to `WO-R16.md`; fresh Reader must re-answer YES/YES before the docs-authorized gate-only Builder door opens
 
 ## Authorized outcome
 

@@ -4196,3 +4196,175 @@ file are frozen. The spent `e824ae10` build is a recorded diagnostic. After a
 fresh Reader YES/YES, Builder repair, and independent PASS, exactly one new
 actual build is authorized for the still-required two-launch Computer consumer
 check. No consumer launch or R17 work is authorized before that PASS.
+
+### NORMAL REOPEN READER DEFECT CLOSURE — exact lifecycle fixture and matrix
+
+The preceding subsection had four finite order defects. “Existing registry/attach
+tests,” “complete bounded R16 parent matrix,” and “byte-preserved review rows”
+were not executable meanings, and the report receipt did not bind one exact
+command/output row per required check. The following closure supersedes only
+those mechanics; the six-table infrastructure boundary and every product,
+schema, founder-database, build, consumer, and R17 prohibition remain unchanged.
+
+Plain meaning: the repair must prove that all six review-support tables survive
+a real close-and-reopen, while an unrelated table still fails the drift check,
+and the Builder must show every red and restored-green result in one receipt.
+
+#### Exact deliverables
+
+1. In `packages/qf-kernel/src/registry-drift.ts`, add exactly these six table
+   names to the existing finite `INFRA_TABLES` set:
+
+   ```text
+   qf_review_source_work
+   qf_review_task
+   qf_review_invocation
+   qf_review_attempt
+   qf_review_receipt
+   qf_review_publication
+   ```
+
+   Keep the set finite. Add this exact adjacent comment:
+   `// R15 durable governed-review support tables, not ontology object types.`
+   No prefix, wildcard, substring, schema-meta insertion, or other exemption
+   is a valid implementation.
+
+2. In `packages/qf-kernel/src/registry-drift.test.ts`, append one runtime test
+   named `ignores exactly six governed-review support tables but rejects a
+   seventh orphan`. It supplies all six exact names plus one seventh table
+   named `qf_review_orphan`. It must require `{ ok: false }`, empty `missing`
+   and `retired`, and `inconsistent === ["qf_review_orphan"]`. Thus omission
+   of any one allowed name or a broad `qf_review_*` exemption is red. The
+   existing tests remain unchanged.
+
+3. In `packages/qf-kernel/src/attach-kernel-drift.test.ts`, append one runtime
+   lifecycle test named `reopens governed-review schema with support rows
+   intact`, with this exact sequence:
+
+   - create one file-backed isolated path under the test's existing temporary
+     directory helper and open it with the real writable `openKernel(path,
+     { create: true })`;
+   - call the real exported `ensureGovernedReviewSchema(db)` exactly once;
+   - insert exactly one deterministic non-empty fixture row into each of the
+     six support tables, using only the table columns created by that real
+     schema function. Every row uses the exact timestamp
+     `2026-08-22T00:00:00.000Z` and the exact source-work JSON
+     `{"source_task_id":"source-task","hypothesis_id":"hypothesis","run_id":"run","result_artifact_id":"result-artifact","executor_session_id":"executor"}`.
+     The six exact row tuples, in table/column order, are:
+
+     ```text
+     qf_review_source_work:
+       (source-task, SOURCE_WORK, 2026-08-22T00:00:00.000Z)
+     qf_review_task:
+       (review-task, review, source-task, SOURCE_WORK, critic, critic,
+        attempt-1, NULL, pending, NULL, 2026-08-22T00:00:00.000Z)
+     qf_review_invocation:
+       (invocation-1, critic, review-task, qf_hypothesis_get,
+        {"id":"hypothesis"}, {"ok":true}, 1, 1,
+        2026-08-22T00:00:00.000Z)
+     qf_review_attempt:
+       (request_review, source-task, SOURCE_WORK, NULL, attempt-1, admitted,
+        {"kind":"admitted","attempt_id":"attempt-1"},
+        2026-08-22T00:00:00.000Z)
+     qf_review_receipt:
+       (receipt-1, delivery_receipt, review-task,
+        {"outcome":"delivered","task_id":"review-task"},
+        2026-08-22T00:00:00.000Z)
+     qf_review_publication:
+       (source-task\0hypothesis\0run\0result-artifact\0executor,
+        report-artifact, evaluation, 2026-08-22T00:00:00.000Z)
+     ```
+
+     Here `SOURCE_WORK` is the exact JSON string above, JSON values are stored
+     without whitespace, and `NULL` is SQL NULL. Direct fixture-row insertion
+     is allowed only for these six support tables; no `schema_meta` row or
+     ontology row may be inserted by hand.
+   - snapshot each table's complete ordered row set with `SELECT * ... ORDER BY
+     rowid`, close the first handle with the real `closeKernel`, reopen the same
+     path with writable `openKernel(path)`, and require no throw and no
+     `getKernelDrift` report;
+   - snapshot the same six ordered row sets again and require byte-for-byte
+     equality with the first snapshots. The test must name the six tables from
+     one literal list and may use identifier interpolation only from that list.
+
+   The test is red if `ensureGovernedReviewSchema` is skipped, any row differs
+   from these exact tuples, the second open
+   uses a different path or a copied detector, any support table is missing,
+   any row changes, or registry drift is reported. It must not open the founder
+   database.
+
+4. The falsifier is one temporary source mutation only: remove the literal
+   `qf_review_task` entry from `INFRA_TABLES`, leaving the test and all other
+   files byte-identical. Run the unchanged attach test; native nonzero output
+   must name `qf_review_task` in the `KernelRegistryDriftError`. Restore the
+   exact candidate bytes, require zero diff for
+   `packages/qf-kernel/src/registry-drift.ts`, and rerun the same test to its
+   native green count. A green mutation run is an acceptance failure.
+
+#### Exact acceptance commands and receipts
+
+The focused commands, in this order, are exactly:
+
+```text
+bun test packages/qf-kernel/src/registry-drift.test.ts
+bun test packages/qf-kernel/src/attach-kernel-drift.test.ts
+bun test packages/qf-kernel/src/r15-governed-review.test.ts
+```
+
+The first two must report `7 pass / 0 fail` and `6 pass / 0 fail`
+respectively. The R15 command must report a native `N pass / 0 fail` with
+`N > 0`. Any other count or native nonzero exit is red.
+
+The complete bounded R16 parent matrix is this exact list, with no wrapper,
+retry, substitution, or omission:
+
+```text
+bun test collab-electron/src/main/governed-review.test.ts
+bun test collab-electron/src/main/research-world.test.ts
+bun test collab-electron/src/windows/shell/src/research-world.test.ts
+bun test collab-electron/src/windows/shell/src/task-composition.test.ts
+bun test collab-electron/src/main/native-tui-orchestration.test.ts
+bun test collab-electron/src/main/precreated-native-tui.test.ts
+bun test packages/qf-kernel/src/r15-governed-review.test.ts
+bun test packages/qf-kernel/src/r16-visible-world.test.ts
+bun test qa/gates/governed-review.test.ts
+bun test qa/gates/research-world-visible.test.ts
+bun qa/run.ts kernel-sole-writer
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+git diff --check fef713c06f091dc8df13f7bde07be859d3b04930 HEAD
+```
+
+The first ten commands must each print native `N pass / 0 fail` with `N > 0`
+and exit zero. The named static gate must print `PASS`; the remaining commands
+must exit zero. The Builder and independent Verifier retain one unedited output
+row for every invocation above. The R15 focused command is run once before the
+parent matrix, and the parent matrix runs its separately listed R15 command
+once; both rows are retained.
+
+The Builder report is exactly
+`docs/orders/evidence/r16/BUILD-REPORT.md`. It contains, in command order, one
+row for each focused command, one row for each parent-matrix command, the Atlas
+outputs, both diff checks, the mutation's native red output and named error,
+the restoration-zero-diff hash, and the restored-green output. It also records
+the immutable candidate SHA, changed paths, and clean status. No other evidence
+file or product/test path is authorized by this closure; no build or launch is
+authorized before independent PASS.
+
+Every acceptance gate can fail: the registry test fails when an exact support
+name is omitted or an orphan is exempted; the attach test fails when the real
+schema creation, same-path reopen, row preservation, or drift-free result is
+broken; the falsifier must fail on the removed `qf_review_task` exemption; the
+R15 and parent commands fail on any regression or missing PASS; Atlas fails on
+stale or regressed projections; and `git diff --check` fails on whitespace.
+Every deliverable has exactly one meaning: one finite six-name infrastructure
+allowlist, one runtime registry regression, one same-file support-row reopen
+regression, one executable falsifier, and one named evidence report. No
+product semantics, schema authority, founder state, build, consumer launch,
+or R17 work is implied.
+
+A fresh Reader must reread the original subsection and this closure and answer
+the two protocol questions exactly. Only final YES/YES opens the bounded
+Builder door; until then this Reader makes no product/test edit, gate run,
+build, launch, founder-database access, or R17 change.
