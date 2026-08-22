@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 SESSION RECEIPT REPAIR - AWAITING FRESH READER
+status: R16 SESSION RECEIPT REPAIR - BUILD AUTHORIZED, READER YES/YES
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -16,6 +16,7 @@ scheduling-reader-receipt: fresh Luna Reader task `01a02755-bf52-7a50-b02f-a9bf5
 post-first-wip-receipt: corrected harness focused tests 11/11; live renderer showed all 13 objects but only the one session-to-session cable, with all 14 research-object cables named missing; cleanup zero; WIP preserved at `04b2596acf84668b8405304c1a2f886f87c9e23f`
 cable-reader-receipt: fresh Luna Reader task `01a02771-b447-7bc2-84b4-60479938fec1`; final YES/YES at `b8e29cfdc3a864e4ad5076a9ad953e062c5fdc60`
 session-field-wip-receipt: cable resolver focused tests 3/3 and unchanged gate contracts 11/11; live app advanced through exact 13/15 world and stopped on missing displayed fields for an existing agent_session tile; cleanup zero; WIP preserved at `4548736a8d216f140a483cbd9d3685d2166acc57`
+session-reader-receipt: fresh Luna Reader task `01a0277a-3674-7141-9da3-1a1be3048c41`; final YES/YES at `326c78756f737f6d23199589cbc0d390ef3a5471`
 
 ## Authorized outcome
 
@@ -44,8 +45,8 @@ cable endpoint defect appended to the order. A fresh two-question Reader must
 answer YES/YES on that repair before another Builder door opens. That Reader
 returned final YES/YES at `b8e29cf`; its repair is preserved at `4548736` and
 the live gate advanced to the session-field defect appended to `WO-R16.md`. A
-fresh two-question Reader must answer YES/YES before the bounded session receipt
-Builder door opens.
+fresh two-question Reader returned final YES/YES at `326c787`; the one bounded
+session receipt Builder door is open.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 
