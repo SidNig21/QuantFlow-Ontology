@@ -932,3 +932,43 @@ implementation run is authorized.
 
 Plain meaning: make Electron tell us the real one-line UI error, fix it only if
 the measuring script is wrong, and stop guessing.
+
+## OBSERVATION RULING - retain the last visible manifest
+
+Diagnostic WIP SHA `58c3288fe36d4f58f8e3db24fef91323c311ea5a` fixed
+the measured renderer-expression syntax error (`missing ) after argument list`)
+and proves the encoded renderer helper with 7/7 focused tests. Its final live
+run returned successful renderer evaluations but timed out waiting for the
+13/15 count. The current wait loop discards every non-matching snapshot, so the
+receipt cannot distinguish one missing tile from an empty canvas.
+
+This ruling authorizes only `qa/gates/research-world-visible.ts` and its focused
+test to retain the last successfully evaluated world snapshot during the normal
+case wait. On timeout, compare that snapshot to the frozen independent Oracle
+and throw exactly one JSON receipt with sorted arrays:
+
+```text
+world_timeout={
+  "object_count": <number>,
+  "link_count": <number>,
+  "missing_objects": ["type:id"],
+  "extra_objects": ["type:id"],
+  "missing_links": ["kind:from_id:to_id"],
+  "extra_links": ["kind:from_id:to_id"]
+}
+```
+
+The focused test supplies a known 12/14 snapshot against a 13/15 expected
+manifest and must assert every exact missing/extra entry and stable sort order.
+Do not change the 13/15 expectation, selectors, fixture, product, schedule,
+deadline, or cleanup. Run the focused test and one live diagnostic gate.
+
+If the exact delta identifies a defect solely in the gate's observation or
+fixture seam already named by this order, the same Builder may repair that one
+defect, add its focused red/green test, and run one final live gate. Any product
+projection change, assertion change, other file, or unexplained delta stops
+R16. A green final run resumes the required falsifiers, matrix, BUILD-REPORT,
+candidate, and fresh verification. No further diagnostic lap is authorized.
+
+Plain meaning: when the canvas count is wrong, print exactly what is missing or
+extra instead of waiting a minute and throwing the evidence away.
