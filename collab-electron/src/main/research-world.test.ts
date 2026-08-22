@@ -51,7 +51,7 @@ describe("Main research-world projection", () => {
     process.env.QF_ARTIFACT_ROOT = root;
     const db = kernel();
     const localTrace = { trace_id: "normal-world-trace", span_id: "normal-world-span" };
-    const session = (id: string, definitionId: string, role: string, groups: string[]) => {
+    const session = (id: string, definitionId: string, role: string, groups: string[], actorSessionId?: string) => {
       execute(db, "register_agent_definition", {
         name: definitionId,
         role,
@@ -60,14 +60,15 @@ describe("Main research-world projection", () => {
         capability_groups: groups,
         display_name: role === "orchestrator" ? "Research Director" : role === "critic" ? "Critic" : "Market Researcher",
       }, localTrace);
-      execute(db, "create_agent_session", { session_id: id, agent_definition_id: definitionId, label: id }, { ...localTrace, ...(role === "worker" ? { actor_session_id: "director-world" } : {}) });
+      execute(db, "create_agent_session", { session_id: id, agent_definition_id: definitionId, label: id }, { ...localTrace, ...(actorSessionId ? { actor_session_id: actorSessionId } : role === "worker" ? { actor_session_id: "director-world" } : {}) });
       execute(db, "start_agent_session", { session_id: id }, localTrace);
     };
 
     try {
       session("director-world", "director-world-definition", "orchestrator", ["desk.orchestrate"]);
       session("worker-world", "worker-world-definition", "worker", ["desk.orchestrate"]);
-      session("critic-world", "hermes-critic", "critic", ["research.evaluate"]);
+      session("critic-world", "hermes-critic", "critic", ["research.evaluate"], "director-world");
+      expect(db.query("SELECT 1 AS ok FROM links WHERE kind = 'delegates_to' AND from_id = ? AND to_id = ?").get("director-world", "critic-world")).toEqual({ ok: 1 });
       const mission = execute(db, "create_mission", {
         mission_id: "mission-normal-world",
         name: "Normal governed world",

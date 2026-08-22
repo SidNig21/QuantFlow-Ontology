@@ -303,8 +303,40 @@ export function getResearchWorldProjection(db: KernelDb, request: ResearchWorldR
       }
     }
   }
+  const selectedLinkKeys = new Set<string>();
+  const addSelectedLink = (kind: string, fromId: unknown, toId: unknown) => {
+    if (typeof fromId === "string" && fromId.length > 0 && typeof toId === "string" && toId.length > 0) {
+      selectedLinkKeys.add(`${kind}\u0000${fromId}\u0000${toId}`);
+    }
+  };
+  const sourceTaskLinks = allLinks.filter((link) => link.from_id === selectedTaskId);
+  const missionId = sourceTaskLinks.find((link) => link.kind === "belongs_to")?.to_id;
+  const executorId = source.executor_session_id;
+  const directorId = sourceTaskLinks.find((link) => link.kind === "delegated_by")?.to_id;
+  addSelectedLink("belongs_to", selectedTaskId, missionId);
+  addSelectedLink("assigned_to", selectedTaskId, executorId);
+  addSelectedLink("delegated_by", selectedTaskId, directorId);
+  addSelectedLink("delegates_to", directorId, executorId);
+  addSelectedLink("tests", source.run_id, source.hypothesis_id);
+  addSelectedLink("uses", source.run_id, runFields.dataset_id);
+  addSelectedLink("produces", source.run_id, source.result_artifact_id);
+  for (const evaluationId of evaluationIds) {
+    const evaluation = objectRow(snapshot, "evaluation", evaluationId);
+    if (!sourceWorkMatches(evaluation, source)) continue;
+    for (const sourceId of sourceIds) addSelectedLink("evaluated_by", sourceId, evaluationId);
+    const evaluationLinks = allLinks.filter((link) => link.from_id === evaluationId);
+    const criticId = evaluationLinks.find((link) => link.kind === "performed_by")?.to_id;
+    addSelectedLink("performed_by", evaluationId, criticId);
+    addSelectedLink("gates", evaluationId, evaluation.publication_report_id);
+    const findingsId = evaluation.findings_artifact_id;
+    addSelectedLink("produces", criticId, findingsId);
+    const reviewTaskId = evaluation.review_task_id;
+    const reviewTaskLinks = allLinks.filter((link) => link.from_id === reviewTaskId);
+    addSelectedLink("assigned_to", reviewTaskId, reviewTaskLinks.find((link) => link.kind === "assigned_to")?.to_id);
+    addSelectedLink("delegated_by", reviewTaskId, reviewTaskLinks.find((link) => link.kind === "delegated_by")?.to_id);
+  }
   const worldLinks = allLinks
-    .filter((link) => idsContain(ids, link.from_id) && idsContain(ids, link.to_id))
+    .filter((link) => selectedLinkKeys.has(`${link.kind}\u0000${link.from_id}\u0000${link.to_id}`))
     .sort((a, b) => a.kind.localeCompare(b.kind) || a.from_id.localeCompare(b.from_id) || a.to_id.localeCompare(b.to_id));
   const missing: MissingLineageFact[] = [];
   const requireLink = (owningType: string, owningId: string, kind: string, predicate: (link: ResearchWorldLink) => boolean) => {

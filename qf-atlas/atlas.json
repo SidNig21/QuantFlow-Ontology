@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "7a6faa1",
+    "commit": "e3039e6",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c3194c0672767000"
+    "fingerprint": "1219812e1dea8dc4"
   },
   "stats": {
     "live": 111,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 124,
-      "indexed": 1154,
+      "indexed": 1155,
       "downgradedFromCheats": 20,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 14,
@@ -1295,8 +1295,8 @@
       "layer": 2,
       "name": "git*",
       "kb": 16.2,
-      "x": -1.69,
-      "z": -2.03,
+      "x": -0.45,
+      "z": -2.6,
       "status": "ok",
       "spawns": 1,
       "writes": 1,
@@ -2046,9 +2046,9 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 15.5,
-      "x": -0.45,
-      "z": -2.6,
+      "kb": 17.6,
+      "x": -1.69,
+      "z": -2.03,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2057,7 +2057,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 14.8,
+          "kb": 16.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -9385,7 +9385,7 @@
     {
       "path": "collab-electron/src/main/research-world-projection.ts",
       "status": "indexed",
-      "indexedFns": 16,
+      "indexedFns": 17,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -58442,12 +58442,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "36235b3",
+      "commit": "7a6faa1",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "7a6faa1",
+      "commit": "e3039e6",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",
