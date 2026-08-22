@@ -830,3 +830,100 @@ The final evidence commit will contain only this report. After that commit is
 pushed, git status --porcelain=v1 must be empty and a fresh Verifier may
 begin. The Builder did not claim the unlaunched normal-app consumer check as
 verified; that remains within the fresh Verifier's independent scope.
+
+## FINAL COMPUTER RED — critic-submit repair
+
+Plain meaning: the critic's review message is now typed once, allowed to settle,
+and submitted once to the same live Hermes terminal; if that terminal changes or
+the submit key is missing, the review attempt fails closed instead of claiming
+delivery.
+
+### Immutable product candidate and scope
+
+| Field | Receipt |
+|---|---|
+| Builder base | `e08dce505a351064d117332e23e6367158b47372` |
+| Product candidate SHA | `d77dfff0e027229ad19a5205802ae7374dae2c52` |
+| Branch / push | `wo-R16` / pushed to `origin/wo-R16` |
+| Product candidate status before evidence | clean |
+| Evidence scope | this BUILD-REPORT only after the product commit |
+
+The product candidate changed exactly these six paths:
+
+~~~text
+collab-electron/src/main/agent-host.ts
+collab-electron/src/main/governed-review.test.ts
+collab-electron/src/main/index.ts
+qf-atlas/ATLAS.md
+qf-atlas/atlas.html
+qf-atlas/atlas.json
+~~~
+
+The normal continuation calls `submitAgentSessionInstruction` exactly once and
+does not call `deliverToAgentSession`. The helper writes the instruction without
+its terminal carriage return once, waits 400 ms, rechecks the same live
+native-TUI session and PTY id, then writes exactly one `\r` to that captured PTY.
+Changed-target and missing-target paths reject before a second write.
+
+### Exact short matrix receipts
+
+Each command below was run against the unchanged bytes that became candidate
+`d77dfff0e027229ad19a5205802ae7374dae2c52`; every command exited natively zero.
+
+| Exact command | Native receipt |
+|---|---|
+| `bun test collab-electron/src/main/governed-review.test.ts` | `0`; `4 pass / 0 fail / 27 expect` |
+| `bun test collab-electron/src/main/research-world.test.ts` | `0`; `3 pass / 0 fail / 13 expect` |
+| `bun test collab-electron/src/windows/shell/src/research-world.test.ts` | `0`; `6 pass / 0 fail / 32 expect` |
+| `bun test collab-electron/src/windows/shell/src/task-composition.test.ts` | `0`; `3 pass / 0 fail / 55 expect` |
+| `bun test collab-electron/src/main/native-tui-orchestration.test.ts` | `0`; `9 pass / 0 fail / 42 expect` |
+| `bun test collab-electron/src/main/precreated-native-tui.test.ts` | `0`; `2 pass / 0 fail / 5 expect` |
+| `bun test packages/qf-kernel/src/r15-governed-review.test.ts` | `0`; `7 pass / 0 fail / 55 expect` |
+| `bun test packages/qf-kernel/src/r16-visible-world.test.ts` | `0`; `3 pass / 0 fail / 5 expect` |
+| `bun test qa/gates/governed-review.test.ts` | `0`; nested production/kernel `11 pass / 0 fail`, live broker `7 pass / 0 fail`, gate `3 pass / 0 fail` |
+| `bun test qa/gates/research-world-visible.test.ts` | `0`; `13 pass / 0 fail / 192 expect` |
+| `bun qa/run.ts kernel-sole-writer` | `0`; `PASS  kernel-sole-writer` |
+| `bun qf-atlas/generate.mjs --check` | `0`; `qf-atlas: current — 432 files, 124 channels, 13 strip candidates` |
+| `bun qf-atlas/ratchet.mjs` | `0`; baseline `3`, HARD RED `0`, unexplained `0`, AMBER `20`, undecided `42` |
+| `git diff --check` | `0`; no output |
+
+Atlas regeneration was authorized and completed with native exit 0. The
+post-change `bun qf-atlas/generate.mjs --diff e08dce505a351064d117332e23e6367158b47372`
+receipt was `VERDICT: UNCHANGED` with added/newly-detected/resolved/regressed
+all `0`; coverage and undecided counts were unchanged.
+
+### Critic-submit falsifier
+
+The only temporary mutation removed exactly the second
+`writeToSession(capturedPtySessionId, "\r")` in
+`submitAgentSessionInstruction`; tests, expected values, and gate files were
+unchanged.
+
+~~~text
+Command: bun test collab-electron/src/main/governed-review.test.ts
+Red native exit: 1
+Red receipt: the unchanged test expected two writes but received only the
+instruction write; the missing second write was the exact separate "\r" submit.
+Restoration: exact second write restored.
+Restored native exit: 0
+Restored receipt: 4 pass / 0 fail / 27 expect
+git diff --quiet HEAD -- collab-electron/src/main/agent-host.ts
+native_exit=0
+~~~
+
+The focused runtime test also records the first write byte-for-byte as the
+`buildMissionActivationInstruction()` result minus its one terminal `\r`, the
+second write as exactly `\r`, a measured settle of at least 350 ms around the
+fixed 400 ms bounded wait, one delivery receipt, the unchanged four governed
+receipts, Evaluation, and supports publication. It exercises changed-PTY and
+missing-live-target rejection without changing Kernel receipts.
+
+### Verification boundary
+
+No live Electron app, normal consumer launch, build, package/installer gate,
+release gate, Computer Use, founder database, or R17 path was run or changed.
+Independent verification remains required at immutable product SHA
+`d77dfff0e027229ad19a5205802ae7374dae2c52`: the Verifier must rerun the named
+matrix, inspect the candidate before and after, and write separate verification
+evidence. The Router's one-build/two-launch normal consumer check remains
+unopened until that independent PASS.
