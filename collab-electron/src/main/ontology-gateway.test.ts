@@ -238,3 +238,272 @@ test("production list_tools serves action and read schemas for admitted seats", 
     else process.env.QF_PEER_BUS_DB = previousPeerBusDb;
   }
 });
+
+test("an admitted governed critic receives and records the verified Artifact receipt", async () => {
+  const { mkdtempSync, rmSync, writeFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { callOntologyReadTool } = await import("./ontology-gateway");
+  const {
+    kernelContinueGovernedResearchResult,
+    kernelExecute,
+    kernelGetObject,
+    kernelRunGuidedResearch,
+    openAppKernel,
+  } = await import("./kernel");
+
+  const artifactRoot = mkdtempSync(join(tmpdir(), "qf-r16-gateway-artifact-"));
+  const previousKernelDb = process.env.QF_KERNEL_DB;
+  const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
+  const previousPeerBusDb = process.env.QF_PEER_BUS_DB;
+  process.env.QF_KERNEL_DB = ":memory:";
+  process.env.QF_ARTIFACT_ROOT = artifactRoot;
+  delete process.env.QF_PEER_BUS_DB;
+  const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  const db = openAppKernel();
+
+  const validArtifactId = "ad2b4752d6a4f24a35d0d354608c239d04129b4f95ef8d91969ec110d2fe229e";
+  const missingArtifactId = "efc346d7d4d0ea23b35afdc8b507c236aac458946b89e38f1d93e1f17f092ae1";
+  const tamperedArtifactId = "e442724a13753b568f0c47ec9c30cdcaba7496e53eab2bca12343b5ef58241f3";
+  const oversizedArtifactId = "1abe08ebecf1c18cab71f6fe28aaddf20268f85bad78bb9a72f88ca47c874662";
+  const invalidUtf8ArtifactId = "8ca9f8c269c0a4b1d8bf0efc67d97df8ad5e0ea93630fd9099860d36c0fe75ea";
+  const validText = "{\"metrics\":{\"roi\":\"1.000000\",\"net_profit\":\"100.000000\"}}";
+  const encoder = new TextEncoder();
+
+  try {
+    const publish = (name: string, bytes: Uint8Array, expectedId?: string) => {
+      const storagePath = join(artifactRoot, name);
+      writeFileSync(storagePath, bytes);
+      const input: Record<string, unknown> = {
+        kind: "result_set",
+        bytes,
+        storage_ref: storagePath,
+      };
+      if (expectedId) input.content_hash = expectedId;
+      const artifact = kernelExecute("publish_artifact", input, trace()) as { object_id: string };
+      if (expectedId) expect(artifact.object_id).toBe(expectedId);
+      return { id: artifact.object_id, storagePath };
+    };
+
+    const validArtifact = publish(
+      "valid.json",
+      encoder.encode(validText),
+      validArtifactId,
+    );
+    const missingArtifact = publish(
+      "missing.json",
+      encoder.encode("{\"fixture\":\"missing\",\"secret\":\"MISSING_PAYLOAD\"}"),
+      missingArtifactId,
+    );
+    rmSync(missingArtifact.storagePath, { force: true });
+    const tamperedArtifact = publish(
+      "tampered.json",
+      encoder.encode("{\"fixture\":\"tampered-original\",\"secret\":\"ORIGINAL\"}"),
+      tamperedArtifactId,
+    );
+    writeFileSync(
+      tamperedArtifact.storagePath,
+      encoder.encode("{\"fixture\":\"tampered-secret\",\"secret\":\"UNVERIFIED\"}"),
+    );
+    const oversizedArtifact = publish(
+      "oversized.json",
+      new Uint8Array(65_537).fill(0x78),
+      oversizedArtifactId,
+    );
+    const invalidUtf8Artifact = publish(
+      "invalid-utf8.bin",
+      new Uint8Array([0xff, 0xfe, 0xfd]),
+      invalidUtf8ArtifactId,
+    );
+
+    const session = (
+      sessionId: string,
+      definitionId: string,
+      role: string,
+      groups: string[],
+      displayName: string,
+    ) => {
+      kernelExecute("register_agent_definition", {
+        name: definitionId,
+        role,
+        package_ref: `test:${definitionId}`,
+        runtime_profile: "default",
+        capability_groups: groups,
+        display_name: displayName,
+      }, trace());
+      kernelExecute("create_agent_session", {
+        session_id: sessionId,
+        agent_definition_id: definitionId,
+        label: sessionId,
+      }, trace());
+      kernelExecute("start_agent_session", { session_id: sessionId }, trace());
+    };
+    session("gateway-director", "gateway-director-definition", "orchestrator", ["desk.orchestrate"], "Research Director");
+    session("gateway-worker", "gateway-worker-definition", "worker", ["desk.orchestrate"], "Market Researcher");
+    session("gateway-critic", "hermes-critic", "critic", ["research.evaluate"], "Critic");
+    session("gateway-reader", "gateway-reader-definition", "worker", ["research.evaluate"], "Market Researcher");
+
+    const dataset = publish(
+      "dataset.json",
+      encoder.encode(JSON.stringify({
+        contract: "qf.dataset.v1",
+        observations: [{ observed_at: "2026-08-22T00:00:00.000Z", edge: 1 }],
+      })),
+    );
+    const datasetVersion = kernelExecute("register_dataset_version", {
+      kind: "results",
+      artifact_id: dataset.id,
+      content_hash: dataset.id,
+      as_of: "2026-08-22T00:00:00.000Z",
+      coverage: { deterministic_score_field: "edge" },
+    }, trace()) as { object_id: string };
+    const hypothesis = kernelExecute("create_hypothesis", {
+      claim: "The verified Artifact receipt is inspectable by the admitted critic.",
+      success_criteria: "The critic receives the exact hash-verified JSON preview.",
+      sources: [datasetVersion.object_id],
+    }, trace()) as { object_id: string };
+    const mission = kernelExecute("create_mission", {
+      mission_id: "mission-gateway-artifact-receipt",
+      name: "Gateway Artifact receipt mission",
+      objective: "Exercise the governed Artifact read boundary.",
+    }, trace()) as { object_id: string };
+    const sourceTask = kernelExecute("create_task", {
+      task_id: "task-gateway-artifact-receipt",
+      title: "Inspect the governed Artifact receipt",
+      description: "Bind the source work for the gateway contract.",
+      assignee_session_id: "gateway-worker",
+    }, {
+      ...trace(),
+      actor_session_id: "gateway-director",
+      mission_id: mission.object_id,
+    }) as { object_id: string };
+    const run = kernelRunGuidedResearch("gateway-worker", hypothesis.object_id, validArtifact.id);
+    expect(run).not.toBeNull();
+    if (!run) return;
+    const continuation = await kernelContinueGovernedResearchResult({
+      source_task_id: sourceTask.object_id,
+      hypothesis_id: run.hypothesisId,
+      run_id: run.runId,
+      result_artifact_id: run.artifactId,
+      executor_session_id: "gateway-worker",
+      critic_session_id: "gateway-critic",
+      attempt_id: "gateway-artifact-receipt-attempt",
+      deliver: async () => {},
+    });
+    expect(continuation.outcome).toBe("delivered");
+
+    const expectedHypothesis = kernelGetObject("hypothesis", hypothesis.object_id);
+    const expectedRun = kernelGetObject("run", run.runId);
+    const expectedValidRow = kernelGetObject("artifact", validArtifactId);
+    const expectedMissingRow = kernelGetObject("artifact", missingArtifactId);
+    const expectedTamperedRow = kernelGetObject("artifact", tamperedArtifactId);
+    const expectedOversizedRow = kernelGetObject("artifact", oversizedArtifactId);
+    const expectedInvalidUtf8Row = kernelGetObject("artifact", invalidUtf8ArtifactId);
+    if (!expectedHypothesis || !expectedRun || !expectedValidRow || !expectedMissingRow || !expectedTamperedRow || !expectedOversizedRow || !expectedInvalidUtf8Row) {
+      throw new Error("gateway Artifact receipt fixtures were not persisted");
+    }
+
+    const critic = { sessionId: "gateway-critic", role: "critic" };
+    const governedHypothesis = callOntologyReadTool(critic, "qf_hypothesis_get", { id: hypothesis.object_id });
+    const governedRun = callOntologyReadTool(critic, "qf_run_get", { id: run.runId });
+    expect(governedHypothesis.result).toEqual(expectedHypothesis);
+    expect(governedRun.result).toEqual(expectedRun);
+
+    const expectedValidResult = {
+      id: validArtifactId,
+      created_at: expectedValidRow.created_at,
+      kind: "result_set",
+      content_hash: validArtifactId,
+      receipt: {
+        artifact_id: validArtifactId,
+        kind: "result_set",
+        content_hash: validArtifactId,
+        durable_bytes_available: true,
+        preview: validText,
+      },
+    };
+    const governedValidArtifact = callOntologyReadTool(critic, "qf_artifact_get", { id: validArtifactId });
+    expect(governedValidArtifact.result).toEqual(expectedValidResult);
+    expect(Object.keys(governedValidArtifact.result as Record<string, unknown>).sort()).toEqual([
+      "content_hash", "created_at", "id", "kind", "receipt",
+    ]);
+    expect(governedValidArtifact.result).not.toHaveProperty("storage_ref");
+
+    const invocation = db.query(
+      "SELECT result FROM qf_review_invocation WHERE task_id = ? AND tool_name = 'qf_artifact_get'",
+    ).get(continuation.review_task_id) as { result: string } | null;
+    if (!invocation) throw new Error("governed Artifact read was not durably recorded");
+    const recordedValidResult = JSON.parse(invocation.result) as Record<string, unknown>;
+    expect(recordedValidResult).toEqual(expectedValidResult);
+    expect(recordedValidResult).toEqual(governedValidArtifact.result);
+
+    const expectUnavailable = (
+      row: Record<string, unknown>,
+      artifactId: string,
+      expectedReceipt: Record<string, unknown>,
+    ) => {
+      const response = callOntologyReadTool(critic, "qf_artifact_get", { id: artifactId });
+      const expected = {
+        id: artifactId,
+        created_at: row.created_at,
+        kind: "result_set",
+        content_hash: artifactId,
+        receipt: expectedReceipt,
+      };
+      expect(response.result).toEqual(expected);
+      expect(response.result).not.toHaveProperty("storage_ref");
+      const serialized = JSON.stringify(response.result);
+      expect(serialized).not.toContain(artifactRoot);
+      expect(serialized).not.toContain("MISSING_PAYLOAD");
+      expect(serialized).not.toContain("ORIGINAL");
+      expect(serialized).not.toContain("UNVERIFIED");
+      return response.result;
+    };
+
+    expectUnavailable(expectedMissingRow, missingArtifactId, {
+      artifact_id: missingArtifactId,
+      kind: "result_set",
+      content_hash: missingArtifactId,
+      durable_bytes_available: false,
+      message: "Artifact unavailable: hash mismatch",
+    });
+    expectUnavailable(expectedTamperedRow, tamperedArtifactId, {
+      artifact_id: tamperedArtifactId,
+      kind: "result_set",
+      content_hash: tamperedArtifactId,
+      durable_bytes_available: false,
+      message: "Artifact unavailable: hash mismatch",
+    });
+    expectUnavailable(expectedOversizedRow, oversizedArtifactId, {
+      artifact_id: oversizedArtifactId,
+      kind: "result_set",
+      content_hash: oversizedArtifactId,
+      durable_bytes_available: true,
+      message: "Preview unavailable: artifact exceeds 65536 bytes",
+    });
+    expectUnavailable(expectedInvalidUtf8Row, invalidUtf8ArtifactId, {
+      artifact_id: invalidUtf8ArtifactId,
+      kind: "result_set",
+      content_hash: invalidUtf8ArtifactId,
+      durable_bytes_available: true,
+      message: "Preview unavailable: artifact is not UTF-8",
+    });
+
+    const nonGovernedArtifact = callOntologyReadTool(
+      { sessionId: "gateway-reader", role: "worker" },
+      "qf_artifact_get",
+      { id: validArtifactId },
+    );
+    expect(nonGovernedArtifact.result).toEqual(expectedValidRow);
+    expect(nonGovernedArtifact.result).toHaveProperty("storage_ref", expectedValidRow.storage_ref);
+    expect(nonGovernedArtifact.result).not.toHaveProperty("receipt");
+  } finally {
+    if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
+    else process.env.QF_KERNEL_DB = previousKernelDb;
+    if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
+    else process.env.QF_ARTIFACT_ROOT = previousArtifactRoot;
+    if (previousPeerBusDb === undefined) delete process.env.QF_PEER_BUS_DB;
+    else process.env.QF_PEER_BUS_DB = previousPeerBusDb;
+    rmSync(artifactRoot, { recursive: true, force: true });
+  }
+});

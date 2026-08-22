@@ -32,6 +32,7 @@ import { invokePrecreatedStart } from "./precreated-start-ownership";
 import { ontologyTrajectoryContext } from "./ontology-trajectory-context";
 import { ontologyReadReceiptEligible } from "./ontology-read-dispatch";
 import { ontologyToolsForRole } from "./ontology-role-tools";
+import { artifactReceipt } from "./research-world-projection";
 
 type RegisterMethod = typeof registerMethod;
 
@@ -152,6 +153,23 @@ export function callOntologyReadTool(
     );
   }
   const governed = kernelGovernedReviewContextForSession(identity.sessionId);
+  if (
+    governed &&
+    parsed.op === "get" &&
+    parsed.objectName === "artifact" &&
+    result &&
+    typeof result === "object" &&
+    !Array.isArray(result)
+  ) {
+    const row = result as Record<string, unknown>;
+    result = {
+      id: row.id,
+      created_at: row.created_at,
+      kind: row.kind,
+      content_hash: row.content_hash,
+      receipt: artifactReceipt(row),
+    };
+  }
   if (governed && (toolName === "qf_hypothesis_get" || toolName === "qf_run_get" || toolName === "qf_artifact_get")) {
     kernelRecordGovernedToolReceipt({
       invocation_id: crypto.randomUUID(), session_id: identity.sessionId, task_id: governed.taskId,

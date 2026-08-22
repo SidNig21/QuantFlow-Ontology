@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "a175f45",
+    "commit": "36235b3",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "67393dcb29a0f69b"
+    "fingerprint": "f9819cd9f40e309e"
   },
   "stats": {
     "live": 111,
@@ -1849,7 +1849,7 @@
       "id": "2:collab-electron/src/main::ontology",
       "layer": 2,
       "name": "ontology*",
-      "kb": 11.6,
+      "kb": 12,
       "x": -3.05,
       "z": 2.53,
       "status": "ok",
@@ -1860,7 +1860,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/ontology-gateway.ts",
-          "kb": 10.3,
+          "kb": 10.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -26636,9 +26636,10 @@
         "collab-electron/src/main/precreated-start-ownership.ts",
         "collab-electron/src/main/ontology-trajectory-context.ts",
         "collab-electron/src/main/ontology-read-dispatch.ts",
-        "collab-electron/src/main/ontology-role-tools.ts"
+        "collab-electron/src/main/ontology-role-tools.ts",
+        "collab-electron/src/main/research-world-projection.ts"
       ],
-      "importCount": 7
+      "importCount": 8
     },
     {
       "path": "collab-electron/src/main/ontology-read-dispatch.ts",
@@ -26816,9 +26817,10 @@
       "path": "collab-electron/src/main/research-world-projection.ts",
       "reach": "reachable",
       "importers": [
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "collab-electron/src/main/ontology-gateway.ts"
       ],
-      "importerCount": 1,
+      "importerCount": 2,
       "imports": [],
       "importCount": 0
     },
@@ -31113,7 +31115,8 @@
         "collab-electron/src/main/precreated-start-ownership.ts",
         "collab-electron/src/main/ontology-trajectory-context.ts",
         "collab-electron/src/main/ontology-read-dispatch.ts",
-        "collab-electron/src/main/ontology-role-tools.ts"
+        "collab-electron/src/main/ontology-role-tools.ts",
+        "collab-electron/src/main/research-world-projection.ts"
       ],
       "affectedWires": [],
       "affectedLoops": [],
@@ -31454,12 +31457,12 @@
     "collab-electron/src/main/research-world-projection.ts": {
       "reach": "reachable",
       "directDependents": [
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "collab-electron/src/main/ontology-gateway.ts"
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/ipc.ts",
-        "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/connections-ipc.ts",
@@ -58439,12 +58442,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "5445578",
+      "commit": "a175f45",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "a175f45",
+      "commit": "36235b3",
       "generatedAt": "2026-08-22"
     },
     "verdict": "better",

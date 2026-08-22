@@ -128,7 +128,7 @@ function freezeDeep<T>(value: T): T {
   return Object.freeze(value);
 }
 
-function artifactReceipt(row: Record<string, unknown>): ArtifactReceipt {
+export function artifactReceipt(row: Record<string, unknown>): ArtifactReceipt {
   const id = String(row.id);
   const kind = String(row.kind);
   const hash = String(row.content_hash);
