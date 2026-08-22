@@ -1,7 +1,7 @@
 # WO-R16 - Visible research world
 
-status: normal consumer critic-submit repair - Builder authorized
-assignee: one fresh Builder session
+status: normal consumer critic-submit write-status rework - fresh Reader required
+assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
@@ -3861,3 +3861,52 @@ Fresh Reader reread receipt: at pushed docs head
 `e97613035545aa0fee307b33a77dc0e84d3b56cb`, this closure is **YES/YES**.
 The Builder is authorized only for the exact critic-submit repair above; no
 consumer launch or R17 work is authorized by this receipt.
+
+### CRITIC SUBMIT VERIFIER RED — silent PTY write still reports delivery
+
+The fresh independent Verifier stopped before running the matrix at immutable
+product candidate `d77dfff0e027229ad19a5205802ae7374dae2c52`.
+`submitAgentSessionInstruction()` rechecks the retained live-map entry before
+and after each write, but `writeToSession()` still returns `void` and silently
+returns when neither a data socket nor PTY session exists. A critic can
+therefore retain the same live `sessionId` and `ptySessionId` while either
+instruction write is dropped; the helper then resolves and the existing
+delivery boundary records `delivered`. This is the Reader's named failed-write
+condition, not a new product requirement. No Verifier matrix command, product
+change, evidence commit, rebuild, consumer launch, or founder-state change
+occurred.
+
+The only authorized correction is finite:
+
+1. In `collab-electron/src/main/pty.ts`, change the existing
+   `writeToSession(sessionId, data)` result from `void` to `boolean` without
+   changing its write routing. Return `true` when bytes are accepted by either
+   the live non-destroyed data socket or the retained PTY session; return
+   `false` only when neither target exists. A socket's native backpressure
+   boolean is not a delivery failure and must not leak into this contract.
+   Existing raw-terminal callers may continue to ignore the result.
+2. In `submitAgentSessionInstruction()` only, require `true` from both the text
+   write and the separate carriage-return write. A `false` result rejects the
+   same one delivery attempt immediately. Preserve the captured PTY identity,
+   400 ms settle, exact payloads, and every pre/post live-target check.
+3. Extend the existing focused production-seam test so a retained unchanged
+   live entry with a missing underlying PTY makes the helper reject for the
+   first write, and separately for the carriage-return write. Neither case may
+   reach a delivered receipt or downstream governed action. Restore the real
+   write target and retain the existing exact two-write green assertion.
+4. Add one temporary falsifier that makes the first or second production
+   `writeToSession()` result `false` while leaving the live entry unchanged.
+   `bun test collab-electron/src/main/governed-review.test.ts` must exit nonzero
+   naming the rejected write; restore exact bytes, prove zero diff for the
+   mutated path, and rerun to the native green count. The preceding missing-CR
+   falsifier and full bounded matrix remain binding.
+
+Allowed product/test paths for this correction are only
+`collab-electron/src/main/pty.ts`,
+`collab-electron/src/main/agent-host.ts`, and
+`collab-electron/src/main/governed-review.test.ts`, plus generated Atlas
+projections and the existing R16 BUILD-REPORT. `index.ts`, Kernel semantics,
+timings, payloads, assertions, peer delivery, founder Submit, and all other
+files are frozen. A fresh Reader must return YES/YES on this subsection before
+one fresh Builder rework. No rebuild, consumer launch, or R17 work is
+authorized before fresh independent PASS.

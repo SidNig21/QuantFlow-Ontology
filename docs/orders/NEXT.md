@@ -93,7 +93,9 @@ consumer-critic-submit-red: normal candidate `34c4bd2` created Mission `mission-
 consumer-terminal-measurement-red: exact Director and critic canaries were accepted/erased without submission; executor completed before its exact canary was captured; next consumer attempt must TIDY and check the executor while live, before waiting for its result
 consumer-critic-submit-reader-findings: fresh adversarial read at inspected head `a7112d5` returned NO/NO; four finite defects and an exact binding closure were appended to `WO-R16.md`; the reread found and corrected the literal-CR falsifier typo and downstream-assertion ambiguity
 consumer-critic-submit-reader-receipt: fresh Reader reread at pushed docs head `e97613035545aa0fee307b33a77dc0e84d3b56cb`; final YES/YES; exact critic-submit Builder door authorized, with no consumer launch or R17 authority
-current-door: corrected `FINAL COMPUTER RED — delivered text was never submitted to Hermes` Builder authorized; no consumer launch or R17 authority
+consumer-critic-submit-candidate: immutable product candidate `d77dfff0e027229ad19a5205802ae7374dae2c52`; Builder evidence `414976eeaf95f867ae8e0ea9699a20bce1babd02`; short matrix and missing-CR falsifier green
+consumer-critic-submit-verifier-red: fresh independent Verifier task `01a02907-1865-7103-af7a-78b96f9bcdbf` stopped before matrix because `writeToSession()` can silently drop either write while the retained live entry remains unchanged, allowing the helper to resolve and delivery to be recorded falsely; no product/founder state changed
+current-door: exact `CRITIC SUBMIT VERIFIER RED — silent PTY write still reports delivery` correction requires fresh Reader YES/YES; no Builder, consumer launch, or R17 authority
 
 ## Authorized outcome
 
