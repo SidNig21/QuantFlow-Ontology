@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R16 @ c79d9ed` on 2026-08-22 by
+> Generated from `wo-R16 @ 5445578` on 2026-08-22 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -470,7 +470,7 @@ mechanism behind the invariant below, not a promise about it.
 | `imports` | 545 | 0 | 4 | 0 | 0 |
 | `ipcRequest` | 278 | 0 | 4 | 0 | 267 |
 | `ipcPush` | 7 | 0 | 4 | 0 | 538 |
-| `persistence` | 23 | 26 | 0 | 0 | 500 |
+| `persistence` | 23 | 27 | 0 | 0 | 499 |
 | `lifetime` | 6 | 61 | 0 | 0 | 482 |
 | `packaging` | 230 | 0 | 0 | 123 | 196 |
 | `ownership` | 20 | 0 | 0 | 355 | 174 |

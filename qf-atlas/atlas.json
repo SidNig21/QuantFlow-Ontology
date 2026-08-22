@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R16",
-    "commit": "c79d9ed",
+    "commit": "5445578",
     "generatedAt": "2026-08-22",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "9f03856a7d06a3b7"
+    "fingerprint": "d770980b61d234a3"
   },
   "stats": {
     "live": 111,
@@ -6476,7 +6476,7 @@
       "id": "0:residue",
       "layer": 0,
       "name": "41 small modules*",
-      "kb": 105,
+      "kb": 105.2,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6663,6 +6663,16 @@
           "executes": 0
         },
         {
+          "path": "packages/qf-kernel/src/registry-drift.ts",
+          "kb": 2.2,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "tools/runtime-proof/scripts/pack-agent.mjs",
           "kb": 2.2,
           "spawns": 2,
@@ -6675,16 +6685,6 @@
         {
           "path": "tools/qf-read-tools/src/artifact-root.ts",
           "kb": 2.1,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "packages/qf-kernel/src/registry-drift.ts",
-          "kb": 2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -19123,11 +19123,12 @@
       "reach": "unsupported",
       "blockers": {
         "reach": "scope-boundary",
+        "persistence": "ast-coverage",
         "ownership": "scope-boundary"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
+      "persistence": "partial",
       "lifetime": "not-applicable",
       "packaging": "not-applicable",
       "ownership": "unsupported",
@@ -19135,7 +19136,7 @@
         "reach": "no reach row was produced for this path",
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
+        "persistence": "6 of 6 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
@@ -25047,8 +25048,8 @@
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 500,
-      "partial": 26,
+      "not-applicable": 499,
+      "partial": 27,
       "indexed": 23
     },
     "lifetime": {
@@ -58447,16 +58448,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R16",
-      "commit": "61243c3",
+      "commit": "c79d9ed",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R16",
-      "commit": "c79d9ed",
+      "commit": "5445578",
       "generatedAt": "2026-08-22"
     },
-    "verdict": "better",
-    "why": "42 improvement(s), nothing added or hidden",
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -58793,7 +58794,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "packages/qf-kernel/src/attach-kernel-drift.test.ts",
+        "analyzer": "persistence",
+        "from": "not-applicable",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "6 of 6 SQL site(s) are not inside a named function, so no call path can be traced"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -58801,7 +58811,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null
