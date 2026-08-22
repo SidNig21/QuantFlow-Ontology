@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - FRESH VERIFIER REQUIRED
+status: R16 NORMAL CONSUMER GOVERNED ARTIFACT READ REPAIR - REPLACEMENT CONSUMER AUTHORIZED
 authorized-at: 2026-08-22
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -122,6 +122,8 @@ consumer-artifact-read-builder-matrix-red: focused gateway contract exactly `6 p
 current-door: docs-only whitespace correction committed without staging Builder product bytes; the same Builder may continue at row 10, then run the exact falsifier/restoration and finish its report/candidate; no row 1–9 retry, replacement build, consumer relaunch, or R17 authority
 consumer-artifact-read-builder-receipt: immutable product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`; Builder evidence `404b7274a03be3189d5360ae55948bbf783fd8b8`; rows 1–9 and corrected row 10 green; metadata-only base mutation red; four-file restoration exact; focused contract restored `6 pass / 0 fail`; tree clean and pushed
 current-door: fresh independent Verifier must freeze candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`, run the exact immutable nine-row matrix and falsifier/restoration, and write PASS or stop on RED; no replacement build, consumer relaunch, or R17 authority before PASS
+consumer-artifact-read-verifier-receipt: fresh independent Verifier task `01a0298b-f981-7011-8ae8-d601f9be46bd`; PASS at immutable candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`; evidence `7bd7f4bd4baf1ee9636ace6c264e6cb0b7387709`; exact nine-row matrix green, Atlas HARD RED 0, falsifier red/restoration `6 pass / 0 fail`, product/test/generated-Atlas bytes frozen
+current-door: Router is authorized for exactly one fresh `bun run --cwd collab-electron build` and the exact normal two-launch Computer Use Attempt 2; any red keeps R16 open; no R17 authority
 
 ## Authorized outcome
 

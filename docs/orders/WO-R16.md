@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: normal consumer governed Artifact read repair - fresh Verifier required
+status: normal consumer governed Artifact read repair - replacement build and consumer authorized
 assignee: one fresh Reader session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
