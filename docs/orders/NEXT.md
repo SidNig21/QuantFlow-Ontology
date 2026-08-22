@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 BUILD-ONCE PREVIEW CLOSURE - BUILD AUTHORIZED
+status: R16 PREVIEW SKIP-BUILD CLOSURE - READER REQUIRED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -42,6 +42,8 @@ session-receipt-diagnostic: focused R16 13/0; live exact receipt showed the Rese
 session-composition-reader-receipt: fresh Luna Reader task `01a02808-6c4d-7d50-8a8c-8115306c2c7b`; first pass NO/NO with eight finite proof defects; exact two-path defect closure landed; final YES/YES at `d880ed57e1a36dac3f138f488153a40303d076bc`
 session-composition-wip-receipt: product unit 3/0, research-world 6/0, focused R16 13/0; live pointer 10/10 and exact 13/15 green, then normal reopen dev rebuild timed out after first world used 43858ms; all cleanup zero; WIP preserved at `6e3e502c7eecd5411a6a2927fab56918568ed2e3`
 build-once-reader-receipt: fresh Luna Reader task `01a02819-452f-7fc1-a6c3-fbdf9e1bdb4b`; final YES/YES at `42d35a527a5cd8a4f59ce04ab0264ace63eba9f8`
+preview-rebuild-red-receipt: one build succeeded in 72720ms and forced cases cleaned, but plain electron-vite preview implicitly rebuilt and first normal launch timed out before readiness; WIP preserved at `88cdaaf3d6f5bba04f060fa941e1ca253e1e2eaf`
+preview-skip-build-reader-receipt: pending reread by fresh build-once Reader task `01a02819-452f-7fc1-a6c3-fbdf9e1bdb4b`; no Builder before final YES/YES
 
 ## Authorized outcome
 

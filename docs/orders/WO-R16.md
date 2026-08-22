@@ -2657,3 +2657,37 @@ worktree, Computer Use, or R17 is authorized. A fresh Reader answers the two
 questions before a fresh Builder. After independent Verifier PASS, the Router
 uses the normal app through Computer Use and closes R16 only on that consumer
 PASS.
+
+### Build-once Reader-defect closure - preview must skip its implicit build
+
+WIP `88cdaaf3d6f5bba04f060fa941e1ca253e1e2eaf` is evidence,
+not a candidate. The one candidate build passed in 72,720 ms. Both forced
+spawn-only cases then cleaned to zero, but the first normal launch timed out
+before readiness. Source inspection names the defect: electron-vite 5's
+`preview()` calls `build()` unless its CLI receives `--skipBuild`. The ordered
+`bun run preview` command therefore rebuilt on every launch, exactly the work
+this closure intended to remove.
+
+Replace only the launch arguments with exact
+`bun run preview -- --skipBuild`. Do not change the package script. The focused
+13th test requires all of the following:
+
+1. `prepareCandidateBuild` remains the sole `bun run build` call and still runs
+   once before the product clock and roots.
+2. Every launch uses the exact argument vector
+   `["run", "preview", "--", "--skipBuild"]`; the test rejects a missing or
+   duplicated `--skipBuild`, plain preview, dev, build, package, or watch in the
+   launch seam.
+3. The committed electron-vite preview implementation still contains the
+   conditional `if (!options.skipBuild) await build(...)`, so this flag is the
+   measured no-rebuild boundary rather than a name-based assumption.
+4. Build freshness/output checks, the runtime-derived build receipt, existing
+   60,000/8,000 clock, four serial attempts, four/2/1 receipt, pointer 10/10,
+   exact 13/15, reopen, failure/timeout, roots, and cleanup remain unchanged.
+
+Run exact pre-live 3/0, 6/0, and 13/0 plus Atlas, then exactly one live gate.
+Any red stops with no second run or timeout change. Full green follows the same
+short matrix, evidence, candidate, independent Verifier, Computer Use consumer
+check, and stop-before-R17 path. Allowed files and every prohibition in the
+parent closure remain unchanged. The same fresh Reader rereads this exact
+defect closure; final YES/YES reopens the Builder.
