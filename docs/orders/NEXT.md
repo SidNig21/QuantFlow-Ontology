@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 BUILD-ONCE PREVIEW CLOSURE - READER REQUIRED
+status: R16 BUILD-ONCE PREVIEW CLOSURE - BUILD AUTHORIZED
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -41,7 +41,7 @@ volatile-status-reader-receipt: fresh Luna Reader task `01a027fd-6604-7bf1-bcc3-
 session-receipt-diagnostic: focused R16 13/0; live exact receipt showed the Research Director tile retained ontology identity but actual displayed fields were `{}` while the independent Oracle held id/label/status; all cleanup zero; WIP preserved at `521a83b1b8db19a7aa23a65f9cd2ad6b80964396`
 session-composition-reader-receipt: fresh Luna Reader task `01a02808-6c4d-7d50-8a8c-8115306c2c7b`; first pass NO/NO with eight finite proof defects; exact two-path defect closure landed; final YES/YES at `d880ed57e1a36dac3f138f488153a40303d076bc`
 session-composition-wip-receipt: product unit 3/0, research-world 6/0, focused R16 13/0; live pointer 10/10 and exact 13/15 green, then normal reopen dev rebuild timed out after first world used 43858ms; all cleanup zero; WIP preserved at `6e3e502c7eecd5411a6a2927fab56918568ed2e3`
-build-once-reader-receipt: pending fresh two-question Reader over `BUILD-ONCE PREVIEW CLOSURE`; no Builder opens before YES/YES
+build-once-reader-receipt: fresh Luna Reader task `01a02819-452f-7fc1-a6c3-fbdf9e1bdb4b`; final YES/YES at `42d35a527a5cd8a4f59ce04ab0264ace63eba9f8`
 
 ## Authorized outcome
 
