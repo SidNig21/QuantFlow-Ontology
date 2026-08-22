@@ -4917,3 +4917,37 @@ then perform the exact four-file falsifier/restoration, append the complete
 Builder report including rows 1–9 and this row-10 continuation, commit, and
 push. Rows 1–9 are not rerun. Any row-10 red after the Router correction, any
 falsifier/restoration red, or any additional scope change stops the repair.
+
+### REPLACEMENT BUILD IDENTITY RED — explicit accepted build inputs
+
+After independent PASS, the Router ran the prescribed
+`bun run --cwd collab-electron build` once from docs head
+`6d117ce824c55b162ba4f55db289d254dd1b20e1`. The native build exited 0 in
+about 53 seconds and Main, preload, and renderer outputs all postdated
+`2026-08-22T13:03:29.9813782Z`, but the Main bundle embedded the docs head
+instead of immutable product candidate
+`99188c6b3e039821c5c615c621a45d5c3f484ab9`. It also retained the default
+`development` timestamp. No application was launched.
+
+This is a build-input defect, not a product or build failure. The existing
+`collab-electron/electron.vite.config.ts` already defines the accepted seams:
+`QF_BUILD_COMMIT_SHA` overrides `git rev-parse HEAD`, and
+`QF_BUILD_TIMESTAMP` overrides `development`. The failed identity output is
+not the replacement candidate and does not count as the one accepted build.
+
+The Router is authorized for exactly one corrected build. In one PowerShell
+process, set `QF_BUILD_COMMIT_SHA` to the full immutable product candidate, set
+`QF_BUILD_TIMESTAMP` to the UTC build-start receipt selected immediately
+before invocation, then run the unchanged build command:
+
+```powershell
+$env:QF_BUILD_COMMIT_SHA='99188c6b3e039821c5c615c621a45d5c3f484ab9'
+$env:QF_BUILD_TIMESTAMP='<exact UTC build start>'
+bun run --cwd collab-electron build
+```
+
+Acceptance remains exact: native exit 0; invoked `electron-vite build`;
+successful Main/preload/renderer phases; all three output products postdate the
+same bound UTC start; and the Main bundle contains both the full candidate SHA
+and exact timestamp. The docs HEAD may not substitute for the product
+candidate. Any red stops R16; no further build or app launch is authorized.

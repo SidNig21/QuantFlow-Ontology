@@ -124,6 +124,8 @@ consumer-artifact-read-builder-receipt: immutable product candidate `99188c6b3e0
 current-door: fresh independent Verifier must freeze candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`, run the exact immutable nine-row matrix and falsifier/restoration, and write PASS or stop on RED; no replacement build, consumer relaunch, or R17 authority before PASS
 consumer-artifact-read-verifier-receipt: fresh independent Verifier task `01a0298b-f981-7011-8ae8-d601f9be46bd`; PASS at immutable candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9`; evidence `7bd7f4bd4baf1ee9636ace6c264e6cb0b7387709`; exact nine-row matrix green, Atlas HARD RED 0, falsifier red/restoration `6 pass / 0 fail`, product/test/generated-Atlas bytes frozen
 current-door: Router is authorized for exactly one fresh `bun run --cwd collab-electron build` and the exact normal two-launch Computer Use Attempt 2; any red keeps R16 open; no R17 authority
+consumer-artifact-read-build-identity-red: native build from docs head `6d117ce824c55b162ba4f55db289d254dd1b20e1` completed Main/preload/renderer with fresh outputs, but the bundle embedded that docs head and default `development` instead of immutable product candidate `99188c6b3e039821c5c615c621a45d5c3f484ab9` plus bound UTC timestamp; no app launch occurred
+current-door: one corrected build using existing `QF_BUILD_COMMIT_SHA` and `QF_BUILD_TIMESTAMP` inputs is Router-authorized; any red stops R16; no app launch or R17 authority before exact identity passes
 
 ## Authorized outcome
 
