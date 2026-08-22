@@ -1517,6 +1517,11 @@ unless that body still contains `dom.webview.focus()`. The two existing tests
 remain byte-identical. The file must report exactly 3 pass and 0 fail. The
 unchanged R16 focused contract must remain exactly 14 pass and 0 fail.
 
+The source-focused test is not the runtime product proof. It pins the exact
+repair and retained programmatic-focus seam cheaply; the unchanged live
+`research-world-visible` native-Tab sequence is the runtime proof and remains
+mandatory.
+
 ### Builder and acceptance authority
 
 A fresh Builder starts only from clean local and remote
@@ -1525,15 +1530,56 @@ and Atlas-refresh commits. It runs Atlas preflight, the 3-test tile-manager
 file, and the 14-test R16 contract, then exactly one live
 `bun qa/run.ts research-world-visible`. Any red stops with its exact
 `tab_focus_failure` when present, `roots_created`, `primary_failure`, and
-`cleanup_failures` receipts. A green proceeds through only the already-
-authorized short matrix, BUILD-REPORT, Atlas regeneration, immutable candidate
-commit, and push.
+`cleanup_failures` receipts. A green proceeds through exactly this short matrix
+once; any nonzero exit is red:
+
+```text
+bun test collab-electron/src/windows/shell/src/tile-manager-layout.test.ts
+bun test qa/gates/research-world-visible.test.ts
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts one-skin
+bun qa/run.ts doc-links
+bun qa/run.ts rung-ladder
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+git diff --check
+```
+
+The one cheap falsifier sample is exact. After the green live run, temporarily
+change only the new `wv.tabIndex = -1` assignment to `wv.tabIndex = 0`, run
+only the 3-test tile-manager file, and require a native nonzero exit naming the
+new test. Restore the exact candidate line, require `git diff` for
+`tile-manager.js` to be empty relative to the pre-mutation working state, and
+rerun the same file to exactly 3 pass / 0 fail. The pre-repair live receipt at
+`49e9fd5` is the real runtime red; this mutation proves the cheap regression
+guard and never launches a second app.
+
+After product/tests are green, commit them as `product_candidate_sha`. Write
+`docs/orders/evidence/r16/BUILD-REPORT.md` with exactly: base WIP SHA; product
+candidate SHA; changed production/test paths; `git diff --check` exit; focused
+test command/exits/counts; the pre-repair `49e9fd5` standalone
+`tab_focus_failure`; the post-repair live `tab_focus_receipts`,
+`keyboard_tiles`, `roots_created`, `primary_failure`, `cleanup_failures`, PASS,
+and native exit; every short-matrix command/exit; falsifier mutation/red/
+restoration/green receipts; Atlas check/ratchet summary; and an explicit
+statement that no product file changed after `product_candidate_sha`. Commit
+that report, regenerate Atlas from the resulting clean commit, run Atlas check,
+ratchet, and `git diff --check`, then commit only changed generated Atlas
+projections. That final clean pushed HEAD is the immutable Builder candidate.
 
 No other webview constructor, renderer, fixture, expected focus target,
 assertion, timeout, schedule, Kernel behavior, package, installer, release,
 worktree, wrapper, or cleanup path changes. A fresh different-model Verifier
-records the candidate SHA before and after and reruns the same focused tests,
-live gate, falsifier sample, and short matrix before writing VERIFICATION.
+records the candidate SHA before and after and requires them equal while it
+reruns the two focused tests, the one live gate, the exact cheap falsifier
+sample, and every short-matrix command above. Only full green may create
+`docs/orders/evidence/r16/VERIFICATION.md`. That file must name: immutable
+candidate SHA; unchanged pre/post SHA and clean status; every command and native
+exit; exact live Tab/keyboard/root/primary/cleanup/PASS receipts; falsifier red,
+restoration-zero-diff, and restored-green receipts; Atlas hard-red/unexplained
+coverage totals; and a final `verdict: PASS`. The Verifier commits only that
+evidence file after measurement; the evidence commit is not the measured
+candidate.
 
 Plain meaning: Tab stays on QuantFlow's shell controls; a click or explicit
 focus still enters the real Hermes terminal.
