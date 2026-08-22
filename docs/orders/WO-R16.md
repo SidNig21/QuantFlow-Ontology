@@ -1,6 +1,6 @@
 # WO-R16 - Visible research world
 
-status: rewrite build authorized - fresh Reader YES/YES at `0700b77`
+status: normal consumer action-schema repair - Computer consumer check required
 assignee: one fresh Builder session
 depends: R15 PASS at `5d8b2f42205220f466878b32f6b17b41b4732fa8`, evidence commit `38464dd39c0b78c711119ac2f67acb96c77119c5`; Atlas v1 accepted at `7889074f10e089d450e307a2c6af0f827e8f06dd`; governed-review product repair `718816a654048f8e3105a0b18a45ad417c22275a`; independently verified falsifier candidate `c59ebfaab687ed6d4a40e2885b98135315da1a86`; operationalization commit below
 rung: R16 - visible research world
@@ -2829,3 +2829,462 @@ weakening outside the removed proof-mode duplicate, fixture/Kernel/package
 change, helper framework, worktree, installer/release work, or R17 work is
 authorized. A fresh Reader answers the two protocol questions before the
 Builder resumes from the preserved clean-base WIP.
+
+## FOUNDER KERNEL UPGRADE COMPATIBILITY - open the real normal app
+
+The independent Verifier proved every focused/static/Atlas check and the exact
+pointer falsifier at product candidate
+`7f03d8e586e504fbe947614f56b60b9a91c0b60d`. Its one live process ran and
+cleaned up, but the execution channel returned neither exit code nor stdout, so
+that run is unreceipted and is not called PASS. Do not repeat it.
+
+The subsequent founder-authorized Computer consumer launch of the normal built
+app never produced a window. Its main process failed before IPC registration:
+
+`KernelUpgradeShapeError (agent-profile-identity): database shape is not an
+exact supported predecessor or current authority`.
+
+Read-only measurement of `C:\Users\rybow\.quantflow\kernel.db` names one exact
+classifier defect. The live database has the complete post-task-composition,
+pre-task-steering/pre-governed-review shape. Against current authority its only
+governed differences are:
+
+- `artifact` lacks later `evaluation_findings`;
+- `evaluation` lacks the later governed-review columns;
+- `links` lacks later `belongs_to`;
+- `schema_meta` lacks `belongs_to`, the six task-steering actions, and
+  `governed_review_task`.
+
+The current `expectedTaskSteering()` predecessor already strips the governed-
+review table columns and six steering actions, but incorrectly retains the
+later `belongs_to` link/meta entry and `governed_review_task` meta entry. A real
+database created before those two upgrades therefore classifies `partial` and
+cannot reach the generated upgrade chain.
+
+Repair only that exact compatibility boundary:
+
+1. In `packages/qf-kernel/src/upgrade.ts`, make the exact post-composition
+   predecessor remove `belongs_to` from link kinds and schema meta and remove
+   `governed_review_task` from schema meta, in addition to its existing removals.
+   Do not broaden partial-shape acceptance, weaken exact snapshot equality, or
+   add a best-effort/warn/write path.
+2. Add a regression test built from pinned schema/upgrade SQL—not from the
+   classifier's own expected snapshot—that constructs the legitimate
+   post-composition predecessor, requires classification as `task_steering`,
+   upgrades through writable `attachKernel()` to exact `current`, and proves
+   representative ontology rows, links, events, and hashes survive. A fixture
+   missing or adding any other governed shape remains `partial` and throws
+   before mutation.
+3. Builder diagnostic may copy the founder Kernel to a temporary isolated path,
+   hash both files before, run the candidate upgrade only on the copy, and prove
+   the source hash is unchanged, the copy reaches `current`, row/link/event
+   counts do not decrease, and representative IDs/content hashes survive. It
+   must never open the real founder Kernel writable or launch the normal app.
+4. Run the focused upgrade tests, `dock-profile-identity`, `kernel-drift`,
+   `kernel-sole-writer`, the R16 focused 13/0 contract, Atlas check/ratchet, and
+   `git diff --check`. No R16 live proof-mode gate is repeated. Full green writes
+   an appended BUILD-REPORT receipt, commits, and pushes one immutable repair
+   candidate.
+5. A fresh different-model Verifier repeats the focused/static matrix and the
+   upgrade-on-copy proof. It verifies source founder DB hash unchanged and does
+   not run the R16 live proof gate. Any red stops; full green writes and pushes
+   verification evidence.
+6. Only after independent PASS, the Router creates one byte-for-byte backup of
+   the real founder Kernel beside it, recording path, size, and SHA-256. It then
+   launches the exact normal candidate and resumes the unchanged Computer
+   consumer contract above. The product's existing transactional upgrade may
+   mutate the real Kernel; no wipe, replacement, reseed, or manual SQL is
+   allowed. A crash, lost row, changed durable identity, missing 13/15 world, or
+   missing backup is red. Final PASS records the post-upgrade hash and retains
+   the backup for recovery.
+
+Allowed Builder product paths are only `packages/qf-kernel/src/upgrade.ts` and
+the nearest existing upgrade-chain test file, plus R16 report/generated Atlas
+evidence. No schema/golden SQL, command/action behavior, Electron renderer/main,
+gate assertion, timeout, helper framework, release/installer, worktree, real
+founder database write, or R17 change is authorized. A fresh Reader answers the
+two protocol questions before construction.
+
+Builder observation: the focused compatibility implementation and regression
+are green, but the required matrix exposed two delivery-instrument defects.
+`qa/gates/dock-profile-identity/run.ts` still enumerates only upgrades 0001-0009
+while production `db.ts` has loaded 0001-0012 since the completed R14/R15 work;
+its static comparison is therefore stale. Synchronize only that gate's
+`PRODUCTION_UPGRADE_FILES` and ordered `PRE_D1_REQUIRED_UPGRADES` to add exact
+0010 task-composition, 0011 task-steering, and 0012 governed-review. This is a
+tightening to the existing production authority, not an assertion relaxation.
+No other gate edit is authorized.
+
+The subsequent `kernel-drift` invocation hit Windows `EPERM` while copying the
+local file dependency after the prior gate rebuilt it. With no matching process
+remaining, rerun that unchanged gate once after the exact dock gate repair. An
+assertion red stops; a repeated `EPERM` stops as an environment defect. The
+Builder may then complete the original matrix, upgrade-on-copy proof, report,
+candidate commit, and push. No live app/gate or founder database write occurs.
+
+The unchanged kernel-drift retry repeated EPERM even after its exact generated
+dependency destination was recoverably moved aside. Diagnosis: its cold
+launcher calls raw `bun install --frozen-lockfile`, while the already-green dock
+launcher uses the repository's existing `runFrozenPackageInstall()` Windows
+seam in `qa/package-install.ts` (stale direct-file destination cleanup plus
+copyfile/isolated backend, no retry). In `qa/gates/kernel-drift.ts`, replace only
+the raw install spawn in `executeInstallPlan()` with that existing helper for
+each unchanged plan entry. Preserve plan order/validation, falsifiers, one
+install attempt per entry, failure propagation, and every gate assertion. No
+new helper or retry is authorized. Run kernel-drift once; red stops, green
+resumes the matrix.
+
+The synchronized dock gate then advanced past its stale file list and failed its
+real pre-D1 upgrade control: 0001 did not classify as exact D1. This is the same
+bounded derivation defect at earlier rungs. Every historical snapshot derived
+from current authority must omit later `belongs_to`, six task-steering actions,
+and `governed_review_task` until their owning upgrade boundary; current code
+omits them only from the post-composition predecessor. Repair the shared
+subtractive helpers in `upgrade.ts` so every exact pre-current state removes
+those later table/link/meta additions in addition to its existing state-specific
+removals. Keep `current` unchanged. Do not add aliases, tolerances, partial-shape
+fallbacks, or name-only acceptance.
+
+The generated 0011/0012 SQL predates the R16-only `belongs_to` and
+`governed_review_task` additions. The runtime chain may materialize those two
+missing additions only from the generated current migration snapshot already
+used as authority in `upgrade.ts`, inside the existing transaction, after
+0011/0012 and before exact-current classification. It must preserve every link
+row and use the authoritative current schema/meta values; no duplicated schema
+literal, backfill, or golden/schema edit is allowed.
+
+Rerun the synchronized dock gate once after this exact repair. It must exercise
+the real pre-D1 chain through all twelve upgrades. Red stops. Green continues to
+the previously authorized unchanged kernel-drift retry and remaining matrix.
+
+That rerun advanced cleanly through 0001-0003 and stopped at 0004 because
+`expectedCapabilityGrants()` alone still retained the later governed-review
+artifact/evaluation columns. Compose the existing `tablesWithoutGovernedReview`
+into that one snapshot alongside the already-authorized late-addition removal.
+No new helper, state, tolerance, or other file change is authorized. Rerun the
+synchronized dock gate once; red stops, green resumes the matrix.
+
+The chain then reached exact current and the dock gate stopped on its legacy-row
+oracle. `snapshotLegacyData()` discovers table names independently before and
+after upgrade, so legitimately created `qf_review_*` tables make the two JSON
+snapshots differ even when every pre-existing row is byte-identical. Correct
+only this oracle: capture the ordered pre-upgrade table-name set once, snapshot
+those tables before, and snapshot that same set after. Current-shape proof owns
+new-table creation; the legacy oracle continues to compare every column that
+existed before upgrade, excluding only its already-named later columns. No table
+name exclusion, row relaxation, or production change is authorized. Rerun the
+dock gate once; red stops, green resumes the matrix.
+
+The reused table set still failed because the oracle recomputes each table's
+column list after upgrade, thereby adding legitimate later columns such as
+`display_name` and governed-review fields only to the after snapshot. Capture
+the ordered pre-upgrade column names for every captured table together with the
+table set, and query those exact table/column projections both before and after.
+This replaces the incomplete hard-coded later-column exclusions; it does not
+exclude any predecessor column or relax any value comparison. Rerun dock once;
+red stops, green resumes the matrix.
+
+The dock chain and legacy projection then passed. Its readonly drift control
+named the final exact defect: `db.ts`'s ordered `upgradeOrder` ends at
+`TASK_STEERING_UPGRADE` although the writable chain already loads and applies
+`GOVERNED_REVIEW_UPGRADE` as 0012. Add that existing constant as the final
+readonly diagnostic entry; keep every completed-by-shape index unchanged. This
+changes no writable behavior and authorizes only `packages/qf-kernel/src/db.ts`
+for that one list entry. Rerun dock once; red stops, green resumes the matrix.
+
+Exact named defect/authority receipt: `qa/gates/kernel-drift/run.ts` `gateG1`
+creates the canary read-only handle inline at
+`readRegistrySets(new Database(canaryPath, { readonly: true }))` and never
+closes it. On Windows this leaves the temp DB busy and the finally `rmSync`
+throws `EBUSY` after G1/G6. Repair only this handle lifecycle: assign the
+read-only canary DB, read its sets, close it before proceeding. Do not add
+retry/scaffolding or weaken the gate.
+
+Exact named stale-G2-control defect/authority receipt: `qa/gates/kernel-drift/run.ts`
+uses `publish_artifact` kind `report` without `evaluation_id`, invalid since
+governed review. Change only that healthy control artifact kind to the valid
+non-governed `result_set` (the existing published bytes/storage_ref remain;
+no semantic/gate weakening). Ensure `FIXTURE_ENV` and the mem DB are cleaned
+in a `finally` so any future assertion cannot leak state, but do not add
+retry/scaffolding.
+
+## NORMAL CONSUMER ACTION-SCHEMA REPAIR - exact R16 founder red
+
+Independent founder-Kernel compatibility verification passed at product
+candidate `b8e7d57c04288e1315bbe658a4665a57b4d5f3e7`; verification evidence is
+`21b8c0b7f1803bb5401a04b86b80a615e9ef3d4d`. Before the first normal launch,
+the Router retained the byte-identical backup
+`C:\Users\rybow\.quantflow\kernel.db.pre-r16-20260822-005409.bak` (299008
+bytes; SHA-256
+`c29fd79a328d1006eedfc425a5f55ca5a60fdc5a07b89db861a7cad128369bdf`).
+The freshly built normal app then opened successfully at the exact candidate,
+reported `schema_meta=84`, and displayed the candidate identity. This closes
+the earlier `KernelUpgradeShapeError` red.
+
+The founder-authorized Computer consumer check then exposed one later, exact
+product red. `TRY GUIDED RESEARCH` created a durable Mission and launched the
+real Hermes Research Director, but the Director's calls to
+`qf_create_agent_session` arrived with an empty arguments object. It retried,
+named the missing required fields, created no specialist session or assigned
+Task, and therefore could not produce the normal 13-object/15-cable world.
+Ordinary window close left `consumer_processes_remaining=0`.
+
+The defect is finite: `kernelListOntologyReadTools()` in
+`collab-electron/src/main/kernel.ts` publishes every capability-group action
+with `inputSchema: { type: "object", properties: {}, additionalProperties:
+true }`, even though the existing schema authority already exports
+`actionToolForAction()` from `qf-kernel-schema/mcp` and that helper derives the
+named required/optional fields and descriptions from each action's Zod input.
+The model is being asked to populate fields that its MCP discovery surface does
+not name.
+
+Repair only this exact normal-consumer boundary:
+
+1. In `collab-electron/src/main/kernel.ts`, reuse the existing
+   `actionToolForAction()` authority for every `schema.actions` entry with a
+   `capabilityGroup`, instead of constructing an empty open-properties schema.
+   Preserve the existing capability-group filter, role grants, `EXPOSED_ACTIONS`,
+   gateway validation, Kernel actions, and action semantics. Do not add an
+   adapter, fallback arguments, prompt-specific special case, or duplicated
+   schema.
+2. Extend exactly `collab-electron/src/main/ontology-gateway.test.ts` with one
+   runtime test of the production `qf.ontology.list_tools` handler. Invoke it
+   with an admitted `desk.orchestrate` seat and inspect the returned `tools`
+   array; the stdio MCP `tools/list` bridge forwards this array unchanged. The
+   test must fail if `qf_create_agent_session` is absent, and must compare its
+   complete `inputSchema` to the schema-authority definition for the declared
+   action. Its property keys are exactly
+   `session_id`, `agent_definition_id`, and `label`, and its required array is
+   exactly `session_id`, `agent_definition_id` in that order. The test must
+   also obtain the served list for a `market.read` seat and compare the complete
+   `qf_venue_get` definition to the existing generated read definition. These
+   are runtime comparisons, not source-text or hard-coded-schema assertions.
+3. The exact Builder matrix is:
+
+   ```text
+   bun test collab-electron/src/main/ontology-gateway.test.ts
+   bun test collab-electron/src/main/mission-activation.test.ts
+   bun test collab-electron/src/main/native-tui-orchestration.test.ts
+   bun qa/run.ts dock-profile-identity
+   bun qa/run.ts kernel-sole-writer
+   bun test qa/gates/research-world-visible.test.ts
+   bun qa/run.ts typecheck
+   bun qf-atlas/generate.mjs --check
+   bun qf-atlas/ratchet.mjs
+   git diff --check
+   ```
+
+   Expected results are, respectively, `5 pass / 0 fail`, `2 pass / 0 fail`,
+   `8 pass / 0 fail`, native exit 0 with `PASS dock-profile-identity`, native
+   exit 0 with `PASS kernel-sole-writer`, `13 pass / 0 fail`, native exit 0 with
+   `PASS  typecheck`, and native exit 0 for each remaining command. Any other
+   count or nonzero exit is red. Before the candidate report, temporarily
+   restore the old empty action schema in `kernel.ts` without changing the test
+   or schema authority; the ontology-gateway test must exit nonzero naming the
+   missing action fields. Restore the exact candidate bytes and rerun it to
+   `5 pass / 0 fail`. Record both native exits and the restoration-zero-diff in
+   `docs/orders/evidence/r16/BUILD-REPORT.md`. No proof-mode live R16 gate,
+   installer, release suite, schema/golden edit, timeout change, helper
+   framework, or R17 work is authorized.
+4. Full green means the exact matrix and the restored-green falsifier above.
+   The Builder records one immutable product candidate SHA, clean status,
+   changed paths, unedited command output, and the red/restored-green receipt
+   in `docs/orders/evidence/r16/BUILD-REPORT.md`. A fresh different-model
+   Verifier reruns that same non-live matrix against that candidate SHA and
+   invokes the served `qf.ontology.list_tools` path to prove the action schema;
+   a generator-only or source-only check is insufficient. Any red stops with
+   the exact command and native receipt; no repair occurs in the Verifier.
+5. Only after independent PASS, rebuild and launch the normal candidate. The
+   Router uses Computer Use to run `TRY GUIDED RESEARCH` once. Before calling
+   the action, the Router records the actual served discovery receipt showing
+   `qf_create_agent_session` with exactly the three properties and two required
+   fields above. The real Hermes Director must then use that discovered surface
+   to create and start the selected `hermes-worker`, create and assign the
+   durable Task, and continue the normal governed flow. Missing discovery,
+   empty/absent required arguments, no worker, no durable Task assignment, or
+   any retry caused by an empty schema is red. The unchanged consumer bar
+   remains real pointer-visible 13 objects/15 cables, all ten inspectors
+   open/collapse, three Hermes terminals accepting and erasing an unsubmitted
+   candidate canary after mouse focus, exact close/reopen inventory equality,
+   and zero descendant processes. A machine-only green does not close R16.
+
+Plain meaning: the Director must be shown the fields needed to hire a worker,
+then guided research must create a real worker and durable task instead of
+retrying an empty call.
+
+Allowed Builder product paths are only `collab-electron/src/main/kernel.ts`
+and the nearest existing gateway/tool-surface test, plus the R16 BUILD-REPORT
+and generated Atlas projections. The real founder database and retained backup
+are not Builder inputs and must not be opened or changed. A fresh Reader must
+answer the protocol's exact two questions before construction.
+
+Verifier tooling receipt: candidate `94c4ee61` passed the required product and
+focused gates through R16 13/0, but the first `bun qa/run.ts typecheck` attempt
+reported Windows `EBUSY` while Electron postinstall removed the generated
+`collab-electron/node_modules/.bun/node-pty@1.1.0/node_modules/node-pty/build`
+directory. The verifier's supervising shell and typecheck/tsc descendants then
+finished and all four were observed absent; no QuantFlow app, founder database,
+product file, assertion, or source artifact was touched. The same Verifier may
+rerun only the unchanged typecheck command once now that the owning processes
+are gone, then continue the still-unrun Atlas check/ratchet and diff check. A
+nonzero assertion/type error or repeated `EBUSY` stops. Green completes the
+original independent verification; no implementation or cleanup helper is
+authorized.
+
+That unchanged continuation was unmeasured rather than red: the command runner
+returned while its Bun/Node rebuild descendants were still alive, emitted no
+native exit or `PASS  typecheck`, and those descendants later exited. No product
+or founder state changed. This is a verification-transport defect, so it does
+not authorize another product lap. One fresh Verifier may measure only the
+unchanged tail using a single direct background PowerShell process with durable
+stdout/stderr and native-exit files under `C:\tmp`; no script, manifest, event
+stream, retry, cleanup framework, or source edit. It must wait for that exact
+process to end (maximum five minutes), require exit file `0` and the gate's
+canonical log text `PASS  typecheck` (two spaces), then run Atlas check/ratchet
+and `git diff --check` directly.
+Missing durable files, timeout, nonzero exit, or absent PASS is red. Combined
+with the prior independent green focused receipts at the same immutable SHA,
+that bounded tail may write the action-schema Verification PASS.
+
+## NORMAL CONSUMER HYPOTHESIS BINDING REPAIR — exact R16 founder red
+
+The action-schema candidate `94c4ee61e9b64fca56d0101557eeb64cb5f4c534`
+opened the normal founder application at `schema_meta=84`. Computer Use clicked
+`TRY GUIDED RESEARCH` once. The real Hermes Research Director selected
+`hermes-worker`, created and started `session-7bae5fa1-worker-0001`, and assigned
+durable Task `task-d5b21e26-4ad6-42f6-94e0-3d07db91c693`. The worker completed
+that Task and published result Artifact
+`c183207fdc494582e27a74c423cca02e97b6157bce6cf739b04923226c87a6d0`
+with seven Kernel-receipted reads. This proves the preceding action-schema repair
+in the normal product.
+
+The same run then stopped before deterministic execution or independent review.
+The native stderr receipt is exact:
+
+```text
+research continuation failed Error: research result has no exact Hypothesis binding for 7fb6d36b-a9b7-4e07-ab92-d8a50921feb3
+```
+
+Read-only Kernel measurement after the run found `run=0`, `evaluation=0`, no
+report Artifact, the completed source Task, and the durable worker result. The
+normal window closed through its ordinary Close control and the process receipt
+was `consumer_processes_remaining=0`.
+
+The defect is one duplicated production boundary. The JSON-RPC
+`qf.research.submit_question` path records
+`researchHypothesisBySession.set(result.sessionId, hypothesisId)` after admission.
+The renderer's normal `qf:research:submit` IPC path performs the same Mission,
+Hypothesis, and Director admission but returns without recording that binding.
+The shared collaboration result callback therefore cannot call the already-
+implemented `kernelRunGuidedResearch()`, critic admission, governed evaluation,
+and report publication path.
+
+Repair only this exact normal-consumer boundary:
+
+1. Replace the file-local `researchHypothesisBySession` map in
+   `collab-electron/src/main/index.ts` with one exact process-local context
+   module at `collab-electron/src/main/research-context.ts`. That module owns
+   only the Director-session-id to Hypothesis-id binding and exports exactly
+   four operations: bind one non-empty pair, read one session, clear one
+   session, and clear all bindings for test/process teardown. It is not Kernel
+   truth and writes no file or database.
+2. Both production question front doors — renderer IPC
+   `qf:research:submit` in `collab-electron/src/main/ipc-kernel.ts` and
+   JSON-RPC `qf.research.submit_question` in
+   `collab-electron/src/main/index.ts` — call the
+   same bind operation with their exact returned `result.sessionId` and exact
+   created `hypothesisId` before returning success. The collaboration result
+   continuation reads through the module. `closeAdmittedSession(sessionId)`
+   clears that session's Hypothesis binding together with its existing Mission
+   binding. Do not change Kernel rows, Mission or Hypothesis creation, Dataset
+   contents, action semantics, prompts, model behavior, review policy, or any
+   proof-only path.
+3. Add exactly
+   `collab-electron/src/main/research-context.test.ts`. Its runtime tests import
+   the real module, not source text. They prove: binding `session-a` to
+   `hypothesis-a` returns that exact id while an unbound session returns
+   `undefined`; clearing `session-a` makes it unaddressable without clearing an
+   independently bound `session-b`; empty session or Hypothesis ids throw
+   before mutation; and clear-all leaves both sessions unaddressable. The final
+   normal Computer consumer run is the integration oracle that the renderer
+   IPC front door actually called this module; a source-text-only assertion is
+   forbidden.
+4. Builder gates are exactly:
+
+   ```text
+   bun test collab-electron/src/main/research-context.test.ts
+   bun test collab-electron/src/main/mission-activation.test.ts
+   bun test collab-electron/src/main/native-tui-orchestration.test.ts
+   bun qa/run.ts kernel-sole-writer
+   bun qf-atlas/generate.mjs --check
+   bun qf-atlas/ratchet.mjs
+   git diff --check
+   ```
+
+   Expected focused counts are `4 pass / 0 fail`, `2 pass / 0 fail`, and
+   `8 pass / 0 fail`; every remaining command exits zero and the named static
+   gate prints PASS. The Builder must falsify the bind condition once by making
+   the module's bind operation a no-op while the test is unchanged, and must
+   separately falsify the clear-one condition once by making that operation a
+   no-op. Each test run must exit nonzero naming its missing condition. Restore
+   exact candidate bytes after each falsifier and finish at `4 pass / 0 fail`
+   with zero diff from the candidate. No source-text test counts.
+
+   Then run `bun qf-atlas/generate.mjs`, repeat Atlas `--check` and ratchet,
+   inspect `bun qf-atlas/generate.mjs --diff 94c4ee61e9b64fca56d0101557eeb64cb5f4c534`,
+   and finish with `git diff --check`. Record unedited output in exactly
+   `docs/orders/evidence/r16/BUILD-REPORT.md`; generated Atlas projections may
+   change only as a consequence of these product paths.
+
+   Builder scope excludes live model runs, the proof-mode R16 gate, installer,
+   release matrix, typecheck rebuild, timeout changes, helper frameworks,
+   worktrees, and R17 edits.
+5. A fresh different-model Verifier re-runs the exact short matrix above against
+   one immutable product candidate, including the post-generation Atlas checks
+   and base diff, and records SHA before/after. It does not edit. It does not
+   repeat the Builder's mutation falsifiers.
+6. Only after independent PASS, rebuild once and repeat the normal Computer
+   consumer check. The real guided sample must retain the already-proven
+   Director, worker, durable Task, and result Artifact; then create a
+   deterministic Run, admit a real `hermes-critic`, record an Evaluation with
+   verdict exactly `supports`, publish the gated report Artifact, and expose the
+   complete durable research world by pointer. A different verdict or absent
+   report is red for this fixed deterministic sample, not an alternate passing
+   branch. The unchanged 13-object/15-cable, inspector, terminal typing,
+   close/reopen equality, and zero-process bar still applies. Any missing exact
+   binding, continuation exception, absent critic, or incomplete world is red
+   and names the next finite defect.
+
+No other gate, test, evidence output, or result branch is implied.
+
+The Builder must not use the broader phrase `R16 evidence`: its only authored
+report is `docs/orders/evidence/r16/BUILD-REPORT.md` plus generated Atlas
+projections allowed above.
+
+The focused regression is deliberately a runtime lifecycle test while the
+normal Computer run is deliberately the renderer-IPC integration test. Neither
+may be substituted for the other.
+
+Plain meaning: both front doors must remember which Hypothesis belongs to the
+Director they started, so the completed worker result can continue into the
+already-built deterministic and independent-review pipeline.
+
+Allowed Builder paths are only `collab-electron/src/main/index.ts`,
+`collab-electron/src/main/ipc-kernel.ts`,
+`collab-electron/src/main/research-context.ts`,
+`collab-electron/src/main/research-context.test.ts`,
+`docs/orders/evidence/r16/BUILD-REPORT.md`, and generated Atlas projections. A
+fresh Reader answers the protocol's exact two questions before construction.
+
+Independent verification receipt: fresh Terra task
+`01a028b0-9f3b-7093-a903-2bfb87328f1c` returned PASS at immutable product
+candidate `f8f085b3e87639f598e6973dca92ebfb2a781b57`, with Builder evidence
+`184dffa41b760e736be4f513dc34f8cac968139f`. Runtime counts were exactly `4/0`,
+`2/0`, and `8/0`; `kernel-sole-writer` printed PASS; Atlas check/ratchet were
+green and the base diff verdict was UNCHANGED; `git diff --check` exited zero;
+HEAD and Router-owned document bytes were identical before/after. The durable
+receipt is `docs/orders/evidence/r16/HYPOTHESIS-BINDING-VERIFICATION.md`.
+
+Current door: rebuild `f8f085b3` once and repeat the normal-app Computer
+consumer contract. No R17 authority exists until that consumer bar passes and
+R16 is closed in the repository.

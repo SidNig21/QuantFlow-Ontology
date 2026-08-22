@@ -49,6 +49,31 @@ cleanup-preflight-reader-receipt: fresh Luna Reader task `01a0282b-556a-7830-b33
 cleanup-preflight-red-receipt: one build passed in 61085ms; forced cleanup passed in 12179ms with zero roots; first-world pointer 10/10, exact 13/15, and shutdown were green; only the duplicate proof-preview reopen timed out; all final cleanup was clean
 consumer-reopen-reader-receipt: fresh Luna Reader task `01a02835-6305-71c3-970b-ef3d5e0b8682`; initial NO/NO defects all landed; corrected reread final YES/YES
 current-door: corrected `CONSUMER-OWNED REOPEN` Builder authorized on the preserved WIP; no R17 authority
+independent-verifier-receipt: fresh Terra Verifier task `01a02848-4d44-7692-9f89-cd30d7bd7c9a`; focused/static/Atlas/falsifier green, but its single live process returned no exit/stdout receipt; no PASS, retry, evidence, or code change
+consumer-red-receipt: exact normal candidate launch failed before a window with `KernelUpgradeShapeError (agent-profile-identity)` against the preserved founder Kernel; launched PID ancestry cleaned to zero; read-only diff identifies the bounded predecessor-classifier defect appended to WO-R16
+founder-kernel-reader-receipt: fresh Luna Reader task `01a02851-1489-7072-aea7-ce0b3a502b6f`; final YES/YES with no defects
+current-door: `FOUNDER KERNEL UPGRADE COMPATIBILITY` Builder authorized; no R17 authority
+founder-kernel-builder-red: focused repair/tests green; required matrix stopped on stale dock-profile upgrade enumeration (9 vs production 12) followed by Windows EPERM in unchanged kernel-drift install; exact gate-only synchronization and one unchanged EPERM rerun authorized in WO-R16
+founder-kernel-gate-red: synchronized dock gate exposed the same late-authority subtraction defect in older legitimate predecessors (`0001 did not produce exact D1`); shared exact historical-snapshot repair and current-authority-derived R16 additions are authorized in WO-R16
+founder-kernel-0004-red: dock chain now passes 0001-0003 and names the sole capability-grants snapshot omission; exact existing governed-review table subtraction authorized in WO-R16
+founder-kernel-legacy-oracle-red: full chain reaches current; dock legacy oracle incorrectly compares newly created tables to the predecessor table set; exact fixed pre-upgrade table-set comparison authorized in WO-R16
+founder-kernel-legacy-column-red: fixed table set still recomputed post-upgrade columns; exact captured pre-upgrade table-and-column projection comparison authorized in WO-R16
+founder-kernel-readonly-red: dock chain/legacy proof now green; production readonly upgrade list omits existing governed-review 0012; exact final diagnostic constant authorized in WO-R16
+kernel-drift-tooling-red: dock-profile-identity fully green; raw kernel-drift Bun install repeats Windows EPERM while the established shared frozen-install seam succeeds; exact reuse of `runFrozenPackageInstall` authorized in WO-R16, with no retry/helper invention
+founder-kernel-candidate: compatibility product candidate `b8e7d57c04288e1315bbe658a4665a57b4d5f3e7`; Builder evidence `fea7144`; independent Verifier PASS/evidence `21b8c0b7f1803bb5401a04b86b80a615e9ef3d4d`
+founder-kernel-backup: `C:\Users\rybow\.quantflow\kernel.db.pre-r16-20260822-005409.bak`; 299008 bytes; SHA-256 matches pre-launch source `c29fd79a328d1006eedfc425a5f55ca5a60fdc5a07b89db861a7cad128369bdf`
+consumer-schema-red: normal exact candidate opens at `schema_meta=84`, but Computer Use `TRY GUIDED RESEARCH` showed the real Hermes Director receive an empty `qf_create_agent_session` argument object because capability action discovery exposes no named properties; no specialist Task/world was created; ordinary close left `consumer_processes_remaining=0`
+consumer-schema-reader-receipt: fresh Luna Reader task `01a0287e-9e58-72d1-a3cf-ca527a08d6e4`; finite gate/meaning defects landed in WO-R16; final YES/YES with no remaining defects
+consumer-schema-builder-receipt: immutable product candidate `94c4ee61e9b64fca56d0101557eeb64cb5f4c534`; evidence `eddbbd202b0506a0a0568cd6c311c8a05cbadd32`; exact matrix green; old empty-schema falsifier 4/1 then restored 5/0 with zero diff
+consumer-schema-verifier-tooling-red: product/focused gates green through R16 13/0; first typecheck reported generated node-pty build-directory `EBUSY`; supervising shell and all typecheck/tsc descendants subsequently exited; one unchanged typecheck continuation is authorized in WO-R16
+consumer-schema-verifier-unmeasured: unchanged continuation lost its native exit when the runner returned ahead of its still-running rebuild descendants; all later exited; no product/founder state changed; durable direct typecheck/Atlas/diff tail authorized in WO-R16
+consumer-schema-durable-typecheck: `C:\tmp\r16-action-schema-typecheck-20260822-013304597.exit` is exactly `0`; paired durable log ends with the gate's canonical `PASS  typecheck`; the Reader-authored one-space literal was corrected as an order receipt typo without rerunning or weakening the gate
+consumer-schema-verifier-receipt: focused/runtime Verifier plus fresh durable-tail Verifier PASS at immutable candidate `94c4ee61e9b64fca56d0101557eeb64cb5f4c534`; evidence commit `f728487b964e2e06c508e6f8c3100e85495868e5`; typecheck/Atlas/ratchet/diff green; product bytes unchanged
+consumer-hypothesis-binding-red: normal `94c4ee61` Computer run at 2026-08-22T08:41Z created Mission `mission-7bae5fa1-5f2f-48fb-9c44-2553d831ad71`, Director `7fb6d36b-a9b7-4e07-ab92-d8a50921feb3`, worker `session-7bae5fa1-worker-0001`, completed Task `task-d5b21e26-4ad6-42f6-94e0-3d07db91c693`, seven durable ontology-read receipts, and result Artifact `c183207f...`; production stderr then named `research result has no exact Hypothesis binding for 7fb6d36b...`, leaving `run=0`, `evaluation=0`, and no report Artifact; ordinary close printed `consumer_processes_remaining=0`
+hypothesis-binding-reader-receipt: fresh Luna Reader task `01a028a5-bc02-7160-a82f-7bd64eca62a3`; first pass NO/NO with finite test-seam defects; every defect landed in WO-R16; reread final YES/YES
+hypothesis-binding-builder-receipt: product candidate `f8f085b3e87639f598e6973dca92ebfb2a781b57`; evidence commit `184dffa41b760e736be4f513dc34f8cac968139f`; exact short matrix green; independent bind and clear-one falsifiers red then restored `4 pass / 0 fail`; Atlas verdict unchanged
+hypothesis-binding-verifier-receipt: fresh Terra Verifier task `01a028b0-9f3b-7093-a903-2bfb87328f1c`; PASS at immutable product candidate `f8f085b3e87639f598e6973dca92ebfb2a781b57`; evidence `docs/orders/evidence/r16/HYPOTHESIS-BINDING-VERIFICATION.md`; runtime tests `4/0`, `2/0`, `8/0`; kernel-sole-writer PASS; Atlas current/ratchet green; Atlas diff UNCHANGED; Router docs byte-identical before/after
+current-door: rebuild `f8f085b3` once and repeat the exact normal-app Computer consumer contract; no R17 authority
 
 ## Authorized outcome
 
@@ -122,5 +147,21 @@ R16 remains the one active product rung. Only the bounded rewrite implementation
 is authorized; no R17 work starts from this file.
 
 ## Stop
+
+Exact named defect/authority receipt: `qa/gates/kernel-drift/run.ts` `gateG1`
+creates the canary read-only handle inline at
+`readRegistrySets(new Database(canaryPath, { readonly: true }))` and never
+closes it. On Windows this leaves the temp DB busy and the finally `rmSync`
+throws `EBUSY` after G1/G6. Repair only this handle lifecycle: assign the
+read-only canary DB, read its sets, close it before proceeding. Do not add
+retry/scaffolding or weaken the gate.
+
+Exact named stale-G2-control defect/authority receipt: `qa/gates/kernel-drift/run.ts`
+uses `publish_artifact` kind `report` without `evaluation_id`, invalid since
+governed review. Change only that healthy control artifact kind to the valid
+non-governed `result_set` (the existing published bytes/storage_ref remain;
+no semantic/gate weakening). Ensure `FIXTURE_ENV` and the mem DB are cleaned
+in a `finally` so any future assertion cannot leak state, but do not add
+retry/scaffolding.
 
 No R17 implementation begins from this file. Never place bets or trades.
