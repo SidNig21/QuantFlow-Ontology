@@ -1,6 +1,6 @@
 # NEXT — R16 visible research world
 
-status: R16 TERMINAL TAB-ORDER REPAIR - BUILD AUTHORIZED, READER YES/YES
+status: R16 SENTINEL SETTLE REPAIR - AWAITING FRESH READER
 authorized-at: 2026-08-21
 authorized-by: founder umbrella goal 2026-08-15
 active-order: [WO-R16](WO-R16.md)
@@ -23,6 +23,7 @@ budget-repair-wip-receipt: focused contract 13/13; live roots and processes clea
 tab-diagnostic-reader-receipt: fresh Luna Reader task `01a0278e-e71d-7922-a96b-8573fab923b8`; final YES/YES at `b91628a8918a22fc565a70ed447c48db2c8f1ef4`
 tab-diagnostic-wip-receipt: focused contract 14/14; live step 9 expected an Artifact Inspect button but focused an interleaved live agent-session terminal webview; roots/processes clean and cleanup failures empty; WIP preserved at `49e9fd529a4dae8f70681e26478719ecdca7fc09`
 terminal-tab-reader-receipt: fresh Luna Reader task `01a02799-c81c-7480-b890-035aba5fce26`; final YES/YES at `fd580be72e86aa2e9a7d54c40b5bb50bfa304132`
+terminal-tab-wip-receipt: terminal guest tab-order focused tests 3/3 and R16 contract 14/14; live step 0 sampled the gate-owned sentinel before native Tab departure became observable; roots/processes clean and cleanup failures empty; WIP preserved at `808e5382aa685655e00021382709a28d40ef475c`
 
 ## Authorized outcome
 
@@ -59,7 +60,9 @@ and exposed the native-Tab diagnostic gap appended to `WO-R16.md`. A fresh
 two-question Reader returned final YES/YES at `b91628a`; that diagnostic
 Builder produced the exact product receipt at `49e9fd5`. The bounded terminal
 Tab-order repair appended to `WO-R16.md` received fresh Reader YES/YES at
-`fd580be`; its Builder door is open.
+`fd580be`; its product fix is preserved at `808e538`. The live run exposed the
+gate-owned sentinel settle case appended to `WO-R16.md`, which now requires
+fresh Reader YES/YES.
 
 ## Bounded prerequisite before R16 construction - complete except Reader
 

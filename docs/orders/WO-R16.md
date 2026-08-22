@@ -1583,3 +1583,57 @@ candidate.
 
 Plain meaning: Tab stays on QuantFlow's shell controls; a click or explicit
 focus still enters the real Hermes terminal.
+
+## SENTINEL SETTLE REPAIR - observe one native Tab before judging it
+
+Terminal-focus WIP SHA `808e5382aa685655e00021382709a28d40ef475c` is
+evidence, not a candidate. The tile-manager repair tests pass 3/3 and the R16
+contract passes 14/14. Its one live run kept the gate-owned sentinel focused at
+step 0 immediately after the acknowledged native Tab; all roots and processes
+were removed and cleanup failures were empty. The exact actual receipt was the
+sentinel button itself, with id `qf-r16-tab-sentinel-<timestamp>`.
+
+This is the gate-owned sentinel case already defined by the preceding
+diagnostic's mechanical decision rule. The terminal product repair remains
+unchanged. No second key input, product edit, target omission, assertion change,
+or longer gate deadline is authorized.
+
+### Exact gate repair
+
+Change only `qa/gates/research-world-visible.ts` and its focused contract test.
+Export one helper named `waitForSentinelDeparture`. It receives the sentinel id,
+an async observation callback returning `FocusedElementReceipt`, and an async
+pause callback. It reads immediately. While and only while the actual `id`
+equals the exact sentinel id, it may pause exactly 10 ms and read again, for at
+most 25 pauses / 26 total reads / 250 ms. It returns the first receipt whose id
+differs from the sentinel, including any wrong external element. If all 26 reads
+still name the sentinel, it returns that final sentinel receipt. It never sends
+or retries a key input and never suppresses a receipt.
+
+In `exerciseNativeKeyboard`, use this helper only after the first native Tab
+and before the existing exact comparison for step 0. Every later step retains
+its immediate observation. A wrong non-sentinel element is compared and fails
+immediately; a stuck sentinel fails through the unchanged
+`tab_focus_failure` after at most 250 ms.
+
+Append exactly two tests to the existing R16 contract file without changing its
+14 current test bodies: one returns the sentinel twice and the expected Mission
+tile on the third read and must observe two 10 ms pauses and three reads; the
+other returns the sentinel for all 26 reads and must observe exactly 25 pauses,
+26 reads, and the final sentinel receipt. The file must report exactly 16 pass
+and 0 fail. The tile-manager file remains exactly 3 pass and 0 fail.
+
+### Builder and acceptance authority
+
+A fresh Builder starts from clean local/remote `808e538` plus Router Reader and
+Atlas-refresh commits. It runs Atlas preflight, the 3-test tile-manager file,
+and the 16-test R16 contract, then exactly one live
+`bun qa/run.ts research-world-visible`. Any red stops with exact focus/root/
+primary/cleanup receipts. Green resumes the exact short matrix, cheap
+tabIndex falsifier, BUILD-REPORT, candidate sequencing, and fresh different-
+model verification specified in TERMINAL TAB-ORDER REPAIR.
+
+No product, Main, key bridge, fixture, expected target, assertion, timeout,
+schedule, package, installer, release, worktree, wrapper, or helper framework
+change. Plain meaning: give the one native Tab up to a quarter-second to become
+observable; never send it twice and never call a wrong destination correct.
