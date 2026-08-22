@@ -75,7 +75,11 @@ hypothesis-binding-builder-receipt: product candidate `f8f085b3e87639f598e6973dc
 hypothesis-binding-verifier-receipt: fresh Terra Verifier task `01a028b0-9f3b-7093-a903-2bfb87328f1c`; PASS at immutable product candidate `f8f085b3e87639f598e6973dca92ebfb2a781b57`; evidence `docs/orders/evidence/r16/HYPOTHESIS-BINDING-VERIFICATION.md`; runtime tests `4/0`, `2/0`, `8/0`; kernel-sole-writer PASS; Atlas current/ratchet green; Atlas diff UNCHANGED; Router docs byte-identical before/after
 consumer-governed-world-red: normal `f8f085b3` Computer run completed a real Director, worker, deterministic Run, independent Hermes critic, `supports` Evaluation, and published report; pointer `Show research world` retained only the Mission because the normal continuation bypassed the existing R15 source-work/review-task boundary used by the synthetic 13/15 fixture
 consumer-shutdown-red: ordinary Close removed all Windows/Hermes/collaboration processes but left one app-owned WSL `qf-ontology-mcp.mjs` child at PID 1198 for more than eight minutes; exact orphan was terminated after recording; source race is an untracked async native-TUI teardown removed from the live map before shutdown can await it
-current-door: fresh two-question Reader on the appended governed-world/shutdown repair; no Builder and no R17 authority until final YES/YES
+reader-receipt: fresh Reader at pushed head `3d1578e` returned `NO/NO` on the
+appended governed-world/shutdown repair; the missing exact matrix, falsifiers,
+and deliverable meanings are now corrected in `WO-R16.md`.
+current-door: corrected appended governed-world/shutdown repair requires a
+fresh two-question Reader; no Builder and no R17 authority until final YES/YES
 
 ## Authorized outcome
 
