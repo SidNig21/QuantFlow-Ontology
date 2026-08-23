@@ -9,7 +9,7 @@ depends: [R17 final acceptance](evidence/r17/FINAL-ACCEPTANCE.md)
 baseline-receipt: [accepted product byte equivalence](evidence/pre-r18-coherence/BASELINE-BYTE-EQUIVALENCE.md)
 cleanup-receipt: [exact audit-residue cleanup](evidence/pre-r18-coherence/AUDIT-RESIDUE-CLEANUP.md)
 authorization: founder command on 2026-08-23; implementation begins only after Reader `YES/YES` and temporary `NEXT.md` rotation
-rework-budget: one bounded repair after the naive-user check; the same semantic assertion failing twice is a founder stop
+rework-budget: exactly one product rework commit for the entire order; any later red receipt stops for Ryan
 
 ## In plain terms
 
@@ -40,19 +40,31 @@ beautification is forbidden.
 
 ## Fixed product vocabulary
 
-**Session state** is `active | closed` and comes from the existing AgentSession
-projection.
+The shared participant view applies this exact source/precedence table. A higher
+row in one axis wins over a lower row in that same axis; one axis never overwrites
+another.
 
-**Runtime state** is `starting | running | stopped | unavailable` and is derived
-from existing launch/session/runtime facts. It is not a new persisted state.
+| Axis | Derived value | Existing source and precedence |
+|---|---|---|
+| Session | `active` | `agent_session.status` is not a terminal/closed value |
+| Session | `closed` | `agent_session.status` is `closed`, `cancelled`, `failed`, or `completed` |
+| Runtime | `running` | the current runtime observation identifies a live PTY/ACP/native process |
+| Runtime | `starting` | the session is admitted/active but no live-process observation or terminal exit exists yet |
+| Runtime | `unavailable` | no live process exists and the profile/runtime availability surface says the definition cannot launch |
+| Runtime | `stopped` | a previously admitted session has no live process and is not `starting` or `unavailable` |
+| Work | `completed` | the owned Task is in its existing terminal success state |
+| Work | `blocked` | the owned Task or governed review surface records the existing blocked/refused state |
+| Work | `waiting` | the owned Task is active but its existing state says waiting/review-pending rather than executing |
+| Work | `working` | an active Task is assigned to this exact `agent_session.id` |
+| Work | `unassigned` | no active Task is assigned to this exact `agent_session.id` |
+| Recovery | `restartable` | the session is not live and the existing definition/profile availability says the same role/runtime can launch |
+| Recovery | `not restartable` | the session is live, or its definition/profile is absent or unavailable |
 
-**Work state** is `unassigned | working | waiting | blocked | completed` and is
-derived from existing Mission, Task, assignment, and completion facts. During a
-durable Mission's startup, a Director with no assigned Task is truthfully
-`planning` in presentation copy; the persisted work axis remains `unassigned`.
-
-**Recovery state** is `restartable | not restartable` and comes from existing
-profile/runtime availability and session facts.
+Missing or unrecognized source facts render `Not recorded`; they never default to
+healthy. `Planning mission` is presentation copy only for the exact Director
+`sessionId` returned by the successful submission response while its durable
+Mission has no Task. It is never a Work-axis value and may not be applied to other
+unassigned participants.
 
 **Raw Artifact** is inspectable participant output that has not itself become an
 accepted conclusion.
@@ -64,23 +76,33 @@ accepted conclusion.
 **Historical** means durable prior or superseded work. Historical objects remain
 inspectable but may not look current.
 
+**Participant identity** is always `agent_session.id`. A ledger entry retains its
+own event id and may display a separate participant-session reference; an event id
+is never a participant id.
+
 ## Deliverables
 
 ### A — Correct current product authority and Atlas status in one docs-only commit
 
 Change only these authority surfaces plus a compact receipt:
 
-- `qf-atlas/AGENT_BOOT.md`: replace the stale statement that Atlas v1 acceptance
-  and its verification/baseline receipts are pending with the accepted current
-  status. Do not change Atlas capability or policy.
-- `qf-atlas/OPERATING_MANUAL.md`: make the same bounded current-status correction.
+- `qf-atlas/AGENT_BOOT.md`: replace the stale statement with exactly this status
+  in the document's existing form: `Capability work: CLOSED; independent
+  acceptance: PASS; founder acceptance: recorded in qf-atlas/verification.json;
+  baseline: present; Atlas authorizes diagnosis and blast-radius analysis, not
+  product repair or deletion.` Do not change Atlas capability or policy.
+- `qf-atlas/OPERATING_MANUAL.md`: make the same exact current-status correction.
 - `docs/PRODUCT.md`: replace global pointer/keyboard parity as a current product
   claim with the accepted mouse-first contract. Normal text and terminal input
   must work after mouse focus, and focus may not become trapped. Full global
   keyboard-navigation parity remains pre-release debt already recorded as
   `docs/DEBT.md` item 38.
 - `docs/orders/evidence/pre-r18-coherence/DOCUMENTATION-CORRECTION.md`:
-  identify the exact old claims, new claims, and authority receipts.
+  identify the exact old claims, new claims, and authority receipts. Its focused
+  check must assert that the old claims are absent, the exact new claims are
+  present, `qf-atlas/verification.json` and `qf-atlas/baseline.json` exist,
+  `docs/PRODUCT.md` points to Debt item 38, and no file outside these four named
+  documentation paths changed in the docs-only commit.
 
 This commit contains no product code, generated Atlas model, baseline mutation,
 or unrelated documentation cleanup.
@@ -92,25 +114,46 @@ id, reveal that Mission through the existing `researchWorldController.reveal`
 path. The Canvas must leave the unexplained landing state without waiting for a
 worker, Artifact, ledger click, or refresh.
 
+`Immediately` has one measurable meaning: after the submission IPC promise
+resolves, the gate observes the matching Mission tile before any worker completion,
+Artifact event, ledger interaction, explicit refresh call, or second submission.
+A timeout is only the test limit; delayed polling or later activity is not the
+behavior being accepted.
+
 The revealed world uses only Kernel-owned Mission, Task, participant, object, and
 link facts. Do not add a UI truth store, synthetic Mission, optimistic domain row,
 new ontology type, or direct renderer write. A failed submission leaves the
 previous Canvas intact and shows the existing error path.
 
-Close/reopen must reconstruct the same durable Mission world through the existing
-hydrate/projection boundary; no replay-only browser state is accepted.
+The immediate Director may be associated with that Mission only by the exact
+`sessionId` returned with the same successful submission. On cold reopen, a
+participant may be called Mission-local only when an existing durable relation in
+the Kernel proves it. If no such relation exists, the Builder stops: adding one is
+outside this order's renderer/projection boundary.
+
+Close/reopen means close and relaunch the normal app against the same isolated app,
+Kernel, and Artifact directories, without refresh or injected browser state. The
+relaunch must reconstruct the same Mission-local object ids, link triples,
+participant ids, and saved research-tile identities through the existing
+hydrate/projection boundary.
 
 ### C — Use one honest participant projection in Dock and Canvas
 
 Create or reuse one pure derived participant view consumed by both Dock session
-rows and Canvas participant tiles. It must expose, from existing facts:
+rows and Canvas participant tiles. Its inputs are the existing AgentSession,
+`spawned_from` definition, runtime observation, Task assignment, durable Mission
+binding, capability groups, and `produces` Artifact links. It must expose:
 
 - role first and runtime second;
 - recruiter or creation reason when that fact exists;
 - owned Task, or truthful Mission-startup copy when the Director is planning;
 - distinct session, runtime, work, and recovery axes;
 - produced Artifact/output when linked;
-- only the interventions the current participant supports.
+- only interventions present in the existing named capability/action mapping.
+
+Missing recruiter/reason, Mission binding, Task, output, capability, or runtime
+facts render `Not recorded`; they do not authorize inference. The helper may not
+read terminal prose to manufacture a state.
 
 Dock and Canvas must render the same values for the same participant id. A live
 session cannot render `stopped` on one surface. A closed runtime may still render
@@ -118,8 +161,9 @@ completed work and `restartable`; those are different axes. Unknown or absent
 facts are labeled honestly, never inferred from CSS, elapsed time, terminal text,
 or display position.
 
-Keep one identity across AgentSession, Dock row, participant tile, Task ownership,
-terminal, and ledger. No duplicate display participant is permitted.
+Keep `agent_session.id` across the Dock row, participant tile, Task ownership, and
+terminal. Ledger event ids remain event ids and may reference the participant
+separately. No duplicate display participant is permitted.
 
 Terminal input remains directly usable after mouse focus. Expanding or focusing
 the terminal may not hide the participant's role, runtime, Task context, or work
@@ -140,6 +184,13 @@ publication state, and existing projection data. A raw Artifact remains visible
 and inspectable but cannot visually compete with the current published Report as
 an equivalent conclusion. Historical styling must not erase provenance or make a
 historical Report appear current.
+
+For one Mission, `PUBLISHED REPORT` is the Report identified by the existing
+publication state as that Mission's current report. Every other Report in the same
+Mission projection is `HISTORICAL`. A result Artifact may carry both `RAW ARTIFACT`
+and `HISTORICAL`; the current published Report may not carry `HISTORICAL`; only the
+current published Report carries the current-authority marker. An Evaluation marks
+judgment over its exact linked Artifact and never becomes the published conclusion.
 
 Long opaque ids may be shortened for display only if the full canonical id remains
 available in the existing inspector or accessible title. Stored ids and link
@@ -162,15 +213,24 @@ inspector, ledger, and session graveyard may not remain one uninterrupted panel.
 Mode selection is ephemeral view state, not domain truth. Do not add a new Dock
 participant, recipe, marketplace, capability, framework, or navigation system.
 
+Modes are exactly one of `START | CATALOG | ACTIVE | INSPECT | HISTORY`. Initial
+mode is `START`. One existing tablist selects them, exactly one tab has
+`aria-selected="true"`, each primary pane carries `data-dock-primary`, exactly one
+primary pane is expanded, and the other four primary panes are collapsed. Compact
+counts may remain outside the panes; object details may appear only in `INSPECT`.
+
 Cancel, close, restart, and similarly dangerous session actions must be explicit,
-labeled targets. Clicking participant identity or whitespace may select/inspect;
-it may not execute a destructive action.
+labeled buttons. Clicking participant identity or whitespace selects/inspects only
+and produces no destructive IPC. When supported, accessible names are exactly
+`Cancel session <id>`, `Close session <id>`, and `Restart session <id>`; activating
+the explicit button invokes the matching existing action for that same session.
 
 ### F — Clarify only existing semantic cables
 
-Existing research-world links may gain readable semantic labels, direction, and
-selection emphasis. Inactive/background and historical cables may be visually
-subordinate only where current projection truth supports that distinction.
+Every rendered research-world cable shows its existing semantic link kind and
+direction. A selected cable receives explicit selection emphasis. Inactive/
+background and historical cables may be visually subordinate only when the
+projection fixture marks that exact cable inactive/background or historical.
 
 Do not add or rename link kinds, alter stored direction, replace the Canvas engine,
 or create a second relationship model.
@@ -188,22 +248,56 @@ replace Main/preload with mocks, write domain truth from the renderer, or call
 `execute()` as a shortcut around the UI path. Mechanical view-state assertions
 may inspect the rendered DOM after the real path has produced its facts.
 
-The gate must be able to fail independently on at least these conditions:
+`Direct renderer write` means renderer-side mutation of Kernel/domain truth.
+Creating, positioning, selecting, expanding, or styling projection tiles and
+changing ephemeral Dock mode state remain allowed.
+
+The gate records distinct production receipts for renderer submission, preload
+IPC, Main handler, read-only Kernel projection, and resulting DOM. It independently
+queries the isolated Kernel read-only and compares the Mission, session, Task,
+Artifact, Evaluation, Report, and link ids to the production response and DOM; a
+printed receipt without that comparison is red.
+
+The isolated fixture contains independent facts for all of these cases:
+
+- the newly submitted planning Director returned by the submission boundary;
+- a live worker assigned an active Task;
+- an ordinary unassigned participant that must remain `unassigned`, not planning;
+- a participant result Artifact, its exact Evaluation, the Mission's current
+  published Report, and one superseded Report;
+- one current cable and one historical/background cable carrying existing kinds
+  and directions.
+
+The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C10`. The unmodified
+control exits zero. Each falsifier corrupts only its named condition and must exit
+nonzero with that condition's name. Builder evidence includes the control output
+and all ten red outputs; unconditional receipt printing is a gate defect.
+
+The ten conditions are:
 
 1. durable Mission does not replace the landing state;
-2. Director startup renders unexplained `No task`;
-3. Dock and Canvas disagree on any of the four participant axes;
-4. raw Artifact is presented as the current governed conclusion;
-5. Evaluation or published Report lacks its authority marker;
-6. historical work is presented as current;
-7. multiple full Dock responsibilities are expanded together;
-8. a session-row identity/whitespace click triggers a destructive action;
-9. terminal focus prevents returning to the Canvas by mouse;
-10. close/reopen does not restore the same Mission-local world.
+2. the exact returned Director renders unexplained `No task`, or the ordinary
+   unassigned participant incorrectly receives Director-only planning copy;
+3. either Dock or Canvas differs from the independently queried Kernel/runtime
+   facts for any of the four participant axes;
+4. the fixture's raw Artifact is presented as the current governed conclusion;
+5. the exact Evaluation or current published Report lacks its required marker;
+6. the superseded Report is presented as current, or more than the current Report
+   carries current-authority status;
+7. other than the selected `data-dock-primary` pane, any primary pane is expanded,
+   or selected pane and `aria-selected` tab disagree while cycling all five modes;
+8. identity/whitespace click produces destructive IPC, the explicit labeled action
+   is absent, or that action does not invoke the correct existing session action;
+9. mouse-focused live terminal cannot type and erase harmless text without submit,
+   hides role/runtime/Task/work context, or mouse focus cannot return to Canvas;
+10. normal-app close/relaunch against the same isolated roots does not restore the
+    exact Mission-local object ids, link triples, participant ids, and saved
+    research-tile identities without refresh or injected state.
 
 The gate prints one named receipt per condition plus the tested commit, Mission id,
-participant id, object ids, and `cleanup=clean`. One process boot is preferred;
-proof scaffolding may not take longer than the correction it protects.
+participant ids, object ids, link triples, and `cleanup=clean`. One process boot is
+preferred for C01–C09; C10 owns the one explicit relaunch. Proof scaffolding may not
+take longer than the correction it protects.
 
 ## Exact file boundary
 
@@ -222,23 +316,64 @@ Product edits are limited to the existing shell and its focused proof surfaces:
 - `docs/DESIGN.md` only for the bounded current-state visual contract;
 - optimized `docs/orders/evidence/pre-r18-coherence/` screenshots and receipts.
 
+Routine `qf-atlas/generate.mjs` output changed solely by the accepted product diff
+may be committed with the product candidate as generated evidence. No Atlas parser,
+decision, baseline, falsifier, policy, or capability edit is allowed.
+
 Any need to change Kernel actions, schema, ontology/link vocabulary, preload/Main
 contracts beyond invoking the existing submission/reveal boundaries, runtime
 adapters, Dock inventory, or another product window is a founder stop.
 
+## Temporary authority lifecycle
+
+After this order records Reader `YES/YES`, the Router—not the Builder—makes one
+docs-only temporary `NEXT.md` rotation that:
+
+- records the prior `NEXT.md` blob SHA;
+- names this exact order and its accepted Reader receipt;
+- says `PRE-R18 COHERENCE — BUILD AUTHORIZED`;
+- keeps R18 pending and grants no future-rung authority.
+
+No Builder starts while `NEXT.md` says `NO BUILD AUTHORITY`. The temporary door
+remains pointed here through verification, naive-user check, and Ryan's decision.
+The independent Verifier owns its final restoration/advance in the closure commit
+after Ryan accepts; a rework decision leaves it pointed to this same bounded order.
+
 ## Builder proof
 
-Run the smallest focused checks while building. Before handoff, run exactly:
+Before any product edit, read `qf-atlas/ATLAS.md`, then run:
 
 ```powershell
-bun qa/run.ts pre-r18-coherence
-bun qa/run.ts research-world-visible
-bun qa/run.ts team-composition-ui
-bun qa/run.ts no-canvas-domain-writes
-bun qa/run.ts kernel-sole-writer
-bun qa/run.ts one-skin
 bun qf-atlas/generate.mjs --check
 bun qf-atlas/ratchet.mjs
+```
+
+Run the smallest focused checks while building. The stale
+`team-composition-ui` harness is forbidden here: Debt item 37 says it must be
+repaired or retired before another order relies on it, and repairing that packaged
+resource harness is outside this correction.
+
+Before handoff, run exactly:
+
+```powershell
+Push-Location collab-electron
+bun install --frozen-lockfile
+bun test
+bunx tsc --noEmit
+Pop-Location
+bun qa/run.ts pre-r18-coherence
+bun qa/run.ts research-world-visible
+bun qa/run.ts repo-shape
+bun qa/run.ts lockfile-committed
+bun qa/run.ts kernel-sole-writer
+bun qa/run.ts no-canvas-domain-writes
+bun qa/run.ts kernel-sole-writer-app
+bun qa/run.ts doc-action-surface
+bun qa/run.ts one-skin
+bun qf-atlas/generate.mjs
+bun qf-atlas/generate.mjs --check
+bun qf-atlas/ratchet.mjs
+bun qf-atlas/generate.mjs --diff 4d25fa3df91964fc90223a135d8969ebd61c5374
 bun qa/run.ts doc-links
 git diff --check 4d25fa3df91964fc90223a135d8969ebd61c5374..HEAD
 git diff --check
@@ -250,9 +385,10 @@ meaning stays inside this build cycle.
 
 Builder writes
 `docs/orders/evidence/pre-r18-coherence/BUILDER-EVIDENCE.md` with commands, exits,
-named receipts, candidate SHA, changed files by defect, screenshot manifest, and
-clean-shutdown result. The tree is clean and the candidate is immutable before
-verification.
+the documentation semantic-check output, the control plus C01–C10 red outputs,
+named production-boundary receipts, Atlas before/after/diff results, candidate SHA,
+changed files by defect, screenshot manifest, and clean-shutdown result. The tree
+is clean and the candidate is immutable before verification.
 
 ## Independent verification
 
@@ -262,7 +398,9 @@ checks the ten falsifiable conditions against the normal product path, verifies
 the commit boundaries, and confirms the worktree starts and ends on the same SHA.
 
 Any red receipt stops verification and returns the named defect to the same bounded
-order. If the same semantic assertion fails again after one repair, stop for Ryan.
+order. Exactly one product rework commit is available globally. Any red receipt
+after that commit—whether the same condition or a different one—stops for Ryan; no
+third implementation attempt exists.
 
 The Verifier writes
 `docs/orders/evidence/pre-r18-coherence/VERIFICATION.md` and makes no product edit.
@@ -285,10 +423,10 @@ without submitting, and returns to the Canvas by mouse. It does not require glob
 keyboard navigation or separate canaries in every role.
 
 If the primary description is `IDE`, `terminal manager`, or `agent launcher`, the
-central correction is red. At most one bounded repair is allowed for a wrong action,
+central correction is red. The one global rework commit may repair a wrong action,
 false belief, missing approved projection, or visual interference directly mapped
-to the three owned defects. All other visual polish becomes debt and cannot delay
-R18.
+to the three owned defects. If it was already spent, stop for Ryan. All other visual
+polish becomes debt and cannot delay R18.
 
 ## Founder acceptance and closure
 
@@ -303,12 +441,20 @@ reopened, Dock, and cable-dense states. Acceptance asks:
 - Does the Dock feel like useful inventory?
 - Would Ryan willingly operate this workflow again?
 
-On `ACCEPT`, write
-`docs/orders/evidence/pre-r18-coherence/FINAL-ACCEPTANCE.md`, mark this non-rung
-order complete, rotate `NEXT.md` and the documented ladder to R18 Compose, preserve
-the existing recall draft as draft-only R19 material where still valid, and then
-open only the bounded R18 order/Reader loop. R19–R21 receive route-level outcomes,
-not build authority.
+Ryan records exactly `ACCEPT PRE-R18 COHERENCE <candidate-sha>` or `REWORK PRE-R18
+COHERENCE <named-condition>`. On `ACCEPT`, the Verifier writes
+`docs/orders/evidence/pre-r18-coherence/FINAL-ACCEPTANCE.md`, marks only this
+non-rung order complete, and rotates `NEXT.md` to `R18 COMPOSE ALIGNMENT — NO BUILD
+AUTHORITY`, naming the forthcoming `WO-R18-COMPOSE.md`. That closure commit does
+not edit the Golden Run rung table or authorize R18 implementation.
+
+The Router then performs the separately founder-authorized route realignment:
+R18 Compose, R19 Recall, R20 Market Learning, R21 System Learning. It preserves the
+existing recall draft as draft-only R19 material where still valid, writes the exact
+bounded `WO-R18-COMPOSE.md`, and sends it through a fresh Reader. Only that later
+Reader `YES/YES` and another explicit `NEXT.md` rotation can authorize R18. If the
+exact R18 order cannot be written without an unresolved product decision, stop
+rather than inventing build authority.
 
 ## Explicit non-deliverables
 
