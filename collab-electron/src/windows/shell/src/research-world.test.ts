@@ -210,7 +210,7 @@ describe("research world renderer seam", () => {
         });
         await controller.reveal("mission", "mission-1");
         const firstReceipt = sessionDOM.taskFoot.children.find((child) => child.className === "qf-world-session-receipt");
-        expect(sessionDOM.taskFoot.children.map((child) => child.className)).toEqual(["existing-before", "qf-world-session-receipt", "existing-after"]);
+        expect(sessionDOM.taskFoot.children.map((child) => child.className)).toEqual(["existing-before", "qf-world-session-receipt", "existing-after", "qf-world-session-inspect"]);
         expect(firstReceipt).toBeDefined();
         expect(firstReceipt!.children.map((row) => row.dataset.qfWorldField)).toEqual(["id", "status", "label"]);
         expect(firstReceipt!.children.map((row) => row.children[1]?.textContent)).toEqual(["session-1", "running", "Not recorded"]);

@@ -79,6 +79,10 @@ function isSessionReceipt(child) {
 	return child?.classList?.length === 1 && child.classList.contains("qf-world-session-receipt");
 }
 
+function isSessionInspection(child) {
+	return child?.classList?.contains("qf-world-session-inspect") === true;
+}
+
 export function renderTaskFoot(dom, tile, {
 	focused = false,
 	sessions = [],
@@ -102,8 +106,9 @@ export function renderTaskFoot(dom, tile, {
 		assigneeSessionId: existingForm.querySelector(".task-assignee")?.value ?? "",
 	} : null;
 	const preservedError = foot.querySelector(".task-foot-error")?.textContent ?? "";
-	const retainedReceipt = [...foot.children].find(isSessionReceipt) ?? null;
-	if (retainedReceipt) foot.replaceChildren(retainedReceipt);
+	const retainedChildren = [...foot.children].filter((child) => isSessionReceipt(child) || isSessionInspection(child));
+	const retainedReceipt = retainedChildren.find(isSessionReceipt) ?? null;
+	if (retainedChildren.length > 0) foot.replaceChildren(...retainedChildren);
 	else foot.replaceChildren();
 	if (!tile?.sessionId) {
 		if (retainedReceipt) foot.appendChild(retainedReceipt);

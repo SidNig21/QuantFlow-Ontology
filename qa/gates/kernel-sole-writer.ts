@@ -109,6 +109,9 @@ const DRIVER_SQL_ALLOW = [
   // WO-R16: independent read-only SQLite Oracle freezes the expected world
   // before the production Electron proof; it does not write fixture truth.
   "qa/gates/research-world-visible.ts",
+  // WO-PRE-R18: independent read-only SQLite Oracle freezes the literal R17
+  // world before the production Electron proof; it does not write fixture truth.
+  "qa/gates/pre-r18-coherence.ts",
   // WO-RD-3: independent read-only oracle over the isolated founder-steering Kernel.
   "qa/gates/founder-steering.ts",
 ];

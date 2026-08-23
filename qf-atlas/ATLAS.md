@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-pre-r18-coherence @ 7de630b` on 2026-08-23 by
+> Generated from `wo-pre-r18-coherence @ 2a401c4` on 2026-08-23 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -410,9 +410,9 @@ asked before the change, when nothing is red yet.
 
 **239 of 241 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**559 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**560 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 318 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 319 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -421,8 +421,8 @@ Most-depended-on files — change these last:
 | `packages/qf-kernel/src/trace.ts` | 57+ | 1 | 0 |
 | `packages/qf-kernel/src/registry-drift.ts` | 56+ | 0 | 0 |
 | `packages/qf-kernel/src/upgrade.ts` | 56+ | 3 | 0 |
+| `collab-electron/src/main/file-filter.ts` | 51+ | 2 | 0 |
 | `packages/qf-kernel/src/db.ts` | 51+ | 4 | 0 |
-| `packages/qf-kernel/src/errors.ts` | 51+ | 0 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
@@ -459,7 +459,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (559 files)
+## Per-analyzer coverage (560 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -467,17 +467,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 555 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 282 | 0 | 4 | 0 | 273 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 548 |
-| `persistence` | 25 | 27 | 0 | 0 | 507 |
-| `lifetime` | 6 | 63 | 0 | 0 | 490 |
-| `packaging` | 233 | 0 | 0 | 123 | 203 |
-| `ownership` | 21 | 0 | 0 | 360 | 178 |
-| `reach` | 238 | 3 | 0 | 318 | 0 |
+| `imports` | 556 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 283 | 0 | 4 | 0 | 273 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 549 |
+| `persistence` | 25 | 27 | 0 | 0 | 508 |
+| `lifetime` | 6 | 64 | 0 | 0 | 490 |
+| `packaging` | 233 | 0 | 0 | 123 | 204 |
+| `ownership` | 21 | 0 | 0 | 361 | 178 |
+| `reach` | 238 | 3 | 0 | 319 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 318 files means those trees are
+failure — `reach: unsupported` on 319 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 123 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.

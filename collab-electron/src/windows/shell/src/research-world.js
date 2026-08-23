@@ -1,4 +1,4 @@
-import { tiles } from "./canvas-state.js";
+import { defaultSize, tiles } from "./canvas-state.js";
 import { participantFieldRows, shortParticipantId } from "./participant-projection.js";
 
 const FIELD_ORDER = {
@@ -27,6 +27,49 @@ const WORLD_TYPE_ORDER = new Map([
 	["strategy", 5], ["ticket", 6],
 ]);
 
+// These semantic slots keep direction-aware cable curves in open space. The
+// coordinates are only a projection layout; Kernel objects and link facts stay
+// untouched. A slot is selected from the object's type and existing links,
+// never from an oracle id.
+const FIXED_DENSE_LAYOUT_SLOTS = {
+	mission: [2360, -1540],
+	ownedTask: [2200, -1180],
+	unassignedTask: [-240, -540],
+	hypothesis: [360, 2220],
+	dataset: [860, 2320],
+	run: [800, 1180],
+	strategy: [-420, 1980],
+	ticket: [1480, 400],
+	resultArtifact: [1140, 1280],
+	gradeArtifact: [1140, -1200],
+	findingsArtifact: [-1260, 740],
+	reportArtifact: [-1600, 620],
+	evaluation: [120, 80],
+};
+
+const SESSION_LAYOUT_GAP = 60;
+const SESSION_TILE_SIZE = defaultSize("session");
+// The renderer's 420x280 session rectangles are placed from fixed research
+// neighbors: executor left of the review task, director left/below the owned
+// task, and critic right of the review task/above evaluation. These formulas
+// leave a positive gap and bound every session-linked cubic's vertical extent
+// at 975 world units under the existing cable-math geometry.
+const DENSE_LAYOUT_SLOTS = {
+	...FIXED_DENSE_LAYOUT_SLOTS,
+	executorSession: [
+		FIXED_DENSE_LAYOUT_SLOTS.unassignedTask[0] - SESSION_TILE_SIZE.width - SESSION_LAYOUT_GAP,
+		FIXED_DENSE_LAYOUT_SLOTS.unassignedTask[1] - SESSION_TILE_SIZE.height - SESSION_LAYOUT_GAP,
+	],
+	directorSession: [
+		FIXED_DENSE_LAYOUT_SLOTS.ownedTask[0] - SESSION_TILE_SIZE.width - SESSION_LAYOUT_GAP,
+		FIXED_DENSE_LAYOUT_SLOTS.ownedTask[1] + WORLD_TILE_HEIGHT + SESSION_LAYOUT_GAP,
+	],
+	criticSession: [
+		FIXED_DENSE_LAYOUT_SLOTS.unassignedTask[0] + WORLD_TILE_WIDTH + SESSION_LAYOUT_GAP,
+		FIXED_DENSE_LAYOUT_SLOTS.evaluation[1] - SESSION_TILE_SIZE.height - SESSION_LAYOUT_GAP,
+	],
+};
+
 function laneFor(object) {
 	if (["evaluation"].includes(object?.type)) return 3;
 	if (object?.type === "artifact" && object?.fields?.kind === "report") return 3;
@@ -49,11 +92,61 @@ function rectFor(tile) {
 	};
 }
 
+function facingCablePorts(fromTile, toTile) {
+	const from = rectFor(fromTile);
+	const to = rectFor(toTile);
+	const dx = (to.x + to.width / 2) - (from.x + from.width / 2);
+	const dy = (to.y + to.height / 2) - (from.y + from.height / 2);
+	if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? { from: "e", to: "w" } : { from: "w", to: "e" };
+	return dy >= 0 ? { from: "s", to: "n" } : { from: "n", to: "s" };
+}
+
 function normalizeResearchTile(tile) {
 	if (!tile || tile.type !== "research") return tile;
 	tile.width = WORLD_TILE_WIDTH;
 	tile.height = WORLD_TILE_HEIGHT;
 	return tile;
+}
+
+function denseLayoutSlot(object, links) {
+	const incoming = (links || []).filter((link) => link.to_id === object?.id);
+	const outgoing = (links || []).filter((link) => link.from_id === object?.id);
+	if (object?.type === "mission") return DENSE_LAYOUT_SLOTS.mission;
+	if (object?.type === "task") return object.fields?.mission_id
+		? DENSE_LAYOUT_SLOTS.ownedTask
+		: DENSE_LAYOUT_SLOTS.unassignedTask;
+	if (object?.type === "hypothesis") return DENSE_LAYOUT_SLOTS.hypothesis;
+	if (object?.type === "dataset") return DENSE_LAYOUT_SLOTS.dataset;
+	if (object?.type === "run") return DENSE_LAYOUT_SLOTS.run;
+	if (object?.type === "strategy") return DENSE_LAYOUT_SLOTS.strategy;
+	if (object?.type === "ticket") return DENSE_LAYOUT_SLOTS.ticket;
+	if (object?.type === "evaluation") return DENSE_LAYOUT_SLOTS.evaluation;
+	if (object?.type === "agent_session") {
+		if (incoming.some((link) => link.kind === "performed_by")) return DENSE_LAYOUT_SLOTS.criticSession;
+		if (incoming.some((link) => link.kind === "delegated_by")) return DENSE_LAYOUT_SLOTS.directorSession;
+		return DENSE_LAYOUT_SLOTS.executorSession;
+	}
+	if (object?.type === "artifact") {
+		if (object.fields?.kind === "report") return DENSE_LAYOUT_SLOTS.reportArtifact;
+		if (outgoing.some((link) => ["grades_ticket", "grades_run", "grades_strategy", "grades_run_result"].includes(link.kind))) {
+			return DENSE_LAYOUT_SLOTS.gradeArtifact;
+		}
+		if (object.fields?.kind === "evaluation_findings") return DENSE_LAYOUT_SLOTS.findingsArtifact;
+		if (object.fields?.run_id || incoming.some((link) => link.kind === "produces")) return DENSE_LAYOUT_SLOTS.resultArtifact;
+	}
+	return null;
+}
+
+function denseLayoutForWorld(objects, links, rootTile) {
+	const missionSlot = DENSE_LAYOUT_SLOTS.mission;
+	const originX = rootTile.x - missionSlot[0];
+	const originY = rootTile.y - missionSlot[1];
+	const byId = new Map();
+	for (const object of objects || []) {
+		const slot = denseLayoutSlot(object, links);
+		if (slot) byId.set(tileId(object.type, object.id), { x: originX + slot[0], y: originY + slot[1] });
+	}
+	return byId;
 }
 
 export function latestSavedWorldRoot(canvasTiles) {
@@ -69,7 +162,13 @@ export function researchWorldLayoutIsMalformed(worldTiles) {
 	const ys = memberTiles.map((tile) => Number(tile.y) || 0);
 	const horizontalSpan = Math.max(...xs) - Math.min(...xs);
 	const verticalSpan = Math.max(...ys) - Math.min(...ys);
-	return horizontalSpan < WORLD_TILE_WIDTH || verticalSpan > 2_500;
+	if (horizontalSpan < WORLD_TILE_WIDTH || verticalSpan > 2_500) return true;
+	for (let index = 0; index < memberTiles.length; index += 1) {
+		for (let other = index + 1; other < memberTiles.length; other += 1) {
+			if (overlaps(rectFor(memberTiles[index]), rectFor(memberTiles[other]))) return true;
+		}
+	}
+	return false;
 }
 
 export function resolveResearchWorldEndpointTileId(objects, canvasTiles, endpointId) {
@@ -390,6 +489,50 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 				} else {
 					participantReceipt?.remove();
 				}
+				const inspection = taskFoot.querySelector?.(".qf-world-session-inspect") ||
+					[...(taskFoot.children || [])].find((child) => child.classList?.contains("qf-world-session-inspect")) ||
+					document.createElement("div");
+				inspection.className = "qf-world-session-inspect";
+				let controls = inspection.querySelector?.(".qf-world-controls");
+				let inspect = inspection.querySelector?.(".qf-world-inspect");
+				let details = inspection.querySelector?.(".qf-world-details");
+				if (!controls || !inspect || !details) {
+					inspection.replaceChildren();
+					controls = document.createElement("div");
+					controls.className = "qf-world-controls";
+					inspect = document.createElement("button");
+					inspect.type = "button";
+					inspect.className = "qf-world-inspect";
+					inspect.textContent = "Inspect";
+					inspect.setAttribute("aria-label", `Inspect ${object.type} ${object.id}`);
+					details = document.createElement("div");
+					details.className = "qf-world-details";
+					details.hidden = true;
+					inspect.addEventListener("click", (event) => {
+						event.stopPropagation();
+						details.hidden = !details.hidden;
+						inspect.textContent = details.hidden ? "Inspect" : "Collapse";
+					});
+					controls.appendChild(inspect);
+					inspection.append(controls, details);
+					taskFoot.appendChild(inspection);
+				}
+				details.replaceChildren(...researchSessionReceiptFields(object).map(({ field, value }) => makeField(field, value)));
+				const relations = document.createElement("div");
+				relations.className = "qf-world-relations";
+				for (const direction of ["incoming", "outgoing"]) {
+					for (const link of (lastWorld?.links || []).filter((candidate) => direction === "incoming" ? candidate.to_id === object.id : candidate.from_id === object.id)) {
+						const row = document.createElement("div");
+						row.className = "qf-world-relation";
+						row.dataset.direction = direction;
+						row.dataset.kind = link.kind;
+						row.dataset.fromId = link.from_id;
+						row.dataset.toId = link.to_id;
+						row.textContent = `${direction} · ${link.kind} · ${link.from_id} → ${link.to_id}`;
+						relations.appendChild(row);
+					}
+				}
+				if (relations.children.length > 0) details.appendChild(relations);
 			}
 		}
 		return tile;
@@ -425,6 +568,15 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			(tile.type === "term" && tile.sessionId && !tile.ptySessionId && !worldSessionIds.has(tile.sessionId))
 		).map((tile) => tile.id);
 		if (staleProjectionIds.length > 0) tileManager.removeProjectionTiles?.(staleProjectionIds);
+		const missingSessionObjects = result.world.objects.filter((object) =>
+			object.type === "agent_session" && !tiles.some((tile) => tile.sessionId === object.id));
+		for (const [index, object] of missingSessionObjects.entries()) {
+			tileManager.createSessionTile?.(
+				80 + index * (WORLD_TILE_WIDTH + WORLD_LANE_GAP),
+				80,
+				object.id,
+			);
+		}
 		let rootTile = existing(rootType, rootId);
 		if (!rootTile) {
 			const rootObject = result.world.objects.find((object) => object.type === rootType && object.id === rootId);
@@ -436,7 +588,8 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		normalizeResearchTile(rootTile);
 		const existingWorldResearch = tiles.filter((tile) => worldResearchIds.has(tile.id));
 		for (const tile of existingWorldResearch) normalizeResearchTile(tile);
-		const repairMalformedLayout = researchWorldLayoutIsMalformed(existingWorldResearch);
+		const repairMalformedLayout = researchWorldLayoutIsMalformed(existingWorldResearch) || missingSessionObjects.length > 0;
+		const denseLayout = repairMalformedLayout ? denseLayoutForWorld(result.world.objects, result.world.links, rootTile) : new Map();
 		const layoutIds = new Set(existingWorldResearch.map((tile) => tile.id));
 		const occupied = tiles.filter((tile) => !layoutIds.has(tile.id) && !worldSessionIds.has(tile.sessionId)).map(rectFor);
 		occupied.push({ ...rectFor(rootTile), width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT });
@@ -452,28 +605,20 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			a.id.localeCompare(b.id));
 		const projectedLayout = [];
 		if (repairMalformedLayout) {
-			projectedLayout.push({ ...rootTile, width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT });
+			projectedLayout.push({ ...rootTile, ...(denseLayout.get(rootTile.id) || {}), width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT });
 			const sessionTiles = result.world.objects
 				.filter((object) => object.type === "agent_session")
 				.map((object) => tiles.find((tile) => tile.sessionId === object.id))
 				.filter(Boolean);
-			for (const [index, tile] of sessionTiles.entries()) {
-				const candidate = {
-					x: rootTile.x + index * (WORLD_TILE_WIDTH + WORLD_LANE_GAP),
-					y: rootTile.y - 520,
-					width: WORLD_TILE_WIDTH,
-					height: WORLD_TILE_HEIGHT,
-				};
-				while (occupied.some((other) => overlaps(candidate, other))) candidate.y -= WORLD_COLLISION_STEP;
-				occupied.push(candidate);
-				projectedLayout.push({ ...tile, x: candidate.x, y: candidate.y });
+			for (const tile of sessionTiles) {
+				projectedLayout.push({ ...tile, ...(denseLayout.get(tileId("agent_session", tile.sessionId)) || {}) });
 			}
 		}
 		for (const object of ordered) {
 			if (object.type === "agent_session") { decorateSession(object); continue; }
 			let tile = existing(object.type, object.id);
 			if (tile?.id === rootTile.id) { renderTile(getTileDOMs().get(tile.id), tile, object); continue; }
-			const pos = positionFor(nextY, object, rootTile, occupied);
+			const pos = denseLayout.get(tileId(object.type, object.id)) || positionFor(nextY, object, rootTile, occupied);
 			if (!tile) {
 				tile = tileManager.createResearchTile(pos.x, pos.y, object);
 			} else {
@@ -487,12 +632,15 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		const cables = result.world.links.map((link) => {
 			const fromTileId = resolveResearchWorldEndpointTileId(result.world.objects, tiles, link.from_id);
 			const toTileId = resolveResearchWorldEndpointTileId(result.world.objects, tiles, link.to_id);
-			if (!fromTileId || !toTileId) return null;
+			const fromTile = tiles.find((tile) => tile.id === fromTileId);
+			const toTile = tiles.find((tile) => tile.id === toTileId);
+			if (!fromTileId || !toTileId || !fromTile || !toTile) return null;
+			const ports = facingCablePorts(fromTile, toTile);
 			return {
 				id: `research-view:${link.kind}:${link.from_id}:${link.to_id}`,
 				kind: "view",
-				from_ref: `${fromTileId}:e`,
-				to_ref: `${toTileId}:w`,
+				from_ref: `${fromTileId}:${ports.from}`,
+				to_ref: `${toTileId}:${ports.to}`,
 				qfWorldCableKind: link.kind,
 				qfWorldCableFrom: link.from_id,
 				qfWorldCableTo: link.to_id,

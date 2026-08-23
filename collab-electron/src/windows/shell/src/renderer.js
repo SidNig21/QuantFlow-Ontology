@@ -622,6 +622,17 @@ async function init() {
 			panY: viewportState.panY,
 			zoom: viewportState.zoom,
 		};
+		const applyFit = () => {
+			viewportState.zoom = fit.zoom;
+			viewportState.panX = fit.panX;
+			viewportState.panY = fit.panY;
+			viewport.updateCanvas();
+		};
+		if (document.visibilityState === "hidden" ||
+			window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+			applyFit();
+			return;
+		}
 		const duration = 280;
 		const t0 = performance.now();
 		function ease(t) {
@@ -688,8 +699,9 @@ async function init() {
 					: fallback;
 				cableInspector.show({
 					...conn,
-					from_ref: `${label(from, conn.qfWorldCableFrom)} · ${conn.from_ref}`,
-					to_ref: `${label(to, conn.qfWorldCableTo)} · ${conn.to_ref}`,
+					kind: conn.qfWorldCableKind,
+					from_ref: `from ${label(from, conn.qfWorldCableFrom)} · ${conn.from_ref}`,
+					to_ref: `to ${label(to, conn.qfWorldCableTo)} · ${conn.to_ref}`,
 				});
 			},
 		});

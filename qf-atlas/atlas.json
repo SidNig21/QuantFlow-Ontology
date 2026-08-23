@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-pre-r18-coherence",
-    "commit": "7de630b",
+    "commit": "2a401c4",
     "generatedAt": "2026-08-23",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "049978022bbe5766"
+    "fingerprint": "4a3f3da50ce3efd1"
   },
   "stats": {
     "live": 113,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 559
+      "files": 560
     },
-    "coverageFiles": 559,
+    "coverageFiles": 560,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -711,8 +711,8 @@
       "layer": 4,
       "name": "forceGraph.ts",
       "kb": 29.9,
-      "x": 0.23,
-      "z": -1.3,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2608,8 +2608,8 @@
       "layer": 4,
       "name": "nav/src/App.tsx",
       "kb": 31,
-      "x": -1.01,
-      "z": -0.85,
+      "x": 0.23,
+      "z": -1.3,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -2691,7 +2691,7 @@
       "id": "4:collab-electron/src/windows/shell/src::cable",
       "layer": 4,
       "name": "cable*",
-      "kb": 17.9,
+      "kb": 19.2,
       "x": -2.48,
       "z": -0.91,
       "status": "ok",
@@ -2702,7 +2702,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/cable-overlay.js",
-          "kb": 6.6,
+          "kb": 7.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2911,7 +2911,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.2,
+      "kb": 59.6,
       "x": -0.23,
       "z": 1.3,
       "status": "ice",
@@ -2922,7 +2922,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.2,
+          "kb": 59.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2939,9 +2939,9 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 25,
-      "x": 1.24,
-      "z": -0.45,
+      "kb": 32.1,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2950,7 +2950,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 25,
+          "kb": 32.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2967,7 +2967,7 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 14.5,
+      "kb": 14.7,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -2978,7 +2978,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 14.5,
+          "kb": 14.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3520,12 +3520,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 648.2,
+      "kb": 683.2,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 83,
-      "writes": 30,
+      "spawns": 85,
+      "writes": 31,
       "dml": 19,
       "executes": 49,
       "files": [
@@ -3565,6 +3565,16 @@
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 4,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/pre-r18-coherence.ts",
+          "kb": 41.5,
+          "spawns": 2,
+          "spawnsLive": 2,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3644,7 +3654,7 @@
         },
         {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 18,
+          "kb": 18.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -3808,16 +3818,6 @@
         {
           "path": "qa/gates/schema-bundle-aliases.ts",
           "kb": 7.1,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 6.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -18312,6 +18312,31 @@
       "unexplained": []
     },
     {
+      "path": "collab-electron/src/windows/shell/src/cable-overlay.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
       "path": "collab-electron/src/windows/shell/src/canvas-layout.js",
       "worst": "unsupported",
       "imports": "indexed",
@@ -18932,7 +18957,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 309 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 408 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -21852,12 +21877,13 @@
       "imports": "indexed",
       "reach": "unsupported",
       "blockers": {
-        "reach": "scope-boundary"
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
-      "lifetime": "not-applicable",
+      "lifetime": "partial",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
       "reasons": {
@@ -21865,7 +21891,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
+        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -25458,41 +25484,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 555,
+      "indexed": 556,
       "dynamic": 4
     },
     "ipcRequest": {
       "not-applicable": 273,
-      "indexed": 282,
+      "indexed": 283,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 548,
+      "not-applicable": 549,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 507,
+      "not-applicable": 508,
       "partial": 27,
       "indexed": 25
     },
     "lifetime": {
       "not-applicable": 490,
-      "partial": 63,
+      "partial": 64,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 203,
+      "not-applicable": 204,
       "unsupported": 123,
       "indexed": 233
     },
     "ownership": {
       "not-applicable": 178,
-      "unsupported": 360,
+      "unsupported": 361,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 318,
+      "unsupported": 319,
       "indexed": 238,
       "partial": 3
     }
@@ -30523,6 +30549,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
@@ -30631,6 +30658,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
@@ -30644,7 +30672,6 @@
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/gates/package-closure/executors.ts",
-        "qa/gates/pre-r18-coherence.ts",
         "collab-electron/src/main/ipc.ts",
         "qa/gates/package-closure.ts"
       ],
@@ -30702,6 +30729,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
@@ -30765,6 +30793,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
@@ -31698,6 +31727,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
@@ -31708,8 +31738,7 @@
         "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
-        "qa/gates/package-closure.ts",
-        "qa/gates/pre-r18-coherence.ts"
+        "qa/gates/package-closure.ts"
       ],
       "transitiveTruncated": false,
       "directDependencies": [],
@@ -32005,6 +32034,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
@@ -32016,7 +32046,6 @@
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
         "qa/gates/package-closure/executors.ts",
-        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/package-closure.ts"
       ],
       "transitiveTruncated": false,
@@ -60019,16 +60048,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "80666e8",
+      "commit": "7de630b",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "7de630b",
+      "commit": "2a401c4",
       "generatedAt": "2026-08-23"
     },
-    "verdict": "better",
-    "why": "42 improvement(s), nothing added or hidden",
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60365,7 +60394,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "qa/gates/pre-r18-coherence.ts",
+        "analyzer": "lifetime",
+        "from": "not-applicable",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -60373,7 +60411,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null

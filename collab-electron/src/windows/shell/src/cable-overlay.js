@@ -15,6 +15,42 @@ import { cableStateLabel } from "./glacier-feel.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+const LABEL_CANDIDATES = Object.freeze([
+	{ dx: 0, dy: 0 },
+	{ dx: 0, dy: -72 },
+	{ dx: 0, dy: 72 },
+	{ dx: 0, dy: -144 },
+	{ dx: 0, dy: 144 },
+	{ dx: -96, dy: 0 },
+	{ dx: 96, dy: 0 },
+	{ dx: -192, dy: 0 },
+	{ dx: 192, dy: 0 },
+	{ dx: -96, dy: -72 },
+	{ dx: 96, dy: -72 },
+	{ dx: -96, dy: 72 },
+	{ dx: 96, dy: 72 },
+]);
+
+function rectsOverlap(a, b) {
+	return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+}
+
+export function chooseCableLabelPosition({ baseX, baseY, baseRect, obstacles, candidates = LABEL_CANDIDATES }) {
+	const positionRect = ({ dx, dy }) => ({
+		left: baseRect.left + dx,
+		top: baseRect.top + dy,
+		right: baseRect.right + dx,
+		bottom: baseRect.bottom + dy,
+	});
+	const candidate = candidates.find((offset) => !obstacles.some((obstacle) =>
+		rectsOverlap(positionRect(offset), obstacle),
+	)) || candidates[0];
+	return {
+		x: baseX + candidate.dx,
+		y: baseY + candidate.dy,
+	};
+}
+
 /** Runtime does not honour view edges yet — solid would be a false close. */
 export function runtimeHonoursViewConnections() {
 	return false;
@@ -126,7 +162,7 @@ export function createCableOverlay(svgEl, {
 
 			if (conn.id === selectedId) {
 				const midX = (a.x + b.x) / 2;
-				const midY = (a.y + b.y) / 2 - 10;
+				const midY = (a.y + b.y) / 2;
 				const label = document.createElementNS(SVG_NS, "text");
 				label.setAttribute("x", String(midX));
 				label.setAttribute("y", String(midY));
@@ -134,6 +170,16 @@ export function createCableOverlay(svgEl, {
 				label.setAttribute("class", "cable-label");
 				label.textContent = style.label;
 				content.appendChild(label);
+				const obstacles = [...document.querySelectorAll(".canvas-tile")]
+					.map((node) => node.getBoundingClientRect());
+				const position = chooseCableLabelPosition({
+					baseX: midX,
+					baseY: midY,
+					baseRect: label.getBoundingClientRect(),
+					obstacles,
+				});
+				label.setAttribute("x", String(position.x));
+				label.setAttribute("y", String(position.y));
 			}
 		}
 		syncNodeHonesty(honoured);
