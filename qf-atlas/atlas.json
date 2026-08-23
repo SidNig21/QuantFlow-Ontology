@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R17",
-    "commit": "98670bf",
-    "generatedAt": "2026-08-22",
-    "filesScanned": 435,
+    "commit": "f1b37d2",
+    "generatedAt": "2026-08-23",
+    "filesScanned": 436,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "48ae0a17b7a256d3"
+    "fingerprint": "b47105e87523cced"
   },
   "stats": {
     "live": 113,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 126,
-      "indexed": 1197,
+      "indexed": 1198,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 554
+      "files": 555
     },
-    "coverageFiles": 554,
+    "coverageFiles": 555,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -3134,7 +3134,7 @@
       "id": "0:packages/qf-kernel/src::db",
       "layer": 0,
       "name": "db*",
-      "kb": 18.1,
+      "kb": 18.2,
       "x": -2.03,
       "z": 1.69,
       "status": "gray",
@@ -3145,7 +3145,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/db.ts",
-          "kb": 15.8,
+          "kb": 15.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3485,7 +3485,7 @@
       "id": "0:packages/qf-kernel/src::upgrade",
       "layer": 0,
       "name": "upgrade.ts",
-      "kb": 41,
+      "kb": 42.3,
       "x": -1.24,
       "z": 0.45,
       "status": "gray",
@@ -3496,18 +3496,18 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/upgrade.ts",
-          "kb": 41,
+          "kb": 42.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
           "dml": 9,
           "dmlLines": [
-            53,
-            187,
-            195,
-            826,
-            827,
-            831
+            54,
+            189,
+            197,
+            840,
+            841,
+            845
           ],
           "executes": 0
         }
@@ -3520,13 +3520,13 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 620.4,
+      "kb": 629.6,
       "x": 0,
       "z": 0,
       "status": "ice",
       "spawns": 82,
       "writes": 30,
-      "dml": 6,
+      "dml": 19,
       "executes": 49,
       "files": [
         {
@@ -3644,7 +3644,7 @@
         },
         {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 17.7,
+          "kb": 17.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -3746,6 +3746,23 @@
           "writes": 4,
           "dml": 0,
           "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/r17-founder-kernel-compatibility.ts",
+          "kb": 9,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 13,
+          "dmlLines": [
+            38,
+            46,
+            47,
+            48,
+            57,
+            57
+          ],
           "executes": 0
         },
         {
@@ -4124,6 +4141,21 @@
         {
           "kind": "outside-write-door",
           "scope": "qa",
+          "what": "13 SQL statements outside execute()",
+          "where": "qa/gates/r17-founder-kernel-compatibility.ts",
+          "lines": [
+            38,
+            46,
+            47,
+            48,
+            57,
+            57
+          ],
+          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
+        },
+        {
+          "kind": "outside-write-door",
+          "scope": "qa",
           "what": "3 SQL statements outside execute()",
           "where": "qa/gates/kernel-sole-writer.ts",
           "lines": [
@@ -4493,7 +4525,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 35.9,
+      "kb": 36.3,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4504,7 +4536,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 35.9,
+          "kb": 36.3,
           "spawns": 5,
           "spawnsLive": 4,
           "writes": 0,
@@ -8756,7 +8788,7 @@
     {
       "path": "packages/qf-kernel/src/upgrade.ts",
       "status": "partial",
-      "indexedFns": 64,
+      "indexedFns": 65,
       "sqlInText": 7,
       "sqlIndexed": 5,
       "sqlUnrecognised": 0,
@@ -10849,6 +10881,10 @@
     },
     {
       "path": "qa/gates/publish-artifact-root.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/r17-founder-kernel-compatibility.ts",
       "status": "out-of-scope"
     },
     {
@@ -21773,6 +21809,30 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/r17-founder-kernel-compatibility.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "indexed",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/release-verifier.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -25258,41 +25318,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 550,
+      "indexed": 551,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 270,
+      "not-applicable": 271,
       "indexed": 280,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 543,
+      "not-applicable": 544,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
       "not-applicable": 503,
       "partial": 27,
-      "indexed": 24
+      "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 486,
+      "not-applicable": 487,
       "partial": 62,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 199,
+      "not-applicable": 200,
       "unsupported": 123,
       "indexed": 232
     },
     "ownership": {
-      "not-applicable": 175,
+      "not-applicable": 176,
       "unsupported": 358,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 314,
+      "unsupported": 315,
       "indexed": 237,
       "partial": 3
     }
@@ -28294,7 +28354,7 @@
         "qa/gates/dock-definition-launch/run.ts",
         "qa/gates/dock-profile-identity/run.ts"
       ],
-      "importerCount": 31,
+      "importerCount": 32,
       "imports": [
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/resolve-path.ts",
@@ -33332,6 +33392,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33355,8 +33416,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/create.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33401,6 +33461,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33452,6 +33513,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33520,6 +33582,7 @@
         "qa/gates/kernel-drift/run.ts",
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33574,6 +33637,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33652,6 +33716,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33706,6 +33771,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33755,6 +33821,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33822,6 +33889,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33875,6 +33943,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33898,8 +33967,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33941,6 +34009,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -33983,6 +34052,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34076,6 +34146,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34129,6 +34200,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34190,6 +34262,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34213,8 +34286,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34252,6 +34324,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34275,8 +34348,7 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34309,6 +34381,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34333,8 +34406,7 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts",
-        "qa/run.ts"
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34420,6 +34492,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34444,8 +34517,7 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts"
+        "qa/run.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34478,6 +34550,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34545,6 +34618,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34570,8 +34644,7 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-peer-bus/src/server.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34605,6 +34678,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34655,6 +34729,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34680,8 +34755,7 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-peer-bus/src/server.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -34715,6 +34789,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34761,6 +34836,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34786,8 +34862,7 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
-        "tools/qf-read-tools/src/discovery.ts"
+        "tools/qf-peer-bus/src/server.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34822,6 +34897,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34917,6 +34993,7 @@
         "qa/gates/kernel-drift/run.ts",
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -34966,6 +35043,7 @@
         "qa/gates/kernel-market-lineage.ts",
         "qa/gates/kernel-task-delegation.ts",
         "qa/gates/market-ingest/run.ts",
+        "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
         "species/critic-mock/register.ts",
@@ -59195,7 +59273,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            834
+            848
           ]
         }
       ]
@@ -59220,7 +59298,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            827
+            841
           ]
         }
       ]
@@ -59245,7 +59323,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            831
+            845
           ]
         }
       ]
@@ -59270,7 +59348,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            833
+            847
           ]
         }
       ]
@@ -59295,7 +59373,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/upgrade.ts",
           "lines": [
-            850
+            864
           ]
         }
       ]
@@ -59613,6 +59691,21 @@
     {
       "kind": "outside-write-door",
       "scope": "qa",
+      "what": "13 SQL statements outside execute()",
+      "where": "qa/gates/r17-founder-kernel-compatibility.ts",
+      "lines": [
+        38,
+        46,
+        47,
+        48,
+        57,
+        57
+      ],
+      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
+    },
+    {
+      "kind": "outside-write-door",
+      "scope": "qa",
       "what": "12 SQL statements outside execute()",
       "where": "qa/gates/vault-projection/fixture-seed.ts",
       "lines": [
@@ -59686,13 +59779,13 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R17",
-      "commit": "66c0516",
+      "commit": "98670bf",
       "generatedAt": "2026-08-22"
     },
     "to": {
       "branch": "wo-R17",
-      "commit": "98670bf",
-      "generatedAt": "2026-08-22"
+      "commit": "f1b37d2",
+      "generatedAt": "2026-08-23"
     },
     "verdict": "better",
     "why": "42 improvement(s), nothing added or hidden",

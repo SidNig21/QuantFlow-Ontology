@@ -432,7 +432,8 @@ export function attachKernel(
       shape === "task_delegation" ||
       shape === "deterministic_execution" ||
       shape === "task_composition" ||
-      shape === "task_steering"
+      shape === "task_steering" ||
+      shape === "pre_r17_current"
     ) {
       const profileIdentitySql = readFileSync(
         upgradeSqlPath("0001-agent-profile-identity.sql"), "utf8",

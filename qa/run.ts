@@ -292,6 +292,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "r17-founder-kernel-compatibility",
+    description: "R17: accepted R16 current database upgrades once without changing founder rows",
+    run: async () => {
+      const { runR17FounderKernelCompatibilityGate } = await import("./gates/r17-founder-kernel-compatibility.ts");
+      const { ok } = await runR17FounderKernelCompatibilityGate();
+      return ok;
+    },
+  },
+  {
     name: "founder-steering",
     description: "R14: visible Task steering, reassignment delivery, second opinion, cancellation, and durable history",
     run: async () => {

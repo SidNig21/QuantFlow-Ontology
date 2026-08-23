@@ -32,6 +32,7 @@ export type KernelShapeState =
   | "deterministic_execution"
   | "task_composition"
   | "task_steering"
+  | "pre_r17_current"
   | "current"
   | "partial";
 
@@ -178,6 +179,7 @@ function resolveCurrentMigrationPath(): string {
 let preD1Snapshot: StructureSnapshot | null = null;
 let d1Snapshot: StructureSnapshot | null = null;
 let currentSnapshot: StructureSnapshot | null = null;
+let preR17CurrentSnapshot: StructureSnapshot | null = null;
 
 function snapshotFromMigrationFile(path: string): StructureSnapshot {
   const sql = readFileSync(path, "utf8");
@@ -222,6 +224,18 @@ function expectedCurrent(): StructureSnapshot {
     currentSnapshot = snapshotFromMigrationFile(resolveCurrentMigrationPath());
   }
   return currentSnapshot;
+}
+
+function expectedPreR17Current(): StructureSnapshot {
+  if (!preR17CurrentSnapshot) {
+    const current = expectedCurrent();
+    preR17CurrentSnapshot = {
+      tables: tablesWithoutR17(current.tables),
+      linkKinds: linkKindsWithoutR17(current.linkKinds),
+      schemaMeta: schemaMetaWithoutR17(current.schemaMeta),
+    };
+  }
+  return preR17CurrentSnapshot;
 }
 
 /** Strip R2 capability_groups from agent_definition DDL for historical snapshots. */
@@ -931,6 +945,7 @@ export function classifyKernelShape(db: KernelDb): KernelShapeState {
   }
   if (snapshotsEqual(live, expectedTaskCompositionHistorical())) return "task_composition";
   if (snapshotsEqual(live, expectedTaskSteering())) return "task_steering";
+  if (snapshotsEqual(live, expectedPreR17Current())) return "pre_r17_current";
   if (snapshotsEqual(live, expectedCurrent())) return "current";
   return "partial";
 }
@@ -945,10 +960,20 @@ export function isD1CompatibilityCandidate(db: KernelDb): boolean {
   const pre = expectedPreD1().schemaMeta;
   const d1 = expectedD1().schemaMeta;
   const current = expectedCurrent().schemaMeta;
+  const preR17 = expectedPreR17Current().schemaMeta;
   const knownNames = new Set([...pre, ...d1, ...current].map((row) => row[0]));
+  const preR17Names = new Set(preR17.map((row) => row[0]));
+  const isNearPreR17 =
+    live.length >= preR17.length &&
+    preR17.every(([name, kind, lifecycle, description]) =>
+      live.some((row) =>
+        row[0] === name && row[1] === kind && row[2] === lifecycle && row[3] === description,
+      ),
+    ) &&
+    live.some(([name]) => !preR17Names.has(name));
   return (
     live.length >= pre.length - 1 &&
-    live.every((row) => knownNames.has(row[0]))
+    (live.every((row) => knownNames.has(row[0])) || isNearPreR17)
   );
 }
 
@@ -986,6 +1011,16 @@ export function applyKernelUpgradeChain(
   if (state === "uninitialized") return;
 
   const tx = db.transaction(() => {
+    if (state === "pre_r17_current") {
+      applyCurrentR16SchemaAdditions(db);
+      if (classifyKernelShape(db) !== "current") {
+        throw new KernelUpgradeShapeError(
+          TASK_COMPOSITION_UPGRADE,
+          "R17 current additions did not produce the exact current shape",
+        );
+      }
+      return;
+    }
     if (state === "pre_d1") {
       db.exec(upgrades.profileIdentitySql);
       if (classifyKernelShape(db) !== "d1") {

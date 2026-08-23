@@ -60,6 +60,8 @@ const DRIVER_SQL_ALLOW = [
   // WO-R17: independent read-only oracle reads the isolated UI-proof Kernel
   // with Database(..., { readonly: true }); it does not write domain state.
   "qa/gates/technique-outcome-loop.ts",
+  // WO-R17 compatibility: disposable fixture SQLite only; founder state is never opened.
+  "qa/gates/r17-founder-kernel-compatibility.ts",
   // WO-PEER-BUS: transport inbox SQLite only — never Kernel DDL/DML.
   "tools/qf-peer-bus/src/bus.ts",
   "collab-electron/",
@@ -149,6 +151,8 @@ const OPEN_ALLOW = [
   "qa/gates/bovada-football/run.ts",
   "qa/gates/kernel-sole-writer.ts",
   "qa/gates/kernel-sole-writer-app.ts",
+  // WO-R17 compatibility gate opens only disposable predecessor fixtures.
+  "qa/gates/r17-founder-kernel-compatibility.ts",
   "qa/gates/kernel-task-delegation.ts",
   "qa/gates/kernel-market-lineage.ts",
   "qa/gates/team-composition.ts",
