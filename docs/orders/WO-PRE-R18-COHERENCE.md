@@ -10,6 +10,7 @@ baseline-receipt: [accepted product byte equivalence](evidence/pre-r18-coherence
 cleanup-receipt: [exact audit-residue cleanup](evidence/pre-r18-coherence/AUDIT-RESIDUE-CLEANUP.md)
 authorization: founder command on 2026-08-23; implementation begins only after Reader `YES/YES` and temporary `NEXT.md` rotation
 reader-receipt: [YES/YES at `afe9b36`](evidence/pre-r18-coherence/READER-ACCEPTANCE.md)
+amendment-reader-receipt: fresh Reader `YES/YES` required for the 2026-08-23 Canvas correction; the prior receipt does not authorize the paused Builder to resume
 rework-budget: exactly one product rework commit for the entire order; any later red receipt stops for Ryan
 
 ## In plain terms
@@ -260,7 +261,8 @@ It shows four defects that directly prevent the approved truths from being used:
   context to understand their relationships;
 - active-session ownership text overlaps in the Dock and becomes unreadable.
 
-At the locked 1600×1000 viewport and 100% zoom, the populated Mission view must:
+At the locked 1600×1000 viewport and 100% zoom, the populated Mission view in the
+deliberate `Show full lineage` overview must:
 
 1. distribute the visible Mission-local world in both axes: tile centers span at
    least 45% of usable Canvas width and 45% of usable Canvas height, and no more
@@ -279,7 +281,7 @@ At the locked 1600×1000 viewport and 100% zoom, the populated Mission view must
 6. preserve full canonical ids and complete relationship details in `INSPECT` even
    when Canvas labels use shortened display text.
 
-The populated fixture is exactly the accepted R17 literal oracle
+The full-lineage fixture is exactly the accepted R17 literal oracle
 `qa/oracles/r17-technique-outcome.json` at SHA-256
 `038a68c2508d3d671a60a1ab3d562d8d387e70ed08e582a4cca2e7fbf0519fa7`:
 all 16 resolved object records and all 20 resolved link records, with no count-only
@@ -290,14 +292,14 @@ center occupancy over every such interval. A cable `anchor` is the existing
 `portPosition` source or target point used by the Glacier cable renderer, in Canvas
 CSS pixels.
 
-Selecting each of the 16 objects in turn must make `INSPECT` show its full id and
+In that full-lineage state, selecting each of the 16 objects in turn must make `INSPECT` show its full id and
 the complete set of incoming/outgoing `kind, from_id, to_id` triples from the
 resolved 20-link oracle. Selecting each of the 20 links must show its kind,
 direction, source label/id, and target label/id. The selected cable's painted
 geometry may not intersect the interior of an unrelated tile and its painted
 bounding height must remain below 90% of usable Canvas height.
 
-These requirements may adjust only the current layout calculation, tile anatomy,
+These full-lineage requirements may adjust only the current layout calculation, tile anatomy,
 bounded CSS, and existing link presentation. They do not authorize a new layout
 engine, ontology field, link, inventory surface, or broad shell redesign.
 
@@ -337,10 +339,14 @@ The isolated fixture contains independent facts for all of these cases:
   semantic cables, used as the representative density fixture rather than a
   re-proof of R17.
 
-The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C14`. The unmodified
-control exits zero. Each falsifier corrupts only its named condition and must exit
-nonzero with that condition's name. Builder evidence includes the control output
-and all fourteen red outputs; unconditional receipt printing is a gate defect.
+The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C14`, plus the
+named amended subcases `C14/model-complete`, `C14/default-projection`,
+`C14/local-lineage`, `C14/full-lineage`, `C14/dock-isolation`,
+`C14/back-to-world`, and `C14/history-authority`. The unmodified control exits
+zero. Each falsifier corrupts only its named condition and must exit nonzero with
+that condition's name. Builder evidence includes the control output, all C01–C13
+red outputs, and one red output for every listed C14 subcase; unconditional receipt
+printing is a gate defect.
 
 The fourteen conditions are:
 
@@ -372,16 +378,19 @@ The fourteen conditions are:
 13. a rendered cable lacks its existing kind/direction, selected cable lacks
     selection emphasis, or the fixture's current and historical/background cables
     receive the wrong visual subordination;
-14. at 1600×1000 and 100% zoom, the resolved world differs from any of the literal
-    oracle's 16 object or 20 link records; tile-center span is below 45% on either
-    measured Canvas axis; more than 60% of centers occupy one median-width vertical
-    band; any pair of tile rectangles intersects; Dock text escapes/intersects its
-    row or action rectangle; any required tile/relationship label is absent;
-    `INSPECT` omits or invents any incoming/outgoing triple for any object or any
-    kind/direction/source/target detail for any link; an SVG endpoint lies more than
-    12 CSS pixels from its existing `portPosition` anchor; the selected painted
-    stroke or label intersects an unrelated tile interior; or the selected stroke's
-    painted bounding height is at least 90% of measured Canvas height.
+14. any predicate in `Finite projection states and C14 observables` fails: the
+    production projection is not the exact 16-object/20-link oracle; `FULL` does
+    not paint/select/Inspect every object and link; `DEFAULT` paints a non-primary
+    or historical record, lacks a readable primary tile, or has a primary cable
+    crossing or obscuring an unrelated tile; `LOCAL` omits or adds a declared
+    local-lineage item, fails the measured dim/normal-strength separation, leaves
+    the selected subject out of `INSPECT`, or leaves a Canvas overlay in place;
+    Dock isolation or `Back to world` is wrong; history carries current authority;
+    or the older full-lineage
+    density, span, rectangle, label, endpoint, selected-stroke, or 90%-height
+    predicate fails in `FULL` at 1600×1000 and 100% zoom. `INSPECT` must still show
+    the full id and complete incoming/outgoing triples for every object and the
+    exact kind/direction/source/target detail for every link.
 
 The gate prints one named receipt per condition plus the tested commit, Mission id,
 participant ids, object ids, link triples, and `cleanup=clean`. One process boot is
@@ -493,7 +502,8 @@ meaning stays inside this build cycle.
 
 Builder writes
 `docs/orders/evidence/pre-r18-coherence/BUILDER-EVIDENCE.md` with commands, exits,
-the documentation semantic-check output, the control plus C01–C14 red outputs,
+the documentation semantic-check output, the control plus C01–C13 and every named
+C14 subcase red output,
 named production-boundary receipts, Atlas before/after/diff results, candidate SHA,
 changed files by defect, screenshot manifest, and clean-shutdown result. The tree
 is clean and the candidate is immutable before verification.
@@ -502,7 +512,7 @@ is clean and the candidate is immutable before verification.
 
 One fresh Verifier receives this order, `PROTOCOL.md`, the immutable candidate SHA,
 and the Builder evidence—not Builder chat reasoning. It reruns the exact matrix,
-checks the fourteen falsifiable conditions against the normal product path, verifies
+checks C01–C13 and every named C14 subcase against the normal product path, verifies
 the commit boundaries, and confirms the worktree starts and ends on the same SHA.
 
 Any red receipt stops verification and returns the named defect to the same bounded
@@ -611,8 +621,9 @@ The single repair owns exactly:
    Make `pre-r18-coherence` exercise the accepted R17
    `qa/oracles/r17-technique-outcome.json` fixture through the real production path,
    resolving and comparing every one of its 16 object records and 20 link records.
-2. Select all 16 objects and all 20 links in the live DOM and compare every
-   required `INSPECT` field/triple. Measure C14 from actual DOM/SVG rectangles,
+2. In the deliberate `FULL` state, select all 16 objects and all 20 links in the
+   live DOM and compare every required `INSPECT` field/triple. Measure C14 from
+   the actual `DEFAULT`/`LOCAL`/`FULL` DOM/SVG states and rectangles,
    Canvas `clientWidth/clientHeight`, existing `portPosition` anchors, painted
    stroke bounds, and the exact thresholds in F1. A source-string or file-exists
    check may not satisfy any C14 predicate.
@@ -632,3 +643,321 @@ tests/oracle glue, and optimized evidence/receipts. It may not change the litera
 R17 oracle, weaken a threshold, replace the R16 oracle, repair unrelated package
 failures, or add product capability. After this commit, any red condition—C14 or
 otherwise—stops for Ryan with no second repair.
+
+## Founder Canvas workflow correction — 2026-08-23
+
+authority: founder-approved acceptance correction after the final visual FAIL
+record: [Final verification](evidence/pre-r18-coherence/VERIFICATION-FINAL.md)
+reader-revalidation: required before the paused Builder resumes
+
+The final verification proved a distinction this order previously left
+ambiguous. The Kernel ontology and its complete 16-object/20-link world were
+mechanically present, while the default Canvas projection was a consumer-unusable
+graph hairball. The default product view may not be a one-to-one, full-brightness
+dump of every durable object, relationship, terminal, history row, and inspector.
+
+The permanent product contract is:
+
+```text
+Kernel / Ontology
+all durable objects and governed relationships
+
+        ↓
+
+Canvas projection
+the readable current-Mission workflow
+
+        ↓
+
+Dock Inspect / local lineage / full lineage
+detail and complete technical truth on deliberate request
+```
+
+This is one projection of existing Kernel truth. It is not a second truth store,
+new ontology, new Canvas engine, parallel layout/workflow truth, or permission to
+omit durable truth. Every state below derives from the same existing read-only
+`world.objects`, `world.links`, `current_report_id`, and existing source-work
+facts. No fixture-id stage map, hand-maintained workflow graph, duplicate
+relationship list, or persisted UI workflow state is authorized.
+
+### Default current-Mission workflow
+
+The normal Canvas opens on one current Mission organized into readable stages:
+
+```text
+Mission + Inputs
+→ Participants + owned Tasks
+→ Run + raw Artifact
+→ independent Evaluation
+→ current published Report
+```
+
+Technique, Hypothesis, Dataset, Ticket, grade Artifact, and other Mission-local
+objects remain first-class and inspectable. They may be grouped as inputs,
+supporting evidence, or outcome detail instead of receiving equal default visual
+weight. Participants sit beside the Tasks they own and expose role, runtime,
+recruiter/reason, session state, work state, recovery, Task, and produced output.
+Their terminal remains an expandable live view, not their complete identity.
+
+The default projection paints only the primary workflow plus the ownership,
+production, and review relationships needed to understand it. Unrelated and
+secondary records remain present in the projection model but are not painted
+in `DEFAULT`; they become available through `LOCAL` or `FULL`.
+Historical work is absent from the current projection or unambiguously historical
+through the existing `HISTORY` mode; it may not compete with current authority.
+
+### Progressive disclosure and full truth
+
+Selecting an object must reveal its exact local lineage and dim unrelated work.
+For example, selecting an Artifact reveals its producer, owning Task, Run,
+Evaluation, and downstream Report. Selecting a participant reveals its recruiter,
+owned Task, produced outputs, and downstream reviewer where those relationships
+exist.
+
+An explicit `Show full lineage` action exposes all 16 R17 objects and all 20 exact
+semantic links. The full-lineage view is an advanced overview and may use pan and
+zoom. It is not required to keep every tile's detail simultaneously readable at
+one fit-to-screen zoom. All 16 objects and 20 links must still be selectable,
+inspectable, semantically exact, and reachable from the default view.
+
+Overview and detail are separate normal product states:
+
+```text
+select object or relationship
+→ focus and raise the exact subject
+→ Dock switches to INSPECT
+→ readable details and local lineage appear
+→ Back to world returns to the prior overview
+```
+
+Object and relationship details belong in the real Dock `INSPECT` mode. A large
+floating connection inspector may not obscure the operating surface. `START`,
+`CATALOG`, `ACTIVE`, `INSPECT`, and `HISTORY` isolate their named responsibility;
+inactive modes may not continue as one compressed panel beneath the active mode.
+
+### Readability is a product invariant
+
+The projection must maintain readable primary tile size and human labels. Pan,
+scroll, and zoom are preferable to postage-stamp tiles. Background cables remain
+subordinate to objects. Selected lineage is visibly stronger than unrelated
+lineage, direction and semantic kind remain available, and no primary visible
+cable, label, or inspector may obscure unrelated tile content.
+
+The dense evidence state is now the deliberate full-lineage overview. The default
+current-Mission screenshot is a separate consumer state and must visibly tell the
+Mission → work → evidence → judgment story without requiring the user to decode
+all 20 relationships.
+
+### Finite projection states and C14 observables
+
+The amendment has exactly three Canvas projection states. They are ephemeral view
+state over the same read-only production projection; they are not Kernel rows,
+ontology facts, or a second lineage model. The projection state, selected subject,
+and saved overview token exist only in memory for the current window; close/reopen
+reconstructs them from durable Mission facts and starts at `DEFAULT`.
+
+| State | Entry and exact painted meaning | Dock and exit |
+|---|---|---|
+| `DEFAULT` | Normal Mission reveal, with no selected subject. Paint exactly the primary object/link set below; do not paint secondary, unrelated, or historical records. They remain in the complete projection model. A visible `Show full lineage` action is required. | The current non-`INSPECT` Dock mode is preserved. Selecting an object or relationship enters `LOCAL`; `Show full lineage` enters `FULL`. |
+| `LOCAL` | Selecting one object or relationship sets that exact subject. Paint the complete current-Mission model; the exact local-lineage set for the subject is normal-strength and every other current-Mission record is visibly dim. History remains in `HISTORY`, not in the current-Mission set. | `INSPECT` is the only expanded Dock primary pane. `Back to world` clears the subject and all inspectors, performs no domain IPC, and restores the saved `DEFAULT` or `FULL` overview and the exact saved non-`INSPECT` Dock mode. |
+| `FULL` | The explicit `Show full lineage` action paints all 16 oracle objects and all 20 exact oracle links, with every item selectable. No subject is selected and no item is hidden by a fit-to-screen rule; pan/zoom is allowed. A visible `Back to world` action is required. | Dock mode is otherwise unchanged. `Back to world` returns to the saved `DEFAULT` overview and performs no domain IPC. |
+
+`DEFAULT`, `LOCAL`, and `FULL` are finitely distinguishable in the live DOM by
+the projection state, selected-subject identity, painted object/link set, and
+computed visual state. The gate must record those four facts; a screenshot or a
+count alone is not a state proof.
+
+For this order, `primary` is a derived presentation classification, not a new
+field or a maintained id/kind list. The projection performs this deterministic
+semantic walk over the existing objects and links: start at the root Mission;
+place a Task beside the AgentSession reached by its existing assignment link;
+from that Task's existing source-work facts, place the Run and every
+Technique/Strategy, Dataset, or Hypothesis input reached by its existing input
+links;
+place the raw Artifact downstream of the Run's existing production link; place
+the Evaluation after the Artifact from the existing judgment link; and place the
+current Report last from the existing publication link and `current_report_id`.
+The primary object set is the objects reached by that walk, and the primary
+relationship set is the exact existing link records used by the walk. Existing
+delegation, review, and output links may add the already-governed participant
+context; they may not be copied into a second relationship list. Same-stage
+siblings use stable `(type, id)` order only as a deterministic tie-breaker.
+`secondary` is the complement of that set among current-Mission, non-history
+records, such as supporting or outcome-detail objects. `history` is the union of an id in the
+existing Mission-local `report_ids` set other than `current_report_id` and the
+records surfaced by the existing `HISTORY` mode with an explicit existing
+`HISTORICAL` marker or session state exactly `closed`, `cancelled`, or `failed`;
+no age, position, or elapsed-time inference is allowed. It is shown only in
+`HISTORY` or with that marker and can never carry current-authority styling. For
+an object selection, `unrelated` is every painted
+current-Mission object/link outside the selected subject's local-lineage set;
+for a relationship selection, it is every painted object tile other than that
+relationship's two endpoints. In `DEFAULT` this is the other painted primary
+work; in `FULL` it is the other painted oracle work.
+
+Local lineage is bounded, not graph reachability. For selected object subject
+`s`, it is `{s}`, every endpoint of a link incident on `s`, and the non-null
+values of
+the existing context fields `mission_id`, `source_task_id`,
+`assignee_session_id`, `delegator_session_id`, `executor_session_id`,
+`result_artifact_id`, `publication_report_id`, `critic_session_id`, and
+`review_task_id` on `s` and those one-hop records. For a selected relationship,
+use the union of that rule for its two endpoint ids and include the selected
+link itself. Its link set is the exact existing link triples whose endpoints
+are in that object set. It does not
+expand through a second link hop, Canvas proximity, or terminal text. This
+bounded rule yields the Mission→Task/participant→Run→raw Artifact→Evaluation→
+current Report context where those existing facts exist. The gate records the
+exact object ids and `kind/from_id/to_id` triples in the set for each selected
+oracle subject; an omitted or extra local item is red.
+
+For C14, `readable` means every primary tile at 1600×1000/100% has a measured
+width of at least 136 CSS pixels, and its human label, semantic type, current
+state/authority marker, and short id each have non-empty, non-zero DOM text
+rectangles fully inside that tile, with computed `display` not `none`, computed
+`visibility` not `hidden`, and computed opacity greater than `0`. The role-specific context required by F1
+(participant Task/output, Artifact producer/source Run/Task, Evaluation
+critic/verdict/target Artifact, and Report gating Evaluation/current or
+historical authority) must use the same visible, in-tile text test; an absent
+source fact must be the exact `Not recorded` value. `dim` means the selected local-lineage
+paint has computed opacity at least `0.80` and every unrelated current-Mission
+paint has computed opacity at most `0.50`; absent records are not claimed to be
+dim. `bounded endpoint tolerance` is the existing Euclidean distance of at most
+12 CSS pixels from each SVG endpoint to its existing `portPosition` anchor.
+These measurements use real DOM/SVG rectangles and computed styles.
+
+Dock isolation means exactly one `data-dock-primary` pane is visible and
+expanded, exactly one tab has `aria-selected="true"`, and no inactive primary
+pane contributes visible detail content; compact counts outside primary panes
+remain allowed. `Back to world` is only the ephemeral restoration operation
+defined in the state table, never a session, Kernel, publication, or navigation
+action. The `history-authority` receipt must show that the `HISTORY` primary pane
+contains only the defined history set, contains neither the current Report nor
+an active current participant as a history item, and leaves the current-Mission
+Canvas authority unchanged.
+
+### Split mechanical and consumer acceptance
+
+The amended C14 and focused proof must independently establish both classes below.
+Neither verdict may substitute for the other.
+
+Mechanical ontology truth:
+
+1. all 16 oracle objects exist through the production projection;
+2. all 20 semantic links exist with exact endpoints, kind, and direction;
+3. every object and link is selectable and inspectable;
+4. `Show full lineage` reaches the complete world without inventing or dropping
+   truth;
+5. close/reopen preserves the same durable world.
+
+Consumer projection:
+
+1. the default view is the staged current-Mission workflow above;
+2. primary tiles do not overlap and retain a measured readable scale;
+3. primary visible cables do not cross or obscure unrelated tile bodies or labels,
+   apart from bounded endpoint tolerance;
+4. selecting a subject reveals the exact local lineage and measurably dims
+   unrelated work;
+5. Dock `INSPECT` presents the selected object or relationship without a Canvas
+   overlay;
+6. `Back to world` restores the overview;
+7. history does not compete with the current Mission;
+8. a naive consumer can identify Mission, ownership, Run, raw Artifact,
+   Evaluation, current Report, and the next useful action within 30 seconds.
+
+For the consumer predicate, the clock starts when the default current-Mission
+Canvas is first visible after normal app readiness and stops when one naive
+consumer, without architecture briefing, answers every listed identity,
+authority, and next-action prompt. `CONSUMER=PASS` requires every answer to be
+correct and complete within 30 seconds; a timeout, omission, or wrong primary
+description is `CONSUMER=FAIL`. “Next useful action” means naming one visible
+existing Inspect, `Show full lineage`, or Dock action and what it reveals or
+advances.
+
+The focused live gate must inspect real DOM/SVG geometry and computed styles for
+these claims. Source strings, fixture ids, hidden test-only styling, capture-only
+overrides, or merely counting objects cannot satisfy them. Existing mechanical
+assertions may be split into named receipts, but no ontology, production-boundary,
+cleanup, or persistence assertion may be weakened or removed.
+
+### Evidence states
+
+The fourteen existing evidence names remain. Their acceptance meaning is amended:
+
+- default/starting/active/completed/reopened frames show the staged current-Mission
+  projection;
+- selected participant, Artifact, and Evaluation frames show readable focus plus
+  the real Dock `INSPECT` state;
+- `14-most-cable-dense-region` shows the deliberate full-lineage overview with all
+  16 objects/20 links available, background lineage subordinate, no floating
+  inspector, and a clear way back to the current workflow.
+
+### Expedited proof discipline for this final lap
+
+One writer owns the checkout. The Builder runs changed-surface unit/static checks
+before an Electron journey, collects the complete related failure frontier before
+making one coherent repair, batches C01–C13 and every named C14 early-exit falsifier between one clean
+control and one final clean control, and does not rerun unrelated release/package
+work. Reports carry four separate verdicts:
+
+```text
+PRODUCT
+EVIDENCE
+ATLAS
+CONSUMER
+```
+
+Each verdict is independently `PASS` or `FAIL`; no verdict may inherit green from
+another. `PRODUCT=PASS` requires the allowed product file boundary, the normal
+renderer→preload→Main→Kernel path, the production-boundary receipts, and every
+C01–C13 plus named C14 control predicate to pass.
+`EVIDENCE=PASS` requires all fourteen named captures, their manifest fields and
+budgets, the clean control, every C01–C13 and named C14 falsifier red receipt, the candidate
+SHA, and clean shutdown. `ATLAS=PASS` requires `bun qf-atlas/generate.mjs`,
+`bun qf-atlas/generate.mjs --check`, `bun qf-atlas/ratchet.mjs`, and the listed
+build-base diff to pass with no unauthorized Atlas edit. `CONSUMER=PASS` is
+the timed naive-consumer predicate above. A receipt is classified by the surface
+that produced it: live behavior/boundary is PRODUCT, capture/manifest/falsifier
+proof is EVIDENCE, Atlas output is ATLAS, and the timed human check is CONSUMER;
+environment or external-runtime noise is recorded separately and never promoted
+to any green verdict.
+
+An evidence-only correction does not invalidate unchanged product bytes. A product
+or acceptance-meaning change does. Every red receipt has exactly one verdict
+surface (`PRODUCT`, `EVIDENCE`, `ATLAS`, or `CONSUMER`) and may additionally carry
+one cause tag: `FIXTURE`, `ENVIRONMENT`, or `EXTERNAL RUNTIME`.
+
+This amendment supersedes any earlier sentence that implies every cable must be
+painted at full prominence in `DEFAULT`, that all 16 objects and 20 links must be
+painted in `DEFAULT` or `LOCAL`, or that all tile details must fit one viewport.
+The older F1 density/span/rectangle/endpoint requirements and the corresponding
+C14 geometry receipts now apply to `FULL`; the amended `DEFAULT`/`LOCAL` and
+`FULL` predicates above are additional consumer requirements, not replacements
+for ontology, inspectability, production-boundary, reopen, Atlas, falsifier, or
+cleanup requirements.
+
+### Amended C14 and final-lap resume boundary
+
+C14 remains one falsifier id, `C14`, but it emits separate named receipts for
+`model-complete`, `default-projection`, `local-lineage`, `full-lineage`,
+`dock-isolation`, `back-to-world`, and `history-authority`. The timed naive
+consumer check is the separate `CONSUMER` verdict and is not disguised as a
+machine-only C14 receipt.
+The clean control must pass every receipt. The `C14` falsifier must corrupt each
+named receipt in turn (with the other receipts controlled) and exit nonzero with
+that receipt name; this is the required falsification proof for the amended
+acceptance, not unconditional receipt printing. The mechanical `model-complete`
+receipt compares all 16/20 records from the real production projection and then
+repeats the exact selection/Inspect checks after `FULL`; it never infers ontology
+truth from the smaller `DEFAULT` paint set.
+
+The paused Builder has one implementation surface: the existing files in
+`Exact file boundary`, the focused Pre-R18 gate and its focused tests, and the
+fourteen evidence/receipt files already named there. The Builder may implement
+only the three projection states, the existing Dock/Canvas presentation and
+restoration behavior, and their real-path C14 receipts. Any need for a new
+Kernel action/schema/link, a second truth store, a new Canvas engine, new Dock
+inventory, unrelated redesign, or a release/package gate is an immediate founder
+stop. After the single global repair is consumed, any `PRODUCT`, `EVIDENCE`,
+`ATLAS`, or `CONSUMER` failure—or an unresolved product decision—means stop for
+Ryan; no third implementation lap or authority expansion exists.
