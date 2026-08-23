@@ -21,7 +21,8 @@ conclusion, and historical work cannot be mistaken for one another.
 
 This order does not redesign QuantFlow. It corrects three comprehension defects
 in the existing shell and records two stale Atlas statements plus the accepted
-mouse-first product authority. R18 remains pending.
+mouse-first product authority. `GOLDEN-RUN.md` continues to label R18 the active
+route target, but R18 has no build authority during this non-rung correction.
 
 ## The three owned defects
 
@@ -134,8 +135,10 @@ outside this order's renderer/projection boundary.
 Close/reopen means close and relaunch the normal app against the same isolated app,
 Kernel, and Artifact directories, without refresh or injected browser state. The
 relaunch must reconstruct the same Mission-local object ids, link triples,
-participant ids, and saved research-tile identities through the existing
-hydrate/projection boundary.
+participants proven Mission-local by durable Kernel relations, and saved
+research-tile identities through the existing hydrate/projection boundary. The
+same-submission planning Director is excluded from the reopen participant
+comparison unless such a durable relation exists.
 
 ### C — Use one honest participant projection in Dock and Canvas
 
@@ -185,10 +188,12 @@ and inspectable but cannot visually compete with the current published Report as
 an equivalent conclusion. Historical styling must not erase provenance or make a
 historical Report appear current.
 
-For one Mission, `PUBLISHED REPORT` is the Report identified by the existing
-publication state as that Mission's current report. Every other Report in the same
-Mission projection is `HISTORICAL`. A result Artifact may carry both `RAW ARTIFACT`
-and `HISTORICAL`; the current published Report may not carry `HISTORICAL`; only the
+The read-only research-world projection exposes `current_report_id` and the full
+Mission-local `report_ids` set from existing governed publication/source-work
+truth. It creates no row and changes no publication semantics. For one Mission,
+`PUBLISHED REPORT` means `object.id === current_report_id`. Every other id in
+`report_ids` is `HISTORICAL`. A result Artifact may carry both `RAW ARTIFACT` and
+`HISTORICAL`; the current published Report may not carry `HISTORICAL`; only the
 current published Report carries the current-authority marker. An Evaluation marks
 judgment over its exact linked Artifact and never becomes the published conclusion.
 
@@ -268,12 +273,12 @@ The isolated fixture contains independent facts for all of these cases:
 - one current cable and one historical/background cable carrying existing kinds
   and directions.
 
-The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C10`. The unmodified
+The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C13`. The unmodified
 control exits zero. Each falsifier corrupts only its named condition and must exit
 nonzero with that condition's name. Builder evidence includes the control output
-and all ten red outputs; unconditional receipt printing is a gate defect.
+and all thirteen red outputs; unconditional receipt printing is a gate defect.
 
-The ten conditions are:
+The thirteen conditions are:
 
 1. durable Mission does not replace the landing state;
 2. the exact returned Director renders unexplained `No task`, or the ordinary
@@ -291,12 +296,20 @@ The ten conditions are:
 9. mouse-focused live terminal cannot type and erase harmless text without submit,
    hides role/runtime/Task/work context, or mouse focus cannot return to Canvas;
 10. normal-app close/relaunch against the same isolated roots does not restore the
-    exact Mission-local object ids, link triples, participant ids, and saved
-    research-tile identities without refresh or injected state.
+    exact Mission-local object ids, link triples, durably Mission-local participant
+    ids, and saved research-tile identities without refresh or injected state;
+11. a refused/failed submission changes the previously visible Canvas or creates a
+    Mission, Task, session, tile, or link;
+12. either surface omits or invents role, runtime, recruiter/reason, Task ownership,
+    produced output, or any of the four axes for the fixture participants, or fails
+    to render `Not recorded` for the fixture's deliberately absent fact;
+13. a rendered cable lacks its existing kind/direction, selected cable lacks
+    selection emphasis, or the fixture's current and historical/background cables
+    receive the wrong visual subordination.
 
 The gate prints one named receipt per condition plus the tested commit, Mission id,
 participant ids, object ids, link triples, and `cleanup=clean`. One process boot is
-preferred for C01–C09; C10 owns the one explicit relaunch. Proof scaffolding may not
+preferred for C01–C09 and C11–C13; C10 owns the one explicit relaunch. Proof scaffolding may not
 take longer than the correction it protects.
 
 ## Exact file boundary
@@ -310,6 +323,9 @@ Product edits are limited to the existing shell and its focused proof surfaces:
 - `collab-electron/src/windows/shell/src/task-composition.js`;
 - `collab-electron/src/windows/shell/src/renderer.js` only for existing controller wiring;
 - `collab-electron/src/windows/shell/src/shell.css`;
+- `collab-electron/src/main/research-world-projection.ts` and its focused test,
+  only to expose read-only `current_report_id` and Mission-local `report_ids` from
+  existing governed truth;
 - an adjacent pure participant-projection helper and focused unit test if sharing
   the derivation cannot be done honestly inside the listed modules;
 - one focused `qa/gates/pre-r18-coherence.ts` gate and its registry/allowlist entry;
@@ -326,13 +342,17 @@ adapters, Dock inventory, or another product window is a founder stop.
 
 ## Temporary authority lifecycle
 
-After this order records Reader `YES/YES`, the Router—not the Builder—makes one
-docs-only temporary `NEXT.md` rotation that:
+After this order records Reader `YES/YES`, the Router writes
+`docs/orders/evidence/pre-r18-coherence/READER-ACCEPTANCE.md` containing the exact
+order SHA, Reader task id, and both answers. The Router—not the Builder—then makes
+one docs-only temporary `NEXT.md` rotation that:
 
 - records the prior `NEXT.md` blob SHA;
-- names this exact order and its accepted Reader receipt;
+- names this exact order and links that exact Reader receipt;
 - says `PRE-R18 COHERENCE — BUILD AUTHORIZED`;
-- keeps R18 pending and grants no future-rung authority.
+- preserves `GOLDEN-RUN.md` unchanged and preserves an `R18` token in the
+  `NEXT.md` title; only the temporary `NEXT.md` status and active-order lines grant
+  authority to this non-rung order, and no future-rung authority is granted.
 
 No Builder starts while `NEXT.md` says `NO BUILD AUTHORITY`. The temporary door
 remains pointed here through verification, naive-user check, and Ryan's decision.
@@ -344,8 +364,13 @@ after Ryan accepts; a rework decision leaves it pointed to this same bounded ord
 Before any product edit, read `qf-atlas/ATLAS.md`, then run:
 
 ```powershell
-bun qf-atlas/generate.mjs --check
-bun qf-atlas/ratchet.mjs
+$ErrorActionPreference = 'Stop'
+function Invoke-Qf([scriptblock]$Command) {
+  & $Command
+  if ($LASTEXITCODE -ne 0) { throw "Command failed with exit $LASTEXITCODE: $Command" }
+}
+Invoke-Qf { bun qf-atlas/generate.mjs --check }
+Invoke-Qf { bun qf-atlas/ratchet.mjs }
 ```
 
 Run the smallest focused checks while building. The stale
@@ -356,27 +381,34 @@ resource harness is outside this correction.
 Before handoff, run exactly:
 
 ```powershell
+$ErrorActionPreference = 'Stop'
+function Invoke-Qf([scriptblock]$Command) {
+  & $Command
+  if ($LASTEXITCODE -ne 0) { throw "Command failed with exit $LASTEXITCODE: $Command" }
+}
 Push-Location collab-electron
-bun install --frozen-lockfile
-bun test
-bunx tsc --noEmit
-Pop-Location
-bun qa/run.ts pre-r18-coherence
-bun qa/run.ts research-world-visible
-bun qa/run.ts repo-shape
-bun qa/run.ts lockfile-committed
-bun qa/run.ts kernel-sole-writer
-bun qa/run.ts no-canvas-domain-writes
-bun qa/run.ts kernel-sole-writer-app
-bun qa/run.ts doc-action-surface
-bun qa/run.ts one-skin
-bun qf-atlas/generate.mjs
-bun qf-atlas/generate.mjs --check
-bun qf-atlas/ratchet.mjs
-bun qf-atlas/generate.mjs --diff 4d25fa3df91964fc90223a135d8969ebd61c5374
-bun qa/run.ts doc-links
-git diff --check 4d25fa3df91964fc90223a135d8969ebd61c5374..HEAD
-git diff --check
+try {
+  Invoke-Qf { bun install --frozen-lockfile }
+  Invoke-Qf { bun test }
+  Invoke-Qf { bunx tsc --noEmit }
+} finally { Pop-Location }
+Invoke-Qf { bun qa/run.ts pre-r18-coherence }
+Invoke-Qf { bun qa/run.ts research-world-visible }
+Invoke-Qf { bun qa/run.ts repo-shape }
+Invoke-Qf { bun qa/run.ts lockfile-committed }
+Invoke-Qf { bun qa/run.ts kernel-sole-writer }
+Invoke-Qf { bun qa/run.ts no-canvas-domain-writes }
+Invoke-Qf { bun qa/run.ts kernel-sole-writer-app }
+Invoke-Qf { bun qa/run.ts doc-action-surface }
+Invoke-Qf { bun qa/run.ts one-skin }
+Invoke-Qf { bun qa/run.ts rung-ladder }
+Invoke-Qf { bun qf-atlas/generate.mjs }
+Invoke-Qf { bun qf-atlas/generate.mjs --check }
+Invoke-Qf { bun qf-atlas/ratchet.mjs }
+Invoke-Qf { bun qf-atlas/generate.mjs --diff 4d25fa3df91964fc90223a135d8969ebd61c5374 }
+Invoke-Qf { bun qa/run.ts doc-links }
+Invoke-Qf { git diff --check 4d25fa3df91964fc90223a135d8969ebd61c5374..HEAD }
+Invoke-Qf { git diff --check }
 ```
 
 No release, installer, packaged-app, broad accessibility, soak, or full-suite gate
@@ -385,7 +417,7 @@ meaning stays inside this build cycle.
 
 Builder writes
 `docs/orders/evidence/pre-r18-coherence/BUILDER-EVIDENCE.md` with commands, exits,
-the documentation semantic-check output, the control plus C01–C10 red outputs,
+the documentation semantic-check output, the control plus C01–C13 red outputs,
 named production-boundary receipts, Atlas before/after/diff results, candidate SHA,
 changed files by defect, screenshot manifest, and clean-shutdown result. The tree
 is clean and the candidate is immutable before verification.
@@ -394,7 +426,7 @@ is clean and the candidate is immutable before verification.
 
 One fresh Verifier receives this order, `PROTOCOL.md`, the immutable candidate SHA,
 and the Builder evidence—not Builder chat reasoning. It reruns the exact matrix,
-checks the ten falsifiable conditions against the normal product path, verifies
+checks the thirteen falsifiable conditions against the normal product path, verifies
 the commit boundaries, and confirms the worktree starts and ends on the same SHA.
 
 Any red receipt stops verification and returns the named defect to the same bounded
@@ -441,8 +473,10 @@ reopened, Dock, and cable-dense states. Acceptance asks:
 - Does the Dock feel like useful inventory?
 - Would Ryan willingly operate this workflow again?
 
-Ryan records exactly `ACCEPT PRE-R18 COHERENCE <candidate-sha>` or `REWORK PRE-R18
-COHERENCE <named-condition>`. On `ACCEPT`, the Verifier writes
+Ryan records exactly `ACCEPT PRE-R18 COHERENCE <candidate-sha>` only after the
+acceptance receipt records `YES` for all seven questions above. Any `NO` records
+`REWORK PRE-R18 COHERENCE <exact-question>` and spends the one global repair if it
+remains available. On `ACCEPT`, the Verifier writes
 `docs/orders/evidence/pre-r18-coherence/FINAL-ACCEPTANCE.md`, marks only this
 non-rung order complete, and rotates `NEXT.md` to `R18 COMPOSE ALIGNMENT — NO BUILD
 AUTHORITY`, naming the forthcoming `WO-R18-COMPOSE.md`. That closure commit does
