@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-pre-r18-coherence",
-    "commit": "1bb4c71",
+    "commit": "bdf4a7e",
     "generatedAt": "2026-08-23",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c03bd68238c754a2"
+    "fingerprint": "571697d826b7bb11"
   },
   "stats": {
     "live": 113,
@@ -2691,7 +2691,7 @@
       "id": "4:collab-electron/src/windows/shell/src::cable",
       "layer": 4,
       "name": "cable*",
-      "kb": 19.1,
+      "kb": 19.2,
       "x": -2.48,
       "z": -0.91,
       "status": "ok",
@@ -2702,7 +2702,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/cable-overlay.js",
-          "kb": 7.8,
+          "kb": 7.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2750,8 +2750,8 @@
       "layer": 4,
       "name": "src/canvas*",
       "kb": 37.3,
-      "x": -1.24,
-      "z": 0.45,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2827,7 +2827,7 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 21.9,
+      "kb": 23,
       "x": -2.03,
       "z": 1.69,
       "status": "ok",
@@ -2838,7 +2838,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 21.9,
+          "kb": 23,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -2911,9 +2911,9 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 59.6,
-      "x": -0.23,
-      "z": 1.3,
+      "kb": 60.1,
+      "x": -1.24,
+      "z": 0.45,
       "status": "ice",
       "spawns": 0,
       "writes": 0,
@@ -2922,7 +2922,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 59.6,
+          "kb": 60.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2939,9 +2939,9 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 32.1,
-      "x": -1.01,
-      "z": -0.85,
+      "kb": 67.6,
+      "x": 1.01,
+      "z": 0.85,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2950,7 +2950,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 32.1,
+          "kb": 67.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2967,7 +2967,7 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 14.8,
+      "kb": 14.9,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -2978,7 +2978,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 14.8,
+          "kb": 14.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2996,8 +2996,8 @@
       "layer": 4,
       "name": "tile*",
       "kb": 61.1,
-      "x": 1.01,
-      "z": 0.85,
+      "x": -0.23,
+      "z": 1.3,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 702.1,
+      "kb": 785.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3530,21 +3530,21 @@
       "executes": 49,
       "files": [
         {
-          "path": "qa/gates/hermes-research.ts",
-          "kb": 66.6,
-          "spawns": 4,
+          "path": "qa/gates/pre-r18-coherence.ts",
+          "kb": 144,
+          "spawns": 2,
           "spawnsLive": 2,
-          "writes": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 60.4,
-          "spawns": 2,
+          "path": "qa/gates/hermes-research.ts",
+          "kb": 66.6,
+          "spawns": 4,
           "spawnsLive": 2,
-          "writes": 1,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -18957,7 +18957,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 408 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 811 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -60048,12 +60048,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "d986435",
+      "commit": "1bb4c71",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "1bb4c71",
+      "commit": "bdf4a7e",
       "generatedAt": "2026-08-23"
     },
     "verdict": "better",
