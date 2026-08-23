@@ -1,10 +1,38 @@
 import { describe, expect, test } from "bun:test";
 import {
-  formatDockSessionState,
-  researchDirectorRunningStatus,
+	dockDefinitionDisplayName,
+	formatDockTeamSummary,
+	formatDockSessionState,
+	launchableDockDefinitions,
+	researchDirectorRunningStatus,
   visibleDockDefinitions,
   visibleDockSessions,
 } from "./dock.js";
+
+describe("Research Dock launchable inventory projection", () => {
+	const definitions = [
+		{ id: "z", display_name: "Worker", availability: { available: true } },
+		{ id: "b", role: "Critic", availability: { available: true } },
+		{ id: "a", role: "Critic", availability: { available: true } },
+		{ id: "missing", availability: { available: true } },
+		{ id: "offline", display_name: "Director", availability: { available: false } },
+	];
+
+	test("filters once, applies fallback, sorts by rendered name/id, and preserves duplicate roles", () => {
+		const before = structuredClone(definitions);
+		const rows = launchableDockDefinitions(definitions, { qaMode: true });
+		expect(rows.map((row) => row.id)).toEqual(["a", "b", "missing", "z"]);
+		expect(rows.map(dockDefinitionDisplayName)).toEqual(["Critic", "Critic", "Not recorded", "Worker"]);
+		expect(definitions).toEqual(before);
+		expect(formatDockTeamSummary(definitions, { qaMode: true })).toBe(
+			"Available team: 4 — Critic, Critic, Not recorded, Worker",
+		);
+	});
+
+	test("uses the literal zero-inventory summary", () => {
+		expect(formatDockTeamSummary([], { qaMode: true })).toBe("Available team: 0 — None recorded");
+	});
+});
 
 test("Research Director status binds the returned Mission id", () => {
   expect(researchDirectorRunningStatus("mission-123")).toBe(

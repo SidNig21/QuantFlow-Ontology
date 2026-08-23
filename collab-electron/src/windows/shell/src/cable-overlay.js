@@ -124,6 +124,7 @@ export function createCableOverlay(svgEl, {
 			const geom = connectionPath(conn, map);
 			if (!geom) continue;
 			const style = cableStrokeStyle(conn, honoured);
+			const displayLabel = conn.qfWorldCableLabel || style.label;
 			const a = worldToScreen(geom.a.x, geom.a.y);
 			const b = worldToScreen(geom.b.x, geom.b.y);
 			const d = bezierPath(
@@ -134,9 +135,9 @@ export function createCableOverlay(svgEl, {
 			path.setAttribute("d", d);
 			path.setAttribute("fill", "none");
 			path.setAttribute("class", style.className);
-			path.setAttribute("aria-label", style.label);
+			path.setAttribute("aria-label", displayLabel);
 			const title = document.createElementNS(SVG_NS, "title");
-			title.textContent = style.label;
+			title.textContent = displayLabel;
 			path.appendChild(title);
 			if (style.strokeDasharray !== "none") {
 				path.setAttribute("stroke-dasharray", style.strokeDasharray);
@@ -168,7 +169,7 @@ export function createCableOverlay(svgEl, {
 				label.setAttribute("y", String(midY));
 				label.setAttribute("text-anchor", "middle");
 				label.setAttribute("class", "cable-label");
-				label.textContent = style.label;
+				label.textContent = displayLabel;
 				content.appendChild(label);
 				const obstacles = [...document.querySelectorAll(".canvas-tile")]
 					.map((node) => node.getBoundingClientRect());

@@ -53,15 +53,22 @@
 				<canvas id="minimap-canvas"></canvas>
 			</div>
 			<div id="canvas-toast" role="status" aria-live="polite" aria-atomic="true"></div>
-			<aside id="cable-inspector" hidden></aside>
+			<div id="research-world-projection" hidden aria-label="Research world projection controls">
+				<span data-qf-projection-label>current Mission</span>
+				<button type="button" data-qf-world-full>Show full lineage</button>
+				<button type="button" data-qf-world-back hidden>Back to world</button>
+			</div>
 		</div>
 		<div id="agent-resize" class="resize-handle" data-panel="agent"></div>
 		<div id="panel-agent">
 			<div id="dock">
 				<header class="dk-hd" id="dock-masthead">
-					<div class="eye">quantflow / dock</div>
+					<div class="eye">quantflow</div>
 					<div class="dk-hd-row">
-						<h2>Research Director</h2>
+						<div>
+							<h2>Research Dock</h2>
+							<div class="dock-front-role">Research Director</div>
+						</div>
 						<button id="dock-tidy" class="dk-link" type="button" title="Arrange eligible canvas tiles into a readable grid">Tidy</button>
 					</div>
 					<div class="tally" id="dock-tally" aria-live="polite"></div>
@@ -78,12 +85,19 @@
 				<section class="dock-primary" data-dock-primary="START" aria-label="Mission composer">
 					<div class="ask" id="dock-question">
 						<form id="dock-question-form" class="dock-question-form">
+							<label class="dock-field-label" for="dock-question-input">Mission</label>
 							<textarea id="dock-question-input" class="dock-question-input" rows="3" placeholder="Ask the Research Director about a bounded market mission…"></textarea>
+							<div class="dock-field">
+								<label class="dock-field-label" for="dock-technique-version">Technique</label>
+								<div id="dock-technique-host"></div>
+							</div>
 							<div class="hint">submit <kbd>Ctrl ⏎</kbd></div>
 							<button id="dock-question-submit" type="submit" class="sr-only">Submit</button>
 						</form>
 						<div class="research-onboarding">
-							<span>QuantFlow delegates evidence, preserves lineage, and independently reviews settled-data results.</span>
+							<div id="dock-team-summary" class="dock-team-summary" aria-live="polite">Available team: 0 — None recorded</div>
+							<button id="dock-browse-catalog" class="dock-browse-catalog" type="button">Browse catalog</button>
+							<div id="dock-mission-empty" class="dock-mission-empty">Compose a Mission or browse the available team.</div>
 							<button id="dock-guided-research" class="dk-link" type="button">Try guided research</button>
 							<div id="dock-question-status" class="research-status" role="status" aria-live="polite"></div>
 						</div>
@@ -109,15 +123,16 @@
 					</div>
 				</section>
 
-				<section class="dock-primary dock-primary-scroll" data-dock-primary="INSPECT" aria-label="Selected participant inspection" hidden>
-					<div class="sh"><b>selected participant</b><span class="r"></span></div>
+				<section class="dock-primary dock-primary-scroll" data-dock-primary="INSPECT" aria-label="Selected object inspection" hidden>
+					<div class="sh"><b>selected object</b><span class="r"></span></div>
 					<div id="dock-inspect-pane" class="dock-inspect-pane"><div class="qf-empty">Select a participant from ACTIVE.</div></div>
+					<div id="cable-inspector" class="dock-connection-inspect" hidden aria-live="polite"></div>
 				</section>
 
 				<section class="dock-primary dock-primary-scroll" data-dock-primary="HISTORY" aria-label="Research history" hidden>
 					<div class="kernel-ledger" id="kernel-ledger">
 						<div class="kl-hd"><span>research ledger</span></div>
-						<div class="kl-empty" id="kernel-ledger-empty">Ask a question to begin durable research.</div>
+						<div class="kl-empty" id="kernel-ledger-empty">No historical research for this Mission.</div>
 						<div class="kl-body" id="kernel-ledger-list"></div>
 					</div>
 					<div class="sh"><b>closed sessions</b><span class="r"></span></div>

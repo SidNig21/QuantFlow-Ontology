@@ -214,6 +214,26 @@ function seedFormAndError(foot: FakeElement): void {
 }
 
 describe("Task footer projection", () => {
+	test("preserves the compact research participant card during task refresh", () => {
+		withDocument(() => {
+			const foot = new FakeElement();
+			const participantCard = new FakeElement();
+			participantCard.className = "qf-world-participant-card";
+			participantCard.textContent = "Worker · working";
+			foot.appendChild(participantCard);
+			for (const title of ["first task state", "second task state"]) {
+				renderTaskFoot(
+					{ taskFoot: foot },
+					{ id: "tile-worker", sessionId: "worker-1" },
+					{ assignments: [{ ...assigned, title }] },
+				);
+				expect(foot.children.filter((child) => child.classList.contains("qf-world-participant-card"))).toEqual([participantCard]);
+				expect(participantCard.textContent).not.toBe("");
+			}
+			expect(foot.children.filter((child) => child.classList.contains("qf-world-participant-card"))).toEqual([participantCard]);
+		});
+	});
+
   test("renders four separate Kernel-backed facts for the exact specialist tile", () => {
     withDocument(() => {
       const foot = new FakeElement();

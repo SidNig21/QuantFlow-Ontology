@@ -527,7 +527,7 @@ async function init() {
 		onTerminalTileClosed() {
 			syncTileList();
 		},
-		 onTileFocused(tile) {
+			 onTileFocused(tile) {
 			tileListWebview.send(
 				"tile-list:focus", tile?.id || null,
 			);
@@ -550,6 +550,7 @@ async function init() {
 			liveConnections = cables;
 			cableOverlay?.redraw();
 		},
+		onClearCableSelection: () => cableOverlay?.setSelectedId?.(null),
 		showStatus: (message) => showCanvasToast(message),
 		getParticipantView: participantViewFor,
 	});
@@ -557,7 +558,7 @@ async function init() {
 		edgeIndicators.update();
 		minimap.update();
 		cableOverlay?.redraw();
-		void animateViewportFit(worldTiles);
+		void animateViewportFit(worldTiles, 90);
 	};
 
 	// -- Edge indicators --
@@ -609,12 +610,12 @@ async function init() {
 		return result;
 	}
 
-	function animateViewportFit(layoutTiles) {
+	function animateViewportFit(layoutTiles, margin = 48) {
 		const fit = fitViewportToTiles(
 			layoutTiles,
 			panelViewer.clientWidth,
 			panelViewer.clientHeight,
-			48,
+			margin,
 		);
 		if (!fit) return;
 		const start = {
@@ -687,6 +688,8 @@ async function init() {
 			getViewport: () => viewportState,
 			getConnections: () => liveConnections,
 			onSelect: (conn) => {
+				researchWorldController?.selectRelationship?.(conn);
+				document.querySelector('[data-dock-mode="INSPECT"]')?.click();
 				if (!conn.qfWorldCableFrom || !conn.qfWorldCableTo) {
 					cableInspector.show(conn);
 					return;
@@ -725,15 +728,18 @@ async function init() {
 		void cableController.refresh();
 	}
 
-	createKernelLedger(document.getElementById("kernel-ledger"), {
+	const kernelLedger = createKernelLedger(document.getElementById("kernel-ledger"), {
 		listEvents: async () => {
 			const res = await window.shellApi.qf.listResearchLedger();
 			if (!res?.ok) return [];
-			return Array.isArray(res.entries) ? res.entries : [];
+			const entries = Array.isArray(res.entries) ? res.entries : [];
+			const model = researchWorldController?.getProjectionModel?.();
+			return model ? entries.filter((entry) => model.historyIds.has(String(entry?.id ?? ""))) : entries;
 		},
 		onSubscribe: (cb) => window.shellApi.qf.onEventsInvalidate(cb),
 		onReveal: (type, id) => researchWorldController?.reveal(type, id),
 	});
+	document.addEventListener("qf:research-world-active", () => { void kernelLedger.refresh(); });
 
 	edgeIndicators.update();
 	minimap.update();
@@ -853,6 +859,7 @@ async function init() {
 			}
 			: { sessions: [], assignments: [] };
 		renderTaskFoots();
+		researchWorldController?.refreshParticipants?.();
 	}
 
 	let taskProjectionReady = false;

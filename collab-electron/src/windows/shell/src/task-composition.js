@@ -108,7 +108,8 @@ export function renderTaskFoot(dom, tile, {
 	const preservedError = foot.querySelector(".task-foot-error")?.textContent ?? "";
 	const retainedReceipt = [...foot.children].find(isSessionReceipt) ?? null;
 	const retainedInspection = [...foot.children].find(isSessionInspection) ?? null;
-	const retainedChildren = [retainedReceipt, retainedInspection].filter(Boolean);
+	const retainedResearchProjection = [...foot.children].find((child) => child.classList?.contains("qf-world-participant-card")) ?? null;
+	const retainedChildren = [retainedReceipt, retainedInspection, retainedResearchProjection].filter(Boolean);
 	if (retainedChildren.length > 0) foot.replaceChildren(...retainedChildren);
 	else foot.replaceChildren();
 	if (!tile?.sessionId) {

@@ -53,6 +53,34 @@ export function visibleDockDefinitions(definitions, { qaMode = false } = {}) {
 	return rows.filter((row) => qaMode || isProductionDockDefinition(row));
 }
 
+export function dockDefinitionDisplayName(row) {
+	const value = row?.display_name ?? row?.role;
+	return value === null || value === undefined || String(value).trim() === ""
+		? "Not recorded"
+		: String(value);
+}
+
+/** One immutable presentation of the existing launchable Kernel inventory. */
+export function launchableDockDefinitions(definitions, { qaMode = false } = {}) {
+	return visibleDockDefinitions(definitions, { qaMode })
+		.filter((row) => row?.availability?.available === true)
+		.slice()
+		.sort((a, b) => dockDefinitionDisplayName(a).localeCompare(dockDefinitionDisplayName(b)) ||
+			String(a?.id ?? "").localeCompare(String(b?.id ?? "")));
+}
+
+export function formatDockTeamSummary(definitions, options = {}) {
+	const launchable = launchableDockDefinitions(definitions, options);
+	return formatLaunchableTeamSummary(launchable);
+}
+
+function formatLaunchableTeamSummary(launchable) {
+	const roles = launchable.length > 0
+		? launchable.map(dockDefinitionDisplayName).join(", ")
+		: "None recorded";
+	return `Available team: ${launchable.length} — ${roles}`;
+}
+
 const CAPABILITY_LABELS = Object.freeze({
 	"market.read": "Market data",
 	"desk.orchestrate": "Team composition",
@@ -157,6 +185,8 @@ export function initDock(panelEl, options = {}) {
 	const historyList = panelEl.querySelector("#dock-history-list");
 	const inspectPane = panelEl.querySelector("#dock-inspect-pane");
 	const tallyEl = panelEl.querySelector("#dock-tally");
+	const teamSummaryEl = panelEl.querySelector("#dock-team-summary");
+	const missionEmptyEl = panelEl.querySelector("#dock-mission-empty");
 	if (!speciesList || !sessionsList || !historyList || !inspectPane) {
 		console.error("[dock] missing required Dock projection surfaces");
 		return;
@@ -171,6 +201,12 @@ export function initDock(panelEl, options = {}) {
 	let planningDirector = null;
 	let missionWorld = null;
 	let latestDefinitions = [];
+	let activeMissionId = null;
+
+	function syncStartDiscovery() {
+		if (teamSummaryEl) teamSummaryEl.textContent = formatLaunchableTeamSummary(latestDefinitions);
+		if (missionEmptyEl) missionEmptyEl.hidden = Boolean(activeMissionId || planningDirector?.missionId || missionWorld?.root?.id);
+	}
 
 	function setMode(mode) {
 		const selected = String(mode ?? "START").toUpperCase();
@@ -186,6 +222,11 @@ export function initDock(panelEl, options = {}) {
 	for (const tab of panelEl.querySelectorAll("[data-dock-mode]")) {
 		tab.addEventListener("click", () => setMode(tab.dataset.dockMode));
 	}
+	panelEl.querySelector("#dock-browse-catalog")?.addEventListener("click", () => setMode("CATALOG"));
+	document.addEventListener("qf:research-world-active", (event) => {
+		activeMissionId = String(event?.detail?.missionId ?? "") || null;
+		syncStartDiscovery();
+	});
 	setMode("START");
 
 	function selectedTaskFor(id, assignments) {
@@ -265,40 +306,28 @@ export function initDock(panelEl, options = {}) {
 					el("div", "qf-empty", defsRes?.error?.message ?? "Failed to list species"),
 				);
 			} else {
-				for (const diagnostic of (Array.isArray(defsRes.diagnostics) ? defsRes.diagnostics : [])) {
-					const row = el("div", "lrow lrow-unavailable");
-					row.appendChild(el("b", null, String(diagnostic.name ?? "Adapter")));
-					row.appendChild(el("span", null, "unavailable"));
-					row.title = String(diagnostic.message ?? "Unavailable");
-					speciesList.appendChild(row);
-				}
-				const defs = visibleDockDefinitions(defsRes.definitions, {
+				const defs = launchableDockDefinitions(defsRes.definitions, {
 					qaMode: options.qaMode === true || window.__QF_QA_MODE__ === true,
 				});
-				if (defs.length === 0 && speciesList.childNodes.length === 0) {
-					speciesList.appendChild(el("div", "qf-empty", "No species registered"));
+				if (defs.length === 0) {
+					speciesList.appendChild(el("div", "qf-empty", "No launchable participants"));
 				}
 				for (const row of defs) {
 					const definitionId = String(row.id ?? "");
-					const name = String(row.display_name ?? "Unknown role");
+					const name = dockDefinitionDisplayName(row);
 					const adapter = dockAdapterLabel(row.availability?.adapterId);
 					const capabilities = formatDockCapabilities(row.capability_groups);
-					const availability = row.availability;
-					const unavailable = availability?.available !== true;
-					const card = el("div", unavailable ? "lrow lrow-unavailable" : "lrow");
-					card.tabIndex = unavailable ? -1 : 0;
+					const card = el("div", "lrow");
+					card.tabIndex = 0;
 					card.setAttribute("role", "button");
 					card.setAttribute("data-definition-id", definitionId);
 					card.appendChild(el("b", null, name));
 					card.appendChild(el("span", "dock-adapter", `${adapter} · native CLI`));
 					card.appendChild(el("span", "dock-capabilities", capabilities.join(" · ")));
-					card.appendChild(el("span", unavailable ? "dock-ready unavailable" : "dock-ready", unavailable ? "unavailable" : "ready"));
-					const cue = el("em", null, unavailable ? "unavailable" : "spawn ⏎");
+					card.appendChild(el("span", "dock-ready", "ready"));
+					const cue = el("em", null, "spawn ⏎");
 					card.appendChild(cue);
-					if (unavailable) {
-						card.title = String(availability.message ?? "Unavailable");
-					} else {
-						launchable += 1;
+					launchable += 1;
 						let spawnInFlight = false;
 						const spawn = async () => {
 							if (spawnInFlight) return;
@@ -332,14 +361,14 @@ export function initDock(panelEl, options = {}) {
 								if (card.getAttribute("aria-disabled") !== "true") void spawn();
 							}
 						});
-					}
 					speciesList.appendChild(card);
 				}
 			}
 
-			latestDefinitions = defsRes?.ok ? visibleDockDefinitions(defsRes.definitions, {
+			latestDefinitions = defsRes?.ok ? launchableDockDefinitions(defsRes.definitions, {
 				qaMode: options.qaMode === true || window.__QF_QA_MODE__ === true,
 			}) : [];
+			syncStartDiscovery();
 			sessionsList.replaceChildren();
 			historyList.replaceChildren();
 			let liveCount = 0;
@@ -449,12 +478,13 @@ export function initDock(panelEl, options = {}) {
 	let selectedStrategyId = null;
 	const techniqueSelect = document.createElement("select");
 	techniqueSelect.className = "dock-technique-version";
+	techniqueSelect.id = "dock-technique-version";
 	techniqueSelect.setAttribute("aria-label", "Technique version");
 	const techniquePlaceholder = document.createElement("option");
 	techniquePlaceholder.value = "";
 	techniquePlaceholder.textContent = "Technique version";
 	techniqueSelect.appendChild(techniquePlaceholder);
-	questionForm?.insertBefore(techniqueSelect, questionForm.querySelector("button[type=submit]") || null);
+	(panelEl.querySelector("#dock-technique-host") || questionForm)?.appendChild(techniqueSelect);
 	const populateTechniqueSelect = () => window.shellApi.qf.listStrategyVersions().then((response) => {
 		for (const option of [...techniqueSelect.options].slice(1)) option.remove();
 		for (const strategy of (response?.strategies || [])) { const option = document.createElement("option"); option.value = String(strategy.strategy_id); option.textContent = String(strategy.label); option.dataset.family = String(strategy.family); option.dataset.version = String(strategy.version); option.dataset.contentHash = String(strategy.content_hash ?? ""); techniqueSelect.appendChild(option); }
@@ -486,6 +516,8 @@ export function initDock(panelEl, options = {}) {
 				if (!res?.ok) throw new Error(res?.error?.message ?? "research launch failed");
 				window.__QF_LAST_RESEARCH_SUBMIT = res;
 				planningDirector = { sessionId: String(res.sessionId), missionId: String(res.missionId) };
+				activeMissionId = String(res.missionId);
+				syncStartDiscovery();
 				void window.shellApi.qf.getResearchWorldProjection({ root_type: "mission", root_id: String(res.missionId) }).then((projection) => {
 					if (projection?.ok) missionWorld = projection.world;
 					void refresh();
