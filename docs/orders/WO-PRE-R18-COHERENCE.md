@@ -149,7 +149,11 @@ binding, capability groups, and `produces` Artifact links. It must expose:
 
 - role first and runtime second;
 - recruiter or creation reason when that fact exists;
-- owned Task, or truthful Mission-startup copy when the Director is planning;
+- owned Task; when and only when the participant is the exact Director `sessionId`
+  returned by the successful submission and that Mission has no Task, its Task
+  display is exactly `Planning mission` while its Work axis remains `unassigned`;
+  every other participant without a Task displays exactly `Not recorded` for Task
+  and `unassigned` for Work;
 - distinct session, runtime, work, and recovery axes;
 - produced Artifact/output when linked;
 - only interventions present in the existing named capability/action mapping.
@@ -240,6 +244,43 @@ projection fixture marks that exact cable inactive/background or historical.
 Do not add or rename link kinds, alter stored direction, replace the Canvas engine,
 or create a second relationship model.
 
+### F1 — Correct the founder's populated-world readability failure
+
+The founder supplied one normal QuantFlow screenshot on 2026-08-23, SHA-256
+`6925fa5b7b5c85050e0441f318565b54388f027aa5a8fb35954743908f58c477`. It is a
+bounded acceptance fixture for screenshot-proven interference, not design authority.
+It shows four defects that directly prevent the approved truths from being used:
+
+- research objects collapse into a near-single vertical column of tiny dark tiles;
+- one selected cable becomes a full-height dominant line instead of explaining two
+  endpoints;
+- participant, Artifact, Evaluation, and Report tiles do not expose enough human
+  context to understand their relationships;
+- active-session ownership text overlaps in the Dock and becomes unreadable.
+
+At the locked 1600×1000 viewport and 100% zoom, the populated Mission view must:
+
+1. distribute the visible Mission-local world in both axes: tile centers span at
+   least 45% of usable Canvas width and 45% of usable Canvas height, and no more
+   than 60% of tile centers fall within one median tile-width vertical band, while
+   preserving the existing Canvas engine and saved positions;
+2. keep tile rectangles and Dock row text/control rectangles non-overlapping;
+3. show a readable human label, semantic type, current state/authority marker, and
+   short id on every visible research-object tile;
+4. make relationship context available without decoding ids: a participant shows
+   owned Task/output; an Artifact shows producer and source Run/Task; an Evaluation
+   shows critic, verdict, and target Artifact; a Report shows its gating Evaluation
+   and current/historical authority;
+5. terminate every visible cable at its actual tile endpoints, keep its label near
+   the selected relationship, and prevent a selected stroke or label from obscuring
+   unrelated tiles or dominating the full Canvas height;
+6. preserve full canonical ids and complete relationship details in `INSPECT` even
+   when Canvas labels use shortened display text.
+
+These requirements may adjust only the current layout calculation, tile anatomy,
+bounded CSS, and existing link presentation. They do not authorize a new layout
+engine, ontology field, link, inventory surface, or broad shell redesign.
+
 ### G — Land one bounded product candidate and focused proof
 
 The product candidate contains only the projection helper or existing equivalent,
@@ -271,18 +312,22 @@ The isolated fixture contains independent facts for all of these cases:
 - a participant result Artifact, its exact Evaluation, the Mission's current
   published Report, and one superseded Report;
 - one current cable and one historical/background cable carrying existing kinds
-  and directions.
+  and directions;
+- the inherited populated research world with 13 objects and 15 semantic cables,
+  used only as the representative density fixture rather than a re-proof of R16.
 
-The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C13`. The unmodified
+The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C14`. The unmodified
 control exits zero. Each falsifier corrupts only its named condition and must exit
 nonzero with that condition's name. Builder evidence includes the control output
-and all thirteen red outputs; unconditional receipt printing is a gate defect.
+and all fourteen red outputs; unconditional receipt printing is a gate defect.
 
-The thirteen conditions are:
+The fourteen conditions are:
 
 1. durable Mission does not replace the landing state;
-2. the exact returned Director renders unexplained `No task`, or the ordinary
-   unassigned participant incorrectly receives Director-only planning copy;
+2. the exact returned Director's Task display is not exactly `Planning mission`
+   while the Mission has no Task, its Work axis is not `unassigned`, any other
+   participant displays `Planning mission`, or another no-Task participant does
+   not display Task `Not recorded` and Work `unassigned`;
 3. either Dock or Canvas differs from the independently queried Kernel/runtime
    facts for any of the four participant axes;
 4. the fixture's raw Artifact is presented as the current governed conclusion;
@@ -305,11 +350,17 @@ The thirteen conditions are:
     to render `Not recorded` for the fixture's deliberately absent fact;
 13. a rendered cable lacks its existing kind/direction, selected cable lacks
     selection emphasis, or the fixture's current and historical/background cables
-    receive the wrong visual subordination.
+    receive the wrong visual subordination;
+14. at 1600×1000 and 100% zoom, tile-center span is below 45% on either Canvas
+    axis, more than 60% of centers occupy one median tile-width vertical band, any
+    pair of tile rectangles intersects, Dock text escapes/intersects its row or
+    action rectangle, a required tile/relationship label is absent, an SVG cable
+    endpoint lies more than 12 CSS pixels from its source/target anchor, or the
+    selected cable label intersects an unrelated tile rectangle.
 
 The gate prints one named receipt per condition plus the tested commit, Mission id,
 participant ids, object ids, link triples, and `cleanup=clean`. One process boot is
-preferred for C01–C09 and C11–C13; C10 owns the one explicit relaunch. Proof scaffolding may not
+preferred for C01–C09 and C11–C14; C10 owns the one explicit relaunch. Proof scaffolding may not
 take longer than the correction it protects.
 
 ## Exact file boundary
@@ -417,7 +468,7 @@ meaning stays inside this build cycle.
 
 Builder writes
 `docs/orders/evidence/pre-r18-coherence/BUILDER-EVIDENCE.md` with commands, exits,
-the documentation semantic-check output, the control plus C01–C13 red outputs,
+the documentation semantic-check output, the control plus C01–C14 red outputs,
 named production-boundary receipts, Atlas before/after/diff results, candidate SHA,
 changed files by defect, screenshot manifest, and clean-shutdown result. The tree
 is clean and the candidate is immutable before verification.
@@ -426,7 +477,7 @@ is clean and the candidate is immutable before verification.
 
 One fresh Verifier receives this order, `PROTOCOL.md`, the immutable candidate SHA,
 and the Builder evidence—not Builder chat reasoning. It reruns the exact matrix,
-checks the thirteen falsifiable conditions against the normal product path, verifies
+checks the fourteen falsifiable conditions against the normal product path, verifies
 the commit boundaries, and confirms the worktree starts and ends on the same SHA.
 
 Any red receipt stops verification and returns the named defect to the same bounded
