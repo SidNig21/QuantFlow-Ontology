@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-pre-r18-coherence",
-    "commit": "d986435",
+    "commit": "1bb4c71",
     "generatedAt": "2026-08-23",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "c6d8c46644094c57"
+    "fingerprint": "c03bd68238c754a2"
   },
   "stats": {
     "live": 113,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 692.7,
+      "kb": 702.1,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3540,21 +3540,21 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/research-world-visible.ts",
-          "kb": 56.9,
+          "path": "qa/gates/pre-r18-coherence.ts",
+          "kb": 60.4,
           "spawns": 2,
           "spawnsLive": 2,
-          "writes": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 51,
+          "path": "qa/gates/research-world-visible.ts",
+          "kb": 56.9,
           "spawns": 2,
           "spawnsLive": 2,
-          "writes": 1,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -60048,12 +60048,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "2a401c4",
+      "commit": "d986435",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "d986435",
+      "commit": "1bb4c71",
       "generatedAt": "2026-08-23"
     },
     "verdict": "better",
