@@ -1,6 +1,6 @@
 # WO-PRE-R18-COHERENCE — Make the accepted R17 world tell one honest story
 
-status: BUILD AUTHORIZED — temporary `NEXT.md` rotation active
+status: REWORK — independent Round 1 red; single global repair commit now in use
 kind: bounded non-rung correction
 branch: `wo-pre-r18-coherence`
 base: accepted R17 closure `4d25fa3df91964fc90223a135d8969ebd61c5374`
@@ -589,3 +589,46 @@ The fresh semantic Reader answers exactly:
 Every defect must be landed in this order. Chat-only guidance cannot authorize a
 Builder. Reader `YES/YES` plus the subsequent temporary `NEXT.md` rotation is the
 only implementation door.
+
+## Round 1 independent verification — REWORK
+
+verifier-task: `01a02de8-530f-7091-b03d-668247fefc7a`
+product-candidate: `d91eda86b1184fe2c381771e293fdd8a79bad98c`
+evidence-head: `dd7ff76dc7ec4bd9d3d2cf6c354bbdfd2f86f642`
+verdict: REWORK — the one global product repair is now consumed
+record: [Round 1 verification](evidence/pre-r18-coherence/VERIFICATION-ROUND-1.md)
+
+The product's focused 25-test suite, TypeScript, static gates, Atlas ratchet, and
+the inherited live 13-object/15-cable R16 world were green with clean shutdown.
+That did not satisfy this order. C14 was a false green: the new gate checked only
+the R17 oracle file's hash/count and source strings while the live control still
+exercised 13 objects, 15 cables, and ten inspectors, with no geometry assertion.
+No optimized screenshot evidence existed.
+
+The single repair owns exactly:
+
+1. Leave `research-world-visible` and its inherited R16 13/15 contract unchanged.
+   Make `pre-r18-coherence` exercise the accepted R17
+   `qa/oracles/r17-technique-outcome.json` fixture through the real production path,
+   resolving and comparing every one of its 16 object records and 20 link records.
+2. Select all 16 objects and all 20 links in the live DOM and compare every
+   required `INSPECT` field/triple. Measure C14 from actual DOM/SVG rectangles,
+   Canvas `clientWidth/clientHeight`, existing `portPosition` anchors, painted
+   stroke bounds, and the exact thresholds in F1. A source-string or file-exists
+   check may not satisfy any C14 predicate.
+3. Capture the implemented versions of the same fourteen named baseline states at
+   1600×1000 and 100% zoom: `01-empty-workspace`, `02-mission-starting`,
+   `03-director-planning`, `04-active-participants`, `05-artifact-produced`,
+   `06-evaluation-and-report`, `07-completed-world`, `08-reopened-world`,
+   `09-dock-catalog`, `10-dock-active-sessions`, `11-selected-participant`,
+   `12-selected-artifact`, `13-selected-evaluation`, and
+   `14-most-cable-dense-region`. Track optimized PNG/WebP files at no more than
+   1600×1000, target 600 KB each, total directory at most 25 MB, and write a
+   manifest containing state, viewport, object/link counts, full SHA-256, file
+   size, and the approved defect it demonstrates.
+
+The repair may touch only the existing candidate files, the focused Pre-R18 gate/
+tests/oracle glue, and optimized evidence/receipts. It may not change the literal
+R17 oracle, weaken a threshold, replace the R16 oracle, repair unrelated package
+failures, or add product capability. After this commit, any red condition—C14 or
+otherwise—stops for Ryan with no second repair.
