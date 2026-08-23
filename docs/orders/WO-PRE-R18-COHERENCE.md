@@ -1,6 +1,6 @@
 # WO-PRE-R18-COHERENCE — Make the accepted R17 world tell one honest story
 
-status: READER ACCEPTED — implementation waits for temporary `NEXT.md` rotation
+status: BUILD AUTHORIZED — temporary `NEXT.md` rotation active
 kind: bounded non-rung correction
 branch: `wo-pre-r18-coherence`
 base: accepted R17 closure `4d25fa3df91964fc90223a135d8969ebd61c5374`
