@@ -2,8 +2,8 @@
 
 ## Attempt 1 — RED: guided sample has no selectable named Technique
 
-Date: 2026-08-22  
-Candidate: `fcce9a5795910e27b6685d561f3f9fd60eebd4cb`  
+Date: 2026-08-22
+Candidate: `fcce9a5795910e27b6685d561f3f9fd60eebd4cb`
 Mode: normal Windows application opened through Computer Use against the
 existing founder Kernel; no proof bridge, QA environment, manual SQL, wipe,
 reseed, replacement database, or external model completion
