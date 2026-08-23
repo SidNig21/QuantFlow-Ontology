@@ -1,11 +1,11 @@
 # WO-R17 — Named Technique and settled outcome loop
 
-status: REWORK — bounded repair Reader YES/YES; fresh Builder authorized
-assignee: fresh rework Builder
+status: COMPLETE — independently verified and normal-app consumer accepted at `83cb58501670ec5e5551ed9a45b5f54aa038261a`
+assignee: closed; inherited by R18+
 depends: R16 independently verified and founder-consumer accepted at `ca59628a334cc3da0060204b7685017fa381dc44`; receipt `evidence/r16/FINAL-ACCEPTANCE.md`
 rung: R17 — Technique and outcome loop
 authorization: founder umbrella goal 2026-08-15; `NEXT.md` names this order
-rework-cycle: 1 of 1 used — exhausted after this bounded repair
+rework-cycle: 1 of 1 used — closed green after bounded compatibility and guided-Technique consumer repairs
 R17_BUILD_BASE_SHA: `7ed2757cfe24d1771117e61cc4a0388aaa332ec5`
 reader-receipt: fresh Luna `r17_prebuild_reader`; four finite defect rounds landed; final YES/YES on 2026-08-22
 rework-reader-receipt: fresh Luna `r17_rework_reader`; one finite defect round landed; final YES/YES on 2026-08-22
@@ -799,3 +799,25 @@ founder-app consumer check. Any second red assertion, any extra Technique or
 truth store, any boot write, any manual state preparation, or any change to the
 ordinary required-selection or R17 Director semantics stops R17 for Router
 decision.
+
+## Closure — 2026-08-22
+
+R17 is complete on immutable candidate
+`83cb58501670ec5e5551ed9a45b5f54aa038261a`. The original Technique/outcome
+capability, the exact founder-Kernel compatibility upgrade, and the bounded
+guided-Technique consumer repair each passed independent verification. The
+normal application then created and selected one canonical
+`guided-settled-results` Technique, admitted a real Research Director Mission,
+survived normal close/reopen, and kept exactly one family/version Strategy and
+one stable registration Run. An ordinary question with the placeholder still
+selected displayed exact `TECHNIQUE COVERAGE REFUSED`; the complete logical
+Kernel snapshot hash was identical before and after that refusal. Final
+shutdown left zero QuantFlow product processes.
+
+Authoritative receipts are
+[`evidence/r17/VERIFICATION.md`](evidence/r17/VERIFICATION.md),
+[`evidence/r17/CONSUMER-CHECK.md`](evidence/r17/CONSUMER-CHECK.md), and
+[`evidence/r17/FINAL-ACCEPTANCE.md`](evidence/r17/FINAL-ACCEPTANCE.md). R17 is
+now inherited. Later rungs may run the cheapest trustworthy regression for a
+seam they actually change, but may not reopen this rung merely to re-earn its
+acceptance.
