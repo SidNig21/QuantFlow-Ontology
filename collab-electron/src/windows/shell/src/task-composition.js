@@ -106,8 +106,9 @@ export function renderTaskFoot(dom, tile, {
 		assigneeSessionId: existingForm.querySelector(".task-assignee")?.value ?? "",
 	} : null;
 	const preservedError = foot.querySelector(".task-foot-error")?.textContent ?? "";
-	const retainedChildren = [...foot.children].filter((child) => isSessionReceipt(child) || isSessionInspection(child));
-	const retainedReceipt = retainedChildren.find(isSessionReceipt) ?? null;
+	const retainedReceipt = [...foot.children].find(isSessionReceipt) ?? null;
+	const retainedInspection = [...foot.children].find(isSessionInspection) ?? null;
+	const retainedChildren = [retainedReceipt, retainedInspection].filter(Boolean);
 	if (retainedChildren.length > 0) foot.replaceChildren(...retainedChildren);
 	else foot.replaceChildren();
 	if (!tile?.sessionId) {

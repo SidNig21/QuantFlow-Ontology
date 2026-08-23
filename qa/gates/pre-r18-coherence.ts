@@ -8,7 +8,8 @@
  * and SVG geometry.
  */
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { spawn, type ChildProcess } from "node:child_process";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -18,6 +19,29 @@ import { collectOwnedPids, isolatedEnvironment, ownedProcessRows, processSnapsho
 
 const REPO_ROOT = resolve(join(import.meta.dir, "../.."));
 const COLLAB_ROOT = join(REPO_ROOT, "collab-electron");
+const EVIDENCE_ROOT = join(REPO_ROOT, "docs/orders/evidence/pre-r18-coherence");
+const captureRequire = createRequire(join(COLLAB_ROOT, "package.json"));
+const sharp = captureRequire("sharp") as (input: string) => {
+  metadata: () => Promise<{ width?: number; height?: number }>;
+  webp: (options: { quality: number; effort: number }) => { toFile: (path: string) => Promise<unknown> };
+};
+const CAPTURE_ENABLED = process.env.QF_PRE_R18_CAPTURE === "1";
+const CAPTURE_NAMES = [
+  "01-empty-workspace",
+  "02-mission-starting",
+  "03-director-planning",
+  "04-active-participants",
+  "05-artifact-produced",
+  "06-evaluation-and-report",
+  "07-completed-world",
+  "08-reopened-world",
+  "09-dock-catalog",
+  "10-dock-active-sessions",
+  "11-selected-participant",
+  "12-selected-artifact",
+  "13-selected-evaluation",
+  "14-most-cable-dense-region",
+] as const;
 const ORACLE_PATH = join(REPO_ROOT, "qa/oracles/r17-technique-outcome.json");
 const R17_ORACLE_SHA256 = "038a68c2508d3d671a60a1ab3d562d8d387e70ed08e582a4cca2e7fbf0519fa7";
 const FALSIFY_ENV = "QF_PRE_R18_COHERENCE_FALSIFY";
@@ -42,6 +66,8 @@ type Json = Record<string, unknown>;
 type R17Object = { type: string; id: string; fields: Json };
 type R17World = { root: { type: string; id: string }; objects: R17Object[]; links: Array<{ kind: string; from_id: string; to_id: string }> };
 type Live = { child: ChildProcess; endpoint: string; owned: Set<number> };
+type CaptureReceipt = { name: string; path: string; bytes: number; sha256: string; width: number; height: number; objects: number; links: number };
+const captureReceipts: CaptureReceipt[] = [];
 
 const JSON_FIELDS = new Set(["sources", "coverage", "params", "metrics", "rubric", "run_metrics", "source_work", "block_reason"]);
 
@@ -204,6 +230,60 @@ async function evaluate<T>(endpoint: string, expression: string): Promise<T> {
   if (result.ok !== true) throw new Error(`renderer assertion failed: ${String(result.message)}`);
   return result.value as T;
 }
+async function captureState(live: Live, name: (typeof CAPTURE_NAMES)[number]): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  const index = CAPTURE_NAMES.indexOf(name);
+  assert(index === captureReceipts.length, `capture sequence expected ${CAPTURE_NAMES[captureReceipts.length] ?? "complete"}, got ${name}`);
+  const rawPath = join(EVIDENCE_ROOT, `.${name}.capture.png`);
+  const outputPath = join(EVIDENCE_ROOT, `${name}.webp`);
+  mkdirSync(EVIDENCE_ROOT, { recursive: true });
+  try {
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 150));
+    const captured = await rpcCall(live.endpoint, "app.ui.capturePage", { outputPath: rawPath }) as Json;
+    assert(captured.width === 1600 && captured.height === 1000, `capture ${name} was ${String(captured.width)}x${String(captured.height)}, expected 1600x1000`);
+    const state = await evaluate<{ objects: number; links: number }>(live.endpoint, "({ objects: document.querySelectorAll('.canvas-tile[data-qf-world-type]').length, links: document.querySelectorAll('.cable-path[data-qf-world-cable-kind]').length })");
+    const rawMetadata = await sharp(rawPath).metadata();
+    assert(rawMetadata.width === 1600 && rawMetadata.height === 1000, `raw capture ${name} was not 1600x1000`);
+    await sharp(rawPath).webp({ quality: 82, effort: 5 }).toFile(outputPath);
+    const bytes = statSync(outputPath).size;
+    assert(bytes > 0 && bytes <= 600 * 1024, `capture ${name} is ${bytes} bytes, outside 0..600KB`);
+    const outputMetadata = await sharp(outputPath).metadata();
+    assert(outputMetadata.width === 1600 && outputMetadata.height === 1000, `optimized capture ${name} was not 1600x1000`);
+    const sha256 = createHash("sha256").update(readFileSync(outputPath)).digest("hex");
+    assert(!captureReceipts.some((receipt) => receipt.sha256 === sha256), `capture ${name} duplicated an earlier frame`);
+    const receipt = { name, path: outputPath, bytes, sha256, width: 1600, height: 1000, objects: state.objects, links: state.links };
+    captureReceipts.push(receipt);
+    console.log(`pre-r18-coherence: screenshot=${JSON.stringify(receipt)}`);
+  } finally {
+    rmSync(rawPath, { force: true });
+  }
+}
+async function setDockMode(live: Live, mode: "START" | "CATALOG" | "ACTIVE" | "INSPECT" | "HISTORY"): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  const selected = await evaluate<boolean>(live.endpoint, `(() => { const tab = document.querySelector(${JSON.stringify(`[data-dock-mode="${mode}"]`)}); if (!(tab instanceof HTMLElement)) throw new Error("Dock mode tab missing"); tab.click(); return true; })()`);
+  assert(selected, `Dock mode ${mode} click did not run`);
+  await waitFor(`Dock mode ${mode}`, async () => await evaluate<boolean>(live.endpoint, `document.querySelector(${JSON.stringify(`[data-dock-mode="${mode}"][aria-selected="true"]`)}) !== null`), Date.now() + 5_000);
+}
+async function toggleObjectInspect(live: Live, type: string, id: string, expected: "open" | "closed" = "open"): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  const state = await evaluate<{ type: string; id: string; label: string; detailsHidden: boolean }>(live.endpoint, `(() => { const tile = [...document.querySelectorAll(".canvas-tile[data-qf-world-type]")].find((node) => node.dataset.qfWorldType === ${JSON.stringify(type)} && node.dataset.qfWorldId === ${JSON.stringify(id)}); const button = tile?.querySelector(".qf-world-inspect"); const details = tile?.querySelector(".qf-world-details"); if (!(button instanceof HTMLElement) || !(details instanceof HTMLElement)) throw new Error("Inspect control missing for ${type}:${id}"); button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window })); return { type: tile.dataset.qfWorldType ?? "", id: tile.dataset.qfWorldId ?? "", label: button.textContent ?? "", detailsHidden: details.hidden }; })()`);
+  const open = expected === "open";
+  assert(state.type === type && state.id === id && state.label === (open ? "Collapse" : "Inspect") && state.detailsHidden === !open, `Inspect did not ${open ? "open" : "close"} the requested ${type}:${id} tile: ${JSON.stringify(state)}`);
+  if (open) await evaluate<boolean>(live.endpoint, `(() => { const tile = [...document.querySelectorAll(".canvas-tile[data-qf-world-type]")].find((node) => node.dataset.qfWorldType === ${JSON.stringify(type)} && node.dataset.qfWorldId === ${JSON.stringify(id)}); const body = tile?.querySelector(".gl-tile__body"); if (!(body instanceof HTMLElement)) throw new Error("Canvas body missing for ${type}:${id}"); body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, button: 0, view: window })); return true; })()`);
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 80));
+}
+async function selectCable(live: Live): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  await evaluate<boolean>(live.endpoint, `(() => { const paths = [...document.querySelectorAll(".cable-path[data-qf-world-cable-kind]")]; const path = paths[paths.length - 1]; if (!(path instanceof SVGPathElement)) throw new Error("Cable path missing"); path.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })); return true; })()`);
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 80));
+}
+async function captureManifestReceipt(): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  assert(captureReceipts.length === CAPTURE_NAMES.length, `captured ${captureReceipts.length} of ${CAPTURE_NAMES.length} required screenshots`);
+  const totalBytes = captureReceipts.reduce((total, receipt) => total + receipt.bytes, 0);
+  assert(totalBytes <= 25 * 1024 * 1024, `screenshot evidence is ${totalBytes} bytes, above 25MB`);
+  console.log(`pre-r18-coherence: screenshot_manifest=${JSON.stringify({ files: captureReceipts.length, totalBytes, captures: captureReceipts })}`);
+}
 async function buildOnce(): Promise<void> {
   const child = spawn("bun", ["run", "build"], { cwd: COLLAB_ROOT, env: { ...process.env }, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] }); child.stdout?.resume(); child.stderr?.resume(); await waitForExit(child, 120_000); assert(child.exitCode === 0, `candidate build exited ${String(child.exitCode)}`);
 }
@@ -251,19 +331,22 @@ async function runLiveR17C14Proof(): Promise<void> {
   const oracle = readOracle(); await buildOnce(); const root = resolve(mkdtempSync(join(tmpdir(), "qf-pre-r18-coherence-"))); const kernelDb = join(root, "stores", "kernel.db"); const artifactRoot = join(root, "stores", "artifacts"); const appRoot = join(root, "app-root"); mkdirSync(artifactRoot, { recursive: true }); let live: Live | null = null;
   try {
     live = await launch(root, kernelDb, artifactRoot, appRoot);
+    await captureState(live, "01-empty-workspace");
     const fixture = await rpcCall(live.endpoint, "qf.research.seed_fixture_dataset", { r17_technique: true }) as Json; const dataset = fixture.dataset as Json; const strategyId = String((fixture.strategies as Json[]).find((row) => Number(row.version) === 2)?.strategy_id ?? ""); assert(dataset && typeof dataset.object_id === "string" && strategyId, "R17 fixture did not return Dataset and v2 Technique");
-    const datasetId = String(dataset.object_id); await submitR17Mission(live.endpoint, datasetId, strategyId); await waitFor("R17 Mission persistence", async () => dbRows(kernelDb, "SELECT id FROM mission WHERE id='mission-r17-gate'").length === 1 ? true : null, Date.now() + 25_000);
-    const admission = await waitFor("R17 Director admission", async () => await rpcCall(live!.endpoint, "qf.r17.admission", {}).catch(() => null) as Json | null, Date.now() + 20_000); const directorSessionId = String(admission.sessionId ?? ""); assert(directorSessionId, "R17 Director submission did not expose session identity");
+    const datasetId = String(dataset.object_id); await submitR17Mission(live.endpoint, datasetId, strategyId); await waitFor("R17 renderer submission receipt", async () => { const value = await evaluate<Json | null>(live!.endpoint, "window.__QF_LAST_RESEARCH_SUBMIT || null"); return value && typeof value.missionId === "string" ? value : null; }, Date.now() + 25_000); await waitFor("R17 Mission persistence", async () => dbRows(kernelDb, "SELECT id FROM mission WHERE id='mission-r17-gate'").length === 1 ? true : null, Date.now() + 25_000); await captureState(live, "02-mission-starting");
+    const admission = await waitFor("R17 Director admission", async () => await rpcCall(live!.endpoint, "qf.r17.admission", {}).catch(() => null) as Json | null, Date.now() + 20_000); const directorSessionId = String(admission.sessionId ?? ""); assert(directorSessionId, "R17 Director submission did not expose session identity"); await setDockMode(live, "ACTIVE"); await captureState(live, "03-director-planning");
     const directorRun = await waitFor("R17 Director Run", async () => dbRows(kernelDb, "SELECT id, params FROM run WHERE id='run-r17-gate'")[0] ?? null, Date.now() + 25_000); const runParams = typeof directorRun.params === "string" ? JSON.parse(directorRun.params) as Json : directorRun.params as Json; const executorSessionId = String(runParams.executor_session_id ?? ""); assert(executorSessionId, "R17 Director Run executor identity is missing");
     await rpcCall(live.endpoint, "qf.research.seed_fixture_dataset", { dataset_id: datasetId, visible_world: { nonce: `pre-r18-${Date.now()}`, task_id: "task-r17-gate", mission_id: "mission-r17-gate", director_session_id: directorSessionId, task_title: "R17 outcome Task", task_description: "R17 live technique outcome", hypothesis_id: "hypothesis-r17-gate", executor_session_id: executorSessionId, critic_session_id: "r17-critic", strategy_id: strategyId, run_id: "run-r17-gate" } });
     await revealMission(live.endpoint);
     const initialWorld = await waitFor("R17 initial projection", async () => { try { const value = await projectedWorld(live!.endpoint); return value.objects.length > 0 ? value : null; } catch { return null; } }, Date.now() + 20_000);
     const resultArtifactId = String(initialWorld.links.find((link) => link.kind === "produces" && link.from_id === "run-r17-gate")?.to_id ?? "");
     assert(resultArtifactId && initialWorld.objects.some((object) => object.id === resultArtifactId), "R17 initial projection did not expose the produced result Artifact");
-    console.log(`pre-r18-coherence: initial_objects=${initialWorld.objects.length} initial_links=${initialWorld.links.length} result_artifact=${resultArtifactId}`);
+    console.log(`pre-r18-coherence: initial_objects=${initialWorld.objects.length} initial_links=${initialWorld.links.length} result_artifact=${resultArtifactId}`); await setDockMode(live, "ACTIVE"); await captureState(live, "04-active-participants"); await toggleObjectInspect(live, "artifact", resultArtifactId); await captureState(live, "05-artifact-produced");
     await settleR17Outcome(live.endpoint, resultArtifactId); await waitFor("R17 settled ticket", async () => dbRows(kernelDb, "SELECT id FROM ticket WHERE id='external-r17'").length === 1 ? true : null, Date.now() + 25_000); await revealMission(live.endpoint);
     const world = await waitFor("R17 settled projection", async () => { try { const value = await projectedWorld(live!.endpoint); return value.objects.length === 16 && value.links.length === 20 ? value : null; } catch { return null; } }, Date.now() + 25_000);
     const { expected, ids } = resolveR17Bindings(kernelDb, oracle, directorSessionId, strategyId); compareResolvedWorld(world, expected);
+    await setDockMode(live, "START"); await captureState(live, "06-evaluation-and-report"); await setDockMode(live, "HISTORY"); await captureState(live, "07-completed-world");
+    await closeLive(live); live = await launch(root, kernelDb, artifactRoot, appRoot); await waitFor("R17 reopened saved world", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000).catch(async () => { await revealMission(live!.endpoint); return await waitFor("R17 reopened revealed world", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000); }); await setDockMode(live, "START"); await captureState(live, "08-reopened-world"); await setDockMode(live, "CATALOG"); await captureState(live, "09-dock-catalog"); await setDockMode(live, "ACTIVE"); await captureState(live, "10-dock-active-sessions"); await evaluate<boolean>(live.endpoint, "(() => { const row=document.querySelector('#dock-sessions-list .srow'); if (!(row instanceof HTMLElement)) throw new Error('active participant row missing'); row.click(); return true; })()"); await waitFor("selected participant Dock mode", async () => await evaluate<boolean>(live!.endpoint, "document.querySelector('[data-dock-primary=\"INSPECT\"]')?.hidden === false"), Date.now() + 5_000); await captureState(live, "11-selected-participant"); await setDockMode(live, "START"); await toggleObjectInspect(live, "artifact", String(ids.result_artifact_id)); await captureState(live, "12-selected-artifact"); await toggleObjectInspect(live, "artifact", String(ids.result_artifact_id), "closed"); await toggleObjectInspect(live, "evaluation", String(ids.evaluation_id)); await captureState(live, "13-selected-evaluation"); await setDockMode(live, "START"); await selectCable(live); await captureState(live, "14-most-cable-dense-region"); await toggleObjectInspect(live, "evaluation", String(ids.evaluation_id), "closed"); await captureManifestReceipt();
     const objectKeys = expected.objects as Array<{ type: string; id: string }>; const linkKeys = expected.links as Array<{ kind: string; from_id: string; to_id: string }>; const measurement = await evaluate<Json>(live.endpoint, geometryExpression(objectKeys, linkKeys)); assert(measurement.objectCount === 16 && measurement.linkCount === 20, "C14 did not select all 16 objects and 20 links");
     console.log(`pre-r18-coherence: oracle_objects=16 oracle_links=20 resolved_objects=${measurement.objectCount} resolved_links=${measurement.linkCount}`); console.log(`pre-r18-coherence: geometry=${JSON.stringify({ viewport: measurement.viewport, canvas: measurement.canvas, measured_tiles: measurement.tiles?.length, measured_links: measurement.paths?.length })}`); console.log(`pre-r18-coherence: inspected_objects=${measurement.tiles?.length} inspected_links=${measurement.paths?.length}`); console.log(`pre-r18-coherence: production_ids=${JSON.stringify({ mission: "mission-r17-gate", director: directorSessionId, executor: executorSessionId, strategy: ids.strategy_id, evaluation: ids.evaluation_id, report: ids.report_artifact_id })}`);
   } finally { if (live) await closeLive(live).catch((error) => console.error(`pre-r18-coherence: cleanup_error=${errorMessage(error)}`)); rmSync(root, { recursive: true, force: true }); console.log(`pre-r18-coherence: roots_remaining=${existsSync(root) ? 1 : 0} leaked=${existsSync(root) ? JSON.stringify([root]) : "[]"}`); }

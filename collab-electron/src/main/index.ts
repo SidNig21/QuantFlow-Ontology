@@ -14,7 +14,7 @@ import {
   type WebContents,
 } from "electron";
 import { execFileSync } from "node:child_process";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { fromCollabFileUrl } from "@collab/shared/collab-file-url";
@@ -1127,6 +1127,25 @@ app.whenReady().then(async () => {
   }, {
     description: "Bounded production UI proof bridge for the live shell renderer",
     params: { expression: "JavaScript evaluated in the production shell renderer" },
+  });
+  registerMethod("app.ui.capturePage", async (params) => {
+    if (process.env.QF_UI_PROOF !== "1") {
+      throw new Error("app.ui.capturePage is disabled outside the bounded UI proof");
+    }
+    const outputPath = (params as Record<string, unknown> | null)?.outputPath;
+    if (typeof outputPath !== "string" || outputPath.trim().length === 0) {
+      throw new Error("app.ui.capturePage requires outputPath:string");
+    }
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      throw new Error("production shell window is not available");
+    }
+    const image = await mainWindow.webContents.capturePage();
+    writeFileSync(outputPath, image.toPNG());
+    const size = image.getSize();
+    return { outputPath, width: size.width, height: size.height };
+  }, {
+    description: "Bounded production UI proof capture of the live shell BrowserWindow",
+    params: { outputPath: "Absolute PNG path for the bounded proof capture" },
   });
   registerMethod("app.ui.pressKey", async (params) => {
     if (process.env.QF_UI_PROOF !== "1") {

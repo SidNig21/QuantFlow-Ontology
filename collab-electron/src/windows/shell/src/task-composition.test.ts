@@ -266,6 +266,8 @@ describe("Task footer projection", () => {
       extraClass.className = "qf-world-session-receipt extra";
       const retainedReceipt = new FakeElement("div");
       retainedReceipt.className = "qf-world-session-receipt";
+      const retainedInspection = new FakeElement("div");
+      retainedInspection.className = "qf-world-session-inspect";
       const receiptRows = ["id", "status", "label"].map((field) => {
         const row = new FakeElement("div");
         row.className = "qf-world-field";
@@ -279,10 +281,14 @@ describe("Task footer projection", () => {
       });
       const duplicateReceipt = new FakeElement("div");
       duplicateReceipt.className = "qf-world-session-receipt";
+      const duplicateInspection = new FakeElement("div");
+      duplicateInspection.className = "qf-world-session-inspect";
       foot.appendChild(nested);
       foot.appendChild(extraClass);
       foot.appendChild(retainedReceipt);
+      foot.appendChild(retainedInspection);
       foot.appendChild(duplicateReceipt);
+      foot.appendChild(duplicateInspection);
 
       const sessionTile = { id: "tile-worker", sessionId: "worker-1" };
       const renderReceipt = (title: string): void => {
@@ -300,6 +306,9 @@ describe("Task footer projection", () => {
         expect(foot.children[foot.children.length - 1]).toBe(retainedReceipt);
         expect(foot.querySelector(".qf-world-session-receipt")).toBe(retainedReceipt);
         expect(foot.children.includes(duplicateReceipt)).toBe(false);
+        expect(foot.querySelector(".qf-world-session-inspect")).toBe(retainedInspection);
+        expect(foot.children.filter((child) => child.classList.contains("qf-world-session-inspect"))).toEqual([retainedInspection]);
+        expect(foot.children.includes(duplicateInspection)).toBe(false);
         expect(foot.children.includes(nested)).toBe(false);
         expect(foot.children.includes(extraClass)).toBe(false);
         expect(retainedReceipt.children).toEqual(receiptRows.map(({ row }) => row));
