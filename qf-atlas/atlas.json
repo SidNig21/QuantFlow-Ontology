@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-pre-r18-coherence",
-    "commit": "2a401c4",
+    "commit": "d986435",
     "generatedAt": "2026-08-23",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "4a3f3da50ce3efd1"
+    "fingerprint": "c6d8c46644094c57"
   },
   "stats": {
     "live": 113,
@@ -1450,21 +1450,21 @@
       "id": "2:collab-electron/src/main::index",
       "layer": 2,
       "name": "main/index.ts",
-      "kb": 56.5,
+      "kb": 57.4,
       "x": -1.24,
       "z": 0.45,
       "status": "warn",
       "spawns": 1,
-      "writes": 0,
+      "writes": 1,
       "dml": 0,
       "executes": 0,
       "files": [
         {
           "path": "collab-electron/src/main/index.ts",
-          "kb": 56.5,
+          "kb": 57.4,
           "spawns": 1,
           "spawnsLive": 0,
-          "writes": 0,
+          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -2691,7 +2691,7 @@
       "id": "4:collab-electron/src/windows/shell/src::cable",
       "layer": 4,
       "name": "cable*",
-      "kb": 19.2,
+      "kb": 19.1,
       "x": -2.48,
       "z": -0.91,
       "status": "ok",
@@ -2702,7 +2702,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/cable-overlay.js",
-          "kb": 7.9,
+          "kb": 7.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2967,7 +2967,7 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 14.7,
+      "kb": 14.8,
       "x": 2.6,
       "z": -0.45,
       "status": "ok",
@@ -2978,7 +2978,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 14.7,
+          "kb": 14.8,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 683.2,
+      "kb": 692.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3550,6 +3550,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/pre-r18-coherence.ts",
+          "kb": 51,
+          "spawns": 2,
+          "spawnsLive": 2,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/technique-outcome-loop.ts",
           "kb": 45.9,
           "spawns": 4,
@@ -3565,16 +3575,6 @@
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 4,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 41.5,
-          "spawns": 2,
-          "spawnsLive": 2,
-          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -56908,27 +56908,27 @@
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1248,
+          "line": 1267,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1348,
+          "line": 1367,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1353,
+          "line": 1372,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1393,
+          "line": 1412,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1433,
+          "line": 1452,
           "kind": "direct"
         }
       ],
@@ -56953,17 +56953,17 @@
       "senders": [
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1349,
+          "line": 1368,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1394,
+          "line": 1413,
           "kind": "direct"
         },
         {
           "file": "collab-electron/src/main/index.ts",
-          "line": 1460,
+          "line": 1479,
           "kind": "direct"
         },
         {
@@ -60048,16 +60048,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "7de630b",
+      "commit": "2a401c4",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "2a401c4",
+      "commit": "d986435",
       "generatedAt": "2026-08-23"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "42 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60394,16 +60394,7 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [
-      {
-        "path": "qa/gates/pre-r18-coherence.ts",
-        "analyzer": "lifetime",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
-      }
-    ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -60411,7 +60402,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null

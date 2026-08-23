@@ -33,4 +33,6 @@ The authorized package-wide `bun test` completed `496 pass, 43 fail, 8 errors` a
 
 ## Atlas and handoff
 
-Atlas was generated after the final product/evidence files were fixed. The final `generate --check`, ratchet, diff, `git diff --check`, clean-tree check, and pushed commit identities are appended here by the final handoff update.
+Atlas was generated after the final product/evidence files were fixed and committed at `d9864351f4a692d6d65eab57c2cb6032fd37232d`. Generation reported 439 files, 110 subsystems, 126 IPC channels, 113 live wires, 13 unused wires, 10 confirmed violations, 3 gray findings, and 22 coverage gaps. The generated map records commit `d986435`; `generate --check` is fingerprint-based and intentionally excludes commit identity, so the subsequent Atlas commit does not make the map self-stale.
+
+Pre-Atlas receipts: `bun qf-atlas/generate.mjs --check` PASS; `bun qf-atlas/ratchet.mjs` PASS in 3.6s with baseline 3, HARD RED 0, unexplained coverage 0, undecided-without-blocker 0; `bun qf-atlas/generate.mjs --diff 4d25fa3df91964fc90223a135d8969ebd61c5374` reported `VERDICT: UNCHANGED` with no architectural change. Final post-Atlas reruns and the final Atlas/evidence commit SHA are recorded in the handoff message and must remain clean.
