@@ -199,7 +199,7 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R15 | complete | `docs/orders/evidence/r15` |
 | R16 | complete | `docs/orders/evidence/r16` |
 | R17 | complete | `docs/orders/evidence/r17` |
-| R18 | pending | — |
+| R18 | active | Draft order only; `NEXT.md` explicitly withholds Builder authority pending founder alignment and a fresh Reader |
 | R19 | pending | — |
 | R20 | pending | — |
 

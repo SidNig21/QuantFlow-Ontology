@@ -74,14 +74,14 @@ The ontology has three planes:
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) points to [`docs/orders/WO-R17.md`](docs/orders/WO-R17.md), the one active product order; its pre-build Reader is the current door |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) records an alignment pause: R17 is accepted, [`docs/orders/WO-R18.md`](docs/orders/WO-R18.md) is draft-only, and no Builder is authorized |
 | Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — non-authoritative source record; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
-| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R16 is complete and R17 named Technique/outcome grading is active |
+| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R17 named Technique/outcome grading is complete; R18 evaluated recall is the next alignment door |
 | Product floor | Installable Windows app, one Hermes Research Director, governed specialist Tasks and steering, exact critic review, evaluation-gated publication, and a pointer-inspectable 13-object/15-cable Mission-to-Report world that survives reopen |
-| Honest boundary | A forward Run does not yet take a founder-selected immutable Technique version or turn a later operator-supplied settlement into visible calibration/CLV. R17 closes that loop; evaluated recall and governed PufferLib learning remain R18 to R20. |
+| Honest boundary | Named Technique-bound forward research now works and missing-Technique admission refuses before write. Evaluated recall, governed PufferLib learning, and trace-driven improvement remain R18 to R20. |
 
 ```bash
-bun qa/run.ts rung-ladder    # must say active=R17
+bun qa/run.ts rung-ladder    # must say active=R18; NEXT keeps Builder authority closed during alignment
 bun qa/run.ts --list         # every registered gate
 ```
 
