@@ -473,3 +473,168 @@ Run the unchanged complete matrix and all eight falsifiers from the main order.
 The exact gate must emit the full live receipt block, finish under two minutes,
 and leave zero PIDs/roots. Any red stops R17 for Router decision; there is no
 second rework lap and no R18 authority.
+
+## Consumer blocker — accepted R16 current database is an exact pre-R17 predecessor
+
+### Fresh Reader finding — 2026-08-22
+
+The exact built candidate parent is `bd619a7483b4ef838ae832302d9b683b85590831`,
+with evidence-only HEAD `451b46f`. The accepted R16 product candidate is
+`ca59628a334cc3da0060204b7685017fa381dc44`; its founder-kernel compatibility
+proof is in `docs/orders/evidence/r16/VERIFICATION.md` and
+`docs/orders/evidence/r16/FINAL-ACCEPTANCE.md`.
+
+Plain meaning: an R16 database that is already healthy must open in R17 without
+losing the founder's work; today the app rejects it before showing a window.
+
+The measured defect is in the upgrade seam, not in the R17 ontology contract:
+
+1. R17 adds exactly four `links.kind` values — `grades_ticket`, `grades_run`,
+   `grades_strategy`, and `grades_run_result` — plus the
+   `record_strategy_outcome` `schema_meta` row. The current generated migration
+   and `applyCurrentR16SchemaAdditions` contain those additions.
+2. A legitimate founder database that was upgraded to the accepted R16 current
+   shape has every R16 table, link kind, and metadata row, but has none of those
+   five R17 additions. Its rows are valid and must remain untouched.
+3. `classifyKernelShape` has exact snapshots for older predecessors and current,
+   but no exact full-R16/pre-R17 snapshot. It therefore returns `partial`, and
+   `assertWritableUpgradeShape` raises `KernelUpgradeShapeError` for
+   `agent-profile-identity` before the normal app can create a window.
+
+This is an active-rung defect under `AUTONOMY.md`: it directly blocks the named
+R17 consumer journey and violates inherited Kernel compatibility. It is not
+authority to broaden classification, alter the generated R17 schema, or start
+R18.
+
+### Smallest safe compatibility repair — one meaning per deliverable
+
+The Builder makes only the following product/test changes. No other R17
+deliverable is reopened.
+
+**A — Add one exact `pre_r17_current` structural predecessor.**
+
+Derive a new frozen snapshot from the current generated migration authority by
+removing only:
+
+- the four R17 link-kind literals named above from the `links` table CHECK; and
+- the one `record_strategy_outcome` row from `schema_meta`.
+
+Every table SQL string, every other link kind, every other `schema_meta` row
+(including `belongs_to`, `governed_review_task`, and all R16 steering actions),
+and every description remain byte-for-byte the current authority. The state name
+is exactly `pre_r17_current` (not a generic “near current” or a renamed older
+state). `classifyKernelShape` returns it only when the complete structural
+snapshot equals that derived shape. Any missing R16 row, extra row, changed
+description, changed table SQL, missing link kind, or other near-shape remains
+`partial` and continues to fail closed.
+
+**B — Add one exact upgrade branch for that state.**
+
+When `applyKernelUpgradeChain` receives `pre_r17_current`, it runs the existing
+current-additions routine once inside the existing Kernel transaction, then
+asserts that the result classifies as `current`. It does not run any earlier
+generated upgrade SQL. Existing recognized predecessors, `current`,
+`uninitialized`, and `partial` behavior remain unchanged. A second attach to a
+now-current database is a no-op. The branch may not delete, rewrite, or recreate
+founder domain rows; the only intended durable additions are the five R17 schema
+definitions and the links-table structural CHECK rebuild required to admit them.
+
+**C — Add one isolated compatibility gate and its complete receipts.**
+
+Register one minutes-scale gate named `r17-founder-kernel-compatibility`. It
+uses a disposable copy of an exact R16-current/pre-R17 fixture and the
+production `attachKernel`/upgrade path. It does not launch Electron, open the
+founder's real database, use manual SQL against founder state, wipe/reseed a
+database, or introduce a migration framework. The gate must:
+
+- compare the full canonical row set of every pre-existing ontology table,
+  `links`, and `events` before and after upgrade, including every id, payload,
+  hash, timestamp, and link endpoint; all pre-existing rows must be identical;
+- assert `pre_r17_current → current`, exact presence of the four R17 link kinds
+  and `record_strategy_outcome`, and no other schema/meta delta;
+- close and re-open the same upgraded copy, assert `current`, and prove the
+  complete database snapshot is unchanged by the second attach; and
+- assert that malformed near-shapes reject with
+  `KernelUpgradeShapeError` and leave file bytes, rows, schema, WAL, and SHM
+  sidecars unchanged.
+
+The fixture may be constructed by existing test helpers in a disposable test
+root; that is test setup, not founder-state migration. The later normal-app
+consumer check below must use the existing founder database with no wipe, reseed,
+or hand-written SQL.
+
+### Adversarial acceptance — every gate must be able to go red
+
+The Builder and independent Verifier run the focused compatibility gate in
+addition to the unchanged R17 matrix:
+
+```text
+bun qa/run.ts r17-founder-kernel-compatibility
+bun test packages/qf-kernel/src/r17-technique-outcome.test.ts
+bun qa/run.ts technique-outcome-loop
+```
+
+The compatibility gate is not a receipt printer. Its assertions read persisted
+rows and SQLite schema state; a constant receipt, row count alone, or a fresh
+current database is red. It prints this exact compatibility receipt block:
+
+```text
+pre_r17_shape=pre_r17_current
+upgrade=pre_r17_current->current
+existing_rows_same=true
+schema_delta=grades_ticket,grades_run,grades_strategy,grades_run_result,record_strategy_outcome
+second_attach_same=true
+partial_extra_refused=true
+partial_missing_r16_refused=true
+partial_changed_sql_refused=true
+transaction_rollback=true
+founder_db_touched=false
+```
+
+The gate must show the following independent falsifiers red, then restore the
+candidate and show the positive control green. Each case starts from a fresh
+disposable copy; the fixture, expected receipt, and compatibility assertions
+are read-only:
+
+1. Remove the `pre_r17_current` classifier branch: exact-shape classification or
+   the `pre_r17_current → current` assertion is red.
+2. Replace the exact snapshot with a subset/feature-presence check: the extra
+   unknown `schema_meta` row case is red because it must remain `partial`.
+3. Skip the upgrade branch: post-attach classification is not `current` and the
+   exact schema delta assertion is red.
+4. Run the full historical upgrade chain for `pre_r17_current`: the test fails
+   on the forbidden extra upgrade/schema delta or changed durable rows.
+5. Change one pre-existing row payload, hash, timestamp, or link endpoint in the
+   upgrade path: the complete canonical row-set assertion is red.
+6. Make the current-additions step fail after the links rebuild: the transaction
+   assertion is red unless the copy returns byte-for-byte to its pre-upgrade
+   state, including WAL/SHM sidecars.
+7. Delete one retained R16 metadata row or link kind: the shape must classify
+   `partial`, throw the exact upgrade-shape error, and leave bytes and rows
+   unchanged.
+8. Add one of the five R17 additions to an otherwise pre-R17 fixture: no
+   intermediate shape is accepted; classification and attach must be red.
+
+The unchanged R17 production gate remains required because compatibility alone
+does not prove the Technique/outcome journey. A red compatibility case cannot
+be hidden by a green fresh-database R17 gate.
+
+### Required normal-app consumer acceptance after independent PASS
+
+Only after the fresh independent Verifier passes the matrix and all
+compatibility falsifiers may the Router perform one normal Windows consumer
+check against the exact immutable candidate SHA. It uses the existing founder
+Kernel path; no manual SQL, wipe, reseed, replacement database, or retry is
+allowed. The check must show:
+
+- the app reaches a normal window without `KernelUpgradeShapeError`;
+- the upgrade reaches `current` and the complete pre-existing founder row set is
+  preserved, not merely its counts or a sample;
+- close and re-open of that same path produces the same world and `current`
+  shape; and
+- ordinary shutdown leaves zero owned product processes.
+
+Any shape outside the exact `pre_r17_current` or an already-current database,
+any row-preservation failure, any manual state preparation, or any second red
+assertion stops R17 for Router decision. Do not widen fail-closed classification,
+touch the generated schema semantics, add release/package work, or begin R18.
