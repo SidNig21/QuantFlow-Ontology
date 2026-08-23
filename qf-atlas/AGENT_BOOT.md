@@ -9,12 +9,7 @@ Read this before touching QuantFlow architecture or cleanup.
 
 **STATUS**
 
-- Capability work: **CLOSED**. Do not redesign, extend or add analyzers.
-- Independent acceptance: **PENDING**. No completed Verifier receipt exists;
-  `qf-atlas/verification.json` and `qf-atlas/baseline.json` are absent by design.
-
-Atlas is authoritative for **diagnosis and blast radius today**. It is **not yet**
-authority for deletion or repair — that waits on independent acceptance.
+- Capability work: CLOSED; independent acceptance: PASS; founder acceptance: recorded in qf-atlas/verification.json; baseline: present; Atlas authorizes diagnosis and blast-radius analysis, not product repair or deletion.
 
 ## Establish snapshot
 

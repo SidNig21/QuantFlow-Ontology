@@ -50,7 +50,9 @@ native QuantFlow visual language.
 
 ## Accessibility & Inclusion
 
-Meet WCAG 2.1 AA contrast for text and state indicators. Every pointer action
-has keyboard parity and a visible focus state. Meaning never depends on color
-alone. Motion communicates state, respects reduced-motion preferences, and does
-not block the operator's workflow.
+Meet WCAG 2.1 AA contrast for text and state indicators. Normal text and terminal
+input must work after explicit mouse focus, and focus may not become trapped.
+Full global keyboard-navigation parity remains pre-release debt in
+[`docs/DEBT.md` item 38](DEBT.md#L63). Meaning never depends on color alone. Motion
+communicates state, respects reduced-motion preferences, and does not block the
+operator's workflow.
