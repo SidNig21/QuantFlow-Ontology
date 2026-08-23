@@ -1028,9 +1028,10 @@ marker and otherwise renders exactly `Not recorded`.
 Every enumerated fact slot renders its labelled value; an absent source renders
 exactly `Not recorded` in that slot. Labels, fixed fallback phrases, badges, and
 derived authority statuses are presentation of existing facts, never new ontology
-fields. For Canvas tile anatomy this table supersedes the older F1 short-id and
-role-specific context-row requirements wherever they differ; Dock `INSPECT`
-retains every full id and detail.
+fields. For Canvas tile anatomy this table supersedes the older Deliverable D/F1
+marker strings and the earlier C14 short-id/context-row rectangle predicates
+wherever they differ: Canvas uses the exact badge/status text in this table, while
+Dock `INSPECT` retains every full id, original semantic marker, and detail.
 
 The Mission tile specifically may not show `missionmission`, a full/rotated id,
 `FOCUS`, fixture/internal copy, the generic `Founder question`, or redundant
