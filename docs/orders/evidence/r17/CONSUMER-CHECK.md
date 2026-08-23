@@ -20,17 +20,20 @@ Verdict: **RED. R17 remains open.**
 
 ### Exact consumer defect
 
-The founder-visible `Technique version` selector contained only its placeholder;
-there was no real R17-valid named Technique to select. The explicit `TRY GUIDED
-RESEARCH` action loaded the sample Dataset, then reached the existing submit
-path with `selectedStrategyId = null`. The normal R17 Main/Director boundary
-correctly refused the missing selection, so the named Technique journey could
-not launch normally.
+Computer Use observed that the founder-visible `Technique version` selector
+contained only its placeholder; there was no real R17-valid named Technique to
+select. Computer Use did **not** click `TRY GUIDED RESEARCH`, so this attempt
+does not claim a live guided-action launch or a live refusal response.
 
-This is a positive-capability RED, not a refusal PASS: the refusal proves only
-that the required-selection boundary is intact. No Technique was created or
-selected by the normal app, so no R17 launch, worker, model completion, outcome,
-or placement claim is made.
+Source inspection diagnosed the blocked path: the explicit `TRY GUIDED
+RESEARCH` handler loads the sample Dataset and then requests the existing form
+submit with `selectedStrategyId = null`, which the normal R17 Main/Director
+boundary is designed to refuse. Therefore the named Technique journey has no
+normal start path on this candidate.
+
+This is a positive-capability RED, not a refusal PASS. No Technique was created
+or selected by the normal app, and no R17 launch, worker, model completion,
+outcome, placement, or live refusal claim is made.
 
 ### Scope receipt
 
