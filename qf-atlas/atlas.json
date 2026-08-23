@@ -1,7 +1,7 @@
 {
   "meta": {
     "branch": "wo-pre-r18-coherence",
-    "commit": "80666e8",
+    "commit": "7de630b",
     "generatedAt": "2026-08-23",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
@@ -60018,13 +60018,13 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "wo-R17",
-      "commit": "7740525",
+      "branch": "wo-pre-r18-coherence",
+      "commit": "80666e8",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "80666e8",
+      "commit": "7de630b",
       "generatedAt": "2026-08-23"
     },
     "verdict": "better",
