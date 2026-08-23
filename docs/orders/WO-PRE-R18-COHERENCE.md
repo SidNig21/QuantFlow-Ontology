@@ -975,9 +975,12 @@ Dock, deterministic `DEFAULT`/`LOCAL`/`FULL` projection, and the exact 16-object
 20-link mechanics. It authorizes no new product, engine, framework, truth store,
 runtime, participant, R18 behavior, or rebrand. It supersedes the earlier
 `no broad visual redesign` restriction only for these bounded existing surfaces
-and only to make their existing product meaning consumer-readable; it does not
-supersede any architecture, provenance, authority, product-meaning, file-boundary,
-or proof constraint.
+and only to make their existing product meaning consumer-readable. It is also
+Ryan's one explicit post-stop authority for the paused writer to make this final
+consumer treatment after the global repair was consumed; it does not replenish
+that repair budget. It does not supersede any architecture, provenance,
+product-meaning, file-boundary, or proof constraint, and every later red returns
+to the existing Ryan stop.
 
 ### One consumer reading order and one default tile grammar
 
@@ -986,32 +989,48 @@ current workflow stage → participant/Task ownership → evidence → Evaluatio
 current Report → technical detail**. Technical detail is deliberate disclosure
 in Dock `INSPECT`, never the first visual hierarchy.
 
-Every default Canvas tile uses the same anatomy: human title; one semantic
-type/authority badge; one primary status; at most two short workflow facts; and
-the existing tile-selection state. A control is not a workflow fact. A compact
-multi-axis participant state is one fact. Rotated or full ids, duplicate type plus
-id, vertical id rails, nested screen chrome, fixture/internal field copy, inline
-full details, and repeated `Inspect` actions are forbidden. Full canonical ids
-and exact incoming/outgoing `kind, from_id, to_id` triples live in Dock `INSPECT`.
+Every research-object or participant tile painted in `DEFAULT`, `LOCAL`, or
+`FULL` uses the same anatomy: human title; exactly one semantic type badge;
+exactly one primary status; zero, one, or two short workflow facts from the table
+below; and one selected/unselected presentation state. A control is not a
+workflow fact. A combined fact shown below counts as one fact and uses the exact
+labelled values in the stated order. Rotated or full ids, duplicate type plus id,
+vertical id rails, nested screen chrome, fixture/internal field copy, inline full
+details, and repeated `Inspect` actions are forbidden. Full canonical ids and
+exact incoming/outgoing `kind, from_id, to_id` triples live in Dock `INSPECT`.
+Neither a short nor full id is painted inside the tile anatomy; accessible identity
+may reference the canonical id without making it part of the visual hierarchy.
 
-The facts are finite:
+`Human title` has one fallback rule. Use the first non-empty source named below;
+where the rule says `humanized kind`, replace `_` or `-` with spaces and title-case
+the existing `kind`; if no named source exists, render exactly `Not recorded`.
+Never fall back to any id. A referenced object's displayed value uses that same
+title rule. `Primary status` uses the stated existing source or derived authority
+marker and otherwise renders exactly `Not recorded`.
 
-| Existing object | Consumer tile facts |
-|---|---|
-| Mission | human question/title, Mission badge, status, Technique; `Open workspace` is its one primary action |
-| Task | human title, Task badge, owner, status |
-| participant | role as title, participant badge, runtime as primary status, owned Task, and the existing session/work/recovery values combined compactly without changing their truth |
-| Run | human run label, Run badge, status, short Mission/Task context |
-| Dataset | human dataset name, Dataset badge, row count, as-of date |
-| raw Artifact | human output label, the exact status `RAW UNREVIEWED`, producer |
-| grade or historical Artifact | human label and an explicit `GRADE ARTIFACT` and/or `HISTORICAL` authority marker as existing truth requires; it may not look raw-current |
-| Evaluation | human label, Evaluation badge, verdict as status, critic, confidence |
-| current Report | human report title and the exact authority marker `PUBLISHED CURRENT` |
-| historical Report | human report title and the exact authority marker `HISTORICAL`; it may not look current |
-| Technique, Hypothesis, Ticket | human label, semantic type, existing state |
+| Existing object | Human-title precedence | Type badge | Primary status | Workflow facts, in order |
+|---|---|---|---|---|
+| Mission | `objective`, then `name` unless it is exactly `Founder question` | `MISSION` | existing `status` | `Technique <title>` for the first primary Technique/Strategy in stable `(type, id)` order |
+| Task | `title`, then `description` | `TASK` | existing `status` | `Owner <participant title>` from its exact `assigned_to` link |
+| participant | shared participant-view `role` | `PARTICIPANT` | shared participant-view runtime | `Task <title>`; `Session <session> · Work <work> · Recovery <recovery>` |
+| Run | `name`, `title`, `label`, then humanized `kind` | `RUN` | existing `status` | `Context <Mission title> · <Task title>` from the primary walk |
+| Dataset | `name`, `title`, `label`, then humanized `kind` | `DATASET` | existing `status` | `Rows <coverage.record_count>`; `As of <as_of>` |
+| raw Artifact | `name`, `title`, `label`, then humanized `kind` | `ARTIFACT` | exactly `RAW UNREVIEWED` | `Producer <title>`; `Source <Run title> · <Task title>` |
+| grade or historical Artifact | `name`, `title`, `label`, then humanized `kind` | `ARTIFACT` | `HISTORICAL` when existing history truth applies, otherwise `GRADE ARTIFACT` when an existing `grades_*` link applies | `Producer <title>`; `Source <Run title> · <Task title>` |
+| other supporting Artifact | `name`, `title`, `label`, then humanized `kind` | `ARTIFACT` | existing `status`, then the first existing semantic marker, otherwise `Not recorded` | `Producer <title>`; `Source <Run title> · <Task title>` |
+| Evaluation | `name`, `title`, `label`, then exactly `Independent evaluation` | `EVALUATION` | existing `verdict` | `Critic <participant title>`; `Confidence <confidence> · Target <Artifact title>` |
+| current Report | `name`, `title`, `label`, then exactly `Current report` | `REPORT` | exactly `PUBLISHED CURRENT` | `Gated by <Evaluation title>` |
+| historical Report | `name`, `title`, `label`, then exactly `Historical report` | `REPORT` | exactly `HISTORICAL` | `Gated by <Evaluation title>` |
+| Technique/Strategy | `family`, `name`, `title`, `label`, then humanized `kind` | `TECHNIQUE` | existing `status` | none |
+| Hypothesis | `claim`, `name`, `title`, `label` | `HYPOTHESIS` | existing `status` | none |
+| Ticket | `name`, `title`, `label`, `external_ref` | `TICKET` | existing `status`, then existing `grade` | none |
 
-Absent values keep the order's exact honest missing-value behavior. Labels and
-badges are presentation of existing facts, never new ontology fields.
+Every enumerated fact slot renders its labelled value; an absent source renders
+exactly `Not recorded` in that slot. Labels, fixed fallback phrases, badges, and
+derived authority statuses are presentation of existing facts, never new ontology
+fields. For Canvas tile anatomy this table supersedes the older F1 short-id and
+role-specific context-row requirements wherever they differ; Dock `INSPECT`
+retains every full id and detail.
 
 The Mission tile specifically may not show `missionmission`, a full/rotated id,
 `FOCUS`, fixture/internal copy, the generic `Founder question`, or redundant
@@ -1019,6 +1038,18 @@ The Mission tile specifically may not show `missionmission`, a full/rotated id,
 Mission status, Technique, and `Open workspace`. Selecting the tile opens its
 details through the normal `LOCAL` → Dock `INSPECT` behavior; no inline
 `Inspect` control is added.
+
+Tile selection has one meaning. Activating ordinary tile body selects that exact
+object, enters `LOCAL`, visibly marks only that tile as selected, and opens that
+same full-id object in Dock `INSPECT`; it performs no domain IPC. An embedded
+control stops propagation and performs only its labelled action. Mission
+`Open workspace` is the sole tile action: it reveals or restores that exact
+Mission's derived `DEFAULT` workflow through the existing projection path and
+performs no Kernel write. From `FULL`, selecting a tile still enters `LOCAL`, and
+`Back to world` restores `FULL` as the earlier state table requires.
+The selected tile alone carries `data-qf-selected="true"`; every other painted
+tile carries `data-qf-selected="false"`, and at least one of its computed outline,
+border color, or background color differs from the controlled unselected state.
 
 ### Research Dock is the unmistakable front door
 
@@ -1040,33 +1071,161 @@ controls remain explicit, labelled, secondary to identity/work, and spatially
 separated from selection and ordinary navigation; identity or whitespace never
 invokes them.
 
+In `START`, discovery is literal: visible text is exactly `Research Dock` and
+`Research Director`; the composer has a visible `Mission` label; the Technique
+selector has a visible `Technique` label; the summary reads
+`Available team: <N> — <roles>`, where `<N>` equals the count of the same existing
+launchable definitions painted by `CATALOG` and `<roles>` is the comma-separated
+`display_name`, else `role`, else `Not recorded`, for every one of those
+definitions in stable `(rendered name, id)` order (`None recorded` when `<N>` is
+zero). A count-only string such as `0 live · 0 closed · 6 launchable` is not this
+summary. A visible
+button named exactly `Browse catalog` switches to `CATALOG` without domain IPC.
+The summary has a non-empty rectangle fully inside `START`, computed font size at
+least 12 CSS pixels, and no clipped role name. When no Mission is active, visible
+empty-state copy is exactly
+`Compose a Mission or browse the available team.` The role-name summary is not a
+definition row and exposes no launch control; `CATALOG` retains inventory
+ownership. All of these nodes live inside the one `START` `data-dock-primary`
+pane, so satisfying discovery cannot weaken one-pane isolation.
+
+The five tab controls remain simultaneously visible with exact text `START`,
+`CATALOG`, `ACTIVE`, `INSPECT`, and `HISTORY`; each has a non-empty painted text
+rectangle, computed font size at least 12 CSS pixels, no overlap or clipping, and
+the one selected tab remains `aria-selected="true"`. Only that tab's primary pane
+has painted descendants. Each inactive pane has `display:none` or `hidden`, a
+zero-width/zero-height rectangle, no descendant with a non-zero painted rectangle,
+and no pointer hit target.
+
 ### Five-stage Canvas, projection, and cable contract
 
-`DEFAULT` lays out exactly five consumer stages: **Mission**, **Work**
-(participant beside its owned Task), **Evidence** (Run, inputs, and raw output),
-**Evaluation**, and **Current Report**. Membership and order are derived only by
-the deterministic Kernel-link walk already specified; stage labels are
-presentation, not stored truth. Evidence-to-judgment order is monotonic, and the
-current Report is last. At 1600×1000, the union bounding rectangle of the primary
-tile rectangles occupies 70–85% of usable Canvas width and 45–70% of usable
-Canvas height. The existing empty Navigator may collapse after Mission reveal.
-While the research projection is active, the legacy orchestration/handoff overlay
-is suppressed; it may not cover or compete with the workflow.
+`DEFAULT` lays out exactly five visible, left-to-right consumer stages:
+**Mission**, **Work**, **Evidence**, **Evaluation**, and **Current Report**. This
+stage assignment supersedes the earlier `Mission + Inputs` placement text and
+the word `may` for delegation/review/output participant context; it resolves those
+members exactly without changing the Kernel-link-derived walking rule:
 
-`DEFAULT` paints only its derived primary links. `LOCAL` keeps the exact selected
-local-lineage paint at computed opacity at least `0.80` and unrelated paint at
-most `0.50`. `FULL` exposes the exact 16 objects and 20 links, with background
-lineage visually subordinate but still selectable and inspectable. Connection
-detail appears only in Dock `INSPECT`; there is no Canvas connection-detail
-overlay. No selected primary cable or cable label may cross the interior of an
-unrelated readable tile, apart from the existing endpoint tolerance at its own
-endpoints.
+1. `Mission` contains only the root Mission.
+2. `Work` contains the source Task, the exact participant reached by its
+   `assigned_to` link, its exact `delegated_by` Director when present, and the
+   primary Evaluation's exact `performed_by` critic when present. When that
+   Evaluation names a review Task, `Work` also contains that exact Task and its
+   exact `assigned_to` participant and `delegated_by` Director; duplicate
+   participant ids paint once. Each assigned participant immediately follows its
+   owned Task in stable `(type, id)` vertical order; remaining participants follow
+   those pairs in the same stable order.
+3. `Evidence` contains the primary Run, every Technique/Strategy, Dataset, or
+   Hypothesis reached from that Run by the existing `uses`/`tests` links, and the
+   raw Artifact reached by its existing `produces` link.
+4. `Evaluation` contains only the primary Evaluation reached from that raw
+   Artifact by the existing `evaluated_by` link.
+5. `Current Report` contains only `current_report_id`, reached from that
+   Evaluation by the existing `gates` link.
+
+A participant reached by the exact `Work` walk remains primary Canvas context
+even when its session is `closed`, `cancelled`, or `failed`: the honest session,
+runtime, work, and recovery values show that condition, and the same id may also
+appear in Dock `HISTORY`. This final rule supersedes the earlier history-only
+painting rule for those reached primary participants only. Any other closed
+session remains outside `DEFAULT` and only in `HISTORY`.
+
+The primary links are exactly these existing traversed records when both endpoints
+exist: source Task `belongs_to` Mission, `assigned_to` executor, and
+`delegated_by` Director; Director `delegates_to` executor; Run `tests` Hypothesis,
+`uses` Dataset/Technique, and `produces` raw Artifact; raw Artifact
+`evaluated_by` Evaluation; Evaluation `performed_by` critic and `gates` current
+Report; and review Task `assigned_to` critic and `delegated_by` Director. No
+same-stage proximity rule adds a link. Missing optional members render no
+synthetic tile or cable. Same-stage siblings use stable `(type, id)` order. Every
+tile center in an earlier stage has a smaller Canvas x coordinate than every tile
+center in the next stage, so evidence-to-judgment order and the last position of
+the current Report are measurable. Stage labels are presentation, not stored
+truth.
+
+In the populated R17 oracle's `DEFAULT` at 1600×1000, the width of the union
+bounding rectangle of all primary tile rectangles divided by usable Canvas
+`clientWidth` is in `[0.70, 0.85]`, and its height divided by usable Canvas
+`clientHeight` is in `[0.45, 0.70]`. Primary tile rectangles do not overlap. The
+empty, starting, and Mission-only states retain the same grammar but are not
+required to fill those populated-world ratios. The existing empty Navigator may
+collapse after Mission reveal. `Research projection active` means a durable Mission world is
+revealed and the projection state is `DEFAULT`, `LOCAL`, or `FULL`. Throughout
+that interval the legacy orchestration/handoff overlay and all of its controls
+have `display:none` or `hidden`, zero painted rectangle, and no pointer hit target.
+
+`DEFAULT` paints only its derived primary links. In `LOCAL`, every tile and cable
+in the exact selected local-lineage set has computed opacity at least `0.80`, and
+every unrelated painted current-Mission tile and cable has computed opacity at
+most `0.50`. In unselected `FULL`, all exact 16 objects have computed opacity at
+least `0.80`, and all exact 20 background cables have computed opacity at most
+`0.50`; every object and cable remains pointer-selectable and Dock-inspectable.
+Connection detail appears only in Dock `INSPECT`; the Canvas connection-detail
+overlay is absent or `display:none`, has a zero painted rectangle, and has no
+pointer hit target. Selecting each of the 20 cables from `FULL` remains subject to
+F1: its stroke and label may not cross the interior of any unrelated readable
+tile, its endpoints retain the 12-pixel tolerance, and its painted height remains
+below 90% of usable Canvas height. The same unrelated-tile obstruction rule
+applies to every selected cable in `DEFAULT` or `LOCAL`, not only a primary cable.
 
 Human titles, statuses, facts, stage labels, Dock modes, and the visible
-`Show full lineage`/`Back to world` controls must be readable at 100% zoom. The
-existing Glacier identity—dark field, restrained luminous color, and spatial
+`Show full lineage`/`Back to world` controls must be readable at 100% zoom: title
+text has computed font size at least 14 CSS pixels; badge, status, fact, stage,
+Dock-mode, and control text has computed font size at least 12 CSS pixels; and
+each required text rectangle is non-empty, non-overlapping, unclipped inside its
+own painted container, and has the visibility/opacity properties already defined
+by C14. The existing Glacier identity—dark field, restrained luminous color, and
+spatial
 Canvas character—remains; consumer hierarchy must no longer read as an IDE,
 terminal, ontology debugger, or generic debug graph.
+
+The three founder-capture defects have only these literal meanings:
+
+1. **Tile/hierarchy red:** any painted tile violates the title/badge/status/fact
+   table, Mission prohibition, selection behavior, or 14/12-pixel text floor.
+2. **Dock/discovery red:** `START` lacks any exact heading, label, team-role
+   summary, empty-state copy, or `Browse catalog` behavior above; any of the five
+   mode controls is illegible; or an inactive primary pane contributes a painted
+   descendant, non-zero rectangle, or pointer target.
+3. **Canvas/workflow red:** `DEFAULT` violates the exact stage membership,
+   left-to-right order, primary-link set, bounding ratios, non-overlap rule, or
+   overlay suppression; `LOCAL` violates its exact set or tile/cable opacity; or
+   `FULL` violates 16/20 completeness, background-cable opacity, selection,
+   Inspect, endpoint, obstruction, or height rules.
+
+`Bulky graph`, `flat hierarchy`, `tiny metadata`, `internal Mission copy/id
+rails`, `duplicate actions`, `Canvas overlays`, `visually absent Dock/team
+inventory`, and `reads as an IDE, terminal, ontology debugger, or debug graph`
+are shorthand for one or more of those three reds, not an additional taste or
+gestalt veto.
+
+The existing named C14 receipts own the new mechanical predicates without adding
+another falsifier id:
+
+| Receipt | Required independent predicate keys |
+|---|---|
+| `default-projection` | `tile-title`, `tile-badge`, `tile-status`, `tile-facts`, `mission-action`, `text-size`, `stage-membership`, `stage-order`, `stage-bounds`, `tile-nonoverlap`, `primary-links`, `legacy-overlay`, `connection-overlay`, `selected-cable-obstruction` |
+| `local-lineage` | `selected-subject`, `selected-tile`, `exact-local-set`, `local-tile-opacity`, `local-cable-opacity`, `unrelated-tile-opacity`, `unrelated-cable-opacity`, `control-no-propagation`, `inspect-match` |
+| `full-lineage` | `objects-16`, `links-20`, `object-opacity`, `background-cable-opacity`, `object-select-inspect`, `link-select-inspect`, `endpoint-tolerance`, `unrelated-tile-obstruction`, `painted-height` |
+| `dock-isolation` | `one-pane`, `inactive-zero-rects`, `mode-tabs`, `dock-title`, `director-role`, `mission-label`, `technique-label`, `team-count`, `team-roles`, `browse-catalog`, `empty-next-action`, `no-start-inventory-rows` |
+
+`model-complete`, `back-to-world`, and `history-authority` keep their earlier
+exact meanings. For each predicate key above, that named C14 falsifier invocation
+must corrupt only that key, evaluate the whole production receipt, print
+`C14/<receipt>/<key>=RED`, restore the controlled state, and continue through all
+keys; it exits nonzero after the finite mutation set. A missing key output, a
+green corrupted key, corruption of a different key, hidden test-only style, or
+unconditional print is red. Thus one red transcript per existing C14 subcase may
+contain its finite independent mutation matrix without creating new top-level
+subcases. The clean control prints every key `PASS` from real DOM/SVG facts.
+For `tile-title`, `tile-badge`, `tile-status`, and `tile-facts`, the matrix iterates
+every applicable object row and every displayed/missing slot across the R17 oracle
+and the isolated current/historical fixture, printing the object type and slot in
+each red receipt. `selected-cable-obstruction` iterates every painted `DEFAULT`
+primary cable, and the corresponding `FULL` keys iterate all exact 20 cables.
+
+All fourteen named screenshots and their manifest must be regenerated from the
+same final candidate bytes and demonstrate the applicable predicate keys; a
+capture or manifest inherited from an earlier candidate makes `EVIDENCE=FAIL`.
 
 ### Final verdicts and immutable visual check
 
@@ -1080,21 +1239,38 @@ CONSUMER-READINESS
 ```
 
 `CONSUMER-READINESS` is the final name for the earlier `CONSUMER` verdict; it does
-not add a fifth verdict or weaken the existing timed check. It is red if any
-founder screenshot defect remains; if the app reads as an IDE, terminal, or debug
-graph; if Research Dock inventory is undiscoverable from `START`; or if a naive
-consumer cannot identify the Mission, current stage, owner and Task, raw evidence,
-Evaluation, current Report, and next useful action under the existing timed rule.
-The bulky graph, Canvas overlays, flat hierarchy, tiny metadata, internal Mission
-copy/id rails, duplicate actions, and visually absent Dock/team inventory are
-therefore explicit red conditions, not taste notes.
+not add a fifth verdict or weaken the existing timed check. From this amendment
+forward, every earlier `CONSUMER` token—including evidence classification and stop
+language—means this same `CONSUMER-READINESS` verdict, and reports print only the
+final name. `CONSUMER-READINESS` is one normal-app check with two conjunctive
+parts: all three literal founder-capture defect groups above are absent, and one
+naive consumer answers this fixed union of the earlier prompts without an
+architecture briefing: (1) QuantFlow is a persistent research world rather than
+an IDE, terminal manager, or agent launcher; (2) the visible Mission question and
+current one of the five stages; (3) the distinct jobs of Dock and Canvas; (4) for
+each visible participant, role, reason, owned Task, runtime, and work state; (5)
+the Run, raw Artifact, Evaluation critic/verdict/target, current published Report,
+and any visible historical work; (6) the kind and direction of the selected
+cable; and (7) one visible existing Inspect, `Show full lineage`, or Dock action
+and what it reveals or advances. The 30-second clock and stopping rule remain the
+ones already defined. Any omitted or wrong answer, elapsed time over 30 seconds,
+or any literal capture red is `CONSUMER-READINESS=FAIL`; only completion of both
+parts is `PASS`.
 
 The final visual acceptance is a normal-app Computer Use check against an
 immutable candidate SHA after mechanical proof is green. Record candidate SHA,
 viewport, zoom, state, and result. If the Computer Use helper fails, restart the
-helper/app as needed and retry the **same candidate bytes**; helper failure,
-timeout, or an uncompleted retry can never be recorded as `PASS`. Any byte change
-invalidates the attempt and requires a new candidate and all applicable proof.
+helper and normal app once and retry the **same candidate bytes**, viewport, zoom,
+and data roots. A helper/tool failure before the consumer check completes is
+recorded as environment noise, not as evidence that the product passed or failed;
+the first such attempt receives no verdict. There are at most two total attempts,
+matching AUTONOMY's two-attempt stop. If the retry also cannot complete,
+`CONSUMER-READINESS=FAIL cause=ENVIRONMENT` and the order stops for Ryan without
+authorizing a product edit. A completed check with any wrong answer or literal
+visual red is `CONSUMER-READINESS=FAIL` and the same stop applies. Any byte change
+invalidates the attempt and requires a new candidate plus all applicable proof,
+but because the global repair remains consumed, only a new explicit Ryan
+amendment can authorize those changed bytes.
 
 ### Amendment-only Reader gate
 
@@ -1112,4 +1288,11 @@ final section together with the still-governing order and answers exactly:
 Only amendment-specific `YES/YES` recorded against the exact order SHA authorizes
 the product writer to resume. Either `NO`, a stale receipt, or a receipt against
 different bytes keeps the writer paused for Ryan; the writer may not self-read or
-self-authorize.
+self-authorize. Once that exact receipt lands, the current `NEXT.md` authority is
+sufficient for the same paused writer to implement this one founder-authorized
+treatment by continuing from its five existing dirty product/proof files and
+touching only the already authorized `Exact file boundary` and evidence paths. No
+additional product decision, repair allocation, Builder replacement, or
+`NEXT.md` rotation is required. The writer then produces one immutable candidate
+and stops; it may not repair any subsequent `PRODUCT`, `EVIDENCE`, `ATLAS`, or
+`CONSUMER-READINESS` red without new explicit Ryan authority.
