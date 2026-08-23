@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R17 @ f1b37d2` on 2026-08-23 by
+> Generated from `wo-R17 @ 19d85c3` on 2026-08-23 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -410,9 +410,9 @@ asked before the change, when nothing is red yet.
 
 **238 of 240 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**555 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**556 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 315 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 316 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -459,7 +459,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (555 files)
+## Per-analyzer coverage (556 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -467,17 +467,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 551 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 280 | 0 | 4 | 0 | 271 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 544 |
-| `persistence` | 25 | 27 | 0 | 0 | 503 |
-| `lifetime` | 6 | 62 | 0 | 0 | 487 |
-| `packaging` | 232 | 0 | 0 | 123 | 200 |
-| `ownership` | 21 | 0 | 0 | 358 | 176 |
-| `reach` | 237 | 3 | 0 | 315 | 0 |
+| `imports` | 552 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 280 | 0 | 4 | 0 | 272 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 545 |
+| `persistence` | 25 | 27 | 0 | 0 | 504 |
+| `lifetime` | 6 | 63 | 0 | 0 | 487 |
+| `packaging` | 232 | 0 | 0 | 123 | 201 |
+| `ownership` | 21 | 0 | 0 | 358 | 177 |
+| `reach` | 237 | 3 | 0 | 316 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 315 files means those trees are
+failure — `reach: unsupported` on 316 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 123 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
@@ -542,7 +542,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
 - `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 640
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
-- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 510
+- `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 601
 
 ### Exact task delivery
 
@@ -551,7 +551,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/execute.ts** — UPDATE task at line 121
 - **packages/qf-kernel/src/create.ts** — INSERT INTO task at line 640
 - **packages/qf-kernel/src/governed-review.ts** — UPDATE task at line 646
-- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 420
+- `collab-electron/src/main/kernel.ts` — exports kernelListTaskAssignments() at line 511
 - `collab-electron/src/main/task-delegation-projection.ts` — exports projectTaskAssignments() at line 81
 
 ### Research review / publication
@@ -560,7 +560,7 @@ discovered from the AST.
 
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO evaluation at line 629
 - **packages/qf-kernel/src/create.ts** — INSERT INTO evaluation at line 1318
-- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 548
+- `collab-electron/src/main/kernel.ts` — exports kernelRequestGovernedReview() at line 639
 - `collab-electron/src/main/second-opinion-admission.ts` — exports resolveSecondOpinionAdmission() at line 6
 - `packages/qf-kernel/src/creation-policy.ts` — exports requireObservedGrade() at line 38
 - `packages/qf-kernel/src/execute.ts` — exports executeSecondOpinion() at line 228

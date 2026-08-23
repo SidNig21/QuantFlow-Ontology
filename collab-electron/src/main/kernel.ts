@@ -155,6 +155,97 @@ export function kernelListStrategyVersions(): Array<Record<string, unknown>> {
   return result.sort((a, b) => String(a.family).localeCompare(String(b.family)) || Number(a.version) - Number(b.version));
 }
 
+export type GuidedTechniqueDescriptor = {
+  strategy_id: string;
+  family: "guided-settled-results";
+  version: 1;
+  content_hash: string;
+};
+
+const GUIDED_TECHNIQUE_SPEC = {
+  contract: "qf.strategy.v1",
+  family: "guided-settled-results",
+  version: 1,
+  stake_model: "flat",
+  score_field: "edge",
+  probability_field: "/edge",
+} as const;
+const GUIDED_TECHNIQUE_RUN_ID = "run:guided-settled-results:v1:registration";
+
+function guidedTechniqueRefusal(): never {
+  throw new Error("TECHNIQUE COVERAGE REFUSED");
+}
+
+/**
+ * Resolve the one named Technique used by the explicit guided sample action.
+ * The selector is a projection; this helper is the only Main seam allowed to
+ * register the guided Technique, and registration remains the Kernel action.
+ */
+export function kernelEnsureGuidedTechnique(datasetId: string): GuidedTechniqueDescriptor {
+  if (typeof datasetId !== "string" || datasetId.trim() !== datasetId || datasetId.length === 0) {
+    return guidedTechniqueRefusal();
+  }
+  const db = getKernelDb();
+  const expectedBytes = new TextEncoder().encode(JSON.stringify(GUIDED_TECHNIQUE_SPEC));
+  const expectedHash = createHash("sha256").update(expectedBytes).digest("hex");
+  const expectedStrategyId = `strategy:${GUIDED_TECHNIQUE_SPEC.family}:v1:${expectedHash.slice(0, 16)}`;
+
+  const matching: GuidedTechniqueDescriptor[] = [];
+  const rows = db.query("SELECT id, spec_ref, version, stake_model FROM strategy").all() as Array<Record<string, unknown>>;
+  for (const row of rows) {
+    const artifact = db.query("SELECT id, kind, content_hash, storage_ref FROM artifact WHERE id = ?")
+      .get(row.spec_ref) as { id?: string; kind?: string; content_hash?: string; storage_ref?: string } | null;
+    if (!artifact?.storage_ref) continue;
+    let spec: Record<string, unknown>;
+    let bytes: Buffer;
+    try {
+      bytes = readFileSync(artifact.storage_ref);
+      spec = JSON.parse(bytes.toString("utf8")) as Record<string, unknown>;
+    } catch {
+      // Unavailable bytes are only relevant when this row claims the guided
+      // family; unrelated legacy rows remain listable as before.
+      if (String(row.id).startsWith(`strategy:${GUIDED_TECHNIQUE_SPEC.family}:v1:`)) return guidedTechniqueRefusal();
+      continue;
+    }
+    if (spec.family !== GUIDED_TECHNIQUE_SPEC.family || Number(spec.version) !== GUIDED_TECHNIQUE_SPEC.version) continue;
+    const exact = JSON.stringify(spec) === JSON.stringify(GUIDED_TECHNIQUE_SPEC)
+      && bytes.equals(Buffer.from(expectedBytes))
+      && artifact.id === expectedHash
+      && artifact.kind === "strategy_spec"
+      && artifact.content_hash === expectedHash
+      && row.id === expectedStrategyId
+      && Number(row.version) === 1
+      && row.stake_model === "flat";
+    if (!exact) return guidedTechniqueRefusal();
+    matching.push({ strategy_id: String(row.id), family: GUIDED_TECHNIQUE_SPEC.family, version: 1, content_hash: expectedHash });
+  }
+  if (matching.length > 1) return guidedTechniqueRefusal();
+
+  const registrationRun = db.query("SELECT id FROM run WHERE id = ?").get(GUIDED_TECHNIQUE_RUN_ID) as { id?: string } | null;
+  if (matching.length === 1) {
+    if (!registrationRun) return guidedTechniqueRefusal();
+    const uses = db.query("SELECT kind, to_id FROM links WHERE from_id = ? AND kind = 'uses' ORDER BY to_id")
+      .all(GUIDED_TECHNIQUE_RUN_ID) as Array<{ kind: string; to_id: string }>;
+    if (uses.length !== 2 || !uses.some((link) => link.to_id === datasetId) || !uses.some((link) => link.to_id === matching[0].strategy_id)) {
+      return guidedTechniqueRefusal();
+    }
+    return matching[0];
+  }
+  if (registrationRun) return guidedTechniqueRefusal();
+
+  kernelExecute("execute_deterministic_run", {
+    run_id: GUIDED_TECHNIQUE_RUN_ID,
+    dataset_id: datasetId,
+    strategy_spec: GUIDED_TECHNIQUE_SPEC,
+    params: { limit: 1 },
+  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+
+  const registered = kernelEnsureGuidedTechnique(datasetId);
+  if (registered.content_hash !== expectedHash || registered.strategy_id !== expectedStrategyId) return guidedTechniqueRefusal();
+  return registered;
+}
+
+
 const PEER_BUS_DDL = `
 CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,

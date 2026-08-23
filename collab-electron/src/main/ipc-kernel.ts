@@ -28,6 +28,7 @@ import {
   kernelGetObject,
   kernelGetLinks,
   kernelEnsureSampleResearchDataset,
+  kernelEnsureGuidedTechnique,
   kernelOpenHypothesisForQuestion,
   kernelListTaskDelegations,
   onKernelEvents,
@@ -395,7 +396,9 @@ export function registerKernelHandlers(): void {
   ipcMain.handle("qf:research:loadSampleDataset", (event) => {
     try {
       assertTrustedSender(event);
-      return { ok: true as const, dataset: kernelEnsureSampleResearchDataset() };
+      const dataset = kernelEnsureSampleResearchDataset();
+      const technique = kernelEnsureGuidedTechnique(String(dataset.object_id ?? ""));
+      return { ok: true as const, dataset, technique };
     } catch (err) {
       return { ok: false as const, error: serializeError(err) };
     }

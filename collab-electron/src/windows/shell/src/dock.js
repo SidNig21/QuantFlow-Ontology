@@ -394,7 +394,7 @@ export function initDock(panelEl, options = {}) {
 	questionForm?.insertBefore(techniqueSelect, questionForm.querySelector("button[type=submit]") || null);
 	const populateTechniqueSelect = () => window.shellApi.qf.listStrategyVersions().then((response) => {
 		for (const option of [...techniqueSelect.options].slice(1)) option.remove();
-		for (const strategy of (response?.strategies || [])) { const option = document.createElement("option"); option.value = String(strategy.strategy_id); option.textContent = String(strategy.label); option.dataset.family = String(strategy.family); option.dataset.version = String(strategy.version); techniqueSelect.appendChild(option); }
+		for (const strategy of (response?.strategies || [])) { const option = document.createElement("option"); option.value = String(strategy.strategy_id); option.textContent = String(strategy.label); option.dataset.family = String(strategy.family); option.dataset.version = String(strategy.version); option.dataset.contentHash = String(strategy.content_hash ?? ""); techniqueSelect.appendChild(option); }
 	}).catch(() => {});
 	void populateTechniqueSelect();
 	techniqueSelect.addEventListener("change", () => { selectedStrategyId = techniqueSelect.value || null; });
@@ -445,6 +445,20 @@ export function initDock(panelEl, options = {}) {
 				if (!res?.ok) throw new Error(res?.error?.message ?? "sample dataset failed");
 				setQuestionStatus("Guided settled-data sample loaded", "ok");
 				selectedResearchDatasetId = res.dataset?.object_id ?? null;
+				const technique = res.technique;
+				if (!technique?.strategy_id || technique.family !== "guided-settled-results" || Number(technique.version) !== 1 || !/^[0-9a-f]{64}$/.test(String(technique.content_hash ?? ""))) throw new Error("TECHNIQUE COVERAGE REFUSED");
+				let option = [...techniqueSelect.options].find((candidate) => candidate.value === String(technique.strategy_id));
+				if (!option) {
+					option = document.createElement("option");
+					option.value = String(technique.strategy_id);
+					option.textContent = `${technique.family} v${technique.version} · ${String(technique.strategy_id).slice(-8)}`;
+					option.dataset.family = String(technique.family);
+					option.dataset.version = String(technique.version);
+					option.dataset.contentHash = String(technique.content_hash);
+					techniqueSelect.appendChild(option);
+				}
+				techniqueSelect.value = String(technique.strategy_id);
+				techniqueSelect.dispatchEvent(new Event("change", { bubbles: true }));
 				questionInput.value = "Using the guided settled-results sample, test whether the highest recorded edge produced positive ROI and explain the evidence.";
 				questionForm.requestSubmit();
 			}).catch((error) => {

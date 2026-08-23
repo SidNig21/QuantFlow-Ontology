@@ -301,6 +301,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "r17-guided-technique-consumer",
+    description: "R17: explicit guided sample creates one immutable Technique and selects it before unchanged admission",
+    run: async () => {
+      const { runR17GuidedTechniqueConsumerGate } = await import("./gates/r17-guided-technique-consumer.ts");
+      const { ok } = await runR17GuidedTechniqueConsumerGate();
+      return ok;
+    },
+  },
+  {
     name: "founder-steering",
     description: "R14: visible Task steering, reassignment delivery, second opinion, cancellation, and durable history",
     run: async () => {

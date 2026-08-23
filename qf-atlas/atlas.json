@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R17",
-    "commit": "f1b37d2",
+    "commit": "19d85c3",
     "generatedAt": "2026-08-23",
-    "filesScanned": 436,
+    "filesScanned": 437,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "b47105e87523cced"
+    "fingerprint": "cb07f6bb92c92489"
   },
   "stats": {
     "live": 113,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 126,
-      "indexed": 1198,
+      "indexed": 1200,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 555
+      "files": 556
     },
-    "coverageFiles": 555,
+    "coverageFiles": 556,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -1451,8 +1451,8 @@
       "layer": 2,
       "name": "main/index.ts",
       "kb": 56.5,
-      "x": -0.23,
-      "z": 1.3,
+      "x": -1.24,
+      "z": 0.45,
       "status": "warn",
       "spawns": 1,
       "writes": 0,
@@ -1500,7 +1500,7 @@
       "id": "2:collab-electron/src/main::ipc",
       "layer": 2,
       "name": "ipc*",
-      "kb": 77.4,
+      "kb": 77.6,
       "x": 1.01,
       "z": 0.85,
       "status": "ok",
@@ -1511,7 +1511,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/ipc-kernel.ts",
-          "kb": 37.5,
+          "kb": 37.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1696,9 +1696,9 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 54.7,
-      "x": -1.24,
-      "z": 0.45,
+      "kb": 58.7,
+      "x": -0.23,
+      "z": 1.3,
       "status": "alert",
       "spawns": 0,
       "writes": 7,
@@ -1707,18 +1707,18 @@
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 54.7,
+          "kb": 58.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 7,
           "dml": 8,
           "dmlLines": [
-            159,
-            194,
-            195,
-            196,
-            197,
-            234
+            250,
+            285,
+            286,
+            287,
+            288,
+            325
           ],
           "executes": 3
         }
@@ -1731,12 +1731,12 @@
           "what": "8 SQL statements outside execute()",
           "where": "collab-electron/src/main/kernel.ts",
           "lines": [
-            159,
-            194,
-            195,
-            196,
-            197,
-            234
+            250,
+            285,
+            286,
+            287,
+            288,
+            325
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -2692,8 +2692,8 @@
       "layer": 4,
       "name": "cable*",
       "kb": 17.9,
-      "x": -2.6,
-      "z": 0.45,
+      "x": -2.48,
+      "z": -0.91,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2827,9 +2827,9 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 16.9,
-      "x": -1.69,
-      "z": -2.03,
+      "kb": 18,
+      "x": -2.6,
+      "z": 0.45,
       "status": "ok",
       "spawns": 2,
       "writes": 0,
@@ -2838,7 +2838,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 16.9,
+          "kb": 18,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -3072,8 +3072,8 @@
       "layer": 4,
       "name": "viewer/src/App.tsx",
       "kb": 17.2,
-      "x": -2.48,
-      "z": -0.91,
+      "x": -1.69,
+      "z": -2.03,
       "status": "ok",
       "spawns": 0,
       "writes": 2,
@@ -3520,11 +3520,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 629.6,
+      "kb": 640.4,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 82,
+      "spawns": 83,
       "writes": 30,
       "dml": 19,
       "executes": 49,
@@ -3685,6 +3685,16 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 14
+        },
+        {
+          "path": "qa/gates/r17-guided-technique-consumer.ts",
+          "kb": 10.8,
+          "spawns": 1,
+          "spawnsLive": 1,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
         },
         {
           "path": "qa/gates/team-composition.ts",
@@ -4525,7 +4535,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 36.3,
+      "kb": 36.7,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4536,7 +4546,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 36.3,
+          "kb": 36.7,
           "spawns": 5,
           "spawnsLive": 4,
           "writes": 0,
@@ -7993,7 +8003,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:250"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:251"
             },
             {
               "layer": "kernel",
@@ -8035,7 +8045,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:515"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:518"
             },
             {
               "layer": "kernel",
@@ -8078,7 +8088,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:559"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:562"
             },
             {
               "layer": "kernel",
@@ -8106,7 +8116,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:663"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:666"
             },
             {
               "layer": "kernel",
@@ -8206,7 +8216,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:801"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:804"
             },
             {
               "layer": "kernel",
@@ -8250,7 +8260,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:636"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:639"
             },
             {
               "layer": "kernel",
@@ -8278,7 +8288,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:596"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:599"
             },
             {
               "layer": "kernel",
@@ -8306,7 +8316,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:842"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:845"
             },
             {
               "layer": "kernel",
@@ -8351,7 +8361,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:434"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:437"
             },
             {
               "layer": "kernel",
@@ -8379,7 +8389,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:473"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:476"
             },
             {
               "layer": "kernel",
@@ -8407,7 +8417,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:490"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:493"
             },
             {
               "layer": "kernel",
@@ -8435,7 +8445,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:422"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:425"
             },
             {
               "layer": "kernel",
@@ -8482,7 +8492,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:356"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:357"
             },
             {
               "layer": "kernel",
@@ -8510,7 +8520,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:413"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:416"
             },
             {
               "layer": "kernel",
@@ -8538,7 +8548,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:342"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:343"
             },
             {
               "layer": "kernel",
@@ -8566,7 +8576,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:880"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:883"
             },
             {
               "layer": "kernel",
@@ -8622,7 +8632,7 @@
             {
               "layer": "main",
               "present": true,
-              "detail": "collab-electron/src/main/ipc-kernel.ts:404"
+              "detail": "collab-electron/src/main/ipc-kernel.ts:407"
             },
             {
               "layer": "kernel",
@@ -8770,7 +8780,7 @@
     {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
-      "indexedFns": 73,
+      "indexedFns": 75,
       "sqlInText": 8,
       "sqlIndexed": 7,
       "sqlUnrecognised": 0,
@@ -10888,6 +10898,10 @@
       "status": "out-of-scope"
     },
     {
+      "path": "qa/gates/r17-guided-technique-consumer.ts",
+      "status": "out-of-scope"
+    },
+    {
       "path": "qa/gates/release-verifier.ts",
       "status": "out-of-scope"
     },
@@ -11569,7 +11583,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelAssertSessionMayClose() at line 510"
+            "exports kernelAssertSessionMayClose() at line 601"
           ],
           "strong": [],
           "weight": "weak"
@@ -11662,7 +11676,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelListTaskAssignments() at line 420"
+            "exports kernelListTaskAssignments() at line 511"
           ],
           "strong": [],
           "weight": "weak"
@@ -11774,9 +11788,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 548",
-            "exports kernelGovernedReviewContextForSession() at line 638",
-            "exports kernelGovernedReviewNextSequence() at line 648"
+            "exports kernelRequestGovernedReview() at line 639",
+            "exports kernelGovernedReviewContextForSession() at line 729",
+            "exports kernelGovernedReviewNextSequence() at line 739"
           ],
           "strong": [],
           "weight": "weak"
@@ -15671,7 +15685,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "ipcRequest": "1 channel name(s) built from a variable or template (line 79)",
+        "ipcRequest": "1 channel name(s) built from a variable or template (line 80)",
         "ipcPush": "1 push channel name(s) built from a variable or template",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -21833,6 +21847,32 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/r17-guided-technique-consumer.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "partial",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/release-verifier.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -25318,41 +25358,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 551,
+      "indexed": 552,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 271,
+      "not-applicable": 272,
       "indexed": 280,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 544,
+      "not-applicable": 545,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 503,
+      "not-applicable": 504,
       "partial": 27,
       "indexed": 25
     },
     "lifetime": {
       "not-applicable": 487,
-      "partial": 62,
+      "partial": 63,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 200,
+      "not-applicable": 201,
       "unsupported": 123,
       "indexed": 232
     },
     "ownership": {
-      "not-applicable": 176,
+      "not-applicable": 177,
       "unsupported": 358,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 315,
+      "unsupported": 316,
       "indexed": 237,
       "partial": 3
     }
@@ -30365,6 +30405,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
         "qa/gates/windows-dock-capability.ts",
@@ -30472,6 +30513,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
         "qa/gates/windows-dock-capability.ts",
@@ -30541,6 +30583,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
         "qa/gates/windows-dock-capability.ts",
@@ -30603,6 +30646,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
         "qa/gates/windows-dock-capability.ts",
@@ -31535,6 +31579,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
         "qa/gates/windows-dock-capability.ts",
@@ -31840,6 +31885,7 @@
         "qa/gates/research-director-delegation.ts",
         "qa/gates/founder-steering.ts",
         "qa/gates/hermes-research.ts",
+        "qa/gates/r17-guided-technique-consumer.ts",
         "qa/gates/research-world-visible.ts",
         "qa/gates/technique-outcome-loop.ts",
         "qa/gates/windows-dock-capability.ts",
@@ -41325,7 +41371,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:342"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:343"
         },
         {
           "layer": "kernel",
@@ -41335,7 +41381,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 342,
+        "line": 343,
         "kind": "handle"
       },
       "calledAt": {
@@ -42357,7 +42403,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:708"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:711"
         },
         {
           "layer": "kernel",
@@ -42367,7 +42413,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 708,
+        "line": 711,
         "kind": "handle"
       },
       "calledAt": {
@@ -42536,7 +42582,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:880"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:883"
         },
         {
           "layer": "kernel",
@@ -42546,7 +42592,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 880,
+        "line": 883,
         "kind": "handle"
       },
       "calledAt": {
@@ -42596,7 +42642,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:220"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:221"
         },
         {
           "layer": "kernel",
@@ -42606,7 +42652,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 220,
+        "line": 221,
         "kind": "handle"
       },
       "calledAt": {
@@ -43062,7 +43108,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:404"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:407"
         },
         {
           "layer": "kernel",
@@ -43072,7 +43118,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 404,
+        "line": 407,
         "kind": "handle"
       },
       "calledAt": {
@@ -43159,7 +43205,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:365"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:366"
         },
         {
           "layer": "kernel",
@@ -43169,7 +43215,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 365,
+        "line": 366,
         "kind": "handle"
       },
       "calledAt": {
@@ -43399,7 +43445,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:356"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:357"
         },
         {
           "layer": "kernel",
@@ -43409,7 +43455,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 356,
+        "line": 357,
         "kind": "handle"
       },
       "calledAt": {
@@ -43514,7 +43560,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:395"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:396"
         },
         {
           "layer": "kernel",
@@ -43524,7 +43570,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 395,
+        "line": 396,
         "kind": "handle"
       },
       "calledAt": {
@@ -43542,8 +43588,10 @@
         "dmlAll": [],
         "handlerFile": "collab-electron/src/main/ipc-kernel.ts",
         "seedCalls": [
+          "String",
           "assertTrustedSender",
           "catch",
+          "kernelEnsureGuidedTechnique",
           "kernelEnsureSampleResearchDataset",
           "serializeError"
         ],
@@ -43556,11 +43604,18 @@
         ],
         "unresolvedCallees": [
           {
-            "name": "resolve",
-            "from": "packages/qf-kernel/src/resolve-artifact-root.ts",
+            "name": "parse",
+            "from": "collab-electron/src/main/kernel.ts",
             "candidates": [
-              "collab-electron/src/main/sidecar/client.ts",
-              "collab-electron/src/main/wikilink-index.ts",
+              "collab-electron/src/main/updater/update-manager.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "push",
+            "from": "collab-electron/src/main/kernel.ts",
+            "candidates": [
+              "collab-electron/src/main/launcher-readiness.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs"
             ],
@@ -43652,6 +43707,17 @@
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
               "packages/qf-kernel/src/events.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "resolve",
+            "from": "packages/qf-kernel/src/resolve-artifact-root.ts",
+            "candidates": [
+              "collab-electron/src/main/sidecar/client.ts",
+              "collab-electron/src/main/wikilink-index.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -43782,7 +43848,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:385"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:386"
         },
         {
           "layer": "kernel",
@@ -43792,7 +43858,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 385,
+        "line": 386,
         "kind": "handle"
       },
       "calledAt": {
@@ -44250,7 +44316,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:351"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:352"
         },
         {
           "layer": "kernel",
@@ -44260,7 +44326,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 351,
+        "line": 352,
         "kind": "handle"
       },
       "calledAt": {
@@ -44330,7 +44396,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:250"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:251"
         },
         {
           "layer": "kernel",
@@ -44340,7 +44406,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 250,
+        "line": 251,
         "kind": "handle"
       },
       "calledAt": {
@@ -45467,7 +45533,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:422"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:425"
         },
         {
           "layer": "kernel",
@@ -45477,7 +45543,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 422,
+        "line": 425,
         "kind": "handle"
       },
       "calledAt": {
@@ -45589,7 +45655,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:434"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:437"
         },
         {
           "layer": "kernel",
@@ -45599,7 +45665,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 434,
+        "line": 437,
         "kind": "handle"
       },
       "calledAt": {
@@ -46374,7 +46440,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:473"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:476"
         },
         {
           "layer": "kernel",
@@ -46384,7 +46450,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 473,
+        "line": 476,
         "kind": "handle"
       },
       "calledAt": {
@@ -46595,7 +46661,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:490"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:493"
         },
         {
           "layer": "kernel",
@@ -46605,7 +46671,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 490,
+        "line": 493,
         "kind": "handle"
       },
       "calledAt": {
@@ -47402,7 +47468,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:842"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:845"
         },
         {
           "layer": "kernel",
@@ -47412,7 +47478,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 842,
+        "line": 845,
         "kind": "handle"
       },
       "calledAt": {
@@ -47887,7 +47953,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:856"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:859"
         },
         {
           "layer": "kernel",
@@ -47897,7 +47963,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 856,
+        "line": 859,
         "kind": "handle"
       },
       "calledAt": {
@@ -48295,7 +48361,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:871"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:874"
         },
         {
           "layer": "kernel",
@@ -48305,7 +48371,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 871,
+        "line": 874,
         "kind": "handle"
       },
       "calledAt": {
@@ -48489,7 +48555,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:801"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:804"
         },
         {
           "layer": "kernel",
@@ -48499,7 +48565,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 801,
+        "line": 804,
         "kind": "handle"
       },
       "calledAt": {
@@ -48974,7 +49040,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:737"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:740"
         },
         {
           "layer": "kernel",
@@ -48984,7 +49050,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 737,
+        "line": 740,
         "kind": "handle"
       },
       "calledAt": {
@@ -49692,7 +49758,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:596"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:599"
         },
         {
           "layer": "kernel",
@@ -49702,7 +49768,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 596,
+        "line": 599,
         "kind": "handle"
       },
       "calledAt": {
@@ -50441,7 +50507,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:515"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:518"
         },
         {
           "layer": "kernel",
@@ -50451,7 +50517,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 515,
+        "line": 518,
         "kind": "handle"
       },
       "calledAt": {
@@ -51112,7 +51178,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:559"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:562"
         },
         {
           "layer": "kernel",
@@ -51122,7 +51188,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 559,
+        "line": 562,
         "kind": "handle"
       },
       "calledAt": {
@@ -51640,7 +51706,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:663"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:666"
         },
         {
           "layer": "kernel",
@@ -51650,7 +51716,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 663,
+        "line": 666,
         "kind": "handle"
       },
       "calledAt": {
@@ -52786,7 +52852,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:636"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:639"
         },
         {
           "layer": "kernel",
@@ -52796,7 +52862,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 636,
+        "line": 639,
         "kind": "handle"
       },
       "calledAt": {
@@ -53313,7 +53379,7 @@
         {
           "layer": "main",
           "present": true,
-          "detail": "collab-electron/src/main/ipc-kernel.ts:413"
+          "detail": "collab-electron/src/main/ipc-kernel.ts:416"
         },
         {
           "layer": "kernel",
@@ -53323,7 +53389,7 @@
       ],
       "registeredAt": {
         "file": "collab-electron/src/main/ipc-kernel.ts",
-        "line": 413,
+        "line": 416,
         "kind": "handle"
       },
       "calledAt": {
@@ -56699,7 +56765,7 @@
         },
         {
           "file": "collab-electron/src/main/ipc-kernel.ts",
-          "line": 896,
+          "line": 899,
           "kind": "helper"
         }
       ],
@@ -56724,7 +56790,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/ipc-kernel.ts",
-          "line": 205,
+          "line": 206,
           "kind": "helper"
         }
       ],
@@ -56749,7 +56815,7 @@
       "senders": [
         {
           "file": "collab-electron/src/main/ipc-kernel.ts",
-          "line": 208,
+          "line": 209,
           "kind": "helper"
         }
       ],
@@ -57146,13 +57212,13 @@
     },
     {
       "file": "collab-electron/src/main/ipc-kernel.ts",
-      "line": 79,
+      "line": 80,
       "why": "push channel name is a variable or template literal, not resolvable from text",
       "coverage": "dynamic"
     },
     {
       "file": "collab-electron/src/main/ipc-kernel.ts",
-      "line": 88,
+      "line": 89,
       "why": "push channel name is a variable or template literal, not resolvable from text",
       "coverage": "dynamic"
     },
@@ -57435,7 +57501,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            1207
+            1298
           ]
         }
       ]
@@ -57487,7 +57553,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57529,7 +57595,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57571,7 +57637,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57613,7 +57679,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57655,7 +57721,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57697,7 +57763,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57739,7 +57805,7 @@
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:1231",
+            "from": "collab-electron/src/main/kernel.ts:1322",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "bindSourceWork"
           }
@@ -57776,7 +57842,7 @@
         "hops": 1,
         "path": [
           {
-            "from": "collab-electron/src/main/kernel.ts:1242",
+            "from": "collab-electron/src/main/kernel.ts:1333",
             "fn": "kernelSeedVisibleResearchWorld",
             "calls": "recordGovernedToolReceipt"
           }
@@ -57891,10 +57957,10 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            194,
-            195,
-            196,
-            197
+            285,
+            286,
+            287,
+            288
           ]
         }
       ]
@@ -57919,7 +57985,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            234
+            325
           ]
         }
       ]
@@ -57944,7 +58010,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            269
+            360
           ]
         }
       ]
@@ -59542,12 +59608,12 @@
       "what": "8 SQL statements outside execute()",
       "where": "collab-electron/src/main/kernel.ts",
       "lines": [
-        159,
-        194,
-        195,
-        196,
-        197,
-        234
+        250,
+        285,
+        286,
+        287,
+        288,
+        325
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -59779,12 +59845,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R17",
-      "commit": "98670bf",
-      "generatedAt": "2026-08-22"
+      "commit": "f1b37d2",
+      "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-R17",
-      "commit": "f1b37d2",
+      "commit": "19d85c3",
       "generatedAt": "2026-08-23"
     },
     "verdict": "better",
