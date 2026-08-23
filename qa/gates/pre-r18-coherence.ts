@@ -264,6 +264,32 @@ async function setDockMode(live: Live, mode: "START" | "CATALOG" | "ACTIVE" | "I
   assert(selected, `Dock mode ${mode} click did not run`);
   await waitFor(`Dock mode ${mode}`, async () => await evaluate<boolean>(live.endpoint, `document.querySelector(${JSON.stringify(`[data-dock-mode="${mode}"][aria-selected="true"]`)}) !== null`), Date.now() + 5_000);
 }
+async function closeParticipantInspectors(live: Live): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  const state = await evaluate<Json>(live.endpoint, `(() => {
+    const rect = (node) => { const r = node.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; };
+    const visuallyPainted = (node) => { if (!(node instanceof HTMLElement)) return false; const style = getComputedStyle(node); const r = node.getBoundingClientRect(); return style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0" && r.width > 0 && r.height > 0; };
+    const visuallyExpanded = (node) => node instanceof HTMLElement && !node.hidden && visuallyPainted(node);
+    const dockInspector = document.querySelector('[data-dock-primary="INSPECT"]');
+    if (!(dockInspector instanceof HTMLElement)) throw new Error("participant Dock inspector missing");
+    const dockTab = document.querySelector('[data-dock-mode="START"]');
+    if (!(dockTab instanceof HTMLElement)) throw new Error("START Dock tab missing while closing participant inspector");
+    dockTab.click();
+    const sessionInspectors = [...document.querySelectorAll('.canvas-tile[data-qf-world-type="agent_session"] .qf-world-session-inspect')];
+    for (const inspector of sessionInspectors) {
+      const button = inspector.querySelector('.qf-world-inspect');
+      const details = inspector.querySelector('.qf-world-details');
+      if (!(button instanceof HTMLElement) || !(details instanceof HTMLElement)) throw new Error("participant Canvas inspector controls missing");
+      if (!details.hidden) button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+    }
+    const expandedCanvas = sessionInspectors.map((node) => node.querySelector('.qf-world-details')).filter((node) => visuallyExpanded(node));
+    if (expandedCanvas.length > 0) throw new Error("participant Canvas inspector remains visually expanded after close: " + expandedCanvas.map((node) => node?.className || "unknown").join(","));
+    return { dock: { hidden: dockInspector.hidden, visuallyVisible: visuallyPainted(dockInspector), display: getComputedStyle(dockInspector).display, rect: rect(dockInspector) }, canvas: sessionInspectors.map((node) => ({ detailsHidden: node.querySelector('.qf-world-details')?.hidden === true, detailsRect: rect(node.querySelector('.qf-world-details')) })) };
+  })()`);
+  assert(state && typeof state === "object", `participant inspector close proof was invalid: ${JSON.stringify(state)}`);
+  console.log(`pre-r18-coherence: participant_inspector_closed=${JSON.stringify(state)}`);
+  await new Promise((resolvePromise) => setTimeout(resolvePromise, 120));
+}
 async function toggleObjectInspect(live: Live, type: string, id: string, expected: "open" | "closed" = "open"): Promise<void> {
   if (!CAPTURE_ENABLED) return;
   const state = await evaluate<{ type: string; id: string; label: string; detailsHidden: boolean }>(live.endpoint, `(() => { const tile = [...document.querySelectorAll(".canvas-tile[data-qf-world-type]")].find((node) => node.dataset.qfWorldType === ${JSON.stringify(type)} && node.dataset.qfWorldId === ${JSON.stringify(id)}); const button = tile?.querySelector(".qf-world-inspect"); const details = tile?.querySelector(".qf-world-details"); if (!(button instanceof HTMLElement) || !(details instanceof HTMLElement)) throw new Error("Inspect control missing for ${type}:${id}"); button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window })); return { type: tile.dataset.qfWorldType ?? "", id: tile.dataset.qfWorldId ?? "", label: button.textContent ?? "", detailsHidden: details.hidden }; })()`);
@@ -271,6 +297,53 @@ async function toggleObjectInspect(live: Live, type: string, id: string, expecte
   assert(state.type === type && state.id === id && state.label === (open ? "Collapse" : "Inspect") && state.detailsHidden === !open, `Inspect did not ${open ? "open" : "close"} the requested ${type}:${id} tile: ${JSON.stringify(state)}`);
   if (open) await evaluate<boolean>(live.endpoint, `(() => { const tile = [...document.querySelectorAll(".canvas-tile[data-qf-world-type]")].find((node) => node.dataset.qfWorldType === ${JSON.stringify(type)} && node.dataset.qfWorldId === ${JSON.stringify(id)}); const body = tile?.querySelector(".gl-tile__body"); if (!(body instanceof HTMLElement)) throw new Error("Canvas body missing for ${type}:${id}"); body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, button: 0, view: window })); return true; })()`);
   await new Promise((resolvePromise) => setTimeout(resolvePromise, 80));
+}
+async function prepareObjectCapture(live: Live, type: string, id: string): Promise<void> {
+  if (!CAPTURE_ENABLED) return;
+  const proof = await evaluate<Json>(live.endpoint, `(() => {
+    const rect = (node) => { const r = node.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height }; };
+    const overlap = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    const tile = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].find((node) => node.dataset.qfWorldType === ${JSON.stringify(type)} && node.dataset.qfWorldId === ${JSON.stringify(id)});
+    const canvas = document.querySelector('#panel-viewer');
+    const body = tile?.querySelector('.gl-tile__body');
+    const button = tile?.querySelector('.qf-world-inspect');
+    const details = tile?.querySelector('.qf-world-details');
+    if (!(tile instanceof HTMLElement) || !(canvas instanceof HTMLElement) || !(body instanceof HTMLElement) || !(button instanceof HTMLElement) || !(details instanceof HTMLElement)) throw new Error("exact Canvas Inspect target missing for ${type}:${id}");
+    const canvasRect = rect(canvas);
+    const beforeRect = rect(tile);
+    const beforeZ = Number.parseInt(getComputedStyle(tile).zIndex || tile.style.zIndex || "0", 10) || 0;
+    const beforeCenter = { x: (beforeRect.left + beforeRect.right) / 2, y: (beforeRect.top + beforeRect.bottom) / 2 };
+    body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, view: window, button: 0, clientX: beforeCenter.x, clientY: beforeCenter.y }));
+    body.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, view: window, button: 0, clientX: beforeCenter.x, clientY: beforeCenter.y }));
+    const targetX = canvasRect.left + canvasRect.width / 2;
+    const targetY = canvasRect.top + canvasRect.height * 0.34;
+    canvas.dispatchEvent(new WheelEvent("wheel", { bubbles: true, cancelable: true, view: window, deltaX: (beforeCenter.x - targetX) / 1.2, deltaY: (beforeCenter.y - targetY) / 1.2, clientX: beforeCenter.x, clientY: beforeCenter.y }));
+    for (let index = 0; index < 16 && tile.getBoundingClientRect().width < 260; index += 1) canvas.dispatchEvent(new WheelEvent("wheel", { bubbles: true, cancelable: true, view: window, deltaY: -25, ctrlKey: true, clientX: targetX, clientY: targetY }));
+    const afterRect = rect(tile);
+    const center = { x: (afterRect.left + afterRect.right) / 2, y: (afterRect.top + afterRect.bottom) / 2 };
+    const z = Number.parseInt(getComputedStyle(tile).zIndex || tile.style.zIndex || "0", 10) || 0;
+    const allTiles = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')];
+    const overlapping = allTiles.filter((other) => other !== tile && overlap(afterRect, rect(other))).map((other) => ({ type: other.dataset.qfWorldType, id: other.dataset.qfWorldId, z: Number.parseInt(getComputedStyle(other).zIndex || other.style.zIndex || "0", 10) || 0 }));
+    if (afterRect.left < canvasRect.left || afterRect.top < canvasRect.top || afterRect.right > canvasRect.right || afterRect.bottom > canvasRect.bottom) throw new Error("exact ${type}:${id} tile is not visibly within the Canvas viewport: " + JSON.stringify({ canvas: canvasRect, tile: afterRect }));
+    if (overlapping.some((other) => z <= other.z)) throw new Error("exact ${type}:${id} tile is not topmost among overlapping tiles: " + JSON.stringify({ z, overlapping }));
+    const topAtCenter = document.elementsFromPoint(center.x, center.y).map((node) => node.closest?.('.canvas-tile')).find(Boolean);
+    if (topAtCenter !== tile) throw new Error("exact ${type}:${id} tile is not the top Canvas element at its center");
+    button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+    return { type: tile.dataset.qfWorldType, id: tile.dataset.qfWorldId, beforeZ, afterZ: z, canvas: canvasRect, tile: afterRect, overlapping, detailsHidden: details.hidden, label: button.textContent, centerTopmost: topAtCenter === tile };
+  })()`);
+  assert(proof.type === type && proof.id === id && proof.detailsHidden === false && proof.label === "Collapse" && proof.centerTopmost === true, `Canvas Inspect proof did not open exact ${type}:${id}: ${JSON.stringify(proof)}`);
+  await waitFor(`painted ${type}:${id} Inspect`, async () => await evaluate<boolean>(live.endpoint, `(() => {
+    const tile = [...document.querySelectorAll('.canvas-tile[data-qf-world-type]')].find((node) => node.dataset.qfWorldType === ${JSON.stringify(type)} && node.dataset.qfWorldId === ${JSON.stringify(id)});
+    const canvas = document.querySelector('#panel-viewer'); const details = tile?.querySelector('.qf-world-details');
+    if (!(tile instanceof HTMLElement) || !(canvas instanceof HTMLElement) || !(details instanceof HTMLElement)) return false;
+    const r = tile.getBoundingClientRect(); const cr = canvas.getBoundingClientRect(); const dr = details.getBoundingClientRect(); const style = getComputedStyle(details);
+    const dockInspector = document.querySelector('[data-dock-primary="INSPECT"]'); const sessionDetails = [...document.querySelectorAll('.canvas-tile[data-qf-world-type="agent_session"] .qf-world-session-inspect .qf-world-details')];
+    const overlap = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    const painted = (node) => node instanceof HTMLElement && getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden' && getComputedStyle(node).opacity !== '0' && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0;
+    const participantVisible = (painted(dockInspector) && overlap(dr, dockInspector.getBoundingClientRect())) || sessionDetails.some((node) => painted(node) && !node.hidden && overlap(dr, node.getBoundingClientRect()));
+    return !details.hidden && style.display !== 'none' && style.visibility !== 'hidden' && dr.width > 0 && dr.height > 0 && r.left >= cr.left && r.top >= cr.top && r.right <= cr.right && r.bottom <= cr.bottom && !participantVisible;
+  })()`), Date.now() + 5_000);
+  console.log(`pre-r18-coherence: canvas_inspect_ready=${JSON.stringify(proof)}`);
 }
 async function selectCable(live: Live): Promise<void> {
   if (!CAPTURE_ENABLED) return;
@@ -346,7 +419,8 @@ async function runLiveR17C14Proof(): Promise<void> {
     const world = await waitFor("R17 settled projection", async () => { try { const value = await projectedWorld(live!.endpoint); return value.objects.length === 16 && value.links.length === 20 ? value : null; } catch { return null; } }, Date.now() + 25_000);
     const { expected, ids } = resolveR17Bindings(kernelDb, oracle, directorSessionId, strategyId); compareResolvedWorld(world, expected);
     await setDockMode(live, "START"); await captureState(live, "06-evaluation-and-report"); await setDockMode(live, "HISTORY"); await captureState(live, "07-completed-world");
-    await closeLive(live); live = await launch(root, kernelDb, artifactRoot, appRoot); await waitFor("R17 reopened saved world", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000).catch(async () => { await revealMission(live!.endpoint); return await waitFor("R17 reopened revealed world", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000); }); await setDockMode(live, "START"); await captureState(live, "08-reopened-world"); await setDockMode(live, "CATALOG"); await captureState(live, "09-dock-catalog"); await setDockMode(live, "ACTIVE"); await captureState(live, "10-dock-active-sessions"); await evaluate<boolean>(live.endpoint, "(() => { const row=document.querySelector('#dock-sessions-list .srow'); if (!(row instanceof HTMLElement)) throw new Error('active participant row missing'); row.click(); return true; })()"); await waitFor("selected participant Dock mode", async () => await evaluate<boolean>(live!.endpoint, "document.querySelector('[data-dock-primary=\"INSPECT\"]')?.hidden === false"), Date.now() + 5_000); await captureState(live, "11-selected-participant"); await setDockMode(live, "START"); await toggleObjectInspect(live, "artifact", String(ids.result_artifact_id)); await captureState(live, "12-selected-artifact"); await toggleObjectInspect(live, "artifact", String(ids.result_artifact_id), "closed"); await toggleObjectInspect(live, "evaluation", String(ids.evaluation_id)); await captureState(live, "13-selected-evaluation"); await setDockMode(live, "START"); await selectCable(live); await captureState(live, "14-most-cable-dense-region"); await toggleObjectInspect(live, "evaluation", String(ids.evaluation_id), "closed"); await captureManifestReceipt();
+    await closeLive(live); live = await launch(root, kernelDb, artifactRoot, appRoot); await waitFor("R17 reopened saved world", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000).catch(async () => { await revealMission(live!.endpoint); return await waitFor("R17 reopened revealed world", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000); }); await setDockMode(live, "START"); await captureState(live, "08-reopened-world"); await setDockMode(live, "CATALOG"); await captureState(live, "09-dock-catalog"); await setDockMode(live, "ACTIVE"); await captureState(live, "10-dock-active-sessions"); await evaluate<boolean>(live.endpoint, "(() => { const row=document.querySelector('#dock-sessions-list .srow'); if (!(row instanceof HTMLElement)) throw new Error('active participant row missing'); row.click(); return true; })()"); await waitFor("selected participant Dock mode", async () => await evaluate<boolean>(live!.endpoint, "document.querySelector('[data-dock-primary=\"INSPECT\"]')?.hidden === false"), Date.now() + 5_000); await captureState(live, "11-selected-participant"); await closeParticipantInspectors(live); await prepareObjectCapture(live, "artifact", String(ids.result_artifact_id)); await captureState(live, "12-selected-artifact"); await toggleObjectInspect(live, "artifact", String(ids.result_artifact_id), "closed"); await prepareObjectCapture(live, "evaluation", String(ids.evaluation_id)); await captureState(live, "13-selected-evaluation"); await toggleObjectInspect(live, "evaluation", String(ids.evaluation_id), "closed");
+    await closeLive(live); live = await launch(root, kernelDb, artifactRoot, appRoot); await waitFor("R17 reopened saved world for dense frame", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000).catch(async () => { await revealMission(live!.endpoint); return await waitFor("R17 reopened revealed world for dense frame", async () => { const count = await evaluate<number>(live!.endpoint, "document.querySelectorAll('.canvas-tile[data-qf-world-type]').length"); return count === 16 ? count : null; }, Date.now() + 20_000); }); await setDockMode(live, "START"); await selectCable(live); await captureState(live, "14-most-cable-dense-region"); await captureManifestReceipt();
     const objectKeys = expected.objects as Array<{ type: string; id: string }>; const linkKeys = expected.links as Array<{ kind: string; from_id: string; to_id: string }>; const measurement = await evaluate<Json>(live.endpoint, geometryExpression(objectKeys, linkKeys)); assert(measurement.objectCount === 16 && measurement.linkCount === 20, "C14 did not select all 16 objects and 20 links");
     console.log(`pre-r18-coherence: oracle_objects=16 oracle_links=20 resolved_objects=${measurement.objectCount} resolved_links=${measurement.linkCount}`); console.log(`pre-r18-coherence: geometry=${JSON.stringify({ viewport: measurement.viewport, canvas: measurement.canvas, measured_tiles: measurement.tiles?.length, measured_links: measurement.paths?.length })}`); console.log(`pre-r18-coherence: inspected_objects=${measurement.tiles?.length} inspected_links=${measurement.paths?.length}`); console.log(`pre-r18-coherence: production_ids=${JSON.stringify({ mission: "mission-r17-gate", director: directorSessionId, executor: executorSessionId, strategy: ids.strategy_id, evaluation: ids.evaluation_id, report: ids.report_artifact_id })}`);
   } finally { if (live) await closeLive(live).catch((error) => console.error(`pre-r18-coherence: cleanup_error=${errorMessage(error)}`)); rmSync(root, { recursive: true, force: true }); console.log(`pre-r18-coherence: roots_remaining=${existsSync(root) ? 1 : 0} leaked=${existsSync(root) ? JSON.stringify([root]) : "[]"}`); }
