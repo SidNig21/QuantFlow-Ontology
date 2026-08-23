@@ -62,6 +62,8 @@ const DRIVER_SQL_ALLOW = [
   "qa/gates/technique-outcome-loop.ts",
   // WO-R17 compatibility: disposable fixture SQLite only; founder state is never opened.
   "qa/gates/r17-founder-kernel-compatibility.ts",
+  // WO-R17 guided consumer: read-only oracle over the disposable UI-proof Kernel.
+  "qa/gates/r17-guided-technique-consumer.ts",
   // WO-PEER-BUS: transport inbox SQLite only — never Kernel DDL/DML.
   "tools/qf-peer-bus/src/bus.ts",
   "collab-electron/",

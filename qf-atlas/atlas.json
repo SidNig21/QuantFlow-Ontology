@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-R17",
-    "commit": "19d85c3",
+    "commit": "7740525",
     "generatedAt": "2026-08-23",
     "filesScanned": 437,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "cb07f6bb92c92489"
+    "fingerprint": "e1aa0d2ac8d4bad0"
   },
   "stats": {
     "live": 113,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 640.4,
+      "kb": 641.2,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3644,7 +3644,7 @@
         },
         {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 17.9,
+          "kb": 18,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -3677,6 +3677,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/r17-guided-technique-consumer.ts",
+          "kb": 11.5,
+          "spawns": 1,
+          "spawnsLive": 1,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/kernel-market-lineage.ts",
           "kb": 10.8,
           "spawns": 0,
@@ -3685,16 +3695,6 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 14
-        },
-        {
-          "path": "qa/gates/r17-guided-technique-consumer.ts",
-          "kb": 10.8,
-          "spawns": 1,
-          "spawnsLive": 1,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
         },
         {
           "path": "qa/gates/team-composition.ts",
@@ -59845,12 +59845,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R17",
-      "commit": "f1b37d2",
+      "commit": "19d85c3",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-R17",
-      "commit": "19d85c3",
+      "commit": "7740525",
       "generatedAt": "2026-08-23"
     },
     "verdict": "better",
