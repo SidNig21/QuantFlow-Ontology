@@ -638,3 +638,164 @@ Any shape outside the exact `pre_r17_current` or an already-current database,
 any row-preservation failure, any manual state preparation, or any second red
 assertion stops R17 for Router decision. Do not widen fail-closed classification,
 touch the generated schema semantics, add release/package work, or begin R18.
+
+## Consumer blocker — the explicit guided sample cannot start R17 normally
+
+### Fresh Reader finding — 2026-08-22
+
+The exact compatibility-repair candidate is `fcce9a5795910e27b6685d561f3f9fd60eebd4cb`.
+Independent R17 verification and the founder-Kernel compatibility repair are
+PASS. Computer Use then opened that exact candidate against the existing founder
+database: the upgrade completed from 84 to 89 rows, all 31 non-meta tables were
+row-identical, the preserved world was visible, and close/reopen was clean.
+
+The normal founder-visible `Technique version` select nevertheless contained
+only its placeholder. The founder Kernel has no R17-valid named Technique, and
+the normal app has no user path to create or load one. The existing explicit
+`TRY GUIDED RESEARCH` handler loads only the sample Dataset and then calls the
+existing form submit with `selectedStrategyId === null`; the R17 Main/Director
+path correctly refuses that omission before launch. This is a direct blocker to
+the named R17 consumer journey, not a compatibility or ontology defect.
+
+Plain meaning: the app can open the founder's work, but its one-click sample
+cannot put a real named Technique in the selector, so the research journey
+cannot begin.
+
+The two Reader questions are answered **YES / YES** after this bounded repair
+authority: every assertion below names a finite break that must go red, and each
+deliverable has one meaning.
+
+### Smallest semantic repair — one explicit guided action, one Kernel-owned Technique
+
+The Builder changes only the existing guided-sample/Main/renderer surfaces and
+focused tests/gate. The allowed product surfaces are the Kernel helper used by
+the existing sample action, the existing Main `loadSampleDataset` handler, and
+the existing Dock renderer guided handler/select. No schema, generated tool
+surface, new object type, second truth store, boot path, ordinary-question
+selection path, proof bridge, QA environment, manual SQL, bet/trade surface, or
+external model completion is added.
+
+1. **Create/load through canonical Kernel behavior.** Add one Main-owned helper
+   that receives the sample Dataset id and returns the one guided Technique
+   descriptor. It first reads the canonical Strategy/strategy-spec projection.
+   If the exact guided family/version is absent, it invokes the existing
+   canonical `execute_deterministic_run` Kernel action once with this immutable
+   spec and a stable registration Run id; that action is the existing authority
+   that publishes the content-hashed `strategy_spec` Artifact, registers the
+   Strategy, and enforces family/version predecessor and immutability rules.
+   The stable registration Run is an implementation receipt for the existing
+   action, not a second Technique or truth store, and it is created only by the
+   explicit guided action. A retry/reopen reads the existing Strategy and does
+   not invoke the action again.
+
+   The exact guided spec is:
+
+   ```json
+   {
+     "contract": "qf.strategy.v1",
+     "family": "guided-settled-results",
+     "version": 1,
+     "stake_model": "flat",
+     "score_field": "edge",
+     "probability_field": "/edge"
+   }
+   ```
+
+   `/edge` is the existing sample's bounded numeric field; no sample bytes are
+   rewritten. The helper returns exactly `{ strategy_id, family, version,
+   content_hash }` from Kernel truth. It must refuse exact-family/version
+   conflicts, malformed or unavailable spec bytes, duplicate family/version
+   rows, or a registration partial state with exact `TECHNIQUE COVERAGE REFUSED`
+   and zero durable-row delta. It never hard-codes a hash or inserts rows.
+
+2. **Return the descriptor from the existing action.** The existing
+   `qf:research:loadSampleDataset` Main handler continues to load the sample
+   Dataset through its current Kernel path, then calls the helper and returns
+   both the Dataset and the exact Technique descriptor. It does not create a
+   Technique during app boot or while merely listing selector options.
+
+3. **Select before the unchanged submit.** The guided renderer stores the
+   returned `strategy_id`, ensures one real option carrying the returned family,
+   version, and hash exists, sets the actual select value, dispatches the same
+   change path that enables Submit, and only then calls the existing
+   `requestSubmit()`. The submitted Main argument must equal the returned
+   `strategy_id`; free text is never parsed as identity. The existing R17 Main,
+   Director, and Kernel run path is unchanged after that selection.
+
+4. **Keep ordinary questions manual.** Boot and ordinary question submission
+   never call the helper or select a Technique. The placeholder keeps Submit
+   disabled; a direct missing/malformed selection still returns exact
+   `TECHNIQUE COVERAGE REFUSED` before Mission/Hypothesis/worker creation with
+   zero durable-row delta.
+
+### Focused assertions and finite falsifiers
+
+Add focused unit coverage and one minutes-scale gate for the semantic delta.
+The gate must exercise the real Main/renderer seam enough to prove selection
+and admission; it must not wait for an external model completion.
+
+The positive assertions are finite and exact:
+
+- On an empty current Kernel, one explicit guided action returns a non-empty
+  `strategy_id`, family `guided-settled-results`, version `1`, and a 64-character
+  lowercase `content_hash`; the persisted Strategy points to one immutable
+  canonical spec Artifact whose bytes hash to that value.
+- A second click and a close/reopen return the identical four-field descriptor,
+  with exactly one Strategy for that family/version and no second registration
+  action/Run or duplicate Strategy row.
+- The real renderer has one non-placeholder selectable option, its value is the
+  returned Strategy id, and the guided request reaches the existing submit with
+  that exact id before the request is admitted.
+- A normal-app positive consumer check opens the exact candidate and founder
+  database, clicks the explicit guided action, observes that real option and
+  exact-id admission, and does not require a worker/model completion. The same
+  app then exercises a missing-selection ordinary question and observes exact
+  `TECHNIQUE COVERAGE REFUSED` with no Mission/Hypothesis/worker delta. Close
+  and reopen are not replaced by a fixture, wipe, reseed, manual SQL, or proof
+  bridge; shutdown leaves zero owned product processes.
+
+Before trusting the gate, show each mutation red, restore the immutable
+candidate, and show the positive control green. Each case uses one fresh
+disposable Kernel/root; the fixture, expected descriptor, and receipts remain
+read-only:
+
+1. Remove the helper call from the guided Main handler: the returned action has
+   no Technique descriptor and the real select/admission assertion is red.
+2. Make the helper create a new Strategy on every click: exact descriptor and
+   one-family/version row-count/idempotence assertions are red.
+3. Change one spec byte or its persisted hash: canonical-byte/hash assertion is
+   red and the helper must refuse with zero durable delta.
+4. Accept a second same-family/version or malformed/unavailable Strategy:
+   conflict refusal and zero-delta assertions are red.
+5. Leave the descriptor returned but omit the renderer value assignment or
+   dispatch: the captured existing submit argument is null/mismatched and the
+   positive consumer assertion is red.
+6. Auto-select the guided Technique during boot or ordinary question submit:
+   the negative manual-selection assertion is red.
+7. Remove the Main missing-selection refusal or move it after Mission creation:
+   exact refusal or zero durable-row delta is red.
+8. Replace the existing R17 Director call with a new/free-text/legacy path:
+   the exact admitted Strategy id and unchanged Director-path assertion is red.
+
+The focused gate prints these exact receipts (with the real ids/hash substituted
+where marked):
+
+```text
+guided_action=explicit_try_guided_research
+dataset=<sample-dataset-id>
+technique=<strategy-id> family=guided-settled-results version=1 content_hash=<64-lower-hex>
+same_on_retry=true same_on_reopen=true family_version_rows=1
+renderer_option_real=true renderer_selected=<strategy-id> submit_strategy_id=<strategy-id>
+guided_launch_accepted=true external_model_completion_required=false
+missing_selection_refusal=TECHNIQUE COVERAGE REFUSED delta=0
+boot_writes=0 ordinary_auto_selection=false
+owned_processes_remaining=0
+PASS r17-guided-technique-consumer
+```
+
+This repair does not claim R17 completion. It authorizes one bounded Builder
+lap, one focused live delta gate, one independent Verifier, and then one normal
+founder-app consumer check. Any second red assertion, any extra Technique or
+truth store, any boot write, any manual state preparation, or any change to the
+ordinary required-selection or R17 Director semantics stops R17 for Router
+decision.
