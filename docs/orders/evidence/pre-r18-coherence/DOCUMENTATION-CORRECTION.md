@@ -1,8 +1,8 @@
 # Documentation correction receipt
 
-Date: 2026-08-23  
-Branch: `wo-pre-r18-coherence`  
-Parent: `2bb828c`  
+Date: 2026-08-23
+Branch: `wo-pre-r18-coherence`
+Parent: `2bb828c`
 Scope: the four named documentation paths only.
 
 ## Old claims removed
