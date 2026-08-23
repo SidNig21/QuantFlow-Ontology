@@ -283,6 +283,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "pre-r18-coherence",
+    description: "PRE-R18: coherent participant projection, current/historical authority markers, and falsifiable product proof",
+    run: async () => {
+      const { runPreR18CoherenceGate } = await import("./gates/pre-r18-coherence.ts");
+      const { ok } = await runPreR18CoherenceGate();
+      return ok;
+    },
+  },
+  {
     name: "technique-outcome-loop",
     description: "R17: immutable named Technique selection and operator-settled outcome grade",
     run: async () => {

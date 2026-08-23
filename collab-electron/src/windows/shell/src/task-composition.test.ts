@@ -459,7 +459,8 @@ describe("Task footer projection", () => {
     });
 
     const source = await Bun.file(new URL("./task-composition.js", import.meta.url)).text();
-    expect(source).not.toContain("qf-world-field");
+	expect(source).toContain("participantFieldRows");
+	expect(source).not.toContain("function makeField");
     expect(source).not.toContain("makeField");
     expect(source).not.toContain("displayValue");
     expect(source).not.toContain("renderObject");

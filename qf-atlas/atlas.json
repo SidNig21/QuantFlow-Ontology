@@ -1,11 +1,11 @@
 {
   "meta": {
-    "branch": "wo-R17",
-    "commit": "7740525",
+    "branch": "wo-pre-r18-coherence",
+    "commit": "80666e8",
     "generatedAt": "2026-08-23",
-    "filesScanned": 437,
+    "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "e1aa0d2ac8d4bad0"
+    "fingerprint": "049978022bbe5766"
   },
   "stats": {
     "live": 113,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 126,
-      "indexed": 1200,
+      "indexed": 1203,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 556
+      "files": 559
     },
-    "coverageFiles": 556,
+    "coverageFiles": 559,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -487,8 +487,8 @@
       "layer": 4,
       "name": "CodeEditorView.tsx",
       "kb": 14.3,
-      "x": 2.6,
-      "z": -0.45,
+      "x": 2.48,
+      "z": 0.91,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -543,8 +543,8 @@
       "layer": 4,
       "name": "Editor.tsx",
       "kb": 23.7,
-      "x": 1.24,
-      "z": -0.45,
+      "x": 0.45,
+      "z": 2.6,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2058,7 +2058,7 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 21,
+      "kb": 25.3,
       "x": -2.48,
       "z": -0.91,
       "status": "ok",
@@ -2069,7 +2069,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 19.9,
+          "kb": 24.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2523,8 +2523,8 @@
       "layer": 4,
       "name": "universal.ts",
       "kb": 23.3,
-      "x": 0.45,
-      "z": 2.6,
+      "x": -0.91,
+      "z": 2.48,
       "status": "warn",
       "spawns": 0,
       "writes": 0,
@@ -2636,8 +2636,8 @@
       "layer": 4,
       "name": "settings/src/App.tsx",
       "kb": 20.1,
-      "x": -0.91,
-      "z": 2.48,
+      "x": -2.6,
+      "z": 0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2827,9 +2827,9 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 18,
-      "x": -2.6,
-      "z": 0.45,
+      "kb": 21.9,
+      "x": -2.03,
+      "z": 1.69,
       "status": "ok",
       "spawns": 2,
       "writes": 0,
@@ -2838,7 +2838,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 18,
+          "kb": 21.9,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -2911,7 +2911,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 56.7,
+      "kb": 59.2,
       "x": -0.23,
       "z": 1.3,
       "status": "ice",
@@ -2922,7 +2922,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 56.7,
+          "kb": 59.2,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2939,9 +2939,9 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 19.1,
-      "x": -2.03,
-      "z": 1.69,
+      "kb": 25,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2950,7 +2950,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 19.1,
+          "kb": 25,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2967,9 +2967,9 @@
       "id": "4:collab-electron/src/windows/shell/src::task",
       "layer": 4,
       "name": "task-composition.js",
-      "kb": 13.9,
-      "x": 2.48,
-      "z": 0.91,
+      "kb": 14.5,
+      "x": 2.6,
+      "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2978,7 +2978,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/task-composition.js",
-          "kb": 13.9,
+          "kb": 14.5,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 641.2,
+      "kb": 648.2,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3541,7 +3541,7 @@
         },
         {
           "path": "qa/gates/research-world-visible.ts",
-          "kb": 56.6,
+          "kb": 56.9,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -3808,6 +3808,16 @@
         {
           "path": "qa/gates/schema-bundle-aliases.ts",
           "kb": 7.1,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/pre-r18-coherence.ts",
+          "kb": 6.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -4535,7 +4545,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 36.7,
+      "kb": 37,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4546,7 +4556,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 36.7,
+          "kb": 37,
           "spawns": 5,
           "spawnsLive": 4,
           "writes": 0,
@@ -5400,8 +5410,8 @@
     {
       "id": "4:residue",
       "layer": 4,
-      "name": "76 small modules*",
-      "kb": 163.2,
+      "name": "77 small modules*",
+      "kb": 166.8,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5602,6 +5612,16 @@
         },
         {
           "path": "collab-electron/packages/components/src/TreeView/useFileTree.ts",
+          "kb": 3.6,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/src/windows/shell/src/participant-projection.js",
           "kb": 3.6,
           "spawns": 0,
           "spawnsLive": 0,
@@ -9512,7 +9532,7 @@
     {
       "path": "collab-electron/src/main/research-world-projection.ts",
       "status": "indexed",
-      "indexedFns": 18,
+      "indexedFns": 21,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -10626,6 +10646,10 @@
       "status": "out-of-scope"
     },
     {
+      "path": "collab-electron/src/windows/shell/src/participant-projection.js",
+      "status": "out-of-scope"
+    },
+    {
       "path": "collab-electron/src/windows/shell/src/renderer.js",
       "status": "out-of-scope"
     },
@@ -10883,6 +10907,10 @@
     },
     {
       "path": "qa/gates/package-closure/modes.ts",
+      "status": "out-of-scope"
+    },
+    {
+      "path": "qa/gates/pre-r18-coherence.ts",
       "status": "out-of-scope"
     },
     {
@@ -16716,7 +16744,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 112 in relationalSnapshot) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 116 in relationalSnapshot) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -18821,6 +18849,53 @@
       "unexplained": []
     },
     {
+      "path": "collab-electron/src/windows/shell/src/participant-projection.js",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "indexed",
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "indexed",
+      "ownership": "unsupported",
+      "blockers": {
+        "ownership": "scope-boundary"
+      },
+      "reasons": {
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "collab-electron/src/windows/shell/src/participant-projection.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
       "path": "collab-electron/src/windows/shell/src/renderer.js",
       "worst": "unsupported",
       "imports": "indexed",
@@ -18857,7 +18932,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 222 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 309 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -21748,6 +21823,31 @@
     },
     {
       "path": "qa/gates/package-closure.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/pre-r18-coherence.ts",
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
@@ -25358,42 +25458,42 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 552,
+      "indexed": 555,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 272,
-      "indexed": 280,
+      "not-applicable": 273,
+      "indexed": 282,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 545,
+      "not-applicable": 548,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 504,
+      "not-applicable": 507,
       "partial": 27,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 487,
+      "not-applicable": 490,
       "partial": 63,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 201,
+      "not-applicable": 203,
       "unsupported": 123,
-      "indexed": 232
+      "indexed": 233
     },
     "ownership": {
-      "not-applicable": 177,
-      "unsupported": 358,
+      "not-applicable": 178,
+      "unsupported": 360,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 316,
-      "indexed": 237,
+      "unsupported": 318,
+      "indexed": 238,
       "partial": 3
     }
   },
@@ -27883,8 +27983,10 @@
         "collab-electron/src/windows/shell/src/renderer.js"
       ],
       "importerCount": 1,
-      "imports": [],
-      "importCount": 0
+      "imports": [
+        "collab-electron/src/windows/shell/src/participant-projection.js"
+      ],
+      "importCount": 1
     },
     {
       "path": "collab-electron/src/windows/shell/src/edge-indicators.js",
@@ -27945,6 +28047,19 @@
       "importCount": 0
     },
     {
+      "path": "collab-electron/src/windows/shell/src/participant-projection.js",
+      "reach": "reachable",
+      "importers": [
+        "collab-electron/src/windows/shell/src/renderer.js",
+        "collab-electron/src/windows/shell/src/dock.js",
+        "collab-electron/src/windows/shell/src/task-composition.js",
+        "collab-electron/src/windows/shell/src/research-world.js"
+      ],
+      "importerCount": 4,
+      "imports": [],
+      "importCount": 0
+    },
+    {
       "path": "collab-electron/src/windows/shell/src/renderer.js",
       "reach": "entrypoint",
       "importers": [],
@@ -27963,7 +28078,7 @@
         "collab-electron/src/windows/shell/src/tile-manager.js",
         "collab-electron/src/windows/shell/src/tile-renderer.js"
       ],
-      "importCount": 26
+      "importCount": 27
     },
     {
       "path": "collab-electron/src/windows/shell/src/research-world.js",
@@ -27973,9 +28088,10 @@
       ],
       "importerCount": 1,
       "imports": [
-        "collab-electron/src/windows/shell/src/canvas-state.js"
+        "collab-electron/src/windows/shell/src/canvas-state.js",
+        "collab-electron/src/windows/shell/src/participant-projection.js"
       ],
-      "importCount": 1
+      "importCount": 2
     },
     {
       "path": "collab-electron/src/windows/shell/src/task-composition.js",
@@ -27985,8 +28101,10 @@
         "qa/gates/research-director-delegation.ts"
       ],
       "importerCount": 2,
-      "imports": [],
-      "importCount": 0
+      "imports": [
+        "collab-electron/src/windows/shell/src/participant-projection.js"
+      ],
+      "importCount": 1
     },
     {
       "path": "collab-electron/src/windows/shell/src/tile-interactions.js",
@@ -30526,6 +30644,7 @@
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/gates/package-closure/executors.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "collab-electron/src/main/ipc.ts",
         "qa/gates/package-closure.ts"
       ],
@@ -31589,7 +31708,8 @@
         "qa/gates/windows-dock-species.ts",
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
-        "qa/gates/package-closure.ts"
+        "qa/gates/package-closure.ts",
+        "qa/gates/pre-r18-coherence.ts"
       ],
       "transitiveTruncated": false,
       "directDependencies": [],
@@ -31896,6 +32016,7 @@
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
         "qa/gates/package-closure/executors.ts",
+        "qa/gates/pre-r18-coherence.ts",
         "qa/gates/package-closure.ts"
       ],
       "transitiveTruncated": false,
@@ -33019,7 +33140,9 @@
       ],
       "transitiveDependents": [],
       "transitiveTruncated": false,
-      "directDependencies": [],
+      "directDependencies": [
+        "collab-electron/src/windows/shell/src/participant-projection.js"
+      ],
       "affectedWires": [],
       "affectedLoops": [],
       "affectedProcesses": [],
@@ -33101,6 +33224,25 @@
       "affectedProcesses": [],
       "packaged": "bundled-via-import"
     },
+    "collab-electron/src/windows/shell/src/participant-projection.js": {
+      "reach": "reachable",
+      "directDependents": [
+        "collab-electron/src/windows/shell/src/renderer.js",
+        "collab-electron/src/windows/shell/src/dock.js",
+        "collab-electron/src/windows/shell/src/task-composition.js",
+        "collab-electron/src/windows/shell/src/research-world.js"
+      ],
+      "transitiveDependents": [
+        "qa/gates/research-director-delegation.ts",
+        "qa/run.ts"
+      ],
+      "transitiveTruncated": false,
+      "directDependencies": [],
+      "affectedWires": [],
+      "affectedLoops": [],
+      "affectedProcesses": [],
+      "packaged": "bundled-via-import"
+    },
     "collab-electron/src/windows/shell/src/renderer.js": {
       "reach": "entrypoint",
       "directDependents": [],
@@ -33131,6 +33273,7 @@
         "collab-electron/src/windows/shell/src/glacier-feel.js",
         "collab-electron/src/windows/shell/src/task-composition.js",
         "collab-electron/src/windows/shell/src/research-world.js",
+        "collab-electron/src/windows/shell/src/participant-projection.js",
         "collab-electron/src/windows/shell/src/shell.css",
         "collab-electron/src/windows/shell/src/tooltip.js"
       ],
@@ -33147,7 +33290,8 @@
       "transitiveDependents": [],
       "transitiveTruncated": false,
       "directDependencies": [
-        "collab-electron/src/windows/shell/src/canvas-state.js"
+        "collab-electron/src/windows/shell/src/canvas-state.js",
+        "collab-electron/src/windows/shell/src/participant-projection.js"
       ],
       "affectedWires": [],
       "affectedLoops": [],
@@ -33164,7 +33308,9 @@
         "qa/run.ts"
       ],
       "transitiveTruncated": false,
-      "directDependencies": [],
+      "directDependencies": [
+        "collab-electron/src/windows/shell/src/participant-projection.js"
+      ],
       "affectedWires": [],
       "affectedLoops": [],
       "affectedProcesses": [],
@@ -43352,6 +43498,15 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "get",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "parse",
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
@@ -43416,6 +43571,25 @@
             "from": "collab-electron/src/main/research-world-projection.ts",
             "candidates": [
               "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "push",
+            "from": "collab-electron/src/main/research-world-projection.ts",
+            "candidates": [
+              "collab-electron/src/main/launcher-readiness.ts",
+              "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
+              "tools/qf-proof-agent/src/qf-proof-agent.mjs"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -59845,12 +60019,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-R17",
-      "commit": "19d85c3",
+      "commit": "7740525",
       "generatedAt": "2026-08-23"
     },
     "to": {
-      "branch": "wo-R17",
-      "commit": "7740525",
+      "branch": "wo-pre-r18-coherence",
+      "commit": "80666e8",
       "generatedAt": "2026-08-23"
     },
     "verdict": "better",

@@ -1,3 +1,5 @@
+import { participantFieldRows } from "./participant-projection.js";
+
 function node(tag, className, text) {
 	const value = document.createElement(tag);
 	if (className) value.className = className;
@@ -81,6 +83,7 @@ export function renderTaskFoot(dom, tile, {
 	focused = false,
 	sessions = [],
 	assignments = [],
+	participantView = null,
 	onCreate,
 	onReassign,
 	onCancel,
@@ -105,6 +108,16 @@ export function renderTaskFoot(dom, tile, {
 	if (!tile?.sessionId) {
 		if (retainedReceipt) foot.appendChild(retainedReceipt);
 		return;
+	}
+	if (participantView) {
+		const receipt = retainedReceipt || node("div", "qf-world-session-receipt");
+		receipt.replaceChildren(...participantFieldRows(participantView).map(({ field, value }) => {
+			const row = node("div", "qf-world-context-field");
+			row.appendChild(node("span", "qf-world-field-label", field));
+			row.appendChild(node("span", "qf-world-field-value", value));
+			return row;
+		}));
+		if (!retainedReceipt) foot.appendChild(receipt);
 	}
 
 	const session = (Array.isArray(sessions) ? sessions : []).find((row) => row?.id === tile.sessionId);

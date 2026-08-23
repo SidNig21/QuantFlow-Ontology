@@ -30,11 +30,13 @@ import { createKernelLedger } from "./kernel-ledger.js";
 import { fitViewportToTiles } from "./glacier-feel.js";
 import { renderTaskFoot } from "./task-composition.js";
 import { createResearchWorldController } from "./research-world.js";
+import { participantView } from "./participant-projection.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
 
 const viewportState = { panX: 0, panY: 0, zoom: 1 };
+let planningDirectorSubmission = null;
 
 const canvasEl = document.getElementById("panel-viewer");
 const gridCanvas = document.getElementById("grid-canvas");
@@ -283,6 +285,10 @@ async function init() {
 
 	initDock(panelAgent, {
 		onTidy: () => tidyTilesToGrid(),
+		onResearchSubmitted: (result) => {
+			planningDirectorSubmission = { sessionId: String(result.sessionId), missionId: String(result.missionId) };
+			void researchWorldController?.reveal("mission", String(result.missionId));
+		},
 	});
 
 	const agentPanel = createPanel("agent", {
@@ -545,6 +551,7 @@ async function init() {
 			cableOverlay?.redraw();
 		},
 		showStatus: (message) => showCanvasToast(message),
+		getParticipantView: participantViewFor,
 	});
 	tileManager.onResearchWorldReady = (worldTiles) => {
 		edgeIndicators.update();
@@ -668,7 +675,23 @@ async function init() {
 			getTiles: () => tiles,
 			getViewport: () => viewportState,
 			getConnections: () => liveConnections,
-			onSelect: (conn) => cableInspector.show(conn),
+			onSelect: (conn) => {
+				if (!conn.qfWorldCableFrom || !conn.qfWorldCableTo) {
+					cableInspector.show(conn);
+					return;
+				}
+				const world = researchWorldController?.getLastWorld?.();
+				const from = world?.objects?.find((object) => object.id === conn.qfWorldCableFrom);
+				const to = world?.objects?.find((object) => object.id === conn.qfWorldCableTo);
+				const label = (object, fallback) => object
+					? `${object.type} · ${object.fields?.name ?? object.fields?.title ?? object.fields?.kind ?? object.id} [${object.id}]`
+					: fallback;
+				cableInspector.show({
+					...conn,
+					from_ref: `${label(from, conn.qfWorldCableFrom)} · ${conn.from_ref}`,
+					to_ref: `${label(to, conn.qfWorldCableTo)} · ${conn.to_ref}`,
+				});
+			},
 		});
 		cableController = createCableController({
 			canvasEl,
@@ -720,6 +743,42 @@ async function init() {
 
 	let taskSurface = { sessions: [], assignments: [] };
 
+	function participantViewFor(sessionId, object = null) {
+		const id = String(sessionId ?? "");
+		const session = taskSurface.sessions.find((row) => String(row?.id ?? "") === id) ?? {
+			id,
+			status: object?.fields?.status,
+			definition_id: object?.fields?.definition_id,
+			display_name: object?.fields?.display_name,
+			role: object?.fields?.role,
+		};
+		const task = taskSurface.assignments.find((row) =>
+			row?.assignmentState === "assigned" && String(row?.assignedToSessionId ?? "") === id,
+		) ?? null;
+		const world = researchWorldController?.getLastWorld?.();
+		const run = world?.objects?.find((candidate) =>
+			candidate.type === "run" && String(candidate.fields?.executor_session_id ?? "") === id,
+		);
+		const producedArtifact = run?.fields?.result_artifact_id
+			? world.objects.find((candidate) => candidate.type === "artifact" && candidate.id === run.fields.result_artifact_id)
+			: null;
+		const term = tiles.find((tile) => String(tile?.sessionId ?? "") === id && tile.type === "term");
+		const hasTask = world?.objects?.some((candidate) => candidate.type === "task") === true;
+		return participantView({
+			session,
+			definition: session,
+			task,
+			runtimeObservation: { live: Boolean(term?.ptySessionId), runtime: "Native TUI" },
+			missionBinding: {
+				missionId: world?.root?.id ?? planningDirectorSubmission?.missionId,
+				hasTask,
+				reason: task?.description,
+			},
+			producedArtifact,
+			planningDirector: planningDirectorSubmission,
+		});
+	}
+
 	function renderTaskFoots() {
 		for (const [id, dom] of tileManager.getTileDOMs()) {
 			const tile = getTile(id);
@@ -728,6 +787,7 @@ async function init() {
 				focused: tileManager.getFocusedTileId() === id,
 				sessions: taskSurface.sessions,
 				assignments: taskSurface.assignments,
+				participantView: tile.sessionId ? participantViewFor(tile.sessionId) : null,
 				onCreate: async (args) => {
 					const result = await window.shellApi.qf.createTask(args);
 					if (!result?.ok) throw new Error(result?.error?.message ?? "Create task failed");

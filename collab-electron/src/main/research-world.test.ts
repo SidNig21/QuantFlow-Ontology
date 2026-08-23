@@ -170,6 +170,11 @@ describe("Main research-world projection", () => {
         ].sort());
         expect(projection.world.objects).toHaveLength(13);
         expect(projection.world.links).toHaveLength(15);
+        expect(projection.world.current_report_id).toBe(String(evaluation.state.report_artifact_id));
+        expect(projection.world.report_ids).toContain(String(evaluation.state.report_artifact_id));
+        expect(projection.world.objects.find((object) => object.type === "evaluation")?.fields.semantic_markers).toEqual(["EVALUATION"]);
+        expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === resultArtifactId)?.fields.semantic_markers).toContain("RAW ARTIFACT");
+        expect(projection.world.objects.find((object) => object.type === "artifact" && object.id === String(evaluation.state.report_artifact_id))?.fields.semantic_markers).toContain("PUBLISHED REPORT");
         expect(projection.world.links.map(({ kind, from_id, to_id }) => `${kind}:${from_id}:${to_id}`)).toEqual([
           `assigned_to:${sourceTask.object_id}:worker-world`,
           `assigned_to:${reviewTaskId}:critic-world`,

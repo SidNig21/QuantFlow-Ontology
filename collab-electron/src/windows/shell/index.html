@@ -67,59 +67,65 @@
 					<div class="tally" id="dock-tally" aria-live="polite"></div>
 				</header>
 
-				<div class="ask" id="dock-question">
-					<form id="dock-question-form" class="dock-question-form">
-						<textarea
-							id="dock-question-input"
-							class="dock-question-input"
-							rows="3"
-							placeholder="Ask the Research Director about a bounded market mission…"
-						></textarea>
-						<div class="hint">submit <kbd>Ctrl ⏎</kbd></div>
-						<button id="dock-question-submit" type="submit" class="sr-only">Submit</button>
-					</form>
-					<div class="research-onboarding">
-						<span>QuantFlow delegates evidence, preserves lineage, and independently reviews settled-data results.</span>
-						<button id="dock-guided-research" class="dk-link" type="button">Try guided research</button>
-						<div id="dock-question-status" class="research-status" role="status" aria-live="polite"></div>
-					</div>
+				<div class="dock-tabs" role="tablist" aria-label="Research Dock modes">
+					<button type="button" role="tab" aria-selected="true" data-dock-mode="START">START</button>
+					<button type="button" role="tab" aria-selected="false" data-dock-mode="CATALOG">CATALOG</button>
+					<button type="button" role="tab" aria-selected="false" data-dock-mode="ACTIVE">ACTIVE</button>
+					<button type="button" role="tab" aria-selected="false" data-dock-mode="INSPECT">INSPECT</button>
+					<button type="button" role="tab" aria-selected="false" data-dock-mode="HISTORY">HISTORY</button>
 				</div>
 
-				<div class="sh"><b>launch</b><span class="r"></span></div>
-				<div class="launch" id="dock-species">
-					<div id="dock-species-list"></div>
-					<div class="authnote" id="dock-auth-note">
-						Auth is checked at launch — if sign-in is required, authenticate in Ubuntu and retry.
+				<section class="dock-primary" data-dock-primary="START" aria-label="Mission composer">
+					<div class="ask" id="dock-question">
+						<form id="dock-question-form" class="dock-question-form">
+							<textarea id="dock-question-input" class="dock-question-input" rows="3" placeholder="Ask the Research Director about a bounded market mission…"></textarea>
+							<div class="hint">submit <kbd>Ctrl ⏎</kbd></div>
+							<button id="dock-question-submit" type="submit" class="sr-only">Submit</button>
+						</form>
+						<div class="research-onboarding">
+							<span>QuantFlow delegates evidence, preserves lineage, and independently reviews settled-data results.</span>
+							<button id="dock-guided-research" class="dk-link" type="button">Try guided research</button>
+							<div id="dock-question-status" class="research-status" role="status" aria-live="polite"></div>
+						</div>
 					</div>
-				</div>
+				</section>
 
-				<div class="sh">
-					<b>sessions</b><span class="r"></span>
-					<button
-						id="dock-sessions-clear"
-						class="dk-link"
-						type="button"
-						title="Hide closed sessions from this list. Kernel history is kept."
-					>
-						clear closed
-					</button>
-				</div>
-				<div class="kernel-ledger" id="kernel-ledger">
-					<div class="kl-hd">
-						<span>research ledger</span>
+				<section class="dock-primary" data-dock-primary="CATALOG" aria-label="Participant catalog" hidden>
+					<div class="sh"><b>launch</b><span class="r"></span></div>
+					<div class="launch" id="dock-species">
+						<div id="dock-species-list"></div>
+						<div class="authnote" id="dock-auth-note">Auth is checked at launch — if sign-in is required, authenticate in Ubuntu and retry.</div>
 					</div>
-					<div class="kl-empty" id="kernel-ledger-empty">Ask a question to begin durable research.</div>
-					<div class="kl-body" id="kernel-ledger-list"></div>
-				</div>
-				<div class="ledger" id="dock-sessions">
-					<div class="lg-hd">
-						<span class="c1"></span>
-						<span class="c2">session</span>
-						<span class="c3">species</span>
-						<span>state</span>
+				</section>
+
+				<section class="dock-primary dock-primary-scroll" data-dock-primary="ACTIVE" aria-label="Active participants" hidden>
+					<div class="sh">
+						<b>active participants</b><span class="r"></span>
+						<button id="dock-sessions-clear" class="dk-link" type="button" title="Hide closed sessions from this list. Kernel history is kept.">clear closed</button>
 					</div>
-					<div class="lg-body" id="dock-sessions-list"></div>
-				</div>
+					<div class="ledger" id="dock-sessions">
+						<div class="lg-hd"><span class="c1"></span><span class="c2">session</span><span class="c3">role / work</span><span>state</span></div>
+						<div class="lg-body" id="dock-sessions-list"></div>
+					</div>
+				</section>
+
+				<section class="dock-primary dock-primary-scroll" data-dock-primary="INSPECT" aria-label="Selected participant inspection" hidden>
+					<div class="sh"><b>selected participant</b><span class="r"></span></div>
+					<div id="dock-inspect-pane" class="dock-inspect-pane"><div class="qf-empty">Select a participant from ACTIVE.</div></div>
+				</section>
+
+				<section class="dock-primary dock-primary-scroll" data-dock-primary="HISTORY" aria-label="Research history" hidden>
+					<div class="kernel-ledger" id="kernel-ledger">
+						<div class="kl-hd"><span>research ledger</span></div>
+						<div class="kl-empty" id="kernel-ledger-empty">Ask a question to begin durable research.</div>
+						<div class="kl-body" id="kernel-ledger-list"></div>
+					</div>
+					<div class="sh"><b>closed sessions</b><span class="r"></span></div>
+					<div class="ledger" id="dock-history">
+						<div class="lg-hd"><span class="c1"></span><span class="c2">session</span><span class="c3">role / work</span><span>state</span></div>
+						<div class="lg-body" id="dock-history-list"></div>
+					</div>
+				</section>
 			</div>
 		</div>
 	</div>

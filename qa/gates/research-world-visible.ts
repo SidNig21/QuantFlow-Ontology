@@ -784,12 +784,15 @@ async function runFirstWorldStage(root: string, nonce: string, startedAt: number
   try {
     active = await launchReady(root, functionalDeadlineAt, activity);
     const first = active;
-    const seeded = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", {}) as { object_id?: string; dataset?: { object_id?: string } };
+    const techniqueFixture = await rpcCall(first.endpoint, "qf.research.seed_fixture_dataset", { r17_technique: true }) as { dataset?: { object_id?: string }; strategies?: Array<{ strategy_id?: string; family?: string; version?: number }> };
+    const strategyId = String(techniqueFixture.strategies?.find((row) => Number(row.version) === 1)?.strategy_id ?? "");
+    assert(strategyId, "named R17 Technique was not seeded");
+    const seeded = techniqueFixture;
     const datasetId = String(seeded.object_id ?? seeded.dataset?.object_id ?? "");
     assert(datasetId, "supporting Dataset was not seeded");
     const missionId = `mission-${nonce}`;
     const question = `R16 visible world ${nonce}`;
-    const submitted = await rpcCall(first.endpoint, "qf.research.submit_question", { mission_id: missionId, question, dataset_id: datasetId }) as { hypothesisId: string; sessionId: string };
+    const submitted = await rpcCall(first.endpoint, "qf.research.submit_question", { mission_id: missionId, question, dataset_id: datasetId, strategy_id: strategyId }) as { hypothesisId: string; sessionId: string };
     const [executor, critic] = await scheduleFirstWorldSpecialists(
       () => rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-worker" }) as Promise<{ sessionId: string }>,
       () => rpcCall(first.endpoint, "qf.dock.spawn", { definitionId: "hermes-critic" }) as Promise<{ sessionId: string }>,

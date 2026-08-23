@@ -1,4 +1,5 @@
 import { tiles } from "./canvas-state.js";
+import { participantFieldRows, shortParticipantId } from "./participant-projection.js";
 
 const FIELD_ORDER = {
 	mission: ["id", "name", "objective"],
@@ -15,8 +16,8 @@ const FIELD_ORDER = {
 
 function tileId(type, id) { return `ontology:${type}:${id}`; }
 
-const WORLD_TILE_WIDTH = 420;
-const WORLD_TILE_HEIGHT = 280;
+const WORLD_TILE_WIDTH = 300;
+const WORLD_TILE_HEIGHT = 230;
 const WORLD_LANE_GAP = 24;
 const WORLD_ROW_GAP = 24;
 const WORLD_COLLISION_STEP = 20;
@@ -27,9 +28,10 @@ const WORLD_TYPE_ORDER = new Map([
 ]);
 
 function laneFor(object) {
-	if (object?.type === "evaluation") return 2;
-	if (object?.type === "artifact" && object?.fields?.kind === "report") return 2;
-	if (["dataset", "run", "strategy", "artifact"].includes(object?.type)) return 1;
+	if (["evaluation"].includes(object?.type)) return 3;
+	if (object?.type === "artifact" && object?.fields?.kind === "report") return 3;
+	if (["run", "artifact", "strategy"].includes(object?.type)) return 2;
+	if (["hypothesis", "dataset"].includes(object?.type)) return 1;
 	return 0;
 }
 
@@ -45,6 +47,13 @@ function rectFor(tile) {
 		width: Number(tile?.width) || WORLD_TILE_WIDTH,
 		height: Number(tile?.height) || WORLD_TILE_HEIGHT,
 	};
+}
+
+function normalizeResearchTile(tile) {
+	if (!tile || tile.type !== "research") return tile;
+	tile.width = WORLD_TILE_WIDTH;
+	tile.height = WORLD_TILE_HEIGHT;
+	return tile;
 }
 
 export function latestSavedWorldRoot(canvasTiles) {
@@ -92,7 +101,22 @@ export function researchSessionReceiptFields(object) {
 
 function objectPrimary(object) {
 	const fields = object.fields || {};
+	if (fields.current_authority === true) return "Published conclusion";
+	if (fields.historical === true) return "Historical work";
 	return fields.name || fields.title || fields.claim || fields.verdict || fields.kind || fields.status || object.id;
+}
+
+function semanticMarkers(object) {
+	return Array.isArray(object?.fields?.semantic_markers) ? object.fields.semantic_markers.map(String) : [];
+}
+
+function objectState(object) {
+	const fields = object?.fields || {};
+	if (fields.current_authority === true) return "current authority";
+	if (fields.historical === true) return "historical";
+	if (typeof fields.status === "string" && fields.status.length > 0) return fields.status;
+	if (typeof fields.verdict === "string" && fields.verdict.length > 0) return fields.verdict;
+	return "Not recorded";
 }
 
 function makeField(field, value, exists) {
@@ -116,11 +140,33 @@ function renderObject(dom, tile, object, onReveal, world, onOutcomeRecorded) {
 	if (container._qfWorldKeyHandler) container.removeEventListener("keydown", container._qfWorldKeyHandler);
 	container.dataset.qfWorldType = object.type;
 	container.dataset.qfWorldId = object.id;
+	const markers = semanticMarkers(object);
+	container.dataset.qfWorldMarkers = markers.join("|");
 	container.setAttribute("aria-label", `${object.type} ${object.id}`);
+	container.setAttribute("aria-description", `${objectPrimary(object)} · ${shortParticipantId(object.id)}`);
 	dom.contentArea.replaceChildren();
 	const compact = document.createElement("div");
 	compact.className = "qf-world-compact";
-	compact.textContent = `${object.type} · ${objectPrimary(object)} · ${object.id}`;
+	const humanLabel = document.createElement("strong");
+	humanLabel.className = "qf-world-human-label";
+	humanLabel.textContent = String(objectPrimary(object));
+	humanLabel.title = object.id;
+	const typeLabel = document.createElement("span");
+	typeLabel.className = "qf-world-type-label";
+	typeLabel.textContent = `${object.type} · ${objectState(object)} · ${shortParticipantId(object.id)}`;
+	compact.append(humanLabel, typeLabel);
+	if (markers.length > 0) {
+		const markerRow = document.createElement("div");
+		markerRow.className = "qf-world-markers";
+		for (const marker of markers) {
+			const markerEl = document.createElement("span");
+			markerEl.className = "qf-world-marker";
+			markerEl.dataset.marker = marker;
+			markerEl.textContent = marker;
+			markerRow.appendChild(markerEl);
+		}
+		compact.appendChild(markerRow);
+	}
 	const controls = document.createElement("div");
 	controls.className = "qf-world-controls";
 	const inspect = document.createElement("button");
@@ -135,6 +181,47 @@ function renderObject(dom, tile, object, onReveal, world, onOutcomeRecorded) {
 		const exists = Object.prototype.hasOwnProperty.call(object.fields || {}, field);
 		details.appendChild(makeField(field, object.fields?.[field], exists));
 	}
+	const contextFields = [
+		["semantic markers", markers.join(" · ")],
+		["producer", object.fields?.producer_type && object.fields?.producer_id ? `${object.fields.producer_type} · ${object.fields.producer_id}` : ""],
+		["source task", object.fields?.source_task_id],
+		["source run", object.fields?.source_run_id],
+		["gating evaluation", object.fields?.gating_evaluation_id],
+		["current authority", object.fields?.current_authority === true ? "yes" : object.fields?.current_authority === false ? "no" : ""],
+		["historical", object.fields?.historical === true ? "yes" : object.fields?.historical === false ? "no" : ""],
+		["target artifact", object.fields?.target_artifact_id],
+		["definition", object.fields?.definition_id],
+		["role", object.fields?.role],
+		["runtime profile", object.fields?.runtime_profile],
+	];
+	for (const [field, value] of contextFields) {
+		if (!value) continue;
+		const row = document.createElement("div");
+		row.className = "qf-world-context-field";
+		const label = document.createElement("span");
+		label.className = "qf-world-field-label";
+		label.textContent = field;
+		const content = document.createElement("span");
+		content.className = "qf-world-field-value";
+		content.textContent = displayValue(value);
+		row.append(label, content);
+		details.appendChild(row);
+	}
+	const relations = document.createElement("div");
+	relations.className = "qf-world-relations";
+	for (const direction of ["incoming", "outgoing"]) {
+		for (const link of (world?.links || []).filter((candidate) => direction === "incoming" ? candidate.to_id === object.id : candidate.from_id === object.id)) {
+			const row = document.createElement("div");
+			row.className = "qf-world-relation";
+			row.dataset.direction = direction;
+			row.dataset.kind = link.kind;
+			row.dataset.fromId = link.from_id;
+			row.dataset.toId = link.to_id;
+			row.textContent = `${direction} · ${link.kind} · ${link.from_id} → ${link.to_id}`;
+			relations.appendChild(row);
+		}
+	}
+	if (relations.children.length > 0) details.appendChild(relations);
 	if (object.type === "artifact" && object.fields?.receipt?.preview) {
 		try {
 			const payload = JSON.parse(object.fields.receipt.preview);
@@ -240,7 +327,7 @@ function renderObject(dom, tile, object, onReveal, world, onOutcomeRecorded) {
 	container.addEventListener("keydown", keyHandler);
 }
 
-export function createResearchWorldController({ tileManager, getTileDOMs, onCables, showStatus }) {
+export function createResearchWorldController({ tileManager, getTileDOMs, onCables, showStatus, getParticipantView }) {
 	let lastRoot = null;
 	let lastWorld = null;
 
@@ -263,7 +350,16 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		if (dom) {
 			dom.container.dataset.qfWorldType = object.type;
 			dom.container.dataset.qfWorldId = object.id;
+			const view = getParticipantView?.(object.id, object);
 			dom.container.setAttribute("aria-label", `${object.type} ${object.id}`);
+			dom.container.setAttribute("aria-description", view ? `${view.displayName} · participant · ${shortParticipantId(object.id)}` : "participant");
+			dom.container.dataset.qfParticipantId = object.id;
+			if (view) {
+				dom.container.dataset.qfParticipantRole = view.role;
+				dom.container.dataset.qfParticipantRuntime = view.runtimeState;
+				dom.container.dataset.qfParticipantWork = view.work;
+				dom.container.dataset.qfParticipantRecovery = view.recovery;
+			}
 			const taskFoot = dom.taskFoot;
 			if (taskFoot) {
 				const receipts = [...taskFoot.children].filter((child) => child.classList.contains("qf-world-session-receipt"));
@@ -274,6 +370,26 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 				}
 				for (const duplicate of receipts.slice(1)) duplicate.remove();
 				receipt.replaceChildren(...researchSessionReceiptFields(object).map(({ field, value }) => makeField(field, value)));
+				const participantReceipt = taskFoot.querySelector?.(".qf-participant-receipt") || null;
+				if (view) {
+					const context = participantReceipt || document.createElement("div");
+					context.className = "qf-participant-receipt";
+					context.replaceChildren(...participantFieldRows(view).map(({ field, value }) => {
+						const row = document.createElement("div");
+						row.className = "qf-world-context-field";
+						const label = document.createElement("span");
+						label.className = "qf-world-field-label";
+						label.textContent = field;
+						const content = document.createElement("span");
+						content.className = "qf-world-field-value";
+						content.textContent = value;
+						row.append(label, content);
+						return row;
+					}));
+					if (!participantReceipt) taskFoot.appendChild(context);
+				} else {
+					participantReceipt?.remove();
+				}
 			}
 		}
 		return tile;
@@ -317,13 +433,16 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			while (occupied.some((other) => overlaps(candidate, other))) candidate.y += WORLD_COLLISION_STEP;
 			rootTile = tileManager.createResearchTile(candidate.x, candidate.y, rootObject);
 		}
+		normalizeResearchTile(rootTile);
 		const existingWorldResearch = tiles.filter((tile) => worldResearchIds.has(tile.id));
+		for (const tile of existingWorldResearch) normalizeResearchTile(tile);
 		const repairMalformedLayout = researchWorldLayoutIsMalformed(existingWorldResearch);
 		const layoutIds = new Set(existingWorldResearch.map((tile) => tile.id));
 		const occupied = tiles.filter((tile) => !layoutIds.has(tile.id) && !worldSessionIds.has(tile.sessionId)).map(rectFor);
-		occupied.push(rectFor(rootTile));
+		occupied.push({ ...rectFor(rootTile), width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT });
 		const nextY = [
 			rootTile.y + WORLD_TILE_HEIGHT + WORLD_ROW_GAP,
+			rootTile.y,
 			rootTile.y,
 			rootTile.y,
 		];
@@ -333,6 +452,7 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			a.id.localeCompare(b.id));
 		const projectedLayout = [];
 		if (repairMalformedLayout) {
+			projectedLayout.push({ ...rootTile, width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT });
 			const sessionTiles = result.world.objects
 				.filter((object) => object.type === "agent_session")
 				.map((object) => tiles.find((tile) => tile.sessionId === object.id))
@@ -341,8 +461,8 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 				const candidate = {
 					x: rootTile.x + index * (WORLD_TILE_WIDTH + WORLD_LANE_GAP),
 					y: rootTile.y - 520,
-					width: Number(tile.width) || 400,
-					height: Number(tile.height) || 500,
+					width: WORLD_TILE_WIDTH,
+					height: WORLD_TILE_HEIGHT,
 				};
 				while (occupied.some((other) => overlaps(candidate, other))) candidate.y -= WORLD_COLLISION_STEP;
 				occupied.push(candidate);
@@ -354,11 +474,13 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			let tile = existing(object.type, object.id);
 			if (tile?.id === rootTile.id) { renderTile(getTileDOMs().get(tile.id), tile, object); continue; }
 			const pos = positionFor(nextY, object, rootTile, occupied);
-			if (!tile) tile = tileManager.createResearchTile(pos.x, pos.y, object);
-			else {
+			if (!tile) {
+				tile = tileManager.createResearchTile(pos.x, pos.y, object);
+			} else {
 				renderTile(getTileDOMs().get(tile.id), tile, object);
-				if (repairMalformedLayout) projectedLayout.push({ ...tile, ...pos });
 			}
+			normalizeResearchTile(tile);
+			if (repairMalformedLayout) projectedLayout.push({ ...tile, ...pos, width: WORLD_TILE_WIDTH, height: WORLD_TILE_HEIGHT });
 		}
 		if (repairMalformedLayout && projectedLayout.length > 0) tileManager.applyTileLayout?.(projectedLayout);
 		if (staleProjectionIds.length > 0 || projectedLayout.length > 0) tileManager.saveCanvasImmediate?.();
@@ -374,9 +496,12 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 				qfWorldCableKind: link.kind,
 				qfWorldCableFrom: link.from_id,
 				qfWorldCableTo: link.to_id,
+				qfWorldCableCurrent: result.world.current_report_id === link.to_id,
+				qfWorldCableHistorical: result.world.report_ids.includes(link.to_id) && result.world.current_report_id !== link.to_id,
 			};
 		}).filter(Boolean);
 		onCables?.(cables);
+		tileManager.repositionAllTiles?.();
 		const worldMemberTiles = tiles.filter((tile) =>
 			worldResearchIds.has(tile.id) || worldSessionIds.has(tile.sessionId));
 		tileManager.onResearchWorldReady?.(worldMemberTiles);

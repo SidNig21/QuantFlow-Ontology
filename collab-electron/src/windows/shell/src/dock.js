@@ -1,3 +1,5 @@
+import { participantFieldRows, participantView } from "./participant-projection.js";
+
 /**
  * Dock rail — species + sessions from Kernel IPC only.
  * No hardcoded species names; refresh on qf:dock:invalidate only.
@@ -147,14 +149,16 @@ function sessionSpeciesLabel(row) {
 
 /**
  * @param {HTMLElement} panelEl
- * @param {{ onTidy?: () => void, qaMode?: boolean }} [options]
+ * @param {{ onTidy?: () => void, onResearchSubmitted?: (result: object) => void, qaMode?: boolean }} [options]
  */
 export function initDock(panelEl, options = {}) {
 	const speciesList = panelEl.querySelector("#dock-species-list");
 	const sessionsList = panelEl.querySelector("#dock-sessions-list");
+	const historyList = panelEl.querySelector("#dock-history-list");
+	const inspectPane = panelEl.querySelector("#dock-inspect-pane");
 	const tallyEl = panelEl.querySelector("#dock-tally");
-	if (!speciesList || !sessionsList) {
-		console.error("[dock] missing #dock-species-list or #dock-sessions-list");
+	if (!speciesList || !sessionsList || !historyList || !inspectPane) {
+		console.error("[dock] missing required Dock projection surfaces");
 		return;
 	}
 
@@ -163,6 +167,72 @@ export function initDock(panelEl, options = {}) {
 	let sessionsClearedThroughIso = null;
 	/** @type {boolean} */
 	let closedCollapsed = true;
+	let selectedSessionId = null;
+	let planningDirector = null;
+	let missionWorld = null;
+	let latestDefinitions = [];
+
+	function setMode(mode) {
+		const selected = String(mode ?? "START").toUpperCase();
+		for (const tab of panelEl.querySelectorAll("[data-dock-mode]")) {
+			const active = tab.dataset.dockMode === selected;
+			tab.setAttribute("aria-selected", active ? "true" : "false");
+		}
+		for (const pane of panelEl.querySelectorAll("[data-dock-primary]")) {
+			pane.hidden = pane.dataset.dockPrimary !== selected;
+		}
+	}
+
+	for (const tab of panelEl.querySelectorAll("[data-dock-mode]")) {
+		tab.addEventListener("click", () => setMode(tab.dataset.dockMode));
+	}
+	setMode("START");
+
+	function selectedTaskFor(id, assignments) {
+		return (Array.isArray(assignments) ? assignments : []).find((row) =>
+			row?.assignmentState === "assigned" && row?.assignedToSessionId === id,
+		) ?? null;
+	}
+
+	function participantFor(session, assignments) {
+		const id = String(session?.id ?? "");
+		const task = selectedTaskFor(id, assignments);
+		const world = missionWorld;
+		const producedLink = world?.links?.find((link) => link.kind === "produces" && link.from_id === id);
+		const producedArtifact = producedLink
+			? world.objects?.find((object) => object.type === "artifact" && object.id === producedLink.to_id)
+			: null;
+		const hasTask = world?.objects?.some((object) => object.type === "task") === true;
+		return participantView({
+			session,
+			definition: latestDefinitions.find((row) => row?.id === session?.definition_id) ?? session,
+			task,
+			runtimeObservation: { live: session?.status === "running", runtime: "Native TUI" },
+			missionBinding: { missionId: world?.root?.id ?? planningDirector?.missionId, hasTask, reason: task?.description },
+			producedArtifact,
+			planningDirector,
+		});
+	}
+
+	function renderInspect(session, view) {
+		inspectPane.replaceChildren();
+		if (!session || !view) {
+			inspectPane.appendChild(el("div", "qf-empty", "Select a participant from ACTIVE."));
+			return;
+		}
+		const heading = el("h3", "dock-inspect-heading", view.displayName);
+		heading.title = String(session.id ?? "");
+		inspectPane.appendChild(heading);
+		inspectPane.appendChild(el("div", "dock-inspect-id", String(session.id ?? "")));
+		const facts = el("div", "dock-inspect-facts");
+		for (const { field, value } of participantFieldRows(view)) {
+			const row = el("div", "qf-world-field");
+			row.appendChild(el("span", "qf-world-field-label", field));
+			row.appendChild(el("span", "qf-world-field-value", value));
+			facts.appendChild(row);
+		}
+		inspectPane.appendChild(facts);
+	}
 
 	function setTally({ live, closed, launchable }) {
 		if (!tallyEl) return;
@@ -267,13 +337,18 @@ export function initDock(panelEl, options = {}) {
 				}
 			}
 
+			latestDefinitions = defsRes?.ok ? visibleDockDefinitions(defsRes.definitions, {
+				qaMode: options.qaMode === true || window.__QF_QA_MODE__ === true,
+			}) : [];
 			sessionsList.replaceChildren();
+			historyList.replaceChildren();
 			let liveCount = 0;
 			let closedCount = 0;
 			if (!sessRes?.ok) {
 				sessionsList.appendChild(
 					el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"),
 				);
+				historyList.appendChild(el("div", "qf-empty", sessRes?.error?.message ?? "Failed to list sessions"));
 			} else {
 				const allSessions = surfaceRes?.ok && Array.isArray(surfaceRes.sessions)
 					? surfaceRes.sessions
@@ -288,23 +363,11 @@ export function initDock(panelEl, options = {}) {
 				liveCount = live.length;
 				closedCount = closed.length;
 
-				if (sessions.length === 0) {
-					const hidden = allSessions.length - sessions.length;
-					sessionsList.appendChild(
-						el(
-							"div",
-							"qf-empty",
-							hidden > 0
-								? `No sessions in view (${hidden} kept in Kernel)`
-								: "No sessions",
-						),
-					);
-				}
-
-				const appendSessionRow = (row) => {
+				const appendSessionRow = (row, targetList) => {
 					const id = String(row.id ?? "");
 					const status = String(row.status ?? "");
 					const state = formatDockSessionState(row);
+					const view = participantFor(row, taskAssignments);
 					const card = el(
 						"div",
 						state.kind === "live"
@@ -313,54 +376,54 @@ export function initDock(panelEl, options = {}) {
 								? "srow blk"
 								: "srow",
 					);
+					card.dataset.sessionId = id;
+					card.tabIndex = 0;
+					card.setAttribute("role", "button");
 					card.appendChild(el("i", null, null));
 					card.appendChild(el("span", "id", shortId(id)));
-					card.appendChild(el("span", "who", sessionSpeciesLabel(row)));
-					card.appendChild(el("span", "st", state.text));
-					const owned = activeTaskForSession(taskAssignments, id);
-					const unavailableTask = unavailableTaskForSession(taskAssignments, id);
-					if (owned) card.appendChild(el("span", "own", `Owns: ${owned.title}`));
-					else if (unavailableTask) card.appendChild(el("span", "own", "Assignment unavailable"));
-
-					if (
-						status === "starting" ||
-						status === "running" ||
-						status === "blocked"
-					) {
-						card.title = "Click to cancel session";
-						card.addEventListener("click", () => {
-							void window.shellApi.qf.cancelSession(id);
-						});
+					const who = el("span", "who", view.role === "Not recorded" ? sessionSpeciesLabel(row) : view.role);
+					who.title = `${view.displayName} · ${view.role}`;
+					card.appendChild(who);
+					card.appendChild(el("span", "own", `${view.task} · ${view.work}`));
+					card.appendChild(el("span", "st", `${view.runtimeState} · ${state.text}`));
+					card.addEventListener("click", () => {
+						selectedSessionId = id;
+						renderInspect(row, view);
+						setMode("INSPECT");
+					});
+					card.addEventListener("keydown", (event) => {
+						if (event.key === "Enter" || event.key === " ") {
+							event.preventDefault();
+							selectedSessionId = id;
+							renderInspect(row, view);
+							setMode("INSPECT");
+						}
+					});
+					const actions = el("span", "srow-actions");
+					if (isDockLiveSessionStatus(status)) {
+						const cancel = el("button", "srow-action", "Cancel");
+						cancel.type = "button";
+						cancel.setAttribute("aria-label", `Cancel session ${id}`);
+						cancel.addEventListener("click", (event) => { event.stopPropagation(); void window.shellApi.qf.cancelSession(id); });
+						actions.appendChild(cancel);
 					} else if (status === "cancelled" || status === "failed") {
-						card.title = "Click to close session";
-						card.addEventListener("click", () => {
-							void window.shellApi.qf.closeSession(id);
-						});
+						const close = el("button", "srow-action", "Close");
+						close.type = "button";
+						close.setAttribute("aria-label", `Close session ${id}`);
+						close.addEventListener("click", (event) => { event.stopPropagation(); void window.shellApi.qf.closeSession(id); });
+						actions.appendChild(close);
 					}
-					sessionsList.appendChild(card);
+					card.appendChild(actions);
+					targetList.appendChild(card);
 				};
 
-				for (const row of live) appendSessionRow(row);
-
-				if (closed.length > 0) {
-					const grp = el("div", "lg-grp");
-					grp.appendChild(
-						document.createTextNode(
-							`closed · ${closed.length}`,
-						),
-					);
-					grp.appendChild(el("span", "r", null));
-					grp.appendChild(
-						el("span", null, closedCollapsed ? "expand" : "collapse"),
-					);
-					grp.addEventListener("click", () => {
-						closedCollapsed = !closedCollapsed;
-						void refresh();
-					});
-					sessionsList.appendChild(grp);
-					if (!closedCollapsed) {
-						for (const row of closed) appendSessionRow(row);
-					}
+				if (live.length === 0) sessionsList.appendChild(el("div", "qf-empty", "No active participants"));
+				for (const row of live) appendSessionRow(row, sessionsList);
+				if (closed.length === 0) historyList.appendChild(el("div", "qf-empty", "No historical sessions"));
+				for (const row of closed) appendSessionRow(row, historyList);
+				if (selectedSessionId) {
+					const selected = allSessions.find((row) => String(row.id ?? "") === selectedSessionId);
+					if (selected) renderInspect(selected, participantFor(selected, taskAssignments));
 				}
 			}
 
@@ -422,6 +485,12 @@ export function initDock(panelEl, options = {}) {
 			void window.shellApi.qf.submitResearchQuestion(question, datasetId ?? undefined, undefined, selectedStrategyId ?? undefined).then((res) => {
 				if (!res?.ok) throw new Error(res?.error?.message ?? "research launch failed");
 				window.__QF_LAST_RESEARCH_SUBMIT = res;
+				planningDirector = { sessionId: String(res.sessionId), missionId: String(res.missionId) };
+				void window.shellApi.qf.getResearchWorldProjection({ root_type: "mission", root_id: String(res.missionId) }).then((projection) => {
+					if (projection?.ok) missionWorld = projection.world;
+					void refresh();
+				}).catch(() => {});
+				options.onResearchSubmitted?.(res);
 				setQuestionStatus(researchDirectorRunningStatus(res.missionId), "ok");
 				void refresh();
 			}).catch((error) => {

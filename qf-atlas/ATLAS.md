@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-R17 @ 7740525` on 2026-08-23 by
+> Generated from `wo-pre-r18-coherence @ 80666e8` on 2026-08-23 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -228,7 +228,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 212 | imported from an entrypoint |
+| `reachable` | 213 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -365,8 +365,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 238 of
-240 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 239 of
+241 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
@@ -408,11 +408,11 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**238 of 240 files that have a reachability verdict** carry a blast radius.
+**239 of 241 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**556 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**559 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 316 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 318 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
@@ -459,7 +459,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (556 files)
+## Per-analyzer coverage (559 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -467,17 +467,17 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 552 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 280 | 0 | 4 | 0 | 272 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 545 |
-| `persistence` | 25 | 27 | 0 | 0 | 504 |
-| `lifetime` | 6 | 63 | 0 | 0 | 487 |
-| `packaging` | 232 | 0 | 0 | 123 | 201 |
-| `ownership` | 21 | 0 | 0 | 358 | 177 |
-| `reach` | 237 | 3 | 0 | 316 | 0 |
+| `imports` | 555 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 282 | 0 | 4 | 0 | 273 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 548 |
+| `persistence` | 25 | 27 | 0 | 0 | 507 |
+| `lifetime` | 6 | 63 | 0 | 0 | 490 |
+| `packaging` | 233 | 0 | 0 | 123 | 203 |
+| `ownership` | 21 | 0 | 0 | 360 | 178 |
+| `reach` | 238 | 3 | 0 | 318 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 316 files means those trees are
+failure — `reach: unsupported` on 318 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
 `packaging: unsupported` on 123 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
