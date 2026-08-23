@@ -47,8 +47,9 @@ another.
 
 | Axis | Derived value | Existing source and precedence |
 |---|---|---|
-| Session | `active` | `agent_session.status` is not a terminal/closed value |
-| Session | `closed` | `agent_session.status` is `closed`, `cancelled`, `failed`, or `completed` |
+| Session | `active` | `agent_session.status` is exactly `starting`, `running`, or `blocked` |
+| Session | `closed` | `agent_session.status` is exactly `closed`, `cancelled`, or `failed` |
+| Session | `Not recorded` | status is missing, `completed`, or any other value |
 | Runtime | `running` | the current runtime observation identifies a live PTY/ACP/native process |
 | Runtime | `starting` | the session is admitted/active but no live-process observation or terminal exit exists yet |
 | Runtime | `unavailable` | no live process exists and the profile/runtime availability surface says the definition cannot launch |
@@ -277,6 +278,24 @@ At the locked 1600×1000 viewport and 100% zoom, the populated Mission view must
 6. preserve full canonical ids and complete relationship details in `INSPECT` even
    when Canvas labels use shortened display text.
 
+The populated fixture is exactly the accepted R17 literal oracle
+`qa/oracles/r17-technique-outcome.json` at SHA-256
+`038a68c2508d3d671a60a1ab3d562d8d387e70ed08e582a4cca2e7fbf0519fa7`:
+all 16 resolved object records and all 20 resolved link records, with no count-only
+substitute. `Usable Canvas` means the research Canvas element's measured
+`clientWidth` and `clientHeight`. A `vertical band` is any closed x interval whose
+width equals the median rendered tile width; the gate computes the maximum object-
+center occupancy over every such interval. A cable `anchor` is the existing
+`portPosition` source or target point used by the Glacier cable renderer, in Canvas
+CSS pixels.
+
+Selecting each of the 16 objects in turn must make `INSPECT` show its full id and
+the complete set of incoming/outgoing `kind, from_id, to_id` triples from the
+resolved 20-link oracle. Selecting each of the 20 links must show its kind,
+direction, source label/id, and target label/id. The selected cable's painted
+geometry may not intersect the interior of an unrelated tile and its painted
+bounding height must remain below 90% of usable Canvas height.
+
 These requirements may adjust only the current layout calculation, tile anatomy,
 bounded CSS, and existing link presentation. They do not authorize a new layout
 engine, ontology field, link, inventory surface, or broad shell redesign.
@@ -313,8 +332,9 @@ The isolated fixture contains independent facts for all of these cases:
   published Report, and one superseded Report;
 - one current cable and one historical/background cable carrying existing kinds
   and directions;
-- the inherited populated research world with 13 objects and 15 semantic cables,
-  used only as the representative density fixture rather than a re-proof of R16.
+- the exact accepted R17 literal oracle named in F1 with all 16 objects and 20
+  semantic cables, used as the representative density fixture rather than a
+  re-proof of R17.
 
 The gate supports `QF_PRE_R18_COHERENCE_FALSIFY=C01` through `C14`. The unmodified
 control exits zero. Each falsifier corrupts only its named condition and must exit
@@ -343,20 +363,24 @@ The fourteen conditions are:
 10. normal-app close/relaunch against the same isolated roots does not restore the
     exact Mission-local object ids, link triples, durably Mission-local participant
     ids, and saved research-tile identities without refresh or injected state;
-11. a refused/failed submission changes the previously visible Canvas or creates a
-    Mission, Task, session, tile, or link;
+11. a submission refused before `create_mission` changes the previously visible
+    Canvas or creates a Mission, Task, session, tile, or link;
 12. either surface omits or invents role, runtime, recruiter/reason, Task ownership,
     produced output, or any of the four axes for the fixture participants, or fails
     to render `Not recorded` for the fixture's deliberately absent fact;
 13. a rendered cable lacks its existing kind/direction, selected cable lacks
     selection emphasis, or the fixture's current and historical/background cables
     receive the wrong visual subordination;
-14. at 1600×1000 and 100% zoom, tile-center span is below 45% on either Canvas
-    axis, more than 60% of centers occupy one median tile-width vertical band, any
-    pair of tile rectangles intersects, Dock text escapes/intersects its row or
-    action rectangle, a required tile/relationship label is absent, an SVG cable
-    endpoint lies more than 12 CSS pixels from its source/target anchor, or the
-    selected cable label intersects an unrelated tile rectangle.
+14. at 1600×1000 and 100% zoom, the resolved world differs from any of the literal
+    oracle's 16 object or 20 link records; tile-center span is below 45% on either
+    measured Canvas axis; more than 60% of centers occupy one median-width vertical
+    band; any pair of tile rectangles intersects; Dock text escapes/intersects its
+    row or action rectangle; any required tile/relationship label is absent;
+    `INSPECT` omits or invents any incoming/outgoing triple for any object or any
+    kind/direction/source/target detail for any link; an SVG endpoint lies more than
+    12 CSS pixels from its existing `portPosition` anchor; the selected painted
+    stroke or label intersects an unrelated tile interior; or the selected stroke's
+    painted bounding height is at least 90% of measured Canvas height.
 
 The gate prints one named receipt per condition plus the tested commit, Mission id,
 participant ids, object ids, link triples, and `cleanup=clean`. One process boot is
