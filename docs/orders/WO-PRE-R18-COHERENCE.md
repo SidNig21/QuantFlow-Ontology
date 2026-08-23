@@ -1,6 +1,6 @@
 # WO-PRE-R18-COHERENCE — Make the accepted R17 world tell one honest story
 
-status: DRAFT — semantic Reader pending; no implementation authority
+status: READER ACCEPTED — implementation waits for temporary `NEXT.md` rotation
 kind: bounded non-rung correction
 branch: `wo-pre-r18-coherence`
 base: accepted R17 closure `4d25fa3df91964fc90223a135d8969ebd61c5374`
@@ -9,6 +9,7 @@ depends: [R17 final acceptance](evidence/r17/FINAL-ACCEPTANCE.md)
 baseline-receipt: [accepted product byte equivalence](evidence/pre-r18-coherence/BASELINE-BYTE-EQUIVALENCE.md)
 cleanup-receipt: [exact audit-residue cleanup](evidence/pre-r18-coherence/AUDIT-RESIDUE-CLEANUP.md)
 authorization: founder command on 2026-08-23; implementation begins only after Reader `YES/YES` and temporary `NEXT.md` rotation
+reader-receipt: [YES/YES at `afe9b36`](evidence/pre-r18-coherence/READER-ACCEPTANCE.md)
 rework-budget: exactly one product rework commit for the entire order; any later red receipt stops for Ryan
 
 ## In plain terms
