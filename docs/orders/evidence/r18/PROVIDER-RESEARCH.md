@@ -26,8 +26,10 @@ Primary source: [The Odds API V4](https://the-odds-api.com/liveapi/guides/v4/)
 - sport key: `americanfootball_nfl`
 - desired bookmaker key: `bovada`
 - market key: `player_pass_interceptions`
-- discovery sequence: sports/events, one event's market inventory, then one
-  event's odds
+- discovery sequence: fetch the complete NFL event inventory once, follow any
+  pagination token, sort in-horizon regular-season events by commencement then
+  provider event id, and query each event's market inventory/odds in that order
+  until the first qualifying event is found
 - exact event, bookmaker, market, outcomes, prices, line, source update time,
   fetch time, and raw response hash are mandatory
 - the API key is read only by the app-owned acquisition boundary, never exposed
@@ -103,10 +105,14 @@ app must prove:
 5. raw bytes can be content-hashed and the normal app can reach its isolated
    Artifact root.
 
-Failure returns one named reason and durable research delta zero. Missing
-Bovada/prop coverage offers exactly two next decisions: authorize one named
-alternate bookmaker from The Odds API for the same component, or postpone/change
-the component. Moneyline and other props are never silent substitutes.
+A feasibility-door failure returns one named reason and durable research delta
+zero. After that door passes, an admission failure may retain only the exact raw
+acquisition Artifact ids/hashes/mandatory metadata links named by its receipt;
+every other domain row remains unchanged and the receipt does not claim zero
+delta. Missing Bovada/prop coverage stops the order and displays exactly two next
+decisions: request separate authority for one named alternate bookmaker from The
+Odds API for the same component, or postpone/change the component. Moneyline and
+other props are never silent substitutes.
 
 ## Optional historical odds
 
