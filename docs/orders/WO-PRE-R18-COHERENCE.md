@@ -1,6 +1,6 @@
 # WO-PRE-R18-COHERENCE — Make the accepted R17 world tell one honest story
 
-status: REWORK — independent Round 1 red; single global repair commit now in use
+status: DONE — accepted; independent product/evidence/consumer verification PASS; docs-only closure recorded
 kind: bounded non-rung correction
 branch: `wo-pre-r18-coherence`
 base: accepted R17 closure `4d25fa3df91964fc90223a135d8969ebd61c5374`
@@ -1297,3 +1297,34 @@ additional product decision, repair allocation, Builder replacement, or
 `NEXT.md` rotation is required. The writer then produces one immutable candidate
 and stops; it may not repair any subsequent `PRODUCT`, `EVIDENCE`, `ATLAS`, or
 `CONSUMER-READINESS` red without new explicit Ryan authority.
+
+## Closure receipt — 2026-08-23
+
+Disposition: **DONE / ACCEPTED**. This non-rung correction is closed by the
+founder-delegated closure authority in the current task; no product, Atlas,
+test, oracle, screenshot, manifest, or future-rung implementation was changed
+by this closure.
+
+### Immutable receipts
+
+- **PRODUCT — PASS:** independent Verifier accepted candidate
+  `eecb2457eef6a71d888129c0bb353129956478d1`; exact DEFAULT `13/13`, LOCAL
+  `9/dim7`, FULL `16/20`, C01–C14 PASS, focused `43 pass / 0 fail / 288`
+  expectations, both named falsifiers red then green, Atlas HARD RED `0`.
+- **EVIDENCE — PASS:** independent evidence receipt accepted exactly 16
+  evidence-only files: 14 unique `1600×1000` screenshots totaling `651,912`
+  bytes, all displaying `eecb245`; doc-links PASS `73`; cleanup zero; product
+  and Atlas bytes unchanged.
+- **CONSUMER-READINESS — PASS:** fresh normal-app consumer task
+  `01a03155-e0d2-7421-80e0-cb9369f32775` understood the research-world
+  hierarchy, Canvas/Dock split, participant and evidence authority, FULL
+  LINEAGE/Back to world behavior, and all five Dock modes without contradiction
+  or dangerous action.
+- **CLEANUP — PASS:** final isolated cleanup stopped PID `29488` and its 15
+  descendants; target processes `0`; isolated root absent; repository remained
+  clean at `dcc85c3` with local equal to origin.
+- **CLOSURE AUTHORITY — RECORDED:** the founder-delegated current task
+  explicitly authorizes this documentation-only closure and requires R18 to
+  remain pending and unauthorized until Ryan and Router regroup.
+
+Closure receipt: [FINAL-ACCEPTANCE.md](evidence/pre-r18-coherence/FINAL-ACCEPTANCE.md).

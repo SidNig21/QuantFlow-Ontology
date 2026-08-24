@@ -70,11 +70,11 @@ The ontology has three planes:
 
 ## Status
 
-**As of 2026-08-22 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
+**As of 2026-08-23 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) records an alignment pause: R17 is accepted, [`docs/orders/WO-R18.md`](docs/orders/WO-R18.md) is draft-only, and no Builder is authorized |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) is the read-only route-decision checkpoint: Pre-R18 coherence is closed, R17 is accepted, R18 remains pending/unauthorized, and no Builder is authorized |
 | Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — non-authoritative source record; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
 | Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R17 named Technique/outcome grading is complete; R18 evaluated recall is the next alignment door |
 | Product floor | Installable Windows app, one Hermes Research Director, governed specialist Tasks and steering, exact critic review, evaluation-gated publication, and a pointer-inspectable 13-object/15-cable Mission-to-Report world that survives reopen |
