@@ -4,7 +4,10 @@
 
 - Branch: `wo-pre-r18-coherence`
 - Reader-approved authority/order SHA: `44f33995c42d2e94dbc22037cf9959c23b635f39`
-- Product/proof candidate: `67f9ba42affcb30fa8bc0961808ed10d8541ea6f`
+- Product/proof candidate: `eecb2457eef6a71d888129c0bb353129956478d1`
+- Evidence boundary: the later single evidence-only commit containing the adopted
+  captures and these two evidence documents; its SHA is reported separately from
+  the immutable product candidate in the handoff.
 - Accepted R17 oracle remains `qa/oracles/r17-technique-outcome.json`: 16 objects and 20 exact links.
 - No Kernel schema/action/link, ontology type, inventory, Canvas engine, truth store, R18 capability, release, installer, or packaging surface changed.
 
@@ -38,10 +41,49 @@ while all five Dock modes retain one-pane paint isolation.
 | Focused Dock/research-world/task-composition/cable-overlay tests | `0`; 26 pass, 0 fail, 186 expectations |
 | `bunx tsc --noEmit` | `0` |
 | Capture-disabled `bun qa/run.ts pre-r18-coherence` with capture/proof env unset | `0`; DEFAULT 13/13, LOCAL exact/dimmed, FULL 16/20, 16 object inspections, 20 link inspections, C01–C14 PASS, production boundaries PASS, clean shutdown |
-| Capture-enabled `bun qa/run.ts pre-r18-coherence` | `0`; 14/14 frames at 1600×1000, 665,388 bytes total, FULL 16/20, clean shutdown |
+| Capture-enabled `$env:QF_PRE_R18_CAPTURE='1'; bun qa/run.ts pre-r18-coherence` | `0`; 14/14 frames at 1600×1000, 651,912 bytes total, FULL 16/20, clean shutdown |
 | `repo-shape`, `lockfile-committed`, `kernel-sole-writer`, `no-canvas-domain-writes`, `kernel-sole-writer-app`, `doc-action-surface`, `one-skin`, `rung-ladder` | all final exits `0` |
 | `bun qa/run.ts doc-links` | `0`; 73 live documents and every pointer resolves |
 | `git diff --check` | `0` |
+
+## Adopted capture receipt
+
+The following exact files were produced by the successful capture command above
+from product candidate `eecb2457eef6a71d888129c0bb353129956478d1`. The repeat
+that was interrupted did not replace or alter them.
+
+| # | File | Dimensions | Bytes | SHA-256 |
+|---:|---|---|---:|---|
+| 01 | `01-empty-workspace.webp` | 1600×1000 | 35,440 | `b90c17f2c463fb94080108d3bb95319bb3f4609ca1b6ba1359290267c6ffc096` |
+| 02 | `02-mission-starting.webp` | 1600×1000 | 36,606 | `b8ae371a01cd1d9b2c378104fc244804dc5dd396f2e20a25518df6ccb758cd76` |
+| 03 | `03-director-planning.webp` | 1600×1000 | 29,246 | `e0c8d3b028e02ab61384298b129a3964d9f64b77a73ae2a54715a87941eccd08` |
+| 04 | `04-active-participants.webp` | 1600×1000 | 46,634 | `9b8ff78ce46c629f8f6d787e44ca0dace1a2a0255d292e485281a51e669c3cb8` |
+| 05 | `05-artifact-produced.webp` | 1600×1000 | 47,590 | `0a5f9fe48b8cb55eff56c86742ca92b386be2564a29afd3f20ef4e314d7eb4b4` |
+| 06 | `06-evaluation-and-report.webp` | 1600×1000 | 52,204 | `bd26b623d1deaecea128724fea0ed299bfb0fe2503b0caef36e8f6a903518037` |
+| 07 | `07-completed-world.webp` | 1600×1000 | 42,626 | `d0369d5d95efb6a5abb3ab226602afbc916d63fff68fc154b3eba9bde11780c2` |
+| 08 | `08-reopened-world.webp` | 1600×1000 | 50,964 | `46a833316569ec90ee608299569e383c2c297ad48bf8c64c9c9208679be4a7a7` |
+| 09 | `09-dock-catalog.webp` | 1600×1000 | 52,568 | `f3719d44fa7ae73d5d64b391c2a68bd74b5eb8c892d29e5b4160c59b9330957a` |
+| 10 | `10-dock-active-sessions.webp` | 1600×1000 | 48,406 | `c11058c7ecf8ecf9ffefc2bf7e71891423c622c2b98bbd67af0505e3697cd43e` |
+| 11 | `11-selected-participant.webp` | 1600×1000 | 49,470 | `10c533bc5c50abfba45801e07431f083862f78e9b8e0c849477a4c45b3ced911` |
+| 12 | `12-selected-artifact.webp` | 1600×1000 | 52,678 | `261c6720a5596ebc13c88ac05f524c58af19492d2195629579f719b40159eea1` |
+| 13 | `13-selected-evaluation.webp` | 1600×1000 | 52,714 | `0b8d0543743aae3b8a6be8e0fe0e23f95ba6145deec852d917040a87d0c454ea` |
+| 14 | `14-most-cable-dense-region.webp` | 1600×1000 | 54,766 | `d0a2a6ba224aabe3c95c49804776f31f6058c0e29f83284b1b3a790b33303ebf` |
+
+Receipt totals: `14 files`, `651,912 bytes`, every frame exactly `1600×1000`,
+every frame readable/nonempty, every frame below 600 KB, and no adopted hash
+equals its prior-manifest hash. Original-resolution inspection confirmed the
+expected 14 state markers and the visible `BUILD EECB2457EEF6A71D888129C0BB353129956478D1`
+footer in every frame.
+
+The capture used isolated roots rooted at randomized
+`qf-pre-r18-coherence-<suffix>`: `<root>\stores\kernel.db`,
+`<root>\stores\artifacts`, `<root>\app-root`, `<root>\home` (including
+`AppData`), and `<root>\temp`. The prior gate cleanup receipt was
+`roots_remaining=0 leaked=[]`; current validation found zero matching temp
+roots and zero capture-owned app/capture processes. The randomized child root
+name was not emitted by the interrupted repeat and is intentionally not
+invented. Candidate HEAD stayed immutable at `eecb2457eef6a71d888129c0bb353129956478d1`;
+the later evidence-only commit is a separate boundary.
 
 The live control emitted these production-boundary receipts:
 `renderer_submission=PASS boundary=qf.research.submit_question`,
@@ -112,11 +154,9 @@ and Evaluation Dock inspection, and a subordinate-cable FULL overview with no
 floating inspector or accidental selection.
 
 Every live PRE-R18 run ended with `roots_remaining=0 leaked=[]` and
-`cleanup=clean`. The exact interrupted verifier root named in
-`VERIFICATION-FINAL.md`,
-`C:\Users\rybow\AppData\Local\Temp\qf-pre-r18-coherence-2lZN1J`, is
-already absent and has zero external owning processes. Pre-existing Atlas and
-installed acceptance processes were not touched.
+`cleanup=clean`. The randomized child root name for the adopted capture was not
+emitted; no root name is invented here. Pre-existing Atlas and installed
+acceptance processes were not touched.
 
 Atlas is generated only after this evidence ordering is committed. Its final
 generate/check/ratchet/build-base-diff exits and separate Atlas commit SHA are
