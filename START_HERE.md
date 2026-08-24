@@ -56,6 +56,9 @@ The route to the golden run is [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-
 the **only** rung status table — the `rung-ladder` gate fails the build if any other authority
 document grows a competing one. [`docs/orders/SPRINT.md`](docs/orders/SPRINT.md) tells a builder how
 to walk that ladder continuously and where it must stop. Neither authorizes work; `NEXT.md` does.
+The current R18-R25 outcome contracts are condensed in
+[`docs/plans/INSTITUTIONAL-BUILD-PLAN.md`](docs/plans/INSTITUTIONAL-BUILD-PLAN.md).
+That plan explains the destination but cannot open the Builder door.
 
 Two surfaces are **generated and cannot go stale** — prefer them over any prose: `qf-kernel-schema/golden/ONTOLOGY.md` for the live schema (byte-checked against the generator), and `bun qa/run.ts --list` for the live gates.
 

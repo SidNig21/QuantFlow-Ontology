@@ -70,18 +70,18 @@ The ontology has three planes:
 
 ## Status
 
-**As of 2026-08-23 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
+**As of 2026-08-24 (this checkout). If this table disagrees with `NEXT.md`, `NEXT.md` wins.**
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) is the read-only route-decision checkpoint: Pre-R18 coherence is closed, R17 is accepted, R18 remains pending/unauthorized, and no Builder is authorized |
-| Product plan | [`docs/proposals/V2-SCOPE.md`](docs/proposals/V2-SCOPE.md) — non-authoritative source record; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
-| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R17 named Technique/outcome grading is complete; R18 evaluated recall is the next alignment door |
-| Product floor | Installable Windows app, one Hermes Research Director, governed specialist Tasks and steering, exact critic review, evaluation-gated publication, and a pointer-inspectable 13-object/15-cable Mission-to-Report world that survives reopen |
-| Honest boundary | Named Technique-bound forward research now works and missing-Technique admission refuses before write. Evaluated recall, governed PufferLib learning, and trace-driven improvement remain R18 to R20. |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) selects R18 Ground for semantic Reader review only; the Builder door remains closed until Reader `YES/YES` is recorded and Ryan sends the exact activation phrase |
+| Product plan | [`docs/plans/INSTITUTIONAL-BUILD-PLAN.md`](docs/plans/INSTITUTIONAL-BUILD-PLAN.md) — canonical R18-R25 outcome contracts; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
+| Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0-R17 and Pre-R18 are accepted; R18 Ground & First Use is active with no Builder |
+| Product floor | Windows app, Hermes Research Director, durable governed work and steering, independent review, evaluation-gated publication, visible/reopenable research world, named Technique selection, and operator-supplied outcome grading |
+| Honest boundary | No normal Mission yet acquires real QB-interception market evidence. R18 owns that first-use journey. R19-R25 remain route-level only. |
 
 ```bash
-bun qa/run.ts rung-ladder    # must say active=R18; NEXT keeps Builder authority closed during alignment
+bun qa/run.ts rung-ladder    # must say active=R18; NEXT must say Builder authority NO
 bun qa/run.ts --list         # every registered gate
 ```
 

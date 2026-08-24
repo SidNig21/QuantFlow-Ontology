@@ -94,9 +94,10 @@ reopen.
 | **R11b** | Large | The quantitative metrics are *correct*, proven against a hand-calculated fixture |
 | **R12** | Large | An independent critic evaluates, and a Report cannot publish without a passing Evaluation |
 
-R10, R11a, R11b, and R12 create the substrate R18 needs: immutable point-in-time datasets,
-deterministic execution, validated quantitative outcomes, and independent Evaluation history. Recall
-or learning has no honest fitness signal until those facts exist in the Kernel.
+R10, R11a, R11b, and R12 create the substrate the institutional route needs:
+immutable point-in-time datasets, deterministic execution, validated quantitative outcomes, and
+independent Evaluation history. Live grounding, recall, and learning have no honest signal until
+those facts exist in the Kernel.
 
 ### Act III — Windows v1 release
 
@@ -124,50 +125,39 @@ Dock and canvas actions remain supported as an alternate control path, but they 
 front door. Scope detail lives in [`../proposals/V2-SCOPE.md`](../proposals/V2-SCOPE.md), which is a
 source record and confers no route or build authority.
 
-### Act V — learning and recall
+### Act V — institutional research
 
 | Rung | Outcome |
 |---|---|
-| **R18** | Recall: prior evaluated work is retrieved with lineage and never becomes truth merely because it was retrieved |
-| **R19** | Market learning: an RL worker runs a PufferLib Environment, publishes a Policy Artifact, and held-out Evaluation gates founder-controlled promotion/rollback |
-| **R20** | Trace-driven harness learning: production trajectories, tool-call traces, Evaluations, and settled outcomes expand the eval set and produce versioned prompt/playbook and harness-improvement candidates. Held-out Evaluation gates founder-controlled promotion, rejection, and rollback; owned-model weight updates may follow later. No trace, prompt, harness, or model becomes a second truth store. |
+| **R18** | Ground & First Use: one understandable football Mission uses a named Technique and real point-in-time evidence to produce an independently evaluated Decision Set or explicit no-candidate |
+| **R19** | Compose: Ryan and the Director recruit real heterogeneous participants from the same governed Dock and preserve one identity and lineage across handoff or runtime replacement |
+| **R20** | Supervise & Strategy Lab: founder controls and bounded Director branch exploration remain durable, visible, and recoverable |
+| **R21** | Remember: evaluated prior work is retrieved with exact lineage and revalidated against present evidence without becoming truth by retrieval |
 
-R18 depends on the independent Evaluation history established by R15–R17. R19 is the first-class
-market-learning destination: its RL worker is a governed Dock seat and PufferLib is workload inside
-the governed RL worker Run, not the application chassis. R19 depends on fenced Datasets, validated
-research outcomes, the Windows product floor, and durable governed work; held-out Evaluation gates
-founder-controlled promotion or rollback. R20 is trace-driven harness learning, while the Kernel
-remains the sole truth store.
+### Act VI — governed learning
 
-**R20 makes production traces a first-class learning input.** QuantFlow already
-preserves structured trajectory and tool-call evidence. R20 turns repeated
-production failure modes into governed improvement candidates rather than
-treating traces as disposable logs.
+| Rung | Outcome |
+|---|---|
+| **R22** | Learn the Market: a governed PufferLib worker publishes a Policy Artifact and held-out Evaluation gates founder-controlled promotion and rollback |
+| **R23** | Improve the Institution: traces produce versioned eval, prompt, playbook, harness, and routing candidates; model weights remain out of scope |
+| **R24** | Own Intelligence: one bounded football open-weight model completes a governed train-evaluate-serve-promote-or-rollback lifecycle |
 
-Its loop is:
+### Act VII — founder delivery
 
-`production traces → failure clustering → new eval cases → prompt/playbook or harness candidate → held-out Evaluation → founder-controlled promote / reject / rollback`
+| Rung | Outcome |
+|---|---|
+| **R25** | Deliver & Operate: Ryan can install, upgrade, back up, restore, roll back, and operate the founder product through one real first-use Mission |
 
-The three initial improvement paths are:
+The exact User Value, Ontology, Operational, and seven-verdict contracts for
+R18-R25 live in [the canonical Institutional Build Plan](../plans/INSTITUTIONAL-BUILD-PLAN.md).
+Only the rung named by `NEXT.md` has build authority. R18 grounds the first real
+Mission; R19-R21 make the institution composable, steerable, and memory-aware;
+R22-R24 add separately governed learning loops; R25 closes founder delivery.
 
-1. **Eval expansion:** recurring failures from real Missions become new
-   regression and evaluation cases.
-2. **Prompt/playbook tuning:** repeated model failure modes produce versioned
-   instruction and playbook candidates instead of guessed prompt edits.
-3. **Harness optimization:** traces expose unnecessary tool calls, retrieval
-   failures, loops, redundant recruitment, excessive context, and trajectories
-   that take substantially more steps than necessary.
-
-**Trace is evidence, never truth.** A production trajectory may propose an
-improvement but may never directly rewrite a prompt, playbook, routing policy,
-harness, or model weight. Every proposed change is a versioned candidate
-evaluated against held-out cases before promotion. Rejected candidates and
-rollback history remain durable evidence.
-
-R18 supplies evaluated recall and retrieval of relevant prior work. R19 learns
-market policies from validated research outcomes. R20 learns how the research
-system itself should operate better from accumulated trajectories and
-Evaluations while the Kernel remains the sole governed truth store.
+**Evidence never promotes itself.** Recall, a market Policy, an institutional
+change candidate, or a model checkpoint remains evidence until an independent
+Evaluation and the rung's founder-controlled promotion contract accept it. The
+Kernel remains the sole governed truth store.
 
 ---
 
@@ -199,9 +189,14 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R15 | complete | `docs/orders/evidence/r15` |
 | R16 | complete | `docs/orders/evidence/r16` |
 | R17 | complete | `docs/orders/evidence/r17` |
-| R18 | active | Draft order only; `NEXT.md` explicitly withholds Builder authority pending founder alignment and a fresh Reader |
+| R18 | active | `WO-R18-GROUND.md` drafted; `NEXT.md` withholds Builder authority pending fresh Reader YES/YES and exact founder activation |
 | R19 | pending | — |
 | R20 | pending | — |
+| R21 | pending | — |
+| R22 | pending | — |
+| R23 | pending | — |
+| R24 | pending | — |
+| R25 | pending | — |
 
 **R13 founder-close exception (2026-08-14).** The founder explicitly stopped
 V2-2 and authorized the route to proceed with the packaging-proof gap recorded

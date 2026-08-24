@@ -169,7 +169,10 @@ execution-provider answer — Modal is rejected. Hermes is deliberately unpinned
 never assume version-specific behaviour, and any Hermes-specific workaround
 carries a comment saying it may evaporate on update. Never read, copy, print, or
 modify credentials. Research only — QuantFlow never places a bet or executes a
-trade. No RL implementation unless NEXT.md names R19 or R20; RL is part of the product destination, with the RL worker as the governed Dock seat and PufferLib as its sandboxed workload.
+trade. No RL implementation unless `NEXT.md` names R22; the RL worker is the
+governed Dock seat and PufferLib is its sandboxed workload. No model-weight
+training or serving implementation unless `NEXT.md` names R24. Neither a
+Policy nor a model checkpoint may approve or promote itself.
 
 ## Reporting
 

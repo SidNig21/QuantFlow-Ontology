@@ -126,7 +126,7 @@ These are inventory entries, not roadmap rungs, dependencies, or permission to b
 | Parent-span trace tree | Underlayer | A real multi-seat failure cannot be reconstructed from current Kernel trajectories and mission/task links |
 | Twelve-seat concurrency gate | Product gate | The supported consumer workflow intentionally rises above the current seat count and needs a measured finite bound |
 | Data refinery | Product/data pipeline | A named Dataset or Run is blocked by raw captured data that cannot be normalized with the existing ingest path |
-| Held-out evaluations | R18 / RL | R13 is accepted, R18 is authorized, and enough real Evaluation history exists to define a non-leaking holdout |
+| Held-out evaluations | R22-R24 learning | R18-R21 have produced enough real, evaluated Missions to define a non-leaking holdout |
 | Cloudflare Workflows | Underlayer candidate | The first long workflow dies mid-flight and cannot resume through existing Kernel state and app recovery |
 | Cloudflare Browser/Computer | Execution-environment candidate | A named data or research task requires a remote browser/computer boundary the native Windows desk cannot safely provide |
 | WebMCP | Dock/tool-surface candidate | A browser data source has a stable structured tool surface that is measurably better than the current generated-tool or capture path |
@@ -139,6 +139,8 @@ These are inventory entries, not roadmap rungs, dependencies, or permission to b
 | Voice operator | Dock/UI candidate | The founder requests hands-free operation after the keyboard/mouse R13 consumer workflow is accepted |
 | Model routing | Product-policy candidate | Repeated measurements show a provider-specific latency, quality, availability, or cost failure across supported seats |
 
-RL remains a founder priority and stays on the shelf above, not deleted. It starts only through a fresh R18 authorization after the Windows v1 consumer loop produces trustworthy trajectories, Evaluations, and fenced Datasets. Renumbered from R14 on 2026-08-12 when the Act IV operating-console rungs were inserted ahead of it; the number states the dependency, it does not demote the work.
+RL remains a founder priority and stays on the shelf above, not deleted. It
+starts only through a fresh R22 authorization after grounded, composable, and
+supervised Missions produce trustworthy trajectories, Evaluations, and fenced Datasets.
 
 The full external classification — current, candidate, reference, rejected — lives in [`proposals/CAPABILITY-REGISTRY.md`](proposals/CAPABILITY-REGISTRY.md), swept from 413 notes on 2026-08-12. That file is inventory and confers no authority.

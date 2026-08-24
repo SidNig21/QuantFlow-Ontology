@@ -20,6 +20,10 @@ candidates or explicit no-candidate results. The canvas makes that work visible
 and steerable. The Kernel remains the sole source of truth. QuantFlow never
 places a bet or trade.
 
+The first institutional journey grounds a founder-named Technique in real,
+point-in-time football evidence. Recall and every learning loop remain
+downstream of independently evaluated, source-timed work.
+
 ## Brand Personality
 
 Precise, governed, alive. QuantFlow should feel like an expert instrument with

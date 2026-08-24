@@ -1,3 +1,10 @@
+> **SUPERSEDED ROUTE DRAFT - NO BUILD AUTHORITY**
+>
+> Written when evaluated recall was numbered R18. The canonical 2026-08-24
+> institutional route moves this outcome to R21. Preserve this text as design
+> input only. It must be re-derived from accepted R20 evidence before any R21
+> order can become active.
+
 # WO-R18 — Evaluated recall with visible lineage
 
 status: DRAFT — fresh semantic Reader required before build
