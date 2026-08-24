@@ -9,6 +9,7 @@ r18-authority: READY FOR FOUNDER GO; NO BUILD AUTHORITY
 order-candidate: `10bad8c24f7665d11b8fb8550fd62b017382e790`
 reader-receipt: [R18 semantic Reader YES/YES](evidence/r18/READER-ACCEPTANCE.md)
 activation-phrase: `FOUNDER GO — ACTIVATE R18 GROUND`
+readiness-receipt: [R18 Surgical Table](evidence/r18/R18-SURGICAL-TABLE.md)
 accepted-product-candidate: `eecb2457eef6a71d888129c0bb353129956478d1`
 accepted-evidence-head: `dcc85c373581a7162b790feef31c9f8ddcbb66c2`
 accepted-closure: `333987dbdc1ca603fb03df4f485f88f1ad4bf458`
