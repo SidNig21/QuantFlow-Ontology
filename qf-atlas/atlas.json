@@ -1,11 +1,11 @@
 {
   "meta": {
-    "branch": "wo-pre-r18-coherence",
-    "commit": "64f764f",
+    "branch": "wo-r18-program-canonicalization",
+    "commit": "119edb5",
     "generatedAt": "2026-08-24",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "7f40c53498c7d8ca"
+    "fingerprint": "9f1f0acb2374d4e3"
   },
   "stats": {
     "live": 113,
@@ -908,7 +908,7 @@
       "id": "2:collab-electron/scripts/package-lib::runtime",
       "layer": 2,
       "name": "runtime-staging.ts",
-      "kb": 7,
+      "kb": 7.1,
       "x": 3.96,
       "z": 0.02,
       "status": "ok",
@@ -919,7 +919,7 @@
       "files": [
         {
           "path": "collab-electron/scripts/package-lib/runtime-staging.ts",
-          "kb": 7,
+          "kb": 7.1,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 1,
@@ -60073,12 +60073,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "bdf4a7e",
-      "generatedAt": "2026-08-23"
+      "commit": "64f764f",
+      "generatedAt": "2026-08-24"
     },
     "to": {
-      "branch": "wo-pre-r18-coherence",
-      "commit": "64f764f",
+      "branch": "wo-r18-program-canonicalization",
+      "commit": "119edb5",
       "generatedAt": "2026-08-24"
     },
     "verdict": "better",

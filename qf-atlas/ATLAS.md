@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-pre-r18-coherence @ 64f764f` on 2026-08-24 by
+> Generated from `wo-r18-program-canonicalization @ 119edb5` on 2026-08-24 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
