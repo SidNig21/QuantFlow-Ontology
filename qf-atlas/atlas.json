@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-pre-r18-coherence",
-    "commit": "bdf4a7e",
-    "generatedAt": "2026-08-23",
+    "commit": "64f764f",
+    "generatedAt": "2026-08-24",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "571697d826b7bb11"
+    "fingerprint": "7f40c53498c7d8ca"
   },
   "stats": {
     "live": 113,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 560
+      "files": 561
     },
-    "coverageFiles": 560,
+    "coverageFiles": 561,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -2827,7 +2827,7 @@
       "id": "4:collab-electron/src/windows/shell/src::dock",
       "layer": 4,
       "name": "dock.js",
-      "kb": 23,
+      "kb": 22.6,
       "x": -2.03,
       "z": 1.69,
       "status": "ok",
@@ -2838,7 +2838,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/dock.js",
-          "kb": 23,
+          "kb": 22.6,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 0,
@@ -2911,7 +2911,7 @@
       "id": "4:collab-electron/src/windows/shell/src::renderer",
       "layer": 4,
       "name": "renderer.js",
-      "kb": 60.1,
+      "kb": 59.1,
       "x": -1.24,
       "z": 0.45,
       "status": "ice",
@@ -2922,7 +2922,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/renderer.js",
-          "kb": 60.1,
+          "kb": 59.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2939,7 +2939,7 @@
       "id": "4:collab-electron/src/windows/shell/src::research",
       "layer": 4,
       "name": "research-world.js",
-      "kb": 67.6,
+      "kb": 68.4,
       "x": 1.01,
       "z": 0.85,
       "status": "ok",
@@ -2950,7 +2950,7 @@
       "files": [
         {
           "path": "collab-electron/src/windows/shell/src/research-world.js",
-          "kb": 67.6,
+          "kb": 68.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3520,7 +3520,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 785.7,
+      "kb": 789.7,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3531,7 +3531,7 @@
       "files": [
         {
           "path": "qa/gates/pre-r18-coherence.ts",
-          "kb": 144,
+          "kb": 148,
           "spawns": 2,
           "spawnsLive": 2,
           "writes": 1,
@@ -5411,7 +5411,7 @@
       "id": "4:residue",
       "layer": 4,
       "name": "77 small modules*",
-      "kb": 166.8,
+      "kb": 168.8,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5463,6 +5463,16 @@
         {
           "path": "collab-electron/packages/shared/src/path-utils.ts",
           "kb": 5.8,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "collab-electron/src/windows/shell/src/participant-projection.js",
+          "kb": 5.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -5612,16 +5622,6 @@
         },
         {
           "path": "collab-electron/packages/components/src/TreeView/useFileTree.ts",
-          "kb": 3.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/shell/src/participant-projection.js",
           "kb": 3.6,
           "spawns": 0,
           "spawnsLive": 0,
@@ -18149,6 +18149,31 @@
       "unexplained": []
     },
     {
+      "path": "collab-electron/src/windows/shell/src/back-to-world.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "indexed",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
       "path": "collab-electron/src/windows/shell/src/cable-controller.js",
       "worst": "unsupported",
       "imports": "indexed",
@@ -18957,7 +18982,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 811 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 827 in renderObject) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -25484,41 +25509,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 556,
+      "indexed": 557,
       "dynamic": 4
     },
     "ipcRequest": {
       "not-applicable": 273,
-      "indexed": 283,
+      "indexed": 284,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 549,
+      "not-applicable": 550,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 508,
+      "not-applicable": 509,
       "partial": 27,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 490,
+      "not-applicable": 491,
       "partial": 64,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 204,
+      "not-applicable": 205,
       "unsupported": 123,
       "indexed": 233
     },
     "ownership": {
       "not-applicable": 178,
-      "unsupported": 361,
+      "unsupported": 362,
       "indexed": 21
     },
     "reach": {
-      "unsupported": 319,
+      "unsupported": 320,
       "indexed": 238,
       "partial": 3
     }
@@ -60048,13 +60073,13 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "1bb4c71",
+      "commit": "bdf4a7e",
       "generatedAt": "2026-08-23"
     },
     "to": {
       "branch": "wo-pre-r18-coherence",
-      "commit": "bdf4a7e",
-      "generatedAt": "2026-08-23"
+      "commit": "64f764f",
+      "generatedAt": "2026-08-24"
     },
     "verdict": "better",
     "why": "42 improvement(s), nothing added or hidden",

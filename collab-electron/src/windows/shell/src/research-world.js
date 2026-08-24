@@ -563,6 +563,22 @@ function bindObjectSelection(container, subject, onSelectObject) {
 	container.addEventListener("pointerdown", handler, true);
 }
 
+/**
+ * Back to world is one ephemeral restoration action. Delegate from the
+ * document so the static Canvas control, a dynamically rendered Dock control,
+ * and a normal DOM replacement all use the same handler exactly once.
+ */
+export function bindBackToWorldControls(root, restoreOverview) {
+	if (!root?.addEventListener || typeof restoreOverview !== "function") return () => {};
+	const handler = (event) => {
+		const target = event?.target?.closest?.("[data-qf-world-back], [data-qf-back-to-world]");
+		if (!target || (typeof root.contains === "function" && !root.contains(target))) return;
+		restoreOverview();
+	};
+	root.addEventListener("click", handler);
+	return () => root.removeEventListener?.("click", handler);
+}
+
 function renderPresentationCard(presentation) {
 	const compact = document.createElement("div");
 	compact.className = "qf-world-compact";
@@ -860,7 +876,6 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			projectionState = PROJECTION_FULL;
 			applyProjection({ fit: true });
 		});
-		projectionControls.querySelector("[data-qf-world-back]")?.addEventListener("click", () => restoreOverview());
 		return projectionControls;
 	}
 
@@ -911,7 +926,6 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		back.className = "dk-link qf-world-back";
 		back.dataset.qfBackToWorld = "true";
 		back.textContent = "Back to world";
-		back.addEventListener("click", () => restoreOverview());
 		pane.appendChild(back);
 		if (subjectObject) {
 			pane.appendChild(renderDockObjectOverview(subjectObject, lastWorkflow, getParticipantView));
@@ -1108,6 +1122,8 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 		setDockMode(restore.dockMode);
 	}
 
+	bindBackToWorldControls(document, restoreOverview);
+
 	function makeWorldCable(link, workflow) {
 		const fromTileId = resolveResearchWorldEndpointTileId(workflow.objects, tiles, link.from_id);
 		const toTileId = resolveResearchWorldEndpointTileId(workflow.objects, tiles, link.to_id);
@@ -1155,13 +1171,15 @@ export function createResearchWorldController({ tileManager, getTileDOMs, onCabl
 			const view = getParticipantView?.(object.id, object);
 			const presentation = researchTilePresentation(object, lastWorkflow, getParticipantView);
 			dom.container.setAttribute("aria-label", `${object.type} ${object.id}`);
-			dom.container.setAttribute("aria-description", `${presentation.title} · PARTICIPANT · ${presentation.status}`);
+			dom.container.setAttribute("aria-description", `${presentation.title} · PARTICIPANT · ${presentation.status} · ${view?.historical ? "HISTORICAL SESSION" : "CURRENT SESSION"}`);
 			dom.container.dataset.qfParticipantId = object.id;
 			if (view) {
 				dom.container.dataset.qfParticipantRole = view.role;
+				dom.container.dataset.qfParticipantSession = view.session;
 				dom.container.dataset.qfParticipantRuntime = view.runtimeState;
 				dom.container.dataset.qfParticipantWork = view.work;
 				dom.container.dataset.qfParticipantRecovery = view.recovery;
+				dom.container.dataset.qfParticipantHistory = view.historical ? "true" : "false";
 			}
 			const taskFoot = dom.taskFoot;
 			if (taskFoot) {

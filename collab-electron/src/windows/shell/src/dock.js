@@ -1,4 +1,4 @@
-import { participantFieldRows, participantView } from "./participant-projection.js";
+import { participantFieldRows, participantViewForSession } from "./participant-projection.js";
 
 /**
  * Dock rail — species + sessions from Kernel IPC only.
@@ -226,31 +226,17 @@ export function initDock(panelEl, options = {}) {
 	document.addEventListener("qf:research-world-active", (event) => {
 		activeMissionId = String(event?.detail?.missionId ?? "") || null;
 		syncStartDiscovery();
+		void refresh();
 	});
 	setMode("START");
 
-	function selectedTaskFor(id, assignments) {
-		return (Array.isArray(assignments) ? assignments : []).find((row) =>
-			row?.assignmentState === "assigned" && row?.assignedToSessionId === id,
-		) ?? null;
-	}
-
-	function participantFor(session, assignments) {
-		const id = String(session?.id ?? "");
-		const task = selectedTaskFor(id, assignments);
-		const world = missionWorld;
-		const producedLink = world?.links?.find((link) => link.kind === "produces" && link.from_id === id);
-		const producedArtifact = producedLink
-			? world.objects?.find((object) => object.type === "artifact" && object.id === producedLink.to_id)
-			: null;
-		const hasTask = world?.objects?.some((object) => object.type === "task") === true;
-		return participantView({
-			session,
-			definition: latestDefinitions.find((row) => row?.id === session?.definition_id) ?? session,
-			task,
-			runtimeObservation: { live: session?.status === "running", runtime: "Native TUI" },
-			missionBinding: { missionId: world?.root?.id ?? planningDirector?.missionId, hasTask, reason: task?.description },
-			producedArtifact,
+	function participantFor(session, assignments, sessions = []) {
+		return participantViewForSession({
+			sessionId: session?.id,
+			sessions: sessions.length > 0 ? sessions : [session],
+			definitions: latestDefinitions,
+			assignments,
+			world: missionWorld,
 			planningDirector,
 		});
 	}
@@ -396,7 +382,7 @@ export function initDock(panelEl, options = {}) {
 					const id = String(row.id ?? "");
 					const status = String(row.status ?? "");
 					const state = formatDockSessionState(row);
-					const view = participantFor(row, taskAssignments);
+					const view = participantFor(row, taskAssignments, allSessions);
 					const card = el(
 						"div",
 						state.kind === "live"
@@ -406,8 +392,14 @@ export function initDock(panelEl, options = {}) {
 								: "srow",
 					);
 					card.dataset.sessionId = id;
+					card.dataset.qfParticipantHistory = view.historical ? "true" : "false";
+					card.dataset.qfParticipantSession = view.session;
+					card.dataset.qfParticipantRuntime = view.runtimeState;
+					card.dataset.qfParticipantWork = view.work;
+					card.dataset.qfParticipantRecovery = view.recovery;
 					card.tabIndex = 0;
 					card.setAttribute("role", "button");
+					card.setAttribute("aria-label", `${view.displayName} ${id} · ${view.historical ? "historical" : "current"} participant`);
 					card.appendChild(el("i", null, null));
 					card.appendChild(el("span", "id", shortId(id)));
 					const who = el("span", "who", view.role === "Not recorded" ? sessionSpeciesLabel(row) : view.role);
@@ -452,7 +444,7 @@ export function initDock(panelEl, options = {}) {
 				for (const row of closed) appendSessionRow(row, historyList);
 				if (selectedSessionId) {
 					const selected = allSessions.find((row) => String(row.id ?? "") === selectedSessionId);
-					if (selected) renderInspect(selected, participantFor(selected, taskAssignments));
+					if (selected) renderInspect(selected, participantFor(selected, taskAssignments, allSessions));
 				}
 			}
 

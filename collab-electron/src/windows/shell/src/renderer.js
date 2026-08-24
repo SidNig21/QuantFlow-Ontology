@@ -30,7 +30,7 @@ import { createKernelLedger } from "./kernel-ledger.js";
 import { fitViewportToTiles } from "./glacier-feel.js";
 import { renderTaskFoot } from "./task-composition.js";
 import { createResearchWorldController } from "./research-world.js";
-import { participantView } from "./participant-projection.js";
+import { participantViewForSession } from "./participant-projection.js";
 
 const CANVAS_DBLCLICK_SUPPRESS_MS = 500;
 const IS_WINDOWS = window.shellApi.getPlatform() === "win32";
@@ -763,36 +763,12 @@ async function init() {
 
 	function participantViewFor(sessionId, object = null) {
 		const id = String(sessionId ?? "");
-		const session = taskSurface.sessions.find((row) => String(row?.id ?? "") === id) ?? {
-			id,
-			status: object?.fields?.status,
-			definition_id: object?.fields?.definition_id,
-			display_name: object?.fields?.display_name,
-			role: object?.fields?.role,
-		};
-		const task = taskSurface.assignments.find((row) =>
-			row?.assignmentState === "assigned" && String(row?.assignedToSessionId ?? "") === id,
-		) ?? null;
 		const world = researchWorldController?.getLastWorld?.();
-		const run = world?.objects?.find((candidate) =>
-			candidate.type === "run" && String(candidate.fields?.executor_session_id ?? "") === id,
-		);
-		const producedArtifact = run?.fields?.result_artifact_id
-			? world.objects.find((candidate) => candidate.type === "artifact" && candidate.id === run.fields.result_artifact_id)
-			: null;
-		const term = tiles.find((tile) => String(tile?.sessionId ?? "") === id && tile.type === "term");
-		const hasTask = world?.objects?.some((candidate) => candidate.type === "task") === true;
-		return participantView({
-			session,
-			definition: session,
-			task,
-			runtimeObservation: { live: Boolean(term?.ptySessionId), runtime: "Native TUI" },
-			missionBinding: {
-				missionId: world?.root?.id ?? planningDirectorSubmission?.missionId,
-				hasTask,
-				reason: task?.description,
-			},
-			producedArtifact,
+		return participantViewForSession({
+			sessionId: id,
+			sessions: taskSurface.sessions,
+			assignments: taskSurface.assignments,
+			world: world ?? (object ? { objects: [object], links: [] } : null),
 			planningDirector: planningDirectorSubmission,
 		});
 	}

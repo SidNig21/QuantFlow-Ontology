@@ -90,6 +90,53 @@ export function participantView({
 		outputId: producedArtifact ? text(producedArtifact.id) : "Not recorded",
 		missionId: text(missionBinding.missionId),
 		capabilityGroups,
+		historical: CLOSED_SESSION_STATUSES.has(sessionStatus),
+	});
+}
+
+/**
+ * Build the participant view from the exact session id shared by Canvas and
+ * Dock. The session surface is the identity source; role names never select a
+ * substitute session. Runtime status is deliberately derived here as well so
+ * both consumers cannot disagree about a live/stopped participant.
+ */
+export function participantViewForSession({
+	sessionId,
+	sessions = [],
+	definitions = [],
+	assignments = [],
+	world = null,
+	planningDirector = null,
+} = {}) {
+	const id = String(sessionId ?? "");
+	const worldObject = Array.isArray(world?.objects)
+		? world.objects.find((object) => object?.type === "agent_session" && String(object.id ?? "") === id)
+		: null;
+	const session = (Array.isArray(sessions) ? sessions : []).find((row) => String(row?.id ?? "") === id) ??
+		(worldObject ? { id, ...worldObject.fields } : { id });
+	const definition = (Array.isArray(definitions) ? definitions : []).find((row) => String(row?.id ?? "") === String(session?.definition_id ?? "")) ?? session;
+	const task = (Array.isArray(assignments) ? assignments : []).find((row) =>
+		row?.assignmentState === "assigned" && String(row?.assignedToSessionId ?? "") === id,
+	) ?? null;
+	const producedLink = Array.isArray(world?.links)
+		? world.links.find((link) => link?.kind === "produces" && String(link?.from_id ?? "") === id)
+		: null;
+	const producedArtifact = producedLink && Array.isArray(world?.objects)
+		? world.objects.find((object) => object?.type === "artifact" && String(object.id ?? "") === String(producedLink.to_id ?? "")) ?? null
+		: null;
+	const hasTask = Array.isArray(world?.objects) && world.objects.some((object) => object?.type === "task");
+	return participantView({
+		session,
+		definition,
+		task,
+		runtimeObservation: { live: session?.status === "running", runtime: "Native TUI" },
+		missionBinding: {
+			missionId: world?.root?.id ?? planningDirector?.missionId,
+			hasTask,
+			reason: task?.description,
+		},
+		producedArtifact,
+		planningDirector,
 	});
 }
 
