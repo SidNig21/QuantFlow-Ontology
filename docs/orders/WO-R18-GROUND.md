@@ -5,7 +5,7 @@ rung: R18 - Ground & First Use
 assignee: none
 builder-authority: NO until `NEXT.md` records Reader YES/YES and the founder says `FOUNDER GO - ACTIVATE R18 GROUND`
 depends: accepted Pre-R18 closure `333987dbdc1ca603fb03df4f485f88f1ad4bf458`
-route: [Institutional Build Plan](../../plans/INSTITUTIONAL-BUILD-PLAN.md)
+route: [Institutional Build Plan](../plans/INSTITUTIONAL-BUILD-PLAN.md)
 research receipt: [R18 provider research](evidence/r18/PROVIDER-RESEARCH.md)
 
 ## Product outcome
@@ -35,10 +35,11 @@ market provider is The Odds API V4. The only historical feature/outcome source
 is a pinned nflverse release corpus. Singles only.
 
 If exact Bovada coverage is unavailable, QuantFlow refuses with one named
-coverage reason. It may offer Ryan exactly two next decisions: authorize one
-named alternate bookmaker from The Odds API for this same Technique, or
-postpone/change the component. It may not silently select moneyline, another
-prop, another sport, another bookmaker, or fixture data.
+coverage reason and stops this order. It may display exactly two next decisions:
+request a separately authorized named alternate bookmaker from The Odds API for
+this same Technique, or postpone/change the component. Neither choice executes
+until NEXT/order authority is amended. It may not silently select moneyline,
+another prop, another sport, another bookmaker, or fixture data.
 
 The existing direct Bovada moneyline acquisition tool is preserved as a
 separate fidelity probe. It does not satisfy this order.
@@ -54,7 +55,8 @@ separate fidelity probe. It does not satisfy this order.
   time are stored in the Dataset receipt;
 - **eligible quarterback** - one offered prop name that resolves through a
   pinned nflverse players asset to exactly one player id and has the minimum
-  sample below; zero or multiple identities are excluded, never guessed;
+  sample below; the provider offer, not a depth-chart assertion, establishes
+  market eligibility. Zero or multiple identities are excluded, never guessed;
 - **Decision Set** - the current Mission's evaluation-gated Report Artifact with
   contract `qf.decision-set.v1`; it is not a new ontology type;
 - **no candidate** - a valid Decision Set whose `candidates` is empty and whose
@@ -62,10 +64,155 @@ separate fidelity probe. It does not satisfy this order.
 - **real Mission** - no `qa`, sample, deterministic-responder, seed, fixture,
   or proof profile participates in its normal-app consumer run;
 - **no durable research mutation** - Mission, Hypothesis, Task, Dataset,
-  Strategy, Run, Ticket, Evaluation, Report, and related links remain unchanged.
-  A source-first raw Artifact may remain only after the post-door acquisition
-  begins, and must be visibly labeled an unsuccessful acquisition receipt.
+  Strategy, Run, Ticket, Evaluation, Report, Venue, MarketEvent,
+  DatasetVersion, Artifact, AgentSession, every governed link, and every other
+  Kernel-owned domain row remain byte-for-byte unchanged. The door compares a
+  complete before/after table-count plus primary-key/hash manifest, not a
+  hand-picked delta. A source-first raw Artifact may remain only after the
+  post-door acquisition begins, and must be visibly labeled an unsuccessful
+  acquisition receipt.
 
+## Binding semantics - Reader round 1
+
+This section resolves the semantic Reader's first-round defects and overrides
+any shorter wording below. A Builder may not choose a different interpretation.
+
+### Provider, time, and refusal
+
+- The main-process credential reference is exactly
+  `QF_THE_ODDS_API_KEY`. Only the main-process adapter reads it.
+- `probe_started_at` is the app clock's UTC millisecond timestamp immediately
+  before the first provider request. The event horizon is inclusive:
+  `[probe_started_at + 12h, probe_started_at + 7d]`.
+- Discovery fetches The Odds API's complete NFL event inventory once, filters
+  regular-season events in that horizon, sorts by `commence_time` then provider
+  event id, and queries event markets in that order until the first qualifying
+  event is found. The adapter follows a provider pagination token when one is
+  present; an incomplete inventory is `PROVIDER_INVENTORY_INCOMPLETE`, not
+  proof that coverage is absent.
+- Each HTTP attempt has a 20-second response deadline. Timeout, connection
+  reset, or DNS failure is a transport failure and permits one immediate retry
+  for that request. HTTP responses, malformed/oversize bodies, and semantic
+  refusals are not retried. The whole probe has no independent shorter wrapper
+  timeout.
+- `observed_at` and Dataset `as_of` are the app clock's UTC millisecond
+  timestamp immediately after the complete admitted event-odds response body
+  is received and before it is hashed or parsed. Historical rows are eligible
+  only when their completed game's `game_date` is strictly earlier than the UTC
+  calendar date containing `as_of`.
+- `market_last_update` is the provider timestamp. It never substitutes for
+  `observed_at` or `as_of`.
+- The nflverse adapter resolves the named `pbp` and `players` release families,
+  records the immutable release tag, asset id/name, resolved download URL,
+  source update time, seasons, compressed byte hash, and decompressed byte hash,
+  and uses those exact bytes for the Mission. Moving `latest` URLs are never
+  stored as the pin. Required seasons are the event season plus its immediately
+  preceding season; older seasons may be fetched only when needed to complete a
+  quarterback's 16-game window and are pinned in the same manifest.
+- The raw response receives only transport checks, byte limit, JSON syntax, and
+  top-level contract/schema checks before it is published. Domain extraction,
+  identity resolution, eligibility, and formula parsing then read the exact
+  published Artifact bytes and reverify their hash. This is the only meaning of
+  “publish before parsing.”
+- `COVERAGE_NOT_OBSERVED` means a complete provider inventory did not expose
+  Bovada plus the exact market. `COVERAGE_UNAVAILABLE` means the provider
+  explicitly reported the bookmaker or market unavailable. Both are refusals,
+  not successful R18 acceptance.
+- The initial R18 candidate is Bovada-only. An absent Bovada/market result stops
+  at the founder door. An alternate bookmaker is not executable authority: Ryan
+  must name its provider key and the order/NEXT authority must be amended before
+  a Builder may substitute it. No live PASS is possible on an unnamed alternate.
+
+### Historical rows and formula inputs
+
+- A completed game is one distinct `game_id` whose `game_date` passes the
+  `as_of` rule above. Windows sort by `game_date` descending and then `game_id`
+  ascending; the final selected set is emitted chronologically by the same two
+  keys. Counts are over distinct games, never play rows.
+- `qb_games` is the number of selected distinct quarterback games.
+  `games_with_interception` is the number of those games for which
+  `max(interception) = 1`; multiple interceptions in one game still count once.
+- A pressure hit is `qb_hit = 1`. `sack` is retained for audit but never added
+  to `qb_hit`. `qb_hits_suffered` sums `qb_hit` for the selected offense rows;
+  `opponent_qb_hits` sums the same field where the selected opponent is
+  `defteam`; `league_qb_hits` sums it over the league window. Denominators sum
+  `pass_attempt = 1` in the same windows. Rows with values outside `0|1` for
+  these binary inputs are refused.
+- “Unknown fields are refused” means an unrecognized or absent required formula
+  input, invalid enum/value, or duplicate semantic column is refused. Extra
+  source columns that are not mapped into the admitted Dataset are ignored and
+  recorded by name; they are not silently treated as formula inputs.
+
+### Strategy bytes, identity, and arithmetic
+
+- R18 implements exactly one action named `register_strategy_version`; there is
+  no conditional Builder choice and v0.1 has `predecessor: null`. It uses the
+  existing Strategy ontology type and `derived_from` kind only for a later
+  non-null predecessor.
+- The v2 Artifact is UTF-8 JSON without BOM or insignificant whitespace. Object
+  keys are recursively lexicographic; array order is semantic and preserved;
+  integer counts are JSON integers; every decimal constant/result is a base-10
+  string with exactly nine fractional digits. No NaN, infinity, exponent form,
+  negative zero, or duplicate key is accepted. SHA-256 of those exact bytes is
+  the `spec_hash`; Strategy id is
+  `strategy:nfl-pressure-cascade:qb-interception:1:<first16-spec_hash>`.
+- The required section values are fixed: `objective` is research-only screening
+  of over 0.5 QB interceptions; `research_only` is `true`; `market` is NFL
+  regular-season `player_pass_interceptions` over `0.500000000` singles;
+  `sources` names The Odds API V4 plus the pinned nflverse manifest;
+  `freshness` contains the inclusive 12h/7d horizon and exact `as_of` rules;
+  `eligibility` contains the 16/8-game windows and 8-game/200-attempt minima;
+  `feature_formulas`, `baseline`, and `decision_rules` contain exactly the
+  formulas/constants in this order; `uncertainty` contains the screening/not-
+  calibrated warning; `evaluation` requires a distinct admitted critic verdict
+  of `supports`; and `predecessor` is null.
+- Decimal prices must match `^[1-9][0-9]{0,5}(\\.[0-9]{1,9})?$` and be strictly
+  greater than `1.000000000`. Parse them into signed BigInt fixed point at scale
+  `1e9`. Addition and multiplication use unbounded intermediates. Every named
+  formula output is rounded once, half away from zero, after its final division
+  or multiplication, then the stated clamp is applied. Stored values use nine
+  digits; UI values use the stored value rounded half away from zero to six.
+  Candidate comparison uses the stored nine-digit `edge`; ties then sort by the
+  resolved nflverse player id as Unicode code-point ascending.
+
+### Existing workflow and visible result
+
+- Production profiles are exactly `hermes-research-director`, `hermes-worker`,
+  and `hermes-critic`. The live gate requires one real Hermes session admitted
+  from each; worker and critic session ids must differ from each other and from
+  the Director.
+- `Prepare NFL Pressure Cascade` is one button in existing Dock START mode below
+  the Technique selector. It starts the ephemeral door, shows one status row,
+  and exposes one Cancel action backed by the same AbortSignal. Success selects
+  the exact Strategy and enables the existing Mission composer; it never submits
+  Mission prose itself. Cancel/refusal returns to START with the reason and zero
+  durable mutation. Window close uses the same cleanup boundary.
+- Immediately after Mission submission, the Canvas must show Mission plus
+  planning state. After delegation it shows each participant's profile/runtime,
+  recruiter reason, exact Task id/title/state, and ownership. Pointer Inspect on
+  Dataset/Run/Artifact/Evaluation/Report exposes source ids/times, formula
+  inputs, exclusions, and links. These are the required Canvas states; no new
+  screen or parallel workflow graph is permitted.
+- A valid external request is one whose local schema, credential-reference,
+  size, and provider-route checks passed and whose attempt receipt was recorded.
+  Provider/model failure then moves the owning Task and Mission projection to
+  `blocked`, preserves exact admitted Artifacts, and exposes Retry. Retry reuses
+  admitted hashes; Refetch is a separate action that must create a new Dataset
+  id. No implicit retry/refetch is permitted.
+- `qf.decision-set.v1` uses exactly these keys: `contract`, `mission_id`,
+  `event`, `dataset`, `strategy`, `candidates`, `exclusions`, `evaluation`, and
+  `research_only_notice`. Player identity is `{provider_name,nflverse_player_id}`;
+  evidence ids are sorted Artifact ids; uncertainty is
+  `{kind:"screening_estimate",calibrated:false}`; critic verdict is one of
+  `supports|rejects|inconclusive`. Exclusion reason is exactly one of
+  `IDENTITY_UNRESOLVED`, `IDENTITY_AMBIGUOUS`, `INSUFFICIENT_QB_GAMES`,
+  `INSUFFICIENT_QB_ATTEMPTS`, `INSUFFICIENT_OFFENSE_ATTEMPTS`,
+  `INSUFFICIENT_DEFENSE_ATTEMPTS`, `INVALID_PRICE_PAIR`, or `EDGE_BELOW_0_05`.
+  Only an exact-lineage Evaluation with verdict `supports` may publish either a
+  candidate or no-candidate Decision Set; all other verdicts block publication.
+- Existing Venue, MarketEvent, Dataset, DatasetVersion, Artifact, Strategy, Run,
+  Ticket, Evaluation, Report, AgentSession, and link kinds are the complete
+  ontology budget. If these cannot express the contract, stop; do not add a kind.
 ## Deliverable A - Credential-safe feasibility door
 
 Add one app-owned source adapter for The Odds API and one for pinned nflverse
@@ -85,9 +232,9 @@ Before Mission creation, an ephemeral probe must establish all of:
 2. its event-market inventory names `bovada` and
    `player_pass_interceptions`;
 3. a fresh event-odds response contains paired over/under outcomes at line 0.5
-   for at least one named quarterback;
+   for at least one named eligible quarterback;
 4. pinned nflverse play-by-play and players assets contain all required fields
-   and end before the current Dataset `as_of`;
+   and end before the UTC calendar date containing `probe_started_at`;
 5. the configured Artifact root is writable without touching the canonical
    founder state.
 
@@ -146,11 +293,11 @@ They do not fabricate, impute, or expand the window.
 
 ## Deliverable C - Immutable Technique constitution
 
-Add one Kernel action, `register_strategy_version`, only if no existing
-execute-path command can register the pre-Mission Strategy without direct SQL.
-It accepts an existing exact `strategy_spec` Artifact, verifies its bytes and
-hash, writes one Strategy version through `execute()`, and optionally writes
-one immediate `derived_from` predecessor. Same id/hash replay is idempotent;
+Add exactly one Kernel action, `register_strategy_version`; do not substitute a
+different command or direct SQL path. It accepts an existing exact
+`strategy_spec` Artifact, verifies its bytes and hash, writes one Strategy
+version through `execute()`, and writes no predecessor for v0.1. Same id/hash
+replay is idempotent;
 same family/version with different bytes is refused atomically.
 
 Extend the deterministic Strategy reader to accept `qf.strategy.v2` while
@@ -286,6 +433,19 @@ Every falsifier is batched into the focused gate and prints RED before restore:
 13. reopen from UI/process memory rather than Kernel truth;
 14. timeout/cancel leaves an owned process or temp root.
 
+For F01-F14 the gate injects one fault through an adapter or dependency seam,
+asserts a nonzero/red result against literal fixture expectations stored outside
+the implementation module, restores the unmodified dependency, and asserts
+green. It prints `Fnn RED <stable-reason>` and `Fnn GREEN` for every case and
+exits 0 only after all 28 observations. Expected formula values are fixed literal
+vectors and may not be computed by importing production formula code.
+The focused and live gates share the same acceptance assertion names. Focused
+uses literal bytes and sessions; live replaces only those inputs with exact
+current source bytes and real admitted Hermes sessions, independently recomputes
+parser/formula/hash/lineage claims in gate-owned oracle code, and proves the
+normal renderer/preload/main/Kernel journey, reopen, and cleanup. A live PASS
+cannot be inferred from the focused PASS.
+
 Each named receipt must fail when its asserted fact is broken. Assertion
 weakening, sample data in the live gate, direct `execute()` from renderer,
 mock main/preload handlers, and direct read/write SQLite shortcuts are
@@ -293,7 +453,11 @@ prohibited.
 
 ## Acceptance sequence
 
-Run changed-surface tests first, then one focused product proof:
+Run changed-surface tests first, then one focused product proof. The Builder
+stores unedited logs plus `builder-matrix.tsv` in
+`docs/orders/evidence/r18/logs/`; each TSV row contains sequence number, command,
+candidate SHA, start/end UTC, exit code, and log SHA-256. Missing, reordered, or
+nonzero rows make verification red:
 
 ```powershell
 bun test packages/qf-kernel/src/r18-ground-first-use.test.ts
@@ -311,12 +475,19 @@ git diff --check
 git diff --cached --check
 ```
 
-Freeze the candidate SHA. A separate Verifier reruns the same matrix at that
-SHA. No release, installer, or packaged-app matrix belongs to R18.
+Freeze the candidate SHA. A separate Verifier task, identified by its Codex task
+id and different from the Builder task id, records `sha_before`, reruns the same
+matrix without edits, records `sha_after`, and requires the SHAs to match. Its
+unedited logs and `verifier-matrix.tsv` use the same schema. Under PROTOCOL's
+current founder override and AUTONOMY's one-checkout/package-gate ban, no
+`verify-release`, installer, or packaged-app matrix belongs to R18.
 
-After independent PASS, run `r18-ground-first-use-live` once against the
-immutable candidate. A fresh unbriefed Computer Use session then operates the
-normal app without architecture explanation and must correctly identify the
+After independent PASS, a missing `QF_THE_ODDS_API_KEY` is a correct `NEEDS YOU`
+refusal but is not R18 acceptance; live acceptance waits for the operator
+reference or an explicit founder stop. With the reference present, run
+`r18-ground-first-use-live` once against the immutable candidate. A fresh
+unbriefed Computer Use session then operates the normal app without architecture
+explanation and must correctly identify the
 Mission, Technique, source time, owner, raw result, independent Evaluation,
 authoritative Decision Set/no-candidate, and next action. Close/reopen must show
 the same world; final shutdown prints `owned_processes_remaining=0
@@ -324,26 +495,38 @@ roots_remaining=0 leaked=[]`.
 
 ## Falsification receipt vocabulary
 
-The focused and live receipts together print:
+The focused and live receipts together print the following bindings. Each id is
+joined back to Kernel truth by the focused gate and independently queried by the
+Verifier; hashes are recomputed from exact Artifact bytes. `domain_manifest`
+hashes every Kernel domain table before/after the refusal. `parsed_from` binds
+the Dataset to every exact raw Artifact. `eligible_ids`/`excluded_rows` bind
+identity, timestamps, and reasons. `process_scope` is the transitive process
+tree spawned by the app plus every configured app/kernel/artifact/temp/profile
+root; cleanup enumerates that whole scope:
 
 ```text
-feasibility=accepted|refused reason=<stable-reason> durable_research_delta=0
+feasibility=accepted|refused reason=<stable-reason> domain_manifest_before=<sha256> domain_manifest_after=<sha256> durable_research_delta=0
 provider=the-odds-api sport=americanfootball_nfl bookmaker=bovada market=player_pass_interceptions
 event=<id> commence_time=<utc> market_last_update=<utc> fetched_at=<utc>
-raw_artifacts=<ids> raw_hashes=<sha256s> nflverse_revision=<revision>
-dataset=<id> as_of=<utc> future_rows=0 eligible=<n> excluded=<n>
+raw_artifacts=<ids> raw_hashes=<sha256s> parsed_from=<artifact-id:sha256,...> nflverse_revision=<tag+asset-ids>
+dataset=<id> as_of=<utc> historical_row_manifest=<sha256-of-sorted-game_id:game_date:player_id-rows> future_rows=0 eligible_ids=<player-ids> excluded_rows=<player-id-or-name:reason:latest-game-date,...>
 strategy=<id> contract=qf.strategy.v2 family=nfl-pressure-cascade component=qb-interception version=1 spec_hash=<sha256>
-run=<id> result=<artifact-id> candidates=<n> no_candidate=<true|false>
-critic=<session-id> evaluation=<id> verdict=<supports|rejects|inconclusive>
-decision_set=<artifact-id|blocked> report_current=<true|false> placed_bets=0
-reopen_same=true owned_processes_remaining=0 roots_remaining=0 leaked=[]
+run=<id> dataset=<id> strategy=<id:spec-hash> worker=<session-id> result=<artifact-id:sha256> candidates=<n> no_candidate=<true|false>
+critic=<session-id> distinct_from=<director-id,worker-id> inputs=<mission,dataset,strategy,run,result hashes> evaluation=<id> findings=<artifact-id:sha256> verdict=<supports|rejects|inconclusive>
+decision_set=<artifact-id:sha256|blocked> mission=<id> dataset=<id> run=<id> evaluation=<id> report_current=<true|false> placed_bets=0
+reopen_projection_before=<sha256> reopen_projection_after=<sha256> reopen_kernel_query=<sha256> reopen_same=true
+process_scope=<app-pid+descendants;literal-roots> owned_processes_remaining=0 roots_remaining=0 leaked=[]
 PASS r18-ground-first-use
 PASS r18-ground-first-use-live
 ```
 
 ## Seven closure verdicts
 
-The evidence file must state:
+The evidence file is exactly
+`docs/orders/evidence/r18/R18-ACCEPTANCE.md`, authored by the Verifier and
+appended with the Computer Use and founder receipts. It links both matrix TSVs,
+all immutable logs, candidate SHA, task ids, provider/refusal receipt, Kernel
+query hashes, screenshots, and final process inventory, then states:
 
 - **PRODUCT:** one guided real football Mission completed or explicit coverage
   refusal was followed by the authorized bounded founder decision;
@@ -354,7 +537,11 @@ The evidence file must state:
 - **ATLAS:** HARD RED 0 and no unexplained new coverage loss on touched paths;
 - **CONSUMER:** fresh Computer Use understood the journey without logs;
 - **OPERATIONS:** credential refusal, timeout, retry, reopen, and cleanup passed;
-- **FOUNDER:** Ryan accepts whether the result is understandable and useful.
+- **FOUNDER:** Ryan answers yes to all three bounded questions: “Can I identify
+  the current Decision Set or explicit blocked/no-candidate result?”, “Can I
+  inspect why it reached that result without logs?”, and “Would I use this flow
+  for the next bounded NFL question?” This is a founder verdict after consumer
+  proof, never a Builder implementation choice.
 
 A red verdict leaves R18 active and stops before R19.
 

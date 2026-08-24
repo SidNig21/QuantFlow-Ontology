@@ -96,7 +96,8 @@ app must prove:
 1. an upcoming NFL event exists inside the order's time horizon;
 2. Bovada is present for that event;
 3. `player_pass_interceptions` is present with complete over/under outcomes
-   for at least one named starting quarterback;
+   for at least one named eligible quarterback; the provider offer establishes
+   market eligibility and no depth-chart assertion is part of v0.1;
 4. a pinned nflverse corpus covers the required historical window with all
    admitted fields and no observation after the Dataset `as_of`;
 5. raw bytes can be content-hashed and the normal app can reach its isolated
