@@ -100,6 +100,11 @@ app must prove:
 3. `player_pass_interceptions` is present with complete over/under outcomes
    for at least one named eligible quarterback; the provider offer establishes
    market eligibility and no depth-chart assertion is part of v0.1;
+   Individual malformed pairs, non-0.5 lines, and ambiguous identities are
+   per-offer exclusions when another valid player remains. Zero valid paired
+   0.5 lines refuses `NO_VALID_0_5_PAIR`; paired lines with zero uniquely
+   resolved players refuses `NO_UNAMBIGUOUS_PLAYER`. The mixed and all-invalid
+   cases are separate falsifier branches;
 4. a pinned nflverse corpus covers the required historical window with all
    admitted fields and no observation after the Dataset `as_of`;
 5. raw bytes can be content-hashed and the normal app can reach its isolated

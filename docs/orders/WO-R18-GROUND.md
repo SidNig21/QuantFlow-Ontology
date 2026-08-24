@@ -375,9 +375,15 @@ The selected event is the earliest commencement satisfying all five
 conditions; ties sort by provider event id. The probe uses 20-second response
 timeouts, a 5 MiB maximum per JSON response, the existing bounded-download
 standard for release assets, and at most one retry for a transport failure. A
-provider 4xx, 5xx, malformed response, oversize response, timeout, missing
-market, missing pair, non-0.5 line, ambiguous player, or missing historical
-field returns one stable reason and no durable research mutation.
+provider 4xx, 5xx, malformed whole response, oversize response, timeout, missing
+market, or missing historical field returns one stable door reason and no
+durable research mutation. Missing pairs, non-0.5 lines, and ambiguous identities
+are per-offer exclusions when at least one other offered player is valid; they
+never invalidate that valid player or the event. If zero offered players retain
+a paired 0.5 line, the door refuses `NO_VALID_0_5_PAIR`. If paired 0.5 lines
+exist but zero offered names resolve uniquely, it refuses
+`NO_UNAMBIGUOUS_PLAYER`. F03 and F04 must prove both the mixed valid/invalid
+exclusion path and the all-invalid door-refusal path.
 
 After the door passes, refetch the selected event odds for admission. Publish
 each admitted raw response or release asset as a content-addressed Artifact
@@ -654,9 +660,9 @@ cleanup enumerates that whole registry:
 phase=feasibility feasibility=accepted|refused reason=<stable-reason> domain_manifest_before=<sha256> domain_manifest_after=<same-sha256> durable_research_delta=0
 phase=post-door post_door_failure=<stable-reason|none> allowed_raw_delta=<artifact-id:sha256,...|none> unexpected_domain_delta=0
 provider=the-odds-api sport=americanfootball_nfl bookmaker=bovada market=player_pass_interceptions
-event=<id> commence_time=<utc> market_last_update=<utc> fetched_at=<utc>
+event=<id> commence_time=<utc> probe_started_at=<utc> market_last_update=<utc> observed_at=<utc> fetched_at=<same-observed_at>
 raw_artifacts=<ids> raw_hashes=<sha256s> parsed_from=<artifact-id:sha256,...> nflverse_revision=<tag+asset-ids>
-dataset=<id> as_of=<utc> historical_row_manifest=<sha256-of-sorted-game_id:game_date:player_id-rows> future_rows=0 eligible_ids=<player-ids> excluded_rows=<player-id-or-name:reason:latest-game-date,...>
+dataset=<id> as_of=<same-observed_at> historical_row_manifest=<sha256-of-sorted-game_id:game_date:player_id-rows> future_rows=0 eligible_ids=<player-ids> excluded_rows=<player-id-or-name:reason:latest-game-date,...>
 strategy=<id> contract=qf.strategy.v2 family=nfl-pressure-cascade component=qb-interception version=1 spec_hash=<sha256>
 run=<id> dataset=<id> strategy=<id:spec-hash> worker=<session-id> result=<artifact-id:sha256> candidates=<n> no_candidate=<true|false>
 critic=<session-id> distinct_from=<director-id,worker-id> inputs=<mission,hypothesis,dataset,strategy,run,result,formula-inputs,source-times,unsupported-claim-list hashes> evaluation=<id> findings=<artifact-id:sha256> verdict=<supports|rejects|inconclusive>
