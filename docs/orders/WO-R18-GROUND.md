@@ -1,6 +1,6 @@
 # WO-R18-GROUND - Ground one real first-use football Mission
 
-status: DRAFT - semantic Reader required
+status: READY FOR FOUNDER GO - Reader YES/YES at 10bad8c; BUILDER CLOSED
 rung: R18 - Ground & First Use
 assignee: none
 builder-authority: NO until `NEXT.md` records Reader YES/YES and the founder says `FOUNDER GO - ACTIVATE R18 GROUND`

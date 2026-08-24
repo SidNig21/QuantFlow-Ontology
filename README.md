@@ -74,7 +74,7 @@ The ontology has three planes:
 
 | Layer | State |
 | --- | --- |
-| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) selects R18 Ground for semantic Reader review only; the Builder door remains closed until Reader `YES/YES` is recorded and Ryan sends the exact activation phrase |
+| Build authority | [`docs/orders/NEXT.md`](docs/orders/NEXT.md) records R18 Ground Reader `YES/YES`; the Builder remains closed until Ryan sends the exact activation phrase |
 | Product plan | [`docs/plans/INSTITUTIONAL-BUILD-PLAN.md`](docs/plans/INSTITUTIONAL-BUILD-PLAN.md) — canonical R18-R25 outcome contracts; route authority remains [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) and build authority remains [`docs/orders/NEXT.md`](docs/orders/NEXT.md) |
 | Golden route | [`docs/orders/GOLDEN-RUN.md`](docs/orders/GOLDEN-RUN.md) — R0-R17 and Pre-R18 are accepted; R18 Ground & First Use is active with no Builder |
 | Product floor | Windows app, Hermes Research Director, durable governed work and steering, independent review, evaluation-gated publication, visible/reopenable research world, named Technique selection, and operator-supplied outcome grading |

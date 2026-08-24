@@ -189,7 +189,7 @@ goes red. **Do not describe rung state anywhere else** — link here instead.
 | R15 | complete | `docs/orders/evidence/r15` |
 | R16 | complete | `docs/orders/evidence/r16` |
 | R17 | complete | `docs/orders/evidence/r17` |
-| R18 | active | `WO-R18-GROUND.md` drafted; `NEXT.md` withholds Builder authority pending fresh Reader YES/YES and exact founder activation |
+| R18 | active | `WO-R18-GROUND.md` Reader YES/YES at `10bad8c`; `NEXT.md` withholds Builder authority pending exact founder activation |
 | R19 | pending | — |
 | R20 | pending | — |
 | R21 | pending | — |
