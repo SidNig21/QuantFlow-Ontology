@@ -406,16 +406,18 @@ the eleven deletions is never in G2 scope.
 ### Rework 1 resume protocol
 
 The Round 1 Builder stopped on the D5 stale assertion with no candidate commit
-or push. Preserve its existing allowlisted diff; do not restart the eleven-file
-disposition or repeat the Vault archive.
+or push. Preserve its existing proof, Atlas and evidence diff. Do not repeat the
+Vault archive.
 
-After the Router lands this amendment, obtains one fresh amendment-only Reader
-YES/YES, and reauthorizes G2 in NEXT.md, the same Builder:
+The Router's documented staging correction restored all eleven deletion targets
+to their exact frozen bytes before this amendment was re-read. After the Router
+obtains one fresh amendment-only Reader YES/YES and reauthorizes G2 in NEXT.md,
+the same Builder:
 
 1. records the clean committed authority HEAD as REWORK_BASE_SHA;
 2. proves the preserved working diff contains only the amended candidate
-   allowlist and the exact eleven deletions;
-3. applies only D5;
+   allowlist, and proves all eleven restored targets match the frozen manifest;
+3. deletes exactly the eleven restored targets and applies only D5;
 4. reruns the full focused matrix from item 1;
 5. produces one immutable candidate whose parent is REWORK_BASE_SHA.
 
