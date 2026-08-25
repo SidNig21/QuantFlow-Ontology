@@ -1,19 +1,19 @@
 # NEXT — R18 — GOLDEN BASELINE HOLD / PHASE 2 G2
 
-status: G2 REWORK 1 AMENDMENT READER REQUIRED / BUILDER CLOSED
+status: G2 REWORK 1 AUTHORIZED / BUILDER RESUME
 rotated-at: 2026-08-24
 rotated-by: Router under founder Golden-Baseline disposition
 active-order: [WO-GOLDEN-G2](WO-GOLDEN-G2.md)
-builder-authority: NO — Round 1 stopped; D5 amendment requires fresh Reader YES/YES
+builder-authority: YES — same Builder resumes preserved G2 diff under Rework 1 only
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-independent-pass: `000BA6BE7DE6227FF850F61EE2DB35E3F72AB49DECAC670893F774ECB3E8CC38`
 phase-2-active-group: G2 — unbuilt and superseded residue
-order-candidate: `4a06e5b1b583b2f58a8b8695abf2caf402cb5098`
-order-content-sha256: `AF07B58007B8BA8D17478FAE4F36C5B9F2C6713FC0EB640CD0F5A440A2BDF416`
+order-candidate: `15d9408d2e5cfa7aca876d4ab7db7cd082de768f`
+order-content-sha256: `F646D462715F4E87D479128B139FFA078335E82A2810FF38109509AD9582DABC`
 reader-receipt: [G2 initial semantic Reader YES/YES](evidence/golden-baseline/g2/READER-ACCEPTANCE.md)
-amendment-reader: pending
-reader-task: pending
+amendment-reader: [G2 Rework 1 Reader YES/YES](evidence/golden-baseline/g2/REWORK-1-READER-ACCEPTANCE.md)
+reader-task: `01a0374e-e3cd-77e1-a05c-838010b0770c`
 g1-build-base: `57fc4ff711848bbb7f668f608e7478d407dc14f4`
 g1-accepted-candidate: `767717760858c8a0dc77d61e95535faca3c316a0`
 g1-evidence-head: `c3a01f6781bb26e6a47d06928a01babcd57895fb`
@@ -32,11 +32,11 @@ R0-R17 and Pre-R18 remain **CLOSED / ACCEPTED**. R18 remains the route's active
 rung but is frozen by ADR-0004 until Phase 2 and the whole-product Phase 3
 requalification pass.
 
-G1 is closed and independently accepted. G2 Round 1 stopped at a pre-existing
-stale heading assertion after the bounded product/proof diff was prepared. The
-accepted shell says Research Dock; one gate alone still expected the old
-Research Director shell title.
+G1 is closed and independently accepted. G2 Round 1 exposed one pre-existing
+stale heading assertion. The exact D5 gate-only amendment and restored-target
+resume protocol now have fresh Reader YES/YES.
 
-The preserved G2 diff may not resume until one fresh Reader returns YES/YES on
-the exact D5 gate-only amendment. Nothing may merge to main, begin R18,
-absorb G3+, or skip the Phase-2 group boundary.
+The same Builder may resume the preserved proof, Atlas and evidence diff,
+re-delete the eleven hash-verified targets, apply only D5, and run the complete
+focused matrix. No second semantic rework is authorized. Nothing may merge to
+main, begin R18, absorb G3+, or skip the Phase-2 group boundary.
