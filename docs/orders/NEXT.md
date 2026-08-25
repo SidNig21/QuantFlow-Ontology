@@ -1,6 +1,6 @@
 # NEXT — R18 — GOLDEN BASELINE HOLD / PHASE 2 G2
 
-status: G2 REWRITE 2 AUTHORIZED / BUILDER RESUME
+status: G2 BUILDER RESUME / MATRIX ITEM 4
 rotated-at: 2026-08-24
 rotated-by: Router under founder Golden-Baseline disposition
 active-order: [WO-GOLDEN-G2](WO-GOLDEN-G2.md)
@@ -9,12 +9,13 @@ program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-independent-pass: `000BA6BE7DE6227FF850F61EE2DB35E3F72AB49DECAC670893F774ECB3E8CC38`
 phase-2-active-group: G2 — unbuilt and superseded residue
-order-candidate: `4ce2fd021b4a821d597cf91d1542c63c30a8517b`
-order-content-sha256: `763DA8ECDCB8DD2245E038A49D579C7E45088A625FE1CE8181BC4B39F9D651C2`
+order-candidate: `bb681fef7abfa6c13f501ca31ed1cfda48d950b2`
+order-content-sha256: `D30FBA7A9BCAC33DBAA29E74BD872E7B94DDE10BC3F749F3B16E498AF0C8B303`
 reader-receipt: [G2 initial semantic Reader YES/YES](evidence/golden-baseline/g2/READER-ACCEPTANCE.md)
 amendment-reader: [G2 Rework 1 Reader YES/YES](evidence/golden-baseline/g2/REWORK-1-READER-ACCEPTANCE.md)
 rewrite-2-reader: [G2 Rewrite 2 Outcome A YES/YES](evidence/golden-baseline/g2/REWRITE-2-READER-ACCEPTANCE.md)
 rewrite-2-reader-task: 01a0377a-970f-7c41-88be-bc76ac949cfe
+pre-existing-red-03: [kernel-market-lineage assigned to G8](evidence/golden-baseline/g2/PREEXISTING-RED-03.md)
 reader-task: `01a0374e-e3cd-77e1-a05c-838010b0770c`
 g1-build-base: `57fc4ff711848bbb7f668f608e7478d407dc14f4`
 g1-accepted-candidate: `767717760858c8a0dc77d61e95535faca3c316a0`
@@ -40,10 +41,11 @@ states around asynchronous worker recruitment. Cleanup is now green, but the
 session topology may not change until a fresh Reader derives the completion
 contract from current accepted authority and source.
 
-The fresh Rewrite 2 Reader proved Outcome A from accepted authority and source:
-front-door completion guarantees exactly one Director while later worker
-recruitment is genuinely asynchronous. The same Builder may now replace only
-the race-prone total count with the accepted finite per-role/link topology,
-retain the green cleanup correction, rerun focused item 2 once, and proceed to
-the full matrix only if green. Nothing may merge to main, begin R18, absorb G3+,
-or skip the Phase-2 group boundary.
+Rewrite 2's accepted finite topology and cleanup are green. Matrix item 3 then
+reproduced a starting-SHA proof-integrity red: kernel-market-lineage passes a
+string where the unchanged canonical schema requires an array. Exact relevant
+blobs are unchanged and G2 has no path intersection, so ADR-0004 assigns this
+pre-existing red to G8. The same Builder resumes at item 4. Item 3 remains an
+exact fingerprint/non-regression requirement for the independent Verifier and
+must be repaired by G8 before Phase 3. Nothing may merge to main, begin R18,
+absorb G3+, or skip the Phase-2 group boundary.
