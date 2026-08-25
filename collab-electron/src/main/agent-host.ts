@@ -49,7 +49,7 @@ import {
   kernelListTaskAssignments,
   type TraceContext,
 } from "./kernel";
-import { writeAgentReportArtifact } from "./agent-artifact-writer";
+import { writeAgentTrajectoryArtifact } from "./agent-artifact-writer";
 import {
   bootstrapDockProfiles,
   getMissingHermesDockDiagnostic,
@@ -981,7 +981,7 @@ export async function runTurn(
 
   let artifactId: string | undefined;
   if (!opts?.skipPublish) {
-    const artifact = writeAgentReportArtifact({
+    const artifact = writeAgentTrajectoryArtifact({
       sessionId,
       text,
       artifactRoot: getArtifactRoot,

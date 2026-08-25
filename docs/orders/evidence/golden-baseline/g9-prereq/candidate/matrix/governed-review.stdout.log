@@ -1,0 +1,4 @@
+governed-review: internal action/MCP boundary=3/3; governed-review admission/delivery task/links DML absent=true
+bun test v1.3.12 (700fc117)
+governed-review: focused production/kernel proof exit=0
+PASS  governed-review

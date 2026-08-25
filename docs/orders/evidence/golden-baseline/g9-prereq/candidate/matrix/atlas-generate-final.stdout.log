@@ -1,0 +1,7 @@
+qf-atlas: wrote atlas.json + atlas.html + ATLAS.md
+  439 files · 110 subsystems · 126 IPC channels
+  wires: 113 live · 0 unreached · 13 unused · 0 DEAD
+  legacy loops: 6/8 healthy · Review and publish, Close the app
+  decisions: 42 undecided of 47
+  13 strip candidates · 10 confirmed violations · 3 gray · 22 coverage gaps
+qf-atlas: current — 439 files, 126 channels, 13 strip candidates

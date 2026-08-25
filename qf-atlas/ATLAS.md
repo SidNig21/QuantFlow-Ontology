@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-r18-program-canonicalization @ 119edb5` on 2026-08-24 by
+> Generated from `wo-golden-g2 @ 0b15416` on 2026-08-25 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -574,7 +574,7 @@ discovered from the AST.
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 565
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
 - `collab-electron/src/main/a2a-artifact-store.ts` — exports createA2aArtifactStore() at line 26
-- `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentReportArtifact() at line 30
+- `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
 - `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 123
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25
 

@@ -1,0 +1,3 @@
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+artifact-root receipt report_refusal RED: text=accepted; artifacts=1->1; events=4->4
+artifact-root FAIL: artifact-root: G9 trajectory proof failed

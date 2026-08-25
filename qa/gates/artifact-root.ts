@@ -8,6 +8,7 @@
  *   QF_K3_COLD_INSTALL_FALSIFY=artifact-root bun qa/gates/artifact-root.ts
  */
 import { join } from "node:path";
+import { runFrozenPackageInstall } from "../package-install.ts";
 
 const GATE_DIR = join(import.meta.dir, "artifact-root");
 const REPO_ROOT = join(import.meta.dir, "../..");
@@ -79,16 +80,7 @@ async function executeInstallPlan(
   entries: ColdInstallPlanEntry[],
 ): Promise<number> {
   for (const entry of entries) {
-    const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-      cwd: entry.cwd,
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    const code = await install.exited;
-    if (code !== 0) {
-      console.error(`artifact-root: ${entry.name} bun install exited ${code}`);
-      return 1;
-    }
+    if (!(await runFrozenPackageInstall("artifact-root:" + entry.name, entry.cwd))) return 1;
   }
   return 0;
 }

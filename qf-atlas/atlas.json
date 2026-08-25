@@ -1,11 +1,11 @@
 {
   "meta": {
-    "branch": "wo-r18-program-canonicalization",
-    "commit": "119edb5",
-    "generatedAt": "2026-08-24",
+    "branch": "wo-golden-g2",
+    "commit": "0b15416",
+    "generatedAt": "2026-08-25",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "9f1f0acb2374d4e3"
+    "fingerprint": "8c590070cefb1ebf"
   },
   "stats": {
     "live": 113,
@@ -1094,7 +1094,7 @@
       "id": "2:collab-electron/src/main::agent",
       "layer": 2,
       "name": "agent*",
-      "kb": 38.3,
+      "kb": 38.6,
       "x": -1.01,
       "z": -0.85,
       "status": "gray",
@@ -1105,7 +1105,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/agent-host.ts",
-          "kb": 34,
+          "kb": 34.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -1125,7 +1125,7 @@
         },
         {
           "path": "collab-electron/src/main/agent-artifact-writer.ts",
-          "kb": 1.5,
+          "kb": 1.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -3520,11 +3520,11 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 789.7,
+      "kb": 789.5,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 85,
+      "spawns": 84,
       "writes": 31,
       "dml": 19,
       "executes": 49,
@@ -3936,18 +3936,18 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/artifact-root.ts",
+          "path": "qa/gates/kernel-drift.ts",
           "kb": 3.5,
-          "spawns": 2,
-          "spawnsLive": 2,
+          "spawns": 1,
+          "spawnsLive": 1,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/kernel-drift.ts",
-          "kb": 3.5,
+          "path": "qa/gates/artifact-root.ts",
+          "kb": 3.3,
           "spawns": 1,
           "spawnsLive": 1,
           "writes": 0,
@@ -4241,24 +4241,24 @@
       "id": "5:qa/gates/artifact-root::run",
       "layer": 5,
       "name": "artifact-root/run.ts",
-      "kb": 17.3,
+      "kb": 25.7,
       "x": 1.24,
       "z": -0.45,
       "status": "ice",
       "spawns": 0,
       "writes": 2,
       "dml": 0,
-      "executes": 3,
+      "executes": 7,
       "files": [
         {
           "path": "qa/gates/artifact-root/run.ts",
-          "kb": 17.3,
+          "kb": 25.7,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
           "dml": 0,
           "dmlLines": [],
-          "executes": 3
+          "executes": 7
         }
       ],
       "strip": [],
@@ -11906,7 +11906,7 @@
         {
           "file": "collab-electron/src/main/agent-artifact-writer.ts",
           "weak": [
-            "exports writeAgentReportArtifact() at line 30"
+            "exports writeAgentTrajectoryArtifact() at line 32"
           ],
           "strong": [],
           "weight": "weak"
@@ -20800,7 +20800,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "2 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
+        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -60072,14 +60072,14 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "wo-pre-r18-coherence",
-      "commit": "64f764f",
-      "generatedAt": "2026-08-24"
-    },
-    "to": {
       "branch": "wo-r18-program-canonicalization",
       "commit": "119edb5",
       "generatedAt": "2026-08-24"
+    },
+    "to": {
+      "branch": "wo-golden-g2",
+      "commit": "0b15416",
+      "generatedAt": "2026-08-25"
     },
     "verdict": "better",
     "why": "42 improvement(s), nothing added or hidden",

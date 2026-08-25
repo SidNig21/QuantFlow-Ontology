@@ -1,0 +1,3 @@
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+artifact-root receipt root_confinement RED: root=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-iWm27K\.quantflow\artifacts returned_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-iWm27K\.quantflow\escaped-artifact storage_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-iWm27K\.quantflow\artifacts\g9-trajectory-proof-session.md
+artifact-root FAIL: artifact-root: G9 trajectory proof failed

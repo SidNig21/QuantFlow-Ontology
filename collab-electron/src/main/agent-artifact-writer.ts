@@ -1,39 +1,41 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-export type ArtifactPublicationInput = {
+type ArtifactPublicationInput = {
   path: string;
-  kind: "report";
+  kind: "trajectory";
   storage_ref: string;
+  bytes: Uint8Array;
+  links: [{ kind: "produces"; from_id: string }];
 };
 
-export type ArtifactPublicationResult = {
+type ArtifactPublicationResult = {
   object_id: string;
 };
 
-export type AgentReportArtifact = {
+export type AgentTrajectoryArtifact = {
   artifactId: string;
   path: string;
   bytes: Uint8Array;
 };
 
-export type AgentArtifactFileWriter = (
+type AgentArtifactFileWriter = (
   path: string,
   body: string,
 ) => void;
 
 /**
- * Write one agent report beneath the resolved artifact root, then publish its identity to the Kernel.
- * The filesystem write must complete before publication; callers supply only the root resolver and
- * the sanctioned Kernel publication callback so this helper remains adapter-agnostic.
+ * Write one AgentOS trajectory beneath the resolved artifact root, then publish its identity to the
+ * Kernel. The filesystem write must complete before publication; callers supply only the root
+ * resolver and the sanctioned Kernel publication callback so this helper remains adapter-agnostic.
  */
-export function writeAgentReportArtifact(options: {
+export function writeAgentTrajectoryArtifact(options: {
   sessionId: string;
   text: string;
   artifactRoot: () => string;
   publish: (input: ArtifactPublicationInput) => ArtifactPublicationResult;
   fileWriter?: AgentArtifactFileWriter;
-}): AgentReportArtifact {
+}): AgentTrajectoryArtifact {
   const root = options.artifactRoot();
   mkdirSync(root, { recursive: true });
 
@@ -44,15 +46,18 @@ export function writeAgentReportArtifact(options: {
   });
 
   fileWriter(path, body);
+  const bytes = new Uint8Array(readFileSync(path));
   const publication = options.publish({
     path,
-    kind: "report",
+    kind: "trajectory",
     storage_ref: path,
+    bytes,
+    links: [{ kind: "produces", from_id: options.sessionId }],
   });
 
   return {
     artifactId: publication.object_id,
     path,
-    bytes: new TextEncoder().encode(body),
+    bytes,
   };
 }
