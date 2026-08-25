@@ -148,6 +148,15 @@ In `qa/gates/artifact-root/run.ts`:
 - retain `MIN_MAIN_FILES` and require `sawHost === true`, proving that the scan
   covered a real production surface and `agent-host.ts` specifically.
 
+In `qa/gates/artifact-root.ts`, replace only the launcher's raw
+`bun install --frozen-lockfile` spawn with the repository's existing
+`runFrozenPackageInstall()` seam from `qa/package-install.ts`, matching the
+accepted `kernel-drift` launcher. Preserve the exact two-entry install plan,
+order, falsification vocabulary, fail-closed exit behavior, and single-attempt
+contract. Do not edit the shared helper. This is a mechanical same-meaning
+Windows proof-harness correction under ADR-0004 section 9, not a new G2
+deliverable or a G12 implementation.
+
 The gate must still fail if `agent-host.ts` stops using the production writer,
 publishes outside the resolved root, or any additional direct production
 publisher appears. Removing a retired publisher may narrow the expected set; it
@@ -341,6 +350,7 @@ The candidate may contain only:
 
 - the eleven exact deletions;
 - `qa/gates/artifact-root/run.ts`;
+- `qa/gates/artifact-root.ts`;
 - `collab-electron/scripts/package-lib/shared-paths.test.ts`;
 - `qa/gates/one-skin.ts`;
 - `qa/gates/research-director-front-door.ts`;
@@ -509,6 +519,34 @@ red. G8 and Phase 3 still require the corrected gate to reach its actual
 market-lineage assertions and pass. The Builder resumes G2 at matrix item 4;
 the Verifier independently reproduces this adjudication rather than claiming
 item 3 green.
+### Matrix item 6 — mechanical Windows launcher correction
+
+The unchanged artifact-root launcher failed before its semantic body loaded on
+two consecutive runs because it still invokes raw `bun install` while the
+repository's accepted Windows-safe package gates use
+`runFrozenPackageInstall()`. The two exact wrapper receipts are:
+
+- `logs/21-matrix-06-artifact-root.txt`, SHA-256
+  `D2794B0EA397EF54F174798CB377281ABC69E7E3020A0A889E5BE383127AE3B3`;
+- `logs/21-matrix-06-artifact-root-retry.txt`, SHA-256
+  `54212AD149F169D9A92C82790DCB5CE3D714CC7B873E9730D9A65AD6F6BF0918`.
+
+Both stopped at the same local-file package copy `EPERM`, before any modified
+`run.ts` assertion executed, with product-process count zero. The raw launcher
+blob at the resume SHA is
+`3b05d81097810e217c2b7b3bd4b65b4a975683e9`; the already-accepted helper blob is
+`067f3ec04fe004da7f8deef0e883f13abbb14e3f` and its unit-test blob is
+`f4af113ada61fb308dde2125f70a996d2de9889a`.
+
+ADR-0004 section 9 therefore authorizes the shortest same-meaning correction:
+retarget only `qa/gates/artifact-root.ts` to the existing helper, run
+`bun test qa/package-install.test.ts`, then rerun matrix item 6 exactly once. A
+helper edit, retry, alternate backend, assertion change, package/cache mutation,
+or continued red stops G2. A green item 6 proves the unchanged cold-install
+meaning and the modified semantic body together; only then may the Builder
+resume items 7-21. G12 still owns whole-program clean install/package/operations
+qualification and the separately recorded historical Windows install debt.
+
 ## Independent Verifier
 
 One fresh read-only Verifier binds to the immutable candidate and reruns:
