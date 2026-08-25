@@ -1,10 +1,10 @@
 # NEXT — R18 — GOLDEN BASELINE HOLD / PHASE 2 G2
 
-status: G2 REWORK 1 AUTHORIZED / BUILDER RESUME
+status: G2 REWRITE 2 / FRESH READER HOLD
 rotated-at: 2026-08-24
 rotated-by: Router under founder Golden-Baseline disposition
 active-order: [WO-GOLDEN-G2](WO-GOLDEN-G2.md)
-builder-authority: YES — same Builder resumes preserved G2 diff under Rework 1 only
+builder-authority: NO — preserve the G2 diff until conditional Rewrite 2 receives fresh Reader YES/YES
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-independent-pass: `000BA6BE7DE6227FF850F61EE2DB35E3F72AB49DECAC670893F774ECB3E8CC38`
@@ -33,10 +33,13 @@ rung but is frozen by ADR-0004 until Phase 2 and the whole-product Phase 3
 requalification pass.
 
 G1 is closed and independently accepted. G2 Round 1 exposed one pre-existing
-stale heading assertion. The exact D5 gate-only amendment and restored-target
-resume protocol now have fresh Reader YES/YES.
+stale heading assertion. Rework 1 then exposed two valid-looking observation
+states around asynchronous worker recruitment. Cleanup is now green, but the
+session topology may not change until a fresh Reader derives the completion
+contract from current accepted authority and source.
 
-The same Builder may resume the preserved proof, Atlas and evidence diff,
-re-delete the eleven hash-verified targets, apply only D5, and run the complete
-focused matrix. No second semantic rework is authorized. Nothing may merge to
-main, begin R18, absorb G3+, or skip the Phase-2 group boundary.
+The current proof, Atlas, deletion and evidence diff remain preserved while one
+fresh Reader adjudicates Rewrite 2. Builder authority stays closed unless the
+Reader proves Outcome A and returns YES/YES. Outcome B stops G2 with a named
+current product/runtime defect. Nothing may merge to main, begin R18, absorb
+G3+, or skip the Phase-2 group boundary.

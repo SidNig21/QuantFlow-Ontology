@@ -118,6 +118,35 @@ including new full file/dependency/resource accounting, zero known current
 defects or unexplained reds, clean Windows build/package, naive and founder
 product traversal, read-only Kernel agreement, close/reopen, and process zero.
 
+### 9. Execution throughput without proof dilution
+
+For G2 through G12 and Phase 3, the program uses these standing execution rules:
+
+1. Freeze each future group's exact focused acceptance matrix against its
+   starting SHA before its Builder opens. Separate pre-existing reds from
+   candidate-introduced reds before mutation.
+2. While an immutable candidate is under independent verification, the next
+   group's fresh Reader may perform provisional read-only source scoping.
+   Neither next-group authority nor a mutating Builder opens before the current
+   group independently passes.
+3. Mutually independent verification commands may run concurrently only when
+   they cannot mutate shared state.
+4. Exact-SHA receipts may be reused when the relevant bytes and configuration
+   are unchanged. Proof is not rerun solely for ceremony.
+5. Clean install, full generation, full package and full current-product
+   traversal are reserved for groups that materially touch those boundaries and
+   for mandatory Phase 3.
+6. Mechanical same-meaning proof-harness corrections use the shortest
+   trustworthy independent verification path. Semantic acceptance changes keep
+   Reader review and founder stops.
+7. A proven pre-existing red outside a group's semantic ownership is recorded
+   against its already named Golden group instead of being absorbed, provided
+   the active group's non-regression can still be independently proved.
+
+These rules do not combine groups, parallelize mutating Builders, weaken
+acceptance, skip immutable candidates or independent verification, or alter the
+Phase-3 closure standard.
+
 ## Consequences
 
 - `NEXT.md` temporarily authorizes Phase-2 groups while keeping R18 frozen.

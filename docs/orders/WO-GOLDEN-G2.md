@@ -421,8 +421,66 @@ the same Builder:
 4. reruns the full focused matrix from item 1;
 5. produces one immutable candidate whose parent is REWORK_BASE_SHA.
 
-No second semantic rework is authorized. The same assertion going red again, or
-any later red outside the amended allowlist, stops G2.
+### Rewrite 2 — conditional temporal-topology adjudication
+
+Rework 1 exposed a race-shaped contradiction in the accepted
+research-director-front-door proof:
+
+1. one clean run reached the front-door observation after one exact Research
+   Director and one exact hermes-worker existed;
+2. the next clean run reached the same observation after the exact Research
+   Director existed but before any worker row existed.
+
+Both runs retained the same product bytes and current synthetic activation path.
+These observations do not by themselves authorize zero-or-one worker
+acceptance.
+
+Before any Builder change, one fresh semantic Reader must derive from current
+accepted authority and current source:
+
+- the semantic completion point this front-door gate is required to test;
+- whether hermes-worker recruitment is genuinely asynchronous relative to that
+  completion point;
+- whether accepted authority requires the worker to exist by that point; and
+- the exact finite session/link topology that can legitimately exist there.
+
+The Reader answers the usual two questions and returns one of two bounded
+outcomes.
+
+**Outcome A — temporal topology is accepted.** If authority proves that
+recruitment may still be pending at the front-door completion point, the gate
+must assert all of these together:
+
+- exactly one new Research Director session;
+- either zero not-yet-recruited hermes-worker sessions or exactly one correctly
+  recruited hermes-worker session;
+- zero sessions from any unknown or other definition;
+- zero duplicate Director or worker sessions;
+- exactly one spawned_from link for the Director;
+- exactly one spawned_from link for any observed worker;
+- total new sessions and spawned_from links equal the exact per-role counts.
+
+This is not a greater-than-or-equal assertion and may not opt into the legacy
+no-recruit fixture. It preserves all profile, placeholder, admission, Mission,
+tile, status, tree-neutrality and cleanup assertions. Receipts print each role
+and link count separately.
+
+**Outcome B — worker required at completion.** If authority requires one worker
+by this semantic completion point, the gate is not changed to accept zero.
+Rewrite 2 stops G2 and records the absent worker as a current product/runtime
+defect for correct Golden ownership.
+
+The cleanup-only correction from the intervening run is retained: capture late
+descendants while the root is alive, request the unchanged production
+app.shutdown, terminate only captured gate-owned survivors, and require all four
+cleanup counts to be zero. Its latest receipt was green.
+
+Only Reader YES/YES for Outcome A reopens the same Builder. The Builder then
+preserves the current diff, changes no product code, runs focused item 2 once,
+and proceeds to the complete matrix only if it is green. No other G2 scope
+change is authorized. The accepted finite-topology assertion going red, any
+later red outside the amended allowlist, or any request for product code stops
+G2.
 
 ## Independent Verifier
 
