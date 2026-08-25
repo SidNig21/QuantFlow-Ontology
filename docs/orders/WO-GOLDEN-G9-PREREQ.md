@@ -33,7 +33,10 @@ ordinary-completion trajectory boundary.
 ## Fixed semantic contract
 
 "Ordinary completion" has one meaning here: exactly one successful **AgentOS**
-`runTurn` with `finalize = true`.
+`runTurn(sessionId, prompt, { finalize: true, skipPublish: false })`, where
+success means `stopReason` is exactly `end_turn` or `unknown`. Cancellation,
+failure, `host_acp`, `native_tui`, `finalize = false`, and
+`skipPublish = true` are excluded.
 
 For that turn:
 
@@ -47,16 +50,13 @@ For that turn:
   `publish_artifact report requires evaluation_id` and changes no Artifact or
   event count.
 
-`host_acp`, `native_tui`, and AgentOS `finalize = false` are explicitly
-outside this prerequisite. They gain no Artifact guarantee here.
-
 "Exact bytes" has one meaning: the UTF-8 bytes actually written by the retained
 writer—`text` when non-empty, otherwise the existing literal
 `(empty agent output)`. The Artifact row must satisfy:
 
-- `artifact.bytes === diskBytes`;
-- `artifact.id === artifact.content_hash === sha256(diskBytes)`;
-- `artifact.storage_ref === returned path`;
+- returned bytes compare byte-for-byte equal to separately read `diskBytes`;
+- `row.id === row.content_hash === sha256(diskBytes)`;
+- `row.storage_ref === returned path`;
 - both resolved paths remain beneath the resolved artifact root.
 
 This derives from existing Kernel truth. It adds no ontology type, action, link,
@@ -68,8 +68,9 @@ truth store, support table, compatibility path, or UI state.
 
 Replace Report-specific naming in the ordinary completion writer and its live
 AgentOS `finalize = true` call site with one canonical trajectory vocabulary.
-The exported writer symbol and its directly coupled type use `Trajectory`, not
-`Report`; no Report compatibility alias remains. The writer calls the existing
+The required exports are exactly `writeAgentTrajectoryArtifact` and
+`AgentTrajectoryArtifact`; no Report compatibility alias remains. The writer
+calls the existing
 `publish_artifact` action with `kind: "trajectory"`, the exact byte contract,
 and one creation-envelope `produces` link from the completing session.
 
@@ -98,8 +99,14 @@ Each smallest break must turn a named receipt red:
 1. kind back to `report` → `ordinary_kind` red;
 2. producer link omitted or duplicated → `producer_link_count` red;
 3. wrong session or direction → `producer_link_identity` red;
-4. bytes/hash/reference/root altered → the corresponding exact identity receipt red;
-5. unevaluated Report accepted or mutates counts → `report_refusal` red.
+4. returned/disk bytes differ → `bytes_identity` names both byte counts and is red;
+5. row id/content hash differs from disk SHA-256 → `hash_identity` names all
+   three values and is red;
+6. row storage reference differs from returned path → `storage_ref_identity`
+   names both paths and is red;
+7. either resolved path escapes the root → `root_confinement` names root and
+   escaped path and is red;
+8. unevaluated Report accepted or mutates counts → `report_refusal` red.
 
 The green receipt names Artifact id, producing session id, exact link tuple/count,
 root, storage reference, hash, byte count, ordinary Report count zero, refusal
@@ -115,6 +122,8 @@ Product:
 Focused proof only:
 
 - `qa/gates/artifact-root/run.ts`
+- `qa/gates/artifact-root.ts` only to delegate frozen package installation to
+  the existing `qa/package-install.ts` helper; no semantic assertion changes
 - generated Atlas outputs caused solely by the allowed product rename
 - `docs/orders/evidence/golden-baseline/g9-prereq/**`
 
@@ -126,8 +135,10 @@ Golden group, or G2 deletion target is in scope.
 Before Builder mutation, freeze against the clean prerequisite starting SHA with
 these exact commands and receipts:
 
-1. `bun qa/run.ts artifact-root` — reaches the writer and records only the
-   current semantic red caused by the unevaluated Report attempt;
+1. `bun qa/run.ts artifact-root` — starting SHA records the pre-existing raw
+   package-install red; after the allowed mechanical launcher delegation it must
+   reach the writer, where the pre-existing semantic red is the unevaluated
+   Report attempt;
 2. `bun qa/run.ts governed-review` — `PASS  governed-review`;
 3. `bun qa/run.ts kernel-one-path` — `PASS  kernel-one-path`;
 4. `bun qa/run.ts kernel-sole-writer` — `PASS  kernel-sole-writer`;
@@ -140,9 +151,10 @@ these exact commands and receipts:
 Record every pre-existing red before mutation and assign it to its named Golden
 owner. A candidate-introduced red stops.
 
-The earlier raw-install `EPERM` receipt is historical, not this semantic
-baseline. This matrix uses the accepted `qa/package-install.ts` seam and must
-reach the writer.
+The raw-install receipt is a starting-SHA pre-existing mechanical red. The
+Builder may correct only that launcher seam by delegating
+`qa/gates/artifact-root.ts` to the existing `qa/package-install.ts` helper
+before the semantic gate can reach the writer. The helper itself is unchanged.
 
 ## Paused G2 preservation and overlap
 
