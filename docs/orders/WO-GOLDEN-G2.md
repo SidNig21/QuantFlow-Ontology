@@ -519,6 +519,7 @@ red. G8 and Phase 3 still require the corrected gate to reach its actual
 market-lineage assertions and pass. The Builder resumes G2 at matrix item 4;
 the Verifier independently reproduces this adjudication rather than claiming
 item 3 green.
+
 ### Matrix item 6 — mechanical Windows launcher correction
 
 The unchanged artifact-root launcher failed before its semantic body loaded on
