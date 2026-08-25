@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "0b15416",
+    "commit": "bc1bdbf",
     "generatedAt": "2026-08-25",
     "filesScanned": 439,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "8c590070cefb1ebf"
+    "fingerprint": "9b71defd3b1388c3"
   },
   "stats": {
     "live": 113,
@@ -4241,21 +4241,21 @@
       "id": "5:qa/gates/artifact-root::run",
       "layer": 5,
       "name": "artifact-root/run.ts",
-      "kb": 25.7,
-      "x": 1.24,
-      "z": -0.45,
+      "kb": 40.9,
+      "x": -0.23,
+      "z": 1.3,
       "status": "ice",
-      "spawns": 0,
-      "writes": 2,
+      "spawns": 1,
+      "writes": 4,
       "dml": 0,
       "executes": 7,
       "files": [
         {
           "path": "qa/gates/artifact-root/run.ts",
-          "kb": 25.7,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 2,
+          "kb": 40.9,
+          "spawns": 1,
+          "spawnsLive": 1,
+          "writes": 4,
           "dml": 0,
           "dmlLines": [],
           "executes": 7
@@ -4298,8 +4298,8 @@
       "layer": 5,
       "name": "dock-definition-launch/run.ts",
       "kb": 37.6,
-      "x": -1.24,
-      "z": 0.45,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ice",
       "spawns": 1,
       "writes": 4,
@@ -4326,8 +4326,8 @@
       "layer": 5,
       "name": "dock-profile-identity/run.ts",
       "kb": 39.4,
-      "x": -0.23,
-      "z": 1.3,
+      "x": -1.24,
+      "z": 0.45,
       "status": "ice",
       "spawns": 2,
       "writes": 0,
@@ -4546,8 +4546,8 @@
       "layer": 5,
       "name": "qa/run.ts",
       "kb": 37,
-      "x": -1.01,
-      "z": -0.85,
+      "x": 0.23,
+      "z": -1.3,
       "status": "ok",
       "spawns": 5,
       "writes": 0,
@@ -7093,8 +7093,8 @@
       "layer": 5,
       "name": "10 small modules*",
       "kb": 27.8,
-      "x": 0.23,
-      "z": -1.3,
+      "x": 1.24,
+      "z": -0.45,
       "status": "ice",
       "spawns": 6,
       "writes": 0,
@@ -20761,12 +20761,13 @@
       "imports": "indexed",
       "reach": "unsupported",
       "blockers": {
-        "reach": "scope-boundary"
+        "reach": "scope-boundary",
+        "lifetime": "ast-coverage"
       },
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
       "persistence": "not-applicable",
-      "lifetime": "not-applicable",
+      "lifetime": "partial",
       "packaging": "not-applicable",
       "ownership": "not-applicable",
       "reasons": {
@@ -20774,7 +20775,7 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
+        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
       },
@@ -25528,8 +25529,8 @@
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 491,
-      "partial": 64,
+      "not-applicable": 490,
+      "partial": 65,
       "indexed": 6
     },
     "packaging": {
@@ -26386,9 +26387,10 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts"
       ],
-      "importerCount": 2,
+      "importerCount": 3,
       "imports": [
         "collab-electron/src/main/app-root.ts",
         "collab-electron/src/main/host-acp-bridge.ts",
@@ -27002,13 +27004,13 @@
       "reach": "reachable",
       "importers": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
-        "collab-electron/src/main/agent-host.ts",
-        "collab-electron/src/main/connections-ipc.ts"
+        "collab-electron/src/main/agent-host.ts"
       ],
-      "importerCount": 8,
+      "importerCount": 9,
       "imports": [
         "packages/qf-kernel/src/portable.ts",
         "qf-kernel-schema/src/schema.ts",
@@ -29963,8 +29965,8 @@
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
         "collab-electron/src/windows/nav/src/main.tsx",
-        "collab-electron/src/main/ipc-kernel.ts",
-        "qa/run.ts"
+        "qa/gates/artifact-root/run.ts",
+        "collab-electron/src/main/ipc-kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -30016,8 +30018,8 @@
         "collab-electron/src/windows/viewer/src/App.tsx",
         "collab-electron/src/main/ipc-misc.ts",
         "collab-electron/packages/components/src/FolderTableView/index.ts",
-        "collab-electron/src/main/ipc-kernel.ts",
-        "collab-electron/src/main/ipc-knowledge.ts"
+        "qa/gates/artifact-root/run.ts",
+        "collab-electron/src/main/ipc-kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -30059,6 +30061,7 @@
         "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/run.ts",
         "collab-electron/scripts/package-lib/package-inspect.ts",
@@ -30298,6 +30301,7 @@
       "transitiveDependents": [
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/ipc.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts"
       ],
       "transitiveTruncated": false,
@@ -30329,6 +30333,7 @@
       "reach": "reachable",
       "directDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts"
       ],
       "transitiveDependents": [
@@ -30413,6 +30418,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -30430,6 +30436,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -30559,6 +30566,7 @@
         "collab-electron/src/main/ipc-filesystem.ts",
         "collab-electron/src/main/ipc-knowledge.ts",
         "collab-electron/src/main/ipc-misc.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/run.ts",
         "collab-electron/scripts/package-lib/package-inspect.ts",
@@ -30631,6 +30639,7 @@
         "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -30650,6 +30659,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts"
       ],
       "transitiveTruncated": false,
@@ -30695,6 +30705,7 @@
         "qa/gates/windows-golden-run.ts",
         "qa/gates/windows-research-question.ts",
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/gates/package-closure/executors.ts",
         "collab-electron/src/main/ipc.ts",
@@ -30739,6 +30750,7 @@
         "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/run.ts",
         "collab-electron/scripts/package-lib/package-inspect.ts",
@@ -30803,6 +30815,7 @@
         "qa/gates/dock-definition-launch/run.ts",
         "collab-electron/src/main/dock-profiles.ts",
         "collab-electron/src/main/definition-runtime.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/run.ts",
         "collab-electron/scripts/package-lib/package-inspect.ts",
@@ -30903,6 +30916,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -30924,6 +30938,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts"
       ],
       "transitiveTruncated": false,
@@ -30945,6 +30960,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -30967,6 +30983,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -30986,6 +31003,7 @@
         "collab-electron/src/main/agent-host.ts"
       ],
       "transitiveDependents": [
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31226,6 +31244,7 @@
         "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/sidecar/entry.ts",
         "collab-electron/src/main/sidecar/client.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31499,6 +31518,7 @@
       "reach": "reachable",
       "directDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -31531,6 +31551,7 @@
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31562,6 +31583,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31644,6 +31666,7 @@
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31732,6 +31755,7 @@
       "transitiveDependents": [
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "qa/gates/dev-dock-readiness.ts",
         "qa/gates/dock-definition-launch/run.ts",
@@ -31797,6 +31821,7 @@
         "collab-electron/src/main/terminal-target.ts",
         "collab-electron/src/main/runtime-adapter.ts",
         "collab-electron/src/main/ipc-workspace.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/connections-ipc.ts",
@@ -31833,6 +31858,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31857,6 +31883,7 @@
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31877,6 +31904,7 @@
         "collab-electron/src/main/index.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31894,6 +31922,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31912,6 +31941,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31932,6 +31962,7 @@
         "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -31951,6 +31982,7 @@
         "collab-electron/src/main/agent-host.ts"
       ],
       "transitiveDependents": [
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -32018,6 +32050,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
@@ -32044,6 +32077,7 @@
       "transitiveDependents": [
         "qa/run.ts",
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "collab-electron/scripts/package-lib/runtime-staging.ts",
@@ -32091,6 +32125,7 @@
         "collab-electron/src/main/agent-host.ts"
       ],
       "transitiveDependents": [
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -32142,6 +32177,7 @@
         "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -32196,6 +32232,7 @@
         "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -32301,6 +32338,7 @@
       "transitiveDependents": [
         "qa/run.ts",
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -32326,6 +32364,7 @@
       ],
       "transitiveDependents": [
         "collab-electron/src/main/peer-delivery.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -32349,6 +32388,7 @@
         "collab-electron/src/main/peer-delivery.ts",
         "collab-electron/src/main/host-native-tui.ts",
         "collab-electron/src/main/agent-host.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/ipc.ts"
       ],
@@ -32377,7 +32417,8 @@
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/agent-host.ts",
         "collab-electron/src/main/host-acp-turn.ts",
-        "collab-electron/src/main/index.ts"
+        "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts"
       ],
       "transitiveTruncated": false,
       "directDependencies": [],
@@ -34683,6 +34724,7 @@
         "qa/gates/package-closure/lazy-loader.ts",
         "tools/qf-bovada-football/src/index.ts",
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -35223,6 +35265,7 @@
         "qa/gates/package-closure/lazy-loader.ts",
         "tools/qf-bovada-football/src/index.ts",
         "collab-electron/src/main/index.ts",
+        "qa/gates/artifact-root/run.ts",
         "collab-electron/src/main/ipc.ts",
         "collab-electron/src/main/ontology-gateway.ts",
         "collab-electron/src/main/host-native-tui.ts",
@@ -35231,7 +35274,6 @@
         "collab-electron/src/main/ipc-kernel.ts",
         "collab-electron/src/main/host-acp-turn.ts",
         "qa/gates/agent-path/run.ts",
-        "qa/gates/artifact-root/run.ts",
         "qa/gates/boot-reconcile/run.ts",
         "qa/gates/dock-definition-launch/run.ts",
         "qa/gates/dock-profile-identity/run.ts",
@@ -60072,17 +60114,17 @@
   ],
   "diffVsHead": {
     "from": {
-      "branch": "wo-r18-program-canonicalization",
-      "commit": "119edb5",
-      "generatedAt": "2026-08-24"
-    },
-    "to": {
       "branch": "wo-golden-g2",
       "commit": "0b15416",
       "generatedAt": "2026-08-25"
     },
-    "verdict": "better",
-    "why": "42 improvement(s), nothing added or hidden",
+    "to": {
+      "branch": "wo-golden-g2",
+      "commit": "bc1bdbf",
+      "generatedAt": "2026-08-25"
+    },
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60419,7 +60461,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "qa/gates/artifact-root/run.ts",
+        "analyzer": "lifetime",
+        "from": "not-applicable",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -60427,7 +60478,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null

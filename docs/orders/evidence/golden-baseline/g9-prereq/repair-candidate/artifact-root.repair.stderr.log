@@ -1,0 +1,9 @@
+run.ts:
+kernel: path=:memory: provenance=env journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) G9 live AgentOS runTurn publishes one trajectory [187.00ms]
+
+ 1 pass
+ 0 fail
+Ran 1 test across 1 file. [295.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89

@@ -1,0 +1,3 @@
+governed-review exit=0 expected=0
+kernel-one-path exit=1 expected=1
+kernel-sole-writer exit=0 expected=0

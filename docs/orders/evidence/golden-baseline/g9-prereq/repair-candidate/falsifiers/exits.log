@@ -1,0 +1,8 @@
+kind exit=1
+producer-link-count exit=1
+producer-link-identity exit=1
+bytes-identity exit=1
+hash-identity exit=1
+storage-ref-identity exit=1
+root-confinement exit=1
+report-refusal exit=1

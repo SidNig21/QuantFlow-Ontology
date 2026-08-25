@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ 0b15416` on 2026-08-25 by
+> Generated from `wo-golden-g2 @ bc1bdbf` on 2026-08-25 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -369,10 +369,11 @@ change is wrong. **`atlas.json` carries this for every file** — 239 of
 241 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
-`collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
+`collab-electron/src/main/kernel.ts` — **9 files depend on it**, it imports 7
 
 ```
   collab-electron/src/main/index.ts
+  qa/gates/artifact-root/run.ts
   collab-electron/src/main/ipc.ts
   collab-electron/src/main/ontology-gateway.ts
   collab-electron/src/main/host-native-tui.ts
@@ -421,7 +422,7 @@ Most-depended-on files — change these last:
 | `packages/qf-kernel/src/trace.ts` | 57+ | 1 | 0 |
 | `packages/qf-kernel/src/registry-drift.ts` | 56+ | 0 | 0 |
 | `packages/qf-kernel/src/upgrade.ts` | 56+ | 3 | 0 |
-| `collab-electron/src/main/file-filter.ts` | 51+ | 2 | 0 |
+| `collab-electron/src/main/file-filter.ts` | 52+ | 2 | 0 |
 | `packages/qf-kernel/src/db.ts` | 51+ | 4 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
@@ -471,7 +472,7 @@ mechanism behind the invariant below, not a promise about it.
 | `ipcRequest` | 284 | 0 | 4 | 0 | 273 |
 | `ipcPush` | 7 | 0 | 4 | 0 | 550 |
 | `persistence` | 25 | 27 | 0 | 0 | 509 |
-| `lifetime` | 6 | 64 | 0 | 0 | 491 |
+| `lifetime` | 6 | 65 | 0 | 0 | 490 |
 | `packaging` | 233 | 0 | 0 | 123 | 205 |
 | `ownership` | 21 | 0 | 0 | 362 | 178 |
 | `reach` | 238 | 3 | 0 | 320 | 0 |

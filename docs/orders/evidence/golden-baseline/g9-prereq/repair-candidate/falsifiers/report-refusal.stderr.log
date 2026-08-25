@@ -1,0 +1,19 @@
+run.ts:
+kernel: path=:memory: provenance=env journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+artifact-root live receipt report_refusal RED: text=accepted; artifacts=1->1; events=5->5
+414 |           artifactsBeforeRefusal === artifactsAfterRefusal &&
+415 |           eventsBeforeRefusal === eventsAfterRefusal,
+416 |         `text=${refusalText}; artifacts=${artifactsBeforeRefusal}->${artifactsAfterRefusal}; events=${eventsBeforeRefusal}->${eventsAfterRefusal}`,
+417 |       ) && ordinaryOk;
+418 |
+419 |     if (!ordinaryOk) throw new Error("live AgentOS runTurn trajectory proof failed");
+                                     ^
+error: live AgentOS runTurn trajectory proof failed
+      at runLiveAgentHostProof (C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\run.ts:419:32)
+      at async <anonymous> (C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\run.ts:464:11)
+(fail) G9 live AgentOS runTurn publishes one trajectory [187.00ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [306.00ms]
+artifact-root FAIL: artifact-root: live AgentOS runTurn test exited 1
