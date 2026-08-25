@@ -1,6 +1,6 @@
 # WO-GOLDEN-G2 — Retire unbuilt and superseded residue
 
-status: **DRAFT — READER REQUIRED; NO BUILD AUTHORITY**
+status: **READER ROUND 1 DEFECTS LANDED — FINAL RE-READ REQUIRED; NO BUILD AUTHORITY**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G2 — unbuilt and superseded residue
@@ -144,7 +144,9 @@ In `qa/gates/artifact-root/run.ts`:
 - keep the exhaustive direct `publish_artifact` production scan;
 - change its exact expected publisher set from `a2a-bus.ts, agent-host.ts` to
   `agent-host.ts` only;
-- retain the coverage floor and proof that `agent-host.ts` was actually scanned.
+- delete the obsolete `sawA2a` coverage requirement with no replacement;
+- retain `MIN_MAIN_FILES` and require `sawHost === true`, proving that the scan
+  covered a real production surface and `agent-host.ts` specifically.
 
 The gate must still fail if `agent-host.ts` stops using the production writer,
 publishes outside the resolved root, or any additional direct production
@@ -154,13 +156,21 @@ may not relax publisher exhaustiveness.
 ### D2 — Shared package-resource paths
 
 In `collab-electron/scripts/package-lib/shared-paths.test.ts`, replace the two
-orphan species source reads with at least two current production consumers of
-`./package-resource-paths`, selected from `agent-host.ts`,
-`host-native-tui.ts`, and `runtime-adapter.ts`.
+orphan species source reads with these two distinct current production
+consumers:
+
+- `src/main/host-native-tui.ts`;
+- `src/main/runtime-adapter.ts`.
+
+Strip comments before checking. For each file, assert a real named import from
+`./package-resource-paths` and at least one call of a name imported by that
+statement. A comment, filename string, unused import, or call to an unrelated
+local function must not satisfy the test.
 
 Keep the package-inspection re-export assertion and the exact meta/allowlist path
-expectations. The test must fail if package inspection or current production
-consumers stop using the shared path module.
+expectations. The current Electron build must also pass, so a syntactically valid
+but unresolved import/call cannot green the proof. The test must fail if package
+inspection or either named current consumer stops using the shared path module.
 
 ### D3 — One skin
 
@@ -171,7 +181,20 @@ add a replacement exception or relax the token/palette rules.
 
 Do not replace `r13-consumer-workflow.check.ts` or `charter-101.md` with new
 active-tree fixtures. Their valid current invariants must be named in the G2
-evidence mapping and remain protected by already-current gates.
+evidence mapping and remain protected by these exact current receipts:
+
+- `bun qa/run.ts research-director-front-door` — durable Mission and Director
+  admission/session path;
+- `bun qa/run.ts kernel-market-lineage` — Dataset, Hypothesis, Run, supporting
+  Evaluation, governed Report lineage, and red empty/fabricated lineage baits;
+- `bun qa/run.ts governed-review` — strict evaluation/publication/refusal and
+  replay contract;
+- `bun test qa/gates/research-world-visible.test.ts` — current research-world
+  object/link projection contract.
+
+All four commands are part of the focused matrix. G2 does not run the slow live
+research-world or technique-outcome journey merely to retire the superseded R13
+wrapper.
 
 ## Deliverable E — Keep Atlas honest on current subjects
 
@@ -187,11 +210,24 @@ This is test-fixture maintenance, not Atlas capability work.
    founder disposition superseded and retired those source-bound decisions.
 3. Retarget falsifier 42 to the current external-anchor case:
    `qa/gates/dock-production-inventory.ts` importing
-   `collab-electron/src/main/dock-profiles.ts`. Its meaning remains: an importer
-   outside product source anchors its target.
-4. Retarget falsifier 43 to the current `agent-host.ts` filename in the artifact
-   publisher assertion. Its meaning remains: a filename string in QA cannot
-   manufacture a `process-entry` verdict.
+   `collab-electron/src/main/dock-profiles.ts`. It must assert all three facts:
+   the gate contains the real import, the Atlas row's `importers` contains that
+   exact QA path, and the row is reachable. Removing the named importer edge
+   must make falsifier 42 red even if another external anchor still reaches the
+   target. Its meaning remains: an importer outside product source anchors its
+   target.
+4. Retarget falsifier 43 with the existing `withFiles` helper. Create only for
+   the falsifier run:
+   - `collab-electron/src/main/zz-vfy43-qa-string-subject.ts`, an otherwise
+     unimported product-scope file;
+   - `qa/gates/zz-vfy43-qa-string-assertion.ts`, which names
+     `zz-vfy43-qa-string-subject.ts` only inside an assertion string and never
+     imports or launches it.
+   Require the subject row to exist with `reach === "unreachable"`. The helper's
+   existing finally/signal restoration and final tree-neutrality assertion apply.
+   A reachable production file is not an acceptable subject because that would
+   let the falsifier pass by construction. The meaning remains: a filename
+   string in QA cannot manufacture a `process-entry` verdict.
 5. Update only the now-stale A2A-specific explanatory comments in
    `qf-atlas/generate.mjs` and `qf-atlas/reach.mjs`; do not change reachability
    semantics.
@@ -200,9 +236,17 @@ This is test-fixture maintenance, not Atlas capability work.
 
 The falsifier count may not shrink, falsifier numbers 42 and 43 may not be
 deleted, and all falsifiers must pass. Atlas must remain HARD RED 0. The seven
-deleted product-scope rows must disappear; no unrelated current-product file may
-become unreachable or acquire a stronger/weaker reach verdict without a named
-causal explanation in `AFTER.md`.
+deleted product-scope rows must disappear.
+
+Write `reach-before.tsv` and `reach-after.tsv` with one row per Atlas `reach`
+entry and columns `path`, `reach`, sorted `importers`, and sorted `imports`.
+Compare by exact `path` key. The only absent-after rows may be the seven deleted
+product-scope targets. For every surviving row, `reach` and `imports` must be
+byte-equal; `importers` may differ only by removing one of the six deleted main
+modules. No new product row or other delta is allowed. `AFTER.md` lists every
+surviving row whose importer set shrank and the exact deleted edge that caused
+it. This finite table is the Atlas causal-diff assertion; words such as
+"stronger" or "weaker" are not used as an unbounded acceptance condition.
 
 `qf-atlas/demolition-proof.md` and historical orders/evidence are G11 history
 compression surfaces, not G2 authority. Do not rewrite or archive them here.
@@ -220,6 +264,60 @@ Create:
 
 Use direct commands. Do not build a runner, manifest framework, JSON event
 stream or supervision wrapper.
+
+### Exact denominators and censuses
+
+Run the following literal target denominator before mutation. It must return the
+same eleven-path set as the frozen table, and every path must exist:
+
+```powershell
+$g2TargetPaths = @(
+  'collab-electron/src/main/a2a-artifact-store.ts',
+  'collab-electron/src/main/a2a-bus.ts',
+  'collab-electron/src/main/a2a-orchestra.ts',
+  'collab-electron/src/main/species-launch.ts',
+  'collab-electron/src/main/species-surface.ts',
+  'collab-electron/src/main/species-tools.ts',
+  'collab-electron/src/windows/shared/flow-cube/cube3d.js',
+  'collab-electron/qa/r13-consumer-workflow.check.ts',
+  'qa/fixtures/charter-101.md',
+  'collab-electron/docs/superpowers/specs/2026-03-23-ipc-workspace-graph-modularization-design.md',
+  'collab-electron/docs/superpowers/specs/2026-04-05-canvas-event-log-design.md'
+)
+$g2Tracked = @(git ls-files -- $g2TargetPaths)
+if ($g2Tracked.Count -ne 11 -or @($g2TargetPaths | Where-Object {
+  $_ -notin $g2Tracked -or -not (Test-Path -LiteralPath $_)
+}).Count -ne 0) { throw 'G2 target denominator mismatch' }
+```
+
+Run this same build/package census before deletion and after the post-edit build.
+Record the scanned-file denominator and require zero matches both times:
+
+```powershell
+$g2BuildNeedle = 'a2a-artifact-store|a2a-bus|a2a-orchestra|species-launch|species-surface|species-tools|cube3d|r13-consumer-workflow|charter-101'
+$g2BuildSurfaces = @('collab-electron/electron.vite.config.ts','collab-electron/package.json')
+$g2DeclarationHits = @(Select-String -LiteralPath $g2BuildSurfaces -Pattern $g2BuildNeedle)
+$g2OutFiles = @(Get-ChildItem -LiteralPath 'collab-electron/out' -Recurse -File -ErrorAction SilentlyContinue)
+$g2OutputHits = @($g2OutFiles | Select-String -Pattern $g2BuildNeedle)
+if ($g2DeclarationHits.Count -ne 0 -or $g2OutputHits.Count -ne 0) {
+  throw 'G2 target appears in build declaration or output'
+}
+```
+
+After deletion, require
+`@($g2TargetPaths | Where-Object { Test-Path -LiteralPath $_ }).Count -eq 0`.
+
+The before and final product-process census is exactly:
+
+```powershell
+@(Get-CimInstance Win32_Process | Where-Object {
+  $_.Name -match 'electron|hermes|wsl|node|bun' -and
+  $_.CommandLine -match 'QuantFlow-Ontology|qf-atlas|hermes'
+})
+```
+
+It must return an empty array. These snippets, their denominators, and their
+results appear in `BEFORE.md`, `AFTER.md`, and the command ledger.
 
 The candidate may contain only:
 
@@ -242,21 +340,26 @@ Dock inventory, Kernel/schema, Canvas, runtime adapter or R18 file may change.
 Run in this order after edits and generation:
 
 1. `bun test collab-electron/scripts/package-lib/shared-paths.test.ts`
-2. `bun qa/run.ts artifact-root`
-3. `bun qa/run.ts one-skin`
-4. `bun qa/run.ts observe-door`
-5. `bun qa/run.ts kernel-sole-writer-app`
-6. `bun qa/run.ts repo-shape`
-7. `bun qa/run.ts doc-links`
-8. `bun qa/run.ts rung-ladder`
-9. `bun qf-atlas/generate.mjs --check`
-10. `bun qf-atlas/falsify.mjs --receipt`
-11. `bun qf-atlas/ratchet.mjs`
-12. `bun run build` from `collab-electron`
-13. direct 11-path absence and build-output/package-input census
-14. `git diff --check`
-15. `git diff --cached --check`
-16. product-process census equals zero
+2. `bun qa/run.ts research-director-front-door`
+3. `bun qa/run.ts kernel-market-lineage`
+4. `bun qa/run.ts governed-review`
+5. `bun test qa/gates/research-world-visible.test.ts`
+6. `bun qa/run.ts artifact-root`
+7. `bun qa/run.ts one-skin`
+8. `bun qa/run.ts observe-door`
+9. `bun qa/run.ts kernel-sole-writer-app`
+10. `bun qa/run.ts repo-shape`
+11. `bun qa/run.ts doc-links`
+12. `bun qa/run.ts rung-ladder`
+13. `bun qf-atlas/generate.mjs --check`
+14. `bun qf-atlas/falsify.mjs --receipt`
+15. `bun qf-atlas/ratchet.mjs`
+16. `bun run build` from `collab-electron`
+17. exact 11-path absence and build-output/package-input census above
+18. exact path-keyed Atlas reach-table comparison above
+19. `git diff --check`
+20. `git diff --cached --check`
+21. exact product-process census above equals zero
 
 No release, installer, packaged-app, slow Hermes, full `--all`, or R18 gate is
 authorized. The build is sufficient to prove the deleted modules are absent
