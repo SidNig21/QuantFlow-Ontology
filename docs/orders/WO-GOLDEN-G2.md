@@ -1,6 +1,6 @@
 # WO-GOLDEN-G2 — Retire unbuilt and superseded residue
 
-status: **READER ROUND 1 DEFECTS LANDED — FINAL RE-READ REQUIRED; NO BUILD AUTHORITY**
+status: **READER YES/YES — AWAITING NEXT.md AUTHORITY**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G2 — unbuilt and superseded residue
@@ -8,7 +8,7 @@ parent-group: G1 **CLOSED / ACCEPTED** at `8ebe35d7374ebca3752c94cf51a676a58e1ed
 r18-authority: **FROZEN**
 main-authority: **NONE**
 release/package-authority: **NONE**
-rework: no implementation lap is authorized by this draft
+rework: no implementation lap is authorized until `NEXT.md` rotates to this order
 
 ## Outcome
 
