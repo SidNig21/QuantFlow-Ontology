@@ -1,0 +1,21 @@
+COMMAND_START_UTC=2026-08-25T06:28:34.7354000Z
+COMMAND=bun qa/run.ts artifact-root
+artifact-root:qf-kernel: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [100.00ms]
+bun install v1.3.12 (700fc117)
+
++ @types/bun@1.3.14
++ qf-kernel@../../../packages/qf-kernel
+
+16 packages installed [589.00ms]
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+artifact-root FAIL: artifact-root: production writer did not create publishable bytes: KernelError: publish_artifact report requires evaluation_id
+FAIL  artifact-root
+COMMAND_END_UTC=2026-08-25T06:28:35.9847984Z
+EXIT=1

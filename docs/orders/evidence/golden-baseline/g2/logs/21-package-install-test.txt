@@ -1,0 +1,17 @@
+COMMAND_START_UTC=2026-08-25T06:28:20.4585435Z
+COMMAND=bun test qa/package-install.test.ts
+bun test v1.3.12 (700fc117)
+
+qa\package-install.test.ts:
+(pass) shared frozen package install > keeps the Windows copyfile and isolated linker contract explicit
+(pass) shared frozen package install > uses hardlink only for the exact Electron typecheck package
+permanent-copy-failure: bun install --frozen-lockfile --backend copyfile --linker isolated exited 1; the original Bun install error above is authoritative (no retry was attempted)
+(pass) shared frozen package install > permanent copy failures remain red
+(pass) shared frozen package install > preserves qf-kernel-schema ignore rules at the repository root [859.00ms]
+
+ 4 pass
+ 0 fail
+ 24 expect() calls
+Ran 4 tests across 1 file. [934.00ms]
+COMMAND_END_UTC=2026-08-25T06:28:21.4742147Z
+EXIT=0

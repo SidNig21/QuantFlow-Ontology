@@ -548,6 +548,34 @@ meaning and the modified semantic body together; only then may the Builder
 resume items 7-21. G12 still owns whole-program clean install/package/operations
 qualification and the separately recorded historical Windows install debt.
 
+### Matrix item 6 semantic stop — G9 prerequisite
+
+The authorized launcher correction passed its existing helper unit test and
+reached the real artifact-root semantic body. It then stopped at the unchanged
+live production writer:
+
+`publish_artifact report requires evaluation_id`
+
+The exact receipt is
+`docs/orders/evidence/golden-baseline/g2/logs/21-matrix-06-artifact-root-helper.txt`,
+SHA-256
+`553F43834222DD82191BF2BA0543E175699B50CB938EA7F3AAD1A242A766BC8D`.
+
+Fresh semantic Reader task `01a0379c-af16-7fc0-b059-0667babd2d16` proved that
+ordinary completed session output is a durable `trajectory` Artifact, while a
+`report` requires the accepted independent Evaluation lineage. The live
+`agent-host.ts` path calls `writeAgentReportArtifact()`, whose publication input
+is hard-coded as `report` without `evaluation_id`; the Kernel correctly refuses
+it. This is a current-product Report-authority defect, not a G2 fixture defect.
+The binding receipt is
+`docs/orders/evidence/golden-baseline/g2/REPORT-AUTHORITY-BLOCKER-READER.md`.
+
+G9 owns the repair under ADR-0004. G2 may not inject a fixture Evaluation,
+relabel only the gate, weaken the positive writer/root/hash proof, or continue
+to items 7-21. Preserve the G2 working diff and stop. Resuming G2 requires a
+separately authorized, independently verified G9 prerequisite and a new G2
+authority SHA; no mutating group may overlap.
+
 ## Independent Verifier
 
 One fresh read-only Verifier binds to the immutable candidate and reruns:
