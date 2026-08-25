@@ -1,6 +1,6 @@
 # WO-GOLDEN-G9 — One governed Report authority
 
-status: DRAFT / READER REQUIRED
+status: PARKED AFTER G8 / NOT BUILD AUTHORITY
 kind: Golden Baseline Phase 2 surgical group
 owner: Router
 build-authority: NO until fresh Reader YES/YES and NEXT.md rotation
@@ -13,18 +13,24 @@ QuantFlow publishes exactly one current governed conclusion for one Mission,
 Technique version, and research state, preserves older conclusions as explicit
 history, and restores the same authority after restart.
 
-## Why G9 advances ahead of G2
+## Dependency-order adjudication
 
 G2 reached the live production artifact writer and proved that ordinary session
 completion is currently hard-coded as `kind: "report"` without an Evaluation.
 The Kernel correctly refused it. Fresh semantic Reader task
 `01a0379c-af16-7fc0-b059-0667babd2d16` assigned that production-bearing defect
 to G9 and proved G2 cannot honestly pass its writer/root/hash non-regression
-without this repair.
+without a Report-authority-owned repair.
 
-This is the complete named G9 group from the Phase-1 disposition, not a G9a or a
-G2 scope expansion. G2 remains paused; its working diff is preserved and no G2
-candidate exists. G8's separate market-lineage/schema proof defect remains G8.
+Fresh read-only dependency adjudication task
+`01a037ab-2506-78d0-a969-42c5d78f3446` then proved that full G9 crosses
+unresolved G8 `qf_review_*` write-law ownership and would stale G8's frozen
+source baseline. It also proved the ordinary-completion trajectory repair is
+separable.
+
+Therefore this complete G9 order remains parked after G8 in the original Golden
+sequence. `WO-GOLDEN-G9-PREREQ.md` is the only authorized route to unblock G2.
+G2 remains paused; its working diff is preserved and no G2 candidate exists.
 G10's Canvas/runtime work remains G10.
 
 ## Fixed authority
