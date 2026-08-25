@@ -1,0 +1,32 @@
+
+collab-electron\src\main\governed-review.test.ts:
+(pass) R15 production governed-review seams > critic policy is exact and least privilege
+(pass) R15 production governed-review seams > request review crosses preload and Main IPC, and block literals are order-owned
+(pass) R15 production governed-review seams > production critic Mission uses the exact ordered findings contract
+(pass) R15 production governed-review seams > sidecar shutdown exit preserves the durable Task/session/link snapshot
+kernel: path=:memory: provenance=env journal=memory sync=2 schema_meta=89
+(pass) R15 production governed-review seams > normal continuation binds worker lineage, admits one review, delivers once, and publishes supports [1063.00ms]
+
+packages\qf-kernel\src\r15-governed-review.test.ts:
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > freezes the tuple, requires exact reads, canonicalizes findings, and publishes supports [31.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > all three governed modes preserve exact Task, identity-link, support, attempt, and event cardinality [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > successful delivery keeps the ontology Task open and stopped-critic failure cancels only its matching Task [32.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > a critic that returns twice without an Evaluation fails only the review Task with a durable reason [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > admission boundary failure rolls back Task, links, review row, attempt, receipt, and event residue [16.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > invalid source work refuses before critic admission and duplicate attempts replay
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > malformed source delegated_by refuses with only one replayable refusal receipt, attempt, and event [15.00ms]
+kernel: path=:memory: provenance=explicit journal=memory sync=2 schema_meta=89
+(pass) R15 governed review > strict rubric thresholds and findings references reject atomically [32.00ms]
+
+ 13 pass
+ 0 fail
+ 117 expect() calls
+Ran 13 tests across 2 files. [1363.00ms]

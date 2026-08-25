@@ -1,0 +1,6 @@
+g9-prereq-bootstrap: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [74.00ms]

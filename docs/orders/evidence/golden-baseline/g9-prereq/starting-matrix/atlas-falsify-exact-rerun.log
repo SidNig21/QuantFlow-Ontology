@@ -1,0 +1,201 @@
+qf-atlas falsifiers — each injects a real defect, then restores
+
+  PASS   1. unreachable IPC handler is detected
+        bucket=safe-leftover
+  PASS   2. broken preload -> main channel is detected
+        status=dead
+  PASS   3. ungoverned domain write is detected
+        domain-truth / medium
+  PASS   4. transport SQL is NOT falsely flagged
+        1 finding(s), governance=compliant
+  PASS   5. governed Kernel internals are NOT falsely flagged
+        deterministic-execution.ts: 4 finding(s), 0 violation(s)
+  PASS   6. unreaped worker is detected
+        status=unreaped
+  PASS   7. duplicate handler for one channel is detected
+        2 owners
+  PASS   8. coverage ledger is complete, unique and well-formed
+        439 rows, all unique and legal; 75 findings all carry sourceClass
+  PASS   9. no finding survives the code it points at
+        all 13 strip candidates still exist in the source they name
+  PASS  10. stale map fails --check
+        --check exited non-zero on moved code
+  PASS  11. handle + on is protocol variants, NOT duplicate owner
+        duplicate_owner=false protocol_variants=2
+  PASS  12. two handle registrations is a duplicate owner
+        mode=invoke, 2 owners
+  PASS  13. SQL attributable to no symbol becomes a coverage gap, not silence
+        coverage=partial sqlInText=1 sqlIndexed=0 finding=false
+  PASS  14. active app bypass to domain SQL is high-confidence red
+        domain-truth/high, wire=cheats, hop4=cheats
+  PASS  15. META: a [false, …] tuple cannot be counted as a pass
+        record() threw TypeError
+  PASS  16. headline counts equal the canonical model
+        stats.violations=10 vs persistence=10; gray 3 vs 3
+  PASS  17. transport SQL is not a violation in JSON or Markdown
+        json=clean markdown=clean
+  PASS  18. coverage gaps appear in the agent brief
+        22 gaps in model; brief shows section=true
+  PASS  19. protocol variants are investigate, not duplicate-owner
+        2 variants, dispositions=investigate, inBrief=true
+  PASS  20. static-only findings are removal candidates, not safe deletes
+        phrased as removal candidate
+  PASS  21. INSERT OR IGNORE is caught, not read as clean
+        violation=true hop4=cheats coverage=indexed
+  PASS  22. same-named functions in different files stay distinct
+        mine=violation/mission files=3
+  PASS  23. evidence line numbers are file-relative
+        every violation line contains its table
+  PASS  24. createReviewTask is a bypass, not kernel-internal gray
+        violation/bypass task+links=2/2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b9ab8749ea4e95fda44aad870149e8d6647b6b556d36aba142115070253ce840 artifactHashAfter=b9ab8749ea4e95fda44aad870149e8d6647b6b556d36aba142115070253ce840 sourceRestored=true restored=true
+  PASS  25. channel-name UPDATE/DELETE does not gray a file
+        coverage=indexed unrecognised=0
+  PASS  26. typed-brace SQL does not leave hop 4 read-only
+        hop4=cheats coverage=indexed violation=true
+  PASS  27. an unimported file is unreachable
+        reach=unreachable
+  PASS  28. core Kernel files are never reported unreachable
+        db.ts, execute.ts, create.ts all reachable
+  PASS  29. spawned workers are process entries, not dead
+        3 worker file(s), 0 wrongly dead
+  PASS  30. every file carries a complete blast radius
+        239 entries, all 7 fields present; e.g. kernel.ts has 8 direct dependants
+  PASS  31. a new finding arrives as undecided
+        verdict=undecided
+  PASS  32. a recorded verdict clears undecided
+        verdict=remove undecided 42 -> 41
+  PASS  33. bare 'accepted' cannot hide a finding
+        verdict=undecided (accepted is missing owner, reason, remediation_trigger, review_or_expiry — it does not count as a decision)
+  PASS  34. a window the build never compiles is not an entrypoint
+        11 built window(s), 0 unbuilt, 0 laundered
+  PASS  35. the generator fails closed when it cannot parse renderer entries
+        generator refused to produce a map
+  PASS  36. a broken bridge call is never a false accusation
+        1 broken call(s), all absent from the preload, all with evidence
+  PASS  37. every build input is an entrypoint, not deletable debt
+        7 code entries, all entrypoint
+  PASS  38. files a package re-exports are not deletable debt
+        2 re-exported file(s), none reported unreachable
+  PASS  39. test-only is a verdict that actually occurs
+        2 test-only: insert.ts, task-governance.ts
+  PASS  40. no product file is silently missing from the reach analysis
+        241 product files, all present in reach
+  PASS  41. alias-resolved imports keep their target reachable
+        45 component files, none unreachable
+  PASS  42. an importer outside the product still anchors its target
+        reach=reachable, importers=qa/gates/artifact-root/run.ts
+  PASS  43. a filename in a QA assertion does not confer process-entry
+        reach=unreachable
+  PASS  44. a live main -> renderer push channel is detected
+        34 live of 47, e.g. pty:data (3 send sites, 1 listeners)
+  PASS  45. a push listener with no sender is detected
+        status=no-sender disposition=INVESTIGATE inLedger=true
+  PASS  46. tunnelled push channels are resolved, not reported orphan
+        14 tunnelled channels, none orphaned; shell:forward itself classified as tunnel
+  PASS  47. a fixed-channel helper's payload strings are not channels
+        0 payload strings as channels; canvas:rpc-request present as live
+  PASS  48. AST resolves the facts regex got wrong
+        ts=5.9.3 kernel.ts lifetime=not-applicable governed-review persistence=indexed
+  PASS  49. every scanned file has a cell for every analyzer
+        561 files × 8 analyzers, no empty cells
+  PASS  50. every non-clean coverage cell carries a named reason
+        unexplained=0; every partial/unsupported/dynamic cell names its blocker
+  PASS  51. the write door is derived from the Kernel, not from a filename list
+        state=partial dispatched=17/43 door=6 files; divergence from the allowlist=8
+  PASS  52. a renamed dispatcher makes the door unknown, not green
+        state=unknown -- no function named `execute` was found in the Kernel; the dispatc
+  PASS  53. the filename allowlist no longer confers compliance
+        28 trusted site(s), every one in a derived door file
+  PASS  54. the authority swap loses no confirmed violation
+        10 confirmed violation(s) across 3 file(s); governed-review.ts red=true
+  PASS  55. classification refuses to run without a derived door
+        throwsWithoutDoor=true allowlistImportRemoved=true
+  PASS  56. a second responsibility owner is found despite an unrelated name
+        claimant found, weight=strong
+  PASS  57. removing the second owner clears the ownership finding
+        8 genuine claimants, no fixture residue
+  PASS  58. a transport module is not reported as a responsibility owner
+        no transport module is credited with owning a responsibility
+  PASS  59. every north-star loop appears in the model
+        11 loops, exactly the ratified set
+  PASS  60. evidence tiers are not collapsed into one green
+        11 loops x 4 tiers, all present, every unproven tier gives a reason, 0 overclaimed
+  PASS  61. moving a finding to another line preserves its id
+        25 ids identical, evidence lines shifted
+  PASS  62. the diff detects an introduced and a resolved violation
+        added=true resolved=true forwardVerdict=worse
+  PASS  63. a coverage regression is reported as worse, not better
+        verdict=worse coverageWorse=1
+  PASS  64. the ratchet fails on a red the baseline does not know
+        exit=1 sawNewRed=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=32b7b26158ee2af2898cfb957f594b438f04824a0ae625cae44b70e18efa533b artifactHashAfter=32b7b26158ee2af2898cfb957f594b438f04824a0ae625cae44b70e18efa533b sourceRestored=true restored=true
+  PASS  65. the baseline refuses to seed without an independent receipt
+        exit=2 refused=true baselineUnchanged=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=32b7b26158ee2af2898cfb957f594b438f04824a0ae625cae44b70e18efa533b artifactHashAfter=32b7b26158ee2af2898cfb957f594b438f04824a0ae625cae44b70e18efa533b sourceRestored=true restored=true
+  PASS  66. adding an analyzer file does not make the map stale
+        fingerprint unchanged by a new qf-atlas module
+  PASS  67. the HTML reads no model field that does not exist
+        14 model fields read by the HTML, all present
+  PASS  68. every canonical dimension reaches Markdown and HTML
+        5 dimensions present in JSON, Markdown and HTML
+  PASS  69. a governed handler is not called cheats by a name-walk
+        create_task hop4=write-door/live; 0 cheats verdict(s) with no confirmed violation behind them
+  PASS  70. every undecided finding names its blocker
+        42 undecided, all blockered: {"founder-decision":22,"ast-coverage":3,"package-proof":17}
+  PASS  71. no output tells anyone something is safe to delete
+        absent from all three outputs
+  PASS  72. the coverage roll-up accounts for every analyzer
+        561 rows, no green roll-up hides a gap
+  PASS  73. the push coverage dimension is measured, not copied
+        277 of 561 rows differ between ipcPush and ipcRequest
+  PASS  74. hop 4 and persistence answer to the same derived door
+        hop4UsesDerivedDoor=true briefPrintsRetiredList=false
+  PASS  75. every HIGH persistence red carries an AST reach proof
+        2 HIGH row(s), including the temporary bypass, all with an AST path (hops: 1,1); baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=15338875ad60dca211db6154683949a8f555f559f4027095edb84edc81a5963c artifactHashAfter=15338875ad60dca211db6154683949a8f555f559f4027095edb84edc81a5963c sourceRestored=true restored=true
+  PASS  76. breaking the reach edge downgrades the row out of HIGH
+        confidence=medium governance=violation; unproven HIGH rows anywhere = 0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=15338875ad60dca211db6154683949a8f555f559f4027095edb84edc81a5963c artifactHashAfter=15338875ad60dca211db6154683949a8f555f559f4027095edb84edc81a5963c sourceRestored=true restored=true
+  PASS  77. a compliant function does not inherit cheats from its file
+        every cheats verdict names a confirmed violating function
+  PASS  78. hard red excludes medium and non-AST classes
+        hardRed=0 medium=0 lifetime=0 bridge=0 unproven=0 ownership=0
+  PASS  79. seeding refuses unadjudicated or KEEP hard reds
+        unadjudicated seeded=0 keep seeded=0 adjudicated seeded=0/0
+  PASS  80. a domain write in a class method is adjudicated, not invisible
+        fn=WidgetStore.persistWidgetRow persistence=domain-truth governance=unknown/low
+  PASS  81. a same-named decoy cannot forge or suppress a reach proof
+        baitHigh=high forgedProofs=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=86cc991ff66b6634dd6ceaa6118ba0b24fe1de19f2c725fc3920df54ce365d4f artifactHashAfter=86cc991ff66b6634dd6ceaa6118ba0b24fe1de19f2c725fc3920df54ce365d4f sourceRestored=true restored=true
+  PASS  83. medium bookkeeping DDL cannot make a wire cheats or break a loop
+        fixture hop4=reaches-sql findings=1 (medium/non-domain-store) promotedToHardRed=0 unbackedCheatsWires=0 loopsBrokenWithoutAHardRed=0
+  PASS  84. legacy or incomplete decision metadata cannot seed the baseline
+        legacy(why)=refused partial(no trigger)=refused canonical=seeded legacyFieldsOnDisk=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=9ef9ca839966930c919cdbdb016cafcf04e0bdf7948cd1d14509e3b44308a4da artifactHashAfter=9ef9ca839966930c919cdbdb016cafcf04e0bdf7948cd1d14509e3b44308a4da sourceRestored=true restored=true
+  PASS  85. a computed callee becomes a named coverage blocker, never silent clean
+        worst=unsupported cellsNamingTheGap=reach blockeredAsAstCoverage=1 unexplained=false
+  PASS  86. a same-named SQL-free helper cannot inherit another module's hard red
+        decoy hop4=read-only cites=0 cheatsWiresNotReachingWhatTheyCite=0 baitWireBacked=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=d7ca571928cbd8fdaf2575b00bfd7ff5d2a6c8f7a6561efdc41c37c6dc339f78 artifactHashAfter=d7ca571928cbd8fdaf2575b00bfd7ff5d2a6c8f7a6561efdc41c37c6dc339f78 sourceRestored=true restored=true
+  PASS  87. a class-method hard red cannot render as read-only at hop 4
+        fn=VfyStore.vfyPersistTaskRow domain-truth/high hardRed=true hop4=cheats hop4ReachesTheMethod=true
+  PASS  88. an app-code domain write is hard red; the same write unreached is not
+        reached: high/proof=true hardRed=true hop4=cheats · unreached: medium/blocker=ast-coverage hardRed=false
+  PASS  89. same table+verb in two functions is two findings; twice in one is one with both lines
+        findings=3 distinctFunctions=3 (expect 3/3) vfyTwiceBypass evidence lines=[8,9] (expect 2)
+  PASS  90. an interrupted run restores the tree, fixtures included
+        listener-invoked (win32: no deliverable signal) · childExit=130 handlerRan=true treeIdentical=true
+  PASS  91. one date authority: free text and past dates are refused everywhere
+        absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  92. a test-only caller cannot corroborate a production reach proof
+        testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  93. an unimported same-named sibling cannot be reached or cited
+        handlerReachedUnimportedSibling=false hop4=read-only dangerStillSeen=true dangerHardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  94. same-named class methods stay distinct and neither forges a proof
+        rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  95. a direct barrel re-export is coverage-limited, not read-only or hard red
+        hop4=unknown status=unreached hardRed=false finding=medium/ast-coverage boundary=direct-barrel-re-export targetAttributed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  96. a coincidental same-named rejected binding remains read-only
+        hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  97. an imported-binding mismatch stays read-only with no barrel boundary
+        hop4=read-only boundary=absent persistBoundary=false reachedDanger=false danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  98. a named-import alias preserves the bounded barrel boundary
+        hop4=unknown status=unreached boundary=direct-barrel-re-export local=p imported=zzVfy98Persist targetAttributed=false finding=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 artifactHashAfter=b80a1c6157c6e725cc1a18d4812549e6558777a321d4f674fe48e65315094210 sourceRestored=true restored=true
+  PASS  82. an ordinary falsifier run leaves the tracked tree byte-identical
+        git status --porcelain identical before and after (0 pre-existing entries)
+
+98/98 falsifiers pass
+receipts written to qf-atlas/falsifiers.json

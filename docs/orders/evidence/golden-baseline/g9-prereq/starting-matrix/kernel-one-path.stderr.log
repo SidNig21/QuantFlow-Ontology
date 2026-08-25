@@ -1,0 +1,13 @@
+kernel-one-path G1: offenders outside allowlist:
+  - packages/qf-kernel/src/r11a-deterministic-execution.test.ts (kernel.db path construction/literal)
+  - qa/gates/dev-dock-readiness.ts (kernel.db path construction/literal)
+  - qa/gates/founder-steering.ts (kernel.db path construction/literal)
+  - qa/gates/pre-r18-coherence.ts (kernel.db path construction/literal)
+  - qa/gates/r17-founder-kernel-compatibility.ts (kernel.db path construction/literal)
+  - qa/gates/r17-guided-technique-consumer.ts (kernel.db path construction/literal)
+  - qa/gates/research-director-delegation.ts (kernel.db path construction/literal)
+  - qa/gates/research-director-front-door.ts (kernel.db path construction/literal)
+  - qa/gates/research-world-visible.ts (kernel.db path construction/literal)
+  - qa/gates/team-composition-ui.ts (kernel.db path construction/literal)
+  - qa/gates/team-composition.ts (kernel.db path construction/literal)
+  - qa/gates/technique-outcome-loop.ts (kernel.db path construction/literal)
