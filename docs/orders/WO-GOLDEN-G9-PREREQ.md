@@ -54,9 +54,10 @@ For that turn:
 writer—`text` when non-empty, otherwise the existing literal
 `(empty agent output)`. The Artifact row must satisfy:
 
-- returned bytes compare byte-for-byte equal to separately read `diskBytes`;
-- `row.id === row.content_hash === sha256(diskBytes)`;
-- `row.storage_ref === returned path`;
+- `returned.bytes` compare byte-for-byte equal to separately read `diskBytes`;
+- `row.id === row.content_hash`;
+- `row.id === sha256(diskBytes)`;
+- `row.storage_ref === returned.path`;
 - both resolved paths remain beneath the resolved artifact root.
 
 This derives from existing Kernel truth. It adds no ontology type, action, link,
@@ -88,7 +89,7 @@ The retained artifact-root semantic gate creates one known Kernel
 and independently asserts:
 
 - `kind === "trajectory"`;
-- `storage_ref === returned path`;
+- `storage_ref === returned.path`;
 - the exact bytes, byte count, hash identity, and root confinement above;
 - exactly one matching `produces` link and zero wrong/duplicate producer links;
 - zero ordinary-completion Report Artifacts;
@@ -99,7 +100,8 @@ Each smallest break must turn a named receipt red:
 1. kind back to `report` → `ordinary_kind` red;
 2. producer link omitted or duplicated → `producer_link_count` red;
 3. wrong session or direction → `producer_link_identity` red;
-4. returned/disk bytes differ → `bytes_identity` names both byte counts and is red;
+4. returned/disk bytes differ → `bytes_identity` records both byte counts,
+   both SHA-256 digests, and the failed byte-equality result, then is red;
 5. row id/content hash differs from disk SHA-256 → `hash_identity` names all
    three values and is red;
 6. row storage reference differs from returned path → `storage_ref_identity`
@@ -135,17 +137,19 @@ Golden group, or G2 deletion target is in scope.
 Before Builder mutation, freeze against the clean prerequisite starting SHA with
 these exact commands and receipts:
 
-1. `bun qa/run.ts artifact-root` — starting SHA records the pre-existing raw
-   package-install red; after the allowed mechanical launcher delegation it must
-   reach the writer, where the pre-existing semantic red is the unevaluated
-   Report attempt;
-2. `bun qa/run.ts governed-review` — `PASS  governed-review`;
-3. `bun qa/run.ts kernel-one-path` — `PASS  kernel-one-path`;
-4. `bun qa/run.ts kernel-sole-writer` — `PASS  kernel-sole-writer`;
-5. `bun qf-atlas/generate.mjs --check` — exit `0`;
-6. `bun qf-atlas/falsify.mjs --receipt` — exit `0`, receipt preserved;
-7. `bun qf-atlas/ratchet.mjs` — exit `0`, no new hard red;
-8. `git diff --check <starting-sha>...<candidate-sha>` — exit `0` after the
+1. `bun qa/run.ts artifact-root` at the clean starting SHA writes
+   `artifact-root.starting-sha.log` and records the pre-existing raw
+   package-install red;
+2. after only the allowed mechanical launcher delegation, the same command
+   writes `artifact-root.candidate-launcher.log`, reaches the writer, and
+   records the pre-existing semantic red from the unevaluated Report attempt;
+3. `bun qa/run.ts governed-review` — `PASS  governed-review`;
+4. `bun qa/run.ts kernel-one-path` — `PASS  kernel-one-path`;
+5. `bun qa/run.ts kernel-sole-writer` — `PASS  kernel-sole-writer`;
+6. `bun qf-atlas/generate.mjs --check` — exit `0`;
+7. `bun qf-atlas/falsify.mjs --receipt` — exit `0`, receipt preserved;
+8. `bun qf-atlas/ratchet.mjs` — exit `0`, no new hard red;
+9. `git diff --check <starting-sha>...<candidate-sha>` — exit `0` after the
    immutable candidate exists.
 
 Record every pre-existing red before mutation and assign it to its named Golden
