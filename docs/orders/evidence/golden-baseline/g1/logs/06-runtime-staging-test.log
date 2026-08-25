@@ -1,0 +1,10 @@
+bun test v1.3.12 (700fc117)
+
+collab-electron\scripts\package-lib\runtime-staging.test.ts:
+(pass) runtime staging inventory > normal production staging contains packaged species only
+(pass) runtime staging inventory > QA staging explicitly adds deterministic proof fixtures
+
+ 2 pass
+ 0 fail
+ 5 expect() calls
+Ran 2 tests across 1 file. [83.00ms]

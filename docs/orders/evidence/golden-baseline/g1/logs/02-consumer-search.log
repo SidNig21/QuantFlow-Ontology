@@ -1,0 +1,9 @@
+docs/orders/evidence/r16/BUILD-REPORT.md:425:wrote qf-atlas/atlas-diff.json
+docs/orders/evidence/r16/BUILD-REPORT.md:430:generated projections committed with the candidate. `atlas-diff.json` is
+docs/orders/evidence/r16/BUILD-REPORT.md:662:wrote qf-atlas/atlas-diff.json
+docs/orders/evidence/r16/BUILD-REPORT.md:822:wrote qf-atlas/atlas-diff.json
+docs/orders/evidence/r16/BUILD-REPORT.md:827:added. atlas-diff.json is ignored and was not included in the candidate.
+docs/orders/evidence/r16/BUILD-REPORT.md:1418:semantic code was changed. `atlas-diff.json` is ignored and was not staged.
+docs/orders/evidence/r16/BUILD-REPORT.md:1714:wrote qf-atlas/atlas-diff.json
+git-grep-exit=0
+rg-exit=1

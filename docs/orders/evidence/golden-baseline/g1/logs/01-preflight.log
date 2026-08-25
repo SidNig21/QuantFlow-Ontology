@@ -1,0 +1,41 @@
+ORDER_CANDIDATE_SHA=f0992b6
+BUILD_BASE_SHA=57fc4ff711848bbb7f668f608e7478d407dc14f4
+HEAD=57fc4ff711848bbb7f668f608e7478d407dc14f4
+STATUS_COUNT=0
+TRACKED_COUNT=14
+collab-electron/.package-staging-test/species/hermes/dock-profiles.json
+collab-electron/.package-staging-test/species/hermes/launch.json
+collab-electron/.package-staging-test/species/hermes/packed/hermes.aospkg
+collab-electron/.package-staging-test/species/hermes/packed/hermes.meta.json
+collab-electron/.package-staging-test/species/hermes/tools-allowlist.json
+collab-electron/.package-staging-test/tools/qf-proof-agent/dock-profiles.json
+collab-electron/.package-staging-test/tools/qf-proof-agent/launch.json
+collab-electron/.package-staging-test/tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+collab-electron/.package-staging-test/tools/qf-proof-agent/packed/qf-proof-agent.meta.json
+collab-electron/.package-staging-test/tools/qf-proof-agent/packed/qf-proof-agent.mjs
+collab-electron/.package-staging-test/tools/runtime-proof/dock-profiles.json
+collab-electron/.package-staging-test/tools/runtime-proof/launch.json
+collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.aospkg
+collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.meta.json
+TARGET_COUNT=17
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\species\hermes\dock-profiles.json|bytes=729|sha256=EE738B213FCB57260B2DC05F2D64A14DB90745C5598B48476EED98CBCDC33152
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\species\hermes\launch.json|bytes=211|sha256=DB349C1C2B294464A135254AD9060876139D857C9BBE5695E5BB267EA97EDFD2
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\species\hermes\packed\hermes.aospkg|bytes=23217|sha256=72DF9FC47735F5E65190D6EF2BBACB03D9C24B9406D8D51F83E7DD9F8BCD8D95
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\species\hermes\packed\hermes.meta.json|bytes=501|sha256=E0D866E733AFE6E16F866D2FDC48D2866C6947169B91BE4DDE5F1F949DF25F8C
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\species\hermes\tools-allowlist.json|bytes=243|sha256=742F2F72166A06924BE05747C6537F16A48883B390404948B26A0853F51EDAE1
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\qf-proof-agent\dock-profiles.json|bytes=575|sha256=3866BDD388A64FE20A755A16289847CD124E709076E460DF064EA96EFA7805F9
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\qf-proof-agent\launch.json|bytes=169|sha256=2F2934F4C3745B7423465F3B3EC8292AA915810E527DB38AC9CA0F159BFF275E
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\qf-proof-agent\packed\qf-proof-agent.aospkg|bytes=44|sha256=12DF151804E5A3F402D6C553DBACC0DFA610992FE0881301480EF62887FE15AF
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\qf-proof-agent\packed\qf-proof-agent.meta.json|bytes=234|sha256=A5050269B71E2626261E010E6B7CF802F8F06A1965B3F2A87BC05AA97ACC1402
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\qf-proof-agent\packed\qf-proof-agent.mjs|bytes=3453|sha256=38C75FFACA66AC2AB40AC633FCCEAF140834E10419976940021CE0062D71182D
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\runtime-proof\dock-profiles.json|bytes=300|sha256=AAA4CDE80C24275C7C12FED3D2A21EA0D966E5FFE72D5A5D27D50EA57F698661
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\runtime-proof\launch.json|bytes=50|sha256=67D21A710620BE94EBECE6981EBE3409CD97184C6358E1A52F79F8C9AF386BE1
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\runtime-proof\packed\qf-toolloop.aospkg|bytes=22707147|sha256=A41C91A4C0E27776BBA630995A513B823A3B28BBFAD707FCFE89AB8C6E642AC6
+TARGET|C:\Users\rybow\QuantFlow-Ontology\collab-electron\.package-staging-test\tools\runtime-proof\packed\qf-toolloop.meta.json|bytes=85|sha256=8F3BA524895014496656A93A0CF216F6DB7C3B7F012DE6FF00F2467D96551C97
+TARGET|C:\Users\rybow\QuantFlow-Ontology\docs\goals\atlas-delete-authority\goal.md|bytes=12732|sha256=0C77F43A0ECB9170553A34AABA3A19AC29AD6F22F5CBAB92EC9BC9DCC37FCC77
+TARGET|C:\Users\rybow\QuantFlow-Ontology\docs\goals\atlas-delete-authority\state.yaml|bytes=5144|sha256=55C968B26B8D92AAB76B2E7035E3B4CCD5D586929142D358B4EE4E255ADC4A9B
+TARGET|C:\Users\rybow\QuantFlow-Ontology\qf-atlas\atlas-diff.json|bytes=679|sha256=1C59F23B02346B40EF65FC33F881D5739BA9EC2973CE44C7F282243038DF810C
+IGNORE|docs/goals/atlas-delete-authority/goal.md|.gitignore:10:docs/*	docs/goals/atlas-delete-authority/goal.md
+IGNORE|docs/goals/atlas-delete-authority/state.yaml|.gitignore:10:docs/*	docs/goals/atlas-delete-authority/state.yaml
+IGNORE|qf-atlas/atlas-diff.json|.gitignore:68:qf-atlas/atlas-diff.json	qf-atlas/atlas-diff.json
+PRODUCT_PROCESSES=[]

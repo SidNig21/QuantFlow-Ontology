@@ -1,0 +1,28 @@
+bun install v1.3.12 (700fc117)
+
++ @rivet-dev/agentos-toolchain@0.2.7
++ @types/bun@1.3.14
++ typescript@5.9.3
++ @agentclientprotocol/sdk@1.2.1
++ @rivet-dev/agentos@0.2.7
++ @rivet-dev/agentos-core@0.2.7
++ ai@7.0.31
++ zod@4.4.3
+
+408 packages installed [22.25s]
+pack-agent: ready qf-proof-agent
+$ node ./scripts/pack-agent.mjs
+Bundled 119 modules in 316ms
+
+  acp-main.js  1.26 MB  (entry point)
+
+packed qf-toolloop@0.1.0 → C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-CwTPNU\repo\tools\runtime-proof\packed\qf-toolloop.tar
+  commands: qf-toolloop-acp
+(node:8992) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-CwTPNU\repo\tools\runtime-proof\packed\qf-toolloop.meta.json {"route":"agentos","name":"qf-toolloop","package":"qf-toolloop.aospkg"}
+pack-agent: ready C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-CwTPNU\repo\tools\runtime-proof\packed\qf-toolloop.aospkg
+pack-agent: wrote C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-CwTPNU\repo\species\hermes\packed\hermes.aospkg and C:\Users\rybow\AppData\Local\Temp\qf-runtime-staging-CwTPNU\repo\species\hermes\packed\hermes.meta.json
+pack-agent: ready claude-code
+dock-production-inventory: production=[{"manifest":"species/hermes/dock-profiles.json","id":"hermes-research-director","role":"orchestrator"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-worker","role":"worker"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-worker-2","role":"worker2"},{"manifest":"species/hermes/dock-profiles.json","id":"hermes-critic","role":"critic"},{"manifest":"species/claude-code/dock-profiles.json","id":"claude-code-orchestrator","role":"claude-orchestrator"},{"manifest":"species/claude-code/dock-profiles.json","id":"claude-code-worker","role":"claude-worker"}] qaContainsClaudeCodeUngranted=true
+PASS  dock-production-inventory
