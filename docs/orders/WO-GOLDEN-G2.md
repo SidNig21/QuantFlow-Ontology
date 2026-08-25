@@ -1,6 +1,6 @@
 # WO-GOLDEN-G2 — Retire unbuilt and superseded residue
 
-status: **REWORK 1 DRAFT — AMENDMENT READER REQUIRED; BUILDER CLOSED**
+status: **REWORK 1 READER YES/YES — AWAITING NEXT.md REAUTHORIZATION**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G2 — unbuilt and superseded residue
