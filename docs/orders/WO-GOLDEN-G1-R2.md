@@ -15,9 +15,13 @@ behavior remain byte-for-byte sourced from the same canonical inputs.
 
 ## Fixed terms
 
-- **BUILD_BASE_SHA** is the literal `order-candidate` SHA in `NEXT.md` at
-  Builder delegation.
-- **CANDIDATE_SHA** is the Builder's single committed result.
+- **ORDER_CANDIDATE_SHA** is the literal independently reviewed order SHA in
+  `NEXT.md` at Builder delegation.
+- **BUILD_BASE_SHA** is the exact SHA printed by `git rev-parse HEAD` after the
+  Builder pulls the authorized branch and before its first edit. It must contain
+  ORDER_CANDIDATE_SHA in its ancestry and is recorded in `BEFORE.md`.
+- **CANDIDATE_SHA** is the Builder's single committed result whose parent is
+  BUILD_BASE_SHA.
 - **Product process** is a Windows process whose name matches
   `electron|hermes|wsl|node|bun` and whose command line names
   `QuantFlow-Ontology`, `qf-atlas`, or `hermes`.
