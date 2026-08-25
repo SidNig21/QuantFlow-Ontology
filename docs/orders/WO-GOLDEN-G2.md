@@ -482,6 +482,33 @@ change is authorized. The accepted finite-topology assertion going red, any
 later red outside the amended allowlist, or any request for product code stops
 G2.
 
+### Matrix item 3 — pre-existing G8 red
+
+After Rewrite 2 passed, focused matrix item 3 reproduced a pre-existing
+proof-integrity defect at the frozen G2 starting SHA. kernel-market-lineage
+passes findings as a string while the same starting SHA's canonical schema
+requires a non-empty ordered array. The gate, qf-kernel implementation,
+governed-review implementation, schema source, runner, package and lock inputs
+are byte-identical between the starting SHA and the G2 worktree. No G2 path
+intersects that execution path.
+
+ADR-0004 section 9 applies. G2 must not repair or absorb the defect. G8 owns it.
+The exact receipt is
+docs/orders/evidence/golden-baseline/g2/PREEXISTING-RED-03.md.
+
+For G2 Builder and Verifier, item 3 non-regression now means all of:
+
+- the relevant starting-SHA blobs remain exact;
+- the command reproduces exit 1 with only the recorded invalid_type fingerprint
+  at findings, expected array, received string;
+- no G2 target or proof edit becomes reachable from the gate;
+- no bypass or alternate green is accepted.
+
+A changed blob, changed failure boundary/fingerprint, or failure to reproduce is
+red. G8 and Phase 3 still require the corrected gate to reach its actual
+market-lineage assertions and pass. The Builder resumes G2 at matrix item 4;
+the Verifier independently reproduces this adjudication rather than claiming
+item 3 green.
 ## Independent Verifier
 
 One fresh read-only Verifier binds to the immutable candidate and reruns:
