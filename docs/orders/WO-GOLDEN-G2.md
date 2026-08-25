@@ -1,6 +1,6 @@
 # WO-GOLDEN-G2 — Retire unbuilt and superseded residue
 
-status: **READER YES/YES — AWAITING NEXT.md AUTHORITY**
+status: **REWORK 1 DRAFT — AMENDMENT READER REQUIRED; BUILDER CLOSED**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G2 — unbuilt and superseded residue
@@ -8,7 +8,7 @@ parent-group: G1 **CLOSED / ACCEPTED** at `8ebe35d7374ebca3752c94cf51a676a58e1ed
 r18-authority: **FROZEN**
 main-authority: **NONE**
 release/package-authority: **NONE**
-rework: no implementation lap is authorized until `NEXT.md` rotates to this order
+rework: **1 of 1** — preserved Round 1 diff may resume only after amendment Reader YES/YES and `NEXT.md` reauthorization
 
 ## Outcome
 
@@ -196,6 +196,24 @@ All four commands are part of the focused matrix. G2 does not run the slow live
 research-world or technique-outcome journey merely to retire the superseded R13
 wrapper.
 
+### D5 — Retarget the accepted Research Dock heading
+
+Round 1 stopped at focused matrix item 2 before any candidate commit. The
+unchanged accepted shell says "Research Dock" at
+"collab-electron/src/windows/shell/index.html:69", exactly as required by the
+accepted Pre-R18 order. The unchanged gate still expects the superseded shell
+heading "Research Director" at
+"qa/gates/research-director-front-door.ts:822".
+
+Change only that heading assertion and its failure message to require
+initial.heading === "Research Dock". Preserve every other Research Director
+profile, placeholder, admission, Mission, tile, status, cleanup and tree-neutral
+assertion in the gate. Do not edit the product shell.
+
+The gate must fail if the visible shell heading ceases to be "Research Dock" or
+if any existing Director behavior fails. This is a stale mechanical assertion
+correction, not a product change or acceptance weakening.
+
 ## Deliverable E — Keep Atlas honest on current subjects
 
 This is test-fixture maintenance, not Atlas capability work.
@@ -325,6 +343,7 @@ The candidate may contain only:
 - `qa/gates/artifact-root/run.ts`;
 - `collab-electron/scripts/package-lib/shared-paths.test.ts`;
 - `qa/gates/one-skin.ts`;
+- `qa/gates/research-director-front-door.ts`;
 - `qf-atlas/decisions.json`;
 - `qf-atlas/falsify.mjs`;
 - comment-only edits in `qf-atlas/generate.mjs` and `qf-atlas/reach.mjs`;
@@ -383,6 +402,25 @@ The Builder:
 The Builder may make mechanical corrections inside the explicit D/E proof files
 while building, provided acceptance meaning does not change. Product code outside
 the eleven deletions is never in G2 scope.
+
+### Rework 1 resume protocol
+
+The Round 1 Builder stopped on the D5 stale assertion with no candidate commit
+or push. Preserve its existing allowlisted diff; do not restart the eleven-file
+disposition or repeat the Vault archive.
+
+After the Router lands this amendment, obtains one fresh amendment-only Reader
+YES/YES, and reauthorizes G2 in NEXT.md, the same Builder:
+
+1. records the clean committed authority HEAD as REWORK_BASE_SHA;
+2. proves the preserved working diff contains only the amended candidate
+   allowlist and the exact eleven deletions;
+3. applies only D5;
+4. reruns the full focused matrix from item 1;
+5. produces one immutable candidate whose parent is REWORK_BASE_SHA.
+
+No second semantic rework is authorized. The same assertion going red again, or
+any later red outside the amended allowlist, stops G2.
 
 ## Independent Verifier
 
