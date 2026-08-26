@@ -100,4 +100,130 @@ No G6 Builder, main merge, full G9, or R18 work is authorized.
 
 ## Reader acceptance
 
-Pending fresh semantic Reader.
+Round 1 at `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`: **NO / NO**. The amendment below is binding. A fresh semantic reread must return `YES / YES` before Builder authority opens.
+
+## Required amendment after Reader Round 1
+
+### Exact semantic disposition
+
+Agent Chat is removable legacy UI. Its dev shim and `acp-agent.test.ts` are QA-only. No current shell opener or supported saved Canvas/window state restores it.
+
+Standalone Terminal is removable legacy UI. The current `nav:open-in-terminal` path opens a Canvas `term` tile and is protected. The stale `viewer:run-in-terminal`, `agent:focus-session`, `cd-to`, `run-in-terminal`, and `focus-tab` paths are standalone-Terminal-only and must be removed as one bounded protocol closure. `ptyForegroundProcess` must not be implemented.
+
+Host ACP is current supported product runtime with QA coverage. Retain:
+
+- `collab-electron/src/main/host-acp-bridge.ts`
+- `collab-electron/src/main/host-acp-permission.ts`
+- `collab-electron/src/main/host-acp-turn.ts`
+- host-ACP portions of `agent-host.ts`
+- `species/hermes/host-acp-client.ts`
+- `species/hermes/host-acp-policy.ts`
+- `species/hermes/host-admit-kernel.ts`
+- Hermes host-ACP package/profile definitions and QA selectors
+
+The shared `resolveHostAcpCommand` consumer used by native TUI is protected and may not be deleted.
+
+Hermes `launch.json` and packed metadata mean current production `native_tui`. `agent-package/agentos-package.json` means the supported host-ACP package/profile route. These are separate meanings and must not be collapsed.
+
+### Exact authorized product disposition
+
+Deletion is authorized only for:
+
+- `collab-electron/src/windows/agent-chat/**`
+- `collab-electron/src/windows/terminal/**`
+- `collab-electron/src/main/acp-agent.ts`
+- `collab-electron/src/main/acp-agent.test.ts`
+- `collab-electron/src/main/acp-fs-root.ts`
+- `collab-electron/src/main/acp-fs-root.test.ts`
+- `qa/gates/acp-fs-confine.ts`, if its final consumer census is zero
+- the frozen ACP exception for `acp-agent.ts` and its test in `qa/gates/kernel-sole-writer-app.ts`
+
+Edits are limited to:
+
+- remove `terminal` and `agent-chat` Vite inputs;
+- remove their `shell:get-view-config` entries;
+- remove `registerAgentIpc`;
+- remove only legacy ACP methods/events from universal preload, shell preload, and `window-api.d.ts`;
+- remove only standalone-Terminal forwarding from `ipc-misc.ts`;
+- remove only the dead `agentWebview` branch from shell renderer;
+- remove the listed direct dependencies and only their unreachable lockfile closure.
+
+Do not delete or weaken Canvas, Dock, Files/viewer, PTY, native TUI, terminal-tile, session-tile, package identity, or host-ACP files.
+
+### Finite predecessor universe
+
+The supported predecessor universe is exactly:
+
+1. current production `QF_APP_DIR` config and `window_state`;
+2. current `canvas-state.json`;
+3. current Kernel state and current production package/profile references;
+4. `.collaborator` to `.quantflow` migrations actually performed by the current app;
+5. current tracked production staging and package metadata.
+
+Historical branches, old receipts, audit copies, external packages, stale build output, and QA-only disposable roots do not create compatibility.
+
+Legacy ACP preferences and `agent-messages.json`, if present, are preserved as ignored residue: no migration, deletion, read, or write.
+
+### Required runnable selectors
+
+The Builder must add:
+
+- `bun qa/run.ts golden-g5-consumer-census`
+- `bun qa/run.ts golden-g5-saved-state`
+
+The smallest focused matrix is:
+
+- `bun qa/run.ts golden-g5-consumer-census`
+- `bun qa/run.ts golden-g5-saved-state`
+- `bun qa/run.ts golden-g4-retired-route`
+- `bun qa/run.ts dock-definition-launch`
+- `bun qa/run.ts hermes-launch-policy`
+- `bun qa/run.ts hermes-first-turn-synthetic`
+- `bun qa/run.ts kernel-sole-writer-app`
+- `bun --cwd collab-electron run build`
+
+Installer/release traversal remains G12/Phase 3 unless G5 changes installer operations, signing, resource staging rules, or release metadata beyond removal of the listed dead renderer/dependency closure.
+
+### Fail-capable falsifiers
+
+Each new G5 selector must run isolated and exit nonzero for:
+
+- one stale Agent Chat or standalone-Terminal opener/build/package reference;
+- deletion of a protected terminal-tile, session-tile, Files/viewer, Dock, PTY, or native-TUI consumer;
+- loss of any current saved tile/window predecessor;
+- unannounced obsolete-record fallback;
+- removal of one retained host-ACP adapter/profile/permission/cleanup consumer;
+- one removed dependency still reachable through source, dynamic import, build input, package staging, QA, or lockfile closure.
+
+A falsifier that unexpectedly exits zero is itself a gate failure. Restore the fixture before the next case.
+
+### Saved-state acceptance
+
+The saved-state selector must prove restoration of `term`, `note`, `code`, `image`, `graph`, `browser`, `pdf`, `artifact`, `session`, and `research`, plus main `WindowState`.
+
+It must prove live terminal PTYs reconnect; stopped session tiles remain visibly stopped; Files/viewer and Dock remain reachable; obsolete Agent Chat/standalone Terminal records are ignored without fallback; and legacy ACP preference/cache files are neither deleted nor migrated.
+
+### Inherited-red ownership
+
+G5 records but does not absorb G8 Kernel/migration reds, G9 `researchEvidenceByRunId`/Report duplication, G10 Canvas/Mission/runtime coherence, or G12 Bovada Windows EPERM/package/typecheck/operations/release reds.
+
+### Rollback and Atlas ordering
+
+The product candidate must be reversible to `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`. No user data may be deleted. Any changed path outside the authorized disposition, current lockfile closure, or explicitly regenerated Atlas output is red. Evidence changes remain separate.
+
+Record baseline Atlas identity; implement and run the focused matrix; generate Atlas only from the green product candidate; run Atlas check and ratchet; then run the independent falsifier. Atlas cannot establish product support or compatibility by itself.
+
+### G5 receipt schema
+
+The final receipt must contain exactly:
+
+- `verdict`, `starting_sha`, `candidate_sha`, `branch`, `upstream`
+- `clean_start`, `clean_end`, `authorized_path_disposition`
+- `agent_chat_classification`, `standalone_terminal_classification`, `host_acp_classification`
+- `saved_state_universe`, `legacy_state_disposition`, `dependency_closure`
+- `matrix_commands`, `matrix_results`, `falsifier_commands`, `falsifier_results`
+- `protected_current_product_results`, `inherited_red_owners`
+- `atlas_identity_before`, `atlas_identity_after`
+- `rollback_boundary`, `user_data_deletion`, `independent_verifier`
+
+No Builder authority opens until this amendment is landed and a fresh Reader returns `YES / YES`.
