@@ -17,3 +17,9 @@ final-proof	bun qa/run.ts golden-g3-consumer-census	0	PASS rows=118; history 88/
 
 baseline	windows-dock-collaboration package run	timeout then cleaned	Known pre-existing package timeout; no product process; ADR-0004
 baseline	Atlas falsifier receipt	98/98	HARD RED 0; tree-neutral; inherited baseline receipt
+amendment	bun install --frozen-lockfile (qa/fixtures/lifecycle-command)	0	PASS frozen fixture install
+amendment	bunx tsc --noEmit (qa/fixtures/lifecycle-command)	0	PASS fixture semantic compile; TS18003 absent
+amendment	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=literal bun qa/run.ts typecheck	1	typecheck: forbidden lifecycle install package=qa\fixtures\lifecycle-command lifecycle=postinstall manager=bun operation=install command=cd x && bun install
+amendment	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=flagged bun qa/run.ts typecheck	1	typecheck: forbidden lifecycle install package=qa\fixtures\lifecycle-command lifecycle=postinstall manager=bun operation=install command=bun --cwd x install --frozen-lockfile
+amendment	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=chained bun qa/run.ts typecheck	1	typecheck: forbidden lifecycle install package=qa\fixtures\lifecycle-command lifecycle=postinstall manager=npm operation=ci command=echo preparing; npm --prefix x ci
+amendment	bun qa/run.ts typecheck	0	PASS typecheck; no TS18003; known baseline EBUSY not observed in this run

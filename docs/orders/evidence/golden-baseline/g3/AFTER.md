@@ -22,7 +22,7 @@ QuantFlow retains the app-owned notification transport and separate transport da
 - Lifecycle falsifiers: **RED** for literal, flagged, and chained install forms, all injected only into `qa/fixtures/lifecycle-command`.
 - Kernel sole-writer and app sole-writer: **PASS**.
 - Kernel-one-path falsifier: **RED**, naming `tools/_qf-k1-path-bait/falsify.ts`; bait cleanup proof is green. Normal kernel-one-path remains the known 12 QA fixture red assigned to G8.
-- Normal typecheck EBUSY and the Windows dock-collaboration timeout remain the frozen pre-existing ADR-0004 assignments; no broad rerun was used to change G3 semantics.
+- Frozen baseline assignment: normal typecheck EBUSY and the Windows dock-collaboration timeout remain recorded under ADR-0004; the amended normal typecheck run below passed and did not reproduce EBUSY.
 - Atlas proof after the clean product candidate: `generate.mjs --check` **PASS**, falsifiers **98/98**, ratchet **PASS** with HARD RED **0**. The fixed Atlas-18 bait is cleaned after the run.
 
 ## Evidence hashes
@@ -42,3 +42,11 @@ QuantFlow retains the app-owned notification transport and separate transport da
 - Atlas projection: 426 files, 126 channels, 13 strip candidates, 0 DEAD, 0 ratchet HARD RED.
 
 The product/QA commit is the generator base; this final evidence update contains only generated artifacts and proof receipts.
+
+## Lifecycle fixture semantic amendment
+
+- `qa/fixtures/lifecycle-command/src/empty.ts` is exactly `export {};` plus one newline; SHA-256 `8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881`.
+- `qa/fixtures/lifecycle-command/tsconfig.json` is exactly `{"files":["src/empty.ts"]}` plus one newline; SHA-256 `1db529942100649636cf57e34ab059ae9d2f24bc507821816b05a311ec2216a8`.
+- Frozen fixture install: **PASS**; fixture `tsc --noEmit`: **PASS**.
+- Literal, flagged, and chained lifecycle selectors remain **RED** with the exact fixture diagnostics recorded in `COMMANDS.tsv`.
+- Normal `bun qa/run.ts typecheck`: **PASS** (`exit 0`, `PASS typecheck`), with no TS18003 and no EBUSY observed in this amendment run.
