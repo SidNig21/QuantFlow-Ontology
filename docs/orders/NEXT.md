@@ -1,17 +1,18 @@
 # NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 BUILDER SUSPENDED FOR G8 PROOF-INTEGRITY PREREQUISITE
+status: G4 CLOSED / G5 BUILDER RESUMED ON FINITE PREREQUISITE
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **NO — FRESH SEMANTIC READER REQUIRED**
+builder-authority: **YES — G5 FINITE PREREQUISITE + ACCEPTED G5 DIFF ONLY**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
 g5-finite-reread-after: `5248031`
 g5-finite-reread-task: `01a04034-6afb-73a3-9f0e-6419fa5f76ec`
 g5-final-reread-task: `01a04044-fea5-71d3-886c-cdeb171ae491`
-g5-finite-reread-verdict: **NO / NO — AUTHORITY 1c61973; THREE FINITE DEFECTS LANDED; FRESH YES / YES REQUIRED**
+g5-final-reread-authority: `5feef239ac4827590a3a17e16afe953ee4c58a1f`
+g5-finite-reread-verdict: **YES / YES — BUILDER MAY RESUME**
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-2-active-group: G5 — Legacy ACP and unconsumed renderers
@@ -33,4 +34,4 @@ G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. The G5 semantic Reader 
 
 The frozen starting matrix records both new G5 selectors as absent/red; G4 retired-route, Dock launch, Hermes launch-policy, Kernel sole-writer, and the real Electron build are green. `hermes-first-turn-synthetic` is pre-existing red because its readiness assertion still names retired `hermes-orchestrator` while production authority requires `hermes-research-director`. This is an authorized mechanical stale-selector repair: change only that readiness assertion, prove old red/new green, and do not rewrite later synthetic fixture identifiers without separate evidence.
 
-The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects. The accepted G5 deletion diff remains preserved but is not a candidate. The finite contract in [WO-GOLDEN-G5](WO-GOLDEN-G5.md#reader-required-finite-contract-after-53e9a25) now binds the exact direct-critic parser, canonical v2 payload/lineage fields, durable first-run `run.params.strategy_id` provenance, exact Director receipt naming, the source-proven `index.ts` → `kernelFinalizeResearchEvaluation` in `kernel.ts` seam, and the smallest inseparable G9 no-duplicate-finalizer prerequisite. There is **NO Builder authority** until a new fresh semantic Reader returns `YES / YES` on this finite contract. No group reorder, G6 authority, main merge, full G9, or R18 implementation is open.
+Fresh semantic Reader task `01a04044-fea5-71d3-886c-cdeb171ae491` returned `YES / YES` against authority `5feef239ac4827590a3a17e16afe953ee4c58a1f`. The existing G5 Builder may resume only the accepted G5 deletion diff and the finite direct-critic/proof-integrity/no-duplicate prerequisite. No group reorder, G6 authority, main merge, full G9, or R18 implementation is open.
