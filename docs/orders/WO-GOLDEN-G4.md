@@ -1,6 +1,6 @@
 # WO-GOLDEN-G4 — Retire the AgentOS runtime fossil
 
-status: **ROUND 2 AMENDED — FOCUSED SEMANTIC REREAD REQUIRED**
+status: **READER YES/YES — BUILDER AUTHORIZED ONLY BY NEXT.md**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G4 — AgentOS runtime fossil
@@ -244,3 +244,8 @@ Starting G8 reds (`kernel-one-path` QA fixtures, `kernel-market-lineage`) and G1
 The independent Verifier uses this one checkout with no active writer and records candidate SHA, upstream equality, clean start/end, the exact matrix, zero bait/temp/product/WSL processes, and source/config identity for evidence-only descendants. Atlas falsification runs without `--receipt`; committed receipt evidence is compared by result name/PASS meaning. No fresh worktree or full installer traversal.
 
 Starting-SHA-proven same-meaning selector, fixture-path, allowlist, invocation, teardown, generated-metadata, or receipt-format repairs use the Golden fast path with one focused old-red/new-green falsifier and non-regression. Route semantics, supported-state membership, package closure meaning, retained lifecycle meaning, or PASS meaning require Reader review.
+
+
+## Reader acceptance
+
+Fresh Reader task `01a03f1a-b4d5-7b82-a58a-0e90965d8873` accepted this order `YES/YES` at immutable SHA `e08e8838fcc70d5e82c129ebbd5a8da43dfbe282`. Receipt: [G4-READER-ACCEPTANCE.md](evidence/golden-baseline/g4/G4-READER-ACCEPTANCE.md).
