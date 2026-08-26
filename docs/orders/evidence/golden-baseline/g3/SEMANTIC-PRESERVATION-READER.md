@@ -34,3 +34,11 @@ At immutable authority `fb256cb668d122eb90fc4c34006ffcbf93235d7c`, the
 Reader returned **YES / YES**. Every retained R12 assertion remains fail-capable,
 the self-review refusal is one pre-mutation invariant, both identity labels are
 exactly bounded, and no G8, full-G9, or G11 scope entered G3.
+
+
+## Authority wording correction
+
+The amendment's phrase current-doc set accidentally contradicted Deliverable E,
+which already requires removing deleted species/critic-mock/README.md from that
+set. The corrected clause preserves every other entry and changes no acceptance
+meaning or candidate product/QA bytes.

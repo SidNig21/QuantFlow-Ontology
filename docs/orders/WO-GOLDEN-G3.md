@@ -325,8 +325,9 @@ The current-identity correction is exact and bounded:
   ownership inverts.` to `QuantFlow stays; ownership inverts.` and
   `Collaborator adapters (not authorities).` to
   `QuantFlow adapters (not authorities).`;
-- preserve `docs/DEBT.md` bytes, Laws A–F, the forbidden identity matcher, the
-  current-doc set, and every other identity classification.
+- preserve `docs/DEBT.md` bytes, Laws A–F, the forbidden identity matcher,
+  every other current-doc entry except the already-authorized removal of deleted
+  `species/critic-mock/README.md`, and every other identity classification.
 
 Focused semantic proof is:
 
