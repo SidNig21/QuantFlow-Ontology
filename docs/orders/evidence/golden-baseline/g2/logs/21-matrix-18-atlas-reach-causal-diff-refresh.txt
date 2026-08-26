@@ -1,0 +1,24 @@
+current=234
+after=234
+before=241
+before_only=7
+after_only=0
+surviving_changed=0
+noncausal=0
+current_after_mismatch=0
+kernel_importerCount=9
+connections_ipc_forward_import_kernel=True
+before_only_paths:
+collab-electron/src/main/a2a-artifact-store.ts
+collab-electron/src/main/a2a-bus.ts
+collab-electron/src/main/a2a-orchestra.ts
+collab-electron/src/main/species-launch.ts
+collab-electron/src/main/species-surface.ts
+collab-electron/src/main/species-tools.ts
+collab-electron/src/windows/shared/flow-cube/cube3d.js
+permitted_importer_deltas:
+kernel removed=collab-electron/src/main/connections-ipc.ts added=qa/gates/artifact-root/run.ts
+agent-host added=qa/gates/artifact-root/run.ts
+unexplained_mismatch=0
+ITEM18=GREEN
+EXIT=0

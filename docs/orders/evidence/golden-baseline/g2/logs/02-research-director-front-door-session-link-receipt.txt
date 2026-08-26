@@ -1,0 +1,13 @@
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+falsifier=cleanup-retained-process-or-root result=red
+falsifier=cleanup-retained-process-or-root restored=true
+falsifier=watchdog-never-settles result=red
+tile_projection_hops=sent,received,dom_identity handler_threw=false
+research-director-front-door: FAIL owned_process_tree_remaining=1
+convergence_remaining=[{"pid":3776,"parent_pid":18596,"name":"electron.exe","executable_path":"C:\\Users\\rybow\\QuantFlow-Ontology\\collab-electron\\node_modules\\.bun\\electron@40.6.0+759ce506b1ed1a42\\node_modules\\electron\\dist\\electron.exe","command_line":"C:\\Users\\rybow\\QuantFlow-Ontology\\collab-electron\\node_modules\\.bun\\electron@40.6.0+759ce506b1ed1a42\\node_modules\\electron\\dist\\electron.exe C:\\Users\\rybow\\QuantFlow-Ontology\\collab-electron\\out\\main\\pty-sidecar.js --token d86fc5bc24cf1239ad2a278853c78291"}]
+owned_process_tree_remaining=0 electron_processes_remaining=1 hermes_processes_remaining=3 roots_remaining=1
+repository_tree_unchanged=true
+elapsed_ms=30396
+FAIL  research-director-front-door

@@ -1,0 +1,6 @@
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+falsifier=cleanup-retained-process-or-root result=red
+falsifier=cleanup-retained-process-or-root restored=true
+falsifier=watchdog-never-settles result=red

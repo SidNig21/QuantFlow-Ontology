@@ -14,11 +14,8 @@ const CODE_EXT = new Set([".css", ".tsx", ".ts", ".js"]);
 
 /**
  * Vendor/generated under windows/ — each entry justified.
- * Flow-cube is the only allowlist: founder brand engine; spectrum is token source.
  */
 const ALLOWLIST = new Set<string>([
-  // Founder-authored brand engine — spectrum constants are the token source, not a divergence.
-  "collab-electron/src/windows/shared/flow-cube/cube3d.js",
   // Founder-authored empty-state wrapper — palette/ink constants belong to the brand engine.
   "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
 ]);

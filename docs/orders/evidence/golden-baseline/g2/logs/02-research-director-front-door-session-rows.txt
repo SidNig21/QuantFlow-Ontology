@@ -1,0 +1,12 @@
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+falsifier=cleanup-retained-process-or-root result=red
+falsifier=cleanup-retained-process-or-root restored=true
+falsifier=watchdog-never-settles result=red
+research-director-front-door: FAIL agent_session row delta was not exactly one: before.sessions=0 after.counts.sessions=2 delta=2 rows=[{"id":"fb2d4f1f-dd20-40e5-ba4e-2d62bf8d0513","status":"running","spawned_from_target":"hermes-research-director"},{"id":"synthetic-worker-68ac4d14-d608-4d69-aae4-89308b5e84a2","status":"starting","spawned_from_target":"hermes-worker"}]
+convergence_remaining=[]
+owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
+repository_tree_unchanged=true
+elapsed_ms=18581
+FAIL  research-director-front-door

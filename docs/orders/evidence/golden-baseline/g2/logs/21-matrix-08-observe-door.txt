@@ -1,0 +1,8 @@
+COMMAND_START_UTC=2026-08-26T01:59:25.9576269Z
+COMMAND=bun qa/run.ts observe-door
+FAIL  observe-door
+observe-door: "observe_ticket" found outside allowlist at qf-atlas/atlas.json
+observe-door: serving surface violation (golden/tools.json) at qa/gates/doc-action-surface.ts
+observe-door: serving surface violation (generateMcp() at qa/gates/governed-review.ts
+COMMAND_END_UTC=2026-08-26T01:59:27.6162987Z
+EXIT=1

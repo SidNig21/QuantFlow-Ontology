@@ -1,0 +1,57 @@
+COMMAND_START_UTC=2026-08-26T01:58:59.5374998Z
+COMMAND=bun qa/run.ts artifact-root
+artifact-root:qf-kernel: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [117.00ms]
+artifact-root:artifact-root: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\node_modules\qf-kernel
+bun install v1.3.12 (700fc117)
+
++ qf-kernel@../../../packages/qf-kernel
+
+4 packages installed [127.00ms]
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+bun test v1.3.12 (700fc117)
+agent-host: host-mounts skip (no file at \tmp\qf-g9-live-app\agentos-host-mounts.json)
+agent-host: host-mounts skip (no file at \tmp\qf-g9-live-app\agentos-host-mounts.json)
+agent-host: admitted agentos session=g9-live-agentos-session definition=g9-live-agentos-definition adapter=g9-agentos (no prompt)
+agent-host: session complete g9-live-agentos-session artifact=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt artifact_count PASS: count=1; expected=1; artifact_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt ordinary_kind PASS: kind=trajectory; expected=trajectory; artifact_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt producer_link_count PASS: count=1; expected=1; links=[{"kind":"produces","from_id":"g9-live-agentos-session","to_id":"5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b"}]
+run.ts:
+kernel: path=:memory: provenance=env journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+(pass) G9 live AgentOS runTurn publishes one trajectory [250.00ms]
+
+ 1 pass
+ 0 fail
+Ran 1 test across 1 file. [362.00ms]
+artifact-root live receipt producer_link_identity PASS: expected kind=produces from_id=g9-live-agentos-session to_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b; actual=[{"kind":"produces","from_id":"g9-live-agentos-session","to_id":"5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b"}]
+artifact-root live receipt bytes_identity PASS: runTurn_text_bytes=31 disk_bytes=31 returned_sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b disk_sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b byte_equal=true
+artifact-root live receipt hash_identity PASS: row_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b content_hash=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b disk_sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt storage_ref_identity PASS: row_storage_ref=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts\g9-live-agentos-session.md returned_path=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts\g9-live-agentos-session.md
+artifact-root live receipt root_confinement PASS: root=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts returned_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts\g9-live-agentos-session.md storage_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts\g9-live-agentos-session.md
+artifact-root live receipt ordinary_report_count PASS: report_count=0; expected=0
+artifact-root live receipt report_refusal PASS: text=publish_artifact report requires evaluation_id; artifacts=1->1; events=5->5
+artifact-root live AgentOS runTurn receipt: PASS session_id=g9-live-agentos-session artifact_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b stop_reason=end_turn finalize=true skipPublish=false link={"kind":"produces","from_id":"g9-live-agentos-session","to_id":"5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b"} link_count=1 root=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts storage_ref=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-3GcUwT\artifacts\g9-live-agentos-session.md sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b byte_count=31 session_status=closed host_destroyed=true ordinary_report_count=0 refusal=publish_artifact report requires evaluation_id post_refusal_artifacts=1 post_refusal_events=5
+kernel: path=:memory: provenance=explicit journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+artifact-root receipt artifact_count PASS: count=1; expected=1; artifact_id=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c
+artifact-root receipt ordinary_kind PASS: kind=trajectory; expected=trajectory; artifact_id=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c
+artifact-root receipt producer_link_count PASS: count=1; expected=1; links=[{"kind":"produces","from_id":"g9-trajectory-proof-session","to_id":"9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c"}]
+artifact-root receipt producer_link_identity PASS: expected kind=produces from_id=g9-trajectory-proof-session to_id=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c; actual=[{"kind":"produces","from_id":"g9-trajectory-proof-session","to_id":"9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c"}]
+artifact-root receipt bytes_identity PASS: returned_bytes=36 disk_bytes=36 returned_sha256=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c disk_sha256=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c byte_equal=true
+artifact-root receipt hash_identity PASS: row_id=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c content_hash=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c disk_sha256=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c
+artifact-root receipt storage_ref_identity PASS: row_storage_ref=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts\g9-trajectory-proof-session.md returned_path=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts\g9-trajectory-proof-session.md
+artifact-root receipt root_confinement PASS: root=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts returned_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts\g9-trajectory-proof-session.md storage_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts\g9-trajectory-proof-session.md
+artifact-root receipt ordinary_report_count PASS: report_count=0; expected=0
+artifact-root receipt report_refusal PASS: text=publish_artifact report requires evaluation_id; artifacts=1->1; events=4->4
+artifact-root G9 trajectory receipt: PASS artifact_id=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c producing_session_id=g9-trajectory-proof-session link={"kind":"produces","from_id":"g9-trajectory-proof-session","to_id":"9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c"} link_count=1 root=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts storage_ref=C:\Users\rybow\AppData\Local\Temp\qf-g9-art-pub-xuwJLA\.quantflow\artifacts\g9-trajectory-proof-session.md sha256=9bc78b8e6ffcea747296ca309ec21dd1a9db02fa40b457914ea8dabba1eb743c byte_count=36 ordinary_report_count=0 refusal=publish_artifact report requires evaluation_id post_refusal_artifacts=1 post_refusal_events=4
+artifact-root G4 production coupling: PASS
+artifact-root K3b governed publishers: PASS (agent-host.ts, index.ts, kernel.ts, kernel.ts, kernel.ts, kernel.ts, ontology-gateway.ts)
+artifact-root OK
+PASS  artifact-root
+COMMAND_END_UTC=2026-08-26T01:59:00.6307233Z
+EXIT=0

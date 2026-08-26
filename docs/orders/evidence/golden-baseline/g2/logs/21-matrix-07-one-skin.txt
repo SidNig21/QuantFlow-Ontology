@@ -1,0 +1,7 @@
+COMMAND_START_UTC=2026-08-26T01:59:16.4247684Z
+COMMAND=bun qa/run.ts one-skin
+one-skin OK
+totals: hex=0 func-color=0 raw-font-family=0 (outside collab-electron/src/windows/shared/qf-tokens.css)
+PASS  one-skin
+COMMAND_END_UTC=2026-08-26T01:59:16.5744274Z
+EXIT=0

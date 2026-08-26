@@ -28,6 +28,7 @@ export const RESEARCH_DIRECTOR_FRONT_DOOR_DEADLINE_MS = 120_000;
 const REPO_ROOT = resolve(join(import.meta.dir, "../.."));
 const HERMES_MANIFEST = join(REPO_ROOT, "species/hermes/dock-profiles.json");
 const DIRECTOR_ID = "hermes-research-director";
+const SPECIALIST_ID = "hermes-worker";
 const OLD_DIRECTOR_ID = "hermes-orchestrator";
 const QUESTION = "NFL Week 2 is coming up; use Strategy qf-nfl-v1 and tell me what data coverage we have before looking for opportunities.";
 
@@ -672,7 +673,12 @@ type OracleCounts = {
   missions: number;
   hypotheses: number;
   sessions: number;
+  directorSessions: number;
+  specialistSessions: number;
+  otherSessions: number;
   spawnedFrom: number;
+  directorSpawnedFrom: number;
+  specialistSpawnedFrom: number;
   definitions: number;
   oldSessions: number;
 };
@@ -685,7 +691,30 @@ function readOracleCounts(path: string): OracleCounts {
       missions: count("SELECT COUNT(*) AS n FROM mission"),
       hypotheses: count("SELECT COUNT(*) AS n FROM hypothesis"),
       sessions: count("SELECT COUNT(*) AS n FROM agent_session"),
+      directorSessions: count(
+        "SELECT COUNT(*) AS n FROM agent_session AS s JOIN links AS l ON l.from_id = s.id WHERE l.kind = 'spawned_from' AND l.to_id = ?",
+        DIRECTOR_ID,
+      ),
+      specialistSessions: count(
+        "SELECT COUNT(*) AS n FROM agent_session AS s JOIN links AS l ON l.from_id = s.id WHERE l.kind = 'spawned_from' AND l.to_id = ?",
+        SPECIALIST_ID,
+      ),
+      otherSessions: count(
+        "SELECT COUNT(*) AS n FROM agent_session AS s WHERE NOT EXISTS (SELECT 1 FROM links AS l WHERE l.from_id = s.id AND l.kind = 'spawned_from' AND l.to_id IN (?, ?)) OR EXISTS (SELECT 1 FROM links AS l WHERE l.from_id = s.id AND l.kind = 'spawned_from' AND l.to_id NOT IN (?, ?))",
+        DIRECTOR_ID,
+        SPECIALIST_ID,
+        DIRECTOR_ID,
+        SPECIALIST_ID,
+      ),
       spawnedFrom: count("SELECT COUNT(*) AS n FROM links WHERE kind = 'spawned_from'"),
+      directorSpawnedFrom: count(
+        "SELECT COUNT(*) AS n FROM links WHERE kind = 'spawned_from' AND to_id = ?",
+        DIRECTOR_ID,
+      ),
+      specialistSpawnedFrom: count(
+        "SELECT COUNT(*) AS n FROM links WHERE kind = 'spawned_from' AND to_id = ?",
+        SPECIALIST_ID,
+      ),
       definitions: count("SELECT COUNT(*) AS n FROM agent_definition WHERE id = ?", DIRECTOR_ID),
       oldSessions: count(
         "SELECT COUNT(*) AS n FROM agent_session AS s JOIN links AS l ON l.from_id = s.id WHERE l.kind = 'spawned_from' AND l.to_id = ?",
@@ -819,21 +848,38 @@ async function runFrontDoorProof(
       placeholder: document.querySelector('#dock-question-input')?.getAttribute('placeholder') ?? '',
     }))()`,
   }, Math.min(2_000, remainingMs(deadlineAt))) as { heading?: string; placeholder?: string };
-  assert(initial.heading === "Research Director", `front door heading mismatch: ${String(initial.heading)}`);
+  assert(initial.heading === "Research Dock", `front door heading mismatch: expected Research Dock, got ${String(initial.heading)}`);
   assert(initial.placeholder === "Ask the Research Director about a bounded market mission…", "Research Director placeholder mismatch");
 
   const submitted = await rpcCall(endpoint, "app.ui.evaluate", {
-    expression: `(() => {
+    expression: `(async () => {
       const input = document.querySelector('#dock-question-input');
       const form = document.querySelector('#dock-question-form');
-      if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement)) throw new Error('Research Director form is missing');
+      const techniqueSelect = document.querySelector('#dock-technique-version');
+      if (!(input instanceof HTMLTextAreaElement) || !(form instanceof HTMLFormElement) || !(techniqueSelect instanceof HTMLSelectElement)) throw new Error('Research Director form is missing');
+      const sample = await window.shellApi.qf.loadSampleResearchDataset();
+      const datasetId = sample?.dataset?.object_id;
+      const strategyId = sample?.technique?.strategy_id;
+      if (!sample?.ok || typeof datasetId !== 'string' || datasetId.length === 0 || typeof strategyId !== 'string' || strategyId.length === 0) throw new Error('sample Research Dataset or Technique missing');
+      let option = [...techniqueSelect.options].find((candidate) => candidate.value === strategyId);
+      if (!option) {
+        option = document.createElement('option');
+        option.value = strategyId;
+        option.textContent = String(sample.technique.label ?? strategyId);
+        techniqueSelect.appendChild(option);
+      }
+      techniqueSelect.value = strategyId;
+      techniqueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      form.dataset.r17DatasetId = datasetId;
       input.value = ${JSON.stringify(QUESTION)};
       input.dispatchEvent(new Event('input', { bubbles: true }));
+      const submit = form.querySelector('button[type=submit]');
+      if (!(submit instanceof HTMLButtonElement) || submit.disabled) throw new Error('real form submit remained disabled after Technique selection');
       form.requestSubmit();
-      return { submitted: true, disabledWhileSubmitting: input.disabled };
+      return { submitted: true, submitEnabledBeforeSubmit: true, disabledWhileSubmitting: input.disabled };
     })()`,
-  }, Math.min(2_000, remainingMs(deadlineAt))) as { submitted?: boolean; disabledWhileSubmitting?: boolean };
-  assert(submitted.submitted === true && submitted.disabledWhileSubmitting === true, "real form did not enter in-flight state");
+  }, Math.min(2_000, remainingMs(deadlineAt))) as { submitted?: boolean; submitEnabledBeforeSubmit?: boolean; disabledWhileSubmitting?: boolean };
+  assert(submitted.submitted === true && submitted.submitEnabledBeforeSubmit === true && submitted.disabledWhileSubmitting === true, "real form did not enter in-flight state with selected Technique");
 
   let visible: { missionId: string; sessionId: string; status: string; tileLabel: string };
   try {
@@ -844,6 +890,7 @@ async function runFrontDoorProof(
         disabled?: unknown;
         ledger?: unknown;
         directorTiles?: unknown;
+        missionTileIds?: unknown;
       };
       try {
         state = await rpcCall(endpoint, "app.ui.evaluate", {
@@ -856,6 +903,7 @@ async function runFrontDoorProof(
               sessionId: tile.getAttribute('data-session-id'),
               label: tile.querySelector('.tile-title-name')?.textContent ?? '',
             })),
+            missionTileIds: [...document.querySelectorAll('.canvas-tile[data-qf-world-type="mission"][data-qf-world-id]')].map((tile) => tile.getAttribute('data-qf-world-id')),
           }))()`,
         }, Math.min(2_000, remainingMs(deadlineAt))) as typeof state;
         diagnostic.mostRecentUiRpc = "ok";
@@ -867,6 +915,11 @@ async function runFrontDoorProof(
       diagnostic.lastUiState = ui;
       const status = String(state.status ?? "");
       const match = /^Research Director running · Mission ([A-Za-z0-9_-]+)$/.exec(status);
+      const missionTileIds = new Set(
+        Array.isArray(state.missionTileIds)
+          ? state.missionTileIds.filter((id): id is string => typeof id === "string" && id.length > 0)
+          : [],
+      );
       const directorTiles = Array.isArray(state.directorTiles) ? state.directorTiles : [];
       const tile = directorTiles.find((candidate) => {
         if (typeof candidate !== "object" || candidate === null) return false;
@@ -876,7 +929,7 @@ async function runFrontDoorProof(
       if (
         match &&
         ui.inputDisabled === false &&
-        ui.ledgerHasQuestion &&
+        missionTileIds.has(match[1]!) &&
         tile &&
         typeof tile.sessionId === "string" &&
         typeof tile.label === "string"
@@ -898,8 +951,56 @@ async function runFrontDoorProof(
   assert(after.spawnedFromExact === 1, "Research Director session does not have exactly one spawned_from link");
   assert(after.counts.missions - before.missions === 1, "Mission row delta was not exactly one");
   assert(after.counts.hypotheses - before.hypotheses === 1, "Hypothesis row delta was not exactly one");
-  assert(after.counts.sessions - before.sessions === 1, "agent_session row delta was not exactly one");
-  assert(after.counts.spawnedFrom - before.spawnedFrom === 1, "spawned_from link delta was not exactly one");
+  const totalSessionsAdded = after.counts.sessions - before.sessions;
+  const directorSessionsAdded = after.counts.directorSessions - before.directorSessions;
+  const specialistSessionsAdded = after.counts.specialistSessions - before.specialistSessions;
+  const otherSessionsAdded = after.counts.otherSessions - before.otherSessions;
+  const directorSpawnedFromAdded = after.counts.directorSpawnedFrom - before.directorSpawnedFrom;
+  const specialistSpawnedFromAdded = after.counts.specialistSpawnedFrom - before.specialistSpawnedFrom;
+  const totalSpawnedFromAdded = after.counts.spawnedFrom - before.spawnedFrom;
+  const recruitmentObserved = specialistSessionsAdded === 1;
+  assert(
+    directorSessionsAdded === 1,
+    `Research Director session row delta was not exactly one: before.director_sessions=${before.directorSessions} after.director_sessions=${after.counts.directorSessions} delta=${directorSessionsAdded}`,
+  );
+  assert(
+    specialistSessionsAdded === 0 || specialistSessionsAdded === 1,
+    `hermes-worker session row delta was outside the finite topology: before.specialist_sessions=${before.specialistSessions} after.specialist_sessions=${after.counts.specialistSessions} delta=${specialistSessionsAdded}`,
+  );
+  assert(
+    otherSessionsAdded === 0,
+    `unknown/other session row delta was not exactly zero: before.other_sessions=${before.otherSessions} after.other_sessions=${after.counts.otherSessions} delta=${otherSessionsAdded}`,
+  );
+  assert(
+    directorSpawnedFromAdded === 1,
+    `Research Director spawned_from link delta was not exactly one: before.director_spawned_from=${before.directorSpawnedFrom} after.director_spawned_from=${after.counts.directorSpawnedFrom} delta=${directorSpawnedFromAdded}`,
+  );
+  assert(
+    specialistSpawnedFromAdded === specialistSessionsAdded,
+    `hermes-worker spawned_from link delta did not match observed worker count: worker_sessions=${specialistSessionsAdded} before.specialist_spawned_from=${before.specialistSpawnedFrom} after.specialist_spawned_from=${after.counts.specialistSpawnedFrom} delta=${specialistSpawnedFromAdded}`,
+  );
+  assert(
+    totalSessionsAdded === 1 + specialistSessionsAdded,
+    (() => {
+      const db = new Database(kernelDb, { readonly: true });
+      try {
+        const rows = db.query(
+          "SELECT s.id, s.status, l.to_id AS spawned_from_target FROM agent_session AS s LEFT JOIN links AS l ON l.from_id = s.id AND l.kind = 'spawned_from' ORDER BY s.id",
+        ).all() as Array<{ id?: unknown; status?: unknown; spawned_from_target?: unknown }>;
+        return `agent_session total row delta did not equal 1 + observed worker count: before.sessions=${before.sessions} after.counts.sessions=${after.counts.sessions} delta=${totalSessionsAdded} worker_sessions=${specialistSessionsAdded} rows=${JSON.stringify(rows.map((row) => ({
+          id: String(row.id ?? ""),
+          status: String(row.status ?? ""),
+          ...(row.spawned_from_target == null ? {} : { spawned_from_target: String(row.spawned_from_target) }),
+        })))}`;
+      } finally {
+        db.close();
+      }
+    })(),
+  );
+  assert(
+    totalSpawnedFromAdded === 1 + specialistSessionsAdded,
+    `spawned_from link total did not equal 1 + observed worker count: before.spawned_from=${before.spawnedFrom} after.spawned_from=${after.counts.spawnedFrom} delta=${totalSpawnedFromAdded} worker_sessions=${specialistSessionsAdded}`,
+  );
   assert(after.counts.definitions === 1, "isolated proof Kernel does not contain exactly one Director definition");
   assert(after.counts.oldSessions === 0, "old hermes-orchestrator received a session");
 
@@ -941,8 +1042,15 @@ async function runFrontDoorProof(
   assertUiBoundaryReceipt(boundary);
   console.log("tile_projection_hops=sent,received,dom_identity handler_threw=false");
 
+  if (child.pid !== undefined && child.exitCode === null) {
+    for (const pid of collectOwnedPids(beforeProcesses, await processSnapshot(), child.pid)) launchPids.add(pid);
+  }
   await rpcCall(endpoint, "app.shutdown", {}, Math.min(2_000, remainingMs(deadlineAt)));
   await waitForExit(child, Math.min(5_000, remainingMs(deadlineAt))).catch(() => null);
+  const afterShutdown = await processSnapshot();
+  for (const pid of launchPids) {
+    if (afterShutdown.some((row) => row.pid === pid)) await terminateOwnedProcessTree(pid);
+  }
   await convergeLaunchPids(diagnostic, launchPids, deadlineAt);
   setActivePid(null);
   if (diagnostic.timeoutDiagnosticEmitted) return { launchPids, beforeProcesses, output };
@@ -956,7 +1064,14 @@ async function runFrontDoorProof(
   console.log("kernel_command=create_mission");
   console.log(`mission_rows_added=${after.counts.missions - before.missions} hypothesis_rows_added=${after.counts.hypotheses - before.hypotheses}`);
   console.log(`director_definition=${DIRECTOR_ID}`);
-  console.log(`director_sessions_added=${after.counts.sessions - before.sessions} spawned_from_exact=${after.spawnedFromExact}`);
+  console.log(`total_sessions_added=${totalSessionsAdded}`);
+  console.log(`director_sessions_added=${directorSessionsAdded}`);
+  console.log(`specialist_definition=${SPECIALIST_ID}`);
+  console.log(`specialist_sessions_added=${specialistSessionsAdded}`);
+  console.log(`recruitment_observed=${recruitmentObserved}`);
+  console.log(`director_spawned_from_added=${directorSpawnedFromAdded}`);
+  console.log(`specialist_spawned_from_added=${specialistSpawnedFromAdded}`);
+  console.log(`spawned_from_links_added=${totalSpawnedFromAdded} director_spawned_from_exact=${after.spawnedFromExact}`);
   console.log("mission_visible=true director_tile_visible=true manual_dock_composition=0");
   console.log(`old_orchestrator_sessions_added=${after.counts.oldSessions}`);
   console.log("oracle=independent_read_only kernel_unchanged_after_oracle=true");

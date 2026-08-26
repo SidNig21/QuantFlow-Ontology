@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ bc1bdbf` on 2026-08-25 by
+> Generated from `wo-golden-g2 @ d1d549a` on 2026-08-26 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**42 of 47 findings have not been looked at.**
+**41 of 41 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 42 |
-| `repair` | 3 |
+| `undecided` | 41 |
+| `repair` | 0 |
 | `remove` | 0 |
-| `keep` | 2 |
+| `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 42 findings still need a decision.
+**Not all clear.** 41 findings still need a decision.
 
 ## The four hops
 
@@ -228,44 +228,11 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 213 | imported from an entrypoint |
+| `reachable` | 212 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
-| **`unreachable`** | **6** | **nothing imports it — start here** |
-
-### Unreachable (6) — ask the founder, do not delete
-
-Nothing in the product imports these. **`unreachable` is a question, not a verdict.**
-Two different situations produce byte-for-byte identical evidence:
-
-| | Looks like | Correct action |
-|---|---|---|
-| **built ahead of the UI** | unreachable | keep — the caller is a future rung |
-| **abandoned** | unreachable | remove |
-
-The code does not record which one it is. Neither does the git history, and neither
-would runtime tracing — code built ahead of its UI never executes either, so a trace
-marks it dead exactly like real corpse code. **Intent is not recoverable from the
-repository.** The only source is the founder, and the only place to put the answer is a
-verdict in `qf-atlas/decisions.json`.
-
-> This section exists because an agent reading this map proposed deleting the `a2a-*`
-> modules as "a fossil". They are agent-to-agent collaboration — the founding concept
-> of the project, named as a plane in `README.md`. The map was right that nothing
-> imports them. The inference drawn from that was wrong, and no amount of further
-> static analysis would have prevented it.
-
-Before proposing removal of anything below, rule out: workspace package exports,
-dynamic `import()`, path-launched processes, packaging manifests, and QA gates that
-assert the file exists. Then ask.
-
-- `collab-electron/src/main/a2a-bus.ts`
-- `collab-electron/src/main/a2a-orchestra.ts`
-- `collab-electron/src/main/species-launch.ts`
-- `collab-electron/src/main/species-surface.ts`
-- `collab-electron/src/main/species-tools.ts`
-- `collab-electron/src/windows/shared/flow-cube/cube3d.js`
+| **`unreachable`** | **0** | **nothing imports it — start here** |
 
 ## What to remove
 
@@ -365,8 +332,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 239 of
-241 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 233 of
+234 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/kernel.ts` — **9 files depend on it**, it imports 7
@@ -409,9 +376,9 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**239 of 241 files that have a reachability verdict** carry a blast radius.
+**233 of 234 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**561 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**554 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
 either. "What breaks if I change a QA gate?" is **not answerable here**, and the 320 files in that position are a stated limit, not an omission.
 
@@ -460,7 +427,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (561 files)
+## Per-analyzer coverage (554 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -468,19 +435,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 557 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 284 | 0 | 4 | 0 | 273 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 550 |
-| `persistence` | 25 | 27 | 0 | 0 | 509 |
-| `lifetime` | 6 | 65 | 0 | 0 | 490 |
-| `packaging` | 233 | 0 | 0 | 123 | 205 |
-| `ownership` | 21 | 0 | 0 | 362 | 178 |
-| `reach` | 238 | 3 | 0 | 320 | 0 |
+| `imports` | 550 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 277 | 0 | 4 | 0 | 273 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 543 |
+| `persistence` | 25 | 27 | 0 | 0 | 502 |
+| `lifetime` | 6 | 65 | 0 | 0 | 483 |
+| `packaging` | 232 | 0 | 0 | 117 | 205 |
+| `ownership` | 20 | 0 | 0 | 356 | 178 |
+| `reach` | 231 | 3 | 0 | 320 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
 failure — `reach: unsupported` on 320 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 123 files means the packaging
+`packaging: unsupported` on 117 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant
@@ -488,15 +455,16 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-42 undecided findings, each carries a blocker:
+41 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
-| `founder-decision` | 22 | the code cannot say which answer is right — this needs your intent |
+| `founder-decision` | 20 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 3 | the analyzer could not resolve this statically |
 | `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
+| `product-defect` | 1 | a real runtime defect: fix the code and the finding goes away |
 
-**22 of 42 are waiting on you, not on the tool.**
+**20 of 41 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 
@@ -533,7 +501,7 @@ discovered from the AST.
 | Layout / cache persistence | 0 | 0 | — *unclaimed* |
 | Process cleanup | 4 | 0 | medium |
 | Research review / publication | 6 | 2 | high |
-| Artifact storage | 8 | 4 | high |
+| Artifact storage | 7 | 4 | high |
 
 ### Session lifecycle
 
@@ -574,7 +542,6 @@ discovered from the AST.
 - **packages/qf-kernel/src/deterministic-execution.ts** — INSERT INTO artifact at line 531
 - **packages/qf-kernel/src/governed-review.ts** — INSERT INTO artifact at line 565
 - **packages/qf-kernel/src/strategy-outcome.ts** — INSERT INTO artifact at line 195
-- `collab-electron/src/main/a2a-artifact-store.ts` — exports createA2aArtifactStore() at line 26
 - `collab-electron/src/main/agent-artifact-writer.ts` — exports writeAgentTrajectoryArtifact() at line 32
 - `collab-electron/src/main/kernel.ts` — exports getArtifactRoot() at line 123
 - `packages/qf-kernel/src/resolve-artifact-root.ts` — exports resolveArtifactRoot() at line 25

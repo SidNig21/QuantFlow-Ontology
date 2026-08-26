@@ -1,0 +1,37 @@
+COMMAND_START_UTC=2026-08-26T01:57:09.5805979Z
+COMMAND=bun qa/run.ts artifact-root
+artifact-root:qf-kernel: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\packages\qf-kernel\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel-schema@../../qf-kernel-schema
+
+2 packages installed [140.00ms]
+artifact-root:artifact-root: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\node_modules\qf-kernel
+bun install v1.3.12 (700fc117)
+
++ qf-kernel@../../../packages/qf-kernel
+
+4 packages installed [141.00ms]
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+bun test v1.3.12 (700fc117)
+run.ts:
+136 |   const artifactRoot = join(fixtureRoot, "artifacts");
+137 |   const appRootEnv = "/tmp/qf-g9-live-app";
+138 |   const appDir = `${appRootEnv}/app`;
+139 |   const packagePath = join(fixtureRoot, "g9-agentos.aospkg");
+140 |   const metadataPath = join(fixtureRoot, "g9-agentos.meta.json");
+141 |   mkdirSync(artifactRoot, { recursive: true });
+        ^
+ReferenceError: mkdirSync is not defined
+      at runLiveAgentHostProof (C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\run.ts:141:3)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\run.ts:462:11)
+(fail) G9 live AgentOS runTurn publishes one trajectory
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [119.00ms]
+artifact-root FAIL: artifact-root: live AgentOS runTurn test exited 1
+FAIL  artifact-root
+COMMAND_END_UTC=2026-08-26T01:57:10.4663339Z
+EXIT=1

@@ -1014,32 +1014,78 @@ record(41, "alias-resolved imports keep their target reachable", ...(() => {
       : `${rows.length} component files, none unreachable`];
 })());
 
-// 42 · An importer outside collab-electron/src still counts. a2a-artifact-store.ts is
-// imported by qa/gates/artifact-root/run.ts:31 and read `unreachable` for as long as
-// the graph universe stopped at the product directories.
+// 42 · An importer outside collab-electron/src still counts. The Dock inventory
+// gate imports dock-profiles.ts from QA, so the external anchor must remain visible.
 record(42, "an importer outside the product still anchors its target", ...(() => {
-  const gate = readFileSync(join(REPO, "qa/gates/artifact-root/run.ts"), "utf8");
-  if (!/a2a-artifact-store/.test(gate))
-    return [false, "the gate no longer imports a2a-artifact-store — this probe needs a new anchor"];
-  const row = before.reach.find((r) => r.path.endsWith("main/a2a-artifact-store.ts"));
-  return [row?.reach === "reachable",
-    row ? `reach=${row.reach}, importers=${row.importers.join(", ") || "none"}` : "row absent"];
+  const gatePath = "qa/gates/dock-production-inventory.ts";
+  const gate = readFileSync(join(REPO, gatePath), "utf8");
+  const realImport =
+    /import\s*\{[\s\S]*?\bdiscoverDockProfileManifests\b[\s\S]*?\}\s*from\s*["']\.\.\/\.\.\/collab-electron\/src\/main\/dock-profiles\.ts["']/.test(
+      gate,
+    );
+  if (!realImport)
+    return [false, "dock-production-inventory.ts no longer has the named dock-profiles import"];
+  const row = before.reach.find(
+    (r) => r.path === "collab-electron/src/main/dock-profiles.ts",
+  );
+  const exactImporter = row?.importers.includes(gatePath) ?? false;
+  if (!row || !exactImporter || row.reach !== "reachable")
+    return [
+      false,
+      row
+        ? "reach=" + row.reach + ", importers=" + row.importers.join(", ")
+        : "row absent",
+    ];
+
+  const withoutImport = gate.replace(
+    /import\s*\{[\s\S]*?\}\s*from\s*["']\.\.\/\.\.\/collab-electron\/src\/main\/dock-profiles\.ts["'];\r?\n/,
+    "",
+  );
+  if (withoutImport === gate)
+    return [false, "could not remove the named external importer edge"];
+  return withFiles({ [gatePath]: withoutImport }, (m) => {
+    const mutated = m.reach.find(
+      (r) => r.path === "collab-electron/src/main/dock-profiles.ts",
+    );
+    const removed = !(mutated?.importers.includes(gatePath) ?? false);
+    return [
+      removed && mutated?.reach === "reachable",
+      mutated
+        ? "after removing QA edge: reach=" +
+          mutated.reach +
+          ", importers=" +
+          mutated.importers.join(", ")
+        : "row absent after edge removal",
+    ];
+  });
 })());
 
-// 43 · A filename inside a QA assertion is NOT a launch reference. Once anchors were
-// walked, `["a2a-bus.ts", "agent-host.ts"]` at qa/gates/artifact-root/run.ts:426 gave
-// a2a-bus.ts the verdict `process-entry` — "a live worker, do not delete". A false
-// KEEP manufactured by the widening itself, which would have hidden the file from the
-// expunge for good.
-record(43, "a filename in a QA assertion does not confer process-entry", ...(() => {
-  const gate = readFileSync(join(REPO, "qa/gates/artifact-root/run.ts"), "utf8");
-  if (!/"a2a-bus\.ts"/.test(gate))
-    return [false, "the gate no longer names a2a-bus.ts in a string — this probe needs a new subject"];
-  const row = before.reach.find((r) => r.path.endsWith("main/a2a-bus.ts"));
-  return [!!row && row.reach !== "process-entry",
-    row ? `reach=${row.reach}` : "row absent"];
-})());
-
+// 43 · A filename inside a QA assertion is NOT a launch reference. The subject is
+// deliberately an otherwise-unimported product file, so the required verdict is
+// unreachable rather than a reachability result manufactured by construction.
+record(43, "a filename in a QA assertion does not confer process-entry", ...withFiles({
+  ["collab-electron/src/main/zz-vfy43-qa-string-subject.ts"]:
+    "export const zzVfy43QaStringSubject = true;\n",
+  ["qa/gates/zz-vfy43-qa-string-assertion.ts"]: [
+    'import { describe, expect, test } from "bun:test";',
+    'describe("falsifier 43", () => {',
+    '  test("a QA filename assertion is not a launch", () => {',
+    '    expect("collab-electron/src/main/zz-vfy43-qa-string-subject.ts").toContain(',
+    '      "zz-vfy43-qa-string-subject.ts",',
+    "    );",
+    "  });",
+    "});",
+    "",
+  ].join("\n"),
+}, (m) => {
+  const row = m.reach.find(
+    (r) => r.path === "collab-electron/src/main/zz-vfy43-qa-string-subject.ts",
+  );
+  return [
+    row?.reach === "unreachable",
+    row ? "reach=" + row.reach : "subject row absent",
+  ];
+}));
 // ── PUSH DIRECTION — contract items 22, 23, 24 ─────────────────────────────
 const PRELOAD = "collab-electron/src/preload";
 

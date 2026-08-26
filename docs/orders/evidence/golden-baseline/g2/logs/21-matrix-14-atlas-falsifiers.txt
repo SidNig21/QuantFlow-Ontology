@@ -1,0 +1,8 @@
+COMMAND=bun qf-atlas/falsify.mjs --receipt
+COMMAND_START_UTC=2026-08-26T02:02:33.8333929Z
+qf-atlas falsifiers — each injects a real defect, then restores
+
+Refusing to run: the working tree has changes outside qf-atlas/.
+Falsifiers edit real files; commit or stash first.
+COMMAND_END_UTC=2026-08-26T02:02:34.8444631Z
+EXIT=2

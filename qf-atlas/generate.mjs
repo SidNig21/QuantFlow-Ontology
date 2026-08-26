@@ -511,13 +511,12 @@ const productFiles = files.filter(inProduct);
 
 // External anchors — launched by path, by CI, or by a harness, and never imported,
 // so no product file points at them. Anything they ALONE import was falling to
-// `unreachable`: that is why all three a2a-* modules read as dead when
-// qa/gates/artifact-root/run.ts:31 imports a2a-artifact-store.ts directly.
-// Walking from these is monotonic in the safe direction — extra roots can only turn
-// a false delete into a true keep. Their own reachability is a different question,
-// so `rowScope` keeps them from acquiring verdicts of their own; without that,
-// widening would hand every QA gate an `unreachable` row and trade one false-delete
-// class for a larger one.
+// unreachable; this is why QA and script entrypoints are included as external
+// roots when they are real consumers. Walking from these roots is monotonic in
+// the safe direction — extra roots can only turn a false delete into a true keep.
+// Their own reachability is a different question, so rowScope keeps them from
+// acquiring verdicts of their own; without that, widening would hand every QA
+// gate an unreachable row and trade one false-delete class for a larger one.
 const ANCHOR = ["qa/", "species/", "collab-electron/cli/", "collab-electron/scripts/", "tools/"];
 const anchors = files.filter((f) => ANCHOR.some((p) => f.startsWith(p)));
 // The renderer entry list must come from the BUILD, not from a directory listing.

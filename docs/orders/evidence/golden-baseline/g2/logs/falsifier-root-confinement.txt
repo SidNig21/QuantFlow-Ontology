@@ -1,0 +1,37 @@
+artifact-root G4 resolver: PASS
+artifact-root G4 env not-directory: PASS
+bun test v1.3.12 (700fc117)
+agent-host: host-mounts skip (no file at \tmp\qf-g9-live-app\agentos-host-mounts.json)
+agent-host: host-mounts skip (no file at \tmp\qf-g9-live-app\agentos-host-mounts.json)
+agent-host: admitted agentos session=g9-live-agentos-session definition=g9-live-agentos-definition adapter=g9-agentos (no prompt)
+run.ts:
+kernel: path=:memory: provenance=env journal=memory sync=1 QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY=1 schema_meta=89
+artifact-root live receipt root_confinement RED: root=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-WphwRh\artifacts returned_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-WphwRh\escaped-artifact storage_resolved=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-WphwRh\artifacts\g9-live-agentos-session.md
+413 |           artifactsBeforeRefusal === artifactsAfterRefusal &&
+414 |           eventsBeforeRefusal === eventsAfterRefusal,
+415 |         `text=${refusalText}; artifacts=${artifactsBeforeRefusal}->${artifactsAfterRefusal}; events=${eventsBeforeRefusal}->${eventsAfterRefusal}`,
+416 |       ) && ordinaryOk;
+417 |
+418 |     if (!ordinaryOk) throw new Error("live AgentOS runTurn trajectory proof failed");
+                                     ^
+error: live AgentOS runTurn trajectory proof failed
+agent-host: session complete g9-live-agentos-session artifact=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt artifact_count PASS: count=1; expected=1; artifact_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt ordinary_kind PASS: kind=trajectory; expected=trajectory; artifact_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt producer_link_count PASS: count=1; expected=1; links=[{"kind":"produces","from_id":"g9-live-agentos-session","to_id":"5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b"}]
+      at runLiveAgentHostProof (C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\run.ts:418:32)
+      at async <anonymous> (C:\Users\rybow\QuantFlow-Ontology\qa\gates\artifact-root\run.ts:463:11)
+(fail) G9 live AgentOS runTurn publishes one trajectory [187.00ms]
+
+ 0 pass
+ 1 fail
+Ran 1 test across 1 file. [285.00ms]
+artifact-root FAIL: artifact-root: live AgentOS runTurn test exited 1
+artifact-root live receipt producer_link_identity PASS: expected kind=produces from_id=g9-live-agentos-session to_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b; actual=[{"kind":"produces","from_id":"g9-live-agentos-session","to_id":"5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b"}]
+artifact-root live receipt bytes_identity PASS: runTurn_text_bytes=31 disk_bytes=31 returned_sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b disk_sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b byte_equal=true
+artifact-root live receipt hash_identity PASS: row_id=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b content_hash=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b disk_sha256=5c54880f7221a14f39ea0e0fd441ff033f5e8cdb13448072e2ba641c850a100b
+artifact-root live receipt storage_ref_identity PASS: row_storage_ref=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-WphwRh\artifacts\g9-live-agentos-session.md returned_path=C:\Users\rybow\AppData\Local\Temp\qf-g9-live-agentos-WphwRh\artifacts\g9-live-agentos-session.md
+artifact-root live receipt ordinary_report_count PASS: report_count=0; expected=0
+artifact-root live receipt report_refusal PASS: text=publish_artifact report requires evaluation_id; artifacts=1->1; events=5->5
+EXPECTED_FALSIFIER=root-confinement
+EXIT=1

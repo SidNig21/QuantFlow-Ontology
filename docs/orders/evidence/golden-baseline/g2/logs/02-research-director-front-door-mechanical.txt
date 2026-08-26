@@ -1,0 +1,13 @@
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+falsifier=cleanup-retained-process-or-root result=red
+falsifier=cleanup-retained-process-or-root restored=true
+falsifier=watchdog-never-settles result=red
+research-director-front-door: FAIL live_timeout
+rd1_timeout_diag={"failure_boundary":"inner_wait_error","failure_class":"visible_projection_mismatch","readiness_returned":true,"rpc":"ok","ui_sample":"present","ui_phase":"running","input_disabled":false,"ledger_has_question":false,"director_tile_count":1,"tile_has_session":true,"kernel_read":"error","mission_for_question":false,"hypothesis_for_question":false,"hypothesis_status":"absent","director_session_status":"absent","director_definition_exact":false,"spawned_from_exact":false,"main_ipc_seen":true,"create_mission_seen":true,"native_admission_returned":true,"tile_event_sent":true,"tile_event_received":true,"tile_handler_threw":false,"tile_dom_identity_present":true}
+convergence_remaining=0
+owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
+repository_tree_unchanged=false
+elapsed_ms=121052
+FAIL  research-director-front-door

@@ -1,0 +1,14 @@
+COMMAND_START_UTC=2026-08-26T01:55:11.9096686Z
+COMMAND=bun test collab-electron/scripts/package-lib/shared-paths.test.ts
+bun test v1.3.12 (700fc117)
+
+collab-electron\scripts\package-lib\shared-paths.test.ts:
+(pass) shared production path rules > changing shared input moves both production and inspection consumers
+(pass) static shared-module dependency > gate and production import and call package-resource-paths
+
+ 2 pass
+ 0 fail
+ 11 expect() calls
+Ran 2 tests across 1 file. [68.00ms]
+COMMAND_END_UTC=2026-08-26T01:55:12.0568245Z
+EXIT=0

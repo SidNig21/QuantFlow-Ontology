@@ -1,0 +1,22 @@
+COMMAND_START_UTC=2026-08-26T02:01:12.9909810Z
+COMMAND=bun qa/run.ts doc-links
+71 |       .map((l) => l.trim())
+72 |       .filter((l) => l.length > 0),
+73 |   );
+74 |
+75 |   for (const doc of liveDocs()) {
+76 |     const text = readFileSync(join(REPO_ROOT, doc), "utf8");
+                      ^
+ENOENT: no such file or directory, open 'C:\Users\rybow\QuantFlow-Ontology\collab-electron\docs\superpowers\specs\2026-03-23-ipc-workspace-graph-modularization-design.md'
+    path: "C:\\Users\\rybow\\QuantFlow-Ontology\\collab-electron\\docs\\superpowers\\specs\\2026-03-23-ipc-workspace-graph-modularization-design.md",
+ syscall: "open",
+   errno: -2,
+    code: "ENOENT"
+
+      at checkDocLinks (C:\Users\rybow\QuantFlow-Ontology\qa\gates\doc-links.ts:76:18)
+      at <anonymous> (C:\Users\rybow\QuantFlow-Ontology\qa\run.ts:825:14)
+      at async main (C:\Users\rybow\QuantFlow-Ontology\qa\run.ts:1112:24)
+
+Bun v1.3.12 (Windows x64)
+COMMAND_END_UTC=2026-08-26T02:01:13.3148007Z
+EXIT=1

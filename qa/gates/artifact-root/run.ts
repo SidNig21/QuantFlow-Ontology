@@ -3,8 +3,8 @@
  *
  * - resolveArtifactRoot default under temp HOME
  * - production helper writes an absent file, then execute publishes the same bytes
- * - the exact production A2A store writes and publishes beneath that root
- * - both production publishers are statically coupled and exhaustively enumerated
+ * - the exact production writer writes and publishes beneath that root
+ * - the production publisher is statically coupled and exhaustively enumerated
  */
 import { Database } from "bun:sqlite";
 import { mock, test } from "bun:test";
@@ -30,7 +30,6 @@ import {
 } from "qf-kernel";
 import { buildArtifactRootInstallPlan } from "../artifact-root.ts";
 import { writeAgentTrajectoryArtifact } from "../../../collab-electron/src/main/agent-artifact-writer.ts";
-import { createA2aArtifactStore } from "../../../collab-electron/src/main/a2a-artifact-store.ts";
 
 const REPO_ROOT = join(import.meta.dir, "../../..");
 const FIXTURE_ENV = "QF_KERNEL_SYNC_UNSAFE_FIXTURES_ONLY";
@@ -849,145 +848,6 @@ function gatePublishUnderRoot(): string | null {
   }
 }
 
-function gateA2aPublishUnderRoot(): string | null {
-  const savedHome = process.env.HOME;
-  const savedRoot = process.env.QF_ARTIFACT_ROOT;
-  const savedFixture = process.env[FIXTURE_ENV];
-  const home = mkdtempSync(join(tmpdir(), "qf-k3b-a2a-home-"));
-  const configuredRoot = join(home, "canonical-artifacts");
-  mkdirSync(configuredRoot, { recursive: true });
-  process.env.HOME = home;
-  process.env.QF_ARTIFACT_ROOT = configuredRoot;
-  process.env[FIXTURE_ENV] = "1";
-
-  const db = openKernel(":memory:");
-  try {
-    const resolved = resolveArtifactRoot();
-    if (resolved.path !== configuredRoot || resolved.provenance !== "env") {
-      return `artifact-root: A2A expected env root ${configuredRoot}, got ${resolved.path} (${resolved.provenance})`;
-    }
-
-    const store = createA2aArtifactStore({
-      artifactRoot: () => resolveArtifactRoot().path,
-      publish: (input) => execute(db, "publish_artifact", input, {
-        trace_id: "k3b-a2a-art-root",
-        span_id: "k3b-a2a-art-span",
-      }),
-    });
-    const expectedDir = join(configuredRoot, "a2a");
-    if (store.artifactDir !== expectedDir) {
-      return `artifact-root: A2A helper directory mismatch: ${store.artifactDir}`;
-    }
-
-    const explicitDir = join(home, "explicit-a2a-override");
-    let overrideConsultedRoot = false;
-    const explicitStore = createA2aArtifactStore({
-      artifactDir: explicitDir,
-      artifactRoot: () => {
-        overrideConsultedRoot = true;
-        return configuredRoot;
-      },
-      publish: (input) => execute(db, "publish_artifact", input, {
-        trace_id: "k3b-a2a-override",
-        span_id: "k3b-a2a-override-span",
-      }),
-    });
-    if (explicitStore.artifactDir !== explicitDir || overrideConsultedRoot) {
-      return "artifact-root: A2A explicit artifactDir override no longer bypasses the default root";
-    }
-
-    const storagePath = join(store.artifactDir, "gate-absent-envelope.json");
-    if (existsSync(storagePath)) {
-      return `artifact-root: A2A gate bytes existed before production writer call: ${storagePath}`;
-    }
-    const bytes = new TextEncoder().encode(
-      '{"a2a":"1","body":"k3b production helper proof"}\n',
-    );
-    store.writeFile(storagePath, bytes);
-    if (!existsSync(storagePath)) {
-      return `artifact-root: A2A production helper left no file: ${storagePath}`;
-    }
-
-    const artifactsBeforeRefusal = Number(
-      (db.query("SELECT COUNT(*) AS count FROM artifact").get() as { count: number }).count,
-    );
-    const eventsBeforeRefusal = Number(
-      (db.query("SELECT COUNT(*) AS count FROM events").get() as { count: number }).count,
-    );
-    let publication: { artifactId: string };
-    try {
-      publication = store.publishArtifact({ storagePath });
-    } catch (error) {
-      const refusalText = error instanceof Error ? error.message : String(error);
-      const artifactsAfterRefusal = Number(
-        (db.query("SELECT COUNT(*) AS count FROM artifact").get() as { count: number }).count,
-      );
-      const eventsAfterRefusal = Number(
-        (db.query("SELECT COUNT(*) AS count FROM events").get() as { count: number }).count,
-      );
-      const refusalOk =
-        refusalText === "publish_artifact report requires evaluation_id" &&
-        artifactsBeforeRefusal === artifactsAfterRefusal &&
-        eventsBeforeRefusal === eventsAfterRefusal;
-      if (refusalOk) {
-        console.log(
-          "artifact-root A2A report refusal: PASS" +
-            " text=" + refusalText +
-            " artifacts=" + artifactsBeforeRefusal + "->" + artifactsAfterRefusal +
-            " events=" + eventsBeforeRefusal + "->" + eventsAfterRefusal,
-        );
-        return null;
-      }
-      return `artifact-root: A2A report refusal mismatch: ${refusalText}`;
-    }
-    const rows = queryObjects(db, "artifact", undefined, null);
-    if (rows.length !== 1) {
-      return `artifact-root: A2A expected one artifact row, got ${rows.length}`;
-    }
-
-    const row = rows[0]!;
-    const diskBytes = readFileSync(storagePath);
-    const expectedHash = contentHash(diskBytes);
-    if (
-      row.id !== expectedHash ||
-      row.content_hash !== expectedHash ||
-      publication.artifactId !== expectedHash
-    ) {
-      return "artifact-root: A2A production bytes and Kernel identity/hash disagree";
-    }
-    if (row.storage_ref !== storagePath) {
-      return `artifact-root: A2A storage_ref mismatch: ${String(row.storage_ref)}`;
-    }
-    if (!Buffer.from(diskBytes).equals(Buffer.from(bytes))) {
-      return "artifact-root: A2A bytes on disk differ from the bytes given to the production helper";
-    }
-
-    const relativePath = relative(
-      realpathSync(configuredRoot),
-      realpathSync(String(row.storage_ref)),
-    );
-    if (
-      isAbsolute(relativePath) ||
-      relativePath === ".." ||
-      relativePath.startsWith(`..${sep}`)
-    ) {
-      return `artifact-root: A2A storage_ref outside resolved root: ${String(row.storage_ref)}`;
-    }
-
-    console.log("artifact-root K3b A2A production writer: PASS");
-    return null;
-  } finally {
-    closeKernel(db);
-    if (savedFixture === undefined) delete process.env[FIXTURE_ENV];
-    else process.env[FIXTURE_ENV] = savedFixture;
-    if (savedHome === undefined) delete process.env.HOME;
-    else process.env.HOME = savedHome;
-    if (savedRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
-    else process.env.QF_ARTIFACT_ROOT = savedRoot;
-    rmSync(home, { recursive: true, force: true });
-  }
-}
-
 function gateAgentHostCoupling(): string | null {
   const src = readFileSync(
     join(REPO_ROOT, "collab-electron/src/main/agent-host.ts"),
@@ -1017,40 +877,6 @@ function gateAgentHostCoupling(): string | null {
   return null;
 }
 
-function gateA2aBusCoupling(): string | null {
-  const src = readFileSync(
-    join(REPO_ROOT, "collab-electron/src/main/a2a-bus.ts"),
-    "utf8",
-  );
-  const stripped = stripComments(src);
-  if (
-    !/import\s*\{\s*createA2aArtifactStore\s*\}\s*from\s*["']\.\/a2a-artifact-store(?:\.ts)?["']/.test(
-      stripped,
-    )
-  ) {
-    return "artifact-root: a2a-bus must import the production A2A artifact store";
-  }
-  if (!stripped.includes("createA2aArtifactStore({")) {
-    return "artifact-root: a2a-bus must call the production A2A artifact store";
-  }
-  if (!stripped.includes("artifactRoot: getArtifactRoot")) {
-    return "artifact-root: a2a-bus must give the production store getArtifactRoot";
-  }
-  if (
-    !stripped.includes("opts?.artifactDir !== undefined") ||
-    !stripped.includes("artifactDir: opts.artifactDir")
-  ) {
-    return "artifact-root: a2a-bus must preserve its explicit artifactDir override";
-  }
-  for (const forbidden of ["COLLAB_DIR", "QF_APP_ROOT", "QF_APP_DIR"]) {
-    if (new RegExp(`\\b${forbidden}\\b`).test(stripped)) {
-      return `artifact-root: a2a-bus must not derive its default from ${forbidden}`;
-    }
-  }
-  console.log("artifact-root K3b A2A production coupling: PASS");
-  return null;
-}
-
 function productionSourceFiles(root: string): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(root, { withFileTypes: true })) {
@@ -1076,12 +902,10 @@ function gateProductionPublishers(): string | null {
   // Coverage floor. Empty main tree → expected callsites "none" already fails,
   // but require we actually read the production surface this gate protects.
   const MIN_MAIN_FILES = 10;
-  const sawA2a = files.some((path) => relative(mainRoot, path).split("\\").join("/") === "a2a-bus.ts");
   const sawHost = files.some((path) => relative(mainRoot, path).split("\\").join("/") === "agent-host.ts");
-  if (files.length < MIN_MAIN_FILES || !sawA2a || !sawHost) {
+  if (files.length < MIN_MAIN_FILES || !sawHost) {
     return (
       `artifact-root: scan collapsed — ${files.length} main files, ` +
-      `a2a-bus.ts seen: ${sawA2a}, agent-host.ts seen: ${sawHost}. ` +
       `Refusing to report PASS on a scan that inspected nothing.`
     );
   }
@@ -1096,7 +920,6 @@ function gateProductionPublishers(): string | null {
   }
 
   const expected = [
-    "a2a-bus.ts",
     "agent-host.ts",
     "index.ts",
     "kernel.ts",
@@ -1164,9 +987,7 @@ async function main(): Promise<number> {
     gateEnvNotDirectory,
     gateLiveAgentHostRunTurn,
     gatePublishUnderRoot,
-    gateA2aPublishUnderRoot,
     gateAgentHostCoupling,
-    gateA2aBusCoupling,
     gateProductionPublishers,
   ]) {
     const err = await fn();

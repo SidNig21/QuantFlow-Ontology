@@ -204,14 +204,11 @@ export function reachability({ repo, rel, files, htmlEntries, extraEntries = [],
   //
   // Both are found by evidence, not by an allowlist: a basename quoted anywhere
   // in reachable source counts as a launch reference.
-  // A filename inside a QA assertion is NOT a launch reference. Once anchors were
-  // walked, `qa/gates/artifact-root/run.ts:426` — `const expected = ["a2a-bus.ts",
-  // "agent-host.ts"]` — handed a2a-bus.ts the verdict `process-entry`, i.e. "a live
-  // worker, do not delete". A false KEEP manufactured by the widening itself.
-  // Two independent guards: anchors never contribute quotes, and the quoting file
-  // must actually launch something. The build-derived entry list plus falsifier 37
-  // now cover the real workers and the sidecar, so this heuristic is a backstop and
-  // can afford to be strict.
+  // A filename inside a QA assertion is NOT a launch reference. An external QA
+  // anchor may preserve a real importer edge, but a bare filename string must not
+  // create a process-entry verdict. The build-derived entry list plus the falsifier
+  // suite cover real workers and sidecars, so this heuristic remains a backstop and
+  // can stay strict.
   const LAUNCHES = /\b(?:fork|spawnSync|spawn|execFileSync|execFile|execSync|utilityProcess|new\s+Worker)\b/;
   const anchorSet = new Set(anchors);
   const quoted = new Set();

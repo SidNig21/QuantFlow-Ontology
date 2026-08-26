@@ -35,33 +35,14 @@
     "2026-08-17 expunge: the four remove verdicts were executed and their findings no longer exist, so their entries were pruned. The reasoning lives in the commit that deleted them.",
     "2026-08-19 — the three governed-review hard reds are adjudicated REPAIR. No expiry: they are being repaired, not accepted. Ownership findings are deliberately NOT here: multiple structural claimants is not proof of competing ownership, so they stay amber until independently adjudicated.",
     "2026-08-18 D6 schema migration: five entries carried `why` and were renamed to `reason` verbatim. No verdict, owner or wording changed. The three `repair` entries below with no `remediation_trigger` are INCOMPLETE and say so; inventing a trigger for them would be authoring founder intent, so they are left for the founder to fill in.",
-    "2026-08-19 D4 identity migration: persistence ids became persistence:<file>:<function>:<table>:<verb>, because the old shape collapsed two different functions writing the same table+verb into one finding and dropped the second. The three governed-review REPAIR keys below were remapped mechanically. No verdict, owner, reason or remediation_trigger changed."
+    "2026-08-19 D4 identity migration: persistence ids became persistence:<file>:<function>:<table>:<verb>, because the old shape collapsed two different functions writing the same table+verb into one finding and dropped the second. The three governed-review REPAIR keys below were remapped mechanically. No verdict, owner, reason or remediation_trigger changed.",
+    "2026-08-24 G2 founder disposition superseded and retired the four source-bound decisions after bounded proof retargeting; current live receipts own the protected invariants.",
   ],
   "decisions": {
-    "unreachable:collab-electron/src/main/a2a-bus.ts": {
-      "verdict": "keep",
-      "owner": "founder",
-      "reason": "GATE-ANCHORED. qa/gates/artifact-root/run.ts:350 reads this exact path, and :359/:362 assert it imports AND calls the production A2A artifact store. Deleting it turns a gate red, which is the one thing this work may never do to make the map greener."
-    },
-    "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js": {
-      "verdict": "keep",
-      "owner": "founder",
-      "reason": "Founder-authored brand engine. qa/gates/one-skin.ts:21 allowlists this exact path as one of two justified palette exceptions, and WO-007 describes it as imported verbatim as founder input. flow-cube-watermark.js does not import it (the apparent import at line 16 is a usage comment), so 'unimported' is accurate and irrelevant: it is an asset, not dead wiring."
-    },
     "broken-bridge-call:ptyForegroundProcess": {
       "verdict": "repair",
       "owner": "founder",
       "reason": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site."
-    },
-    "unreachable:collab-electron/src/main/species-launch.ts": {
-      "verdict": "repair",
-      "owner": "founder",
-      "reason": "ORPHANED, NOT DEAD. Nothing imports it, but collab-electron/scripts/package-lib/shared-paths.test.ts:38 reads its source and asserts it contains './package-resource-paths', and WO-008c documents its launch-precedence chain as live behaviour. A module that a test pins and no code imports is a wiring defect, not a deletion candidate."
-    },
-    "unreachable:collab-electron/src/main/species-tools.ts": {
-      "verdict": "repair",
-      "owner": "founder",
-      "reason": "Same shape as species-launch.ts: shared-paths.test.ts:42 pins its content, nothing imports it. WO-008a also uses it as the ACP sole-writer perimeter bait target."
     },
     "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into": {
       "verdict": "repair",

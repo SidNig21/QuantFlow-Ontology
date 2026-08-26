@@ -1,0 +1,25 @@
+COMMAND_START_UTC=2026-08-26T01:56:56.2589627Z
+COMMAND=bun test qa/gates/research-world-visible.test.ts
+bun test v1.3.12 (700fc117)
+
+qa\gates\research-world-visible.test.ts:
+(pass) research-world-visible gate contract > keeps the live gate bounded and contract-complete without launching in the focused test
+(pass) research-world-visible gate contract > requires the corrected 13-tile/15-cable Oracle count
+(pass) research-world-visible gate contract > preserves the first functional failure and reports cleanup failures separately [16.00ms]
+(pass) research-world-visible gate contract > returns specialist results in executor/critic order after critic resolves first
+(pass) research-world-visible gate contract > removes an existing expired-deadline root with one immediate attempt
+(pass) research-world-visible gate contract > JSON-encodes renderer expressions and returns the exact error shape
+(pass) research-world-visible gate contract > world observation expression parses before it reaches the renderer
+(pass) research-world-visible gate contract > reports every sorted delta for a known 12/14 snapshot
+(pass) research-world-visible gate contract > enforces the exact saved research-tile storage allowlist
+(pass) research-world-visible gate contract > runs cases serially and derives one-launch activity with concrete red checks
+(pass) research-world-visible gate contract > stops on a child-bearing rejection and closes its activity lease in finally
+(pass) research-world-visible gate contract > requires the exact pointer-first DOM click-handler proof and no keyboard sender
+(pass) research-world-visible gate contract > keeps fixture truth out of the renderer and exposes inspection attributes
+
+ 13 pass
+ 0 fail
+ 192 expect() calls
+Ran 13 tests across 1 file. [98.00ms]
+COMMAND_END_UTC=2026-08-26T01:56:56.4324402Z
+EXIT=0

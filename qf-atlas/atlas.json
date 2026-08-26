@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "bc1bdbf",
-    "generatedAt": "2026-08-25",
-    "filesScanned": 439,
+    "commit": "d1d549a",
+    "generatedAt": "2026-08-26",
+    "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "9b71defd3b1388c3"
+    "fingerprint": "dca9eca4b78dd17f"
   },
   "stats": {
     "live": 113,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 126,
-      "indexed": 1203,
+      "indexed": 1181,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 561
+      "files": 554
     },
-    "coverageFiles": 561,
+    "coverageFiles": 554,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -343,28 +343,29 @@
     "violations": 10,
     "governanceUnknown": 3,
     "legacyLeads": 10,
-    "nodes": 110,
+    "nodes": 108,
     "loopsBroken": 2,
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 42,
+    "undecided": 41,
     "allClear": false,
     "decisions": {
-      "total": 47,
-      "undecided": 42,
-      "keep": 2,
-      "repair": 3,
+      "total": 41,
+      "undecided": 41,
+      "keep": 0,
+      "repair": 0,
       "remove": 0,
       "accepted": 0,
-      "incomplete": 3,
+      "incomplete": 0,
       "allClear": false
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 22,
+      "founder-decision": 20,
       "ast-coverage": 3,
-      "package-proof": 17
+      "package-proof": 17,
+      "product-defect": 1
     }
   },
   "layers": [
@@ -909,8 +910,8 @@
       "layer": 2,
       "name": "runtime-staging.ts",
       "kb": 7.1,
-      "x": 3.96,
-      "z": 0.02,
+      "x": 3.83,
+      "z": -1,
       "status": "ok",
       "spawns": 1,
       "writes": 1,
@@ -975,8 +976,8 @@
       "layer": 2,
       "name": "upload-to-github.cjs",
       "kb": 10,
-      "x": -3.71,
-      "z": -1.38,
+      "x": -3.42,
+      "z": -2,
       "status": "ok",
       "spawns": 1,
       "writes": 3,
@@ -989,54 +990,6 @@
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 3,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        }
-      ],
-      "strip": [],
-      "breaches": [],
-      "wires": []
-    },
-    {
-      "id": "2:collab-electron/src/main::a2a",
-      "layer": 2,
-      "name": "main/a2a*",
-      "kb": 9,
-      "x": 0.71,
-      "z": -3.9,
-      "status": "ok",
-      "spawns": 0,
-      "writes": 1,
-      "dml": 0,
-      "executes": 0,
-      "files": [
-        {
-          "path": "collab-electron/src/main/a2a-orchestra.ts",
-          "kb": 5,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/main/a2a-bus.ts",
-          "kb": 2.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/main/a2a-artifact-store.ts",
-          "kb": 1.4,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 1,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -1143,8 +1096,8 @@
       "layer": 2,
       "name": "app*",
       "kb": 9.4,
-      "x": -0.67,
-      "z": -3.9,
+      "x": 0.54,
+      "z": -3.92,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1413,8 +1366,8 @@
       "layer": 2,
       "name": "image*",
       "kb": 11.5,
-      "x": -3.96,
-      "z": -0.02,
+      "x": -3.92,
+      "z": -0.54,
       "status": "ok",
       "spawns": 0,
       "writes": 2,
@@ -1748,8 +1701,8 @@
       "layer": 2,
       "name": "live*",
       "kb": 3.1,
-      "x": 1.96,
-      "z": 3.44,
+      "x": 2.39,
+      "z": 3.16,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1786,8 +1739,8 @@
       "layer": 2,
       "name": "logger*",
       "kb": 2.4,
-      "x": 0.67,
-      "z": 3.9,
+      "x": 1,
+      "z": 3.83,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1824,8 +1777,8 @@
       "layer": 2,
       "name": "mission*",
       "kb": 3.9,
-      "x": 3.02,
-      "z": 2.56,
+      "x": 3.42,
+      "z": 2,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1862,8 +1815,8 @@
       "layer": 2,
       "name": "ontology*",
       "kb": 12,
-      "x": -3.05,
-      "z": 2.53,
+      "x": -3.16,
+      "z": 2.39,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -1920,8 +1873,8 @@
       "layer": 2,
       "name": "peer*",
       "kb": 9.9,
-      "x": -3.02,
-      "z": -2.56,
+      "x": -2.39,
+      "z": -3.16,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -1983,8 +1936,8 @@
       "layer": 2,
       "name": "precreated*",
       "kb": 1.3,
-      "x": -0.71,
-      "z": 3.9,
+      "x": -0.54,
+      "z": 3.92,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -2209,60 +2162,12 @@
       "wires": []
     },
     {
-      "id": "2:collab-electron/src/main::species",
-      "layer": 2,
-      "name": "species*",
-      "kb": 8.6,
-      "x": 3.05,
-      "z": -2.53,
-      "status": "ok",
-      "spawns": 0,
-      "writes": 0,
-      "dml": 0,
-      "executes": 0,
-      "files": [
-        {
-          "path": "collab-electron/src/main/species-launch.ts",
-          "kb": 3.3,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/main/species-surface.ts",
-          "kb": 3.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/main/species-tools.ts",
-          "kb": 2.1,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        }
-      ],
-      "strip": [],
-      "breaches": [],
-      "wires": []
-    },
-    {
       "id": "2:collab-electron/src/main::terminal",
       "layer": 2,
       "name": "terminal-target.ts",
       "kb": 11.6,
-      "x": -3.73,
-      "z": 1.33,
+      "x": -3.83,
+      "z": 1,
       "status": "ok",
       "spawns": 3,
       "writes": 0,
@@ -2289,8 +2194,8 @@
       "layer": 2,
       "name": "updater/",
       "kb": 8.1,
-      "x": 3.73,
-      "z": -1.33,
+      "x": 3.16,
+      "z": -2.39,
       "status": "alert",
       "spawns": 0,
       "writes": 0,
@@ -2332,8 +2237,8 @@
       "layer": 2,
       "name": "watcher*",
       "kb": 5.3,
-      "x": 3.71,
-      "z": 1.38,
+      "x": 3.92,
+      "z": 0.54,
       "status": "ok",
       "spawns": 1,
       "writes": 0,
@@ -2370,8 +2275,8 @@
       "layer": 2,
       "name": "wikilink-index.ts",
       "kb": 9.5,
-      "x": -1.96,
-      "z": -3.44,
+      "x": -1,
+      "z": -3.83,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -3520,7 +3425,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 789.5,
+      "kb": 796.3,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3560,21 +3465,21 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/technique-outcome-loop.ts",
-          "kb": 45.9,
-          "spawns": 4,
+          "path": "qa/gates/research-director-front-door.ts",
+          "kb": 50.5,
+          "spawns": 3,
           "spawnsLive": 2,
-          "writes": 0,
+          "writes": 4,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
         },
         {
-          "path": "qa/gates/research-director-front-door.ts",
-          "kb": 43.5,
-          "spawns": 3,
+          "path": "qa/gates/technique-outcome-loop.ts",
+          "kb": 45.9,
+          "spawns": 4,
           "spawnsLive": 2,
-          "writes": 4,
+          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -3906,8 +3811,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/one-skin.ts",
-          "kb": 4.2,
+          "path": "qa/gates/verb-retirement.ts",
+          "kb": 4.1,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -3916,8 +3821,8 @@
           "executes": 0
         },
         {
-          "path": "qa/gates/verb-retirement.ts",
-          "kb": 4.1,
+          "path": "qa/gates/one-skin.ts",
+          "kb": 4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -4241,24 +4146,24 @@
       "id": "5:qa/gates/artifact-root::run",
       "layer": 5,
       "name": "artifact-root/run.ts",
-      "kb": 40.9,
-      "x": -0.23,
-      "z": 1.3,
+      "kb": 34,
+      "x": 0.23,
+      "z": -1.3,
       "status": "ice",
       "spawns": 1,
-      "writes": 4,
+      "writes": 3,
       "dml": 0,
-      "executes": 7,
+      "executes": 5,
       "files": [
         {
           "path": "qa/gates/artifact-root/run.ts",
-          "kb": 40.9,
+          "kb": 34,
           "spawns": 1,
           "spawnsLive": 1,
-          "writes": 4,
+          "writes": 3,
           "dml": 0,
           "dmlLines": [],
-          "executes": 7
+          "executes": 5
         }
       ],
       "strip": [],
@@ -4298,8 +4203,8 @@
       "layer": 5,
       "name": "dock-definition-launch/run.ts",
       "kb": 37.6,
-      "x": -1.01,
-      "z": -0.85,
+      "x": -1.24,
+      "z": 0.45,
       "status": "ice",
       "spawns": 1,
       "writes": 4,
@@ -4326,8 +4231,8 @@
       "layer": 5,
       "name": "dock-profile-identity/run.ts",
       "kb": 39.4,
-      "x": -1.24,
-      "z": 0.45,
+      "x": -0.23,
+      "z": 1.3,
       "status": "ice",
       "spawns": 2,
       "writes": 0,
@@ -4546,8 +4451,8 @@
       "layer": 5,
       "name": "qa/run.ts",
       "kb": 37,
-      "x": 0.23,
-      "z": -1.3,
+      "x": -1.01,
+      "z": -0.85,
       "status": "ok",
       "spawns": 5,
       "writes": 0,
@@ -4956,7 +4861,7 @@
     {
       "id": "3:species/hermes::a2a",
       "layer": 3,
-      "name": "hermes/a2a*",
+      "name": "a2a*",
       "kb": 21.7,
       "x": 1.01,
       "z": 0.85,
@@ -5410,8 +5315,8 @@
     {
       "id": "4:residue",
       "layer": 4,
-      "name": "77 small modules*",
-      "kb": 168.8,
+      "name": "76 small modules*",
+      "kb": 164.1,
       "x": 0,
       "z": 0,
       "status": "ok",
@@ -5516,16 +5421,6 @@
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
-          "kb": 4.7,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -8978,30 +8873,6 @@
       "sqlUnrecognised": 0
     },
     {
-      "path": "collab-electron/src/main/a2a-artifact-store.ts",
-      "status": "indexed",
-      "indexedFns": 2,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/a2a-bus.ts",
-      "status": "indexed",
-      "indexedFns": 8,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/a2a-orchestra.ts",
-      "status": "indexed",
-      "indexedFns": 6,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
       "path": "collab-electron/src/main/acp-agent.ts",
       "status": "indexed",
       "indexedFns": 21,
@@ -9613,30 +9484,6 @@
       "path": "collab-electron/src/main/sidecar/server.ts",
       "status": "indexed",
       "indexedFns": 28,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/species-launch.ts",
-      "status": "indexed",
-      "indexedFns": 3,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/species-surface.ts",
-      "status": "indexed",
-      "indexedFns": 4,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "collab-electron/src/main/species-tools.ts",
-      "status": "indexed",
-      "indexedFns": 3,
       "sqlInText": 0,
       "sqlIndexed": 0,
       "sqlUnrecognised": 0
@@ -10563,10 +10410,6 @@
     },
     {
       "path": "collab-electron/src/windows/settings/src/main.tsx",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
       "status": "out-of-scope"
     },
     {
@@ -11896,14 +11739,6 @@
           "weight": "strong"
         },
         {
-          "file": "collab-electron/src/main/a2a-artifact-store.ts",
-          "weak": [
-            "exports createA2aArtifactStore() at line 26"
-          ],
-          "strong": [],
-          "weight": "weak"
-        },
-        {
           "file": "collab-electron/src/main/agent-artifact-writer.ts",
           "weak": [
             "exports writeAgentTrajectoryArtifact() at line 32"
@@ -11928,7 +11763,7 @@
           "weight": "weak"
         }
       ],
-      "ownerCount": 8,
+      "ownerCount": 7,
       "strongOwnerCount": 4,
       "why": "4 files carry STRUCTURAL evidence for one responsibility — they mutate the same table or own the same channel family, which is competing ownership rather than a shared helper",
       "note": null
@@ -14415,72 +14250,6 @@
         "lifetime": "starts no long-lived child process",
         "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
         "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/a2a-artifact-store.ts",
-      "worst": "indexed",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "indexed",
-      "ownership": "indexed",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/a2a-bus.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "blockers": {
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ownership": "unsupported",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/a2a-orchestra.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "blockers": {
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ownership": "unsupported",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
       },
       "unexplained": []
     },
@@ -17113,78 +16882,6 @@
       "unexplained": []
     },
     {
-      "path": "collab-electron/src/main/species-launch.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "blockers": {
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ownership": "unsupported",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/species-surface.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "blockers": {
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ownership": "unsupported",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/main/species-tools.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "blockers": {
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ownership": "unsupported",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
       "path": "collab-electron/src/main/task-delegation-projection.test.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -18076,30 +17773,6 @@
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "indexed",
-      "ipcRequest": "indexed",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "blockers": {
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ownership": "unsupported",
-      "reasons": {
-        "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
         "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
       },
       "unexplained": []
@@ -25510,42 +25183,42 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 557,
+      "indexed": 550,
       "dynamic": 4
     },
     "ipcRequest": {
       "not-applicable": 273,
-      "indexed": 284,
+      "indexed": 277,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 550,
+      "not-applicable": 543,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 509,
+      "not-applicable": 502,
       "partial": 27,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 490,
+      "not-applicable": 483,
       "partial": 65,
       "indexed": 6
     },
     "packaging": {
       "not-applicable": 205,
-      "unsupported": 123,
-      "indexed": 233
+      "unsupported": 117,
+      "indexed": 232
     },
     "ownership": {
       "not-applicable": 178,
-      "unsupported": 362,
-      "indexed": 21
+      "unsupported": 356,
+      "indexed": 20
     },
     "reach": {
       "unsupported": 320,
-      "indexed": 238,
+      "indexed": 231,
       "partial": 3
     }
   },
@@ -26295,42 +25968,6 @@
         "collab-electron/packages/shared/src/types.ts"
       ],
       "importCount": 1
-    },
-    {
-      "path": "collab-electron/src/main/a2a-artifact-store.ts",
-      "reach": "reachable",
-      "importers": [
-        "qa/gates/artifact-root/run.ts"
-      ],
-      "importerCount": 1,
-      "imports": [],
-      "importCount": 0
-    },
-    {
-      "path": "collab-electron/src/main/a2a-bus.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "species/hermes/a2a-core.ts",
-        "collab-electron/src/main/a2a-artifact-store.ts",
-        "collab-electron/src/main/kernel.ts",
-        "collab-electron/src/main/pty-display.ts",
-        "collab-electron/src/main/pty.ts"
-      ],
-      "importCount": 5
-    },
-    {
-      "path": "collab-electron/src/main/a2a-orchestra.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "collab-electron/src/main/a2a-bus.ts",
-        "collab-electron/src/main/agent-host.ts",
-        "species/hermes/a2a-proof-script.ts"
-      ],
-      "importCount": 3
     },
     {
       "path": "collab-electron/src/main/acp-agent.ts",
@@ -27436,41 +27073,6 @@
       "importCount": 5
     },
     {
-      "path": "collab-electron/src/main/species-launch.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "collab-electron/src/main/host-mounts.ts",
-        "collab-electron/src/main/kernel.ts",
-        "collab-electron/src/main/package-resource-paths.ts",
-        "collab-electron/src/main/package-resource-paths.ts"
-      ],
-      "importCount": 4
-    },
-    {
-      "path": "collab-electron/src/main/species-surface.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "collab-electron/src/main/species-launch.ts",
-        "collab-electron/src/main/kernel.ts"
-      ],
-      "importCount": 2
-    },
-    {
-      "path": "collab-electron/src/main/species-tools.ts",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [
-        "collab-electron/src/main/kernel.ts",
-        "collab-electron/src/main/package-resource-paths.ts"
-      ],
-      "importCount": 2
-    },
-    {
       "path": "collab-electron/src/main/task-delegation-projection.ts",
       "reach": "reachable",
       "importers": [
@@ -27866,14 +27468,6 @@
         "collab-electron/packages/theme/src/styles.css"
       ],
       "importCount": 6
-    },
-    {
-      "path": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
-      "reach": "unreachable",
-      "importers": [],
-      "importerCount": 0,
-      "imports": [],
-      "importCount": 0
     },
     {
       "path": "collab-electron/src/windows/shared/flow-cube/flow-cube-watermark.js",
@@ -30197,51 +29791,6 @@
       "affectedProcesses": [],
       "packaged": "bundled-via-import"
     },
-    "collab-electron/src/main/a2a-artifact-store.ts": {
-      "reach": "reachable",
-      "directDependents": [
-        "qa/gates/artifact-root/run.ts"
-      ],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/main/a2a-bus.ts": {
-      "reach": "unreachable",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "species/hermes/a2a-core.ts",
-        "collab-electron/src/main/a2a-artifact-store.ts",
-        "collab-electron/src/main/kernel.ts",
-        "collab-electron/src/main/pty-display.ts",
-        "collab-electron/src/main/pty.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "not-reached"
-    },
-    "collab-electron/src/main/a2a-orchestra.ts": {
-      "reach": "unreachable",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/main/a2a-bus.ts",
-        "collab-electron/src/main/agent-host.ts",
-        "species/hermes/a2a-proof-script.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "not-reached"
-    },
     "collab-electron/src/main/acp-agent.ts": {
       "reach": "reachable",
       "directDependents": [
@@ -32284,50 +31833,6 @@
         }
       ],
       "packaged": "bundled-via-import"
-    },
-    "collab-electron/src/main/species-launch.ts": {
-      "reach": "unreachable",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/main/host-mounts.ts",
-        "collab-electron/src/main/kernel.ts",
-        "collab-electron/src/main/package-resource-paths.ts",
-        "collab-electron/src/main/package-resource-paths.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "not-reached"
-    },
-    "collab-electron/src/main/species-surface.ts": {
-      "reach": "unreachable",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/main/species-launch.ts",
-        "collab-electron/src/main/kernel.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "not-reached"
-    },
-    "collab-electron/src/main/species-tools.ts": {
-      "reach": "unreachable",
-      "directDependents": [],
-      "transitiveDependents": [],
-      "transitiveTruncated": false,
-      "directDependencies": [
-        "collab-electron/src/main/kernel.ts",
-        "collab-electron/src/main/package-resource-paths.ts"
-      ],
-      "affectedWires": [],
-      "affectedLoops": [],
-      "affectedProcesses": [],
-      "packaged": "not-reached"
     },
     "collab-electron/src/main/task-delegation-projection.ts": {
       "reach": "reachable",
@@ -44740,7 +44245,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -44809,7 +44313,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -44835,7 +44338,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -45072,7 +44574,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -45110,7 +44611,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -45214,7 +44714,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -45427,7 +44926,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -45991,7 +45489,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -46025,7 +45522,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -46051,7 +45547,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -46210,7 +45705,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -46248,7 +45742,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -46352,7 +45845,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -46514,7 +46006,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -46994,7 +46485,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -47028,7 +46518,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -47054,7 +46543,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -47213,7 +46701,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -47251,7 +46738,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -47355,7 +46841,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -47542,7 +47027,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -47792,7 +47276,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/host-native-tui.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -48937,7 +48420,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/host-acp-turn.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -48964,7 +48446,6 @@
             "name": "publish",
             "from": "collab-electron/src/main/agent-artifact-writer.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -49375,7 +48856,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -49417,7 +48897,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -49443,7 +48922,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -49600,7 +49078,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -49638,7 +49115,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -49742,7 +49218,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -49855,7 +49330,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -50101,7 +49575,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/host-native-tui.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -52052,7 +51525,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -52086,7 +51558,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -52112,7 +51583,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -52391,7 +51861,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -52429,7 +51898,6 @@
             "name": "onStarted",
             "from": "collab-electron/src/main/native-tui-orchestration.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-orchestra.ts",
               "collab-electron/src/main/ipc-kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
@@ -52533,7 +52001,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -52746,7 +52213,6 @@
             "name": "newTrace",
             "from": "collab-electron/src/main/runtime-kernel-admission.ts",
             "candidates": [
-              "collab-electron/src/main/a2a-bus.ts",
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/connections-ipc.ts",
               "collab-electron/src/main/index.ts"
@@ -60115,16 +59581,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "0b15416",
+      "commit": "bc1bdbf",
       "generatedAt": "2026-08-25"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "bc1bdbf",
-      "generatedAt": "2026-08-25"
+      "commit": "d1d549a",
+      "generatedAt": "2026-08-26"
     },
-    "verdict": "worse",
-    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
+    "verdict": "better",
+    "why": "42 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -60460,25 +59926,24 @@
     ],
     "regressed": [],
     "changedConfidence": [],
-    "changedOwner": [],
-    "changedCoverage": [
+    "changedOwner": [
       {
-        "path": "qa/gates/artifact-root/run.ts",
-        "analyzer": "lifetime",
-        "from": "not-applicable",
-        "to": "partial",
-        "direction": "worse",
-        "reason": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file"
+        "id": "ownership:artifact-storage",
+        "gained": [],
+        "lost": [
+          "collab-electron/src/main/a2a-artifact-store.ts"
+        ]
       }
     ],
+    "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
       "resolved": 47,
       "regressed": 0,
       "changedConfidence": 0,
-      "changedOwner": 0,
-      "coverageWorse": 1,
+      "changedOwner": 1,
+      "coverageWorse": 0,
       "coverageBetter": 0,
       "undecidedFrom": 42,
       "undecidedTo": null
@@ -60774,118 +60239,13 @@
       "verdict": "undecided"
     },
     {
-      "id": "unreachable:collab-electron/src/main/a2a-bus.ts",
-      "kind": "unreachable",
-      "what": "a2a-bus.ts",
-      "where": "collab-electron/src/main/a2a-bus.ts",
-      "blocker": "founder-decision",
-      "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
-      "verdict": "keep",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "GATE-ANCHORED. qa/gates/artifact-root/run.ts:350 reads this exact path, and :359/:362 assert it imports AND calls the production A2A artifact store. Deleting it turns a gate red, which is the one thing this work may never do to make the map greener.",
-        "remediation_trigger": null,
-        "review_or_expiry": null,
-        "complete": true,
-        "missing": []
-      }
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/a2a-orchestra.ts",
-      "kind": "unreachable",
-      "what": "a2a-orchestra.ts",
-      "where": "collab-electron/src/main/a2a-orchestra.ts",
-      "blocker": "founder-decision",
-      "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/species-launch.ts",
-      "kind": "unreachable",
-      "what": "species-launch.ts",
-      "where": "collab-electron/src/main/species-launch.ts",
-      "blocker": "founder-decision",
-      "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "ORPHANED, NOT DEAD. Nothing imports it, but collab-electron/scripts/package-lib/shared-paths.test.ts:38 reads its source and asserts it contains './package-resource-paths', and WO-008c documents its launch-precedence chain as live behaviour. A module that a test pins and no code imports is a wiring defect, not a deletion candidate.",
-        "remediation_trigger": null,
-        "review_or_expiry": null,
-        "complete": false,
-        "missing": [
-          "remediation_trigger"
-        ]
-      }
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/species-surface.ts",
-      "kind": "unreachable",
-      "what": "species-surface.ts",
-      "where": "collab-electron/src/main/species-surface.ts",
-      "blocker": "founder-decision",
-      "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
-      "verdict": "undecided"
-    },
-    {
-      "id": "unreachable:collab-electron/src/main/species-tools.ts",
-      "kind": "unreachable",
-      "what": "species-tools.ts",
-      "where": "collab-electron/src/main/species-tools.ts",
-      "blocker": "founder-decision",
-      "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "Same shape as species-launch.ts: shared-paths.test.ts:42 pins its content, nothing imports it. WO-008a also uses it as the ACP sole-writer perimeter bait target.",
-        "remediation_trigger": null,
-        "review_or_expiry": null,
-        "complete": false,
-        "missing": [
-          "remediation_trigger"
-        ]
-      }
-    },
-    {
-      "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
-      "kind": "unreachable",
-      "what": "cube3d.js",
-      "where": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
-      "blocker": "founder-decision",
-      "reason": "built ahead of its caller and abandoned code are byte-identical here; only intent separates them",
-      "verdict": "keep",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "Founder-authored brand engine. qa/gates/one-skin.ts:21 allowlists this exact path as one of two justified palette exceptions, and WO-007 describes it as imported verbatim as founder input. flow-cube-watermark.js does not import it (the apparent import at line 16 is a usage comment), so 'unimported' is accurate and irrelevant: it is an asset, not dead wiring.",
-        "remediation_trigger": null,
-        "review_or_expiry": null,
-        "complete": true,
-        "missing": []
-      }
-    },
-    {
       "id": "broken-bridge-call:ptyForegroundProcess",
       "kind": "broken-bridge-call",
       "what": "ptyForegroundProcess",
       "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
       "blocker": "product-defect",
       "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
-      "verdict": "repair",
-      "owner": "founder",
-      "decision": {
-        "owner": "founder",
-        "reason": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
-        "remediation_trigger": null,
-        "review_or_expiry": null,
-        "complete": false,
-        "missing": [
-          "remediation_trigger"
-        ]
-      }
+      "verdict": "undecided"
     },
     {
       "id": "push:cd-to",
@@ -60960,10 +60320,6 @@
       "verdict": "undecided"
     }
   ],
-  "decisionOrphans": [
-    "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
-    "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
-    "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
-  ],
+  "decisionOrphans": [],
   "unexplainedUndecided": []
 }
