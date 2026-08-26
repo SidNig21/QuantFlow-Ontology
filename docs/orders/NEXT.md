@@ -1,10 +1,10 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G5 BUILDER
+# NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 BUILDER AUTHORIZED
+status: G4 CLOSED / G5 BUILDER SUSPENDED FOR G8 PROOF-INTEGRITY PREREQUISITE
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **YES — G5 ONLY**
+builder-authority: **NO — FRESH SEMANTIC READER REQUIRED**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
@@ -29,4 +29,4 @@ G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. The G5 semantic Reader 
 
 The frozen starting matrix records both new G5 selectors as absent/red; G4 retired-route, Dock launch, Hermes launch-policy, Kernel sole-writer, and the real Electron build are green. `hermes-first-turn-synthetic` is pre-existing red because its readiness assertion still names retired `hermes-orchestrator` while production authority requires `hermes-research-director`. This is an authorized mechanical stale-selector repair: change only that readiness assertion, prove old red/new green, and do not rewrite later synthetic fixture identifiers without separate evidence.
 
-The Builder is authorized only for G5's accepted deletion/contract boundary plus this exact mechanical selector repair. No G6 authority, main merge, full G9, or R18 implementation is open.
+The accepted G5 deletion diff is preserved but not yet a candidate. Mechanical alignment cleared the retired readiness/profile inputs and exposed a frozen-product semantic red: the synthetic critic does not consume the production direct-critic activation, so no Evaluation or Report is produced. The active order now binds only the smallest G8 proof-integrity prerequisite needed to finish G5. One fresh semantic Reader must return `YES / YES` before any Builder resumes. No full G8 reorder, G6 authority, main merge, full G9, or R18 implementation is open.

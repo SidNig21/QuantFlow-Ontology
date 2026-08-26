@@ -340,3 +340,61 @@ independent_verifier
 ```
 
 No Builder authority opens until this exact amendment is committed and a fresh semantic Reader returns `YES / YES`.
+
+## Required amendment after inherited Report red
+
+The mechanically corrected `hermes-first-turn-synthetic` gate reached the accepted R17 Director, recruited worker, durable Run/Artifact, and critic launch, then produced no Evaluation or Report. A fresh read-only adjudication proved that this failure exists in the frozen product bytes and is not caused by the G5 deletion diff.
+
+This amendment authorizes only the smallest G8 proof-integrity prerequisite required to finish G5. It does not reorder full G8, open full G9, change governed-review schema, change Report publication authority, or weaken the invariant that only an independently supported Evaluation may publish a Report.
+
+### Exact semantic defect and ownership
+
+The production direct-critic path delivers a `QUANTFLOW_MISSION` activation containing `review_task_id` and frozen `source_work`. The synthetic critic adapter waits for a different governed-review envelope or an obsolete `artifact_id=` fallback, so it never consumes the production activation, never performs its exact reads, and never calls `qf_record_evaluation`.
+
+The proof adapter mismatch is a G8 Kernel/schema/proof-integrity prerequisite. The separate duplicate/legacy Electron Report finalization remains G9-owned and may not be changed or used as a bypass here.
+
+### Exact authorized repair boundary
+
+The semantic Builder may edit only:
+
+- `collab-electron/cli/qf-hermes-synthetic-responder.mjs`
+- `qa/gates/hermes-research.ts`
+- the already-authorized G5 evidence files
+
+The responder repair must:
+
+1. parse the direct critic `QUANTFLOW_MISSION` payload already emitted by production;
+2. require its exact non-empty `review_task_id` and frozen `source_work` fields;
+3. bind the exact source Task, Hypothesis, Run, result Artifact, and executor session identifiers;
+4. perform only the already-granted Hypothesis, Run, and Artifact reads;
+5. call `qf_record_evaluation` exactly once with those exact identifiers, a valid verdict/confidence/rationale, and a non-empty ordered findings array;
+6. preserve Kernel-only Evaluation-to-Report publication and all existing critic tool restrictions;
+7. refuse malformed, missing, mismatched, duplicate, or unrelated review activation without creating an Evaluation or Report.
+
+The Builder may not edit `packages/qf-kernel/src/governed-review.ts`, Report publication code, `researchEvidenceByRunId`, Electron's duplicate finalizer, product schema, runtime profile authority, or any G5 product disposition path beyond the already accepted diff.
+
+### Exact proof reconciliation
+
+`qa/gates/hermes-research.ts` must continue to prove the same end-to-end research meaning using the accepted R17 inputs:
+
+- `hermes-research-director` is the production Director definition;
+- the accepted fixture supplies the canonical version-2 Technique;
+- both accepted submissions carry that exact `strategy_id`;
+- the second submission obtains the Technique through the first submission receipt rather than an out-of-scope local;
+- receipts name `hermes-research-director`, never retired `hermes-orchestrator`;
+- the critic creates exactly one Evaluation over the exact Run/Artifact;
+- the Report is parsed and asserted as canonical `qf.research.report.v2` lineage rather than obsolete v1 fields;
+- the Report is published only after the independently supported Evaluation;
+- two accepted runs do not reuse Evaluation or Report evidence.
+
+No assertion, timeout, cleanup requirement, or failure vocabulary may be weakened.
+
+### Fail-capable focused falsifier
+
+Before rerunning the full G5 matrix, the Builder must add or use a focused falsifier that feeds the synthetic critic a direct production-shaped `QUANTFLOW_MISSION` with one of these defects: missing `review_task_id`, mismatched `source_work`, or substituted `result_artifact_id`. The responder must refuse it, call `qf_record_evaluation` zero times, and leave Evaluation and Report counts unchanged. The restored normal case must consume the exact payload, call `qf_record_evaluation` exactly once, and reach one canonical v2 Report.
+
+Record the masked starting-SHA reds and each old-red/new-green transition in unedited evidence. After the focused proof is green, rerun the complete unchanged G5 matrix and falsifier set. The final immutable G5 candidate still requires one independent Verifier.
+
+### Semantic reread boundary
+
+The current Builder authority is suspended. This amendment must be committed and one fresh semantic Reader must return `YES / YES` on whether every gate can fail and every deliverable has exactly one meaning before the semantic repair Builder resumes. A Reader `NO` lands every numbered defect here before another reread.
