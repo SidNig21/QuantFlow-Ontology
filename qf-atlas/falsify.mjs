@@ -632,14 +632,28 @@ record(17, "transport SQL is not a violation in JSON or Markdown", ...(() => {
   return [!inJson && !inMd, `json=${inJson ? "violation" : "clean"} markdown=${inMd ? "listed" : "clean"}`];
 })());
 
-// 18 · coverage gaps are visible in the brief, not only the JSON
-record(18, "coverage gaps appear in the agent brief", ...(() => {
-  const gaps = before.coverage.filter((c) => c.status === "partial" || c.status === "unindexed").length;
-  const text = md();
-  const shown = text.includes("What the analyzer could not read") && text.includes("qf-peer-bus");
-  return [gaps > 0 && shown, `${gaps} gaps in model; brief shows section=${shown}`];
-})());
-
+// 18 · the fixed top-level SQL coverage bait is visible in the brief, not only JSON
+const ATLAS_COVERAGE_BAIT = "tools/_qf-atlas-coverage-bait.ts";
+const ATLAS_COVERAGE_BAIT_CONTENT = `export const qfAtlasCoverageBait = "INSERT INTO mission (id) VALUES ('atlas-coverage-bait')";`;
+record(18, "the fixed coverage bait appears in the agent brief", ...withFile(
+  ATLAS_COVERAGE_BAIT,
+  ATLAS_COVERAGE_BAIT_CONTENT,
+  (m) => {
+    const row = (m.coverage ?? []).find((c) => c.path === ATLAS_COVERAGE_BAIT);
+    const text = md();
+    const sectionStart = text.indexOf("## What the analyzer could not read");
+    const sectionEnd = text.indexOf("## Per-analyzer coverage", sectionStart);
+    const section = text.slice(sectionStart, sectionEnd < 0 ? undefined : sectionEnd);
+    const shown = section.includes(ATLAS_COVERAGE_BAIT);
+    const ok = row?.status === "unindexed"
+      && row.sqlInText === 1
+      && row.sqlIndexed === 0
+      && shown;
+    return [ok,
+      `path=${row?.path ?? "absent"} status=${row?.status ?? "absent"} ` +
+      `sqlInText=${row?.sqlInText ?? "?"} sqlIndexed=${row?.sqlIndexed ?? "?"} shown=${shown}`];
+  },
+));
 // 19 · protocol variants are amber/investigate, never duplicate-owner red
 record(19, "protocol variants are investigate, not duplicate-owner", ...(() => {
   const pv = before.protocolVariants ?? [];

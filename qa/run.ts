@@ -26,7 +26,7 @@ type PackageManifest = {
 type PackageManager = "bun" | "npm" | "pnpm" | "yarn";
 type LifecycleOperation = "install" | "ci";
 
-const PEER_BUS_DIR = join(REPO_ROOT, "tools/qf-peer-bus");
+const LIFECYCLE_FIXTURE_DIR = join(REPO_ROOT, "qa/fixtures/lifecycle-command");
 const LIFECYCLE_KEYS = ["preinstall", "install", "postinstall"] as const;
 const LIFECYCLE_SEGMENT_BREAK = /;|&&|\|\||\|/;
 const BARE_PACKAGE_MANAGER =
@@ -177,7 +177,7 @@ function lifecycleManifest(
   pkg: PackageManifest,
   falsifierCommand: string | undefined,
 ): PackageManifest {
-  if (falsifierCommand === undefined || dir !== PEER_BUS_DIR) return pkg;
+  if (falsifierCommand === undefined || dir !== LIFECYCLE_FIXTURE_DIR) return pkg;
   return {
     ...pkg,
     scripts: { ...pkg.scripts, postinstall: falsifierCommand },
@@ -193,7 +193,7 @@ function checkLifecycleScripts(
     const pkg = readPackageManifest(dir);
     if (!pkg) continue;
     const manifest = lifecycleManifest(dir, pkg, falsifierCommand);
-    if (falsifierCommand !== undefined && dir === PEER_BUS_DIR) {
+    if (falsifierCommand !== undefined && dir === LIFECYCLE_FIXTURE_DIR) {
       falsifierApplied = true;
     }
     for (const lifecycleKey of LIFECYCLE_KEYS) {
@@ -209,7 +209,7 @@ function checkLifecycleScripts(
   }
   if (!falsifierApplied) {
     console.error(
-      `typecheck: falsifier target is not in the install closure: ${relative(REPO_ROOT, PEER_BUS_DIR)}`,
+      `typecheck: falsifier target is not in the install closure: ${relative(REPO_ROOT, LIFECYCLE_FIXTURE_DIR)}`,
     );
     return false;
   }
@@ -769,6 +769,17 @@ const gates: Gate[] = [
       const { checkKernelSoleWriter } = await import("./gates/kernel-sole-writer.ts");
       const { ok } = checkKernelSoleWriter();
       return ok;
+    },
+  },
+  {
+    name: "golden-g3-consumer-census",
+    description:
+      "G3: deleted peer-bus and critic-mock islands have no live production consumer; app-owned seams remain",
+    run: async () => {
+      const { runGoldenG3ConsumerCensus } = await import(
+        "./gates/golden-g3-consumer-census.ts"
+      );
+      return runGoldenG3ConsumerCensus();
     },
   },
   {

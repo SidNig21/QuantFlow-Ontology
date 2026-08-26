@@ -495,7 +495,7 @@ export function renderMarkdown(m) {
     p(`| File | Coverage | SQL in text | SQL resolved |`);
     p(`|---|---|---:|---:|`);
     // Worst first: unrecognised SQL, then most unread SQL. Alphabetical order
-    // pushed qf-peer-bus — the known hole — past the truncation point, so the
+    // pushed the temporary coverage bait — the known hole — past the truncation point, so the
     // brief silently stopped showing the example it exists to surface.
     const ranked = [...covGaps].sort((a, b) =>
       (b.sqlUnrecognised ?? 0) - (a.sqlUnrecognised ?? 0) ||

@@ -45,7 +45,7 @@ Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a reco
 - **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel `execute()`; gates fail the build if any other path writes domain truth.
 - **The canvas + dock** — an infinite pan/zoom Electron surface. Every agent card launches by exact Kernel definition id. Sessions link back to the definition the founder clicked. Dock **Clear** hides closed sessions from the ledger without deleting Kernel history.
 - **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
-- **The peer bus** (`tools/qf-peer-bus`) — stdio MCP (`send_to_peer` / `read_inbox` / `list_peers`). Peer messages land as content-addressed `trajectory` artifacts. Transport SQLite stays separate from the Kernel.
+- **The app-owned peer notification transport** (`collab-electron/src/main/peer-delivery.ts`) — live Agent Host/native-TUI delivery for Kernel notifications. Transport SQLite stays separate from the Kernel.
 - **Desk + governed research loop (R0–R15)** - Kernel, Dock seats, durable Tasks, Research Director recruitment and steering, strict independent critic review, and evaluation-gated Report publication are independently verified in this checkout.
 - **Native Hermes development runtime** - the custom Research Director and exact least-privilege critic run through the production Hermes transport with durable Kernel identity and receipts.
 - **Connection write path (WO-g5a)** — experimental `create_connection` / `delete_connection` through `execute()` only; upgrade `0006` brings existing Kernels forward.
@@ -101,7 +101,7 @@ Non-authoritative [Product brief](docs/PRODUCT.md); `START_HERE.md` remains the 
 │  seat spawn rail · terminal tiles · live PTY sessions │
 ├───────────────────────────────────────────────────────┤
 │  COLLABORATION PLANE               agent ↔ agent      │
-│  qf-peer-bus (stdio MCP) · host push into live TUIs   │
+│  app-owned notification transport · host push into live TUIs │
 ├───────────────────────────────────────────────────────┤
 │  WORLD MODEL                       agent ↔ world      │
 │  SQLite Kernel · sole writer · append-only event log  │
@@ -117,7 +117,7 @@ Runtime split worth knowing: the Electron main process is Node (`node:sqlite`); 
 |---|---|
 | `collab-electron/` | The desktop app — canvas, dock, seat spawning, peer delivery watcher |
 | `qf-kernel-schema/` | Schema → generated Kernel SQL, tools, ontology docs, upgrades |
-| `tools/qf-peer-bus/` | The MCP peer bus: server, transport db, Kernel recording, cold-harness proofs |
+| `collab-electron/src/main/peer-delivery.ts` | App-owned peer notification transport and live TUI delivery watcher |
 | `species/` | Runtime/adapter packages and agent fixtures; durable Dock profile identity lives in the Kernel |
 | `design/glacier/` | Glacier visual language — tokens, tile/showcase specs, cable plumbing |
 | `qa/` | Gates. Falsifiable by construction — if a gate can't go red, it isn't a gate |
@@ -161,7 +161,7 @@ under `app/` (development launches are isolated below `app/dev/worktree-<id>/`).
 QuantFlow copies eligible state from the legacy Collaborator locations without deleting the source;
 if both roots exist, the QuantFlow root wins unchanged.
 
-Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap automatically from packaged manifests, but real Hermes turns still require the founder's local [Hermes](https://github.com/NousResearch/hermes-agent) install and matching `qf-orchestrator`, `qf-worker`, and `qf-worker-2` runtime profiles. The founder-only peer-bus helper is `tools/qf-peer-bus/scripts/setup-founder-seats.ts`.
+Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap automatically from packaged manifests, but real Hermes turns still require the founder's local [Hermes](https://github.com/NousResearch/hermes-agent) install and matching `qf-orchestrator`, `qf-worker`, and `qf-worker-2` runtime profiles. App-owned notifications remain the delivery seam for live collaboration.
 
 **Current collaboration limit:** Windows proofs cover catalogue selection, session lineage, safe native-TUI cleanup, and metadata-authorized PTY delivery for deterministic seats. They do not create Hermes profiles, handle credentials, or prove an unscripted real-model research collaboration; those remain later rungs.
 
@@ -176,7 +176,7 @@ Gates run from `qa/` and are wired into CI. The Dock definitions bootstrap autom
 
 ## Lineage
 
-QuantFlow is a fork of [Collaborator](https://github.com/collaborator-ai/collab-public) (`collab-electron`), whose canvas, tile system, and terminal architecture form the surface layer — see `LICENSE.md` and `NOTICE.md`. The Kernel, peer bus, seats, gates, and the ontology direction are QuantFlow's own.
+QuantFlow is a fork of [Collaborator](https://github.com/collaborator-ai/collab-public) (`collab-electron`), whose canvas, tile system, and terminal architecture form the surface layer — see `LICENSE.md` and `NOTICE.md`. The Kernel, app-owned peer transport, seats, gates, and the ontology direction are QuantFlow's own.
 
 ## License
 

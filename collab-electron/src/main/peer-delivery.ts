@@ -1,8 +1,8 @@
 /**
  * Peer-delivery bridge — the DESK-UX half of visible agent collaboration.
  *
- * The peer-bus MCP server records a peer message (real, agent-driven) into the
- * Kernel and enqueues it in the transport db. Delivery is PULL: an agent only
+ * The app-owned notification transport enqueues real agent messages in the transport
+ * db. Delivery is PULL: an agent only
  * sees a message if it calls read_inbox. This watcher adds a PUSH surface: it
  * polls the transport db and writes each not-yet-pushed message into the
  * recipient seat's live PTY, so it appears in the real Hermes TUI and is

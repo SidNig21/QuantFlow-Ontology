@@ -1,6 +1,0 @@
-node_modules/
-agent-package/node_modules/
-agent-package/dist/
-dist/
-packed/
-*.tar

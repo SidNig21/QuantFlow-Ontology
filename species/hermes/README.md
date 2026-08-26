@@ -57,4 +57,4 @@ roles reject instead of rerouting messages. Null, unlisted, and unflagged profil
 
 D2 proves admission and cleanup with credential-free fakes. It does not enforce caller-bound
 QuantFlow tool grants or claim an unscripted real-model collaboration; founder setup and live turns
-are documented in `tools/qf-peer-bus/README.md`.
+are documented by the app-owned notification transport in `collab-electron/src/main/peer-delivery.ts`.

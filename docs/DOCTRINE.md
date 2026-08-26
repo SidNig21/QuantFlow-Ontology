@@ -41,7 +41,7 @@ An ontology is *real* the day an agent performs cross-object synthesis through g
 > — *the QuantFlow one-shot test (Phase 4 exit gate)*
 
 ### The honest part about the last few months
-Time wasn't lost because the goal was too big. It was **layer confusion** — rebuilding engines (harness, canvas, runtime plumbing) already good enough, while the world model they exist to serve stayed empty. The dock/canvas of heterogeneous agents is the differentiator nothing else ships, and this week the collaboration plane through it became *real* (peer bus + PTY delivery, verified). The missing organ was never another engine. It's the shared world the agents act on. That's the ontology — Part IV.
+Time wasn't lost because the goal was too big. It was **layer confusion** — rebuilding engines (harness, canvas, runtime plumbing) already good enough, while the world model they exist to serve stayed empty. The dock/canvas of heterogeneous agents is the differentiator nothing else ships, and this week the collaboration plane through it became *real* (app-owned notification transport + PTY delivery, verified). The missing organ was never another engine. It's the shared world the agents act on. That's the ontology — Part IV.
 
 ---
 
@@ -52,7 +52,7 @@ Mapped against the six-layer agent stack Palantir launched at DevCon6. Status is
 | Palantir layer | QuantFlow equivalent | Status |
 |---|---|---|
 | **Ontology** | SQLite Kernel — sole writer, append-only log, content-addressed artifacts, schema-gen code | SUBSTRATE **HAVE** / CHARTER **GAP** |
-| **Ontology MCP (OMCP)** | qf-peer-bus proves the MCP plane + Kernel recording; `qf_*` verbs hand-grown, not generated | **SEED** |
+| **Ontology MCP (OMCP)** | the existing MCP stack and app-owned transport prove the MCP plane + Kernel recording; `qf_*` verbs hand-grown, not generated | **SEED** |
 | **Agent Engine** | Hermes seats (orchestrator/worker/worker2) — BYO harness, the pattern Palantir supports | **HAVE · PROVEN** |
 | **Orchestrator** | Event log gives replayability; no durable suspend/retry yet (Effect is the candidate) | **PARTIAL** |
 | **Agent SDK / Builder** | qf-kernel-schema codegen (schema → typed code) — the OSDK move | **HAVE** |
@@ -80,7 +80,7 @@ Nothing here is behind a paywall, a free-tier cap, or a contract. Most is alread
 | Ontology-as-code (`ontology.mts`) | Objects/links/actions as TS; live regen; drift = lint error | A TypeScript charter module; qf-kernel-schema regenerates typed code; drift lint | **PHASE 1** |
 | OSDK codegen | Schema change → SDK regen → type errors in dependents | qf-kernel-schema already codegens — extend it to emit tool defs | **HAVE (EXTEND)** |
 | Actions / write-back | All mutation through governed actions | Kernel commands via `execute()` over the event log — already gate-enforced | **HAVE** |
-| OMCP server | One MCP server over the graph; tools derived; client-agnostic | `@modelcontextprotocol/sdk` — the stack qf-peer-bus ships on. Generate read+action tools from the charter | **PHASE 2** |
+| OMCP server | One MCP server over the graph; tools derived; client-agnostic | `@modelcontextprotocol/sdk` — the repository MCP stack. Generate read+action tools from the charter | **PHASE 2** |
 | Pipelines | Source data flows in via pipelines, never manual actions | Bun scripts + cron writing through Kernel commands with ingest trace | **PHASE 3** |
 | Workshop / OSDK apps | Human surfaces over the ontology | Electron canvas + dock — superior for your operator | **HAVE** |
 | Agent Engine + harnesses | BYO harness today; Agent SDK "coming soon" | Hermes seats + any MCP agent. Model-agnostic | **HAVE · PROVEN** |
@@ -194,14 +194,14 @@ That last comment is Palantir's SuperRepo demo (local embedded ontology, live-re
 No phase is "done" by prose. Each has an exit gate that can go red.
 
 ### Phase 0 — The substrate · **BANKED**
-Sole-writer Kernel + event log + content-addressed artifacts. Peer bus with Kernel-recorded trajectories. PTY delivery — live, verified agent collaboration in native TUIs. Canvas + dock. Falsified gate culture. **Do not rebuild any of this. It is finished.**
+Sole-writer Kernel + event log + content-addressed artifacts. App-owned notification transport with Kernel-recorded trajectories. PTY delivery — live, verified agent collaboration in native TUIs. Canvas + dock. Falsified gate culture. **Do not rebuild any of this. It is finished.**
 
 ### Phase 1 — The charter · **WEEK 1**
 Write `ontology/` as code: the ~14 types of Part IV, every type/property described, links + actions declared, lifecycle flag on every type. A modeling week, not an engineering month — most shapes already exist informally in the Kernel; you are naming and governing them.
 > **Exit gate:** schema lint goes red on a missing description, a subtype-of-Run clone, or a property removed from a non-experimental type. Falsified with a bait commit before it counts.
 
 ### Phase 2 — The generated tool plane · **WEEKS 2–3**
-Extend qf-kernel-schema codegen to emit the MCP server: per-type read tools (`get / search / traverse-links`) and per-action write tools, from the charter, on the `@modelcontextprotocol/sdk` stack qf-peer-bus proved. Retire hand-grown `qf_*` verbs as generated equivalents land. Peer bus stays as the agent↔agent plane; this is the agent↔world plane beside it.
+Extend qf-kernel-schema codegen to emit the MCP server: per-type read tools (`get / search / traverse-links`) and per-action write tools, from the charter, on the `@modelcontextprotocol/sdk` repository stack. Retire hand-grown `qf_*` verbs as generated equivalents land. App-owned notification transport stays as the agent↔agent plane; this is the agent↔world plane beside it.
 > **Exit gate:** add a brand-new object type → its tools appear with zero hand-written tool code, and a Hermes seat lists and calls them cold.
 
 ### Phase 3 — The first market plane · **WEEK 4**
@@ -209,7 +209,7 @@ One pipeline, one source, one market — odds or HyperLiquid, your call, the ont
 > **Exit gate:** every market row traces to an ingest event (provenance recomputable), and a seat answers a cross-object question about real data through generated tools only.
 
 ### Phase 4 — The defining loop, agent-run · **WEEKS 5–8**
-Orchestrator + workers execute the full loop over the peer bus: `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`, every step a Kernel action, every conversation a trajectory artifact. Evaluation gates Report publication mechanically. Add Effect-typed retries where Runs get long.
+Orchestrator + workers execute the full loop over app-owned notification transport: `Hypothesis → Dataset → Run → Artifact → Evaluation → Report`, every step a Kernel action, every conversation a trajectory artifact. Evaluation gates Report publication mechanically. Add Effect-typed retries where Runs get long.
 > **Exit gate:** the one-shot test from Part I, answered correctly, one pass, tools-only, fully recorded. **This is the day QuantFlow is a real ontology.**
 
 ### Phase 5 — Recall + trust boundaries · **MONTHS 2–3**
@@ -493,6 +493,6 @@ dependency. AgentOS is predecessor history and is not QuantFlow architecture.
 - [[09 - Ontology Governance]] — DDD ordering; six anti-patterns; extend-don't-mutate; descriptions as agent grounding
 - [[Cerebras Knowledge Base - Retrieval Layer Notes]] — record vs recall; distill-then-embed; RRF k=60
 - [[INSPIRE-USECASES]] — the defining loop; three-things-first; Effect, Ragas, WrenAI candidates
-- Repo audit (this week) — peer bus + PTY delivery verified; gate falsification records; trajectory artifacts live
+- Repo audit (this week) — app-owned notification transport + PTY delivery verified; gate falsification records; trajectory artifacts live
 
 Related: [[QuantFlow Ontology Schema v0]] · [[QuantFlow Rebuild Blueprint]] · [[QuantFlow Hub]]

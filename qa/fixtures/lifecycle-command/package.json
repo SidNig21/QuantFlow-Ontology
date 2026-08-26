@@ -1,0 +1,11 @@
+{
+  "name": "qf-g3-lifecycle-command",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

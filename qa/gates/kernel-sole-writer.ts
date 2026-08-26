@@ -65,7 +65,7 @@ const DRIVER_SQL_ALLOW = [
   // WO-R17 guided consumer: read-only oracle over the disposable UI-proof Kernel.
   "qa/gates/r17-guided-technique-consumer.ts",
   // WO-PEER-BUS: transport inbox SQLite only — never Kernel DDL/DML.
-  "tools/qf-peer-bus/src/bus.ts",
+
   "collab-electron/",
   "qa/gates/dock-registry/run.ts",
   // WO-D1: gate-only temporary Kernels exercise partial-schema rejection,
@@ -133,16 +133,16 @@ const OPEN_ALLOW = [
   // separately allowlisted for the gate below).
   "tools/qf-vault-projection/src/cli.ts",
   "tools/qf-vault-projection/src/gate.ts",
-  "tools/qf-peer-bus/src/bus.ts",
-  "tools/qf-peer-bus/src/harness.ts",
-  "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
+
+
+
   // WO-107: deterministic fixture suite/gate open only temporary Kernels.
   "tools/qf-bovada-football/src/runner.test.ts",
   "tools/qf-bovada-football/src/gate.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
   "species/hermes/a2a-4tile-smoke.ts",
-  "species/critic-mock/register.ts",
+
   "qa/gates/dock-registry/run.ts",
   // WO-D1: gate-only profile identity and frozen-upgrade proof.
   "qa/gates/dock-profile-identity/run.ts",
@@ -177,13 +177,13 @@ const WRITE_ALLOW = [
   // WO-V1 gate seeds fixture Kernels through execute() (G1–G5); the projector
   // CLI itself never writes.
   "tools/qf-vault-projection/src/gate.ts",
-  "tools/qf-peer-bus/src/bus.ts",
+
   // WO-107: the finite runner writes only through its injected execute boundary.
   "tools/qf-bovada-football/src/runner.ts",
   "species/hermes/register.ts",
   "species/hermes/host-admit-kernel.ts",
   "species/hermes/a2a-4tile-smoke.ts",
-  "species/critic-mock/register.ts",
+
   "qa/gates/dock-registry/run.ts",
   // WO-D1: gate-only setup and assertions use the sanctioned write boundary.
   "qa/gates/dock-profile-identity/run.ts",
@@ -210,9 +210,9 @@ const WRITE_ALLOW = [
 /** Production openers that must never pass { create: true } (G3b). */
 const PRODUCTION_NO_CREATE = [
   "tools/qf-read-tools/src/server.ts",
-  "tools/qf-peer-bus/src/bus.ts",
+
   "species/hermes/register.ts",
-  "species/critic-mock/register.ts",
+
   // WO-V1 projector: readonly open only; never create a Kernel as a side effect.
   "tools/qf-vault-projection/src/cli.ts",
 ];

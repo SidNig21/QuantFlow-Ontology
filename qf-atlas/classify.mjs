@@ -2,7 +2,7 @@
 //
 // The old rule was "SQL outside a short allowlist is a violation". That is a lead
 // generator, not a judgment, and it was wrong in both directions:
-//   · peer-delivery.ts and qf-peer-bus write `messages` — transport bookkeeping,
+//   · peer-delivery.ts and the app Kernel transport write `messages` — transport bookkeeping,
 //     not domain truth — and were reported as product violations.
 //   · a Kernel helper reached only through a governed action would be reported as
 //     a bypass purely because the SQL is not textually inside execute.ts.
@@ -88,7 +88,6 @@ export function domainTables(repo) {
  *  that is created there is transport; a domain table created there is still
  *  domain. kernel.ts holds the in-process peer-bus DDL. */
 const TRANSPORT_CREATE_FILES = [
-  "tools/qf-peer-bus/src/bus.ts",
   "collab-electron/src/main/peer-delivery.ts",
   "collab-electron/src/main/kernel.ts",
 ];
@@ -177,7 +176,7 @@ export function sourceClass(path) {
   if (path.startsWith("qf-kernel-schema/")) return "generated";
   if (path.startsWith("qa/") || /\bfixtures?\.ts$/.test(path)) return "QA";
   if (/\bupgrade\.ts$/.test(path) || path.includes("/migrations/")) return "migration";
-  if (path.startsWith("tools/qf-peer-bus/") || /peer-delivery\.ts$/.test(path)) return "transport";
+  if (/peer-delivery\.ts$/.test(path)) return "transport";
   if (path.startsWith("docs/history/") || path.includes("/upstream/")) return "upstream-residue";
   if (path.includes("node_modules") || path.startsWith("vendor/")) return "vendor";
   return "product";
@@ -506,7 +505,7 @@ export function classifyPersistence({ index, names, domain, transport, governed,
 
 /**
  * COVERAGE. Absence of a finding must never mean "the analyzer skipped it".
- * qf-peer-bus writes `messages` from a syntactic form the function indexer does
+ * App transport writes `messages` from a syntactic form the function indexer does
  * not resolve, so it produced no finding at all — indistinguishable from clean.
  * Every analysed file now reports how well it was actually read:
  *

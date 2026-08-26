@@ -1,0 +1,14 @@
+phase	command	exit	result/assignment
+after-delete	bun qa/run.ts golden-g3-consumer-census	0	PASS rows=307; preserved app seams present
+after-delete	QF_G3_CONSUMER_CENSUS_FALSIFY=peer-bus bun qa/run.ts golden-g3-consumer-census	1	RED exact production-import bait
+after-delete	QF_G3_CONSUMER_CENSUS_FALSIFY=critic-mock bun qa/run.ts golden-g3-consumer-census	1	RED exact production-import bait
+after-delete	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=literal bun qa/run.ts typecheck	1	RED dedicated qa/fixtures/lifecycle-command postinstall control
+after-delete	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=flagged bun qa/run.ts typecheck	1	RED dedicated qa/fixtures/lifecycle-command postinstall control
+after-delete	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=chained bun qa/run.ts typecheck	1	RED dedicated qa/fixtures/lifecycle-command postinstall control
+after-delete	bun qa/run.ts kernel-sole-writer	0	PASS
+after-delete	bun qa/run.ts kernel-sole-writer-app	0	PASS
+after-delete	QF_KERNEL_ONE_PATH_FALSIFY=1 bun qa/run.ts kernel-one-path	1	RED caught tools/_qf-k1-path-bait/falsify.ts; bait absent after
+after-delete	bun qa/run.ts kernel-one-path	1	Known unchanged 12 QA fixture offenders; assigned G8
+baseline	bun qa/run.ts typecheck	red/timed out	Known Windows node-pty/dependency EBUSY; assigned ADR-0004/G12 if hardening required
+baseline	windows-dock-collaboration package run	timeout then cleaned	Known pre-existing package timeout; no product process; ADR-0004
+baseline	Atlas falsifier receipt	98/98	HARD RED 0; tree-neutral; inherited baseline receipt

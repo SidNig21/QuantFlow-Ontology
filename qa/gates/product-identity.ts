@@ -90,7 +90,6 @@ const CURRENT_DOCS_THAT_MUST_NOT_BE_STALE = new Set([
   "docs/demos/agent-path.md",
   "docs/demos/dock.md",
   "docs/demos/law-d.md",
-  "species/critic-mock/README.md",
   "species/hermes/README.md",
 ]);
 

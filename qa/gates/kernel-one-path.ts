@@ -9,13 +9,17 @@
  *
  * Stated limit (same as kernel-sole-writer): this is a grep, not a parser.
  */
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { runFrozenPackageInstall } from "../package-install.ts";
 
 const REPO_ROOT = join(import.meta.dir, "../..");
 const READ_TOOLS = join(REPO_ROOT, "tools/qf-read-tools");
 const KERNEL_PKG = join(REPO_ROOT, "packages/qf-kernel");
+
+const FALSIFY_ENV = "QF_KERNEL_ONE_PATH_FALSIFY";
+const FALSIFY_DIR = join(REPO_ROOT, "tools", "_qf-k1-path-bait");
+const FALSIFY_FILE = join(FALSIFY_DIR, "falsify.ts");
 
 const ENV_READ = /process\.env\.QF_KERNEL_DB/;
 const KERNEL_DB_LITERAL = /kernel\.db/;
@@ -37,7 +41,6 @@ const ALLOW_PREFIXES = [
   "tools/qf-read-tools/src/gates/action-transport.ts",
   "tools/qf-read-tools/src/gates/publish-artifact-root.ts",
   "tools/qf-read-tools/src/gates/kernel-one-world.ts",
-  "tools/qf-peer-bus/src/harness.ts",
   // WO-V1: fixture gate constructs temp Kernel paths (join(dir, "kernel.db")).
   "tools/qf-vault-projection/src/gate.ts",
   // WO-N1: migration fixture proves legacy Kernel files are excluded, never opened.
@@ -171,7 +174,7 @@ export function checkKernelOnePath(): { ok: boolean; offenders: string[] } {
   return { ok: true, offenders: [] };
 }
 
-export async function runKernelOnePathGate(): Promise<{ ok: boolean }> {
+async function runKernelOnePathProof(): Promise<{ ok: boolean }> {
   const g1 = checkKernelOnePath();
   if (!g1.ok) return { ok: false };
 
@@ -208,6 +211,44 @@ export async function runKernelOnePathGate(): Promise<{ ok: boolean }> {
   }
 
   return { ok: true };
+}
+
+function removeFalsifyBait(): void {
+  try {
+    rmSync(FALSIFY_DIR, { recursive: true, force: true });
+  } catch {
+    // surfaced by the post-run tree check
+  }
+}
+
+export async function runKernelOnePathGate(): Promise<{ ok: boolean }> {
+  if (process.env[FALSIFY_ENV] !== "1") return runKernelOnePathProof();
+
+  mkdirSync(FALSIFY_DIR, { recursive: true });
+  writeFileSync(
+    FALSIFY_FILE,
+    'const unauthorized = process.env.QF_KERNEL_DB;\nconst baitPath = "kernel.db";\nvoid unauthorized; void baitPath;\n',
+  );
+  const onSignal = () => {
+    removeFalsifyBait();
+    process.exit(130);
+  };
+  process.on("SIGINT", onSignal);
+  process.on("SIGTERM", onSignal);
+  try {
+    const result = checkKernelOnePath();
+    const caught = result.offenders.some((offender) => offender.includes("tools/_qf-k1-path-bait/falsify.ts"));
+    if (!caught) {
+      console.error("kernel-one-path falsifier: bait was not caught");
+    } else {
+      console.error("kernel-one-path falsifier: caught tools/_qf-k1-path-bait/falsify.ts");
+    }
+    return { ok: false };
+  } finally {
+    process.removeListener("SIGINT", onSignal);
+    process.removeListener("SIGTERM", onSignal);
+    removeFalsifyBait();
+  }
 }
 
 if (import.meta.main) {
