@@ -308,8 +308,9 @@ bind the exact source work, admit and deliver the production `hermes-critic`,
 record the three exact successful broker reads plus the bound
 `qf_record_evaluation` invocation, and submit the canonical structured findings
 array. Preserve its distinct assertions for exact R11b metrics, `performed_by`
-critic identity, critic-produced findings, findings-to-Run lineage, Report
-`gates` lineage, non-critic atomic refusal, rejecting-publication refusal, and
+critic identity, critic-produced findings, findings-to-Run lineage, successful
+`resolve_hypothesis` transition, Report `gates` lineage, non-critic atomic
+refusal, rejecting-publication refusal, and
 self-review atomic refusal. Replace only the obsolete findings-envelope
 assertion with an assertion over the canonical structured findings bytes and
 their exact `evidence_refs` binding to the result Artifact.
@@ -320,8 +321,10 @@ The current-identity correction is exact and bounded:
   `design/glacier/showcase.html`;
 - add only `docs/DEBT.md` to `product-identity.ts`'s existing bucket C because
   this order explicitly classifies that file as accepted historical evidence;
-- change only `Collaborator stays; ownership inverts.` to
-  `QuantFlow stays; ownership inverts.` in current-authority `docs/LAWS.md`;
+- in current-authority `docs/LAWS.md`, change only `Collaborator stays;
+  ownership inverts.` to `QuantFlow stays; ownership inverts.` and
+  `Collaborator adapters (not authorities).` to
+  `QuantFlow adapters (not authorities).`;
 - preserve `docs/DEBT.md` bytes, Laws A–F, the forbidden identity matcher, the
   current-doc set, and every other identity classification.
 

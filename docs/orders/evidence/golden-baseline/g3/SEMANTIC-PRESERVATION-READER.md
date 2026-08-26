@@ -1,6 +1,6 @@
 # Golden Baseline G3 — Semantic Preservation Reader
 
-status: **NO / YES — order amended for reread**
+status: **NO / NO — round 2 defects amended for reread**
 reader-task: `01a03e9b-e9b6-78a2-aa33-c78a83208b5c`
 reviewed-candidate: `b3e3a4805e8e11ea435bf0a20ec38c0ded5ac559`
 reader-mutation: none
@@ -18,5 +18,12 @@ in its original position after G8.
 
 The Reader returned YES for the exact three-part correction: remove the one
 static showcase row, classify only `docs/DEBT.md` as the accepted historical
-evidence already named by the order, and update the one stale current-authority
-sentence in `docs/LAWS.md` without changing Laws A–F.
+evidence already named by the order, and update the stale current-authority
+identity labels in `docs/LAWS.md` without changing Laws A–F.
+
+## Round 2 defects
+
+The first amendment omitted R12's unique successful `resolve_hypothesis`
+assertion and the second stale current-authority identity label in
+`docs/LAWS.md`. Both are now named explicitly; no additional product, gate, or
+documentation scope opened.
