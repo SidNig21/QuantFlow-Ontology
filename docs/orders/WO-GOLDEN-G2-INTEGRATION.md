@@ -5,6 +5,7 @@ order-type: Golden G2 bounded preservation-integration amendment
 branch: `wo-golden-g2`
 authority-head: `45c395f3af712cf3f30269d208a940e9f95b9b7f`
 reader-task: `01a0380f-defb-76a0-a367-1e9564847225`
+observe-door-reader-task: `01a03bf0-9713-79a3-87dd-7a6ec14a0d13`
 full-g9: **PARKED AFTER G8**
 main-authority: **NONE**
 r18-authority: **FROZEN**
@@ -121,6 +122,46 @@ files, `qf-atlas/decisions.json`, `falsify.mjs`, comment-only `generate.mjs` and
 
 No other product, package, lockfile, schema, Kernel, Dock, Canvas, runtime, G8,
 full-G9, G3, or R18 path may change.
+
+## Mechanical observe-door classification repair
+
+The first independent candidate verification proved matrix item 8 was a real
+exit-1 receipt, not a green command. A fresh read-only Reader established that
+all three reported surfaces predate G2, are byte-identical from original G2
+start `6f73e61f74dc5f438da90d92e3f1ed3a33586297`, and cannot serve an action at
+runtime. This is an ADR-0004 same-meaning proof-harness correction. The product
+invariant remains unchanged: no production, app, or tool runtime may serve
+`observe_ticket`.
+
+Authorize exactly one proof-file edit to `qa/gates/observe-door.ts`:
+
+- add only `qf-atlas/atlas.json` to `OBSERVE_ALLOWLIST`, because it is a
+  generated developer projection and not a runtime input;
+- add only `qa/gates/doc-action-surface.ts` and
+  `qa/gates/governed-review.ts` to `SERVING_ALLOWLIST`, because they are static
+  QA consumers that neither register nor advertise tools;
+- add no blanket `qa/`, `.json`, `qf-atlas/`, generated-output, extension, or
+  directory allowance.
+
+The repair must prove all of the following before a replacement candidate:
+
+1. `bun qa/run.ts observe-door` exits 0;
+2. `bun qa/run.ts tool-plane` proves real MCP `tools/list` excludes
+   `qf_observe_ticket`;
+3. an unallowlisted production-scope file naming `observe_ticket` makes the
+   gate red;
+4. an unallowlisted JSON reference to `golden/tools.json` makes the gate red;
+5. an unallowlisted QA consumer of `generateMcp()` makes the gate red;
+6. `bun qf-atlas/generate.mjs --check` and the accepted G2 Atlas causal-diff
+   remain green;
+7. the three newly classified paths contain no `McpServer`, `registerTool`,
+   transport, runtime action dispatch, or product import/read surface.
+
+The Reader adjudication is preserved at
+`docs/orders/evidence/golden-baseline/g2/OBSERVE-DOOR-READER-ADJUDICATION.md`.
+No other matrix assertion, allowlist entry, timing, product path, or acceptance
+meaning may change. After the repair, a fresh independent Verifier reruns the
+complete matrix; only the already-frozen item-3 G8 red remains admissible.
 
 ## Builder and verification
 
