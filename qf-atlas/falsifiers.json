@@ -49,7 +49,7 @@
       "n": 8,
       "name": "coverage ledger is complete, unique and well-formed",
       "passed": true,
-      "detail": "426 rows, all unique and legal; 73 findings all carry sourceClass"
+      "detail": "427 rows, all unique and legal; 73 findings all carry sourceClass"
     },
     {
       "n": 9,
@@ -145,7 +145,7 @@
       "n": 24,
       "name": "createReviewTask is a bypass, not kernel-internal gray",
       "passed": true,
-      "detail": "violation/bypass task+links=2/2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=c95b41c9df62ae47c9bf7d8ea169929b3cf304b6db4403ee34bfb81a628bd7b6 artifactHashAfter=c95b41c9df62ae47c9bf7d8ea169929b3cf304b6db4403ee34bfb81a628bd7b6 sourceRestored=true restored=true"
+      "detail": "violation/bypass task+links=2/2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=574f1094a0da68ee31a27752676d355a43ad7f07ade9d91500890302022dbcae artifactHashAfter=574f1094a0da68ee31a27752676d355a43ad7f07ade9d91500890302022dbcae sourceRestored=true restored=true"
     },
     {
       "n": 25,
@@ -295,7 +295,7 @@
       "n": 49,
       "name": "every scanned file has a cell for every analyzer",
       "passed": true,
-      "detail": "548 files × 8 analyzers, no empty cells"
+      "detail": "549 files × 8 analyzers, no empty cells"
     },
     {
       "n": 50,
@@ -385,13 +385,13 @@
       "n": 64,
       "name": "the ratchet fails on a red the baseline does not know",
       "passed": true,
-      "detail": "exit=1 sawNewRed=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c artifactHashAfter=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c sourceRestored=true restored=true"
+      "detail": "exit=1 sawNewRed=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=1dc637be7b7d37505c4074607ac8bb9fe468484f4bffd3c394ae5349db5dabb6 artifactHashAfter=1dc637be7b7d37505c4074607ac8bb9fe468484f4bffd3c394ae5349db5dabb6 sourceRestored=true restored=true"
     },
     {
       "n": 65,
       "name": "the baseline refuses to seed without an independent receipt",
       "passed": true,
-      "detail": "exit=2 refused=true baselineUnchanged=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c artifactHashAfter=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c sourceRestored=true restored=true"
+      "detail": "exit=2 refused=true baselineUnchanged=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=1dc637be7b7d37505c4074607ac8bb9fe468484f4bffd3c394ae5349db5dabb6 artifactHashAfter=1dc637be7b7d37505c4074607ac8bb9fe468484f4bffd3c394ae5349db5dabb6 sourceRestored=true restored=true"
     },
     {
       "n": 66,
@@ -433,13 +433,13 @@
       "n": 72,
       "name": "the coverage roll-up accounts for every analyzer",
       "passed": true,
-      "detail": "548 rows, no green roll-up hides a gap"
+      "detail": "549 rows, no green roll-up hides a gap"
     },
     {
       "n": 73,
       "name": "the push coverage dimension is measured, not copied",
       "passed": true,
-      "detail": "270 of 548 rows differ between ipcPush and ipcRequest"
+      "detail": "270 of 549 rows differ between ipcPush and ipcRequest"
     },
     {
       "n": 74,
@@ -451,13 +451,13 @@
       "n": 75,
       "name": "every HIGH persistence red carries an AST reach proof",
       "passed": true,
-      "detail": "2 HIGH row(s), including the temporary bypass, all with an AST path (hops: 1,1); baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 artifactHashAfter=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 sourceRestored=true restored=true"
+      "detail": "2 HIGH row(s), including the temporary bypass, all with an AST path (hops: 1,1); baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=6776f8fa693b476b64d81f4f8dc342f3ed447a5d74ad396825254a163d1077a3 artifactHashAfter=6776f8fa693b476b64d81f4f8dc342f3ed447a5d74ad396825254a163d1077a3 sourceRestored=true restored=true"
     },
     {
       "n": 76,
       "name": "breaking the reach edge downgrades the row out of HIGH",
       "passed": true,
-      "detail": "confidence=medium governance=violation; unproven HIGH rows anywhere = 0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 artifactHashAfter=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 sourceRestored=true restored=true"
+      "detail": "confidence=medium governance=violation; unproven HIGH rows anywhere = 0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=6776f8fa693b476b64d81f4f8dc342f3ed447a5d74ad396825254a163d1077a3 artifactHashAfter=6776f8fa693b476b64d81f4f8dc342f3ed447a5d74ad396825254a163d1077a3 sourceRestored=true restored=true"
     },
     {
       "n": 77,
@@ -487,7 +487,7 @@
       "n": 81,
       "name": "a same-named decoy cannot forge or suppress a reach proof",
       "passed": true,
-      "detail": "baitHigh=high forgedProofs=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=deeac8018da2227295e072d51d52db6c3b2d16e28147ad2ce29375d87e250022 artifactHashAfter=deeac8018da2227295e072d51d52db6c3b2d16e28147ad2ce29375d87e250022 sourceRestored=true restored=true"
+      "detail": "baitHigh=high forgedProofs=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=9a2469557253e0b4fa2f691025f570c0c2fd46339d08c0c3105ad2a0bcadd223 artifactHashAfter=9a2469557253e0b4fa2f691025f570c0c2fd46339d08c0c3105ad2a0bcadd223 sourceRestored=true restored=true"
     },
     {
       "n": 83,
@@ -499,7 +499,7 @@
       "n": 84,
       "name": "legacy or incomplete decision metadata cannot seed the baseline",
       "passed": true,
-      "detail": "legacy(why)=refused partial(no trigger)=refused canonical=seeded legacyFieldsOnDisk=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b552337a60c2f1477c24a0605103618f856650fa4b0608d8baa7b28c8930231b artifactHashAfter=b552337a60c2f1477c24a0605103618f856650fa4b0608d8baa7b28c8930231b sourceRestored=true restored=true"
+      "detail": "legacy(why)=refused partial(no trigger)=refused canonical=seeded legacyFieldsOnDisk=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=4cb0c72f3faf9d1b692d1ed965436b235c631d5ba2a81182be024f072f158619 artifactHashAfter=4cb0c72f3faf9d1b692d1ed965436b235c631d5ba2a81182be024f072f158619 sourceRestored=true restored=true"
     },
     {
       "n": 85,
@@ -511,7 +511,7 @@
       "n": 86,
       "name": "a same-named SQL-free helper cannot inherit another module's hard red",
       "passed": true,
-      "detail": "decoy hop4=read-only cites=0 cheatsWiresNotReachingWhatTheyCite=0 baitWireBacked=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=e9ebc713ccc19ae98dd80c1df202274012e653a43c4ce6c108dd96861ab15c0f artifactHashAfter=e9ebc713ccc19ae98dd80c1df202274012e653a43c4ce6c108dd96861ab15c0f sourceRestored=true restored=true"
+      "detail": "decoy hop4=read-only cites=0 cheatsWiresNotReachingWhatTheyCite=0 baitWireBacked=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=8e129d39de239c6d0734ad65c3dc6aa28a91a0a3a0048e07a4e04d2cde4dc041 artifactHashAfter=8e129d39de239c6d0734ad65c3dc6aa28a91a0a3a0048e07a4e04d2cde4dc041 sourceRestored=true restored=true"
     },
     {
       "n": 87,
@@ -541,55 +541,55 @@
       "n": 91,
       "name": "one date authority: free text and past dates are refused everywhere",
       "passed": true,
-      "detail": "absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 92,
       "name": "a test-only caller cannot corroborate a production reach proof",
       "passed": true,
-      "detail": "testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 93,
       "name": "an unimported same-named sibling cannot be reached or cited",
       "passed": true,
-      "detail": "handlerReachedUnimportedSibling=false hop4=read-only dangerStillSeen=true dangerHardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "handlerReachedUnimportedSibling=false hop4=read-only dangerStillSeen=true dangerHardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 94,
       "name": "same-named class methods stay distinct and neither forges a proof",
       "passed": true,
-      "detail": "rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 95,
       "name": "a direct barrel re-export is coverage-limited, not read-only or hard red",
       "passed": true,
-      "detail": "hop4=unknown status=unreached hardRed=false finding=medium/ast-coverage boundary=direct-barrel-re-export targetAttributed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "hop4=unknown status=unreached hardRed=false finding=medium/ast-coverage boundary=direct-barrel-re-export targetAttributed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 96,
       "name": "a coincidental same-named rejected binding remains read-only",
       "passed": true,
-      "detail": "hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 97,
       "name": "an imported-binding mismatch stays read-only with no barrel boundary",
       "passed": true,
-      "detail": "hop4=read-only boundary=absent persistBoundary=false reachedDanger=false danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "hop4=read-only boundary=absent persistBoundary=false reachedDanger=false danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 98,
       "name": "a named-import alias preserves the bounded barrel boundary",
       "passed": true,
-      "detail": "hop4=unknown status=unreached boundary=direct-barrel-re-export local=p imported=zzVfy98Persist targetAttributed=false finding=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
+      "detail": "hop4=unknown status=unreached boundary=direct-barrel-re-export local=p imported=zzVfy98Persist targetAttributed=false finding=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 artifactHashAfter=21303861e79be214db60f9ab10a1dfe57717315a5a67b8f19be47c8620411a90 sourceRestored=true restored=true"
     },
     {
       "n": 82,
       "name": "an ordinary falsifier run leaves the tracked tree byte-identical",
       "passed": true,
-      "detail": "git status --porcelain identical before and after (5 pre-existing entries)"
+      "detail": "git status --porcelain identical before and after (1 pre-existing entry)"
     }
   ]
 }

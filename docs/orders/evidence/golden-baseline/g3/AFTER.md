@@ -38,7 +38,7 @@ QuantFlow retains the app-owned notification transport and separate transport da
 - `qf-atlas/atlas.json`: `BCF877C591B0793015C9A266DF1ABE9B61B896055589F45E83FC874CC22B880A`
 - `qf-atlas/atlas.html`: `7C8AC51B35D5463C218B703B61F643ADFAA06CBA32135D801874B51668A5030E`
 - `qf-atlas/ATLAS.md`: `6B980942D852E7980BC4CFEBEB593EAB785DB2C5DA647C5BED87CF25BE43FDD6`
-- `qf-atlas/falsifiers.json`: `745dcca3cac9c6a9623bd1c67abf20d502aeeb1bca4276d776900b0abfe09eaa`
+- `qf-atlas/falsifiers.json`: `3993B08004E01D0FE6D15E059090A5D3D9FA214CB74C9D27646F16CA8325AAFE`
 - Atlas projection: 427 files, 126 channels, 13 strip candidates, 0 DEAD, 0 ratchet HARD RED.
 
 The product/QA commit is the generator base; this final evidence update contains only generated artifacts and proof receipts.
@@ -68,3 +68,22 @@ The product/QA commit is the generator base; this final evidence update contains
 - Atlas metadata fingerprint: `22056902de7379ea`; 427 files, 106 nodes/subsystems, 126 channels; 113 live, 0 unreached, 13 unused, 0 DEAD; 13 strip candidates; 0 unexplained coverage and 0 unexplained undecided findings.
 - `bun qf-atlas/generate.mjs --check`: **PASS**; `bun qf-atlas/falsify.mjs`: **98/98 PASS**, tree-neutral; `bun qf-atlas/ratchet.mjs`: **PASS**, HARD RED 0, unexplained coverage 0, undecided without blocker 0.
 - Falsifier bait and generated temporary files are absent after restoration. No product, QA, configuration, order semantics, acceptance, or runtime files changed.
+
+
+## Atlas falsifier interrupted-run repair
+
+- Verifier-reported state at authority 3f117ab915d6f068941b2eea8bafb96a8345235d: qf-atlas/ATLAS.md, qf-atlas/atlas.html, and qf-atlas/atlas.json were modified; four governed-review bait files were untracked: collab-electron/src/main/zz-falsify-governed-review-bait-handler.ts, collab-electron/src/main/zz-falsify-governed-review-bait.ts, collab-electron/src/preload/zz-falsify-governed-review-bait.ts, and collab-electron/src/windows/agent-chat/src/zz-falsify-governed-review-bait.ts.
+- Recovery snapshot before this repair: HEAD and origin both 3f117ab915d6f068941b2eea8bafb96a8345235d; only qf-atlas/falsifiers.json was modified; the four reported bait paths were already absent.
+- Recovery Atlas SHA-256: qf-atlas/ATLAS.md 6B980942D852E7980BC4CFEBEB593EAB785DB2C5DA647C5BED87CF25BE43FDD6, qf-atlas/atlas.html 7C8AC51B35D5463C218B703B61F643ADFAA06CBA32135D801874B51668A5030E, qf-atlas/atlas.json BCF877C591B0793015C9A266DF1ABE9B61B896055589F45E83FC874CC22B880A; modified receipt qf-atlas/falsifiers.json F97CAC7D009F0BA0A329BB5A046B5BC36E6F23AC66E8B4D8A3F57E213511363E.
+- The repair scope is limited to falsifier cleanup/receipt mechanics and these G3 receipts; no falsifier assertion, Atlas finding logic, product source, or PASS meaning is changed.
+
+
+## Controlled falsifier failure and receipt repair
+
+- Old failure mechanism reproduced with node qf-atlas/falsify.mjs --receipt: a hard stop while all four governed-review bait files were in flight prevented the final 98/98 summary, receipt write, and cleanup. The captured stdout stopped at case 23; forced process termination bypassed finally, exit, and signal cleanup.
+- Controlled dirty-state hashes before cleanup: qf-atlas/ATLAS.md 03CA464D662B92CCCEB63C6C9587A8A44E61F52A6373C3B739199E90BECF42FA; qf-atlas/atlas.html 86E277E1DE4CD95377134FFAFBDB499341093C936253EDC42ED6EBD2FF657F9A; qf-atlas/atlas.json FBD8DDF9A7EC1002C676B942F71ED2356AE521E85BC6C0644876188CEF046528.
+- Captured bait hashes: handler E231969B921BB5C7A141E3BC3386DAF0E8A7D07390A639206AB81ADF08274836 (222 bytes); source 771828EC838574107ACAF56722F378816EDC6AB69749C41BB1CFFCD9BD4E274A (273 bytes); preload 701248653DE8F8A17C092ECD3A15F0D7B71601FA589808CC883D9CA1532DFFF5 (210 bytes); renderer FEECF9EFB3B31820331756001F440BF403653A64825A0265F8B3A9531B505B93 (111 bytes).
+- Cleanup restored qf-atlas/ATLAS.md, atlas.html, atlas.json, and falsifiers.json byte-identically to authority and removed only the four named bait files; all four are absent.
+- Harness correction: qf-atlas/falsify.mjs now tracks receiptWritten, restores the prior receipt on abort/failure, and marks receipt success only after atomic rename. No falsifier assertion, Atlas finding logic, product source, or PASS meaning changed.
+- Corrected node qf-atlas/falsify.mjs --receipt: exit 0; explicit 98/98 falsifiers pass; receipts written; qf-atlas/falsifiers.json SHA-256 3993B08004E01D0FE6D15E059090A5D3D9FA214CB74C9D27646F16CA8325AAFE.
+- Corrected bun qf-atlas/ratchet.mjs: exit 0; HARD RED 0; unexplained coverage 0; undecided without blocker 0; AMBER 20; undecided 40.

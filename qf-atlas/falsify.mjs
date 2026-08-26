@@ -102,6 +102,7 @@ const SNAPSHOT = new Map(ARTIFACTS.map((p) => {
 }));
 const INITIAL_STATUS = porcelain();
 let restored = false;
+let receiptWritten = false;
 
 // IN-FLIGHT FIXTURES. `withFile` restores in a `finally`, which does not run when the
 // process is signalled. A Ctrl-C mid-suite therefore left a synthetic
@@ -125,7 +126,7 @@ function restoreArtifacts() {
   restoreInflight();
   for (const [p, bytes] of SNAPSHOT) {
     // --receipt is the one deliberate write this run is allowed to leave behind.
-    if (RECEIPT_MODE && p.endsWith("falsifiers.json")) continue;
+    if (RECEIPT_MODE && p.endsWith("falsifiers.json") && receiptWritten) continue;
     const abs = join(REPO, p);
     try {
       if (bytes === null) { if (existsSync(abs)) unlinkSync(abs); }
@@ -141,7 +142,7 @@ function restoreArtifacts() {
 }
 
 // A falsifier that throws must not leave the map rewritten either.
-process.on("exit", () => { if (!restored) restoreArtifacts(); });
+process.on("exit", () => { if (!restored || (RECEIPT_MODE && !receiptWritten)) restoreArtifacts(); });
 // `exit` does not fire for a signal, and neither does `finally`. Handling SIGINT and
 // SIGTERM covers Ctrl-C, an IDE stop button, a CI cancel and `kill <pid>` — every
 // ordinary way a run is interrupted. SIGKILL and power loss remain uncatchable by
@@ -2379,6 +2380,7 @@ for (let attempt = 0; attempt < 5 && !written; attempt++) {
     const tmp = `${receiptPath}.tmp-${process.pid}`;
     writeFileSync(tmp, receipt);
     renameSync(tmp, receiptPath);
+    receiptWritten = true;
     written = true;
   } catch (err) {
     if (attempt === 4) {

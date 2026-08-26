@@ -34,3 +34,12 @@ atlas-refresh	bun qf-atlas/generate.mjs	0	PASS clean authority e0f9ae2; generate
 atlas-refresh	bun qf-atlas/generate.mjs --check	0	PASS current 427 files/126 channels; fingerprint 22056902de7379ea
 atlas-refresh	bun qf-atlas/falsify.mjs	0	PASS 98/98; tree-neutral; no files written
 atlas-refresh	bun qf-atlas/ratchet.mjs	0	PASS HARD RED 0; unexplained coverage 0; undecided without blocker 0; undecided 40
+recovery	verifier-reported dirty state at 3f117ab	recorded	modified ATLAS.md/atlas.html/atlas.json; four named governed-review bait files untracked; rerun refused dirty tree
+recovery	live state before controlled repair	recorded	HEAD=origin=3f117ab; only qf-atlas/falsifiers.json modified; four named bait files absent
+recovery	Atlas generated-byte snapshot	recorded	ATLAS.md=6B980942D852E7980BC4CFEBEB593EAB785DB2C5DA647C5BED87CF25BE43FDD6; atlas.html=7C8AC51B35D5463C218B703B61F643ADFAA06CBA32135D801874B51668A5030E; atlas.json=BCF877C591B0793015C9A266DF1ABE9B61B896055589F45E83FC874CC22B880A
+repair-proof	controlled node qf-atlas/falsify.mjs --receipt hard-stop probe	reproduced	force-stopped while four governed-review bait files in flight; stdout stopped at case 23; no final 98/98 or receipt/cleanup
+repair-proof	controlled dirty-state capture	recorded	Atlas hashes 03CA464D662B92CCCEB63C6C9587A8A44E61F52A6373C3B739199E90BECF42FA / 86E277E1DE4CD95377134FFAFBDB499341093C936253EDC42ED6EBD2FF657F9A / FBD8DDF9A7EC1002C676B942F71ED2356AE521E85BC6C0644876188CEF046528; four bait hashes recorded in AFTER.md
+repair-proof	literal cleanup of four named bait paths	0	PASS all four absent; only named paths removed; Atlas and receipt restored to authority bytes
+repair-proof	node qf-atlas/falsify.mjs --receipt	0	PASS 98/98; receipts written; receipt SHA256=3993B08004E01D0FE6D15E059090A5D3D9FA214CB74C9D27646F16CA8325AAFE
+repair-proof	bun qf-atlas/ratchet.mjs	0	PASS HARD RED 0; unexplained coverage 0; undecided without blocker 0; AMBER 20; undecided 40
+repair-proof	qf-atlas/falsify.mjs mechanics diff	0	EXACT receiptWritten/abort-restore/atomic-rename state only; no assertion or Atlas logic changes
