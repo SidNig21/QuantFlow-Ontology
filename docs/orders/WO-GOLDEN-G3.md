@@ -1,6 +1,6 @@
 # WO-GOLDEN-G3 — Retire peer-bus and critic-mock package islands
 
-status: **READER ROUND 2 NO/NO — EXACTNESS AMENDED FOR FINAL RE-READ**
+status: **SEMANTIC READER YES/YES — AWAITING NEXT.md BUILDER ROTATION**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G3 — peer-bus and critic-mock islands
