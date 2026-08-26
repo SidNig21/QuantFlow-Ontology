@@ -6,7 +6,7 @@
  * boundary. Unsupported metadata is allowed through parse/resolve only to
  * prove that dispatch rejects it before a callback can mutate runtime state.
  */
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import {
@@ -21,6 +21,49 @@ import {
 import { prepareRuntimeStaging } from "../../collab-electron/scripts/package-lib/runtime-staging.ts";
 
 const REPO_ROOT = resolve(import.meta.dir, "../..");
+function assertPrecreatedPathUsesSingleDispatcher(): void {
+  const source = readFileSync(
+    join(REPO_ROOT, "collab-electron/src/main/agent-host.ts"),
+    "utf8",
+  );
+  const admissionStart = source.indexOf(
+    "export async function admitAndStartSession(",
+  );
+  const precreatedStart = source.indexOf(
+    "export async function startPrecreatedNativeTuiSession(",
+  );
+  const precreatedEnd = source.indexOf("function peerBusDbPath()", precreatedStart);
+  if (admissionStart < 0 || precreatedStart < 0 || precreatedEnd < 0 || precreatedStart <= admissionStart) {
+    throw new Error("production precreated/admission functions are missing");
+  }
+  const admission = source.slice(admissionStart, precreatedStart);
+  const precreated = source.slice(precreatedStart, precreatedEnd);
+  const dispatchCount =
+    admission.match(/\bdispatchRuntimeRoute\s*\(/g)?.length ?? 0;
+  if (dispatchCount !== 1) {
+    throw new Error(
+      "production admission must have exactly one runtime dispatcher",
+    );
+  }
+  if (
+    !/const runtime = getDefinitionRuntime\(definitionId\);\s+return await admitAndStartSession\(definitionId, \{/.test(
+      precreated,
+    )
+  ) {
+    throw new Error(
+      "precreated path must resolve metadata and hand off to admitAndStartSession",
+    );
+  }
+  if (
+    /assertPrecreatedNativeTuiRoute|metadata\.route|dispatchRuntimeRoute|kernelExecute|admitNativeTuiDefinition|admitHostAcp|completeRuntimeKernelAdmission/.test(
+      precreated,
+    )
+  ) {
+    throw new Error(
+      "precreated path has a competing refusal, mutation, or runtime callback boundary",
+    );
+  }
+}
 
 type RouteProbe = {
   route: string;
@@ -100,6 +143,7 @@ export function runGoldenG4RetiredRouteGate(): { ok: boolean } {
   const mutations = { value: 0 };
   try {
     prepareRuntimeStaging({ stagingRoot, repoRoot: REPO_ROOT }, { qaMode: true });
+    assertPrecreatedPathUsesSingleDispatcher();
     const manifests = discoverDockProfileManifests(stagingRoot, { qaMode: true });
     const refs = packageRefs(manifests);
     if (refs.length === 0) throw new Error("staged QA closure has no profile references");

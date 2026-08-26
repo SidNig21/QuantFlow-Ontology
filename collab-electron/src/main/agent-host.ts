@@ -61,7 +61,6 @@ import {
 } from "./terminal-target";
 import { resolveCollaborationResourcePath } from "./package-resource-paths";
 import { captureSession, writeToSession } from "./pty";
-import { assertPrecreatedNativeTuiRoute } from "./precreated-native-tui";
 import { assertPrecreatedStartOwnership } from "./precreated-start-ownership";
 
 export function appRoot(): string {
@@ -526,7 +525,6 @@ export async function startPrecreatedNativeTuiSession(
     .filter((link) => link.to_id === sessionId);
   assertPrecreatedStartOwnership(caller.sessionId, sessionId, delegations);
   const runtime = getDefinitionRuntime(definitionId);
-  assertPrecreatedNativeTuiRoute(runtime.metadata.route);
   return await admitAndStartSession(definitionId, {
     existingSessionId: sessionId,
     missionActivation: opts?.missionActivation,
