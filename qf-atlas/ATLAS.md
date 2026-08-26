@@ -1,6 +1,6 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ fd60b38` on 2026-08-26 by
+> Generated from `wo-golden-g2 @ 2f7ea77` on 2026-08-26 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
@@ -228,7 +228,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 213 | imported from an entrypoint |
+| `reachable` | 212 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -332,8 +332,8 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 234 of
-235 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 233 of
+234 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
 `collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
@@ -375,9 +375,9 @@ asked before the change, when nothing is red yet.
 
 ### Blast-radius coverage
 
-**234 of 235 files that have a reachability verdict** carry a blast radius.
+**233 of 234 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**537 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**536 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
 either. "What breaks if I change a QA gate?" is **not answerable here**, and the 302 files in that position are a stated limit, not an omission.
 
@@ -426,7 +426,7 @@ prevent a clean architectural result.
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (537 files)
+## Per-analyzer coverage (536 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -434,14 +434,14 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 533 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 278 | 0 | 4 | 0 | 255 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 526 |
-| `persistence` | 23 | 26 | 0 | 0 | 488 |
-| `lifetime` | 6 | 57 | 0 | 0 | 474 |
-| `packaging` | 233 | 0 | 0 | 105 | 199 |
-| `ownership` | 20 | 0 | 0 | 345 | 172 |
-| `reach` | 232 | 3 | 0 | 302 | 0 |
+| `imports` | 532 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 277 | 0 | 4 | 0 | 255 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 525 |
+| `persistence` | 23 | 26 | 0 | 0 | 487 |
+| `lifetime` | 6 | 57 | 0 | 0 | 473 |
+| `packaging` | 232 | 0 | 0 | 105 | 199 |
+| `ownership` | 20 | 0 | 0 | 344 | 172 |
+| `reach` | 231 | 3 | 0 | 302 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
 failure — `reach: unsupported` on 302 files means those trees are
@@ -507,7 +507,7 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 492
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 491
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
 - `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 601
 

@@ -1,5 +1,5 @@
 {
-  "candidate_product_commit": "fd60b38",
+  "candidate_product_commit": "2f7ea77",
   "production_manifests": [
     "species/hermes/dock-profiles.json",
     "species/claude-code/dock-profiles.json"
