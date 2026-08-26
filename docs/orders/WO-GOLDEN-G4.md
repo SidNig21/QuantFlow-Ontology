@@ -1,6 +1,6 @@
 # WO-GOLDEN-G4 — Retire the AgentOS runtime fossil
 
-status: **ROUND 1 AMENDED — FOCUSED SEMANTIC REREAD REQUIRED**
+status: **ROUND 2 AMENDED — FOCUSED SEMANTIC REREAD REQUIRED**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G4 — AgentOS runtime fossil
@@ -207,6 +207,7 @@ G4 adds zero fake runtime fixtures. The dispatcher gate may use metadata and cal
 ### 5. Literal-reference ownership
 
 - Retarget `dock-profiles.test.ts`, `boot-reconcile/run.ts`, `dock-profile-identity/run.ts`, and `qf-vault-projection/src/gate.ts` from qf-toolloop to retained qf-proof-agent/current metadata without changing assertion meaning.
+- Retarget only the stale `qf-toolloop` required-Dock identity in `qa/gates/windows-cold-boot.ts` to the retained `qf-proof-agent`/current QA identity set. Preserve every cold-boot, package, RPC, shutdown, and cleanup assertion. G12 still owns execution of the full Windows cold-boot/operations boundary and its inherited reds; G4 owns this exact fixture-reference correction so AgentOS removal does not leave an impossible future gate.
 - In `artifact-root/run.ts`, remove only the AgentOS live trajectory and assign current-runtime trajectory proof to G9.
 - In `host-mounts.ts`, retain shared adapter environment resolution; remove AgentOS-only language/branches only after zero-consumer proof. G5 owns broader host-ACP.
 - Retarget `collab-electron/package.json` `pack-agent` to qf-proof-agent if current and fail-capable; otherwise remove it with zero-consumer proof.
@@ -223,7 +224,6 @@ bun qa/run.ts dock-production-inventory
 bun qa/run.ts dock-definition-launch
 bun qa/run.ts hermes-launch-policy
 bun qa/run.ts package-closure
-bun qa/run.ts runtime-kernel-admission
 bun test collab-electron/src/main/runtime-adapter.test.ts collab-electron/src/main/precreated-native-tui.test.ts collab-electron/src/main/native-tui-orchestration.test.ts
 bun --cwd collab-electron run build
 bun qf-atlas/generate.mjs --check
@@ -233,7 +233,9 @@ git diff --check "$BUILD_BASE_SHA...HEAD"
 git diff --check
 ```
 
-`dock-definition-launch` derives expected identities from canonical retained manifests rather than stale qf-toolloop, six-row, or Hermes-orchestrator constants. That is same-meaning fixture maintenance after this semantic amendment.
+`dock-definition-launch` derives expected identities from canonical retained manifests rather than stale qf-toolloop, six-row, or Hermes-orchestrator constants. Its existing direct import and execution of `completeRuntimeKernelAdmission` is the executable generic-admission proof; `runtime-kernel-admission` is a source module, not a `qa/run.ts` selector. Removing the nonexistent selector changes invocation only, not the lifecycle assertion.
+
+The `windows-cold-boot.ts` required-ID retarget gets one focused source/fixture falsifier showing the old qf-toolloop identity is red and the retained current identity is green. The full Windows gate remains G12-owned and is not rerun for G4 ceremony.
 
 Starting G8 reds (`kernel-one-path` QA fixtures, `kernel-market-lineage`) and G12 reds (Electron `userData`, Windows package/typecheck/operations) stay assigned there. G4 proceeds only with exact pre/post non-regression.
 
