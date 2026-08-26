@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ e0f9ae2` on 2026-08-26 by
+> Generated from `wo-golden-g2 @ fd60b38` on 2026-08-26 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**40 of 41 findings have not been looked at.**
+**39 of 40 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 40 |
+| `undecided` | 39 |
 | `repair` | 1 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 40 findings still need a decision.
+**Not all clear.** 39 findings still need a decision.
 
 ## The four hops
 
@@ -48,7 +48,7 @@ flowchart TD
   RO["<b>read-only</b><br/>no mutation seen"]
   H -->|"read-only 96"| RO
 
-  QA["<b>QA · governance</b><br/>13 subsystems<br/>asserts the rules above"]
+  QA["<b>QA · governance</b><br/>11 subsystems<br/>asserts the rules above"]
   SP["<b>Species · runtimes</b><br/>3 subsystems<br/>launched by path,<br/>not imported"]
   SC["<b>Schema · generated contract</b><br/>5 subsystems<br/>generated, never hand-edited"]
   QA -.->|"gates"| H
@@ -228,7 +228,7 @@ and each window's own script — so this is a file-level graph, not a call graph
 | | Files | Meaning |
 |---|---:|---|
 | `entrypoint` | 18 | the app starts here |
-| `reachable` | 212 | imported from an entrypoint |
+| `reachable` | 213 | imported from an entrypoint |
 | `process-entry` | 0 | launched by path, not imported (workers) |
 | `package-entry` | 2 | named in a workspace package's exports |
 | `test-only` | 2 | reached only from tests |
@@ -305,7 +305,7 @@ state reach this SQL without first entering a governed action?** Domain tables c
 from the generated schema; reachability follows call sites and the Kernel command table.
 
 **0 confirmed at `high` confidence**, 10 more at `medium`,
-3 unknown (gray — not counted as debt).
+2 unknown (gray — not counted as debt).
 
 The split matters. A `high` row is a domain-truth write reached from outside a governed
 action. A `medium` row is usually a store that is not in the golden schema — real, but a
@@ -332,15 +332,14 @@ weaker claim, and it should not be read as the same kind of defect.
 ### Before you edit these
 
 Everything that imports the file, directly or transitively. This is what breaks if the
-change is wrong. **`atlas.json` carries this for every file** — 233 of
-234 — not only the ones carrying a finding, because the question is
+change is wrong. **`atlas.json` carries this for every file** — 234 of
+235 — not only the ones carrying a finding, because the question is
 asked before the change, when nothing is red yet.
 
-`collab-electron/src/main/kernel.ts` — **9 files depend on it**, it imports 7
+`collab-electron/src/main/kernel.ts` — **8 files depend on it**, it imports 7
 
 ```
   collab-electron/src/main/index.ts
-  qa/gates/artifact-root/run.ts
   collab-electron/src/main/ipc.ts
   collab-electron/src/main/ontology-gateway.ts
   collab-electron/src/main/host-native-tui.ts
@@ -358,39 +357,39 @@ asked before the change, when nothing is red yet.
   collab-electron/src/main/index.ts
 ```
 
-`packages/qf-kernel/src/governed-review.ts` — **41 files depend on it**, it imports 7
+`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 7
 
 ```
   packages/qf-kernel/src/index.ts
   packages/qf-kernel/src/portable.ts
   packages/qf-kernel/src/create.ts
   packages/qf-kernel/src/execute.ts
-  qa/gates/agent-path/run.ts
   qa/gates/artifact-root/run.ts
   qa/gates/boot-reconcile/run.ts
   qa/gates/bovada-football/run.ts
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
-  …31 more
+  qa/gates/kernel-drift/run.ts
+  …30 more
 ```
 
 ### Blast-radius coverage
 
-**233 of 234 files that have a reachability verdict** carry a blast radius.
+**234 of 235 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**549 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**537 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 315 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 302 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 53+ | 1 | 0 |
-| `collab-electron/src/main/file-filter.ts` | 52+ | 2 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 52+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 52+ | 3 | 0 |
-| `collab-electron/src/main/files.ts` | 49+ | 2 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 51+ | 1 | 0 |
+| `collab-electron/src/main/files.ts` | 50+ | 2 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 50+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 50+ | 3 | 0 |
+| `packages/qf-kernel/src/pipeline.ts` | 47+ | 6 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
@@ -398,7 +397,7 @@ which are not in the golden schema),
 Kernel command implementations dispatched by `execute()`, schema migrations,
 generated SQL, and QA fixture seeding.
 
-## What the analyzer could not read (20)
+## What the analyzer could not read (19)
 
 **Absence of a finding is not proof of compliance.** These files hold SQL the function
 indexer could not resolve, so governance analysis never saw it. They are gray, and they
@@ -421,13 +420,13 @@ prevent a clean architectural result.
 | `tools/qf-bovada-football/src/constants.ts` | unindexed | 0 | 0 |
 | `tools/qf-bovada-football/src/index.ts` | unindexed | 0 | 0 |
 | `tools/qf-proof-agent/scripts/pack-agent.mjs` | unindexed | 0 | 0 |
-| …5 more | | | see `atlas.json` |
+| …4 more | | | see `atlas.json` |
 
 > `kernel.ts`
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (549 files)
+## Per-analyzer coverage (537 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -435,19 +434,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 545 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 277 | 0 | 4 | 0 | 268 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 538 |
-| `persistence` | 25 | 26 | 0 | 0 | 498 |
-| `lifetime` | 6 | 64 | 0 | 0 | 479 |
-| `packaging` | 232 | 0 | 0 | 110 | 207 |
-| `ownership` | 20 | 0 | 0 | 352 | 177 |
-| `reach` | 231 | 3 | 0 | 315 | 0 |
+| `imports` | 533 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 278 | 0 | 4 | 0 | 255 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 526 |
+| `persistence` | 23 | 26 | 0 | 0 | 488 |
+| `lifetime` | 6 | 57 | 0 | 0 | 474 |
+| `packaging` | 233 | 0 | 0 | 105 | 199 |
+| `ownership` | 20 | 0 | 0 | 345 | 172 |
+| `reach` | 232 | 3 | 0 | 302 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 315 files means those trees are
+failure — `reach: unsupported` on 302 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 110 files means the packaging
+`packaging: unsupported` on 105 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant
@@ -455,15 +454,15 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-40 undecided findings, each carries a blocker:
+39 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
 | `founder-decision` | 20 | the code cannot say which answer is right — this needs your intent |
-| `ast-coverage` | 3 | the analyzer could not resolve this statically |
+| `ast-coverage` | 2 | the analyzer could not resolve this statically |
 | `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
 
-**20 of 40 are waiting on you, not on the tool.**
+**20 of 39 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 
@@ -508,7 +507,7 @@ discovered from the AST.
 
 - **collab-electron/src/main/host-acp-permission.ts** — ipcMain.handle("qf:sessions:permissionDecision") at line 54
 - **packages/qf-kernel/src/create.ts** — INSERT INTO agent_session at line 573
-- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 640
+- `collab-electron/src/main/agent-host.ts` — exports startPrecreatedNativeTuiSession() at line 492
 - `collab-electron/src/main/host-native-tui.ts` — exports cancelNativeTuiSession() at line 395
 - `collab-electron/src/main/kernel.ts` — exports kernelAssertSessionMayClose() at line 601
 

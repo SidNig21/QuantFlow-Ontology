@@ -1,0 +1,28 @@
+{
+  "candidate_product_commit": "fd60b38",
+  "production_manifests": [
+    "species/hermes/dock-profiles.json",
+    "species/claude-code/dock-profiles.json"
+  ],
+  "qa_manifests": [
+    "species/claude-code/qa-dock-profiles.json",
+    "tools/qf-proof-agent/dock-profiles.json"
+  ],
+  "retained_routes": {
+    "native_tui": [
+      "species/hermes/packed/hermes.aospkg",
+      "species/claude-code/packed/claude-code.aospkg",
+      "tools/qf-proof-agent/packed/qf-proof-agent.aospkg"
+    ],
+    "host_acp": []
+  },
+  "rejected_routes": [
+    "agentos",
+    "golden-g4-unknown"
+  ],
+  "dispatcher_error": {
+    "name": "UnsupportedRuntimeRouteError",
+    "code": "QF_UNSUPPORTED_RUNTIME_ROUTE",
+    "mutation_callbacks_for_rejected_routes": 0
+  }
+}

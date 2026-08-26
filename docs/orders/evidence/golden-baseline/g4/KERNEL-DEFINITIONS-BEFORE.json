@@ -1,0 +1,77 @@
+{
+  "build_base_sha": "dd1dcb7ef50248e46f4de5acb543ef7e7753a981",
+  "canonical_db": "C:\\Users\\rybow\\.quantflow\\kernel.db",
+  "count": 7,
+  "rows": [
+    {
+      "definition_id": "claude-code-orchestrator",
+      "role": "claude-orchestrator",
+      "package_ref": "species/claude-code/packed/claude-code.aospkg",
+      "profile_id": "claude-code-orchestrator",
+      "metadata_ref": "species/claude-code/packed/claude-code.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "effc65fefe5299f69933404033cbf697dc2826d397e8333768710f66dffd7f4c"
+    },
+    {
+      "definition_id": "claude-code-worker",
+      "role": "claude-worker",
+      "package_ref": "species/claude-code/packed/claude-code.aospkg",
+      "profile_id": "claude-code-worker",
+      "metadata_ref": "species/claude-code/packed/claude-code.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "effc65fefe5299f69933404033cbf697dc2826d397e8333768710f66dffd7f4c"
+    },
+    {
+      "definition_id": "hermes-critic",
+      "role": "critic",
+      "package_ref": "species/hermes/packed/hermes.aospkg",
+      "profile_id": "default",
+      "metadata_ref": "species/hermes/packed/hermes.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "21d304aa95126f083066fb42a44f44ee0d3cd489b36d725d98123614396e8cb7"
+    },
+    {
+      "definition_id": "hermes-orchestrator",
+      "role": "orchestrator",
+      "package_ref": "species/hermes/packed/hermes.aospkg",
+      "profile_id": "default",
+      "metadata_ref": "species/hermes/packed/hermes.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "21d304aa95126f083066fb42a44f44ee0d3cd489b36d725d98123614396e8cb7"
+    },
+    {
+      "definition_id": "hermes-research-director",
+      "role": "orchestrator",
+      "package_ref": "species/hermes/packed/hermes.aospkg",
+      "profile_id": "default",
+      "metadata_ref": "species/hermes/packed/hermes.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "21d304aa95126f083066fb42a44f44ee0d3cd489b36d725d98123614396e8cb7"
+    },
+    {
+      "definition_id": "hermes-worker",
+      "role": "worker",
+      "package_ref": "species/hermes/packed/hermes.aospkg",
+      "profile_id": "default",
+      "metadata_ref": "species/hermes/packed/hermes.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "21d304aa95126f083066fb42a44f44ee0d3cd489b36d725d98123614396e8cb7"
+    },
+    {
+      "definition_id": "hermes-worker-2",
+      "role": "worker2",
+      "package_ref": "species/hermes/packed/hermes.aospkg",
+      "profile_id": "default",
+      "metadata_ref": "species/hermes/packed/hermes.meta.json",
+      "route": "native_tui",
+      "resolution": "current-repo-metadata",
+      "metadata_sha256": "21d304aa95126f083066fb42a44f44ee0d3cd489b36d725d98123614396e8cb7"
+    }
+  ]
+}

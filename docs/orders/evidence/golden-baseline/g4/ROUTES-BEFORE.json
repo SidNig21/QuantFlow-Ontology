@@ -1,0 +1,61 @@
+{
+  "production_manifests": [
+    "species/hermes/dock-profiles.json",
+    "species/claude-code/dock-profiles.json"
+  ],
+  "qa_manifests": [
+    "species/claude-code/qa-dock-profiles.json",
+    "tools/qf-proof-agent/dock-profiles.json",
+    "tools/runtime-proof/dock-profiles.json"
+  ],
+  "packages": [
+    {
+      "scope": "production",
+      "package_ref": "species/hermes/packed/hermes.aospkg",
+      "metadata_path": "species/hermes/packed/hermes.meta.json",
+      "adapter_id": "hermes",
+      "route": "native_tui",
+      "source_marker_present": true,
+      "source_marker_sha256": "aba1069507d3d0d8dee78fa6e4c55afc66ef8e45b1b73e0921b10b5da8ce6bc1",
+      "staged_marker_present": true,
+      "staged_marker_sha256": "aba1069507d3d0d8dee78fa6e4c55afc66ef8e45b1b73e0921b10b5da8ce6bc1",
+      "metadata_sha256": "21d304aa95126f083066fb42a44f44ee0d3cd489b36d725d98123614396e8cb7"
+    },
+    {
+      "scope": "production",
+      "package_ref": "species/claude-code/packed/claude-code.aospkg",
+      "metadata_path": "species/claude-code/packed/claude-code.meta.json",
+      "adapter_id": "claude-code",
+      "route": "native_tui",
+      "source_marker_present": true,
+      "source_marker_sha256": "83a551b8a9d42187281da8dc149712c22036cd14caf3b299ceabc8df79ba9857",
+      "staged_marker_present": true,
+      "staged_marker_sha256": "83a551b8a9d42187281da8dc149712c22036cd14caf3b299ceabc8df79ba9857",
+      "metadata_sha256": "effc65fefe5299f69933404033cbf697dc2826d397e8333768710f66dffd7f4c"
+    },
+    {
+      "scope": "qa-only-retained",
+      "package_ref": "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+      "metadata_path": "tools/qf-proof-agent/packed/qf-proof-agent.meta.json",
+      "adapter_id": "qf-proof-agent",
+      "route": "native_tui",
+      "source_marker_present": true,
+      "source_marker_sha256": "12df151804e5a3f402d6c553dbacc0dfa610992fe0881301480ef62887fe15af",
+      "staged_marker_present": true,
+      "staged_marker_sha256": "12df151804e5a3f402d6c553dbacc0dfa610992fe0881301480ef62887fe15af",
+      "metadata_sha256": "1f8d07f1cd1eac90487996f4201c3c46e6fb45b48b988e256d43e4718ff32d1d"
+    },
+    {
+      "scope": "qa-only-retirement-candidate",
+      "package_ref": "tools/runtime-proof/packed/qf-toolloop.aospkg",
+      "metadata_path": "tools/runtime-proof/packed/qf-toolloop.meta.json",
+      "adapter_id": "qf-toolloop",
+      "route": "agentos",
+      "source_marker_present": false,
+      "source_marker_sha256": null,
+      "staged_marker_present": true,
+      "staged_marker_sha256": "7e9bd05e69137b7d5a28a919b7290407445233d5e2a3d7b6f7c8d2cfea8e38e4",
+      "metadata_sha256": "8f3ba524895014496656a93a0cf216f6db7c3b7f012de6ff00f2467d96551c97"
+    }
+  ]
+}

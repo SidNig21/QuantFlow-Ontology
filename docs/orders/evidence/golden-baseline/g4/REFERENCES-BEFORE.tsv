@@ -1,0 +1,1033 @@
+path	line	source_class	text_prefix
+./docs/DEBT.md	42	other	| 17 | **Durable execution — logged, not evaluated.** Candidates: RivetKit (library, in-process), Restate (single self-hostable binary), Temporal (server + Postgres), DBOS (needs Postgres — splits the system of record, likely disqualifying). Licensing **probed 2026-07-24 via `gh repo view`**: `rivet-dev/rivet` and `rivet-dev/agentos` are both **Apache-2.0** (confirmed at source, active repos). Restate-BSL-1.1 / Inngest-SSPL claims remain unprobed — verify at adoption if they're ever candidates; licenses cha
+./docs/DEBT.md	54	other	| 29 | **Domain truth and the bytes it points at fork on different rules, so the documented drift remedy orphans every artifact.** `COLLAB_DIR` (`collab-electron/src/main/paths.ts:24`) forks per launch directory on `sha256(cwd)[:12]`, and nine subsystems follow it: Kernel, canvas persistence, config, a2a bus, PTY logs, IPC sockets, terminals. These do **not** follow it, using `homedir()`/`$HOME` + `.collaborator` directly: `~/.collaborator/agent-artifacts/` (`agent-host.ts:633`), `agentos-host-mounts.json`
+./docs/adr/0004-repository-golden-baseline.md	49	other	4. AgentOS runtime fossil while preserving independently required `.aospkg`
+./docs/demos/dock.md	4	other	definition clicked; qf-toolloop and all Hermes profiles use this one path. Nothing is remembered in
+./docs/demos/dock.md	11	other	   cd tools/runtime-proof && bun install --frozen-lockfile && bun run pack-agent
+./docs/demos/dock.md	20	other	3. With a fresh Kernel, confirm the **Agent dock** shows exactly `qf-toolloop`,
+./qa/fixtures/pre-d1-profile-identity/seed.sql	6	other	  ('researcher-pre', '2026-07-20T00:00:00.000Z', 'researcher-pre', 'researcher', 'tools/runtime-proof/packed/qf-toolloop.aospkg', NULL),
+./qa/fixtures/pre-d1-profile-identity/seed.sql	7	other	  ('critic-pre', '2026-07-20T00:00:01.000Z', 'critic-pre', 'critic', 'tools/runtime-proof/packed/qf-toolloop.aospkg', NULL);
+./docs/demos/agent-path.md	10	other	   cd collab-electron && bun run pack-agent   # once, if .aospkg missing
+./docs/demos/agent-path.md	18	other	3. **File → Spawn Agent Session** (species `qf-toolloop`).
+./docs/RESEARCH.md	31	other	**From the ecosystem generally — the rule that stops the loop.** Four substrate re-evaluations (agentOS, Rivet/Temporal/DuckDB, Restate/RivetKit, and counting) each produced a defensible answer and none advanced the charter. Hence the triage in `START_HERE.md` §5.8: dock item / underlayer / neither, classified on sight.
+./docs/RESEARCH.md	72	other	## Worked example — agentOS, triaged per layer (probed 2026-07-24)
+./docs/RESEARCH.md	74	other	Probed at source: `agentos-sdk.dev/docs/architecture` (read in full — it 403s plain fetchers, use a browser), the v0.2 changelog on rivet.dev, and both GitHub repos via `gh`. The durable lesson: **triage runs per layer, never per brand name** — one product held all three buckets at once.
+./docs/RESEARCH.md	78	other	| **Cargo agents** — Pi, plus "Claude Code, Codex, and OpenCode" (v0.2) | CLI agents wrapped by adapters (`@agentos-software/*`), sessions streamed as ACP events | **Dock items — with or without agentOS.** They are CLIs; QuantFlow can spawn them as native seats today. agentOS is evidence they speak ACP, not the thing that grants them |
+./docs/RESEARCH.md	79	other	| **Rivet Actor layer** (`@rivet-dev/agentos`) | Wraps the VM; workflows where each `ctx.step()` is "recorded, retried, and resumed independently"; cron; sleep/wake persistence | **Underlayer.** The durable-execution engine — ROADMAP debt #17. Trigger: the first orchestrator run that dies mid-flight and cannot resume |
+./docs/RESEARCH.md	82	other	Licensing probed at source via `gh repo view`: `rivet-dev/rivet` and `rivet-dev/agentos` are both **Apache-2.0**.
+./docs/RESEARCH.md	84	other	**The quarantine tier.** The dock-species doctrine ("anything with a CLI — adopt freely") has one real hole: spawning an *unvetted* CLI as a native process — your user, your real filesystem — is how a desk gets owned. The VM layer is the patch, taken as inventory rather than infrastructure: `execution_environment.kind = "host-pty"` for trusted species (Hermes, Claude Code, Codex), `"agentos-vm"` for strangers. Same dock, same canvas, same `execute()` front door; a species that earns trust graduates to a hos
+./docs/RESEARCH.md	86	other	**Honest unknowns:** whether Hermes runs end-to-end inside an agentOS VM (empirical, ~a day; only worth answering if the quarantine tier gets built) · "agentOS Apps" (described elsewhere as multi-tenant app hosting; unverified by this probe, and nothing turns on it).
+./docs/RESEARCH.md	95	other	| **Rebuild engines** | Envoy / Flue / Omnigent / agentOS core as replacements for app-owned transport and seats |
+./README.md	22	other	  <img src="docs/readme-assets/dock-session.png" alt="Dock session tile with qf-toolloop running on the canvas" width="720" />
+./README.md	25	other	<p align="center"><em>A Dock-spawned <code>qf-toolloop</code> session on the canvas with live session ledger (running / closed) — collaboration transport proven on Windows.</em></p>
+./README.md	47	other	- **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
+./qa/run.ts	487	other	      "WO-CI2: packaged Linux app closes over qf-toolloop and Hermes runtime bytes",
+./qa/run.ts	671	other	    name: "runtime-proof",
+./qa/run.ts	673	other	      "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",
+./qa/run.ts	675	other	      const cwd = join(REPO_ROOT, "tools/runtime-proof");
+./qa/run.ts	683	other	        console.error(`runtime-proof: bun install exited ${installCode}`);
+./qa/run.ts	701	other	        console.error(`runtime-proof: bun test exited ${code}`);
+./qf-atlas/coverage-matrix.mjs	73	other	        `${dyn.length} import specifier(s) computed at runtime (line ${dyn.map((d) => d.line).join(", ")})`, "runtime-proof");
+./qf-atlas/coverage-matrix.mjs	115	other	      set("ipcRequest", state, why, state === "dynamic" ? "runtime-proof" : null);
+./qf-atlas/coverage-matrix.mjs	126	other	          `${pushDynamic.length} push channel name(s) built from a variable or template`, "runtime-proof");
+./qf-atlas/coverage-matrix.mjs	178	other	    const CATEGORIES = new Set(["ast-coverage", "runtime-proof", "package-proof", "scope-boundary"]);
+./qf-atlas/decisions.mjs	112	other	  "runtime-proof": "only observing the running app can settle this",
+./tools/runtime-proof/src/proof.ts	1	other	import { AgentOs, type JsonRpcNotification } from "@rivet-dev/agentos-core";
+./tools/runtime-proof/src/proof.ts	13	other	export const AGENT_PACKAGE_PATH = join(import.meta.dir, "..", "packed", "qf-toolloop.aospkg");
+./tools/runtime-proof/src/proof.ts	22	other	  /** Host-reported ID from createSession (AgentOS adopted the guest mint). */
+./tools/runtime-proof/src/proof.ts	23	other	  agentOsSessionId: string;
+./tools/runtime-proof/src/proof.ts	40	other	  agentOsSessionId: string;
+./tools/runtime-proof/src/proof.ts	77	other	  os: AgentOs;
+./tools/runtime-proof/src/proof.ts	103	other	/** Create the shared AgentOS fixture (pack must already have run). */
+./tools/runtime-proof/src/proof.ts	107	other	  const os = await AgentOs.create({
+./tools/runtime-proof/src/proof.ts	119	other	function registeredSessionIds(os: AgentOs): string[] {
+./tools/runtime-proof/src/proof.ts	134	other	    const created = await shared.os.createSession("qf-toolloop", {
+./tools/runtime-proof/src/proof.ts	178	other	 * One prompt turn on an existing AgentOS. Session ID evidence comes from
+./tools/runtime-proof/src/proof.ts	184	other	  const created = await os.createSession("qf-toolloop");
+./tools/runtime-proof/src/proof.ts	185	other	  const agentOsSessionId = created.sessionId;
+./tools/runtime-proof/src/proof.ts	191	other	  if (!listedSessionIds.includes(agentOsSessionId)) {
+./tools/runtime-proof/src/proof.ts	192	other	    throw new Error("AgentOS listSessions did not report the created session id");
+./tools/runtime-proof/src/proof.ts	202	other	  const unsub = os.onSessionEvent(agentOsSessionId, (event) => {
+./tools/runtime-proof/src/proof.ts	211	other	    const promptResult = await os.prompt(agentOsSessionId, "uppercase quantflow");
+./tools/runtime-proof/src/proof.ts	216	other	      agentOsSessionId,
+./tools/runtime-proof/src/proof.ts	231	other	    await os.destroySession(agentOsSessionId);
+./tools/runtime-proof/src/proof.ts	256	other	  const created = await os.createSession("qf-toolloop", {
+./tools/runtime-proof/src/proof.ts	259	other	  const agentOsSessionId = created.sessionId;
+./tools/runtime-proof/src/proof.ts	263	other	  const unsub = os.onSessionEvent(agentOsSessionId, (event) => {
+./tools/runtime-proof/src/proof.ts	269	other	  const promptPromise = os.prompt(agentOsSessionId, "uppercase quantflow");
+./tools/runtime-proof/src/proof.ts	278	other	    await os.destroySession(agentOsSessionId).catch(() => {});
+./tools/runtime-proof/src/proof.ts	289	other	    await os.cancelSession(agentOsSessionId);
+./tools/runtime-proof/src/proof.ts	302	other	  await os.destroySession(agentOsSessionId);
+./tools/runtime-proof/src/proof.ts	303	other	  const sessionGone = os.listSessions().every((s) => s.sessionId !== agentOsSessionId);
+./tools/runtime-proof/src/proof.ts	320	other	      agentOsSessionId,
+./tools/runtime-proof/src/proof.test.ts	16	other	  // Pack once for the suite. The qa `runtime-proof` gate does not pack again —
+./tools/runtime-proof/src/proof.test.ts	36	other	    console.log("P1 createSession / AgentOS:", run.agentOsSessionId);
+./tools/runtime-proof/src/proof.test.ts	40	other	    expect(run.agentOsSessionId.length).toBeGreaterThan(0);
+./tools/runtime-proof/src/proof.test.ts	42	other	    expect(run.listedSessionIds).toContain(run.agentOsSessionId);
+./tools/runtime-proof/src/proof.test.ts	45	other	      expect(sid).toBe(run.agentOsSessionId);
+./tools/runtime-proof/src/proof.test.ts	56	other	      expect(ev.sessionId).toBe(run.agentOsSessionId);
+./qf-atlas/markdown.mjs	570	other	      "runtime-proof": "only observing the running app can settle it",
+./tools/runtime-proof/src/processes.ts	1	other	/** Read one process table and derive only descendant AgentOS/tool-loop PIDs. */
+./tools/runtime-proof/src/processes.ts	3	other	const AGENT_CMDLINE = /acp-main|qf-toolloop/;
+./tools/runtime-proof/src/processes.ts	65	other	/** Select only matching AgentOS/tool-loop descendants of the supplied root PID. */
+./tools/runtime-proof/src/processes.test.ts	12	other	  "110 100 /packed/qf-toolloop.aospkg qf-toolloop",
+./tools/runtime-proof/src/processes.test.ts	14	other	  "112 111 /usr/bin/helper-for-qf-toolloop",
+./tools/runtime-proof/src/processes.test.ts	15	other	  "120 1 /packed/qf-toolloop.aospkg qf-toolloop",
+./tools/runtime-proof/src/processes.test.ts	32	other	      parseProcessTable(`${TABLE}\n140 100 /packed/qf-toolloop.aospkg qf-toolloop`),
+./tools/runtime-proof/src/processes.test.ts	44	other	    const records = parseProcessTable("not a process\n200 nope qf-toolloop\n201 100 qf-toolloop");
+./qf-atlas/atlas.html	129	other	const M = {"meta":{"branch":"wo-golden-g2","commit":"e0f9ae2","generatedAt":"2026-08-26","filesScanned":427,"note":"Generated projection of the code. Not Kernel truth, not the running app.","fingerprint":"22056902de7379ea"},"stats":{"live":113,"unreached":0,"unused":13,"dead":0,"channels":126,"bridges":["shellApi","__QF_UI_PROOF__","api"],"bridgeMethods":130,"bridgeMethodsUsed":116,"brokenBridgeCalls":1,"bridgeBlindSpots":43,"pushChannels":{"channels":47,"tunnelled":14,"live":34,"rendererTerminated":2,"noLi
+./tools/runtime-proof/scripts/pack-agent.mjs	3	other	 * Bundle agent-package ACP entrypoint and pack it for AgentOs.create({ software }).
+./tools/runtime-proof/scripts/pack-agent.mjs	20	other	const aospkg = join(outDir, "qf-toolloop.aospkg");
+./tools/runtime-proof/scripts/pack-agent.mjs	21	other	const metaOut = join(outDir, "qf-toolloop.meta.json");
+./tools/runtime-proof/scripts/pack-agent.mjs	44	other	const toolchain = process.env.QF_AGENTOS_TOOLCHAIN_BIN ?? join(
+./tools/runtime-proof/scripts/pack-agent.mjs	46	other	  "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs",
+./tools/runtime-proof/scripts/pack-agent.mjs	55	other	    "qf-toolloop-acp",
+./tools/runtime-proof/scripts/pack-agent.mjs	57	other	    join(outDir, "qf-toolloop.tar"),
+./tools/runtime-proof/scripts/pack-agent.mjs	73	other	if (launch.route !== "agentos" || launch.name !== "qf-toolloop") {
+./tools/runtime-proof/scripts/pack-agent.mjs	74	other	  console.error("pack-agent: launch.json must declare qf-toolloop on agentos");
+./tools/runtime-proof/scripts/pack-agent.mjs	80	other	  package: "qf-toolloop.aospkg",
+./collab-electron/bun.lock	14	other	        "@rivet-dev/agentos-core": "0.2.7",
+./collab-electron/bun.lock	110	other	    "@agentos-software/claude-code": ["@agentos-software/claude-code@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@anthropic-ai/claude-agent-sdk": "0.2.87", "zod": "^4.1.11" }, "bin": { "claude": "dist/claude-cli.mjs", "claude-sdk-acp": "dist/adapter.js" } }, "sha512-gXmqqOUWT98QvLkQXHn1UU8OOvqMO8BRSj+0PT99mOL6XNpBlPW6L065FJ9dC4IwJC5xeGzB1XFevjOdP7LwQg=="],
+./collab-electron/bun.lock	112	other	    "@agentos-software/codex-cli": ["@agentos-software/codex-cli@0.3.3", "", {}, "sha512-63f4jymlxe4S003/4Fiu9Y/BAzT6ajHEDidfNqv39SkWNJWxT1ndY+j1/7XYT6NsGgg2ZSo+OGuexlkL8Jx1RA=="],
+./collab-electron/bun.lock	114	other	    "@agentos-software/common": ["@agentos-software/common@0.2.7", "", { "dependencies": { "@agentos-software/coreutils": "0.3.3", "@agentos-software/diffutils": "0.3.3", "@agentos-software/findutils": "0.3.3", "@agentos-software/gawk": "0.3.3", "@agentos-software/grep": "0.3.3", "@agentos-software/gzip": "0.3.3", "@agentos-software/sed": "0.3.3", "@agentos-software/tar": "0.3.3" } }, "sha512-eM5znR9qOaDIEsCBtzxzAfxgynq7ntNyk+lchHF7OUv7Cenbq4XGhCbA1T2dbl45G3/2Wz3+21QM0sv+797lvA=="],
+./collab-electron/bun.lock	116	other	    "@agentos-software/coreutils": ["@agentos-software/coreutils@0.3.3", "", {}, "sha512-uzBD6Q5z+ACn29CMNMSnA+nUzITbTosuOe6Hr/o5ylUpoxODbz6ziAwZ5Cr1XAgF//Qqz7HfQfnogf4zcb+Gvg=="],
+./collab-electron/bun.lock	118	other	    "@agentos-software/diffutils": ["@agentos-software/diffutils@0.3.3", "", {}, "sha512-aaTMx3jWrTn18OxLk0g4nb3MgkLHjXyqlz5BQ3YlRj7hNuRT+hOPnzcSf8zP+pXFR+SGf7a98M2kSNV/ucfyDw=="],
+./collab-electron/bun.lock	120	other	    "@agentos-software/findutils": ["@agentos-software/findutils@0.3.3", "", {}, "sha512-CrtFrmG2o+z0gaxtQBJw4wWGF7TxKq5ukxVFkf2/LxxsdZBc2F04MT6FNY3VMKf4Cq5kFvh7/ZRkMdg2yHAMvA=="],
+./collab-electron/bun.lock	122	other	    "@agentos-software/gawk": ["@agentos-software/gawk@0.3.3", "", {}, "sha512-iHDeJ6rsGxijBQMmqH1w6bQ2+sWrC1f9OqNvUItHOZk85KFmg9a3ueyy0krq9pZRuZe+fU5yEhuUg7ovNqZ9NQ=="],
+./collab-electron/bun.lock	124	other	    "@agentos-software/grep": ["@agentos-software/grep@0.3.3", "", {}, "sha512-jV49HWFJcEGjHBPk37EnisrdKwNfeZ+d+TA6LpAuDKRwFmj/2xc3rGVCTvKIxdZUKYuffu9NI9xgxJ0iKiUU2w=="],
+./collab-electron/bun.lock	126	other	    "@agentos-software/gzip": ["@agentos-software/gzip@0.3.3", "", {}, "sha512-Jbmsu7trAhnnWvT9qlry/hETa5EOlUwdcYHtsyV9W2OQvMc3tOeLy3zwF8nWNuZ3/g1veRenRkK1ZgkqsDZpiw=="],
+./collab-electron/bun.lock	128	other	    "@agentos-software/manifest": ["@agentos-software/manifest@0.2.7", "", {}, "sha512-1e4J8YRR8Ftj7ftKFdqAH2m5ksHz9v+XUGMzirDPGHwXaGzjham3SdWadpqHOE7q3GIWJdP4uWZeY22fquJNrg=="],
+./collab-electron/bun.lock	130	other	    "@agentos-software/opencode": ["@agentos-software/opencode@0.2.7", "", { "bin": { "agentos-opencode-acp": "dist/adapter.js" } }, "sha512-lZspCiMgM0+kPAA08CEvyNy8lfBx463wObKpAwbYyaVvc0KfGvbAPS6VmnuZQWmaBmJJuRMtSo14nmb8XCD16g=="],
+./collab-electron/bun.lock	132	other	    "@agentos-software/pi": ["@agentos-software/pi@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@mariozechner/pi-ai": "0.60.0", "@mariozechner/pi-coding-agent": "0.60.0" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-sdk-acp": "dist/adapter.js" } }, "sha512-nOdwksByJgTqt92Ya84CzTGxpVFwGI6gkGWaCD/mmvP11JRA++1nshNdbig2mtiaxT7VG3ovWJmK7ZLTTzkhPA=="],
+./collab-electron/bun.lock	134	other	    "@agentos-software/pi-cli": ["@agentos-software/pi-cli@0.2.7", "", { "dependencies": { "@mariozechner/pi-coding-agent": "^0.60.0", "pi-acp": "^0.0.23" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-acp": "node_modules/pi-acp/dist/index.js" } }, "sha512-uddhoZ8o5zcGsma5s/+jzQg++SRKtZkpY6cSNru4O0t53LJ41t3+OFhC6j8WkQsIYU0ThAwH6LdKHHjWWKBa2g=="],
+./collab-electron/bun.lock	136	other	    "@agentos-software/sed": ["@agentos-software/sed@0.3.3", "", {}, "sha512-cVNTD9VzodpJ+Kn/xqHo/AcUUkpPSuF9A/0jIqFkDNF24alwNG8ndVLwgFWMP+0mSo68HZumbjjnMQWE3NjRSw=="],
+./collab-electron/bun.lock	138	other	    "@agentos-software/tar": ["@agentos-software/tar@0.3.3", "", {}, "sha512-pmYVIn3XQEKVbfKhms7bEpsGR7YXqaLXtglIHmnhyUwLZhdyerrEkO+VgpC8zuWMeYfmTsstEgpEL1K66sgR2w=="],
+./collab-electron/bun.lock	668	other	    "@rivet-dev/agentos-core": ["@rivet-dev/agentos-core@0.2.7", "", { "dependencies": { "@agentos-software/claude-code": "0.2.7", "@agentos-software/codex-cli": "0.3.3", "@agentos-software/common": "0.2.7", "@agentos-software/manifest": "0.2.7", "@agentos-software/opencode": "0.2.7", "@agentos-software/pi": "0.2.7", "@agentos-software/pi-cli": "0.2.7", "@aws-sdk/client-s3": "^3.1019.0", "@rivet-dev/agentos-runtime-core": "0.2.7", "@rivet-dev/agentos-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "@xterm
+./collab-electron/bun.lock	670	other	    "@rivet-dev/agentos-runtime-core": ["@rivet-dev/agentos-runtime-core@0.2.7", "", { "dependencies": { "@rivet-dev/agentos-runtime-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "zod": "^4.1.11" } }, "sha512-Dih3ex/FIr69VhReUIAapBBNrghkA26IMlPs9fiWkrj0QEjdDTCMvfBkhseQelUdzmL6hCLnIrru2cQ29KwxCQ=="],
+./collab-electron/bun.lock	672	other	    "@rivet-dev/agentos-runtime-sidecar": ["@rivet-dev/agentos-runtime-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-QuAEG3/IKiBDlUbVYBNKc4h0TcT6DDYKlz58lwniv/L0v4qpJBwKLYikdSyNjp1H8eVZXFr7UsaaqFmuvCSsug=="],
+./collab-electron/bun.lock	674	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": ["@rivet-dev/agentos-runtime-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-u14Mr7wp4h7IF8mc7jXREBh1xPOoLCzwMVUH/zpa/Y7eiGb6LE7RPW2n+nC0VpciiLf/7gYejU6QboJnhiq1uw=="],
+./collab-electron/bun.lock	676	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-x64": ["@rivet-dev/agentos-runtime-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-4IABmx8Pi7f76J8aMypln5dZs0qsWVXXW31oA7v4I3e11EGvCmsubjCEO+9YLvEuk6La3JcSO+685bs45twIvA=="],
+./collab-electron/bun.lock	678	other	    "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-YHZFlGAljRMjceUsVU7e1GjTeM4QNj6/OjGcpprciyKosRNny8aoVsA4gJbe0dCNEbwVmO6peczFVAt5k54VEw=="],
+./collab-electron/bun.lock	680	other	    "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-wcHg/ifVWKqFosNN7YLNsP/SrZxZccd2UP2EPQHnIcRyMg+w14LpgdDcIsPWO/HvS7+78OwRsCck5IIOeonIUw=="],
+./collab-electron/bun.lock	682	other	    "@rivet-dev/agentos-sidecar": ["@rivet-dev/agentos-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-mui+hg8uWF3mjubp6YfpTW21TAqB+ZpA/VTSsKjngEw774oBkuvpY+eycxRbsxZIM4RMzl0EdHgCt8fFTGNxOQ=="],
+./collab-electron/bun.lock	684	other	    "@rivet-dev/agentos-sidecar-darwin-arm64": ["@rivet-dev/agentos-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-/FgUVxg27IQQ0swBXVBg8s3spaFk8tA+icQVa0KYC7eOZF+2fhNXcjuQrkCB9yoNHd2YMNrWp4PB/mQ16yg3Ag=="],
+./collab-electron/bun.lock	686	other	    "@rivet-dev/agentos-sidecar-darwin-x64": ["@rivet-dev/agentos-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-akj3VqdmcPHPzBDwBYpScjeudjpEsTBJAL5iGnPUEoLA3hLJrBdoXovbR9xMQgixontPDYu4rvttiTQUt0doug=="],
+./collab-electron/bun.lock	688	other	    "@rivet-dev/agentos-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-Hyrxo6Bh5aF6iqt076xN8VggxfCMN9qGkMb/BBH+LgtQQX2Pq76wJRZCltm8g5TOCxlczob8E5HqMdpCkw0Z9w=="],
+./collab-electron/bun.lock	690	other	    "@rivet-dev/agentos-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-blcgYjNG1zE3bI6SFOfhTHe8NrSm3QGannfNR6RQCoalif9Hf7bpxR/ha3uMKH+0fmlmuuc8LUi/O2N/uoiB9Q=="],
+./collab-electron/bun.lock	2506	other	    "@agentos-software/claude-code/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./collab-electron/bun.lock	2508	other	    "@agentos-software/claude-code/@anthropic-ai/claude-agent-sdk": ["@anthropic-ai/claude-agent-sdk@0.2.87", "", { "dependencies": { "@anthropic-ai/sdk": "^0.74.0", "@modelcontextprotocol/sdk": "^1.27.1" }, "optionalDependencies": { "@img/sharp-darwin-arm64": "^0.34.2", "@img/sharp-darwin-x64": "^0.34.2", "@img/sharp-linux-arm": "^0.34.2", "@img/sharp-linux-arm64": "^0.34.2", "@img/sharp-linux-x64": "^0.34.2", "@img/sharp-linuxmusl-arm64": "^0.34.2", "@img/sharp-linuxmusl-x64": "^0.34.2", "@img/sharp-win32
+./collab-electron/bun.lock	2510	other	    "@agentos-software/pi/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./collab-electron/bun.lock	2584	other	    "@rivet-dev/agentos-core/minimatch": ["minimatch@10.2.5", "", { "dependencies": { "brace-expansion": "^5.0.5" } }, "sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg=="],
+./collab-electron/bun.lock	2754	other	    "@agentos-software/claude-code/@anthropic-ai/claude-agent-sdk/@anthropic-ai/sdk": ["@anthropic-ai/sdk@0.74.0", "", { "dependencies": { "json-schema-to-ts": "^3.1.1" }, "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" }, "optionalPeers": ["zod"], "bin": { "anthropic-ai-sdk": "bin/cli" } }, "sha512-srbJV7JKsc5cQ6eVuFzjZO7UR3xEPJqPamHFIe29bs38Ij2IripoAhC0S5NslNbaFUYqBKypmmpzMTpqfHEUDw=="],
+./collab-electron/bun.lock	2780	other	    "@rivet-dev/agentos-core/minimatch/brace-expansion": ["brace-expansion@5.0.7", "", { "dependencies": { "balanced-match": "^4.0.2" } }, "sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA=="],
+./collab-electron/bun.lock	2928	other	    "@rivet-dev/agentos-core/minimatch/brace-expansion/balanced-match": ["balanced-match@4.0.4", "", {}, "sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA=="],
+./qf-atlas/atlas.json	5241	other	      "id": "0:tools/runtime-proof/src::proof",
+./qf-atlas/atlas.json	5254	other	          "path": "tools/runtime-proof/src/proof.ts",
+./qf-atlas/atlas.json	6476	other	          "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
+./qf-atlas/atlas.json	6578	other	          "path": "tools/runtime-proof/src/processes.ts",
+./qf-atlas/atlas.json	6618	other	          "path": "tools/runtime-proof/src/listeners.ts",
+./qf-atlas/atlas.json	6638	other	          "path": "tools/runtime-proof/scripts/pack-agent.mjs",
+./qf-atlas/atlas.json	8746	other	      "path": "tools/runtime-proof/scripts/pack-agent.mjs",
+./qf-atlas/atlas.json	9834	other	      "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
+./qf-atlas/atlas.json	9842	other	      "path": "tools/runtime-proof/src/listeners.ts",
+./qf-atlas/atlas.json	9850	other	      "path": "tools/runtime-proof/src/processes.ts",
+./qf-atlas/atlas.json	9858	other	      "path": "tools/runtime-proof/src/proof.ts",
+./qf-atlas/atlas.json	14146	other	        "ipcRequest": "runtime-proof",
+./qf-atlas/atlas.json	14147	other	        "ipcPush": "runtime-proof"
+./qf-atlas/atlas.json	15333	other	        "ipcRequest": "runtime-proof",
+./qf-atlas/atlas.json	15334	other	        "ipcPush": "runtime-proof",
+./qf-atlas/atlas.json	16274	other	        "ipcRequest": "runtime-proof",
+./qf-atlas/atlas.json	16275	other	        "ipcPush": "runtime-proof"
+./qf-atlas/atlas.json	17199	other	        "ipcRequest": "runtime-proof",
+./qf-atlas/atlas.json	17200	other	        "ipcPush": "runtime-proof",
+./qf-atlas/atlas.json	24359	other	        "imports": "runtime-proof",
+./qf-atlas/atlas.json	24388	other	        "imports": "runtime-proof",
+./qf-atlas/atlas.json	24444	other	        "imports": "runtime-proof",
+./qf-atlas/atlas.json	24636	other	        "imports": "runtime-proof",
+./qf-atlas/atlas.json	24688	other	      "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
+./qf-atlas/atlas.json	24715	other	      "path": "tools/runtime-proof/scripts/pack-agent.mjs",
+./qf-atlas/atlas.json	24742	other	      "path": "tools/runtime-proof/src/listeners.test.ts",
+./qf-atlas/atlas.json	24769	other	      "path": "tools/runtime-proof/src/listeners.ts",
+./qf-atlas/atlas.json	24797	other	      "path": "tools/runtime-proof/src/processes.test.ts",
+./qf-atlas/atlas.json	24823	other	      "path": "tools/runtime-proof/src/processes.ts",
+./qf-atlas/atlas.json	24851	other	      "path": "tools/runtime-proof/src/proof.test.ts",
+./qf-atlas/atlas.json	24877	other	      "path": "tools/runtime-proof/src/proof.ts",
+./qf-atlas/atlas.json	34668	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	34890	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	35051	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	35067	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	36846	other	              "tools/runtime-proof/src/proof.ts"
+./qf-atlas/atlas.json	36856	other	              "tools/runtime-proof/src/proof.ts"
+./qf-atlas/atlas.json	37313	other	              "tools/runtime-proof/src/proof.ts"
+./qf-atlas/atlas.json	37323	other	              "tools/runtime-proof/src/proof.ts"
+./qf-atlas/atlas.json	39229	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	39483	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	39533	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	39751	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	39959	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	40242	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	40492	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	40634	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	40719	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	44141	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	44193	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	44313	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	44545	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45180	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45198	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45208	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45308	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45428	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45609	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	45860	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	46144	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	46162	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	46172	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	46272	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	46392	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	46598	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	47883	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	48525	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	48577	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	48697	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	48829	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	50538	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	51244	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	51296	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	51416	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	51648	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	52172	other	              "tools/runtime-proof/agent-package/src/acp-main.ts"
+./qf-atlas/atlas.json	54695	other	              "tools/runtime-proof/src/proof.ts"
+./qf-atlas/atlas.json	54705	other	              "tools/runtime-proof/src/proof.ts"
+./species/hermes/scripts/pack-agent.mjs	14	other	const markerPath = join(packedDir, "hermes.aospkg");
+./species/hermes/scripts/pack-agent.mjs	75	other	  package: "hermes.aospkg",
+./collab-electron/scripts/package-lib/shared-paths.test.ts	45	other	    const ref = "species/hermes/packed/hermes.aospkg";
+./docs/orders/WO-V2-3R.md	14	other	participants from tracked native-CLI adapter assets, with no AgentOS packaging
+./docs/orders/WO-V2-3R.md	65	other	runtime package missing: species/hermes/packed/hermes.aospkg
+./docs/orders/WO-V2-3R.md	75	other	  `collab-electron/.package-staging`, which contains `hermes.aospkg`.
+./docs/orders/WO-V2-3R.md	77	other	- `species/hermes/packed/hermes.aospkg` was generated and intentionally ignored,
+./docs/orders/WO-V2-3R.md	101	other	### A. Production Hermes has no AgentOS packaging dependency
+./docs/orders/WO-V2-3R.md	103	other	Hermes launches through `route: native_tui`; the `.aospkg` is an adapter identity
+./docs/orders/WO-V2-3R.md	107	other	1. Track `species/hermes/packed/hermes.aospkg` as exactly the UTF-8 bytes for
+./docs/orders/WO-V2-3R.md	114	other	   invokes no bundler, npm command, AgentOS package, or external toolchain.
+./docs/orders/WO-V2-3R.md	120	other	   `package` is `hermes.aospkg`.
+./docs/orders/WO-V2-3R.md	121	other	3. Remove unused `@rivet-dev/agentos-core` and
+./docs/orders/WO-V2-3R.md	122	other	   `@rivet-dev/agentos-toolchain` dependencies from the Hermes workspace and
+./docs/orders/WO-V2-3R.md	128	other	   the marker and metadata. QA-only AgentOS proof species are unchanged.
+./docs/orders/WO-V2-3R.md	129	other	5. `bun run dev` performs no packaging, npm discovery, AgentOS discovery, or
+./docs/orders/WO-V2-3R.md	135	other	portable. Do not patch, upgrade, wrap, or invoke AgentOS to repair production
+./docs/orders/WO-V2-3R.md	136	other	Hermes. This order does not remove the separate QA-only `agentos` runtime proof
+./docs/orders/WO-V2-3R.md	166	other	`agentos`, or any non-`node:` package. The repository script is never executed
+./docs/orders/WO-V2-3R.md	169	other	The pack proof also fails if either removed AgentOS package name remains in
+./docs/orders/WO-V2-3R.md	171	other	proof separately fails if `dev.mjs` or `dev.ps1` still discovers npm, AgentOS,
+./docs/orders/WO-V2-3R.md	173	other	path may retain its existing AgentOS behavior.
+./docs/orders/WO-V2-3R.md	195	other	`.package-staging`, synthesize an `.aospkg`, insert an `agent_definition`
+./docs/orders/WO-V2-3R.md	205	other	   `route: agentos`. The native-TUI production-profile check must reject it and
+./docs/orders/WO-V2-3R.md	258	other	red if production staging attempts a Hermes install/AgentOS toolchain or omits
+./docs/orders/WO-V2-3R.md	269	other	agentos_packaging_used=false
+./docs/orders/WO-V2-3R.md	312	other	- Delete the two unused AgentOS dependencies from `species/hermes`; add no
+./packages/qf-kernel/src/r16-visible-world.test.ts	27	other	    name: definitionId, role, package_ref: "species/hermes/packed/hermes.aospkg",
+./qa/gates/windows-cold-boot.ts	63	other	  "qf-toolloop",
+./species/hermes/dock-profiles.json	5	other	    "package": "packed/hermes.aospkg"
+./tools/runtime-proof/packed/qf-toolloop.meta.json	2	other	  "route": "agentos",
+./tools/runtime-proof/packed/qf-toolloop.meta.json	3	other	  "name": "qf-toolloop",
+./tools/runtime-proof/packed/qf-toolloop.meta.json	4	other	  "package": "qf-toolloop.aospkg"
+./collab-electron/src/windows/shell/src/dock.test.ts	45	other	    { id: "hermes-worker", name: "Hermes worker", package_ref: "species/hermes/packed/hermes.aospkg" },
+./collab-electron/src/windows/shell/src/dock.test.ts	46	other	    { id: "qf-toolloop", name: "QF ToolLoop", package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg" },
+./collab-electron/src/windows/shell/src/dock.test.ts	47	other	    { id: "qf-proof-orchestrator", name: "Proof orchestrator", package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg" },
+./collab-electron/src/windows/shell/src/dock.test.ts	48	other	    { id: "qf-proof-worker", name: "Proof worker", package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg" },
+./collab-electron/src/windows/shell/src/dock.test.ts	60	other	      "qf-toolloop",
+./species/hermes/register.ts	13	other	const PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
+./collab-electron/scripts/package-lib/runtime-staging.ts	22	other	  "species/hermes/packed/hermes.aospkg",
+./collab-electron/scripts/package-lib/runtime-staging.ts	30	other	  "species/claude-code/packed/claude-code.aospkg",
+./collab-electron/scripts/package-lib/runtime-staging.ts	38	other	  "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./collab-electron/scripts/package-lib/runtime-staging.ts	43	other	  "tools/runtime-proof/packed/qf-toolloop.aospkg",
+./collab-electron/scripts/package-lib/runtime-staging.ts	44	other	  "tools/runtime-proof/packed/qf-toolloop.meta.json",
+./collab-electron/scripts/package-lib/runtime-staging.ts	45	other	  "tools/runtime-proof/launch.json",
+./collab-electron/scripts/package-lib/runtime-staging.ts	46	other	  "tools/runtime-proof/dock-profiles.json",
+./collab-electron/scripts/package-lib/runtime-staging.ts	98	other	  const source = join(root, "node_modules/@rivet-dev/agentos-toolchain");
+./collab-electron/scripts/package-lib/runtime-staging.ts	99	other	  if (!existsSync(source)) throw new Error(`AgentOS toolchain missing: ${source}`);
+./collab-electron/scripts/package-lib/runtime-staging.ts	102	other	    "node_modules/@rivet-dev/agentos-toolchain-win-adapter",
+./collab-electron/scripts/package-lib/runtime-staging.ts	113	other	    throw new Error(`AgentOS toolchain adapter bundle missing npmBinary: ${dist}`);
+./collab-electron/scripts/package-lib/runtime-staging.ts	129	other	    throw new Error("AgentOS toolchain npm calls changed; Windows adapter needs review");
+./collab-electron/scripts/package-lib/runtime-staging.ts	133	other	    bin: join(target, "bin/agentos-toolchain.mjs"),
+./collab-electron/scripts/package-lib/runtime-staging.ts	161	other	  const runtimeProofDir = join(stagingRepo, "tools/runtime-proof");
+./collab-electron/scripts/package-lib/runtime-staging.ts	168	other	      copySourceTree(join(repoRoot, "tools/runtime-proof"), runtimeProofDir);
+./collab-electron/scripts/package-lib/runtime-staging.ts	182	other	          QF_AGENTOS_TOOLCHAIN_BIN: adapter.bin,
+./collab-electron/scripts/package-lib/runtime-staging.ts	183	other	          AGENTOS_TOOLCHAIN_NPM: "npm",
+./packages/qf-kernel/src/r15-governed-review.test.ts	32	other	    name: definitionId, role, package_ref: "species/hermes/packed/hermes.aospkg",
+./tools/runtime-proof/package.json	2	other	  "name": "runtime-proof",
+./tools/runtime-proof/package.json	12	other	    "@rivet-dev/agentos": "0.2.7",
+./tools/runtime-proof/package.json	13	other	    "@rivet-dev/agentos-core": "0.2.7",
+./tools/runtime-proof/package.json	18	other	    "@rivet-dev/agentos-toolchain": "0.2.7",
+./species/hermes/README.md	15	other	`~/.quantflow/app/agentos-host-mounts.json`.
+./docs/orders/WO-V2-3.md	518	other	C:\Users\rybow\QuantFlow-Ontology\species\hermes\packed\hermes.aospkg
+./collab-electron/src/windows/shell/src/dock.js	40	other	  packageRef.startsWith("tools/runtime-proof/")
+./collab-electron/scripts/package-lib/runtime-staging.test.ts	22	other	      "tools/runtime-proof/dock-profiles.json",
+./species/hermes/D0-MOUNT-PROBE.md	1	other	WO-008b Deliverable 0 — AgentOS mounts vs bundle probe
+./species/hermes/D0-MOUNT-PROBE.md	7	other	AgentOs.create({ mounts: NativeMountConfig[] })
+./species/hermes/D0-MOUNT-PROBE.md	45	other	  ERR_AGENTOS_NODE_SYNC_RPC: refused to compile guest WebAssembly module
+./species/hermes/D0-MOUNT-PROBE.md	56	other	UNBUILDABLE for Outcome A on AgentOS 0.2.7: guest child_process may only run
+./tools/runtime-proof/launch.json	2	other	  "route": "agentos",
+./tools/runtime-proof/launch.json	3	other	  "name": "qf-toolloop"
+./packages/qf-kernel/src/r12-independent-critic.test.ts	43	other	      package_ref: "species/hermes/packed/hermes.aospkg",
+./tools/runtime-proof/dock-profiles.json	4	other	    "id": "qf-toolloop",
+./tools/runtime-proof/dock-profiles.json	5	other	    "package": "packed/qf-toolloop.aospkg"
+./tools/runtime-proof/dock-profiles.json	9	other	      "id": "qf-toolloop",
+./docs/orders/WO-V2-1.md	71	other	   `@agentos-software/opencode@0.2.7` with `ENOENT`. In a fresh short worktree
+./docs/orders/WO-V2-1.md	292	other	  `@agentos-software/opencode@0.2.7` `ENOENT` link failure. Restore hardlink in
+./docs/orders/WO-V2-1.md	475	other	   @agentos-software/opencode@0.2.7 (copyfile)`. The verifier first reproduced a
+./tools/runtime-proof/bun.lock	6	other	      "name": "runtime-proof",
+./tools/runtime-proof/bun.lock	9	other	        "@rivet-dev/agentos": "0.2.7",
+./tools/runtime-proof/bun.lock	10	other	        "@rivet-dev/agentos-core": "0.2.7",
+./tools/runtime-proof/bun.lock	15	other	        "@rivet-dev/agentos-toolchain": "0.2.7",
+./tools/runtime-proof/bun.lock	24	other	    "@agentos-software/claude-code": ["@agentos-software/claude-code@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@anthropic-ai/claude-agent-sdk": "0.2.87", "zod": "^4.1.11" }, "bin": { "claude": "dist/claude-cli.mjs", "claude-sdk-acp": "dist/adapter.js" } }, "sha512-gXmqqOUWT98QvLkQXHn1UU8OOvqMO8BRSj+0PT99mOL6XNpBlPW6L065FJ9dC4IwJC5xeGzB1XFevjOdP7LwQg=="],
+./tools/runtime-proof/bun.lock	26	other	    "@agentos-software/codex-cli": ["@agentos-software/codex-cli@0.3.3", "", {}, "sha512-63f4jymlxe4S003/4Fiu9Y/BAzT6ajHEDidfNqv39SkWNJWxT1ndY+j1/7XYT6NsGgg2ZSo+OGuexlkL8Jx1RA=="],
+./tools/runtime-proof/bun.lock	28	other	    "@agentos-software/common": ["@agentos-software/common@0.2.7", "", { "dependencies": { "@agentos-software/coreutils": "0.3.3", "@agentos-software/diffutils": "0.3.3", "@agentos-software/findutils": "0.3.3", "@agentos-software/gawk": "0.3.3", "@agentos-software/grep": "0.3.3", "@agentos-software/gzip": "0.3.3", "@agentos-software/sed": "0.3.3", "@agentos-software/tar": "0.3.3" } }, "sha512-eM5znR9qOaDIEsCBtzxzAfxgynq7ntNyk+lchHF7OUv7Cenbq4XGhCbA1T2dbl45G3/2Wz3+21QM0sv+797lvA=="],
+./tools/runtime-proof/bun.lock	30	other	    "@agentos-software/coreutils": ["@agentos-software/coreutils@0.3.3", "", {}, "sha512-uzBD6Q5z+ACn29CMNMSnA+nUzITbTosuOe6Hr/o5ylUpoxODbz6ziAwZ5Cr1XAgF//Qqz7HfQfnogf4zcb+Gvg=="],
+./tools/runtime-proof/bun.lock	32	other	    "@agentos-software/diffutils": ["@agentos-software/diffutils@0.3.3", "", {}, "sha512-aaTMx3jWrTn18OxLk0g4nb3MgkLHjXyqlz5BQ3YlRj7hNuRT+hOPnzcSf8zP+pXFR+SGf7a98M2kSNV/ucfyDw=="],
+./tools/runtime-proof/bun.lock	34	other	    "@agentos-software/findutils": ["@agentos-software/findutils@0.3.3", "", {}, "sha512-CrtFrmG2o+z0gaxtQBJw4wWGF7TxKq5ukxVFkf2/LxxsdZBc2F04MT6FNY3VMKf4Cq5kFvh7/ZRkMdg2yHAMvA=="],
+./tools/runtime-proof/bun.lock	36	other	    "@agentos-software/gawk": ["@agentos-software/gawk@0.3.3", "", {}, "sha512-iHDeJ6rsGxijBQMmqH1w6bQ2+sWrC1f9OqNvUItHOZk85KFmg9a3ueyy0krq9pZRuZe+fU5yEhuUg7ovNqZ9NQ=="],
+./tools/runtime-proof/bun.lock	38	other	    "@agentos-software/grep": ["@agentos-software/grep@0.3.3", "", {}, "sha512-jV49HWFJcEGjHBPk37EnisrdKwNfeZ+d+TA6LpAuDKRwFmj/2xc3rGVCTvKIxdZUKYuffu9NI9xgxJ0iKiUU2w=="],
+./tools/runtime-proof/bun.lock	40	other	    "@agentos-software/gzip": ["@agentos-software/gzip@0.3.3", "", {}, "sha512-Jbmsu7trAhnnWvT9qlry/hETa5EOlUwdcYHtsyV9W2OQvMc3tOeLy3zwF8nWNuZ3/g1veRenRkK1ZgkqsDZpiw=="],
+./tools/runtime-proof/bun.lock	42	other	    "@agentos-software/manifest": ["@agentos-software/manifest@0.2.7", "", {}, "sha512-1e4J8YRR8Ftj7ftKFdqAH2m5ksHz9v+XUGMzirDPGHwXaGzjham3SdWadpqHOE7q3GIWJdP4uWZeY22fquJNrg=="],
+./tools/runtime-proof/bun.lock	44	other	    "@agentos-software/opencode": ["@agentos-software/opencode@0.2.7", "", { "bin": { "agentos-opencode-acp": "dist/adapter.js" } }, "sha512-lZspCiMgM0+kPAA08CEvyNy8lfBx463wObKpAwbYyaVvc0KfGvbAPS6VmnuZQWmaBmJJuRMtSo14nmb8XCD16g=="],
+./tools/runtime-proof/bun.lock	46	other	    "@agentos-software/pi": ["@agentos-software/pi@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@mariozechner/pi-ai": "0.60.0", "@mariozechner/pi-coding-agent": "0.60.0" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-sdk-acp": "dist/adapter.js" } }, "sha512-nOdwksByJgTqt92Ya84CzTGxpVFwGI6gkGWaCD/mmvP11JRA++1nshNdbig2mtiaxT7VG3ovWJmK7ZLTTzkhPA=="],
+./tools/runtime-proof/bun.lock	48	other	    "@agentos-software/pi-cli": ["@agentos-software/pi-cli@0.2.7", "", { "dependencies": { "@mariozechner/pi-coding-agent": "^0.60.0", "pi-acp": "^0.0.23" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-acp": "node_modules/pi-acp/dist/index.js" } }, "sha512-uddhoZ8o5zcGsma5s/+jzQg++SRKtZkpY6cSNru4O0t53LJ41t3+OFhC6j8WkQsIYU0ThAwH6LdKHHjWWKBa2g=="],
+./tools/runtime-proof/bun.lock	50	other	    "@agentos-software/sed": ["@agentos-software/sed@0.3.3", "", {}, "sha512-cVNTD9VzodpJ+Kn/xqHo/AcUUkpPSuF9A/0jIqFkDNF24alwNG8ndVLwgFWMP+0mSo68HZumbjjnMQWE3NjRSw=="],
+./tools/runtime-proof/bun.lock	52	other	    "@agentos-software/tar": ["@agentos-software/tar@0.3.3", "", {}, "sha512-pmYVIn3XQEKVbfKhms7bEpsGR7YXqaLXtglIHmnhyUwLZhdyerrEkO+VgpC8zuWMeYfmTsstEgpEL1K66sgR2w=="],
+./tools/runtime-proof/bun.lock	224	other	    "@rivet-dev/agentos": ["@rivet-dev/agentos@0.2.7", "", { "dependencies": { "@agentos-software/common": "0.2.7", "@rivet-dev/agentos-core": "0.2.7", "@rivet-dev/agentos-sidecar": "0.2.7", "@rivetkit/react": "0.0.0-stack-feat-rivetkit-forward-inspector-tabs-to-native-plugin-actors-qkwmksyy.d2859b0", "rivetkit": "0.0.0-stack-feat-rivetkit-forward-inspector-tabs-to-native-plugin-actors-qkwmksyy.d2859b0", "zod": "^4.1.11" }, "optionalDependencies": { "@rivet-dev/agentos-plugin-darwin-arm64": "0.2.7", "@rivet
+./tools/runtime-proof/bun.lock	226	other	    "@rivet-dev/agentos-core": ["@rivet-dev/agentos-core@0.2.7", "", { "dependencies": { "@agentos-software/claude-code": "0.2.7", "@agentos-software/codex-cli": "0.3.3", "@agentos-software/common": "0.2.7", "@agentos-software/manifest": "0.2.7", "@agentos-software/opencode": "0.2.7", "@agentos-software/pi": "0.2.7", "@agentos-software/pi-cli": "0.2.7", "@aws-sdk/client-s3": "^3.1019.0", "@rivet-dev/agentos-runtime-core": "0.2.7", "@rivet-dev/agentos-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "@xterm
+./tools/runtime-proof/bun.lock	228	other	    "@rivet-dev/agentos-plugin-darwin-arm64": ["@rivet-dev/agentos-plugin-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-bYnR25T1zuC4V8GonnYNSrSEE3LADz17lSRzSP509bC2JTQL7L6Ztq+AY1Hs/iTJ+mK6j2PEdrj7bIG0SOTHDA=="],
+./tools/runtime-proof/bun.lock	230	other	    "@rivet-dev/agentos-plugin-darwin-x64": ["@rivet-dev/agentos-plugin-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-Rc4xoWb46VZfsAZMBLdmNX0aRQZs34sPGWH+AfM2WADvvZGbL1MSYEbRvdaC7wMjVrXiFJ9QpYDBBnD2L/x10Q=="],
+./tools/runtime-proof/bun.lock	232	other	    "@rivet-dev/agentos-plugin-linux-arm64-gnu": ["@rivet-dev/agentos-plugin-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-XWicGBQVOTCXL1CakZzqGRZ0U2oOVSOu4+R5j1wQBcv4IZWXJV5qHAVz44AW4YJmUsiG/MU3aK3UDOL/o+IzJQ=="],
+./tools/runtime-proof/bun.lock	234	other	    "@rivet-dev/agentos-plugin-linux-x64-gnu": ["@rivet-dev/agentos-plugin-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-7xxCD6M5ak/L8SuXPXR1xdRO0STf1gIHCSiFPBSPkQ0bAfLdOcV/LMJwolzMJqUWRRL68+MT4luQgysnKPeoiQ=="],
+./tools/runtime-proof/bun.lock	236	other	    "@rivet-dev/agentos-runtime-core": ["@rivet-dev/agentos-runtime-core@0.2.7", "", { "dependencies": { "@rivet-dev/agentos-runtime-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "zod": "^4.1.11" } }, "sha512-Dih3ex/FIr69VhReUIAapBBNrghkA26IMlPs9fiWkrj0QEjdDTCMvfBkhseQelUdzmL6hCLnIrru2cQ29KwxCQ=="],
+./tools/runtime-proof/bun.lock	238	other	    "@rivet-dev/agentos-runtime-sidecar": ["@rivet-dev/agentos-runtime-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-QuAEG3/IKiBDlUbVYBNKc4h0TcT6DDYKlz58lwniv/L0v4qpJBwKLYikdSyNjp1H8eVZXFr7UsaaqFmuvCSsug=="],
+./tools/runtime-proof/bun.lock	240	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": ["@rivet-dev/agentos-runtime-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-u14Mr7wp4h7IF8mc7jXREBh1xPOoLCzwMVUH/zpa/Y7eiGb6LE7RPW2n+nC0VpciiLf/7gYejU6QboJnhiq1uw=="],
+./tools/runtime-proof/bun.lock	242	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-x64": ["@rivet-dev/agentos-runtime-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-4IABmx8Pi7f76J8aMypln5dZs0qsWVXXW31oA7v4I3e11EGvCmsubjCEO+9YLvEuk6La3JcSO+685bs45twIvA=="],
+./tools/runtime-proof/bun.lock	244	other	    "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-YHZFlGAljRMjceUsVU7e1GjTeM4QNj6/OjGcpprciyKosRNny8aoVsA4gJbe0dCNEbwVmO6peczFVAt5k54VEw=="],
+./tools/runtime-proof/bun.lock	246	other	    "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-wcHg/ifVWKqFosNN7YLNsP/SrZxZccd2UP2EPQHnIcRyMg+w14LpgdDcIsPWO/HvS7+78OwRsCck5IIOeonIUw=="],
+./tools/runtime-proof/bun.lock	248	other	    "@rivet-dev/agentos-sidecar": ["@rivet-dev/agentos-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-mui+hg8uWF3mjubp6YfpTW21TAqB+ZpA/VTSsKjngEw774oBkuvpY+eycxRbsxZIM4RMzl0EdHgCt8fFTGNxOQ=="],
+./tools/runtime-proof/bun.lock	250	other	    "@rivet-dev/agentos-sidecar-darwin-arm64": ["@rivet-dev/agentos-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-/FgUVxg27IQQ0swBXVBg8s3spaFk8tA+icQVa0KYC7eOZF+2fhNXcjuQrkCB9yoNHd2YMNrWp4PB/mQ16yg3Ag=="],
+./tools/runtime-proof/bun.lock	252	other	    "@rivet-dev/agentos-sidecar-darwin-x64": ["@rivet-dev/agentos-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-akj3VqdmcPHPzBDwBYpScjeudjpEsTBJAL5iGnPUEoLA3hLJrBdoXovbR9xMQgixontPDYu4rvttiTQUt0doug=="],
+./tools/runtime-proof/bun.lock	254	other	    "@rivet-dev/agentos-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-Hyrxo6Bh5aF6iqt076xN8VggxfCMN9qGkMb/BBH+LgtQQX2Pq76wJRZCltm8g5TOCxlczob8E5HqMdpCkw0Z9w=="],
+./tools/runtime-proof/bun.lock	256	other	    "@rivet-dev/agentos-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-blcgYjNG1zE3bI6SFOfhTHe8NrSm3QGannfNR6RQCoalif9Hf7bpxR/ha3uMKH+0fmlmuuc8LUi/O2N/uoiB9Q=="],
+./tools/runtime-proof/bun.lock	258	other	    "@rivet-dev/agentos-toolchain": ["@rivet-dev/agentos-toolchain@0.2.7", "", { "dependencies": { "@rivetkit/bare-ts": "^0.6.2" }, "bin": { "agentos-toolchain": "bin/agentos-toolchain.mjs" } }, "sha512-PIzpgATYQcl7ptxWpTyVTH9qDmjYPdODMkKw+FDRhx/+svcp3RVd2E4jrbYu08eNqdkkp89UDBpkAXW7Z8UioQ=="],
+./tools/runtime-proof/bun.lock	898	other	    "@agentos-software/claude-code/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./tools/runtime-proof/bun.lock	900	other	    "@agentos-software/pi/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./species/hermes/agent-package/src/acp-shim.ts	11	other	 * AgentOS guest stdin/stdout are EventEmitter-like objects without `.pipe()`
+./species/hermes/agent-package/src/acp-shim.ts	47	other	/** Bridge AgentOS guest stdio ↔ child stdio without relying on stream.pipe(). */
+./qa/gates/team-composition.ts	95	other	        package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./collab-electron/scripts/package-lib/package-inspect.ts	35	other	export const QF_TOOLLOOP_REF = "tools/runtime-proof/packed/qf-toolloop.aospkg";
+./collab-electron/scripts/package-lib/package-inspect.ts	37	other	  "tools/runtime-proof/packed/qf-toolloop.meta.json";
+./collab-electron/scripts/package-lib/package-inspect.ts	38	other	export const QF_TOOLLOOP_LAUNCH = "tools/runtime-proof/launch.json";
+./collab-electron/scripts/package-lib/package-inspect.ts	40	other	  "tools/runtime-proof/dock-profiles.json";
+./collab-electron/scripts/package-lib/package-inspect.ts	51	other	export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
+./collab-electron/scripts/package-lib/package-inspect.ts	265	other	      const toolloopPath = resolvePackageRef(QF_TOOLLOOP_REF, root, "qf-toolloop");
+./collab-electron/scripts/package-lib/package-inspect.ts	276	other	      return { ok: false, reason: `unresolved qf-toolloop reference: ${message}` };
+./species/hermes/agent-package/agentos-package.json	10	other	    "description": "WO-008c: host-bridged ACP (hermes acp on host). launch=host_acp — not AgentOS guest exec."
+./collab-electron/scripts/package-lib/package-inspect.test.ts	47	other	  mkdirSync(join(resources, "tools/runtime-proof/packed"), { recursive: true });
+./tools/runtime-proof/agent-package/src/acp-main.ts	3	other	 * ACP stdio agent for AgentOS (WO-004 / WO-004a).
+./tools/runtime-proof/agent-package/src/acp-main.ts	4	other	 * Mints the session ID in newSession (adopted by AgentOS). Runs ToolLoopAgent
+./tools/runtime-proof/agent-package/src/acp-main.ts	112	other	        name: "qf-toolloop",
+./tools/runtime-proof/agent-package/package.json	2	other	  "name": "qf-toolloop",
+./tools/runtime-proof/agent-package/package.json	7	other	    "qf-toolloop-acp": "./dist/acp-main.js"
+./species/hermes/packed/hermes.meta.json	15	other	  "package": "hermes.aospkg",
+./tools/runtime-proof/agent-package/agentos-package.json	2	other	  "name": "qf-toolloop",
+./tools/runtime-proof/agent-package/agentos-package.json	5	other	    "acpEntrypoint": "qf-toolloop-acp",
+./species/hermes/a2a-4tile-smoke.ts	221	other	      package_ref: "species/hermes/packed/hermes.aospkg",
+./tools/runtime-proof/.gitignore	5	other	!packed/qf-toolloop.meta.json
+./species/hermes/.gitignore	7	other	!packed/hermes.aospkg
+./packages/qf-kernel/src/kernel.test.ts	121	other	      { name: "proof-profile", role: "test", package_ref: "/tmp/proof.aospkg" },
+./packages/qf-kernel/src/kernel.test.ts	344	other	        package_ref: "/tmp/bait.aospkg",
+./packages/qf-kernel/src/kernel.test.ts	351	other	    expect(result.state.package_ref).toBe("/tmp/bait.aospkg");
+./packages/qf-kernel/src/kernel.test.ts	366	other	        package_ref: "/tmp/research-director.aospkg",
+./packages/qf-kernel/src/kernel.test.ts	384	other	          package_ref: "/tmp/unknown-display-name.aospkg",
+./packages/qf-kernel/src/kernel.test.ts	399	other	      { name: "dup", role: "a", package_ref: "/tmp/a.aospkg" },
+./packages/qf-kernel/src/kernel.test.ts	406	other	        { name: "dup", role: "b", package_ref: "/tmp/b.aospkg" },
+./species/hermes/host-admit-kernel.ts	25	other	const PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
+./docs/orders/WO-R16.md	795	other	- `tools/runtime-proof/dock-profiles.json`, adding `display_name:
+./docs/orders/WO-R16.md	796	other	  "Market Researcher"` to `qf-toolloop`; and
+./docs/orders/WO-R16.md	803	other	Because `tools/runtime-proof/packed/qf-toolloop.aospkg` is an intentionally
+./docs/orders/WO-R16.md	805	other	may invoke only the existing `tools/runtime-proof` `pack-agent` script once
+./docs/orders/WO-R16.md	822	other	The authorized runtime-proof pack invocation failed twice before Electron
+./docs/orders/WO-R16.md	823	other	launch: first because the AgentOS toolchain selected extensionless `npm`, then
+./docs/orders/WO-R16.md	825	other	not use `qf-toolloop`, and repairing an obsolete AgentOS packaging path is not
+./docs/orders/WO-R16.md	830	other	measured checked-in contract mismatch. Remove the runtime-proof pack call and
+./docs/orders/WO-R16.md	831	other	do not generate or require `qf-toolloop.aospkg` in this gate.
+./docs/orders/WO-R16.md	844	other	credential-free responder, and do not revive AgentOS merely to open R16.
+./docs/orders/WO-R16.md	957	other	display name, timeout value, assertion strength, package path, AgentOS path, or
+./docs/orders/WO-R16.md	1121	other	candidate commit, and push. No package, installer, release, AgentOS, second
+./docs/orders/WO-R16.md	3662	other	entry is removed, and marks it settled exactly once. `disposeAgentOs` awaits
+./qa/gates/research-director-front-door.ts	532	other	    "species/hermes/packed/hermes.aospkg",
+./qa/gates/research-director-front-door.ts	536	other	    "species/claude-code/packed/claude-code.aospkg",
+./collab-electron/package.json	13	other	    "pack-agent": "bun run --cwd ../tools/runtime-proof pack-agent",
+./collab-electron/package.json	168	other	    "@rivet-dev/agentos-core": "0.2.7",
+./species/claude-code/scripts/pack-agent.mjs	18	other	  join(outDir, "claude-code.aospkg"),
+./species/claude-code/scripts/pack-agent.mjs	30	other	    package: "claude-code.aospkg",
+./docs/orders/WO-NORTHSTAR-1.md	43	other	   dependency. AgentOS is predecessor history, not product architecture.
+./docs/orders/WO-NORTHSTAR-1.md	80	other	AgentOS example. Replace it with: `Apply the dependency-arrow test per layer,
+./docs/orders/WO-NORTHSTAR-1.md	125	other	dependency. AgentOS is predecessor history and is not QuantFlow architecture.
+./docs/orders/WO-NORTHSTAR-1.md	254	other	species/hermes/packed/hermes.aospkg                              aba1069507d3d0d8dee78fa6e4c55afc66ef8e45b1b73e0921b10b5da8ce6bc1
+./docs/orders/WO-NORTHSTAR-1.md	334	other	  'species/hermes/packed/hermes.aospkg'='aba1069507d3d0d8dee78fa6e4c55afc66ef8e45b1b73e0921b10b5da8ce6bc1'
+./species/claude-code/qa-dock-profiles.json	5	other	    "package": "packed/claude-code.aospkg"
+./docs/orders/WO-GOLDEN-G9-PREREQ.md	11	other	When one finalized AgentOS turn completes, QuantFlow preserves its exact output as
+./docs/orders/WO-GOLDEN-G9-PREREQ.md	35	other	"Ordinary completion" has one meaning here: exactly one successful **AgentOS**
+./docs/orders/WO-GOLDEN-G9-PREREQ.md	71	other	AgentOS `finalize = true` call site with one canonical trajectory vocabulary.
+./docs/orders/WO-GOLDEN-G4.md	1	other	# WO-GOLDEN-G4 — Retire the AgentOS runtime fossil
+./docs/orders/WO-GOLDEN-G4.md	6	other	founder-approved-route: G4 — AgentOS runtime fossil
+./docs/orders/WO-GOLDEN-G4.md	14	other	G4 removes unsupported AgentOS guest-runtime execution and its QA-only toolchain from the current Windows product while preserving the package identity contract used by current Hermes and Claude native adapters.
+./docs/orders/WO-GOLDEN-G4.md	16	other	After G4, a package marker may still use the `.aospkg` suffix. That suffix means a package reference plus sibling metadata; it does not imply AgentOS execution. Current supported runtime routes remain `native_tui` and `host_acp`. Metadata requesting retired route `agentos` is refused before session or Kernel mutation with one explicit unsupported-route diagnostic.
+./docs/orders/WO-GOLDEN-G4.md	35	other	- no current production Dock manifest or packaged production resource selects route `agentos`;
+./docs/orders/WO-GOLDEN-G4.md	36	other	- no current canonical Kernel AgentDefinition/Profile resolves through installed production metadata to route `agentos`;
+./docs/orders/WO-GOLDEN-G4.md	38	other	- no accepted R18–R25 route requires AgentOS guest execution.
+./docs/orders/WO-GOLDEN-G4.md	40	other	If all four hold, G4 defines route `agentos` as unsupported retired metadata rather than supported compatibility. No migration invents a replacement runtime. Resolution fails closed before admission and names the retired route and package reference. Historical or external packages are not silently rewritten.
+./docs/orders/WO-GOLDEN-G4.md	42	other	If any current supported predecessor resolves to route `agentos`, the Reader returns `NO`; the Builder may not remove compatibility until an explicit migration/retirement contract exists.
+./docs/orders/WO-GOLDEN-G4.md	48	other	- Hermes or Claude `.aospkg` markers, sibling metadata, launch descriptors, Dock profiles, prompts, or pack scripts;
+./docs/orders/WO-GOLDEN-G4.md	58	other	After the starting census and Reader acceptance, the Builder may remove only AgentOS-owned behavior:
+./docs/orders/WO-GOLDEN-G4.md	60	other	1. In `collab-electron/src/main/agent-host.ts`: AgentOS imports, native-Windows AgentOS guard, AgentOS singleton/link state, QA boot smoke, AgentOS package admission, fallback dispatch, prompt/stream/cancel/finalize branches, and AgentOS disposal.
+./docs/orders/WO-GOLDEN-G4.md	61	other	2. In `collab-electron/src/main/runtime-adapter.ts`: route `agentos` acceptance while retaining fail-closed unknown/retired-route validation and both current routes.
+./docs/orders/WO-GOLDEN-G4.md	62	other	3. The app direct dependency `@rivet-dev/agentos-core` and only its now-unreachable lock closure.
+./docs/orders/WO-GOLDEN-G4.md	63	other	4. The literal `tools/runtime-proof/**` AgentOS fixture/toolchain package, including ignored/generated descendants, after a complete tracked/ignored manifest.
+./docs/orders/WO-GOLDEN-G4.md	64	other	5. AgentOS-only `qf-toolloop` cases from `qa/gates/agent-path/**`, `qa/gates/dock-registry/**`, `qa/gates/dock-definition-launch/**`, and their package-local manifests/locks.
+./docs/orders/WO-GOLDEN-G4.md	65	other	6. AgentOS-only QA staging/toolchain preparation and `qf-toolloop` resources in `collab-electron/scripts/package-lib/runtime-staging.ts` and direct consumers.
+./docs/orders/WO-GOLDEN-G4.md	66	other	7. AgentOS-only app boot/import/disposal calls that become unreachable.
+./docs/orders/WO-GOLDEN-G4.md	68	other	The Builder may not delete a shared file wholesale merely because it contains an AgentOS branch. A dependency leaves only when the post-edit direct and transitive consumer census proves no surviving current, compatibility, QA, package, or named-future consumer.
+./docs/orders/WO-GOLDEN-G4.md	75	other	- every tracked and ignored path under `tools/runtime-proof`, with bytes and SHA-256;
+./docs/orders/WO-GOLDEN-G4.md	76	other	- all AgentOS imports, route branches, package resources, QA references, dependency declarations, lock entries, docs/authority references, generated Atlas rows, and build output;
+./docs/orders/WO-GOLDEN-G4.md	83	other	Any unclassified production, package, compatibility, or future-rung AgentOS consumer stops G4.
+./docs/orders/WO-GOLDEN-G4.md	87	other	G4 may delete AgentOS-specific proof subjects but not their current invariants.
+./docs/orders/WO-GOLDEN-G4.md	97	other	Prefer existing `runtime-kernel-admission`, native-TUI, Dock-definition, Hermes-launch, and governed-review tests. Add at most one small QA-only fixture if a current invariant otherwise loses its sole fail-capable proof. It may not implement a fake product runtime or preserve AgentOS terminology merely to keep an old gate green.
+./docs/orders/WO-GOLDEN-G4.md	99	other	Retire the `runtime-proof` command from `qa/run.ts` only after the invariant map names its surviving proof for every accepted assertion.
+./docs/orders/WO-GOLDEN-G4.md	107	other	- metadata route `agentos` exits non-zero before any AgentSession, Task, Artifact, event, PTY, ACP handle, package link, or process is created;
+./docs/orders/WO-GOLDEN-G4.md	111	other	The falsifier must demonstrate that accepting `agentos`, falling through to a default route, or mutating before refusal makes the proof red.
+./docs/orders/WO-GOLDEN-G4.md	129	other	Do not run a full installer/release traversal solely for ceremony. If production package resources or package inspection semantics change beyond removing QA-only AgentOS staging, the Reader must say so and expand only the necessary bounded package proof before Builder authority.
+./docs/orders/WO-GOLDEN-G4.md	135	other	- no tracked/ignored `tools/runtime-proof` descendant remains;
+./docs/orders/WO-GOLDEN-G4.md	136	other	- no production source imports or dynamically resolves `@rivet-dev/agentos-core`;
+./docs/orders/WO-GOLDEN-G4.md	137	other	- no current manifest/lock/build/package resource retains AgentOS solely for removed G4 behavior;
+./docs/orders/WO-GOLDEN-G4.md	138	other	- no production Dock/staging route equals `agentos`;
+./docs/orders/WO-GOLDEN-G4.md	139	other	- no AgentOS branch remains in app admission/turn/cancel/disposal;
+./docs/orders/WO-GOLDEN-G4.md	141	other	- remaining `.aospkg` references all resolve through current package metadata and are not relabeled AgentOS;
+./docs/orders/WO-GOLDEN-G4.md	174	other	The starting census records, without private content, each current AgentDefinition/Profile identity hash, package-reference class, resolution status, and resolved route. An absolute, external, unreadable, non-production, or `agentos`-resolving current reference is a semantic stop. G4 may not guess, rewrite, or migrate it. If the bounded universe contains none, `agentos` is unsupported retired metadata and requires no compatibility path.
+./docs/orders/WO-GOLDEN-G4.md	176	other	`README.md`, `docs/demos/dock.md`, and `docs/demos/agent-path.md` are stale if they describe `qf-toolloop` or AgentOS as current. G4 owns only those exact corrections; G11 owns broader authority/history compression.
+./docs/orders/WO-GOLDEN-G4.md	180	other	Production staging retains every Hermes and Claude resource unchanged. QA staging retains `qf-proof-agent`, all production runtime files, and current Claude QA profiles. It removes `qf-toolloop`, `tools/runtime-proof`, AgentOS toolchain preparation, and their local manifests/locks.
+./docs/orders/WO-GOLDEN-G4.md	182	other	`package-closure` and `package-inspect` become route-aware enumerations of every staged package metadata/profile reference. They validate retained qf-proof-agent, Hermes, and Claude resources and reject every staged `agentos` route. They may not replace one hard-coded blind spot with another. The command description names current production/QA runtime resources.
+./docs/orders/WO-GOLDEN-G4.md	188	other	It exports `UnsupportedRuntimeRouteError` with code `QF_UNSUPPORTED_RUNTIME_ROUTE`, properties `route` and `packageRef`, and exact message `unsupported runtime route "<route>" for package_ref "<packageRef>"`. Route `agentos` and arbitrary unknown routes use that same class and shape before any Kernel/session, PTY, ACP, package-link, process, Task, Artifact, or event callback can run.
+./docs/orders/WO-GOLDEN-G4.md	190	other	Add and register `qa/gates/golden-g4-retired-route.ts` as `golden-g4-retired-route`. It exercises the production dispatcher with observable callbacks; proves all mutation counters stay zero for `agentos` and unknown routes; and proves each current route selects exactly its callback. It enumerates all production and QA staged metadata/profile references and rejects any `agentos` route. Its falsifiers turn red if AgentOS is accepted, a fallback returns, any callback runs before validation, route/package refer
+./docs/orders/WO-GOLDEN-G4.md	198	other	| AgentOS/qf-toolloop identity, list, notification | Retarget Dock-definition assertions to retained `qf-proof-agent`/current identities; preserve generic admission with `runtime-kernel-admission`. |
+./docs/orders/WO-GOLDEN-G4.md	199	other	| AgentOS socket denial | Retired; not a current invariant. |
+./docs/orders/WO-GOLDEN-G4.md	200	other	| AgentOS streamed prompt/unknown guest | Retired; native-TUI and retained host-ACP tests own their distinct behavior. |
+./docs/orders/WO-GOLDEN-G4.md	203	other	| Artifact publication | G9 owns it. Preserve non-AgentOS `artifact-root` assertions; remove only its AgentOS live fixture and record the current-runtime trajectory gap for G9. Do not invent a fake runtime. |
+./docs/orders/WO-GOLDEN-G4.md	209	other	- Retarget `dock-profiles.test.ts`, `boot-reconcile/run.ts`, `dock-profile-identity/run.ts`, and `qf-vault-projection/src/gate.ts` from qf-toolloop to retained qf-proof-agent/current metadata without changing assertion meaning.
+./docs/orders/WO-GOLDEN-G4.md	210	other	- Retarget only the stale `qf-toolloop` required-Dock identity in `qa/gates/windows-cold-boot.ts` to the retained `qf-proof-agent`/current QA identity set. Preserve every cold-boot, package, RPC, shutdown, and cleanup assertion. G12 still owns execution of the full Windows cold-boot/operations boundary and its inherited reds; G4 owns this exact fixture-reference correction so AgentOS removal does not leave an impossible future gate.
+./docs/orders/WO-GOLDEN-G4.md	211	other	- In `artifact-root/run.ts`, remove only the AgentOS live trajectory and assign current-runtime trajectory proof to G9.
+./docs/orders/WO-GOLDEN-G4.md	212	other	- In `host-mounts.ts`, retain shared adapter environment resolution; remove AgentOS-only language/branches only after zero-consumer proof. G5 owns broader host-ACP.
+./docs/orders/WO-GOLDEN-G4.md	214	other	- G4 owns exact stale AgentOS/qf-toolloop README/demo claims, `agent-path/**`, `dock-registry/**`, QA staging, package inspection/closure, `qa/run.ts`, runtime adapter/host, and AgentOS-only boot/disposal.
+./docs/orders/WO-GOLDEN-G4.md	236	other	`dock-definition-launch` derives expected identities from canonical retained manifests rather than stale qf-toolloop, six-row, or Hermes-orchestrator constants. Its existing direct import and execution of `completeRuntimeKernelAdmission` is the executable generic-admission proof; `runtime-kernel-admission` is a source module, not a `qa/run.ts` selector. Removing the nonexistent selector changes invocation only, not the lifecycle assertion.
+./docs/orders/WO-GOLDEN-G4.md	238	other	The `windows-cold-boot.ts` required-ID retarget gets one focused source/fixture falsifier showing the old qf-toolloop identity is red and the retained current identity is green. The full Windows gate remains G12-owned and is not rerun for G4 ceremony.
+./tools/qf-vault-projection/src/gate.ts	202	other	      package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+./qa/gates/kernel-task-delegation.ts	79	other	        package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./qa/gates/kernel-task-delegation.ts	92	other	        package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./docs/orders/WO-GOLDEN-G3.md	36	other	- shared MCP, ACP, AgentOS, AI, Zod, or `qf-kernel` dependencies used elsewhere.
+./docs/orders/WO-GOLDEN-G3.md	38	other	G4 owns AgentOS, G5 owns ACP/Agent Chat/Terminal, and G7 owns broader dependency contraction.
+./docs/orders/WO-GOLDEN-G3.md	55	other	12. `species/critic-mock/agent-package/agentos-package.json`
+./docs/orders/WO-GOLDEN-G3.md	234	other	"species/critic-mock/.gitignore","species/critic-mock/README.md","species/critic-mock/agent-package/agentos-package.json","species/critic-mock/agent-package/package.json","species/critic-mock/agent-package/src/acp-main.ts","species/critic-mock/bun.lock","species/critic-mock/evidence/dock.png","species/critic-mock/package.json","species/critic-mock/register.ts","species/critic-mock/scripts/pack-agent.mjs"
+./qa/gates/pre-r18-coherence.ts	344	other	    .filter((row) => !String(row.id ?? "").startsWith("qf-proof-") && !String(row.package_ref ?? "").startsWith("tools/qf-proof-agent/") && !String(row.package_ref ?? "").startsWith("tools/runtime-proof/"))
+./qa/gates/kernel-sole-writer-app.ts	2	other	 * WO-006b/c: Kernel SQLite sole-writer + AgentOS sole-host under collab-electron/src.
+./qa/gates/kernel-sole-writer-app.ts	4	other	 * - Only agent-host.ts may import @rivet-dev/agentos*
+./qa/gates/kernel-sole-writer-app.ts	34	other	const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
+./qa/gates/kernel-sole-writer-app.ts	64	other	  { name: "@rivet-dev/agentos", re: /@rivet-dev\/agentos/ },
+./qa/gates/kernel-sole-writer-app.ts	114	other	    if (p.name === "@rivet-dev/agentos" && rel === AGENTOS_ALLOWED) continue;
+./species/claude-code/packed/claude-code.meta.json	10	other	  "package": "claude-code.aospkg",
+./qa/gates/dock-registry/run.ts	8	other	 * Species-literal scan (d) is always on; bait a `qf-toolloop` string under
+./qa/gates/dock-registry/run.ts	13	other	import { AgentOs } from "@rivet-dev/agentos-core";
+./qa/gates/dock-registry/run.ts	28	other	const AOSPKG = join(PKG, "packed/qf-toolloop.aospkg");
+./qa/gates/dock-registry/run.ts	33	other	const BAIT_B = "qf-toolloop";
+./qa/gates/dock-registry/run.ts	34	other	const SPECIES_LITERAL = "qf-toolloop";
+./qa/gates/dock-registry/run.ts	131	other	    "/nonexistent/dock-registry-corrupt.aospkg",
+./qa/gates/dock-registry/run.ts	218	other	  const os = await AgentOs.create({
+./docs/orders/WO-GOLDEN-G1.md	55	other	collab-electron/.package-staging-test/species/hermes/packed/hermes.aospkg
+./docs/orders/WO-GOLDEN-G1.md	60	other	collab-electron/.package-staging-test/tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+./docs/orders/WO-GOLDEN-G1.md	63	other	collab-electron/.package-staging-test/tools/runtime-proof/dock-profiles.json
+./docs/orders/WO-GOLDEN-G1.md	64	other	collab-electron/.package-staging-test/tools/runtime-proof/launch.json
+./docs/orders/WO-GOLDEN-G1.md	65	other	collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/orders/WO-GOLDEN-G1.md	66	other	collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.meta.json
+./docs/orders/WO-GOLDEN-G1.md	156	other	- AgentOS, ACP, Claude, peer bus, critic mock, or dependency removal;
+./qa/gates/kernel-market-lineage.ts	38	other	      package_ref: "species/hermes/packed/hermes.aospkg",
+./qa/gates/dock-registry/package.json	12	other	    "@rivet-dev/agentos-core": "0.2.7",
+./qa/gates/dock-registry/package.json	18	other	    "@rivet-dev/agentos-toolchain": "0.2.7",
+./docs/orders/WO-GOLDEN-G1-R2.md	46	other	collab-electron/.package-staging-test/species/hermes/packed/hermes.aospkg
+./docs/orders/WO-GOLDEN-G1-R2.md	51	other	collab-electron/.package-staging-test/tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+./docs/orders/WO-GOLDEN-G1-R2.md	54	other	collab-electron/.package-staging-test/tools/runtime-proof/dock-profiles.json
+./docs/orders/WO-GOLDEN-G1-R2.md	55	other	collab-electron/.package-staging-test/tools/runtime-proof/launch.json
+./docs/orders/WO-GOLDEN-G1-R2.md	56	other	collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/orders/WO-GOLDEN-G1-R2.md	57	other	collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.meta.json
+./qa/gates/dock-registry/pack.mjs	3	other	 * Pack qf-toolloop into this package's packed/ using the repo's agent-package
+./qa/gates/dock-registry/pack.mjs	4	other	 * sources (tools/runtime-proof/agent-package — in git) and this package's
+./qa/gates/dock-registry/pack.mjs	5	other	 * agentos-toolchain (installed here, not free-riding on runtime-proof).
+./qa/gates/dock-registry/pack.mjs	14	other	const agentDir = join(repo, "tools/runtime-proof/agent-package");
+./qa/gates/dock-registry/pack.mjs	17	other	const aospkg = join(outDir, "qf-toolloop.aospkg");
+./qa/gates/dock-registry/pack.mjs	20	other	  "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs",
+./qa/gates/dock-registry/pack.mjs	28	other	  console.error("pack: missing agentos-toolchain — run bun install in", here);
+./qa/gates/dock-registry/pack.mjs	72	other	    "qf-toolloop-acp",
+./qa/gates/dock-registry/pack.mjs	74	other	    join(outDir, "qf-toolloop.tar"),
+./qa/gates/dev-dock-readiness.ts	25	other	const HERMES_PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
+./qa/gates/dev-dock-readiness.ts	32	other	  "species/claude-code/packed/claude-code.aospkg",
+./qa/gates/dev-dock-readiness.ts	247	other	      !/child_process|Bun\.spawn|\bnpm\b|agentos/i.test(source),
+./qa/gates/dev-dock-readiness.ts	261	other	        !packageSource.includes("@rivet-dev/agentos-core") &&
+./qa/gates/dev-dock-readiness.ts	262	other	          !packageSource.includes("@rivet-dev/agentos-toolchain"),
+./qa/gates/dev-dock-readiness.ts	263	other	        `removed Hermes AgentOS dependency remains in ${relativePath}`,
+./qa/gates/dev-dock-readiness.ts	269	other	        !/npm|agentos|pack-agent|\.package-staging/i.test(startupSource),
+./qa/gates/dev-dock-readiness.ts	314	other	    metadata.route = "agentos";
+./qa/gates/dev-dock-readiness.ts	324	other	        routeReason.includes("native-TUI production profile rejected route=agentos"),
+./qa/gates/dev-dock-readiness.ts	327	other	    console.log(`falsifier=hermes-agentos-route discovery=red hermes_definitions=0 reason=${routeReason}`);
+./qa/gates/dev-dock-readiness.ts	389	other	    console.log("agentos_packaging_used=false");
+./species/claude-code/dock-profiles.json	5	other	    "package": "packed/claude-code.aospkg"
+./docs/orders/WO-GOLDEN-G1-R1.md	48	other	collab-electron/.package-staging-test/species/hermes/packed/hermes.aospkg
+./docs/orders/WO-GOLDEN-G1-R1.md	53	other	collab-electron/.package-staging-test/tools/qf-proof-agent/packed/qf-proof-agent.aospkg
+./docs/orders/WO-GOLDEN-G1-R1.md	56	other	collab-electron/.package-staging-test/tools/runtime-proof/dock-profiles.json
+./docs/orders/WO-GOLDEN-G1-R1.md	57	other	collab-electron/.package-staging-test/tools/runtime-proof/launch.json
+./docs/orders/WO-GOLDEN-G1-R1.md	58	other	collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/orders/WO-GOLDEN-G1-R1.md	59	other	collab-electron/.package-staging-test/tools/runtime-proof/packed/qf-toolloop.meta.json
+./qa/gates/dock-registry/bun.lock	9	other	        "@rivet-dev/agentos-core": "0.2.7",
+./qa/gates/dock-registry/bun.lock	15	other	        "@rivet-dev/agentos-toolchain": "0.2.7",
+./qa/gates/dock-registry/bun.lock	23	other	    "@agentos-software/claude-code": ["@agentos-software/claude-code@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@anthropic-ai/claude-agent-sdk": "0.2.87", "zod": "^4.1.11" }, "bin": { "claude": "dist/claude-cli.mjs", "claude-sdk-acp": "dist/adapter.js" } }, "sha512-gXmqqOUWT98QvLkQXHn1UU8OOvqMO8BRSj+0PT99mOL6XNpBlPW6L065FJ9dC4IwJC5xeGzB1XFevjOdP7LwQg=="],
+./qa/gates/dock-registry/bun.lock	25	other	    "@agentos-software/codex-cli": ["@agentos-software/codex-cli@0.3.3", "", {}, "sha512-63f4jymlxe4S003/4Fiu9Y/BAzT6ajHEDidfNqv39SkWNJWxT1ndY+j1/7XYT6NsGgg2ZSo+OGuexlkL8Jx1RA=="],
+./qa/gates/dock-registry/bun.lock	27	other	    "@agentos-software/common": ["@agentos-software/common@0.2.7", "", { "dependencies": { "@agentos-software/coreutils": "0.3.3", "@agentos-software/diffutils": "0.3.3", "@agentos-software/findutils": "0.3.3", "@agentos-software/gawk": "0.3.3", "@agentos-software/grep": "0.3.3", "@agentos-software/gzip": "0.3.3", "@agentos-software/sed": "0.3.3", "@agentos-software/tar": "0.3.3" } }, "sha512-eM5znR9qOaDIEsCBtzxzAfxgynq7ntNyk+lchHF7OUv7Cenbq4XGhCbA1T2dbl45G3/2Wz3+21QM0sv+797lvA=="],
+./qa/gates/dock-registry/bun.lock	29	other	    "@agentos-software/coreutils": ["@agentos-software/coreutils@0.3.3", "", {}, "sha512-uzBD6Q5z+ACn29CMNMSnA+nUzITbTosuOe6Hr/o5ylUpoxODbz6ziAwZ5Cr1XAgF//Qqz7HfQfnogf4zcb+Gvg=="],
+./qa/gates/dock-registry/bun.lock	31	other	    "@agentos-software/diffutils": ["@agentos-software/diffutils@0.3.3", "", {}, "sha512-aaTMx3jWrTn18OxLk0g4nb3MgkLHjXyqlz5BQ3YlRj7hNuRT+hOPnzcSf8zP+pXFR+SGf7a98M2kSNV/ucfyDw=="],
+./qa/gates/dock-registry/bun.lock	33	other	    "@agentos-software/findutils": ["@agentos-software/findutils@0.3.3", "", {}, "sha512-CrtFrmG2o+z0gaxtQBJw4wWGF7TxKq5ukxVFkf2/LxxsdZBc2F04MT6FNY3VMKf4Cq5kFvh7/ZRkMdg2yHAMvA=="],
+./qa/gates/dock-registry/bun.lock	35	other	    "@agentos-software/gawk": ["@agentos-software/gawk@0.3.3", "", {}, "sha512-iHDeJ6rsGxijBQMmqH1w6bQ2+sWrC1f9OqNvUItHOZk85KFmg9a3ueyy0krq9pZRuZe+fU5yEhuUg7ovNqZ9NQ=="],
+./qa/gates/dock-registry/bun.lock	37	other	    "@agentos-software/grep": ["@agentos-software/grep@0.3.3", "", {}, "sha512-jV49HWFJcEGjHBPk37EnisrdKwNfeZ+d+TA6LpAuDKRwFmj/2xc3rGVCTvKIxdZUKYuffu9NI9xgxJ0iKiUU2w=="],
+./qa/gates/dock-registry/bun.lock	39	other	    "@agentos-software/gzip": ["@agentos-software/gzip@0.3.3", "", {}, "sha512-Jbmsu7trAhnnWvT9qlry/hETa5EOlUwdcYHtsyV9W2OQvMc3tOeLy3zwF8nWNuZ3/g1veRenRkK1ZgkqsDZpiw=="],
+./qa/gates/dock-registry/bun.lock	41	other	    "@agentos-software/manifest": ["@agentos-software/manifest@0.2.7", "", {}, "sha512-1e4J8YRR8Ftj7ftKFdqAH2m5ksHz9v+XUGMzirDPGHwXaGzjham3SdWadpqHOE7q3GIWJdP4uWZeY22fquJNrg=="],
+./qa/gates/dock-registry/bun.lock	43	other	    "@agentos-software/opencode": ["@agentos-software/opencode@0.2.7", "", { "bin": { "agentos-opencode-acp": "dist/adapter.js" } }, "sha512-lZspCiMgM0+kPAA08CEvyNy8lfBx463wObKpAwbYyaVvc0KfGvbAPS6VmnuZQWmaBmJJuRMtSo14nmb8XCD16g=="],
+./qa/gates/dock-registry/bun.lock	45	other	    "@agentos-software/pi": ["@agentos-software/pi@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@mariozechner/pi-ai": "0.60.0", "@mariozechner/pi-coding-agent": "0.60.0" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-sdk-acp": "dist/adapter.js" } }, "sha512-nOdwksByJgTqt92Ya84CzTGxpVFwGI6gkGWaCD/mmvP11JRA++1nshNdbig2mtiaxT7VG3ovWJmK7ZLTTzkhPA=="],
+./qa/gates/dock-registry/bun.lock	47	other	    "@agentos-software/pi-cli": ["@agentos-software/pi-cli@0.2.7", "", { "dependencies": { "@mariozechner/pi-coding-agent": "^0.60.0", "pi-acp": "^0.0.23" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-acp": "node_modules/pi-acp/dist/index.js" } }, "sha512-uddhoZ8o5zcGsma5s/+jzQg++SRKtZkpY6cSNru4O0t53LJ41t3+OFhC6j8WkQsIYU0ThAwH6LdKHHjWWKBa2g=="],
+./qa/gates/dock-registry/bun.lock	49	other	    "@agentos-software/sed": ["@agentos-software/sed@0.3.3", "", {}, "sha512-cVNTD9VzodpJ+Kn/xqHo/AcUUkpPSuF9A/0jIqFkDNF24alwNG8ndVLwgFWMP+0mSo68HZumbjjnMQWE3NjRSw=="],
+./qa/gates/dock-registry/bun.lock	51	other	    "@agentos-software/tar": ["@agentos-software/tar@0.3.3", "", {}, "sha512-pmYVIn3XQEKVbfKhms7bEpsGR7YXqaLXtglIHmnhyUwLZhdyerrEkO+VgpC8zuWMeYfmTsstEgpEL1K66sgR2w=="],
+./qa/gates/dock-registry/bun.lock	201	other	    "@rivet-dev/agentos-core": ["@rivet-dev/agentos-core@0.2.7", "", { "dependencies": { "@agentos-software/claude-code": "0.2.7", "@agentos-software/codex-cli": "0.3.3", "@agentos-software/common": "0.2.7", "@agentos-software/manifest": "0.2.7", "@agentos-software/opencode": "0.2.7", "@agentos-software/pi": "0.2.7", "@agentos-software/pi-cli": "0.2.7", "@aws-sdk/client-s3": "^3.1019.0", "@rivet-dev/agentos-runtime-core": "0.2.7", "@rivet-dev/agentos-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "@xterm
+./qa/gates/dock-registry/bun.lock	203	other	    "@rivet-dev/agentos-runtime-core": ["@rivet-dev/agentos-runtime-core@0.2.7", "", { "dependencies": { "@rivet-dev/agentos-runtime-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "zod": "^4.1.11" } }, "sha512-Dih3ex/FIr69VhReUIAapBBNrghkA26IMlPs9fiWkrj0QEjdDTCMvfBkhseQelUdzmL6hCLnIrru2cQ29KwxCQ=="],
+./qa/gates/dock-registry/bun.lock	205	other	    "@rivet-dev/agentos-runtime-sidecar": ["@rivet-dev/agentos-runtime-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-QuAEG3/IKiBDlUbVYBNKc4h0TcT6DDYKlz58lwniv/L0v4qpJBwKLYikdSyNjp1H8eVZXFr7UsaaqFmuvCSsug=="],
+./qa/gates/dock-registry/bun.lock	207	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": ["@rivet-dev/agentos-runtime-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-u14Mr7wp4h7IF8mc7jXREBh1xPOoLCzwMVUH/zpa/Y7eiGb6LE7RPW2n+nC0VpciiLf/7gYejU6QboJnhiq1uw=="],
+./qa/gates/dock-registry/bun.lock	209	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-x64": ["@rivet-dev/agentos-runtime-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-4IABmx8Pi7f76J8aMypln5dZs0qsWVXXW31oA7v4I3e11EGvCmsubjCEO+9YLvEuk6La3JcSO+685bs45twIvA=="],
+./qa/gates/dock-registry/bun.lock	211	other	    "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-YHZFlGAljRMjceUsVU7e1GjTeM4QNj6/OjGcpprciyKosRNny8aoVsA4gJbe0dCNEbwVmO6peczFVAt5k54VEw=="],
+./qa/gates/dock-registry/bun.lock	213	other	    "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-wcHg/ifVWKqFosNN7YLNsP/SrZxZccd2UP2EPQHnIcRyMg+w14LpgdDcIsPWO/HvS7+78OwRsCck5IIOeonIUw=="],
+./qa/gates/dock-registry/bun.lock	215	other	    "@rivet-dev/agentos-sidecar": ["@rivet-dev/agentos-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-mui+hg8uWF3mjubp6YfpTW21TAqB+ZpA/VTSsKjngEw774oBkuvpY+eycxRbsxZIM4RMzl0EdHgCt8fFTGNxOQ=="],
+./qa/gates/dock-registry/bun.lock	217	other	    "@rivet-dev/agentos-sidecar-darwin-arm64": ["@rivet-dev/agentos-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-/FgUVxg27IQQ0swBXVBg8s3spaFk8tA+icQVa0KYC7eOZF+2fhNXcjuQrkCB9yoNHd2YMNrWp4PB/mQ16yg3Ag=="],
+./qa/gates/dock-registry/bun.lock	219	other	    "@rivet-dev/agentos-sidecar-darwin-x64": ["@rivet-dev/agentos-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-akj3VqdmcPHPzBDwBYpScjeudjpEsTBJAL5iGnPUEoLA3hLJrBdoXovbR9xMQgixontPDYu4rvttiTQUt0doug=="],
+./qa/gates/dock-registry/bun.lock	221	other	    "@rivet-dev/agentos-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-Hyrxo6Bh5aF6iqt076xN8VggxfCMN9qGkMb/BBH+LgtQQX2Pq76wJRZCltm8g5TOCxlczob8E5HqMdpCkw0Z9w=="],
+./qa/gates/dock-registry/bun.lock	223	other	    "@rivet-dev/agentos-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-blcgYjNG1zE3bI6SFOfhTHe8NrSm3QGannfNR6RQCoalif9Hf7bpxR/ha3uMKH+0fmlmuuc8LUi/O2N/uoiB9Q=="],
+./qa/gates/dock-registry/bun.lock	225	other	    "@rivet-dev/agentos-toolchain": ["@rivet-dev/agentos-toolchain@0.2.7", "", { "dependencies": { "@rivetkit/bare-ts": "^0.6.2" }, "bin": { "agentos-toolchain": "bin/agentos-toolchain.mjs" } }, "sha512-PIzpgATYQcl7ptxWpTyVTH9qDmjYPdODMkKw+FDRhx/+svcp3RVd2E4jrbYu08eNqdkkp89UDBpkAXW7Z8UioQ=="],
+./qa/gates/dock-registry/bun.lock	767	other	    "@agentos-software/claude-code/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./qa/gates/dock-registry/bun.lock	769	other	    "@agentos-software/pi/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./docs/orders/NEXT.md	10	other	phase-2-active-group: G4 — AgentOS runtime fossil
+./docs/DOCTRINE.md	284	other	- **Substrate triage** (`START_HERE.md` §5.8): dock item / underlayer / neither, decided per *layer* by the dependency arrow, never per brand name. Substrate proposals get logged, not evaluated, until the Research plane exists. Worked example: agentOS (`docs/RESEARCH.md`).
+./docs/DOCTRINE.md	487	other	dependency. AgentOS is predecessor history and is not QuantFlow architecture.
+./docs/orders/PROTOCOL.md	101	other	The reason is that builders share the founder's single working tree. WO-005 and WO-004a both carried `rm -rf tools/*/node_modules qf-kernel-schema/node_modules packages/*/node_modules` as a builder step — correct for a builder with a private clone, destructive where the builders actually stand (~1.9 GB of installed dependencies, `tools/runtime-proof` alone 1.8 GB). Two builders independently noticed and routed around it: WO-005's deferred the cold run to the verifier, WO-004a's invented a clean-room worktre
+./tools/qf-proof-agent/dock-profiles.json	5	other	    "package": "packed/qf-proof-agent.aospkg"
+./qa/gates/dock-definition-launch/run.ts	61	other	    id: "qf-toolloop",
+./qa/gates/dock-definition-launch/run.ts	63	other	    packageRef: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+./qa/gates/dock-definition-launch/run.ts	69	other	    packageRef: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./qa/gates/dock-definition-launch/run.ts	75	other	    packageRef: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./qa/gates/dock-definition-launch/run.ts	81	other	    packageRef: "species/hermes/packed/hermes.aospkg",
+./qa/gates/dock-definition-launch/run.ts	87	other	    packageRef: "species/hermes/packed/hermes.aospkg",
+./qa/gates/dock-definition-launch/run.ts	93	other	    packageRef: "species/hermes/packed/hermes.aospkg",
+./qa/gates/dock-definition-launch/run.ts	123	other	    "tools/runtime-proof/dock-profiles.json",
+./qa/gates/dock-definition-launch/run.ts	124	other	    "tools/runtime-proof/launch.json",
+./qa/gates/dock-definition-launch/run.ts	125	other	    "tools/runtime-proof/packed/qf-toolloop.meta.json",
+./qa/gates/dock-definition-launch/run.ts	136	other	    "species/hermes/packed/hermes.aospkg",
+./qa/gates/dock-definition-launch/run.ts	137	other	    "tools/runtime-proof/packed/qf-toolloop.aospkg",
+./qa/gates/dock-definition-launch/run.ts	138	other	    "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
+./qa/gates/dock-definition-launch/run.ts	183	other	    { root: "species/hermes", packageName: "hermes.aospkg" },
+./qa/gates/dock-definition-launch/run.ts	184	other	    { root: "tools/runtime-proof", packageName: "qf-toolloop.aospkg" },
+./qa/gates/dock-definition-launch/run.ts	185	other	    { root: "tools/qf-proof-agent", packageName: "qf-proof-agent.aospkg" },
+./qa/gates/dock-definition-launch/run.ts	190	other	        join(REPO, adapter.root, "packed", adapter.packageName.replace(/\.aospkg$/, ".meta.json")),
+./qa/gates/dock-definition-launch/run.ts	235	other	  traversal.adapter.package = "../packed/hermes.aospkg";
+./qa/gates/dock-definition-launch/run.ts	245	other	  const absolutePath = join(absoluteRoot, "tools/runtime-proof/dock-profiles.json");
+./qa/gates/dock-definition-launch/run.ts	249	other	  absolute.adapter.package = "/tmp/qf-toolloop.aospkg";
+./qa/gates/dock-definition-launch/run.ts	413	other	type AcpSurface = "host_acp" | "agentos";
+./qa/gates/dock-definition-launch/run.ts	584	other	  const hostAcp = functionSource(host, "admitHostAcpDefinition", "admitAgentOsDefinition");
+./qa/gates/dock-definition-launch/run.ts	585	other	  const agentOs = functionSource(host, "admitAgentOsDefinition", "runTurn");
+./qa/gates/dock-definition-launch/run.ts	586	other	  for (const [label, body] of [["host ACP", hostAcp], ["AgentOS", agentOs]] as const) {
+./qa/gates/dock-definition-launch/run.ts	597	other	    /tearDownRuntime:\s*(?:async\s*)?\(\)\s*=>\s*(?:await\s+)?host\.destroySession\(guestId\)/.test(agentOs),
+./qa/gates/dock-definition-launch/run.ts	598	other	    "AgentOS compensation does not destroy its exact guest id",
+./qa/gates/dock-definition-launch/run.ts	601	other	    !/tearDownRuntime:[\s\S]{0,120}host\.destroySession\(sessionId\)/.test(agentOs),
+./qa/gates/dock-definition-launch/run.ts	602	other	    "AgentOS compensation incorrectly destroys the Kernel session id",
+./qa/gates/dock-definition-launch/run.ts	650	other	    "production AgentOS startup must use shared adapter/package deduplication",
+./qa/gates/dock-definition-launch/run.ts	662	other	    "AgentOS must create the packaged adapter id, not a profile definition id",
+./qa/gates/dock-definition-launch/run.ts	713	other	        name: "qf-toolloop",
+./qa/gates/dock-definition-launch/run.ts	715	other	        package_ref: "operator/custom.aospkg",
+./qa/gates/dock-definition-launch/run.ts	723	other	    const preserved = definition(conflictDb, "qf-toolloop");
+./qa/gates/dock-definition-launch/run.ts	724	other	    assert(preserved?.role === "operator-preserved-conflict" && preserved?.package_ref === "operator/custom.aospkg", "bootstrap overwrote conflicting operator row", preserved);
+./qa/gates/dock-definition-launch/run.ts	746	other	      `${orchestrator.resolved.packagePath.replace(/\/hermes\.aospkg$/, "")}`
+./qa/gates/dock-definition-launch/run.ts	747	other	      + "/ignored/../hermes.aospkg",
+./qa/gates/dock-definition-launch/run.ts	771	other	      { definitionId: "hermes-worker", packageRef: "other.aospkg" },
+./qa/gates/dock-definition-launch/run.ts	809	other	    const toolloop = resolvedRow(db, appRoot, "qf-toolloop");
+./qa/gates/dock-definition-launch/run.ts	810	other	    assert(!allowsPtyRoleDelivery(toolloop.adapter.metadata, null), "qf-toolloop became peer eligible");
+./qa/gates/dock-definition-launch/run.ts	899	other	    for (const surface of ["host_acp", "agentos"] as const) {
+./qa/gates/dock-definition-launch/run.ts	904	other	          definitionId: surface === "host_acp" ? "hermes-worker" : "qf-toolloop",
+./qa/gates/dock-definition-launch/run.ts	911	other	        definitionId: surface === "host_acp" ? "hermes-worker" : "qf-toolloop",
+./qa/gates/dock-definition-launch/run.ts	935	other	        cleanupFaultAggregation: ["host_acp:start", "agentos:start"],
+./docs/history/BLUEPRINT-2026-07-18.md	23	other	| **L1 Durability** | **AgentOS / Rivet** actors + a ledger table in the Kernel | `run()`/`signal()` wrappers, idempotency keys, replay | Cold-reopen. Kill the app mid-backtest, relaunch, the Run tile is exactly where it was |
+./docs/history/BLUEPRINT-2026-07-18.md	38	other	**Runtime proof gate (the L2 bet) — PROVEN 2026-07-18 by WO-004.** AgentOS owns the public session lifecycle → custom ACP agent → Vercel `ToolLoopAgent` owns the model/tool loop. One session ID, no second Eve server. Mastra was the named fallback; **it is not needed and is now off the table** unless a later order reopens the question.
+./docs/history/BLUEPRINT-2026-07-18.md	40	other	**Session identity flows guest → host, corrected 2026-07-18.** This paragraph previously said AgentOS is the *source* of the session ID. It is not: ACP's `session/new` returns the ID by protocol, so the **ACP agent mints it and AgentOS adopts it**. AgentOS still owns the lifecycle (create · cancel · destroy). Anything that records session identity (the Kernel's `agent_session`, WO-005) must **adopt** the guest-minted ID, never mint its own.
+./docs/history/BLUEPRINT-2026-07-18.md	42	other	**Two identity layers, not three — narrowed 2026-07-18 after adversarial review.** The measured claim is: the ACP guest mints the ID and AgentOS adopts it, ACP carries it in-band on every `sessionUpdate`, and cancel is routed by that ID. **`ToolLoopAgent` owns no session identity** — the AI SDK has no such concept (`ai@7.0.31`), so the loop runs *inside* the session's scope rather than carrying it. WO-004's original three-layer assertion echoed the ACP ID rather than measuring a third value; that assertion
+./docs/history/BLUEPRINT-2026-07-18.md	44	other	**How the agent runs:** as a **stdio child process** under one embedded AgentOS (`AgentOs.create`), not a socket server. That is why there is no second listener and no second session registry — the structural fix for the predecessor's Eve split.
+./docs/history/BLUEPRINT-2026-07-18.md	48	other	**The guest is a species, not a marriage — open-host principle (recorded 2026-07-19).** The ACP stdio seam proven by WO-004/004a is the deliberate swap point: any program that speaks ACP can be packed as AgentOS software and driven as a session guest — this is the documented AgentOS custom-agent path (single-process, like OpenCode). `ToolLoopAgent` is the v0.1 species. **Hermes** is the founder’s primary interactive agent — host process + native TUI (WO-008d); `hermes acp` remains available substrate. Three
+./docs/history/BLUEPRINT-2026-07-18.md	50	other	- **New tools the founder finds plug in at the edges** — as MCP servers, AgentOS software packages, or Kernel-backed generated tools under deny-by-default permissions. Never by forking the host, and never by hard-wiring one harness into the canvas. The host is built to stay open; species choice is cheap, host rewrites are not.
+./docs/history/BLUEPRINT-2026-07-18.md	85	other	| `tools/agentos-host` | **Reference only — do NOT port.** Corrected 2026-07-18: previously listed as "wholesale — standalone." Measurement says otherwise — `host.js` is 1542 lines with 90 Eve references and 175 tile/cable/connection-graph references. Its *tests* are standalone; its *architecture* is the predecessor's integration layer, carrying both the second-Eve-server pattern and canvas coupling that Laws A–C forbid. Build against `@rivet-dev/agentos` directly. |
+./qa/gates/dock-profile-identity/run.ts	68	other	const QF_TOOLLOOP_PACKAGE = join(REPO, "tools/runtime-proof/agent-package");
+./qa/gates/dock-profile-identity/run.ts	629	other	  // credential-free qf-toolloop package source; agent-path separately packs
+./tools/qf-proof-agent/scripts/pack-agent.mjs	21	other	  join(outDir, "qf-proof-agent.aospkg"),
+./tools/qf-proof-agent/scripts/pack-agent.mjs	29	other	    package: "qf-proof-agent.aospkg",
+./qa/gates/boot-reconcile/run.ts	6	other	 * The gate cannot import agent-host (Electron + AgentOS at module scope).
+./qa/gates/boot-reconcile/run.ts	212	other	      package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+./tools/qf-proof-agent/packed/qf-proof-agent.meta.json	17	other	  "package": "qf-proof-agent.aospkg",
+./docs/history/VERIFYING-2026-08-02.md	88	other	- `BLUEPRINT` said `agentos-host` was "wholesale — standalone." Measured: 1542 lines, 90 Eve references, 175 tile/cable references. Harvesting it would have imported the exact pattern the order existed to disprove.
+./docs/history/ladders/SCOPES-2026-07-25.md	41	other	AgentOS/Rivet redesign · WSL as an acceptance substitute · migration or mutation of founder state.
+./collab-electron/src/main/agent-host.ts	2	other	 * Sole app module that imports @rivet-dev/agentos* (mirror of kernel.ts).
+./collab-electron/src/main/agent-host.ts	6	other	 * AgentOS proof fixtures are packed only by explicit QA gates.
+./collab-electron/src/main/agent-host.ts	14	other	  AgentOs,
+./collab-electron/src/main/agent-host.ts	18	other	} from "@rivet-dev/agentos-core";
+./collab-electron/src/main/agent-host.ts	75	other	/** Credential-free QA-only adapter used by the AgentOS identity smoke. */
+./collab-electron/src/main/agent-host.ts	76	other	export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
+./collab-electron/src/main/agent-host.ts	79	other	 * AgentOS/Rivet's packaged sidecar support is not available on native Windows
+./collab-electron/src/main/agent-host.ts	81	other	 * usable; profiles that require AgentOS are admitted only when this boundary
+./collab-electron/src/main/agent-host.ts	84	other	export function isAgentOsBootSupported(): boolean {
+./collab-electron/src/main/agent-host.ts	88	other	function assertAgentOsSupported(): void {
+./collab-electron/src/main/agent-host.ts	89	other	  if (!isAgentOsBootSupported()) {
+./collab-electron/src/main/agent-host.ts	91	other	      "AgentOS/Rivet is unsupported on native Windows in this package; use a native-TUI or host-ACP Dock profile",
+./collab-electron/src/main/agent-host.ts	118	other	let os: AgentOs | null = null;
+./collab-electron/src/main/agent-host.ts	119	other	/** Absolute package paths already admitted into the live AgentOs. */
+./collab-electron/src/main/agent-host.ts	124	other	  /** AgentOS guest id, ACP session id, or PTY session id for native_tui. */
+./collab-electron/src/main/agent-host.ts	126	other	  kind: "agentos" | "host_acp" | "native_tui";
+./collab-electron/src/main/agent-host.ts	421	other	/** Admit one adapter package into the live AgentOS host. */
+./collab-electron/src/main/agent-host.ts	423	other	  assertAgentOsSupported();
+./collab-electron/src/main/agent-host.ts	424	other	  const host = await ensureAgentOs();
+./collab-electron/src/main/agent-host.ts	440	other	export async function ensureAgentOs(): Promise<AgentOs> {
+./collab-electron/src/main/agent-host.ts	441	other	  assertAgentOsSupported();
+./collab-electron/src/main/agent-host.ts	463	other	  os = await AgentOs.create({
+./collab-electron/src/main/agent-host.ts	475	other	  const host = await ensureAgentOs();
+./collab-electron/src/main/agent-host.ts	632	other	  return admitAgentOsDefinition(runtime, opts);
+./collab-electron/src/main/agent-host.ts	778	other	async function admitAgentOsDefinition(
+./collab-electron/src/main/agent-host.ts	795	other	  assertAgentOsSupported();
+./collab-electron/src/main/agent-host.ts	798	other	  const host = await ensureAgentOs();
+./collab-electron/src/main/agent-host.ts	821	other	    kind: "agentos",
+./collab-electron/src/main/agent-host.ts	841	other	    `agent-host: admitted agentos session=${sessionId}`
+./collab-electron/src/main/agent-host.ts	858	other	    /** Default true — close Kernel row + destroy AgentOS session after the turn. */
+./collab-electron/src/main/agent-host.ts	899	other	  const host = await ensureAgentOs();
+./collab-electron/src/main/agent-host.ts	1066	other	  const host = await ensureAgentOs();
+./collab-electron/src/main/agent-host.ts	1102	other	  } else if (entry.kind === "agentos") {
+./collab-electron/src/main/agent-host.ts	1103	other	    void ensureAgentOs().then((host) =>
+./collab-electron/src/main/agent-host.ts	1110	other	export async function disposeAgentOs(): Promise<void> {
+./collab-electron/src/main/dock-profiles.test.ts	27	other	  base: "species/hermes" | "species/claude-code" | "tools/runtime-proof" | "tools/qf-proof-agent",
+./collab-electron/src/main/dock-profiles.test.ts	28	other	  adapterId: "hermes" | "claude-code" | "qf-toolloop" | "qf-proof-agent",
+./collab-electron/src/main/dock-profiles.test.ts	40	other	    ? "hermes.aospkg"
+./collab-electron/src/main/dock-profiles.test.ts	42	other	      ? "claude-code.aospkg"
+./collab-electron/src/main/dock-profiles.test.ts	43	other	    : adapterId === "qf-toolloop"
+./collab-electron/src/main/dock-profiles.test.ts	44	other	      ? "qf-toolloop.aospkg"
+./collab-electron/src/main/dock-profiles.test.ts	45	other	      : "qf-proof-agent.aospkg";
+./collab-electron/src/main/dock-profiles.test.ts	53	other	      route: adapterId === "qf-toolloop" ? "agentos" : "native_tui",
+./collab-electron/src/main/dock-profiles.test.ts	171	other	  seedAdapter(root, "tools/runtime-proof", "qf-toolloop", [
+./collab-electron/src/main/dock-profiles.test.ts	173	other	      id: "qf-toolloop",
+./collab-electron/src/main/dock-profiles.test.ts	198	other	    const toolloop = JSON.parse(readFileSync(join(REPO_ROOT, "tools/runtime-proof/dock-profiles.json"), "utf8")) as { profiles: Array<Record<string, unknown>> };
+./collab-electron/src/main/dock-profiles.test.ts	205	other	      { id: "qf-toolloop", display_name: "Market Researcher" },
+./collab-electron/src/main/dock-profiles.test.ts	221	other	        (profile) => profile.package_ref === "species/hermes/packed/hermes.aospkg",
+./collab-electron/src/main/dock-profiles.test.ts	266	other	      "qf-toolloop",
+./collab-electron/src/main/dock-profiles.test.ts	275	other	    rmSync(join(root, "tools/runtime-proof/packed/qf-toolloop.aospkg"));
+./collab-electron/src/main/dock-profiles.test.ts	289	other	    rmSync(join(root, "species/hermes/packed/hermes.aospkg"));
+./collab-electron/src/main/dock-profiles.test.ts	377	other	      adapter: { id: "hermes", package: "../packed/hermes.aospkg" },
+./collab-electron/src/main/dock-profiles.test.ts	392	other	    base.adapter.package = "packed/hermes.aospkg";
+./docs/history/evidence/HANDOFF-wo-106b-wo-V1.md	224	other	  run the suite against a busy machine — the first cost a false `runtime-proof` failure. It is now a
+./collab-electron/src/main/agent-artifact-writer.ts	28	other	 * Write one AgentOS trajectory beneath the resolved artifact root, then publish its identity to the
+./docs/history/ladders/ROADMAP-2026-07-18.md	39	other	| WO-004 | Runtime ownership proof: AgentOS session → ACP agent → `ToolLoopAgent`, one session ID, no second Eve server | The L2 bet — **PROOF HELD**; Mastra fallback not needed | **done** 2026-07-18 |
+./docs/history/ladders/ROADMAP-2026-07-18.md	59	other	> qf-toolloop plus Hermes runtime files. Debt **#30's trigger has fired**, but WO-N1 stays parked until
+./docs/history/ladders/ROADMAP-2026-07-18.md	68	other	> bootstraps qf-toolloop plus three Hermes profiles, expands package-owned runtime selectors, and
+./docs/history/ladders/ROADMAP-2026-07-18.md	70	other	> gone. Debt #30 is unblocked for WO-N1; WO-D2b has closed the host-ACP/AgentOS orphan seams and the
+./docs/history/ladders/ROADMAP-2026-07-18.md	74	other	> rejection and repair. Host ACP and AgentOS now compensate exact runtime owners across create/start
+./docs/history/ladders/ROADMAP-2026-07-18.md	120	other	| 17 | **Durable execution — logged, not evaluated.** Candidates: RivetKit (library, in-process), Restate (single self-hostable binary), Temporal (server + Postgres), DBOS (needs Postgres — splits the system of record, likely disqualifying). Licensing **probed 2026-07-24 via `gh repo view`**: `rivet-dev/rivet` and `rivet-dev/agentos` are both **Apache-2.0** (confirmed at source, active repos). Restate-BSL-1.1 / Inngest-SSPL claims remain unprobed — verify at adoption if they're ever candidates; licenses cha
+./docs/history/ladders/ROADMAP-2026-07-18.md	132	other	| 29 | **Domain truth and the bytes it points at fork on different rules, so the documented drift remedy orphans every artifact.** `COLLAB_DIR` (`collab-electron/src/main/paths.ts:24`) forks per launch directory on `sha256(cwd)[:12]`, and nine subsystems follow it: Kernel, canvas persistence, config, a2a bus, PTY logs, IPC sockets, terminals. These do **not** follow it, using `homedir()`/`$HOME` + `.collaborator` directly: `~/.collaborator/agent-artifacts/` (`agent-host.ts:633`), `agentos-host-mounts.json`
+./docs/history/ladders/ROADMAP-2026-07-18.md	241	other	1. **A "plug" is data, not code.** One species = an AgentOS software package (any ACP guest) + an `agent_definition` row (name, package ref, description, tool allowlist) + a deny-by-default permissions manifest. **Admitting a new species requires zero changes to dock or canvas source** — this is gated by diff, not assumed.
+./docs/history/ladders/ROADMAP-2026-07-18.md	256	other	- Spawn from dock → AgentOS session + `agent_session` (guest-minted ID adopted) + streaming tile; all three carry the same session ID (WO-004a's measured assertions reused, not re-proven).
+./docs/history/ladders/ROADMAP-2026-07-18.md	274	other	**WO-008c · Hermes host-bridged ACP.** ***done** — verified + merged 2026-07-20.* Host `hermes acp` stdio (Outcome A); `launch.json` + packed `*.meta.json` deploy-true; one shared `host-acp-client`; AgentOS kept for Node/WASM guests. Live turn → **WO-008a**.
+./docs/history/ladders/ROADMAP-2026-07-18.md	278	other	**Standing rule (founder 2026-07-20):** Interactive agents that ship a **native TUI** always surface that TUI in a QuantFlow **term tile**. QuantFlow does not invent a parallel chat UI for them. ACP/AgentOS session tiles remain for ACP-only guests (toolloop, etc.).
+./qa/gates/artifact-root/run.ts	38	other	const G9_LIVE_SESSION_ID = "g9-live-agentos-session";
+./qa/gates/artifact-root/run.ts	39	other	const G9_LIVE_TRAJECTORY_TEXT = "g9 live AgentOS trajectory body";
+./qa/gates/artifact-root/run.ts	71	other	class FixtureAgentOs {
+./qa/gates/artifact-root/run.ts	95	other	    if (prompt !== "g9 live AgentOS trajectory prompt") {
+./qa/gates/artifact-root/run.ts	96	other	      throw new Error(`unexpected live AgentOS prompt: ${prompt}`);
+./qa/gates/artifact-root/run.ts	136	other	  const fixtureRoot = mkdtempSync(join(tmpdir(), "qf-g9-live-agentos-"));
+./qa/gates/artifact-root/run.ts	140	other	  const packagePath = join(fixtureRoot, "g9-agentos.aospkg");
+./qa/gates/artifact-root/run.ts	141	other	  const metadataPath = join(fixtureRoot, "g9-agentos.meta.json");
+./qa/gates/artifact-root/run.ts	144	other	  writeFileSync(packagePath, "g9-agentos fixture package", "utf8");
+./qa/gates/artifact-root/run.ts	148	other	      route: "agentos",
+./qa/gates/artifact-root/run.ts	149	other	      name: "g9-agentos",
+./qa/gates/artifact-root/run.ts	150	other	      package: "g9-agentos.aospkg",
+./qa/gates/artifact-root/run.ts	160	other	  let fixtureHost: FixtureAgentOs | null = null;
+./qa/gates/artifact-root/run.ts	192	other	    mock.module("@rivet-dev/agentos-core", () => ({
+./qa/gates/artifact-root/run.ts	193	other	      AgentOs: {
+./qa/gates/artifact-root/run.ts	195	other	          fixtureHost = new FixtureAgentOs();
+./qa/gates/artifact-root/run.ts	212	other	        name: "g9-live-agentos-definition",
+./qa/gates/artifact-root/run.ts	222	other	      "g9 live AgentOS trajectory prompt",
+./qa/gates/artifact-root/run.ts	231	other	      throw new Error("live runTurn did not destroy the finalized AgentOS session");
+./qa/gates/artifact-root/run.ts	418	other	    if (!ordinaryOk) throw new Error("live AgentOS runTurn trajectory proof failed");
+./qa/gates/artifact-root/run.ts	423	other	      "artifact-root live AgentOS runTurn receipt: PASS" +
+./qa/gates/artifact-root/run.ts	462	other	  test("G9 live AgentOS runTurn publishes one trajectory", async () => {
+./qa/gates/artifact-root/run.ts	482	other	    return `artifact-root: live AgentOS runTurn test exited ${exitCode}`;
+./qa/gates/artifact-root/run.ts	484	other	  if (!stdout.includes("artifact-root live AgentOS runTurn receipt: PASS")) {
+./qa/gates/artifact-root/run.ts	485	other	    return "artifact-root: live AgentOS runTurn receipt missing";
+./qa/gates/artifact-root/run.ts	592	other	        package_ref: "g9-trajectory-proof.aospkg",
+./collab-electron/src/main/dock-profiles.ts	17	other	export const HERMES_DOCK_PACKAGE_REF = "species/hermes/packed/hermes.aospkg";
+./collab-electron/src/main/dock-profiles.ts	36	other	  "tools/runtime-proof/dock-profiles.json",
+./qa/gates/agent-path.ts	4	other	 * Heavy deps (@rivet-dev/agentos-core, qf-kernel) live in ./agent-path/ and are
+./collab-electron/src/main/governed-review.test.ts	187	other	            package_ref: "species/hermes/packed/hermes.aospkg",
+./collab-electron/src/main/host-mounts.ts	2	other	 * Founder-controlled AgentOS host mounts (WO-008b).
+./collab-electron/src/main/host-mounts.ts	5	other	 * Default path: ~/.quantflow/app/agentos-host-mounts.json
+./collab-electron/src/main/host-mounts.ts	6	other	 * Override: QF_AGENTOS_HOST_MOUNTS=<absolute path to json>
+./collab-electron/src/main/host-mounts.ts	35	other	  /** Optional per-species launch override: "host_acp" | "agentos" (WO-008c). */
+./collab-electron/src/main/host-mounts.ts	40	other	  const override = process.env.QF_AGENTOS_HOST_MOUNTS;
+./collab-electron/src/main/host-mounts.ts	42	other	  return join(QF_APP_ROOT, "agentos-host-mounts.json");
+./collab-electron/src/main/index.ts	115	other	  disposeAgentOs,
+./collab-electron/src/main/index.ts	119	other	  isAgentOsBootSupported,
+./collab-electron/src/main/index.ts	915	other	  await disposeAgentOs();
+./collab-electron/src/main/index.ts	1017	other	    if (isAgentOsBootSupported() && process.env.QF_DOCK_QA_MODE === "1") {
+./collab-electron/src/main/index.ts	1021	other	        "agent-host: AgentOS/Rivet proof boot smoke is QA-only; base shell remains available",
+./qa/gates/agent-path/run.ts	15	other	import { AgentOs, type JsonRpcNotification } from "@rivet-dev/agentos-core";
+./qa/gates/agent-path/run.ts	25	other	const AOSPKG = join(PKG, "packed/qf-toolloop.aospkg");
+./qa/gates/agent-path/run.ts	26	other	const SPECIES = "qf-toolloop";
+./qa/gates/agent-path/run.ts	27	other	const AGENT_CMDLINE = /acp-main|qf-toolloop/;
+./qa/gates/agent-path/run.ts	42	other	    if (line.includes("pack-agent") || line.includes("agentos-toolchain")) {
+./qa/gates/agent-path/run.ts	96	other	  os: AgentOs,
+./qa/gates/agent-path/run.ts	126	other	  os: AgentOs,
+./qa/gates/agent-path/run.ts	221	other	  os: AgentOs,
+./qa/gates/agent-path/run.ts	291	other	  const os = await AgentOs.create({
+./qa/gates/agent-path/pack.mjs	3	other	 * Pack qf-toolloop into this package's packed/ using the repo's agent-package
+./qa/gates/agent-path/pack.mjs	4	other	 * sources (tools/runtime-proof/agent-package — in git) and this package's
+./qa/gates/agent-path/pack.mjs	5	other	 * agentos-toolchain (installed here, not free-riding on runtime-proof).
+./qa/gates/agent-path/pack.mjs	14	other	const agentDir = join(repo, "tools/runtime-proof/agent-package");
+./qa/gates/agent-path/pack.mjs	17	other	const aospkg = join(outDir, "qf-toolloop.aospkg");
+./qa/gates/agent-path/pack.mjs	20	other	  "node_modules/@rivet-dev/agentos-toolchain/bin/agentos-toolchain.mjs",
+./qa/gates/agent-path/pack.mjs	28	other	  console.error("pack: missing agentos-toolchain — run bun install in", here);
+./qa/gates/agent-path/pack.mjs	73	other	    "qf-toolloop-acp",
+./qa/gates/agent-path/pack.mjs	75	other	    join(outDir, "qf-toolloop.tar"),
+./qa/gates/agent-path/package.json	12	other	    "@rivet-dev/agentos-core": "0.2.7",
+./qa/gates/agent-path/package.json	18	other	    "@rivet-dev/agentos-toolchain": "0.2.7",
+./docs/history/evidence/wo-101/builder-report-d1.md	85	other	runtime-proof WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)
+./docs/history/evidence/wo-102/builder-report-d3-d4.md	170	other	runtime-proof WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)
+./qa/gates/agent-path/bun.lock	9	other	        "@rivet-dev/agentos-core": "0.2.7",
+./qa/gates/agent-path/bun.lock	15	other	        "@rivet-dev/agentos-toolchain": "0.2.7",
+./qa/gates/agent-path/bun.lock	23	other	    "@agentos-software/claude-code": ["@agentos-software/claude-code@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@anthropic-ai/claude-agent-sdk": "0.2.87", "zod": "^4.1.11" }, "bin": { "claude": "dist/claude-cli.mjs", "claude-sdk-acp": "dist/adapter.js" } }, "sha512-gXmqqOUWT98QvLkQXHn1UU8OOvqMO8BRSj+0PT99mOL6XNpBlPW6L065FJ9dC4IwJC5xeGzB1XFevjOdP7LwQg=="],
+./qa/gates/agent-path/bun.lock	25	other	    "@agentos-software/codex-cli": ["@agentos-software/codex-cli@0.3.3", "", {}, "sha512-63f4jymlxe4S003/4Fiu9Y/BAzT6ajHEDidfNqv39SkWNJWxT1ndY+j1/7XYT6NsGgg2ZSo+OGuexlkL8Jx1RA=="],
+./qa/gates/agent-path/bun.lock	27	other	    "@agentos-software/common": ["@agentos-software/common@0.2.7", "", { "dependencies": { "@agentos-software/coreutils": "0.3.3", "@agentos-software/diffutils": "0.3.3", "@agentos-software/findutils": "0.3.3", "@agentos-software/gawk": "0.3.3", "@agentos-software/grep": "0.3.3", "@agentos-software/gzip": "0.3.3", "@agentos-software/sed": "0.3.3", "@agentos-software/tar": "0.3.3" } }, "sha512-eM5znR9qOaDIEsCBtzxzAfxgynq7ntNyk+lchHF7OUv7Cenbq4XGhCbA1T2dbl45G3/2Wz3+21QM0sv+797lvA=="],
+./qa/gates/agent-path/bun.lock	29	other	    "@agentos-software/coreutils": ["@agentos-software/coreutils@0.3.3", "", {}, "sha512-uzBD6Q5z+ACn29CMNMSnA+nUzITbTosuOe6Hr/o5ylUpoxODbz6ziAwZ5Cr1XAgF//Qqz7HfQfnogf4zcb+Gvg=="],
+./qa/gates/agent-path/bun.lock	31	other	    "@agentos-software/diffutils": ["@agentos-software/diffutils@0.3.3", "", {}, "sha512-aaTMx3jWrTn18OxLk0g4nb3MgkLHjXyqlz5BQ3YlRj7hNuRT+hOPnzcSf8zP+pXFR+SGf7a98M2kSNV/ucfyDw=="],
+./qa/gates/agent-path/bun.lock	33	other	    "@agentos-software/findutils": ["@agentos-software/findutils@0.3.3", "", {}, "sha512-CrtFrmG2o+z0gaxtQBJw4wWGF7TxKq5ukxVFkf2/LxxsdZBc2F04MT6FNY3VMKf4Cq5kFvh7/ZRkMdg2yHAMvA=="],
+./qa/gates/agent-path/bun.lock	35	other	    "@agentos-software/gawk": ["@agentos-software/gawk@0.3.3", "", {}, "sha512-iHDeJ6rsGxijBQMmqH1w6bQ2+sWrC1f9OqNvUItHOZk85KFmg9a3ueyy0krq9pZRuZe+fU5yEhuUg7ovNqZ9NQ=="],
+./qa/gates/agent-path/bun.lock	37	other	    "@agentos-software/grep": ["@agentos-software/grep@0.3.3", "", {}, "sha512-jV49HWFJcEGjHBPk37EnisrdKwNfeZ+d+TA6LpAuDKRwFmj/2xc3rGVCTvKIxdZUKYuffu9NI9xgxJ0iKiUU2w=="],
+./qa/gates/agent-path/bun.lock	39	other	    "@agentos-software/gzip": ["@agentos-software/gzip@0.3.3", "", {}, "sha512-Jbmsu7trAhnnWvT9qlry/hETa5EOlUwdcYHtsyV9W2OQvMc3tOeLy3zwF8nWNuZ3/g1veRenRkK1ZgkqsDZpiw=="],
+./qa/gates/agent-path/bun.lock	41	other	    "@agentos-software/manifest": ["@agentos-software/manifest@0.2.7", "", {}, "sha512-1e4J8YRR8Ftj7ftKFdqAH2m5ksHz9v+XUGMzirDPGHwXaGzjham3SdWadpqHOE7q3GIWJdP4uWZeY22fquJNrg=="],
+./qa/gates/agent-path/bun.lock	43	other	    "@agentos-software/opencode": ["@agentos-software/opencode@0.2.7", "", { "bin": { "agentos-opencode-acp": "dist/adapter.js" } }, "sha512-lZspCiMgM0+kPAA08CEvyNy8lfBx463wObKpAwbYyaVvc0KfGvbAPS6VmnuZQWmaBmJJuRMtSo14nmb8XCD16g=="],
+./qa/gates/agent-path/bun.lock	45	other	    "@agentos-software/pi": ["@agentos-software/pi@0.2.7", "", { "dependencies": { "@agentclientprotocol/sdk": "^0.16.1", "@mariozechner/pi-ai": "0.60.0", "@mariozechner/pi-coding-agent": "0.60.0" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-sdk-acp": "dist/adapter.js" } }, "sha512-nOdwksByJgTqt92Ya84CzTGxpVFwGI6gkGWaCD/mmvP11JRA++1nshNdbig2mtiaxT7VG3ovWJmK7ZLTTzkhPA=="],
+./qa/gates/agent-path/bun.lock	47	other	    "@agentos-software/pi-cli": ["@agentos-software/pi-cli@0.2.7", "", { "dependencies": { "@mariozechner/pi-coding-agent": "^0.60.0", "pi-acp": "^0.0.23" }, "bin": { "pi": "node_modules/@mariozechner/pi-coding-agent/dist/cli.js", "pi-acp": "node_modules/pi-acp/dist/index.js" } }, "sha512-uddhoZ8o5zcGsma5s/+jzQg++SRKtZkpY6cSNru4O0t53LJ41t3+OFhC6j8WkQsIYU0ThAwH6LdKHHjWWKBa2g=="],
+./qa/gates/agent-path/bun.lock	49	other	    "@agentos-software/sed": ["@agentos-software/sed@0.3.3", "", {}, "sha512-cVNTD9VzodpJ+Kn/xqHo/AcUUkpPSuF9A/0jIqFkDNF24alwNG8ndVLwgFWMP+0mSo68HZumbjjnMQWE3NjRSw=="],
+./qa/gates/agent-path/bun.lock	51	other	    "@agentos-software/tar": ["@agentos-software/tar@0.3.3", "", {}, "sha512-pmYVIn3XQEKVbfKhms7bEpsGR7YXqaLXtglIHmnhyUwLZhdyerrEkO+VgpC8zuWMeYfmTsstEgpEL1K66sgR2w=="],
+./qa/gates/agent-path/bun.lock	201	other	    "@rivet-dev/agentos-core": ["@rivet-dev/agentos-core@0.2.7", "", { "dependencies": { "@agentos-software/claude-code": "0.2.7", "@agentos-software/codex-cli": "0.3.3", "@agentos-software/common": "0.2.7", "@agentos-software/manifest": "0.2.7", "@agentos-software/opencode": "0.2.7", "@agentos-software/pi": "0.2.7", "@agentos-software/pi-cli": "0.2.7", "@aws-sdk/client-s3": "^3.1019.0", "@rivet-dev/agentos-runtime-core": "0.2.7", "@rivet-dev/agentos-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "@xterm
+./qa/gates/agent-path/bun.lock	203	other	    "@rivet-dev/agentos-runtime-core": ["@rivet-dev/agentos-runtime-core@0.2.7", "", { "dependencies": { "@rivet-dev/agentos-runtime-sidecar": "0.2.7", "@rivetkit/bare-ts": "^0.6.2", "zod": "^4.1.11" } }, "sha512-Dih3ex/FIr69VhReUIAapBBNrghkA26IMlPs9fiWkrj0QEjdDTCMvfBkhseQelUdzmL6hCLnIrru2cQ29KwxCQ=="],
+./qa/gates/agent-path/bun.lock	205	other	    "@rivet-dev/agentos-runtime-sidecar": ["@rivet-dev/agentos-runtime-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-QuAEG3/IKiBDlUbVYBNKc4h0TcT6DDYKlz58lwniv/L0v4qpJBwKLYikdSyNjp1H8eVZXFr7UsaaqFmuvCSsug=="],
+./qa/gates/agent-path/bun.lock	207	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-arm64": ["@rivet-dev/agentos-runtime-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-u14Mr7wp4h7IF8mc7jXREBh1xPOoLCzwMVUH/zpa/Y7eiGb6LE7RPW2n+nC0VpciiLf/7gYejU6QboJnhiq1uw=="],
+./qa/gates/agent-path/bun.lock	209	other	    "@rivet-dev/agentos-runtime-sidecar-darwin-x64": ["@rivet-dev/agentos-runtime-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-4IABmx8Pi7f76J8aMypln5dZs0qsWVXXW31oA7v4I3e11EGvCmsubjCEO+9YLvEuk6La3JcSO+685bs45twIvA=="],
+./qa/gates/agent-path/bun.lock	211	other	    "@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-YHZFlGAljRMjceUsVU7e1GjTeM4QNj6/OjGcpprciyKosRNny8aoVsA4gJbe0dCNEbwVmO6peczFVAt5k54VEw=="],
+./qa/gates/agent-path/bun.lock	213	other	    "@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-runtime-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-wcHg/ifVWKqFosNN7YLNsP/SrZxZccd2UP2EPQHnIcRyMg+w14LpgdDcIsPWO/HvS7+78OwRsCck5IIOeonIUw=="],
+./qa/gates/agent-path/bun.lock	215	other	    "@rivet-dev/agentos-sidecar": ["@rivet-dev/agentos-sidecar@0.2.7", "", { "optionalDependencies": { "@rivet-dev/agentos-sidecar-darwin-arm64": "0.2.7", "@rivet-dev/agentos-sidecar-darwin-x64": "0.2.7", "@rivet-dev/agentos-sidecar-linux-arm64-gnu": "0.2.7", "@rivet-dev/agentos-sidecar-linux-x64-gnu": "0.2.7" } }, "sha512-mui+hg8uWF3mjubp6YfpTW21TAqB+ZpA/VTSsKjngEw774oBkuvpY+eycxRbsxZIM4RMzl0EdHgCt8fFTGNxOQ=="],
+./qa/gates/agent-path/bun.lock	217	other	    "@rivet-dev/agentos-sidecar-darwin-arm64": ["@rivet-dev/agentos-sidecar-darwin-arm64@0.2.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-/FgUVxg27IQQ0swBXVBg8s3spaFk8tA+icQVa0KYC7eOZF+2fhNXcjuQrkCB9yoNHd2YMNrWp4PB/mQ16yg3Ag=="],
+./qa/gates/agent-path/bun.lock	219	other	    "@rivet-dev/agentos-sidecar-darwin-x64": ["@rivet-dev/agentos-sidecar-darwin-x64@0.2.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-akj3VqdmcPHPzBDwBYpScjeudjpEsTBJAL5iGnPUEoLA3hLJrBdoXovbR9xMQgixontPDYu4rvttiTQUt0doug=="],
+./qa/gates/agent-path/bun.lock	221	other	    "@rivet-dev/agentos-sidecar-linux-arm64-gnu": ["@rivet-dev/agentos-sidecar-linux-arm64-gnu@0.2.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-Hyrxo6Bh5aF6iqt076xN8VggxfCMN9qGkMb/BBH+LgtQQX2Pq76wJRZCltm8g5TOCxlczob8E5HqMdpCkw0Z9w=="],
+./qa/gates/agent-path/bun.lock	223	other	    "@rivet-dev/agentos-sidecar-linux-x64-gnu": ["@rivet-dev/agentos-sidecar-linux-x64-gnu@0.2.7", "", { "os": "linux", "cpu": "x64" }, "sha512-blcgYjNG1zE3bI6SFOfhTHe8NrSm3QGannfNR6RQCoalif9Hf7bpxR/ha3uMKH+0fmlmuuc8LUi/O2N/uoiB9Q=="],
+./qa/gates/agent-path/bun.lock	225	other	    "@rivet-dev/agentos-toolchain": ["@rivet-dev/agentos-toolchain@0.2.7", "", { "dependencies": { "@rivetkit/bare-ts": "^0.6.2" }, "bin": { "agentos-toolchain": "bin/agentos-toolchain.mjs" } }, "sha512-PIzpgATYQcl7ptxWpTyVTH9qDmjYPdODMkKw+FDRhx/+svcp3RVd2E4jrbYu08eNqdkkp89UDBpkAXW7Z8UioQ=="],
+./qa/gates/agent-path/bun.lock	767	other	    "@agentos-software/claude-code/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./qa/gates/agent-path/bun.lock	769	other	    "@agentos-software/pi/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@0.16.1", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-1ad+Sc/0sCtZGHthxxvgEUo5Wsbw16I+aF+YwdiLnPwkZG8KAGUEAPK6LM6Pf69lCyJPt1Aomk1d+8oE3C4ZEw=="],
+./docs/history/evidence/wo-d2b/BUILDER.md	11	other	## D0 — measured AgentOS teardown
+./docs/history/evidence/wo-d2b/BUILDER.md	13	other	The credential-free packed `qf-toolloop` adapter was exercised against
+./docs/history/evidence/wo-d2b/BUILDER.md	14	other	`@rivet-dev/agentos-core` `0.2.7`, without a prompt, model, network request, credential, or founder
+./docs/history/evidence/wo-d2b/BUILDER.md	17	other	- `createSession("qf-toolloop")` returned guest id
+./docs/history/evidence/wo-d2b/BUILDER.md	25	other	separate process inspection found no probe, qf-toolloop, or AgentOS process. No tracked file changed.
+./docs/history/evidence/wo-d2b/BUILDER.md	34	other	The host-ACP caller captures `tearDownHostAcp(handle)`. The AgentOS caller captures
+./docs/history/evidence/wo-d2b/BUILDER.md	45	other	  "matrix": ["host_acp:create", "host_acp:start", "agentos:create", "agentos:start"],
+./docs/history/evidence/wo-d2b/BUILDER.md	47	other	  "cleanupFaultAggregation": ["host_acp:start", "agentos:start"],
+./docs/history/evidence/wo-d2b/BUILDER.md	75	other	| Rename/remove AgentOS shared-helper delegation | `AgentOS production caller does not delegate`; exit 1 |
+./docs/history/evidence/wo-d2b/BUILDER.md	76	other	| Pass Kernel `sessionId` to `destroySession()` | `AgentOS compensation does not destroy its exact guest id`; exit 1 |
+./docs/history/evidence/wo-V1/prebuild-read.md	98	other	| Real Kernel: 5 artifacts, 18 sessions, **2 species**, 0 runs, 0 links, 68 events | **Wrong row** | On `~/.collaborator/dev/worktree-ada48d49dc49/kernel.db`: artifact=5, agent_session=18, run=0, links=0, events=68. **No `species` table.** Count **2** is `agent_definition` (`qf-toolloop`, `hermes`). Calling them “species” is domain slang, not a measured table name — a **wrong measured-fact row**. |
+./docs/history/evidence/wo-103/verifier-report.md	17	other	- `PASS runtime-proof`
+./docs/history/evidence/wo-103/verifier-report.md	36	other	- `runtime-proof` — PASS
+./docs/history/evidence/wo-103/verifier-report.md	163	other	- Existing non-target gates (`runtime-proof`, `agent-path`, `dock-registry`, `one-skin`, etc.) were accepted based on cold green results rather than additional bespoke sabotage in this verification round.
+./docs/history/evidence/wo-d2/BUILDER.md	18	other	    "packagePath": "app/species/hermes/packed/hermes.aospkg",
+./docs/history/evidence/wo-d2/BUILDER.md	27	other	    { "adapterId": "hermes", "packagePath": "app/species/hermes/packed/hermes.aospkg" },
+./docs/history/evidence/wo-d2/BUILDER.md	28	other	    { "adapterId": "qf-toolloop", "packagePath": "app/tools/runtime-proof/packed/qf-toolloop.aospkg" }
+./docs/history/evidence/wo-d2/BUILDER.md	40	other	The exact four package-owned defaults are `qf-toolloop`, `hermes-orchestrator`, `hermes-worker`,
+./docs/history/evidence/wo-d2/BUILDER.md	41	other	and `hermes-worker-2`. A second bootstrap made zero writes. A pre-existing differing qf-toolloop
+./docs/history/evidence/wo-d2/BUILDER.md	88	other	one shared normalized adapter/package identity before AgentOS admission.
+./docs/history/evidence/wo-d2/BUILDER.md	91	other	covered. The equivalent pre-existing host-ACP and AgentOS seams remain: both create a runtime before
+./docs/history/evidence/wo-k3/BUILD-REPORT.md	17	other	- `openAppKernel` injects `QF_ARTIFACT_ROOT`; spawn paths (agent-host ACP/AgentOS,
+./docs/history/orders/WO-006c.md	19	other	2. `tools/runtime-proof/` — the **proven** chain (AgentOS embedded via `AgentOs.create`, ACP guest as stdio child, streaming, strict cancel). Reuse its patterns; its assertions are the standard.
+./docs/history/orders/WO-006c.md	24	other	**Measured facts this order relies on (verifier, 2026-07-19):** the guest package `qf-toolloop` is a plain JS `bin` (`dist/acp-main.js`) resolved via `agentos-package.json`'s `acpEntrypoint` — no Bun requirement in the guest. `creationCommands` lives in `qf-kernel-schema/src/commands.ts:145`; `creationHandlers` in `packages/qf-kernel/src/create.ts:125` with `assertCreationHandlersComplete` enforcing the join. `start_agent_session` exists as the `starting → running` transition command emitting `agent_session
+./docs/history/orders/WO-006c.md	28	other	**0. Smoke first — Electron can host AgentOS (fast-fail; do this before anything else).**
+./docs/history/orders/WO-006c.md	29	other	In the main process at app-ready: `AgentOs.create` → `createSession("qf-toolloop")` → one prompt → log `agent-host: smoke ok session=<id> guestMinted=<id> chunks=<n>` — **and the smoke asserts the two IDs are equal** (guest-minted ≡ adopted; WO-004a's invariant). A smoke line that prints without that assertion is not a smoke. If AgentOS cannot run under Electron's Node (Bun-bound API, packaging failure, anything), **stop and report with the exact error** — that finding redirects this order and is a success,
+./docs/history/orders/WO-006c.md	40	other	**2. `collab-electron/src/main/agent-host.ts`** — the app's **only** module importing `@rivet-dev/agentos*` (mirror of `kernel.ts`'s sole-ownership of SQLite). It owns one embedded AgentOS and a **species registry that is data**: a record mapping species name → packed `.aospkg` path, seeded with exactly `qf-toolloop`. Packing reuses `tools/runtime-proof`'s pack script, wired so dev and build both produce the package (say where). **No `ai`, `ToolLoopAgent`, `@rivet-dev/agentos*`, or `@agentclientprotocol` im
+./docs/history/orders/WO-006c.md	54	other	**9. Headless E2E gate — `qa/gates/agent-path.ts`**, wired into `qa/run.ts --all`. Runs under Bun with the bun driver (`openKernel`) + embedded AgentOS (both proven under Bun) — no Electron, no display, no API key, installs its own deps, cold-safe. It must cover: spawn → `agent_session.created`/`started` events with the adopted ID → streamed chunks observed → tool call → completion publishes the artifact (event + row) → **two sessions provably concurrent — both observed non-terminal at the same instant (or
+./docs/history/orders/WO-006c.md	62	other	- **The seam is law:** only `agent-host.ts` imports AgentOS; renderer reaches agents only via IPC; no agent-brain imports in the app **except the single frozen legacy file per deliverable 2 (debt #14)**. Enforce it in the gate from deliverable 9 or extend `kernel-sole-writer-app` — say which.
+./docs/history/orders/WO-006c.md	64	other	- Do not touch `tools/runtime-proof/` (reference only); in `docs/`, touch **only** the two authorized files — `docs/ONTOLOGY_SCHEMA.md` (deliverable 1's one-token action edit) and `docs/demos/agent-path.md` (deliverable 10) — and no schema surface beyond deliverable 1.
+./docs/history/orders/WO-006c.md	84	other	2. Deliverable 0 verdict first: did AgentOS run inside Electron? If not, the exact error and your read on why.
+./docs/history/orders/WO-006c.md	95	other	**Confirmed good, independently:** all four `agent-path` falsifications red under the verifier's hands (`env QF_AGENT_PATH_*=1` → exit 1 each; unset → green); the extended `kernel-sole-writer-app` gate baited with a renderer `@rivet-dev/agentos-core` import → red, restored → green; the `qf:execute` allowlist is a **hardcoded constant** (`qf-execute-allowlist.ts` — the caps name is just the constant, not an env var); **zero proof flags in production code** — all four live in `qa/gates/agent-path.ts` only (th
+./docs/history/orders/WO-006c.md	97	other	**D1 — the `agent-path` gate is not cold-safe, and its failure kills the whole runner.** The order required the gate to "install its own deps, cold-safe." Measured cold (fresh worktree, zero `node_modules`): `bun qa/run.ts --all` → **exit 1, ZERO gates run** — `agent-path.ts` imports `@rivet-dev/agentos-core` via a relative path into `tools/runtime-proof/node_modules`, and (second layer) resolves `qf-kernel`, whose own `qf-kernel-schema` dep is also uninstalled. The gate free-rides on two other packages' in
+./docs/history/orders/WO-004.md	13	other	Prove the L2 bet: **AgentOS owns the public session lifecycle → a custom ACP agent bridges → Vercel AI SDK's `ToolLoopAgent` owns the model/tool loop**, with **one session ID** visible end to end and **no second server process**. If the chain cannot hold, say so with evidence — that outcome triggers the named Mastra fallback by a follow-up order.
+./docs/history/orders/WO-004.md	27	other	You may *read* the predecessor's `tools/agentos-host/` to understand how AgentOS sessions were driven. You may not copy it. The `BLUEPRINT.md` harvest table previously described it as "wholesale — standalone"; that was measured and found wrong (corrected in the same commit as this order): `host.js` is **1542 lines carrying 90 Eve references and 175 tile/cable/connection-graph references**. It is the predecessor's *integration layer*, not a neutral host. Copying it would import both the second-Eve-server pat
+./docs/history/orders/WO-004.md	29	other	Build directly against the AgentOS packages named in `docs/BLUEPRINT.md` L1: **`@rivet-dev/agentos`** / **`@rivet-dev/agentos-core`** (v0.2.7 on npm). If those packages cannot start a session without the predecessor's wrapper, **that is a finding — stop and report it**, do not reconstruct the wrapper.
+./docs/history/orders/WO-004.md	33	other	1. **`tools/runtime-proof/`** — a standalone Bun + TypeScript package containing the whole proof harness. It is a spike: no Electron, no canvas, no Kernel, no SQLite, and nothing copied from the predecessor repo.
+./docs/history/orders/WO-004.md	36	other	   - an **AgentOS session** started directly against `@rivet-dev/agentos`, which owns the public session lifecycle and is the source of the session ID;
+./docs/history/orders/WO-004.md	49	other	   - **P1 · One session ID.** The ID reported by AgentOS, the ID carried by the ACP layer, and the ID attached to the tool-loop turn are **identical**. Assert equality on the actual runtime values, not on a variable you passed around by hand.
+./docs/history/orders/WO-004.md	54	other	7. **A repo qa gate** — `qa/run.ts` gains a `runtime-proof` gate that runs the proof suite. It must appear in `--list` and pass in `--all`. Two hard requirements, both learned from WO-003's CI failure:
+./docs/history/orders/WO-004.md	70	other	cd tools/runtime-proof && bun install && bun test    # P1–P4
+./docs/history/orders/WO-004.md	71	other	cd tools/runtime-proof && bunx tsc --noEmit          # exit 0
+./docs/history/orders/WO-004.md	81	other	The Kernel and any persistence (WO-005) · canvas/tile rendering (WO-006) · multiple concurrent sessions · approval gates · trace/span emission · the remaining six AgentOS roles · Mastra (a separate order if this proof fails).
+./docs/history/orders/WO-004.md	89	other	1. File tree of `tools/runtime-proof/`.
+./docs/history/orders/WO-004.md	104	other	**Gates re-run cold:** `bun qa/run.ts --all` green including the new `runtime-proof` gate; 4/4 proof tests; `tsc --noEmit` exit 0. Scope clean: `qa/run.ts` + `tools/runtime-proof/` only. **Harvest contract honored — nothing copied from the predecessor**, verified by grep for `eve-session-broker` / `eve-supervisor` / `quantflow-eve` across the diff: zero hits.
+./docs/history/orders/WO-004.md	108	other	- **P1 is a real cross-boundary assertion.** The AgentOS-side ID comes from `os.createSession()`; the ACP and tool-loop IDs are read from a receipt the **guest process writes** and the host reads back via `os.readFile`. Not a closed-over variable, which is exactly what the order demanded. The session UUID differs on every run (`6ad011b0…` in the builder's report, `72998927…` in mine) — regenerated, not fixtured.
+./docs/history/orders/WO-004.md	114	other	`acp-main.ts:114` — the **ACP agent mints the session ID** (`crypto.randomUUID()` in `newSession`); **AgentOS adopts it**. `BLUEPRINT.md` and this order both asserted the opposite ("AgentOS … is the source of the session ID"). That was my error: ACP's `session/new` returns the ID by protocol, so the client cannot impose one.
+./docs/history/orders/WO-004.md	116	other	**The invariant that matters is unaffected** — one ID, no second identity, AgentOS still owns create/cancel/destroy. But the direction is load-bearing for WO-005: the Kernel's `agent_session` identity is **adopted from the guest**, not minted by the Kernel. Corrected in `BLUEPRINT.md` in the merge commit. The builder surfaced this in §7 rather than quietly matching the doc — correct behavior.
+./docs/history/orders/WO-004.md	120	other	`AgentOs.create` embeds AgentOS in-process and opens **zero** listeners, so "no new listeners" passes without discriminating much. The substantive property still holds and is better than the order asked: the agent is a **stdio child process**, not a socket server — no second server, and no second session registry. Noted so nobody later reads P2 as proving more than it does. The real listener/soak pressure belongs to WO-006's proof bar.
+./docs/history/orders/WO-004.md	136	other	`acp-main.ts` writes `toolLoopSessionId: acpSessionId` — a **self-assignment**. No session identity is ever passed into `agent.stream()`. So `expect(run.toolLoopSessionId).toBe(run.agentOsSessionId)` compares a value to itself, laundered through a JSON file.
+./docs/history/orders/WO-004.md	144	other	- **Two identity layers agree, genuinely:** the ACP guest mints the session ID and AgentOS adopts it; the host reads it back across the process boundary.
+./docs/history/orders/WO-005.md	59	other	- Do not touch `collab-electron/`, `tools/runtime-proof/`, or `docs/` except your report. **WO-004a may be running in parallel inside `tools/runtime-proof/` — stay out of it.**
+./docs/history/orders/WO-005.md	99	other	**All seven gates pass cold:** `repo-shape` · `lockfile-committed` · `schema` · `runtime-proof` · `kernel` · `kernel-sole-writer` · `no-canvas-domain-writes`. `illegal_transitions_rejected=7`, `replay_assertion=equal`.
+./docs/history/evidence/wo-k1/prebuild-read-raw.md	6	other	2. **D6 names one edit point; three other closed allowlists still strip `QF_KERNEL_DB`** — AgentOS→`acp-shim.ts`, `host-native-tui.ts`, and the discarded merge at `:380`.
+./docs/history/evidence/wo-k1/prebuild-read-raw.md	81	other	| `admitAgentOsSpecies` `:453-460` | Passes merged env to AgentOS | Not named |
+./docs/history/evidence/wo-k1/prebuild-read-raw.md	82	other	| **`species/hermes/agent-package/src/acp-shim.ts:70-77`** | Closed `HERMES_BIN`/`HOME`/`PATH` only | **Strips `QF_KERNEL_DB` even if AgentOS had it** |
+./docs/history/evidence/wo-k1/prebuild-read-raw.md	88	other	**Cost:** “agents share a world” ships as a comment while AgentOS, TUI, and peer-bus MCP keep private or empty Kernel config.
+./docs/history/evidence/wo-106/BUILD-REPORT.md	197	other	  and AgentOS at module scope, so a gate cannot import it. A refactor extracting the reconcile logic
+./docs/history/evidence/wo-106/BUILD-REPORT.md	216	other	**`runtime-proof`'s P4 orphan check fails when a second agent is working on the same machine.** Its
+./docs/history/evidence/wo-106/BUILD-REPORT.md	232	other	active, and treat a lone `runtime-proof` P4 failure as a scheduling artefact until they have checked
+./docs/history/evidence/wo-k1/prebuild-read-round2-raw.md	34	other	**5. Fifth config surface: `~/.collaborator/agentos-host-mounts.json`**
+./docs/history/evidence/wo-k1/prebuild-read-round2-raw.md	35	other	Measured: no `QF_KERNEL_DB` today. But `resolveSpeciesSessionEnv` (`host-mounts.ts:103-113`) forwards arbitrary `speciesEnv` keys into AgentOS's merged env (`agent-host.ts:452-456`). Not in D8's four-file table. A future or founder-local pin there would reach AgentOS but not the host-ACP literal at `:395` or Hermes MCP YAML — another silent half-split vector.
+./docs/history/evidence/wo-k1/prebuild-read-round2.md	72	other	**The fifth config surface is latent, not live.** `~/.collaborator/agentos-host-mounts.json` carries
+./docs/history/evidence/wo-k1/prebuild-read-round2.md	74	other	the AgentOS env. Measured: it holds only `HERMES_BIN`, `HOME`, `HOST_ACP_BIN` — **no Kernel pin, so
+./docs/history/evidence/wo-k1/prebuild-read-round2.md	75	other	nothing to strip.** Recorded because a pin added there later would reach AgentOS and not the
+./docs/history/orders/WO-004a.md	5	other	parallel: eligible — touches only `tools/runtime-proof/`, no overlap with WO-005
+./docs/history/orders/WO-004a.md	20	other	## Deliverables (all inside `tools/runtime-proof/`)
+./docs/history/orders/WO-004a.md	23	other	   - the ID AgentOS reports from `createSession` / `listSessions` **equals** the ID the guest minted in `newSession`, read back across the process boundary;
+./docs/history/orders/WO-004a.md	34	other	5. **Kill the `/tmp` receipt as a cross-layer oracle.** `/tmp/qf-runtime-proof-receipt.json` is a fixed path shared by every concurrent run, its write is swallowed by `catch {}`, and it is parsed with a cast. Replace with either ACP-native evidence (preferred — the notifications you already receive) or a per-run unique path that **fails loudly** on write error and is validated, not cast. No silent failure may be able to masquerade as a pass.
+./docs/history/orders/WO-004a.md	36	other	6. **One shared fixture.** P1/P1b/P3 each pay a full `AgentOs.create` today. Use one fixture per suite and pack the agent **once** (currently packed in `beforeAll` *and* again in the qa gate).
+./docs/history/orders/WO-004a.md	42	other	- Do not touch `qf-kernel-schema/`, `packages/`, or `collab-electron/`. **WO-005 may be running in parallel; stay inside `tools/runtime-proof/` and `qa/run.ts`'s `runtime-proof` gate only.**
+./docs/history/orders/WO-004a.md	48	other	cd tools/runtime-proof && bun install && bun test
+./docs/history/orders/WO-004a.md	49	other	cd tools/runtime-proof && bunx tsc --noEmit          # exit 0
+./docs/history/orders/WO-004a.md	74	other	Verified cold in a detached clean-room worktree (`--detach`, so the branch stayed checked out in the founder's tree). **The clean room had zero `node_modules` on arrival — no deletion was needed at all.** All seven gates green, exit 0: `repo-shape`, `lockfile-committed`, `schema` (139 tests), `runtime-proof` (5), `kernel` (7; `illegal_transitions_rejected=7`, `replay_assertion=equal`), `kernel-sole-writer`, `no-canvas-domain-writes`.
+./docs/history/orders/WO-004a.md	76	other	**Scope: clean.** Only `tools/runtime-proof/` and `qa/run.ts`. Nothing touched `packages/`, `qf-kernel-schema/`, or `collab-electron/`.
+./docs/history/orders/WO-004a.md	78	other	**Confirmed by measurement, not by report:** `toolLoopSessionId` is gone (one comment remains); `qf-runtime-proof-receipt` has no references anywhere.
+./docs/history/orders/WO-004a.md	89	other	`tools/runtime-proof/src/proof.ts:96`:
+./docs/history/orders/WO-004a.md	92	other	const listedSessionId = listed.find((s) => s.sessionId === agentOsSessionId)?.sessionId;
+./docs/history/orders/WO-004a.md	95	other	This filters *by* the value and returns that same value, so `expect(run.listedSessionId).toBe(run.agentOsSessionId)` (`proof.test.ts:40`) is a tautology — it cannot fail.
+./docs/history/orders/WO-004a.md	104	other	expect(listed.map((s) => s.sessionId)).toContain(run.agentOsSessionId);
+./docs/history/orders/WO-004a.md	125	other	**D1 verdict:** fixed. `listedSessionIds` is the full table, mapped without keying on the expected value — the provenance is honest, which was D1's entire substance. `expect(run.listedSessionIds).toContain(run.agentOsSessionId)` is the assertion the rework demanded, verbatim in shape.
+./docs/history/orders/WO-006a.md	5	other	parallel: eligible — touches only `packages/qf-kernel/`, `qf-kernel-schema/src/commands.ts`, and `qa/`; no overlap with `tools/runtime-proof/` (WO-004a)
+./docs/history/orders/WO-006a.md	64	other	- Do not touch `collab-electron/`, `tools/runtime-proof/`, or `docs/` except your report. **WO-004a may be in rework inside `tools/runtime-proof/` — stay out of it.**
+./docs/history/orders/WO-006a.md	149	other	**D5 (new, blocks merge) — the falsification flag is a production off-switch in the Kernel.** `create.ts:72` wraps the D1 integrity check in `if (process.env.QF_PROOF_SKIP_ARTIFACT_META_CHECK !== "1")`. Any process that sets one env var silently disables metadata-conflict rejection at runtime. The round-1 record's instruction was a **temporary** edit ("temporarily disable the comparison, show the new test red, restore, show green") — a permanent switch exceeds it and leaves a bypass seam in the one componen
+./docs/history/orders/LOG.md	55	other	| [WO-CI2](WO-CI2.md) | The shipped app contains its required runtime files (off-ladder release repair) | **done** — independently verified + merged 2026-07-30 at b1dd8f7. Two rejected implementation lines never merged. Two pristine worktrees proved standalone package closure and the complete install → unit → build → package → QA release path. The unsigned Linux package contains qf-toolloop + four Hermes files; removing Hermes fails by unresolved reference. Merge-risk review also narrowed cleanup to owned o
+./docs/history/orders/LOG.md	58	other	| [WO-D2b](WO-D2b.md) | Compensate the remaining ACP launch paths | **done** — independently verified at `3970ea1` and merged 2026-07-30 after one integration-gate rework. Host ACP and AgentOS now share exact-owner compensation; cold package plus all QA passed. Record: [`evidence/wo-d2b/VERIFICATION.md`](evidence/wo-d2b/VERIFICATION.md) | builder + independent verifier |
+./docs/history/orders/WO-008d.md	36	other	Species that ship a native TUI declare it once (e.g. `surface: "native_tui"` + argv template next to `launch.json` / meta — pick smallest shape; **stop and report** if you need a schema column). Dock Spawn for those species always takes the term-tile path. AgentOS / ACP session tiles remain for guests that are ACP-only (toolloop, critic-mock). No `if (species === "hermes")` scattered in the renderer — one host resolve path.
+./docs/history/orders/WO-008d.md	48	other	- Do not weaken AgentOS `agent-path` for toolloop.
+./docs/history/orders/WO-008d.md	66	other	Datasets (**WO-009** parked) · rewriting Hermes itself · A2A · removing ACP host bridge · AgentOS guest TUI (WASM wall still holds).
+./docs/history/orders/WO-008d.md	87	other	- AgentOS `agent-path` still green among the 12.
+./docs/history/orders/WO-008.md	7	other	> **This is the order everything has led to: the first real agent enters QuantFlow, and the gate is that nothing had to change to admit it.** It is also deliberately a *fact-finding* order at its head: deliverable 0 settles how a host-installed agent runs inside the AgentOS guest space, and every downstream deliverable is conditioned on its named outcomes. Stopping at deliverable 0 with a precise finding is a **success**.
+./docs/history/orders/WO-008.md	17	other	3. `tools/runtime-proof/agent-package/` — the proven wrapper shape
+./docs/history/orders/WO-008.md	23	other	- **Guest env is caller-supplied only:** `agent-os.js:2693` `const launchEnv = { ...options?.env }` — host `PATH`/`HOME` are **not** inherited; sessions run in the AgentOS guest space (overlay filesystem modes `ephemeral|read-only`, `layers.d.ts`). **A shim that assumes host PATH or `~/.hermes` visibility is wrong by construction.**
+./docs/history/orders/WO-008.md	27	other	- **Data constraint (runtime audit, 2026-07-19): the `agent_definition.name` must equal the package's `agentos-package.json` agent name** — a mismatch fails `createSession(name)`. Both must be `"hermes"` (and `"critic-mock"` for deliverable 4).
+./docs/history/orders/WO-008.md	29	other	- `register.ts` opens the DB with `openKernel(dbPath)` from `qf-kernel` (Bun SQLite + `attachKernel`) — the audited import shape; relative `package_ref` values resolve from the repo root (`appRoot()`), matching the boot seed's `tools/runtime-proof/packed/...` pattern.
+./docs/history/orders/WO-008.md	42	other	`agentos-package.json` (`name: "hermes"`, `agent.acpEntrypoint` → shim) · shim that spawns the Hermes ACP server from a **configured absolute path** (supplied via the session env from deliverable 0 — no PATH lookup, no hardcoded home) and pipes stdio, failing loudly and typed if unreachable · pack step per the proof-tree pattern · `register.ts --db <path>` calling `execute("register_agent_definition", { name: "hermes", role: "orchestrator", package_ref: <packed path> })`.
+./docs/history/orders/WO-008.md	63	other	5. **Corrupt-package falsification:** after registration, move/corrupt the packed `.aospkg` → spawn fails with the typed error, app healthy → restore → green. Paste both. (Replaces any host-binary rename — it proves plug integrity, not PATH luck.)
+./docs/history/orders/WO-008.md	91	other	- **D3 — critic-mock announces `agentInfo.name: "qf-toolloop"`** (`acp-main.ts:97`): finish the rename; the species must not lie about its identity on the wire.
+./docs/history/orders/WO-008.md	103	other	**D2 / D3 confirmed:** dock-proof script absent; `evidence/dock.png` kept; `agentInfo.name: "critic-mock"`; no `qf-toolloop` under `species/critic-mock` (sources).
+./docs/history/evidence/wo-k1/prebuild-read.md	95	other	| `agent-host.ts:453-460` (AgentOS) | passes merged `env` to `host.createSession` | would carry the key, but nothing puts it there |
+./docs/history/evidence/wo-k1/prebuild-read.md	96	other	| `species/hermes/agent-package/src/acp-shim.ts:70-77` | closed literal — `HERMES_BIN`, `HOME`, `PATH` | **strips it even if AgentOS had it** |
+./docs/history/orders/WO-008c.md	4	other	depends: WO-008b (probe held — in-guest native exec impossible on AgentOS 0.2.7)
+./docs/history/orders/WO-008c.md	9	other	Hermes speaks ACP as a **real host process** (`hermes acp`), driven by QuantFlow’s Electron host. Dock **Spawn** still admits a session and opens a **session tile** — same founder UX — without asking AgentOS’s WASM-only guest to exec Python/ELF. Handshake only; no live turn (WO-008a).
+./docs/history/orders/WO-008c.md	13	other	WO-008b proved: authorized mounts make Hermes files **visible** in the guest; guest `spawn` of Hermes/Python fails with `ERR_NATIVE_BINARY_NOT_SUPPORTED` / WASM refuse. Bundle hits the same wall. See `species/hermes/D0-MOUNT-PROBE.md`. AgentOS remains correct for **Node/WASM ACP guests** (toolloop, critic-mock, future Pi-in-AgentOS). Hermes is a **host-bridged** species.
+./docs/history/orders/WO-008c.md	19	other	3. Hermes programmatic integration — **ACP** = JSON-RPC over stdio (`hermes acp`); same protocol AgentOS uses for in-VM guests
+./docs/history/orders/WO-008c.md	25	other	On the **Electron main / host** side (not inside AgentOS guest exec): spawn `hermes acp` (absolute `HERMES_BIN` from founder config / PATH resolve recorded in the report — paths only, never secrets) as a stdio child; complete ACP initialize + `session/new` (or equivalent); adopt the **ACP session id** into Kernel `create_agent_session` + `start_agent_session`. **Send no prompt.** Paste session id + proof of no chunks/artifacts.
+./docs/history/orders/WO-008c.md	30	other	`admitAndStartSession("hermes")` (and dock spawn) must take the **host-bridge** path for Hermes. In-VM AgentOS `createSession` remains for AgentOS packages (toolloop / critic-mock). Document the rule in one place (species flag, package manifest field, or host allowlist of `launch: "host_acp"` — pick the smallest data-driven shape; **stop and report** if you need a schema column). No `if (species === "hermes")` scattered across renderer.
+./docs/history/orders/WO-008c.md	33	other	Register Hermes → dock lists it → **Spawn** → session tile opens, Kernel `created`+`started`, chip/status live. **Do not Run turn** on Hermes. Paste screenshot + event types. Critic-mock / toolloop must still spawn via AgentOS (regression: one mock admit still green).
+./docs/history/orders/WO-008c.md	45	other	- Do not weaken `agent-path` falsifications for the AgentOS mock path.
+./docs/history/orders/WO-008c.md	55	other	4. Mock/toolloop still admits via AgentOS (one green paste).
+./docs/history/orders/WO-008c.md	64	other	Permission UI / allowlists (**WO-008a**) · A2A · putting Hermes back inside AgentOS guest exec · Docker-as-AgentOS substitute (Hermes-in-Docker is fine *as the host process* Hermes itself uses; QuantFlow still talks ACP to that process).
+./docs/history/orders/WO-008c.md	82	other	- AgentOS toolloop `agent-path` still green. `runTurn` forbidden on `host_acp`. Deny-by-default `requestPermission` (not legacy auto-approve). Gate allowlists `host-acp-bridge.ts` for ACP SDK.
+./docs/history/orders/WO-008c.md	86	other	- **D1 — `launch: "host_acp"` does not survive pack / is not the deploy source of truth.** Source `agent-package/agentos-package.json` has `"launch":"host_acp"`, but packed `hermes.tar` → `agentos-package.json` **drops it** (only `name` / `agent.acpEntrypoint` / `version`). `species-launch.ts` reads the **unpacked source tree sibling**, not the packed package. Repo checkout works by accident; a deploy that only ships `packed/*.aospkg` falls through to `agentos` and Hermes hits the WASM wall again. **Fix:**
+./docs/history/orders/WO-008c.md	98	other	**D1 closed (measured):** pack writes `packed/hermes.meta.json` `{"launch":"host_acp",…}`; packed root `agentos-package.json` still strips `launch` (toolchain). Committed `species/hermes/launch.json` is durable SoT. Falsify: rename `agent-package/` away → `host_acp` still from meta / `launch.json`. `species-launch.ts` precedence: meta → launch.json → host `speciesLaunch` → source last.
+./docs/history/orders/WO-008c.md	105	other	- Default `agentos` when no launch doc remains correct for AgentOS species; Hermes is covered by committed `launch.json` + pack meta.
+./docs/history/orders/WO-007.md	28	other	- `agent_definition` gains `package_ref TEXT NOT NULL` (comment: "AgentOS package this species launches — the plug half of the row"). Table is empty in every real DB; no migration compatibility work.
+./docs/history/orders/WO-007.md	33	other	**2. Boot seed through the front door.** At app-ready, if no `agent_definition` row named `qf-toolloop` exists, the main process registers it **via `execute("register_agent_definition", …)`** — never a direct insert. Idempotent across relaunches (row count stays 1; paste proof).
+./docs/history/orders/WO-007.md	35	other	**3. The host resolves species from rows, not code.** `agent-host.ts`'s in-code species map shrinks to nothing or to pure path-resolution plumbing: spawn takes a species *name*, loads the row, launches `package_ref`. **SDK path (measured, `@rivet-dev/agentos-core` `agent-os.d.ts:554`):** packages for rows known at host creation go into `AgentOs.create`'s `software` list; a row registered **after** the host exists is admitted via `await os.linkSoftware(...)` before `createSession(name)` — no host re-create.
+./docs/history/orders/WO-007.md	52	other	- **(d) no species literal in renderer source:** static scan asserting the string `qf-toolloop` appears nowhere under `collab-electron/src/windows/` — the dock knows species only through the Kernel. Falsify: add the literal to any renderer file → red → remove → green.
+./docs/history/orders/WO-007.md	53	other	- runtime admission: register a second bait species (bait `package_ref` pointing at the qf-toolloop package), `linkSoftware`, `createSession(name)` succeeds — proving admission needs no host restart.
+./docs/history/orders/WO-007.md	62	other	- All prior seams hold: `agent-host.ts` sole AgentOS importer (frozen `acp-agent.ts` exception, debt #14) · `kernel.ts` sole DB owner · renderer reaches domain state only via IPC · every write through `execute` · one-skin green.
+./docs/history/orders/WO-007.md	80	other	Second species / Hermes (WO-008) · permissions manifests, deny-lists, approval UI · A2A/bindings · tool allowlists on rows · canvas tile drag/cable work beyond the dock rail and cube · templates/workflows · touching `tools/runtime-proof/`.
+./docs/history/orders/WO-007.md	95	other	**Confirmed good, independently:** schema amendment landed exactly as authorized (`package_ref TEXT NOT NULL` at `migration.sql:299`; `register_agent_definition` handler with `id = name` and typed duplicate rejection); species literal scan honest (`qf-toolloop` appears nowhere under `windows/`); dock-registry falsifications and the widened one-skin gate as reported; species map deleted in favor of row + `linkSoftware` resolution; build green. Builder decisions accepted: the revived `#panel-agent` rail; the
+./docs/history/orders/WO-008b.md	9	other	Make Hermes reachable from the AgentOS guest so deliverable-0 can claim **Outcome A** (ACP handshake) — without prompting Hermes and without marrying the host to one vendor forever. Probe the SDK's typed mount surface first; only then implement the winning path (authorized mount **or** self-contained bundle).
+./docs/history/orders/WO-008b.md	16	other	4. Typed AgentOS options (`@rivet-dev/agentos-core` `AgentOsOptions`): `mounts?: MountConfig[]`, `rootFilesystem?` — **not** a public `hostMounts` knob (private `_hostMounts` exists; do not invent APIs). Measure `mounts` / native mount plugins from the installed SDK docs + d.ts.
+./docs/history/orders/WO-008b.md	21	other	Throwaway harness under `/tmp` (or `species/hermes/` scratch that is **not** the admitting commit): try to expose a known host path into the guest via `AgentOs.create({ mounts: … })` (exact shape from the typed surface you measure). Guest must prove visibility (read a marker file or `existsSync` on the mounted Hermes binary path). Paste the exact create options (paths only, never secrets) and the guest evidence.
+./docs/history/orders/WO-008b.md	29	other	Wire the measured mount into the **host** AgentOS create site (`agent-host.ts` `AgentOs.create`) as a **generic**, data-driven capability — not a Hermes hardcode. Prefer: mount specs sourced from species data / a small allowlisted host config the founder controls; renderer must not supply mount paths. Then set Hermes `HERMES_BIN`/`HOME` (manifest `agent.env` and/or host opts.env) so the existing shim sees the binary **inside the guest**. Re-run `species/hermes/d0-smoke.ts` → **Outcome A** (exit 0), paste lo
+./docs/history/orders/WO-008b.md	75	other	**Accepted:** founder mounts file + generic `host-mounts.ts` plumbing (kept for data mounts). **Not accepted as complete:** in-guest Hermes handshake / dock admit of Hermes via AgentOS `createSession`.
+./docs/history/orders/WO-008b.md	77	other	**Architect decision:** Hermes becomes a **host-bridged ACP** species (**WO-008c**). AgentOS stays for Node/WASM guests (toolloop, critic-mock, optional future Pi-in-AgentOS). Dock UX unchanged: Spawn → session tile.
+./docs/history/orders/WO-008a.md	28	other	Lift the WO-008c forbid. Prompt → stream chunks into the session tile (same IPC/events shape as AgentOS turns where possible). Cancel mid-turn tears down cleanly (no orphan hermes pids — reuse WO-008c orphan check).
+./docs/history/orders/WO-008a.md	42	other	- Do not weaken AgentOS `agent-path` falsifications.
+./docs/history/orders/WO-008a.md	61	other	A2A · removing debt #14 legacy `acp-agent.ts` (may land here only if spawn registration can die cleanly without scope creep) · putting Hermes back inside AgentOS guest exec · schema churn unless deliverable 2 forces a stop-and-report.
+./docs/history/orders/WO-008a.md	80	other	- AgentOS `agent-path` still green. Deny-by-default on timeout / missing UI; allowlist before founder prompt.
+./docs/history/orders/WO-008a.md	89	other	- Shared session terminalizer AgentOS vs `host_acp` (lifecycle copy drift).
+./docs/history/orders/WO-007b.md	39	other	- All standing gates green; `agent-path` falsifications may not weaken; seam laws hold (`agent-host.ts` sole AgentOS importer via `kernel.ts` reads).
+./docs/history/orders/WO-101.md	298	other	| `bun qa/run.ts --all` (fresh worktree, exit 0) | **12/12 PASS** — `repo-shape · lockfile-committed · schema · runtime-proof · kernel · kernel-sole-writer · kernel-sole-writer-app · no-canvas-domain-writes · doc-action-surface · agent-path · one-skin · dock-registry` |
+./docs/history/orders/WO-008e.md	77	other	- Do not weaken AgentOS `agent-path`.
+./docs/history/orders/WO-103.md	512	other	| `tools/runtime-proof` | 597 MB |
+./docs/history/orders/WO-103.md	541	other	`tools/runtime-proof/node_modules` must not exist.** Those two are 3.4 GB of the 3.4 GB, and
+./docs/history/orders/WO-106.md	76	other	(`tools/runtime-proof/agent-package/src/acp-main.ts:20,32`;
+./docs/history/orders/WO-106.md	146	other	| Agent seats use a mock model | `runtime-proof/.../acp-main.ts:20,32` · `critic-mock/.../acp-main.ts:20,32` | ✅ |
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	66	other	packed qf-toolloop@0.1.0 → /home/sidnig21/qf-worktrees/wo-105/tools/runtime-proof/packed/qf-toolloop.tar
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	67	other	  commands: qf-toolloop-acp
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	68	other	pack-agent: ready /home/sidnig21/qf-worktrees/wo-105/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	71	other	P1 createSession / AgentOS: 5e04ab2a-eb0c-46b6-bd0f-bc760bfc88c8
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	100	other	PASS  runtime-proof
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	174	other	packed qf-toolloop@0.1.0 → /home/sidnig21/qf-worktrees/wo-105/qa/gates/agent-path/packed/qf-toolloop.tar
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	175	other	  commands: qf-toolloop-acp
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	176	other	pack: ready /home/sidnig21/qf-worktrees/wo-105/qa/gates/agent-path/packed/qf-toolloop.aospkg
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	186	other	+ @rivet-dev/agentos-toolchain@0.2.7
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	189	other	+ @rivet-dev/agentos-core@0.2.7
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	200	other	packed qf-toolloop@0.1.0 → /home/sidnig21/qf-worktrees/wo-105/qa/gates/dock-registry/packed/qf-toolloop.tar
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	201	other	  commands: qf-toolloop-acp
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	202	other	pack: ready /home/sidnig21/qf-worktrees/wo-105/qa/gates/dock-registry/packed/qf-toolloop.aospkg
+./docs/history/evidence/wo-105/builder-report-rework-r1.md	204	other	{"baitA":"dock-registry-bait-a","baitB":"qf-toolloop","packagePath":"/home/sidnig21/qf-worktrees/wo-105/qa/gates/dock-registry/packed/qf-toolloop.aospkg","literalHits":0}
+./collab-electron/src/main/package-resource-paths.ts	41	other	/** package_ref → packed sibling meta: species/hermes/packed/hermes.aospkg → …/hermes.meta.json */
+./collab-electron/src/main/package-resource-paths.ts	46	other	  if (!packageRef.endsWith(".aospkg")) return null;
+./collab-electron/src/main/package-resource-paths.ts	48	other	  const base = basename(packageRef, ".aospkg");
+./collab-electron/src/main/package-resource-paths.ts	88	other	  return join(appRoot, root, name, "agent-package", "agentos-package.json");
+./docs/history/orders/WO-CI2.md	48	other	resources/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/history/orders/WO-CI2.md	49	other	resources/species/hermes/packed/hermes.aospkg
+./docs/history/orders/WO-CI2.md	58	other	REJECTED qf-toolloop PackageRefUnresolvedError
+./docs/history/orders/WO-CI2.md	59	other	  .../resources/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/history/orders/WO-CI2.md	61	other	  .../resources/species/hermes/packed/hermes.aospkg
+./docs/history/orders/WO-CI2.md	69	other	- `tools/runtime-proof/packed/` and `species/hermes/packed/` are ignored generated output.
+./docs/history/orders/WO-CI2.md	71	other	  `tools/runtime-proof/packed/qf-toolloop.aospkg` into the Kernel.
+./docs/history/orders/WO-CI2.md	73	other	The package's asar does contain third-party AgentOS dependency packages under `node_modules`, but
+./docs/history/orders/WO-CI2.md	111	other	tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/history/orders/WO-CI2.md	112	other	species/hermes/packed/hermes.aospkg
+./docs/history/orders/WO-CI2.md	119	other	tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/history/orders/WO-CI2.md	120	other	species/hermes/packed/hermes.aospkg
+./docs/history/orders/WO-CI2.md	126	other	Use the existing package scripts and lockfiles; do not hand-author `.aospkg` or packed metadata.
+./docs/history/orders/WO-CI2.md	165	other	For both `qf-toolloop` and `hermes`, call the production `resolvePackageRef()` against the actual
+./docs/history/orders/WO-CI2.md	171	other	fresh packaged Kernel currently boot-seeds only `qf-toolloop`; Hermes registration and heterogeneous
+./docs/history/orders/WO-CI2.md	206	other	- `tools/runtime-proof`
+./docs/history/orders/WO-CI2.md	256	other	- copy the finished package to a bait directory and remove its Hermes `.aospkg` → inspector red
+./docs/history/orders/WO-CI2.md	371	other	- packed sibling metadata from a `.aospkg` reference;
+./docs/history/orders/WO-CI2.md	591	other	qf-toolloop runtimes, and deleting Hermes from a copy makes the same package checker fail.
+./docs/history/orders/WO-CI2.md	602	other	tools/runtime-proof/packed/qf-toolloop.aospkg  22600560 bytes
+./docs/history/orders/WO-CI2.md	603	other	species/hermes/packed/hermes.aospkg               20031 bytes
+./docs/history/orders/WO-CI3.md	103	other	exited `1` solely because the previously documented machine-wide `runtime-proof` listener trap saw a
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	19	other	+ @rivet-dev/agentos-toolchain@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	23	other	+ @rivet-dev/agentos@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	24	other	+ @rivet-dev/agentos-core@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	34	other	packed qf-toolloop@0.1.0 → /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/tools/runtime-proof/packed/qf-toolloop.tar
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	35	other	  commands: qf-toolloop-acp
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	36	other	pack-agent: ready /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/tools/runtime-proof/packed/qf-toolloop.aospkg
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	39	other	P1 createSession / AgentOS: cfd45a5a-89bc-49da-b66e-476a31c742c5
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	68	other	PASS  runtime-proof
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	152	other	+ @rivet-dev/agentos-toolchain@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	155	other	+ @rivet-dev/agentos-core@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	166	other	packed qf-toolloop@0.1.0 → /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/agent-path/packed/qf-toolloop.tar
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	167	other	  commands: qf-toolloop-acp
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	168	other	pack: ready /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/agent-path/packed/qf-toolloop.aospkg
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	178	other	+ @rivet-dev/agentos-toolchain@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	181	other	+ @rivet-dev/agentos-core@0.2.7
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	192	other	packed qf-toolloop@0.1.0 → /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/dock-registry/packed/qf-toolloop.tar
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	193	other	  commands: qf-toolloop-acp
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	194	other	pack: ready /tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/dock-registry/packed/qf-toolloop.aospkg
+./docs/history/evidence/wo-105/verify-r1-cold-suite.log	196	other	{"baitA":"dock-registry-bait-a","baitB":"qf-toolloop","packagePath":"/tmp/claude-1000/-home-sidnig21-QuantFlow-Ontology/ab181370-2403-44e2-9689-82dcf0efd33f/scratchpad/cold-105/qa/gates/dock-registry/packed/qf-toolloop.aospkg","literalHits":0}
+./docs/history/orders/WO-CI4.md	11	other	Make the runtime ownership proof reject TCP listeners owned by its own AgentOS/tool-loop process
+./docs/history/orders/WO-CI4.md	31	other	The release still exited `1` only because `tools/runtime-proof` snapshots every machine-wide
+./docs/history/orders/WO-CI4.md	45	other	`tools/runtime-proof/src/listeners.ts`; it does not attribute sockets to the test or its children.
+./docs/history/orders/WO-CI4.md	51	other	1. the runtime-proof test process (`process.pid`), or
+./docs/history/orders/WO-CI4.md	52	other	2. a `qf-toolloop`/`acp-main` process that appeared after this test's agent-process baseline **and is
+./docs/history/orders/WO-CI4.md	53	other	   a descendant of the runtime-proof test PID**.
+./docs/history/orders/WO-CI4.md	59	other	runtime-proof test PID. `SharedOs` records the descendant agent-process baseline before
+./docs/history/orders/WO-CI4.md	60	other	`AgentOs.create()`. At every P2 listener assertion, derive the owned PID set from `process.pid` plus
+./docs/history/orders/WO-CI4.md	62	other	concurrent `qf-toolloop` launched by another task is foreign even if it started after the baseline.
+./docs/history/orders/WO-CI4.md	88	other	Add one test-only runtime-proof hook, `QF_PROOF_OPEN_LISTENER=1`, passed only into the packed
+./docs/history/orders/WO-CI4.md	89	other	`qf-toolloop` session used by P2. Under that hook the mock ACP child opens an ephemeral TCP listener
+./docs/history/orders/WO-CI4.md	94	other	before P4's final owned-listener snapshot, the runtime-proof **test process itself** opens one
+./docs/history/orders/WO-CI4.md	105	other	1. `tools/runtime-proof/src/listeners.ts`: pure PID parsing plus owned-listener snapshot/delta.
+./docs/history/orders/WO-CI4.md	106	other	2. `tools/runtime-proof/src/processes.ts` and `processes.test.ts`: recursive descendant ownership,
+./docs/history/orders/WO-CI4.md	108	other	3. `tools/runtime-proof/src/proof.ts`: descendant baseline/new-agent ownership wired through P2 and
+./docs/history/orders/WO-CI4.md	110	other	4. `tools/runtime-proof/src/listeners.test.ts`: parser and live same-user PID-attribution proof,
+./docs/history/orders/WO-CI4.md	113	other	   no app/runtime package surface outside `tools/runtime-proof` changes.
+./docs/history/orders/WO-CI4.md	119	other	From `tools/runtime-proof` after its frozen install:
+./docs/history/orders/WO-CI4.md	143	other	   CI3's unchanged five-second drift tests and runtime-proof under ordinary concurrent host noise.
+./docs/history/orders/WO-CI4.md	147	other	Port allowlists · special-casing 8180 · production networking · AgentOS replacement · Peer Bus or MCP
+./docs/history/orders/WO-CI4.md	192	other	The builder may change only `tools/runtime-proof/agent-package/src/acp-main.ts` from `9d9d430`, run
+./docs/history/orders/WO-CI4.md	202	other	This section supersedes Ruling 1 and RW1 only for the AgentOS guest's P2 listener invariant. Host
+./docs/history/orders/WO-CI4.md	210	other	reported owned listener counts `0/0/0` and passed. The packed AgentOS guest is isolated from the
+./docs/history/orders/WO-CI4.md	217	other	AgentOs.create({ limits: { resources: { maxSockets: 0 } } })
+./docs/history/orders/WO-CI4.md	225	other	The runtime-proof AgentOS fixture sets exactly `limits.resources.maxSockets: 0`. This fixture uses
+./docs/history/orders/WO-CI4.md	229	other	Add one permanent P2 socket-denial control that asks the real packed `qf-toolloop` child to open its
+./docs/history/orders/WO-CI4.md	232	other	1. `session/new` rejects with the exact AgentOS capacity mechanism (`maximum socket count reached`);
+./docs/history/orders/WO-CI4.md	244	other	- `tools/runtime-proof/src/proof.ts` — configure the zero-socket limit and expose the smallest
+./docs/history/orders/WO-CI4.md	246	other	- `tools/runtime-proof/src/proof.test.ts` — add the permanent packed denial control.
+./docs/history/orders/WO-CI5.md	23	other	qf-toolloop and all Hermes controls. `release:qa` exited `1` because the `typecheck` gate reached
+./docs/history/orders/WO-D1.md	200	other	  credential-free qf-toolloop package reference;
+./collab-electron/src/main/precreated-native-tui.test.ts	43	other	  expect(() => assertPrecreatedNativeTuiRoute("agentos")).toThrow(/native_tui/);
+./docs/history/orders/WO-D2b.md	16	other	- AgentOS calls `createSession(adapterId)` before Kernel create/start; the same exceptions do not
+./docs/history/orders/WO-D2b.md	23	other	### D0 — measure the AgentOS destruction surface before editing
+./docs/history/orders/WO-D2b.md	25	other	Use the packed credential-free qf-toolloop adapter to call the installed SDK's real
+./docs/history/orders/WO-D2b.md	35	other	   host-ACP and AgentOS callers. Do not alter handshake, prompt, permission, environment, or surface
+./docs/history/orders/WO-D2b.md	38	other	2. Give every fake distinct identifiers: Kernel `sessionId`, host-ACP `handle.sessionId`, and AgentOS
+./docs/history/orders/WO-D2b.md	40	other	3. Exercise the full four-case matrix: host-ACP create failure, host-ACP start failure, AgentOS
+./docs/history/orders/WO-D2b.md	41	other	   create failure, and AgentOS start failure. Prove immediate relaunch of the same definition after
+./docs/history/orders/WO-D2b.md	50	other	6. Never scan or kill by process name, PID range, or global AgentOS state. Run no model, prompt,
+./docs/history/orders/WO-D2b.md	59	other	2. Remove the AgentOS caller's delegation: red under the same control.
+./docs/history/orders/WO-D2b.md	60	other	3. Break exact owner teardown by passing Kernel `sessionId` to AgentOS `destroySession()` instead of
+./docs/history/orders/WO-D2b.md	91	other	gate passed. AgentOS teardown was independently observed against an exact guest id; all four
+./docs/history/orders/WO-D2.md	27	other	- Boot registers only `qf-toolloop`. The shipped package contains Hermes package, metadata, launch,
+./docs/history/orders/WO-D2.md	34	other	- Native-TUI, host-ACP, and AgentOS admission all spawn before Kernel creation/start. A Kernel
+./docs/history/orders/WO-D2.md	56	other	and qf-toolloop (`name:"qf-toolloop"`, AgentOS). Stage and inspect both metadata files. There is no
+./docs/history/orders/WO-D2.md	88	other	`tools/runtime-proof/dock-profiles.json`. Generic discovery accepts exactly
+./docs/history/orders/WO-D2.md	95	other	  "adapter": { "id": "hermes", "package": "packed/hermes.aospkg" },
+./docs/history/orders/WO-D2.md	116	other	exist. Qf-toolloop therefore gains explicit committed/packed metadata declaring
+./docs/history/orders/WO-D2.md	117	other	`name:"qf-toolloop"` and the AgentOS route, rather than relying on definition-id equality. Source
+./docs/history/orders/WO-D2.md	135	other	| `qf-toolloop` | `toolloop-proof` | `tools/runtime-proof/packed/qf-toolloop.aospkg` | `null` | `null` |
+./docs/history/orders/WO-D2.md	136	other	| `hermes-orchestrator` | `orchestrator` | `species/hermes/packed/hermes.aospkg` | `qf-orchestrator` | `null` |
+./docs/history/orders/WO-D2.md	137	other	| `hermes-worker` | `worker` | `species/hermes/packed/hermes.aospkg` | `qf-worker` | `null` |
+./docs/history/orders/WO-D2.md	138	other	| `hermes-worker-2` | `worker2` | `species/hermes/packed/hermes.aospkg` | `qf-worker-2` | `null` |
+./docs/history/orders/WO-D2.md	151	other	the existing delivery watcher idempotently. Qf-toolloop omits it. Historical generic Hermes with a
+./docs/history/orders/WO-D2.md	185	other	Remeasure the equivalent existing host-ACP and AgentOS orphan seams and record them in the report.
+./docs/history/orders/WO-D2.md	198	other	- AgentOS uses the packaged adapter id for `createSession`, not a differing profile id. Host ACP
+./docs/history/orders/WO-D2.md	200	other	- Deduplicate AgentOS software admission by normalized package path and adapter id. Four default
+./docs/history/orders/WO-D2.md	202	other	  `AgentOs.create` or repeat `linkSoftware`. Exercise startup resolution with all four defaults.
+./docs/history/orders/WO-D2.md	210	other	- Add the exact closed-schema package-owned defaults for qf-toolloop and the three ruled Hermes
+./docs/history/orders/WO-D2.md	211	other	  profiles, plus explicit qf-toolloop adapter metadata.
+./docs/history/orders/WO-D2.md	343	other	10. Judgment: every silent choice, especially config fallback and untouched ACP/AgentOS cleanup.
+./docs/history/orders/WO-D2.md	350	other	hashes, cleanup/relaunch results, and the routed ACP/AgentOS seam are recorded in
+./docs/history/orders/WO-K1.md	313	other	| `agent-host.ts:453-460` (AgentOS) | forwards merged `env` to `host.createSession` | ensure the merged env carries it |
+./docs/history/orders/WO-K1.md	314	other	| `species/hermes/agent-package/src/acp-shim.ts:70-77` | closed literal — `HERMES_BIN`, `HOME`, `PATH` | add the key explicitly, or AgentOS's work is undone one hop later |
+./docs/history/orders/WO-K1.md	388	other	**One latent vector, named so it is not rediscovered.** `~/.collaborator/agentos-host-mounts.json`
+./docs/history/orders/WO-K1.md	390	other	wholesale into the AgentOS merged env (`agent-host.ts:452-456`). Measured today it holds only
+./docs/history/orders/WO-K1.md	392	other	added there in future would reach AgentOS and *not* the host-ACP literal at `:395`, producing another
+./collab-electron/src/main/runtime-adapter.test.ts	22	other	    package: "hermes.aospkg",
+./collab-electron/src/main/runtime-adapter.test.ts	36	other	    package: "hermes.aospkg",
+./collab-electron/src/main/runtime-adapter.test.ts	101	other	    writeFileSync(join(packed, "hermes.aospkg"), "package");
+./collab-electron/src/main/runtime-adapter.test.ts	108	other	      "species/hermes/packed/hermes.aospkg",
+./collab-electron/src/main/runtime-adapter.test.ts	112	other	    expect(resolved.metadata.packageName).toBe("hermes.aospkg");
+./collab-electron/src/main/research-world.test.ts	58	other	        package_ref: "species/hermes/packed/hermes.aospkg",
+./collab-electron/src/main/research-world.test.ts	221	other	          name, role, package_ref: "species/hermes/packed/hermes.aospkg", runtime_profile: "default",
+./collab-electron/src/main/runtime-adapter.ts	15	other	export type RuntimeAdapterRoute = "native_tui" | "host_acp" | "agentos";
+./collab-electron/src/main/runtime-adapter.ts	92	other	  if (value === "native_tui" || value === "host_acp" || value === "agentos") {
+./collab-electron/src/main/runtime-adapter.ts	96	other	    `${label} must be native_tui, host_acp, or agentos`,
+./docs/history/orders/WO-WIN2.md	65	other	- No credentials, network model, AgentOS sidecar, Bovada capture, betting execution, or ontology
+./docs/history/orders/WO-WIN2.md	67	other	- AgentOS remains a capability boundary. This proof must not pretend `qf-toolloop` works on Windows.
+./docs/history/orders/WO-WIN1.md	50	other	Kernel-backed Dock inventory for `qf-toolloop`, `hermes-orchestrator`, `hermes-worker`, and
+./docs/history/orders/WO-WIN1.md	74	other	- AgentOS is not a reason to block boot. Only packaged profiles that actually require it may touch
+./docs/history/orders/WO-WIN1.md	75	other	  it, and no AgentOS/Rivet architecture decision is in scope.

@@ -1,0 +1,19 @@
+selector	command	result	owner_or_disposition
+golden-g4-retired-route	bun qa/run.ts golden-g4-retired-route	not registered at frozen starting SHA	G4 implementation deliverable
+dock-production-inventory	bun qa/run.ts dock-production-inventory	PASS; six current production definitions; QA qf-toolloop staging present before mutation	G4 inherited/non-regression
+dock-definition-launch	bun qa/run.ts dock-definition-launch	RED; EPERM copying qf-kernel-schema from Bun cache during qf-kernel install	ADR-0004/G12 inherited red; exact pre/post non-regression
+hermes-launch-policy	bun qa/run.ts hermes-launch-policy	PASS	G4 inherited/non-regression
+package-closure	bun qa/run.ts package-closure	RED; electron-vite Rollup cannot resolve qf-kernel-schema	ADR-0004/G12 inherited red; exact pre/post non-regression
+runtime-adapter-tests	bun test collab-electron/src/main/runtime-adapter.test.ts collab-electron/src/main/precreated-native-tui.test.ts collab-electron/src/main/native-tui-orchestration.test.ts	PASS; 16 pass, 0 fail, 63 expect	G4 inherited/non-regression
+electron-build-literal	bun --cwd collab-electron run build	RED before build; Bun 1.3.12 rejects this argument placement and prints bun run help	Mechanical invocation defect; semantic working-directory form separately retained inherited build red
+electron-build-semantic	Set-Location collab-electron; bun run build	RED; Rollup cannot resolve qf-kernel-schema	ADR-0004/G12 inherited red; exact pre/post non-regression
+atlas-check	bun qf-atlas/generate.mjs --check	PASS; current — 427 files, 126 channels, 13 strip candidates	G4 inherited/non-regression
+atlas-falsifier	node qf-atlas/falsify.mjs	10 printed PASS cases; harness left asynchronous bait artifacts/processes and was stopped/cleaned by exact process identity	Harness limitation recorded; no product mutation accepted
+atlas-ratchet	bun qf-atlas/ratchet.mjs	PASS; 3 entries, HARD RED 0, unexplained coverage 0, undecided without blocker 0, undecided 40	G4 inherited/non-regression
+diff-check	git diff --check	PASS	G4 inherited/non-regression
+kernel-one-path	bun qa/run.ts kernel-one-path	RED; 12 pre-existing QA fixture kernel.db literal offenders	G8 inherited red; exact pre/post non-regression
+kernel-market-lineage	bun qa/run.ts kernel-market-lineage	Inherited pre-existing red per NEXT/ADR-0004; not rerun in G4 focused matrix	G8 owned; exact pre/post non-regression
+typecheck	bun qa/run.ts typecheck	Inherited Windows node-pty/dependency EBUSY red/timed out per G3 evidence	G12 owned; exact pre/post non-regression
+windows-cold-boot-and-operations	G4 order-prescribed inherited evidence; full Windows gates not rerun	Inherited Windows userData/package/operations reds remain outside G4	G12 owned; exact pre/post non-regression
+kernel-sole-writer	bun qa/run.ts kernel-sole-writer	PASS in inherited G3 matrix	G4 inherited/non-regression
+kernel-sole-writer-app	bun qa/run.ts kernel-sole-writer-app	PASS in inherited G3 matrix	G4 inherited/non-regression

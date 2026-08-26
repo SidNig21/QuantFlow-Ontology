@@ -42,12 +42,12 @@ export const NORTH_STAR = [
   { id: "recruit", name: "RECRUIT",
     blurb: "A team is composed from agent definitions — which runtimes are available and hired.",
     channels: ["qf:definitions:list"],
-    gates: ["team-composition", "team-composition-ui", "windows-dock-hire", "dock-registry"] },
+    gates: ["team-composition", "team-composition-ui", "windows-dock-hire"] },
 
   { id: "assign", name: "ASSIGN",
     blurb: "A Task moves to a seat. The agent path notifies the seat; the human path is where delivery has failed before.",
     channels: ["qf:tasks:reassign", "qf:tasks:surface", "qf:handoffs:list"],
-    gates: ["kernel-task-delegation", "agent-path"] },
+    gates: ["kernel-task-delegation"] },
 
   { id: "watch", name: "WATCH",
     blurb: "The operator can see work in flight: a PTY, then an agent session on top of it.",

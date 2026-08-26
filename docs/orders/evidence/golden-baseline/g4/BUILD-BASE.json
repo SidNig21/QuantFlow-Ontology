@@ -1,0 +1,63 @@
+{
+  "build_base_sha": "dd1dcb7ef50248e46f4de5acb543ef7e7753a981",
+  "starting_tree_sha": "010f3f0fa7a9a0d0593a6fa241864b3f844a6914",
+  "branch": "wo-golden-g2",
+  "upstream": "origin/wo-golden-g2",
+  "protected_main": "5882ab2febf00f2c15a94c868c191420ed561bb4",
+  "authority": "G4 Builder authorized at immutable pushed authority SHA",
+  "product_tree_clean_at_freeze": true,
+  "product_process_check": "zero",
+  "atlas": {
+    "check": "PASS — current — 427 files, 126 channels, 13 strip candidates",
+    "ratchet": "PASS — 3 entries, HARD RED 0, unexplained coverage 0, undecided without blocker 0, undecided 40",
+    "projection_sha256": {
+      "qf-atlas/atlas.json": "bcf877c591b0793015c9a266df1abe9b61b896055589f45e83fc874cc22b880a",
+      "qf-atlas/ATLAS.md": "6b980942d852e7980bc4cfebeb593eab785db2c5da647c5bed87cf25be43fdd6",
+      "qf-atlas/atlas.html": "7c8ac51b35d5463c218b703b61f643adfaa06cba32135d801874b51668a5030e"
+    }
+  },
+  "frozen_manifests": {
+    "RUNTIME-PROOF-BEFORE.tsv": {
+      "rows": 28317,
+      "tracked_rows": 17,
+      "ignored_or_untracked_rows": 28300,
+      "bytes": 4890537,
+      "sha256": "461aae6134e7c74912f3cb516cd7bfe4ef81993aa7f4ba3d2c52b62f5580fe70"
+    },
+    "REFERENCES-BEFORE.tsv": {
+      "rows": 1032,
+      "bytes": 177677,
+      "sha256": "2b263c63c384e74b5edb27046aa0d6e40da80656f83cb1d778643f3f30740d4b"
+    },
+    "PACKAGE-STAGING-BEFORE.tsv": {
+      "rows": 23,
+      "bytes": 2536,
+      "sha256": "5704a90a2a09ec838d6c29952d916d526771c9748772675d9f71cbbd8cfddeb3"
+    },
+    "BUILD-OUTPUT-BEFORE.tsv": {
+      "rows": 256,
+      "bytes": 33749,
+      "sha256": "6cd36acf9718f09ed0c9b8cb375c89c57659f55b86d85632c39bfdad30be9e26"
+    },
+    "ROUTES-BEFORE.json": {
+      "package_rows": 4,
+      "sha256": "d5782fc7965f3e65b6ccdeb23e8eb70a8169386aa51b8356d02b2523c2342752"
+    },
+    "KERNEL-DEFINITIONS-BEFORE.json": {
+      "definition_rows": 7,
+      "sha256": "45739cf5efbb6e5bda54ba31eabef35ac6054fd64edebd13e501d41f2000f793",
+      "all_resolve_current_repo_metadata": true,
+      "all_routes": "native_tui"
+    }
+  },
+  "starting_state": {
+    "production_dock_definitions": 6,
+    "canonical_kernel_definitions": 7,
+    "production_routes": ["native_tui"],
+    "qa_retirement_candidate_route": "agentos",
+    "runtime_proof_files": 28317,
+    "package_staging_files": 23,
+    "build_output_files": 256,
+    "windows_full_matrix": "not rerun by G4 order; inherited G12 evidence retained"
+  }
+}
