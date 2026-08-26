@@ -10,7 +10,7 @@ after-delete	bun qa/run.ts kernel-sole-writer-app	0	PASS
 after-delete	QF_KERNEL_ONE_PATH_FALSIFY=1 bun qa/run.ts kernel-one-path	1	RED caught tools/_qf-k1-path-bait/falsify.ts; bait absent after
 after-delete	bun qa/run.ts kernel-one-path	1	Known unchanged 12 QA fixture offenders; assigned G8
 baseline	bun qa/run.ts typecheck	red/timed out	Known Windows node-pty/dependency EBUSY; assigned ADR-0004/G12 if hardening required
-after-candidate	bun qf-atlas/generate.mjs --check	0	PASS current 426 files/126 channels
+after-candidate	bun qf-atlas/generate.mjs --check	0	PASS current 427 files/126 channels; fingerprint 22056902de7379ea
 final-proof	node qf-atlas/falsify.mjs --receipt	0	PASS 98/98; tree-neutral; fixed coverage bait cleaned
 final-proof	bun qf-atlas/ratchet.mjs	0	PASS HARD RED 0; unexplained coverage 0
 final-proof	bun qa/run.ts golden-g3-consumer-census	0	PASS rows=118; history 88/control 28/QA 2; final committed-state proof
@@ -30,3 +30,7 @@ amendment	bun qa/run.ts product-identity	1	Pre-existing/non-G3 red after approve
 amendment	git diff --check	0	PASS
 amendment	lifecycle fixture exact/no node_modules residue	0	PASS previously recorded exact hashes; fixture node_modules absent
 precommit	git diff --name-only	0	EXACT authorized implementation paths plus AFTER.md and COMMANDS.tsv only
+atlas-refresh	bun qf-atlas/generate.mjs	0	PASS clean authority e0f9ae2; generated only atlas.json, atlas.html, ATLAS.md; fingerprint 22056902de7379ea
+atlas-refresh	bun qf-atlas/generate.mjs --check	0	PASS current 427 files/126 channels; fingerprint 22056902de7379ea
+atlas-refresh	bun qf-atlas/falsify.mjs	0	PASS 98/98; tree-neutral; no files written
+atlas-refresh	bun qf-atlas/ratchet.mjs	0	PASS HARD RED 0; unexplained coverage 0; undecided without blocker 0; undecided 40

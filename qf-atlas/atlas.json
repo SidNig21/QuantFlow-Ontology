@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "d4f0ab7",
+    "commit": "e0f9ae2",
     "generatedAt": "2026-08-26",
-    "filesScanned": 426,
+    "filesScanned": 427,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "6ee252c73c823cd0"
+    "fingerprint": "22056902de7379ea"
   },
   "stats": {
     "live": 113,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 548
+      "files": 549
     },
-    "coverageFiles": 548,
+    "coverageFiles": 549,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -3188,7 +3188,7 @@
       "id": "0:packages/qf-kernel/src::governed",
       "layer": 0,
       "name": "governed-review.ts",
-      "kb": 42.5,
+      "kb": 42.6,
       "x": -0.23,
       "z": 1.3,
       "status": "alert",
@@ -3199,7 +3199,7 @@
       "files": [
         {
           "path": "packages/qf-kernel/src/governed-review.ts",
-          "kb": 42.5,
+          "kb": 42.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
@@ -3424,7 +3424,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 805.5,
+      "kb": 805.6,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3525,7 +3525,7 @@
         },
         {
           "path": "qa/gates/product-identity.ts",
-          "kb": 20.4,
+          "kb": 20.5,
           "spawns": 1,
           "spawnsLive": 0,
           "writes": 1,
@@ -6901,7 +6901,7 @@
     {
       "id": "5:residue",
       "layer": 5,
-      "name": "10 small modules*",
+      "name": "11 small modules*",
       "kb": 27.8,
       "x": 1.24,
       "z": -0.45,
@@ -7011,6 +7011,16 @@
         {
           "path": "qa/gates/dock-definition-launch/fake-cli.ts",
           "kb": 0.3,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/fixtures/lifecycle-command/src/empty.ts",
+          "kb": 0,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -10417,6 +10427,10 @@
       "status": "out-of-scope"
     },
     {
+      "path": "qa/fixtures/lifecycle-command/src/empty.ts",
+      "status": "out-of-scope"
+    },
+    {
       "path": "qa/gates/acp-fs-confine.ts",
       "status": "out-of-scope"
     },
@@ -11384,7 +11398,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "UPDATE task at line 646"
+            "UPDATE task at line 647"
           ],
           "weight": "strong"
         },
@@ -11487,8 +11501,8 @@
             "exports requestGovernedReview() at line 452"
           ],
           "strong": [
-            "INSERT INTO evaluation at line 629",
-            "UPDATE evaluation at line 641"
+            "INSERT INTO evaluation at line 630",
+            "UPDATE evaluation at line 642"
           ],
           "weight": "strong"
         },
@@ -20145,6 +20159,31 @@
       "unexplained": []
     },
     {
+      "path": "qa/fixtures/lifecycle-command/src/empty.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/acp-fs-confine.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -24864,41 +24903,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 544,
+      "indexed": 545,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 267,
+      "not-applicable": 268,
       "indexed": 277,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 537,
+      "not-applicable": 538,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 497,
+      "not-applicable": 498,
       "partial": 26,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 478,
+      "not-applicable": 479,
       "partial": 64,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 206,
+      "not-applicable": 207,
       "unsupported": 110,
       "indexed": 232
     },
     "ownership": {
-      "not-applicable": 176,
+      "not-applicable": 177,
       "unsupported": 352,
       "indexed": 20
     },
     "reach": {
-      "unsupported": 314,
+      "unsupported": 315,
       "indexed": 231,
       "partial": 3
     }
@@ -57958,7 +57997,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            629
+            630
           ]
         }
       ]
@@ -57983,7 +58022,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            641
+            642
           ]
         }
       ]
@@ -58008,9 +58047,9 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            631,
             632,
-            639
+            633,
+            640
           ]
         }
       ]
@@ -58035,7 +58074,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            625
+            626
           ]
         }
       ]
@@ -58060,7 +58099,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            643
+            644
           ]
         }
       ]
@@ -58085,7 +58124,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            638
+            639
           ]
         }
       ]
@@ -58110,7 +58149,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            648
+            649
           ]
         }
       ]
@@ -58135,7 +58174,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            645
+            646
           ]
         }
       ]
@@ -58160,7 +58199,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            646
+            647
           ]
         }
       ]
@@ -58828,16 +58867,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "ea7e656",
+      "commit": "d4f0ab7",
       "generatedAt": "2026-08-26"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "d4f0ab7",
+      "commit": "e0f9ae2",
       "generatedAt": "2026-08-26"
     },
     "verdict": "better",
-    "why": "41 improvement(s), nothing added or hidden",
+    "why": "40 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -59070,7 +59109,7 @@
         "kind": "broken-bridge-call",
         "what": "ptyForegroundProcess",
         "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
-        "note": "was undecided"
+        "note": "was repair"
       },
       {
         "id": "push:cd-to",
@@ -59142,7 +59181,7 @@
       "changedOwner": 0,
       "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 41,
+      "undecidedFrom": 40,
       "undecidedTo": null
     }
   },

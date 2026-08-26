@@ -35,11 +35,11 @@ QuantFlow retains the app-owned notification transport and separate transport da
 
 ## Final generated proof hashes
 
-- `qf-atlas/atlas.json`: `7e98927f045b79316cb043d5bb917dae406207e3774813799ed77d6041e9cf16`
-- `qf-atlas/atlas.html`: `662b6d8b7eb4ede35511ede2b877f293857c90269e32d0008c47f8867c23f395`
-- `qf-atlas/ATLAS.md`: `50ad5d208f523c478db50a531ebdf485a36bda142927965f9b3c07caffe4073b`
+- `qf-atlas/atlas.json`: `BCF877C591B0793015C9A266DF1ABE9B61B896055589F45E83FC874CC22B880A`
+- `qf-atlas/atlas.html`: `7C8AC51B35D5463C218B703B61F643ADFAA06CBA32135D801874B51668A5030E`
+- `qf-atlas/ATLAS.md`: `6B980942D852E7980BC4CFEBEB593EAB785DB2C5DA647C5BED87CF25BE43FDD6`
 - `qf-atlas/falsifiers.json`: `745dcca3cac9c6a9623bd1c67abf20d502aeeb1bca4276d776900b0abfe09eaa`
-- Atlas projection: 426 files, 126 channels, 13 strip candidates, 0 DEAD, 0 ratchet HARD RED.
+- Atlas projection: 427 files, 126 channels, 13 strip candidates, 0 DEAD, 0 ratchet HARD RED.
 
 The product/QA commit is the generator base; this final evidence update contains only generated artifacts and proof receipts.
 
@@ -60,3 +60,11 @@ The product/QA commit is the generator base; this final evidence update contains
 - Frozen fixture install: **PASS**; fixture `tsc --noEmit`: **PASS**.
 - Literal, flagged, and chained lifecycle selectors remain **RED** with the exact fixture diagnostics recorded in `COMMANDS.tsv`.
 - Normal `bun qa/run.ts typecheck`: **PASS** (`exit 0`, `PASS typecheck`), with no TS18003 and no EBUSY observed in this amendment run.
+
+## Atlas generated-output repair
+
+- Clean authority/evidence head: `e0f9ae23a1ba56c76dc4ce368f67a4b7931a9682`; HEAD and origin matched and the tree was clean before generation.
+- Canonical `bun qf-atlas/generate.mjs` changed only `qf-atlas/atlas.json`, `qf-atlas/atlas.html`, and `qf-atlas/ATLAS.md`.
+- Atlas metadata fingerprint: `22056902de7379ea`; 427 files, 106 nodes/subsystems, 126 channels; 113 live, 0 unreached, 13 unused, 0 DEAD; 13 strip candidates; 0 unexplained coverage and 0 unexplained undecided findings.
+- `bun qf-atlas/generate.mjs --check`: **PASS**; `bun qf-atlas/falsify.mjs`: **98/98 PASS**, tree-neutral; `bun qf-atlas/ratchet.mjs`: **PASS**, HARD RED 0, unexplained coverage 0, undecided without blocker 0.
+- Falsifier bait and generated temporary files are absent after restoration. No product, QA, configuration, order semantics, acceptance, or runtime files changed.
