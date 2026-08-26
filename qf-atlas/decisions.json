@@ -36,7 +36,7 @@
     "2026-08-19 — the three governed-review hard reds are adjudicated REPAIR. No expiry: they are being repaired, not accepted. Ownership findings are deliberately NOT here: multiple structural claimants is not proof of competing ownership, so they stay amber until independently adjudicated.",
     "2026-08-18 D6 schema migration: five entries carried `why` and were renamed to `reason` verbatim. No verdict, owner or wording changed. The three `repair` entries below with no `remediation_trigger` are INCOMPLETE and say so; inventing a trigger for them would be authoring founder intent, so they are left for the founder to fill in.",
     "2026-08-19 D4 identity migration: persistence ids became persistence:<file>:<function>:<table>:<verb>, because the old shape collapsed two different functions writing the same table+verb into one finding and dropped the second. The three governed-review REPAIR keys below were remapped mechanically. No verdict, owner, reason or remediation_trigger changed.",
-    "2026-08-24 G2 founder disposition superseded and retired the four source-bound decisions after bounded proof retargeting; current live receipts own the protected invariants.",
+    "2026-08-24 G2 founder disposition superseded and retired the four source-bound decisions after bounded proof retargeting; current live receipts own the protected invariants."
   ],
   "decisions": {
     "broken-bridge-call:ptyForegroundProcess": {
