@@ -1,10 +1,13 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G5 READER ONLY
+# NEXT — R18 GOLDEN BASELINE HOLD / G5 BUILDER
 
-status: G4 CLOSED / G5 READER ONLY
+status: G4 CLOSED / G5 BUILDER AUTHORIZED
 rotated-at: 2026-08-26
-rotated-by: Router after independent G4 semantic PASS and mechanical close repair
+rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **NO — READER ONLY**
+builder-authority: **YES — G5 ONLY**
+g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
+g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
+g5-reader-verdict: **YES / YES**
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-2-active-group: G5 — Legacy ACP and unconsumed renderers
@@ -22,6 +25,8 @@ protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
 R0–R17 and Pre-R18 remain **CLOSED / ACCEPTED**. G1–G4 are independently accepted. Full G9 remains after G8. G8 owns the frozen `kernel-market-lineage` red; G12 owns the frozen Electron `userData`, Windows package/typecheck, and operations reds.
 
-G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. G5 is open only for one fresh semantic Reader to adjudicate saved-state compatibility, current openers/restore/package consumers, host-ACP support, and dependency reachability. Mechanical same-meaning harness repairs use the Golden fast path; compatibility, runtime support, product behavior, scope/order, or PASS-meaning changes require semantic Reader adjudication.
+G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. The G5 semantic Reader accepted the amended order at `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`. The order-only commits after `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806` leave product/config bytes unchanged.
 
-No G5 Builder, G6 authority, main merge, full G9, or R18 implementation is open. `NEXT.md` rotates again only after the G5 Reader returns `YES/YES` and its defects are landed in the order.
+The frozen starting matrix records both new G5 selectors as absent/red; G4 retired-route, Dock launch, Hermes launch-policy, Kernel sole-writer, and the real Electron build are green. `hermes-first-turn-synthetic` is pre-existing red because its readiness assertion still names retired `hermes-orchestrator` while production authority requires `hermes-research-director`. This is an authorized mechanical stale-selector repair: change only that readiness assertion, prove old red/new green, and do not rewrite later synthetic fixture identifiers without separate evidence.
+
+The Builder is authorized only for G5's accepted deletion/contract boundary plus this exact mechanical selector repair. No G6 authority, main merge, full G9, or R18 implementation is open.

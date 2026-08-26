@@ -180,7 +180,7 @@ The smallest focused matrix is:
 - `bun qa/run.ts hermes-launch-policy`
 - `bun qa/run.ts hermes-first-turn-synthetic`
 - `bun qa/run.ts kernel-sole-writer-app`
-- `bun --cwd collab-electron run build`
+- `bun run --cwd collab-electron build`
 
 Installer/release traversal remains G12/Phase 3 unless G5 changes installer operations, signing, resource staging rules, or release metadata beyond removal of the listed dead renderer/dependency closure.
 
@@ -255,7 +255,7 @@ bun qa/run.ts dock-definition-launch
 bun qa/run.ts hermes-launch-policy
 bun qa/run.ts hermes-first-turn-synthetic
 bun qa/run.ts kernel-sole-writer-app
-bun --cwd collab-electron run build
+bun run --cwd collab-electron build
 ```
 
 Every normal command must exit `0`.
