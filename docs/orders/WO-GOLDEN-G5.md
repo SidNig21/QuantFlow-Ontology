@@ -227,3 +227,116 @@ The final receipt must contain exactly:
 - `rollback_boundary`, `user_data_deletion`, `independent_verifier`
 
 No Builder authority opens until this amendment is landed and a fresh Reader returns `YES / YES`.
+
+## Required amendment after Reader Round 2
+
+This binding contract supersedes the earlier `Required runnable selectors`, `Fail-capable falsifiers`, and `G5 receipt schema` subsections where they differ.
+
+### Exact gate deliverables
+
+The Builder must add exactly:
+
+- `qa/gates/golden-g5-consumer-census.ts`
+- `qa/gates/golden-g5-saved-state.ts`
+- one `qa/run.ts` registration named exactly `golden-g5-consumer-census`
+- one `qa/run.ts` registration named exactly `golden-g5-saved-state`
+
+A selector exits `0` only when its normal assertions pass and exits nonzero whenever any required falsifier is active.
+
+### Exact Builder matrix
+
+From repository root, the Builder runs and records unedited output for:
+
+```text
+bun qa/run.ts golden-g5-consumer-census
+bun qa/run.ts golden-g5-saved-state
+bun qa/run.ts golden-g4-retired-route
+bun qa/run.ts dock-definition-launch
+bun qa/run.ts hermes-launch-policy
+bun qa/run.ts hermes-first-turn-synthetic
+bun qa/run.ts kernel-sole-writer-app
+bun --cwd collab-electron run build
+```
+
+Every normal command must exit `0`.
+
+The Builder runs these falsifiers in isolated temporary fixtures. Each must exit nonzero; after every case the fixture is restored and the corresponding normal selector reruns at exit `0`.
+
+```text
+$env:QF_G5_FALSIFY="stale-opener"; bun qa/run.ts golden-g5-consumer-census
+$env:QF_G5_FALSIFY="protected-consumer"; bun qa/run.ts golden-g5-consumer-census
+$env:QF_G5_FALSIFY="host-acp"; bun qa/run.ts golden-g5-consumer-census
+$env:QF_G5_FALSIFY="dependency-closure"; bun qa/run.ts golden-g5-consumer-census
+$env:QF_G5_FALSIFY="saved-state-loss"; bun qa/run.ts golden-g5-saved-state
+$env:QF_G5_FALSIFY="obsolete-fallback"; bun qa/run.ts golden-g5-saved-state
+```
+
+For each falsifier, the gate prints the named defect, exits nonzero, restores the fixture, and then the same selector prints PASS and exits `0`. An unexpectedly green falsifier is a gate failure.
+
+### Exact command ownership
+
+The Builder runs the normal matrix and every falsifier above.
+
+The independent Verifier reruns the same normal matrix and inspects the unedited falsifier outputs at the immutable candidate SHA. The Verifier does not regenerate, edit, or repair the candidate.
+
+G5 does not run `bun qa/verify-release.ts` or the Windows installer matrix. Those remain G12/Phase 3 unless the candidate changes installer operations, signing, production resource-staging rules, or release metadata. Such a change is out of G5 scope and stops the candidate.
+
+### Exact evidence files
+
+After Reader acceptance and only after product changes exist, create exactly:
+
+- `docs/orders/evidence/golden-baseline/g5/BEFORE.md`
+- `docs/orders/evidence/golden-baseline/g5/COMMANDS.tsv`
+- `docs/orders/evidence/golden-baseline/g5/FALSIFIERS.tsv`
+- `docs/orders/evidence/golden-baseline/g5/AFTER.md`
+- `docs/orders/evidence/golden-baseline/g5/READER-ACCEPTANCE.md`
+- `docs/orders/evidence/golden-baseline/g5/VERIFIER-ACCEPTANCE.md`
+- `docs/orders/evidence/golden-baseline/g5/GROUP-ACCEPTANCE.md`
+
+`COMMANDS.tsv` columns are exactly:
+
+```text
+id	role	command	expected_exit	actual_exit	output_path
+```
+
+`FALSIFIERS.tsv` columns are exactly:
+
+```text
+id	selector	falsifier	expected_exit	actual_exit	restored	normal_rerun_exit	output_path
+```
+
+`READER-ACCEPTANCE.md` is the semantic receipt. `VERIFIER-ACCEPTANCE.md` is the independent verification receipt. `GROUP-ACCEPTANCE.md` records final group closure only.
+
+### Exact receipt fields
+
+`READER-ACCEPTANCE.md` must contain exactly these named fields:
+
+```text
+verdict
+starting_sha
+candidate_sha
+branch
+upstream
+clean_start
+clean_end
+authorized_path_disposition
+agent_chat_classification
+standalone_terminal_classification
+host_acp_classification
+saved_state_universe
+legacy_state_disposition
+dependency_closure
+matrix_commands
+matrix_results
+falsifier_commands
+falsifier_results
+protected_current_product_results
+inherited_red_owners
+atlas_identity_before
+atlas_identity_after
+rollback_boundary
+user_data_deletion
+independent_verifier
+```
+
+No Builder authority opens until this exact amendment is committed and a fresh semantic Reader returns `YES / YES`.
