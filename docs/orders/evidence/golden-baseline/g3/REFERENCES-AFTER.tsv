@@ -1,6 +1,7 @@
 classification	source	target	count
 history	docs/history/** and docs/orders/evidence/**	tools/qf-peer-bus or species/critic-mock	88
 control-document	docs/orders/NEXT.md and docs/orders/WO-GOLDEN-G3.md	tools/qf-peer-bus or species/critic-mock	28
-generated	qf-atlas generated projection	tools/qf-peer-bus or species/critic-mock	191
+qa	qa/**	tools/qf-peer-bus or species/critic-mock	2
+generated	qf-atlas generated projection	tools/qf-peer-bus or species/critic-mock	0
 production-import/spawn/runtime/package/compatibility/current-authority	working product tree	tools/qf-peer-bus or species/critic-mock	0
-census-total	working product tree	non-consumer references	307
+census-total	working product tree	non-consumer references	118

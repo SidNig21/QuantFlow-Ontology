@@ -17,7 +17,7 @@ QuantFlow retains the app-owned notification transport and separate transport da
 
 ## G3 matrix
 
-- Consumer census: **PASS**, 307 rows classified as history, control-document, or generated; zero production/import/spawn/runtime/package/current-authority consumers.
+- Consumer census on the final committed candidate: **PASS**, 118 rows classified as history (88), control-document (28), or QA (2); zero production/import/spawn/runtime/package/current-authority consumers.
 - Consumer falsifiers: **RED** for both `peer-bus` and `critic-mock`, with the exact virtual production-import bait named.
 - Lifecycle falsifiers: **RED** for literal, flagged, and chained install forms, all injected only into `qa/fixtures/lifecycle-command`.
 - Kernel sole-writer and app sole-writer: **PASS**.

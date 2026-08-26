@@ -13,6 +13,7 @@ baseline	bun qa/run.ts typecheck	red/timed out	Known Windows node-pty/dependency
 after-candidate	bun qf-atlas/generate.mjs --check	0	PASS current 426 files/126 channels
 final-proof	node qf-atlas/falsify.mjs --receipt	0	PASS 98/98; tree-neutral; fixed coverage bait cleaned
 final-proof	bun qf-atlas/ratchet.mjs	0	PASS HARD RED 0; unexplained coverage 0
+final-proof	bun qa/run.ts golden-g3-consumer-census	0	PASS rows=118; history 88/control 28/QA 2; final committed-state proof
 
 baseline	windows-dock-collaboration package run	timeout then cleaned	Known pre-existing package timeout; no product process; ADR-0004
 baseline	Atlas falsifier receipt	98/98	HARD RED 0; tree-neutral; inherited baseline receipt
