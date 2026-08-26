@@ -23,3 +23,10 @@ amendment	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=literal bun qa/run.ts typecheck
 amendment	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=flagged bun qa/run.ts typecheck	1	typecheck: forbidden lifecycle install package=qa\fixtures\lifecycle-command lifecycle=postinstall manager=bun operation=install command=bun --cwd x install --frozen-lockfile
 amendment	QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL=chained bun qa/run.ts typecheck	1	typecheck: forbidden lifecycle install package=qa\fixtures\lifecycle-command lifecycle=postinstall manager=npm operation=ci command=echo preparing; npm --prefix x ci
 amendment	bun qa/run.ts typecheck	0	PASS typecheck; no TS18003; known baseline EBUSY not observed in this run
+amendment	bun test packages/qf-kernel/src/r12-independent-critic.test.ts packages/qf-kernel/src/r15-governed-review.test.ts collab-electron/src/main/governed-review.test.ts	0	PASS 17/17; R12 atomic self-review exact message/state proof included
+amendment	bun qa/run.ts governed-review	0	PASS focused production/kernel proof
+amendment	bun qa/run.ts governed-review-live	0	PASS broker/kernel live-contract control
+amendment	bun qa/run.ts product-identity	1	Pre-existing/non-G3 red after approved historical classifications: production boot does not bind Electron userData to QF_APP_DIR/electron
+amendment	git diff --check	0	PASS
+amendment	lifecycle fixture exact/no node_modules residue	0	PASS previously recorded exact hashes; fixture node_modules absent
+precommit	git diff --name-only	0	EXACT authorized implementation paths plus AFTER.md and COMMANDS.tsv only

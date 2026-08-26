@@ -1,7 +1,7 @@
 # LAWS.md — the canvas-seam laws
 
 > **ADOPTED 2026-07-18 (WO-002a).** Governing contract for the canvas seam. **Same weight as the One
-> Rule** (`START_HERE.md` §1). Collaborator stays; ownership inverts. **A tile that remembers is a bug.**
+> Rule** (`START_HERE.md` §1). QuantFlow stays; ownership inverts. **A tile that remembers is a bug.**
 >
 > Cut out of `docs/BLUEPRINT.md` (now `docs/history/BLUEPRINT-2026-07-18.md`) on 2026-08-03 under DOCTRINE A9, unchanged. The blueprint's stack
 > table and organ-harvest notes went to `docs/history/`; these laws did not, because `START_HERE.md`
@@ -28,5 +28,5 @@ The Kernel models *operational* states with legal-transition tables (`run: queue
 **Tile contract (canonical).**
 `Tile = render(projection) + dispatch(action)`. Projection is derived from the Kernel. Action is a Kernel action (or a thin UI command that becomes one). No other write path.
 
-**Collaborator adapters (not authorities).**
+**QuantFlow adapters (not authorities).**
 `tile-manager` create/move/resize/close, `restoreCanvasState`, `canvas:save-state`, `canvas-rpc` mutations, and `syncTileList` are adapters over Kernel actions and projections. Persistence demotes to cache or dies; the Kernel commit is durability.

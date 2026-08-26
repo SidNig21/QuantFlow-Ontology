@@ -98,6 +98,8 @@ function bucketC(file: string): boolean {
   return (
     file === "README.md" ||
     file === "START_HERE.md" ||
+    file === "docs/DEBT.md" ||
+    file.startsWith("docs/history/") ||
     /^LICENSE(?:\.|$)/.test(file) ||
     /^NOTICE(?:\.|$)/.test(file) ||
     file.startsWith("docs/orders/") ||

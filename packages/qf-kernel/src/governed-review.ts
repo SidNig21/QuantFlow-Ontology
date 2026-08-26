@@ -597,6 +597,7 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
   const work = assertSourceWorkShape(JSON.parse(task.source_work));
   const suppliedWork = assertSourceWorkShape(input.source_work);
   if (!sameJson(work, suppliedWork)) throw new KernelError("source work is immutable");
+  if (criticSessionId === work.executor_session_id) throw new KernelError("record_evaluation requires an independent critic session");
   if (input.hypothesis_id !== work.hypothesis_id || input.run_id !== work.run_id || input.artifact_id !== work.result_artifact_id) throw new KernelError("record_evaluation ids do not match frozen source work");
   validateStoredSourceWork(db, work);
   validateQualifyingReads(db, work, taskId, typeof input.broker_invocation_id === "string" ? input.broker_invocation_id : undefined);

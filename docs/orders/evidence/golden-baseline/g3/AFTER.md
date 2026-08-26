@@ -43,6 +43,16 @@ QuantFlow retains the app-owned notification transport and separate transport da
 
 The product/QA commit is the generator base; this final evidence update contains only generated artifacts and proof receipts.
 
+## Semantic preservation amendment — governed self-review prerequisite
+
+- Authority: `73b86840e4900f0426322d85834ceedc4e3e9cb0`.
+- `recordGovernedEvaluation` now refuses an admitted critic equal to the frozen source-work executor before Evaluation, Artifact, link, Task, receipt, publication, or event mutation, with the exact message `record_evaluation requires an independent critic session`.
+- R12 is ported onto the current governed source Task: exact bound `source_work`, delivered production `hermes-critic`, three exact successful reads, bound `qf_record_evaluation` invocation, canonical structured findings, exact result-Artifact evidence reference, R11b metrics, performed-by identity, findings-to-Run lineage, successful `resolve_hypothesis`, Report gates lineage, and atomic non-critic/rejecting-publication/self-review refusals.
+- Focused critic/governed tests: `17/17 PASS`; `governed-review`: `PASS`; `governed-review-live`: `PASS`.
+- `product-identity` classified the approved static showcase row, `docs/DEBT.md`, and `docs/history/**`; it then exposed the unrelated pre-existing production-boot red `production boot does not bind Electron userData to QF_APP_DIR/electron`. No product source or production-delegation logic changed.
+- The two `docs/LAWS.md` labels are the exact approved `QuantFlow` replacements; Laws A–F and the forbidden identity matcher remain otherwise unchanged.
+- Lifecycle fixture remains exact at the previously recorded hashes; no `qa/fixtures/lifecycle-command/node_modules` residue exists.
+- Candidate parent is the clean authority above; final local/remote identity and process-zero proof are recorded at handoff after commit/push.
 ## Lifecycle fixture semantic amendment
 
 - `qa/fixtures/lifecycle-command/src/empty.ts` is exactly `export {};` plus one newline; SHA-256 `8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881`.
