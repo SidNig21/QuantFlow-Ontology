@@ -825,16 +825,6 @@ const committedLedger = (() => {
 const ledgerWith = (obj) => JSON.stringify(
   { ...committedLedger, decisions: { ...(committedLedger.decisions ?? {}), ...obj } }, null, 2);
 
-// Must return a finding that is actually UNDECIDED. Picking merely the first
-// `unreachable` row would eventually select one the founder had already ruled on —
-// overriding a verdict rather than adding one, so the undecided count would not move
-// and the test would fail for a reason that has nothing to do with what it checks.
-const firstUnreachable = () => {
-  const open = new Set(before.decisions
-    .filter((d) => d.kind === "unreachable" && d.verdict === "undecided")
-    .map((d) => d.where));
-  return (before.reach.find((r) => r.reach === "unreachable" && open.has(r.path)) ?? {}).path;
-};
 
 // 31 · a finding nobody has ruled on is undecided
 record(31, "a new finding arrives as undecided",
@@ -846,31 +836,40 @@ record(31, "a new finding arrives as undecided",
     }));
 
 // 32 · recording a verdict takes it out of undecided
-record(32, "a recorded verdict clears undecided", ...(() => {
-  const target = firstUnreachable();
-  if (!target) return [false, "no unreachable finding to decide on"];
-  const id = `unreachable:${target}`;
-  return withFile(DECISIONS,
-    ledgerWith({ [id]: { verdict: "remove", why: "falsifier", owner: "test", expires: "2099-01-01" } }),
-    (m) => {
-      const d = m.decisions.find((x) => x.id === id);
-      return [d?.verdict === "remove" && m.stats.undecided < before.stats.undecided,
-        `verdict=${d?.verdict} undecided ${before.stats.undecided} -> ${m.stats.undecided}`];
-    });
-})());
+record(32, "a recorded verdict clears undecided", ...withFile(
+  `${MAIN}/zz-falsify-32.ts`,
+  `export function orphan32(){ return 1; }\n`,
+  (fixture) => {
+    const id = "unreachable:collab-electron/src/main/zz-falsify-32.ts";
+    const fixtureDecision = fixture.decisions.find((x) => x.id === id);
+    if (fixtureDecision?.verdict !== "undecided")
+      return [false, `fixture verdict=${fixtureDecision?.verdict ?? "missing"}`];
+    return withFile(DECISIONS,
+      ledgerWith({ [id]: { verdict: "remove", owner: "test", reason: "falsifier", remediation_trigger: "falsifier" } }),
+      (m) => {
+        const d = m.decisions.find((x) => x.id === id);
+        const exactReduction = m.stats.undecided === fixture.stats.undecided - 1;
+        return [d?.verdict === "remove" && exactReduction,
+          `verdict=${d?.verdict} undecided ${fixture.stats.undecided} -> ${m.stats.undecided}`];
+      });
+  }));
 
 // 33 · "accepted" without owner, reason and expiry is NOT a decision.
 // Otherwise the whole ledger can be zeroed with one careless entry.
-record(33, "bare 'accepted' cannot hide a finding", ...(() => {
-  const target = firstUnreachable();
-  if (!target) return [false, "no unreachable finding to test"];
-  const id = `unreachable:${target}`;
-  return withFile(DECISIONS, ledgerWith({ [id]: { verdict: "accepted" } }), (m) => {
-    const d = m.decisions.find((x) => x.id === id);
-    return [d?.verdict === "undecided",
-      d ? `verdict=${d.verdict}${d.note ? ` (${d.note})` : ""}` : "finding vanished"];
-  });
-})());
+record(33, "bare 'accepted' cannot hide a finding", ...withFile(
+  `${MAIN}/zz-falsify-33.ts`,
+  `export function orphan33(){ return 1; }\n`,
+  (fixture) => {
+    const id = "unreachable:collab-electron/src/main/zz-falsify-33.ts";
+    const fixtureDecision = fixture.decisions.find((x) => x.id === id);
+    if (fixtureDecision?.verdict !== "undecided")
+      return [false, `fixture verdict=${fixtureDecision?.verdict ?? "missing"}`];
+    return withFile(DECISIONS, ledgerWith({ [id]: { verdict: "accepted" } }), (m) => {
+      const d = m.decisions.find((x) => x.id === id);
+      return [d?.verdict === "undecided",
+        d ? `verdict=${d.verdict}${d.note ? ` (${d.note})` : ""}` : "finding vanished"];
+    });
+  }));
 
 const VITE = "collab-electron/electron.vite.config.ts";
 const WINDOW_ENTRY = /["']src\/windows\/([\w-]+)\/index\.html["']/g;
