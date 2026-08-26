@@ -249,3 +249,10 @@ Starting-SHA-proven same-meaning selector, fixture-path, allowlist, invocation, 
 ## Reader acceptance
 
 Fresh Reader task `01a03f1a-b4d5-7b82-a58a-0e90965d8873` accepted this order `YES/YES` at immutable SHA `e08e8838fcc70d5e82c129ebbd5a8da43dfbe282`. Receipt: [G4-READER-ACCEPTANCE.md](evidence/golden-baseline/g4/G4-READER-ACCEPTANCE.md).
+## Semantic timing adjudication — Reader accepted
+
+Fresh semantic Reader task `01a03f1a-b4d5-7b82-a58a-0e90965d8873` ruled that Contract A is required by this order: arbitrary non-empty route strings remain untrusted metadata through parsing/resolution, and only `runtime-route-dispatch.ts` decides whether they are supported.
+
+This is not a compatibility expansion. Only `native_tui` and `host_acp` dispatch. Retired `agentos` and arbitrary unknown routes both produce the exact `UnsupportedRuntimeRouteError` before any mutation. Parser-level rejection would bypass the accepted dispatcher and create two refusal meanings.
+
+The exact fail-capable proof is `bun qa/run.ts golden-g4-retired-route`, covering parse → resolve → dispatch for both supported routes, `agentos`, and an arbitrary unknown route. Parser rejection, fallback, wrong callback selection, or pre-dispatch mutation makes the gate red. Receipt: [G4-ROUTE-TIMING-READER.md](evidence/golden-baseline/g4/G4-ROUTE-TIMING-READER.md).
