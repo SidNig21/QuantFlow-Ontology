@@ -1,5 +1,5 @@
 {
-  "ran": "2026-08-21",
+  "ran": "2026-08-26",
   "passed": 98,
   "total": 98,
   "results": [
@@ -49,7 +49,7 @@
       "n": 8,
       "name": "coverage ledger is complete, unique and well-formed",
       "passed": true,
-      "detail": "427 rows, all unique and legal; 66 findings all carry sourceClass"
+      "detail": "426 rows, all unique and legal; 73 findings all carry sourceClass"
     },
     {
       "n": 9,
@@ -97,7 +97,7 @@
       "n": 16,
       "name": "headline counts equal the canonical model",
       "passed": true,
-      "detail": "stats.violations=17 vs persistence=17; gray 3 vs 3"
+      "detail": "stats.violations=10 vs persistence=10; gray 3 vs 3"
     },
     {
       "n": 17,
@@ -107,9 +107,9 @@
     },
     {
       "n": 18,
-      "name": "coverage gaps appear in the agent brief",
+      "name": "the fixed coverage bait appears in the agent brief",
       "passed": true,
-      "detail": "22 gaps in model; brief shows section=true"
+      "detail": "path=tools/_qf-atlas-coverage-bait.ts status=partial sqlInText=1 sqlIndexed=0 shown=true"
     },
     {
       "n": 19,
@@ -145,7 +145,7 @@
       "n": 24,
       "name": "createReviewTask is a bypass, not kernel-internal gray",
       "passed": true,
-      "detail": "violation/bypass table=task"
+      "detail": "violation/bypass task+links=2/2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=c95b41c9df62ae47c9bf7d8ea169929b3cf304b6db4403ee34bfb81a628bd7b6 artifactHashAfter=c95b41c9df62ae47c9bf7d8ea169929b3cf304b6db4403ee34bfb81a628bd7b6 sourceRestored=true restored=true"
     },
     {
       "n": 25,
@@ -181,7 +181,7 @@
       "n": 30,
       "name": "every file carries a complete blast radius",
       "passed": true,
-      "detail": "232 entries, all 7 fields present; e.g. update-manager.ts has 1 direct dependants"
+      "detail": "233 entries, all 7 fields present; e.g. kernel.ts has 9 direct dependants"
     },
     {
       "n": 31,
@@ -193,7 +193,7 @@
       "n": 32,
       "name": "a recorded verdict clears undecided",
       "passed": true,
-      "detail": "verdict=remove undecided 46 -> 45"
+      "detail": "verdict=remove undecided 41 -> 40"
     },
     {
       "n": 33,
@@ -253,7 +253,7 @@
       "n": 42,
       "name": "an importer outside the product still anchors its target",
       "passed": true,
-      "detail": "reach=reachable, importers=qa/gates/artifact-root/run.ts"
+      "detail": "after removing QA edge: reach=reachable, importers=collab-electron/scripts/package-lib/package-inspect.ts, collab-electron/scripts/package-lib/runtime-staging.ts, qa/gates/dev-dock-readiness.ts, qa/gates/dock-definition-launch/run.ts, qa/gates/research-director-front-door.ts, qa/gates/windows-cold-boot.ts"
     },
     {
       "n": 43,
@@ -289,13 +289,13 @@
       "n": 48,
       "name": "AST resolves the facts regex got wrong",
       "passed": true,
-      "detail": "ts=5.9.3 kernel.ts lifetime=not-applicable governed-review persistence=partial"
+      "detail": "ts=5.9.3 kernel.ts lifetime=not-applicable governed-review persistence=indexed"
     },
     {
       "n": 49,
       "name": "every scanned file has a cell for every analyzer",
       "passed": true,
-      "detail": "539 files × 8 analyzers, no empty cells"
+      "detail": "548 files × 8 analyzers, no empty cells"
     },
     {
       "n": 50,
@@ -307,7 +307,7 @@
       "n": 51,
       "name": "the write door is derived from the Kernel, not from a filename list",
       "passed": true,
-      "detail": "state=partial dispatched=17/41 door=6 files; divergence from the allowlist=8"
+      "detail": "state=partial dispatched=17/43 door=6 files; divergence from the allowlist=8"
     },
     {
       "n": 52,
@@ -319,13 +319,13 @@
       "n": 53,
       "name": "the filename allowlist no longer confers compliance",
       "passed": true,
-      "detail": "27 trusted site(s), every one in a derived door file"
+      "detail": "28 trusted site(s), every one in a derived door file"
     },
     {
       "n": 54,
       "name": "the authority swap loses no confirmed violation",
       "passed": true,
-      "detail": "17 confirmed violation(s) across 2 file(s); governed-review.ts red=true"
+      "detail": "10 confirmed violation(s) across 3 file(s); governed-review.ts red=true"
     },
     {
       "n": 55,
@@ -367,7 +367,7 @@
       "n": 61,
       "name": "moving a finding to another line preserves its id",
       "passed": true,
-      "detail": "26 ids identical, evidence lines shifted"
+      "detail": "25 ids identical, evidence lines shifted"
     },
     {
       "n": 62,
@@ -385,13 +385,13 @@
       "n": 64,
       "name": "the ratchet fails on a red the baseline does not know",
       "passed": true,
-      "detail": "exit=1 sawNewRed=true"
+      "detail": "exit=1 sawNewRed=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c artifactHashAfter=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c sourceRestored=true restored=true"
     },
     {
       "n": 65,
       "name": "the baseline refuses to seed without an independent receipt",
       "passed": true,
-      "detail": "exit=2 refused=true baselineWritten=false"
+      "detail": "exit=2 refused=true baselineUnchanged=true baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c artifactHashAfter=d64409cebd2296e58339b9c3028ce4e389b27d64941a2deb4cbeadda516b7e8c sourceRestored=true restored=true"
     },
     {
       "n": 66,
@@ -421,7 +421,7 @@
       "n": 70,
       "name": "every undecided finding names its blocker",
       "passed": true,
-      "detail": "46 undecided, all blockered: {\"founder-decision\":26,\"ast-coverage\":3,\"package-proof\":17}"
+      "detail": "40 undecided, all blockered: {\"founder-decision\":20,\"ast-coverage\":3,\"package-proof\":17}"
     },
     {
       "n": 71,
@@ -433,13 +433,13 @@
       "n": 72,
       "name": "the coverage roll-up accounts for every analyzer",
       "passed": true,
-      "detail": "539 rows, no green roll-up hides a gap"
+      "detail": "548 rows, no green roll-up hides a gap"
     },
     {
       "n": 73,
       "name": "the push coverage dimension is measured, not copied",
       "passed": true,
-      "detail": "264 of 539 rows differ between ipcPush and ipcRequest"
+      "detail": "270 of 548 rows differ between ipcPush and ipcRequest"
     },
     {
       "n": 74,
@@ -451,13 +451,13 @@
       "n": 75,
       "name": "every HIGH persistence red carries an AST reach proof",
       "passed": true,
-      "detail": "3 HIGH row(s), all with an AST path (hops: 2,2,1)"
+      "detail": "2 HIGH row(s), including the temporary bypass, all with an AST path (hops: 1,1); baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 artifactHashAfter=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 sourceRestored=true restored=true"
     },
     {
       "n": 76,
       "name": "breaking the reach edge downgrades the row out of HIGH",
       "passed": true,
-      "detail": "confidence=low governance=unknown; unproven HIGH rows anywhere = 0"
+      "detail": "confidence=medium governance=violation; unproven HIGH rows anywhere = 0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 artifactHashAfter=558d043f5da10fa2fe40fae5e2b8ad3b6c78e5a31c89770aba6d406b978b0055 sourceRestored=true restored=true"
     },
     {
       "n": 77,
@@ -469,13 +469,13 @@
       "n": 78,
       "name": "hard red excludes medium and non-AST classes",
       "passed": true,
-      "detail": "hardRed=3 medium=0 lifetime=0 bridge=0 unproven=0 ownership=0"
+      "detail": "hardRed=0 medium=0 lifetime=0 bridge=0 unproven=0 ownership=0"
     },
     {
       "n": 79,
       "name": "seeding refuses unadjudicated or KEEP hard reds",
       "passed": true,
-      "detail": "unadjudicated seeded=0 keep seeded=0 adjudicated seeded=3/3"
+      "detail": "unadjudicated seeded=0 keep seeded=0 adjudicated seeded=0/0"
     },
     {
       "n": 80,
@@ -487,7 +487,7 @@
       "n": 81,
       "name": "a same-named decoy cannot forge or suppress a reach proof",
       "passed": true,
-      "detail": "highs=3 (expect 3, i.e. not suppressed) forgedProofs=0"
+      "detail": "baitHigh=high forgedProofs=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=deeac8018da2227295e072d51d52db6c3b2d16e28147ad2ce29375d87e250022 artifactHashAfter=deeac8018da2227295e072d51d52db6c3b2d16e28147ad2ce29375d87e250022 sourceRestored=true restored=true"
     },
     {
       "n": 83,
@@ -499,7 +499,7 @@
       "n": 84,
       "name": "legacy or incomplete decision metadata cannot seed the baseline",
       "passed": true,
-      "detail": "legacy(why)=refused partial(no trigger)=refused canonical=seeded legacyFieldsOnDisk=0"
+      "detail": "legacy(why)=refused partial(no trigger)=refused canonical=seeded legacyFieldsOnDisk=0; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=b552337a60c2f1477c24a0605103618f856650fa4b0608d8baa7b28c8930231b artifactHashAfter=b552337a60c2f1477c24a0605103618f856650fa4b0608d8baa7b28c8930231b sourceRestored=true restored=true"
     },
     {
       "n": 85,
@@ -511,7 +511,7 @@
       "n": 86,
       "name": "a same-named SQL-free helper cannot inherit another module's hard red",
       "passed": true,
-      "detail": "decoy hop4=read-only cites=0 cheatsWiresNotReachingWhatTheyCite=0 realCheatsWires=3 (expect 3, i.e. not suppressed)"
+      "detail": "decoy hop4=read-only cites=0 cheatsWiresNotReachingWhatTheyCite=0 baitWireBacked=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=e9ebc713ccc19ae98dd80c1df202274012e653a43c4ce6c108dd96861ab15c0f artifactHashAfter=e9ebc713ccc19ae98dd80c1df202274012e653a43c4ce6c108dd96861ab15c0f sourceRestored=true restored=true"
     },
     {
       "n": 87,
@@ -541,49 +541,49 @@
       "n": 91,
       "name": "one date authority: free text and past dates are refused everywhere",
       "passed": true,
-      "detail": "absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED"
+      "detail": "absent:incomplete/undecided/refused · free text:incomplete/undecided/refused · past:incomplete/undecided/refused · unparseable:incomplete/undecided/refused · future:complete/accepted/SEEDED; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 92,
       "name": "a test-only caller cannot corroborate a production reach proof",
       "passed": true,
-      "detail": "testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · hardRedTotal=3 (expect 3, i.e. not suppressed)"
+      "detail": "testOnlyRow: corroborated=false blocker=ast-coverage hardRed=false · proofsRoutedThroughTests=0 · baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 93,
       "name": "an unimported same-named sibling cannot be reached or cited",
       "passed": true,
-      "detail": "handlerReachedUnimportedSibling=false hop4=read-only dangerStillSeen=true dangerHardRed=false hardRedTotal=3 (expect 3)"
+      "detail": "handlerReachedUnimportedSibling=false hop4=read-only dangerStillSeen=true dangerHardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 94,
       "name": "same-named class methods stay distinct and neither forges a proof",
       "passed": true,
-      "detail": "rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+      "detail": "rows=1 fn=ZzDangerStore.zzPersist94 safeInheritedSql=false proofCorroborated=false blocker=ast-coverage hardRed=false baitHardRed=true; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 95,
       "name": "a direct barrel re-export is coverage-limited, not read-only or hard red",
       "passed": true,
-      "detail": "hop4=unknown status=unreached hardRed=false finding=medium/ast-coverage boundary=direct-barrel-re-export targetAttributed=false hardRedTotal=3 (expect 3)"
+      "detail": "hop4=unknown status=unreached hardRed=false finding=medium/ast-coverage boundary=direct-barrel-re-export targetAttributed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 96,
       "name": "a coincidental same-named rejected binding remains read-only",
       "passed": true,
-      "detail": "hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+      "detail": "hop4=read-only reachedUnwitnessedDanger=false boundary=absent danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 97,
       "name": "an imported-binding mismatch stays read-only with no barrel boundary",
       "passed": true,
-      "detail": "hop4=read-only boundary=absent persistBoundary=false reachedDanger=false danger=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+      "detail": "hop4=read-only boundary=absent persistBoundary=false reachedDanger=false danger=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 98,
       "name": "a named-import alias preserves the bounded barrel boundary",
       "passed": true,
-      "detail": "hop4=unknown status=unreached boundary=direct-barrel-re-export local=p imported=zzVfy98Persist targetAttributed=false finding=medium/ast-coverage hardRed=false hardRedTotal=3 (expect 3)"
+      "detail": "hop4=unknown status=unreached boundary=direct-barrel-re-export local=p imported=zzVfy98Persist targetAttributed=false finding=medium/ast-coverage hardRed=false baitHardRed=2; baitTransport=live/none baitWire=cheats/kernel/cheats baitRedIds=persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:links:insert-into|persistence:collab-electron/src/main/zz-falsify-governed-review-bait.ts:createReviewTask:task:insert-into baitHardRed=2 restoredHardRed=0 artifactHashBefore=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b artifactHashAfter=0b8ebbbd9efccffd87826083125cfce1f8135d6ec4a62f310a9338bb6f49685b sourceRestored=true restored=true"
     },
     {
       "n": 82,

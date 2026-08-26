@@ -645,7 +645,7 @@ record(18, "the fixed coverage bait appears in the agent brief", ...withFile(
     const sectionEnd = text.indexOf("## Per-analyzer coverage", sectionStart);
     const section = text.slice(sectionStart, sectionEnd < 0 ? undefined : sectionEnd);
     const shown = section.includes(ATLAS_COVERAGE_BAIT);
-    const ok = row?.status === "unindexed"
+    const ok = row?.status === "partial"
       && row.sqlInText === 1
       && row.sqlIndexed === 0
       && shown;

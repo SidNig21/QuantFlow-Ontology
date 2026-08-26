@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "ea7e656",
+    "commit": "d4f0ab7",
     "generatedAt": "2026-08-26",
-    "filesScanned": 432,
+    "filesScanned": 426,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "fb418038be895339"
+    "fingerprint": "6ee252c73c823cd0"
   },
   "stats": {
     "live": 113,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 126,
-      "indexed": 1181,
+      "indexed": 1166,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -307,9 +307,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 554
+      "files": 548
     },
-    "coverageFiles": 554,
+    "coverageFiles": 548,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -342,30 +342,29 @@
     "stripCandidates": 13,
     "violations": 10,
     "governanceUnknown": 3,
-    "legacyLeads": 10,
-    "nodes": 108,
+    "legacyLeads": 9,
+    "nodes": 106,
     "loopsBroken": 2,
     "loopsTotal": 8,
     "unreaped": 3,
     "conditionalReap": 0,
-    "undecided": 41,
+    "undecided": 40,
     "allClear": false,
     "decisions": {
       "total": 41,
-      "undecided": 41,
+      "undecided": 40,
       "keep": 0,
-      "repair": 0,
+      "repair": 1,
       "remove": 0,
       "accepted": 0,
-      "incomplete": 0,
+      "incomplete": 1,
       "allClear": false
     },
     "unexplainedUndecided": 0,
     "blockers": {
       "founder-decision": 20,
       "ast-coverage": 3,
-      "package-proof": 17,
-      "product-defect": 1
+      "package-proof": 17
     }
   },
   "layers": [
@@ -3127,8 +3126,8 @@
       "layer": 0,
       "name": "errors.ts",
       "kb": 12,
-      "x": 2.6,
-      "z": -0.45,
+      "x": 2.03,
+      "z": -1.69,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -3308,8 +3307,8 @@
       "layer": 0,
       "name": "resolve*",
       "kb": 4,
-      "x": -1.96,
-      "z": -3.44,
+      "x": 1.69,
+      "z": 2.03,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -3425,12 +3424,12 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 796.5,
+      "kb": 805.5,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 84,
-      "writes": 31,
+      "spawns": 86,
+      "writes": 32,
       "dml": 19,
       "executes": 49,
       "files": [
@@ -3559,7 +3558,7 @@
         },
         {
           "path": "qa/gates/kernel-sole-writer.ts",
-          "kb": 18.2,
+          "kb": 17.9,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 2,
@@ -3691,9 +3690,29 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/kernel-one-path.ts",
+          "kb": 8.9,
+          "spawns": 2,
+          "spawnsLive": 2,
+          "writes": 1,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/release-verifier.ts",
           "kb": 8.2,
           "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/golden-g3-consumer-census.ts",
+          "kb": 8,
+          "spawns": 2,
           "spawnsLive": 0,
           "writes": 0,
           "dml": 0,
@@ -3705,16 +3724,6 @@
           "kb": 8,
           "spawns": 1,
           "spawnsLive": 1,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/kernel-one-path.ts",
-          "kb": 7.6,
-          "spawns": 2,
-          "spawnsLive": 2,
           "writes": 0,
           "dml": 0,
           "dmlLines": [],
@@ -4450,7 +4459,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 37,
+      "kb": 37.5,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4461,7 +4470,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 37,
+          "kb": 37.5,
           "spawns": 5,
           "spawnsLive": 4,
           "writes": 0,
@@ -5021,62 +5030,6 @@
       "wires": []
     },
     {
-      "id": "0:tools/qf-peer-bus/scripts::setup",
-      "layer": 0,
-      "name": "setup-founder-seats.ts",
-      "kb": 8.5,
-      "x": -2,
-      "z": 3.42,
-      "status": "ok",
-      "spawns": 3,
-      "writes": 2,
-      "dml": 0,
-      "executes": 0,
-      "files": [
-        {
-          "path": "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-          "kb": 8.5,
-          "spawns": 3,
-          "spawnsLive": 1,
-          "writes": 2,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        }
-      ],
-      "strip": [],
-      "breaches": [],
-      "wires": []
-    },
-    {
-      "id": "0:tools/qf-peer-bus/src::harness",
-      "layer": 0,
-      "name": "qf-peer-bus/src/harness.ts",
-      "kb": 12.9,
-      "x": 2.03,
-      "z": -1.69,
-      "status": "ok",
-      "spawns": 0,
-      "writes": 0,
-      "dml": 0,
-      "executes": 0,
-      "files": [
-        {
-          "path": "tools/qf-peer-bus/src/harness.ts",
-          "kb": 12.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        }
-      ],
-      "strip": [],
-      "breaches": [],
-      "wires": []
-    },
-    {
       "id": "0:tools/qf-proof-agent/packed::qf",
       "layer": 0,
       "name": "packed/qf-proof-agent.mjs",
@@ -5193,10 +5146,10 @@
     {
       "id": "0:tools/qf-read-tools/src::harness",
       "layer": 0,
-      "name": "qf-read-tools/src/harness.ts",
+      "name": "harness.ts",
       "kb": 11.1,
-      "x": 1.69,
-      "z": 2.03,
+      "x": 2.48,
+      "z": 0.91,
       "status": "ice",
       "spawns": 0,
       "writes": 0,
@@ -5223,8 +5176,8 @@
       "layer": 0,
       "name": "assert*",
       "kb": 2.2,
-      "x": 3.96,
-      "z": 0.02,
+      "x": -2,
+      "z": 3.42,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -5289,8 +5242,8 @@
       "layer": 0,
       "name": "proof.ts",
       "kb": 11.5,
-      "x": 2.48,
-      "z": 0.91,
+      "x": 2.6,
+      "z": -0.45,
       "status": "ok",
       "spawns": 0,
       "writes": 0,
@@ -6093,7 +6046,7 @@
     {
       "id": "2:residue",
       "layer": 2,
-      "name": "39 small modules*",
+      "name": "main/39 small modules*",
       "kb": 102.8,
       "x": 0,
       "z": 0,
@@ -6509,15 +6462,15 @@
     {
       "id": "0:residue",
       "layer": 0,
-      "name": "41 small modules*",
-      "kb": 105.2,
+      "name": "src/39 small modules*",
+      "kb": 95.4,
       "x": 0,
       "z": 0,
       "status": "gray",
       "spawns": 5,
       "writes": 5,
-      "dml": 9,
-      "executes": 2,
+      "dml": 5,
+      "executes": 1,
       "files": [
         {
           "path": "tools/runtime-proof/agent-package/src/acp-main.ts",
@@ -6538,21 +6491,6 @@
           "dml": 0,
           "dmlLines": [],
           "executes": 0
-        },
-        {
-          "path": "tools/qf-peer-bus/src/bus.ts",
-          "kb": 6.2,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 4,
-          "dmlLines": [
-            52,
-            73,
-            143,
-            164
-          ],
-          "executes": 1
         },
         {
           "path": "packages/qf-kernel/src/links.ts",
@@ -6629,16 +6567,6 @@
         {
           "path": "packages/qf-kernel/src/replay.ts",
           "kb": 4,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "tools/qf-peer-bus/src/server.ts",
-          "kb": 3.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -6949,19 +6877,6 @@
         {
           "kind": "outside-write-door",
           "scope": "product",
-          "what": "4 SQL statements outside execute()",
-          "where": "tools/qf-peer-bus/src/bus.ts",
-          "lines": [
-            52,
-            73,
-            143,
-            164
-          ],
-          "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
-        },
-        {
-          "kind": "outside-write-door",
-          "scope": "product",
           "what": "2 SQL statements outside execute()",
           "where": "packages/qf-kernel/src/fixtures.ts",
           "lines": [
@@ -7215,26 +7130,16 @@
     {
       "id": "3:residue",
       "layer": 3,
-      "name": "11 small modules*",
-      "kb": 31.3,
+      "name": "8 small modules*",
+      "kb": 22.5,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 7,
+      "spawns": 5,
       "writes": 5,
       "dml": 0,
-      "executes": 2,
+      "executes": 1,
       "files": [
-        {
-          "path": "species/critic-mock/agent-package/src/acp-main.ts",
-          "kb": 5.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
         {
           "path": "species/hermes/tui-pty-smoke.ts",
           "kb": 5.3,
@@ -7298,26 +7203,6 @@
         {
           "path": "species/hermes/register.ts",
           "kb": 1.6,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 1
-        },
-        {
-          "path": "species/critic-mock/scripts/pack-agent.mjs",
-          "kb": 1.5,
-          "spawns": 2,
-          "spawnsLive": 0,
-          "writes": 0,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "species/critic-mock/register.ts",
-          "kb": 1.4,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -8720,15 +8605,6 @@
       "why": "7 SQL site(s) in the text, 5 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
-      "path": "tools/qf-peer-bus/src/bus.ts",
-      "status": "partial",
-      "indexedFns": 5,
-      "sqlInText": 4,
-      "sqlIndexed": 2,
-      "sqlUnrecognised": 0,
-      "why": "4 SQL site(s) in the text, 2 resolved into a function. The unresolved ones are invisible to governance analysis."
-    },
-    {
       "path": "collab-electron/src/main/env.d.ts",
       "status": "unindexed",
       "indexedFns": 0,
@@ -8810,14 +8686,6 @@
     },
     {
       "path": "tools/qf-bovada-football/src/index.ts",
-      "status": "unindexed",
-      "indexedFns": 0,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "tools/qf-peer-bus/src/server.ts",
       "status": "unindexed",
       "indexedFns": 0,
       "sqlInText": 0,
@@ -9817,22 +9685,6 @@
       "sqlUnrecognised": 0
     },
     {
-      "path": "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-      "status": "indexed",
-      "indexedFns": 7,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "tools/qf-peer-bus/src/harness.ts",
-      "status": "indexed",
-      "indexedFns": 8,
-      "sqlInText": 0,
-      "sqlIndexed": 0,
-      "sqlUnrecognised": 0
-    },
-    {
       "path": "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
       "status": "indexed",
       "indexedFns": 27,
@@ -10661,6 +10513,10 @@
       "status": "out-of-scope"
     },
     {
+      "path": "qa/gates/golden-g3-consumer-census.ts",
+      "status": "out-of-scope"
+    },
+    {
       "path": "qa/gates/governed-review.ts",
       "status": "out-of-scope"
     },
@@ -11014,18 +10870,6 @@
     },
     {
       "path": "species/claude-code/src/claude-code.mjs",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "species/critic-mock/agent-package/src/acp-main.ts",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "species/critic-mock/register.ts",
-      "status": "out-of-scope"
-    },
-    {
-      "path": "species/critic-mock/scripts/pack-agent.mjs",
       "status": "out-of-scope"
     },
     {
@@ -20938,6 +20782,31 @@
       "unexplained": []
     },
     {
+      "path": "qa/gates/golden-g3-consumer-census.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "not-applicable",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
       "path": "qa/gates/governed-review.test.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -23510,84 +23379,6 @@
       "unexplained": []
     },
     {
-      "path": "species/critic-mock/agent-package/src/acp-main.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "species/critic-mock/register.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "species/critic-mock/scripts/pack-agent.mjs",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "not-applicable",
-      "reasons": {
-        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "responsibility ownership is evaluated for product code only"
-      },
-      "unexplained": []
-    },
-    {
       "path": "species/hermes/a2a-4tile-smoke.ts",
       "worst": "unsupported",
       "imports": "indexed",
@@ -24200,116 +23991,6 @@
     },
     {
       "path": "tools/qf-bovada-football/src/transport.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "unsupported",
-      "reasons": {
-        "reach": "no reach row was produced for this path",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "lifetime": "ast-coverage",
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "partial",
-      "packaging": "unsupported",
-      "ownership": "unsupported",
-      "reasons": {
-        "reach": "no reach row was produced for this path",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "1 long-lived spawn(s) found by the parser but no reap analysis was produced for this file",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "tools/qf-peer-bus/src/bus.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "persistence": "ast-coverage",
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "partial",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "unsupported",
-      "reasons": {
-        "reach": "no reach row was produced for this path",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "2 of 4 SQL site(s) are not inside a named function, so no call path can be traced",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "tools/qf-peer-bus/src/harness.ts",
-      "worst": "unsupported",
-      "imports": "indexed",
-      "reach": "unsupported",
-      "blockers": {
-        "reach": "scope-boundary",
-        "packaging": "package-proof",
-        "ownership": "scope-boundary"
-      },
-      "ipcRequest": "not-applicable",
-      "ipcPush": "not-applicable",
-      "persistence": "not-applicable",
-      "lifetime": "not-applicable",
-      "packaging": "unsupported",
-      "ownership": "unsupported",
-      "reasons": {
-        "reach": "no reach row was produced for this path",
-        "ipcRequest": "not a main, preload or renderer module",
-        "ipcPush": "not a main, preload or renderer module",
-        "persistence": "no SQL DML or DDL in this file",
-        "lifetime": "starts no long-lived child process",
-        "packaging": "the build config does not name this file and packaging manifests are not yet parsed, so ship status is unproven",
-        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
-      },
-      "unexplained": []
-    },
-    {
-      "path": "tools/qf-peer-bus/src/server.ts",
       "worst": "unsupported",
       "imports": "indexed",
       "reach": "unsupported",
@@ -25183,41 +24864,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 550,
+      "indexed": 544,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 273,
+      "not-applicable": 267,
       "indexed": 277,
       "dynamic": 4
     },
     "ipcPush": {
-      "not-applicable": 543,
+      "not-applicable": 537,
       "dynamic": 4,
       "indexed": 7
     },
     "persistence": {
-      "not-applicable": 502,
-      "partial": 27,
+      "not-applicable": 497,
+      "partial": 26,
       "indexed": 25
     },
     "lifetime": {
-      "not-applicable": 483,
-      "partial": 65,
+      "not-applicable": 478,
+      "partial": 64,
       "indexed": 6
     },
     "packaging": {
-      "not-applicable": 205,
-      "unsupported": 117,
+      "not-applicable": 206,
+      "unsupported": 110,
       "indexed": 232
     },
     "ownership": {
-      "not-applicable": 178,
-      "unsupported": 356,
+      "not-applicable": 176,
+      "unsupported": 352,
       "indexed": 20
     },
     "reach": {
-      "unsupported": 320,
+      "unsupported": 314,
       "indexed": 231,
       "partial": 3
     }
@@ -28159,7 +27840,7 @@
         "qa/gates/dock-definition-launch/run.ts",
         "qa/gates/dock-profile-identity/run.ts"
       ],
-      "importerCount": 32,
+      "importerCount": 28,
       "imports": [
         "packages/qf-kernel/src/db.ts",
         "packages/qf-kernel/src/resolve-path.ts",
@@ -33187,13 +32868,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33208,7 +32885,12 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "packages/qf-kernel/src/create.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33256,13 +32938,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33277,7 +32955,11 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33308,13 +32990,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33327,7 +33005,6 @@
         "tools/qf-vault-projection/src/gate.ts",
         "tools/qf-vault-projection/src/project.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
         "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": false,
@@ -33377,13 +33054,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33432,13 +33105,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33453,7 +33122,11 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33511,13 +33184,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33566,13 +33235,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33583,7 +33248,11 @@
         "tools/qf-read-tools/src/server.ts",
         "tools/qf-vault-projection/src/cli.ts",
         "tools/qf-vault-projection/src/gate.ts",
-        "tools/qf-vault-projection/src/project.ts"
+        "tools/qf-vault-projection/src/project.ts",
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "tools/qf-bovada-football/src/artifact-store.ts",
+        "tools/qf-bovada-football/src/runner.ts",
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33616,13 +33285,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33639,7 +33304,11 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "packages/qf-kernel/src/create.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "packages/qf-kernel/src/execute.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33684,13 +33353,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33703,7 +33368,6 @@
         "tools/qf-vault-projection/src/gate.ts",
         "tools/qf-vault-projection/src/project.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
         "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": false,
@@ -33738,13 +33402,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33759,7 +33419,12 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33804,13 +33469,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33821,7 +33482,11 @@
         "tools/qf-read-tools/src/server.ts",
         "tools/qf-vault-projection/src/cli.ts",
         "tools/qf-vault-projection/src/gate.ts",
-        "tools/qf-vault-projection/src/project.ts"
+        "tools/qf-vault-projection/src/project.ts",
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "tools/qf-bovada-football/src/artifact-store.ts",
+        "tools/qf-bovada-football/src/runner.ts",
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -33847,13 +33512,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33868,7 +33529,6 @@
       ],
       "transitiveDependents": [
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts",
         "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": false,
@@ -33941,13 +33601,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -33958,7 +33614,11 @@
         "tools/qf-read-tools/src/server.ts",
         "tools/qf-vault-projection/src/cli.ts",
         "tools/qf-vault-projection/src/gate.ts",
-        "tools/qf-vault-projection/src/project.ts"
+        "tools/qf-vault-projection/src/project.ts",
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "tools/qf-bovada-football/src/artifact-store.ts",
+        "tools/qf-bovada-football/src/runner.ts",
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -33995,13 +33655,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34016,7 +33672,11 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34057,13 +33717,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34078,7 +33734,12 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34119,13 +33780,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34140,7 +33797,12 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34176,13 +33838,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34198,7 +33856,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts"
+        "packages/qf-kernel/src/governed-review.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34288,13 +33950,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34310,7 +33968,11 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "qa/run.ts"
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts",
+        "tools/qf-bovada-football/src/index.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34346,13 +34008,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34414,13 +34072,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34437,7 +34091,18 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts",
+        "tools/qf-bovada-football/src/index.ts",
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/ipc.ts",
+        "collab-electron/src/main/ontology-gateway.ts",
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts",
+        "collab-electron/src/main/connections-ipc.ts",
+        "collab-electron/src/main/ipc-kernel.ts",
+        "collab-electron/src/main/host-acp-turn.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34474,13 +34139,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34495,7 +34156,9 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "packages/qf-kernel/src/execute.ts",
+        "qa/run.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -34525,13 +34188,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34548,7 +34207,18 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts",
+        "tools/qf-bovada-football/src/index.ts",
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/ipc.ts",
+        "collab-electron/src/main/ontology-gateway.ts",
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts",
+        "collab-electron/src/main/connections-ipc.ts",
+        "collab-electron/src/main/ipc-kernel.ts",
+        "collab-electron/src/main/host-acp-turn.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -34585,13 +34255,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34602,7 +34268,11 @@
         "tools/qf-read-tools/src/server.ts",
         "tools/qf-vault-projection/src/cli.ts",
         "tools/qf-vault-projection/src/gate.ts",
-        "tools/qf-vault-projection/src/project.ts"
+        "tools/qf-vault-projection/src/project.ts",
+        "collab-electron/scripts/package-lib/package-inspect.ts",
+        "tools/qf-bovada-football/src/artifact-store.ts",
+        "tools/qf-bovada-football/src/runner.ts",
+        "collab-electron/src/main/kernel.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [],
@@ -34632,13 +34302,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34655,7 +34321,18 @@
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
         "qa/run.ts",
-        "tools/qf-peer-bus/src/server.ts"
+        "tools/qf-read-tools/src/discovery.ts",
+        "collab-electron/scripts/package-verify.ts",
+        "qa/gates/package-closure/lazy-loader.ts",
+        "tools/qf-bovada-football/src/index.ts",
+        "collab-electron/src/main/index.ts",
+        "collab-electron/src/main/ipc.ts",
+        "collab-electron/src/main/ontology-gateway.ts",
+        "collab-electron/src/main/host-native-tui.ts",
+        "collab-electron/src/main/agent-host.ts",
+        "collab-electron/src/main/connections-ipc.ts",
+        "collab-electron/src/main/ipc-kernel.ts",
+        "collab-electron/src/main/host-acp-turn.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34693,13 +34370,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34714,7 +34387,9 @@
         "collab-electron/scripts/package-lib/package-inspect.ts",
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
-        "collab-electron/src/main/kernel.ts"
+        "collab-electron/src/main/kernel.ts",
+        "qa/run.ts",
+        "tools/qf-read-tools/src/discovery.ts"
       ],
       "transitiveTruncated": true,
       "directDependencies": [
@@ -34789,13 +34464,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -34839,13 +34510,9 @@
         "qa/gates/r17-founder-kernel-compatibility.ts",
         "qa/gates/team-composition.ts",
         "qa/gates/windows-golden-seed.ts",
-        "species/critic-mock/register.ts",
         "species/hermes/a2a-4tile-smoke.ts",
         "species/hermes/host-admit-kernel.ts",
         "species/hermes/register.ts",
-        "tools/qf-peer-bus/scripts/setup-founder-seats.ts",
-        "tools/qf-peer-bus/src/bus.ts",
-        "tools/qf-peer-bus/src/harness.ts",
         "tools/qf-read-tools/src/artifact-root.ts",
         "tools/qf-read-tools/src/gates/action-transport.ts",
         "tools/qf-read-tools/src/gates/kernel-one-world.ts",
@@ -35184,14 +34851,6 @@
               "tools/runtime-proof/agent-package/src/acp-main.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
         "backedBy": null,
@@ -35375,14 +35034,6 @@
             "from": "collab-electron/src/main/acp-agent.ts",
             "candidates": [
               "collab-electron/src/main/updater/update-manager.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/acp-agent.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -36279,16 +35930,6 @@
         ],
         "inlineDml": false,
         "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-canvas.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
@@ -37171,7 +36812,6 @@
             "name": "close",
             "from": "collab-electron/src/main/file-filter.ts",
             "candidates": [
-              "tools/qf-peer-bus/src/bus.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs",
               "tools/runtime-proof/src/proof.ts"
@@ -37639,7 +37279,6 @@
             "name": "close",
             "from": "collab-electron/src/main/file-filter.ts",
             "candidates": [
-              "tools/qf-peer-bus/src/bus.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs",
               "tools/runtime-proof/src/proof.ts"
@@ -39469,16 +39108,6 @@
         ],
         "inlineDml": false,
         "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/index.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
@@ -39765,14 +39394,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/pty.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "collab-electron/src/main/pty-display.ts",
             "candidates": [
@@ -39803,14 +39424,6 @@
             "from": "collab-electron/src/main/pty.ts",
             "candidates": [
               "collab-electron/src/main/bovada-capture-rpc.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/pty.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -40309,14 +39922,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/pty.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "clearTimeout",
             "from": "collab-electron/src/main/sidecar/client.ts",
             "candidates": [
@@ -40608,14 +40213,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/pty.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "get",
             "from": "collab-electron/src/main/pty.ts",
             "candidates": [
@@ -40646,14 +40243,6 @@
             "candidates": [
               "collab-electron/src/main/kernel.ts",
               "collab-electron/src/main/peer-role-registry.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/pty.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -44277,14 +43866,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "setTimeout",
             "from": "collab-electron/src/main/host-native-tui.ts",
             "candidates": [
@@ -44347,22 +43928,6 @@
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
               "collab-electron/src/main/index.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -45578,22 +45143,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "transaction",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
@@ -46256,22 +45805,6 @@
         ],
         "unresolvedCallees": [
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "transaction",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
@@ -46570,22 +46103,6 @@
             "candidates": [
               "collab-electron/src/main/sidecar/ring-buffer.ts",
               "tools/runtime-proof/agent-package/src/acp-main.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -47310,22 +46827,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "destroy",
             "from": "collab-electron/src/main/pty.ts",
             "candidates": [
@@ -47773,22 +47274,6 @@
               "collab-electron/src/main/wikilink-index.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -48377,22 +47862,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "onChunk",
             "from": "collab-electron/src/main/host-acp-turn.ts",
             "candidates": [
@@ -48861,14 +48330,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "setTimeout",
             "from": "collab-electron/src/main/host-native-tui.ts",
             "candidates": [
@@ -48931,22 +48392,6 @@
             "from": "collab-electron/src/main/agent-host.ts",
             "candidates": [
               "collab-electron/src/main/index.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -49605,22 +49050,6 @@
               "collab-electron/src/main/wikilink-index.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -50318,22 +49747,6 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "requireTrace",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -50981,22 +50394,6 @@
         ],
         "unresolvedCallees": [
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "requireTrace",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -51612,22 +51009,6 @@
             "candidates": [
               "collab-electron/src/main/agent-host.ts",
               "collab-electron/src/main/host-native-tui.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -52647,22 +52028,6 @@
         ],
         "unresolvedCallees": [
           {
-            "name": "send",
-            "from": "collab-electron/src/main/host-acp-permission.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/ipc-kernel.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
             "name": "requireTrace",
             "from": "packages/qf-kernel/src/execute.ts",
             "candidates": [
@@ -53555,16 +52920,6 @@
         ],
         "inlineDml": false,
         "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/index.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
@@ -53622,16 +52977,6 @@
         ],
         "inlineDml": false,
         "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/index.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
@@ -53689,16 +53034,6 @@
         ],
         "inlineDml": false,
         "attribution": "ast-module-edge",
-        "unresolvedCallees": [
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/index.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          }
-        ],
         "backedBy": null,
         "reachPath": null,
         "ungoverned": [],
@@ -54017,14 +53352,6 @@
               "collab-electron/src/main/bovada-capture-rpc.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/updater/update-manager.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
         "backedBy": null,
@@ -54091,14 +53418,6 @@
             "from": "collab-electron/src/main/updater/update-manager.ts",
             "candidates": [
               "collab-electron/src/main/bovada-capture-rpc.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/updater/update-manager.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           },
@@ -54239,14 +53558,6 @@
             "from": "collab-electron/src/main/analytics.ts",
             "candidates": [
               "collab-electron/src/main/index.ts"
-            ],
-            "why": "every definition of this name is in a module the caller has no import path to"
-          },
-          {
-            "name": "send",
-            "from": "collab-electron/src/main/updater/update-manager.ts",
-            "candidates": [
-              "tools/qf-peer-bus/src/bus.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
           }
@@ -55350,7 +54661,6 @@
             "name": "close",
             "from": "collab-electron/src/main/file-filter.ts",
             "candidates": [
-              "tools/qf-peer-bus/src/bus.ts",
               "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
               "tools/qf-proof-agent/src/qf-proof-agent.mjs",
               "tools/runtime-proof/src/proof.ts"
@@ -59179,56 +58489,6 @@
           ]
         }
       ]
-    },
-    {
-      "id": "persistence:tools/qf-peer-bus/src/bus.ts:PeerBus.readInbox:messages:update",
-      "classification": "persistence-ok",
-      "disposition": "keep",
-      "fn": "PeerBus.readInbox",
-      "table": "messages",
-      "verb": "UPDATE",
-      "persistence": "transport-bookkeeping",
-      "sourceClass": "transport",
-      "reachability": "unknown",
-      "governance": "compliant",
-      "confidence": "high",
-      "reachProof": null,
-      "blocker": null,
-      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "tools/qf-peer-bus/src/bus.ts",
-          "lines": [
-            164
-          ]
-        }
-      ]
-    },
-    {
-      "id": "persistence:tools/qf-peer-bus/src/bus.ts:PeerBus.send:messages:insert-into",
-      "classification": "persistence-ok",
-      "disposition": "keep",
-      "fn": "PeerBus.send",
-      "table": "messages",
-      "verb": "INSERT INTO",
-      "persistence": "transport-bookkeeping",
-      "sourceClass": "transport",
-      "reachability": "bypass",
-      "governance": "compliant",
-      "confidence": "high",
-      "reachProof": null,
-      "blocker": null,
-      "why": "transport-bookkeeping — outside the domain the Kernel owns.",
-      "evidence": [
-        {
-          "type": "static",
-          "file": "tools/qf-peer-bus/src/bus.ts",
-          "lines": [
-            143
-          ]
-        }
-      ]
     }
   ],
   "strip": [
@@ -59378,19 +58638,6 @@
         701,
         739,
         774
-      ],
-      "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
-    },
-    {
-      "kind": "outside-write-door",
-      "scope": "product",
-      "what": "4 SQL statements outside execute()",
-      "where": "tools/qf-peer-bus/src/bus.ts",
-      "lines": [
-        52,
-        73,
-        143,
-        164
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -59581,12 +58828,12 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "d1d549a",
+      "commit": "ea7e656",
       "generatedAt": "2026-08-26"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "ea7e656",
+      "commit": "d4f0ab7",
       "generatedAt": "2026-08-26"
     },
     "verdict": "better",
@@ -60195,7 +59442,18 @@
       "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
       "blocker": "product-defect",
       "reason": "the renderer awaits a bridge method no preload exposes; it throws when that path runs",
-      "verdict": "undecided"
+      "verdict": "repair",
+      "owner": "founder",
+      "decision": {
+        "owner": "founder",
+        "reason": "REAL RUNTIME DEFECT in a live window. terminal IS a build input, and terminal/src/App.tsx:202 awaits window.api.ptyForegroundProcess(session.id), which neither preload exposes — it throws TypeError when that path runs. Verified pre-existing at d543b01, so atlas-strip-1 did not cause it; removing the orphaned pty:foreground-process main handler was correct. Fix is to restore the preload method or drop the call site.",
+        "remediation_trigger": null,
+        "review_or_expiry": null,
+        "complete": false,
+        "missing": [
+          "remediation_trigger"
+        ]
+      }
     },
     {
       "id": "push:cd-to",
@@ -60270,6 +59528,10 @@
       "verdict": "undecided"
     }
   ],
-  "decisionOrphans": [],
+  "decisionOrphans": [
+    "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:links:insert-into",
+    "persistence:packages/qf-kernel/src/governed-review.ts:createReviewTask:task:insert-into",
+    "persistence:packages/qf-kernel/src/governed-review.ts:markGovernedDelivery:task:update"
+  ],
   "unexplainedUndecided": []
 }

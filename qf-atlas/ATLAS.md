@@ -1,13 +1,13 @@
 # How QuantFlow runs
 
-> Generated from `wo-golden-g2 @ ea7e656` on 2026-08-26 by
+> Generated from `wo-golden-g2 @ d4f0ab7` on 2026-08-26 by
 > `qf-atlas/generate.mjs`. **A projection of the code** — not Kernel truth, not the
 > running app, not a place to store anything. The Kernel still owns Missions, Tasks,
 > Runs, Artifacts and Evaluations. Do not hand-edit; run the generator.
 
 ## Where this repo stands
 
-**41 of 41 findings have not been looked at.**
+**40 of 41 findings have not been looked at.**
 
 That is the number to drive to zero — not the number of findings. Some gaps cannot be
 parsed without a compiler, and some debt is deliberate, so zero findings is not
@@ -16,13 +16,13 @@ finding stops being undecided. Add debt and the number goes back up.
 
 | Verdict | Count |
 |---|---:|
-| `undecided` | 41 |
-| `repair` | 0 |
+| `undecided` | 40 |
+| `repair` | 1 |
 | `remove` | 0 |
 | `keep` | 0 |
 | `accepted` | 0 |
 
-**Not all clear.** 41 findings still need a decision.
+**Not all clear.** 40 findings still need a decision.
 
 ## The four hops
 
@@ -358,7 +358,7 @@ asked before the change, when nothing is red yet.
   collab-electron/src/main/index.ts
 ```
 
-`packages/qf-kernel/src/governed-review.ts` — **40 files depend on it**, it imports 7
+`packages/qf-kernel/src/governed-review.ts` — **41 files depend on it**, it imports 7
 
 ```
   packages/qf-kernel/src/index.ts
@@ -371,26 +371,26 @@ asked before the change, when nothing is red yet.
   qa/gates/bovada-football/run.ts
   qa/gates/dock-definition-launch/run.ts
   qa/gates/dock-profile-identity/run.ts
-  …30 more
+  …31 more
 ```
 
 ### Blast-radius coverage
 
 **233 of 234 files that have a reachability verdict** carry a blast radius.
 The rest have no dependents, no dependencies and no wires. But the scanned universe is
-**554 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
+**548 files** — everything under `qa/`, `species/`, `cli/`, `scripts/` and
 `qf-kernel-schema/` is an import ANCHOR with no reach row, so it has no blast radius
-either. "What breaks if I change a QA gate?" is **not answerable here**, and the 320 files in that position are a stated limit, not an omission.
+either. "What breaks if I change a QA gate?" is **not answerable here**, and the 314 files in that position are a stated limit, not an omission.
 
 Most-depended-on files — change these last:
 
 | File | Dependents | Imports | Wires |
 |---|---:|---:|---:|
-| `packages/qf-kernel/src/trace.ts` | 57+ | 1 | 0 |
-| `packages/qf-kernel/src/registry-drift.ts` | 56+ | 0 | 0 |
-| `packages/qf-kernel/src/upgrade.ts` | 56+ | 3 | 0 |
+| `packages/qf-kernel/src/trace.ts` | 53+ | 1 | 0 |
 | `collab-electron/src/main/file-filter.ts` | 52+ | 2 | 0 |
-| `packages/qf-kernel/src/db.ts` | 51+ | 4 | 0 |
+| `packages/qf-kernel/src/registry-drift.ts` | 52+ | 0 | 0 |
+| `packages/qf-kernel/src/upgrade.ts` | 52+ | 3 | 0 |
+| `collab-electron/src/main/files.ts` | 49+ | 2 | 0 |
 
 Deliberately **not** violations, and each was reported as one before the classifier
 learned the difference: transport bookkeeping (tables created by the peer-bus DDL,
@@ -398,7 +398,7 @@ which are not in the golden schema),
 Kernel command implementations dispatched by `execute()`, schema migrations,
 generated SQL, and QA fixture seeding.
 
-## What the analyzer could not read (22)
+## What the analyzer could not read (20)
 
 **Absence of a finding is not proof of compliance.** These files hold SQL the function
 indexer could not resolve, so governance analysis never saw it. They are gray, and they
@@ -407,7 +407,6 @@ prevent a clean architectural result.
 | File | Coverage | SQL in text | SQL resolved |
 |---|---|---:|---:|
 | `packages/qf-kernel/src/upgrade.ts` | partial | 7 | 5 |
-| `tools/qf-peer-bus/src/bus.ts` | partial | 4 | 2 |
 | `collab-electron/src/main/kernel.ts` | partial | 8 | 7 |
 | `packages/qf-kernel/src/db.ts` | partial | 1 | 0 |
 | `collab-electron/src/main/env.d.ts` | unindexed | 0 | 0 |
@@ -421,13 +420,14 @@ prevent a clean architectural result.
 | `packages/qf-kernel/src/task-governance.ts` | unindexed | 0 | 0 |
 | `tools/qf-bovada-football/src/constants.ts` | unindexed | 0 | 0 |
 | `tools/qf-bovada-football/src/index.ts` | unindexed | 0 | 0 |
-| …7 more | | | see `atlas.json` |
+| `tools/qf-proof-agent/scripts/pack-agent.mjs` | unindexed | 0 | 0 |
+| …5 more | | | see `atlas.json` |
 
 > `kernel.ts`
 > is in this table, so the confirmed-violation count above is a **floor**, not a
 > total: it was computed from a partial read of the very file the finding concerns.
 
-## Per-analyzer coverage (554 files)
+## Per-analyzer coverage (548 files)
 
 Every scanned file gets a cell from every analyzer. A file absent from an analysis
 cannot look green, and **every non-clean cell names its blocker** — that is the
@@ -435,19 +435,19 @@ mechanism behind the invariant below, not a promise about it.
 
 | Analyzer | indexed | partial | dynamic | unsupported | n/a |
 |---|---:|---:|---:|---:|---:|
-| `imports` | 550 | 0 | 4 | 0 | 0 |
-| `ipcRequest` | 277 | 0 | 4 | 0 | 273 |
-| `ipcPush` | 7 | 0 | 4 | 0 | 543 |
-| `persistence` | 25 | 27 | 0 | 0 | 502 |
-| `lifetime` | 6 | 65 | 0 | 0 | 483 |
-| `packaging` | 232 | 0 | 0 | 117 | 205 |
-| `ownership` | 20 | 0 | 0 | 356 | 178 |
-| `reach` | 231 | 3 | 0 | 320 | 0 |
+| `imports` | 544 | 0 | 4 | 0 | 0 |
+| `ipcRequest` | 277 | 0 | 4 | 0 | 267 |
+| `ipcPush` | 7 | 0 | 4 | 0 | 537 |
+| `persistence` | 25 | 26 | 0 | 0 | 497 |
+| `lifetime` | 6 | 64 | 0 | 0 | 478 |
+| `packaging` | 232 | 0 | 0 | 110 | 206 |
+| `ownership` | 20 | 0 | 0 | 352 | 176 |
+| `reach` | 231 | 3 | 0 | 314 | 0 |
 
 **Unexplained cells: 0.** `unsupported` is not a
-failure — `reach: unsupported` on 320 files means those trees are
+failure — `reach: unsupported` on 314 files means those trees are
 import ANCHORS whose own reachability is deliberately not evaluated, and it says so.
-`packaging: unsupported` on 117 files means the packaging
+`packaging: unsupported` on 110 files means the packaging
 manifests are not parsed, so ship status is genuinely unproven rather than assumed.
 
 ### The invariant
@@ -455,16 +455,15 @@ manifests are not parsed, so ship status is genuinely unproven rather than assum
 **Unexplained undecided: 0.** This is the contract's
 target, and it is *not* the coverage number above — coverage counts analyzer cells,
 this counts findings nobody has ruled on that also fail to say why. Of the
-41 undecided findings, each carries a blocker:
+40 undecided findings, each carries a blocker:
 
 | Blocker | Findings | Meaning |
 |---|---:|---|
 | `founder-decision` | 20 | the code cannot say which answer is right — this needs your intent |
 | `ast-coverage` | 3 | the analyzer could not resolve this statically |
 | `package-proof` | 17 | a packaged or dynamically-loaded caller must be ruled out first |
-| `product-defect` | 1 | a real runtime defect: fix the code and the finding goes away |
 
-**20 of 41 are waiting on you, not on the tool.**
+**20 of 40 are waiting on you, not on the tool.**
 Zero unknowns is not the goal and never was: forcing that number down buys fake
 certainty. Zero *unexplained* is the goal, and it is met.
 

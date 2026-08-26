@@ -10,5 +10,9 @@ after-delete	bun qa/run.ts kernel-sole-writer-app	0	PASS
 after-delete	QF_KERNEL_ONE_PATH_FALSIFY=1 bun qa/run.ts kernel-one-path	1	RED caught tools/_qf-k1-path-bait/falsify.ts; bait absent after
 after-delete	bun qa/run.ts kernel-one-path	1	Known unchanged 12 QA fixture offenders; assigned G8
 baseline	bun qa/run.ts typecheck	red/timed out	Known Windows node-pty/dependency EBUSY; assigned ADR-0004/G12 if hardening required
+after-candidate	bun qf-atlas/generate.mjs --check	0	PASS current 426 files/126 channels
+final-proof	node qf-atlas/falsify.mjs --receipt	0	PASS 98/98; tree-neutral; fixed coverage bait cleaned
+final-proof	bun qf-atlas/ratchet.mjs	0	PASS HARD RED 0; unexplained coverage 0
+
 baseline	windows-dock-collaboration package run	timeout then cleaned	Known pre-existing package timeout; no product process; ADR-0004
 baseline	Atlas falsifier receipt	98/98	HARD RED 0; tree-neutral; inherited baseline receipt
