@@ -1,14 +1,18 @@
-# NEXT — R18 — GOLDEN BASELINE HOLD / G9 MINIMUM PREREQUISITE
+# NEXT — R18 — GOLDEN BASELINE HOLD / G2 RESUMED
 
-status: G9 MINIMUM PREREQUISITE AUTHORIZED / G2 PRESERVED
+status: G2 PRESERVATION INTEGRATION AUTHORIZED
 rotated-at: 2026-08-25
 rotated-by: Router under founder Golden-Baseline disposition
-active-order: [WO-GOLDEN-G9-PREREQ](WO-GOLDEN-G9-PREREQ.md)
-builder-authority: YES — only after the paused G2 diff is durably hashed/stashed and the clean starting matrix is frozen
+active-order: [WO-GOLDEN-G2-INTEGRATION](WO-GOLDEN-G2-INTEGRATION.md)
+builder-authority: YES — bounded recovery/integration followed by the complete G2 matrix
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-1-independent-pass: `000BA6BE7DE6227FF850F61EE2DB35E3F72AB49DECAC670893F774ECB3E8CC38`
-phase-2-active-group: G2 paused; minimum G9 prerequisite temporarily active (does not close or reorder G9)
+phase-2-active-group: G2 resumed over accepted minimum prerequisite; full G9 remains after G8
+integration-reader: [G2 preservation integration Reader YES/YES](evidence/golden-baseline/g2/INTEGRATION-READER-ACCEPTANCE.md)
+integration-reader-task: `01a0380f-defb-76a0-a367-1e9564847225`
+restoration-check: [Exact patch check and five-file overlap](evidence/golden-baseline/g2/PREREQUISITE-RESTORATION-CHECK.md)
+prerequisite-acceptance: [Minimum Report-authority prerequisite CLOSED](evidence/golden-baseline/g9-prereq/PREREQUISITE-ACCEPTANCE.md)
 prerequisite-order-accepted-sha: `dc4ece31a3cc8473cb603d6e6e6fef6d2a16a4ee`
 prerequisite-reader: [G9 prerequisite semantic Reader YES/YES](evidence/golden-baseline/g9-prereq/READER-ACCEPTANCE.md)
 prerequisite-reader-task: `01a037b5-93c0-7fc2-8eec-63319089f2e3`
