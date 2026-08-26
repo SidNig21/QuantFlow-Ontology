@@ -1,6 +1,6 @@
 # WO-GOLDEN-G3 — Retire peer-bus and critic-mock package islands
 
-status: **READER ROUND 1 NO/NO — AMENDED FOR FINAL RE-READ**
+status: **READER ROUND 2 NO/NO — EXACTNESS AMENDED FOR FINAL RE-READ**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G3 — peer-bus and critic-mock islands
@@ -19,7 +19,9 @@ G3 removes two obsolete standalone package islands:
 
 It retains the current app-owned notification transport and the current governed critic path. “One collaboration truth path” means Kernel Task, Artifact, Evaluation, and Report objects remain authoritative while `collab-electron/src/main/kernel.ts` app-owned notifications flow through `peer-delivery.ts` to Agent Host/native TUI. Transport rows are delivery state, never domain truth.
 
-A “consumer” is an executable import, spawn/launch route, Dock inventory entry, package/build resource, supported predecessor-state requirement, current authority requirement, or explicit R18–R25 dependency. QA, generated output, history, filename strings, and comments are classified separately and do not count as production consumers.
+A “consumer” is an executable import, spawn/launch route, Dock inventory entry, package/build resource, supported predecessor-state requirement, or explicit R18–R25 implementation dependency. QA, generated output, history, filename strings, and comments are classified separately and do not count as production consumers.
+
+The consumer census treats `docs/orders/NEXT.md` and `docs/orders/WO-GOLDEN-G3.md` as active scope/authority records, not executable consumers. It excludes its own output root `docs/orders/evidence/golden-baseline/g3/**` from self-census. These accepted historical evidence paths may contain obsolete names without becoming current consumers: `docs/DEBT.md`, `docs/orders/evidence/post-merge-review-kernel-identity.md`, and all files under `docs/orders/evidence/wo-103/**`, `wo-103b/**`, `wo-104/**`, `wo-106/**`, `wo-106b/**`, `wo-ci4/**`, `wo-ci5/**`, and `wo-k1/**`. Any other current-authority occurrence must be classified explicitly in BEFORE.md and corrected if it asserts the obsolete package is live.
 
 ## Preserved current boundary
 
@@ -77,7 +79,7 @@ Before mutation create `docs/orders/evidence/golden-baseline/g3/BEFORE.md` with:
 
 Search universe is every tracked file plus package/build/update/runtime resolution inputs and ignored descendants under the two roots. Exclude `.git`, external `node_modules` except the named in-root residue, disposable temp roots, caches, and generated build output except for a literal target-name absence scan.
 
-Add `qa/gates/golden-g3-consumer-census.ts` and register `golden-g3-consumer-census` in `qa/run.ts`. It must enumerate the consumer classes above, reject either obsolete root in every production/package/compatibility/future-rung class, permit named QA/history/generated/comment occurrences only when listed in `BEFORE.md`, and assert the preserved app-owned seams remain present. It has a non-writing selector `QF_G3_CONSUMER_CENSUS_FALSIFY=peer-bus|critic-mock` that injects one virtual forbidden production consumer. Each selector exits 1 naming the injected root/class; unset exits 0. No new product truth or runtime code.
+Add `qa/gates/golden-g3-consumer-census.ts` and register `golden-g3-consumer-census` in `qa/run.ts`. It must enumerate the consumer classes above, reject either obsolete root in every production/package/compatibility/future-rung class, permit only the explicitly named QA/history/generated/comment/control-document occurrences, and assert the preserved app-owned seams remain present. Exclude `docs/orders/evidence/golden-baseline/g3/**` from self-census. Its non-writing selector `QF_G3_CONSUMER_CENSUS_FALSIFY=peer-bus|critic-mock` injects exactly one virtual row with `class=production-import` and `source=qa:falsifier` targeting the selected obsolete root. Each selector exits 1 with exact prefix `golden-g3-consumer-census: forbidden production-import qa:falsifier ->` followed by the selected root; unset exits 0. No filesystem bait, new product truth, or runtime code.
 
 Because neither target is a current package input, G3 requires this explicit package-boundary census and Electron build, not a full installer/release traversal.
 
@@ -118,7 +120,7 @@ No allowlist change may exempt a new product path.
 
 Remove only the standalone peer-bus special classifier/transport rows from `qf-atlas/classify.mjs`. Preserve app `peer-delivery.ts` and Kernel transport classification.
 
-Retarget falsifier 18 from the deleted island to a purpose-built temporary coverage bait that creates a real unresolved/coverage-limited example, proves the generated coverage brief names it, then restores exact bytes in `finally` and signal cleanup. Do not use `peer-delivery.ts` unless it genuinely has the named coverage gap. Update `qf-atlas/markdown.mjs` wording from the obsolete package to the temporary coverage example.
+Retarget falsifier 18 to exact temporary path `tools/_qf-atlas-coverage-bait.ts` with exact content `export const qfAtlasCoverageBait = "INSERT INTO mission (id) VALUES ('atlas-coverage-bait')";`. This top-level SQL string has one SQL site and no enclosing indexed function. During the falsifier, the regenerated model must contain that exact path with `status === "unindexed"`, `sqlInText === 1`, and `sqlIndexed === 0`; the generated Markdown coverage table must contain that exact path under `What the analyzer could not read`. Use the existing falsifier model generation and output-byte snapshot/restore contract. Create/remove the bait through the existing fixture helper, plus finally/signal cleanup, and require pre/post HEAD, status, generated-output bytes, and tree hash equality. Update `qf-atlas/markdown.mjs` wording to describe the temporary coverage bait rather than an obsolete named package.
 
 Regenerate `atlas.json`, `ATLAS.md`, and `atlas.html` only after the product/QA candidate is committed clean. Require check, all falsifiers, ratchet HARD RED 0, and before/after tree hash equality for non-generating proof runs.
 
@@ -132,36 +134,131 @@ Historical receipts, including `docs/DEBT.md` and accepted evidence, remain byte
 
 ## Command-exact starting and candidate matrix
 
-All commands run from repository root in PowerShell. Record command, UTC start/end, exit, log SHA-256, pre/post HEAD, and pre/post status. Falsifier failures are expected exit 1 and must restore the clean starting tree.
+All commands run from repository root in PowerShell. Record command, UTC start/end, exit, log SHA-256, pre/post HEAD, and pre/post status. Falsifier failures are expected exit 1 and must restore the clean starting tree. Builder runs the starting/candidate matrix; independent Verifier reruns the final matrix except generation, using the immutable candidate.
 
-| # | Exact command | Expected |
-|---:|---|---|
-| 1 | `git status --porcelain=v1; git rev-parse HEAD; git rev-parse origin/wo-golden-g2` | empty status; three SHAs equal at start |
-| 2 | for each `literal,flagged,chained`: set `QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL`, run `bun qa/run.ts typecheck`, unset | each exit 1, names forbidden lifecycle; tree clean |
-| 3 | `bun qa/run.ts typecheck` | exit 0 |
-| 4 | set `QF_KERNEL_ONE_PATH_FALSIFY=1`; `bun qa/run.ts kernel-one-path`; unset | exit 1 naming bait; bait absent/tree clean |
-| 5 | `bun qa/run.ts kernel-one-path` | exit 0 |
-| 6 | set `QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN=1`; `bun qa/run.ts kernel-sole-writer`; unset | exit 1 naming open bait; tree clean |
-| 7 | set `QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE=1`; `bun qa/run.ts kernel-sole-writer`; unset | exit 1 naming write bait; tree clean |
-| 8 | `bun qa/run.ts kernel-sole-writer; bun qa/run.ts kernel-sole-writer-app` | both exit 0 |
-| 9 | for each `peer-bus,critic-mock`: set `QF_G3_CONSUMER_CENSUS_FALSIFY`, run `bun qa/run.ts golden-g3-consumer-census`, unset | each exit 1 naming root/class; tree clean |
-| 10 | `bun qa/run.ts golden-g3-consumer-census` | exit 0 |
-| 11 | `bun test packages/qf-kernel/src/r12-independent-critic.test.ts packages/qf-kernel/src/r15-governed-review.test.ts collab-electron/src/main/governed-review.test.ts` | exit 0 |
-| 12 | `bun qa/run.ts governed-review; bun qa/run.ts governed-review-live` | both exit 0 |
-| 13 | `bun qa/run.ts windows-dock-collaboration` | exit 0; isolated transport/task/ACK and cleanup |
-| 14 | `bun qa/run.ts dock-production-inventory; bun qa/run.ts product-identity` | both exit 0; no mock inventory |
-| 15 | `bun test collab-electron/scripts/package-lib/shared-paths.test.ts` | exit 0 |
-| 16 | `bun install --frozen-lockfile --ignore-scripts; bun run build` in `collab-electron` using the repository’s existing frozen-install helper where the gate already supplies one | both exit 0; no lifecycle scripts |
-| 17 | `bun qa/run.ts repo-shape; bun qa/run.ts doc-links; bun qa/run.ts rung-ladder` | all exit 0 |
-| 18 | `bun qf-atlas/generate.mjs --check` | exit 0/current |
-| 19 | `bun qf-atlas/falsify.mjs` | all falsifiers PASS; pre/post HEAD/status/tree equal |
-| 20 | `bun qf-atlas/ratchet.mjs` | exit 0; HARD RED 0 |
-| 21 | literal PowerShell checks for absence of all 19 targets, both roots, ignored descendants, and target strings in built output | zero remaining |
-| 22 | `git diff --check BUILD_BASE_SHA...HEAD; git diff --check` | both exit 0 |
-| 23 | exact QuantFlow/Electron/Bun/Hermes/WSL process census and G3-created temp-root census | process_count=0; roots_remaining=0; leaked=[] |
-| 24 | `git status --porcelain=v1; git rev-parse HEAD` | clean immutable candidate SHA |
+### 1 — Freeze identity and starting temp roots
 
-On the frozen starting SHA, commands 2, 4, and 9 may be unavailable until their G3 falsifier is implemented; record that as `not-yet-implemented`, not green. All existing commands run before mutation. Any other starting red is classified before the Builder opens.
+```powershell
+$BUILD_BASE_SHA = (git rev-parse HEAD).Trim()
+$UPSTREAM_SHA = (git rev-parse origin/wo-golden-g2).Trim()
+if ((git status --porcelain=v1) -or $BUILD_BASE_SHA -ne $UPSTREAM_SHA) { throw "G3 start is not clean/upstream-equal" }
+$g3Prefixes = @("qf-dock-production-inventory-*","qf-product-identity-*","qf-windows-dock-collaboration-*")
+$g3Before = Get-ChildItem -LiteralPath $env:TEMP -Directory | Where-Object { $n=$_.Name; $g3Prefixes.Where({$n -like $_}).Count -gt 0 } | Select-Object -ExpandProperty FullName | Sort-Object
+$g3Before | Set-Content -LiteralPath docs/orders/evidence/golden-baseline/g3/TEMP-ROOTS-BEFORE.txt -Encoding utf8
+```
+
+Expected: no throw; `BUILD_BASE_SHA == origin/wo-golden-g2`.
+
+### 2 — Lifecycle red controls and green
+
+```powershell
+$env:QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL="literal"; bun qa/run.ts typecheck; $code=$LASTEXITCODE; Remove-Item Env:QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL; if($code -ne 1){throw "literal expected 1 got $code"}
+$env:QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL="flagged"; bun qa/run.ts typecheck; $code=$LASTEXITCODE; Remove-Item Env:QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL; if($code -ne 1){throw "flagged expected 1 got $code"}
+$env:QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL="chained"; bun qa/run.ts typecheck; $code=$LASTEXITCODE; Remove-Item Env:QF_TYPECHECK_FALSIFY_RECURSIVE_INSTALL; if($code -ne 1){throw "chained expected 1 got $code"}
+bun qa/run.ts typecheck; if($LASTEXITCODE -ne 0){throw "typecheck green failed"}
+```
+
+Each red includes `typecheck: forbidden lifecycle` and the fixture path; final run exits 0.
+
+### 3 — Kernel law red controls and green
+
+```powershell
+$env:QF_KERNEL_ONE_PATH_FALSIFY="1"; bun qa/run.ts kernel-one-path; $code=$LASTEXITCODE; Remove-Item Env:QF_KERNEL_ONE_PATH_FALSIFY; if($code -ne 1){throw "kernel-one-path red expected 1 got $code"}
+if(Test-Path -LiteralPath tools/_qf-k1-path-bait){throw "kernel-one-path bait leaked"}
+bun qa/run.ts kernel-one-path; if($LASTEXITCODE -ne 0){throw "kernel-one-path green failed"}
+$env:QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN="1"; bun qa/run.ts kernel-sole-writer; $code=$LASTEXITCODE; Remove-Item Env:QF_KERNEL_SOLE_WRITER_FALSIFY_OPEN; if($code -ne 1){throw "sole-writer open red expected 1 got $code"}
+$env:QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE="1"; bun qa/run.ts kernel-sole-writer; $code=$LASTEXITCODE; Remove-Item Env:QF_KERNEL_SOLE_WRITER_FALSIFY_WRITE; if($code -ne 1){throw "sole-writer write red expected 1 got $code"}
+if(Test-Path -LiteralPath tools/_qf-k2-sole-writer-bait){throw "sole-writer bait leaked"}
+bun qa/run.ts kernel-sole-writer; if($LASTEXITCODE -ne 0){throw "sole-writer green failed"}
+bun qa/run.ts kernel-sole-writer-app; if($LASTEXITCODE -ne 0){throw "sole-writer-app green failed"}
+```
+
+Red diagnostics name their exact bait/claim. All baits are absent; both green gates exit 0.
+
+### 4 — Consumer-census red controls and green
+
+```powershell
+$env:QF_G3_CONSUMER_CENSUS_FALSIFY="peer-bus"; bun qa/run.ts golden-g3-consumer-census; $code=$LASTEXITCODE; Remove-Item Env:QF_G3_CONSUMER_CENSUS_FALSIFY; if($code -ne 1){throw "peer-bus census red expected 1 got $code"}
+$env:QF_G3_CONSUMER_CENSUS_FALSIFY="critic-mock"; bun qa/run.ts golden-g3-consumer-census; $code=$LASTEXITCODE; Remove-Item Env:QF_G3_CONSUMER_CENSUS_FALSIFY; if($code -ne 1){throw "critic-mock census red expected 1 got $code"}
+bun qa/run.ts golden-g3-consumer-census; if($LASTEXITCODE -ne 0){throw "G3 census green failed"}
+```
+
+Each red prints exact prefix `golden-g3-consumer-census: forbidden production-import qa:falsifier ->` plus the selected root; green exits 0.
+
+### 5 — Current critic, transport, inventory, and package proof
+
+```powershell
+bun test packages/qf-kernel/src/r12-independent-critic.test.ts packages/qf-kernel/src/r15-governed-review.test.ts collab-electron/src/main/governed-review.test.ts; if($LASTEXITCODE -ne 0){throw "critic/governed tests failed"}
+bun qa/run.ts governed-review; if($LASTEXITCODE -ne 0){throw "governed-review failed"}
+bun qa/run.ts governed-review-live; if($LASTEXITCODE -ne 0){throw "governed-review-live failed"}
+bun qa/run.ts windows-dock-collaboration; if($LASTEXITCODE -ne 0){throw "app-owned collaboration failed"}
+bun qa/run.ts dock-production-inventory; if($LASTEXITCODE -ne 0){throw "Dock inventory failed"}
+bun qa/run.ts product-identity; if($LASTEXITCODE -ne 0){throw "product identity failed"}
+bun test collab-electron/scripts/package-lib/shared-paths.test.ts; if($LASTEXITCODE -ne 0){throw "package paths failed"}
+Push-Location -LiteralPath collab-electron
+try {
+  bun install --frozen-lockfile --ignore-scripts; if($LASTEXITCODE -ne 0){throw "Electron frozen install failed"}
+  bun run build; if($LASTEXITCODE -ne 0){throw "Electron build failed"}
+} finally { Pop-Location }
+bun qa/run.ts repo-shape; if($LASTEXITCODE -ne 0){throw "repo-shape failed"}
+bun qa/run.ts doc-links; if($LASTEXITCODE -ne 0){throw "doc-links failed"}
+bun qa/run.ts rung-ladder; if($LASTEXITCODE -ne 0){throw "rung-ladder failed"}
+```
+
+Every command exits 0. The collaboration gate proves isolated transport/task/ACK and cleanup.
+
+### 6 — Atlas proof
+
+```powershell
+$atlasHead=(git rev-parse HEAD).Trim(); $atlasStatus=git status --porcelain=v1
+bun qf-atlas/generate.mjs --check; if($LASTEXITCODE -ne 0){throw "Atlas drift"}
+bun qf-atlas/falsify.mjs; if($LASTEXITCODE -ne 0){throw "Atlas falsifiers failed"}
+bun qf-atlas/ratchet.mjs; if($LASTEXITCODE -ne 0){throw "Atlas ratchet failed"}
+if((git rev-parse HEAD).Trim() -ne $atlasHead -or (git status --porcelain=v1) -ne $atlasStatus){throw "Atlas non-generating proof mutated tree"}
+```
+
+Expected: current, all falsifiers PASS, HARD RED 0, exact pre/post identity.
+
+### 7 — Literal deletion and built-output absence
+
+```powershell
+$g3Targets=@(
+"tools/qf-peer-bus/.gitignore","tools/qf-peer-bus/README.md","tools/qf-peer-bus/bun.lock","tools/qf-peer-bus/package.json","tools/qf-peer-bus/tsconfig.json","tools/qf-peer-bus/scripts/setup-founder-seats.ts","tools/qf-peer-bus/src/bus.ts","tools/qf-peer-bus/src/harness.ts","tools/qf-peer-bus/src/server.ts",
+"species/critic-mock/.gitignore","species/critic-mock/README.md","species/critic-mock/agent-package/agentos-package.json","species/critic-mock/agent-package/package.json","species/critic-mock/agent-package/src/acp-main.ts","species/critic-mock/bun.lock","species/critic-mock/evidence/dock.png","species/critic-mock/package.json","species/critic-mock/register.ts","species/critic-mock/scripts/pack-agent.mjs"
+)
+$remaining=$g3Targets | Where-Object { Test-Path -LiteralPath $_ }
+$roots=@("tools/qf-peer-bus","species/critic-mock") | Where-Object { Test-Path -LiteralPath $_ }
+if($remaining -or $roots){throw "G3 deletion incomplete: $($remaining+$roots -join ', ')"}
+rg -n "tools/qf-peer-bus|species/critic-mock" collab-electron/out
+if($LASTEXITCODE -eq 0){throw "deleted island string present in Electron build"}
+if($LASTEXITCODE -gt 1){throw "built-output absence scan failed"}
+```
+
+Expected: zero remaining targets/roots and no built-output hit.
+
+### 8 — Diff, temp, and process zero
+
+```powershell
+git diff --check "$BUILD_BASE_SHA...HEAD"; if($LASTEXITCODE -ne 0){throw "candidate diff check failed"}
+git diff --check; if($LASTEXITCODE -ne 0){throw "worktree diff check failed"}
+$g3Before=@(Get-Content -LiteralPath docs/orders/evidence/golden-baseline/g3/TEMP-ROOTS-BEFORE.txt -ErrorAction Stop)
+$g3Prefixes=@("qf-dock-production-inventory-*","qf-product-identity-*","qf-windows-dock-collaboration-*")
+$g3After=@(Get-ChildItem -LiteralPath $env:TEMP -Directory | Where-Object { $n=$_.Name; $g3Prefixes.Where({$n -like $_}).Count -gt 0 } | Select-Object -ExpandProperty FullName | Sort-Object)
+$leaked=@(Compare-Object $g3Before $g3After | Where-Object SideIndicator -eq "=>" | Select-Object -ExpandProperty InputObject)
+if($leaked){throw "G3 temp roots leaked: $($leaked -join ', ')"}
+$repoPattern=[regex]::Escape((Resolve-Path .).Path)
+$proc=@(Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.Name -match '^(electron|bun|node|hermes)(\.exe)?$' -and $_.CommandLine -match $repoPattern })
+if($proc){$proc | Format-Table ProcessId,Name,CommandLine -AutoSize | Out-String | Write-Error; throw "G3 repository processes remain"}
+$wsl=@(wsl.exe -e sh -lc "pgrep -af '[h]ermes|[c]ollab-electron|[Q]uantFlow' || true")
+if(($wsl -join "").Trim()){throw "G3 WSL product processes remain: $($wsl -join '; ')"}
+"roots_remaining=0 leaked=[] process_count=0"
+git status --porcelain=v1
+git rev-parse HEAD
+```
+
+Expected: both diff checks 0; `roots_remaining=0 leaked=[] process_count=0`; empty status; immutable candidate SHA.
+
+On the frozen starting SHA, new G3 selectors may be recorded as `not-yet-implemented`, never green. All existing commands run before mutation. Any other starting red is classified before Builder opens.
 
 ## Evidence and candidate
 
