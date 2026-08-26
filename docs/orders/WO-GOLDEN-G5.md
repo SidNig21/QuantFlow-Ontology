@@ -398,3 +398,54 @@ Record the masked starting-SHA reds and each old-red/new-green transition in une
 ### Semantic reread boundary
 
 The current Builder authority is suspended. This amendment must be committed and one fresh semantic Reader must return `YES / YES` on whether every gate can fail and every deliverable has exactly one meaning before the semantic repair Builder resumes. A Reader `NO` lands every numbered defect here before another reread.
+
+## Reader-required finite contract after 53e9a25
+
+The fresh semantic Reader returned `NO / NO` against authority `53e9a25` with finite defects. The following contract is binding for the next semantic repair and reread; it does not authorize a Builder to resume.
+
+### Exact direct-critic activation grammar
+
+The synthetic responder must:
+
+- consume exactly one line beginning `QUANTFLOW_MISSION ` and parse the suffix as JSON;
+- require `contract === "qf.mission.activation.v1"`;
+- require `mission_id === review_task_id`;
+- inside `question`, require exactly one full line matching `^review_task_id=([A-Za-z0-9_-]{1,128})$` and exactly one full line matching `^source_work=(\{.*\})$`;
+- require parsed `source_work` to contain exactly these five keys: `source_task_id`, `hypothesis_id`, `run_id`, `result_artifact_id`, and `executor_session_id`; every value must be a non-empty string;
+- reject missing, duplicate, malformed, extra, or internally mismatched values before any evaluation write; and
+- use neither `qf.governed_review.v1` nor the legacy `artifact_id=` fallback on the production direct-critic path.
+
+### Canonical proof meaning
+
+`qa/gates/hermes-research.ts` must assert the canonical `qf.research.report.v2` payload and lineage required by the current governed-review implementation and remove obsolete v1-only Report assertions. Both normal submissions must bind the same accepted R17 Technique version. The second run must obtain its own strategy/Technique identifier from the first run's durable accepted receipt, not from a function-local first-run variable or an invented fixture value. Director receipt naming is a failing assertion: every applicable receipt must name `hermes-research-director`, and any `hermes-orchestrator` value fails.
+
+### Smallest inseparable G9 prerequisite
+
+The allowed production-file set expands only by `collab-electron/src/main/ontology-gateway.ts` and its existing focused test file. When `qf_record_evaluation` has already produced the canonical governed `qf.research.report.v2` through Kernel authority, the Electron legacy `kernelFinalizeResearchEvaluation` path must not publish a second v1 Report. Rejection must remain in place when no independently supported Evaluation exists.
+
+This prerequisite may not alter governed-review schema, Report semantics, current-result selection, other finalizers, or any other G9 scope. The focused path must prove exactly one canonical current Report per reviewed run, zero Report before an accepted Evaluation, and no duplicate legacy Report afterward.
+
+### Required falsifiers
+
+Each falsifier must run through the normal `bun qa/run.ts hermes-first-turn-synthetic` command with the exact environment mode shown:
+
+```text
+QF_HERMES_SYNTHETIC_CRITIC_FALSIFY=missing-review-task-id
+QF_HERMES_SYNTHETIC_CRITIC_FALSIFY=mismatched-source-work
+QF_HERMES_SYNTHETIC_CRITIC_FALSIFY=substituted-result-artifact-id
+```
+
+Each run must exit nonzero before `qf_record_evaluation`. Each receipt must contain exactly these fields: `falsifier`, `qf_record_evaluation_calls`, `evaluation_count_before`, `evaluation_count_after`, `report_count_before`, `report_count_after`, `expected_exit`, `actual_exit`, `restored`, `normal_rerun_exit`, and `output_path`. After the environment is restored, the normal gate must pass.
+
+### Exact allowed files and reread condition
+
+This prerequisite may edit exactly:
+
+- `collab-electron/cli/qf-hermes-synthetic-responder.mjs`;
+- `qa/gates/hermes-research.ts`;
+- `collab-electron/src/main/ontology-gateway.ts`;
+- the existing focused ontology-gateway/governed-review test file needed to prove no duplicate finalizer;
+- G5 evidence files; and
+- the already accepted G5 deletion diff.
+
+No full G8 or G9 reorder is open. A new fresh semantic Reader must return `YES / YES` on this finite contract before the existing Builder resumes.
