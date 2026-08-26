@@ -1,14 +1,14 @@
 # Dock demo — one definition-driven agent catalogue
 
 Founder hands-on script for WO-D2. The Dock lists `agent_definition` rows and launches the exact
-definition clicked; qf-toolloop and all Hermes profiles use this one path. Nothing is remembered in
+definition clicked; qf-proof-agent and all Hermes profiles use this one path. Nothing is remembered in
 the renderer, and there is no second Peer Seats catalogue.
 
 ## Steps
 
 1. Build both packaged adapters once, then start the app in dev:
    ```bash
-   cd tools/runtime-proof && bun install --frozen-lockfile && bun run pack-agent
+   cd tools/qf-proof-agent && bun install --frozen-lockfile && bun run pack-agent
    cd ../../species/hermes && bun install --frozen-lockfile && bun run pack-agent
    cd ../../collab-electron
    env -u ELECTRON_RUN_AS_NODE bun run dev
@@ -17,14 +17,14 @@ the renderer, and there is no second Peer Seats catalogue.
    - `kernel: opened …`
    - `agent-host: Dock bootstrap registered=… skipped=… conflicts=…`
    - dock invalidate / host ready
-3. With a fresh Kernel, confirm the **Agent dock** shows exactly `qf-toolloop`,
-   `hermes-orchestrator`, `hermes-worker`, and `hermes-worker-2`. On an existing founder Kernel,
+3. With a fresh Kernel, confirm the **Agent dock** shows exactly `qf-proof-agent`,
+   `hermes-research-director`, `hermes-worker`, and `hermes-worker-2`. On an existing founder Kernel,
    additional historical definitions remain visible and a differing same-id row is preserved and
    reported as a bootstrap conflict.
-4. Spawn `hermes-orchestrator`, then `hermes-worker`. Confirm each opens a term tile and the host
+4. Spawn `hermes-research-director`, then `hermes-worker`. Confirm each opens a term tile and the host
    log names the exact definition and argv:
-   - `hermes-orchestrator` → `["-p","qf-orchestrator","--tui"]`
-   - `hermes-worker` → `["-p","qf-worker","--tui"]`
+   - `hermes-research-director` → `["--tui"]`
+   - `hermes-worker` → `["--tui"]`
 5. Confirm for each launch:
    - a session row appears with a state chip walking the transition table (`starting` → `running` → …)
    - a Session tile appears on the canvas (cube fades as tiles exist)

@@ -1,4 +1,5 @@
 /** Cold-safe launcher for the WO-D2 dock-definition-launch gate. */
+import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 const CWD = join(import.meta.dir, "dock-definition-launch");
@@ -6,7 +7,7 @@ const KERNEL_PKG = join(import.meta.dir, "../../packages/qf-kernel");
 const SCHEMA_PKG = join(import.meta.dir, "../../qf-kernel-schema");
 
 async function install(name: string, cwd: string): Promise<number> {
-  const child = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
+  const child = Bun.spawn(["bun", "install", "--frozen-lockfile", "--backend", "copyfile", "--linker", "isolated"], {
     cwd,
     stdout: "inherit",
     stderr: "inherit",
@@ -23,6 +24,7 @@ async function run(): Promise<number> {
   if ((await install("qf-kernel", KERNEL_PKG)) !== 0) return 1;
   if ((await install("gate", CWD)) !== 0) return 1;
 
+  mkdirSync(join(CWD, ".gate-home"), { recursive: true });
   const child = Bun.spawn(["bun", "./run.ts"], {
     cwd: CWD,
     stdout: "inherit",

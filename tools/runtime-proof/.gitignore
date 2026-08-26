@@ -1,9 +1,0 @@
-node_modules
-packed/
-!packed/
-packed/*
-!packed/qf-toolloop.meta.json
-agent-package/dist
-*.tgz
-.env
-.env.*

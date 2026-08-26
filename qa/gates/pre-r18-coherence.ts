@@ -341,7 +341,7 @@ function dockInventoryExpectation(definitions: Json[]): Array<{ id: string; name
     return value === null || value === undefined || String(value).trim() === "" ? "Not recorded" : String(value);
   };
   return definitions
-    .filter((row) => !String(row.id ?? "").startsWith("qf-proof-") && !String(row.package_ref ?? "").startsWith("tools/qf-proof-agent/") && !String(row.package_ref ?? "").startsWith("tools/runtime-proof/"))
+    .filter((row) => !String(row.id ?? "").startsWith("qf-proof-") && !String(row.package_ref ?? "").startsWith("tools/qf-proof-agent/"))
     .filter((row) => (row.availability as Json | undefined)?.available === true)
     .map((row) => ({ id: String(row.id ?? ""), name: name(row) }))
     .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));

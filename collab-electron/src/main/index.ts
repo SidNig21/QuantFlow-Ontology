@@ -112,13 +112,13 @@ import {
   bootstrapPackagedDockProfiles,
   closeAgentSessionRow,
   captureAgentSessionOutput,
-  disposeAgentOs,
+  disposeAgentHost,
   submitAgentSessionInstruction,
   admitAndStartSession,
   startPrecreatedNativeTuiSession,
-  isAgentOsBootSupported,
+
   reconcileStaleSessions,
-  runAgentHostSmoke,
+
 } from "./agent-host";
 import {
   buildGovernedCriticCompletionInstruction,
@@ -912,7 +912,7 @@ async function shutdownBackgroundServices(): Promise<void> {
   pty.setShuttingDown(true);
   await pty.killAllAndWait();
   await pty.shutdownSidecarIfIdle();
-  await disposeAgentOs();
+  await disposeAgentHost();
   watcher.stopWorker();
   if (!DISABLE_GIT_REPLAY) gitReplay.stopWorker();
   stopJsonRpcServer();
@@ -1014,15 +1014,8 @@ app.whenReady().then(async () => {
     bootstrapPackagedDockProfiles();
     bootstrapPackagedDockProfiles(); // explicit startup idempotence control
     reconcileStaleSessions();
-    if (isAgentOsBootSupported() && process.env.QF_DOCK_QA_MODE === "1") {
-      await runAgentHostSmoke();
-    } else {
-      console.warn(
-        "agent-host: AgentOS/Rivet proof boot smoke is QA-only; base shell remains available",
-      );
-    }
   } catch (err) {
-    console.error("agent-host: smoke FAILED", err);
+    console.error("agent-host: startup FAILED", err);
     throw err;
   }
 

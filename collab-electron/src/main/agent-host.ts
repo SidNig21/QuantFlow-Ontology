@@ -1,21 +1,15 @@
 /**
- * Sole app module that imports @rivet-dev/agentos* (mirror of kernel.ts).
+ * App-owned runtime admission and lifecycle boundary.
  * Species come from agent_definition rows (package_ref); no in-code registry map.
  *
- * Production packaging stages the genuine Hermes species. Deterministic
- * AgentOS proof fixtures are packed only by explicit QA gates.
+ * Production packaging stages the genuine Hermes and Claude species.
+
  */
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { app } from "electron";
 import { defaultRepoRoot, selectAppRoot } from "./app-root";
-import {
-  AgentOs,
-  createHostDirBackend,
-  type JsonRpcNotification,
-  type MountConfig,
-} from "@rivet-dev/agentos-core";
 import {
   admitHostAcp,
   cancelHostAcp,
@@ -28,6 +22,7 @@ import {
   requestFounderPermission,
 } from "./host-acp-permission";
 import { runHostAcpTurn } from "./host-acp-turn";
+import { resolveAdapterSessionEnv } from "./host-mounts";
 import {
   admitNativeTuiDefinition,
   cancelNativeTuiSession,
@@ -36,16 +31,12 @@ import {
   type NativeTuiLive,
 } from "./host-native-tui";
 import {
-  resolveHostMountSpecs,
-  resolveAdapterSessionEnv,
-} from "./host-mounts";
-import {
   getArtifactRoot,
   kernelExecute,
   kernelGetLinks,
   kernelGetObject,
   kernelListAgentSessions,
-  kernelListAgentDefinitions,
+
   kernelListTaskAssignments,
   type TraceContext,
 } from "./kernel";
@@ -56,12 +47,13 @@ import {
   type DockAdapterDiagnostic,
 } from "./dock-profiles";
 import {
-  collectUniqueRuntimeSoftware,
+
   resolveDefinitionRuntime,
-  runtimeSoftwareIdentity,
+
   type DefinitionRuntime,
 } from "./definition-runtime";
 import { allowsPtyRoleDelivery } from "./runtime-adapter";
+import { dispatchRuntimeRoute } from "./runtime-route-dispatch";
 import { completeRuntimeKernelAdmission } from "./runtime-kernel-admission";
 import {
   classifyWslNativeTuiPrerequisites,
@@ -71,27 +63,6 @@ import { resolveCollaborationResourcePath } from "./package-resource-paths";
 import { captureSession, writeToSession } from "./pty";
 import { assertPrecreatedNativeTuiRoute } from "./precreated-native-tui";
 import { assertPrecreatedStartOwnership } from "./precreated-start-ownership";
-
-/** Credential-free QA-only adapter used by the AgentOS identity smoke. */
-export const BOOT_SMOKE_DEFINITION = "qf-toolloop" as const;
-
-/**
- * AgentOS/Rivet's packaged sidecar support is not available on native Windows
- * in the current pinned runtime. The base shell and Kernel-backed Dock remain
- * usable; profiles that require AgentOS are admitted only when this boundary
- * says the capability exists.
- */
-export function isAgentOsBootSupported(): boolean {
-  return process.platform !== "win32";
-}
-
-function assertAgentOsSupported(): void {
-  if (!isAgentOsBootSupported()) {
-    throw new Error(
-      "AgentOS/Rivet is unsupported on native Windows in this package; use a native-TUI or host-ACP Dock profile",
-    );
-  }
-}
 
 export function appRoot(): string {
   const proofResourceRoot = process.env.QF_UI_PROOF_RESOURCE_ROOT?.trim();
@@ -115,15 +86,12 @@ type DoneListener = (
   },
 ) => void;
 
-let os: AgentOs | null = null;
-/** Absolute package paths already admitted into the live AgentOs. */
-const linkedPackages = new Set<string>();
 type LiveSession = {
   cancelled: boolean;
   definitionId: string;
-  /** AgentOS guest id, ACP session id, or PTY session id for native_tui. */
+  /** Runtime-owned session id or PTY session id for native_tui. */
   guestId: string;
-  kind: "agentos" | "host_acp" | "native_tui";
+  kind: "host_acp" | "native_tui";
   hostAcp?: HostAcpHandle;
   ptySessionId?: string;
   unsub?: () => void;
@@ -242,29 +210,6 @@ function newTrace(): TraceContext {
     trace_id: crypto.randomUUID(),
     span_id: crypto.randomUUID(),
   };
-}
-
-function sessionIdFromNotification(
-  event: JsonRpcNotification,
-): string | null {
-  if (event.method !== "session/update") return null;
-  const params = event.params;
-  if (!params || typeof params !== "object") return null;
-  const sid = (params as { sessionId?: unknown }).sessionId;
-  return typeof sid === "string" && sid.length > 0 ? sid : null;
-}
-
-function chunkTextFromNotification(
-  event: JsonRpcNotification,
-): string | null {
-  if (event.method !== "session/update") return null;
-  const params = event.params as {
-    update?: { sessionUpdate?: string; content?: { text?: string } };
-  } | null;
-  if (!params?.update) return null;
-  if (params.update.sessionUpdate !== "agent_message_chunk") return null;
-  const text = params.update.content?.text;
-  return typeof text === "string" ? text : null;
 }
 
 function getDefinition(definitionId: string): Record<string, unknown> | null {
@@ -418,98 +363,6 @@ export function onSessionDone(listener: DoneListener): () => void {
   };
 }
 
-/** Admit one adapter package into the live AgentOS host. */
-export async function admitPackage(runtime: DefinitionRuntime): Promise<void> {
-  assertAgentOsSupported();
-  const host = await ensureAgentOs();
-  const identity = runtimeSoftwareIdentity(
-    runtime.metadata.adapterId,
-    runtime.packagePath,
-  );
-  if (linkedPackages.has(identity.key)) return;
-  if (!existsSync(identity.packagePath)) {
-    throw new Error(`agent-host: missing adapter package at ${identity.packagePath}`);
-  }
-  await host.linkSoftware({ packagePath: identity.packagePath });
-  linkedPackages.add(identity.key);
-  console.log(
-    `agent-host: linkSoftware adapter=${identity.adapterId} ${identity.packagePath}`,
-  );
-}
-
-export async function ensureAgentOs(): Promise<AgentOs> {
-  assertAgentOsSupported();
-  if (os) return os;
-  const defs = kernelListAgentDefinitions();
-  const resolvedSoftware = collectUniqueRuntimeSoftware(
-    defs,
-    appRoot(),
-    getDefinition,
-  );
-  const software = resolvedSoftware.map(({ packagePath }) => ({ packagePath }));
-  if (software.length === 0) {
-    throw new Error(
-      "agent-host: no resolvable agent_definition rows — boot-seed failed?",
-    );
-  }
-  const mounts: MountConfig[] = resolveHostMountSpecs().map((spec) => ({
-    path: spec.guestPath,
-    plugin: createHostDirBackend({
-      hostPath: spec.hostPath,
-      readOnly: spec.readOnly,
-    }),
-    readOnly: spec.readOnly,
-  }));
-  os = await AgentOs.create({
-    defaultSoftware: false,
-    software,
-    ...(mounts.length > 0 ? { mounts } : {}),
-  });
-  for (const runtime of resolvedSoftware) {
-    linkedPackages.add(`${runtime.adapterId}\0${runtime.packagePath}`);
-  }
-  return os;
-}
-
-export async function runAgentHostSmoke(): Promise<void> {
-  const host = await ensureAgentOs();
-  const runtime = getDefinitionRuntime(BOOT_SMOKE_DEFINITION);
-  await admitPackage(runtime);
-  const created = await host.createSession(runtime.metadata.adapterId);
-  const session = created.sessionId;
-
-  let guestMinted: string | null = null;
-  let chunks = 0;
-  const unsub = host.onSessionEvent(session, (event) => {
-    const sid = sessionIdFromNotification(event);
-    if (!sid) return;
-    if (!guestMinted) guestMinted = sid;
-    chunks += 1;
-  });
-
-  try {
-    await host.prompt(session, "uppercase quantflow");
-  } finally {
-    unsub();
-    await host.destroySession(session).catch(() => {});
-  }
-
-  if (!guestMinted) {
-    throw new Error(
-      "agent-host smoke: no session/update notification — cannot assert ID adoption",
-    );
-  }
-  if (session !== guestMinted) {
-    throw new Error(
-      `agent-host smoke: ID adoption failed session=${session} guestMinted=${guestMinted}`,
-    );
-  }
-
-  console.log(
-    `agent-host: smoke ok session=${session} guestMinted=${guestMinted} chunks=${chunks}`,
-  );
-}
-
 export function reconcileStaleSessions(): void {
   if (process.env.QF_HERMES_SYNTHETIC_TEST === "1" && process.env.QF_UI_PROOF === "1") {
     console.log("agent-host: synthetic UI proof retains Kernel session snapshot");
@@ -593,43 +446,42 @@ export async function admitAndStartSession(
   },
 ): Promise<AdmitResult> {
   const runtime = getDefinitionRuntime(definitionId);
-  if (runtime.metadata.route === "native_tui") {
-    const peerDelivery = allowsPtyRoleDelivery(
-      runtime.metadata,
-      runtime.runtimeProfile,
-    )
-      ? { role: runtime.role, dbPath: peerBusDbPath() }
-      : undefined;
-    return admitNativeTuiDefinition({
-      definitionId: runtime.definitionId,
-      adapterId: runtime.metadata.adapterId,
-      argv: runtime.argv,
-      command: runtime.metadata.command,
-      entrypointPath: runtime.entrypointPath,
-      terminalTarget: runtime.metadata.terminalTarget,
-      role: runtime.role,
-      env: opts?.env,
-      corruptId: opts?.corruptId,
-      existingSessionId: opts?.existingSessionId,
-      missionActivation: opts?.missionActivation,
-      beforeActivation: opts?.beforeActivation,
-      newTrace,
-      liveSet: (sessionId, entry) => {
-        live.set(sessionId, entry);
-      },
-      liveDelete: (sessionId) => {
-        live.delete(sessionId);
-      },
-      peerDelivery,
-      onStarted: opts?.onStarted
-        ? (sessionId, sp, info) => opts.onStarted?.(sessionId, sp, info)
-        : undefined,
-    });
-  }
-  if (runtime.metadata.route === "host_acp") {
-    return admitHostAcpDefinition(runtime, opts);
-  }
-  return admitAgentOsDefinition(runtime, opts);
+  return dispatchRuntimeRoute(runtime.metadata.route, runtime.packageRef, {
+    native_tui: () => {
+      const peerDelivery = allowsPtyRoleDelivery(
+        runtime.metadata,
+        runtime.runtimeProfile,
+      )
+        ? { role: runtime.role, dbPath: peerBusDbPath() }
+        : undefined;
+      return admitNativeTuiDefinition({
+        definitionId: runtime.definitionId,
+        adapterId: runtime.metadata.adapterId,
+        argv: runtime.argv,
+        command: runtime.metadata.command,
+        entrypointPath: runtime.entrypointPath,
+        terminalTarget: runtime.metadata.terminalTarget,
+        role: runtime.role,
+        env: opts?.env,
+        corruptId: opts?.corruptId,
+        existingSessionId: opts?.existingSessionId,
+        missionActivation: opts?.missionActivation,
+        beforeActivation: opts?.beforeActivation,
+        newTrace,
+        liveSet: (sessionId, entry) => {
+          live.set(sessionId, entry);
+        },
+        liveDelete: (sessionId) => {
+          live.delete(sessionId);
+        },
+        peerDelivery,
+        onStarted: opts?.onStarted
+          ? (sessionId, sp, info) => opts.onStarted?.(sessionId, sp, info)
+          : undefined,
+      });
+    },
+    host_acp: () => admitHostAcpDefinition(runtime, opts),
+  });
 }
 
 /**
@@ -775,75 +627,6 @@ async function admitHostAcpDefinition(
   return { sessionId, guestId, definitionId, surface: "acp_session" };
 }
 
-async function admitAgentOsDefinition(
-  runtime: DefinitionRuntime,
-  opts?: {
-    env?: Record<string, string>;
-    corruptId?: string;
-    beforeActivation?: (sessionId: string) => void | Promise<void>;
-    onStarted?: (
-      sessionId: string,
-      definitionId: string,
-      info?: {
-        surface: "acp_session" | "native_tui";
-        ptySessionId?: string;
-        role?: string;
-      },
-    ) => void;
-  },
-): Promise<AdmitResult> {
-  assertAgentOsSupported();
-  const { definitionId } = runtime;
-  const adapterId = runtime.metadata.adapterId;
-  const host = await ensureAgentOs();
-  await admitPackage(runtime);
-  const fromConfig = resolveAdapterSessionEnv(adapterId);
-  const merged: Record<string, string> = { ...fromConfig, ...opts?.env };
-  if (process.env.QF_KERNEL_DB && !merged.QF_KERNEL_DB) {
-    merged.QF_KERNEL_DB = process.env.QF_KERNEL_DB;
-  }
-  if (process.env.QF_ARTIFACT_ROOT && !merged.QF_ARTIFACT_ROOT) {
-    merged.QF_ARTIFACT_ROOT = process.env.QF_ARTIFACT_ROOT;
-  }
-  const env =
-    Object.keys(merged).length > 0 ? merged : undefined;
-  const created = await host.createSession(
-    adapterId,
-    env ? { env } : undefined,
-  );
-  const guestId = created.sessionId;
-  const sessionId = opts?.corruptId ?? guestId;
-
-  const liveEntry: LiveSession = {
-    cancelled: false,
-    definitionId,
-    guestId,
-    kind: "agentos",
-    turnInFlight: false,
-  };
-  await completeRuntimeKernelAdmission(
-    { definitionId, sessionId, liveEntry },
-    {
-      execute: kernelExecute,
-      newTrace,
-      liveSet: (id, entry) => {
-        live.set(id, entry);
-      },
-      liveDelete: (id) => {
-        live.delete(id);
-      },
-      tearDownRuntime: () => host.destroySession(guestId),
-    },
-  );
-  await opts?.beforeActivation?.(sessionId);
-  opts?.onStarted?.(sessionId, definitionId, { surface: "acp_session" });
-  console.log(
-    `agent-host: admitted agentos session=${sessionId}`
-    + ` definition=${definitionId} adapter=${adapterId} (no prompt)`,
-  );
-  return { sessionId, guestId, definitionId, surface: "acp_session" };
-}
-
 /**
  * Prompt + stream + optional publish on an already-admitted session.
  * Callable while the session remains live; default finalizes (close + destroy)
@@ -855,7 +638,7 @@ export async function runTurn(
   promptText: string,
   opts?: {
     skipPublish?: boolean;
-    /** Default true — close Kernel row + destroy AgentOS session after the turn. */
+    /** Default true — close Kernel row + destroy the runtime session after the turn. */
     finalize?: boolean;
   },
 ): Promise<TurnResult> {
@@ -891,92 +674,6 @@ export async function runTurn(
         live.delete(sid);
       },
     });
-  }
-
-  entry.turnInFlight = true;
-  entry.cancelled = false;
-
-  const host = await ensureAgentOs();
-  const guestId = entry.guestId;
-
-  let text = "";
-  const unsub = host.onSessionEvent(guestId, (event) => {
-    const chunk = chunkTextFromNotification(event);
-    if (chunk) {
-      text += chunk;
-      for (const l of chunkListeners) l(sessionId, chunk);
-    }
-  });
-  entry.unsub = unsub;
-
-  let stopReason = "unknown";
-  try {
-    const promptResult = await host.prompt(guestId, promptText);
-    const response = promptResult.response as {
-      result?: { stopReason?: string };
-    };
-    stopReason = response?.result?.stopReason ?? "end_turn";
-  } catch (err) {
-    stopReason = "failed";
-    console.error("agent-host: prompt failed", err);
-  } finally {
-    unsub();
-    entry.unsub = undefined;
-    entry.turnInFlight = false;
-  }
-
-  const wasCancelled =
-    (live.get(sessionId)?.cancelled ?? false) || stopReason === "cancelled";
-
-  if (wasCancelled) {
-    live.delete(sessionId);
-    try {
-      kernelExecute(
-        "cancel_agent_session",
-        { session_id: sessionId },
-        newTrace(),
-      );
-    } catch {
-      /* already terminal */
-    }
-    try {
-      kernelExecute(
-        "close_agent_session",
-        { session_id: sessionId },
-        newTrace(),
-      );
-    } catch {
-      /* ignore */
-    }
-    await host.destroySession(guestId).catch(() => {});
-    for (const l of doneListeners) {
-      l(sessionId, { status: "cancelled", text });
-    }
-    console.log(`agent-host: session cancelled ${sessionId}`);
-    return { sessionId, stopReason: "cancelled", text };
-  }
-
-  if (stopReason !== "end_turn" && stopReason !== "unknown") {
-    live.delete(sessionId);
-    try {
-      kernelExecute(
-        "fail_agent_session",
-        { session_id: sessionId, reason: stopReason },
-        newTrace(),
-      );
-      kernelExecute(
-        "close_agent_session",
-        { session_id: sessionId },
-        newTrace(),
-      );
-    } catch {
-      /* ignore */
-    }
-    await host.destroySession(guestId).catch(() => {});
-    for (const l of doneListeners) {
-      l(sessionId, { status: "failed", text });
-    }
-    return { sessionId, stopReason, text };
   }
 
   let artifactId: string | undefined;
@@ -1063,10 +760,8 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
     console.log(`agent-host: host_acp cancel+close ${sessionId}`);
     return;
   }
-  const host = await ensureAgentOs();
-  const guestId = entry?.guestId ?? sessionId;
-  await host.cancelSession(guestId).catch(() => {});
-  console.log(`agent-host: cancel requested ${sessionId}`);
+  if (!entry) return;
+  throw new Error("agent-host: unsupported live session kind for " + sessionId);
 }
 
 export function closeAgentSessionRow(sessionId: string): void {
@@ -1099,15 +794,11 @@ export function closeAgentSessionRow(sessionId: string): void {
   } else if (entry.kind === "host_acp" && entry.hostAcp) {
     cancelPendingPermissions(sessionId);
     void tearDownHostAcp(entry.hostAcp).catch(() => {});
-  } else if (entry.kind === "agentos") {
-    void ensureAgentOs().then((host) =>
-      host.destroySession(entry.guestId).catch(() => {}),
-    );
   }
   console.log(`agent-host: close ${sessionId}`);
 }
 
-export async function disposeAgentOs(): Promise<void> {
+export async function disposeAgentHost(): Promise<void> {
   for (const [id, entry] of live) {
     if (entry.kind === "native_tui") {
       await nativeTuiTeardowns.begin(id, entry as NativeTuiLive).catch(() => {});
@@ -1117,13 +808,7 @@ export async function disposeAgentOs(): Promise<void> {
     live.delete(id);
   }
   await nativeTuiTeardowns.awaitAll();
-  if (!os) return;
-  const current = os;
-  os = null;
-  linkedPackages.clear();
-  await current.dispose?.().catch(() => {});
 }
-
 installNativeTuiPtyExitHook((sessionId) => {
   closeAgentSessionRow(sessionId);
 });

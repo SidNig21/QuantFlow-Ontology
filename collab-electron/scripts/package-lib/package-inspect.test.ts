@@ -8,7 +8,6 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
-import { finished } from "node:stream/promises";
 import { createPackage } from "@electron/asar";
 import {
   HERMES_REF,
@@ -19,8 +18,8 @@ import {
   QF_KERNEL_SCHEMA_MARKET_INGEST_UPGRADE,
   QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY,
   QF_KERNEL_SCHEMA_UPGRADE,
-  QF_TOOLLOOP_REF,
   QF_LINUX_EXECUTABLE,
+  CLAUDE_REF,
   QF_PACKAGE_NAME,
   QF_UPDATE_OWNER,
   QF_UPDATE_REPOSITORY,
@@ -44,10 +43,12 @@ function testTmpPath(label: string): string {
 
 function seedMinimalPackage(root: string): void {
   const resources = join(root, "resources");
-  mkdirSync(join(resources, "tools/runtime-proof/packed"), { recursive: true });
   mkdirSync(join(resources, "species/hermes/packed"), { recursive: true });
-  writeFileSync(join(resources, QF_TOOLLOOP_REF), "toolloop");
+  mkdirSync(join(resources, "species/claude-code/packed"), { recursive: true });
   writeFileSync(join(resources, HERMES_REF), "hermes");
+  writeFileSync(join(resources, CLAUDE_REF), "claude");
+  mkdirSync(join(resources, "species/hermes/prompts"), { recursive: true });
+  copyFileSync(join(repoRoot, "species/hermes/prompts/research-director.md"), join(resources, "species/hermes/prompts/research-director.md"));
   for (const rel of RUNTIME_CONTROL_FILES) {
     const destination = join(resources, rel);
     mkdirSync(dirname(destination), { recursive: true });
@@ -128,11 +129,10 @@ async function seedSqlAsar(
       ),
   );
 
-  const stream = await createPackage(
+  await createPackage(
     source,
     join(root, "resources", "app.asar"),
   );
-  await finished(stream);
   rmSync(source, { recursive: true, force: true });
 }
 
@@ -187,9 +187,7 @@ describe("inspectPackagedResources root rules", () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.reason.startsWith("unresolved hermes reference:")).toBe(
-        true,
-      );
+      expect(result.reason).toContain("runtime control validation failed: Dock profile runtime package missing");
     }
   });
 

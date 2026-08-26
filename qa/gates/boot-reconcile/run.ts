@@ -3,7 +3,7 @@
  * when more than 100 rows exist.
  *
  * Models collab-electron/src/main/agent-host.ts reconcileStaleSessions().
- * The gate cannot import agent-host (Electron + AgentOS at module scope).
+ * The gate cannot import agent-host (Electron bridge dependencies at module scope).
  * Coupling: static assertion that production lists via kernelListAgentSessions()
  * with limit null; behavioral test mirrors the same reconcile branches.
  *
@@ -209,7 +209,7 @@ async function main(): Promise<number> {
     {
       name: BOOT_DEFINITION_ID,
       role: "boot-reconcile-proof",
-      package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+      package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
     },
     trace(),
   );

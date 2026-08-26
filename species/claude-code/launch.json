@@ -3,6 +3,5 @@
   "name": "claude-code",
   "command": "node",
   "entrypoint": "claude-code.mjs",
-  "profile_argv": ["--profile", "{runtime_profile}"],
-  "argv": ["--profile", "default"]
+  "profile_argv": ["--profile", "{runtime_profile}"]
 }

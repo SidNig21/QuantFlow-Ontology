@@ -19,7 +19,6 @@ describe("runtime staging inventory", () => {
   test("QA staging explicitly adds deterministic proof fixtures", () => {
     expect(QA_RUNTIME_FILES).toEqual(expect.arrayContaining([
       "tools/qf-proof-agent/dock-profiles.json",
-      "tools/runtime-proof/dock-profiles.json",
       "species/hermes/dock-profiles.json",
     ]));
     expect(QA_RUNTIME_FILES.length).toBeGreaterThan(PRODUCTION_RUNTIME_FILES.length);

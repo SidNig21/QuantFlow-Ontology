@@ -1,7 +1,7 @@
 /**
  * WO-006b/c: Kernel SQLite sole-writer + AgentOS sole-host under collab-electron/src.
  * - Only kernel.ts may import qf-kernel / sqlite / mention the Kernel db filename
- * - Only agent-host.ts may import @rivet-dev/agentos*
+ * - No production app source may import the retired @rivet-dev/agentos* runtime
  * - acp-agent.ts is a frozen exception for @agentclientprotocol (debt #14)
  * - WO-008a: species/hermes/host-acp-client.ts is the sole live ACP SDK home
  *   (scanned explicitly; collab-electron bridge must not import the SDK)
@@ -31,7 +31,6 @@ const KERNEL_ALLOWED = new Set([
  * still flagged if it ever references the Kernel db or imports the Kernel pkg.
  */
 const TRANSPORT_SQLITE_ALLOWED = "collab-electron/src/main/peer-delivery.ts";
-const AGENTOS_ALLOWED = "collab-electron/src/main/agent-host.ts";
 /** Frozen legacy Collaborator path — debt #14. No *new* SDK imports here. */
 const ACP_FROZEN = "collab-electron/src/main/acp-agent.ts";
 /**
@@ -111,7 +110,6 @@ function scanAgentPatterns(
 ): void {
   for (const p of AGENT_PATTERNS) {
     if (!p.re.test(text)) continue;
-    if (p.name === "@rivet-dev/agentos" && rel === AGENTOS_ALLOWED) continue;
     if (
       p.name === "@agentclientprotocol" &&
       (rel === ACP_FROZEN ||

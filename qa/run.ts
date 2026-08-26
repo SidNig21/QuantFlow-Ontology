@@ -484,7 +484,7 @@ const gates: Gate[] = [
   {
     name: "package-closure",
     description:
-      "WO-CI2: packaged Linux app closes over qf-toolloop and Hermes runtime bytes",
+      "WO-CI2/G4: packaged Linux app closes over retained runtime bytes and route-aware profile references",
     run: async () => {
       const { runPackageClosureGate } = await import("./gates/package-closure.ts");
       const { ok } = await runPackageClosureGate();
@@ -668,43 +668,17 @@ const gates: Gate[] = [
     },
   },
   {
-    name: "runtime-proof",
+    name: "golden-g4-retired-route",
     description:
-      "WO-004a AgentOS→ACP→ToolLoopAgent proof (P1–P4; no API key; installs own deps; pack-once in test beforeAll)",
+      "G4: route-aware staged package closure admits native_tui/host_acp and rejects retired or unknown routes before mutation",
     run: async () => {
-      const cwd = join(REPO_ROOT, "tools/runtime-proof");
-      const install = Bun.spawn(["bun", "install", "--frozen-lockfile"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-      });
-      const installCode = await install.exited;
-      if (installCode !== 0) {
-        console.error(`runtime-proof: bun install exited ${installCode}`);
-        return false;
-      }
-      // Pack happens once inside the suite beforeAll — do not pack again here.
-      const proc = Bun.spawn(["bun", "test", "src"], {
-        cwd,
-        stdout: "inherit",
-        stderr: "inherit",
-        env: {
-          ...process.env,
-          // Ensure no credential is required or consulted.
-          OPENAI_API_KEY: "",
-          ANTHROPIC_API_KEY: "",
-          OPENROUTER_API_KEY: "",
-        },
-      });
-      const code = await proc.exited;
-      if (code !== 0) {
-        console.error(`runtime-proof: bun test exited ${code}`);
-        return false;
-      }
-      return true;
+      const { runGoldenG4RetiredRouteGate } = await import(
+        "./gates/golden-g4-retired-route.ts"
+      );
+      const { ok } = runGoldenG4RetiredRouteGate();
+      return ok;
     },
-  },
-  {
+  },  {
     name: "kernel",
     description:
       "qf-kernel tests green (migration, commands, replay, session id, trace) — installs own deps",
@@ -856,16 +830,6 @@ const gates: Gate[] = [
     },
   },
   {
-    name: "agent-path",
-    description:
-      "WO-006c: headless spawn→stream→tool→artifact, concurrency, cancel, orphans, reconcile",
-    run: async () => {
-      const { runAgentPathGate } = await import("./gates/agent-path.ts");
-      const { ok } = await runAgentPathGate();
-      return ok;
-    },
-  },
-  {
     name: "glacier-feel",
     description:
       "WO-g6: cable endpoints track tile geometry; Kernel ledger projection matches events",
@@ -958,16 +922,6 @@ const gates: Gate[] = [
         "./gates/dock-definition-launch.ts"
       );
       const { ok } = await runDockDefinitionLaunchGate();
-      return ok;
-    },
-  },
-  {
-    name: "dock-registry",
-    description:
-      "WO-007: agent_definition registry list/resolve, species-literal scan, linkSoftware admission",
-    run: async () => {
-      const { runDockRegistryGate } = await import("./gates/dock-registry.ts");
-      const { ok } = await runDockRegistryGate();
       return ok;
     },
   },

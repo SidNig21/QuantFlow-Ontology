@@ -1,39 +1,27 @@
 /**
- * Founder-controlled AgentOS host mounts (WO-008b).
+ * Founder-controlled adapter session environment (WO-008b shared configuration).
  *
  * Specs come from a JSON file the founder owns — never from the renderer.
- * Default path: ~/.quantflow/app/agentos-host-mounts.json
+ * Default path: ~/.quantflow/app/agentos-host-mounts.json (legacy filename retained for config identity)
  * Override: QF_AGENTOS_HOST_MOUNTS=<absolute path to json>
  *
  * Shape:
  * {
- *   "mounts": [
- *     { "hostPath": "/abs/host/dir", "guestPath": "/abs/guest/dir", "readOnly": true }
- *   ],
  *   "speciesEnv": {
  *     "hermes": { "HERMES_BIN": "/abs/...", "HOME": "/abs/..." }
  *   }
  * }
  *
- * This module is data-only — agent-host builds typed mounts via createHostDirBackend.
+ * This module is data-only; native and host-ACP adapters consume only the session environment map.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { QF_APP_ROOT } from "./paths";
 
-export type HostMountSpec = {
-  hostPath: string;
-  /** Guest path to mount at; defaults to hostPath (same-path projection). */
-  guestPath?: string;
-  readOnly?: boolean;
-};
 
 export type HostMountsFile = {
-  mounts?: HostMountSpec[];
   /** Optional per-species createSession env (paths only — never secrets). */
   speciesEnv?: Record<string, Record<string, string>>;
-  /** Optional per-species launch override: "host_acp" | "agentos" (WO-008c). */
-  speciesLaunch?: Record<string, string>;
 };
 
 function configPath(): string {
@@ -60,43 +48,6 @@ export function loadHostMountsFile(): HostMountsFile | null {
     console.error(`agent-host: host-mounts failed to parse ${path}`, err);
     return null;
   }
-}
-
-/** Validated mount specs (absolute existing host paths only). */
-export function resolveHostMountSpecs(
-  file: HostMountsFile | null = loadHostMountsFile(),
-): Array<{ hostPath: string; guestPath: string; readOnly: boolean }> {
-  if (!file?.mounts?.length) return [];
-  const out: Array<{
-    hostPath: string;
-    guestPath: string;
-    readOnly: boolean;
-  }> = [];
-  for (const spec of file.mounts) {
-    if (!spec?.hostPath || typeof spec.hostPath !== "string") continue;
-    if (!spec.hostPath.startsWith("/")) {
-      console.error(
-        `agent-host: host-mounts skip non-absolute hostPath=${spec.hostPath}`,
-      );
-      continue;
-    }
-    if (!existsSync(spec.hostPath)) {
-      console.error(
-        `agent-host: host-mounts skip missing hostPath=${spec.hostPath}`,
-      );
-      continue;
-    }
-    const guestPath =
-      typeof spec.guestPath === "string" && spec.guestPath.startsWith("/")
-        ? spec.guestPath
-        : spec.hostPath;
-    const readOnly = spec.readOnly !== false;
-    out.push({ hostPath: spec.hostPath, guestPath, readOnly });
-  }
-  console.log(
-    `agent-host: host-mounts loaded n=${out.length} from ${configPath()}`,
-  );
-  return out;
 }
 
 /** Adapter session env from founder config (paths only). */

@@ -12,7 +12,7 @@ import { isTerminalTarget, type TerminalTarget } from "./config";
 
 export const RUNTIME_PROFILE_TOKEN = "{runtime_profile}" as const;
 
-export type RuntimeAdapterRoute = "native_tui" | "host_acp" | "agentos";
+export type RuntimeAdapterRoute = string;
 
 export type PeerDeliveryContract = {
   mode: "pty_role";
@@ -89,12 +89,7 @@ function stringArray(
 }
 
 function parseRoute(value: unknown, label: string): RuntimeAdapterRoute {
-  if (value === "native_tui" || value === "host_acp" || value === "agentos") {
-    return value;
-  }
-  throw new RuntimeAdapterContractError(
-    `${label} must be native_tui, host_acp, or agentos`,
-  );
+  return trimmedString(value, label);
 }
 
 function validateBaseArgv(argv: string[], label: string): void {

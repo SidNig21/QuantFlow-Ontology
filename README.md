@@ -19,10 +19,10 @@ Built solo, in the open, for native Windows first. Early-stage and honest about 
 <p align="center"><em>Live Windows shell (WO-WIN1 evidence): infinite canvas, file rail, and Dock — Act I product floor. Glacier (g1–g5) re-skins this surface in source; rebuild the install to see it on the desktop shortcut.</em></p>
 
 <p align="center">
-  <img src="docs/readme-assets/dock-session.png" alt="Dock session tile with qf-toolloop running on the canvas" width="720" />
+  <img src="docs/readme-assets/dock-session.png" alt="Dock session tile with qf-proof-agent running on the canvas" width="720" />
 </p>
 
-<p align="center"><em>A Dock-spawned <code>qf-toolloop</code> session on the canvas with live session ledger (running / closed) — collaboration transport proven on Windows.</em></p>
+<p align="center"><em>A Dock-spawned <code>qf-proof-agent</code> session on the canvas with live session ledger (running / closed) — collaboration transport proven on Windows.</em></p>
 
 <p align="center">
   <img src="docs/readme-assets/glacier-showcase.png" alt="Glacier design showcase — spine tiles, dock, and a declared cable" width="900" />
@@ -44,7 +44,7 @@ Every claim below is backed by a falsified `qa/` gate, a Kernel proof, or a reco
 
 - **The Kernel** — a sole-writer SQLite system of record. Append-only event log, content-addressed artifacts, schema-generated code (`qf-kernel-schema`). All mutation goes through Kernel `execute()`; gates fail the build if any other path writes domain truth.
 - **The canvas + dock** — an infinite pan/zoom Electron surface. Every agent card launches by exact Kernel definition id. Sessions link back to the definition the founder clicked. Dock **Clear** hides closed sessions from the ledger without deleting Kernel history.
-- **Agent seats** — packaged Dock includes `qf-toolloop`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
+- **Agent seats** — packaged Dock includes `qf-proof-agent`, Hermes profiles, and labeled deterministic proof profiles. Deterministic collaboration is proven end-to-end on Windows; model-backed seats are present with distinct Kernel identities but are not certified as everyday research workflows.
 - **The app-owned peer notification transport** (`collab-electron/src/main/peer-delivery.ts`) — live Agent Host/native-TUI delivery for Kernel notifications. Transport SQLite stays separate from the Kernel.
 - **Desk + governed research loop (R0–R15)** - Kernel, Dock seats, durable Tasks, Research Director recruitment and steering, strict independent critic review, and evaluation-gated Report publication are independently verified in this checkout.
 - **Native Hermes development runtime** - the custom Research Director and exact least-privilege critic run through the production Hermes transport with durable Kernel identity and receipts.

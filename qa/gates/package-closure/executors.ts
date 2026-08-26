@@ -259,9 +259,9 @@ export async function executePackageClosureMode(
         if (inspect.ok) {
           return fail("missing-hermes bait expected unresolved hermes reference");
         }
-        if (!inspect.reason.startsWith("unresolved hermes reference:")) {
+        if (!inspect.reason.startsWith("runtime control validation failed: Dock profile runtime package missing:")) {
           return fail(
-            `missing-hermes bait expected unresolved hermes reference, got: ${inspect.reason}`,
+            `missing-hermes bait expected staged Hermes package failure, got: ${inspect.reason}`,
           );
         }
         console.error(`package-closure: ${inspect.reason}`);

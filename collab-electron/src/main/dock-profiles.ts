@@ -33,7 +33,7 @@ export const QA_DOCK_PROFILE_MANIFESTS = [
   ...PRODUCTION_DOCK_PROFILE_MANIFESTS,
   "species/claude-code/qa-dock-profiles.json",
   "tools/qf-proof-agent/dock-profiles.json",
-  "tools/runtime-proof/dock-profiles.json",
+
 ] as const;
 
 /** Backward-compatible name for the normal product contract. */

@@ -36,8 +36,7 @@ export function researchDirectorRunningStatus(missionId) {
 export function isProductionDockDefinition(row) {
 	const packageRef = String(row?.package_ref ?? "");
 	if (
-		packageRef.startsWith("tools/qf-proof-agent/") ||
-		packageRef.startsWith("tools/runtime-proof/")
+		packageRef.startsWith("tools/qf-proof-agent/")
 	) {
 		return false;
 	}

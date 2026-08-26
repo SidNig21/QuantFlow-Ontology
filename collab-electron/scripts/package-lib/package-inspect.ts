@@ -14,7 +14,6 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { finished } from "node:stream/promises";
 import {
   createPackage,
   extractAll,
@@ -31,13 +30,15 @@ import {
 import { expandFileSetOutputs } from "./fileset-expand.ts";
 import type { FileSet } from "./extra-resources.ts";
 import { discoverDockProfileManifests } from "../../src/main/dock-profiles.ts";
+import { resolveRuntimeAdapterMetadata } from "../../src/main/runtime-adapter.ts";
 
-export const QF_TOOLLOOP_REF = "tools/runtime-proof/packed/qf-toolloop.aospkg";
-export const QF_TOOLLOOP_META =
-  "tools/runtime-proof/packed/qf-toolloop.meta.json";
-export const QF_TOOLLOOP_LAUNCH = "tools/runtime-proof/launch.json";
-export const QF_TOOLLOOP_DOCK_PROFILES =
-  "tools/runtime-proof/dock-profiles.json";
+export const QF_PROOF_AGENT_REF = "tools/qf-proof-agent/packed/qf-proof-agent.aospkg";
+export const QF_PROOF_AGENT_META =
+  "tools/qf-proof-agent/packed/qf-proof-agent.meta.json";
+export const QF_PROOF_AGENT_LAUNCH = "tools/qf-proof-agent/launch.json";
+
+export const QF_PROOF_AGENT_DOCK_PROFILES =
+  "tools/qf-proof-agent/dock-profiles.json";
 export const QF_KERNEL_SCHEMA_MIGRATION =
   "node_modules/qf-kernel-schema/golden/migration.sql";
 export const QF_KERNEL_SCHEMA_PRE_D1_AUTHORITY =
@@ -52,6 +53,12 @@ export const HERMES_REF = "species/hermes/packed/hermes.aospkg";
 export const HERMES_META = "species/hermes/packed/hermes.meta.json";
 export const HERMES_LAUNCH = "species/hermes/launch.json";
 export const HERMES_DOCK_PROFILES = "species/hermes/dock-profiles.json";
+export const CLAUDE_REF = "species/claude-code/packed/claude-code.aospkg";
+export const CLAUDE_META = "species/claude-code/packed/claude-code.meta.json";
+export const CLAUDE_LAUNCH = "species/claude-code/launch.json";
+export const CLAUDE_DOCK_PROFILES = "species/claude-code/dock-profiles.json";
+
+
 export const QF_LINUX_EXECUTABLE = "quantflow";
 export const QF_PACKAGE_NAME = "@quantflow/electron";
 export const QF_UPDATE_OWNER = "SidNig21";
@@ -61,12 +68,15 @@ export const PRODUCTION_RUNTIME_CONTROL_FILES = [
   HERMES_META,
   HERMES_LAUNCH,
   HERMES_DOCK_PROFILES,
+  CLAUDE_META,
+  CLAUDE_LAUNCH,
+  CLAUDE_DOCK_PROFILES,
 ] as const;
 
 export const QA_RUNTIME_CONTROL_FILES = [
-  QF_TOOLLOOP_META,
-  QF_TOOLLOOP_LAUNCH,
-  QF_TOOLLOOP_DOCK_PROFILES,
+  QF_PROOF_AGENT_META,
+  QF_PROOF_AGENT_LAUNCH,
+  QF_PROOF_AGENT_DOCK_PROFILES,
   "species/claude-code/qa-dock-profiles.json",
   ...PRODUCTION_RUNTIME_CONTROL_FILES,
 ] as const;
@@ -203,6 +213,56 @@ function assertPackagedResourcesRoot(
   return null;
 }
 
+function inspectStagedRuntimeReferences(
+  resourcesRoot: string,
+  qaMode: boolean,
+  checked: { path: string; bytes: number }[],
+): InspectFailure | null {
+  let manifests: ReturnType<typeof discoverDockProfileManifests>;
+  try {
+    manifests = discoverDockProfileManifests(resourcesRoot, { qaMode });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { ok: false, reason: `runtime control validation failed: ${message}` };
+  }
+
+  const packageRefs = [...new Set(
+    manifests.flatMap((manifest) =>
+      manifest.profiles.map((profile) => profile.package_ref),
+    ),
+  )].sort();
+
+  for (const packageRef of packageRefs) {
+    let resolved: ReturnType<typeof resolveRuntimeAdapterMetadata>;
+    try {
+      resolved = resolveRuntimeAdapterMetadata(packageRef, resourcesRoot);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        ok: false,
+        reason: `unresolved staged runtime reference ${packageRef}: ${message}`,
+      };
+    }
+    if (resolved.metadata.route !== "native_tui" && resolved.metadata.route !== "host_acp") {
+      return {
+        ok: false,
+        reason: `unsupported staged runtime route "${resolved.metadata.route}" for package_ref "${packageRef}"`,
+      };
+    }
+    const packageFail = requireNonEmpty(resolved.packagePath, "runtime package");
+    if (packageFail) return packageFail;
+    checked.push({ path: resolved.packagePath, bytes: fileSize(resolved.packagePath) });
+    const auxFail = inspectAuxiliaryPaths(
+      packageRef,
+      resourcesRoot,
+      checked,
+      packageRef === HERMES_REF,
+    );
+    if (auxFail) return auxFail;
+  }
+
+  return null;
+}
 export function inspectPackagedResources(
   resourcesRoot: string,
   collabRoot: string,
@@ -260,40 +320,8 @@ export function inspectPackagedResources(
   );
   if (controlFail) return controlFail;
 
-  if (qaMode) {
-    try {
-      const toolloopPath = resolvePackageRef(QF_TOOLLOOP_REF, root, "qf-toolloop");
-      checked.push({ path: toolloopPath, bytes: fileSize(toolloopPath) });
-      const auxFail = inspectAuxiliaryPaths(
-        QF_TOOLLOOP_REF,
-        root,
-        checked,
-        false,
-      );
-      if (auxFail) return auxFail;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { ok: false, reason: `unresolved qf-toolloop reference: ${message}` };
-    }
-  }
-
-  try {
-    const hermesPath = resolvePackageRef(HERMES_REF, root, "hermes");
-    checked.push({ path: hermesPath, bytes: fileSize(hermesPath) });
-    const auxFail = inspectAuxiliaryPaths(HERMES_REF, root, checked, true);
-    if (auxFail) return auxFail;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { ok: false, reason: `unresolved hermes reference: ${message}` };
-  }
-
-  try {
-    discoverDockProfileManifests(root, { qaMode });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { ok: false, reason: `runtime control validation failed: ${message}` };
-  }
-
+  const stagedRuntimeFail = inspectStagedRuntimeReferences(root, qaMode, checked);
+  if (stagedRuntimeFail) return stagedRuntimeFail;
   for (const fileSet of fileSets) {
     const outputs = expandFileSetOutputs(collabRoot, fileSet);
     for (const output of outputs) {
@@ -357,6 +385,9 @@ export function removeHermesPackage(baitPackageRoot: string): void {
   rmSync(target, { force: true });
 }
 
+function asarEntryPath(path: string): string {
+  return process.platform === "win32" ? path.replaceAll("/", "\\") : path;
+}
 function sha256Buffer(buf: Buffer): string {
   return createHash("sha256").update(buf).digest("hex");
 }
@@ -377,7 +408,7 @@ export function inspectBovadaPackagedSurface(
 
   let mainBundle: Buffer;
   try {
-    mainBundle = extractFile(asarPath, "out/main/index.js");
+    mainBundle = extractFile(asarPath, asarEntryPath("out/main/index.js"));
   } catch {
     return {
       ok: false,
@@ -471,7 +502,7 @@ function inspectAsarSqlArtifacts(
   for (const pair of pairs) {
     let packagedBytes: Buffer;
     try {
-      packagedBytes = extractFile(asarPath, pair.packaged);
+      packagedBytes = extractFile(asarPath, asarEntryPath(pair.packaged));
     } catch {
       return {
         ok: false,
@@ -528,7 +559,7 @@ function inspectPackagedProductIdentity(
   const asarPath = join(resourcesRoot, "app.asar");
   let manifestBytes: Buffer;
   try {
-    manifestBytes = extractFile(asarPath, "package.json");
+    manifestBytes = extractFile(asarPath, asarEntryPath("package.json"));
   } catch {
     return { ok: false, reason: "packaged app.asar manifest missing: package.json" };
   }
@@ -676,8 +707,7 @@ async function removeUpgradeFromAsar(
     }
     rmSync(upgradePath);
 
-    const stream = await createPackage(extractRoot, replacementPath);
-    await finished(stream);
+    await createPackage(extractRoot, replacementPath);
     renameSync(replacementPath, asarPath);
 
     // @electron/asar caches archive headers by path. The copied archive now has

@@ -199,7 +199,7 @@ function ensureFixtureDefinition(db: KernelDb): void {
     {
       name: FIXTURE_DEFINITION_ID,
       role: "vault-projection-proof",
-      package_ref: "tools/runtime-proof/packed/qf-toolloop.aospkg",
+      package_ref: "tools/qf-proof-agent/packed/qf-proof-agent.aospkg",
     },
     trace(),
   );

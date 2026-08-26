@@ -60,7 +60,7 @@ export type ProcessOwnershipReceipt = {
 
 // Cold boot is an explicit QA fixture path; normal product boot is Hermes-only.
 const REQUIRED_DOCK_IDS = [
-  "qf-toolloop",
+  "qf-proof-orchestrator",
   "hermes-orchestrator",
   "hermes-worker",
   "hermes-worker-2",

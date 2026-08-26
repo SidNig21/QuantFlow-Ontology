@@ -24,8 +24,8 @@ afterEach(() => {
 
 function seedAdapter(
   root: string,
-  base: "species/hermes" | "species/claude-code" | "tools/runtime-proof" | "tools/qf-proof-agent",
-  adapterId: "hermes" | "claude-code" | "qf-toolloop" | "qf-proof-agent",
+  base: "species/hermes" | "species/claude-code" | "tools/qf-proof-agent",
+  adapterId: "hermes" | "claude-code" | "qf-proof-agent",
   profiles: Array<{
     id: string;
     role: string;
@@ -40,9 +40,7 @@ function seedAdapter(
     ? "hermes.aospkg"
     : adapterId === "claude-code"
       ? "claude-code.aospkg"
-    : adapterId === "qf-toolloop"
-      ? "qf-toolloop.aospkg"
-      : "qf-proof-agent.aospkg";
+    : "qf-proof-agent.aospkg";
   const packed = join(root, base, "packed");
   mkdirSync(packed, { recursive: true });
   writeFileSync(join(packed, packageName), "package");
@@ -50,7 +48,7 @@ function seedAdapter(
     join(packed, `${adapterId}.meta.json`),
     `${JSON.stringify({
       name: adapterId,
-      route: adapterId === "qf-toolloop" ? "agentos" : "native_tui",
+      route: "native_tui",
       package: packageName,
       ...(adapterId === "hermes"
         ? {
@@ -168,15 +166,7 @@ function seedQaFixtures(root: string): void {
       capability_groups: ["market.read"],
     },
   ]);
-  seedAdapter(root, "tools/runtime-proof", "qf-toolloop", [
-    {
-      id: "qf-toolloop",
-      role: "toolloop-proof",
-      runtime_profile: null,
-      system_prompt_ref: null,
-      capability_groups: [],
-    },
-  ]);
+
 }
 
 function freshRoot(): string {
@@ -195,14 +185,11 @@ function freshQaRoot(): string {
 describe("Dock profile manifests", () => {
   test("actual repository QA discovery accepts the proof fixture display names", () => {
     const proof = JSON.parse(readFileSync(join(REPO_ROOT, "tools/qf-proof-agent/dock-profiles.json"), "utf8")) as { profiles: Array<Record<string, unknown>> };
-    const toolloop = JSON.parse(readFileSync(join(REPO_ROOT, "tools/runtime-proof/dock-profiles.json"), "utf8")) as { profiles: Array<Record<string, unknown>> };
     expect([
       ...proof.profiles,
-      ...toolloop.profiles,
     ].map((profile) => ({ id: profile.id, display_name: profile.display_name }))).toEqual([
       { id: "qf-proof-orchestrator", display_name: "Orchestrator" },
       { id: "qf-proof-worker", display_name: "Market Researcher" },
-      { id: "qf-toolloop", display_name: "Market Researcher" },
     ]);
   });
 
@@ -263,7 +250,6 @@ describe("Dock profile manifests", () => {
       "hermes-worker-2",
       "qf-proof-orchestrator",
       "qf-proof-worker",
-      "qf-toolloop",
     ]);
     expect(manifests.map((manifest) => manifest.manifestRef)).toContain(
       "species/claude-code/qa-dock-profiles.json",
@@ -272,7 +258,7 @@ describe("Dock profile manifests", () => {
 
   test("QA discovery still fails when a required fixture package is missing", () => {
     const root = freshQaRoot();
-    rmSync(join(root, "tools/runtime-proof/packed/qf-toolloop.aospkg"));
+    rmSync(join(root, "tools/qf-proof-agent/packed/qf-proof-agent.aospkg"));
     expect(() => discoverDockProfileManifests(root, { qaMode: true })).toThrow(
       /Dock profile runtime package missing/,
     );

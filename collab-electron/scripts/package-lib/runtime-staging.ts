@@ -4,15 +4,15 @@
 import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
-  cpSync,
+
   existsSync,
   mkdirSync,
   mkdtempSync,
-  readFileSync,
+
   readdirSync,
   rmSync,
   statSync,
-  writeFileSync,
+
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -40,10 +40,10 @@ export const QA_RUNTIME_FILES = [
   "tools/qf-proof-agent/packed/qf-proof-agent.mjs",
   "tools/qf-proof-agent/launch.json",
   "tools/qf-proof-agent/dock-profiles.json",
-  "tools/runtime-proof/packed/qf-toolloop.aospkg",
-  "tools/runtime-proof/packed/qf-toolloop.meta.json",
-  "tools/runtime-proof/launch.json",
-  "tools/runtime-proof/dock-profiles.json",
+
+
+
+
   ...PRODUCTION_RUNTIME_FILES,
   "species/claude-code/qa-dock-profiles.json",
 ] as const;
@@ -90,51 +90,6 @@ function copySourceTree(source: string, target: string): void {
   }
 }
 
-function prepareWindowsToolchainAdapter(root: string): {
-  bin: string;
-  cleanup: () => void;
-} | null {
-  if (process.platform !== "win32") return null;
-  const source = join(root, "node_modules/@rivet-dev/agentos-toolchain");
-  if (!existsSync(source)) throw new Error(`AgentOS toolchain missing: ${source}`);
-  const target = join(
-    root,
-    "node_modules/@rivet-dev/agentos-toolchain-win-adapter",
-  );
-  rmSync(target, { recursive: true, force: true });
-  cpSync(source, target, { recursive: true });
-  const dist = join(target, "dist");
-  const bundle = readdirSync(dist)
-    .filter((name) => name.endsWith(".js"))
-    .map((name) => join(dist, name))
-    .find((path) => readFileSync(path, "utf8").includes("function npmBinary()"));
-  if (!bundle) {
-    rmSync(target, { recursive: true, force: true });
-    throw new Error(`AgentOS toolchain adapter bundle missing npmBinary: ${dist}`);
-  }
-  const before = readFileSync(bundle, "utf8");
-  const after = before
-    .replaceAll('{ stdio: "pipe" }', '{ stdio: "pipe", shell: process.env.ComSpec }')
-    .replaceAll('{ encoding: "utf8" }', '{ encoding: "utf8", shell: process.env.ComSpec }')
-    .replaceAll(
-      "symlinkSync(relative(binDir, targetAbs), join3(binDir, cmd));",
-      "cpSync2(targetAbs, join3(binDir, cmd));",
-    );
-  if (
-    after === before &&
-    (!before.includes("shell: process.env.ComSpec") ||
-      before.includes("symlinkSync(relative(binDir, targetAbs), join3(binDir, cmd));"))
-  ) {
-    rmSync(target, { recursive: true, force: true });
-    throw new Error("AgentOS toolchain npm calls changed; Windows adapter needs review");
-  }
-  if (after !== before) writeFileSync(bundle, after, "utf8");
-  return {
-    bin: join(target, "bin/agentos-toolchain.mjs"),
-    cleanup: () => rmSync(target, { recursive: true, force: true }),
-  };
-}
-
 function assertNonEmptyFile(path: string): void {
   if (!existsSync(path)) {
     throw new Error(`runtime staging missing file: ${path}`);
@@ -158,42 +113,21 @@ export function prepareRuntimeStaging(
   const stagingRepo = join(stagingWorkspace, "repo");
   const hermesDir = join(stagingRepo, "species/hermes");
   const claudeCodeDir = join(stagingRepo, "species/claude-code");
-  const runtimeProofDir = join(stagingRepo, "tools/runtime-proof");
+
   const proofAgentDir = join(stagingRepo, "tools/qf-proof-agent");
   try {
     copySourceTree(join(repoRoot, "species/hermes"), hermesDir);
     copySourceTree(join(repoRoot, "species/claude-code"), claudeCodeDir);
     if (qaMode) {
       copySourceTree(join(repoRoot, "tools/qf-proof-agent"), proofAgentDir);
-      copySourceTree(join(repoRoot, "tools/runtime-proof"), runtimeProofDir);
+
     }
 
     if (qaMode) {
-      const installArgs = ["install", "--frozen-lockfile", "--backend", "copyfile"];
-      runOrThrow("bun", installArgs, runtimeProofDir);
+      runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir);
     }
-
-    const proofAdapter = qaMode
-      ? prepareWindowsToolchainAdapter(runtimeProofDir)
-      : null;
-    const packEnv = (adapter: { bin: string } | null) => adapter
-      ? {
-          ...process.env,
-          QF_AGENTOS_TOOLCHAIN_BIN: adapter.bin,
-          AGENTOS_TOOLCHAIN_NPM: "npm",
-        }
-      : undefined;
-    try {
-      if (qaMode) {
-        runOrThrow("node", ["./scripts/pack-agent.mjs"], proofAgentDir);
-        runOrThrow("bun", ["run", "pack-agent"], runtimeProofDir, packEnv(proofAdapter));
-      }
-      runOrThrow("node", ["./scripts/pack-agent.mjs"], hermesDir);
-      runOrThrow("node", ["./scripts/pack-agent.mjs"], claudeCodeDir);
-    } finally {
-      proofAdapter?.cleanup();
-    }
-
+    runOrThrow("node", ["./scripts/pack-agent.mjs"], hermesDir);
+    runOrThrow("node", ["./scripts/pack-agent.mjs"], claudeCodeDir);
     const stagedRepo = stagingRepo;
     discoverDockProfileManifests(stagedRepo, { qaMode });
     for (const rel of runtimeFiles) {

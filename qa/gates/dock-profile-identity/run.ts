@@ -65,7 +65,7 @@ const PRODUCTION_UPGRADE_FILES = [
 ] as const;
 const PRE_D1_REQUIRED_UPGRADES =
   "agent-profile-identity,market-ingest,market-context,capability-grants,task-status,connection-actions,task-delegation,deterministic-execution,independent-critic,task-composition,task-steering,governed-review";
-const QF_TOOLLOOP_PACKAGE = join(REPO, "tools/runtime-proof/agent-package");
+const QF_PROOF_AGENT_PACKAGE = join(REPO, "tools/qf-proof-agent");
 const ELECTRON_MAIN = join(REPO, "collab-electron/src/main");
 const KERNEL_ATTACH_SOURCE = join(REPO, "packages/qf-kernel/src/db.ts");
 const SKIP_SPAWNED_CHECK = process.env.QF_D1_GATE_SKIP_SPAWNED_FROM_CHECK === "1";
@@ -595,8 +595,8 @@ function snapshotLegacyData(
 }
 
 async function main(): Promise<number> {
-  if (!existsSync(QF_TOOLLOOP_PACKAGE)) {
-    console.error("dock-profile-identity FAIL: missing", QF_TOOLLOOP_PACKAGE);
+  if (!existsSync(QF_PROOF_AGENT_PACKAGE)) {
+    console.error("dock-profile-identity FAIL: missing", QF_PROOF_AGENT_PACKAGE);
     return 1;
   }
 
@@ -626,9 +626,9 @@ async function main(): Promise<number> {
 
   const db = openKernel(":memory:");
   // D1 proves shared profile identity, not runtime launch. This is the real,
-  // credential-free qf-toolloop package source; agent-path separately packs
+  // credential-free qf-proof-agent package source; QA staging packs
   // and launches the same package as its lifecycle proof.
-  const pkgRef = QF_TOOLLOOP_PACKAGE;
+  const pkgRef = QF_PROOF_AGENT_PACKAGE;
 
   const profileA = execute(
     db,

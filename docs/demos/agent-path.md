@@ -13,9 +13,9 @@ in `kernel.db`. Chunk streams are ephemeral (Law C).
 2. Wait for:
    - `kernel: opened …`
    - `agent-host: reconcile closed N stale session(s)`
-   - `agent-host: smoke ok session=<id> guestMinted=<id> chunks=<n>`
-     (guestMinted must equal session — ID adoption)
-3. **File → Spawn Agent Session** (species `qf-toolloop`).
+   - `agent-host: Dock bootstrap registered=… skipped=… conflicts=…`
+     (the Dock definitions are Kernel-backed and package-owned)
+3. **File → Spawn Agent Session** (species `qf-proof-agent`).
 4. Confirm:
    - a Session tile appears with short id, species, live status from Kernel
    - stream text + a tool call (`echo_upper`) appear live
