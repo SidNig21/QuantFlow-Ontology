@@ -1,4 +1,4 @@
-state`tpath
+state	path
 already-removed-before-resume	tools/qf-peer-bus/node_modules/.bin/node-which.bunx
 already-removed-before-resume	tools/qf-peer-bus/node_modules/.bin/node-which.exe
 already-removed-before-resume	tools/qf-peer-bus/node_modules/.bin/tsc.bunx

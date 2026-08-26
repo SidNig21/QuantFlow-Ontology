@@ -1,4 +1,4 @@
-state`tkind`tpath
+state	kind	path
 already-removed	tracked	tools/qf-peer-bus/.gitignore
 already-removed	tracked	tools/qf-peer-bus/README.md
 already-removed	tracked	tools/qf-peer-bus/bun.lock
