@@ -417,13 +417,17 @@ The synthetic responder must:
 
 ### Canonical proof meaning
 
-`qa/gates/hermes-research.ts` must assert the canonical `qf.research.report.v2` payload and lineage required by the current governed-review implementation and remove obsolete v1-only Report assertions. Both normal submissions must bind the same accepted R17 Technique version. The second run must obtain its own strategy/Technique identifier from the first run's durable accepted receipt, not from a function-local first-run variable or an invented fixture value. Director receipt naming is a failing assertion: every applicable receipt must name `hermes-research-director`, and any `hermes-orchestrator` value fails.
+`qa/gates/hermes-research.ts` must assert the canonical `qf.research.report.v2` payload and lineage required by `packages/qf-kernel/src/governed-review.ts` and reject every obsolete v1-only or text-fallback Report assertion. The canonical Report has exactly these top-level fields: `schema`, `source_work`, `source_result`, and `publication_evaluation`. `schema` is exactly `qf.research.report.v2`; `source_work` contains exactly `source_task_id`, `hypothesis_id`, `run_id`, `result_artifact_id`, and `executor_session_id`; `source_result` contains exactly `artifact_id` and `content_hash`, with `artifact_id === source_work.result_artifact_id` and `content_hash` equal to the durable result Artifact content hash; and `publication_evaluation` contains exactly `evaluation_id`, `critic_session_id`, `rubric`, `overall`, `verdict`, `confidence`, `rationale`, `findings_artifact_id`, and `findings_content_hash`, with `rubric` containing exactly `faithfulness`, `answer_relevancy`, `context_precision`, and `context_recall`, and `verdict === "supports"`. Obsolete top-level `evaluation_id`, `hypothesis`, `run`, `evaluation`, and `evidence` fields fail.
+
+Both normal submissions must bind the same accepted R17 Technique version. The second normal run's exact accepted Technique/strategy ID must be read from the first run's durable Kernel `run` row, JSON column `params`, literal field `params.strategy_id`, keyed by the first run's durable Run ID. A function-local `strategyId`, fixture value, or invented value fails. The exact Director-name receipt field is `definition` in the `dock_admission` receipt, sourced from submission `definition_id`; it must equal `hermes-research-director`, and `hermes-orchestrator` fails.
 
 ### Smallest inseparable G9 prerequisite
 
-The allowed production-file set expands only by `collab-electron/src/main/ontology-gateway.ts` and its existing focused test file. When `qf_record_evaluation` has already produced the canonical governed `qf.research.report.v2` through Kernel authority, the Electron legacy `kernelFinalizeResearchEvaluation` path must not publish a second v1 Report. Rejection must remain in place when no independently supported Evaluation exists.
+The source-proven duplicate path is `collab-electron/src/main/index.ts` -> its `record_evaluation` callback -> `kernelFinalizeResearchEvaluation` in `collab-electron/src/main/kernel.ts`. The minimum G9 prerequisite may edit only those two production files plus the existing focused `collab-electron/src/main/ontology-gateway.test.ts`. When `qf_record_evaluation` has already produced the canonical governed `qf.research.report.v2` publication from the accepted Evaluation through Kernel authority, the legacy finalizer must suppress v1 publication and must not create a second Report. When no independently supported Evaluation exists, rejection and zero Report must remain in place.
 
-This prerequisite may not alter governed-review schema, Report semantics, current-result selection, other finalizers, or any other G9 scope. The focused path must prove exactly one canonical current Report per reviewed run, zero Report before an accepted Evaluation, and no duplicate legacy Report afterward.
+The exact focused command is `bun test collab-electron/src/main/ontology-gateway.test.ts`. It must prove `report_count_before=0` before accepted Evaluation, `report_count_after=1` after canonical v2 publication, and a count that remains `1` after the legacy callback/finalizer seam executes. Callback cleanup and invalidation behavior must remain unchanged, including invalidations, Canvas-tile behavior, and admitted-session cleanup.
+
+This prerequisite may not alter governed-review schema, canonical Report semantics, current-result selection, other finalizers, or any other G9 scope. No full G8 or G9 reorder is open.
 
 ### Required falsifiers
 
@@ -443,8 +447,9 @@ This prerequisite may edit exactly:
 
 - `collab-electron/cli/qf-hermes-synthetic-responder.mjs`;
 - `qa/gates/hermes-research.ts`;
-- `collab-electron/src/main/ontology-gateway.ts`;
-- the existing focused ontology-gateway/governed-review test file needed to prove no duplicate finalizer;
+- `collab-electron/src/main/index.ts`;
+- `collab-electron/src/main/kernel.ts`;
+- `collab-electron/src/main/ontology-gateway.test.ts`, with exact command `bun test collab-electron/src/main/ontology-gateway.test.ts`;
 - G5 evidence files; and
 - the already accepted G5 deletion diff.
 
