@@ -1,6 +1,6 @@
 # WO-GOLDEN-G4 — Retire the AgentOS runtime fossil
 
-status: **DRAFT — FRESH SEMANTIC READER REQUIRED**
+status: **ROUND 1 AMENDED — FOCUSED SEMANTIC REREAD REQUIRED**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G4 — AgentOS runtime fossil
@@ -162,3 +162,83 @@ The falsifier runs without `--receipt` during independent verification; the comm
 Mechanical same-meaning selector, path, allowlist, teardown, generated-metadata, or receipt-format repairs use the ADR-0004 fast path. Any change to supported compatibility, route meaning, lifecycle assertion, package boundary, or what PASS means requires Reader adjudication.
 
 The same semantic assertion failing twice after repair stops G4. No full G9, G5 Builder, `main` merge, or R18 work is authorized.
+
+## Reader Round 1 semantic amendment — authoritative where text above conflicts
+
+Reader task `01a03f00-ec58-7891-ae33-8a6d1494e8f6` returned `NO/NO`. The nine defects are preserved in `evidence/golden-baseline/g4/READER-ROUND-1.md`. This amendment closes their meanings without opening Builder authority.
+
+### 1. Supported-state universe and compatibility decision
+
+The supported predecessor universe is finite: (1) the canonical current production Kernel selected by production app-root/environment resolution at `BUILD_BASE_SHA`; (2) current production Dock manifests and package resources staged by `runtime-staging.ts`; and (3) no other database, external package root, historical proof root, or legacy migration store.
+
+The starting census records, without private content, each current AgentDefinition/Profile identity hash, package-reference class, resolution status, and resolved route. An absolute, external, unreadable, non-production, or `agentos`-resolving current reference is a semantic stop. G4 may not guess, rewrite, or migrate it. If the bounded universe contains none, `agentos` is unsupported retired metadata and requires no compatibility path.
+
+`README.md`, `docs/demos/dock.md`, and `docs/demos/agent-path.md` are stale if they describe `qf-toolloop` or AgentOS as current. G4 owns only those exact corrections; G11 owns broader authority/history compression.
+
+### 2. Exact post-G4 package closure
+
+Production staging retains every Hermes and Claude resource unchanged. QA staging retains `qf-proof-agent`, all production runtime files, and current Claude QA profiles. It removes `qf-toolloop`, `tools/runtime-proof`, AgentOS toolchain preparation, and their local manifests/locks.
+
+`package-closure` and `package-inspect` become route-aware enumerations of every staged package metadata/profile reference. They validate retained qf-proof-agent, Hermes, and Claude resources and reject every staged `agentos` route. They may not replace one hard-coded blind spot with another. The command description names current production/QA runtime resources.
+
+### 3. Executable retired-route boundary and diagnostic
+
+Create `collab-electron/src/main/runtime-route-dispatch.ts`, used by `agent-host.ts` after metadata resolution and before any runtime callback. It dispatches only `native_tui` and `host_acp`; there is no default fallback.
+
+It exports `UnsupportedRuntimeRouteError` with code `QF_UNSUPPORTED_RUNTIME_ROUTE`, properties `route` and `packageRef`, and exact message `unsupported runtime route "<route>" for package_ref "<packageRef>"`. Route `agentos` and arbitrary unknown routes use that same class and shape before any Kernel/session, PTY, ACP, package-link, process, Task, Artifact, or event callback can run.
+
+Add and register `qa/gates/golden-g4-retired-route.ts` as `golden-g4-retired-route`. It exercises the production dispatcher with observable callbacks; proves all mutation counters stay zero for `agentos` and unknown routes; and proves each current route selects exactly its callback. It enumerates all production and QA staged metadata/profile references and rejects any `agentos` route. Its falsifiers turn red if AgentOS is accepted, a fallback returns, any callback runs before validation, route/package reference leaves the diagnostic, or an AgentOS resource is staged.
+
+Exact command: `bun qa/run.ts golden-g4-retired-route`.
+
+### 4. Deterministic retained-invariant map
+
+| Retired proof meaning | G4 disposition |
+|---|---|
+| AgentOS/qf-toolloop identity, list, notification | Retarget Dock-definition assertions to retained `qf-proof-agent`/current identities; preserve generic admission with `runtime-kernel-admission`. |
+| AgentOS socket denial | Retired; not a current invariant. |
+| AgentOS streamed prompt/unknown guest | Retired; native-TUI and retained host-ACP tests own their distinct behavior. |
+| Cancel, no post-cancel output, orphan/listener cleanup | Preserve through native-TUI/current native-host and retained host-ACP tests until G5. |
+| Unsupported route creates no state | New `golden-g4-retired-route` gate. |
+| Artifact publication | G9 owns it. Preserve non-AgentOS `artifact-root` assertions; remove only its AgentOS live fixture and record the current-runtime trajectory gap for G9. Do not invent a fake runtime. |
+
+G4 adds zero fake runtime fixtures. The dispatcher gate may use metadata and callback spies only.
+
+### 5. Literal-reference ownership
+
+- Retarget `dock-profiles.test.ts`, `boot-reconcile/run.ts`, `dock-profile-identity/run.ts`, and `qf-vault-projection/src/gate.ts` from qf-toolloop to retained qf-proof-agent/current metadata without changing assertion meaning.
+- In `artifact-root/run.ts`, remove only the AgentOS live trajectory and assign current-runtime trajectory proof to G9.
+- In `host-mounts.ts`, retain shared adapter environment resolution; remove AgentOS-only language/branches only after zero-consumer proof. G5 owns broader host-ACP.
+- Retarget `collab-electron/package.json` `pack-agent` to qf-proof-agent if current and fail-capable; otherwise remove it with zero-consumer proof.
+- G4 owns exact stale AgentOS/qf-toolloop README/demo claims, `agent-path/**`, `dock-registry/**`, QA staging, package inspection/closure, `qa/run.ts`, runtime adapter/host, and AgentOS-only boot/disposal.
+- G5 owns host-ACP; G6 Claude identity; G7 broader dependencies/protocol; G8 Kernel/write-law reds; G9 Report authority; G11 broader vault/docs; G12 Windows package/operations.
+
+### 6. Exact focused matrix and mechanical policy
+
+Set `BUILD_BASE_SHA` to the immutable pre-Builder SHA. The exact matrix is:
+
+```powershell
+bun qa/run.ts golden-g4-retired-route
+bun qa/run.ts dock-production-inventory
+bun qa/run.ts dock-definition-launch
+bun qa/run.ts hermes-launch-policy
+bun qa/run.ts package-closure
+bun qa/run.ts runtime-kernel-admission
+bun test collab-electron/src/main/runtime-adapter.test.ts collab-electron/src/main/precreated-native-tui.test.ts collab-electron/src/main/native-tui-orchestration.test.ts
+bun --cwd collab-electron run build
+bun qf-atlas/generate.mjs --check
+node qf-atlas/falsify.mjs
+bun qf-atlas/ratchet.mjs
+git diff --check "$BUILD_BASE_SHA...HEAD"
+git diff --check
+```
+
+`dock-definition-launch` derives expected identities from canonical retained manifests rather than stale qf-toolloop, six-row, or Hermes-orchestrator constants. That is same-meaning fixture maintenance after this semantic amendment.
+
+Starting G8 reds (`kernel-one-path` QA fixtures, `kernel-market-lineage`) and G12 reds (Electron `userData`, Windows package/typecheck/operations) stay assigned there. G4 proceeds only with exact pre/post non-regression.
+
+### 7. Verifier contract and Golden fast path
+
+The independent Verifier uses this one checkout with no active writer and records candidate SHA, upstream equality, clean start/end, the exact matrix, zero bait/temp/product/WSL processes, and source/config identity for evidence-only descendants. Atlas falsification runs without `--receipt`; committed receipt evidence is compared by result name/PASS meaning. No fresh worktree or full installer traversal.
+
+Starting-SHA-proven same-meaning selector, fixture-path, allowlist, invocation, teardown, generated-metadata, or receipt-format repairs use the Golden fast path with one focused old-red/new-green falsifier and non-regression. Route semantics, supported-state membership, package closure meaning, retained lifecycle meaning, or PASS meaning require Reader review.
