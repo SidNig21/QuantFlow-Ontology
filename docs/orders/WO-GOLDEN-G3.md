@@ -90,13 +90,20 @@ The generic recursive-install lifecycle invariant remains current but may not de
 Add exact QA-only fixture root `qa/fixtures/lifecycle-command/` containing:
 
 - `package.json`: private package, `scripts.typecheck = "tsc --noEmit"`, only `devDependencies.typescript = "5.9.3"`;
-- empty `tsconfig.json`;
+- src/empty.ts containing exactly: export {};
+- tsconfig.json containing exactly: {"files":["src/empty.ts"]};
 - committed frozen `bun.lock`.
 
 In `qa/run.ts`, replace only the obsolete `PEER_BUS_DIR` lifecycle target with this fixture, rename the constant to `LIFECYCLE_FIXTURE_DIR`, and keep discovery/matcher behavior unchanged. Preserve all allowed/rejected controls and selectors `literal`, `flagged`, and `chained`.
 
 For each selector, `bun qa/run.ts typecheck` must exit 1 with `typecheck: forbidden lifecycle` and name the fixture. With the selector unset it exits 0. Unknown selector behavior remains fail-closed.
 
+## Semantic fixture amendment — Reader YES/YES
+
+Independent verification proved an empty TypeScript project cannot satisfy the
+required normal typecheck. The dedicated fixture therefore contains the one inert
+source file and exact files binding above. This changes no lifecycle matcher,
+falsifier, product, runtime, or PASS meaning.
 ## Deliverable C — Current law gates remain falsifiable
 
 ### Kernel one path
