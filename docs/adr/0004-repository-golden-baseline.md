@@ -137,9 +137,25 @@ For G2 through G12 and Phase 3, the program uses these standing execution rules:
    traversal are reserved for groups that materially touch those boundaries and
    for mandatory Phase 3.
 6. Mechanical same-meaning proof-harness corrections use the shortest
-   trustworthy independent verification path. Semantic acceptance changes keep
-   Reader review and founder stops.
-7. A proven pre-existing red outside a group's semantic ownership is recorded
+   trustworthy independent verification path. A fresh Reader is required only
+   when a red could change product behavior, semantic authority, acceptance
+   meaning, group scope/order, supported compatibility, or what a PASS means.
+   A red proven at the frozen starting SHA and limited to path classification,
+   a stale selector, an allowlist entry, harness invocation, teardown,
+   generated proof metadata, or receipt formatting may be repaired directly
+   by the Router under the Reader-approved order. That correction must retain
+   the assertion and prove the old red, new green, and focused non-regression.
+7. A documentation/evidence-only commit after an immutable product candidate
+   does not force the complete matrix to rerun. Product-tree and relevant
+   configuration identity must be proved by hash, after which exact-byte
+   receipts remain reusable.
+8. Known harness preconditions, especially Atlas clean-tree requirements, are
+   computed before Builder mutation so evidence/commit ordering does not create
+   procedural stops.
+9. Every final group candidate still requires one independent Verifier. The
+   Verifier falsifies the candidate; it does not become a second Builder or
+   reopen already-proved semantics.
+10. A proven pre-existing red outside a group's semantic ownership is recorded
    against its already named Golden group instead of being absorbed, provided
    the active group's non-regression can still be independently proved.
 
