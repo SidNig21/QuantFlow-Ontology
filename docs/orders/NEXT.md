@@ -10,7 +10,8 @@ g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
 g5-finite-reread-after: `5248031`
 g5-finite-reread-task: `01a04034-6afb-73a3-9f0e-6419fa5f76ec`
-g5-finite-reread-verdict: **NO / NO — AUTHORITY 5248031; FRESH YES / YES REQUIRED**
+g5-final-reread-task: `01a04044-fea5-71d3-886c-cdeb171ae491`
+g5-finite-reread-verdict: **NO / NO — AUTHORITY 1c61973; THREE FINITE DEFECTS LANDED; FRESH YES / YES REQUIRED**
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-2-active-group: G5 — Legacy ACP and unconsumed renderers

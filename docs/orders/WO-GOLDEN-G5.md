@@ -403,6 +403,8 @@ The current Builder authority is suspended. This amendment must be committed and
 
 The fresh semantic Reader returned `NO / NO` against authority `53e9a25` with finite defects. The following contract is binding for the next semantic repair and reread; it does not authorize a Builder to resume.
 
+This later finite contract explicitly supersedes the earlier prohibition on editing Electron's duplicate finalizer, but only for the named `index.ts` -> `kernelFinalizeResearchEvaluation` minimum prerequisite and exact files below. Every other earlier prohibition remains binding.
+
 ### Exact direct-critic activation grammar
 
 The synthetic responder must:
@@ -427,11 +429,17 @@ The source-proven duplicate path is `collab-electron/src/main/index.ts` -> its `
 
 The exact focused command is `bun test collab-electron/src/main/ontology-gateway.test.ts`. It must prove `report_count_before=0` before accepted Evaluation, `report_count_after=1` after canonical v2 publication, and a count that remains `1` after the legacy callback/finalizer seam executes. Callback cleanup and invalidation behavior must remain unchanged, including invalidations, Canvas-tile behavior, and admitted-session cleanup.
 
+The focused receipt/assertions name these exact observables after one `record_evaluation` callback: `callback_count=1`, `dock_invalidate_count=1`, `events_invalidate_count=1`, `legacy_create_artifact_tile_count=0`, `critic_close_count=1`, `delegator_close_count=1`, `critic_session_after=closed`, and `delegator_session_after=closed`. The close assertions run after the existing 2,000 ms callback delay. No additional invalidation, Canvas tile, or admitted-session cleanup event is permitted.
+
 This prerequisite may not alter governed-review schema, canonical Report semantics, current-result selection, other finalizers, or any other G9 scope. No full G8 or G9 reorder is open.
 
 ### Required falsifiers
 
 Each falsifier must run through the normal `bun qa/run.ts hermes-first-turn-synthetic` command with the exact environment mode shown:
+
+- `missing-review-task-id` removes the sole `review_task_id=` line from `question` while leaving the rest of the production-shaped activation unchanged;
+- `mismatched-source-work` changes only `source_task_id` inside the `question` `source_work` object so it no longer equals the frozen activation source work; and
+- `substituted-result-artifact-id` changes only `result_artifact_id` inside the `question` `source_work` object to a different existing Artifact ID that is not the frozen result Artifact.
 
 ```text
 QF_HERMES_SYNTHETIC_CRITIC_FALSIFY=missing-review-task-id
@@ -440,6 +448,8 @@ QF_HERMES_SYNTHETIC_CRITIC_FALSIFY=substituted-result-artifact-id
 ```
 
 Each run must exit nonzero before `qf_record_evaluation`. Each receipt must contain exactly these fields: `falsifier`, `qf_record_evaluation_calls`, `evaluation_count_before`, `evaluation_count_after`, `report_count_before`, `report_count_after`, `expected_exit`, `actual_exit`, `restored`, `normal_rerun_exit`, and `output_path`. After the environment is restored, the normal gate must pass.
+
+For every falsifier, `qf_record_evaluation_calls=0`, `evaluation_count_after=evaluation_count_before`, and `report_count_after=report_count_before`. The gate and responder must map each environment mode to exactly the malformed payload named above; an unknown mode fails closed before launch.
 
 ### Exact allowed files and reread condition
 
