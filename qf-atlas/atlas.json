@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "d1d549a",
+    "commit": "ea7e656",
     "generatedAt": "2026-08-26",
     "filesScanned": 432,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "dca9eca4b78dd17f"
+    "fingerprint": "fb418038be895339"
   },
   "stats": {
     "live": 113,
@@ -3425,7 +3425,7 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 796.3,
+      "kb": 796.5,
       "x": 0,
       "z": 0,
       "status": "ice",
@@ -3741,6 +3741,16 @@
           "executes": 0
         },
         {
+          "path": "qa/gates/observe-door.ts",
+          "kb": 6.1,
+          "spawns": 0,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 0,
+          "dmlLines": [],
+          "executes": 0
+        },
+        {
           "path": "qa/gates/rung-ladder.ts",
           "kb": 6.1,
           "spawns": 0,
@@ -3756,16 +3766,6 @@
           "spawns": 4,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 0,
-          "dmlLines": [],
-          "executes": 0
-        },
-        {
-          "path": "qa/gates/observe-door.ts",
-          "kb": 5.9,
-          "spawns": 0,
-          "spawnsLive": 0,
-          "writes": 0,
           "dml": 0,
           "dmlLines": [],
           "executes": 0
@@ -59581,16 +59581,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "bc1bdbf",
-      "generatedAt": "2026-08-25"
-    },
-    "to": {
-      "branch": "wo-golden-g2",
       "commit": "d1d549a",
       "generatedAt": "2026-08-26"
     },
+    "to": {
+      "branch": "wo-golden-g2",
+      "commit": "ea7e656",
+      "generatedAt": "2026-08-26"
+    },
     "verdict": "better",
-    "why": "42 improvement(s), nothing added or hidden",
+    "why": "41 improvement(s), nothing added or hidden",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -59819,53 +59819,11 @@
         "note": "was undecided"
       },
       {
-        "id": "unreachable:collab-electron/src/main/a2a-bus.ts",
-        "kind": "unreachable",
-        "what": "a2a-bus.ts",
-        "where": "collab-electron/src/main/a2a-bus.ts",
-        "note": "was keep"
-      },
-      {
-        "id": "unreachable:collab-electron/src/main/a2a-orchestra.ts",
-        "kind": "unreachable",
-        "what": "a2a-orchestra.ts",
-        "where": "collab-electron/src/main/a2a-orchestra.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "unreachable:collab-electron/src/main/species-launch.ts",
-        "kind": "unreachable",
-        "what": "species-launch.ts",
-        "where": "collab-electron/src/main/species-launch.ts",
-        "note": "was repair"
-      },
-      {
-        "id": "unreachable:collab-electron/src/main/species-surface.ts",
-        "kind": "unreachable",
-        "what": "species-surface.ts",
-        "where": "collab-electron/src/main/species-surface.ts",
-        "note": "was undecided"
-      },
-      {
-        "id": "unreachable:collab-electron/src/main/species-tools.ts",
-        "kind": "unreachable",
-        "what": "species-tools.ts",
-        "where": "collab-electron/src/main/species-tools.ts",
-        "note": "was repair"
-      },
-      {
-        "id": "unreachable:collab-electron/src/windows/shared/flow-cube/cube3d.js",
-        "kind": "unreachable",
-        "what": "cube3d.js",
-        "where": "collab-electron/src/windows/shared/flow-cube/cube3d.js",
-        "note": "was keep"
-      },
-      {
         "id": "broken-bridge-call:ptyForegroundProcess",
         "kind": "broken-bridge-call",
         "what": "ptyForegroundProcess",
         "where": "collab-electron/src/windows/terminal/src/App.tsx:202",
-        "note": "was repair"
+        "note": "was undecided"
       },
       {
         "id": "push:cd-to",
@@ -59926,26 +59884,18 @@
     ],
     "regressed": [],
     "changedConfidence": [],
-    "changedOwner": [
-      {
-        "id": "ownership:artifact-storage",
-        "gained": [],
-        "lost": [
-          "collab-electron/src/main/a2a-artifact-store.ts"
-        ]
-      }
-    ],
+    "changedOwner": [],
     "changedCoverage": [],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
-      "resolved": 47,
+      "resolved": 41,
       "regressed": 0,
       "changedConfidence": 0,
-      "changedOwner": 1,
+      "changedOwner": 0,
       "coverageWorse": 0,
       "coverageBetter": 0,
-      "undecidedFrom": 42,
+      "undecidedFrom": 41,
       "undecidedTo": null
     }
   },

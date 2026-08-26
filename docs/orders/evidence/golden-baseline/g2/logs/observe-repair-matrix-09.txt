@@ -1,0 +1,2 @@
+kernel-sole-writer-app OK
+PASS  kernel-sole-writer-app

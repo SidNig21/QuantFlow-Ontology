@@ -1,0 +1,12 @@
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-market-lineage-8eaQiA\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel-market-lineage: FAIL [
+  {
+    "expected": "array",
+    "code": "invalid_type",
+    "path": [
+      "findings"
+    ],
+    "message": "Invalid input: expected array, received string"
+  }
+]
+FAIL  kernel-market-lineage

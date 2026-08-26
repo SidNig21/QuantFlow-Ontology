@@ -1,0 +1,2 @@
+doc-links: PASS (79 live documents, every pointer resolves)
+PASS  doc-links

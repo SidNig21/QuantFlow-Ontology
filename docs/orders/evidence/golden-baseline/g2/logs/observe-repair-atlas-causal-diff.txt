@@ -1,0 +1,47 @@
+**********************
+PowerShell transcript start
+Start time: 20260825200127
+Username: DESKTOP-7VRJQRM\rybow
+RunAs User: DESKTOP-7VRJQRM\rybow
+Configuration Name:
+Machine: DESKTOP-7VRJQRM (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\rybow\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+$log='C:\tmp\g2-observe-repair-atlas-causal-diff.txt'; Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue; $code=0; Start-Transcript -LiteralPath $log -Force | Out-Null; try { $atlas=Get-Content -Raw -LiteralPath 'qf-atlas/atlas.json' | ConvertFrom-Json; $before=@(Import-Csv -LiteralPath 'docs/orders/evidence/golden-baseline/g2/reach-before.tsv' -Delimiter "`t"); $after=@(Import-Csv -LiteralPath 'docs/orders/evidence/golden-baseline/g2/reach-after.tsv' -Delimiter "`t"); function Normalize($r){ [pscustomobject]@{path=[string]$r.path; reach=[string]$r.reach; importers=[string]$r.'importers(sorted)'; imports=[string]$r.'imports(sorted)'; importerCount=[int]$r.'importerCount'} }; $bm=@{}; foreach($r in $before){$bm[[string]$r.path]=Normalize $r}; $am=@{}; foreach($r in $after){$am[[string]$r.path]=Normalize $r}; $cm=@{}; foreach($r in @($atlas.reach)){ $ims=@($r.importers | ForEach-Object {[string]$_} | Sort-Object); $ins=@($r.imports | ForEach-Object {[string]$_} | Sort-Object); $cm[[string]$r.path]=[pscustomobject]@{path=[string]$r.path;reach=[string]$r.reach;importers=($ims -join ';');imports=($ins -join ';');importerCount=[int]$r.importerCount} }; $beforeOnly=@($bm.Keys | Where-Object {-not $am.ContainsKey($_)} | Sort-Object); $afterOnly=@($am.Keys | Where-Object {-not $bm.ContainsKey($_)} | Sort-Object); $currentAfterMismatch=@($am.Keys | Where-Object {-not $cm.ContainsKey($_) -or $am[$_].reach -ne $cm[$_].reach -or $am[$_].imports -ne $cm[$_].imports} | Sort-Object); $survivingChanged=@($am.Keys | Where-Object {$bm.ContainsKey($_) -and ($bm[$_].reach -ne $cm[$_].reach -or $bm[$_].imports -ne $cm[$_].imports)} | Sort-Object); $importerChanges=@(); foreach($p in $bm.Keys){ if($cm.ContainsKey($p) -and $bm[$p].importers -ne $cm[$p].importers){ $importerChanges += [pscustomobject]@{path=$p; before=$bm[$p].importers; current=$cm[$p].importers} } }; $allowedImporterChanges=@('collab-electron/src/main/agent-host.ts','collab-electron/src/main/kernel.ts'); $noncausal=@($importerChanges | Where-Object {$allowedImporterChanges -notcontains $_.path}); $kernel=$cm['collab-electron/src/main/kernel.ts']; $connections=Get-Content -Raw -LiteralPath 'collab-electron/src/main/connections-ipc.ts'; $expectedBeforeOnly=@('collab-electron/src/main/a2a-artifact-store.ts','collab-electron/src/main/a2a-bus.ts','collab-electron/src/main/a2a-orchestra.ts','collab-electron/src/main/species-launch.ts','collab-electron/src/main/species-surface.ts','collab-electron/src/main/species-tools.ts','collab-electron/src/windows/shared/flow-cube/cube3d.js'); $beforeOnlyExact=(($beforeOnly -join '|') -eq ($expectedBeforeOnly -join '|')); $checks=[ordered]@{current=($cm.Count -eq 234); after=($am.Count -eq 234); before=($bm.Count -eq 241); before_only_exact=$beforeOnlyExact; after_only_zero=($afterOnly.Count -eq 0); current_after_reach_imports_equal=($currentAfterMismatch.Count -eq 0); surviving_reach_imports_unchanged=($survivingChanged.Count -eq 0); importer_change_count=($importerChanges.Count -eq 2); no_noncausal_importer_change=($noncausal.Count -eq 0); kernel_importerCount_9=($kernel.importerCount -eq 9); connections_forward_kernel=($connections -match 'from "\.\/kernel"')}; Write-Output ('current=' + $cm.Count); Write-Output ('after=' + $am.Count); Write-Output ('before=' + $bm.Count); Write-Output ('before_only=' + $beforeOnly.Count); Write-Output ('after_only=' + $afterOnly.Count); Write-Output ('surviving_changed=' + $survivingChanged.Count); Write-Output ('noncausal=' + $noncausal.Count); Write-Output ('current_after_mismatch=' + $currentAfterMismatch.Count); Write-Output ('kernel_importerCount=' + $kernel.importerCount); Write-Output ('connections_ipc_forward_import_kernel=' + ($connections -match 'from "\.\/kernel"')); Write-Output 'before_only_paths:'; $beforeOnly | ForEach-Object { Write-Output $_ }; Write-Output 'permitted_importer_deltas:'; foreach($d in $importerChanges){ if($d.path -eq 'collab-electron/src/main/agent-host.ts'){Write-Output ('agent-host added=qa/gates/artifact-root/run.ts')}; if($d.path -eq 'collab-electron/src/main/kernel.ts'){Write-Output ('kernel removed=collab-electron/src/main/connections-ipc.ts added=qa/gates/artifact-root/run.ts')} }; if($checks.Values -contains $false){$code=1; Write-Output 'unexplained_mismatch=1'; Write-Output 'ITEM18=RED'} else {Write-Output 'unexplained_mismatch=0'; Write-Output 'ITEM18=GREEN'} } catch { $code=1; Write-Output ('CAUSAL_PROOF_ERROR=' + $_.Exception.Message); Write-Output 'ITEM18=RED' } finally { Stop-Transcript | Out-Null }; exit $code
+Process ID: 43316
+PSVersion: 7.6.4
+PSEdition: Core
+GitCommitId: 7.6.4
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+current=234
+after=234
+before=241
+before_only=7
+after_only=0
+surviving_changed=0
+noncausal=0
+current_after_mismatch=0
+kernel_importerCount=9
+connections_ipc_forward_import_kernel=True
+before_only_paths:
+collab-electron/src/main/a2a-artifact-store.ts
+collab-electron/src/main/a2a-bus.ts
+collab-electron/src/main/a2a-orchestra.ts
+collab-electron/src/main/species-launch.ts
+collab-electron/src/main/species-surface.ts
+collab-electron/src/main/species-tools.ts
+collab-electron/src/windows/shared/flow-cube/cube3d.js
+permitted_importer_deltas:
+agent-host added=qa/gates/artifact-root/run.ts
+kernel removed=collab-electron/src/main/connections-ipc.ts added=qa/gates/artifact-root/run.ts
+unexplained_mismatch=0
+ITEM18=GREEN
+**********************
+PowerShell transcript end
+End time: 20260825200127
+**********************

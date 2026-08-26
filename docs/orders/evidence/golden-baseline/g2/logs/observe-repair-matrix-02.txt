@@ -1,0 +1,34 @@
+falsifier=old-orchestrator-id result=red
+falsifier=generic-orchestrator-prompt result=red
+falsifier=ui-boundary-or-auto-tile-shortcut result=red
+falsifier=cleanup-retained-process-or-root result=red
+falsifier=cleanup-retained-process-or-root restored=true
+falsifier=watchdog-never-settles result=red
+tile_projection_hops=sent,received,dom_identity handler_threw=false
+production_manifest_director=hermes-research-director exact=true
+production_manifest_old_orchestrator_entries=0
+default_ipc_definition=hermes-research-director
+default_rpc_definition=hermes-research-director
+qa_override_preserved=true explicit_override_preserved=true
+front_door=Research Director
+renderer_form_submit=1 preload_ipc=qf:research:submitQuestion main_ipc=qf:research:submitQuestion
+kernel_command=create_mission
+mission_rows_added=1 hypothesis_rows_added=1
+director_definition=hermes-research-director
+total_sessions_added=2
+director_sessions_added=1
+specialist_definition=hermes-worker
+specialist_sessions_added=1
+recruitment_observed=true
+director_spawned_from_added=1
+specialist_spawned_from_added=1
+spawned_from_links_added=2 director_spawned_from_exact=1
+mission_visible=true director_tile_visible=true manual_dock_composition=0
+old_orchestrator_sessions_added=0
+oracle=independent_read_only kernel_unchanged_after_oracle=true
+convergence_remaining=[]
+owned_process_tree_remaining=0 electron_processes_remaining=0 hermes_processes_remaining=0 roots_remaining=0
+repository_tree_unchanged=true
+elapsed_ms=28670
+PASS research-director-front-door
+PASS  research-director-front-door

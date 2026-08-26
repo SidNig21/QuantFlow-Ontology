@@ -20,6 +20,8 @@ const OBSERVE_ALLOWLIST = new Set([
   "qf-kernel-schema/golden/ONTOLOGY.md",
   "qf-kernel-schema/golden/migration.sql",
   "qf-kernel-schema/golden/tools.json",
+  // G2: generated developer projection, not a runtime input.
+  "qf-atlas/atlas.json",
   // WO-D1: immutable byte-for-byte copy of the pre-D1 generated migration.
   "qf-kernel-schema/compat/pre-d1-profile-identity.sql",
   "qa/gates/observe-door.ts",
@@ -148,6 +150,9 @@ const SERVING_ALLOWLIST = new Set([
   // WO-D1: gate compares the complete generated catalogue with the filtered
   // served catalogue; it does not register or advertise tools.
   "qa/gates/dock-profile-identity/run.ts",
+  // G2: pure QA comparisons; neither registers nor advertises tools.
+  "qa/gates/doc-action-surface.ts",
+  "qa/gates/governed-review.ts",
   "qa/gates/observe-door.ts",
 ]);
 

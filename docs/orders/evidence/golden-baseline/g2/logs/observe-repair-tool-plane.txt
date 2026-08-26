@@ -1,0 +1,54 @@
+tool-plane: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\tools\qf-read-tools\node_modules\qf-kernel
+tool-plane: cleared stale local file dependency C:\Users\rybow\QuantFlow-Ontology\tools\qf-read-tools\node_modules\qf-kernel-schema
+bun install v1.3.12 (700fc117)
+
++ qf-kernel@../../packages/qf-kernel
++ qf-kernel-schema@../../qf-kernel-schema
+
+4 packages installed [137.00ms]
+$ bun src/harness.ts
+[harness] work dir: C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon
+[harness] kernel db: C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+
+=== G2 doctrine phase-exit gate ===
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\experimental-kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\experimental-kernel.db provenance=env journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\experimental-kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+tool_plane_expected_count=103 served_count=103 read=72 actions=31
+tool_plane_restricted_action_leaks=[]
+G2_experimental_tools=["qf_experimental_get","qf_experimental_links","qf_experimental_query"]
+G2_experimental_get_response={"content":[{"type":"text","text":"{\n  \"id\": \"exp-probe-1\",\n  \"created_at\": \"2026-07-26T12:00:00.000Z\",\n  \"label\": \"gate-fixture\"\n}"}]}
+
+=== G3 links traversal ===
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=env journal=wal sync=2 schema_meta=89
+tool_plane_expected_count=99 served_count=99 read=69 actions=30
+tool_plane_restricted_action_leaks=[]
+G3_tool_response={"content":[{"type":"text","text":"[\n  {\n    \"id\": \"8ef0ffdb-2cb0-4b09-87d6-3cbc8b032fd3\",\n    \"kind\": \"tests\",\n    \"from_id\": \"harness-run-1\",\n    \"to_id\": \"1a13ab44-ed29-492d-a42f-30cc2ddf497c\",\n    \"created_at\": \"2026-08-26T02:53:13.719Z\"\n  }\n]"}]}
+G3_sql_rows=[{"kind":"tests","from_id":"harness-run-1","to_id":"1a13ab44-ed29-492d-a42f-30cc2ddf497c"}]
+
+=== tool-plane action surface ===
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=env journal=wal sync=2 schema_meta=89
+tool_plane_expected_count=99 served_count=99 read=69 actions=30
+tool_plane_restricted_action_leaks=[]
+tool_plane_action_bad={"content":[{"type":"text","text":"[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"bogus_gate1_field\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"bogus_gate1_field\\\"\"\n  }\n]"}],"isError":true}
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+tool_plane_events_before_after_bad=4 4
+tool_plane_run_status_after_bad=queued
+tool_plane_action_ok={"content":[{"type":"text","text":"{\n  \"kind\": \"object\",\n  \"object_type\": \"run\",\n  \"object_id\": \"harness-run-action-ok\",\n  \"from\": \"queued\",\n  \"to\": \"running\",\n  \"event\": \"run.started\",\n  \"state\": {\n    \"id\": \"harness-run-action-ok\",\n    \"created_at\": \"2026-08-26T02:53:14.056Z\",\n    \"kind\": \"backtest\",\n    \"status\": \"running\",\n    \"params\": \"{}\",\n    \"trace_id\": \"harness-trace\"\n  }\n}"}]}
+
+=== GATE 2 via action tool ===
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=env journal=wal sync=2 schema_meta=89
+tool_plane_illegal_transition={"content":[{"type":"text","text":"IllegalTransitionError: Illegal transition for run: queued → succeeded"}],"isError":true}
+kernel: path=C:\Users\rybow\AppData\Local\Temp\qf-tool-plane-harness-lTmIon\kernel.db provenance=explicit journal=wal sync=2 schema_meta=89
+tool_plane_illegal_events_before_after=6 6
+tool_plane_illegal_status=queued
+
+[harness] tool-plane PASS
+PASS  tool-plane
+COMMAND_START_UTC=2026-08-26T02:53:11.1665679Z
+COMMAND_END_UTC=2026-08-26T02:53:14.7612714Z
+EXIT=0

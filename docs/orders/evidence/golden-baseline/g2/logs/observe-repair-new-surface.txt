@@ -1,0 +1,32 @@
+**********************
+PowerShell transcript start
+Start time: 20260825200238
+Username: DESKTOP-7VRJQRM\rybow
+RunAs User: DESKTOP-7VRJQRM\rybow
+Configuration Name:
+Machine: DESKTOP-7VRJQRM (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Users\rybow\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.dll -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+$log='C:\tmp\g2-observe-repair-new-surface.txt'; Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue; $code=0; Start-Transcript -LiteralPath $log -Force | Out-Null; try { $atlasText=Get-Content -Raw -LiteralPath 'qf-atlas/atlas.json'; $atlas=$atlasText | ConvertFrom-Json; $doc=Get-Content -Raw -LiteralPath 'qa/gates/doc-action-surface.ts'; $review=Get-Content -Raw -LiteralPath 'qa/gates/governed-review.ts'; $atlasProjection=($atlas.meta.note -eq 'Generated projection of the code. Not Kernel truth, not the running app.'); $atlasImportSyntax=@([regex]::Matches($atlasText,'(?m)^\s*(?:import|export)\b')); $apiHits=@(); $runtimeExpressionHits=@(); $productRuntimeImportHits=@(); foreach($item in @([pscustomobject]@{path='qf-atlas/atlas.json';text=$atlasText},[pscustomobject]@{path='qa/gates/doc-action-surface.ts';text=$doc},[pscustomobject]@{path='qa/gates/governed-review.ts';text=$review})){ if($item.text -match '\b(?:McpServer|registerTool)\b'){ $apiHits += $item.path }; if($item.text -match '(?:new\s+McpServer|registerTool\s*\(|transport\.(?:send|invoke|handle)\s*\(|dispatch[A-Za-z0-9_]*\s*\()'){ $runtimeExpressionHits += $item.path }; if($item.text -match 'from\s+["''](?:\.\.?/)*?(?:collab-electron|packages/qf-kernel)/' -or $item.text -match 'import\s*\(["''](?:\.\.?/)*?(?:collab-electron|packages/qf-kernel)/'){ $productRuntimeImportHits += $item.path } }; $checks=[ordered]@{atlas_json_valid=($null -ne $atlas); atlas_projection_note=$atlasProjection; atlas_has_no_executable_import_export=($atlasImportSyntax.Count -eq 0); api_marker_hits=($apiHits.Count -eq 0); runtime_transport_dispatch_expression_hits=($runtimeExpressionHits.Count -eq 0); product_runtime_import_hits=($productRuntimeImportHits.Count -eq 0)}; Write-Output ('atlas_json_valid=' + ($null -ne $atlas)); Write-Output ('atlas_generated_projection=' + $atlasProjection); Write-Output ('atlas_executable_import_export_hits=' + $atlasImportSyntax.Count); Write-Output ('new_surface_api_marker_hits=' + $apiHits.Count); Write-Output ('new_surface_runtime_transport_dispatch_expression_hits=' + $runtimeExpressionHits.Count); Write-Output ('new_surface_product_runtime_import_hits=' + $productRuntimeImportHits.Count); Write-Output 'static_qa_schema_or_fixture_reads=accepted'; if($checks.Values -contains $false){$code=1; Write-Output 'NEW_SURFACE=RED'} else {Write-Output 'NEW_SURFACE=GREEN'} } catch { $code=1; Write-Output ('NEW_SURFACE_PROOF_ERROR=' + $_.Exception.Message); Write-Output 'NEW_SURFACE=RED' } finally { Stop-Transcript | Out-Null }; exit $code
+Process ID: 21232
+PSVersion: 7.6.4
+PSEdition: Core
+GitCommitId: 7.6.4
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+atlas_json_valid=True
+atlas_generated_projection=True
+atlas_executable_import_export_hits=0
+new_surface_api_marker_hits=0
+new_surface_runtime_transport_dispatch_expression_hits=0
+new_surface_product_runtime_import_hits=0
+static_qa_schema_or_fixture_reads=accepted
+NEW_SURFACE=GREEN
+**********************
+PowerShell transcript end
+End time: 20260825200238
+**********************

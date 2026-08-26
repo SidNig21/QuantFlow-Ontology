@@ -1,0 +1,12 @@
+COMMAND=bun qa/run.ts observe-door
+TEMP_TARGET=collab-electron/src/main/g2-observe-door-falsifier.json
+COMMAND_START_UTC=2026-08-26T02:53:52.1989556Z
+COMMAND_END_UTC=2026-08-26T02:53:53.2542758Z
+FAIL  observe-door
+observe-door: serving surface violation (golden/tools.json) at collab-electron/src/main/g2-observe-door-falsifier.json
+EXPECTED_FALSIFIER=unallowlisted JSON golden/tools.json reference
+EXPECTED_RED=1
+VIOLATION_HIT=True
+CLEANUP_TARGET_ABSENT=True
+TREE_UNCHANGED=True
+EXIT=0
