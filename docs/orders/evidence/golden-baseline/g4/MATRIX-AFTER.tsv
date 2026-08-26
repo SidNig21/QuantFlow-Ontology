@@ -1,4 +1,6 @@
 selector	command	result	owner_or_disposition
+verifier-final	independent Verifier task 01a03fc3-6f33-7c51-a6f4-a1c92111310c	SEMANTIC PASS; clean-close FAIL only for exact lifecycle-command node_modules residue and stale G4 receipt counts/header	mechanical evidence-only close repair
+cleanup-receipt	Router cleanup at prior candidate 62f97a31d1983632ad890fcc3768278c133a36f8	PASS; exact qa/fixtures/lifecycle-command/node_modules removed; status/untracked/residue/relevant-process rows all zero	evidence-only close repair
 verifier-previous	independent verification at 564af3c096ac7ef64c39dfb3cfa19bc7964812a4	FAIL; stale precreated native_tui-only refusal preceded dispatcher for retired routes	repaired under fresh Reader YES/YES
 golden-g4-retired-route	bun qa/run.ts golden-g4-retired-route	PASS; retained refs=3; agentos and arbitrary unknown rejected by exact dispatcher; precreated path single-dispatcher contract green	G4 semantic repair/non-regression
 precreated-production-path	bun test collab-electron/src/main/precreated-native-tui.test.ts	PASS; agentos and golden-g4-unknown use production start path; exact UnsupportedRuntimeRouteError fields; zero Kernel mutations and runtime callbacks	G4 semantic repair
@@ -6,7 +8,8 @@ dock-production-inventory	bun qa/run.ts dock-production-inventory	PASS; Hermes a
 dock-definition-launch	bun qa/run.ts dock-definition-launch	PASS; 9 canonical QA profiles; definition argv, peer ownership, host-ACP cleanup green	G4 non-regression
 hermes-launch-policy	bun qa/run.ts hermes-launch-policy	PASS; mission, critic, worker, fallback argv policy green	G4 non-regression
 package-closure	bun qa/run.ts package-closure	RED after staged build/inspection at package:verify: linux-only verification package command	G12 inherited platform boundary
-runtime-adapter-tests	bun test collab-electron/src/main/runtime-adapter.test.ts collab-electron/src/main/precreated-native-tui.test.ts collab-electron/src/main/native-tui-orchestration.test.ts	PASS; 16 pass, 0 fail, 63 expect	G4 non-regression
+runtime-adapter-tests	bun test collab-electron/src/main/runtime-adapter.test.ts collab-electron/src/main/precreated-native-tui.test.ts collab-electron/src/main/native-tui-orchestration.test.ts	PASS; independent Verifier rerun 16 pass, 0 fail, 68 expectations	independent Verifier semantic PASS / G4
+builder-changed-surface	bun test ... precreated-start-ownership.test.ts plus required G4 test set	PASS; Builder combined changed-surface run 18 pass, 0 fail, 73 expectations; distinct from independent 16/68 rerun	Builder evidence only
 typecheck	bun qa/run.ts typecheck	PASS; dependency install and all strict package checks completed; prior G12 Windows red did not reproduce	G4 non-regression / G12 pre-existing red not reproduced
 build	bun --cwd collab-electron run build	Bun 1.3.12 printed usage with exit 0; supported bun run --cwd collab-electron build completed with exit 0	mechanical invocation receipt; no semantic red
 atlas-check	bun qf-atlas/generate.mjs --check	PASS; 417 files, 126 channels, 13 strip candidates	G4 evidence

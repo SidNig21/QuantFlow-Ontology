@@ -1,6 +1,6 @@
 # Golden Baseline G4 — Builder receipts
 
-Candidate product/config commit: `fd60b38`
+Candidate product/config commit: `2f7ea77ebf3671e25a6c556b7afcd1c355877efe` (prior G4 product commit: `fd60b38`)
 
 The product/config tree is the first commit. Atlas and evidence are committed
 after it so the Atlas falsifier can run on a clean product tree.
@@ -66,3 +66,15 @@ Repair proof:
 Changed-surface receipt: 18 tests passed, 0 failed, 73 expectations. G4 retired-route gate passed. Atlas falsification passed 98/98; Atlas is current at 417 files, 126 channels, and 13 strip candidates.
 
 The G12-owned Windows package-closure red remains unchanged from the prior candidate; no package, Dock, route compatibility, or retained lifecycle semantics were changed by this repair.
+
+## Final independent Verifier close result
+
+Final independent Verifier task 01a03fc3-6f33-7c51-a6f4-a1c92111310c returned semantic PASS and clean-close FAIL only because the typecheck had generated qa/fixtures/lifecycle-command/node_modules and the checked-in G4 receipt counts/header were stale.
+
+The Router removed exactly qa/fixtures/lifecycle-command/node_modules and confirmed the prior candidate 62f97a31d1983632ad890fcc3768278c133a36f8 was clean. This evidence-only correction records that cleanup and receipt repair; it does not change product/config/source/tests/gates.
+
+Independent Verifier semantic rerun: 16 pass, 0 fail, 68 expectations for the production-path focused command. The Builder combined changed-surface run remains separately recorded as 18 pass, 0 fail, 73 expectations and is not presented as the same command.
+
+Final cleanup receipt: exact generated directory removed; git status --porcelain 0; untracked rows 0; residue rows 0; relevant product/temp/WSL process rows 0. The inherited G12 package-closure red is unchanged.
+
+Candidate lineage: repaired product/config commit 2f7ea77ebf3671e25a6c556b7afcd1c355877efe, prior verified candidate 62f97a31d1983632ad890fcc3768278c133a36f8, then this evidence-only close correction.
