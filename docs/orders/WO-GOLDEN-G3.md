@@ -279,6 +279,65 @@ Commit product/QA/docs changes, regenerate Atlas from a clean candidate, commit 
 - exact candidate parent chain;
 - clean upstream match.
 
+## Semantic preservation amendment — governed self-review prerequisite
+
+Independent verification proved the preserved R12 test predates the accepted
+R15 governed-review contract. Dropping that test would remove distinct,
+fail-capable report-lineage assertions. Porting it without closing the discovered
+self-review hole would instead make G3 certify a critic as independent when the
+critic and source executor are the same session. Neither outcome is authorized.
+
+G3 therefore owns one minimum Report-authority prerequisite only. This is not
+authority to execute full G9 early:
+
+- in `packages/qf-kernel/src/governed-review.ts`, after the frozen `source_work`
+  is recovered and matched but before any Evaluation, Artifact, link, Task,
+  receipt, publication, or event mutation, `recordGovernedEvaluation` must reject
+  when the admitted critic session equals `source_work.executor_session_id`;
+- the refusal message is exactly
+  `record_evaluation requires an independent critic session`;
+- the refusal is atomic: Evaluation, findings Artifact, Report, links, Task
+  lifecycle, broker write success, review receipt, and event count remain
+  unchanged;
+- no other admission, publication, revision, second-critic, schema, action, or
+  runtime behavior changes.
+
+Modernize only `packages/qf-kernel/src/r12-independent-critic.test.ts` onto the
+already-current governed path. Its positive fixture must create a source Task,
+bind the exact source work, admit and deliver the production `hermes-critic`,
+record the three exact successful broker reads plus the bound
+`qf_record_evaluation` invocation, and submit the canonical structured findings
+array. Preserve its distinct assertions for exact R11b metrics, `performed_by`
+critic identity, critic-produced findings, findings-to-Run lineage, Report
+`gates` lineage, non-critic atomic refusal, rejecting-publication refusal, and
+self-review atomic refusal. Replace only the obsolete findings-envelope
+assertion with an assertion over the canonical structured findings bytes and
+their exact `evidence_refs` binding to the result Artifact.
+
+The current-identity correction is exact and bounded:
+
+- remove only the obsolete static `.collaborator` tree row from
+  `design/glacier/showcase.html`;
+- add only `docs/DEBT.md` to `product-identity.ts`'s existing bucket C because
+  this order explicitly classifies that file as accepted historical evidence;
+- change only `Collaborator stays; ownership inverts.` to
+  `QuantFlow stays; ownership inverts.` in current-authority `docs/LAWS.md`;
+- preserve `docs/DEBT.md` bytes, Laws A–F, the forbidden identity matcher, the
+  current-doc set, and every other identity classification.
+
+Focused semantic proof is:
+
+```powershell
+bun test packages/qf-kernel/src/r12-independent-critic.test.ts packages/qf-kernel/src/r15-governed-review.test.ts collab-electron/src/main/governed-review.test.ts; if($LASTEXITCODE -ne 0){throw "critic/governed tests failed"}
+bun qa/run.ts governed-review; if($LASTEXITCODE -ne 0){throw "governed-review gate failed"}
+bun qa/run.ts governed-review-live; if($LASTEXITCODE -ne 0){throw "governed-review-live gate failed"}
+bun qa/run.ts product-identity; if($LASTEXITCODE -ne 0){throw "product identity failed"}
+```
+
+The existing product-identity matcher is already proven fail-capable by the
+observed stale-row/current-authority reds; no new identity falsifier is required.
+The same independent G3 Verifier reruns this focused amendment and reuses prior
+G3 receipts only where relevant bytes and configuration are identical.
 ## Throughput and stops
 
 A red that changes product behavior, semantic authority, acceptance meaning, group scope/order, supported compatibility, or PASS meaning requires semantic Reader adjudication.
