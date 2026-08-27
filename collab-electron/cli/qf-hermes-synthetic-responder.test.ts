@@ -142,3 +142,122 @@ test("production worker without hold keeps the existing market-read and send_res
   reader.close();
   await running;
 });
+
+const CRITIC_TOOLS = ["qf_hypothesis_get", "qf_run_get", "qf_artifact_get", "qf_record_evaluation"];
+const CRITIC_IDS = {
+  source_task_id: "source-task-test",
+  hypothesis_id: "hypothesis-test",
+  run_id: "run-test",
+  result_artifact_id: "artifact-test",
+  executor_session_id: "executor-session-test",
+};
+const CRITIC_REVIEW_TASK_ID = "review-task-test";
+
+function criticActivationLine(includeReviewTask = true, sourceWork = CRITIC_IDS) {
+  const lines = [
+    ...(includeReviewTask ? [`review_task_id=${CRITIC_REVIEW_TASK_ID}`] : []),
+    `source_work=${JSON.stringify(sourceWork)}`,
+  ];
+  return `QUANTFLOW_MISSION ${JSON.stringify({
+    contract: "qf.mission.activation.v1",
+    mission_id: CRITIC_REVIEW_TASK_ID,
+    question: lines.join("\n"),
+  })}`;
+}
+
+function makeCriticOntology(options: any = {}) {
+  const calls: Array<{ name: string; args: any }> = [];
+  const tools = options.tools ?? CRITIC_TOOLS;
+  const ontology = {
+    calls,
+    async listTools() { return tools.map((name: string) => ({ name })); },
+    async callTool(name: string, args: any) {
+      calls.push({ name, args });
+      options.onCall?.(name, args);
+      if (name === "qf_record_evaluation") return options.evaluationResult ?? { result: { object_id: "evaluation-test" } };
+      if (options.readResult) return options.readResult(name, args);
+      return { artifactId: `trajectory-${name}`, result: { id: args.id } };
+    },
+  };
+  return ontology;
+}
+
+async function runDirectCritic(ontology: any, includeReviewTask = true) {
+  const output: string[] = [];
+  const originalWrite = process.stdout.write;
+  process.stdout.write = ((chunk: any) => {
+    output.push(String(chunk));
+    return true;
+  }) as typeof process.stdout.write;
+  try {
+    await responder.selectRoleHandler("critic")(
+      new ControlledReader(criticActivationLine(includeReviewTask)),
+      ontology,
+      {},
+    );
+  } finally {
+    process.stdout.write = originalWrite;
+  }
+  return { calls: ontology.calls, output };
+}
+
+test("production critic direct activation reads exact objects and records one durable evaluation", async () => {
+  const ontology = makeCriticOntology();
+  const { calls, output } = await runDirectCritic(ontology);
+  expect(calls.map(({ name }) => name)).toEqual(CRITIC_TOOLS);
+  expect(calls.slice(0, 3).map(({ args }) => args)).toEqual([
+    { id: CRITIC_IDS.hypothesis_id },
+    { id: CRITIC_IDS.run_id },
+    { id: CRITIC_IDS.result_artifact_id },
+  ]);
+  expect(calls[3]?.args).toMatchObject({
+    hypothesis_id: CRITIC_IDS.hypothesis_id,
+    run_id: CRITIC_IDS.run_id,
+    artifact_id: CRITIC_IDS.result_artifact_id,
+    review_task_id: CRITIC_REVIEW_TASK_ID,
+    source_work: CRITIC_IDS,
+  });
+  expect(calls[3]?.args.source_work).toEqual(CRITIC_IDS);
+  expect(calls[3]?.args).toHaveProperty("verdict", "supports");
+  expect(output.join("")).toContain("boundary=lineage_publication");
+  expect(output.join("")).toContain("evaluation_id=evaluation-test");
+  expect(output.join("")).toContain("turn=complete");
+});
+
+test("production critic direct path rejects the required-tool and exact-read/evaluation falsifiers", async () => {
+  await expect(runDirectCritic(makeCriticOntology({ tools: CRITIC_TOOLS.filter((name) => name !== "qf_artifact_get") }))).rejects.toThrow("critic ontology missing generated tool qf_artifact_get");
+  await expect(runDirectCritic(makeCriticOntology({
+    readResult: (name: string, args: any) => name === "qf_run_get"
+      ? { artifactId: "trajectory-qf_run_get", result: { id: "wrong-run" } }
+      : { artifactId: `trajectory-${name}`, result: { id: args.id } },
+  }))).rejects.toThrow("qf_run_get returned the wrong object for run-test");
+  await expect(runDirectCritic(makeCriticOntology({
+    readResult: (name: string, args: any) => name === "qf_hypothesis_get"
+      ? { result: { id: args.id } }
+      : { artifactId: `trajectory-${name}`, result: { id: args.id } },
+  }))).rejects.toThrow("qf_hypothesis_get returned no read trajectory artifact");
+  await expect(runDirectCritic(makeCriticOntology({ evaluationResult: { result: {} } }))).rejects.toThrow("qf_record_evaluation returned no Evaluation id");
+});
+
+test("existing critic activation falsifiers preserve missing review, source-work mismatch, and substituted artifact inputs", async () => {
+  delete process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY;
+  delete process.env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID;
+  await expect(runDirectCritic(makeCriticOntology(), false)).rejects.toThrow("critic activation review_task_id line is not unique");
+
+  let mismatchedSourceWork: any;
+  process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY = "mismatched-source-work";
+  await runDirectCritic(makeCriticOntology({ onCall: (name: string, args: any) => {
+    if (name === "qf_record_evaluation") mismatchedSourceWork = args.source_work;
+  } }));
+  expect(mismatchedSourceWork.source_task_id).toBe("source-task-test-falsifier");
+
+  let substitutedArtifactId = "";
+  process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY = "substituted-result-artifact-id";
+  process.env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID = "artifact-substituted";
+  await runDirectCritic(makeCriticOntology({ onCall: (name: string, args: any) => {
+    if (name === "qf_record_evaluation") substitutedArtifactId = args.artifact_id;
+  } }));
+  expect(substitutedArtifactId).toBe("artifact-substituted");
+  delete process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY;
+  delete process.env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID;
+});

@@ -447,4 +447,59 @@ describe("R15 production governed-review seams", () => {
       rmSync(artifactRoot, { recursive: true, force: true });
     }
   });
+
+  test("R17 guided research rejects duplicate nested strategy_id before Run creation", async () => {
+    const {
+      kernelEnsureR17TechniqueFixture,
+      kernelExecute,
+      kernelRunGuidedResearch,
+      openAppKernel,
+    } = await import("./kernel");
+    const artifactRoot = mkdtempSync(join(tmpdir(), "qf-r17-strategy-falsifier-"));
+    const previousKernelDb = process.env.QF_KERNEL_DB;
+    const previousArtifactRoot = process.env.QF_ARTIFACT_ROOT;
+    process.env.QF_KERNEL_DB = ":memory:";
+    process.env.QF_ARTIFACT_ROOT = artifactRoot;
+    const trace = () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+    const db = openAppKernel();
+    try {
+      const fixture = kernelEnsureR17TechniqueFixture();
+      const datasetId = String(fixture.dataset.object_id);
+      const strategyId = String(fixture.strategies.find((row) => Number(row.version) === 2)?.strategy_id ?? "");
+      expect(datasetId.startsWith("dataset:")).toBe(true);
+      expect(strategyId.startsWith("strategy:")).toBe(true);
+      const hypothesis = kernelExecute("create_hypothesis", {
+        claim: "The R17 duplicate parameter must be refused before Run creation.",
+        success_criteria: "The repaired guided path creates one deterministic Run.",
+        sources: [datasetId],
+      }, trace()) as { object_id: string };
+      const runCount = () => Number((db.query("SELECT COUNT(*) AS n FROM run").get() as { n: number }).n);
+      const before = runCount();
+      let oldError: unknown = null;
+      try {
+        kernelExecute("execute_deterministic_run", {
+          run_id: "r17-g5-nested-strategy-falsifier",
+          dataset_id: datasetId,
+          hypothesis_id: hypothesis.object_id,
+          strategy_id: strategyId,
+          params: { limit: 1, strategy_id: strategyId },
+        }, trace());
+      } catch (error) {
+        oldError = error;
+      }
+      expect(oldError instanceof Error ? oldError.message : String(oldError)).toBe("params rejects fields: strategy_id");
+      expect(runCount()).toBe(before);
+      console.log(`R17 prerequisite FALSIFY RED old nested params refused before Run; run_count=${before}`);
+      const repaired = kernelRunGuidedResearch("r17-g5-guided-falsifier", hypothesis.object_id, "r17-g5-evidence", strategyId);
+      expect(repaired).not.toBeNull();
+      expect(runCount()).toBe(before + 1);
+      console.log(`R17 prerequisite FALSIFY GREEN repaired guided path created Run=${String(repaired?.runId ?? "")}`);
+    } finally {
+      if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
+      else process.env.QF_KERNEL_DB = previousKernelDb;
+      if (previousArtifactRoot === undefined) delete process.env.QF_ARTIFACT_ROOT;
+      else process.env.QF_ARTIFACT_ROOT = previousArtifactRoot;
+      rmSync(artifactRoot, { recursive: true, force: true });
+    }
+  });
 });

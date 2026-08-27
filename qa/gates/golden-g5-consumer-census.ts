@@ -119,7 +119,7 @@ function scanConsumerCensus(options: ScanOptions = {}): string[] {
     "species/hermes/agent-package/agentos-package.json",
   ];
   for (const rel of requiredFiles) {
-    if (!options.missing?.has(rel) && !existsSync(join(repoRoot, rel))) {
+    if (options.missing?.has(rel) || !existsSync(join(repoRoot, rel))) {
       issues.push("protected current file missing: " + rel);
     }
   }

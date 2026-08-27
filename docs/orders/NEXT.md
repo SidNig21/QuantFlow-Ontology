@@ -1,10 +1,10 @@
 # NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 FINAL CLOSURE ADJUDICATION — FRESH SEMANTIC READER REQUIRED
+status: G4 CLOSED / G5 FINAL CLOSURE ADJUDICATION — READER YES / YES
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **CLOSED PENDING FRESH READER YES / YES ON FINAL G5 CLOSURE ADJUDICATION**
+builder-authority: **EVIDENCE-ONLY FINALIZATION AUTHORIZED — PENDING INDEPENDENT VERIFIER**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
@@ -14,6 +14,9 @@ g5-finite-reread-verdict: **NO / NO — AUTHORITY 5248031; superseded by final f
 g5-final-finite-reader-verdict: **YES / YES**
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
+g5-final-closure-reader-task: 01a0420e-ba89-7111-8832-4fa1928e23b9
+g5-final-closure-reader-authority: 5a3c02e3c35feaf9901606de0faba030bcb87f14
+g5-final-closure-reader-verdict: **YES / YES**
 phase-2-active-group: G5 — Legacy ACP and unconsumed renderers
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
@@ -43,4 +46,4 @@ Add one focused old-red/new-green falsifier: with the duplicate nested field res
 
 Full G8 remains in its original order; full G9 remains after G8. This amendment does not reorder or open either group.
 
-The final packaged synthetic rerun reaches Director, recruited worker, durable Run/Artifact, critic launch, activation, and exact four-tool discovery, then records no critic read/Evaluation/Report. Source adjudication assigns this unchanged failure shape to G8 proof integrity rather than G5 deletion or lifecycle behavior. Under the founder's standing Golden throughput clarification, [the final G5 closure adjudication](WO-GOLDEN-G5.md#final-closure-adjudication-after-the-g8-owned-packaged-red) may close G5 only after one fresh semantic Reader returns `YES / YES` and one fresh independent Verifier proves the exact bounded non-regression contract. Builder authority is closed until that Reader verdict. No product or gate repair is open.
+The final packaged synthetic rerun reaches Director, recruited worker, durable Run/Artifact, critic launch, activation, and exact four-tool discovery, then records no critic read/Evaluation/Report. Source adjudication assigns this unchanged failure shape to G8 proof integrity rather than G5 deletion or lifecycle behavior. Under the founder's standing Golden throughput clarification, [the final G5 closure adjudication](WO-GOLDEN-G5.md#final-closure-adjudication-after-the-g8-owned-packaged-red) may close G5 only after one fresh semantic Reader returns `YES / YES` and one fresh independent Verifier proves the exact bounded non-regression contract. Fresh semantic Reader task `01a0420e-ba89-7111-8832-4fa1928e23b9` returned `YES / YES` against authority `5a3c02e3c35feaf9901606de0faba030bcb87f14` with no defects. Builder authority is now limited to evidence-only finalization; no product or gate repair is open.
