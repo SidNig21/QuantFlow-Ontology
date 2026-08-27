@@ -464,3 +464,18 @@ This prerequisite may edit exactly:
 - the already accepted G5 deletion diff.
 
 No full G8 or G9 reorder is open. A new fresh semantic Reader must return `YES / YES` on this finite contract before the existing Builder resumes.
+
+### Result-delivery trace — authorized after packaged semantic red
+
+- Accepted finite Reader YES/YES resumed Builder.
+- Genuine packaged red at `071b6d5`: valid worker `send_result` and `turn=complete`, but no Director `qf.peer-notification` result line, no `boundary=result_return`, no governed Report; cleanup zero.
+- Worker completion remains intermediate.
+- One diagnostic-only G5 trace is authorized with tracing disabled by default, limited to `collaboration-gateway.ts`, `kernel.ts`, `peer-delivery.ts`, `peer-notification.ts`, `qf-hermes-synthetic-responder.mjs`, `hermes-research.ts`, and G5 disposable/evidence receipts.
+- For one valid Task record exact `task_id`, `artifact_id`, delegator role/session, peer-bus `message_id`, inserted/not-inserted, `pushed_at` before/after, role→PTY mapping, text-write attempt/result, Enter attempt/result, first Director receipt, `boundary=result_return`, swallowed notification error.
+- Trace output disposable only; behavior and persisted truth unchanged when disabled.
+- No assertion, timeout, cleanup, grammar, fallback, Report/Evaluation semantic, group order, or G5 deletion change. Do not accept worker completion as `result_return`.
+- Stop after the first broken transition. Fresh finite Reader required before repair. No full G8/G9 reorder.
+
+### Required diagnostic-only execution boundary
+
+Do not resume product repair. The Builder must first commit only this authority record and the corresponding `NEXT.md` status update. Then implement only the default-off diagnostic trace within the named boundary, preserve the existing G5 diff, run one isolated normal `hermes-first-turn-synthetic` trace with a durable log and clean shutdown, and do not repair the discovered product defect. If instrumentation changes normal behavior, fails to isolate, or requires any file outside the listed boundary, stop.

@@ -1,10 +1,10 @@
 # NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 BUILDER SUSPENDED FOR G8 PROOF-INTEGRITY PREREQUISITE
+status: G4 CLOSED / G5 DIAGNOSTIC-ONLY RESULT-DELIVERY TRACE AUTHORIZED
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **NO — FRESH SEMANTIC READER REQUIRED**
+builder-authority: **DIAGNOSTIC ONLY — NO PRODUCT REPAIR UNTIL FINITE READER YES / YES**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
