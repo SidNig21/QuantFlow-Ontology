@@ -1,10 +1,10 @@
 # NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 FINAL FINITE CONTRACT ACCEPTED — BOUNDED RESULT-DELIVERY REPAIR AUTHORIZED
+status: G4 CLOSED / G5 FINAL CLOSURE ADJUDICATION — FRESH SEMANTIC READER REQUIRED
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **BOUNDED RESULT-DELIVERY REPAIR ONLY — EXACT WO-GOLDEN-G5 CONTRACT**
+builder-authority: **CLOSED PENDING FRESH READER YES / YES ON FINAL G5 CLOSURE ADJUDICATION**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
@@ -42,3 +42,5 @@ This amendment supersedes only the named result-delivery file boundary for one f
 Add one focused old-red/new-green falsifier: with the duplicate nested field restored, the focused path must fail before Run creation with `params rejects fields: strategy_id`; with only that duplicate removed, the unchanged `hermes-first-turn-synthetic` gate must prove the complete Run -> independent critic -> Evaluation -> canonical `qf.research.report.v2` chain. All existing assertions, falsifiers, timeouts, cleanup rules, and the full G5 matrix remain unchanged.
 
 Full G8 remains in its original order; full G9 remains after G8. This amendment does not reorder or open either group.
+
+The final packaged synthetic rerun reaches Director, recruited worker, durable Run/Artifact, critic launch, activation, and exact four-tool discovery, then records no critic read/Evaluation/Report. Source adjudication assigns this unchanged failure shape to G8 proof integrity rather than G5 deletion or lifecycle behavior. Under the founder's standing Golden throughput clarification, [the final G5 closure adjudication](WO-GOLDEN-G5.md#final-closure-adjudication-after-the-g8-owned-packaged-red) may close G5 only after one fresh semantic Reader returns `YES / YES` and one fresh independent Verifier proves the exact bounded non-regression contract. Builder authority is closed until that Reader verdict. No product or gate repair is open.

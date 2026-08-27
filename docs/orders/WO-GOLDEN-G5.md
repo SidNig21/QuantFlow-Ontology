@@ -509,3 +509,34 @@ This amendment supersedes only the named result-delivery file boundary for one f
 Add one focused old-red/new-green falsifier: with the duplicate nested field restored, the focused path must fail before Run creation with `params rejects fields: strategy_id`; with only that duplicate removed, the unchanged `hermes-first-turn-synthetic` gate must prove the complete Run -> independent critic -> Evaluation -> canonical `qf.research.report.v2` chain. All existing assertions, falsifiers, timeouts, cleanup rules, and the full G5 matrix remain unchanged.
 
 Full G8 remains in its original order; full G9 remains after G8. This amendment does not reorder or open either group.
+
+## Final closure adjudication after the G8-owned packaged red
+
+The founder's standing Golden throughput clarification permits a proven pre-existing red outside the active group's semantic ownership to remain assigned to its already named Golden group when the active group's non-regression can still be independently proved. This section changes G5 closure meaning and therefore requires one fresh semantic Reader `YES / YES` before candidate finalization. It authorizes no product repair.
+
+### Frozen evidence and ownership
+
+- G5 starting product SHA is `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`.
+- The accepted G5 deletion and result-delivery candidate ancestor is `82011c5f934aca5d15b692bed883d1addfc19245`.
+- The finite G8 prerequisite authority head is `a2bdf33669b91b941f73441e889c2f9502374eb2`.
+- The normal packaged synthetic run reaches the production Director, recruited worker, durable Run and result Artifact, critic launch, critic activation, and exact four-tool discovery, then records no critic ontology read, Evaluation, or canonical Report.
+- The same red was source-adjudicated as G8 proof-integrity/adapter ownership, not a G5 deletion or result-delivery defect. The isolated responder proof is `7 / 7` green and proves the exact three reads, single Evaluation write, and malformed-activation refusals. The focused Kernel proof is green and proves the duplicate nested `params.strategy_id` old red and repaired Run-creation path.
+- The suffix-11 trace filename mismatch is diagnostic-only G8 proof debt. It is not a G5 product repair and no further diagnostic scaffolding is authorized.
+
+This classification does not claim the full research chain is healthy, does not waive G8, and does not permit R18. Full G8 must own and close the missing packaged critic observation before Phase 3 can pass.
+
+### G5 closure criterion
+
+G5 may close only if one fresh independent Verifier proves all of the following at one immutable candidate SHA:
+
+1. every G5-owned normal selector and falsifier is green, including consumer census, saved-state, lifecycle, supporting, ontology, static, Atlas, and cleanup receipts;
+2. the accepted deletion diff removes only the classified legacy Agent Chat, standalone Terminal, and legacy ACP islands while preserving host ACP, Canvas terminal, native Hermes TUI, Dock, Files, PTY, current saved state, and dependency closure;
+3. the result-delivery lifecycle old-red/new-green proof remains green and the actual Director receipt precedes `result_return`;
+4. the focused finite G8 prerequisite proofs remain green: malformed duplicate nested strategy fails before Run creation, the repaired path creates one Run, and the isolated direct-critic responder remains `7 / 7` green;
+5. the sole inherited packaged red reproduces the frozen G8-owned shape above, with `processes=0`, `roots_remaining=0`, and `leaked=[]`; any earlier failure, different failure, G5 regression, unknown session, duplicate session, or cleanup red fails G5;
+6. candidate product/config bytes are immutable before and after verification; and
+7. G8 receives a durable inherited-red receipt naming the exact command, output, first missing transition, starting SHA, candidate SHA, and why G5 did not cause it.
+
+The Verifier may reuse exact-SHA receipts where relevant bytes and configuration are identical. It must rerun changed-surface G5 proofs and the inherited-red reproduction. It may not repair the candidate, weaken an assertion, treat worker completion as `result_return`, or report the packaged chain PASS.
+
+After Reader `YES / YES`, the existing Builder may edit only G5 evidence files to bind the immutable candidate and inherited-red receipt. No product, gate, timing, assertion, cleanup, diagnostic, G8, or G9 edit is authorized by this closure section.
