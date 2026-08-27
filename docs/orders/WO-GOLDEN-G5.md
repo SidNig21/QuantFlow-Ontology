@@ -540,3 +540,32 @@ G5 may close only if one fresh independent Verifier proves all of the following 
 The Verifier may reuse exact-SHA receipts where relevant bytes and configuration are identical. It must rerun changed-surface G5 proofs and the inherited-red reproduction. It may not repair the candidate, weaken an assertion, treat worker completion as `result_return`, or report the packaged chain PASS.
 
 After Reader `YES / YES`, the existing Builder may edit only G5 evidence files to bind the immutable candidate and inherited-red receipt. No product, gate, timing, assertion, cleanup, diagnostic, G8, or G9 edit is authorized by this closure section.
+
+## Independent Verifier defect — transport ownership seam
+
+The independent Verifier task `01a0422d-95b8-7143-9022-6ce8bdb7993b` rejected candidate `37d0caad99f99bbf02295a9b2d0a9a72522ca019`. Every behavioral G5 proof and all six falsifier/restore pairs passed, and the inherited packaged G8 red reproduced exactly with clean shutdown. The sole red was `bun qa/run.ts kernel-sole-writer-app`: production `agent-host.ts` and its lifecycle test import SQLite directly.
+
+This is a semantic authority-path defect. The peer bus is transport state, not Kernel truth, but `peer-delivery.ts` is the existing sole transport-SQLite owner and exact static-law exception. Production `agent-host.ts` may not receive a new SQLite exception.
+
+### Exact repair
+
+A later Builder may edit only:
+
+- `collab-electron/src/main/peer-delivery.ts`;
+- `collab-electron/src/main/peer-delivery.test.ts`;
+- `collab-electron/src/main/agent-host.ts`;
+- `collab-electron/src/main/agent-host-lifecycle.test.ts`;
+- `qa/gates/kernel-sole-writer-app.ts`; and
+- G5 evidence and `NEXT.md`.
+
+`peer-delivery.ts` must expose one read-only predicate over its already-owned transport database: for an exact recipient role and session, return whether one `message_kind='result'` row has `pushed_at IS NULL`. An absent database or pre-schema transport database returns false; all other errors fail closed. It may not read or write Kernel truth and may not mark delivery.
+
+`agent-host.ts` must call that predicate before native-TUI cancel, explicit close, teardown-registry begin, and disposal. It must retain the exact existing block/release behavior while importing no SQLite package and executing no SQL. The lifecycle test must use the exported transport seam rather than becoming a second transport owner.
+
+The static gate may add exactly `peer-delivery.test.ts` as an isolated transport-SQLite fixture beside the existing `peer-delivery.ts` exception. It may not allow `agent-host.ts`, `agent-host-lifecycle.test.ts`, any wildcard, or any other product/test file.
+
+### Required proof
+
+1. `kernel-sole-writer-app` is green; a focused falsifier that adds a direct SQLite import to `agent-host.ts` is red and restores green.
+2. The transport predicate test proves pending result=true, acknowledged result=false, unrelated role/session=false, and absent/pre-schema database=false without modifying `pushed_at`.
+3. The lifecycle old-red/new-green proof remains green: undelivered result blocks teardown; durable acknowledgment releases it; Director receipt still precedes `result_return`.
