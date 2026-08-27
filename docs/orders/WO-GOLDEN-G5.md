@@ -569,3 +569,25 @@ The static gate may add exactly `peer-delivery.test.ts` as an isolated transport
 1. `kernel-sole-writer-app` is green; a focused falsifier that adds a direct SQLite import to `agent-host.ts` is red and restores green.
 2. The transport predicate test proves pending result=true, acknowledged result=false, unrelated role/session=false, and absent/pre-schema database=false without modifying `pushed_at`.
 3. The lifecycle old-red/new-green proof remains green: undelivered result blocks teardown; durable acknowledgment releases it; Director receipt still precedes `result_return`.
+
+## Reader defects after e5b5e84
+
+Fresh semantic Reader task `01a0423b-f35d-7de1-8508-db6f921f25dc` returned `NO / NO`. This section supersedes the incomplete meanings above and is the complete contract for the next reread.
+
+### Corrected exact meaning
+
+1. `peer-delivery.ts` remains the sole non-Kernel production owner of peer-bus push-tracking SQLite. `kernel.ts` retains its existing governed peer-bus action boundary; no ownership claim removes or changes it.
+2. The predicate returns `false` only when the database is absent or the `messages` table / `pushed_at` column is not yet present. That is an explicit behavior change from the current pre-schema throw and means there can be no pending result yet.
+3. For every other open, prepare, query, malformed-database, permission, lock, or I/O error, the predicate fails closed by returning `true`; agent-host therefore blocks teardown with the existing `UNDELIVERED_RESULT_ERROR`. It may not swallow such errors as `false`.
+4. `agent-host.ts` imports only the predicate and contains no SQLite import, SQL text, or transport-database open. The pending-result decision is applied before explicit close, cancel, teardown-registry begin, and disposal, preserving the same undelivered block and acknowledged release behavior.
+5. `peer-delivery.test.ts` may receive only the same pattern-specific `node:sqlite` exception as production `peer-delivery.ts`. It remains subject to `qf-kernel`, `kernel.db`, `bun:sqlite`, `better-sqlite3`, AgentOS, ACP, and AI import checks. It may not enter `KERNEL_ALLOWED` and no wildcard is permitted.
+
+### Corrected fail-capable proof
+
+1. `kernel-sole-writer-app` passes normally; inserting a direct `node:sqlite` import into `agent-host.ts` makes it red; inserting `qf-kernel` or `kernel.db` into `peer-delivery.test.ts` also makes it red; both restore green.
+2. Predicate tests prove pending=true, acknowledged=false, unrelated role/session=false, absent=false, pre-schema=false, and representative non-schema error=true, while hashing/querying the fixture before and after to prove `pushed_at` is unchanged.
+3. Lifecycle tests independently exercise explicit close, `cancelAgentSession`, teardown-registry begin, and disposal. Each blocks on pending result and releases after durable acknowledgment; removing any one guard makes its named test red.
+4. The unchanged packaged trace or exact-tree receipt proves the actual Director receipt precedes `result_return`; no unit-only substitute may claim that ordering.
+5. The changed-surface matrix reruns the static gate, predicate test, lifecycle test, G5 census/saved-state, supporting/ontology/focused Kernel/responder proofs, and exactly one inherited packaged reproduction with the accepted G8 late red and clean shutdown.
+
+The allowed file list above remains exact. This revised contract requires one new fresh semantic Reader `YES / YES` before Builder repair. No full G8/G9 work, fallback, timeout change, cleanup weakening, or packaged PASS claim is authorized.
