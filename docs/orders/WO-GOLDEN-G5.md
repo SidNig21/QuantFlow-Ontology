@@ -591,3 +591,23 @@ Fresh semantic Reader task `01a0423b-f35d-7de1-8508-db6f921f25dc` returned `NO /
 5. The changed-surface matrix reruns the static gate, predicate test, lifecycle test, G5 census/saved-state, supporting/ontology/focused Kernel/responder proofs, and exactly one inherited packaged reproduction with the accepted G8 late red and clean shutdown.
 
 The allowed file list above remains exact. This revised contract requires one new fresh semantic Reader `YES / YES` before Builder repair. No full G8/G9 work, fallback, timeout change, cleanup weakening, or packaged PASS claim is authorized.
+
+## Reader defects after 07186ed
+
+Fresh semantic Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO`. This section supersedes only the contradictory or unfalsifiable clauses above.
+
+1. The predicate's boolean has one meaning: `false` means no matching undelivered result exists; `true` means one exists or safety cannot be established. Therefore absent database, pre-schema database, acknowledged result, and unrelated role/session return `false`; a matching pending result and every unexpected exception from open/prepare/query return `true`.
+2. The implementation must wrap the complete open/prepare/query operation in one fail-closed exception boundary. A test-injected throw through that exact boundary proves the catch-all maps every such exception to `true`; separate examples for every operating-system error code are not required and no exception may escape as teardown permission.
+3. Teardown protection has exactly two causal guard sites. `createNativeTuiTeardownRegistry.begin` owns the guard for explicit close and disposal; neither caller duplicates it. `cancelAgentSession` owns the guard for its distinct cancel path. Removing the registry guard makes the direct-registry, explicit-close, and disposal cases red. Removing the cancel guard makes the cancel case red.
+4. Lifecycle tests exercise direct registry begin, explicit close, disposal, and cancel separately. For each path, pending result blocks teardown and acknowledged result releases it. Tests assert no teardown call, live role binding retained, and Kernel session row retained on block; they assert exactly one teardown and expected row/binding cleanup after acknowledgment.
+5. The actual Director ordering is an exact packaged-gate assertion: the first concrete `qf.peer-notification` result receipt for the delegated artifact must have a lower ordered transcript index than `boundary=result_return`. Missing, duplicate, artifact-mismatched, or later notification fails. A test-only reordering falsifier swaps those two observed receipt positions and must make the unchanged assertion red, then restore green.
+
+The exact allowed files are the prior list plus `qa/gates/hermes-research.ts` only for the ordered-receipt assertion and its reordering falsifier. No other gate, product, timing, cleanup, Report/Evaluation, G8, or G9 change is authorized.
+
+### Final fail-capable matrix
+
+- normal and falsified `kernel-sole-writer-app`, including direct `node:sqlite` in `agent-host.ts` and forbidden `qf-kernel` / `kernel.db` in the exact transport test exception;
+- transport predicate truth table plus catch-all injected throw and before/after `pushed_at` identity;
+- registry, close, disposal, and cancel lifecycle guard-removal falsifiers;
+- ordered Director notification/result-return assertion plus reordering falsifier;
+- prior changed-surface G5 matrix and exactly one inherited packaged reproduction with the accepted G8 late red and clean shutdown.

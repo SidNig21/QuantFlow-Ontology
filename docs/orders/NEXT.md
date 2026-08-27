@@ -1,10 +1,10 @@
 # NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 TRANSPORT READER NO / NO — FINITE REREAD REQUIRED
+status: G4 CLOSED / G5 SECOND TRANSPORT READER NO / NO — FINAL FINITE REREAD REQUIRED
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **CLOSED PENDING NEW FRESH READER YES / YES ON CORRECTED TRANSPORT CONTRACT**
+builder-authority: **CLOSED PENDING FINAL FRESH READER YES / YES ON CAUSAL TRANSPORT CONTRACT**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
@@ -51,3 +51,5 @@ The final packaged synthetic rerun reaches Director, recruited worker, durable R
 Independent Verifier task `01a0422d-95b8-7143-9022-6ce8bdb7993b` rejected candidate `37d0caad99f99bbf02295a9b2d0a9a72522ca019` only because `agent-host.ts` and its lifecycle test directly import SQLite, violating `kernel-sole-writer-app`. [The finite transport-ownership amendment](WO-GOLDEN-G5.md#independent-verifier-defect--transport-ownership-seam) moves the pending-result read behind the existing `peer-delivery.ts` transport owner and requires a fresh semantic Reader before any repair. No Builder authority is open.
 
 Fresh Reader task `01a0423b-f35d-7de1-8508-db6f921f25dc` returned `NO / NO` on that first amendment. [The corrected finite contract](WO-GOLDEN-G5.md#reader-defects-after-e5b5e84) now binds exact error semantics, non-Kernel transport ownership, pattern-specific test exception, all teardown paths, and fail-capable falsifiers. Builder authority remains closed pending a new fresh Reader.
+
+Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on the second contract. [The final causal contract](WO-GOLDEN-G5.md#reader-defects-after-07186ed) removes contradictory false cases, centralizes the guard into two causal sites, makes each lifecycle path fail-capable, and adds an exact Director-notification-before-result-return assertion with reordering falsifier. Builder authority remains closed pending one final fresh Reader.
