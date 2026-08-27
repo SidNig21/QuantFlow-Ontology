@@ -259,6 +259,121 @@ function parseMission(line) {
   return mission;
 }
 
+const CRITIC_FALSIFIERS = new Set([
+  "missing-review-task-id",
+  "mismatched-source-work",
+  "substituted-result-artifact-id",
+]);
+
+function criticFalsifierMode() {
+  const mode = process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY || "";
+  if (mode && !CRITIC_FALSIFIERS.has(mode)) {
+    throw new Error("unknown critic activation falsifier: " + mode);
+  }
+  return mode || null;
+}
+
+function falsifyCriticQuestion(question, mode) {
+  if (!mode) return question;
+  const lines = question.split(/\r?\n/);
+  if (mode === "missing-review-task-id") {
+    return lines.filter((line) => !line.startsWith("review_task_id=")).join("\n");
+  }
+  const sourceIndexes = lines
+    .map((line, index) => line.startsWith("source_work=") ? index : -1)
+    .filter((index) => index >= 0);
+  if (sourceIndexes.length !== 1) throw new Error("critic activation source_work line is not unique");
+  const sourceIndex = sourceIndexes[0];
+  const match = /^source_work=(\{.*\})$/.exec(lines[sourceIndex]);
+  if (!match) throw new Error("critic activation source_work line is malformed");
+  const sourceWork = JSON.parse(match[1]);
+  if (!sourceWork || typeof sourceWork !== "object" || Array.isArray(sourceWork)) {
+    throw new Error("critic activation source_work payload is malformed");
+  }
+  if (mode === "mismatched-source-work") {
+    sourceWork.source_task_id = `${sourceWork.source_task_id}-falsifier`;
+  } else if (mode === "substituted-result-artifact-id") {
+    const substitutedArtifactId = process.env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID || "";
+    if (!substitutedArtifactId) throw new Error("critic activation substituted Artifact input is unavailable");
+    if (substitutedArtifactId === sourceWork.result_artifact_id) {
+      throw new Error("critic activation substituted Artifact input is not different");
+    }
+    sourceWork.result_artifact_id = substitutedArtifactId;
+  }
+  lines[sourceIndex] = "source_work=" + JSON.stringify(sourceWork);
+  return lines.join("\n");
+}
+
+function parseCriticMission(line) {
+  if (!line.startsWith(MISSION_PREFIX)) return null;
+  const mode = criticFalsifierMode();
+  let mission;
+  try {
+    mission = JSON.parse(line.slice(MISSION_PREFIX.length));
+  } catch {
+    throw new Error("critic activation JSON is malformed");
+  }
+  if (!mission || typeof mission !== "object" || Array.isArray(mission)) {
+    throw new Error("critic activation JSON is not an object");
+  }
+  if (mission.contract !== "qf.mission.activation.v1") {
+    throw new Error("critic activation contract is invalid");
+  }
+  if (typeof mission.mission_id !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(mission.mission_id)) {
+    throw new Error("critic activation mission_id is invalid");
+  }
+  if (typeof mission.question !== "string") throw new Error("critic activation question is invalid");
+  const question = falsifyCriticQuestion(mission.question, mode);
+  const lines = question.split(/\r?\n/);
+  const reviewCandidates = lines.filter((entry) => entry.startsWith("review_task_id="));
+  if (reviewCandidates.length !== 1) throw new Error("critic activation review_task_id line is not unique");
+  const reviewMatch = /^review_task_id=([A-Za-z0-9_-]{1,128})$/.exec(reviewCandidates[0]);
+  if (!reviewMatch) throw new Error("critic activation review_task_id line is malformed");
+  const reviewTaskId = reviewMatch[1];
+  if (mission.mission_id !== reviewTaskId) {
+    throw new Error("critic activation mission_id and review_task_id mismatch");
+  }
+  const sourceCandidates = lines.filter((entry) => entry.startsWith("source_work="));
+  if (sourceCandidates.length !== 1) throw new Error("critic activation source_work line is not unique");
+  const sourceMatch = /^source_work=(\{.*\})$/.exec(sourceCandidates[0]);
+  if (!sourceMatch) throw new Error("critic activation source_work line is malformed");
+  let sourceWork;
+  try {
+    sourceWork = JSON.parse(sourceMatch[1]);
+  } catch {
+    throw new Error("critic activation source_work JSON is malformed");
+  }
+  if (!sourceWork || typeof sourceWork !== "object" || Array.isArray(sourceWork)) {
+    throw new Error("critic activation source_work JSON is not an object");
+  }
+  const requiredKeys = ["source_task_id", "hypothesis_id", "run_id", "result_artifact_id", "executor_session_id"];
+  if (Object.keys(sourceWork).sort().join(",") !== requiredKeys.slice().sort().join(",")) {
+    throw new Error("critic activation source_work keys are not exact");
+  }
+  if (!requiredKeys.every((key) => typeof sourceWork[key] === "string" && sourceWork[key].length > 0)) {
+    throw new Error("critic activation source_work values are invalid");
+  }
+  let metrics;
+  const metricsLine = lines.find((entry) => entry.startsWith("metrics="));
+  if (metricsLine) {
+    try {
+      metrics = JSON.parse(metricsLine.slice("metrics=".length));
+    } catch {
+      throw new Error("critic activation metrics JSON is malformed");
+    }
+  }
+  return {
+    ...mission,
+    question,
+    review_task_id: reviewTaskId,
+    source_work: sourceWork,
+    hypothesis_id: sourceWork.hypothesis_id,
+    run_id: sourceWork.run_id,
+    artifact_id: sourceWork.result_artifact_id,
+    metrics,
+  };
+}
+
 function parseTask(line) {
   const match = /^\[QuantFlow TASK ([A-Za-z0-9_-]{1,128}) from orchestrator\] (.+)$/.exec(line);
   return match ? { taskId: match[1], task: match[2] } : null;
@@ -316,26 +431,15 @@ async function consumeDeliveries(reader) {
 }
 
 async function nextReview(reader) {
-  const values = {};
-  let carry = "";
-  const deadline = Date.now() + MCP_TIMEOUT_MS;
-  while (Date.now() < deadline) {
-    const line = cleanPtyLine(await reader.next(Math.max(1, deadline - Date.now())));
-    const delivery = parseDelivery(line);
-    if (delivery?.contract === "qf.task.second_opinion.v1") return { secondOpinion: delivery };
-    if (delivery?.contract === "qf.governed_review.v1") return { governedReview: delivery, ...delivery.source_work };
-    carry = `${carry}\n${line}`.slice(-8_192);
-    for (const field of ["hypothesis_id", "run_id", "artifact_id"]) {
-      const match = new RegExp(`${field}=([A-Za-z0-9_-]{1,128})`).exec(carry);
-      if (match) values[field] = match[1];
-    }
-    const metricsMatch = /metrics=(\{.*\})/.exec(carry);
-    if (metricsMatch) {
-      try { values.metrics = JSON.parse(metricsMatch[1]); } catch { /* keep reading */ }
-    }
-    if (values.hypothesis_id && values.run_id && values.artifact_id) return values;
-  }
-  throw new Error("synthetic critic activation is missing research ids");
+  const activation = await nextMatching(reader, (line) => parseCriticMission(line));
+  return {
+    review_task_id: activation.review_task_id,
+    source_work: activation.source_work,
+    hypothesis_id: activation.hypothesis_id,
+    run_id: activation.run_id,
+    artifact_id: activation.artifact_id,
+    metrics: activation.metrics,
+  };
 }
 
 async function orchestrator(reader, ontology, collaboration, directorLifecycle = completeDirectorTurnAndWait) {

@@ -159,8 +159,8 @@
     }
   },
   "dependencies": {
-    "@agentclientprotocol/claude-agent-acp": "^0.26.0",
-    "@agentclientprotocol/sdk": "^0.18.2",
+
+
     "@lezer/common": "^1.5.1",
     "@lezer/python": "^1.1.18",
     "@parcel/watcher": "2.5.6",
@@ -178,9 +178,6 @@
     "sharp": "0.34.5",
     "typescript": "5.9.3"
   },
-  "overrides": {
-    "@assistant-ui/store": "0.2.20"
-  },
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "0.34.5",
     "@img/sharp-darwin-x64": "0.34.5",
@@ -192,8 +189,8 @@
     "@parcel/watcher-darwin-x64": "2.5.6"
   },
   "devDependencies": {
-    "@assistant-ui/react": "^0.12.24",
-    "@assistant-ui/react-markdown": "^0.12.8",
+
+
     "@blocknote/core": "0.47.0",
     "@blocknote/mantine": "0.47.0",
     "@blocknote/react": "0.47.0",
@@ -222,7 +219,7 @@
     "electron-builder": "26.8.1",
     "electron-vite": "5.0.0",
     "katex": "0.16.33",
-    "lucide-react": "0.576.0",
+
     "monaco-editor": "^0.55.1",
     "posthog-js": "^1.359.1",
     "react": "19.2.4",

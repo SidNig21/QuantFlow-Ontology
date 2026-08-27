@@ -107,7 +107,7 @@ import { installCli } from "./cli-installer";
 import { listTerminalTargets } from "./terminal-target";
 import { readSessionMeta } from "./tmux";
 import { registerBrowserIpc } from "./ipc-browser";
-import { registerAgentIpc } from "./acp-agent";
+
 import {
   bootstrapPackagedDockProfiles,
   closeAgentSessionRow,
@@ -718,14 +718,14 @@ ipcMain.handle("shell:get-view-config", () => {
   return {
     nav: { src: getRendererURL("nav"), preload },
     viewer: { src: getRendererURL("viewer"), preload },
-    terminal: { src: getRendererURL("terminal"), preload },
+
     terminalTile: { src: getRendererURL("terminal-tile"), preload },
     graphTile: { src: getRendererURL("graph-tile"), preload },
     artifactTile: { src: getRendererURL("artifact-tile"), preload },
     sessionTile: { src: getRendererURL("session-tile"), preload },
     settings: { src: getRendererURL("settings"), preload },
     tileList: { src: getRendererURL("tile-list"), preload },
-    agentChat: { src: getRendererURL("agent-chat"), preload },
+
   };
 });
 
@@ -1027,7 +1027,7 @@ app.whenReady().then(async () => {
 
   buildAppMenu();
   createWindow();
-  registerAgentIpc(mainWindow!, config);
+
   registerToggleShortcuts(mainWindow!);
 
   initMainAnalytics();
@@ -1404,9 +1404,10 @@ app.whenReady().then(async () => {
         const final = kernelFinalizeResearchEvaluation(evaluationId);
         mainWindow?.webContents.send("qf:dock:invalidate");
         mainWindow?.webContents.send("qf:events:invalidate");
-        if (final.reportArtifactId) {
+        const legacyReportArtifactId = final.reportArtifactId;
+        if (legacyReportArtifactId) {
           mainWindow?.webContents.send(
-            "shell:forward", "canvas", "create-artifact-tile", final.reportArtifactId,
+            "shell:forward", "canvas", "create-artifact-tile", legacyReportArtifactId,
           );
         }
       } finally {

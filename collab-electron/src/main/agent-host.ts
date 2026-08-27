@@ -6,6 +6,7 @@
 
  */
 import { existsSync } from "node:fs";
+import { DatabaseSync } from "node:sqlite";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { app } from "electron";
@@ -99,7 +100,28 @@ type LiveSession = {
 
 const live = new Map<string, LiveSession>();
 const chunkListeners = new Set<ChunkListener>();
+type NativeTuiPeerDelivery = { role: string; dbPath: string };
+const nativeTuiPeerDeliveryBySession = new Map<string, NativeTuiPeerDelivery>();
 const doneListeners = new Set<DoneListener>();
+
+const UNDELIVERED_RESULT_ERROR = "agent-host: native-TUI teardown blocked while a delegated result remains undelivered";
+
+function assertNativeTuiTeardownAllowed(sessionId: string): void {
+  const peer = nativeTuiPeerDeliveryBySession.get(sessionId);
+  if (!peer || !existsSync(peer.dbPath)) return;
+  const db = new DatabaseSync(peer.dbPath);
+  try {
+    const pending = db.prepare(`
+      SELECT 1 AS pending FROM messages
+      WHERE to_role = ? AND to_session_id = ?
+        AND message_kind = 'result' AND pushed_at IS NULL
+      LIMIT 1
+    `).get(peer.role, sessionId);
+    if (pending) throw new Error(UNDELIVERED_RESULT_ERROR);
+  } finally {
+    db.close();
+  }
+}
 
 export function createNativeTuiTeardownRegistry(
   teardown: (entry: NativeTuiLive) => Promise<void> = tearDownNativeTui,
@@ -112,6 +134,7 @@ export function createNativeTuiTeardownRegistry(
   const begin = (sessionId: string, entry: NativeTuiLive): Promise<void> => {
     const existing = inFlight.get(sessionId);
     if (existing) return existing;
+    assertNativeTuiTeardownAllowed(sessionId);
     const promise = teardown(entry).finally(() => {
       if (inFlight.get(sessionId) === promise) inFlight.delete(sessionId);
     });
@@ -468,10 +491,14 @@ export async function admitAndStartSession(
         beforeActivation: opts?.beforeActivation,
         newTrace,
         liveSet: (sessionId, entry) => {
+          if (peerDelivery) {
+            nativeTuiPeerDeliveryBySession.set(sessionId, peerDelivery);
+          }
           live.set(sessionId, entry);
         },
         liveDelete: (sessionId) => {
           live.delete(sessionId);
+          nativeTuiPeerDeliveryBySession.delete(sessionId);
         },
         peerDelivery,
         onStarted: opts?.onStarted
@@ -717,6 +744,7 @@ export async function runTurn(
 
 export async function cancelAgentSession(sessionId: string): Promise<void> {
   const entry = live.get(sessionId);
+  if (entry?.kind === "native_tui") assertNativeTuiTeardownAllowed(sessionId);
   if (entry) entry.cancelled = true;
   if (entry?.kind === "native_tui" && entry.ptySessionId) {
     await cancelNativeTuiSession(
@@ -725,6 +753,7 @@ export async function cancelAgentSession(sessionId: string): Promise<void> {
       newTrace,
     );
     live.delete(sessionId);
+    nativeTuiPeerDeliveryBySession.delete(sessionId);
     for (const l of doneListeners) {
       l(sessionId, { status: "cancelled", text: "" });
     }
@@ -766,6 +795,7 @@ export function closeAgentSessionRow(sessionId: string): void {
   const entry = live.get(sessionId);
   // Close the Kernel row before tearing down the runtime. The Kernel refusal
   // for an open assigned task must leave the seat visibly intact.
+  if (entry?.kind === "native_tui") assertNativeTuiTeardownAllowed(sessionId);
   try {
     kernelExecute(
       "close_agent_session",
@@ -788,6 +818,7 @@ export function closeAgentSessionRow(sessionId: string): void {
   if (entry.kind === "native_tui") {
     const teardown = nativeTuiTeardowns.begin(sessionId, entry as NativeTuiLive);
     live.delete(sessionId);
+    nativeTuiPeerDeliveryBySession.delete(sessionId);
     void teardown.catch(() => {});
   } else if (entry.kind === "host_acp" && entry.hostAcp) {
     cancelPendingPermissions(sessionId);
@@ -799,11 +830,16 @@ export function closeAgentSessionRow(sessionId: string): void {
 export async function disposeAgentHost(): Promise<void> {
   for (const [id, entry] of live) {
     if (entry.kind === "native_tui") {
-      await nativeTuiTeardowns.begin(id, entry as NativeTuiLive).catch(() => {});
+      try {
+        await nativeTuiTeardowns.begin(id, entry as NativeTuiLive);
+      } catch (error) {
+        if (error instanceof Error && error.message === UNDELIVERED_RESULT_ERROR) continue;
+      }
     } else if (entry.kind === "host_acp" && entry.hostAcp) {
       await tearDownHostAcp(entry.hostAcp).catch(() => {});
     }
     live.delete(id);
+    if (entry.kind === "native_tui") nativeTuiPeerDeliveryBySession.delete(id);
   }
   await nativeTuiTeardowns.awaitAll();
 }

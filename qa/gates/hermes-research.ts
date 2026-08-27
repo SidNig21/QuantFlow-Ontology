@@ -7,6 +7,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  writeFileSync,
   readdirSync,
   rmSync,
   statSync,
@@ -31,6 +32,13 @@ import {
 const REPO_ROOT = resolve(import.meta.dir, "../..");
 const COLLAB_ROOT = join(REPO_ROOT, "collab-electron");
 const TEMP_KERNEL_DB_NAME = ["kernel", "db"].join(".");
+const SYNTHETIC_MARKET_SOURCE_PAYLOAD = `${JSON.stringify({ fixture: "wo-v2-2-hermes-market" })}\n`;
+const SYNTHETIC_MARKET_SOURCE_ARTIFACT_ID = createHash("sha256").update(SYNTHETIC_MARKET_SOURCE_PAYLOAD).digest("hex");
+const CRITIC_FALSIFIER_MODES = [
+  "missing-review-task-id",
+  "mismatched-source-work",
+  "substituted-result-artifact-id",
+] as const;
 const BOUNDARIES = [
   "dock_admission",
   "launch_readiness",
@@ -528,6 +536,9 @@ async function launch(
   delete env.QF_DOCK_QA_MODE;
   env.QF_HERMES_SYNTHETIC_TEST = "1";
   env.QF_PEER_BUS_DB = busDb;
+  if (process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY === "substituted-result-artifact-id") {
+    env.QF_HERMES_SYNTHETIC_SUBSTITUTED_RESULT_ARTIFACT_ID = SYNTHETIC_MARKET_SOURCE_ARTIFACT_ID;
+  }
   if (suppressed) env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY = suppressed;
   else delete env.QF_HERMES_SYNTHETIC_SUPPRESS_BOUNDARY;
   const endpointFile = join(env.USERPROFILE!, ".quantflow", "app", "socket-path");
@@ -547,7 +558,7 @@ async function launch(
     const readiness = ready.readiness as Record<string, unknown>;
     const identity = readiness.buildIdentity as Record<string, unknown> | undefined;
     assert(identity?.commitSha && identity?.packagedAt, "packaged app readiness omitted build identity");
-    assert(readiness.dockProfileIds?.includes("hermes-orchestrator"), "production Hermes orchestrator profile is absent");
+    assert(readiness.dockProfileIds?.includes("hermes-research-director"), "production Hermes Research Director profile is absent");
     assert(readiness.dockProfileIds?.includes("hermes-worker"), "production Hermes worker profile is absent");
     assert(readiness.dockProfileIds?.includes("hermes-critic"), "production Hermes critic profile is absent");
     const afterReady = await processSnapshot();
@@ -573,14 +584,20 @@ async function launch(
       }
       console.log("windows-hermes-research: FALSIFY RED future Dataset after as_of refused; FALSIFY GREEN no downstream objects");
     }
-    const seeded = await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: false }) as Record<string, unknown>;
-    const datasetId = String(seeded.object_id ?? seeded.id ?? "");
+    const fixture = await rpcCall(ready.endpoint, "qf.research.seed_fixture_dataset", { include_future_row: false, r17_technique: true }) as Record<string, unknown>;
+    const dataset = fixture.dataset as Record<string, unknown>;
+    const strategies = fixture.strategies as Array<Record<string, unknown>>;
+    const strategyId = String(strategies.find((row) => Number(row.version) === 2)?.strategy_id ?? "");
+    assert(dataset && strategyId, "fixture seed did not return Dataset and v2 Technique");
+    const datasetId = String(dataset.object_id ?? "");
     assert(datasetId.startsWith("dataset:"), `fixture seed did not return a Dataset id: ${datasetId}`);
+    assert(strategyId.startsWith("strategy:"), `fixture seed did not return a v2 Technique id: ${strategyId}`);
     const submitted = await rpcCall(ready.endpoint, "qf.research.submit_question", {
       mission_id: "wo-v2-2-synthetic",
       question: "Does the packaged deterministic fixture preserve the declared bounded edge signal?",
       dataset_id: datasetId,
-      definition_id: "hermes-orchestrator",
+      strategy_id: strategyId,
+      definition_id: "hermes-research-director",
     }, 120_000) as Record<string, unknown>;
     assert(typeof submitted.ptySessionId === "string", "research submission omitted PTY session id");
     const submission = { ...submitted, datasetId, endpoint: ready.endpoint, identity };
@@ -655,9 +672,9 @@ function readResearch(tempRoot: string, hypothesisId: string): {
   producedBy: string;
   question: string;
   metrics: Record<string, unknown>;
+  strategyId: string;
 } | null {
   const kernelDb = join(tempRoot, "stores", TEMP_KERNEL_DB_NAME);
-  const artifactRoot = join(tempRoot, "stores", "artifacts");
   if (!existsSync(kernelDb)) return null;
   const db = new Database(kernelDb, { readonly: true });
   try {
@@ -688,6 +705,7 @@ function readResearch(tempRoot: string, hypothesisId: string): {
     const datasetId = String(runParams.dataset_id ?? "");
     const resultId = String(runParams.result_artifact_id ?? "");
     const datasetArtifactId = String(runParams.dataset_artifact_id ?? "");
+    const strategyId = String(runParams.strategy_id ?? "");
     const dataset = getObject(db, "dataset", datasetId);
     const result = artifactReceipt(db, resultId);
     const datasetArtifact = artifactReceipt(db, datasetArtifactId);
@@ -697,25 +715,65 @@ function readResearch(tempRoot: string, hypothesisId: string): {
     const resultMetrics = jsonRecord(JSON.stringify(resultPayload.metrics));
     const reportPayload = JSON.parse(readFileSync(String(report.storage_ref), "utf8")) as Record<string, unknown>;
     const performed = db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'performed_by'").get(String(evaluation.id)) as { to_id?: string } | null;
-    const evidence = reportPayload.evidence as Record<string, unknown> | undefined;
-    const workerResultId = String((evidence?.worker_result_artifact as Record<string, unknown>)?.id ?? "");
-    const workerResult = artifactReceipt(db, workerResultId);
-    const workerProducer = workerResultId
-      ? db.query("SELECT from_id FROM links WHERE kind = 'produces' AND to_id = ?").get(workerResultId) as { from_id?: string } | null
+    const sourceWork = reportPayload.source_work && typeof reportPayload.source_work === "object" && !Array.isArray(reportPayload.source_work)
+      ? reportPayload.source_work as Record<string, unknown>
+      : {};
+    const sourceResult = reportPayload.source_result && typeof reportPayload.source_result === "object" && !Array.isArray(reportPayload.source_result)
+      ? reportPayload.source_result as Record<string, unknown>
+      : {};
+    const publication = reportPayload.publication_evaluation && typeof reportPayload.publication_evaluation === "object" && !Array.isArray(reportPayload.publication_evaluation)
+      ? reportPayload.publication_evaluation as Record<string, unknown>
+      : {};
+    const findingsId = String(publication.findings_artifact_id ?? "");
+    const findings = artifactReceipt(db, findingsId);
+    const sourceWorkKeys = ["executor_session_id", "hypothesis_id", "result_artifact_id", "run_id", "source_task_id"];
+    const publicationKeys = ["confidence", "critic_session_id", "evaluation_id", "findings_artifact_id", "findings_content_hash", "rationale", "rubric", "overall", "verdict"];
+    assert(Object.keys(reportPayload).sort().join(",") === "publication_evaluation,schema,source_result,source_work", "Report has non-canonical top-level fields");
+    assert(String(reportPayload.schema) === "qf.research.report.v2", "Report schema is not qf.research.report.v2");
+    const storedSourceWork = jsonRecord(evaluation.source_work);
+    for (const key of sourceWorkKeys) {
+      assert(typeof sourceWork[key] === "string" && String(sourceWork[key]).length > 0, `Report source_work.${key} is invalid`);
+      assert(sourceWork[key] === storedSourceWork[key], `Report source_work.${key} drifted from the frozen work`);
+    }
+    assert(sourceWork.hypothesis_id === hypothesisId, "Report source_work selected the wrong Hypothesis");
+    assert(sourceWork.run_id === String(run.id), "Report source_work selected the wrong Run");
+    assert(sourceWork.result_artifact_id === result.id, "Report source_work selected the wrong result Artifact");
+    assert(String(sourceResult.artifact_id) === result.id, "Report source_result omitted the exact result Artifact id");
+    assert(String(sourceResult.content_hash) === result.content_hash, "Report source_result omitted the exact result Artifact hash");
+    assert(String(publication.evaluation_id) === String(evaluation.id), "Report publication_evaluation selected the wrong Evaluation");
+    assert(String(publication.critic_session_id) === String(performed?.to_id ?? ""), "Report publication_evaluation selected the wrong critic session");
+    assert(publication.verdict === "supports", "Report publication_evaluation verdict is not supports");
+    assert(String(publication.findings_content_hash) === String(findings?.content_hash ?? ""), "Report findings hash is not the durable findings Artifact hash");
+    const rubric = publication.rubric && typeof publication.rubric === "object" && !Array.isArray(publication.rubric)
+      ? publication.rubric as Record<string, unknown>
+      : {};
+    assert(Object.keys(rubric).sort().join(",") === "answer_relevancy,context_precision,context_recall,faithfulness", "Report rubric fields are not exact");
+    assert(JSON.stringify(rubric) === String(evaluation.rubric), "Report rubric drifted from the durable Evaluation");
+    assert(Number(publication.overall) === Number(evaluation.overall), "Report overall drifted from the durable Evaluation");
+    assert(Number(publication.confidence) === Number(evaluation.confidence), "Report confidence drifted from the durable Evaluation");
+    assert(String(publication.rationale) === String(evaluation.rationale), "Report rationale drifted from the durable Evaluation");
+    const workerResultRow = db.query(`
+      SELECT artifact.* FROM artifact
+      JOIN links p ON p.to_id = artifact.id AND p.kind = 'produces' AND p.from_id = ?
+      WHERE artifact.kind = 'result_set'
+      ORDER BY artifact.created_at DESC, artifact.id DESC LIMIT 1
+    `).get(String(sourceWork.executor_session_id)) as Record<string, unknown> | null;
+    const workerResult = workerResultRow ? artifactReceipt(db, String(workerResultRow.id)) : null;
+    const workerProducer = workerResult
+      ? db.query("SELECT from_id FROM links WHERE kind = 'produces' AND to_id = ?").get(workerResult.id) as { from_id?: string } | null
       : null;
-    const reportTrajectoryIds = Array.isArray(evidence?.market_read_trajectory_artifacts)
-      ? evidence.market_read_trajectory_artifacts
-        .map((item) => item && typeof item === "object" ? String((item as Record<string, unknown>).id ?? "") : "")
-        .filter(Boolean)
+    const reportTrajectoryIds = workerResult
+      ? db.query("SELECT to_id FROM links WHERE from_id = ? AND kind = 'derived_from'").all(workerResult.id) as Array<{ to_id: string }>
       : [];
-    const readTrajectory = reportTrajectoryIds.flatMap((trajectoryId) => {
+    const readTrajectory = reportTrajectoryIds.flatMap(({ to_id: trajectoryId }) => {
       const receipt = artifactReceipt(db, trajectoryId);
       return receipt?.kind === "trajectory" ? [receipt] : [];
     });
-    if (!performed?.to_id || !workerResult || !workerProducer?.from_id || readTrajectory.length === 0) return null;
+    if (!performed?.to_id || !workerResult || !workerProducer?.from_id || readTrajectory.length === 0 || !findings) return null;
     const producerSession = getObject(db, "agent_session", workerProducer.from_id);
     assert(String(producerSession?.label ?? "").toLowerCase().includes("worker"), "Report evidence was not produced by a worker session");
     assert(performed.to_id !== workerProducer.from_id, "critic and worker lineage collapsed to one session");
+    assert(workerProducer.from_id === sourceWork.executor_session_id, "worker result is not bound to the frozen executor session");
     const reportPath = reportReceipt.storage_ref!;
     assert(existsSync(reportPath), `report storage path is absent: ${reportPath}`);
     assert(sha256File(reportPath) === reportReceipt.content_hash, "Report content hash does not match durable bytes");
@@ -728,14 +786,7 @@ function readResearch(tempRoot: string, hypothesisId: string): {
     assert(String(dataset.as_of) === "2026-08-09T12:00:00.000Z", "Dataset as_of changed unexpectedly");
     assert(String(evaluation.verdict) === "supports", "positive control did not produce a supporting Evaluation");
     assert(JSON.stringify(resultMetrics) === JSON.stringify(jsonRecord(evaluation.metrics)), "critic did not consume the exact durable Run metrics");
-    assert(String(reportPayload.evaluation_id) === String(evaluation.id), "Report omitted the exact Evaluation id");
-    assert(String((reportPayload.hypothesis as Record<string, unknown>)?.id) === hypothesisId, "Report selected the wrong Hypothesis");
-    assert(String((reportPayload.run as Record<string, unknown>)?.id) === String(run.id), "Report selected the wrong Run");
-    assert(String((reportPayload.evaluation as Record<string, unknown>)?.id) === String(evaluation.id), "Report embedded the wrong Evaluation");
-    assert(String((evidence?.worker_result_artifact as Record<string, unknown>)?.content_hash) === workerResult.content_hash, "Report omitted the exact worker result hash");
-    assert(Array.isArray(evidence?.market_read_trajectory_artifacts), "Report omitted market-read trajectory receipts");
-    assert((evidence?.dataset_artifact as Record<string, unknown>)?.content_hash === datasetArtifact.content_hash, "Report Dataset hash is not exact");
-    assert((evidence?.result_artifact as Record<string, unknown>)?.content_hash === result.content_hash, "Report result hash is not exact");
+    assert(strategyId.startsWith("strategy:"), "Run params omitted the durable v2 Technique id");
     return {
       dataset,
       run,
@@ -750,6 +801,7 @@ function readResearch(tempRoot: string, hypothesisId: string): {
       producedBy: workerProducer.from_id,
       question: String(hypothesis.claim),
       metrics: resultMetrics,
+      strategyId,
     };
   } finally {
     db.close();
@@ -954,6 +1006,22 @@ async function researchFor(launchState: Launch, hypothesisId: string, timeoutMs 
 }
 
 async function runBoundaryFalsifiers(packageRoot: string, identity: Identity): Promise<void> {
+function researchCounts(tempRoot: string): { evaluation_count: number; report_count: number } {
+  const kernelDb = join(tempRoot, "stores", TEMP_KERNEL_DB_NAME);
+  const db = new Database(kernelDb, { readonly: true });
+  try {
+    const evaluation = db.query("SELECT COUNT(*) AS count FROM evaluation").get() as { count: number };
+    const report = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
+    return { evaluation_count: Number(evaluation.count), report_count: Number(report.count) };
+  } finally {
+    db.close();
+  }
+}
+
+function successfulRecordEvaluationOutputCount(output: string): number {
+  return [...output.matchAll(/boundary=tool_output[^\r\n]*tool=qf_record_evaluation/g)].length;
+}
+
   for (const boundary of BOUNDARIES) {
     const redRoot = createGateTempRoot(`qf-boundary-red-${boundary}-`);
     let red: Launch | null = null;
@@ -1151,7 +1219,6 @@ async function runGateFalsifiers(launchState: Launch): Promise<void> {
   assert(result.missing_report && result.rejects_evaluation && result.changed_repeat, "Kernel falsifier receipt set is incomplete");
   console.log("hermes-first-turn-synthetic: FALSIFY GREEN missing Evaluation, rejects Evaluation, and changed replay restored to accepted positive-control boundaries");
 }
-
 async function runResearchPackage(packageRoot: string, label: "hermes-first-turn-synthetic" | "windows-hermes-research-chain"): Promise<void> {
   const tempRoot = createGateTempRoot(`qf-${label}-`);
   let run: Launch | null = null;
@@ -1159,8 +1226,35 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
     run = await launch(packageRoot, tempRoot, null, label);
     const submission = run.submission;
     const hypothesisId = String(submission.hypothesisId);
-    console.log(`${label}: dock_admission=pass definition=hermes-orchestrator session=${submission.sessionId}`);
+    console.log(`${label}: dock_admission=pass definition=hermes-research-director session=${submission.sessionId}`);
     console.log(`${label}: launch_readiness=pass pty_session=${run.ptySessionId}`);
+    const criticFalsifier = process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY ?? "";
+    if (criticFalsifier) {
+      const before = researchCounts(tempRoot);
+      const ptyOutput = await captureUntil(run, "boundary=result_return");
+      const fullOutput = `${ptyOutput}\n${await captureFor(run, 12_000)}`;
+      const after = researchCounts(tempRoot);
+      const qfRecordEvaluationCalls = successfulRecordEvaluationOutputCount(fullOutput);
+      const restored = before.evaluation_count === after.evaluation_count && before.report_count === after.report_count;
+      const outputPath = join(tempRoot, "critic-activation-falsifier-output.log");
+      writeFileSync(outputPath, fullOutput, "utf8");
+      assert(qfRecordEvaluationCalls === 0, `critic activation falsifier reached a successful qf_record_evaluation: ${qfRecordEvaluationCalls}`);
+      assert(restored, `critic activation falsifier changed durable counts: before=${JSON.stringify(before)} after=${JSON.stringify(after)}`);
+      console.log(`${label}: critic-activation-falsifier=${JSON.stringify({
+        falsifier: criticFalsifier,
+        qf_record_evaluation_calls: qfRecordEvaluationCalls,
+        evaluation_count_before: before.evaluation_count,
+        evaluation_count_after: after.evaluation_count,
+        report_count_before: before.report_count,
+        report_count_after: after.report_count,
+        expected_exit: 1,
+        actual_exit: 1,
+        restored,
+        normal_rerun_exit: "pending",
+        output_path: outputPath,
+      })}`);
+      throw new Error(`critic activation falsifier ${criticFalsifier} rejected before publication`);
+    }
     const evidencePromise = (async () => {
       const deadline = Date.now() + 90_000;
       while (Date.now() < deadline) {
@@ -1196,14 +1290,15 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
       critic_session: evidence.performedBy,
       report_artifact: evidence.report,
     })}`);
-    console.log(`${label}: metrics=${JSON.stringify(evidence.metrics)} as_of=${String(evidence.dataset.as_of)} report_evaluation_id=${String(evidence.reportPayload.evaluation_id)}`);
+    console.log(`${label}: metrics=${JSON.stringify(evidence.metrics)} as_of=${String(evidence.dataset.as_of)} report_evaluation_id=${String((evidence.reportPayload.publication_evaluation as Record<string, unknown>).evaluation_id)}`);
     console.log(`${label}: l4_candidate_ready=true l4_certified=false live_turn_count=0 retry_count=0`);
     if (label === "hermes-first-turn-synthetic") {
       const secondSubmission = await rpcCall(run.endpoint, "qf.research.submit_question", {
         mission_id: "wo-v2-2-synthetic-second-run",
         question: "Does the second packaged worker preserve the same bounded edge signal without borrowing first-run evidence?",
         dataset_id: String(submission.datasetId),
-        definition_id: "hermes-orchestrator",
+        strategy_id: evidence.strategyId,
+        definition_id: "hermes-research-director",
       }) as Record<string, unknown>;
       const secondRun = { ...run, ptySessionId: String(secondSubmission.ptySessionId) };
       const secondOutput = await captureUntil(secondRun, "boundary=result_return");
@@ -1212,8 +1307,8 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
       assert(secondEvidence.run.id !== evidence.run.id, "multi-run falsifier did not create a second Run");
       assert(secondEvidence.producedBy !== evidence.producedBy, "multi-worker falsifier reused the first worker");
       assert(secondEvidence.workerResult.id !== evidence.workerResult.id, "multi-worker falsifier reused the first result Artifact");
-      assert(secondEvidence.reportPayload.evaluation_id !== evidence.reportPayload.evaluation_id, "multi-run falsifier reused the first Evaluation");
-      assert(secondEvidence.reportPayload.evidence && JSON.stringify(secondEvidence.reportPayload.evidence) !== JSON.stringify(evidence.reportPayload.evidence), "Report evidence was not tied to the evaluated Run");
+      assert(String((secondEvidence.reportPayload.publication_evaluation as Record<string, unknown>).evaluation_id) !== String((evidence.reportPayload.publication_evaluation as Record<string, unknown>).evaluation_id), "multi-run falsifier reused the first Evaluation");
+      assert(String((secondEvidence.reportPayload.source_work as Record<string, unknown>).run_id) === String(secondEvidence.run.id), "Report source work was not tied to the evaluated Run");
       console.log(`${label}: FALSIFY RED multi-run/multi-worker swapped first trajectory rejected; FALSIFY GREEN exact-run evidence restored=${JSON.stringify({ first_run: evidence.run.id, first_worker: evidence.producedBy, second_run: secondEvidence.run.id, second_worker: secondEvidence.producedBy })}`);
       await runGateFalsifiers(run);
     }
@@ -1273,6 +1368,11 @@ export async function runHermesFirstTurnSyntheticGate(): Promise<{ ok: boolean }
     return { ok: false };
   }
   beginCleanupTracking("hermes-first-turn-synthetic");
+  const criticFalsifier = process.env.QF_HERMES_SYNTHETIC_CRITIC_FALSIFY ?? "";
+  if (criticFalsifier && !CRITIC_FALSIFIER_MODES.includes(criticFalsifier as typeof CRITIC_FALSIFIER_MODES[number])) {
+    console.error(`hermes-first-turn-synthetic: FAIL unknown critic activation falsifier: ${criticFalsifier}`);
+    return { ok: false };
+  }
   let gateOk = false;
   try {
     const identity = setBuildIdentity();

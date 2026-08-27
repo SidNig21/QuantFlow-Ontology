@@ -668,6 +668,28 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "golden-g5-consumer-census",
+    description:
+      "G5: legacy Agent Chat/standalone Terminal closure with protected current consumer census",
+    run: async () => {
+      const { runGoldenG5ConsumerCensusGate } = await import(
+        "./gates/golden-g5-consumer-census.ts"
+      );
+      return runGoldenG5ConsumerCensusGate().ok;
+    },
+  },
+  {
+    name: "golden-g5-saved-state",
+    description:
+      "G5: supported Canvas/window predecessor restoration and obsolete-record disposition",
+    run: async () => {
+      const { runGoldenG5SavedStateGate } = await import(
+        "./gates/golden-g5-saved-state.ts"
+      );
+      return runGoldenG5SavedStateGate().ok;
+    },
+  },
+  {
     name: "golden-g4-retired-route",
     description:
       "G4: route-aware staged package closure admits native_tui/host_acp and rejects retired or unknown routes before mutation",

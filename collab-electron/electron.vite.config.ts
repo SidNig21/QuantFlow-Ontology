@@ -95,7 +95,7 @@ export default defineConfig({
         input: {
           nav: resolve(__dirname, "src/windows/nav/index.html"),
           viewer: resolve(__dirname, "src/windows/viewer/index.html"),
-          terminal: resolve(__dirname, "src/windows/terminal/index.html"),
+
           settings: resolve(__dirname, "src/windows/settings/index.html"),
           shell: resolve(__dirname, "src/windows/shell/index.html"),
           "terminal-tile": resolve(
@@ -115,10 +115,6 @@ export default defineConfig({
             "src/windows/session-tile/index.html",
           ),
           "tile-list": resolve(__dirname, "src/windows/tile-list/index.html"),
-          "agent-chat": resolve(
-            __dirname,
-            "src/windows/agent-chat/index.html",
-          ),
         },
       },
     },

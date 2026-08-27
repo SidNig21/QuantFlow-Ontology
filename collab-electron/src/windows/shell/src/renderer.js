@@ -268,7 +268,6 @@ async function init() {
 	});
 	panelManager.initPrefs(prefNavWidth, prefSidebarMode);
 
-	let agentWebview = null;
 	let canvasToastTimer = null;
 	function showCanvasToast(message, { tone = "neutral" } = {}) {
 		const toast = document.getElementById("canvas-toast");
@@ -438,9 +437,6 @@ async function init() {
 			"canvas-opacity", opacity,
 		);
 		tileListWebview.send("canvas-opacity", opacity);
-		if (agentWebview) {
-			agentWebview.send("canvas-opacity", opacity);
-		}
 	};
 	broadcastCanvasOpacity();
 
@@ -929,11 +925,6 @@ async function init() {
 			}
 		}
 
-		if (surface === "agent" && agentWebview && agentPanel.isVisible()) {
-			agentWebview.webview.focus();
-			noteSurfaceFocus("agent");
-			return;
-		}
 
 		requestAnimationFrame(() => {
 			window.focus();
@@ -971,7 +962,6 @@ async function init() {
 		agentToggle.blur();
 		singletonViewer.webview.blur();
 		workspaceManager.getNavWebview().webview.blur();
-		if (agentWebview) agentWebview.webview.blur();
 	}
 
 	// -- getAllWebviews aggregator --
@@ -981,7 +971,6 @@ async function init() {
 		all.push(singletonViewer);
 		all.push(tileListWebview);
 		all.push(singletonWebviews.settings);
-		if (agentWebview) all.push(agentWebview);
 		for (const [, dom] of tileManager.getTileDOMs()) {
 			if (dom.webview) {
 				all.push({

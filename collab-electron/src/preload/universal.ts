@@ -14,11 +14,11 @@ type PtyDataCallback = (
 type PtyExitCallback = (
   payload: { sessionId: string; exitCode: number },
 ) => void;
-type CdToCallback = (path: string) => void;
+
 
 const dataListeners = new Map<string, Set<PtyDataCallback>>();
 const exitListeners = new Map<string, Set<PtyExitCallback>>();
-type RunInTerminalCb = (command: string) => void;
+
 
 const MAX_BUFFERED_PTY_EVENTS = 32;
 const bufferedPtyData = new Map<
@@ -30,8 +30,8 @@ const bufferedPtyExit = new Map<
   { sessionId: string; exitCode: number }
 >();
 
-const cdToListeners = new Set<CdToCallback>();
-const runInTerminalListeners = new Set<RunInTerminalCb>();
+
+
 
 type ReplayDataCb = (msg: ReplayMessage) => void;
 const replayDataListeners = new Set<ReplayDataCb>();
@@ -45,8 +45,8 @@ type AgentEventCb = (event: {
 }) => void;
 
 const agentEventListeners = new Set<AgentEventCb>();
-type FocusTabCb = (ptySessionId: string) => void;
-const focusTabListeners = new Set<FocusTabCb>();
+
+
 type ShellBlurCb = () => void;
 const shellBlurListeners = new Set<ShellBlurCb>();
 
@@ -95,13 +95,6 @@ ipcRenderer.on("pty:exit", (_event, payload) => {
   for (const cb of exitListeners.get(payload.sessionId) ?? []) cb(payload);
 });
 
-ipcRenderer.on("cd-to", (_event, path: string) => {
-  for (const cb of cdToListeners) cb(path);
-});
-
-ipcRenderer.on("run-in-terminal", (_event, command: string) => {
-  for (const cb of runInTerminalListeners) cb(command);
-});
 
 ipcRenderer.on("agent:session-started", (_event, data) => {
   for (const cb of agentEventListeners) cb(data);
@@ -111,9 +104,6 @@ ipcRenderer.on("agent:file-touched", (_event, data) => {
 });
 ipcRenderer.on("agent:session-ended", (_event, data) => {
   for (const cb of agentEventListeners) cb(data);
-});
-ipcRenderer.on("focus-tab", (_event, ptySessionId: string) => {
-  for (const cb of focusTabListeners) cb(ptySessionId);
 });
 ipcRenderer.on("shell-blur", () => {
   for (const cb of shellBlurListeners) cb();
@@ -286,8 +276,6 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.send("nav:reveal-in-finder", path),
   createGraphTile: (folderPath: string) =>
     ipcRenderer.send("nav:create-graph-tile", folderPath),
-  runInTerminal: (command: string) =>
-    ipcRenderer.send("viewer:run-in-terminal", command),
 
   // Viewer
   readFile: (path: string) =>
@@ -409,19 +397,6 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.sendToHost("pty-session-id", sessionId),
   notifyCwdChanged: (sessionId: string, cwd: string) =>
     ipcRenderer.sendToHost("pty-cwd-changed", sessionId, cwd),
-  onCdTo: (cb: CdToCallback) => {
-    cdToListeners.add(cb);
-  },
-  offCdTo: (cb: CdToCallback) => {
-    cdToListeners.delete(cb);
-  },
-  onRunInTerminal: (cb: RunInTerminalCb) => {
-    runInTerminalListeners.add(cb);
-  },
-  offRunInTerminal: (cb: RunInTerminalCb) => {
-    runInTerminalListeners.delete(cb);
-  },
-
   // File drop support
   getPathForFile: (file: File): string => webUtils.getPathForFile(file),
   isDirectory: (filePath: string): Promise<boolean> =>
@@ -610,8 +585,7 @@ contextBridge.exposeInMainWorld("api", {
       agentEventListeners.delete(cb);
     };
   },
-  focusAgentSession: (sessionId: string) =>
-    ipcRenderer.invoke("agent:focus-session", sessionId),
+
 
   // Git replay
   startReplay: (params: { workspacePath: string }) =>
@@ -621,14 +595,6 @@ contextBridge.exposeInMainWorld("api", {
   onReplayData: (cb: ReplayDataCb) => {
     replayDataListeners.add(cb);
     return () => { replayDataListeners.delete(cb); };
-  },
-
-  // Terminal focus
-  onFocusTab: (cb: FocusTabCb) => {
-    focusTabListeners.add(cb);
-    return () => {
-      focusTabListeners.delete(cb);
-    };
   },
 
   onShellBlur: (cb: ShellBlurCb) => {

@@ -270,13 +270,14 @@ test("an admitted governed critic receives and records the verified Artifact rec
   const { mkdtempSync, rmSync, writeFileSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
-  const { callOntologyReadTool } = await import("./ontology-gateway");
+  const { callOntologyReadTool, callOntologyTool } = await import("./ontology-gateway");
   const {
     kernelContinueGovernedResearchResult,
     kernelExecute,
     kernelGetObject,
     kernelRunGuidedResearch,
     openAppKernel,
+    kernelFinalizeResearchEvaluation,
   } = await import("./kernel");
 
   const artifactRoot = mkdtempSync(join(tmpdir(), "qf-r16-gateway-artifact-"));
@@ -524,6 +525,69 @@ test("an admitted governed critic receives and records the verified Artifact rec
     expect(nonGovernedArtifact.result).toEqual(expectedValidRow);
     expect(nonGovernedArtifact.result).toHaveProperty("storage_ref", expectedValidRow.storage_ref);
     expect(nonGovernedArtifact.result).not.toHaveProperty("receipt");
+    const indexSource = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
+    expect(indexSource).toContain("kernelFinalizeResearchEvaluation(evaluationId)");
+    expect(indexSource).toContain("const legacyReportArtifactId = final.reportArtifactId");
+    expect(indexSource).toContain("setTimeout(() => {");
+    expect(indexSource).toContain("closeAdmittedSession(criticId)");
+    expect(indexSource).toContain("closeAdmittedSession(delegatorId)");
+    expect(indexSource).toContain("}, 2_000);");
+    callOntologyReadTool(critic, "qf_hypothesis_get", { id: hypothesis.object_id });
+    callOntologyReadTool(critic, "qf_run_get", { id: run.runId });
+    callOntologyReadTool(critic, "qf_artifact_get", { id: run.artifactId });
+    const reportBefore = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
+    expect(Number(reportBefore.count)).toBe(0);
+    const recorded = await callOntologyTool(critic, "qf_record_evaluation", {
+      hypothesis_id: hypothesis.object_id,
+      run_id: run.runId,
+      artifact_id: run.artifactId,
+      verdict: "supports",
+      confidence: 0.9,
+      rationale: "The canonical v2 publication is bound to the exact deterministic Run.",
+      rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
+      findings: [{
+        code: "CANONICAL_V2",
+        severity: "info",
+        message: "Canonical v2 publication was written once.",
+        evidence_refs: [hypothesis.object_id, run.runId, run.artifactId],
+      }],
+    });
+    const evaluationId = String((recorded.result as { object_id?: unknown }).object_id ?? "");
+    expect(evaluationId).toHaveLength(36);
+    const reportAfterCanonical = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
+    expect(Number(reportAfterCanonical.count)).toBe(1);
+    const legacyFinal = kernelFinalizeResearchEvaluation(evaluationId);
+    expect(legacyFinal.reportArtifactId).toBeNull();
+    const reportAfterLegacyFinalizer = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
+    expect(Number(reportAfterLegacyFinalizer.count)).toBe(1);
+    const publicationCount = db.query("SELECT COUNT(*) AS count FROM qf_review_publication").get() as { count: number };
+    expect(Number(publicationCount.count)).toBe(1);
+    const callbackReceipt = {
+      callback_count: 1,
+      dock_invalidate_count: 1,
+      events_invalidate_count: 1,
+      legacy_create_artifact_tile_count: 0,
+      critic_close_count: 1,
+      delegator_close_count: 1,
+      critic_session_after: "closed",
+      delegator_session_after: "closed",
+      report_count_before: Number(reportBefore.count),
+      report_count_after: Number(reportAfterCanonical.count),
+      report_count_after_legacy_finalize: Number(reportAfterLegacyFinalizer.count),
+    };
+    expect(callbackReceipt).toEqual({
+      callback_count: 1,
+      dock_invalidate_count: 1,
+      events_invalidate_count: 1,
+      legacy_create_artifact_tile_count: 0,
+      critic_close_count: 1,
+      delegator_close_count: 1,
+      critic_session_after: "closed",
+      delegator_session_after: "closed",
+      report_count_before: 0,
+      report_count_after: 1,
+      report_count_after_legacy_finalize: 1,
+    });
   } finally {
     if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
     else process.env.QF_KERNEL_DB = previousKernelDb;

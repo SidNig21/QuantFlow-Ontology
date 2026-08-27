@@ -155,7 +155,7 @@ function poll(): void {
   } finally {
     try {
       db?.close();
-    } catch {
+        } catch {
       /* ignore */
     }
   }

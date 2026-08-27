@@ -86,8 +86,8 @@ type PtyDataCb = (
 type PtyExitCb = (
   payload: { sessionId: string; exitCode: number },
 ) => void;
-type CdToCb = (path: string) => void;
-type RunInTerminalCb = (command: string) => void;
+
+
 
 interface AgentSessionEvent {
   kind: "session-started";
@@ -112,30 +112,6 @@ type AgentEvent =
   | AgentFileTouchedEvent
   | AgentSessionEndedEvent;
 
-export interface AcpUpdate {
-  sessionId: string;
-  update: {
-    sessionUpdate: string;
-    content?:
-      | { type: string; text?: string }
-      | Array<{
-        type: string;
-        content?: { type: string; text?: string };
-      }>;
-    toolCallId?: string;
-    title?: string;
-    kind?: string;
-    status?: string;
-    rawInput?: unknown;
-    rawOutput?: unknown;
-  };
-}
-
-interface AgentSpawnResult {
-  sessionId: string;
-  resumed: boolean;
-  cachedMessages: unknown[];
-}
 
 interface AgentInfo {
   id: string;
@@ -315,9 +291,6 @@ export interface CollabApi {
   offPtyData: (sessionId: string, cb: PtyDataCb) => void;
   onPtyExit: (sessionId: string, cb: PtyExitCb) => void;
   offPtyExit: (sessionId: string, cb: PtyExitCb) => void;
-  onCdTo: (cb: CdToCb) => void;
-  offCdTo: (cb: CdToCb) => void;
-
   // QuantFlow Kernel (WO-006b/c)
   qf: {
     execute: (
@@ -407,10 +380,6 @@ export interface CollabApi {
   openInTerminal: (path: string) => void;
   revealInFinder: (path: string) => void;
   createGraphTile: (folderPath: string) => void;
-  runInTerminal: (command: string) => void;
-  onRunInTerminal: (cb: RunInTerminalCb) => void;
-  offRunInTerminal: (cb: RunInTerminalCb) => void;
-
   // File drop support
   getPathForFile: (file: File) => string;
   isDirectory: (filePath: string) => Promise<boolean>;
@@ -491,30 +460,7 @@ export interface CollabApi {
 
   // Agent activity
   onAgentEvent: (cb: (event: AgentEvent) => void) => Unsubscribe;
-  focusAgentSession: (sessionId: string) => Promise<void>;
 
-  // ACP agent
-  agentSpawn: (cwd: string) => Promise<AgentSpawnResult>;
-  agentPrompt: (sessionId: string, text: string) => Promise<void>;
-  agentCancel: (sessionId: string) => Promise<void>;
-  agentKill: (sessionId: string) => Promise<void>;
-  agentSaveMessages: (messages: unknown[]) => Promise<void>;
-  onAgentUpdate: (cb: (params: AcpUpdate) => void) => Unsubscribe;
-  onAgentPromptComplete: (
-    cb: (data: { sessionId: string; stopReason: string }) => void,
-  ) => Unsubscribe;
-  onAgentPromptError: (
-    cb: (data: { sessionId: string; error: string }) => void,
-  ) => Unsubscribe;
-  onAgentExit: (
-    cb: (data: { sessionId: string }) => void,
-  ) => Unsubscribe;
-  onAgentSessionReady: (
-    cb: (data: { sessionId: string }) => void,
-  ) => Unsubscribe;
-  onAgentSessionFailed: (
-    cb: (data: { sessionId: string }) => void,
-  ) => Unsubscribe;
 
   // Terminal list (shell renderer ↔ webview)
   sendToHost: (channel: string, ...args: unknown[]) => void;
@@ -528,7 +474,7 @@ export interface CollabApi {
   ) => Unsubscribe;
 
   // Terminal focus (receiving end)
-  onFocusTab: (cb: (ptySessionId: string) => void) => Unsubscribe;
+
   onShellBlur: (cb: () => void) => Unsubscribe;
 
   // Canvas pinch forwarding

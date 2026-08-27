@@ -210,32 +210,6 @@ export function registerMiscHandlers(
     );
   });
 
-  ipcMain.handle(
-    "agent:focus-session",
-    (_event, sessionId: string) => {
-      const ptyId =
-        agentActivity.getPtySessionId(sessionId);
-      if (ptyId) {
-        ctx.forwardToWebview(
-          "terminal",
-          "focus-tab",
-          ptyId,
-        );
-      }
-    },
-  );
-
-  // Viewer: run in terminal
-  ipcMain.on(
-    "viewer:run-in-terminal",
-    (_event, command: string) => {
-      ctx.forwardToWebview(
-        "terminal",
-        "run-in-terminal",
-        command,
-      );
-    },
-  );
 
   // JSON-RPC methods
   registerMethod(

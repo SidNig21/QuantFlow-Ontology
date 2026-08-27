@@ -1118,7 +1118,7 @@ export function kernelRunGuidedResearch(
     ...(strategyId ? { strategy_id: strategyId } : { strategy_spec: {
       contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: scoreField,
     } }),
-    params: { limit: 1 },
+    params: { limit: 1, ...(strategyId ? { strategy_id: strategyId } : {}) },
   }, {
     trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId,
   }) as { object_id: string; state: Record<string, unknown> };
@@ -1152,6 +1152,13 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
     hypothesis_id: hypothesisId, evaluation_id: evaluationId, status,
   }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
   if (verdict !== "supports") return { reportArtifactId: null, hypothesisId, status };
+  let existingPublication: { report_artifact_id?: string } | null = null;
+  try {
+    existingPublication = getKernelDb().query(
+      "SELECT report_artifact_id FROM qf_review_publication WHERE publication_evaluation_id = ? LIMIT 1",
+    ).get(evaluationId) as { report_artifact_id?: string } | null;
+  } catch {}
+  if (existingPublication?.report_artifact_id) return { reportArtifactId: null, hypothesisId, status };
 
   const run = kernelGetObject("run", runId);
   const runParams = jsonRecord(run?.params);
