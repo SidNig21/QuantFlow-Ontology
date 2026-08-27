@@ -501,3 +501,11 @@ The repair must not introduce fallback, fake completion, resurrection, timeout o
 The later Builder must prove the old-red/new-green lifecycle falsifier, normal `bun qa/run.ts hermes-first-turn-synthetic`, and the unchanged G5 matrix. The trace must be inert when disabled. The final proof receipt must show `processes=0`, `roots_remaining=0`, and `leaked=[]`. The isolated lifecycle proof must stop at the first broken transition and preserve the exact Director receipt before `result_return`.
 
 No product repair is authorized outside this boundary. No full G8/G9 reorder, deletion-scope change, fallback, synthetic completion, resurrection, timeout weakening, cleanup weakening, or other G5 expansion is authorized.
+
+## Finite G8 prerequisite amendment
+
+This amendment supersedes only the named result-delivery file boundary for one finite G8 Kernel/schema proof-integrity prerequisite. It authorizes editing exactly `collab-electron/src/main/kernel.ts`, `qa/gates/hermes-research.ts`, and G5 evidence files. In `kernelRunGuidedResearch`, remove only the duplicate nested `params.strategy_id` field. Retain the existing top-level `strategy_id` action field unchanged. Do not modify the Kernel callee, generated schema, governed-review implementation, Report publication, runtime identity, or any G5 deletion path.
+
+Add one focused old-red/new-green falsifier: with the duplicate nested field restored, the focused path must fail before Run creation with `params rejects fields: strategy_id`; with only that duplicate removed, the unchanged `hermes-first-turn-synthetic` gate must prove the complete Run -> independent critic -> Evaluation -> canonical `qf.research.report.v2` chain. All existing assertions, falsifiers, timeouts, cleanup rules, and the full G5 matrix remain unchanged.
+
+Full G8 remains in its original order; full G9 remains after G8. This amendment does not reorder or open either group.
