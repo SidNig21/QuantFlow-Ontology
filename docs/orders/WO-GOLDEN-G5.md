@@ -1,13 +1,13 @@
 # WO-GOLDEN-G5 — Retire legacy ACP and unconsumed renderers
 
-status: **DRAFT / READER ONLY**
+status: **DRAFT / FRESH FINITE READER ACCEPTED — BOUNDED REPAIR ONLY**
 order-type: Golden Baseline Phase 2 non-rung group
 branch: `wo-golden-g2`
 founder-approved-route: G5 — Legacy ACP and unconsumed renderers
 parent-group: G4 **CLOSED / ACCEPTED** at `2d491f20a030b9ac0b476846535f2ecc71239af1`
 r18-authority: **FROZEN**
 main-authority: **NONE**
-builder-authority: **NONE UNTIL READER YES/YES + LATER NEXT.md ROTATION**
+builder-authority: **LATER BOUNDED RESULT-DELIVERY REPAIR ONLY — EXACT CONTRACT BELOW**
 
 ## Outcome and one meaning
 
@@ -22,7 +22,7 @@ One fresh semantic Reader must answer exactly:
 1. Can every acceptance gate actually fail on the defect it names?
 2. Does every deliverable have exactly one meaning?
 
-The Reader must adjudicate current compatibility from source, package output, saved-state shapes, and the accepted product path. `NEXT.md` is Reader-only. No mutation is authorized by this draft.
+The Reader must adjudicate current compatibility from source, package output, saved-state shapes, and the accepted product path. `NEXT.md` is Reader-only. No mutation is authorized outside an accepted bounded contract below.
 
 ## Mandatory starting census
 
@@ -476,6 +476,28 @@ No full G8 or G9 reorder is open. A new fresh semantic Reader must return `YES /
 - No assertion, timeout, cleanup, grammar, fallback, Report/Evaluation semantic, group order, or G5 deletion change. Do not accept worker completion as `result_return`.
 - Stop after the first broken transition. Fresh finite Reader required before repair. No full G8/G9 reorder.
 
-### Required diagnostic-only execution boundary
+### Final fresh Reader result-delivery contract
 
-Do not resume product repair. The Builder must first commit only this authority record and the corresponding `NEXT.md` status update. Then implement only the default-off diagnostic trace within the named boundary, preserve the existing G5 diff, run one isolated normal `hermes-first-turn-synthetic` trace with a durable log and clean shutdown, and do not repair the discovered product defect. If instrumentation changes normal behavior, fails to isolate, or requires any file outside the listed boundary, stop.
+This section supersedes the preceding result-delivery diagnostic stop only to authorize the one bounded repair below. Every earlier G5 constraint remains binding. The final fresh semantic Reader returned **YES / YES**: every gate is fail-capable on the defect it names, and every deliverable has exactly one meaning.
+
+#### Cause and trace
+
+Cause: `closeAgentSessionRow` admits native-TUI teardown after `complete_task` because it checks for an open assigned Task but not undelivered result messages.
+
+The causal trace is fixed: the orchestrator PTY registered at sequence 2; explicit teardown unregistered it at sequence 7; the exact result was queued/looked up at sequence 8 with `pushed_at=NULL`; and the later PTY exit was non-causal.
+
+The actual Director receipt must be preserved before `result_return`. A worker `turn=complete` is intermediate only and is never accepted as `result_return`.
+
+#### Exact later-Builder boundary
+
+The later Builder may edit only `collab-electron/src/main/agent-host.ts`, specifically the teardown admission in `closeAgentSessionRow`, `cancelAgentSession`, and `createNativeTuiTeardownRegistry`, plus the focused test `collab-electron/src/main/agent-host-lifecycle.test.ts`.
+
+The invariant is: do not unregister or kill a native-TUI recipient while any delegated result addressed to it remains undelivered. Normal teardown is allowed only after durable `pushed_at` acknowledgment or when there is no outstanding result.
+
+The repair must not introduce fallback, fake completion, resurrection, timeout or cleanup weakening, G8/G9 reorder, or any other G5 scope change. It must not change persisted truth or the disabled-by-default diagnostic behavior.
+
+#### Required proof
+
+The later Builder must prove the old-red/new-green lifecycle falsifier, normal `bun qa/run.ts hermes-first-turn-synthetic`, and the unchanged G5 matrix. The trace must be inert when disabled. The final proof receipt must show `processes=0`, `roots_remaining=0`, and `leaked=[]`. The isolated lifecycle proof must stop at the first broken transition and preserve the exact Director receipt before `result_return`.
+
+No product repair is authorized outside this boundary. No full G8/G9 reorder, deletion-scope change, fallback, synthetic completion, resurrection, timeout weakening, cleanup weakening, or other G5 expansion is authorized.

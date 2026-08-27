@@ -1,16 +1,17 @@
 # NEXT — R18 GOLDEN BASELINE HOLD / G5 SEMANTIC PREREQUISITE READ
 
-status: G4 CLOSED / G5 DIAGNOSTIC-ONLY RESULT-DELIVERY TRACE AUTHORIZED
+status: G4 CLOSED / G5 FINAL FINITE CONTRACT ACCEPTED — BOUNDED RESULT-DELIVERY REPAIR AUTHORIZED
 rotated-at: 2026-08-26
 rotated-by: Router after G5 Reader YES/YES and frozen starting matrix
 active-order: [WO-GOLDEN-G5](WO-GOLDEN-G5.md)
-builder-authority: **DIAGNOSTIC ONLY — NO PRODUCT REPAIR UNTIL FINITE READER YES / YES**
+builder-authority: **BOUNDED RESULT-DELIVERY REPAIR ONLY — EXACT WO-GOLDEN-G5 CONTRACT**
 g5-reader-order-sha: `cd0a2405af9c7e97a9740b1df065b6ec98eaeeac`
 g5-starting-product-sha: `f29dc3603ee969e9c6573f0a91ce0a4bc0f5b806`
 g5-reader-verdict: **YES / YES**
 g5-finite-reread-after: `5248031`
 g5-finite-reread-task: `01a04034-6afb-73a3-9f0e-6419fa5f76ec`
-g5-finite-reread-verdict: **NO / NO — AUTHORITY 5248031; FRESH YES / YES REQUIRED**
+g5-finite-reread-verdict: **NO / NO — AUTHORITY 5248031; superseded by final fresh finite Reader below**
+g5-final-finite-reader-verdict: **YES / YES**
 program-decision: [ADR-0004](../adr/0004-repository-golden-baseline.md)
 phase-1-audited-sha: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 phase-2-active-group: G5 — Legacy ACP and unconsumed renderers
@@ -32,4 +33,4 @@ G4 closed at `2d491f20a030b9ac0b476846535f2ecc71239af1`. The G5 semantic Reader 
 
 The frozen starting matrix records both new G5 selectors as absent/red; G4 retired-route, Dock launch, Hermes launch-policy, Kernel sole-writer, and the real Electron build are green. `hermes-first-turn-synthetic` is pre-existing red because its readiness assertion still names retired `hermes-orchestrator` while production authority requires `hermes-research-director`. This is an authorized mechanical stale-selector repair: change only that readiness assertion, prove old red/new green, and do not rewrite later synthetic fixture identifiers without separate evidence.
 
-The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects. The accepted G5 deletion diff remains preserved but is not a candidate. The finite contract in [WO-GOLDEN-G5](WO-GOLDEN-G5.md#reader-required-finite-contract-after-53e9a25) now binds the exact direct-critic parser, canonical v2 payload/lineage fields, durable first-run `run.params.strategy_id` provenance, exact Director receipt naming, the source-proven `index.ts` → `kernelFinalizeResearchEvaluation` in `kernel.ts` seam, and the smallest inseparable G9 no-duplicate-finalizer prerequisite. There is **NO Builder authority** until a new fresh semantic Reader returns `YES / YES` on this finite contract. No group reorder, G6 authority, main merge, full G9, or R18 implementation is open.
+The fresh semantic Reader task `01a04034-6afb-73a3-9f0e-6419fa5f76ec` returned `NO / NO` against authority `5248031` with finite defects. The accepted G5 deletion diff remains preserved but is not a candidate. The final fresh semantic Reader now returns **YES / YES** on the finite result-delivery contract in [WO-GOLDEN-G5](WO-GOLDEN-G5.md#final-fresh-reader-result-delivery-contract): `closeAgentSessionRow` currently admits native-TUI teardown after `complete_task` without checking undelivered addressed results; the fixed trace is orchestrator PTY registration sequence 2, explicit teardown unregister sequence 7, exact result queue/lookup sequence 8 with `pushed_at=NULL`, then non-causal PTY exit. The later Builder may edit only `collab-electron/src/main/agent-host.ts` teardown admission and `collab-electron/src/main/agent-host-lifecycle.test.ts`. The invariant is that a native-TUI recipient is not unregistered or killed while an addressed delegated result remains undelivered; teardown is allowed after durable `pushed_at` acknowledgment or with no outstanding result. The proof is old-red/new-green lifecycle falsifier, normal `bun qa/run.ts hermes-first-turn-synthetic`, unchanged G5 matrix, trace-disabled inertness, and `processes=0 roots_remaining=0 leaked=[]`. The actual Director receipt must precede `result_return`; worker `turn=complete` remains intermediate only. No fallback, fake completion, resurrection, timeout/cleanup weakening, G8/G9 reorder, or other G5 scope change is open.
