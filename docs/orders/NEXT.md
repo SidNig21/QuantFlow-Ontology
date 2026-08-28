@@ -1,10 +1,10 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 SEMANTIC READER ROUND 2 NO / NO AMENDMENT
+# NEXT — R18 GOLDEN BASELINE HOLD / G8 CLOSED / G9 FINAL READER YES / YES / BUILDER OPEN
 
-status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 SEMANTIC READER ROUND 2 NO / NO — TWO FINITE AMBIGUITIES; PRIOR FIVE PRESERVED / BUILDER CLOSED
+status: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS / G9 FINAL READER YES / YES — ALL SEVEN CUMULATIVE DEFECTS CURED / EXACTLY ONE BOUNDED BUILDER OPEN
 rotated-at: 2026-08-28
-rotated-by: Router after G9 semantic Reader Round 2 NO / NO
+rotated-by: Router after final G9 semantic Reader YES / YES
 active-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md)
-builder-authority: **CLOSED — same G9 Reader reviews exactly two Round 2 ambiguities; prior five preserved; no G9 Builder authority**
+builder-authority: **OPEN — exactly one bounded G9 Builder under WO-GOLDEN-G9; no second Builder and no G10–G12/R18 work**
 g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
@@ -88,29 +88,36 @@ g5-evidence-head: `bd3135edfe7004b140874fd2dcbef16ddb433540`
 g5-independent-verifier-task: 01a04624-d75d-7c12-a35d-2fdf105962f6
 g5-packaged-log: `C:\Users\rybow\AppData\Local\Temp\qf-g5-verifier-20260827-packaged-hermes-first-turn-synthetic.log`
 g5-packaged-exit: 1 (packaged command is not PASS)
-phase-2-active-group: G9 — bounded Report authority consolidation; semantic Reader Round 2 NO / NO amendment pending; Builder closed
+phase-2-active-group: G9 — bounded Report authority consolidation; final semantic Reader YES / YES; exactly one Builder open
 g4-accepted-candidate: `2d491f20a030b9ac0b476846535f2ecc71239af1`
 g4-acceptance: [G4 CLOSED / ACCEPTED](evidence/golden-baseline/g4/GROUP-ACCEPTANCE.md)
 g3-accepted-candidate: `01f3a3257d2cbd7e9d5e11219520013b957a6801`
 g3-acceptance: [G3 CLOSED / ACCEPTED](evidence/golden-baseline/g3/GROUP-ACCEPTANCE.md)
 g2-acceptance: [G2 CLOSED / ACCEPTED](evidence/golden-baseline/g2/GROUP-ACCEPTANCE.md)
 g1-acceptance: [G1 CLOSED / ACCEPTED](evidence/golden-baseline/g1/GROUP-ACCEPTANCE.md)
-full-g9-authority: SEMANTIC READER ROUND 2 NO / NO AMENDMENT PENDING AFTER G8
+full-g9-authority: FINAL SEMANTIC READER YES / YES AFTER G8; EXACTLY ONE BOUNDED BUILDER OPEN
 full-g8-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md) — CLOSED
-full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — SEMANTIC READER ROUND 2 NO / NO AMENDMENT PENDING; BUILDER CLOSED
-g9-reader-status: **ROUND 2 NO / NO — exactly two finite ambiguities; prior five preserved; same Reader amendment pending; Builder closed**
+full-g9-order: [WO-GOLDEN-G9](WO-GOLDEN-G9.md) — FINAL READER YES / YES; EXACTLY ONE BOUNDED BUILDER OPEN
+g9-reader-status: **FINAL YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion**
 g9-reader-task: `01a0489e-04ea-71a1-8b6a-d0e151621103`
-g9-reader-round: 2
-g9-reader-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
-g9-reader-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
-g9-reader-verdict: **NO / NO — partition-before-fold cross-key isolation and current-vs-historical finalizer-id defects recorded; prior five preserved**
+g9-reader-round: FINAL
+g9-reader-authority: `8d78fb714998cc52d50538d6f9ea9a3323f75535`
+g9-reader-tree: `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`
+g9-reader-verdict: **YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion**
 g9-reader-round-1-authority: `d6ab5ed66a18c9de23db047a4b41584acaaeec0e`
 g9-reader-round-1-tree: `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`
+g9-reader-round-2-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
+g9-reader-round-2-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
+g9-builder-status: **OPEN — exactly one bounded G9 Builder under WO-GOLDEN-G9**
+g9-builder-starting-authority: `8d78fb714998cc52d50538d6f9ea9a3323f75535`
+g9-builder-starting-tree: `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`
+g9-builder-starting-matrix: **WO-GOLDEN-G9 § Starting-SHA matrix, rows 1–19, bound to the exact source manifest; no candidate yet**
+g9-builder-surface: **WO-GOLDEN-G9 candidate allowlist only: governed-review/support-schema tests, directly caused Report guard, Electron finalizer seams, durable projection, named stale-profile proof, report-authority gate/registration, focused tests/fixtures; generated Atlas/evidence only**
 g9-starting-authority: `754606932dfb23bd0a6e6f432937b1c2bc436739`
 g9-starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
 g9-starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 g9-starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
-g9-reader-scaffold: [G9 Reader Round 2 NO / NO amendment](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
+g9-reader-scaffold: [G9 final Reader acceptance](evidence/golden-baseline/g9/READER-ACCEPTANCE.md)
 r18-authority: FROZEN UNTIL PHASE 2 + PHASE 3 GOLDEN PASS
 protected-main: `5882ab2febf00f2c15a94c868c191420ed561bb4`
 
@@ -121,14 +128,14 @@ Current routing: G8 is closed at candidate
 `754606932dfb23bd0a6e6f432937b1c2bc436739`, under fresh independent Verifier
 task `01a0487e-4331-76e1-86ed-ef1b8db29e94`, with verdict **PASS WITH INHERITED
 G9/G12 REDS**. G9 semantic Reader task
-`01a0489e-04ea-71a1-8b6a-d0e151621103` returned Round 2 **NO / NO** against
-amendment `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4` (tree
-`54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`) and named exactly two finite
-ambiguities: partition-before-fold cross-key isolation and current-vs-
-historical finalizer-ID agreement. The prior five cures remain binding. The
-same Reader reviews this bounded amendment; Builder authority remains closed.
-The exact packet is in [WO-GOLDEN-G9](WO-GOLDEN-G9.md) and its [Round 2 NO / NO
-Reader evidence](evidence/golden-baseline/g9/READER-ACCEPTANCE.md). The
+`01a0489e-04ea-71a1-8b6a-d0e151621103` returned final **YES / YES** against
+amendment authority `8d78fb714998cc52d50538d6f9ea9a3323f75535` (tree
+`9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`), confirming all seven cumulative
+defects cured with no new ambiguity or scope expansion. Exactly one bounded G9
+Builder is open from that authority; its starting matrix is the 19-row
+WO-GOLDEN-G9 matrix and its exact source-manifest requirement, with no candidate
+or Builder evidence yet. The exact packet is in
+[WO-GOLDEN-G9](WO-GOLDEN-G9.md) and its [final Reader evidence](evidence/golden-baseline/g9/READER-ACCEPTANCE.md). The
 inherited G9 report-boundary red and G12 Windows/package/operations reds remain
 red and are not acceptance.
 

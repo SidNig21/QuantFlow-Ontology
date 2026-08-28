@@ -1,17 +1,24 @@
 # WO-GOLDEN-G9 — Report authority consolidation
 
-status: AMENDMENT REQUIRED — READER ROUND 2 NO / NO; BUILDER CLOSED
+status: BUILDER OPEN — FINAL READER YES / YES; EXACTLY ONE BOUNDED G9 BUILDER
 kind: Golden Baseline Phase 2 bounded Report/result-authority group
 owner: Router
 depends: G8 CLOSED / PASS WITH INHERITED G9/G12 REDS
-build-authority: NO — fresh Reader only; Builder opens only after Reader YES/YES and NEXT.md rotation
+build-authority: YES — exactly one bounded G9 Builder; no second Builder and no G10–G12/R18 work
 reader-task: 01a0489e-04ea-71a1-8b6a-d0e151621103
-reader-round: 2
-reader-reviewed-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
-reader-reviewed-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
-reader-verdict: NO / NO — exactly two finite ambiguities; prior five preserved; Builder remains closed
+reader-round: FINAL
+reader-reviewed-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
+reader-reviewed-tree: 9af6ae1714c49fc9caa8e59915d0bc88b11a9b35
+reader-verdict: YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion
 reader-round-1-authority: d6ab5ed66a18c9de23db047a4b41584acaaeec0e
 reader-round-1-tree: 8f94bf63b16bd74e5ef17461cc4f0d15477efc4f
+reader-round-2-authority: d6c0d7e91d726d8b5a33050f403efec87a3f1cd4
+reader-round-2-tree: 54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182
+builder-status: OPEN — exactly one bounded G9 Builder under this order
+builder-starting-authority: 8d78fb714998cc52d50538d6f9ea9a3323f75535
+builder-starting-tree: 9af6ae1714c49fc9caa8e59915d0bc88b11a9b35
+builder-candidate: none — Builder not yet run
+builder-evidence: none — Builder not yet run
 starting-authority: 754606932dfb23bd0a6e6f432937b1c2bc436739
 starting-product-candidate: 61abfa5b23553f86a5c2d95facdf0473310fc44
 starting-product-tree: 94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013
@@ -25,9 +32,9 @@ evidence-directory: docs/orders/evidence/golden-baseline/g9/
 A research answer becomes a durable Report only after an independent review, and
 there is one clearly marked current answer for each Mission, Technique version,
 and point-in-time research state while older answers remain inspectable. The
-Round 1 Reader found five finite omissions, and Round 2 found two remaining
-ambiguities; this packet binds both amendment sets without opening
-implementation authority.
+final Reader accepted all seven cumulative cures with no new ambiguity or scope
+expansion. This packet now opens exactly one bounded implementation Builder;
+the independent Verifier still decides whether its immutable candidate passes.
 
 ## Authority and dependency order
 
@@ -52,8 +59,7 @@ The semantic Reader Round 1 review
 `01a0489e-04ea-71a1-8b6a-d0e151621103` returned **NO / NO** against authority
 `d6ab5ed66a18c9de23db047a4b41584acaaeec0e` (tree
 `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`). The five finite defects and their
-bounded cures are recorded below. This is a Router evidence amendment only;
-the Builder remains closed until the same Reader reviews the amended packet.
+bounded cures are recorded below.
 
 ## Reader Round 1 NO / NO amendment — exactly five finite defects preserved
 
@@ -83,6 +89,31 @@ binding; only these two finite ambiguities are added:
 
 Only these two Round 2 ambiguities are amended. No prior requirement is relaxed,
 G8 is not reopened, and G10/G11/G12/R18 boundaries remain frozen.
+
+## Final G9 Reader YES / YES — all seven cumulative defects accepted
+
+The same Reader task `01a0489e-04ea-71a1-8b6a-d0e151621103` returned
+**YES / YES** against final amendment authority
+`8d78fb714998cc52d50538d6f9ea9a3323f75535` (tree
+`9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`). The Reader confirmed that the
+five Round 1 cures and two Round 2 cures are all finite, fail-capable, and
+unambiguous, with no new defect or scope expansion. The accepted contract is
+the exact contract below; this verdict opens exactly one G9 Builder and no
+other Builder authority.
+
+| cumulative cure | accepted proof obligation |
+| ---: | --- |
+| 1 | `strategy_id` is a separate authority-key field, with same-version/different-strategy cross-context red and green proof |
+| 2 | the existing durable worker-evidence relation requires exactly one matching completed-task trajectory |
+| 3 | F09 can remove durable binding or restore map-only lookup, restart, expose the exact missing-binding red, then restore green |
+| 4 | legacy publication upgrade orders multiple rows deterministically and aborts atomically on an unresolvable row |
+| 5 | finalization returns the persisted Report id and proves publication/gates/projection/retry agreement without duplicates |
+| 6 | legacy rows partition by the complete five-field key before fold, with cross-key F12 isolation |
+| 7 | current and historical finalizers return their own persisted ids, with separate fail-capable agreement and retry cases |
+
+The final Reader verdict is semantic acceptance only. No Builder candidate or
+Builder evidence exists yet; the next mutation must start at the exact
+`builder-starting-authority` and `builder-starting-tree` above.
 
 ## Fixed semantic contract
 
@@ -319,15 +350,46 @@ root, exercise the real production seams and prove:
 The gate must use generated/runtime data from the exercised Kernel rather than
 hard-coded ids or a self-authored expected manifest.
 
+## Exact source manifest requirement
+
+The Builder must freeze one sorted, literal source manifest before mutation at
+the exact `builder-starting-authority` and `builder-starting-tree` above. The
+manifest must enumerate, by full path and role, every source/consumer/write/
+publication path in the inventory table and every focused test or fixture that
+will be exercised; it must also list generated Atlas paths and the evidence
+paths separately. Directory globs, inferred paths, or a self-authored expected
+manifest are not sufficient. For every row record the parent blob SHA-256 and
+one disposition: read-only census, editable candidate surface, generated
+projection, or receipt-only evidence. Before the candidate is reported, record
+the complete literal changed/untracked path list and post-candidate SHA-256s.
+Any changed path absent from the manifest, any read-only source changed without
+new Reader authority, any unlisted untracked path, or any candidate-to-evidence
+file that is not receipt-only (`non-receipt=0`) is a hard red. This manifest is
+release evidence only and never a second runtime truth store.
+
+The exact editable source surface is limited to the candidate allowlist below:
+`packages/qf-kernel/src/governed-review.ts`, directly caused support-schema or
+upgrade tests, `packages/qf-kernel/src/create.ts` only for the named Report
+guard, `collab-electron/src/main/kernel.ts`,
+`collab-electron/src/main/index.ts`,
+`collab-electron/src/main/research-world-projection.ts`, the shell projection
+only if required, `qa/gates/hermes-research.ts` only for the named stale-profile
+proof, `qa/gates/report-authority.ts`, `qa/run.ts`, and focused tests/fixtures.
+Atlas and G9 evidence are generated/receipt surfaces only. The ordinary
+trajectory writer/host and every out-of-scope boundary remain read-only.
+
 ## Starting-SHA matrix
 
-The Builder is not authorized. The Reader reviews this matrix against the clean
-starting authority at the top of this file. Any red not named below stops
-Builder mutation.
+The Builder is authorized exactly once from the final Reader authority
+`8d78fb714998cc52d50538d6f9ea9a3323f75535` (tree
+`9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`). It preserves the inherited G8
+identities at the top of this file as the measured baseline and must reproduce
+every row below against this clean Builder starting identity. Any red not named
+below stops Builder mutation and any second Builder is unauthorized.
 
 | # | command | starting disposition |
 | ---: | --- | --- |
-| 1 | git rev-parse HEAD and git rev-parse HEAD^{tree} | must equal the starting candidate/evidence identities above |
+| 1 | git rev-parse HEAD and git rev-parse HEAD^{tree} | must equal Builder starting authority `8d78fb714998cc52d50538d6f9ea9a3323f75535` and tree `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`; inherited G8 candidate/evidence identities remain exactly as recorded above |
 | 2 | bun qa/run.ts artifact-root | inherited prerequisite proof; remain green or reproduce only its accepted environment red |
 | 3 | bun qa/run.ts governed-review | current G8 evidence: 15/15 governed-review tests green |
 | 4 | bun test src/r15-governed-review.test.ts in packages/qf-kernel | current G8 evidence: repaired test stable; final Verifier observed 30/30 |
@@ -347,9 +409,9 @@ Builder mutation.
 | 18 | git diff --check | clean before Builder mutation |
 | 19 | exact product-process census | zero owned product processes and zero owned roots |
 
-The Builder preserves unedited output for this matrix before mutation. The
-independent Verifier reruns it at the immutable candidate, adding the focused
-G9 gate and all falsifiers.
+The Builder preserves unedited output for this matrix before mutation and binds
+it to the exact source manifest above. The independent Verifier reruns it at
+the immutable candidate, adding the focused G9 gate and all falsifiers.
 
 ## Fail-capable falsifiers
 
@@ -416,8 +478,9 @@ may be opened, copied, hashed, or logged.
 
 The Builder produces one immutable candidate SHA/tree and a separate receipt-only
 evidence SHA/tree. The Verifier binds its decision to both and reports clean
-status. This Reader scaffold has no candidate yet; its starting identities are
-the exact G8 identities at the top.
+status. The Builder starts from the final Reader amendment identity above; the
+Router's later authority/evidence commit is not a product candidate and does
+not change that starting matrix.
 
 ## Report back
 

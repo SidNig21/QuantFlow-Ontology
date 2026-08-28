@@ -1,29 +1,34 @@
-# G9 semantic Reader acceptance — Round 2 NO / NO amendment
+# G9 semantic Reader acceptance — final YES / YES
 
-status: **NO / NO — TWO FINITE AMBIGUITIES; PRIOR FIVE PRESERVED; BUILDER CLOSED**
+status: **YES / YES — ALL SEVEN CUMULATIVE DEFECTS CURED; EXACTLY ONE BUILDER OPEN**
 order: `docs/orders/WO-GOLDEN-G9.md`
 reader-task: `01a0489e-04ea-71a1-8b6a-d0e151621103`
-reader-round: 2
-reader-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
-reader-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
-reader-verdict: **NO / NO — exactly two finite ambiguities; prior five preserved**
+reader-round: FINAL
+reader-authority: `8d78fb714998cc52d50538d6f9ea9a3323f75535`
+reader-tree: `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`
+reader-verdict: **YES / YES — all seven cumulative defects cured; no new ambiguity or scope expansion**
 reader-round-1-authority: `d6ab5ed66a18c9de23db047a4b41584acaaeec0e`
 reader-round-1-tree: `8f94bf63b16bd74e5ef17461cc4f0d15477efc4f`
+reader-round-2-authority: `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4`
+reader-round-2-tree: `54ecefe7cd2f979c0e3864a5d7c4cd6aff31f182`
 review-mode: fresh read-only semantic review; no repository mutation
 starting-authority: `754606932dfb23bd0a6e6f432937b1c2bc436739`
 starting-product-candidate: `61abfa5b23553f86a5c2d95facdf0473310fc44`
 starting-product-tree: `94ef17e1876c68fcfb2713f4a2cf9f0d05a9d013`
 starting-evidence-tree: `b04a991ca98da1d57b8637a7fcd0738a4e41bd21`
 accepted-trajectory-prerequisite: `4a12b948746c108bae3143d5982decd50a6957e9`
-candidate-after-reader: **none — Reader returned NO / NO; Builder is closed**
-evidence-after-reader: **this documentation amendment is not a product candidate**
+candidate-after-reader: **none — Builder has not run; this Reader verdict opens exactly one bounded Builder**
+evidence-after-reader: **this Router documentation record is receipt-only and not a product candidate**
+builder-starting-authority: `8d78fb714998cc52d50538d6f9ea9a3323f75535`
+builder-starting-tree: `9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`
+builder-status: **OPEN — exactly one bounded G9 Builder under WO-GOLDEN-G9**
 
 ## Plain-language review target
 
-The Round 2 Reader decided that the next work is not yet ready to make one
-independently reviewed answer authoritative without losing older answers or
-inventing a second store. The amendment below is bounded to two finite
-ambiguities; the five prior cures remain binding.
+The final Reader accepted the bounded contract needed to make one independently
+reviewed answer authoritative without losing older answers or inventing a
+second store. All seven cumulative defects are cured; exactly one bounded G9
+Builder may now implement this contract from the recorded starting identity.
 
 ## Inputs the Reader must bind
 
@@ -56,6 +61,15 @@ The exact source paths are `packages/qf-kernel/src/governed-review.ts`,
 `qa/run.ts`, plus focused tests, generated Atlas projections, legacy publication
 upgrade fixtures, and this evidence directory. The accepted trajectory files
 are read-only census inputs.
+
+The Builder must preserve the order's exact source-manifest requirement: before
+mutation, record one sorted literal full-path manifest covering every inventoried
+source/consumer/write/publication path, focused test/fixture, generated Atlas
+projection, and receipt-only evidence path, with parent blob SHA-256 and an
+explicit read-only/editable/generated/receipt disposition. After mutation,
+record every changed and untracked path with post-candidate SHA-256; an
+unlisted path, changed read-only path, omitted source, or candidate-to-evidence
+non-receipt is hard red. The manifest is evidence only, not runtime truth.
 
 ## Round 1 — five finite defects preserved and amended
 
@@ -92,6 +106,29 @@ amendment `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4` (tree
    `current_report_id`/current projection; F14 must make current-vs-historical
    ID agreement cases and idempotent retries for each fail-capable.
 
+## Final Reader result — YES / YES
+
+The same Reader task `01a0489e-04ea-71a1-8b6a-d0e151621103` returned
+**YES / YES** against final amendment authority
+`8d78fb714998cc52d50538d6f9ea9a3323f75535` (tree
+`9af6ae1714c49fc9caa8e59915d0bc88b11a9b35`). The Reader confirmed all seven
+cumulative cures with no new ambiguity or scope expansion:
+
+1. separate `strategy_id` authority-key component and same-version/different-
+   strategy cross-context red/green proof;
+2. exact one-match durable `task.completed` worker-evidence binding;
+3. restart-specific F09 missing-binding red and restored durable-binding green;
+4. deterministic legacy ordering and all-row atomic failure;
+5. persisted finalizer Report identity and publication/gates/projection/retry
+   agreement;
+6. complete five-field partition-before-fold legacy isolation; and
+7. distinct current/historical finalizer ids with fail-capable agreement and
+   retry cases for each.
+
+This is semantic acceptance only. It opens exactly one bounded G9 Builder under
+`WO-GOLDEN-G9.md`; no candidate or Builder evidence exists yet, and the
+independent Verifier remains the authority for implementation acceptance.
+
 ## Exactly two Reader questions
 
 1. **Can every G9 normal gate and falsifier fail on the duplicate publisher,
@@ -107,9 +144,9 @@ amendment `d6c0d7e91d726d8b5a33050f403efec87a3f1cd4` (tree
 
 ## Reader result
 
-Question 1: **NO — Round 2 adds two finite ambiguities; prior five are preserved**
+Question 1: **YES — all seven cumulative defects have finite fail-capable red/green obligations**
 
-Question 2: **NO — the packet remains incomplete, boundaries remain preserved**
+Question 2: **YES — G8 is closed, the accepted trajectory prerequisite is preserved, and G10–G12/R18 boundaries remain closed/frozen**
 
-Verdict: **NO / NO — Round 2; Builder remains closed; the same Reader must
-review the bounded amendment before NEXT.md can rotate.**
+Verdict: **YES / YES — final amendment accepted; exactly one bounded G9 Builder
+is open; no new ambiguity or scope expansion.**
