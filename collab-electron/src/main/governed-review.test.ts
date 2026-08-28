@@ -197,7 +197,7 @@ describe("R15 production governed-review seams", () => {
         kernelExecute("start_agent_session", { session_id: id }, trace());
       };
       session("director-continuation", "director-continuation-definition", "orchestrator", ["desk.orchestrate"]);
-      session("worker-continuation", "worker-continuation-definition", "worker", ["desk.orchestrate"]);
+      session("worker-continuation", "worker-continuation-definition", "worker", ["desk.orchestrate", "market.read"]);
       session("critic-continuation", "hermes-critic", "critic", ["research.evaluate"], "director-continuation");
       await admitAndStartSession("hermes-critic", { existingSessionId: "critic-continuation" });
       const mission = kernelExecute("create_mission", {
@@ -230,6 +230,33 @@ describe("R15 production governed-review seams", () => {
       const run = kernelRunGuidedResearch("worker-continuation", hypothesis.object_id, "worker-evidence");
       expect(run).not.toBeNull();
       if (!run) return;
+      const readBytes = new TextEncoder().encode(JSON.stringify({
+        contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: "venue-continuation" },
+        result: { id: "venue-continuation" }, session_id: "worker-continuation", role: "worker",
+        created_at: "2026-08-28T00:00:00.000Z", nonce: "continuation-read-nonce",
+      }));
+      const readPath = join(artifactRoot, "continuation-read.json");
+      writeFileSync(readPath, readBytes);
+      const read = kernelExecute("publish_artifact", {
+        kind: "trajectory", bytes: readBytes, storage_ref: readPath,
+        links: [{ kind: "produces", from_id: "worker-continuation" }],
+      }, { ...trace(), actor_session_id: "worker-continuation", ontology_read_tool: "qf_venue_get" } as never) as { object_id: string };
+      const resultBytes = new TextEncoder().encode(JSON.stringify({
+        contract: "qf.collaboration.v1", kind: "result", task_id: task.object_id,
+        from_session_id: "worker-continuation", result: "completed",
+      }));
+      const resultPath = join(artifactRoot, "continuation-result.json");
+      writeFileSync(resultPath, resultBytes);
+      const resultTrajectory = kernelExecute("publish_artifact", {
+        kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
+        links: [
+          { kind: "produces", from_id: "worker-continuation" },
+          { kind: "derived_from", to_id: read.object_id },
+        ],
+      }, { ...trace(), actor_session_id: "worker-continuation" }) as { object_id: string };
+      kernelExecute("complete_task", {
+        task_id: task.object_id, result_artifact_id: resultTrajectory.object_id,
+      }, { ...trace(), actor_session_id: "worker-continuation" });
 
       const deliveries: Array<{ reviewTaskId: string; sourceWork: Record<string, string> }> = [];
       const writes: Array<{ sessionId: string; data: string; at: number }> = [];

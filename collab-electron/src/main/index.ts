@@ -1386,10 +1386,10 @@ app.whenReady().then(async () => {
         const final = kernelFinalizeResearchEvaluation(evaluationId);
         mainWindow?.webContents.send("qf:dock:invalidate");
         mainWindow?.webContents.send("qf:events:invalidate");
-        const legacyReportArtifactId = final.reportArtifactId;
-        if (legacyReportArtifactId) {
+        const persistedReportArtifactId = final.reportArtifactId;
+        if (persistedReportArtifactId) {
           mainWindow?.webContents.send(
-            "shell:forward", "canvas", "create-artifact-tile", legacyReportArtifactId,
+            "shell:forward", "canvas", "create-artifact-tile", persistedReportArtifactId,
           );
         }
       } finally {
@@ -1556,7 +1556,7 @@ app.whenReady().then(async () => {
       );
       const executorSessionId = `kernel-falsifier-executor-${crypto.randomUUID()}`;
       createKernelAgentSession(
-        { sessionId: executorSessionId, definitionId: "hermes-orchestrator", label: "Kernel falsifier executor" },
+        { sessionId: executorSessionId, definitionId: "hermes-research-director", label: "Kernel falsifier executor" },
         { execute: kernelExecute, newTrace: () => ({ trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) },
       );
       const run = kernelRunGuidedResearch(executorSessionId, hypothesisId, "trajectory:kernel-falsifier-worker");

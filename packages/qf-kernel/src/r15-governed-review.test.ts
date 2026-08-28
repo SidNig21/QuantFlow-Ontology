@@ -45,13 +45,14 @@ function fixture(deliver = true, admit = true) {
   session("executor", "executor-definition", "worker", ["desk.orchestrate"]);
   session("critic", "hermes-critic", "critic", ["research.evaluate"]);
   const hypothesis = execute(db, "create_hypothesis", { claim: "Fixture evidence supports the claim.", success_criteria: "All four critic scores support." }, trace);
+  const mission = execute(db, "create_mission", { mission_id: "r15-mission", name: "R15 fixture mission", objective: "Provide the bounded authority context." }, trace);
   const datasetBytes = new TextEncoder().encode(JSON.stringify({ contract: "qf.dataset.v1", observations: [{ id: "r15", observed_at: "2026-08-15T10:00:00.000Z", edge: 1, settlement: { outcome: "win", stake: "100.000000", decimal_odds: "2.000000", closing_decimal_odds: "1.500000" } }] }));
   const datasetPath = join(root, "dataset.json");
   writeFileSync(datasetPath, datasetBytes);
   const datasetArtifact = execute(db, "publish_artifact", { kind: "result_set", bytes: datasetBytes, storage_ref: datasetPath }, trace);
   const dataset = execute(db, "register_dataset_version", { kind: "results", artifact_id: datasetArtifact.object_id, content_hash: datasetArtifact.object_id, as_of: "2026-08-15T11:00:00.000Z", coverage: { deterministic_score_field: "edge" } }, trace);
   const run = execute(db, "execute_deterministic_run", { run_id: "r15-run", dataset_id: dataset.object_id, strategy_spec: { contract: "qf.strategy.v1", version: 1, stake_model: "flat", score_field: "edge" }, params: { limit: 1 } }, { ...trace, actor_session_id: "executor" });
-  const task = execute(db, "create_task", { task_id: "source-task", title: "Reviewable research", description: "Review the exact completed research.", assignee_session_id: "executor" }, { ...trace, actor_session_id: "director" });
+  const task = execute(db, "create_task", { task_id: "source-task", title: "Reviewable research", description: "Review the exact completed research.", assignee_session_id: "executor" }, { ...trace, actor_session_id: "director", mission_id: mission.object_id });
   const work = bindSourceWork(db, { source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id, result_artifact_id: String(run.state.result_artifact_id), executor_session_id: "executor" }, trace);
   const admission = admit ? requestGovernedReview(db, "source-task", "attempt-1", "critic", trace) : null;
   if (admission) {
@@ -59,6 +60,41 @@ function fixture(deliver = true, admit = true) {
     if (deliver) markGovernedDelivery(db, String(admission.review_task_id), "delivered", trace);
   }
   return { work, taskId: admission ? String(admission.review_task_id) : "", hypothesisId: hypothesis.object_id, runId: run.object_id, artifactId: String(run.state.result_artifact_id) };
+}
+
+function completeWorkerTask(taskId: string): void {
+  const readBytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.ontology.v1",
+    tool: "qf_venue_get",
+    arguments: { id: "venue-r15" },
+    result: { id: "venue-r15" },
+    session_id: "executor",
+    role: "worker",
+    created_at: "2026-08-28T00:00:00.000Z",
+    nonce: "r15-read-nonce",
+  }));
+  const readPath = join(root!, "r15-read.json");
+  writeFileSync(readPath, readBytes);
+  const read = execute(db!, "publish_artifact", {
+    kind: "trajectory", bytes: readBytes, storage_ref: readPath,
+    links: [{ kind: "produces", from_id: "executor" }],
+  }, { ...trace, actor_session_id: "executor", ontology_read_tool: "qf_venue_get" } as never);
+  const resultBytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.collaboration.v1", kind: "result", task_id: taskId,
+    from_session_id: "executor", result: "completed",
+  }));
+  const resultPath = join(root!, "r15-result-trajectory.json");
+  writeFileSync(resultPath, resultBytes);
+  const result = execute(db!, "publish_artifact", {
+    kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
+    links: [
+      { kind: "produces", from_id: "executor" },
+      { kind: "derived_from", to_id: read.object_id },
+    ],
+  }, { ...trace, actor_session_id: "executor" });
+  execute(db!, "complete_task", {
+    task_id: taskId, result_artifact_id: result.object_id,
+  }, { ...trace, actor_session_id: "executor" });
 }
 
 function sessionFromExistingDefinition(id: string): void {
@@ -124,6 +160,7 @@ describe("R15 governed review", () => {
 
   test("freezes the tuple, requires exact reads, canonicalizes findings, and publishes supports", () => {
     const f = fixture();
+    completeWorkerTask("source-task");
     readReceipt(f.taskId, "qf_hypothesis_get", { id: f.hypothesisId }, 1);
     readReceipt(f.taskId, "qf_run_get", { id: f.runId }, 2);
     readReceipt(f.taskId, "qf_artifact_get", { id: f.artifactId }, 3);

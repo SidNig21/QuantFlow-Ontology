@@ -7,6 +7,7 @@ import { execute } from "./execute.ts";
 import { appendEvent } from "./events.ts";
 import { KernelError } from "./errors.ts";
 import { contentHash } from "./hash.ts";
+import { assertDurableOntologyReadReceipt } from "./ontology-read-receipt.ts";
 import { resolveArtifactRoot } from "./resolve-artifact-root.ts";
 
 export const GOVERNED_CRITIC_TOOLS = [
@@ -80,6 +81,30 @@ export type GovernedToolReceiptInput = {
   broker_sequence: number;
 };
 
+export type AuthorityContext = {
+  mission_id: string;
+  strategy_id: string;
+  strategy_version: number;
+  dataset_id: string;
+  dataset_as_of: string;
+  authority_key: string;
+};
+
+export type GovernedPublication = AuthorityContext & {
+  source_work_key: string;
+  report_artifact_id: string;
+  publication_evaluation_id: string;
+  created_at: string;
+  is_current: number;
+  supersedes_source_work_key: string | null;
+  superseded_by_source_work_key: string | null;
+};
+
+export type GovernedWorkerEvidence = {
+  artifactId: string;
+  eventId: string;
+};
+
 function object(value: unknown, label: string): JsonRecord {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new KernelError(`${label} must be an object`);
@@ -106,8 +131,212 @@ function sameJson(left: unknown, right: unknown): boolean {
   return json(left) === json(right);
 }
 
+const PUBLICATION_DDL = `
+  CREATE TABLE qf_review_publication (
+    source_work_key TEXT PRIMARY KEY NOT NULL,
+    report_artifact_id TEXT NOT NULL,
+    publication_evaluation_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    mission_id TEXT NOT NULL,
+    strategy_id TEXT NOT NULL,
+    strategy_version INTEGER NOT NULL,
+    dataset_id TEXT NOT NULL,
+    dataset_as_of TEXT NOT NULL,
+    authority_key TEXT NOT NULL,
+    is_current INTEGER NOT NULL CHECK (is_current IN (0, 1)),
+    supersedes_source_work_key TEXT,
+    superseded_by_source_work_key TEXT
+  );
+  CREATE UNIQUE INDEX qf_review_publication_current_authority
+    ON qf_review_publication(authority_key) WHERE is_current = 1;
+`;
+
+function tableExists(db: KernelDb, table: string): boolean {
+  return Boolean(db.query("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = ?").get(table));
+}
+
+function tableColumns(db: KernelDb, table: string): Set<string> {
+  return new Set((db.query(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>).map((row) => row.name));
+}
+
+function canonicalAuthorityKey(context: Omit<AuthorityContext, "authority_key">): string {
+  return JSON.stringify([
+    context.mission_id,
+    context.strategy_id,
+    context.strategy_version,
+    context.dataset_id,
+    context.dataset_as_of,
+  ]);
+}
+
+function authorityContextForSourceWork(db: KernelDb, work: SourceWork): AuthorityContext {
+  const missionRows = db.query(
+    `SELECT l.to_id AS mission_id
+       FROM links l JOIN mission m ON m.id = l.to_id
+      WHERE l.from_id = ? AND l.kind = 'belongs_to'
+      ORDER BY l.created_at ASC, l.id ASC`,
+  ).all(work.source_task_id) as Array<{ mission_id: string }>;
+  if (missionRows.length !== 1 || !missionRows[0]!.mission_id) {
+    throw new KernelError("Report authority context requires exactly one Mission");
+  }
+  const run = db.query("SELECT params FROM run WHERE id = ?").get(work.run_id) as { params: string } | null;
+  if (!run) throw new KernelError("Report authority context requires the exact Run");
+  const params = parseJson(run.params, "Run params");
+  const strategyId = params.strategy_id;
+  const datasetId = params.dataset_id;
+  if (typeof strategyId !== "string" || strategyId.length === 0 || typeof datasetId !== "string" || datasetId.length === 0) {
+    throw new KernelError("Report authority context requires immutable strategy_id and dataset_id");
+  }
+  const strategy = db.query("SELECT version FROM strategy WHERE id = ?").get(strategyId) as { version: number } | null;
+  const dataset = db.query("SELECT as_of FROM dataset WHERE id = ?").get(datasetId) as { as_of: string } | null;
+  if (!strategy || !Number.isInteger(strategy.version) || strategy.version < 1) {
+    throw new KernelError("Report authority context requires a persisted Technique version");
+  }
+  if (!dataset || typeof dataset.as_of !== "string" || dataset.as_of.length === 0) {
+    throw new KernelError("Report authority context requires a persisted Dataset as-of");
+  }
+  const fields = {
+    mission_id: missionRows[0]!.mission_id,
+    strategy_id: strategyId,
+    strategy_version: Number(strategy.version),
+    dataset_id: datasetId,
+    dataset_as_of: dataset.as_of,
+  };
+  return { ...fields, authority_key: canonicalAuthorityKey(fields) };
+}
+
+function eventObject(value: unknown, label: string): JsonRecord {
+  if (typeof value === "string") {
+    try { return object(JSON.parse(value), label); } catch (error) {
+      if (error instanceof KernelError) throw error;
+      throw new KernelError(`${label} is invalid JSON`);
+    }
+  }
+  return object(value, label);
+}
+
+/** Resolve the one completed worker trajectory that is allowed to support a Report. */
+export function resolveGovernedWorkerEvidence(db: KernelDb, work: SourceWork): GovernedWorkerEvidence {
+  const fail = (): never => { throw new KernelError(`Run lacks exact worker evidence binding: ${work.run_id}`); };
+  const assignments = db.query(
+    "SELECT to_id FROM links WHERE from_id = ? AND kind = 'assigned_to' ORDER BY created_at ASC, id ASC",
+  ).all(work.source_task_id) as Array<{ to_id: string }>;
+  if (assignments.length !== 1 || assignments[0]!.to_id !== work.executor_session_id) fail();
+  const run = db.query("SELECT params FROM run WHERE id = ?").get(work.run_id) as { params: string } | null;
+  if (!run || parseJson(run.params, "Run params").executor_session_id !== work.executor_session_id) fail();
+  const events = db.query(
+    `SELECT id, payload FROM events
+      WHERE type = 'task.completed' AND object_type = 'task' AND object_id = ?
+      ORDER BY rowid ASC, id ASC`,
+  ).all(work.source_task_id) as Array<{ id: string; payload: string }>;
+  let candidates: Array<{ event: { id: string }; artifactId: unknown }> = [];
+  try {
+    candidates = events.map((event) => {
+      const payload = eventObject(event.payload, "task.completed payload");
+      const input = eventObject(payload.input, "task.completed input");
+      return { event, artifactId: input.result_artifact_id };
+    });
+  } catch {
+    fail();
+  }
+  if (candidates.length !== 1 || typeof candidates[0]!.artifactId !== "string" || candidates[0]!.artifactId.length === 0) fail();
+  const artifactId = String(candidates[0]!.artifactId);
+  const artifact = db.query("SELECT kind, storage_ref FROM artifact WHERE id = ?").get(artifactId) as { kind: string; storage_ref: string } | null;
+  const producers = db.query(
+    "SELECT from_id FROM links WHERE kind = 'produces' AND to_id = ? ORDER BY created_at ASC, id ASC",
+  ).all(artifactId) as Array<{ from_id: string }>;
+  if (artifact === null) fail();
+  const verifiedArtifact = artifact as { kind: string; storage_ref: string };
+  if (verifiedArtifact.kind !== "trajectory" || producers.length !== 1 || producers[0]!.from_id !== work.executor_session_id) fail();
+  const storageRef = verifiedArtifact.storage_ref;
+  try {
+    const trajectory = eventObject(readFileSync(storageRef, "utf8"), "worker trajectory");
+    if (trajectory.task_id !== work.source_task_id || trajectory.from_session_id !== work.executor_session_id) fail();
+  } catch {
+    fail();
+  }
+  const readTrajectories = db.query(
+    "SELECT to_id FROM links WHERE from_id = ? AND kind = 'derived_from' ORDER BY created_at ASC, id ASC",
+  ).all(artifactId) as Array<{ to_id: string }>;
+  if (readTrajectories.length === 0) fail();
+  for (const row of readTrajectories) {
+    try { assertDurableOntologyReadReceipt(db, row.to_id, work.executor_session_id); } catch { fail(); }
+  }
+  return { artifactId, eventId: candidates[0]!.event.id };
+}
+
+type LegacyPublication = {
+  source_work_key: string;
+  report_artifact_id: string;
+  publication_evaluation_id: string;
+  created_at: string;
+};
+
+function resolveLegacyPublications(db: KernelDb): Array<GovernedPublication> {
+  const rows = db.query(
+    "SELECT source_work_key, report_artifact_id, publication_evaluation_id, created_at FROM qf_review_publication ORDER BY created_at ASC, source_work_key ASC",
+  ).all() as LegacyPublication[];
+  const resolved = rows.map((row) => {
+    const evaluation = db.query("SELECT source_work FROM evaluation WHERE id = ?").get(row.publication_evaluation_id) as { source_work: string | null } | null;
+    if (!evaluation?.source_work) throw new KernelError(`legacy publication row cannot resolve Evaluation: ${row.source_work_key}`);
+    let work: SourceWork;
+    try { work = assertSourceWorkShape(JSON.parse(evaluation.source_work)); } catch { throw new KernelError(`legacy publication row cannot resolve source work: ${row.source_work_key}`); }
+    if (sourceWorkKey(work) !== row.source_work_key) throw new KernelError(`legacy publication row source-work key mismatch: ${row.source_work_key}`);
+    const context = authorityContextForSourceWork(db, work);
+    return {
+      ...context,
+      source_work_key: row.source_work_key,
+      report_artifact_id: row.report_artifact_id,
+      publication_evaluation_id: row.publication_evaluation_id,
+      created_at: row.created_at,
+      is_current: 0,
+      supersedes_source_work_key: null,
+      superseded_by_source_work_key: null,
+    };
+  });
+  const partitions = new Map<string, GovernedPublication[]>();
+  for (const row of resolved) {
+    const partition = partitions.get(row.authority_key) ?? [];
+    partition.push(row);
+    partitions.set(row.authority_key, partition);
+  }
+  for (const partition of partitions.values()) {
+    partition.sort((left, right) => left.created_at.localeCompare(right.created_at) || left.source_work_key.localeCompare(right.source_work_key));
+    for (let index = 0; index < partition.length; index += 1) {
+      const current = partition[index]!;
+      current.is_current = index === partition.length - 1 ? 1 : 0;
+      current.supersedes_source_work_key = index > 0 ? partition[index - 1]!.source_work_key : null;
+      current.superseded_by_source_work_key = index + 1 < partition.length ? partition[index + 1]!.source_work_key : null;
+    }
+  }
+  return resolved;
+}
+
+function migrateLegacyPublicationTable(db: KernelDb): void {
+  const resolved = resolveLegacyPublications(db);
+  const tx = db.transaction(() => {
+    db.exec("ALTER TABLE qf_review_publication RENAME TO qf_review_publication_legacy");
+    db.exec(PUBLICATION_DDL);
+    for (const row of resolved) {
+      db.query(`INSERT INTO qf_review_publication
+        (source_work_key, report_artifact_id, publication_evaluation_id, created_at,
+         mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of,
+         authority_key, is_current, supersedes_source_work_key, superseded_by_source_work_key)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(row.source_work_key, row.report_artifact_id, row.publication_evaluation_id, row.created_at,
+          row.mission_id, row.strategy_id, row.strategy_version, row.dataset_id, row.dataset_as_of,
+          row.authority_key, row.is_current, row.supersedes_source_work_key, row.superseded_by_source_work_key);
+    }
+    db.exec("DROP TABLE qf_review_publication_legacy");
+  });
+  tx();
+}
+
 /** R15's durable append-only support tables. They are Kernel tables, not a second truth store. */
 export function ensureGovernedReviewSchema(db: KernelDb): void {
+  if (tableExists(db, "qf_review_publication") && !tableColumns(db, "qf_review_publication").has("authority_key")) {
+    migrateLegacyPublicationTable(db);
+  }
   db.exec(`
     CREATE TABLE IF NOT EXISTS qf_review_source_work (
       source_task_id TEXT PRIMARY KEY NOT NULL,
@@ -164,9 +393,41 @@ export function ensureGovernedReviewSchema(db: KernelDb): void {
       source_work_key TEXT PRIMARY KEY NOT NULL,
       report_artifact_id TEXT NOT NULL,
       publication_evaluation_id TEXT NOT NULL,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      mission_id TEXT NOT NULL,
+      strategy_id TEXT NOT NULL,
+      strategy_version INTEGER NOT NULL,
+      dataset_id TEXT NOT NULL,
+      dataset_as_of TEXT NOT NULL,
+      authority_key TEXT NOT NULL,
+      is_current INTEGER NOT NULL CHECK (is_current IN (0, 1)),
+      supersedes_source_work_key TEXT,
+      superseded_by_source_work_key TEXT
     );
+    CREATE UNIQUE INDEX IF NOT EXISTS qf_review_publication_current_authority
+      ON qf_review_publication(authority_key) WHERE is_current = 1;
   `);
+}
+
+/** Read one durable publication row; finalizers never synthesize publication truth. */
+export function readGovernedPublicationForEvaluation(db: KernelDb, evaluationId: string): GovernedPublication | null {
+  if (!tableExists(db, "qf_review_publication")) return null;
+  const direct = db.query(`SELECT source_work_key, report_artifact_id, publication_evaluation_id, created_at,
+      mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of, authority_key,
+      is_current, supersedes_source_work_key, superseded_by_source_work_key
+    FROM qf_review_publication WHERE publication_evaluation_id = ? LIMIT 1`).get(evaluationId) as GovernedPublication | null;
+  if (direct) return direct;
+  const evaluation = db.query("SELECT source_work FROM evaluation WHERE id = ?").get(evaluationId) as { source_work: string | null } | null;
+  if (!evaluation?.source_work) return null;
+  try {
+    const work = assertSourceWorkShape(JSON.parse(evaluation.source_work));
+    return db.query(`SELECT source_work_key, report_artifact_id, publication_evaluation_id, created_at,
+        mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of, authority_key,
+        is_current, supersedes_source_work_key, superseded_by_source_work_key
+      FROM qf_review_publication WHERE source_work_key = ? LIMIT 1`).get(sourceWorkKey(work)) as GovernedPublication | null;
+  } catch {
+    return null;
+  }
 }
 
 function sourceWorkKey(work: SourceWork): string {
@@ -613,11 +874,19 @@ function insertArtifact(db: KernelDb, id: string, kind: string, bytes: Uint8Arra
   db.query("INSERT INTO artifact (id, created_at, kind, content_hash, storage_ref) VALUES (?, ?, ?, ?, ?)").run(id, new Date().toISOString(), kind, id, storageRef);
 }
 
-function canonicalReport(work: SourceWork, resultContentHash: string, evaluation: JsonRecord, findingsId: string, findingsHash: string): Uint8Array {
+function canonicalReport(work: SourceWork, context: AuthorityContext, resultContentHash: string, evaluation: JsonRecord, findingsId: string, findingsHash: string): Uint8Array {
   const rubric = evaluation.rubric as Rubric;
   const envelope = {
     schema: "qf.research.report.v2",
     source_work: work,
+    authority_context: {
+      mission_id: context.mission_id,
+      strategy_id: context.strategy_id,
+      strategy_version: context.strategy_version,
+      dataset_id: context.dataset_id,
+      dataset_as_of: context.dataset_as_of,
+      authority_key: context.authority_key,
+    },
     source_result: { artifact_id: work.result_artifact_id, content_hash: resultContentHash },
     publication_evaluation: {
       evaluation_id: evaluation.id,
@@ -661,6 +930,8 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
   const findingsBytes = new TextEncoder().encode(JSON.stringify(findings));
   const findingsId = contentHash(findingsBytes);
   const resultArtifact = readArtifactBytes(db, work.result_artifact_id);
+  const authorityContext = derivedVerdict === "supports" ? authorityContextForSourceWork(db, work) : null;
+  if (derivedVerdict === "supports") resolveGovernedWorkerEvidence(db, work);
   let runMetrics: unknown = null;
   try {
     const resultPayload = object(JSON.parse(new TextDecoder().decode(resultArtifact.bytes)), "result Artifact");
@@ -672,7 +943,7 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
   const tx = db.transaction(() => {
     insertArtifact(db, findingsId, "evaluation_findings", findingsBytes, "evaluation-findings");
     db.query("INSERT OR IGNORE INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'produces', ?, ?, ?)").run(crypto.randomUUID(), criticSessionId, findingsId, new Date().toISOString());
-    const existingPublication = db.query("SELECT report_artifact_id, publication_evaluation_id FROM qf_review_publication WHERE source_work_key = ?").get(sourceWorkKey(work)) as { report_artifact_id: string; publication_evaluation_id: string } | null;
+    const existingPublication = db.query("SELECT report_artifact_id, publication_evaluation_id, authority_key, is_current FROM qf_review_publication WHERE source_work_key = ?").get(sourceWorkKey(work)) as { report_artifact_id: string; publication_evaluation_id: string; authority_key: string; is_current: number } | null;
     const reason = blockReason(derivedVerdict);
     const evaluationRow = { id: evaluationId, critic_session_id: criticSessionId, rubric, overall, verdict: derivedVerdict, confidence: input.confidence, rationale, findings_artifact_id: findingsId, broker_invocation_id: input.broker_invocation_id ?? null, review_task_id: taskId, source_work: work, run_metrics: runMetrics, publication_report_id: existingPublication?.report_artifact_id ?? null, block_reason: reason };
     db.query(`INSERT INTO evaluation (id, created_at, metrics, critic_findings_ref, verdict, confidence, rationale, rubric, overall, run_metrics, findings_artifact_id, broker_invocation_id, review_task_id, source_work, publication_report_id, block_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
@@ -680,14 +951,33 @@ export function recordGovernedEvaluation(db: KernelDb, input: JsonRecord, trace:
     for (const id of [work.hypothesis_id, work.run_id, work.result_artifact_id]) db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'evaluated_by', ?, ?, ?)").run(crypto.randomUUID(), id, evaluationId, new Date().toISOString());
     db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'performed_by', ?, ?, ?)").run(crypto.randomUUID(), evaluationId, criticSessionId, new Date().toISOString());
     let reportId: string | null = existingPublication?.report_artifact_id ?? null;
+    if (derivedVerdict === "supports" && !authorityContext) throw new KernelError("Report authority context is unavailable");
     if (derivedVerdict === "supports" && !existingPublication) {
-      const reportBytes = canonicalReport(work, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
+      const reportBytes = canonicalReport(work, authorityContext!, resultArtifact.content_hash, { ...evaluationRow, id: evaluationId }, findingsId, findingsId);
       reportId = contentHash(reportBytes);
       insertArtifact(db, reportId, "report", reportBytes, "reports");
-      db.query("INSERT INTO qf_review_publication (source_work_key, report_artifact_id, publication_evaluation_id, created_at) VALUES (?, ?, ?, ?)").run(sourceWorkKey(work), reportId, evaluationId, new Date().toISOString());
-      db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'gates', ?, ?, ?)").run(crypto.randomUUID(), evaluationId, reportId, new Date().toISOString());
+      const predecessor = db.query(
+        "SELECT source_work_key FROM qf_review_publication WHERE authority_key = ? AND is_current = 1",
+      ).get(authorityContext!.authority_key) as { source_work_key: string } | null;
+      if (predecessor) {
+        db.query("UPDATE qf_review_publication SET is_current = 0, superseded_by_source_work_key = ? WHERE source_work_key = ?")
+          .run(sourceWorkKey(work), predecessor.source_work_key);
+      }
+      db.query(`INSERT INTO qf_review_publication
+        (source_work_key, report_artifact_id, publication_evaluation_id, created_at,
+         mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of,
+         authority_key, is_current, supersedes_source_work_key, superseded_by_source_work_key)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, NULL)`)
+        .run(sourceWorkKey(work), reportId, evaluationId, new Date().toISOString(),
+          authorityContext!.mission_id, authorityContext!.strategy_id, authorityContext!.strategy_version,
+          authorityContext!.dataset_id, authorityContext!.dataset_as_of, authorityContext!.authority_key,
+          predecessor?.source_work_key ?? null);
     }
-    if (reportId) db.query("UPDATE evaluation SET publication_report_id = ? WHERE id = ?").run(reportId, evaluationId);
+    if (reportId) {
+      db.query("UPDATE evaluation SET publication_report_id = ? WHERE id = ?").run(reportId, evaluationId);
+      const gates = db.query("SELECT 1 AS ok FROM links WHERE kind = 'gates' AND from_id = ? AND to_id = ?").get(evaluationId, reportId);
+      if (!gates) db.query("INSERT INTO links (id, kind, from_id, to_id, created_at) VALUES (?, 'gates', ?, ?, ?)").run(crypto.randomUUID(), evaluationId, reportId, new Date().toISOString());
+    }
     if (typeof input.broker_invocation_id === "string") {
       db.query("UPDATE qf_review_invocation SET success = 1, result = ? WHERE invocation_id = ?").run(json({ evaluation_id: evaluationId, report_artifact_id: reportId }), input.broker_invocation_id);
     }

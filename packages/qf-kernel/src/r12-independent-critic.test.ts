@@ -139,6 +139,12 @@ function fixture(executorSessionId = "executor") {
     createSession("critic", "critic", ["research.evaluate"], "hermes-critic");
   }
   const target = createResearchRun(executorSessionId);
+  const mission = execute(
+    db,
+    "create_mission",
+    { mission_id: "r12-mission", name: "R12 fixture mission", objective: "Bind the Report authority context." },
+    baseTrace,
+  );
   const sourceTask = execute(
     db,
     "create_task",
@@ -148,7 +154,7 @@ function fixture(executorSessionId = "executor") {
       description: "Review the exact completed research.",
       assignee_session_id: executorSessionId,
     },
-    { ...baseTrace, actor_session_id: "director" },
+    { ...baseTrace, actor_session_id: "director", mission_id: mission.object_id },
   );
   const work = bindSourceWork(
     db,
@@ -166,6 +172,31 @@ function fixture(executorSessionId = "executor") {
   const taskId = String(admission.review_task_id);
   markGovernedDelivery(db, taskId, "delivered", baseTrace);
   return { ...target, sourceTaskId: sourceTask.object_id, taskId, work };
+}
+
+function completeWorkerTask(taskId: string): void {
+  const readBytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: "venue-r12" },
+    result: { id: "venue-r12" }, session_id: "executor", role: "worker",
+    created_at: "2026-08-28T00:00:00.000Z", nonce: "r12-read-nonce",
+  }));
+  const readPath = join(root!, "r12-read.json");
+  writeFileSync(readPath, readBytes);
+  const read = execute(db!, "publish_artifact", {
+    kind: "trajectory", bytes: readBytes, storage_ref: readPath,
+    links: [{ kind: "produces", from_id: "executor" }],
+  }, { ...baseTrace, actor_session_id: "executor", ontology_read_tool: "qf_venue_get" } as never);
+  const resultBytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.collaboration.v1", kind: "result", task_id: taskId,
+    from_session_id: "executor", result: "completed",
+  }));
+  const resultPath = join(root!, "r12-result-trajectory.json");
+  writeFileSync(resultPath, resultBytes);
+  const result = execute(db!, "publish_artifact", {
+    kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
+    links: [{ kind: "produces", from_id: "executor" }, { kind: "derived_from", to_id: read.object_id }],
+  }, { ...baseTrace, actor_session_id: "executor" });
+  execute(db!, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, { ...baseTrace, actor_session_id: "executor" });
 }
 
 type GovernedTool = "qf_hypothesis_get" | "qf_run_get" | "qf_artifact_get" | "qf_record_evaluation";
@@ -203,6 +234,7 @@ function evaluationInput(f: ReturnType<typeof fixture>, verdict: "supports" | "r
 }
 
 function recordEvaluation(f: ReturnType<typeof fixture>, verdict: "supports" | "rejects", score: number) {
+  if (verdict === "supports") completeWorkerTask(f.sourceTaskId);
   readReceipt(f.taskId, "qf_hypothesis_get", { id: f.hypothesisId }, 1);
   readReceipt(f.taskId, "qf_run_get", { id: f.runId }, 2);
   readReceipt(f.taskId, "qf_artifact_get", { id: f.artifactId }, 3);

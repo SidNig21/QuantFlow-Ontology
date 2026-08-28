@@ -20,6 +20,33 @@ function kernel(): KernelDb {
   return openKernel(":memory:");
 }
 
+function completeWorkerTask(db: KernelDb, root: string, taskId: string, workerId: string, label: string): void {
+  const readBytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.ontology.v1", tool: "qf_venue_get", arguments: { id: `venue-${label}` },
+    result: { id: `venue-${label}` }, session_id: workerId, role: "worker",
+    created_at: "2026-08-28T00:00:00.000Z", nonce: `${label}-read-nonce`,
+  }));
+  const readPath = join(root, `${label}-read.json`);
+  writeFileSync(readPath, readBytes);
+  const read = execute(db, "publish_artifact", {
+    kind: "trajectory", bytes: readBytes, storage_ref: readPath,
+    links: [{ kind: "produces", from_id: workerId }],
+  }, { trace_id: `${label}-trace`, span_id: `${label}-read-span`, actor_session_id: workerId, ontology_read_tool: "qf_venue_get" } as never);
+  const resultBytes = new TextEncoder().encode(JSON.stringify({
+    contract: "qf.collaboration.v1", kind: "result", task_id: taskId,
+    from_session_id: workerId, result: "completed",
+  }));
+  const resultPath = join(root, `${label}-result-trajectory.json`);
+  writeFileSync(resultPath, resultBytes);
+  const result = execute(db, "publish_artifact", {
+    kind: "trajectory", bytes: resultBytes, storage_ref: resultPath,
+    links: [{ kind: "produces", from_id: workerId }, { kind: "derived_from", to_id: read.object_id }],
+  }, { trace_id: `${label}-trace`, span_id: `${label}-result-span`, actor_session_id: workerId });
+  execute(db, "complete_task", { task_id: taskId, result_artifact_id: result.object_id }, {
+    trace_id: `${label}-trace`, span_id: `${label}-complete-span`, actor_session_id: workerId,
+  });
+}
+
 describe("Main research-world projection", () => {
   test("returns exact root errors and honest empty-world facts", () => {
     const db = kernel();
@@ -115,6 +142,7 @@ describe("Main research-world projection", () => {
         result_artifact_id: resultArtifactId,
         executor_session_id: "worker-world",
       }, localTrace);
+      completeWorkerTask(db, root, sourceTask.object_id, "worker-world", "normal-world");
       const admission = requestGovernedReview(db, sourceTask.object_id, "normal-world-attempt", "critic-world", localTrace);
       expect(admission.kind).toBe("admitted");
       const reviewTaskId = String(admission.review_task_id);
@@ -278,6 +306,7 @@ describe("Main research-world projection", () => {
           source_task_id: task.object_id, hypothesis_id: hypothesis.object_id, run_id: run.object_id,
           result_artifact_id: resultArtifact, executor_session_id: worker,
         }, localTrace);
+        completeWorkerTask(db, root, task.object_id, worker, `${prefix}-shared`);
         const admission = requestGovernedReview(db, task.object_id, `${prefix}-shared-attempt`, critic, localTrace);
         expect(admission.kind).toBe("admitted");
         const reviewTask = String(admission.review_task_id);

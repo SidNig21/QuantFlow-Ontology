@@ -75,7 +75,14 @@ type RelationalSnapshot = {
   links: ResearchWorldLink[];
   derivedLinks: ResearchWorldLink[];
   sourceWork: Map<string, Array<Record<string, unknown>>>;
-  currentReports: Map<string, string>;
+  publications: Array<{
+    source_work_key: string;
+    report_artifact_id: string;
+    authority_key: string;
+    is_current: number;
+    supersedes_source_work_key: string | null;
+    superseded_by_source_work_key: string | null;
+  }>;
 };
 
 function objectExists(snapshot: RelationalSnapshot, type: string, id: string): boolean {
@@ -132,13 +139,23 @@ function relationalSnapshot(db: KernelDb): RelationalSnapshot {
         sourceWork.set(row.source_task_id, values);
       }
     }
-    const currentReports = new Map<string, string>();
+    const publications: RelationalSnapshot["publications"] = [];
     if (tableExists(db, "qf_review_publication")) {
       for (const row of db.query(
-        "SELECT source_work_key, report_artifact_id FROM qf_review_publication ORDER BY created_at ASC, source_work_key ASC",
-      ).all() as Array<{ source_work_key: string; report_artifact_id: string }>) {
-        if (typeof row.source_work_key === "string" && typeof row.report_artifact_id === "string") {
-          currentReports.set(row.source_work_key, row.report_artifact_id);
+        `SELECT source_work_key, report_artifact_id, authority_key, is_current,
+                supersedes_source_work_key, superseded_by_source_work_key
+           FROM qf_review_publication
+          ORDER BY created_at ASC, source_work_key ASC`,
+      ).all() as RelationalSnapshot["publications"]) {
+        if (typeof row.source_work_key === "string" && typeof row.report_artifact_id === "string" && typeof row.authority_key === "string") {
+          publications.push({
+            source_work_key: row.source_work_key,
+            report_artifact_id: row.report_artifact_id,
+            authority_key: row.authority_key,
+            is_current: Number(row.is_current),
+            supersedes_source_work_key: row.supersedes_source_work_key ?? null,
+            superseded_by_source_work_key: row.superseded_by_source_work_key ?? null,
+          });
         }
       }
     }
@@ -147,7 +164,7 @@ function relationalSnapshot(db: KernelDb): RelationalSnapshot {
       links: readLinks(db, [...TRAVERSAL_KINDS]),
       derivedLinks: readLinks(db, ["derived_from"]),
       sourceWork,
-      currentReports,
+      publications,
     };
   })();
 }
@@ -232,6 +249,11 @@ type ReportContext = { currentReportId: string | null; reportIds: string[] };
 
 function reportContext(snapshot: RelationalSnapshot, source: Record<string, unknown>): ReportContext {
   const ids = new Set<string>();
+  const sourceKey = sourceWorkKey(source);
+  const sourcePublication = snapshot.publications.find((row) => row.source_work_key === sourceKey);
+  const authorityRows = sourcePublication
+    ? snapshot.publications.filter((row) => row.authority_key === sourcePublication.authority_key)
+    : [];
   for (const link of snapshot.links) {
     if (link.kind !== "gates" || !objectExists(snapshot, "evaluation", link.from_id)) continue;
     const evaluation = objectRow(snapshot, "evaluation", link.from_id);
@@ -240,7 +262,8 @@ function reportContext(snapshot: RelationalSnapshot, source: Record<string, unkn
       ids.add(link.to_id);
     }
   }
-  const currentReportId = snapshot.currentReports.get(sourceWorkKey(source)) ?? null;
+  for (const row of authorityRows) ids.add(row.report_artifact_id);
+  const currentReportId = authorityRows.find((row) => row.is_current === 1)?.report_artifact_id ?? null;
   if (currentReportId) ids.add(currentReportId);
   return { currentReportId, reportIds: [...ids].sort() };
 }

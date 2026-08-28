@@ -93,6 +93,8 @@ export {
   REVISION_EXECUTOR_NOT_RUNNING_MESSAGE,
   bindSourceWork,
   ensureGovernedReviewSchema,
+  readGovernedPublicationForEvaluation,
+  resolveGovernedWorkerEvidence,
   freezeSourceWork,
   governedReviewProjection,
   markGovernedCompletionFailed,
@@ -107,6 +109,9 @@ export {
   type GovernedReviewAdmission,
   type GovernedReviewTrace,
   type GovernedToolReceiptInput,
+  type AuthorityContext,
+  type GovernedPublication,
+  type GovernedWorkerEvidence,
   type Rubric,
   type SourceWork,
 } from "./governed-review.ts";

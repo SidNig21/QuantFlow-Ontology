@@ -1933,8 +1933,7 @@ async function runResearchPackage(packageRoot: string, label: "hermes-first-turn
         await runGateFalsifiers(run);
       } catch (error) {
         const reason = errorMessage(error);
-        assert(reason.includes("unknown agent_definition_id: hermes-orchestrator"), `unexpected Kernel falsifier failure: ${reason}`);
-        console.log(`${label}: INHERITED RED owner=G9 boundary=report-boundary command=qf.research.run_kernel_falsifiers reason=${reason} current_g8_nonregression=normal_run_report_and_result_identity_green`);
+        throw new Error(`Kernel falsifier unexpectedly failed after supported Director identity repair: ${reason}`);
       }
     }
     const candidateIdentity = run.identity;

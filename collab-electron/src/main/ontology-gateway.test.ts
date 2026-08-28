@@ -278,6 +278,9 @@ test("an admitted governed critic receives and records the verified Artifact rec
     kernelRunGuidedResearch,
     openAppKernel,
     kernelFinalizeResearchEvaluation,
+    kernelEnsureSyntheticMarketFixture,
+    commitCollaborationResult,
+    kernelGetResearchWorldProjection,
   } = await import("./kernel");
 
   const artifactRoot = mkdtempSync(join(tmpdir(), "qf-r16-gateway-artifact-"));
@@ -367,7 +370,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
       kernelExecute("start_agent_session", { session_id: sessionId }, trace());
     };
     session("gateway-director", "gateway-director-definition", "orchestrator", ["desk.orchestrate"], "Research Director");
-    session("gateway-worker", "gateway-worker-definition", "worker", ["desk.orchestrate"], "Market Researcher");
+    session("gateway-worker", "gateway-worker-definition", "worker", ["desk.orchestrate", "market.read"], "Market Researcher");
     session("gateway-critic", "hermes-critic", "critic", ["research.evaluate"], "Critic");
     session("gateway-reader", "gateway-reader-definition", "worker", ["research.evaluate"], "Market Researcher");
 
@@ -408,6 +411,24 @@ test("an admitted governed critic receives and records the verified Artifact rec
     const run = kernelRunGuidedResearch("gateway-worker", hypothesis.object_id, validArtifact.id);
     expect(run).not.toBeNull();
     if (!run) return;
+    kernelEnsureSyntheticMarketFixture();
+    const marketRead = callOntologyReadTool(
+      { sessionId: "gateway-worker", role: "worker" },
+      "qf_venue_get",
+      { id: "venue-hermes-synthetic" },
+    );
+    const committedResult = commitCollaborationResult({
+      taskId: sourceTask.object_id,
+      workerSessionId: "gateway-worker",
+      workerRole: "worker",
+      delegatorSessionId: "gateway-director",
+      delegatorRole: "orchestrator",
+      result: "The deterministic result is ready for independent review.",
+      citedMarketIds: ["venue-hermes-synthetic"],
+      readTrajectoryArtifactIds: [marketRead.artifactId],
+    });
+    expect(committedResult.artifactId).toBeTruthy();
+    expect(kernelGetObject("task", sourceTask.object_id)?.status).toBe("done");
     const continuation = await kernelContinueGovernedResearchResult({
       source_task_id: sourceTask.object_id,
       hypothesis_id: run.hypothesisId,
@@ -527,7 +548,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
     expect(nonGovernedArtifact.result).not.toHaveProperty("receipt");
     const indexSource = readFileSync(new URL("./index.ts", import.meta.url), "utf8");
     expect(indexSource).toContain("kernelFinalizeResearchEvaluation(evaluationId)");
-    expect(indexSource).toContain("const legacyReportArtifactId = final.reportArtifactId");
+    expect(indexSource).toContain("const persistedReportArtifactId = final.reportArtifactId");
     expect(indexSource).toContain("setTimeout(() => {");
     expect(indexSource).toContain("closeAdmittedSession(criticId)");
     expect(indexSource).toContain("closeAdmittedSession(delegatorId)");
@@ -556,8 +577,11 @@ test("an admitted governed critic receives and records the verified Artifact rec
     expect(evaluationId).toHaveLength(36);
     const reportAfterCanonical = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
     expect(Number(reportAfterCanonical.count)).toBe(1);
-    const legacyFinal = kernelFinalizeResearchEvaluation(evaluationId);
-    expect(legacyFinal.reportArtifactId).toBeNull();
+    const repeatedFinal = kernelFinalizeResearchEvaluation(evaluationId);
+    const persistedReport = db.query(
+      "SELECT publication_report_id FROM evaluation WHERE id = ?",
+    ).get(evaluationId) as { publication_report_id: string };
+    expect(repeatedFinal.reportArtifactId).toBe(persistedReport.publication_report_id);
     const reportAfterLegacyFinalizer = db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get() as { count: number };
     expect(Number(reportAfterLegacyFinalizer.count)).toBe(1);
     const publicationCount = db.query("SELECT COUNT(*) AS count FROM qf_review_publication").get() as { count: number };
@@ -573,7 +597,7 @@ test("an admitted governed critic receives and records the verified Artifact rec
       delegator_session_after: "closed",
       report_count_before: Number(reportBefore.count),
       report_count_after: Number(reportAfterCanonical.count),
-      report_count_after_legacy_finalize: Number(reportAfterLegacyFinalizer.count),
+      report_count_after_repeated_finalize: Number(reportAfterLegacyFinalizer.count),
     };
     expect(callbackReceipt).toEqual({
       callback_count: 1,
@@ -586,8 +610,92 @@ test("an admitted governed critic receives and records the verified Artifact rec
       delegator_session_after: "closed",
       report_count_before: 0,
       report_count_after: 1,
-      report_count_after_legacy_finalize: 1,
+      report_count_after_repeated_finalize: 1,
     });
+
+    const secondHypothesis = kernelExecute("create_hypothesis", {
+      claim: "The second supported result is a historical authority successor.",
+      success_criteria: "The later independent review becomes current without erasing the first Report.",
+      sources: [datasetVersion.object_id],
+    }, trace()) as { object_id: string };
+    const secondTask = kernelExecute("create_task", {
+      task_id: "task-gateway-artifact-receipt-successor",
+      title: "Inspect the successor governed result",
+      description: "Bind the second source work for current/history finalization.",
+      assignee_session_id: "gateway-worker",
+    }, {
+      ...trace(), actor_session_id: "gateway-director", mission_id: mission.object_id,
+    }) as { object_id: string };
+    const secondRun = kernelRunGuidedResearch("gateway-worker", secondHypothesis.object_id, validArtifact.id);
+    expect(secondRun).not.toBeNull();
+    if (!secondRun) return;
+    const secondRead = callOntologyReadTool(
+      { sessionId: "gateway-worker", role: "worker" },
+      "qf_venue_get",
+      { id: "venue-hermes-synthetic" },
+    );
+    commitCollaborationResult({
+      taskId: secondTask.object_id,
+      workerSessionId: "gateway-worker",
+      workerRole: "worker",
+      delegatorSessionId: "gateway-director",
+      delegatorRole: "orchestrator",
+      result: "The successor deterministic result is ready for independent review.",
+      citedMarketIds: ["venue-hermes-synthetic"],
+      readTrajectoryArtifactIds: [secondRead.artifactId],
+    });
+    const secondContinuation = await kernelContinueGovernedResearchResult({
+      source_task_id: secondTask.object_id,
+      hypothesis_id: secondRun.hypothesisId,
+      run_id: secondRun.runId,
+      result_artifact_id: secondRun.artifactId,
+      executor_session_id: "gateway-worker",
+      critic_session_id: "gateway-critic",
+      attempt_id: "gateway-artifact-receipt-successor-attempt",
+      deliver: async () => {},
+    });
+    callOntologyReadTool(critic, "qf_hypothesis_get", { id: secondHypothesis.object_id });
+    callOntologyReadTool(critic, "qf_run_get", { id: secondRun.runId });
+    callOntologyReadTool(critic, "qf_artifact_get", { id: secondRun.artifactId });
+    const secondRecorded = await callOntologyTool(critic, "qf_record_evaluation", {
+      hypothesis_id: secondHypothesis.object_id,
+      run_id: secondRun.runId,
+      artifact_id: secondRun.artifactId,
+      verdict: "supports",
+      confidence: 0.9,
+      rationale: "The successor result is independently supported and preserves prior history.",
+      rubric: { faithfulness: 0.9, answer_relevancy: 0.9, context_precision: 0.9, context_recall: 0.9 },
+      findings: [{
+        code: "CANONICAL_V2_SUCCESSOR",
+        severity: "info",
+        message: "The successor publication preserves the prior authority row as history.",
+        evidence_refs: [secondHypothesis.object_id, secondRun.runId, secondRun.artifactId],
+      }],
+    });
+    expect(secondContinuation.outcome).toBe("delivered");
+    const secondEvaluationId = String((secondRecorded.result as { object_id?: unknown }).object_id ?? "");
+    expect(secondEvaluationId).toHaveLength(36);
+    const historicalFinal = kernelFinalizeResearchEvaluation(evaluationId);
+    const currentFinal = kernelFinalizeResearchEvaluation(secondEvaluationId);
+    expect(historicalFinal.reportArtifactId).toBe(persistedReport.publication_report_id);
+    expect(historicalFinal.current).toBe(false);
+    expect(currentFinal.reportArtifactId).not.toBe(historicalFinal.reportArtifactId);
+    expect(currentFinal.current).toBe(true);
+    expect(kernelFinalizeResearchEvaluation(evaluationId).reportArtifactId).toBe(historicalFinal.reportArtifactId);
+    expect(kernelFinalizeResearchEvaluation(secondEvaluationId).reportArtifactId).toBe(currentFinal.reportArtifactId);
+    expect(db.query("SELECT COUNT(*) AS count FROM artifact WHERE kind = 'report'").get()).toEqual({ count: 2 });
+    expect(db.query("SELECT COUNT(*) AS count FROM qf_review_publication").get()).toEqual({ count: 2 });
+    expect(db.query("SELECT COUNT(*) AS count FROM links WHERE kind = 'gates'").get()).toEqual({ count: 2 });
+    const world = kernelGetResearchWorldProjection({ root_type: "task", root_id: secondTask.object_id });
+    expect(world.ok).toBe(true);
+    if (world.ok) {
+      expect(world.world.current_report_id).toBe(currentFinal.reportArtifactId);
+      expect(world.world.report_ids).toEqual([historicalFinal.reportArtifactId, currentFinal.reportArtifactId].sort());
+      const currentReport = world.world.objects.find((object) => object.type === "artifact" && object.id === currentFinal.reportArtifactId);
+      const historicalReport = world.world.objects.find((object) => object.type === "artifact" && object.id === historicalFinal.reportArtifactId);
+      expect(currentReport?.fields.semantic_markers).toEqual(["PUBLISHED REPORT", "CURRENT AUTHORITY"]);
+      expect(historicalReport?.fields.semantic_markers).toEqual(["HISTORICAL"]);
+    }
   } finally {
     if (previousKernelDb === undefined) delete process.env.QF_KERNEL_DB;
     else process.env.QF_KERNEL_DB = previousKernelDb;

@@ -346,6 +346,15 @@ const gates: Gate[] = [
     },
   },
   {
+    name: "report-authority",
+    description: "G9: one durable Report authority, full-key current/history selection, worker evidence cardinality, migration, and idempotent finalization",
+    run: async () => {
+      const { runReportAuthorityGate } = await import("./gates/report-authority.ts");
+      const { ok } = await runReportAuthorityGate();
+      return ok;
+    },
+  },
+  {
     name: "repo-shape",
     description: "The authority set named by START_HERE exists; CLA machinery stays gone",
     run: () => {

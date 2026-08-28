@@ -26,6 +26,8 @@ import {
   type GovernedToolReceiptInput,
   freezeSourceWork,
   governedReviewProjection,
+  readGovernedPublicationForEvaluation,
+  resolveGovernedWorkerEvidence,
   type SourceWork,
 } from "qf-kernel/portable";
 import { schema } from "qf-kernel-schema";
@@ -1071,8 +1073,6 @@ export function kernelOpenHypothesisForQuestion(question: string, datasetId?: st
   return result.object_id;
 }
 
-const researchEvidenceByRunId = new Map<string, string>();
-
 /** R17 Director path: named Technique is mandatory and legacy strategy synthesis is unreachable. */
 export function kernelRunR17DirectorResearch(
   executorSessionId: string,
@@ -1119,7 +1119,9 @@ export function kernelRunGuidedResearch(
   }, {
     trace_id: crypto.randomUUID(), span_id: crypto.randomUUID(), actor_session_id: executorSessionId,
   }) as { object_id: string; state: Record<string, unknown> };
-  researchEvidenceByRunId.set(run.object_id, evidenceArtifactId);
+  // The caller's worker trajectory is durably bound by complete_task. Keep this
+  // argument for the established seam, but never retain it in process memory.
+  void evidenceArtifactId;
   return {
     hypothesisId: String(hypothesis.id),
     runId: run.object_id,
@@ -1132,6 +1134,9 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
   reportArtifactId: string | null;
   hypothesisId: string;
   status: string;
+  authorityKey: string | null;
+  evidenceArtifactId: string | null;
+  current: boolean;
 } {
   const evaluation = kernelGetObject("evaluation", evaluationId);
   if (!evaluation) throw new Error(`Evaluation not found: ${evaluationId}`);
@@ -1145,62 +1150,39 @@ export function kernelFinalizeResearchEvaluation(evaluationId: string): {
   if (!hypothesisId || !runId) throw new Error("Evaluation lacks exact hypothesis and Run lineage");
   const verdict = String(evaluation.verdict);
   const status = verdict === "supports" ? "supported" : verdict === "rejects" ? "rejected" : "inconclusive";
-  kernelExecute("resolve_hypothesis", {
-    hypothesis_id: hypothesisId, evaluation_id: evaluationId, status,
-  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
-  if (verdict !== "supports") return { reportArtifactId: null, hypothesisId, status };
-  let existingPublication: { report_artifact_id?: string } | null = null;
-  try {
-    existingPublication = getKernelDb().query(
-      "SELECT report_artifact_id FROM qf_review_publication WHERE publication_evaluation_id = ? LIMIT 1",
-    ).get(evaluationId) as { report_artifact_id?: string } | null;
-  } catch {}
-  if (existingPublication?.report_artifact_id) return { reportArtifactId: null, hypothesisId, status };
+  const existingHypothesis = kernelGetObject("hypothesis", hypothesisId);
+  if (existingHypothesis && String(existingHypothesis.status) === "open") {
+    kernelExecute("resolve_hypothesis", {
+      hypothesis_id: hypothesisId, evaluation_id: evaluationId, status,
+    }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() });
+  } else if (!existingHypothesis || String(existingHypothesis.status) !== status) {
+    throw new Error("Evaluation hypothesis resolution is not idempotently persisted");
+  }
+  if (verdict !== "supports") return { reportArtifactId: null, hypothesisId, status, authorityKey: null, evidenceArtifactId: null, current: false };
 
-  const run = kernelGetObject("run", runId);
-  const runParams = jsonRecord(run?.params);
-  const resultArtifactId = typeof runParams.result_artifact_id === "string"
-    ? runParams.result_artifact_id
-    : null;
-  const datasetArtifactId = typeof runParams.dataset_artifact_id === "string"
-    ? runParams.dataset_artifact_id
-    : null;
-  const artifactReceipt = (artifactId: string | null): Record<string, unknown> | null => {
-    if (!artifactId) return null;
-    const artifact = kernelGetObject("artifact", artifactId);
-    if (!artifact) return null;
-    return {
-      id: artifactId,
-      content_hash: String(artifact.content_hash),
-    };
+  let sourceWork: SourceWork;
+  try {
+    sourceWork = JSON.parse(String(evaluation.source_work)) as SourceWork;
+  } catch {
+    throw new Error(`Evaluation lacks exact source work: ${evaluationId}`);
+  }
+  const evidence = resolveGovernedWorkerEvidence(getKernelDb(), sourceWork);
+  const publication = readGovernedPublicationForEvaluation(getKernelDb(), evaluationId);
+  if (!publication) throw new Error(`Evaluation lacks persisted Report publication: ${evaluationId}`);
+  const gates = getKernelDb().query(
+    "SELECT to_id FROM links WHERE kind = 'gates' AND from_id = ? ORDER BY created_at ASC, id ASC",
+  ).all(evaluationId) as Array<{ to_id: string }>;
+  if (gates.length !== 1 || gates[0]!.to_id !== publication.report_artifact_id || String(evaluation.publication_report_id ?? "") !== publication.report_artifact_id) {
+    throw new Error(`Evaluation publication agreement is invalid: ${evaluationId}`);
+  }
+  return {
+    reportArtifactId: publication.report_artifact_id,
+    hypothesisId,
+    status,
+    authorityKey: publication.authority_key,
+    evidenceArtifactId: evidence.artifactId,
+    current: publication.is_current === 1,
   };
-  const evidenceArtifactId = researchEvidenceByRunId.get(runId) ?? null;
-  if (!evidenceArtifactId) throw new Error(`Run lacks exact worker evidence binding: ${runId}`);
-  const marketReadTrajectoryArtifacts = kernelGetLinks(evidenceArtifactId, { kind: "derived_from" })
-        .map((link) => artifactReceipt(link.to_id))
-        .filter((value): value is Record<string, unknown> => value !== null);
-  const payload = `${JSON.stringify({
-    contract: "qf.research.report.v1",
-    evaluation_id: evaluationId,
-    hypothesis: kernelGetObject("hypothesis", hypothesisId),
-    run,
-    evaluation,
-    evidence: {
-      market_read_trajectory_artifacts: marketReadTrajectoryArtifacts,
-      worker_result_artifact: artifactReceipt(evidenceArtifactId),
-      dataset_artifact: artifactReceipt(datasetArtifactId),
-      result_artifact: artifactReceipt(resultArtifactId),
-    },
-  }, null, 2)}\n`;
-  const hash = createHash("sha256").update(payload).digest("hex");
-  const directory = join(getArtifactRoot(), "reports");
-  const path = join(directory, `${hash}.json`);
-  mkdirSync(directory, { recursive: true });
-  if (!existsSync(path)) writeFileSync(path, payload, { encoding: "utf8", flag: "wx" });
-  const report = kernelExecute("publish_artifact", {
-    kind: "report", path, storage_ref: path, content_hash: hash, evaluation_id: evaluationId,
-  }, { trace_id: crypto.randomUUID(), span_id: crypto.randomUUID() }) as { object_id: string };
-  return { reportArtifactId: report.object_id, hypothesisId, status };
 }
 
 /** Unbounded agent_session listing for IPC / reconciliation (created_at DESC). */

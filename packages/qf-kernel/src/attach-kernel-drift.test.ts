@@ -225,12 +225,21 @@ describe("attachKernel WO-K3 drift / incomplete init", () => {
       createdAt,
     );
     first.query(
-      "INSERT INTO qf_review_publication (source_work_key, report_artifact_id, publication_evaluation_id, created_at) VALUES (?, ?, ?, ?)",
+      "INSERT INTO qf_review_publication (source_work_key, report_artifact_id, publication_evaluation_id, created_at, mission_id, strategy_id, strategy_version, dataset_id, dataset_as_of, authority_key, is_current, supersedes_source_work_key, superseded_by_source_work_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     ).run(
       "source-task\0hypothesis\0run\0result-artifact\0executor",
       "report-artifact",
       "evaluation",
       createdAt,
+      "mission",
+      "strategy",
+      1,
+      "dataset",
+      createdAt,
+      JSON.stringify(["mission", "strategy", 1, "dataset", createdAt]),
+      1,
+      null,
+      null,
     );
 
     const snapshot = (db: KernelDb) =>
@@ -286,6 +295,15 @@ describe("attachKernel WO-K3 drift / incomplete init", () => {
         report_artifact_id: "report-artifact",
         publication_evaluation_id: "evaluation",
         created_at: createdAt,
+        mission_id: "mission",
+        strategy_id: "strategy",
+        strategy_version: 1,
+        dataset_id: "dataset",
+        dataset_as_of: createdAt,
+        authority_key: JSON.stringify(["mission", "strategy", 1, "dataset", createdAt]),
+        is_current: 1,
+        supersedes_source_work_key: null,
+        superseded_by_source_work_key: null,
       }],
     ]);
     const firstBytes = JSON.stringify(firstSnapshots);

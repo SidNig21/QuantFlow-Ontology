@@ -1,11 +1,11 @@
 {
   "meta": {
     "branch": "wo-golden-g2",
-    "commit": "5a5f76f6",
+    "commit": "67b01ff6",
     "generatedAt": "2026-08-28",
-    "filesScanned": 406,
+    "filesScanned": 407,
     "note": "Generated projection of the code. Not Kernel truth, not the running app.",
-    "fingerprint": "5f4413c636d925d3"
+    "fingerprint": "a8358cfb7d24deba"
   },
   "stats": {
     "live": 104,
@@ -33,7 +33,7 @@
     },
     "hop4": {
       "handlers": 111,
-      "indexed": 1115,
+      "indexed": 1124,
       "downgradedFromCheats": 21,
       "promotedToCheats": 0,
       "regexOnlyAttributions": 15,
@@ -112,7 +112,8 @@
           "channel": "qf:review:projection",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "migrateLegacyPublicationTable (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -120,7 +121,10 @@
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
-            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
           ],
           "hardRed": false,
           "from": "cheats",
@@ -131,7 +135,8 @@
           "channel": "qf:review:request",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "migrateLegacyPublicationTable (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -139,7 +144,10 @@
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
-            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
           ],
           "hardRed": false,
           "from": "cheats",
@@ -150,7 +158,8 @@
           "channel": "qf:review:revision",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "migrateLegacyPublicationTable (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -158,7 +167,10 @@
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
-            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
           ],
           "hardRed": false,
           "from": "cheats",
@@ -169,7 +181,8 @@
           "channel": "qf:review:secondCritic",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "migrateLegacyPublicationTable (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -177,7 +190,10 @@
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
-            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
           ],
           "hardRed": false,
           "from": "cheats",
@@ -287,7 +303,8 @@
           "channel": "qf:tasks:surface",
           "handler": "collab-electron/src/main/ipc-kernel.ts",
           "reached": [
-            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)"
+            "ensureGovernedReviewSchema (packages/qf-kernel/src/governed-review.ts)",
+            "migrateLegacyPublicationTable (packages/qf-kernel/src/governed-review.ts)"
           ],
           "backing": [
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_attempt:create-table-if-not-exists",
@@ -295,7 +312,10 @@
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_publication:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_receipt:create-table-if-not-exists",
             "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_source_work:create-table-if-not-exists",
-            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists"
+            "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+            "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
           ],
           "hardRed": false,
           "from": "cheats",
@@ -307,9 +327,9 @@
     "ast": {
       "available": true,
       "version": "5.9.3",
-      "files": 525
+      "files": 527
     },
-    "coverageFiles": 525,
+    "coverageFiles": 527,
     "ownership": {
       "responsibilities": 10,
       "contested": 6,
@@ -340,7 +360,7 @@
     },
     "unexplainedCoverage": 0,
     "stripCandidates": 7,
-    "violations": 7,
+    "violations": 10,
     "governanceUnknown": 2,
     "legacyLeads": 9,
     "nodes": 99,
@@ -348,11 +368,11 @@
     "loopsTotal": 8,
     "unreaped": 2,
     "conditionalReap": 0,
-    "undecided": 31,
+    "undecided": 34,
     "allClear": false,
     "decisions": {
-      "total": 31,
-      "undecided": 31,
+      "total": 34,
+      "undecided": 34,
       "keep": 0,
       "repair": 0,
       "remove": 0,
@@ -362,7 +382,7 @@
     },
     "unexplainedUndecided": 0,
     "blockers": {
-      "founder-decision": 16,
+      "founder-decision": 19,
       "ast-coverage": 2,
       "package-proof": 8,
       "product-defect": 5
@@ -1600,29 +1620,29 @@
       "id": "2:collab-electron/src/main::kernel",
       "layer": 2,
       "name": "kernel.ts",
-      "kb": 59.9,
+      "kb": 59.1,
       "x": -0.23,
       "z": 1.3,
       "status": "gray",
       "spawns": 0,
-      "writes": 7,
+      "writes": 6,
       "dml": 7,
       "executes": 3,
       "files": [
         {
           "path": "collab-electron/src/main/kernel.ts",
-          "kb": 59.9,
+          "kb": 59.1,
           "spawns": 0,
           "spawnsLive": 0,
-          "writes": 7,
+          "writes": 6,
           "dml": 7,
           "dmlLines": [
-            245,
-            280,
-            281,
+            247,
             282,
             283,
-            323
+            284,
+            285,
+            325
           ],
           "executes": 3
         }
@@ -1635,12 +1655,12 @@
           "what": "7 SQL statements outside execute()",
           "where": "collab-electron/src/main/kernel.ts",
           "lines": [
-            245,
-            280,
-            281,
+            247,
             282,
             283,
-            323
+            284,
+            285,
+            325
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -1924,7 +1944,7 @@
       "id": "2:collab-electron/src/main::research",
       "layer": 2,
       "name": "research*",
-      "kb": 25.3,
+      "kb": 26.4,
       "x": -2.48,
       "z": -0.91,
       "status": "ok",
@@ -1935,7 +1955,7 @@
       "files": [
         {
           "path": "collab-electron/src/main/research-world-projection.ts",
-          "kb": 24.2,
+          "kb": 25.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -2820,8 +2840,8 @@
       "layer": 0,
       "name": "create.ts",
       "kb": 53.3,
-      "x": 1.01,
-      "z": 0.85,
+      "x": -0.23,
+      "z": 1.3,
       "status": "ok",
       "spawns": 0,
       "writes": 1,
@@ -3004,29 +3024,29 @@
       "id": "0:packages/qf-kernel/src::governed",
       "layer": 0,
       "name": "governed-review.ts",
-      "kb": 44.4,
-      "x": -0.23,
-      "z": 1.3,
+      "kb": 58.6,
+      "x": 1.01,
+      "z": 0.85,
       "status": "alert",
       "spawns": 0,
       "writes": 1,
-      "dml": 27,
+      "dml": 32,
       "executes": 7,
       "files": [
         {
           "path": "packages/qf-kernel/src/governed-review.ts",
-          "kb": 44.4,
+          "kb": 58.6,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 1,
-          "dml": 27,
+          "dml": 32,
           "dmlLines": [
-            112,
-            117,
-            132,
-            145,
-            156,
-            163
+            135,
+            318,
+            321,
+            330,
+            341,
+            346
           ],
           "executes": 7
         }
@@ -3036,15 +3056,15 @@
         {
           "kind": "outside-write-door",
           "scope": "product",
-          "what": "27 SQL statements outside execute()",
+          "what": "32 SQL statements outside execute()",
           "where": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            112,
-            117,
-            132,
-            145,
-            156,
-            163
+            135,
+            318,
+            321,
+            330,
+            341,
+            346
           ],
           "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
         }
@@ -3240,13 +3260,13 @@
       "id": "5:qa/gates",
       "layer": 5,
       "name": "qa/gates/",
-      "kb": 904.5,
+      "kb": 913.2,
       "x": 0,
       "z": 0,
       "status": "ice",
-      "spawns": 81,
+      "spawns": 82,
       "writes": 44,
-      "dml": 19,
+      "dml": 21,
       "executes": 49,
       "files": [
         {
@@ -3261,7 +3281,7 @@
         },
         {
           "path": "qa/gates/hermes-research.ts",
-          "kb": 101.3,
+          "kb": 101.1,
           "spawns": 5,
           "spawnsLive": 2,
           "writes": 1,
@@ -3512,6 +3532,19 @@
             48,
             57,
             57
+          ],
+          "executes": 0
+        },
+        {
+          "path": "qa/gates/report-authority.ts",
+          "kb": 8.9,
+          "spawns": 1,
+          "spawnsLive": 0,
+          "writes": 0,
+          "dml": 2,
+          "dmlLines": [
+            89,
+            89
           ],
           "executes": 0
         },
@@ -3949,6 +3982,17 @@
         {
           "kind": "outside-write-door",
           "scope": "qa",
+          "what": "2 SQL statements outside execute()",
+          "where": "qa/gates/report-authority.ts",
+          "lines": [
+            89,
+            89
+          ],
+          "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
+        },
+        {
+          "kind": "outside-write-door",
+          "scope": "qa",
           "what": "1 SQL statement outside execute()",
           "where": "qa/gates/team-composition.ts",
           "lines": [
@@ -4224,7 +4268,7 @@
       "id": "5:qa::run",
       "layer": 5,
       "name": "qa/run.ts",
-      "kb": 37.5,
+      "kb": 37.9,
       "x": -1.01,
       "z": -0.85,
       "status": "ok",
@@ -4235,7 +4279,7 @@
       "files": [
         {
           "path": "qa/run.ts",
-          "kb": 37.5,
+          "kb": 37.9,
           "spawns": 3,
           "spawnsLive": 2,
           "writes": 0,
@@ -6140,7 +6184,7 @@
       "id": "0:residue",
       "layer": 0,
       "name": "35 small modules*",
-      "kb": 80.9,
+      "kb": 81.1,
       "x": 0,
       "z": 0,
       "status": "gray",
@@ -6243,7 +6287,7 @@
         },
         {
           "path": "packages/qf-kernel/src/index.ts",
-          "kb": 3.2,
+          "kb": 3.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -6253,7 +6297,7 @@
         },
         {
           "path": "packages/qf-kernel/src/portable.ts",
-          "kb": 3.2,
+          "kb": 3.3,
           "spawns": 0,
           "spawnsLive": 0,
           "writes": 0,
@@ -7833,7 +7877,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+              "detail": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
             }
           ],
           "breakAt": "renderer"
@@ -7908,7 +7952,7 @@
             {
               "layer": "kernel",
               "present": true,
-              "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+              "detail": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
             }
           ],
           "breakAt": null
@@ -8144,7 +8188,7 @@
     {
       "path": "collab-electron/src/main/kernel.ts",
       "status": "partial",
-      "indexedFns": 75,
+      "indexedFns": 74,
       "sqlInText": 7,
       "sqlIndexed": 6,
       "sqlUnrecognised": 0,
@@ -8158,6 +8202,15 @@
       "sqlIndexed": 0,
       "sqlUnrecognised": 0,
       "why": "1 SQL site(s) in the text, 0 resolved into a function. The unresolved ones are invisible to governance analysis."
+    },
+    {
+      "path": "packages/qf-kernel/src/governed-review.ts",
+      "status": "partial",
+      "indexedFns": 49,
+      "sqlInText": 32,
+      "sqlIndexed": 31,
+      "sqlUnrecognised": 0,
+      "why": "32 SQL site(s) in the text, 31 resolved into a function. The unresolved ones are invisible to governance analysis."
     },
     {
       "path": "packages/qf-kernel/src/upgrade.ts",
@@ -9046,14 +9099,6 @@
       "indexedFns": 1,
       "sqlInText": 2,
       "sqlIndexed": 2,
-      "sqlUnrecognised": 0
-    },
-    {
-      "path": "packages/qf-kernel/src/governed-review.ts",
-      "status": "indexed",
-      "indexedFns": 40,
-      "sqlInText": 27,
-      "sqlIndexed": 27,
       "sqlUnrecognised": 0
     },
     {
@@ -10105,6 +10150,10 @@
       "status": "out-of-scope"
     },
     {
+      "path": "qa/gates/report-authority.ts",
+      "status": "out-of-scope"
+    },
+    {
       "path": "qa/gates/research-director-delegation.ts",
       "status": "out-of-scope"
     },
@@ -10754,7 +10803,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelAssertSessionMayClose() at line 599"
+            "exports kernelAssertSessionMayClose() at line 601"
           ],
           "strong": [],
           "weight": "weak"
@@ -10840,14 +10889,14 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "UPDATE task at line 695"
+            "UPDATE task at line 985"
           ],
           "weight": "strong"
         },
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelListTaskAssignments() at line 509"
+            "exports kernelListTaskAssignments() at line 511"
           ],
           "strong": [],
           "weight": "weak"
@@ -10930,13 +10979,13 @@
         {
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [
-            "exports ensureGovernedReviewSchema() at line 110",
-            "exports executeGovernedReviewTask() at line 463",
-            "exports requestGovernedReview() at line 490"
+            "exports ensureGovernedReviewSchema() at line 336",
+            "exports executeGovernedReviewTask() at line 724",
+            "exports requestGovernedReview() at line 751"
           ],
           "strong": [
-            "INSERT INTO evaluation at line 678",
-            "UPDATE evaluation at line 690"
+            "INSERT INTO evaluation at line 949",
+            "UPDATE evaluation at line 977"
           ],
           "weight": "strong"
         },
@@ -10951,9 +11000,9 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports kernelRequestGovernedReview() at line 637",
-            "exports kernelGovernedReviewContextForSession() at line 727",
-            "exports kernelGovernedReviewNextSequence() at line 737"
+            "exports kernelRequestGovernedReview() at line 639",
+            "exports kernelGovernedReviewContextForSession() at line 729",
+            "exports kernelGovernedReviewNextSequence() at line 739"
           ],
           "strong": [],
           "weight": "weak"
@@ -11018,7 +11067,7 @@
           "file": "packages/qf-kernel/src/governed-review.ts",
           "weak": [],
           "strong": [
-            "INSERT INTO artifact at line 613"
+            "INSERT INTO artifact at line 874"
           ],
           "weight": "strong"
         },
@@ -11041,7 +11090,7 @@
         {
           "file": "collab-electron/src/main/kernel.ts",
           "weak": [
-            "exports getArtifactRoot() at line 118"
+            "exports getArtifactRoot() at line 120"
           ],
           "strong": [],
           "weight": "weak"
@@ -15740,7 +15789,7 @@
       "packaging": "indexed",
       "ownership": "unsupported",
       "reasons": {
-        "reach": "1 call(s) with a computed callee (line 116 in relationalSnapshot) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
+        "reach": "1 call(s) with a computed callee (line 123 in relationalSnapshot) — the callee is a value, so this edge cannot be followed, so calls out of this file are incompletely traced",
         "ipcPush": "no webContents.send and no ipcRenderer.on in this file",
         "persistence": "no SQL DML or DDL in this file",
         "lifetime": "starts no long-lived child process",
@@ -18464,19 +18513,50 @@
       "unexplained": []
     },
     {
+      "path": "packages/qf-kernel/src/g9-report-authority.test.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary",
+        "persistence": "ast-coverage",
+        "ownership": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "partial",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "unsupported",
+      "reasons": {
+        "reach": "no reach row was produced for this path",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
+        "persistence": "8 of 8 SQL site(s) are not inside a named function, so no call path can be traced",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "no architectural responsibility is claimed for this file by the ownership policy"
+      },
+      "unexplained": []
+    },
+    {
       "path": "packages/qf-kernel/src/governed-review.ts",
-      "worst": "indexed",
+      "worst": "partial",
       "imports": "indexed",
       "reach": "indexed",
       "ipcRequest": "not-applicable",
       "ipcPush": "not-applicable",
-      "persistence": "indexed",
+      "persistence": "partial",
+      "blockers": {
+        "persistence": "ast-coverage"
+      },
       "lifetime": "not-applicable",
       "packaging": "indexed",
       "ownership": "indexed",
       "reasons": {
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
+        "persistence": "1 of 32 SQL site(s) are not inside a named function, so no call path can be traced",
         "lifetime": "starts no long-lived child process"
       },
       "unexplained": []
@@ -20789,6 +20869,30 @@
         "ipcRequest": "not a main, preload or renderer module",
         "ipcPush": "not a main, preload or renderer module",
         "persistence": "no SQL DML or DDL in this file",
+        "lifetime": "starts no long-lived child process",
+        "packaging": "test or QA code does not ship",
+        "ownership": "responsibility ownership is evaluated for product code only"
+      },
+      "unexplained": []
+    },
+    {
+      "path": "qa/gates/report-authority.ts",
+      "worst": "unsupported",
+      "imports": "indexed",
+      "reach": "unsupported",
+      "blockers": {
+        "reach": "scope-boundary"
+      },
+      "ipcRequest": "not-applicable",
+      "ipcPush": "not-applicable",
+      "persistence": "indexed",
+      "lifetime": "not-applicable",
+      "packaging": "not-applicable",
+      "ownership": "not-applicable",
+      "reasons": {
+        "reach": "outside the product row scope: this tree is an import ANCHOR, so its own reachability is not evaluated",
+        "ipcRequest": "not a main, preload or renderer module",
+        "ipcPush": "not a main, preload or renderer module",
         "lifetime": "starts no long-lived child process",
         "packaging": "test or QA code does not ship",
         "ownership": "responsibility ownership is evaluated for product code only"
@@ -23748,41 +23852,41 @@
   ],
   "analyzerTally": {
     "imports": {
-      "indexed": 521,
+      "indexed": 523,
       "dynamic": 4
     },
     "ipcRequest": {
-      "not-applicable": 255,
+      "not-applicable": 257,
       "indexed": 267,
       "dynamic": 3
     },
     "ipcPush": {
-      "not-applicable": 515,
+      "not-applicable": 517,
       "indexed": 7,
       "dynamic": 3
     },
     "persistence": {
       "not-applicable": 476,
-      "partial": 26,
+      "partial": 28,
       "indexed": 23
     },
     "lifetime": {
-      "not-applicable": 464,
+      "not-applicable": 466,
       "partial": 56,
       "indexed": 5
     },
     "packaging": {
-      "not-applicable": 202,
+      "not-applicable": 204,
       "unsupported": 102,
       "indexed": 221
     },
     "ownership": {
-      "not-applicable": 172,
-      "unsupported": 334,
+      "not-applicable": 173,
+      "unsupported": 335,
       "indexed": 19
     },
     "reach": {
-      "unsupported": 302,
+      "unsupported": 304,
       "indexed": 220,
       "partial": 3
     }
@@ -26557,9 +26661,10 @@
         "packages/qf-kernel/src/events.ts",
         "packages/qf-kernel/src/errors.ts",
         "packages/qf-kernel/src/hash.ts",
+        "packages/qf-kernel/src/ontology-read-receipt.ts",
         "packages/qf-kernel/src/resolve-artifact-root.ts"
       ],
-      "importCount": 7
+      "importCount": 8
     },
     {
       "path": "packages/qf-kernel/src/hash.ts",
@@ -26680,9 +26785,10 @@
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
-      "importerCount": 4,
+      "importerCount": 5,
       "imports": [
         "qf-kernel-schema/src/schema.ts",
         "packages/qf-kernel/src/db.ts",
@@ -31894,6 +32000,7 @@
         "packages/qf-kernel/src/events.ts",
         "packages/qf-kernel/src/errors.ts",
         "packages/qf-kernel/src/hash.ts",
+        "packages/qf-kernel/src/ontology-read-receipt.ts",
         "packages/qf-kernel/src/resolve-artifact-root.ts"
       ],
       "affectedWires": [],
@@ -32217,7 +32324,8 @@
         "packages/qf-kernel/src/index.ts",
         "packages/qf-kernel/src/portable.ts",
         "packages/qf-kernel/src/create.ts",
-        "packages/qf-kernel/src/execute.ts"
+        "packages/qf-kernel/src/execute.ts",
+        "packages/qf-kernel/src/governed-review.ts"
       ],
       "transitiveDependents": [
         "qa/gates/artifact-root/run.ts",
@@ -32250,7 +32358,6 @@
         "tools/qf-bovada-football/src/artifact-store.ts",
         "tools/qf-bovada-football/src/runner.ts",
         "collab-electron/src/main/kernel.ts",
-        "packages/qf-kernel/src/governed-review.ts",
         "qa/gates/golden-g8-kernel-proof.ts",
         "qa/run.ts",
         "tools/qf-read-tools/src/discovery.ts",
@@ -41473,7 +41580,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+          "detail": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
         }
       ],
       "registeredAt": {
@@ -41498,6 +41605,12 @@
             "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
+            "inline": false
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "hops": 4,
             "inline": false
           }
         ],
@@ -41547,6 +41660,71 @@
               "collab-electron/src/main/kernel.ts"
             ],
             "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "get",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "exec",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
           }
         ],
         "backedBy": null,
@@ -41565,10 +41743,21 @@
             ],
             "confidence": "medium",
             "persistence": "non-domain-store"
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
         "downgradedFrom": "cheats",
-        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+        "why": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -41620,6 +41809,12 @@
             "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
+            "inline": false
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "hops": 4,
             "inline": false
           }
         ],
@@ -41866,6 +42061,71 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "get",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "exec",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "parse",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
@@ -41990,10 +42250,21 @@
             ],
             "confidence": "medium",
             "persistence": "non-domain-store"
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
         "downgradedFrom": "cheats",
-        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+        "why": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -42045,6 +42316,12 @@
             "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
+            "inline": false
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "hops": 4,
             "inline": false
           }
         ],
@@ -42223,6 +42500,71 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "get",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "exec",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "parse",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
@@ -42347,10 +42689,21 @@
             ],
             "confidence": "medium",
             "persistence": "non-domain-store"
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
         "downgradedFrom": "cheats",
-        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+        "why": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -42402,6 +42755,12 @@
             "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 3,
+            "inline": false
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "hops": 4,
             "inline": false
           }
         ],
@@ -42645,6 +43004,71 @@
             "why": "every definition of this name is in a module the caller has no import path to"
           },
           {
+            "name": "get",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts",
+              "collab-electron/src/main/peer-role-registry.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "all",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "transaction",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "exec",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "run",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
+            "name": "query",
+            "from": "packages/qf-kernel/src/governed-review.ts",
+            "candidates": [
+              "collab-electron/src/main/kernel.ts"
+            ],
+            "why": "every definition of this name is in a module the caller has no import path to"
+          },
+          {
             "name": "parse",
             "from": "packages/qf-kernel/src/governed-review.ts",
             "candidates": [
@@ -42769,10 +43193,21 @@
             ],
             "confidence": "medium",
             "persistence": "non-domain-store"
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
         "downgradedFrom": "cheats",
-        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+        "why": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -46172,7 +46607,7 @@
         {
           "layer": "kernel",
           "present": true,
-          "detail": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+          "detail": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
         }
       ],
       "registeredAt": {
@@ -46197,6 +46632,12 @@
             "fn": "ensureGovernedReviewSchema",
             "file": "packages/qf-kernel/src/governed-review.ts",
             "hops": 4,
+            "inline": false
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "hops": 5,
             "inline": false
           }
         ],
@@ -46397,10 +46838,21 @@
             ],
             "confidence": "medium",
             "persistence": "non-domain-store"
+          },
+          {
+            "fn": "migrateLegacyPublicationTable",
+            "file": "packages/qf-kernel/src/governed-review.ts",
+            "findings": [
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+              "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into"
+            ],
+            "confidence": "medium",
+            "persistence": "non-domain-store"
           }
         ],
         "downgradedFrom": "cheats",
-        "why": "reaches ensureGovernedReviewSchema() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
+        "why": "reaches ensureGovernedReviewSchema(), migrateLegacyPublicationTable() — persistence findings exist and stay visible, but none is a hard red (medium confidence, non-domain-store), so this is not a governance breach"
       }
     },
     {
@@ -49711,14 +50163,14 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:236",
-            "fn": "freezeSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:634",
-            "fn": "kernelFreezeSourceWork",
-            "calls": "freezeSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
           }
         ],
         "alternatives": 1,
@@ -49731,7 +50183,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            145
+            374
           ]
         }
       ]
@@ -49753,14 +50205,14 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:236",
-            "fn": "freezeSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:634",
-            "fn": "kernelFreezeSourceWork",
-            "calls": "freezeSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
           }
         ],
         "alternatives": 1,
@@ -49773,7 +50225,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            132
+            361
           ]
         }
       ]
@@ -49795,14 +50247,14 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:236",
-            "fn": "freezeSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:634",
-            "fn": "kernelFreezeSourceWork",
-            "calls": "freezeSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
           }
         ],
         "alternatives": 1,
@@ -49815,7 +50267,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            163
+            392
           ]
         }
       ]
@@ -49837,14 +50289,14 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:236",
-            "fn": "freezeSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:634",
-            "fn": "kernelFreezeSourceWork",
-            "calls": "freezeSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
           }
         ],
         "alternatives": 1,
@@ -49857,7 +50309,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            156
+            385
           ]
         }
       ]
@@ -49879,14 +50331,14 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:236",
-            "fn": "freezeSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:634",
-            "fn": "kernelFreezeSourceWork",
-            "calls": "freezeSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
           }
         ],
         "alternatives": 1,
@@ -49899,7 +50351,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            112
+            341
           ]
         }
       ]
@@ -49921,14 +50373,14 @@
         "hops": 2,
         "path": [
           {
-            "from": "packages/qf-kernel/src/governed-review.ts:236",
-            "fn": "freezeSourceWork",
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
             "calls": "ensureGovernedReviewSchema"
           },
           {
-            "from": "collab-electron/src/main/kernel.ts:634",
-            "fn": "kernelFreezeSourceWork",
-            "calls": "freezeSourceWork"
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
           }
         ],
         "alternatives": 1,
@@ -49941,7 +50393,148 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            117
+            346
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "migrateLegacyPublicationTable",
+      "table": "qf_review_publication_legacy",
+      "verb": "DROP TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "reachProof": {
+        "corroborated": true,
+        "hops": 3,
+        "path": [
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:338",
+            "fn": "ensureGovernedReviewSchema",
+            "calls": "migrateLegacyPublicationTable"
+          },
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
+            "calls": "ensureGovernedReviewSchema"
+          },
+          {
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
+          }
+        ],
+        "alternatives": 1,
+        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
+      },
+      "blocker": null,
+      "why": "Writes `qf_review_publication_legacy`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            330
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "migrateLegacyPublicationTable",
+      "table": "qf_review_publication",
+      "verb": "ALTER TABLE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "reachProof": {
+        "corroborated": true,
+        "hops": 3,
+        "path": [
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:338",
+            "fn": "ensureGovernedReviewSchema",
+            "calls": "migrateLegacyPublicationTable"
+          },
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
+            "calls": "ensureGovernedReviewSchema"
+          },
+          {
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
+          }
+        ],
+        "alternatives": 1,
+        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
+      },
+      "blocker": null,
+      "why": "Writes `qf_review_publication`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            318
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into",
+      "classification": "governance-violation",
+      "disposition": "repair",
+      "fn": "migrateLegacyPublicationTable",
+      "table": "qf_review_publication",
+      "verb": "INSERT INTO",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "bypass",
+      "governance": "violation",
+      "confidence": "medium",
+      "reachProof": {
+        "corroborated": true,
+        "hops": 3,
+        "path": [
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:338",
+            "fn": "ensureGovernedReviewSchema",
+            "calls": "migrateLegacyPublicationTable"
+          },
+          {
+            "from": "packages/qf-kernel/src/governed-review.ts:1015",
+            "fn": "governedReviewProjection",
+            "calls": "ensureGovernedReviewSchema"
+          },
+          {
+            "from": "collab-electron/src/main/kernel.ts:803",
+            "fn": "kernelGovernedReviewProjection",
+            "calls": "governedReviewProjection"
+          }
+        ],
+        "alternatives": 1,
+        "resolution": "AST call expressions plus a module-import edge on every hop; still name-matched across files, not type-resolved"
+      },
+      "blocker": null,
+      "why": "Writes `qf_review_publication`, a table absent from the generated schema, reachable from outside the write door.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            321
           ]
         }
       ]
@@ -50016,10 +50609,10 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            280,
-            281,
             282,
-            283
+            283,
+            284,
+            285
           ]
         }
       ]
@@ -50044,7 +50637,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            323
+            325
           ]
         }
       ]
@@ -50069,7 +50662,7 @@
           "type": "static",
           "file": "collab-electron/src/main/kernel.ts",
           "lines": [
-            358
+            360
           ]
         }
       ]
@@ -50771,7 +51364,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            395
+            656
           ]
         }
       ]
@@ -50796,7 +51389,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            227
+            488
           ]
         }
       ]
@@ -50821,7 +51414,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            418
+            679
           ]
         }
       ]
@@ -50846,7 +51439,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            414
+            675
           ]
         }
       ]
@@ -50871,7 +51464,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            455
+            716
           ]
         }
       ]
@@ -50896,7 +51489,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            439
+            700
           ]
         }
       ]
@@ -50921,7 +51514,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            613
+            874
           ]
         }
       ]
@@ -50946,7 +51539,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            275
+            536
           ]
         }
       ]
@@ -50971,7 +51564,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            269
+            530
           ]
         }
       ]
@@ -50996,7 +51589,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            678
+            949
           ]
         }
       ]
@@ -51021,7 +51614,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            690
+            977
           ]
         }
       ]
@@ -51046,9 +51639,9 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            680,
-            681,
-            688
+            951,
+            952,
+            979
           ]
         }
       ]
@@ -51073,7 +51666,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            674
+            945
           ]
         }
       ]
@@ -51098,7 +51691,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            692
+            982
           ]
         }
       ]
@@ -51123,7 +51716,32 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            687
+            966
+          ]
+        }
+      ]
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:recordGovernedEvaluation:qf_review_publication:update",
+      "classification": "persistence-ok",
+      "disposition": "keep",
+      "fn": "recordGovernedEvaluation",
+      "table": "qf_review_publication",
+      "verb": "UPDATE",
+      "persistence": "non-domain-store",
+      "sourceClass": "product",
+      "reachability": "governed",
+      "governance": "compliant",
+      "confidence": "medium",
+      "reachProof": null,
+      "blocker": null,
+      "why": "Internal implementation: every caller of recordGovernedEvaluation() is inside the write door, so production reaches this SQL only through a governed action.",
+      "evidence": [
+        {
+          "type": "static",
+          "file": "packages/qf-kernel/src/governed-review.ts",
+          "lines": [
+            963
           ]
         }
       ]
@@ -51148,7 +51766,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            697
+            987
           ]
         }
       ]
@@ -51173,7 +51791,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            694
+            984
           ]
         }
       ]
@@ -51198,7 +51816,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            695
+            985
           ]
         }
       ]
@@ -51223,7 +51841,7 @@
           "type": "static",
           "file": "packages/qf-kernel/src/governed-review.ts",
           "lines": [
-            521
+            782
           ]
         }
       ]
@@ -51619,27 +52237,27 @@
       "what": "7 SQL statements outside execute()",
       "where": "collab-electron/src/main/kernel.ts",
       "lines": [
-        245,
-        280,
-        281,
+        247,
         282,
         283,
-        323
+        284,
+        285,
+        325
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
     {
       "kind": "outside-write-door",
       "scope": "product",
-      "what": "27 SQL statements outside execute()",
+      "what": "32 SQL statements outside execute()",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "lines": [
-        112,
-        117,
-        132,
-        145,
-        156,
-        163
+        135,
+        318,
+        321,
+        330,
+        341,
+        346
       ],
       "why": "START_HERE §1: the Kernel owns truth. This product file writes SQL without going through the declared write door."
     },
@@ -51821,6 +52439,17 @@
     {
       "kind": "outside-write-door",
       "scope": "qa",
+      "what": "2 SQL statements outside execute()",
+      "where": "qa/gates/report-authority.ts",
+      "lines": [
+        89,
+        89
+      ],
+      "why": "A QA harness writing its own fixture SQL. Expected, but listed so it stays visible."
+    },
+    {
+      "kind": "outside-write-door",
+      "scope": "qa",
       "what": "1 SQL statement outside execute()",
       "where": "qa/gates/team-composition.ts",
       "lines": [
@@ -51832,16 +52461,16 @@
   "diffVsHead": {
     "from": {
       "branch": "wo-golden-g2",
-      "commit": "8d78fb71",
+      "commit": "5a5f76f6",
       "generatedAt": "2026-08-28"
     },
     "to": {
       "branch": "wo-golden-g2",
-      "commit": "5a5f76f6",
+      "commit": "67b01ff6",
       "generatedAt": "2026-08-28"
     },
-    "verdict": "better",
-    "why": "31 improvement(s), nothing added or hidden",
+    "verdict": "worse",
+    "why": "1 analyzer cell(s) got worse — a finding that vanishes because the analyzer stopped reading the file is a regression, not a fix",
     "added": [],
     "newlyDetected": [],
     "resolved": [
@@ -52066,7 +52695,16 @@
     "regressed": [],
     "changedConfidence": [],
     "changedOwner": [],
-    "changedCoverage": [],
+    "changedCoverage": [
+      {
+        "path": "packages/qf-kernel/src/governed-review.ts",
+        "analyzer": "persistence",
+        "from": "indexed",
+        "to": "partial",
+        "direction": "worse",
+        "reason": "1 of 32 SQL site(s) are not inside a named function, so no call path can be traced"
+      }
+    ],
     "stats": {
       "added": 0,
       "newlyDetected": 0,
@@ -52074,7 +52712,7 @@
       "regressed": 0,
       "changedConfidence": 0,
       "changedOwner": 0,
-      "coverageWorse": 0,
+      "coverageWorse": 1,
       "coverageBetter": 0,
       "undecidedFrom": 31,
       "undecidedTo": null
@@ -52139,6 +52777,33 @@
       "id": "persistence:packages/qf-kernel/src/governed-review.ts:ensureGovernedReviewSchema:qf_review_task:create-table-if-not-exists",
       "kind": "persistence",
       "what": "qf_review_task create table if not exists",
+      "where": "packages/qf-kernel/src/governed-review.ts",
+      "blocker": "founder-decision",
+      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
+      "verdict": "undecided"
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication_legacy:drop-table",
+      "kind": "persistence",
+      "what": "qf_review_publication_legacy drop table",
+      "where": "packages/qf-kernel/src/governed-review.ts",
+      "blocker": "founder-decision",
+      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
+      "verdict": "undecided"
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:alter-table",
+      "kind": "persistence",
+      "what": "qf_review_publication alter table",
+      "where": "packages/qf-kernel/src/governed-review.ts",
+      "blocker": "founder-decision",
+      "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
+      "verdict": "undecided"
+    },
+    {
+      "id": "persistence:packages/qf-kernel/src/governed-review.ts:migrateLegacyPublicationTable:qf_review_publication:insert-into",
+      "kind": "persistence",
+      "what": "qf_review_publication insert into",
       "where": "packages/qf-kernel/src/governed-review.ts",
       "blocker": "founder-decision",
       "reason": "a confirmed ungoverned write: decide repair or accept, both of which need an owner",
