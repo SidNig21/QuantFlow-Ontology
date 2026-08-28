@@ -1,6 +1,6 @@
 # WO-GOLDEN-G8 — Kernel, schema, Law-B, and proof-integrity repair
 
-status: **AMENDMENT READER YES / YES — EXACTLY ONE BOUNDED V-01 THROUGH V-04 REPAIR BUILDER OPEN**
+status: **FINAL VERIFIER FAIL — ONE PRE-EXISTING MECHANICAL TEST NONDETERMINISM; V-01 THROUGH V-04 PASS; ONE BOUNDED TEST-ONLY REPAIR BUILDER OPEN**
 order-type: Golden Baseline Phase 2 bounded Kernel/schema/proof-integrity group
 current-evidence-branch: `wo-golden-g2`
 parent-group: G7 **CLOSED / PASS WITH INHERITED REDS**
@@ -24,19 +24,28 @@ final-reader-authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 final-reader-tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 final-reader-verdict: **YES / YES — all Round 1 and Round 2 defects cured; no remaining defects**
 reader-authority: **CLOSED — fresh amendment Reader accepted exactly V-01 through V-04**
-independent-verifier-verdict: **FAIL — four finite defects; no other assertion reopened**
-independent-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
-independent-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
-independent-verifier-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
-independent-verifier-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
-builder-authority: **OPEN — exactly one bounded G8 repair Builder for V-01 through V-04**
+independent-verifier-task: `01a04849-8218-7a21-8586-601ccc621e36`
+independent-verifier-verdict: **FAIL — one pre-existing mechanical test nondeterminism; V-01 through V-04 PASS; G8 repair-surface non-regression PASS**
+independent-verifier-evidence-head: `9004224b1ed3e332446be2230eed2fc3e2a0ea24`
+independent-verifier-evidence-tree: `f48c5bb560fab5a543366abecd501582170676ac`
+independent-verifier-product-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
+independent-verifier-product-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+v01-v04-status: **PASS — no prior repair reopened**
+g8-repair-surface-non-regression: **PASS**
+prior-independent-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
+prior-independent-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
+prior-independent-verifier-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
+prior-independent-verifier-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
+builder-authority: **OPEN — exactly one bounded G8 test-only repair Builder for `packages/qf-kernel/src/r15-governed-review.test.ts`**
 amendment-reader-task: `01a047ea-2e77-79e3-9052-47982b265786`
 amendment-reader-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
 amendment-reader-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
 amendment-reader-verdict: **YES / YES**
-builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
-builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
-builder-scope: **exactly V-01 through V-04; four named source paths plus generated artifacts caused solely by those repairs**
+prior-builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+prior-builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+builder-starting-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
+builder-starting-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+builder-scope: **exactly `packages/qf-kernel/src/r15-governed-review.test.ts`; no production, gate, semantic, assertion-relaxation, or new-group edits**
 g9-order: **UNCHANGED — full G9 remains after G8**
 r18-authority: **FROZEN**
 
@@ -111,7 +120,7 @@ Final semantic Reader acceptance is recorded for task
 remaining defects. `NEXT.md` was then rotated to exactly one bounded G8 Builder
 under this order; the later independent Verifier FAIL suspended that authority.
 
-## Independent Verifier FAIL and one bounded amendment
+## Historical independent Verifier FAIL and V-01 through V-04 amendment
 
 The independent G8 Verifier failed the immutable product candidate
 `b20966dc8ec86193de8af092df45248fbeb3fc1b` (tree
@@ -565,6 +574,43 @@ The following are explicitly out of scope and remain closed or parked:
 
 G9 remains after G8 in the founder-approved order. No G8 result may be called a
 full Report or R18 acceptance.
+
+## Final G8 Verifier result and one mechanical test-only repair
+
+Final G8 Verifier task `01a04849-8218-7a21-8586-601ccc621e36` returned
+**FAIL** against immutable product candidate
+`6a26340162148118c84f0148638bd36a32a3af99` (tree
+`1b242d47035745f356eb0f3ff2ec9beda584eb7c`) at evidence head
+`9004224b1ed3e332446be2230eed2fc3e2a0ea24` (tree
+`f48c5bb560fab5a543366abecd501582170676ac`). V-01 through V-04 and the G8
+repair-surface non-regression passed; no other assertion, behavior, cleanup
+requirement, ownership, or G8 boundary reopened.
+
+The sole defect is pre-existing and mechanical. Around lines 164–169,
+`packages/qf-kernel/src/r15-governed-review.test.ts` creates a delivered
+receipt and then a failed completion receipt at the same-millisecond
+timestamp, then selects `ORDER BY created_at DESC, id DESC`. Random UUID
+ordering can therefore select the delivered receipt. The observed repeated
+exits were `0, 1, 0`. Production
+`packages/qf-kernel/src/governed-review.ts` and the test are byte-unchanged by
+candidate `6a263401`; no product defect was established.
+
+Under standing Golden throughput authority, exactly one bounded mechanical,
+same-meaning, test-only repair Builder is authorized. Its only editable path
+is `packages/qf-kernel/src/r15-governed-review.test.ts`. It must:
+
+1. Reproduce the old same-millisecond delivered-versus-failed receipt
+   ambiguity in a fail-capable deterministic check.
+2. Select or assert the exact completion-failure receipt/invocation instead of
+   arbitrary newest-UUID ordering, preserving the existing meaning and all
+   assertions.
+3. Run focused repeated green coverage and G8 repair-surface
+   non-regression/cleanup checks.
+4. Produce a new immutable candidate/evidence head and stop for a fresh
+   independent Verifier. Do not start G9.
+
+No production edit, semantic change, relaxed assertion, new gate/group, G9
+work, or R18 change is authorized.
 
 ## Rollback and report
 

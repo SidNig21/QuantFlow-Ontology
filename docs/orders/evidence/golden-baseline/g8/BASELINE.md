@@ -1,6 +1,6 @@
 # G8 Reader baseline — Kernel, schema, Law-B, and proof-integrity contract
 
-status: **AMENDMENT READER YES / YES — EXACTLY ONE BOUNDED V-01 THROUGH V-04 REPAIR BUILDER OPEN**
+status: **FINAL VERIFIER FAIL — ONE PRE-EXISTING MECHANICAL TEST NONDETERMINISM; V-01 THROUGH V-04 PASS; ONE BOUNDED TEST-ONLY REPAIR BUILDER OPEN**
 order: `docs/orders/WO-GOLDEN-G8.md`
 starting_authority: `8f13495b24e995e69f43deadeeec72ff644e111a`
 starting_evidence_tree: `39fcc664b03717dcbf9b9abdf4951152dc44bf93`
@@ -23,19 +23,28 @@ final_reader_authority: `baedcecd55b91dc3c5d951f969a2111d5cedf4d2`
 final_reader_tree: `33695d1ac5a53b56077bbf739d94e6e230d6533b`
 final_reader_verdict: **YES / YES — all Round 1 and Round 2 defects cured; no remaining defects**
 reader_authority: **CLOSED — fresh amendment Reader accepted exactly V-01 through V-04**
-independent_verifier_verdict: **FAIL — four finite defects; no other assertion reopened**
-independent_verifier_evidence_head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
-independent_verifier_evidence_tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
-independent_verifier_product_candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
-independent_verifier_product_tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
-builder_authority: **OPEN — exactly one bounded G8 repair Builder for V-01 through V-04**
+independent_verifier_task: `01a04849-8218-7a21-8586-601ccc621e36`
+independent_verifier_verdict: **FAIL — one pre-existing mechanical test nondeterminism; V-01 through V-04 PASS; G8 repair-surface non-regression PASS**
+independent_verifier_evidence_head: `9004224b1ed3e332446be2230eed2fc3e2a0ea24`
+independent_verifier_evidence_tree: `f48c5bb560fab5a543366abecd501582170676ac`
+independent_verifier_product_candidate: `6a26340162148118c84f0148638bd36a32a3af99`
+independent_verifier_product_tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+v01_v04_status: **PASS — no prior repair reopened**
+g8_repair_surface_non_regression: **PASS**
+prior_independent_verifier_evidence_head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
+prior_independent_verifier_evidence_tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a5`
+prior_independent_verifier_product_candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
+prior_independent_verifier_product_tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
+builder_authority: **OPEN — exactly one bounded G8 test-only repair Builder**
 amendment_reader_task: `01a047ea-2e77-79e3-9052-47982b265786`
 amendment_reader_authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
 amendment_reader_tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
 amendment_reader_verdict: **YES / YES**
-builder_starting_authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
-builder_starting_tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
-builder_scope: **exactly V-01 through V-04; four named source paths plus generated artifacts caused solely by those repairs**
+prior_builder_starting_authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+prior_builder_starting_tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+builder_starting_candidate: `6a26340162148118c84f0148638bd36a32a3af99`
+builder_starting_tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+builder_scope: **exactly `packages/qf-kernel/src/r15-governed-review.test.ts`; mechanical receipt/invocation identity selection only**
 g9_order: **UNCHANGED — full G9 remains after G8**
 r18_authority: **FROZEN**
 
@@ -189,3 +198,32 @@ Verifier then returned `FAIL` on the four finite defects above. The fresh
 amendment Reader recorded `YES / YES` for exactly V-01 through V-04, so exactly
 one bounded repair Builder is open from the amendment identity; later groups
 remain closed.
+
+## Final Verifier disposition and one test-only repair
+
+Final G8 Verifier task `01a04849-8218-7a21-8586-601ccc621e36` returned
+**FAIL** for one pre-existing mechanical test nondeterminism against immutable
+candidate `6a26340162148118c84f0148638bd36a32a3af99` (tree
+`1b242d47035745f356eb0f3ff2ec9beda584eb7c`) at evidence head
+`9004224b1ed3e332446be2230eed2fc3e2a0ea24` (tree
+`f48c5bb560fab5a543366abecd501582170676ac`). V-01 through V-04 and G8
+repair-surface non-regression passed; no prior assertion or boundary reopened.
+
+The defect is confined to the pre-existing test selector around
+`packages/qf-kernel/src/r15-governed-review.test.ts` lines 164–169: delivered
+and failed receipts can share a millisecond timestamp, and
+`created_at DESC, id DESC` allows random UUID ordering to select the delivered
+receipt. Observed exits were `0, 1, 0`. Candidate `6a263401` leaves both
+`packages/qf-kernel/src/governed-review.ts` and the test byte-unchanged, so no
+production defect was established.
+
+Standing Golden throughput authority opens exactly one bounded test-only
+repair Builder, starting from candidate `6a26340162148118c84f0148638bd36a32a3af99`
+and tree `1b242d47035745f356eb0f3ff2ec9beda584eb7c`. Only
+`packages/qf-kernel/src/r15-governed-review.test.ts` may change. The Builder
+must reproduce the old ambiguity fail-capably, select/assert the exact
+completion-failure receipt/invocation, preserve all existing meaning and
+assertions, run focused repeated green and G8 non-regression coverage, then
+produce a new immutable candidate/evidence head for fresh Verifier review.
+No production edit, semantic change, relaxed assertion, new group, G9 work,
+or R18 change is authorized.

@@ -1,10 +1,10 @@
-# NEXT — R18 GOLDEN BASELINE HOLD / G7 CLOSED / G8 REPAIR BUILDER OPEN
+# NEXT — R18 GOLDEN BASELINE HOLD / G7 CLOSED / G8 FINAL VERIFIER FAIL / TEST-ONLY REPAIR OPEN
 
-status: G7 CLOSED / PASS WITH INHERITED REDS / G8 AMENDMENT READER YES / YES — BOUNDED V-01 THROUGH V-04 BUILDER OPEN
+status: G7 CLOSED / PASS WITH INHERITED REDS / G8 FINAL VERIFIER FAIL — ONE PRE-EXISTING MECHANICAL TEST NONDETERMINISM / ONE BOUNDED TEST-ONLY REPAIR BUILDER OPEN
 rotated-at: 2026-08-28
-rotated-by: Router after fresh G8 amendment Reader acceptance
+rotated-by: Router after final G8 Verifier result
 active-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
-builder-authority: **OPEN — exactly one bounded G8 repair Builder for V-01 through V-04; no later-group authority**
+builder-authority: **OPEN — exactly one bounded G8 test-only repair Builder for the governed-review receipt selector; no later-group authority**
 g8-reader-status: **AMENDMENT YES / YES — exact V-01 through V-04 accepted**
 g8-reader-task: `01a04716-ef0f-72d1-aaa1-be295596f893`
 g8-reader-authority: `00490e8284ef923ccbc12bb60583d744295d7fe0`
@@ -17,15 +17,25 @@ g8-amendment-reader-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
 g8-amendment-reader-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
 g8-amendment-reader-verdict: **YES / YES**
 g8-reader-acceptance: [Fresh amendment Reader acceptance](evidence/golden-baseline/g8/READER-ACCEPTANCE.md)
-g8-verifier-verdict: **FAIL — four finite defects; no other assertion reopened**
-g8-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
-g8-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
-g8-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
-g8-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
-g8-verifier-acceptance: [G8 Verifier FAIL — V-01 through V-04](evidence/golden-baseline/g8/VERIFIER-ACCEPTANCE.md)
-g8-builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
-g8-builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
-g8-builder-scope: **exactly V-01 through V-04; four named source paths plus generated artifacts caused solely by those repairs**
+g8-verifier-task: `01a04849-8218-7a21-8586-601ccc621e36`
+g8-verifier-verdict: **FAIL — one pre-existing mechanical test nondeterminism; V-01 through V-04 PASS; G8 repair-surface non-regression PASS**
+g8-evidence-head: `9004224b1ed3e332446be2230eed2fc3e2a0ea24`
+g8-evidence-tree: `f48c5bb560fab5a543366abecd501582170676ac`
+g8-product-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
+g8-product-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+g8-v01-v04-status: **PASS — no prior repair reopened**
+g8-repair-surface-non-regression: **PASS**
+g8-verifier-acceptance: [G8 final Verifier FAIL](evidence/golden-baseline/g8/VERIFIER-ACCEPTANCE.md)
+g8-prior-verifier-evidence-head: `2b5e50e2d59e1025d54ac95ae13dc4fa009b26e8`
+g8-prior-verifier-evidence-tree: `99c7bfd2f0df79a5e9d4f4e85aa5144603eda2a`
+g8-prior-product-candidate: `b20966dc8ec86193de8af092df45248fbeb3fc1b`
+g8-prior-product-tree: `3023dc2091b8b3c44da564266b0d24126da2247c`
+g8-prior-builder-starting-authority: `1d121ef3ebf9af4014632417d98984d468e93cdb`
+g8-prior-builder-starting-tree: `ed66a06c9ade1a97559f06cd18e236497b77239c`
+g8-builder-starting-candidate: `6a26340162148118c84f0148638bd36a32a3af99`
+g8-builder-starting-tree: `1b242d47035745f356eb0f3ff2ec9beda584eb7c`
+g8-builder-scope: **exactly `packages/qf-kernel/src/r15-governed-review.test.ts`; mechanical receipt/invocation identity selection only**
+g8-builder-brief: **reproduce the old same-millisecond ambiguity fail-capably, select/assert the exact completion-failure receipt/invocation, run focused repeated green/non-regression, and produce a new immutable candidate/evidence head for fresh Verifier review**
 g8-builder-order: [WO-GOLDEN-G8](WO-GOLDEN-G8.md)
 g6-status: **CLOSED / PASS WITH INHERITED G8/G12 REDS**
 g6-verifier-task: `01a04695-825e-7893-89fb-d0efb6ceec3c`
@@ -119,7 +129,7 @@ Fresh Reader task `01a04244-afb8-77c1-a18c-323dd5a05afb` returned `NO / NO` on t
 ## Historical final G5 candidate state
 
 The final causal Reader and independent Verifier are complete; G5 is closed as PASS WITH INHERITED G8/G12 REDS. G6 is closed as PASS WITH INHERITED G8/G12 REDS under its independent Verifier receipt. G7 is closed as PASS WITH INHERITED REDS under its independent Verifier receipt. G8 is the only active order and is pending the same semantic Reader's approval of the exact four-defect amendment after the independent Verifier FAIL; its Builder authority is closed. Full G9 remains after G8, and R18 remains FROZEN until Phase 2 + Phase 3 Golden PASS.
-## Current G8 amendment routing
+## Historical G8 amendment routing
 
 This current routing supersedes the historical pending/closed wording in the
 handoff narrative above; the authority fields at the top of this file govern.
@@ -133,3 +143,28 @@ Builder source surface: `qa/gates/hermes-research.ts` for V-01/V-02,
 `collab-electron/src/main/sidecar/server.ts` and
 `packages/qf-kernel/src/upgrade.ts` for V-03, plus generated artifacts caused
 solely by those repairs. Any other path requires a new Reader amendment.
+
+## Current G8 final-verifier routing
+
+This section supersedes the historical amendment-Builder wording above; the
+authority fields at the top of this file govern. Final G8 Verifier task
+`01a04849-8218-7a21-8586-601ccc621e36` returned **FAIL** against immutable
+product candidate `6a26340162148118c84f0148638bd36a32a3af99` (tree
+`1b242d47035745f356eb0f3ff2ec9beda584eb7c`) at evidence head
+`9004224b1ed3e332446be2230eed2fc3e2a0ea24` (tree
+`f48c5bb560fab5a543366abecd501582170676ac`). V-01 through V-04 and the G8
+repair-surface non-regression all passed; the sole failure is the pre-existing
+same-millisecond receipt-selection nondeterminism recorded in the final
+Verifier receipt.
+
+Under standing Golden throughput authority, exactly one bounded test-only
+repair Builder is open. Its only editable path is
+`packages/qf-kernel/src/r15-governed-review.test.ts`. The Builder must create
+a fail-capable deterministic reproduction of the old ambiguity, select or
+assert the exact completion-failure receipt/invocation rather than arbitrary
+newest UUID order, run focused repeated green and G8 repair-surface
+non-regression checks, and return a new immutable candidate/evidence head for
+a fresh independent Verifier. No production edit, semantic change, relaxed
+assertion, new gate/group, G9 work, or R18 change is authorized.
+
+G9 remains after G8 and R18 remains frozen.
