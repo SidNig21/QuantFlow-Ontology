@@ -223,6 +223,68 @@ qa/gates/kernel-drift/bun.lock
 qa/gates/market-ingest/bun.lock
 ```
 
+## Reader amendment — finite current set and baseline evidence
+
+The Phase-1 values above are historical provenance only: `1,150` tracked
+files, `153` direct dependency rows, `19` Electron package declarations/hooks,
+and `40` bounded operational roots. They are not the current G7 gate
+denominators. G7 evaluates the frozen current set: exactly `20` tracked
+`package.json` manifests, exactly `109` rows in their current
+`dependencies`/`devDependencies`/`optionalDependencies`/`peerDependencies`
+sections, and exactly `15` tracked `bun.lock` roots. The 44-row reconciliation
+from Phase 1 is `G3 -13 + 1`, `G4 -26`, `G5 -6`, `G6 0`, with G1/G2 `0`, for
+`-45 + 1 = -44`; `153 - 44 = 109`. The G5 override is historical package
+policy accounting and is not a current root. The exact paths and accounting
+are frozen in
+`docs/orders/evidence/golden-baseline/g7/BASELINE.md`.
+
+The finite candidate universe is literal and immutable at this starting
+source: the 50 protocol rows (20 Atlas rows, two PTY variants, one no-sender,
+five routed broken calls, one transport row, 20 static inner channels, and
+one dynamic inner-channel family) and all 109 current dependency rows in
+`docs/orders/evidence/golden-baseline/g7/CANDIDATE-LEDGER.tsv`. The 50 protocol
+rows are the complete frozen starting set; the dynamic family is separate
+from the 20 static inner-channel names. The 109 dependency rows
+are keyed by exact `manifest#section#package` and retain their exact
+specifier. A future receipt must give every row one final disposition
+(`removed`, `retained`, or the named G10 routed disposition), exact current
+consumer/compatibility/QA/future-rung proof, and an explicit
+recreation-cheaper-than-retention decision. A no-op, blank row, invented
+candidate, or variable subset cannot pass.
+
+The shell-forward baseline is frozen at the approved G6 source SHA, not
+derived from an edited candidate. It contains 20 static inner channels and
+the dynamic `agent:${event.kind}` family; it names the dynamic sender
+parameters, replay target `viewer:${msg.workspacePath}`, preload tuple and
+buffer/replacement listeners, `sendToShell` sites, and renderer `viewer:*` /
+`startsWith("agent:")` routing. Every static channel, each dynamic family,
+and the transport has its own named isolated bait: the same assertion must
+exit 1 with only that channel altered, then exit 0 after exact byte restore.
+The expected set may not be read from edited source.
+
+The finite saved-state matrix in the baseline covers only the G7-touched
+session, research, terminal/PTy, Canvas, Dock, external-CLI, and host-ACP
+seams. It names exact Kernel records/fields, Canvas tile/viewport fields,
+runtime/result fields, and readback assertions. Its isolated predecessor
+fixture is disposable and is not the canonical database; each same assertion
+must go red under its named bait and green after restore. Untouched state is
+not claimed.
+
+The dependency proof uses exactly the 20 manifests, 15 lock roots, and 109
+ledger rows: resolve each importer/root, follow local and registry edges for
+all dependency kinds including optional/platform branches, take the union
+closure from retained declaration and runtime/resource roots, and require
+every removed lock entry to be in the exact removed closure while every
+survivor remains reachable. No version update, lock reformat, or unrelated
+churn is allowed. Retained package identity is exactly G6 P1 (eight Hermes
+paths) plus Q1's three qf-proof controls and two qf-proof runtime files;
+`package_ref` to packed artifact and sibling metadata/launch identity must
+remain byte/path exact. Native packaging pins, installer/signing/asar policy,
+Windows qualification, and full package requalification remain G12 work,
+except that G7 must prove the exact manifest/lock consequence of any
+dependency it removes. The full algorithm and path sets are in the baseline
+artifact.
+
 ## Exact reversible file boundary
 
 After Reader YES / YES, the Builder may modify only the following files:
@@ -255,11 +317,12 @@ only by the Router after the candidate and are not product rollback targets.
 The Builder must produce, without self-closing G7:
 
 - `docs/orders/evidence/golden-baseline/g7/BEFORE.md` with the exact 1,150-file,
-  153-declaration, 19-hook, and 40-root manifests, the 20 current manifest
-  paths, and the 15 lockfiles; starting protocol sets;
+  153-declaration, 19-hook, and 40-root historical provenance, plus the exact
+  current 20-manifest/109-row/15-lock evaluated set; starting protocol sets;
   current-consumer classifications; dependency graph/lock closure; supported
   predecessor-state review; package/runtime/QA/future ownership; process/root
-  baseline; Atlas identity; and all pre-existing reds.
+  baseline; Atlas identity; and all pre-existing reds. It must agree byte-for-
+  byte with the Router baseline artifact and the literal candidate ledger.
 - `docs/orders/evidence/golden-baseline/g7/COMMANDS.tsv` containing unedited
   normal command output and exit status.
 - `docs/orders/evidence/golden-baseline/g7/FALSIFIERS.tsv` containing every
@@ -344,6 +407,12 @@ $env:QF_G7_FALSIFY="retained-direct-dependency"; bun qa/run.ts golden-g7-protoco
 $env:QF_G7_FALSIFY="orphan-lock-closure"; bun qa/run.ts golden-g7-protocol-dependencies  # exit 1; clear; rerun exit 0
 $env:QF_G7_FALSIFY="package-runtime-resource"; bun qa/run.ts golden-g7-protocol-dependencies  # exit 1; clear; rerun exit 0
 ```
+
+In addition to those focused cases, the Builder/Verifier must record the
+independent `shell-forward:transport`, `shell-forward:<each of the 20 static
+inner channels>`, `shell-forward:agent:<event.kind>`, and
+`shell-forward:viewer:<workspacePath>` bait/restore pairs defined in the
+baseline artifact. One aggregate dynamic-forward bait is insufficient.
 
 The baits have one meaning each: removing `qf:research:submitQuestion` or
 `qf:sessions:spawn` from a copy must fail the required-current-bridge proof;

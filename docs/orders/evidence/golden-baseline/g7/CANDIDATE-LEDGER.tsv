@@ -1,0 +1,160 @@
+id	category	specifier-or-source	baseline_disposition	final_status_required
+protocol:unreached-ipc:browser:evaluate	protocol	ipc-browser.ts:198	PENDING	removed|retained with exact proof and recreation decision
+protocol:unreached-ipc:browser:info	protocol	ipc-browser.ts:182	PENDING	removed|retained with exact proof and recreation decision
+protocol:unreached-ipc:browser:scroll	protocol	ipc-browser.ts:133	PENDING	removed|retained with exact proof and recreation decision
+protocol:unreached-ipc:browser:wait	protocol	ipc-browser.ts:147	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:openFolder()→dialog:open-folder	protocol	universal.ts:429	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:openImageDialog()→dialog:open-image	protocol	universal.ts:305	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:countFiles()→fs:count-files	protocol	universal.ts:260	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:getHomePath()→get-home-path	protocol	shell.ts:317	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:deleteConnectionsForTile()→qf:connections:deleteForTile	protocol	shell.ts:128	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:getGovernedReviewProjection()→qf:review:projection	protocol	shell.ts:90	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:permissionDecision()→qf:sessions:permissionDecision	protocol	universal.ts:157	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:openSettings()→settings:open	protocol	shell.ts:218	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:openExternal()→shell:open-external	protocol	shell.ts:311	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:workspaceRemove()→workspace:remove	protocol	shell.ts:262	PENDING	removed|retained with exact proof and recreation decision
+protocol:unused-bridge:updateFrontmatter()→workspace:update-frontmatter	protocol	universal.ts:314	PENDING	removed|retained with exact proof and recreation decision
+protocol:dead-wire:agent:cancel	protocol	universal.ts:656	PENDING	removed|retained with exact proof and recreation decision
+protocol:dead-wire:agent:kill	protocol	universal.ts:661	PENDING	removed|retained with exact proof and recreation decision
+protocol:dead-wire:agent:prompt	protocol	universal.ts:651	PENDING	removed|retained with exact proof and recreation decision
+protocol:dead-wire:agent:save-messages	protocol	universal.ts:666	PENDING	removed|retained with exact proof and recreation decision
+protocol:dead-wire:agent:spawn	protocol	universal.ts:646	PENDING	removed|retained with exact proof and recreation decision
+protocol:variant:pty:write:invoke	protocol	index.ts:790; send universal.ts:345	PENDING	removed|retained; send path and PTY behavior proven
+protocol:variant:pty:send-raw-keys:invoke	protocol	index.ts:810; send universal.ts:348	PENDING	removed|retained; send path and PTY behavior proven
+protocol:push-no-sender:shell:loading-status	protocol	shell.ts:178	PENDING	removed|retained with dynamic/package/startup proof
+protocol:broken-call:browserEvaluate	protocol	canvas-rpc.js:338	ROUTE-G10	retained/routed; never hide in G7
+protocol:broken-call:browserInfo	protocol	canvas-rpc.js:358	ROUTE-G10	retained/routed; never hide in G7
+protocol:broken-call:browserScroll	protocol	canvas-rpc.js:328	ROUTE-G10	retained/routed; never hide in G7
+protocol:broken-call:browserWait	protocol	canvas-rpc.js:348	ROUTE-G10	retained/routed; never hide in G7
+protocol:broken-call:focusAgentSession	protocol	WorkspaceGraph.tsx:388	ROUTE-G10	retained/routed; never hide in G7
+protocol:shell-forward:transport	protocol	ipc.ts:32-42; shell.ts:38-43,148-166	RETAIN-REQUIRED	retain exact tuple and dynamic routing
+protocol:shell-forward:inner:agent:${event.kind}	protocol	ipc-misc.ts:206-210; renderer.js:1441	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:create-artifact-tile	protocol	ipc-kernel.ts:212-216; index.ts:1262-1268,1410	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:create-graph-tile	protocol	ipc-knowledge.ts:110-114	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:create-term-tile	protocol	ipc-kernel.ts:306-318; index.ts:1048-1058	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:file-renamed	protocol	ipc-filesystem.ts:134-145,203-214	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:file-selected	protocol	ipc-knowledge.ts:71-72; index.ts:925-927,1076-1078	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:files-deleted	protocol	ipc.ts:91-94	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:folder-selected	protocol	ipc-knowledge.ts:79-83	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:fs-changed	protocol	ipc.ts:66-67; ipc-filesystem.ts:103-104,191-192	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:handoffs-changed	protocol	ipc-kernel.ts:900; index.ts:1259,1366	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:nav-drag-active	protocol	ipc-canvas.ts:44-48,54-58	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:open-browser-tile	protocol	index.ts:957-960	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:open-terminal	protocol	ipc-knowledge.ts:91-95	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:replay:data	protocol	ipc-misc.ts:159-163	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:sessions-changed	protocol	ipc-kernel.ts:301; index.ts:1046; session-canvas-projector.ts:10	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:wikilinks-updated	protocol	ipc-filesystem.ts:148-152	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:workspace-added	protocol	ipc-workspace.ts:315	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:workspace-removed	protocol	ipc-workspace.ts:333-337,356-360	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:spawn-failed	protocol	ipc-kernel.ts:790-796	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:spawn-pending	protocol	ipc-kernel.ts:751-757	RETAIN-REQUIRED	independent bait red then restore green
+protocol:shell-forward:inner:spawn-reconciled	protocol	ipc-kernel.ts:769-781	RETAIN-REQUIRED	independent bait red then restore green
+dependency:collab-electron/package.json#dependencies#@lezer/common	dependency	^1.5.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#@lezer/python	dependency	^1.1.18	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#@parcel/watcher	dependency	2.5.6	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#@postlight/parser	dependency	^2.2.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#dependency-cruiser	dependency	^17.3.8	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#electron-log	dependency	5.4.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#electron-updater	dependency	6.8.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#front-matter	dependency	4.0.2	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#ignore	dependency	7.0.5	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#node-pty	dependency	^1.1.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#posthog-node	dependency	^5.28.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#qf-bovada-football	dependency	file:../tools/qf-bovada-football	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#qf-kernel	dependency	file:../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#qf-kernel-schema	dependency	file:../qf-kernel-schema	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#sharp	dependency	0.34.5	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#dependencies#typescript	dependency	5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@blocknote/core	dependency	0.47.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@blocknote/mantine	dependency	0.47.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@blocknote/react	dependency	0.47.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@electron/asar	dependency	3.4.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@electron/notarize	dependency	2.5.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@electron/rebuild	dependency	^4.0.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@octokit/rest	dependency	22.0.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@phosphor-icons/react	dependency	2.1.7	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@posthog/react	dependency	^1.8.2	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@tailwindcss/vite	dependency	4.2.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@tiptap/core	dependency	3.20.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@tiptap/extension-typography	dependency	3.20.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@types/d3	dependency	7.4.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@types/react	dependency	19.2.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@types/react-dom	dependency	19.2.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@vitejs/plugin-react	dependency	5.1.4	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@xterm/addon-fit	dependency	^0.11.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@xterm/addon-unicode11	dependency	^0.9.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@xterm/addon-webgl	dependency	^0.19.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#@xterm/xterm	dependency	^6.0.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#app-builder-bin	dependency	4.2.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#class-variance-authority	dependency	^0.7.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#clsx	dependency	2.1.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#d3	dependency	7.9.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#electron	dependency	40.6.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#electron-builder	dependency	26.8.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#electron-vite	dependency	5.0.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#katex	dependency	0.16.33	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#monaco-editor	dependency	^0.55.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#posthog-js	dependency	^1.359.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#react	dependency	19.2.4	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#react-dom	dependency	19.2.4	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#react-markdown	dependency	10.1.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#rehype-katex	dependency	7.0.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#rehype-raw	dependency	7.0.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#remark-breaks	dependency	4.0.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#remark-gfm	dependency	4.0.1	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#remark-math	dependency	6.0.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#streamdown	dependency	2.3.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#tailwind-merge	dependency	3.5.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#tailwindcss	dependency	4.2.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#tsx	dependency	^4.20.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#devDependencies#use-stick-to-bottom	dependency	1.1.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@img/sharp-darwin-arm64	dependency	0.34.5	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@img/sharp-darwin-x64	dependency	0.34.5	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@img/sharp-libvips-darwin-arm64	dependency	1.2.4	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@img/sharp-libvips-darwin-x64	dependency	1.2.4	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@img/sharp-libvips-linux-x64	dependency	1.2.4	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@img/sharp-linux-x64	dependency	0.34.5	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@parcel/watcher-darwin-arm64	dependency	2.5.6	PENDING	removed|retained with exact proof and recreation decision
+dependency:collab-electron/package.json#optionalDependencies#@parcel/watcher-darwin-x64	dependency	2.5.6	PENDING	removed|retained with exact proof and recreation decision
+dependency:packages/qf-kernel/package.json#dependencies#qf-kernel-schema	dependency	file:../../qf-kernel-schema	PENDING	removed|retained with exact proof and recreation decision
+dependency:packages/qf-kernel/package.json#dependencies#zod	dependency	^4.4.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:packages/qf-kernel/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:packages/qf-kernel/package.json#devDependencies#typescript	dependency	^5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/fixtures/lifecycle-command/package.json#devDependencies#typescript	dependency	5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/artifact-root/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/artifact-root/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/boot-reconcile/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/boot-reconcile/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/bovada-football/package.json#dependencies#qf-bovada-football	dependency	file:../../../tools/qf-bovada-football	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/bovada-football/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/bovada-football/package.json#dependencies#qf-kernel-schema	dependency	file:../../../qf-kernel-schema	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/bovada-football/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/bovada-football/package.json#devDependencies#typescript	dependency	^5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/dock-definition-launch/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/dock-profile-identity/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/dock-profile-identity/package.json#dependencies#qf-kernel-schema	dependency	file:../../../qf-kernel-schema	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/dock-profile-identity/package.json#dependencies#typescript	dependency	5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/kernel-drift/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/kernel-drift/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/market-ingest/package.json#dependencies#qf-kernel	dependency	file:../../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:qa/gates/market-ingest/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:qf-kernel-schema/package.json#dependencies#zod	dependency	^4.4.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:qf-kernel-schema/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:qf-kernel-schema/package.json#devDependencies#typescript	dependency	^5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:species/hermes/package.json#dependencies#@agentclientprotocol/sdk	dependency	0.18.2	PENDING	removed|retained with exact proof and recreation decision
+dependency:species/hermes/package.json#dependencies#qf-kernel	dependency	file:../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:species/hermes/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-bovada-football/package.json#dependencies#qf-kernel	dependency	file:../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-bovada-football/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-bovada-football/package.json#devDependencies#typescript	dependency	^5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-read-tools/package.json#dependencies#@modelcontextprotocol/sdk	dependency	^1.29.0	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-read-tools/package.json#dependencies#qf-kernel	dependency	file:../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-read-tools/package.json#dependencies#qf-kernel-schema	dependency	file:../../qf-kernel-schema	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-read-tools/package.json#dependencies#zod	dependency	^4.4.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-read-tools/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-read-tools/package.json#devDependencies#typescript	dependency	^5.9.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-vault-projection/package.json#dependencies#qf-kernel	dependency	file:../../packages/qf-kernel	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-vault-projection/package.json#dependencies#qf-kernel-schema	dependency	file:../../qf-kernel-schema	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-vault-projection/package.json#dependencies#zod	dependency	^4.4.3	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-vault-projection/package.json#devDependencies#@types/bun	dependency	^1.3.14	PENDING	removed|retained with exact proof and recreation decision
+dependency:tools/qf-vault-projection/package.json#devDependencies#typescript	dependency	^5.9.3	PENDING	removed|retained with exact proof and recreation decision
